@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/n8n_course/Chapter_3",
+      "destination": "/n8n_course/Chapter_3.html"
+    }
+  ]
+}
