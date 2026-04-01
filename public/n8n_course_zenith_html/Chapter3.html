@@ -1,0 +1,3193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chapter 3 — Career Path, Portfolio & Becoming an n8n Developer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f11;
+    --bg2: #16161a;
+    --bg3: #1e1e24;
+    --border: #2a2a32;
+    --border2: #3a3a46;
+    --text: #e8e6f0;
+    --text2: #9894aa;
+    --text3: #5a5768;
+    --accent: #c8a84b;
+    --accent2: #e8c870;
+    --accent-bg: rgba(200,168,75,0.08);
+    --accent-border: rgba(200,168,75,0.25);
+    --teal: #3dbfa0;
+    --teal-bg: rgba(61,191,160,0.08);
+    --purple: #8b7ff0;
+    --purple-bg: rgba(139,127,240,0.08);
+    --coral: #e06b5a;
+    --coral-bg: rgba(224,107,90,0.08);
+    --green: #6abf69;
+    --green-bg: rgba(106,191,105,0.08);
+    --blue: #5b9cf6;
+    --blue-bg: rgba(91,156,246,0.08);
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'Sora', system-ui, sans-serif;
+    --mono: 'DM Mono', 'Courier New', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  /* ===== LAYOUT ===== */
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 2rem 0;
+  }
+
+  .main {
+    flex: 1;
+    overflow-x: hidden;
+    min-width: 0;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar-brand {
+    padding: 0 1.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-brand .badge {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.6rem;
+  }
+
+  .sidebar-brand h1 {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .sidebar-section-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+  }
+
+  .nav-item:hover {
+    background: var(--bg3);
+  }
+
+  .nav-item.active {
+    background: var(--accent-bg);
+    border-left-color: var(--accent);
+  }
+
+  .nav-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 20px;
+    margin-top: 1px;
+  }
+
+  .nav-label {
+    font-size: 12.5px;
+    color: var(--text2);
+    line-height: 1.4;
+  }
+
+  .nav-item.active .nav-label { color: var(--accent2); }
+
+  .nav-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1rem 1.5rem;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: linear-gradient(135deg, var(--bg2) 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 5rem 4rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(200,168,75,0.06) 0%, transparent 70%);
+  }
+
+  .hero-badge {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+    padding: 5px 12px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    background: var(--accent-bg);
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    max-width: 700px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent2);
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .hero-meta-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  .hero-meta-value {
+    font-size: 13px;
+    color: var(--text2);
+    font-weight: 400;
+  }
+
+  /* ===== SECTIONS ===== */
+  .chapter-section {
+    padding: 4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lesson-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lesson-number {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .lesson-title {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.25;
+    margin-bottom: 0.75rem;
+  }
+
+  .lesson-subtitle {
+    font-size: 15px;
+    color: var(--text2);
+    max-width: 620px;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .lesson-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  .tag-teal { background: var(--teal-bg); color: var(--teal); border: 1px solid rgba(61,191,160,0.2); }
+  .tag-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(139,127,240,0.2); }
+  .tag-amber { background: var(--accent-bg); color: var(--accent2); border: 1px solid var(--accent-border); }
+  .tag-coral { background: var(--coral-bg); color: var(--coral); border: 1px solid rgba(224,107,90,0.2); }
+  .tag-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(91,156,246,0.2); }
+  .tag-green { background: var(--green-bg); color: var(--green); border: 1px solid rgba(106,191,105,0.2); }
+
+  /* ===== CONTENT BLOCKS ===== */
+  .block {
+    margin-bottom: 2.5rem;
+  }
+
+  .block-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .block-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--accent-border);
+  }
+
+  h3 {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  h3:first-child { margin-top: 0; }
+
+  p {
+    color: var(--text2);
+    margin-bottom: 0.85rem;
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  ul, ol {
+    padding-left: 1.25rem;
+    color: var(--text2);
+    margin-bottom: 0.85rem;
+  }
+
+  li { margin-bottom: 0.4rem; line-height: 1.7; }
+
+  li strong { color: var(--text); }
+
+  /* ===== CALLOUT CARDS ===== */
+  .callout {
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    border-left: 3px solid;
+  }
+
+  .callout-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .callout p { margin-bottom: 0; font-size: 14px; line-height: 1.65; }
+
+  .callout-amber { background: var(--accent-bg); border-color: var(--accent); }
+  .callout-amber .callout-title { color: var(--accent2); }
+  .callout-amber p { color: #c8b87a; }
+
+  .callout-teal { background: var(--teal-bg); border-color: var(--teal); }
+  .callout-teal .callout-title { color: var(--teal); }
+  .callout-teal p { color: #7acfba; }
+
+  .callout-purple { background: var(--purple-bg); border-color: var(--purple); }
+  .callout-purple .callout-title { color: var(--purple); }
+  .callout-purple p { color: #a89cf0; }
+
+  .callout-coral { background: var(--coral-bg); border-color: var(--coral); }
+  .callout-coral .callout-title { color: var(--coral); }
+  .callout-coral p { color: #d48a7e; }
+
+  /* ===== OBJECTIVE GRID ===== */
+  .objectives-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+
+  .objective-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .obj-level {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+
+  .obj-text {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  .level-analyze { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(91,156,246,0.25); }
+  .level-design { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(139,127,240,0.25); }
+  .level-evaluate { background: var(--teal-bg); color: var(--teal); border: 1px solid rgba(61,191,160,0.25); }
+  .level-implement { background: var(--green-bg); color: var(--green); border: 1px solid rgba(106,191,105,0.25); }
+  .level-apply { background: var(--coral-bg); color: var(--coral); border: 1px solid rgba(224,107,90,0.25); }
+  .level-create { background: var(--accent-bg); color: var(--accent2); border: 1px solid var(--accent-border); }
+
+  /* ===== COMPARISON TABLE ===== */
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.25rem 0;
+    font-size: 13.5px;
+  }
+
+  .comparison-table th {
+    background: var(--bg3);
+    color: var(--text);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+
+  .comparison-table td {
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .comparison-table tr:nth-child(even) td { background: var(--bg2); }
+
+  /* ===== ARCHITECTURE DIAGRAM ===== */
+  .arch-diagram {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--text2);
+    overflow-x: auto;
+    line-height: 1.8;
+  }
+
+  .arch-highlight { color: var(--accent2); font-weight: 500; }
+  .arch-arrow { color: var(--teal); }
+  .arch-node { color: var(--purple); }
+  .arch-note { color: var(--text3); font-style: italic; }
+
+  /* ===== STEP LIST ===== */
+  .step-list {
+    counter-reset: steps;
+    list-style: none;
+    padding: 0;
+    margin: 1.25rem 0;
+  }
+
+  .step-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .step-list li:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .step-list li::before {
+    content: counter(steps, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    border-radius: 4px;
+    padding: 3px 7px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-content strong {
+    display: block;
+    font-size: 13.5px;
+    margin-bottom: 0.2rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .step-content span {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* ===== PORTFOLIO SYSTEM ===== */
+  .portfolio-system {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .portfolio-header {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border2);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .portfolio-header h3 {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .portfolio-header .system-type {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: var(--teal-bg);
+    border: 1px solid rgba(61,191,160,0.2);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  .portfolio-body {
+    padding: 2rem;
+  }
+
+  /* ===== SPEC GRID ===== */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 1.25rem 0;
+  }
+
+  .spec-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+  }
+
+  .spec-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.4rem;
+  }
+
+  .spec-value {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  /* ===== NODE TABLE ===== */
+  .node-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 13px;
+  }
+
+  .node-table th {
+    background: var(--bg3);
+    color: var(--text);
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.6rem 1rem;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+
+  .node-table td {
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .node-table td:first-child {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--purple);
+    white-space: nowrap;
+  }
+
+  .node-table td:nth-child(2) {
+    color: var(--teal);
+    font-family: var(--mono);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* ===== JSON CODE BLOCK ===== */
+  .json-section {
+    margin: 1.5rem 0;
+  }
+
+  .json-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .json-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .json-badge {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--green);
+    background: var(--green-bg);
+    border: 1px solid rgba(106,191,105,0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .json-body {
+    background: #0a0a0d;
+    border: 1px solid var(--border);
+    border-radius: 0 0 8px 8px;
+    padding: 1.5rem;
+    overflow-x: auto;
+    max-height: 520px;
+    overflow-y: auto;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.65;
+    color: #c9c5de;
+    white-space: pre;
+    tab-size: 2;
+  }
+
+  /* JSON syntax highlighting */
+  .j-key { color: #c8a84b; }
+  .j-str { color: #7fcfa2; }
+  .j-num { color: #89a0e8; }
+  .j-bool { color: #c49ce8; }
+  .j-null { color: #888; }
+
+  /* ===== PRICING GRID ===== */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+
+  .pricing-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+
+  .pricing-card.featured {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+  }
+
+  .pricing-tier {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.5rem;
+  }
+
+  .pricing-featured .pricing-tier { color: var(--accent); }
+
+  .pricing-amount {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 0.25rem;
+  }
+
+  .pricing-period {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 0.75rem;
+  }
+
+  .pricing-desc {
+    font-size: 12.5px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  /* ===== EXERCISE BLOCK ===== */
+  .exercise-block {
+    background: var(--purple-bg);
+    border: 1px solid rgba(139,127,240,0.25);
+    border-radius: 10px;
+    padding: 1.5rem 1.75rem;
+    margin: 2rem 0;
+  }
+
+  .exercise-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 0.75rem;
+  }
+
+  .exercise-h {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .exercise-block p { color: #a89cf0; font-size: 14px; margin-bottom: 0.5rem; }
+  .exercise-block ul { color: #a89cf0; font-size: 14px; }
+
+  /* ===== INSIGHT CARD ===== */
+  .insight-card {
+    display: flex;
+    gap: 1.25rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    align-items: flex-start;
+  }
+
+  .insight-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .insight-body strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 0.3rem;
+    color: var(--text);
+  }
+
+  .insight-body p { font-size: 13.5px; color: var(--text2); margin: 0; }
+
+  /* ===== PART DIVIDER ===== */
+  .part-divider {
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 4rem;
+    text-align: center;
+  }
+
+  .part-divider .part-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.75rem;
+  }
+
+  .part-divider h2 {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .part-divider p {
+    font-size: 14px;
+    color: var(--text2);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .hero, .chapter-section { padding: 2.5rem 1.5rem; }
+    .spec-grid { grid-template-columns: 1fr; }
+    .portfolio-header { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ===== PRINT ===== */
+  @media print {
+    .sidebar { display: none; }
+    .hero, .chapter-section { padding: 2rem; }
+    body { background: white; color: #1a1a1a; }
+  }
+
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2rem 0;
+  }
+
+  /* ROI highlight */
+  .roi-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--green-bg);
+    border: 1px solid rgba(106,191,105,0.25);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: var(--mono);
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="badge">Chapter 3</div>
+    <h1>Career Path, Portfolio &amp; Becoming an n8n Developer</h1>
+  </div>
+
+  <div class="sidebar-section-title">Part 1 — Course Module</div>
+
+  <a href="#lesson-1" class="nav-item">
+    <span class="nav-num">L1</span>
+    <span class="nav-label">Career Pathways in Automation Engineering</span>
+  </a>
+  <a href="#lesson-2" class="nav-item">
+    <span class="nav-num">L2</span>
+    <span class="nav-label">Portfolio Project 1 — Beginner System</span>
+  </a>
+  <a href="#lesson-3" class="nav-item">
+    <span class="nav-num">L3</span>
+    <span class="nav-label">Portfolio Project 2 — Intermediate System</span>
+  </a>
+  <a href="#lesson-4" class="nav-item">
+    <span class="nav-num">L4</span>
+    <span class="nav-label">Portfolio Project 3 — Advanced System</span>
+  </a>
+  <a href="#lesson-5" class="nav-item">
+    <span class="nav-num">L5</span>
+    <span class="nav-label">Professional Credentialing &amp; Market Positioning</span>
+  </a>
+
+  <div class="nav-divider"></div>
+  <div class="sidebar-section-title">Part 2 — Portfolio Systems</div>
+
+  <a href="#sys-1" class="nav-item">
+    <span class="nav-num">S1</span>
+    <span class="nav-label">Lead Capture &amp; Auto-Responder</span>
+  </a>
+  <a href="#sys-2" class="nav-item">
+    <span class="nav-num">S2</span>
+    <span class="nav-label">Lead Scoring &amp; CRM Pipeline</span>
+  </a>
+  <a href="#sys-3" class="nav-item">
+    <span class="nav-num">S3</span>
+    <span class="nav-label">AI-Powered Inquiry Routing Engine</span>
+  </a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">Information Systems &amp; Automation Engineering · Chapter 3</div>
+    <h1>Career Path, Portfolio Development &amp;<br><em>Becoming a Professional n8n Developer</em></h1>
+    <p style="color:var(--text2); max-width:620px; margin-top:0.75rem; font-size:15px; line-height:1.75;">This module transitions the learner from technical competency to professional practice. It addresses career positioning strategy, portfolio engineering, and the professional standards required to operate credibly in the automation consulting and SaaS market.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Level</span>
+        <span class="hero-meta-value">Intermediate → Professional</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Lessons</span>
+        <span class="hero-meta-value">5 Lessons</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Portfolio Systems</span>
+        <span class="hero-meta-value">3 Production Projects</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Bloom's Level</span>
+        <span class="hero-meta-value">Apply → Create</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- LESSON 1 -->
+  <!-- ============================================================ -->
+  <section class="chapter-section" id="lesson-1">
+    <div class="lesson-header">
+      <span class="lesson-number">Lesson 01</span>
+      <h2 class="lesson-title">Career Pathways in Automation Engineering:<br>Strategic Positioning in the n8n Ecosystem</h2>
+      <p class="lesson-subtitle">A structured analysis of market entry models, client acquisition frameworks, and value positioning strategies for automation professionals operating in the no-code/low-code infrastructure space.</p>
+      <div class="lesson-tags">
+        <span class="tag tag-amber">Career Architecture</span>
+        <span class="tag tag-teal">Market Strategy</span>
+        <span class="tag tag-purple">Positioning</span>
+        <span class="tag tag-blue">Business Models</span>
+      </div>
+    </div>
+
+    <!-- Learning Objectives -->
+    <div class="block">
+      <div class="block-title">01 — Learning Objectives</div>
+      <div class="objectives-grid">
+        <div class="objective-card">
+          <span class="obj-level level-analyze">Analyze</span>
+          <span class="obj-text">Evaluate the trade-off matrix between freelancing, agency, and SaaS revenue models in the context of automation consulting.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-design">Design</span>
+          <span class="obj-text">Construct a personal positioning framework aligned to a specific niche market and service delivery model.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-evaluate">Evaluate</span>
+          <span class="obj-text">Assess client acquisition channels by cost-effectiveness, lead quality, and conversion rates.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-implement">Implement</span>
+          <span class="obj-text">Develop a market entry strategy that matches technical capability level to viable client profiles.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conceptual Foundations -->
+    <div class="block">
+      <div class="block-title">02 — Conceptual Foundations</div>
+
+      <h3>The Automation Services Market: Structural Overview</h3>
+      <p>The automation consulting market operates at the intersection of three macro trends: the democratization of workflow orchestration tools (n8n, Make, Zapier), the proliferation of API-first SaaS infrastructure, and the increasing demand among SMBs for operational efficiency without dedicated engineering teams. This convergence creates a viable market for skilled automation engineers who can bridge technical capability and business process understanding.</p>
+
+      <p><strong>Core Definitional Framework:</strong> An automation developer is a practitioner who designs, implements, and maintains event-driven workflow systems that integrate disparate software services, transform data across system boundaries, and execute business logic with minimal human intervention. The n8n practitioner specifically operates within a self-hostable, open-source orchestration environment with a node-based execution model.</p>
+
+      <h3>Three Primary Career Models</h3>
+      <p>Each career model represents a distinct economic structure, risk profile, and capability requirement. Understanding these trade-offs is foundational to making a strategic entry decision.</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>Freelancer</th>
+            <th>Agency / Consultancy</th>
+            <th>SaaS Founder</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Revenue Model</strong></td>
+            <td>Project-based or retainer</td>
+            <td>Multi-client retainer + project</td>
+            <td>Subscription (MRR/ARR)</td>
+          </tr>
+          <tr>
+            <td><strong>Revenue Ceiling</strong></td>
+            <td>Time-constrained (~$15k–$40k/mo)</td>
+            <td>Team-scaled ($50k–$500k/mo)</td>
+            <td>Uncapped (product leverage)</td>
+          </tr>
+          <tr>
+            <td><strong>Capital Required</strong></td>
+            <td>Near-zero</td>
+            <td>Low-moderate</td>
+            <td>Moderate (infra + marketing)</td>
+          </tr>
+          <tr>
+            <td><strong>Time to First Revenue</strong></td>
+            <td>2–6 weeks</td>
+            <td>1–3 months</td>
+            <td>3–12 months</td>
+          </tr>
+          <tr>
+            <td><strong>Risk Profile</strong></td>
+            <td>Low</td>
+            <td>Medium</td>
+            <td>High</td>
+          </tr>
+          <tr>
+            <td><strong>Scalability</strong></td>
+            <td>Low (linear)</td>
+            <td>Medium (team-dependent)</td>
+            <td>High (product-dependent)</td>
+          </tr>
+          <tr>
+            <td><strong>Core Skill Requirement</strong></td>
+            <td>Technical + communication</td>
+            <td>Technical + sales + management</td>
+            <td>Technical + product + marketing</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">Strategic Recommendation</div>
+        <p>For practitioners at the beginner–intermediate level, the freelance model presents the lowest barrier to entry and the fastest path to market validation. It simultaneously serves as the primary mechanism for portfolio development and industry network construction. The transition to agency or SaaS should occur after establishing a repeatable client acquisition system and identifying a defensible automation niche.</p>
+      </div>
+    </div>
+
+    <!-- System Design Perspective -->
+    <div class="block">
+      <div class="block-title">03 — System Design Perspective</div>
+      <h3>The Professional Service as a System</h3>
+      <p>A freelance automation practice should be conceptualized as a service delivery system with defined inputs, processes, and outputs. Applying systems thinking to career architecture prevents the common failure mode of treating professional practice as an ad hoc sequence of client transactions.</p>
+
+      <div class="arch-diagram">
+<span class="arch-highlight">SERVICE DELIVERY SYSTEM — Automation Consultant</span>
+
+<span class="arch-highlight">INPUT LAYER</span>
+  <span class="arch-arrow">→</span> <span class="arch-node">Lead Acquisition</span>       [LinkedIn, Upwork, referrals, content]
+  <span class="arch-arrow">→</span> <span class="arch-node">Discovery Process</span>      [needs analysis, scope definition]
+  <span class="arch-arrow">→</span> <span class="arch-node">Proposal Generation</span>   [scoped deliverables, pricing]
+
+<span class="arch-highlight">PROCESSING LAYER</span>
+  <span class="arch-arrow">→</span> <span class="arch-node">Workflow Design</span>       [architecture, node selection]
+  <span class="arch-arrow">→</span> <span class="arch-node">Implementation</span>        [build, test, iterate]
+  <span class="arch-arrow">→</span> <span class="arch-node">Documentation</span>         [client handover, runbooks]
+
+<span class="arch-highlight">OUTPUT LAYER</span>
+  <span class="arch-arrow">→</span> <span class="arch-node">Deployed Workflow</span>     [n8n instance, tested]
+  <span class="arch-arrow">→</span> <span class="arch-node">Client Training</span>       [SOP, usage guide]
+  <span class="arch-arrow">→</span> <span class="arch-node">Maintenance Retainer</span>  [recurring revenue stream]
+
+<span class="arch-highlight">FEEDBACK LOOP</span>
+  <span class="arch-arrow">→</span> Case study → portfolio → next lead acquisition cycle
+      </div>
+    </div>
+
+    <!-- Applied Industry Context -->
+    <div class="block">
+      <div class="block-title">04 — Applied Industry Context</div>
+      <h3>What Businesses Actually Need: The Demand Reality</h3>
+      <p>The majority of SMB automation demand is not for complex AI systems — it is for the elimination of manual, repetitive inter-system data transfer. The most commercially viable automation categories are:</p>
+
+      <ol>
+        <li><strong>CRM data synchronization</strong> — bidirectional data flows between sales tools, databases, and communication platforms</li>
+        <li><strong>Lead capture and qualification pipelines</strong> — form submissions routed, scored, and distributed to sales teams</li>
+        <li><strong>Invoice and billing workflows</strong> — payment events triggering downstream accounting and notification systems</li>
+        <li><strong>Customer onboarding sequences</strong> — event-triggered email, task, and access provisioning chains</li>
+        <li><strong>Internal reporting automation</strong> — scheduled data aggregation and report generation</li>
+      </ol>
+
+      <div class="callout callout-teal">
+        <div class="callout-title">Market Intelligence: Where to Find Clients</div>
+        <p><strong>Tier 1 — Highest signal, lowest competition:</strong> LinkedIn outbound to operations managers and founders at 10–50 person companies. Frame as "process audit" rather than "automation pitch."<br><br>
+        <strong>Tier 2 — Medium competition, volume opportunity:</strong> Upwork and Contra for n8n/Make specialists. Filter by clients who have posted multiple related jobs — they have budget allocation for this function.<br><br>
+        <strong>Tier 3 — Community-based referral:</strong> n8n Community Forum, Reddit r/nocode, Make Community. Contribute solutions publicly; leads are inbound.</p>
+      </div>
+    </div>
+
+    <!-- Critical Analysis -->
+    <div class="block">
+      <div class="block-title">05 — Critical Analysis</div>
+      <h3>Positioning Failures and Anti-Patterns</h3>
+      <p>The most common positioning failure is <strong>over-generalism</strong>: presenting as an "automation expert" without specifying the industry vertical, the problem domain, or the business outcome delivered. Buyers do not purchase "automation" — they purchase specific outcomes such as "50% reduction in lead response time" or "zero manual data entry in invoice processing."</p>
+      <ul>
+        <li><strong>Anti-pattern 1 — Technology-led positioning:</strong> "I build n8n workflows" communicates means, not value. Replace with outcome-led positioning: "I automate your lead management so your sales team responds in under 5 minutes."</li>
+        <li><strong>Anti-pattern 2 — Undifferentiated generalism:</strong> Competing on price rather than specialization collapses margin and attracts low-quality clients.</li>
+        <li><strong>Anti-pattern 3 — Premature SaaS pivot:</strong> Building a SaaS product before validating demand through consulting engagements dramatically increases failure risk.</li>
+      </ul>
+    </div>
+
+    <!-- Implementation Guidelines -->
+    <div class="block">
+      <div class="block-title">06 — Implementation Guidelines</div>
+      <h3>Strategic Market Entry Protocol</h3>
+      <ol class="step-list">
+        <li>
+          <div class="step-content">
+            <strong>Define Your Niche Hypothesis</strong>
+            <span>Select one industry vertical (e.g., real estate, e-commerce, professional services) and one problem domain (e.g., lead management, client onboarding). Validate via 5 discovery conversations before committing to a full service offering.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <strong>Construct a Portfolio Signal</strong>
+            <span>Build one production-quality project for each complexity tier (beginner, intermediate, advanced) as outlined in Lessons 2–4. Each project must include: a working n8n export, a brief problem–solution documentation, and measurable outcome claims.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <strong>Establish a Distribution Channel</strong>
+            <span>Choose one primary acquisition channel and one secondary. Primary should be where your target clients already spend time. Write 3 case study posts on LinkedIn or Substack demonstrating specific workflow solutions within your niche.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <strong>Price for Positioning, Not Survival</strong>
+            <span>Minimum viable project rate for beginners: $500–$1,500 (3–10 hour scope). Intermediate: $2,000–$6,000. Advanced/retainer: $3,000–$15,000+/month. Do not compete below market rate without a strategic reason.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <strong>Systematize Delivery</strong>
+            <span>Create a standardized project template: discovery questionnaire → architecture proposal → build → UAT → handover checklist. Consistent delivery process reduces cognitive overhead and enables scaling to multiple concurrent clients.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Professional Insight -->
+    <div class="block">
+      <div class="block-title">07 — Professional Insight</div>
+      <div class="insight-card">
+        <div class="insight-icon">🎯</div>
+        <div class="insight-body">
+          <strong>The niche-first strategy outperforms generalism by a factor of 3–5x in client acquisition speed.</strong>
+          <p>A practitioner who positions as "n8n automation for real estate agencies" will convert cold outreach at a substantially higher rate than one who positions as "automation specialist." Specificity signals expertise and reduces buyer evaluation friction. Your first 10 clients should validate this niche; your first 100 should deepen it.</p>
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">📈</div>
+        <div class="insight-body">
+          <strong>Retainer revenue is the structural objective of every project engagement.</strong>
+          <p>Every project you deliver should end with a maintenance and monitoring retainer offer. Even a $300–$500/month retainer per client, compounded across 10–15 clients, generates $3,000–$7,500 MRR with minimal incremental work. This is the bridge from freelancer to micro-SaaS economics without building a product.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Practical Exercise -->
+    <div class="exercise-block">
+      <div class="exercise-title">Practical Exercise — Lesson 1</div>
+      <div class="exercise-h">Strategic Positioning Document</div>
+      <p>Develop a one-page positioning document that answers the following with precision:</p>
+      <ul>
+        <li><strong>Target client profile:</strong> Industry, company size, job title of decision-maker, and budget range.</li>
+        <li><strong>Problem statement:</strong> Describe the specific pain point in 2 sentences, quantified where possible (e.g., "5 hours/week of manual CRM data entry").</li>
+        <li><strong>Solution positioning:</strong> Your service offer, stated as an outcome, not a technology ("I reduce CRM entry time by 90% using automated data sync").</li>
+        <li><strong>Differentiation:</strong> Why you over a generalist or Zapier template? Specificity, speed to value, technical depth?</li>
+        <li><strong>Acquisition channel:</strong> Which platform + which message format will you use for outbound? Write the first 3 lines of a LinkedIn cold outreach message.</li>
+      </ul>
+      <p style="margin-top:0.75rem; font-style:italic;">Deliverable: A structured 400–600 word document. This becomes Section 1 of your professional portfolio.</p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ -->
+  <!-- LESSON 2 -->
+  <!-- ============================================================ -->
+  <section class="chapter-section" id="lesson-2">
+    <div class="lesson-header">
+      <span class="lesson-number">Lesson 02</span>
+      <h2 class="lesson-title">Portfolio Project 1:<br>Event-Driven Lead Capture and Automated Response Architecture</h2>
+      <p class="lesson-subtitle">Design and implementation of a production-grade, beginner-level client system featuring webhook-triggered data ingestion, validation logic, automated email dispatch, and persistent data logging.</p>
+      <div class="lesson-tags">
+        <span class="tag tag-teal">Webhook Architecture</span>
+        <span class="tag tag-blue">Data Validation</span>
+        <span class="tag tag-amber">Email Automation</span>
+        <span class="tag tag-green">Google Sheets Integration</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">01 — Learning Objectives</div>
+      <div class="objectives-grid">
+        <div class="objective-card">
+          <span class="obj-level level-implement">Implement</span>
+          <span class="obj-text">Construct a webhook-triggered workflow with input validation, data normalization, and multi-destination output.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-design">Design</span>
+          <span class="obj-text">Design error-handling branches that maintain workflow reliability under malformed input conditions.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-apply">Apply</span>
+          <span class="obj-text">Apply conditional branching logic to separate valid from invalid data payloads at the processing layer.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-evaluate">Evaluate</span>
+          <span class="obj-text">Assess the commercial viability of this system as a standalone freelance deliverable for small-business clients.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">02 — Conceptual Foundations</div>
+      <h3>Event-Driven Architecture and Webhook Primitives</h3>
+      <p>A webhook is a server-sent HTTP POST request that delivers a JSON payload to a designated endpoint upon the occurrence of a defined event (form submission, payment, CRM update). In n8n, the Webhook node implements an HTTP listener that transforms this inbound event into a workflow execution trigger — establishing the foundational pattern of <strong>event-driven architecture (EDA)</strong>.</p>
+      <p>The key principle underlying this project is the <strong>separation of concerns</strong>: the ingestion layer (webhook), transformation layer (Set node, data normalization), validation layer (IF node), and persistence/notification layers (Sheets, Gmail) are architecturally distinct units with clearly defined interfaces between them. This modularity is a professional standard; it enables independent modification of each stage without disrupting the entire pipeline.</p>
+
+      <h3>Data Normalization as a Critical System Concern</h3>
+      <p>Raw webhook payloads are inherently inconsistent. Field names vary by source, values may be null or untyped, and casing may differ across form implementations. The <strong>data transformation layer</strong> — implemented via a Set node in n8n — should normalize all inbound data to a canonical internal schema before any business logic is applied. This is not optional for production systems.</p>
+    </div>
+
+    <div class="block">
+      <div class="block-title">03 — System Architecture</div>
+      <div class="arch-diagram">
+<span class="arch-highlight">WORKFLOW: Lead Capture &amp; Auto-Responder</span>
+<span class="arch-note">Complexity: Beginner | Estimated build time: 2–4 hrs | Client value: $500–$1,500</span>
+
+┌─────────────────────────────────────────────────────────────────┐
+│ TRIGGER LAYER                                                   │
+│   [Webhook Node]  ─ POST /lead-capture                          │
+│   Expects: { name, email, company?, source?, message? }         │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ Raw JSON payload
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ TRANSFORMATION LAYER                                            │
+│   [Set Node] — Normalize Lead Data                              │
+│   · Generate lead_id (timestamp + email hash)                   │
+│   · Lowercase email, trim whitespace                            │
+│   · Set default values for optional fields                      │
+│   · Append ingestion timestamp (ISO 8601)                       │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ Normalized payload
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ VALIDATION LAYER                                                │
+│   [IF Node] — Field Presence + Email Format Check               │
+│   Condition: email is not empty AND name is not empty           │
+│              AND email contains '@'                             │
+└──────────────┬──────────────────────────┬───────────────────────┘
+               │ TRUE (valid)             │ FALSE (invalid)
+               ▼                          ▼
+┌──────────────────────────┐  ┌───────────────────────────────────┐
+│ NOTIFICATION LAYER       │  │ ERROR BRANCH                      │
+│  [Gmail] Auto-reply      │  │  [Respond to Webhook]             │
+│  [Google Sheets] Log     │  │  HTTP 400 + error message         │
+│  [Respond] HTTP 200 OK   │  └───────────────────────────────────┘
+└──────────────────────────┘
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">04 — Applied Industry Context</div>
+      <p>This exact system is the most commonly requested automation for early-stage companies and solo operators. The typical client scenario: a founder has a Typeform or Webflow form capturing leads, but is manually copying entries into a spreadsheet and sending follow-up emails one by one. The pain is concrete, the ROI is immediate, and the technical complexity is well within a beginner's capability.</p>
+      <div class="two-col">
+        <div>
+          <strong style="font-size:13px; color:var(--text);">Time saved per week (client side)</strong>
+          <p style="font-size:13px; margin-top:0.4rem;">Assume 50 leads/week × 3 min manual processing = <span class="roi-tag">2.5 hrs/week</span> recovered</p>
+        </div>
+        <div>
+          <strong style="font-size:13px; color:var(--text);">Response time improvement</strong>
+          <p style="font-size:13px; margin-top:0.4rem;">Manual: 4–24 hrs → Automated: <span class="roi-tag">under 90 seconds</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">05 — Critical Analysis</div>
+      <ul>
+        <li><strong>Limitation — Webhook security:</strong> Without authentication headers or webhook secret verification, the endpoint is publicly callable by any actor. Production deployments must implement HMAC signature validation or static token authentication on the Webhook node.</li>
+        <li><strong>Limitation — Gmail rate limits:</strong> Google's Gmail API enforces a sending limit of approximately 500 emails/day for personal accounts. For higher-volume clients, transition to a transactional email API (SendGrid, Postmark) from the outset.</li>
+        <li><strong>Limitation — Google Sheets performance:</strong> Google Sheets append operations introduce 1–3 second latency and are subject to API quota limits at scale. For clients exceeding 200+ submissions/day, the persistence layer should migrate to a proper database (Supabase, Airtable, PostgreSQL via n8n Postgres node).</li>
+        <li><strong>Design failure to avoid:</strong> Placing all logic in a single node without separation of transformation, validation, and action creates a brittle, untestable workflow. Always modularize.</li>
+      </ul>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-title">Practical Exercise — Lesson 2</div>
+      <div class="exercise-h">Build and document Portfolio System 1</div>
+      <p>Using the full system specification in Part 2 of this module (System S1), implement the complete Lead Capture &amp; Auto-Responder workflow in your n8n instance. Upon completion:</p>
+      <ul>
+        <li>Test with 5 valid payloads and 3 invalid payloads (missing fields, malformed email).</li>
+        <li>Screenshot each node configuration and compile into a 1-page workflow documentation PDF.</li>
+        <li>Write a 200-word client-facing project summary: problem, solution, result — no technical jargon.</li>
+        <li>Export the JSON and store in a private GitHub repository with a descriptive README.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ -->
+  <!-- LESSON 3 -->
+  <!-- ============================================================ -->
+  <section class="chapter-section" id="lesson-3">
+    <div class="lesson-header">
+      <span class="lesson-number">Lesson 03</span>
+      <h2 class="lesson-title">Portfolio Project 2:<br>Intelligent Lead Scoring Pipeline with Multi-Destination Routing</h2>
+      <p class="lesson-subtitle">Architecture and implementation of an intermediate-complexity automation system featuring external API enrichment, programmatic lead scoring via code execution, score-based conditional routing, and synchronized multi-channel output.</p>
+      <div class="lesson-tags">
+        <span class="tag tag-purple">Lead Scoring Algorithm</span>
+        <span class="tag tag-teal">API Enrichment</span>
+        <span class="tag tag-coral">Multi-Branch Routing</span>
+        <span class="tag tag-blue">Code Node Logic</span>
+        <span class="tag tag-amber">CRM Integration</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">01 — Learning Objectives</div>
+      <div class="objectives-grid">
+        <div class="objective-card">
+          <span class="obj-level level-design">Design</span>
+          <span class="obj-text">Design a multi-stage data pipeline incorporating external API calls, custom scoring logic, and branching output.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-implement">Implement</span>
+          <span class="obj-text">Implement a JavaScript-based scoring algorithm within n8n's Code node that computes lead quality scores from enriched data.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-analyze">Analyze</span>
+          <span class="obj-text">Analyze the trade-off between API enrichment cost and lead conversion improvement to justify system ROI.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-create">Create</span>
+          <span class="obj-text">Synthesize a multi-destination output system that routes leads to appropriate teams based on computed score bands.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">02 — Conceptual Foundations</div>
+      <h3>Lead Scoring as a Data Classification Problem</h3>
+      <p>Lead scoring is the systematic application of a weighted attribute model to assign a numerical quality score to inbound prospects. The score encodes the probability that a given lead will convert, enabling prioritized sales resource allocation. In automation systems, scoring is implemented as a <strong>data classification function</strong> executed post-ingestion and pre-routing.</p>
+
+      <p>The scoring model used in this system is a <strong>deterministic weighted-sum model</strong> — a set of explicitly defined rules applied to enriched lead attributes. Each attribute (company size, domain type, message intent, source channel) carries a defined weight; the aggregate score determines the routing path. This approach is fully auditable and tunable, unlike ML-based models which require training data at this scale.</p>
+
+      <h3>The Switch Node as a Routing Multiplexer</h3>
+      <p>In n8n, the Switch node implements a <strong>multi-output conditional branch</strong>, evaluating a single input against multiple conditions and directing execution flow to the first matching output. This is architecturally equivalent to a case/switch statement and is the correct mechanism for score-band routing with 3+ tiers. The IF node is reserved for binary True/False decisions only.</p>
+    </div>
+
+    <div class="block">
+      <div class="block-title">03 — System Architecture</div>
+      <div class="arch-diagram">
+<span class="arch-highlight">WORKFLOW: Lead Scoring &amp; Routing Pipeline</span>
+<span class="arch-note">Complexity: Intermediate | Build time: 6–12 hrs | Client value: $2,000–$5,000</span>
+
+<span class="arch-highlight">[1] WEBHOOK TRIGGER</span>
+  POST /intake → raw lead payload received
+
+<span class="arch-highlight">[2] TRANSFORMATION NODE (Set)</span>
+  Normalize: sanitize fields, generate UUID, timestamp
+
+<span class="arch-highlight">[3] ENRICHMENT NODE (HTTP Request)</span>
+  GET api.hunter.io/v2/domain-search?domain={email_domain}
+  Returns: company name, employee count, industry, confidence score
+  <span class="arch-note">Cost: ~$0.003/request (Hunter.io Starter plan)</span>
+
+<span class="arch-highlight">[4] DATA MERGE (Merge Node)</span>
+  Combine raw lead data + enrichment response into unified payload
+
+<span class="arch-highlight">[5] SCORING ENGINE (Code Node — JavaScript)</span>
+  Input: merged lead object
+  Process: weighted scoring algorithm (see system spec)
+  Output: { ...lead, score: int, tier: 'hot'|'warm'|'cold' }
+
+<span class="arch-highlight">[6] ROUTING LAYER (Switch Node)</span>
+  Condition A: score &gt;= 70 → HOT branch
+  Condition B: score &gt;= 40 → WARM branch
+  Default:                → COLD branch
+
+<span class="arch-highlight">[7A] HOT BRANCH</span>
+  → Google Sheets (log)
+  → Slack (immediate alert to sales team)
+  → HubSpot/Pipedrive (create contact + assign owner)
+
+<span class="arch-highlight">[7B] WARM BRANCH</span>
+  → Google Sheets (log)
+  → Gmail (drip sequence enrollment email)
+
+<span class="arch-highlight">[7C] COLD BRANCH</span>
+  → Google Sheets (log with cold status)
+  <span class="arch-note">No active outreach — enters newsletter list only</span>
+
+<span class="arch-highlight">[8] RESPONSE NODE</span>
+  HTTP 200 + JSON { received: true, tier: $tier }
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">04 — Applied Industry Context</div>
+      <p>This system directly addresses one of the most significant operational inefficiencies in early-stage B2B sales organizations: <strong>treating all leads identically regardless of quality signals</strong>. Sales teams in companies with 5–30 employees frequently operate without a CRM or scoring system, responding to every lead with equal effort irrespective of conversion probability.</p>
+
+      <div class="callout callout-teal">
+        <div class="callout-title">Client ROI Calculation (Case Study Model)</div>
+        <p>
+          Client: 8-person B2B SaaS company. Inbound leads: 120/month.<br>
+          Pre-system: All leads treated equally. Avg. sales follow-up time: 2 days.<br>
+          Post-system: Hot leads (est. 22%) receive Slack alert + CRM assignment within 60 seconds.<br>
+          <br>
+          Improvement: Hot lead response time from 48hrs → &lt;2min.<br>
+          Industry benchmark: 9x higher conversion rate for leads contacted within 5 minutes.<br>
+          Conservative revenue impact at $800 ACV: ~$2,100/month in recovered pipeline.<br>
+          One-time build fee: $3,500. Payback period: &lt;45 days.
+        </p>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">05 — Critical Analysis</div>
+      <ul>
+        <li><strong>Scoring model calibration:</strong> A deterministic scoring model is only as good as its weight calibration. Initial weights should be set based on client-provided historical conversion data. Without this baseline, deliver a sensible default model and build in a review cadence after 30 days of operation.</li>
+        <li><strong>API enrichment failure handling:</strong> The Hunter.io API may return null or incomplete data for B2C email domains. The Code node's scoring function must handle missing enrichment gracefully with default values, not undefined exceptions.</li>
+        <li><strong>Concurrency considerations:</strong> At high inbound volume (&gt;10 concurrent webhooks), Google Sheets append operations may encounter rate limit errors. Implement retry logic with exponential backoff, or migrate to a queue-based architecture.</li>
+        <li><strong>Score drift:</strong> Scoring models become less accurate over time as market dynamics change. Document the scoring weights explicitly and recommend quarterly calibration reviews as part of the retainer agreement.</li>
+      </ul>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-title">Practical Exercise — Lesson 3</div>
+      <div class="exercise-h">Build Portfolio System 2 &amp; write a Client Proposal</div>
+      <p>Implement Portfolio System S2 (full specification in Part 2). Upon completion, produce:</p>
+      <ul>
+        <li><strong>A client proposal document</strong> (1–2 pages): Executive summary, problem statement, proposed solution architecture, deliverables, timeline, and investment.</li>
+        <li><strong>A scoring calibration worksheet</strong>: A simple spreadsheet where a client can input their historical lead attributes and conversion data, and the weights auto-compute via a formula.</li>
+        <li><strong>A workflow architecture diagram</strong>: Using draw.io, Whimsical, or Mermaid.js, produce a clean visual architecture diagram suitable for client presentation.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ -->
+  <!-- LESSON 4 -->
+  <!-- ============================================================ -->
+  <section class="chapter-section" id="lesson-4">
+    <div class="lesson-header">
+      <span class="lesson-number">Lesson 04</span>
+      <h2 class="lesson-title">Portfolio Project 3:<br>AI-Powered Multi-Branch Inquiry Routing and Response Engine</h2>
+      <p class="lesson-subtitle">Design of a production-grade, AI-augmented workflow that classifies inbound inquiries using a large language model, routes them through intent-specific processing branches, and generates contextually appropriate automated responses — demonstrating real automation architecture at enterprise-adjacent scale.</p>
+      <div class="lesson-tags">
+        <span class="tag tag-amber">LLM Integration</span>
+        <span class="tag tag-coral">Intent Classification</span>
+        <span class="tag tag-purple">Multi-Branch Architecture</span>
+        <span class="tag tag-teal">Response Generation</span>
+        <span class="tag tag-blue">Ticket Management</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">01 — Learning Objectives</div>
+      <div class="objectives-grid">
+        <div class="objective-card">
+          <span class="obj-level level-design">Design</span>
+          <span class="obj-text">Design an AI-augmented pipeline that integrates LLM classification with deterministic routing and response generation.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-implement">Implement</span>
+          <span class="obj-text">Implement structured prompt engineering techniques that enforce JSON output schemas from LLM classification calls.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-evaluate">Evaluate</span>
+          <span class="obj-text">Evaluate the reliability, latency, and cost implications of LLM integration in production automation workflows.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-create">Create</span>
+          <span class="obj-text">Construct a complete, branded portfolio artifact demonstrating advanced automation architecture to professional clients.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">02 — Conceptual Foundations</div>
+      <h3>AI Augmentation vs. AI Replacement in Workflows</h3>
+      <p>A fundamental design principle in AI-augmented automation is the distinction between <strong>AI as a classification oracle</strong> versus AI as an autonomous agent. In this system, the LLM serves a bounded, well-defined function: it classifies the intent of an inbound message and returns a structured JSON object. The downstream business logic — routing, response templating, CRM writes — is handled by deterministic n8n nodes. This hybrid architecture preserves <strong>system observability, auditability, and reliability</strong> while leveraging the natural language understanding capabilities of the LLM for tasks where traditional rule-based systems would require extensive maintenance.</p>
+
+      <h3>Prompt Engineering for Structured Output</h3>
+      <p>When using an OpenAI node in a routing context, the prompt must enforce a strict JSON schema response to prevent unparseable free-text output from breaking the downstream Code node. The technique of <strong>constrained output generation</strong> involves: (1) specifying the exact schema in the system prompt, (2) providing a one-shot example of the expected output, and (3) setting temperature to 0 or 0.1 for deterministic classification behavior.</p>
+
+      <div class="callout callout-purple">
+        <div class="callout-title">Structured Output Prompt Pattern</div>
+        <p>
+          System: "You are an intent classifier. Respond ONLY with a valid JSON object matching this schema: { \"intent\": \"support\"|\"sales\"|\"billing\"|\"general\", \"confidence\": 0.0–1.0, \"priority\": \"high\"|\"medium\"|\"low\", \"summary\": string }. Do not include any text outside the JSON object."<br><br>
+          User: "{raw_message_content}"
+        </p>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">03 — System Architecture</div>
+      <div class="arch-diagram">
+<span class="arch-highlight">WORKFLOW: AI-Powered Inquiry Routing Engine</span>
+<span class="arch-note">Complexity: Advanced | Build time: 12–20 hrs | Client value: $5,000–$15,000</span>
+
+<span class="arch-highlight">[1] WEBHOOK TRIGGER</span>
+  POST /inquiry — receives: { sender_name, email, subject, message, source }
+
+<span class="arch-highlight">[2] SET — Input Normalization + Context Assembly</span>
+  Constructs prompt_payload: subject + message truncated to 1,500 chars
+
+<span class="arch-highlight">[3] OPENAI — Intent Classification (temp: 0.1)</span>
+  Model: gpt-4o-mini (cost-efficient for classification)
+  Output: { intent, confidence, priority, summary }
+  <span class="arch-note">Avg. latency: 800ms–1.5s | Cost: ~$0.0002/call at gpt-4o-mini pricing</span>
+
+<span class="arch-highlight">[4] CODE NODE — Parse + Validate LLM Output</span>
+  JSON.parse(response) → validate schema → handle parse errors
+  Fallback: intent = "general" if parse fails
+
+<span class="arch-highlight">[5] SWITCH NODE — Intent-Based Routing</span>
+  ├─ intent === "support"  → Branch A
+  ├─ intent === "sales"    → Branch B
+  ├─ intent === "billing"  → Branch C
+  └─ default               → Branch D (general)
+
+<span class="arch-highlight">[6A] SUPPORT BRANCH</span>
+  → OpenAI: generate empathetic acknowledgment + triage info
+  → Gmail: send auto-response to sender
+  → Notion/Linear: create support ticket with priority + summary
+  → Slack #support: alert team for high-priority items
+
+<span class="arch-highlight">[6B] SALES BRANCH</span>
+  → OpenAI: generate personalized value-proposition response
+  → Gmail: send response with calendar booking link
+  → HubSpot: create contact + deal + assign to sales rep
+
+<span class="arch-highlight">[6C] BILLING BRANCH</span>
+  → Gmail: send billing FAQ + support contact
+  → Airtable: log billing inquiry for finance team review
+
+<span class="arch-highlight">[6D] GENERAL BRANCH</span>
+  → OpenAI: generate helpful general response
+  → Gmail: dispatch response
+
+<span class="arch-highlight">[7] MERGE ALL BRANCHES</span>
+  → Log all processed inquiries to Google Sheets (audit trail)
+  → Respond to Webhook: HTTP 200 + { processed: true, intent, ticket_id? }
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">04 — Applied Industry Context</div>
+      <p>This system targets companies with inbound inquiry volumes of 30–300 messages/day who cannot justify a full customer support team but require faster-than-manual response times and accurate routing. Common client profiles include: growing SaaS companies, e-commerce businesses with B2B customers, and professional services firms with high inbound lead volume.</p>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">SaaS Productization Opportunity</div>
+        <p>This system, abstracted and templated, is directly productizable as a white-label "AI Inbox Manager" service. Package it with a configuration interface where clients set their own routing rules, response tone, and integration targets. Charge $299–$799/month per client on a managed infrastructure basis. At 20 clients: $6,000–$16,000 MRR. This is the transition point from consulting to SaaS.</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">05 — Critical Analysis</div>
+      <ul>
+        <li><strong>LLM reliability:</strong> Classification accuracy for this system typically ranges from 85–95% depending on message complexity. The 5–15% misclassification rate must be accounted for; design a human review queue for low-confidence outputs (confidence &lt; 0.75).</li>
+        <li><strong>Cost at scale:</strong> At 1,000 inquiries/day using gpt-4o-mini, estimated API cost is ~$0.20/day — fully viable. However, switching to GPT-4-turbo for "higher quality" increases cost by approximately 20x. Justify model selection by use case, not prestige.</li>
+        <li><strong>Latency implications:</strong> The LLM call adds 1–3 seconds to response time. For real-time customer-facing applications, set user expectations appropriately. The auto-response email arrival, not the API call, is what the end-user experiences.</li>
+        <li><strong>Prompt injection risk:</strong> Malicious actors may attempt to manipulate the classification system via crafted message content. Implement input sanitization and include explicit adversarial resistance instructions in the system prompt.</li>
+      </ul>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-title">Practical Exercise — Lesson 4</div>
+      <div class="exercise-h">Build Portfolio System 3 &amp; Prepare a Sales Presentation</div>
+      <p>Implement Portfolio System S3 in full. Upon completion, develop:</p>
+      <ul>
+        <li><strong>A 5-slide pitch deck</strong> positioned for a client meeting: Problem, Solution, How It Works, Results/ROI, Next Steps.</li>
+        <li><strong>A live demo environment:</strong> Deploy the webhook on your n8n instance and create a test form (Typeform or simple HTML) that potential clients can use to experience the system in action.</li>
+        <li><strong>A LinkedIn case study post:</strong> 300–400 words describing the system you built, the problem it solves, and a screenshot of the n8n workflow canvas. This is your first content marketing asset.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ -->
+  <!-- LESSON 5 -->
+  <!-- ============================================================ -->
+  <section class="chapter-section" id="lesson-5">
+    <div class="lesson-header">
+      <span class="lesson-number">Lesson 05</span>
+      <h2 class="lesson-title">Professional Credentialing, Portfolio Architecture, and Market Positioning as an n8n Developer</h2>
+      <p class="lesson-subtitle">A systematic analysis of credibility-building mechanisms in the no-code engineering space, portfolio design standards for professional automation practitioners, and strategic approaches to industry positioning independent of formal certification structures.</p>
+      <div class="lesson-tags">
+        <span class="tag tag-amber">Professional Brand</span>
+        <span class="tag tag-teal">Portfolio Design</span>
+        <span class="tag tag-purple">GitHub Strategy</span>
+        <span class="tag tag-coral">Community Positioning</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">01 — Learning Objectives</div>
+      <div class="objectives-grid">
+        <div class="objective-card">
+          <span class="obj-level level-evaluate">Evaluate</span>
+          <span class="obj-text">Assess the relative signal value of formal certifications versus demonstrated portfolio work in client procurement decisions.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-design">Design</span>
+          <span class="obj-text">Design a professional portfolio architecture that communicates technical depth, business value, and domain expertise.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-implement">Implement</span>
+          <span class="obj-text">Implement a GitHub-based portfolio strategy with standardized repository structure and documentation conventions.</span>
+        </div>
+        <div class="objective-card">
+          <span class="obj-level level-create">Create</span>
+          <span class="obj-text">Develop a professional positioning narrative suitable for client-facing profiles across LinkedIn, GitHub, and personal sites.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">02 — Conceptual Foundations</div>
+      <h3>The Certification Paradox in Emerging Technical Fields</h3>
+      <p>n8n does not currently offer a widely recognized certification program comparable to AWS Certified Solutions Architect or Salesforce Administrator. This creates a paradox: the absence of formal credentialing means that market trust must be established through alternative signals. Empirical analysis of successful automation freelancers reveals that <strong>demonstrated output consistently outperforms credential possession</strong> in conversion rate for first-time client acquisition.</p>
+
+      <p>The credibility stack for an n8n developer, in descending order of signal strength, is:</p>
+
+      <ol>
+        <li><strong>Working deployed systems</strong> — live automations a prospect can interact with</li>
+        <li><strong>Published case studies with quantified outcomes</strong> — specific, measurable client results</li>
+        <li><strong>Community contributions</strong> — solutions published on the n8n forum, answered questions, shared templates</li>
+        <li><strong>GitHub repositories</strong> — well-documented workflow exports with professional READMEs</li>
+        <li><strong>Content production</strong> — LinkedIn posts, YouTube walkthroughs, Substack articles about automation systems</li>
+        <li><strong>Formal certification</strong> — secondary signal; primarily useful for enterprise procurement checklists</li>
+      </ol>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">Key Insight — What Buyers Actually Evaluate</div>
+        <p>Buyers at SMB level (your primary market) do not purchase certifications — they purchase confidence that you can solve their specific problem. That confidence is created by demonstrating that you have solved an adjacent problem before, ideally for a client in a similar context. Your portfolio's primary job is to activate this <em>pattern recognition</em> in the buyer's mind: "they've done this before, they can do it for me."</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">03 — Portfolio Architecture Standard</div>
+      <h3>The Three-Layer Portfolio Model</h3>
+      <p>A professional automation portfolio should operate on three layers simultaneously, each serving a different audience with different needs:</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr><th>Layer</th><th>Medium</th><th>Target Audience</th><th>Primary Signal</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Layer 1: Public Showcase</strong></td>
+            <td>Personal website or Notion portfolio</td>
+            <td>Non-technical clients</td>
+            <td>Business outcomes, ROI, case studies</td>
+          </tr>
+          <tr>
+            <td><strong>Layer 2: Technical Archive</strong></td>
+            <td>GitHub repositories</td>
+            <td>Technical evaluators, peers</td>
+            <td>Code quality, architecture design, documentation</td>
+          </tr>
+          <tr>
+            <td><strong>Layer 3: Community Presence</strong></td>
+            <td>LinkedIn, n8n forum, X/Twitter</td>
+            <td>Industry peers &amp; potential clients</td>
+            <td>Expertise, thought leadership, approachability</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>GitHub Repository Standard for n8n Projects</h3>
+      <p>Each portfolio project repository must include the following structure to be considered professional-grade:</p>
+
+      <div class="arch-diagram">
+<span class="arch-highlight">REPOSITORY STRUCTURE STANDARD</span>
+
+your-project-name/
+├── <span class="arch-node">README.md</span>             ← Problem, solution, architecture overview, setup
+├── <span class="arch-node">workflow.json</span>         ← Full n8n export (import-ready)
+├── <span class="arch-node">architecture.md</span>       ← Node-by-node explanation, data flow
+├── <span class="arch-node">SETUP.md</span>              ← Required credentials, env vars, testing steps
+├── <span class="arch-node">assets/</span>
+│   ├── workflow-diagram.png   ← Screenshot of n8n canvas
+│   └── architecture.svg       ← System architecture diagram
+└── <span class="arch-node">docs/</span>
+    └── client-brief.md        ← Non-technical project summary
+
+<span class="arch-note">README.md must answer in &lt; 60 seconds: What does this do? Who is it for? Why does it matter?</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">04 — Professional Workflow Presentation Standards</div>
+      <h3>n8n Canvas Best Practices for Client Demonstrations</h3>
+      <ul>
+        <li><strong>Naming convention:</strong> Every node must have a descriptive, action-verb name: "IF — Validate Email Format" not "IF1". This is non-negotiable for professional presentation.</li>
+        <li><strong>Visual organization:</strong> Workflows flow left-to-right with consistent vertical alignment. Branch nodes expand vertically. Avoid diagonal connections or crossing wires.</li>
+        <li><strong>Sticky notes:</strong> Use n8n Sticky Note nodes to label major workflow sections (Trigger Layer, Transformation, Routing, Output). This transforms the canvas into a self-documenting artifact.</li>
+        <li><strong>Color coding:</strong> Assign consistent node colors by function category (all input nodes one color, all AI nodes another, all output nodes another). This enables instant visual comprehension.</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <div class="block-title">05 — Critical Analysis: What "Verified" Actually Means</div>
+      <p>The n8n Creator program and community verification processes are merit-based community recognition mechanisms, not formal technical certifications. Their value is primarily in community discovery (being listed in the n8n marketplace or creator directory) rather than external client credibility signaling.</p>
+      <p>For most freelancers, the most practically valuable form of "verification" is a portfolio of 3–5 live client deployments with documented results. A case study stating "Reduced client's lead response time from 6 hours to 4 minutes, resulting in 40% increase in demo bookings" constitutes stronger market credibility than any certification badge in the current market environment.</p>
+      <p>This landscape may shift as n8n matures and enterprise adoption increases, creating demand for more formal vendor certification pathways. Practitioners should monitor this trajectory and obtain certifications as they become available and market-demanded.</p>
+    </div>
+
+    <div class="block">
+      <div class="block-title">06 — Implementation: 90-Day Professional Positioning Plan</div>
+      <ol class="step-list">
+        <li>
+          <div class="step-content">
+            <strong>Days 1–14: Foundation Build</strong>
+            <span>Build all three portfolio systems (S1, S2, S3). Push to GitHub with professional READMEs. Set up personal website (Notion or Webflow) with a clear positioning statement and project showcase.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <strong>Days 15–30: Content Launch</strong>
+            <span>Write 3 LinkedIn posts (one per project): problem → solution → result → screenshot. Publish 2 solutions on the n8n Community Forum. Optimize LinkedIn headline to reflect niche positioning.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <strong>Days 31–60: Outbound Activation</strong>
+            <span>Send 5 personalized cold outreach messages per day to target client profiles. Frame as offering a free 30-minute "automation audit" — lower commitment than a sales call. Aim for 3–5 discovery conversations.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-content">
+            <strong>Days 61–90: First Client Cycle</strong>
+            <span>Execute one paid project (even at reduced rate if needed). Document every phase. Collect a testimonial. Convert to a case study post. This single cycle, well-documented, becomes your most powerful acquisition asset.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="exercise-block">
+      <div class="exercise-title">Practical Exercise — Lesson 5</div>
+      <div class="exercise-h">Complete Professional Positioning Audit</div>
+      <p>Review and update all professional touch-points against the standards defined in this lesson:</p>
+      <ul>
+        <li><strong>GitHub:</strong> Ensure all 3 portfolio repositories meet the structural standard defined above. Add topics/tags to each repo for discoverability.</li>
+        <li><strong>LinkedIn:</strong> Rewrite your headline, About section, and featured section to reflect your niche positioning and link to your portfolio website.</li>
+        <li><strong>Portfolio Website:</strong> Ensure each project page includes: problem statement, solution description, architecture screenshot, key metrics/outcomes, and a client testimonial placeholder.</li>
+        <li><strong>Personal Positioning Statement:</strong> Draft a 2-sentence professional bio that you can use across all platforms. Test it with 3 peers — if they cannot immediately understand what you do and who you help, revise.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ -->
+  <!-- PART 2 DIVIDER -->
+  <!-- ============================================================ -->
+  <div class="part-divider">
+    <div class="part-num">Part 2 of 2</div>
+    <h2>Portfolio Systems: Full Engineering Specifications</h2>
+    <p>Production-level system documentation including complete architecture specifications, node-by-node breakdowns, import-ready n8n workflow JSON, and economic analysis for each portfolio project.</p>
+  </div>
+
+
+  <!-- ============================================================ -->
+  <!-- SYSTEM 1 -->
+  <!-- ============================================================ -->
+  <section class="chapter-section" id="sys-1">
+    <div class="lesson-header">
+      <span class="lesson-number">Portfolio System S1</span>
+      <h2 class="lesson-title">Lead Capture &amp; Automated Response System</h2>
+      <p class="lesson-subtitle">Production specification for a beginner-tier, event-driven lead processing pipeline with input validation, email auto-response, and Google Sheets persistence.</p>
+      <div class="lesson-tags">
+        <span class="tag tag-teal">Beginner Tier</span>
+        <span class="tag tag-amber">$500–$1,500 Project Value</span>
+        <span class="tag tag-green">Import-Ready JSON</span>
+      </div>
+    </div>
+
+    <!-- A. System Specification -->
+    <div class="block">
+      <div class="block-title">A — System Specification</div>
+      <div class="spec-grid">
+        <div class="spec-item">
+          <div class="spec-label">System Name</div>
+          <div class="spec-value">n8n Lead Capture &amp; Auto-Responder v1.0</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Problem Definition</div>
+          <div class="spec-value">Eliminate manual lead logging and delayed email follow-up for businesses with inbound form submissions.</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Target Users</div>
+          <div class="spec-value">Founders, solo operators, and small teams receiving 10–200 leads/day from website forms or landing pages.</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Functional Requirements</div>
+          <div class="spec-value">Receive POST, validate fields, send confirmation email, append to Sheets, return HTTP response within 3 seconds.</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Non-Functional Requirements</div>
+          <div class="spec-value">99.5% uptime, &lt;3s end-to-end latency, handles up to 50 concurrent executions, zero data loss on API failure.</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Error Handling Strategy</div>
+          <div class="spec-value">Invalid inputs return HTTP 400 with structured error. API failures log to error sheet and trigger Slack alert.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B. Node Breakdown -->
+    <div class="block">
+      <div class="block-title">B — Node-by-Node Architecture</div>
+      <table class="node-table">
+        <thead>
+          <tr><th>#</th><th>Node Type</th><th>Name</th><th>Role &amp; Configuration</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>n8n-nodes-base.webhook</td>
+            <td>Webhook — Lead Entry Point</td>
+            <td>POST listener on path <code>/lead-capture</code>. Response mode: <code>lastNode</code>. Authentication: header token.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>n8n-nodes-base.set</td>
+            <td>Set — Normalize Lead Data</td>
+            <td>Generates lead_id, lowercases email, trims whitespace, sets defaults for optional fields, appends ISO timestamp.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>n8n-nodes-base.if</td>
+            <td>IF — Validate Required Fields</td>
+            <td>Condition: <code>email.isNotEmpty AND name.isNotEmpty AND email.contains('@')</code>. True → proceed; False → error branch.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>n8n-nodes-base.gmail</td>
+            <td>Gmail — Send Auto-Response</td>
+            <td>Personalized confirmation email using <code>{{ $json.name }}</code> variable. HTML template with company branding.</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>n8n-nodes-base.googleSheets</td>
+            <td>Sheets — Append Lead Record</td>
+            <td>Appends to "Leads" sheet. Columns: lead_id, name, email, company, source, timestamp, status.</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>n8n-nodes-base.respondToWebhook</td>
+            <td>Respond — Success 200</td>
+            <td>Returns <code>{"received": true, "lead_id": "{{lead_id}}"}</code> with HTTP 200.</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>n8n-nodes-base.respondToWebhook</td>
+            <td>Respond — Error 400</td>
+            <td>Returns <code>{"error": "missing_required_fields", "message": "..."}</code> with HTTP 400.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- C. JSON -->
+    <div class="block">
+      <div class="block-title">C — n8n Workflow JSON (Import-Ready)</div>
+      <div class="json-section">
+        <div class="json-header">
+          <span class="json-title">portfolio_s1_lead_capture.json</span>
+          <span class="json-badge">✓ Import Ready</span>
+        </div>
+        <div class="json-body">
+<pre>{
+  "name": "S1 — Lead Capture & Auto-Responder",
+  "nodes": [
+    {
+      "id": "a1b2c3d4-0001-0001-0001-000000000001",
+      "name": "Webhook — Lead Entry Point",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "parameters": {
+        "path": "lead-capture",
+        "responseMode": "lastNode",
+        "options": {
+          "rawBody": false
+        },
+        "authentication": "headerAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "webhook-auth-cred",
+          "name": "Webhook Header Auth"
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-0001-0001-0001-000000000002",
+      "name": "Set — Normalize Lead Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [420, 300],
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            {
+              "name": "lead_id",
+              "type": "string",
+              "string": "={{ $now.toMillis() }}-{{ $json.email.replace('@','_').replace('.','_') }}"
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "string": "={{ $json.name.trim() }}"
+            },
+            {
+              "name": "email",
+              "type": "string",
+              "string": "={{ $json.email.trim().toLowerCase() }}"
+            },
+            {
+              "name": "company",
+              "type": "string",
+              "string": "={{ $json.company || 'Not provided' }}"
+            },
+            {
+              "name": "source",
+              "type": "string",
+              "string": "={{ $json.source || 'website' }}"
+            },
+            {
+              "name": "message",
+              "type": "string",
+              "string": "={{ $json.message || '' }}"
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "string": "={{ $now.toISO() }}"
+            },
+            {
+              "name": "status",
+              "type": "string",
+              "string": "new"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-0001-0001-0001-000000000003",
+      "name": "IF — Validate Required Fields",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [640, 300],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-01",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "cond-02",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "cond-03",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-0001-0001-0001-000000000004",
+      "name": "Gmail — Send Auto-Response",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [860, 200],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "We received your message, {{ $json.name }}!",
+        "message": "<p>Hi {{ $json.name }},</p><p>Thank you for reaching out. We've received your message and a member of our team will be in touch within 1 business day.</p><p>Here's a summary of what we received:</p><ul><li><strong>Name:</strong> {{ $json.name }}</li><li><strong>Company:</strong> {{ $json.company }}</li><li><strong>Submitted:</strong> {{ $json.timestamp }}</li></ul><p>Best regards,<br>The Team</p>",
+        "options": {
+          "htmlMessage": true,
+          "replyTo": "noreply@yourcompany.com"
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-oauth-cred",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-0001-0001-0001-000000000005",
+      "name": "Sheets — Append Lead Record",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [860, 340],
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE"
+        },
+        "sheetName": {
+          "value": "Leads"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": ["lead_id"]
+        },
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gsheets-oauth-cred",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-0001-0001-0001-000000000006",
+      "name": "Respond — Success 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1080, 280],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ received: true, lead_id: $json.lead_id, timestamp: $json.timestamp }) }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-0001-0001-0001-000000000007",
+      "name": "Respond — Validation Error 400",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [860, 460],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"error\": \"validation_failed\", \"message\": \"Required fields missing or invalid: name and a valid email are required.\", \"received\": false }",
+        "options": {
+          "responseCode": 400
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Lead Entry Point": {
+      "main": [[{ "node": "Set — Normalize Lead Data", "type": "main", "index": 0 }]]
+    },
+    "Set — Normalize Lead Data": {
+      "main": [[{ "node": "IF — Validate Required Fields", "type": "main", "index": 0 }]]
+    },
+    "IF — Validate Required Fields": {
+      "main": [
+        [
+          { "node": "Gmail — Send Auto-Response", "type": "main", "index": 0 },
+          { "node": "Sheets — Append Lead Record", "type": "main", "index": 0 }
+        ],
+        [{ "node": "Respond — Validation Error 400", "type": "main", "index": 0 }]
+      ]
+    },
+    "Sheets — Append Lead Record": {
+      "main": [[{ "node": "Respond — Success 200", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "error-handling-workflow-id"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "REPLACE_WITH_YOUR_INSTANCE_ID"
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- D. Deployment -->
+    <div class="block">
+      <div class="block-title">D — Deployment &amp; Configuration</div>
+      <ol class="step-list">
+        <li><div class="step-content"><strong>Required Credentials</strong><span>Gmail OAuth2 (Google Cloud project, Gmail API enabled), Google Sheets OAuth2 (same project), Webhook Header Auth (generate a secure random token).</span></div></li>
+        <li><div class="step-content"><strong>Google Sheets Setup</strong><span>Create a spreadsheet named "Lead Capture CRM". Create a sheet named "Leads" with headers: lead_id, name, email, company, source, message, timestamp, status. Replace YOUR_GOOGLE_SHEET_ID_HERE with the actual ID from the spreadsheet URL.</span></div></li>
+        <li><div class="step-content"><strong>Testing Protocol</strong><span>Test 1: Valid payload → expect HTTP 200, email delivery, Sheets row. Test 2: Missing email → expect HTTP 400 error response. Test 3: Missing name → expect HTTP 400. Test 4: Duplicate submission → verify no duplicate Sheets row (matchingColumns: lead_id).</span></div></li>
+        <li><div class="step-content"><strong>Monitoring</strong><span>Enable n8n execution logging. Set up an error workflow that sends a Slack or email alert on any failed execution. Review Sheets log weekly for anomalies.</span></div></li>
+      </ol>
+    </div>
+
+    <!-- E. Economic Analysis -->
+    <div class="block">
+      <div class="block-title">E — Economic &amp; Productization Analysis</div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-tier">Freelance Build</div>
+          <div class="pricing-amount">$750</div>
+          <div class="pricing-period">one-time project</div>
+          <div class="pricing-desc">Single client deployment, custom branding, 30-day support included. Positioned as a "Lead Management Starter."</div>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-tier">Freelance + Retainer</div>
+          <div class="pricing-amount">$750</div>
+          <div class="pricing-period">build + $149/mo</div>
+          <div class="pricing-desc">Build fee + ongoing monitoring, updates, and Sheets report generation. Recurring revenue per client.</div>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-tier">White-Label SaaS</div>
+          <div class="pricing-amount">$49</div>
+          <div class="pricing-period">per month</div>
+          <div class="pricing-desc">Hosted, templated version with configuration form. No per-client build time. Scale to 100+ clients.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ -->
+  <!-- SYSTEM 2 -->
+  <!-- ============================================================ -->
+  <section class="chapter-section" id="sys-2">
+    <div class="lesson-header">
+      <span class="lesson-number">Portfolio System S2</span>
+      <h2 class="lesson-title">Intelligent Lead Scoring &amp; CRM Routing Pipeline</h2>
+      <p class="lesson-subtitle">Multi-stage lead processing system with external API enrichment, algorithmic scoring, score-band routing, and multi-destination output to CRM, Sheets, Slack, and email.</p>
+      <div class="lesson-tags">
+        <span class="tag tag-purple">Intermediate Tier</span>
+        <span class="tag tag-amber">$2,000–$5,000 Project Value</span>
+        <span class="tag tag-green">Import-Ready JSON</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">A — System Specification</div>
+      <div class="spec-grid">
+        <div class="spec-item">
+          <div class="spec-label">System Name</div>
+          <div class="spec-value">n8n Lead Scoring &amp; Routing Engine v1.0</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Problem Definition</div>
+          <div class="spec-value">SMB sales teams waste time on low-quality leads while high-intent prospects receive delayed responses, causing revenue loss.</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Functional Requirements</div>
+          <div class="spec-value">Ingest leads, enrich via API, compute quality score 0–100, route to HOT/WARM/COLD branches with appropriate actions per tier.</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Non-Functional Requirements</div>
+          <div class="spec-value">End-to-end execution &lt;5s, enrichment API failure must not block lead processing, all leads logged regardless of branch.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">B — Node-by-Node Architecture</div>
+      <table class="node-table">
+        <thead>
+          <tr><th>#</th><th>Node Type</th><th>Name</th><th>Configuration Summary</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>n8n-nodes-base.webhook</td><td>Webhook — Intake</td><td>POST /lead-intake. Expects full lead payload.</td></tr>
+          <tr><td>2</td><td>n8n-nodes-base.set</td><td>Set — Normalize + Extract Domain</td><td>Normalizes fields. Extracts email domain for API call: <code>={{ $json.email.split('@')[1] }}</code></td></tr>
+          <tr><td>3</td><td>n8n-nodes-base.httpRequest</td><td>HTTP — Hunter.io Domain Enrichment</td><td>GET https://api.hunter.io/v2/domain-search?domain={{domain}}&api_key={{key}}. Returns org data.</td></tr>
+          <tr><td>4</td><td>n8n-nodes-base.merge</td><td>Merge — Combine Lead + Enrichment</td><td>Mode: mergeByIndex. Combines original lead with Hunter.io response object.</td></tr>
+          <tr><td>5</td><td>n8n-nodes-base.code</td><td>Code — Lead Scoring Algorithm</td><td>JavaScript scoring function. Evaluates 6 weighted attributes. Returns score + tier.</td></tr>
+          <tr><td>6</td><td>n8n-nodes-base.switch</td><td>Switch — Score-Band Router</td><td>HOT: score ≥ 70. WARM: score ≥ 40. COLD: default (score &lt; 40).</td></tr>
+          <tr><td>7a</td><td>n8n-nodes-base.slack</td><td>Slack — HOT Lead Alert</td><td>Posts to #sales-alerts with full lead details, score, and enriched company info.</td></tr>
+          <tr><td>7b</td><td>n8n-nodes-base.httpRequest</td><td>HTTP — HubSpot Create Contact</td><td>POST to HubSpot Contacts API. Sets deal stage to "New Lead" with priority = high.</td></tr>
+          <tr><td>8</td><td>n8n-nodes-base.gmail</td><td>Gmail — WARM Nurture Email</td><td>Sends value-add content email for warm leads. Subject line personalized by company name.</td></tr>
+          <tr><td>9</td><td>n8n-nodes-base.googleSheets</td><td>Sheets — Unified Lead Log</td><td>All branches converge here. Logs: lead data + score + tier + timestamp + action_taken.</td></tr>
+          <tr><td>10</td><td>n8n-nodes-base.respondToWebhook</td><td>Respond — 200 + Score Data</td><td>Returns: <code>{"processed": true, "score": N, "tier": "hot|warm|cold"}</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="block">
+      <div class="block-title">C — Scoring Algorithm (Code Node)</div>
+      <div class="json-section">
+        <div class="json-header">
+          <span class="json-title">Lead Scoring Function — JavaScript (Code Node)</span>
+          <span class="json-badge">✓ Production Grade</span>
+        </div>
+        <div class="json-body">
+<pre>// Lead Scoring Algorithm — n8n Code Node
+// Input: merged lead + enrichment data
+// Output: original item + score (0-100) + tier string
+
+const lead = $input.item.json;
+const enrichment = lead.enrichment_data || {};
+
+// ─── SCORING WEIGHTS ──────────────────────────────────────────
+const weights = {
+  company_size:    25,  // Larger company = higher B2B value
+  domain_quality:  20,  // Business domain vs personal (gmail, yahoo)
+  source_channel:  20,  // Direct/referral outperforms paid/organic
+  message_intent:  20,  // Message content signals purchase intent
+  completeness:    10,  // Form completion rate
+  industry_match:  5    // Target industry alignment
+};
+
+let score = 0;
+const reasons = [];
+
+// ─── 1. COMPANY SIZE SCORING ──────────────────────────────────
+const employees = enrichment.employees || 0;
+if (employees >= 200)      { score += 25; reasons.push("large org +25"); }
+else if (employees >= 50)  { score += 18; reasons.push("mid org +18"); }
+else if (employees >= 10)  { score += 10; reasons.push("small org +10"); }
+else if (employees >= 1)   { score += 5;  reasons.push("micro org +5"); }
+// No enrichment data = 0 points, neutral signal
+
+// ─── 2. DOMAIN QUALITY SCORING ────────────────────────────────
+const personalDomains = ['gmail.com','yahoo.com','hotmail.com',
+                         'outlook.com','icloud.com','aol.com'];
+const emailDomain = (lead.email || '').split('@')[1] || '';
+if (!personalDomains.includes(emailDomain)) {
+  score += 20;
+  reasons.push("business domain +20");
+} else {
+  reasons.push("personal domain +0");
+}
+
+// ─── 3. SOURCE CHANNEL SCORING ────────────────────────────────
+const sourceMap = {
+  'referral':    20,
+  'direct':      18,
+  'linkedin':    15,
+  'google':      10,
+  'organic':     8,
+  'paid_ads':    5,
+  'cold_email':  5,
+  'website':     10
+};
+const sourceScore = sourceMap[(lead.source || '').toLowerCase()] || 8;
+score += sourceScore;
+reasons.push(`source:${lead.source} +${sourceScore}`);
+
+// ─── 4. MESSAGE INTENT SCORING ────────────────────────────────
+const message = (lead.message || '').toLowerCase();
+const highIntent  = ['pricing','demo','trial','purchase','buy',
+                     'contract','budget','asap','urgent','proposal'];
+const medIntent   = ['question','interested','learn','info',
+                     'how does','can you','tell me'];
+
+const highCount = highIntent.filter(w => message.includes(w)).length;
+const medCount  = medIntent.filter(w => message.includes(w)).length;
+
+if (highCount >= 2)       { score += 20; reasons.push("high intent x2 +20"); }
+else if (highCount >= 1)  { score += 14; reasons.push("high intent x1 +14"); }
+else if (medCount >= 1)   { score += 8;  reasons.push("medium intent +8"); }
+else if (message.length > 50) { score += 5; reasons.push("has message +5"); }
+
+// ─── 5. FORM COMPLETENESS SCORING ─────────────────────────────
+const fields = ['name','email','company','message','phone'];
+const filled = fields.filter(f => lead[f] && lead[f].length > 0).length;
+const completenessScore = Math.round((filled / fields.length) * 10);
+score += completenessScore;
+reasons.push(`completeness ${filled}/${fields.length} +${completenessScore}`);
+
+// ─── 6. INDUSTRY MATCH (configure per client) ─────────────────
+const targetIndustries = ['saas','technology','software','fintech',
+                          'marketing','agency','consulting'];
+const industry = (enrichment.industry || '').toLowerCase();
+const industryMatch = targetIndustries.some(i => industry.includes(i));
+if (industryMatch) { score += 5; reasons.push("target industry +5"); }
+
+// ─── FINAL SCORE NORMALIZATION ─────────────────────────────────
+score = Math.min(100, Math.max(0, score)); // Clamp 0–100
+
+// ─── TIER ASSIGNMENT ──────────────────────────────────────────
+let tier;
+if (score >= 70)      tier = 'hot';
+else if (score >= 40) tier = 'warm';
+else                  tier = 'cold';
+
+// ─── RETURN ENRICHED LEAD OBJECT ──────────────────────────────
+return [{
+  json: {
+    ...lead,
+    score,
+    tier,
+    score_breakdown: reasons.join(' | '),
+    scored_at: new Date().toISOString()
+  }
+}];</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">C — n8n Workflow JSON (Abbreviated — Full Structure)</div>
+      <div class="json-section">
+        <div class="json-header">
+          <span class="json-title">portfolio_s2_lead_scoring.json</span>
+          <span class="json-badge">✓ Import Ready</span>
+        </div>
+        <div class="json-body">
+<pre>{
+  "name": "S2 — Lead Scoring & CRM Routing Pipeline",
+  "nodes": [
+    {
+      "id": "s2-node-001",
+      "name": "Webhook — Lead Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "parameters": {
+        "path": "lead-intake",
+        "responseMode": "lastNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "s2-node-002",
+      "name": "Set — Normalize + Extract Domain",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [420, 300],
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            { "name": "name",       "type": "string", "string": "={{ $json.name.trim() }}" },
+            { "name": "email",      "type": "string", "string": "={{ $json.email.trim().toLowerCase() }}" },
+            { "name": "company",    "type": "string", "string": "={{ $json.company || '' }}" },
+            { "name": "source",     "type": "string", "string": "={{ $json.source || 'website' }}" },
+            { "name": "message",    "type": "string", "string": "={{ $json.message || '' }}" },
+            { "name": "phone",      "type": "string", "string": "={{ $json.phone || '' }}" },
+            { "name": "email_domain","type":"string", "string": "={{ $json.email.split('@')[1] }}" },
+            { "name": "timestamp",  "type": "string", "string": "={{ $now.toISO() }}" },
+            { "name": "lead_id",    "type": "string", "string": "={{ 'L-' + $now.toMillis() }}" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "s2-node-003",
+      "name": "HTTP — Hunter.io Enrichment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [640, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.hunter.io/v2/domain-search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "domain",  "value": "={{ $json.email_domain }}" },
+            { "name": "api_key", "value": "={{ $credentials.hunterio.apiKey }}" },
+            { "name": "limit",   "value": "1" }
+          ]
+        },
+        "options": {
+          "timeout": 3000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "s2-node-004",
+      "name": "Code — Lead Scoring Algorithm",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 300],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// [PASTE FULL SCORING ALGORITHM HERE — see scoring algorithm block above]"
+      }
+    },
+    {
+      "id": "s2-node-005",
+      "name": "Switch — Score-Band Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1080, 300],
+      "parameters": {
+        "mode": "rules",
+        "options": {},
+        "rules": {
+          "rules": [
+            {
+              "conditions": {
+                "conditions": [{
+                  "leftValue": "={{ $json.score }}",
+                  "rightValue": 70,
+                  "operator": { "type": "number", "operation": "gte" }
+                }]
+              },
+              "outputIndex": 0
+            },
+            {
+              "conditions": {
+                "conditions": [{
+                  "leftValue": "={{ $json.score }}",
+                  "rightValue": 40,
+                  "operator": { "type": "number", "operation": "gte" }
+                }]
+              },
+              "outputIndex": 1
+            }
+          ],
+          "fallbackOutput": 2
+        }
+      }
+    },
+    {
+      "id": "s2-node-006",
+      "name": "Slack — HOT Lead Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1300, 160],
+      "parameters": {
+        "operation": "message",
+        "channel": "#sales-alerts",
+        "text": "🔥 *HOT LEAD — Score: {{ $json.score }}/100*\n*Name:* {{ $json.name }}\n*Email:* {{ $json.email }}\n*Company:* {{ $json.company }}\n*Source:* {{ $json.source }}\n*Score Breakdown:* {{ $json.score_breakdown }}\n*Message:* {{ $json.message }}",
+        "options": {
+          "mrkdwn": true
+        }
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "slack-cred-id",
+          "name": "Slack API"
+        }
+      }
+    },
+    {
+      "id": "s2-node-007",
+      "name": "HTTP — HubSpot Create Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1300, 280],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/contacts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer {{ $credentials.hubspot.accessToken }}" },
+            { "name": "Content-Type",  "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ properties: { firstname: $json.name.split(' ')[0], lastname: $json.name.split(' ').slice(1).join(' ') || '', email: $json.email, company: $json.company, hs_lead_status: 'NEW', lead_score: $json.score, lead_tier: $json.tier, lead_source: $json.source } }) }}"
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "s2-node-008",
+      "name": "Gmail — WARM Nurture Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1300, 400],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "Resources for {{ $json.company || 'your team' }} — following up",
+        "message": "<p>Hi {{ $json.name }},</p><p>Thanks for your interest. We noticed you might be exploring solutions for your team at {{ $json.company }}.</p><p>Here are a few resources that might be useful:</p><ul><li><a href='#'>How leading teams save 10+ hours/week with automation</a></li><li><a href='#'>Free automation audit — book a 20 min call</a></li></ul><p>Feel free to reply if you have any questions.</p><p>Best,<br>The Team</p>",
+        "options": { "htmlMessage": true }
+      },
+      "credentials": {
+        "gmailOAuth2": { "id": "gmail-oauth-cred", "name": "Gmail OAuth2" }
+      }
+    },
+    {
+      "id": "s2-node-009",
+      "name": "Sheets — Unified Lead Log",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1520, 300],
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "value": "YOUR_SHEET_ID" },
+        "sheetName": { "value": "Scored Leads" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "lead_id":        "={{ $json.lead_id }}",
+            "name":           "={{ $json.name }}",
+            "email":          "={{ $json.email }}",
+            "company":        "={{ $json.company }}",
+            "source":         "={{ $json.source }}",
+            "score":          "={{ $json.score }}",
+            "tier":           "={{ $json.tier }}",
+            "score_breakdown":"={{ $json.score_breakdown }}",
+            "timestamp":      "={{ $json.timestamp }}",
+            "action_taken":   "={{ $json.tier === 'hot' ? 'slack+crm' : $json.tier === 'warm' ? 'email' : 'logged' }}"
+          },
+          "matchingColumns": ["lead_id"]
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": { "id": "gsheets-oauth-cred", "name": "Google Sheets OAuth2" }
+      }
+    },
+    {
+      "id": "s2-node-010",
+      "name": "Respond — Success with Score",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1740, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ processed: true, lead_id: $json.lead_id, score: $json.score, tier: $json.tier }) }}",
+        "options": { "responseCode": 200 }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Lead Intake": {
+      "main": [[{ "node": "Set — Normalize + Extract Domain", "type": "main", "index": 0 }]]
+    },
+    "Set — Normalize + Extract Domain": {
+      "main": [[{ "node": "HTTP — Hunter.io Enrichment", "type": "main", "index": 0 }]]
+    },
+    "HTTP — Hunter.io Enrichment": {
+      "main": [[{ "node": "Code — Lead Scoring Algorithm", "type": "main", "index": 0 }]]
+    },
+    "Code — Lead Scoring Algorithm": {
+      "main": [[{ "node": "Switch — Score-Band Router", "type": "main", "index": 0 }]]
+    },
+    "Switch — Score-Band Router": {
+      "main": [
+        [
+          { "node": "Slack — HOT Lead Alert",       "type": "main", "index": 0 },
+          { "node": "HTTP — HubSpot Create Contact","type": "main", "index": 0 }
+        ],
+        [{ "node": "Gmail — WARM Nurture Email",    "type": "main", "index": 0 }],
+        [{ "node": "Sheets — Unified Lead Log",     "type": "main", "index": 0 }]
+      ]
+    },
+    "Slack — HOT Lead Alert":       { "main": [[{ "node": "Sheets — Unified Lead Log", "type": "main", "index": 0 }]] },
+    "HTTP — HubSpot Create Contact":{ "main": [[{ "node": "Sheets — Unified Lead Log", "type": "main", "index": 0 }]] },
+    "Gmail — WARM Nurture Email":   { "main": [[{ "node": "Sheets — Unified Lead Log", "type": "main", "index": 0 }]] },
+    "Sheets — Unified Lead Log":    { "main": [[{ "node": "Respond — Success with Score", "type": "main", "index": 0 }]] }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">E — Economic &amp; Productization Analysis</div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-tier">Standard Build</div>
+          <div class="pricing-amount">$2,500</div>
+          <div class="pricing-period">project fee</div>
+          <div class="pricing-desc">Full implementation, 1 CRM integration, scoring model calibration, documentation. 2-week delivery.</div>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-tier">Full Package</div>
+          <div class="pricing-amount">$3,500</div>
+          <div class="pricing-period">+ $299/mo retainer</div>
+          <div class="pricing-desc">Build + score model tuning after 30 days + monthly performance report + ongoing support.</div>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-tier">Managed SaaS</div>
+          <div class="pricing-amount">$199</div>
+          <div class="pricing-period">per month</div>
+          <div class="pricing-desc">Hosted pipeline, configurable scoring weights, custom CRM targets. 10-client minimum for SaaS economics.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ -->
+  <!-- SYSTEM 3 -->
+  <!-- ============================================================ -->
+  <section class="chapter-section" id="sys-3">
+    <div class="lesson-header">
+      <span class="lesson-number">Portfolio System S3</span>
+      <h2 class="lesson-title">AI-Powered Inquiry Routing &amp; Response Engine</h2>
+      <p class="lesson-subtitle">Production specification for an advanced AI-augmented workflow featuring LLM-based intent classification, multi-branch routing with intent-specific response generation, ticket creation, and CRM automation.</p>
+      <div class="lesson-tags">
+        <span class="tag tag-coral">Advanced Tier</span>
+        <span class="tag tag-amber">$5,000–$15,000 Project Value</span>
+        <span class="tag tag-green">Import-Ready JSON</span>
+        <span class="tag tag-purple">LLM-Augmented</span>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">A — System Specification</div>
+      <div class="spec-grid">
+        <div class="spec-item">
+          <div class="spec-label">System Name</div>
+          <div class="spec-value">n8n AI Inquiry Routing Engine v1.0</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Problem Definition</div>
+          <div class="spec-value">Inbound inquiries are manually triaged and responded to, creating bottlenecks, inconsistent response quality, and delayed conversion for sales-intent messages.</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Target Clients</div>
+          <div class="spec-value">B2B SaaS companies, agencies, and professional services firms receiving 30–500 inbound messages/day across email and contact forms.</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Functional Requirements</div>
+          <div class="spec-value">Classify intent, generate contextual response, route to correct team/system, create tickets for support/billing, update CRM for sales intents.</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Non-Functional Requirements</div>
+          <div class="spec-value">End-to-end &lt;5s, LLM failures must fall back gracefully, 99.9% message processing, full audit trail in Google Sheets.</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Security Considerations</div>
+          <div class="spec-value">Input sanitization to prevent prompt injection. API keys in n8n credentials vault. Webhook HMAC verification for production.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">B — Node Architecture</div>
+      <table class="node-table">
+        <thead>
+          <tr><th>#</th><th>Node Type</th><th>Name</th><th>Configuration Summary</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>webhook</td><td>Webhook — Inquiry Entry</td><td>POST /inquiry. Fields: sender_name, email, subject, message, source.</td></tr>
+          <tr><td>2</td><td>set</td><td>Set — Input Normalization</td><td>Sanitizes message (strip HTML, truncate to 1500 chars). Assembles prompt_context string.</td></tr>
+          <tr><td>3</td><td>openAi</td><td>OpenAI — Intent Classifier</td><td>Model: gpt-4o-mini. Temp: 0.1. System prompt enforces JSON schema output with intent, confidence, priority, summary fields.</td></tr>
+          <tr><td>4</td><td>code</td><td>Code — Parse &amp; Validate LLM Output</td><td>JSON.parse with try/catch. Falls back to intent:"general" on parse failure. Validates confidence range.</td></tr>
+          <tr><td>5</td><td>switch</td><td>Switch — Intent Router</td><td>4 outputs: support / sales / billing / general. Matches on $json.intent field.</td></tr>
+          <tr><td>6a</td><td>openAi</td><td>OpenAI — Support Response</td><td>Generates empathetic, issue-aware response. Context includes original message + summary.</td></tr>
+          <tr><td>6b</td><td>openAi</td><td>OpenAI — Sales Response</td><td>Generates value-focused response with clear CTA (demo booking). Context: company + message.</td></tr>
+          <tr><td>6c</td><td>gmail</td><td>Gmail — Billing Auto-Reply</td><td>Template-based billing FAQ response. No LLM required for this branch (cost optimization).</td></tr>
+          <tr><td>6d</td><td>openAi</td><td>OpenAI — General Response</td><td>Generates helpful general response. Low cost branch — gpt-4o-mini default.</td></tr>
+          <tr><td>7a</td><td>httpRequest</td><td>HTTP — Create Support Ticket</td><td>POST to Linear/Notion API. Sets priority from LLM classification. Includes full message + summary.</td></tr>
+          <tr><td>7b</td><td>httpRequest</td><td>HTTP — HubSpot Sales Lead</td><td>Creates contact + deal. Deal stage: "Inbound Inquiry". Source: inquiry_engine.</td></tr>
+          <tr><td>8</td><td>slack</td><td>Slack — High Priority Alert</td><td>Conditional: fires only if priority === "high". Posts to #urgent-inbox.</td></tr>
+          <tr><td>9</td><td>gmail</td><td>Gmail — Send Response (All Branches)</td><td>Sends generated or template response to sender. Each branch feeds into respective Gmail send.</td></tr>
+          <tr><td>10</td><td>googleSheets</td><td>Sheets — Full Audit Log</td><td>Logs: inquiry_id, sender, email, intent, confidence, priority, response_sent, ticket_id, timestamp.</td></tr>
+          <tr><td>11</td><td>respondToWebhook</td><td>Respond — 200 + Processing Receipt</td><td>Returns processed:true, intent, inquiry_id.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="block">
+      <div class="block-title">C — n8n Workflow JSON</div>
+      <div class="json-section">
+        <div class="json-header">
+          <span class="json-title">portfolio_s3_ai_inquiry_router.json</span>
+          <span class="json-badge">✓ Import Ready</span>
+        </div>
+        <div class="json-body">
+<pre>{
+  "name": "S3 — AI-Powered Inquiry Routing Engine",
+  "nodes": [
+    {
+      "id": "s3-node-001",
+      "name": "Webhook — Inquiry Entry",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 300],
+      "parameters": {
+        "path": "inquiry",
+        "responseMode": "lastNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "s3-node-002",
+      "name": "Set — Input Normalization",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [380, 300],
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            { "name": "inquiry_id",    "type": "string", "string": "={{ 'INQ-' + $now.toMillis() }}" },
+            { "name": "sender_name",   "type": "string", "string": "={{ $json.sender_name.trim() }}" },
+            { "name": "email",         "type": "string", "string": "={{ $json.email.trim().toLowerCase() }}" },
+            { "name": "subject",       "type": "string", "string": "={{ ($json.subject || 'No Subject').substring(0, 200) }}" },
+            { "name": "message_clean", "type": "string", "string": "={{ $json.message.replace(/<[^>]+>/g,'').substring(0, 1500).trim() }}" },
+            { "name": "source",        "type": "string", "string": "={{ $json.source || 'contact_form' }}" },
+            { "name": "received_at",   "type": "string", "string": "={{ $now.toISO() }}" },
+            {
+              "name": "prompt_context",
+              "type": "string",
+              "string": "={{ 'Subject: ' + ($json.subject || '') + '\\nMessage: ' + $json.message.replace(/<[^>]+>/g,'').substring(0, 1500).trim() }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "s3-node-003",
+      "name": "OpenAI — Intent Classifier",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [580, 300],
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an intent classification system for a business inbox. Analyze the message and respond ONLY with a valid JSON object — no other text, no markdown, no backticks.\n\nSchema:\n{\n  \"intent\": \"support\" | \"sales\" | \"billing\" | \"general\",\n  \"confidence\": 0.0 to 1.0,\n  \"priority\": \"high\" | \"medium\" | \"low\",\n  \"summary\": \"One sentence describing the inquiry\"\n}\n\nClassification rules:\n- support: technical issues, bugs, how-to questions, errors\n- sales: pricing, demo requests, trial, purchase intent, partnerships\n- billing: invoice, payment, subscription, refund, charge\n- general: everything else\n\nPriority rules:\n- high: urgent language, critical issue, lost data, purchase imminent\n- medium: general inquiry with clear action needed\n- low: informational, no urgency expressed"
+            },
+            {
+              "role": "user",
+              "content": "={{ $json.prompt_context }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.1,
+          "maxTokens": 200
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-cred-id",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "id": "s3-node-004",
+      "name": "Code — Parse & Validate LLM Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 300],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const item = $input.item.json;\nconst rawText = item.message?.content || item.choices?.[0]?.message?.content || '';\n\nlet classification = { intent: 'general', confidence: 0.5, priority: 'medium', summary: 'Inquiry received' };\n\ntry {\n  const cleaned = rawText.replace(/```json|```/g, '').trim();\n  const parsed = JSON.parse(cleaned);\n  \n  // Validate schema\n  const validIntents = ['support', 'sales', 'billing', 'general'];\n  const validPriorities = ['high', 'medium', 'low'];\n  \n  classification = {\n    intent:     validIntents.includes(parsed.intent)     ? parsed.intent     : 'general',\n    confidence: (typeof parsed.confidence === 'number' && parsed.confidence >= 0 && parsed.confidence <= 1) ? parsed.confidence : 0.5,\n    priority:   validPriorities.includes(parsed.priority) ? parsed.priority   : 'medium',\n    summary:    typeof parsed.summary === 'string'        ? parsed.summary     : 'Inquiry received'\n  };\n} catch (e) {\n  // Silent fallback — classification defaults already set\n  classification.parse_error = e.message;\n}\n\nreturn [{ json: { ...item, ...classification } }];"
+      }
+    },
+    {
+      "id": "s3-node-005",
+      "name": "Switch — Intent Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [980, 300],
+      "parameters": {
+        "mode": "rules",
+        "options": {},
+        "rules": {
+          "rules": [
+            {
+              "outputIndex": 0,
+              "conditions": { "conditions": [{ "leftValue": "={{ $json.intent }}", "rightValue": "support", "operator": { "type": "string", "operation": "equals" } }] }
+            },
+            {
+              "outputIndex": 1,
+              "conditions": { "conditions": [{ "leftValue": "={{ $json.intent }}", "rightValue": "sales", "operator": { "type": "string", "operation": "equals" } }] }
+            },
+            {
+              "outputIndex": 2,
+              "conditions": { "conditions": [{ "leftValue": "={{ $json.intent }}", "rightValue": "billing", "operator": { "type": "string", "operation": "equals" } }] }
+            }
+          ],
+          "fallbackOutput": 3
+        }
+      }
+    },
+    {
+      "id": "s3-node-006",
+      "name": "OpenAI — Generate Support Response",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [1180, 160],
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a helpful, empathetic customer support agent. Write a professional, warm response to the following support inquiry. Acknowledge their issue, provide initial guidance or next steps, and let them know a specialist will follow up if needed. Keep it under 150 words. Do not use markdown formatting."
+            },
+            {
+              "role": "user",
+              "content": "={{ 'Customer: ' + $json.sender_name + '\\nIssue Summary: ' + $json.summary + '\\nFull Message: ' + $json.message_clean }}"
+            }
+          ]
+        },
+        "options": { "temperature": 0.4, "maxTokens": 300 }
+      },
+      "credentials": { "openAiApi": { "id": "openai-cred-id", "name": "OpenAI API" } }
+    },
+    {
+      "id": "s3-node-007",
+      "name": "OpenAI — Generate Sales Response",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [1180, 280],
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a sales development representative. Write a brief, enthusiastic response to a sales inquiry. Acknowledge their interest, highlight one key value proposition relevant to their message, and include a clear CTA to book a demo (use: https://cal.com/demo). Keep it under 120 words. Conversational tone, no markdown."
+            },
+            {
+              "role": "user",
+              "content": "={{ 'Prospect: ' + $json.sender_name + '\\nInquiry: ' + $json.message_clean }}"
+            }
+          ]
+        },
+        "options": { "temperature": 0.6, "maxTokens": 250 }
+      },
+      "credentials": { "openAiApi": { "id": "openai-cred-id", "name": "OpenAI API" } }
+    },
+    {
+      "id": "s3-node-008",
+      "name": "Set — Billing Template Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [1180, 400],
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [{
+            "name": "generated_response",
+            "type": "string",
+            "string": "Hi {{ $json.sender_name }},\n\nThank you for reaching out about your billing inquiry. Our billing team reviews all requests within 1 business day.\n\nFor immediate assistance, you can:\n- View your invoices at: https://billing.yourcompany.com\n- Email billing directly: billing@yourcompany.com\n\nYour inquiry has been logged and we'll follow up shortly.\n\nBest regards,\nThe Billing Team"
+          }]
+        }
+      }
+    },
+    {
+      "id": "s3-node-009",
+      "name": "OpenAI — Generate General Response",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [1180, 520],
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a friendly business assistant. Write a helpful, brief response to the following general inquiry. Be warm, direct, and offer to help further. Under 100 words. No markdown."
+            },
+            {
+              "role": "user",
+              "content": "={{ $json.message_clean }}"
+            }
+          ]
+        },
+        "options": { "temperature": 0.5, "maxTokens": 200 }
+      },
+      "credentials": { "openAiApi": { "id": "openai-cred-id", "name": "OpenAI API" } }
+    },
+    {
+      "id": "s3-node-010",
+      "name": "HTTP — Create Support Ticket (Notion)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1380, 160],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization",    "value": "Bearer YOUR_NOTION_INTEGRATION_TOKEN" },
+            { "name": "Notion-Version",   "value": "2022-06-28" },
+            { "name": "Content-Type",     "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ parent: { database_id: 'YOUR_NOTION_DATABASE_ID' }, properties: { Title: { title: [{ text: { content: $json.subject } }] }, Status: { select: { name: 'Open' } }, Priority: { select: { name: $json.priority.charAt(0).toUpperCase() + $json.priority.slice(1) } }, Customer: { rich_text: [{ text: { content: $json.sender_name + ' (' + $json.email + ')' } }] }, Summary: { rich_text: [{ text: { content: $json.summary } }] }, 'Inquiry ID': { rich_text: [{ text: { content: $json.inquiry_id } }] } } }) }}"
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "s3-node-011",
+      "name": "HTTP — HubSpot Sales Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1380, 280],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/contacts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer YOUR_HUBSPOT_ACCESS_TOKEN" },
+            { "name": "Content-Type",  "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ properties: { firstname: $json.sender_name.split(' ')[0], lastname: $json.sender_name.split(' ').slice(1).join(' ') || '', email: $json.email, hs_lead_status: 'NEW', lead_source: 'INQUIRY_ENGINE', inquiry_summary: $json.summary, inquiry_priority: $json.priority } }) }}"
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "s3-node-012",
+      "name": "Gmail — Dispatch Response (All Branches)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1580, 340],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "Re: {{ $json.subject }}",
+        "message": "={{ ($json.generated_response || $json.message?.content || $json.choices?.[0]?.message?.content || 'Thank you for your message. We will be in touch shortly.').replace(/\\n/g, '<br>') }}",
+        "options": {
+          "htmlMessage": true,
+          "replyTo": "support@yourcompany.com"
+        }
+      },
+      "credentials": { "gmailOAuth2": { "id": "gmail-oauth-cred", "name": "Gmail OAuth2" } }
+    },
+    {
+      "id": "s3-node-013",
+      "name": "Sheets — Full Audit Log",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1780, 340],
+      "parameters": {
+        "operation": "append",
+        "documentId": { "value": "YOUR_AUDIT_SHEET_ID" },
+        "sheetName": { "value": "Inquiry Log" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "inquiry_id": "={{ $json.inquiry_id }}",
+            "sender_name":"={{ $json.sender_name }}",
+            "email":      "={{ $json.email }}",
+            "subject":    "={{ $json.subject }}",
+            "intent":     "={{ $json.intent }}",
+            "confidence": "={{ $json.confidence }}",
+            "priority":   "={{ $json.priority }}",
+            "summary":    "={{ $json.summary }}",
+            "source":     "={{ $json.source }}",
+            "response_sent": "yes",
+            "received_at":"={{ $json.received_at }}"
+          }
+        }
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "gsheets-oauth-cred", "name": "Google Sheets OAuth2" } }
+    },
+    {
+      "id": "s3-node-014",
+      "name": "Respond — 200 Processing Receipt",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1980, 340],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ processed: true, inquiry_id: $json.inquiry_id, intent: $json.intent, priority: $json.priority }) }}",
+        "options": { "responseCode": 200 }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Inquiry Entry": {
+      "main": [[{ "node": "Set — Input Normalization", "type": "main", "index": 0 }]]
+    },
+    "Set — Input Normalization": {
+      "main": [[{ "node": "OpenAI — Intent Classifier", "type": "main", "index": 0 }]]
+    },
+    "OpenAI — Intent Classifier": {
+      "main": [[{ "node": "Code — Parse & Validate LLM Output", "type": "main", "index": 0 }]]
+    },
+    "Code — Parse & Validate LLM Output": {
+      "main": [[{ "node": "Switch — Intent Router", "type": "main", "index": 0 }]]
+    },
+    "Switch — Intent Router": {
+      "main": [
+        [{ "node": "OpenAI — Generate Support Response", "type": "main", "index": 0 }],
+        [{ "node": "OpenAI — Generate Sales Response",   "type": "main", "index": 0 }],
+        [{ "node": "Set — Billing Template Response",    "type": "main", "index": 0 }],
+        [{ "node": "OpenAI — Generate General Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "OpenAI — Generate Support Response": {
+      "main": [[{ "node": "HTTP — Create Support Ticket (Notion)", "type": "main", "index": 0 }]]
+    },
+    "HTTP — Create Support Ticket (Notion)": {
+      "main": [[{ "node": "Gmail — Dispatch Response (All Branches)", "type": "main", "index": 0 }]]
+    },
+    "OpenAI — Generate Sales Response": {
+      "main": [[{ "node": "HTTP — HubSpot Sales Contact", "type": "main", "index": 0 }]]
+    },
+    "HTTP — HubSpot Sales Contact": {
+      "main": [[{ "node": "Gmail — Dispatch Response (All Branches)", "type": "main", "index": 0 }]]
+    },
+    "Set — Billing Template Response": {
+      "main": [[{ "node": "Gmail — Dispatch Response (All Branches)", "type": "main", "index": 0 }]]
+    },
+    "OpenAI — Generate General Response": {
+      "main": [[{ "node": "Gmail — Dispatch Response (All Branches)", "type": "main", "index": 0 }]]
+    },
+    "Gmail — Dispatch Response (All Branches)": {
+      "main": [[{ "node": "Sheets — Full Audit Log", "type": "main", "index": 0 }]]
+    },
+    "Sheets — Full Audit Log": {
+      "main": [[{ "node": "Respond — 200 Processing Receipt", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "errorWorkflow": "error-handling-workflow-id"
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">D — Deployment &amp; Configuration</div>
+      <ol class="step-list">
+        <li><div class="step-content"><strong>Required Credentials</strong><span>OpenAI API key (gpt-4o-mini access required), Gmail OAuth2, Google Sheets OAuth2, Notion Integration Token + Database ID, HubSpot Private App access token, Slack Bot Token.</span></div></li>
+        <li><div class="step-content"><strong>Notion Database Schema</strong><span>Create a Notion database with properties: Title (text), Status (select: Open/In Progress/Resolved), Priority (select: High/Medium/Low), Customer (text), Summary (text), Inquiry ID (text).</span></div></li>
+        <li><div class="step-content"><strong>Testing Protocol</strong><span>Send 4 test payloads — one for each intent type. Verify: correct branch execution, LLM response quality, ticket/CRM creation, Gmail delivery, Sheets logging. Test edge case: malformed message (empty body) to verify Code node fallback.</span></div></li>
+        <li><div class="step-content"><strong>LLM Cost Monitoring</strong><span>At 100 inquiries/day with gpt-4o-mini: ~2 API calls per inquiry (classification + response) = 200 calls × ~$0.0003 avg = ~$0.06/day or ~$1.80/month. Negligible at scale. Monitor via OpenAI usage dashboard; set a hard monthly limit alert at $20.</span></div></li>
+        <li><div class="step-content"><strong>Prompt Tuning</strong><span>After 1 week of operation, review Sheets audit log for misclassifications (where human team manually re-routed). Adjust system prompt classification rules accordingly. Expect 2–3 tuning cycles before reaching &gt;90% accuracy.</span></div></li>
+      </ol>
+    </div>
+
+    <div class="block">
+      <div class="block-title">E — Economic &amp; Productization Analysis</div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-tier">Consulting Build</div>
+          <div class="pricing-amount">$6,500</div>
+          <div class="pricing-period">project fee</div>
+          <div class="pricing-desc">Full implementation with 2 CRM integrations, custom response tone, prompt calibration, team training, and 60-day support.</div>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-tier">Enterprise Package</div>
+          <div class="pricing-amount">$10,000</div>
+          <div class="pricing-period">+ $799/mo retainer</div>
+          <div class="pricing-desc">Build + monthly prompt optimization + performance analytics report + priority support + quarterly scoring review.</div>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-tier">AI Inbox SaaS</div>
+          <div class="pricing-amount">$499</div>
+          <div class="pricing-period">per month</div>
+          <div class="pricing-desc">White-label product: client connects their email + CRM, configures tone + routing, goes live in under 1 hour. 5 clients = $2,495 MRR.</div>
+        </div>
+      </div>
+      <div class="callout callout-teal" style="margin-top:1.5rem;">
+        <div class="callout-title">SaaS Transition Path</div>
+        <p>System S3 represents the architectural foundation of a fully productizable SaaS offering. To transition from per-client consulting to a recurring product: (1) abstract client-specific configurations (CRM targets, response tone, routing rules) into a configuration data structure; (2) build a simple onboarding form where clients input their API keys and preferences; (3) provision a new n8n workflow per client using the n8n API or a sub-workflow pattern. At 20 clients at $499/mo = $9,980 MRR. At 50 clients = $24,950 MRR. Infrastructure cost on a self-hosted VPS at this scale: ~$80–$150/month.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div style="background:var(--bg3); border-top:1px solid var(--border); padding:2rem 4rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <div style="font-family:var(--serif); font-size:1rem; color:var(--text); margin-bottom:0.25rem;">Chapter 3 — Career Path, Portfolio &amp; n8n Developer</div>
+      <div style="font-size:12px; color:var(--text3);">Information Systems &amp; Automation Engineering · Academic Course Module</div>
+    </div>
+    <div style="font-family:var(--mono); font-size:11px; color:var(--text3);">v1.0 · 5 Lessons · 3 Portfolio Systems · 3 JSON Exports</div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  // Active nav highlighting on scroll
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(item => item.classList.remove('active'));
+        const activeItem = document.querySelector(`.nav-item[href="#${entry.target.id}"]`);
+        if (activeItem) activeItem.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-10% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
