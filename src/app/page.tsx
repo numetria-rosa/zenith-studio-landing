@@ -221,7 +221,6 @@ export default function ZenithStudioLandingPage() {
               <div className="text-xs uppercase tracking-[0.3em] text-fuchsia-200/70">Projects / Live demos</div>
               <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">Systems built to prove value fast</h2>
             </div>
-            <div className="text-sm text-white/55">Placeholders ready for the live demos you’ll add next.</div>
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
@@ -235,7 +234,7 @@ export default function ZenithStudioLandingPage() {
                   <div className="text-xs uppercase tracking-[0.25em] text-white/45">Demo {String(index + 1).padStart(2, "0")}</div>
                   <h3 className="mt-3 text-2xl font-semibold tracking-[-0.04em]">{demo}</h3>
                   <p className="mt-3 max-w-xl text-sm leading-7 text-white/60">
-                    Sleek landing spot for a real, working system demo. Add screenshots, public links, case-study metrics, and a CTA once each build is ready.
+                    
                   </p>
                   <div className="mt-6 flex items-center gap-3">
                     <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">Live preview soon</span>
