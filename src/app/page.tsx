@@ -286,17 +286,17 @@ export default function ZenithStudioLandingPage() {
               </div>
 
               <div className="rounded-[30px] border border-white/10 bg-black/20 p-6">
-                <div className="text-sm font-semibold text-white">What you can put here next</div>
+                <div className="text-sm font-semibold text-white"></div>
                 <div className="mt-4 space-y-3 text-sm text-white/62">
-                  <div>• Upwork profile link</div>
-                  <div>• Email contact</div>
-                  <div>• Calendly / booking link</div>
-                  <div>• Product request form</div>
+                  
                 </div>
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <a href="#" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black">Book a Call</a>
-                  <a href="#" className="rounded-full border border-white/12 bg-white/5 px-5 py-3 text-sm font-semibold text-white">See Projects</a>
-                </div>
+<a 
+  href="mailto:zenith.studio.s@outlook.com" 
+  className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black"
+>
+  Contact Us
+</a>                </div>
               </div>
             </div>
           </div>
