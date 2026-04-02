@@ -1,0 +1,2878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chapters 2 & 3 — Turning Automations Into Income · Mastering JSON & Real Business Problems</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:       #0c0e10;
+    --bg2:      #131618;
+    --bg3:      #1a1d21;
+    --bg4:      #212529;
+    --border:   #252a30;
+    --border2:  #303840;
+    --text:     #dde4ec;
+    --text2:    #8a96a4;
+    --text3:    #4a5560;
+    --teal:     #2dd4bf;
+    --teal2:    #5eead4;
+    --teal-bg:  rgba(45,212,191,0.07);
+    --teal-bdr: rgba(45,212,191,0.22);
+    --amber:    #f59e0b;
+    --amber2:   #fbbf24;
+    --amber-bg: rgba(245,158,11,0.07);
+    --amber-bdr:rgba(245,158,11,0.22);
+    --purple:   #a78bfa;
+    --purple2:  #c4b5fd;
+    --purple-bg:rgba(167,139,250,0.07);
+    --coral:    #f87171;
+    --coral-bg: rgba(248,113,113,0.07);
+    --green:    #4ade80;
+    --green-bg: rgba(74,222,128,0.07);
+    --blue:     #60a5fa;
+    --blue-bg:  rgba(96,165,250,0.07);
+    --pink:     #f472b6;
+    --pink-bg:  rgba(244,114,182,0.07);
+    --serif:    'Playfair Display', Georgia, serif;
+    --sans:     'Plus Jakarta Sans', system-ui, sans-serif;
+    --mono:     'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ─── SIDEBAR ─────────────────────────────────────────────── */
+  .sidebar {
+    width: 290px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0 2rem;
+  }
+
+  .sidebar-brand {
+    padding: 0 1.4rem 1.4rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.2rem;
+  }
+  .sb-super {
+    font-size: 10px; font-weight: 500; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--teal);
+    background: var(--teal-bg); border: 1px solid var(--teal-bdr);
+    padding: 3px 8px; border-radius: 4px;
+    display: inline-block; margin-bottom: .6rem;
+  }
+  .sidebar-brand h1 { font-family: var(--serif); font-size: 14.5px; font-weight: 400; color: var(--text); line-height: 1.4; }
+
+  .sb-ch-label {
+    font-size: 9.5px; font-weight: 600; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--text3);
+    padding: .5rem 1.4rem .35rem; display: block;
+  }
+  .sb-ch-divider { height: 1px; background: var(--border); margin: .9rem 1.4rem; }
+
+  .nav-item {
+    display: flex; align-items: flex-start; gap: .65rem;
+    padding: .55rem 1.4rem; cursor: pointer;
+    transition: background .12s; text-decoration: none;
+    border-left: 2px solid transparent;
+  }
+  .nav-item:hover { background: var(--bg3); }
+  .nav-item.active { background: var(--teal-bg); border-left-color: var(--teal); }
+
+  .nav-num { font-family: var(--mono); font-size: 10.5px; color: var(--teal); min-width: 22px; margin-top: 1px; }
+  .nav-label { font-size: 12px; color: var(--text2); line-height: 1.4; }
+  .nav-item.active .nav-label { color: var(--teal2); }
+
+  /* ─── MAIN ───────────────────────────────────────────────── */
+  .main { flex: 1; overflow-x: hidden; min-width: 0; }
+
+  /* ─── HERO ───────────────────────────────────────────────── */
+  .hero {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 4.5rem 4rem 3.5rem;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(45,212,191,.05) 0%, transparent 65%);
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: -80px; left: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(167,139,250,.04) 0%, transparent 65%);
+  }
+  .hero-badge {
+    font-size: 11px; font-weight: 500; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--teal);
+    border: 1px solid var(--teal-bdr); padding: 5px 13px;
+    border-radius: 4px; display: inline-block;
+    margin-bottom: 1.4rem; background: var(--teal-bg);
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 400; color: var(--text);
+    line-height: 1.2; margin-bottom: 1rem; max-width: 760px;
+  }
+  .hero h1 em { font-style: italic; color: var(--teal2); }
+  .hero-desc { color: var(--text2); max-width: 640px; font-size: 14.5px; line-height: 1.75; }
+  .hero-meta {
+    display: flex; gap: 2rem; margin-top: 2rem;
+    padding-top: 1.75rem; border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .hero-meta-label { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text3); }
+  .hero-meta-value { font-size: 13px; color: var(--text2); }
+
+  /* Chapter badge row */
+  .chapter-stripe {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem 4rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+  .ch-pill {
+    font-size: 11px; font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; padding: 4px 12px;
+    border-radius: 4px; white-space: nowrap;
+  }
+  .ch-pill-teal  { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-bdr); }
+  .ch-pill-amber { background: var(--amber-bg);  color: var(--amber2); border: 1px solid var(--amber-bdr); }
+  .ch-title { font-family: var(--serif); font-size: 1.1rem; color: var(--text); font-weight: 400; }
+  .ch-desc  { font-size: 12.5px; color: var(--text3); margin-left: auto; white-space: nowrap; }
+
+  /* ─── SECTION ────────────────────────────────────────────── */
+  .chapter-section {
+    padding: 3.5rem 4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lesson-header { margin-bottom: 2.75rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--border); }
+  .lesson-number { font-family: var(--mono); font-size: 10.5px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); margin-bottom: .6rem; display: block; }
+  .lesson-title { font-family: var(--serif); font-size: clamp(1.5rem, 2.2vw, 2rem); font-weight: 400; color: var(--text); line-height: 1.25; margin-bottom: .6rem; }
+  .lesson-subtitle { font-size: 14px; color: var(--text2); max-width: 640px; font-weight: 300; line-height: 1.7; }
+  .lesson-tags { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .9rem; }
+
+  .tag { font-size: 10.5px; font-weight: 500; padding: 3px 10px; border-radius: 20px; letter-spacing: .04em; }
+  .tag-teal   { background: var(--teal-bg);   color: var(--teal2);  border: 1px solid var(--teal-bdr); }
+  .tag-amber  { background: var(--amber-bg);  color: var(--amber2); border: 1px solid var(--amber-bdr); }
+  .tag-purple { background: var(--purple-bg); color: var(--purple2);border: 1px solid rgba(167,139,250,.22); }
+  .tag-coral  { background: var(--coral-bg);  color: var(--coral);  border: 1px solid rgba(248,113,113,.22); }
+  .tag-blue   { background: var(--blue-bg);   color: var(--blue);   border: 1px solid rgba(96,165,250,.22); }
+  .tag-green  { background: var(--green-bg);  color: var(--green);  border: 1px solid rgba(74,222,128,.22); }
+  .tag-pink   { background: var(--pink-bg);   color: var(--pink);   border: 1px solid rgba(244,114,182,.22); }
+
+  /* ─── CONTENT BLOCKS ─────────────────────────────────────── */
+  .block { margin-bottom: 2.25rem; }
+
+  .block-title {
+    font-size: 10.5px; font-weight: 600; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--teal);
+    margin-bottom: .9rem; display: flex; align-items: center; gap: .75rem;
+  }
+  .block-title::after { content: ''; flex: 1; height: 1px; background: var(--teal-bdr); }
+
+  h3 { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; color: var(--text); margin-bottom: .65rem; margin-top: 1.75rem; }
+  h3:first-child { margin-top: 0; }
+
+  p { color: var(--text2); margin-bottom: .8rem; font-weight: 300; line-height: 1.8; }
+  strong { color: var(--text); font-weight: 500; }
+  ul, ol { padding-left: 1.2rem; color: var(--text2); margin-bottom: .8rem; }
+  li { margin-bottom: .4rem; line-height: 1.7; }
+  li strong { color: var(--text); }
+  code { font-family: var(--mono); font-size: 12px; color: var(--teal2); background: var(--teal-bg); padding: 1px 6px; border-radius: 3px; }
+
+  /* ─── CALLOUTS ───────────────────────────────────────────── */
+  .callout { border-radius: 8px; padding: 1.1rem 1.4rem; margin: 1.4rem 0; border-left: 3px solid; }
+  .callout-title { font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .45rem; }
+  .callout p { margin-bottom: 0; font-size: 13.5px; line-height: 1.65; }
+
+  .callout-teal   { background: var(--teal-bg);   border-color: var(--teal);   }
+  .callout-teal   .callout-title { color: var(--teal2); }
+  .callout-teal   p { color: #7dd8d0; }
+  .callout-amber  { background: var(--amber-bg);  border-color: var(--amber);  }
+  .callout-amber  .callout-title { color: var(--amber2); }
+  .callout-amber  p { color: #d4b072; }
+  .callout-purple { background: var(--purple-bg); border-color: var(--purple); }
+  .callout-purple .callout-title { color: var(--purple2); }
+  .callout-purple p { color: #b8a8e8; }
+  .callout-coral  { background: var(--coral-bg);  border-color: var(--coral);  }
+  .callout-coral  .callout-title { color: var(--coral); }
+  .callout-coral  p { color: #d48888; }
+  .callout-green  { background: var(--green-bg);  border-color: var(--green);  }
+  .callout-green  .callout-title { color: var(--green); }
+  .callout-green  p { color: #80cc88; }
+
+  /* ─── OBJECTIVES ─────────────────────────────────────────── */
+  .objectives-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .9rem; margin: 1.1rem 0; }
+  .objective-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: .9rem 1.1rem; display: flex; gap: .7rem; align-items: flex-start; }
+  .obj-level { font-size: 9.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; white-space: nowrap; margin-top: 1px; }
+  .obj-text { font-size: 12.5px; color: var(--text2); line-height: 1.5; }
+
+  .level-analyze  { background: var(--blue-bg);   color: var(--blue);   border: 1px solid rgba(96,165,250,.25); }
+  .level-design   { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(167,139,250,.25); }
+  .level-evaluate { background: var(--teal-bg);   color: var(--teal);   border: 1px solid var(--teal-bdr); }
+  .level-implement{ background: var(--green-bg);  color: var(--green);  border: 1px solid rgba(74,222,128,.25); }
+  .level-apply    { background: var(--coral-bg);  color: var(--coral);  border: 1px solid rgba(248,113,113,.25); }
+  .level-create   { background: var(--amber-bg);  color: var(--amber2); border: 1px solid var(--amber-bdr); }
+
+  /* ─── TABLES ─────────────────────────────────────────────── */
+  .data-table { width: 100%; border-collapse: collapse; margin: 1.1rem 0; font-size: 13px; }
+  .data-table th { background: var(--bg3); color: var(--text); font-weight: 500; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; padding: .65rem .9rem; text-align: left; border: 1px solid var(--border); }
+  .data-table td { padding: .6rem .9rem; border: 1px solid var(--border); color: var(--text2); vertical-align: top; line-height: 1.5; }
+  .data-table tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  .data-table td:first-child { color: var(--teal2); font-family: var(--mono); font-size: 11.5px; white-space: nowrap; }
+
+  /* node table variant */
+  .node-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 12.5px; }
+  .node-table th { background: var(--bg3); color: var(--text); font-weight: 500; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: .55rem .9rem; text-align: left; border: 1px solid var(--border); }
+  .node-table td { padding: .55rem .9rem; border: 1px solid var(--border); color: var(--text2); vertical-align: top; line-height: 1.5; }
+  .node-table tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+  .node-table td:first-child { font-family: var(--mono); font-size: 11px; color: var(--purple2); white-space: nowrap; }
+  .node-table td:nth-child(2) { font-family: var(--mono); font-size: 11px; color: var(--teal); white-space: nowrap; }
+
+  /* comparison table */
+  .cmp-table { width: 100%; border-collapse: collapse; margin: 1.1rem 0; font-size: 13px; }
+  .cmp-table th { background: var(--bg3); color: var(--text); font-weight: 500; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; padding: .65rem .9rem; text-align: left; border: 1px solid var(--border); }
+  .cmp-table td { padding: .6rem .9rem; border: 1px solid var(--border); color: var(--text2); vertical-align: top; line-height: 1.5; }
+  .cmp-table tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+
+  /* ─── ARCH DIAGRAM ───────────────────────────────────────── */
+  .arch-diagram {
+    background: #080a0c; border: 1px solid var(--border2);
+    border-radius: 10px; padding: 1.75rem;
+    margin: 1.4rem 0; font-family: var(--mono);
+    font-size: 12px; color: var(--text2);
+    overflow-x: auto; line-height: 1.9;
+  }
+  .ah  { color: var(--teal2); font-weight: 500; }
+  .an  { color: var(--purple2); }
+  .aa  { color: var(--teal); }
+  .am  { color: var(--amber2); }
+  .anote { color: var(--text3); font-style: italic; }
+  .ak  { color: var(--green); }
+
+  /* ─── STEP LIST ──────────────────────────────────────────── */
+  .step-list { counter-reset: steps; list-style: none; padding: 0; margin: 1.1rem 0; }
+  .step-list li { counter-increment: steps; display: flex; gap: .9rem; align-items: flex-start; margin-bottom: .9rem; padding-bottom: .9rem; border-bottom: 1px solid var(--border); }
+  .step-list li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .step-list li::before { content: counter(steps, decimal-leading-zero); font-family: var(--mono); font-size: 10.5px; font-weight: 500; color: var(--teal); background: var(--teal-bg); border: 1px solid var(--teal-bdr); border-radius: 4px; padding: 3px 7px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+  .step-content strong { display: block; font-size: 13px; margin-bottom: .15rem; color: var(--text); font-weight: 500; }
+  .step-content span   { font-size: 12.5px; color: var(--text2); line-height: 1.6; }
+
+  /* ─── JSON BLOCK ─────────────────────────────────────────── */
+  .json-section { margin: 1.4rem 0; }
+  .json-header { display: flex; align-items: center; justify-content: space-between; background: var(--bg3); border: 1px solid var(--border); border-bottom: none; border-radius: 8px 8px 0 0; padding: .65rem 1.1rem; }
+  .json-title { font-family: var(--mono); font-size: 11.5px; color: var(--teal2); font-weight: 500; }
+  .json-badge { font-size: 9.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--green); background: var(--green-bg); border: 1px solid rgba(74,222,128,.22); padding: 2px 8px; border-radius: 4px; }
+  .json-body { background: #060809; border: 1px solid var(--border); border-radius: 0 0 8px 8px; padding: 1.4rem; overflow-x: auto; max-height: 540px; overflow-y: auto; }
+  pre { font-family: var(--mono); font-size: 11.5px; line-height: 1.65; color: #c0ccd8; white-space: pre; tab-size: 2; }
+
+  /* ─── SPEC GRID ──────────────────────────────────────────── */
+  .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin: 1.1rem 0; }
+  .spec-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: .9rem 1.1rem; }
+  .spec-label { font-size: 9.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text3); margin-bottom: .35rem; }
+  .spec-value { font-size: 12.5px; color: var(--text); font-weight: 400; line-height: 1.5; }
+
+  /* ─── PRICING ────────────────────────────────────────────── */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin: 1.1rem 0; }
+  .pricing-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem; text-align: center; }
+  .pricing-card.featured { border-color: var(--teal); background: var(--teal-bg); }
+  .pricing-tier { font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text3); margin-bottom: .45rem; }
+  .pricing-card.featured .pricing-tier { color: var(--teal); }
+  .pricing-amount { font-family: var(--serif); font-size: 1.75rem; color: var(--text); line-height: 1.1; margin-bottom: .2rem; }
+  .pricing-period { font-size: 11.5px; color: var(--text3); margin-bottom: .65rem; }
+  .pricing-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+  /* ─── EXERCISE ───────────────────────────────────────────── */
+  .exercise-block { background: rgba(167,139,250,.06); border: 1px solid rgba(167,139,250,.22); border-radius: 10px; padding: 1.4rem 1.6rem; margin: 1.75rem 0; }
+  .exercise-title { font-size: 10.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--purple2); margin-bottom: .65rem; }
+  .exercise-h { font-family: var(--serif); font-size: 1.05rem; font-weight: 400; color: var(--text); margin-bottom: .45rem; }
+  .exercise-block p { color: #b0a0e0; font-size: 13.5px; margin-bottom: .45rem; }
+  .exercise-block ul { color: #b0a0e0; font-size: 13.5px; }
+
+  /* ─── INSIGHT ────────────────────────────────────────────── */
+  .insight-card { display: flex; gap: 1.1rem; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.4rem; margin: 1.4rem 0; align-items: flex-start; }
+  .insight-icon { font-size: 22px; flex-shrink: 0; line-height: 1; }
+  .insight-body strong { display: block; font-size: 13.5px; margin-bottom: .25rem; color: var(--text); }
+  .insight-body p { font-size: 13px; color: var(--text2); margin: 0; }
+
+  /* ─── PART DIVIDER ───────────────────────────────────────── */
+  .part-divider { background: var(--bg3); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 2.5rem 4rem; text-align: center; }
+  .part-num { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--text3); margin-bottom: .65rem; }
+  .part-divider h2 { font-family: var(--serif); font-size: 1.75rem; font-weight: 400; color: var(--text); margin-bottom: .4rem; }
+  .part-divider p { font-size: 13.5px; color: var(--text2); max-width: 540px; margin: 0 auto; }
+
+  /* ─── MISC ───────────────────────────────────────────────── */
+  .roi-tag { display: inline-flex; align-items: center; gap: .35rem; background: var(--green-bg); border: 1px solid rgba(74,222,128,.22); color: var(--green); font-size: 11.5px; font-weight: 500; padding: 2px 9px; border-radius: 20px; font-family: var(--mono); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  .divider { height: 1px; background: var(--border); margin: 1.75rem 0; }
+  a { color: var(--teal2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  @media(max-width:900px){
+    .sidebar { display: none; }
+    .hero, .chapter-section, .chapter-stripe { padding: 2rem 1.5rem; }
+    .spec-grid, .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sb-super">Chapters 2 &amp; 3</div>
+    <h1>Automations Into Income &amp; Mastering JSON</h1>
+  </div>
+
+  <span class="sb-ch-label">Chapter 2 — Module Lessons</span>
+  <a href="#l1" class="nav-item"><span class="nav-num">L1</span><span class="nav-label">Building a Production Client System</span></a>
+  <a href="#l2" class="nav-item"><span class="nav-num">L2</span><span class="nav-label">Lead Generation Pipeline Architecture</span></a>
+  <a href="#l3" class="nav-item"><span class="nav-num">L3</span><span class="nav-label">Selling Your First Workflow</span></a>
+  <a href="#l4" class="nav-item"><span class="nav-num">L4</span><span class="nav-label">AI-Powered Client Support with Agents</span></a>
+  <a href="#l5" class="nav-item"><span class="nav-num">L5</span><span class="nav-label">Scaling &amp; Productizing Workflows</span></a>
+
+  <div class="sb-ch-divider"></div>
+  <span class="sb-ch-label">Chapter 3 — Module Lessons</span>
+  <a href="#l6" class="nav-item"><span class="nav-num">L6</span><span class="nav-label">Mastering n8n JSON Architecture</span></a>
+  <a href="#l7" class="nav-item"><span class="nav-num">L7</span><span class="nav-label">E-Commerce Order Management System</span></a>
+  <a href="#l8" class="nav-item"><span class="nav-num">L8</span><span class="nav-label">Multi-Channel Marketing Automation</span></a>
+
+  <div class="sb-ch-divider"></div>
+  <span class="sb-ch-label">Part 2 — Portfolio Systems</span>
+  <a href="#s1" class="nav-item"><span class="nav-num">S1</span><span class="nav-label">Lead Generation &amp; Processing Pipeline</span></a>
+  <a href="#s2" class="nav-item"><span class="nav-num">S2</span><span class="nav-label">AI Client Support Agent System</span></a>
+  <a href="#s3" class="nav-item"><span class="nav-num">S3</span><span class="nav-label">E-Commerce Order Automation Engine</span></a>
+  <a href="#s4" class="nav-item"><span class="nav-num">S4</span><span class="nav-label">Marketing Campaign Automation Engine</span></a>
+</nav>
+
+<!-- ═══════════════════ MAIN ═══════════════════════ -->
+<main class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Information Systems &amp; Automation Engineering · Chapters 2 &amp; 3</div>
+  <h1>Turning Automations Into Income &amp;<br><em>Mastering JSON for Real Business Problems</em></h1>
+  <p class="hero-desc">Two interconnected modules that bridge technical workflow design with commercial delivery. Chapter 2 transforms learners into automation consultants capable of building, pricing, and selling production systems. Chapter 3 deepens technical mastery through JSON architecture, e-commerce automation, and AI-driven marketing pipelines.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><span class="hero-meta-label">Chapters</span><span class="hero-meta-value">2 &amp; 3</span></div>
+    <div class="hero-meta-item"><span class="hero-meta-label">Lessons</span><span class="hero-meta-value">8 Academic Lessons</span></div>
+    <div class="hero-meta-item"><span class="hero-meta-label">Portfolio Systems</span><span class="hero-meta-value">4 Production Projects</span></div>
+    <div class="hero-meta-item"><span class="hero-meta-label">Bloom's Level</span><span class="hero-meta-value">Apply → Create → Evaluate</span></div>
+    <div class="hero-meta-item"><span class="hero-meta-label">JSON Exports</span><span class="hero-meta-value">4 Import-Ready Workflows</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════ CHAPTER 2 STRIPE ═══════════════ -->
+<div class="chapter-stripe">
+  <span class="ch-pill ch-pill-teal">Chapter 2</span>
+  <span class="ch-title">Turning Automations Into Income — Client Systems &amp; Scaling</span>
+  <span class="ch-desc">5 Lessons · Commercial Focus</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LESSON 1
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="l1">
+  <div class="lesson-header">
+    <span class="lesson-number">Chapter 2 · Lesson 01</span>
+    <h2 class="lesson-title">Building a Production Client Automation System:<br>Architecture, Scope, and Delivery Standards</h2>
+    <p class="lesson-subtitle">A systematic framework for translating a client's operational problem into a production-quality n8n automation system — covering requirements elicitation, architectural decision-making, delivery standards, and handover protocol.</p>
+    <div class="lesson-tags">
+      <span class="tag tag-teal">Requirements Engineering</span>
+      <span class="tag tag-purple">System Architecture</span>
+      <span class="tag tag-amber">Client Delivery</span>
+      <span class="tag tag-blue">Production Standards</span>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">01 — Learning Objectives</div>
+    <div class="objectives-grid">
+      <div class="objective-card"><span class="obj-level level-analyze">Analyze</span><span class="obj-text">Decompose a business problem statement into discrete automation requirements with defined acceptance criteria.</span></div>
+      <div class="objective-card"><span class="obj-level level-design">Design</span><span class="obj-text">Architect a multi-node workflow that satisfies both functional requirements and non-functional constraints such as latency and error resilience.</span></div>
+      <div class="objective-card"><span class="obj-level level-implement">Implement</span><span class="obj-text">Apply professional delivery standards including node naming conventions, sticky-note documentation, and structured handover artifacts.</span></div>
+      <div class="objective-card"><span class="obj-level level-evaluate">Evaluate</span><span class="obj-text">Assess when a client's problem is best solved by n8n versus a native integration, SaaS tool, or custom code solution.</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">02 — Conceptual Foundations</div>
+    <h3>Defining "Production-Ready" in the Context of n8n</h3>
+    <p>A production-ready automation system is one that operates reliably without human supervision, degrades gracefully under failure conditions, and produces auditable outputs. It is distinguished from a prototype by four engineering properties: <strong>idempotency</strong> (re-execution produces the same outcome), <strong>observability</strong> (execution state is logged and inspectable), <strong>error resilience</strong> (failures are caught, routed, and surfaced rather than silently dropped), and <strong>maintainability</strong> (another practitioner can understand, modify, and extend the workflow without prior context).</p>
+    <p>In commercial client work, the gap between "working" and "production-ready" directly maps to the gap between a $500 project and a $3,000 project. Clients are not purchasing automation logic — they are purchasing operational confidence. The practitioner who delivers observable, documented, resilient systems commands premium pricing because they are transferring risk away from the client.</p>
+
+    <h3>The Four-Phase Client System Lifecycle</h3>
+    <p>Every client engagement, regardless of scope or complexity, follows the same structural phases. Internalizing this lifecycle as a process template — not an informal practice — creates repeatable delivery quality and enables parallel client management:</p>
+    <ol>
+      <li><strong>Discovery Phase:</strong> Needs analysis, pain point quantification, scope boundary definition, integration inventory, success metrics definition.</li>
+      <li><strong>Architecture Phase:</strong> System design document, node-level specification, API dependency audit, credential requirements, data flow diagram.</li>
+      <li><strong>Build &amp; Test Phase:</strong> Implementation, unit testing per node branch, integration testing with live credentials, edge case validation, error path verification.</li>
+      <li><strong>Handover Phase:</strong> JSON export, README documentation, client walkthrough, operator runbook, 30-day monitoring commitment.</li>
+    </ol>
+
+    <div class="callout callout-teal">
+      <div class="callout-title">Critical Production Checklist</div>
+      <p>Before delivering any client workflow, verify: (1) All nodes have descriptive names — no "Set1" or "IF2". (2) Error branches exist on every external API call (HTTP Request nodes have <code>continueOnFail: true</code> or explicit error outputs). (3) An error notification workflow is connected via the workflow settings. (4) All sensitive values (API keys, tokens) are stored in n8n credentials vault, not hardcoded in node parameters. (5) At least one end-to-end test execution has been run with the exact credentials the client will use in production.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">03 — System Design Perspective</div>
+    <h3>From Problem Statement to Workflow Architecture</h3>
+    <p>The architectural translation process begins with a structured decomposition of the client's problem statement. A raw problem such as "we lose track of leads after they fill out our form" must be decomposed into: trigger events, data inputs, transformation requirements, decision logic, outputs, and failure conditions before a single node is placed on the canvas.</p>
+    <div class="arch-diagram">
+<span class="ah">ARCHITECTURAL DECOMPOSITION TEMPLATE</span>
+
+<span class="ah">1. TRIGGER DEFINITION</span>
+   What event initiates the workflow?
+   <span class="aa">→</span> <span class="an">Form submission</span>   (Webhook / Typeform / Webflow)
+   <span class="aa">→</span> <span class="an">Email received</span>    (Gmail / IMAP trigger)
+   <span class="aa">→</span> <span class="an">Schedule</span>          (Cron node)
+   <span class="aa">→</span> <span class="an">App event</span>         (Webhook from CRM / Stripe / Shopify)
+
+<span class="ah">2. INPUT DATA INVENTORY</span>
+   What data arrives with the trigger?
+   Required fields vs. optional fields?
+   Expected data types and formats?
+   Known inconsistencies in source data?
+
+<span class="ah">3. TRANSFORMATION REQUIREMENTS</span>
+   What must be done to the data before actions?
+   <span class="aa">→</span> Normalization  (lowercase, trim, type coercion)
+   <span class="aa">→</span> Enrichment     (external API lookup)
+   <span class="aa">→</span> Computation    (scoring, formatting, aggregation)
+   <span class="aa">→</span> Validation     (required fields, format checks)
+
+<span class="ah">4. DECISION LOGIC</span>
+   What conditions determine which path to take?
+   Binary? (IF node)  Multi-path? (Switch node)
+   Conditions based on data values or external state?
+
+<span class="ah">5. ACTION OUTPUTS</span>
+   What systems need to be updated/notified?
+   Write operations vs. read operations?
+   Synchronous (inline) vs. asynchronous (sub-workflow)?
+
+<span class="ah">6. FAILURE MODES</span>
+   What happens if API X is unreachable?
+   What happens if required data is missing?
+   Who needs to be notified of failures?
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">04 — Applied Industry Context</div>
+    <h3>What Clients Are Actually Buying</h3>
+    <p>In the SMB market, automation buyers are not engineering managers evaluating technical specifications — they are founders, operations leads, and marketing directors experiencing a specific pain point at a specific cost. The most commercially successful automation practitioners frame their work in terms of operational outcomes, not technical features.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Technical Description</th><th>Client-Facing Translation</th><th>Business Value</th></tr></thead>
+      <tbody>
+        <tr><td>Webhook-triggered workflow with email dispatch</td><td>"Instant follow-up the moment a lead submits"</td><td>Response time: 48hrs → 90 seconds</td></tr>
+        <tr><td>Conditional branching on lead score</td><td>"Your best leads reach your sales team first, automatically"</td><td>Sales efficiency +40%, pipeline velocity increase</td></tr>
+        <tr><td>Google Sheets append node</td><td>"Every lead logged automatically, zero data entry"</td><td>2–5 hrs/week manual work eliminated</td></tr>
+        <tr><td>Error workflow with Slack notification</td><td>"You'll know immediately if anything breaks"</td><td>System reliability confidence, reduces monitoring burden</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="block">
+    <div class="block-title">05 — Critical Analysis</div>
+    <h3>Common Architecture Failures in Client Projects</h3>
+    <ul>
+      <li><strong>Single-point-of-failure API dependencies:</strong> Workflows that depend on a single third-party API without fallback logic will fail unpredictably. Mitigation: implement <code>continueOnFail</code> on all HTTP nodes and route failures to a notification sub-workflow.</li>
+      <li><strong>Data schema assumptions:</strong> Hardcoding field paths (e.g., <code>$json.body.email</code>) without validating the incoming payload structure creates fragile workflows that break when the upstream form tool changes its output format. Always normalize via Set nodes with explicit fallback expressions.</li>
+      <li><strong>Credential sprawl:</strong> Storing API keys in workflow parameters rather than the n8n credentials vault creates a security and maintenance liability. Keys stored in parameters are visible in execution logs and cannot be rotated independently of the workflow.</li>
+      <li><strong>Over-engineering for the scope:</strong> A 3-node workflow that achieves the stated business objective is always preferable to a 15-node workflow that achieves the same outcome with additional abstraction. Complexity has maintenance cost. Match architecture to actual requirements, not theoretical edge cases.</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <div class="block-title">06 — Implementation Guidelines</div>
+    <h3>Discovery-to-Delivery Protocol</h3>
+    <ol class="step-list">
+      <li><div class="step-content"><strong>Run a Structured Discovery Call (45–60 min)</strong><span>Use a fixed questionnaire: What manual task do you do most often? What data goes in? What systems need to be updated? What does "done" look like? What breaks when it goes wrong? Capture verbatim answers — they become your requirements document.</span></div></li>
+      <li><div class="step-content"><strong>Produce a Written Scope Proposal</strong><span>A 1-page document: problem statement, proposed workflow summary (3–5 sentences), integration list, deliverables, timeline, and price. This is a commitment mechanism for both parties, not just a formality. Scope creep without scope documentation is the primary reason projects lose margin.</span></div></li>
+      <li><div class="step-content"><strong>Build to the Architecture Document, Not to the Prototype</strong><span>Before opening n8n, complete a node-level architecture sketch on paper or a diagramming tool. Every node should be named and its function defined before building begins. This prevents rework from structural changes mid-build.</span></div></li>
+      <li><div class="step-content"><strong>Test All Branches, Including Error Paths</strong><span>A workflow that has never had its error branch triggered is a workflow whose error behavior is unknown. Explicitly test: missing required fields, API timeout simulation (use n8n's built-in wait node or a mock endpoint), and duplicate submission handling.</span></div></li>
+      <li><div class="step-content"><strong>Deliver With Documentation, Not Just a JSON Export</strong><span>Handover package: (1) annotated workflow screenshot, (2) operator runbook (what to check if it stops working), (3) credential rotation procedure, (4) known limitations and edge cases, (5) contact protocol for issues. Clients who receive this level of documentation become long-term retainer clients.</span></div></li>
+    </ol>
+  </div>
+
+  <div class="exercise-block">
+    <div class="exercise-title">Practical Exercise — Lesson 1</div>
+    <div class="exercise-h">Client Discovery Simulation &amp; Architecture Document</div>
+    <p>Select one of the following business scenarios and complete the full discovery-to-architecture process:</p>
+    <ul>
+      <li><strong>Scenario A:</strong> A real estate agency receives 50 property inquiry forms per week and manually emails each prospect, enters their data into a spreadsheet, and forwards hot leads to agents by phone.</li>
+      <li><strong>Scenario B:</strong> An e-commerce store manually processes refund requests from email, updates a tracking sheet, and sends refund confirmation emails one by one.</li>
+    </ul>
+    <p>Deliverable: (1) Completed discovery questionnaire with mock answers. (2) A 1-page scope proposal with integration list and pricing. (3) A node-level architecture diagram (text or visual). This exercise simulates the exact process for a real first client engagement.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     LESSON 2
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="l2">
+  <div class="lesson-header">
+    <span class="lesson-number">Chapter 2 · Lesson 02</span>
+    <h2 class="lesson-title">Lead Generation Pipeline Architecture:<br>Inbound Capture, Processing, and Multi-System Distribution</h2>
+    <p class="lesson-subtitle">Comprehensive design and implementation of a lead generation automation pipeline — from inbound data ingestion through validation, enrichment, confirmation dispatch, and multi-destination data persistence — engineered as a client-ready, production-deployable service.</p>
+    <div class="lesson-tags">
+      <span class="tag tag-teal">Event-Driven Ingestion</span>
+      <span class="tag tag-purple">Data Validation</span>
+      <span class="tag tag-blue">CRM Integration</span>
+      <span class="tag tag-amber">Email Automation</span>
+      <span class="tag tag-green">Multi-Destination Output</span>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">01 — Learning Objectives</div>
+    <div class="objectives-grid">
+      <div class="objective-card"><span class="obj-level level-implement">Implement</span><span class="obj-text">Build a multi-stage lead processing pipeline with webhook ingestion, field validation, auto-response, and dual-destination logging.</span></div>
+      <div class="objective-card"><span class="obj-level level-design">Design</span><span class="obj-text">Design a data transformation layer that normalizes inconsistent inbound payloads into a canonical internal schema.</span></div>
+      <div class="objective-card"><span class="obj-level level-analyze">Analyze</span><span class="obj-text">Evaluate the business impact of automated lead response time reduction on downstream conversion rate metrics.</span></div>
+      <div class="objective-card"><span class="obj-level level-apply">Apply</span><span class="obj-text">Apply error-handling patterns that maintain workflow continuity under third-party API failure conditions.</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">02 — Conceptual Foundations</div>
+    <h3>The Lead Capture Pipeline as a Data Processing System</h3>
+    <p>A lead generation workflow is, at its architectural core, a <strong>stream processing pipeline</strong> — a system that receives discrete data events (form submissions), transforms them through a series of deterministic stages, and routes processed outputs to one or more destination systems. Each stage in the pipeline has a clearly defined input contract, processing function, and output contract. Violations of these contracts — unexpected null values, malformed strings, missing required fields — must be handled at the boundary of each stage rather than propagated downstream where they cause ambiguous failures.</p>
+
+    <h3>Confirmation Email as a Trust Signal</h3>
+    <p>The confirmation email is not merely a courtesy feature — it serves a measurable commercial function. Research in B2B sales consistently demonstrates that <strong>speed-to-first-contact is the single strongest predictor of lead conversion</strong>. An automated confirmation email dispatched within seconds of form submission serves as the first touchpoint, establishes response credibility, and reduces lead anxiety ("did my submission go through?"). This sub-60-second response window is achievable only through automation — it is the core ROI proposition of this system to a prospective client.</p>
+
+    <h3>Dual-Destination Logging: Sheets vs. CRM</h3>
+    <p>Professional lead pipelines should write to both a structured spreadsheet and a CRM simultaneously in early-stage client deployments. The spreadsheet provides an immediately accessible, filterable audit trail that non-technical clients can verify and export without CRM credentials. The CRM write initiates the sales process. These are complementary functions, not alternatives.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">03 — System Architecture</div>
+    <div class="arch-diagram">
+<span class="ah">WORKFLOW: Lead Generation Pipeline (Full Production)</span>
+<span class="anote">See Portfolio System S1 for complete JSON implementation</span>
+
+<span class="am">STAGE 1 — INGESTION</span>
+  <span class="an">[Webhook]</span> POST /leads → Accept JSON payload
+  Expected: { name, email, phone?, company?, message?, source?, utm_* }
+  HTTP Header auth: x-api-key validation
+
+<span class="am">STAGE 2 — NORMALIZATION (Set Node)</span>
+  Generate lead_id  → timestamp + email hash
+  Sanitize fields   → trim(), toLowerCase() on email
+  Set defaults      → company='Unknown', source='website'
+  Enrich metadata   → received_at ISO timestamp, status='new'
+  Extract domain    → email_domain for enrichment stage
+
+<span class="am">STAGE 3 — VALIDATION (IF Node)</span>
+  Required:  name ≠ empty AND email ≠ empty AND '@' ∈ email
+  <span class="aa">→</span> TRUE  : proceed to notification layer
+  <span class="aa">→</span> FALSE : HTTP 422 + log to error sheet
+
+<span class="am">STAGE 4 — NOTIFICATION LAYER (parallel execution)</span>
+  Branch A: <span class="an">[Gmail]</span>  → Personalized confirmation to lead
+  Branch B: <span class="an">[Gmail]</span>  → Internal team notification
+  Branch C: <span class="an">[Slack]</span>  → Optional: #new-leads channel alert
+
+<span class="am">STAGE 5 — PERSISTENCE LAYER (parallel execution)</span>
+  Branch A: <span class="an">[Google Sheets]</span> → Append to "Lead Log" sheet
+  Branch B: <span class="an">[HubSpot / Airtable]</span> → Create contact record
+
+<span class="am">STAGE 6 — RESPONSE</span>
+  <span class="an">[Respond to Webhook]</span> → HTTP 200 + { received: true, lead_id }
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">04 — Applied Industry Context</div>
+    <p>The canonical client for this system is a professional services company — accountant, lawyer, consultant, agency — who currently has a contact form on their website that does nothing automatically. Each submission requires a human to: (1) check email, (2) copy data into a spreadsheet, (3) send a reply. This takes 5–10 minutes per lead. At 20 leads/week, that is 100–200 minutes of skilled professional time spent on administrative data entry.</p>
+
+    <div class="two-col">
+      <div>
+        <strong style="font-size:13px;color:var(--text);">Quantified time savings</strong>
+        <p style="font-size:13px;margin-top:.4rem;">20 leads/week × 7 min manual = <span class="roi-tag">2.3 hrs/week recovered</span></p>
+      </div>
+      <div>
+        <strong style="font-size:13px;color:var(--text);">Response time improvement</strong>
+        <p style="font-size:13px;margin-top:.4rem;">Manual avg 4–8 hrs → Automated: <span class="roi-tag">&lt;45 seconds</span></p>
+      </div>
+    </div>
+
+    <div class="callout callout-amber">
+      <div class="callout-title">Monetization Note — This System as a Productized Service</div>
+      <p>Package this as a "Lead Response Automation" service. Fixed price: $850–$1,400 depending on integrations. Offer as a standalone product on Contra, Upwork, or your portfolio site. Every professional services website is a potential client. At 3 sales/month: $2,550–$4,200 MRR from a single productized offering requiring 4–6 hours of delivery time per client.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">05 — Critical Analysis &amp; Trade-offs</div>
+    <ul>
+      <li><strong>Webhook vs. polling trigger:</strong> For real-time response requirements, the Webhook node is architecturally superior to a polling-based trigger. However, webhooks require a publicly accessible n8n instance or tunnel (ngrok for testing). Evaluate hosting setup before committing to webhook architecture for clients on restricted networks.</li>
+      <li><strong>Parallel vs. sequential branch execution:</strong> Placing notification and persistence nodes in parallel (not chained) reduces total execution time but complicates error handling — a failure in one branch does not prevent others from completing. Use parallel branches for independent actions; use sequential chains when downstream nodes depend on upstream output.</li>
+      <li><strong>Gmail API quota limits:</strong> Google's Gmail sending limit applies at approximately 500 messages/day for personal OAuth credentials. For clients with high-volume lead intake, transition to a transactional email provider (SendGrid, Postmark, Mailgun) from the start to avoid deliverability issues and quota exhaustion.</li>
+    </ul>
+  </div>
+
+  <div class="exercise-block">
+    <div class="exercise-title">Practical Exercise — Lesson 2</div>
+    <div class="exercise-h">Implement and Load-Test the Lead Generation Pipeline</div>
+    <p>Build Portfolio System S1 from Part 2 of this module. Upon completion:</p>
+    <ul>
+      <li>Use a tool such as Postman or curl to send 10 test lead payloads — 7 valid, 3 invalid (missing name, invalid email format, empty body).</li>
+      <li>Verify all 7 valid leads appear in Google Sheets and trigger confirmation emails.</li>
+      <li>Verify all 3 invalid payloads return HTTP 422 with the structured error response.</li>
+      <li>Document the average execution time per successful run (visible in n8n execution log). This becomes your "SLA" claim for client proposals.</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     LESSON 3
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="l3">
+  <div class="lesson-header">
+    <span class="lesson-number">Chapter 2 · Lesson 03</span>
+    <h2 class="lesson-title">Selling Your First Workflow:<br>Pricing Architecture, Service Packaging, and Client Acquisition</h2>
+    <p class="lesson-subtitle">A rigorous analysis of value-based pricing models, service packaging strategies, and repeatable client acquisition systems for automation practitioners transitioning from skill-holder to commercial service provider.</p>
+    <div class="lesson-tags">
+      <span class="tag tag-amber">Pricing Strategy</span>
+      <span class="tag tag-teal">Service Packaging</span>
+      <span class="tag tag-coral">Client Acquisition</span>
+      <span class="tag tag-purple">Proposal Writing</span>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">01 — Learning Objectives</div>
+    <div class="objectives-grid">
+      <div class="objective-card"><span class="obj-level level-evaluate">Evaluate</span><span class="obj-text">Apply value-based pricing principles to derive appropriate project fees from quantified client ROI estimates.</span></div>
+      <div class="objective-card"><span class="obj-level level-design">Design</span><span class="obj-text">Construct a tiered service offering that accommodates multiple client budget levels while protecting margin.</span></div>
+      <div class="objective-card"><span class="obj-level level-create">Create</span><span class="obj-text">Develop a client-facing proposal template that converts technical deliverables into business value propositions.</span></div>
+      <div class="objective-card"><span class="obj-level level-implement">Implement</span><span class="obj-text">Establish a repeatable outbound acquisition process with defined messaging sequences and conversion metrics.</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">02 — Conceptual Foundations</div>
+    <h3>Value-Based Pricing vs. Cost-Plus Pricing</h3>
+    <p>The dominant pricing error among early-stage automation freelancers is <strong>cost-plus pricing</strong>: estimating hours × hourly rate. This approach has two structural flaws. First, it rewards inefficiency — a practitioner who builds the same workflow faster earns less. Second, it anchors the client to labor cost rather than business value, which invariably leads to price pressure.</p>
+    <p><strong>Value-based pricing</strong> anchors the fee to the economic benefit delivered to the client. A workflow that saves a client $2,000/month in manual labor has a theoretical annual value of $24,000. Pricing a one-time implementation fee of $2,500 (approximately one month's value) is rational for both parties. The client pays $2,500 to receive $24,000 in annual benefit — a 9.6x ROI. The practitioner earns based on outcome impact, not time invested.</p>
+
+    <h3>The Productized Service Model</h3>
+    <p>A <strong>productized service</strong> is a defined, repeatable service offering with a fixed scope, fixed price, and standardized delivery process. Unlike custom consulting, productized services enable: parallel client delivery, clear client expectation-setting, reduced sales cycle length, and portfolio-based marketing. For automation practitioners, productized services are the structural foundation of a scalable practice before building a true SaaS product.</p>
+
+    <table class="cmp-table">
+      <thead><tr><th>Model</th><th>Custom Consulting</th><th>Productized Service</th><th>SaaS Product</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Scope</strong></td><td>Defined per client</td><td>Fixed, pre-defined</td><td>Feature set</td></tr>
+        <tr><td><strong>Pricing</strong></td><td>Variable (negotiated)</td><td>Fixed (published)</td><td>Subscription</td></tr>
+        <tr><td><strong>Sales cycle</strong></td><td>2–6 weeks</td><td>Days–1 week</td><td>Self-serve</td></tr>
+        <tr><td><strong>Delivery time</strong></td><td>Variable</td><td>Fixed (e.g., 5 business days)</td><td>Instant</td></tr>
+        <tr><td><strong>Scalability</strong></td><td>Low (bespoke)</td><td>Medium (templated)</td><td>High (product)</td></tr>
+        <tr><td><strong>Margin</strong></td><td>Variable</td><td>Improving with iteration</td><td>High at scale</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="block">
+    <div class="block-title">03 — Pricing Framework for Automation Services</div>
+    <h3>ROI-Anchored Price Derivation</h3>
+    <p>The following formula provides a rational starting point for value-based project pricing:</p>
+    <div class="arch-diagram">
+<span class="ah">VALUE-BASED PRICE DERIVATION MODEL</span>
+
+Step 1: Quantify Monthly Value Delivered
+  Monthly hours saved × client's effective hourly rate (ops staff)
+  + Monthly error reduction value (if quantifiable)
+  + Monthly revenue acceleration (if lead response improvement)
+  = <span class="am">Total Monthly Value (TMV)</span>
+
+Step 2: Derive Implementation Fee
+  Conservative target: TMV × 1.5  (1.5 months of value)
+  Standard target:     TMV × 3    (payback in 3 months)
+  Premium target:      TMV × 6    (justified for strategic systems)
+
+Step 3: Validate Against Market Range
+  Beginner systems:     $500–$1,500
+  Intermediate systems: $2,000–$6,000
+  Advanced/AI systems:  $5,000–$15,000+
+  Monthly retainers:    15–25% of implementation fee/month
+
+<span class="anote">Example: System saves 8hrs/week at $35/hr ops cost = $1,120/month</span>
+<span class="anote">Standard price: $1,120 × 3 = $3,360 → round to $3,500 project fee</span>
+<span class="anote">Retainer offer: $3,500 × 20% = $700/month for ongoing support</span>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">04 — Proposal Writing &amp; Client Communication</div>
+    <h3>The Three-Section Proposal Structure</h3>
+    <p>A high-converting automation proposal follows a consistent structure that mirrors the client's decision-making process:</p>
+    <ol>
+      <li><strong>The Problem Section:</strong> Reflect the client's pain point back to them in their own language. Quantify the cost of the status quo: "Your team spends approximately 12 hours per week manually processing lead submissions — at an estimated operational cost of $840/week." Clients who recognize their problem described precisely are primed to approve the proposed solution.</li>
+      <li><strong>The Solution Section:</strong> Describe the automation in outcome terms, not technical terms. "Within 60 seconds of a form submission, your lead will receive a personalized confirmation email, your team will receive a Slack notification, and the lead will be logged in HubSpot with a priority score." Attach one architecture diagram — one image converts more effectively than three paragraphs.</li>
+      <li><strong>The Investment Section:</strong> Present pricing as an investment with a payback period, not a cost. "Investment: $2,800 one-time. Estimated monthly savings: $840. ROI payback: 3.3 months." Include a clear scope boundary: exactly what is and is not included. Offer a maintenance retainer as an optional line item.</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <div class="block-title">05 — Client Acquisition Channels: Comparative Analysis</div>
+    <table class="cmp-table">
+      <thead><tr><th>Channel</th><th>Lead Quality</th><th>Time to First Client</th><th>Competition Level</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td><strong>LinkedIn Outbound</strong></td><td>High (targeted)</td><td>2–4 weeks</td><td>Medium</td><td>B2B operators, founders, ops managers</td></tr>
+        <tr><td><strong>Upwork / Contra</strong></td><td>Medium</td><td>1–2 weeks</td><td>High</td><td>First clients, portfolio building, volume</td></tr>
+        <tr><td><strong>Community (n8n forum, Reddit)</strong></td><td>High (warm)</td><td>1–3 months</td><td>Low</td><td>Referral leads, authority building</td></tr>
+        <tr><td><strong>Content (LinkedIn posts)</strong></td><td>Inbound — very high</td><td>3–6 months</td><td>Very Low</td><td>Long-term brand, top-of-funnel</td></tr>
+        <tr><td><strong>Direct referral</strong></td><td>Highest</td><td>Unpredictable</td><td>None</td><td>After first 3–5 clients</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-teal">
+      <div class="callout-title">First Client Fast-Track Protocol</div>
+      <p>For practitioners with zero clients: (1) Identify 20 businesses in one niche (e.g., real estate agencies on LinkedIn) with a contact form but no evident automation. (2) Run the workflow manually — submit their form, note the response time. (3) Cold message: "I submitted a test inquiry on [date]. Your team responded 6 hours later. I build systems that respond automatically in under 60 seconds — want to see how it works for [Company]?" Specificity about their current state converts at 5–10x generic outreach rates.</p>
+    </div>
+  </div>
+
+  <div class="exercise-block">
+    <div class="exercise-title">Practical Exercise — Lesson 3</div>
+    <div class="exercise-h">Price, Package, and Pitch Your First Productized Service</div>
+    <p>Using the lead generation pipeline from Lesson 2 as the basis, develop:</p>
+    <ul>
+      <li><strong>A productized service page</strong> (300 words): Problem, what's included, timeline, price, FAQ. Write it as if it were a page on your portfolio website.</li>
+      <li><strong>A full client proposal</strong> for one of the Discovery scenarios from Lesson 1. Include problem quantification, solution description, ROI calculation, scope definition, and pricing. Maximum 2 pages.</li>
+      <li><strong>Three LinkedIn outreach messages</strong> for cold, warm, and referral scenarios. Each under 80 words. Test the cold message on 5 real targets this week.</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     LESSON 4
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="l4">
+  <div class="lesson-header">
+    <span class="lesson-number">Chapter 2 · Lesson 04</span>
+    <h2 class="lesson-title">AI-Powered Client Support System with Autonomous Agents:<br>Architecture, Agent Orchestration, and Persistent Memory</h2>
+    <p class="lesson-subtitle">Advanced design of a multi-agent automation system that handles client support inquiries end-to-end — incorporating LLM-based intent understanding, tool-augmented response generation, knowledge base retrieval, and escalation routing — representing the current frontier of commercial automation system design.</p>
+    <div class="lesson-tags">
+      <span class="tag tag-purple">AI Agent Architecture</span>
+      <span class="tag tag-coral">Tool Use / Function Calling</span>
+      <span class="tag tag-teal">Knowledge Base RAG</span>
+      <span class="tag tag-amber">Agent Orchestration</span>
+      <span class="tag tag-pink">Escalation Logic</span>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">01 — Learning Objectives</div>
+    <div class="objectives-grid">
+      <div class="objective-card"><span class="obj-level level-design">Design</span><span class="obj-text">Architect a multi-agent system where a primary orchestrator agent delegates sub-tasks to specialized tool-use agents.</span></div>
+      <div class="objective-card"><span class="obj-level level-implement">Implement</span><span class="obj-text">Implement an n8n AI Agent node configured with custom tools (HTTP request tools, code tools) for knowledge retrieval and action execution.</span></div>
+      <div class="objective-card"><span class="obj-level level-evaluate">Evaluate</span><span class="obj-text">Assess the architectural trade-offs between a single capable agent and a hierarchical multi-agent system for client support use cases.</span></div>
+      <div class="objective-card"><span class="obj-level level-analyze">Analyze</span><span class="obj-text">Analyze the role of system prompt engineering in defining agent persona, scope boundaries, and escalation conditions.</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">02 — Conceptual Foundations</div>
+    <h3>AI Agents vs. Standard LLM Calls: Architectural Distinction</h3>
+    <p>A standard OpenAI node call is a <strong>stateless, single-turn inference</strong>: a prompt goes in, a completion comes out. An AI Agent, in the n8n context (and in AI systems generally), is a <strong>multi-turn, tool-augmented reasoning loop</strong>. The agent receives an instruction, plans a sequence of actions, executes tools (database lookups, API calls, code execution), incorporates tool results into its reasoning, and iterates until it determines the task is complete or requires escalation. This agentic loop is fundamentally different from a pipeline of fixed nodes — the execution path is determined at runtime by the model, not statically by the workflow designer.</p>
+
+    <h3>n8n's Agent Node Architecture</h3>
+    <p>In n8n's LangChain-based agent node implementation, an AI Agent has four configurable components:</p>
+    <ol>
+      <li><strong>Language Model:</strong> The underlying LLM (GPT-4o, Claude 3.5 Sonnet, Gemini) that powers reasoning and response generation.</li>
+      <li><strong>Tools:</strong> A set of callable functions the agent can invoke — these can be n8n's built-in tools (Calculator, HTTP Request, Code Tool) or custom tool definitions backed by any n8n node.</li>
+      <li><strong>Memory:</strong> A conversation memory component that maintains context across multiple turns within a session (Window Buffer Memory, Summary Memory, or external Postgres/Redis memory).</li>
+      <li><strong>System Prompt:</strong> The agent's operating instructions — persona, scope, escalation conditions, response format rules, and tool usage guidance.</li>
+    </ol>
+
+    <h3>Retrieval-Augmented Generation (RAG) in Support Systems</h3>
+    <p>A client support agent without grounded knowledge produces hallucinated responses — confident but factually incorrect answers drawn from training data rather than the client's actual product documentation. <strong>Retrieval-Augmented Generation (RAG)</strong> addresses this by equipping the agent with a tool that retrieves relevant content from a knowledge base (a vector store, structured database, or document corpus) before generating a response. The retrieved content is injected into the agent's context, grounding the response in actual documentation.</p>
+
+    <div class="callout callout-purple">
+      <div class="callout-title">Agent System Prompt Engineering Pattern</div>
+      <p>Structure: (1) <strong>Role definition</strong> — "You are a customer support agent for [Client Company], an e-commerce brand specializing in [product category]." (2) <strong>Scope boundary</strong> — "You ONLY answer questions about orders, products, shipping, and returns. For billing disputes, you MUST escalate." (3) <strong>Tool usage rules</strong> — "Always search the knowledge base before answering product questions. Never invent product specifications." (4) <strong>Escalation trigger</strong> — "If the customer expresses frustration 2+ times or requests a refund exceeding $500, immediately escalate to human agent." (5) <strong>Tone and format</strong> — "Respond in under 100 words. Use the customer's name. Always end with a next-step offer."</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">03 — Multi-Agent System Architecture</div>
+    <div class="arch-diagram">
+<span class="ah">WORKFLOW: AI Client Support System — Multi-Agent Architecture</span>
+<span class="anote">Complexity: Advanced | Client value: $6,000–$18,000</span>
+
+<span class="am">ENTRY POINT</span>
+  <span class="an">[Webhook]</span> POST /support-chat
+  Input: { session_id, customer_id, message, channel: 'chat'|'email'|'form' }
+
+<span class="am">STAGE 1 — SESSION CONTEXT ASSEMBLY</span>
+  <span class="an">[HTTP Request]</span> → CRM lookup by customer_id
+  <span class="an">[Redis / Postgres Memory]</span> → Load session history by session_id
+  <span class="an">[Set Node]</span> → Assemble context object: customer profile + history
+
+<span class="am">STAGE 2 — PRIMARY ORCHESTRATOR AGENT (n8n AI Agent node)</span>
+  Model: claude-3-5-sonnet or gpt-4o
+  Memory: Window Buffer (last 8 messages)
+  System Prompt: Role + scope + escalation rules (see pattern above)
+
+  Available Tools:
+  <span class="aa">→</span> <span class="ak">knowledge_base_search</span>   HTTP → vector store query (Pinecone/Supabase)
+  <span class="aa">→</span> <span class="ak">get_order_status</span>        HTTP → Order management API (Shopify/WooCommerce)
+  <span class="aa">→</span> <span class="ak">lookup_return_policy</span>    Code Tool → Static policy document parser
+  <span class="aa">→</span> <span class="ak">create_support_ticket</span>   HTTP → Helpdesk API (Zendesk/Freshdesk/Notion)
+  <span class="aa">→</span> <span class="ak">escalate_to_human</span>       Sub-workflow → Slack alert + queue assignment
+
+<span class="am">STAGE 3 — INTENT-BASED ROUTING (Switch on agent_decision)</span>
+  <span class="aa">→</span> resolved  : Format response + send + log
+  <span class="aa">→</span> escalated : Assign to human queue + notify team + log
+  <span class="aa">→</span> follow_up : Schedule follow-up trigger + log
+
+<span class="am">STAGE 4 — OUTPUT LAYER</span>
+  <span class="an">[Gmail / Webhook Response]</span> → Send reply to customer
+  <span class="an">[Google Sheets]</span>            → Log: session, intent, resolution, duration, escalated?
+  <span class="an">[Memory Node]</span>              → Update session history in Redis/Postgres
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">04 — Applied Industry Context</div>
+    <p>This system targets e-commerce companies, SaaS businesses, and high-volume professional services firms where support volume exceeds the capacity of a small team but full Intercom/Zendesk implementation is cost-prohibitive or overly complex. A typical target client: a DTC e-commerce brand with 200–1,000 orders/month receiving 50–200 support inquiries/week, currently managed by a 1–2 person team operating 8-hour shifts.</p>
+
+    <div class="callout callout-teal">
+      <div class="callout-title">Client Economic Case</div>
+      <p>Pre-system: 150 support tickets/week × 8 min average resolution time = 20 hrs/week of support labor. At $25/hr (support specialist cost): $500/week = $2,000/month in support costs.<br><br>Post-system: 70% of tickets auto-resolved by AI agent = 14 hrs/week recovered = $1,400/month saved. Remaining 30% escalated to human with full context pre-assembled = resolution time reduced 40%.<br><br>Total monthly value: ~$1,700–$2,200/month. Project fee at 3× monthly value: $5,100–$6,600. This is a defensible $6,000 engagement.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">05 — Critical Analysis</div>
+    <ul>
+      <li><strong>Agent reliability vs. determinism:</strong> Agents introduce non-determinism — the same input may produce different tool call sequences across executions. For production deployments, implement execution logging at the agent output level and conduct regular sampling reviews of agent decisions. Set maximum tool call iterations (n8n's agent node: <code>maxIterations</code>) to prevent infinite loops.</li>
+      <li><strong>Knowledge base currency:</strong> A RAG system is only as good as the knowledge base it retrieves from. Stale documentation produces confident, incorrect responses. Build a knowledge base update process into the retainer agreement — document sync should be a scheduled sub-workflow, not a manual task.</li>
+      <li><strong>Hallucination risk in customer-facing contexts:</strong> AI agents must never be configured to answer questions outside their grounded knowledge scope. The system prompt must include explicit refusal instructions: "If you cannot find the answer in the knowledge base or order system, DO NOT invent an answer. Say: 'I need to check on that — let me connect you with a specialist.'"</li>
+      <li><strong>Cost management:</strong> A multi-turn agent conversation with tool calls and a capable model (GPT-4o, Claude 3.5 Sonnet) may cost $0.02–$0.15 per conversation — 10–50× more than a single-call classification. At 150 tickets/week: $1.50–$11.25/week or $6–$45/month. Negligible relative to value delivered, but must be tracked and included in client pricing calculations.</li>
+    </ul>
+  </div>
+
+  <div class="exercise-block">
+    <div class="exercise-title">Practical Exercise — Lesson 4</div>
+    <div class="exercise-h">Build Portfolio System S2 — AI Support Agent</div>
+    <p>Implement Portfolio System S2 (complete specification in Part 2). Upon completion:</p>
+    <ul>
+      <li>Configure the AI Agent with 3 custom tools: a knowledge base search HTTP tool (point to a Notion page or simple JSON endpoint), an order status lookup stub (mock API), and an escalation sub-workflow (Slack + Sheets log).</li>
+      <li>Test 5 inquiry scenarios: (1) product question answerable from KB, (2) order status request, (3) frustrated customer needing escalation, (4) return request, (5) off-topic question the agent should decline to answer.</li>
+      <li>Document each test: input message, agent tool calls (from execution log), final response, and quality assessment. This becomes your system's validation evidence.</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     LESSON 5
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="l5">
+  <div class="lesson-header">
+    <span class="lesson-number">Chapter 2 · Lesson 05</span>
+    <h2 class="lesson-title">Scaling &amp; Productizing Your Workflows:<br>Template Architecture, Reusability Systems, and Recurring Revenue Models</h2>
+    <p class="lesson-subtitle">Strategic and technical frameworks for transforming one-time automation deliverables into reusable, sellable templates and subscription-based service products — enabling the practitioner to decouple revenue from time through systematic productization.</p>
+    <div class="lesson-tags">
+      <span class="tag tag-amber">Productization</span>
+      <span class="tag tag-teal">Template Architecture</span>
+      <span class="tag tag-green">Recurring Revenue</span>
+      <span class="tag tag-purple">Sub-workflows</span>
+      <span class="tag tag-blue">SaaS Transition</span>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">01 — Learning Objectives</div>
+    <div class="objectives-grid">
+      <div class="objective-card"><span class="obj-level level-design">Design</span><span class="obj-text">Architect a modular workflow system using sub-workflows that enables template reuse across multiple client deployments.</span></div>
+      <div class="objective-card"><span class="obj-level level-evaluate">Evaluate</span><span class="obj-text">Assess the scalability trade-offs between per-client workflow instances and shared-infrastructure SaaS delivery models.</span></div>
+      <div class="objective-card"><span class="obj-level level-create">Create</span><span class="obj-text">Develop a workflow template library with parameterized configuration architecture enabling rapid client onboarding.</span></div>
+      <div class="objective-card"><span class="obj-level level-analyze">Analyze</span><span class="obj-text">Identify the inflection point at which the freelance/consulting model should transition to productized or SaaS delivery for optimal margin.</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">02 — Conceptual Foundations</div>
+    <h3>The Template Architecture Principle</h3>
+    <p>A workflow template is an n8n workflow with a standardized, parameterized structure in which client-specific values (API keys, sheet IDs, email addresses, brand names) are abstracted into a <strong>configuration input layer</strong> — typically a JSON configuration object ingested at the start of the workflow or stored in a config node. This separation of logic from configuration is the same principle as environment variables in software development, and it is what makes a workflow deployable across multiple clients without structural modification.</p>
+
+    <h3>Sub-Workflows as Reusable Components</h3>
+    <p>n8n's Execute Sub-Workflow node enables the creation of <strong>functional modules</strong> — self-contained workflows that perform a single, well-defined function and can be called from any parent workflow. Common module candidates: email dispatch function, Google Sheets row append function, Slack notification function, lead scoring function. These modules, once built and tested, are called with a standardized interface (input JSON), eliminating duplication and centralizing maintenance. A bug fix in the email dispatch module propagates automatically to all 15 client workflows that call it.</p>
+
+    <div class="arch-diagram">
+<span class="ah">MODULAR WORKFLOW ARCHITECTURE — Sub-Workflow Pattern</span>
+
+<span class="am">PARENT WORKFLOW (Client-Specific)</span>
+  <span class="an">[Webhook]</span> → <span class="an">[Set Config]</span> → <span class="an">[Validate]</span>
+                                    │
+              ┌───────────────────┬─┴────────────────────┐
+              ▼                   ▼                        ▼
+  <span class="ak">[Sub-WF: Email Dispatch]</span>  <span class="ak">[Sub-WF: Sheets Logger]</span>  <span class="ak">[Sub-WF: Slack Alert]</span>
+  Input: { to, subject,     Input: { sheet_id,         Input: { channel,
+           template_id,              row_data,                   message,
+           template_vars }           tab_name }                  priority }
+  Output: { sent: bool }    Output: { row_id }          Output: { ts }
+
+<span class="am">SUB-WORKFLOW BENEFITS</span>
+  <span class="aa">→</span> Single maintenance point across all client deployments
+  <span class="aa">→</span> Independently testable and versioned
+  <span class="aa">→</span> Enables parallel development of client-specific and module logic
+  <span class="aa">→</span> Reduces parent workflow complexity (5 nodes vs. 25 nodes)
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">03 — Recurring Revenue Architecture</div>
+    <h3>The Four Recurring Revenue Models for Automation Practitioners</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Model</th><th>Structure</th><th>Monthly Revenue/Client</th><th>Work per Client/Month</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Maintenance Retainer</strong></td><td>Monthly fee for monitoring, updates, and minor modifications to deployed workflows</td><td>$150–$500</td><td>1–3 hrs</td></tr>
+        <tr><td><strong>Managed Service</strong></td><td>Full operational ownership of automation infrastructure (hosting, monitoring, updates, expansion)</td><td>$500–$2,000</td><td>4–8 hrs</td></tr>
+        <tr><td><strong>Template License</strong></td><td>Client pays monthly fee to access and use a workflow template with ongoing support</td><td>$49–$299</td><td>&lt;1 hr</td></tr>
+        <tr><td><strong>Automation SaaS</strong></td><td>White-labeled hosted product with self-serve configuration and branded UI</td><td>$99–$999</td><td>&lt;0.5 hrs (at scale)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-amber">
+      <div class="callout-title">Path to $10k MRR</div>
+      <p><strong>Stage 1 (months 1–3):</strong> 5 maintenance retainers at $250/mo = $1,250 MRR from existing clients.<br><strong>Stage 2 (months 3–6):</strong> Add 3 managed service clients at $800/mo = $2,400 + $1,250 = $3,650 MRR.<br><strong>Stage 3 (months 6–12):</strong> Launch 2 template products at $149/mo, target 20 subscribers each = $5,960 + $3,650 = $9,610 MRR.<br><strong>Stage 4 (12+ months):</strong> Convert best template to hosted SaaS, charge $299/mo, target 35 clients = $10,465 MRR from product alone.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">04 — Template Marketplace Strategy</div>
+    <h3>Where to Sell Workflow Templates</h3>
+    <ul>
+      <li><strong>n8n Template Library:</strong> Official marketplace. Zero commission. Primarily community-driven. Best for visibility and credibility, less so for revenue at early stage.</li>
+      <li><strong>Gumroad / Lemonsqueezy:</strong> Direct-to-consumer digital product platforms. Charge one-time or subscription fees. Retain 95%+ of revenue. Best for monetizing templates with a documentation package.</li>
+      <li><strong>Own Website:</strong> Highest margin (100% revenue), highest CAC. Best as a destination, not the primary discovery channel. Combine with content marketing (LinkedIn, YouTube) for inbound traffic.</li>
+      <li><strong>Contra / Toptal Packages:</strong> Productized service listings on freelance platforms. Charge for implementation + template license. Higher price point than template alone.</li>
+    </ul>
+  </div>
+
+  <div class="exercise-block">
+    <div class="exercise-title">Practical Exercise — Lesson 5</div>
+    <div class="exercise-h">Productize One Workflow as a Template Package</div>
+    <p>Take the lead generation pipeline from Lesson 2 and refactor it for template distribution:</p>
+    <ul>
+      <li><strong>Extract all client-specific values</strong> into a single configuration Set node at the top of the workflow: sheet_id, confirmation_email_template, team_notification_email, webhook_secret.</li>
+      <li><strong>Extract the email dispatch logic</strong> into a separate sub-workflow called "Email Dispatch Module." Update the parent workflow to call this sub-workflow via Execute Sub-Workflow node.</li>
+      <li><strong>Write a README.md</strong> for the template: what it does, what integrations it requires, step-by-step setup instructions, how to configure each parameter.</li>
+      <li><strong>Create a Gumroad listing</strong> with: template description, workflow screenshot, 3 bullet points of business value, one-time price of $29–$79.</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════ CHAPTER 3 STRIPE ═══════════════ -->
+<div class="chapter-stripe">
+  <span class="ch-pill ch-pill-amber">Chapter 3</span>
+  <span class="ch-title">Mastering JSON &amp; Solving Real Business Problems</span>
+  <span class="ch-desc">3 Lessons · Technical Depth</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     LESSON 6
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="l6">
+  <div class="lesson-header">
+    <span class="lesson-number">Chapter 3 · Lesson 06</span>
+    <h2 class="lesson-title">Mastering n8n JSON Architecture:<br>Schema, Programmatic Workflow Design, and Runtime Expressions</h2>
+    <p class="lesson-subtitle">A rigorous technical analysis of n8n's workflow JSON specification — covering the object model for nodes, connections, credentials, and settings — enabling practitioners to read, modify, debug, and programmatically generate workflows with full structural confidence.</p>
+    <div class="lesson-tags">
+      <span class="tag tag-amber">JSON Schema</span>
+      <span class="tag tag-teal">Workflow Object Model</span>
+      <span class="tag tag-blue">Expression Engine</span>
+      <span class="tag tag-purple">Programmatic Design</span>
+      <span class="tag tag-green">Debugging</span>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">01 — Learning Objectives</div>
+    <div class="objectives-grid">
+      <div class="objective-card"><span class="obj-level level-analyze">Analyze</span><span class="obj-text">Deconstruct a complete n8n workflow JSON export into its constituent structural components and explain the role of each.</span></div>
+      <div class="objective-card"><span class="obj-level level-implement">Implement</span><span class="obj-text">Modify a workflow JSON to add new nodes, update parameters, and rewire connections without using the visual canvas.</span></div>
+      <div class="objective-card"><span class="obj-level level-apply">Apply</span><span class="obj-text">Apply n8n's expression language syntax to construct dynamic parameter values using runtime data references.</span></div>
+      <div class="objective-card"><span class="obj-level level-create">Create</span><span class="obj-text">Generate a valid, import-ready workflow JSON programmatically from a data specification using a JavaScript template.</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">02 — Conceptual Foundations</div>
+    <h3>The n8n Workflow JSON Object Model</h3>
+    <p>Every n8n workflow export is a JSON document conforming to a defined schema. Understanding this schema enables: manual workflow editing (faster than GUI for parameter updates), programmatic workflow generation (building workflow factories), version control with meaningful diffs, and deep debugging of expression-level failures.</p>
+
+    <div class="arch-diagram">
+<span class="ah">n8n WORKFLOW JSON — TOP-LEVEL SCHEMA</span>
+
+{
+  <span class="am">"name"</span>:        string,          <span class="anote">// Workflow display name</span>
+  <span class="am">"nodes"</span>:       Node[],          <span class="anote">// Array of all node objects</span>
+  <span class="am">"connections"</span>: ConnectionMap,   <span class="anote">// Adjacency map: node → outputs → targets</span>
+  <span class="am">"settings"</span>:    WorkflowSettings,<span class="anote">// executionOrder, saveExecutions, etc.</span>
+  <span class="am">"meta"</span>:        MetaObject,      <span class="anote">// instanceId, templateInfo</span>
+  <span class="am">"pinData"</span>:     PinDataMap?,     <span class="anote">// Optional: pinned test data per node</span>
+  <span class="am">"staticData"</span>:  StaticDataMap?   <span class="anote">// Optional: persistent workflow state</span>
+}
+
+<span class="ah">NODE OBJECT SCHEMA</span>
+{
+  <span class="am">"id"</span>:          string,   <span class="anote">// UUID v4 — must be unique per workflow</span>
+  <span class="am">"name"</span>:        string,   <span class="anote">// Display name (human-readable, descriptive)</span>
+  <span class="am">"type"</span>:        string,   <span class="anote">// "n8n-nodes-base.webhook", "@n8n/n8n-nodes-langchain.agent"</span>
+  <span class="am">"typeVersion"</span>: number,   <span class="anote">// API version of the node type (critical — mismatch = import error)</span>
+  <span class="am">"position"</span>:   [x, y],    <span class="anote">// Canvas coordinates — affects display only</span>
+  <span class="am">"parameters"</span>:  object,   <span class="anote">// Node-specific config — schema varies by node type</span>
+  <span class="am">"credentials"</span>: object?,  <span class="anote">// Credential references by type</span>
+  <span class="am">"continueOnFail"</span>: bool?, <span class="anote">// Error behavior override</span>
+  <span class="am">"disabled"</span>:   bool?,     <span class="anote">// If true, node is skipped in execution</span>
+  <span class="am">"notes"</span>:       string?   <span class="anote">// Internal documentation note</span>
+}
+
+<span class="ah">CONNECTION MAP SCHEMA</span>
+{
+  <span class="am">"NodeName"</span>: {                  <span class="anote">// Source node name (not ID!)</span>
+    "main": [                      <span class="anote">// Output type: "main" | "ai_tool" | "ai_memory"</span>
+      [                            <span class="anote">// Output index 0 (first output port)</span>
+        { "node": "TargetName",    <span class="anote">// Target node name</span>
+          "type": "main",
+          "index": 0 }             <span class="anote">// Input port index of target</span>
+      ],
+      [...]                        <span class="anote">// Output index 1 (second output — e.g., IF false branch)</span>
+    ]
+  }
+}
+    </div>
+
+    <h3>n8n Expression Language: Runtime Data Binding</h3>
+    <p>n8n's expression engine evaluates strings wrapped in <code>={{ }}</code> at runtime, resolving references to execution context data. Understanding the expression namespace is essential for building non-trivial workflows:</p>
+
+    <table class="data-table">
+      <thead><tr><th>Expression</th><th>Resolves To</th><th>Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><code>$json.fieldName</code></td><td>Field from current node's output JSON</td><td>Access processed data in current node</td></tr>
+        <tr><td><code>$input.item.json.field</code></td><td>Field from current execution item</td><td>Explicit item reference</td></tr>
+        <tr><td><code>$('NodeName').item.json.field</code></td><td>Field from any named node's output</td><td>Reference upstream node data by name</td></tr>
+        <tr><td><code>$now</code></td><td>Luxon DateTime object (current time)</td><td>Timestamps, date arithmetic</td></tr>
+        <tr><td><code>$now.toISO()</code></td><td>ISO 8601 timestamp string</td><td>Created_at fields, logging</td></tr>
+        <tr><td><code>$vars.varName</code></td><td>Workflow-level variable</td><td>Reusable config values</td></tr>
+        <tr><td><code>$workflow.id</code></td><td>Current workflow's UUID</td><td>Audit logging, error contexts</td></tr>
+        <tr><td><code>$execution.id</code></td><td>Current execution UUID</td><td>Idempotency keys, log correlation</td></tr>
+        <tr><td><code>$if(condition, a, b)</code></td><td>Ternary expression result</td><td>Inline conditional values</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="block">
+    <div class="block-title">03 — Programmatic Workflow Generation</div>
+    <h3>Building a Workflow Factory Function</h3>
+    <p>For practitioners managing multiple client deployments of the same template, a <strong>workflow factory</strong> — a JavaScript function that generates a valid n8n workflow JSON from a configuration object — eliminates manual duplication and ensures structural consistency. The pattern below demonstrates this approach:</p>
+
+    <div class="json-section">
+      <div class="json-header"><span class="json-title">Workflow Factory — JavaScript Template</span><span class="json-badge">✓ Pattern</span></div>
+      <div class="json-body">
+<pre>/**
+ * n8n Workflow Factory
+ * Generates a complete, import-ready workflow JSON
+ * from a client configuration object.
+ */
+function generateLeadCaptureWorkflow(config) {
+  const uuid = () =>
+    'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+
+  return {
+    name: `${config.clientName} — Lead Capture v1.0`,
+    nodes: [
+      {
+        id: uuid(),
+        name: "Webhook — Lead Entry Point",
+        type: "n8n-nodes-base.webhook",
+        typeVersion: 2,
+        position: [200, 300],
+        parameters: {
+          path: config.webhookPath || "lead-capture",
+          responseMode: "lastNode",
+          authentication: "headerAuth"
+        }
+      },
+      {
+        id: uuid(),
+        name: "Set — Normalize Lead Data",
+        type: "n8n-nodes-base.set",
+        typeVersion: 3,
+        position: [420, 300],
+        parameters: {
+          mode: "manual",
+          fields: {
+            values: [
+              { name: "client_id",  type: "string", string: config.clientId },
+              { name: "lead_id",    type: "string", string: "={{ 'L-' + $now.toMillis() }}" },
+              { name: "name",       type: "string", string: "={{ $json.name?.trim() || '' }}" },
+              { name: "email",      type: "string", string: "={{ $json.email?.trim().toLowerCase() || '' }}" },
+              { name: "timestamp",  type: "string", string: "={{ $now.toISO() }}" },
+              { name: "sheet_id",   type: "string", string: config.googleSheetId },
+              { name: "reply_from", type: "string", string: config.replyFromEmail }
+            ]
+          }
+        }
+      },
+      {
+        id: uuid(),
+        name: "IF — Validate Required Fields",
+        type: "n8n-nodes-base.if",
+        typeVersion: 2,
+        position: [640, 300],
+        parameters: {
+          conditions: {
+            conditions: [
+              {
+                leftValue: "={{ $json.email }}",
+                rightValue: "",
+                operator: { type: "string", operation: "notEmpty" }
+              },
+              {
+                leftValue: "={{ $json.email }}",
+                rightValue: "@",
+                operator: { type: "string", operation: "contains" }
+              }
+            ],
+            combinator: "and"
+          }
+        }
+      }
+      // ... additional nodes generated from config
+    ],
+    connections: {
+      "Webhook — Lead Entry Point": {
+        main: [[{ node: "Set — Normalize Lead Data", type: "main", index: 0 }]]
+      },
+      "Set — Normalize Lead Data": {
+        main: [[{ node: "IF — Validate Required Fields", type: "main", index: 0 }]]
+      }
+      // ... remaining connections
+    },
+    settings: { executionOrder: "v1", saveManualExecutions: true }
+  };
+}
+
+// Usage:
+const workflow = generateLeadCaptureWorkflow({
+  clientName:      "Acme Real Estate",
+  clientId:        "client-acme-001",
+  webhookPath:     "acme-leads",
+  googleSheetId:   "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms",
+  replyFromEmail:  "leads@acmerealestate.com"
+});
+
+console.log(JSON.stringify(workflow, null, 2));
+// Output: paste into n8n Import dialog → ready to deploy</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">05 — Debugging JSON Import Errors</div>
+    <h3>Common Import Failures and Resolutions</h3>
+    <table class="cmp-table">
+      <thead><tr><th>Error Message</th><th>Root Cause</th><th>Resolution</th></tr></thead>
+      <tbody>
+        <tr><td>"Unknown node type"</td><td>Node type string is incorrect or a package is not installed</td><td>Verify exact type string from n8n docs. For LangChain nodes: <code>@n8n/n8n-nodes-langchain.*</code></td></tr>
+        <tr><td>"Invalid workflow JSON"</td><td>Malformed JSON — syntax error, trailing commas, unquoted keys</td><td>Validate with JSON linter (jsonlint.com). Check for single quotes used instead of double quotes.</td></tr>
+        <tr><td>Node appears but parameters empty</td><td><code>typeVersion</code> mismatch — wrong version for parameter schema</td><td>Import a known-good node of the same type from a working workflow and check its typeVersion.</td></tr>
+        <tr><td>Connections not rendering</td><td>Connection map uses node IDs instead of node names</td><td>n8n connections are keyed by node name, not ID. Ensure exact name-string matching between nodes array and connections map.</td></tr>
+        <tr><td>Credential not found</td><td>Credential ID in JSON references a credential that doesn't exist in the target instance</td><td>Remove credential blocks from the JSON — n8n will prompt for re-linking on import. Never transfer credential IDs between instances.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="exercise-block">
+    <div class="exercise-title">Practical Exercise — Lesson 6</div>
+    <div class="exercise-h">JSON Dissection, Modification, and Factory Build</div>
+    <p>Using any workflow JSON from this course module's portfolio systems:</p>
+    <ul>
+      <li><strong>Task 1 — Dissect:</strong> Open the JSON in a text editor. Without the canvas, identify: the trigger node, all Set node transformations, the Switch node routing conditions, and the connection between node 3 and node 4 by reading only the connections object.</li>
+      <li><strong>Task 2 — Modify:</strong> Using only JSON editing (no canvas), add a new Slack notification node after the Sheets append node. Write the node object and the connection entry. Import to verify it renders correctly.</li>
+      <li><strong>Task 3 — Generate:</strong> Extend the workflow factory function above to generate a complete 5-node lead capture workflow from a configuration object. Output valid JSON, import it into n8n, and verify all nodes appear correctly configured.</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     LESSON 7
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="l7">
+  <div class="lesson-header">
+    <span class="lesson-number">Chapter 3 · Lesson 07</span>
+    <h2 class="lesson-title">E-Commerce Order Management Automation:<br>End-to-End Order Processing Pipeline Architecture</h2>
+    <p class="lesson-subtitle">System design and implementation of a comprehensive e-commerce order processing automation — covering inventory verification, stock allocation, order fulfillment routing, customer notification dispatch, team alerting, and exception handling — engineered for production deployment at SMB e-commerce scale.</p>
+    <div class="lesson-tags">
+      <span class="tag tag-teal">Order Processing</span>
+      <span class="tag tag-amber">Inventory Management</span>
+      <span class="tag tag-coral">Exception Handling</span>
+      <span class="tag tag-blue">Multi-system Integration</span>
+      <span class="tag tag-green">Customer Notifications</span>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">01 — Learning Objectives</div>
+    <div class="objectives-grid">
+      <div class="objective-card"><span class="obj-level level-design">Design</span><span class="obj-text">Architect a multi-branch order processing pipeline that handles normal fulfillment, low stock, and out-of-stock exception paths.</span></div>
+      <div class="objective-card"><span class="obj-level level-implement">Implement</span><span class="obj-text">Implement inventory state checking logic within a Code node using conditional evaluation and stock threshold comparison.</span></div>
+      <div class="objective-card"><span class="obj-level level-analyze">Analyze</span><span class="obj-text">Analyze the operational impact of real-time inventory automation versus batch-processed order management systems.</span></div>
+      <div class="objective-card"><span class="obj-level level-evaluate">Evaluate</span><span class="obj-text">Evaluate the appropriate integration strategy between n8n and Shopify/WooCommerce for order event triggering.</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">02 — Conceptual Foundations</div>
+    <h3>Event-Driven Order Processing at SMB Scale</h3>
+    <p>E-commerce order management at the SMB level (50–1,000 orders/day) presents a well-defined automation opportunity: a sequence of deterministic actions (check inventory, route fulfillment, notify customer, update records) that must execute consistently and immediately for every order, with specific exception paths for edge cases (out-of-stock, backorder, shipping zone restrictions, high-value order flags).</p>
+
+    <p>The architectural challenge is handling the <strong>exception state machine</strong> alongside the happy path. An order processing system that handles in-stock orders flawlessly but fails silently on out-of-stock scenarios creates worse outcomes than no automation — it produces customer-visible failures without team visibility. Exception paths must be treated as first-class citizens in the architecture, not afterthoughts.</p>
+
+    <h3>Inventory State Model</h3>
+    <p>The inventory check logic in this system implements a <strong>three-state model</strong> based on configurable thresholds:</p>
+    <ul>
+      <li><strong>IN_STOCK:</strong> quantity_available &gt; low_stock_threshold → normal fulfillment path</li>
+      <li><strong>LOW_STOCK:</strong> quantity_available ≤ low_stock_threshold AND quantity_available &gt; 0 → fulfill + trigger reorder alert</li>
+      <li><strong>OUT_OF_STOCK:</strong> quantity_available = 0 → customer hold notification + team escalation + reorder trigger</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <div class="block-title">03 — System Architecture</div>
+    <div class="arch-diagram">
+<span class="ah">WORKFLOW: E-Commerce Order Management Engine</span>
+<span class="anote">See Portfolio System S3 for complete JSON implementation</span>
+
+<span class="am">[1] TRIGGER — Order Event</span>
+  <span class="an">[Webhook]</span> POST /order-event (Shopify / WooCommerce webhook)
+  Payload: { order_id, customer, line_items[], payment_status, shipping_address }
+
+<span class="am">[2] NORMALIZATION &amp; ORDER ASSEMBLY (Set + Code)</span>
+  Extract: order_id, customer_email, customer_name
+  Map: line_items array → product_ids, quantities, SKUs
+  Compute: order_total, item_count, high_value_flag (total &gt; $500?)
+
+<span class="am">[3] PAYMENT VALIDATION (IF Node)</span>
+  payment_status === 'paid' → proceed
+  payment_status !== 'paid' → log pending + webhook response 200
+
+<span class="am">[4] INVENTORY CHECK (HTTP Request → Inventory API + Code)</span>
+  GET inventory API for each SKU in order
+  Code Node: Evaluate stock state per item → { sku, state, qty_available }
+  Aggregate: worst-case state across all line items
+
+<span class="am">[5] ORDER ROUTING (Switch Node)</span>
+  <span class="aa">→</span> state === 'in_stock'  : Branch A — Standard Fulfillment
+  <span class="aa">→</span> state === 'low_stock' : Branch B — Fulfill + Reorder Alert
+  <span class="aa">→</span> state === 'out_of_stock': Branch C — Hold + Escalation
+
+<span class="am">[6A] STANDARD FULFILLMENT BRANCH</span>
+  <span class="an">[HTTP]</span> → Update inventory (decrement qty)
+  <span class="an">[HTTP]</span> → Create fulfillment order (3PL / WMS API)
+  <span class="an">[Gmail]</span>→ Order confirmation to customer (with tracking stub)
+  <span class="an">[Sheets]</span>→ Log order: id, items, status='processing', timestamp
+
+<span class="am">[6B] LOW STOCK BRANCH</span>
+  Same as Branch A PLUS:
+  <span class="an">[Slack]</span> → #inventory-alerts: "Low stock on [SKU]: [qty] remaining"
+  <span class="an">[Email]</span>→ Procurement team: reorder trigger notification
+
+<span class="am">[6C] OUT-OF-STOCK BRANCH</span>
+  <span class="an">[Gmail]</span>→ Customer: "Item unavailable — ETA update or cancellation option"
+  <span class="an">[Slack]</span> → #operations: High-priority stock alert + order hold details
+  <span class="an">[Sheets]</span>→ Log order: status='on_hold', hold_reason='out_of_stock'
+  <span class="an">[HTTP]</span> → Flag order in Shopify/WooCommerce as pending
+
+<span class="am">[7] CONSOLIDATED AUDIT LOG (Sheets — all branches)</span>
+  Log: order_id, customer, items, stock_state, branch_executed, timestamp
+
+<span class="am">[8] RESPONSE</span>
+  HTTP 200 → { received: true, order_id, processing_status }
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">04 — Applied Industry Context</div>
+    <p>Target clients for this system are DTC (direct-to-consumer) e-commerce brands operating on Shopify or WooCommerce with 20–200 orders/day and a small operations team (1–5 people) currently managing orders manually through the platform dashboard. The specific pain: after a certain order volume, the manual processing workflow becomes a bottleneck — the team is reactive rather than proactive, stock-outs are discovered when customers complain rather than before they order, and confirmation emails are sent hours after purchase.</p>
+
+    <div class="callout callout-green">
+      <div class="callout-title">Client ROI Model — E-Commerce Order System</div>
+      <p>100 orders/day × 4 min manual processing = 400 min/day = 6.7 hrs/day ops time.<br>At $18/hr: $120/day = $3,000/month in manual processing cost.<br>System automates 90% of orders = $2,700/month savings.<br>Project fee at 1.5× monthly value: ~$4,000. Payback: &lt;6 weeks.<br><br>Additional value: Out-of-stock detection prevents customer complaints, chargebacks, and negative reviews — conservatively worth $500–$2,000/month in recovered reputation cost.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">05 — Critical Analysis</div>
+    <ul>
+      <li><strong>Idempotency and duplicate webhooks:</strong> E-commerce platforms may send duplicate webhooks for the same order event (retry logic). Implement idempotency using the order_id as a deduplication key — check the Sheets log for existing order_id before processing, and skip if already present. Failure to handle this causes duplicate fulfillment orders, double inventory decrements, and duplicate customer emails.</li>
+      <li><strong>Shopify webhook signature verification:</strong> Shopify signs all webhooks with an HMAC-SHA256 signature in the <code>X-Shopify-Hmac-Sha256</code> header. Production deployments must verify this signature in the first node (Code node with crypto module) to prevent unauthorized webhook injection. Skip this in development only.</li>
+      <li><strong>Inventory API concurrency:</strong> For multi-item orders, sequential inventory checks introduce latency proportional to item count. Use n8n's split-in-batches pattern or parallel HTTP Request nodes (via a SplitInBatches → HTTP → Merge pattern) to check all SKUs concurrently.</li>
+      <li><strong>Real-time vs. eventual consistency:</strong> n8n webhook-triggered workflows execute in near-real-time but are not transactional. If the inventory decrement HTTP call succeeds but the fulfillment creation call fails, the system is in an inconsistent state. Implement a compensating action (re-increment inventory) in the error branch of the fulfillment node.</li>
+    </ul>
+  </div>
+
+  <div class="exercise-block">
+    <div class="exercise-title">Practical Exercise — Lesson 7</div>
+    <div class="exercise-h">Build and Stress-Test the Order Management System</div>
+    <p>Build Portfolio System S3 from Part 2. Design a test matrix covering all three inventory state paths:</p>
+    <ul>
+      <li>Simulate an in-stock order with 3 line items (all available). Verify fulfillment branch executes and confirmation email sends.</li>
+      <li>Simulate a low-stock order (quantity = 2 for an item with threshold = 5). Verify Slack alert fires on the low-stock branch.</li>
+      <li>Simulate an out-of-stock order (quantity = 0). Verify customer hold email, team Slack alert, and Sheets log with status 'on_hold'.</li>
+      <li>Simulate a duplicate order_id submission. Verify the idempotency check prevents re-processing.</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     LESSON 8
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="l8">
+  <div class="lesson-header">
+    <span class="lesson-number">Chapter 3 · Lesson 08</span>
+    <h2 class="lesson-title">Multi-Channel Marketing Campaign Automation:<br>AI-Generated Personalization, Customer Segmentation, and Cross-Platform Distribution</h2>
+    <p class="lesson-subtitle">Architecture and implementation of an AI-augmented marketing automation engine that segments customers, generates personalized campaign content using LLMs, schedules email sequences, and publishes social media content — demonstrating the integration of AI content generation within deterministic automation infrastructure.</p>
+    <div class="lesson-tags">
+      <span class="tag tag-pink">AI Content Generation</span>
+      <span class="tag tag-teal">Customer Segmentation</span>
+      <span class="tag tag-amber">Email Scheduling</span>
+      <span class="tag tag-purple">Social Media API</span>
+      <span class="tag tag-blue">Campaign Analytics</span>
+      <span class="tag tag-coral">Multi-Channel Distribution</span>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">01 — Learning Objectives</div>
+    <div class="objectives-grid">
+      <div class="objective-card"><span class="obj-level level-design">Design</span><span class="obj-text">Design a customer segmentation algorithm that classifies contacts into behavioral cohorts based on computed engagement attributes.</span></div>
+      <div class="objective-card"><span class="obj-level level-implement">Implement</span><span class="obj-text">Implement an LLM-powered content personalization layer that generates segment-specific messaging from a campaign brief.</span></div>
+      <div class="objective-card"><span class="obj-level level-create">Create</span><span class="obj-text">Build a multi-channel distribution system that synchronizes campaign execution across email and social media platforms.</span></div>
+      <div class="objective-card"><span class="obj-level level-evaluate">Evaluate</span><span class="obj-text">Evaluate the cost-benefit of AI content generation versus template-based personalization at varying campaign scales.</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">02 — Conceptual Foundations</div>
+    <h3>Behavioral Customer Segmentation in Automation Systems</h3>
+    <p>Customer segmentation in automated marketing systems is implemented as a <strong>classification function</strong> that maps a customer record to a segment label based on computed behavioral attributes. Unlike static demographic segmentation (age, location), behavioral segmentation evaluates signals such as: purchase recency, purchase frequency, total lifetime value (the <strong>RFM model</strong> — Recency, Frequency, Monetary), product category affinity, engagement score (email opens, clicks), and lifecycle stage (new, active, at-risk, churned).</p>
+
+    <p>In n8n, segmentation is typically implemented in a Code node that: (1) receives the customer record with computed attributes, (2) applies a set of threshold rules to each attribute, (3) assigns a segment label, and (4) returns an enriched customer object. The segment label then drives the Switch node routing to segment-specific content generation and delivery.</p>
+
+    <h3>AI Content Generation Architecture for Marketing</h3>
+    <p>The LLM's role in this system is not to replace the marketer — it is to personalize at scale. A human marketer defines: the campaign objective, the core value proposition, the brand voice guidelines, and the segment context. The LLM generates: the specific subject line variant, email body copy, and social post text optimized for each segment's behavioral profile and language register. This human-in-the-loop architecture preserves strategic control while eliminating the per-segment manual copywriting bottleneck.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">03 — System Architecture</div>
+    <div class="arch-diagram">
+<span class="ah">WORKFLOW: Multi-Channel Marketing Campaign Engine</span>
+<span class="anote">See Portfolio System S4 for complete JSON. Triggered by schedule or manual run.</span>
+
+<span class="am">[1] TRIGGER</span>
+  <span class="an">[Cron / Manual Trigger]</span>
+  Run: daily at 09:00 OR on-demand from campaign manager
+
+<span class="am">[2] CAMPAIGN BRIEF INGESTION (HTTP / Sheets)</span>
+  Load from config sheet or HTTP endpoint:
+  { campaign_name, objective, core_message, brand_voice,
+    product_name, promotion_details, target_launch_date }
+
+<span class="am">[3] CUSTOMER LIST FETCH + SEGMENTATION (HTTP + Code)</span>
+  GET customers from CRM / Sheets / Airtable
+  Code Node: RFM Segmentation Algorithm
+  <span class="aa">→</span> Segment A: <span class="am">Champions</span>       (high RFM: recent, frequent, high-value)
+  <span class="aa">→</span> Segment B: <span class="am">At-Risk</span>         (high value, declining recency)
+  <span class="aa">→</span> Segment C: <span class="am">New Customers</span>    (recent first purchase, low frequency)
+  <span class="aa">→</span> Segment D: <span class="am">Dormant</span>          (no activity 90+ days)
+
+<span class="am">[4] AI CONTENT GENERATION (OpenAI — per segment)</span>
+  For each segment, call OpenAI with:
+  - System: Brand voice + content guidelines
+  - User: Campaign brief + segment profile + tone instructions
+  Output per segment: { subject_line, email_body, social_caption }
+  <span class="anote">Model: gpt-4o-mini | Temp: 0.7 | Max tokens: 800</span>
+
+<span class="am">[5] CONTENT QUALITY GATE (IF Node)</span>
+  Validate: generated content is not empty + length within bounds
+  <span class="aa">→</span> Valid: proceed to distribution
+  <span class="aa">→</span> Invalid: log + send fallback template
+
+<span class="am">[6] DISTRIBUTION LAYER (parallel per segment)</span>
+  <span class="an">[SendGrid / Mailchimp API]</span>
+    → Create campaign with generated content
+    → Schedule send for target_launch_date + segment-optimal time window
+    → Tag campaign: campaign_name + segment_label
+
+  <span class="an">[Twitter / Buffer / LinkedIn API]</span>
+    → Post social caption (or schedule via Buffer)
+    → Champions segment → direct post
+    → Others → schedule for optimal engagement window
+
+<span class="am">[7] ANALYTICS SETUP (HTTP)</span>
+  Register campaign in analytics tracker (UTM params, campaign ID)
+  Log to Sheets: campaign_id, segments, send_counts, scheduled_times
+
+<span class="am">[8] NOTIFICATION</span>
+  <span class="an">[Slack]</span> → #marketing: Campaign launched summary
+  → [Campaign name] deployed to [N] segments, [X] total recipients
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">04 — Applied Industry Context</div>
+    <p>This system targets SMB e-commerce brands, SaaS companies, and marketing agencies managing multiple client campaigns. The specific value proposition: a marketing manager can define a campaign brief once and have the system generate, personalize, and schedule across 4 customer segments and 2 channels — a process that would require 6–8 hours of manual copywriting and scheduling reduced to a 10-minute brief completion.</p>
+
+    <div class="callout callout-amber">
+      <div class="callout-title">Agentization Opportunity</div>
+      <p>This system can be extended to a fully autonomous campaign agent by adding: (1) a Google Analytics / Shopify API tool that retrieves prior campaign performance data, (2) a prompt that instructs the LLM to adapt messaging based on what worked in previous campaigns for each segment, and (3) an A/B test configuration that generates two subject line variants per segment for split testing. The result is a self-improving campaign system that learns from each deployment cycle.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">05 — Critical Analysis</div>
+    <ul>
+      <li><strong>Content brand fidelity at scale:</strong> LLM-generated marketing content can drift from established brand voice as temperature increases. Implement a low temperature (0.4–0.6) for subject lines (where consistency matters) and higher temperature (0.7–0.8) for email body where creative variation is desirable. Always include 3–5 brand voice examples in the system prompt as few-shot anchors.</li>
+      <li><strong>Email deliverability dependencies:</strong> Automated campaign systems that send to large lists require transactional email infrastructure with proper SPF, DKIM, and DMARC DNS records. Using Gmail for bulk campaign sends will trigger spam filters and degrade sender reputation. Require SendGrid or Mailchimp API integration for any client with &gt;500 recipients.</li>
+      <li><strong>Social platform API rate limits:</strong> Twitter/X limits posting to 300 tweets per 3-hour window per app. LinkedIn restricts automated posting without a Partner Program integration. Buffer and Hootsuite APIs provide a compliant intermediary layer for scheduling. Design the social distribution layer around a scheduling tool API rather than direct platform APIs where possible.</li>
+      <li><strong>Regulatory compliance:</strong> Email campaigns must include: unsubscribe mechanisms (CAN-SPAM, GDPR), physical mailing address, consent verification. An automated campaign system that sends to unverified or non-consenting lists creates legal liability for the client and reputational risk for the practitioner. Require clients to confirm list compliance before deploying this system.</li>
+    </ul>
+  </div>
+
+  <div class="exercise-block">
+    <div class="exercise-title">Practical Exercise — Lesson 8</div>
+    <div class="exercise-h">Build and Configure the Campaign Automation Engine</div>
+    <p>Implement Portfolio System S4. For the testing phase:</p>
+    <ul>
+      <li>Create a mock customer list in Google Sheets with 20 customers across 4 RFM segments (5 per segment). Include: customer_id, name, email, last_purchase_date, purchase_count, lifetime_value.</li>
+      <li>Write a campaign brief for a hypothetical product (e.g., "Summer Sale — 20% off all items"). Run the system in test mode (email sends to your own address, not live customer list).</li>
+      <li>Evaluate the 4 generated email variants side-by-side. Document: which segment received the most compelling subject line? What tone differences are visible across segments?</li>
+      <li>Write a 1-page "Campaign Performance Brief" template that a client could use to define future campaigns — this becomes a recurring deliverable in your retainer package.</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PART 2 DIVIDER
+═══════════════════════════════════════════════════════════════ -->
+<div class="part-divider">
+  <div class="part-num">Part 2 of 2</div>
+  <h2>Portfolio Systems — Full Engineering Specifications</h2>
+  <p>Four production-level systems with complete architecture documentation, node-by-node breakdowns, import-ready n8n workflow JSON, deployment protocols, and economic analysis.</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SYSTEM S1 — LEAD GENERATION PIPELINE
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="s1">
+  <div class="lesson-header">
+    <span class="lesson-number">Portfolio System S1</span>
+    <h2 class="lesson-title">Lead Generation &amp; Processing Pipeline</h2>
+    <p class="lesson-subtitle">Production-ready, event-driven lead ingestion system with validation, dual-notification, Google Sheets logging, and structured HTTP responses.</p>
+    <div class="lesson-tags"><span class="tag tag-teal">Intermediate</span><span class="tag tag-amber">$850–$1,500 Value</span><span class="tag tag-green">Import-Ready JSON</span></div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">A — System Specification</div>
+    <div class="spec-grid">
+      <div class="spec-item"><div class="spec-label">System Name</div><div class="spec-value">n8n Lead Generation Pipeline v2.0</div></div>
+      <div class="spec-item"><div class="spec-label">Problem Definition</div><div class="spec-value">Eliminate manual lead processing, delayed responses, and data entry for businesses receiving form submissions.</div></div>
+      <div class="spec-item"><div class="spec-label">Functional Requirements</div><div class="spec-value">Receive POST, validate, send confirmation + internal notification, append to Sheets, optionally create CRM contact, return structured HTTP response.</div></div>
+      <div class="spec-item"><div class="spec-label">Non-Functional Requirements</div><div class="spec-value">&lt;3s end-to-end, handles 100+ concurrent submissions, zero data loss on downstream API failure, full error logging.</div></div>
+      <div class="spec-item"><div class="spec-label">Security</div><div class="spec-value">Webhook header authentication. API keys in credentials vault. PII handling: email stored encrypted in Sheets if required.</div></div>
+      <div class="spec-item"><div class="spec-label">Error Strategy</div><div class="spec-value">Invalid inputs → HTTP 422 + structured error body. Downstream API failures → log to error sheet + Slack alert via error workflow.</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">B — Node Architecture</div>
+    <table class="node-table">
+      <thead><tr><th>#</th><th>Node Type</th><th>Name</th><th>Configuration</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>n8n-nodes-base.webhook</td><td>Webhook — Lead Intake</td><td>POST /leads. responseMode: lastNode. headerAuth enabled. Accepts: name, email, phone?, company?, message?, source?</td></tr>
+        <tr><td>2</td><td>n8n-nodes-base.set</td><td>Set — Normalize &amp; Enrich</td><td>Generate lead_id, lowercase/trim email, set defaults, extract email_domain, append ISO timestamp, set status:'new'</td></tr>
+        <tr><td>3</td><td>n8n-nodes-base.if</td><td>IF — Validate Required Fields</td><td>email.notEmpty AND name.notEmpty AND email.contains('@'). True → proceed. False → error branch.</td></tr>
+        <tr><td>4a</td><td>n8n-nodes-base.gmail</td><td>Gmail — Customer Confirmation</td><td>To: lead email. Personalized HTML template. Reply-to: client address. Includes: name, company, timestamp.</td></tr>
+        <tr><td>4b</td><td>n8n-nodes-base.gmail</td><td>Gmail — Team Notification</td><td>To: client's team email. Subject: "New Lead — {{name}} from {{company}}". Includes full lead details.</td></tr>
+        <tr><td>4c</td><td>n8n-nodes-base.slack</td><td>Slack — New Lead Alert</td><td>To: #new-leads. Formatted message with lead name, email, company, source. continueOnFail: true.</td></tr>
+        <tr><td>5</td><td>n8n-nodes-base.googleSheets</td><td>Sheets — Append Lead</td><td>appendOrUpdate. Sheet: "Leads". Columns: lead_id, name, email, phone, company, message, source, timestamp, status. matchingColumns: lead_id.</td></tr>
+        <tr><td>6</td><td>n8n-nodes-base.respondToWebhook</td><td>Respond — HTTP 200</td><td>JSON: {received:true, lead_id, timestamp}. Status: 200.</td></tr>
+        <tr><td>7</td><td>n8n-nodes-base.respondToWebhook</td><td>Respond — HTTP 422</td><td>JSON: {error:"validation_failed", message:"..."}. Status: 422.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="block">
+    <div class="block-title">C — n8n Workflow JSON</div>
+    <div class="json-section">
+      <div class="json-header"><span class="json-title">portfolio_s1_lead_generation_pipeline.json</span><span class="json-badge">✓ Import Ready</span></div>
+      <div class="json-body">
+<pre>{
+  "name": "S1 — Lead Generation & Processing Pipeline v2.0",
+  "nodes": [
+    {
+      "id": "ch2-s1-001",
+      "name": "Webhook — Lead Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "parameters": {
+        "path": "leads",
+        "responseMode": "lastNode",
+        "authentication": "headerAuth",
+        "options": { "rawBody": false }
+      },
+      "credentials": {
+        "httpHeaderAuth": { "id": "webhook-header-cred", "name": "Webhook Auth" }
+      }
+    },
+    {
+      "id": "ch2-s1-002",
+      "name": "Set — Normalize & Enrich Lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [420, 300],
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            { "name": "lead_id",     "type": "string", "string": "={{ 'LEAD-' + $now.toFormat('yyyyMMdd') + '-' + $now.toMillis().toString().slice(-6) }}" },
+            { "name": "name",        "type": "string", "string": "={{ $json.name?.trim() || '' }}" },
+            { "name": "email",       "type": "string", "string": "={{ $json.email?.trim().toLowerCase() || '' }}" },
+            { "name": "phone",       "type": "string", "string": "={{ $json.phone?.trim() || '' }}" },
+            { "name": "company",     "type": "string", "string": "={{ $json.company?.trim() || 'Not provided' }}" },
+            { "name": "message",     "type": "string", "string": "={{ $json.message?.trim() || '' }}" },
+            { "name": "source",      "type": "string", "string": "={{ $json.source || 'website' }}" },
+            { "name": "email_domain","type": "string", "string": "={{ ($json.email || '').split('@')[1] || '' }}" },
+            { "name": "timestamp",   "type": "string", "string": "={{ $now.toISO() }}" },
+            { "name": "status",      "type": "string", "string": "new" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ch2-s1-003",
+      "name": "IF — Validate Required Fields",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [640, 300],
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            { "leftValue": "={{ $json.email }}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty" } },
+            { "leftValue": "={{ $json.name }}",  "rightValue": "", "operator": { "type": "string", "operation": "notEmpty" } },
+            { "leftValue": "={{ $json.email }}", "rightValue": "@","operator": { "type": "string", "operation": "contains" } }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "ch2-s1-004",
+      "name": "Gmail — Customer Confirmation",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [860, 180],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "Got it, {{ $json.name }}! We'll be in touch shortly.",
+        "message": "<div style='font-family:sans-serif;max-width:560px'><p>Hi <strong>{{ $json.name }}</strong>,</p><p>Thank you for reaching out! We've received your message and will be in touch within 1 business day.</p><table style='width:100%;border-collapse:collapse;margin:16px 0'><tr style='background:#f5f5f5'><td style='padding:8px 12px;font-weight:bold'>Name</td><td style='padding:8px 12px'>{{ $json.name }}</td></tr><tr><td style='padding:8px 12px;font-weight:bold'>Company</td><td style='padding:8px 12px'>{{ $json.company }}</td></tr><tr style='background:#f5f5f5'><td style='padding:8px 12px;font-weight:bold'>Submitted</td><td style='padding:8px 12px'>{{ $json.timestamp }}</td></tr></table><p>Best regards,<br><strong>The Team</strong></p></div>",
+        "options": { "htmlMessage": true }
+      },
+      "credentials": { "gmailOAuth2": { "id": "gmail-cred", "name": "Gmail OAuth2" } },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch2-s1-005",
+      "name": "Gmail — Team Notification",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [860, 300],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "team@yourcompany.com",
+        "subject": "New Lead: {{ $json.name }} — {{ $json.company }}",
+        "message": "<div style='font-family:sans-serif'><h3>New Lead Received</h3><p><strong>Lead ID:</strong> {{ $json.lead_id }}<br><strong>Name:</strong> {{ $json.name }}<br><strong>Email:</strong> {{ $json.email }}<br><strong>Phone:</strong> {{ $json.phone }}<br><strong>Company:</strong> {{ $json.company }}<br><strong>Source:</strong> {{ $json.source }}<br><strong>Time:</strong> {{ $json.timestamp }}</p><p><strong>Message:</strong><br>{{ $json.message }}</p></div>",
+        "options": { "htmlMessage": true }
+      },
+      "credentials": { "gmailOAuth2": { "id": "gmail-cred", "name": "Gmail OAuth2" } },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch2-s1-006",
+      "name": "Slack — New Lead Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [860, 420],
+      "parameters": {
+        "operation": "message",
+        "channel": "#new-leads",
+        "text": "📥 *New Lead Received*\n*Name:* {{ $json.name }}\n*Email:* {{ $json.email }}\n*Company:* {{ $json.company }}\n*Source:* {{ $json.source }}\n*Lead ID:* {{ $json.lead_id }}",
+        "options": { "mrkdwn": true }
+      },
+      "credentials": { "slackApi": { "id": "slack-cred", "name": "Slack API" } },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch2-s1-007",
+      "name": "Sheets — Append Lead Record",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1080, 300],
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "value": "YOUR_GOOGLE_SHEET_ID" },
+        "sheetName":  { "value": "Leads" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "lead_id":   "={{ $json.lead_id }}",
+            "name":      "={{ $json.name }}",
+            "email":     "={{ $json.email }}",
+            "phone":     "={{ $json.phone }}",
+            "company":   "={{ $json.company }}",
+            "message":   "={{ $json.message }}",
+            "source":    "={{ $json.source }}",
+            "timestamp": "={{ $json.timestamp }}",
+            "status":    "={{ $json.status }}"
+          },
+          "matchingColumns": ["lead_id"]
+        }
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "gsheets-cred", "name": "Google Sheets OAuth2" } }
+    },
+    {
+      "id": "ch2-s1-008",
+      "name": "Respond — HTTP 200 Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1300, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ received: true, lead_id: $json.lead_id, timestamp: $json.timestamp }) }}",
+        "options": { "responseCode": 200 }
+      }
+    },
+    {
+      "id": "ch2-s1-009",
+      "name": "Respond — HTTP 422 Validation Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [860, 560],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"error\": \"validation_failed\", \"message\": \"Required fields missing or invalid. Provide a valid name and email address.\", \"received\": false }",
+        "options": { "responseCode": 422 }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Lead Intake": {
+      "main": [[{ "node": "Set — Normalize & Enrich Lead", "type": "main", "index": 0 }]]
+    },
+    "Set — Normalize & Enrich Lead": {
+      "main": [[{ "node": "IF — Validate Required Fields", "type": "main", "index": 0 }]]
+    },
+    "IF — Validate Required Fields": {
+      "main": [
+        [
+          { "node": "Gmail — Customer Confirmation", "type": "main", "index": 0 },
+          { "node": "Gmail — Team Notification",    "type": "main", "index": 0 },
+          { "node": "Slack — New Lead Alert",       "type": "main", "index": 0 }
+        ],
+        [{ "node": "Respond — HTTP 422 Validation Error", "type": "main", "index": 0 }]
+      ]
+    },
+    "Gmail — Team Notification": {
+      "main": [[{ "node": "Sheets — Append Lead Record", "type": "main", "index": 0 }]]
+    },
+    "Sheets — Append Lead Record": {
+      "main": [[{ "node": "Respond — HTTP 200 Success", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1", "saveManualExecutions": true }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">E — Economic Analysis</div>
+    <div class="pricing-grid">
+      <div class="pricing-card"><div class="pricing-tier">Starter</div><div class="pricing-amount">$850</div><div class="pricing-period">one-time</div><div class="pricing-desc">Sheets + 2 Gmail notifications. 3-day delivery. No CRM integration.</div></div>
+      <div class="pricing-card featured"><div class="pricing-tier">Standard</div><div class="pricing-amount">$1,400</div><div class="pricing-period">+ $149/mo</div><div class="pricing-desc">Full system + Slack + CRM write. Monitoring retainer included. 5-day delivery.</div></div>
+      <div class="pricing-card"><div class="pricing-tier">Template License</div><div class="pricing-amount">$49</div><div class="pricing-period">per month</div><div class="pricing-desc">Self-serve template with docs. Clients configure their own credentials. Zero delivery time.</div></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SYSTEM S2 — AI CLIENT SUPPORT AGENT
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="s2">
+  <div class="lesson-header">
+    <span class="lesson-number">Portfolio System S2</span>
+    <h2 class="lesson-title">AI-Powered Client Support Agent System</h2>
+    <p class="lesson-subtitle">Multi-tool AI agent with knowledge base retrieval, order lookup, ticket creation, escalation routing, and session memory — production-grade support automation for SMB e-commerce and SaaS companies.</p>
+    <div class="lesson-tags"><span class="tag tag-purple">Advanced</span><span class="tag tag-amber">$6,000–$15,000 Value</span><span class="tag tag-green">Import-Ready JSON</span></div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">A — System Specification</div>
+    <div class="spec-grid">
+      <div class="spec-item"><div class="spec-label">System Name</div><div class="spec-value">n8n AI Client Support Agent v1.0</div></div>
+      <div class="spec-item"><div class="spec-label">Problem</div><div class="spec-value">Support teams are overwhelmed with repetitive inquiries; response times are slow; inconsistent answers damage client trust.</div></div>
+      <div class="spec-item"><div class="spec-label">Target Clients</div><div class="spec-value">E-commerce brands, SaaS companies, and professional services with 30–500 weekly support inquiries and 1–5 person support teams.</div></div>
+      <div class="spec-item"><div class="spec-label">Functional Requirements</div><div class="spec-value">Classify intent, retrieve relevant KB context, generate grounded response, create tickets for escalations, maintain session context, log all interactions.</div></div>
+      <div class="spec-item"><div class="spec-label">Non-Functional</div><div class="spec-value">&lt;5s response time, 70%+ ticket auto-resolution target, full conversation audit trail, LLM hallucination mitigation via RAG.</div></div>
+      <div class="spec-item"><div class="spec-label">Security</div><div class="spec-value">Input sanitization against prompt injection. Customer data processed in-memory, not stored in LLM provider logs (use n8n's own credential management).</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">B — Node Architecture</div>
+    <table class="node-table">
+      <thead><tr><th>#</th><th>Node Type</th><th>Name</th><th>Configuration Summary</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>webhook</td><td>Webhook — Support Inquiry</td><td>POST /support. Fields: session_id, customer_id, message, channel.</td></tr>
+        <tr><td>2</td><td>set</td><td>Set — Input Sanitize &amp; Context Prep</td><td>Strip HTML, truncate message to 2000 chars. Generate inquiry_id. Assemble context_string.</td></tr>
+        <tr><td>3</td><td>httpRequest</td><td>HTTP — Load Session History</td><td>GET from Redis/Upstash or Airtable using session_id. continueOnFail: true (new sessions return empty).</td></tr>
+        <tr><td>4</td><td>@n8n/n8n-nodes-langchain.agent</td><td>AI Agent — Support Orchestrator</td><td>Model: gpt-4o. Memory: Window Buffer (8 turns). System prompt: role + scope + escalation rules + format rules.</td></tr>
+        <tr><td>4a</td><td>@n8n/n8n-nodes-langchain.toolHttpRequest</td><td>Tool — Knowledge Base Search</td><td>HTTP GET to vector store / Notion API with query param. Returns top 3 matching KB articles.</td></tr>
+        <tr><td>4b</td><td>@n8n/n8n-nodes-langchain.toolHttpRequest</td><td>Tool — Order Status Lookup</td><td>HTTP GET to Shopify/WooCommerce Orders API. Requires customer_id or order_id. Returns order status + tracking.</td></tr>
+        <tr><td>4c</td><td>@n8n/n8n-nodes-langchain.toolCode</td><td>Tool — Return Policy Checker</td><td>Code tool returning static return policy text. No API call — deterministic, low latency.</td></tr>
+        <tr><td>4d</td><td>@n8n/n8n-nodes-langchain.toolWorkflow</td><td>Tool — Escalate to Human</td><td>Calls escalation sub-workflow: creates ticket in Notion, posts to #urgent-support Slack, assigns agent.</td></tr>
+        <tr><td>5</td><td>switch</td><td>Switch — Resolution Routing</td><td>Routes on agent's output action field: resolved / escalated / follow_up.</td></tr>
+        <tr><td>6</td><td>gmail</td><td>Gmail — Send Response</td><td>To: customer email. Subject: Re: their inquiry. Body: agent's generated response. continueOnFail: true.</td></tr>
+        <tr><td>7</td><td>httpRequest</td><td>HTTP — Save Session History</td><td>POST to Redis/Airtable: session_id + updated conversation array.</td></tr>
+        <tr><td>8</td><td>googleSheets</td><td>Sheets — Interaction Audit Log</td><td>Appends: inquiry_id, session_id, customer_id, message_summary, resolution, escalated, duration_ms, timestamp.</td></tr>
+        <tr><td>9</td><td>respondToWebhook</td><td>Respond — 200 + Result</td><td>Returns: {processed:true, inquiry_id, resolution_type, response_preview}.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="block">
+    <div class="block-title">C — Agent System Prompt (Production Grade)</div>
+    <div class="json-section">
+      <div class="json-header"><span class="json-title">AI Agent System Prompt Template</span><span class="json-badge">✓ Configurable</span></div>
+      <div class="json-body">
+<pre>You are a customer support agent for [CLIENT_COMPANY], a [BUSINESS_DESCRIPTION].
+Your role is to help customers with questions about their orders, products, shipping, and returns.
+
+## SCOPE BOUNDARIES
+You ONLY answer questions about:
+- Order status and tracking
+- Product information (use knowledge_base_search before answering)
+- Return and refund policies (use lookup_return_policy tool)
+- General company information
+
+You DO NOT answer questions about:
+- Competitor products
+- Internal company processes
+- Anything unrelated to [CLIENT_COMPANY]
+
+## TOOL USAGE RULES
+1. ALWAYS use knowledge_base_search before answering any product question
+2. ALWAYS use get_order_status when a customer mentions an order number or asks about delivery
+3. NEVER invent product specifications, prices, or availability
+4. If a tool returns empty results, acknowledge the limitation and offer to connect the customer with a specialist
+
+## ESCALATION CONDITIONS
+Immediately use the escalate_to_human tool when:
+- Customer explicitly requests a human agent
+- Customer expresses anger or frustration more than once
+- Refund amount exceeds $[THRESHOLD]
+- You cannot find relevant information after 2 tool uses
+- Customer reports a safety issue with a product
+
+## RESPONSE FORMAT
+- Address the customer by their first name
+- Keep responses under 120 words
+- End every response with a specific next-step offer
+- Do not use markdown formatting in your response
+- Be warm, professional, and solution-focused
+
+## RESOLUTION SIGNAL
+At the end of your response, append exactly one of these action tags on a new line:
+[ACTION:resolved] — if the inquiry is fully addressed
+[ACTION:escalated] — if you used the escalate tool
+[ACTION:follow_up] — if you need more information from the customer
+
+Today's date: {{ $now.toFormat('yyyy-MM-dd') }}
+Customer name: {{ $json.customer_name || 'Valued Customer' }}
+Session ID: {{ $json.session_id }}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">C — Workflow JSON (Key Nodes)</div>
+    <div class="json-section">
+      <div class="json-header"><span class="json-title">portfolio_s2_ai_support_agent.json</span><span class="json-badge">✓ Import Ready</span></div>
+      <div class="json-body">
+<pre>{
+  "name": "S2 — AI Client Support Agent v1.0",
+  "nodes": [
+    {
+      "id": "ch2-s2-001",
+      "name": "Webhook — Support Inquiry",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 300],
+      "parameters": {
+        "path": "support",
+        "responseMode": "lastNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "ch2-s2-002",
+      "name": "Set — Sanitize & Context Prep",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [380, 300],
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            { "name": "inquiry_id",     "type": "string", "string": "={{ 'INQ-' + $now.toMillis() }}" },
+            { "name": "session_id",     "type": "string", "string": "={{ $json.session_id || ('SES-' + $now.toMillis()) }}" },
+            { "name": "customer_id",    "type": "string", "string": "={{ $json.customer_id || 'anonymous' }}" },
+            { "name": "customer_name",  "type": "string", "string": "={{ $json.customer_name || 'Customer' }}" },
+            { "name": "customer_email", "type": "string", "string": "={{ ($json.email || '').toLowerCase().trim() }}" },
+            { "name": "message_clean",  "type": "string", "string": "={{ $json.message.replace(/<[^>]+>/g, '').substring(0, 2000).trim() }}" },
+            { "name": "channel",        "type": "string", "string": "={{ $json.channel || 'web' }}" },
+            { "name": "received_at",    "type": "string", "string": "={{ $now.toISO() }}" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ch2-s2-003",
+      "name": "HTTP — Load Session History",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [580, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.upstash.io/get/session-{{ $json.session_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer YOUR_UPSTASH_TOKEN" }
+          ]
+        },
+        "options": { "timeout": 2000 }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch2-s2-004",
+      "name": "AI Agent — Support Orchestrator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [780, 300],
+      "parameters": {
+        "agentType": "toolsAgent",
+        "promptType": "define",
+        "text": "={{ $json.message_clean }}",
+        "systemMessage": "You are a customer support agent for [CLIENT_COMPANY]...\n[PASTE FULL SYSTEM PROMPT HERE]\n\nCustomer name: {{ $json.customer_name }}\nSession ID: {{ $json.session_id }}",
+        "options": {
+          "maxIterations": 6,
+          "returnIntermediateSteps": false
+        }
+      },
+      "credentials": {
+        "openAiApi": { "id": "openai-cred", "name": "OpenAI API" }
+      }
+    },
+    {
+      "id": "ch2-s2-005",
+      "name": "Code — Parse Agent Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 300],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const item = $input.item.json;\nconst agentOutput = item.output || '';\n\n// Extract action tag\nconst actionMatch = agentOutput.match(/\\[ACTION:(resolved|escalated|follow_up)\\]/i);\nconst action = actionMatch ? actionMatch[1] : 'resolved';\n\n// Clean response (remove action tag)\nconst cleanResponse = agentOutput.replace(/\\[ACTION:[^\\]]+\\]/gi, '').trim();\n\nreturn [{ json: {\n  ...item,\n  agent_response: cleanResponse,\n  resolution_action: action,\n  response_length: cleanResponse.length\n}}];"
+      }
+    },
+    {
+      "id": "ch2-s2-006",
+      "name": "Switch — Resolution Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1180, 300],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "rules": [
+            {
+              "outputIndex": 0,
+              "conditions": { "conditions": [{ "leftValue": "={{ $json.resolution_action }}", "rightValue": "escalated", "operator": { "type": "string", "operation": "equals" } }] }
+            },
+            {
+              "outputIndex": 1,
+              "conditions": { "conditions": [{ "leftValue": "={{ $json.resolution_action }}", "rightValue": "follow_up", "operator": { "type": "string", "operation": "equals" } }] }
+            }
+          ],
+          "fallbackOutput": 2
+        }
+      }
+    },
+    {
+      "id": "ch2-s2-007",
+      "name": "Slack — Escalation Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1380, 160],
+      "parameters": {
+        "operation": "message",
+        "channel": "#urgent-support",
+        "text": "⚠️ *ESCALATION REQUIRED*\n*Inquiry ID:* {{ $json.inquiry_id }}\n*Customer:* {{ $json.customer_name }} ({{ $json.customer_email }})\n*Message:* {{ $json.message_clean }}\n*Agent Summary:* {{ $json.agent_response }}\n\nPlease respond within 30 minutes.",
+        "options": { "mrkdwn": true }
+      },
+      "credentials": { "slackApi": { "id": "slack-cred", "name": "Slack API" } },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch2-s2-008",
+      "name": "Gmail — Send Agent Response",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1380, 300],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "Re: Your Support Request [{{ $json.inquiry_id }}]",
+        "message": "={{ $json.agent_response.replace(/\\n/g, '<br>') }}",
+        "options": { "htmlMessage": true }
+      },
+      "credentials": { "gmailOAuth2": { "id": "gmail-cred", "name": "Gmail OAuth2" } },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch2-s2-009",
+      "name": "Sheets — Interaction Audit Log",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1580, 300],
+      "parameters": {
+        "operation": "append",
+        "documentId": { "value": "YOUR_AUDIT_SHEET_ID" },
+        "sheetName": { "value": "Support Log" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "inquiry_id":    "={{ $json.inquiry_id }}",
+            "session_id":    "={{ $json.session_id }}",
+            "customer_id":   "={{ $json.customer_id }}",
+            "customer_email":"={{ $json.customer_email }}",
+            "message":       "={{ $json.message_clean.substring(0, 500) }}",
+            "resolution":    "={{ $json.resolution_action }}",
+            "response_sent": "yes",
+            "received_at":   "={{ $json.received_at }}"
+          }
+        }
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "gsheets-cred", "name": "Google Sheets OAuth2" } }
+    },
+    {
+      "id": "ch2-s2-010",
+      "name": "Respond — 200 Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1780, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ processed: true, inquiry_id: $json.inquiry_id, resolution: $json.resolution_action }) }}",
+        "options": { "responseCode": 200 }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Support Inquiry":   { "main": [[{ "node": "Set — Sanitize & Context Prep",   "type": "main", "index": 0 }]] },
+    "Set — Sanitize & Context Prep":{ "main": [[{ "node": "HTTP — Load Session History",     "type": "main", "index": 0 }]] },
+    "HTTP — Load Session History":  { "main": [[{ "node": "AI Agent — Support Orchestrator", "type": "main", "index": 0 }]] },
+    "AI Agent — Support Orchestrator":{ "main": [[{ "node": "Code — Parse Agent Output",     "type": "main", "index": 0 }]] },
+    "Code — Parse Agent Output":    { "main": [[{ "node": "Switch — Resolution Router",      "type": "main", "index": 0 }]] },
+    "Switch — Resolution Router": {
+      "main": [
+        [{ "node": "Slack — Escalation Alert",   "type": "main", "index": 0 }],
+        [{ "node": "Gmail — Send Agent Response","type": "main", "index": 0 }],
+        [{ "node": "Gmail — Send Agent Response","type": "main", "index": 0 }]
+      ]
+    },
+    "Slack — Escalation Alert":    { "main": [[{ "node": "Gmail — Send Agent Response",    "type": "main", "index": 0 }]] },
+    "Gmail — Send Agent Response": { "main": [[{ "node": "Sheets — Interaction Audit Log", "type": "main", "index": 0 }]] },
+    "Sheets — Interaction Audit Log":{ "main": [[{ "node": "Respond — 200 Result",         "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "saveManualExecutions": true }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">E — Economic Analysis</div>
+    <div class="pricing-grid">
+      <div class="pricing-card"><div class="pricing-tier">Standard Build</div><div class="pricing-amount">$6,500</div><div class="pricing-period">project fee</div><div class="pricing-desc">Agent + 3 tools + KB setup + Gmail + Slack escalation + Sheets audit + 60-day support.</div></div>
+      <div class="pricing-card featured"><div class="pricing-tier">Enterprise</div><div class="pricing-amount">$10,000</div><div class="pricing-period">+ $799/mo</div><div class="pricing-desc">Full build + session memory infrastructure + monthly agent tuning + performance analytics dashboard.</div></div>
+      <div class="pricing-card"><div class="pricing-tier">SaaS Product</div><div class="pricing-amount">$399</div><div class="pricing-period">per month</div><div class="pricing-desc">White-label: client connects their KB, email, Slack. 10 clients = $3,990 MRR. Infrastructure cost: ~$120/mo.</div></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SYSTEM S3 — E-COMMERCE ORDER MANAGEMENT
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="s3">
+  <div class="lesson-header">
+    <span class="lesson-number">Portfolio System S3</span>
+    <h2 class="lesson-title">E-Commerce Order Management Automation Engine</h2>
+    <p class="lesson-subtitle">Full order lifecycle automation with inventory state checking, three-branch fulfillment routing, customer notifications, team alerts, and duplicate prevention — production-ready for Shopify/WooCommerce integrations.</p>
+    <div class="lesson-tags"><span class="tag tag-teal">Advanced</span><span class="tag tag-amber">$4,000–$9,000 Value</span><span class="tag tag-green">Import-Ready JSON</span></div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">A — System Specification</div>
+    <div class="spec-grid">
+      <div class="spec-item"><div class="spec-label">System Name</div><div class="spec-value">n8n E-Commerce Order Engine v1.0</div></div>
+      <div class="spec-item"><div class="spec-label">Problem</div><div class="spec-value">Manual order processing creates bottlenecks, delayed customer notifications, undetected stock issues, and ops team overload at scale.</div></div>
+      <div class="spec-item"><div class="spec-label">Functional Requirements</div><div class="spec-value">Receive order webhook, validate payment, check all SKU inventory states, route to correct fulfillment branch, send customer notification, log to Sheets, alert team on stock issues.</div></div>
+      <div class="spec-item"><div class="spec-label">Non-Functional</div><div class="spec-value">Idempotent (duplicate webhook protection), &lt;4s execution, handles 100+ concurrent orders, inventory checks parallelized for multi-item orders.</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">C — Inventory Evaluation Code Node</div>
+    <div class="json-section">
+      <div class="json-header"><span class="json-title">Inventory State Evaluation — Code Node JavaScript</span><span class="json-badge">✓ Production Grade</span></div>
+      <div class="json-body">
+<pre>// Inventory State Evaluator
+// Input: merged order data + inventory API responses
+// Output: order with stock_state, affected_items, reorder_skus
+
+const item = $input.item.json;
+const order = item.order_data;
+const inventoryResults = item.inventory_results || [];
+
+// Configuration (should come from config node in production)
+const LOW_STOCK_THRESHOLD = item.low_stock_threshold || 5;
+const HIGH_VALUE_ORDER_THRESHOLD = item.high_value_threshold || 500;
+
+// ─── EVALUATE EACH LINE ITEM ──────────────────────────────────
+const itemEvaluations = (order.line_items || []).map(lineItem => {
+  const inventoryData = inventoryResults.find(
+    inv => inv.sku === lineItem.sku || inv.variant_id === lineItem.variant_id
+  );
+
+  const qty_available = inventoryData?.quantity_available ?? 0;
+  const qty_ordered   = lineItem.quantity || 1;
+
+  let item_state;
+  if (qty_available === 0) {
+    item_state = 'out_of_stock';
+  } else if (qty_available < LOW_STOCK_THRESHOLD) {
+    item_state = 'low_stock';
+  } else if (qty_available >= qty_ordered) {
+    item_state = 'in_stock';
+  } else {
+    // Partial stock (can fulfill but will go below threshold)
+    item_state = 'low_stock';
+  }
+
+  return {
+    sku:           lineItem.sku,
+    product_name:  lineItem.title || lineItem.name,
+    qty_ordered,
+    qty_available,
+    item_state,
+    can_fulfill:   qty_available >= qty_ordered
+  };
+});
+
+// ─── DETERMINE AGGREGATE ORDER STATE ─────────────────────────
+// Priority: out_of_stock > low_stock > in_stock
+const has_out_of_stock = itemEvaluations.some(i => i.item_state === 'out_of_stock');
+const has_low_stock    = itemEvaluations.some(i => i.item_state === 'low_stock');
+
+const stock_state = has_out_of_stock ? 'out_of_stock'
+                  : has_low_stock    ? 'low_stock'
+                  :                    'in_stock';
+
+// ─── IDENTIFY REORDER CANDIDATES ─────────────────────────────
+const reorder_skus = itemEvaluations
+  .filter(i => i.item_state === 'out_of_stock' || i.item_state === 'low_stock')
+  .map(i => ({ sku: i.sku, name: i.product_name, qty_available: i.qty_available }));
+
+// ─── HIGH VALUE ORDER FLAG ────────────────────────────────────
+const order_total = parseFloat(order.total_price || 0);
+const is_high_value = order_total >= HIGH_VALUE_ORDER_THRESHOLD;
+
+// ─── IDEMPOTENCY CHECK ─────────────────────────────────────────
+const order_id = order.id || order.order_id;
+
+return [{
+  json: {
+    ...item,
+    order_id,
+    customer_email:  order.email || order.customer?.email,
+    customer_name:   order.shipping_address?.name || order.customer?.name || 'Valued Customer',
+    order_total,
+    is_high_value,
+    stock_state,
+    item_evaluations:    itemEvaluations,
+    reorder_skus,
+    unfulfillable_items: itemEvaluations.filter(i => !i.can_fulfill),
+    fulfillable_items:   itemEvaluations.filter(i => i.can_fulfill),
+    evaluated_at: new Date().toISOString()
+  }
+}];</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">C — Workflow JSON (Core Structure)</div>
+    <div class="json-section">
+      <div class="json-header"><span class="json-title">portfolio_s3_ecommerce_order_engine.json</span><span class="json-badge">✓ Import Ready</span></div>
+      <div class="json-body">
+<pre>{
+  "name": "S3 — E-Commerce Order Management Engine v1.0",
+  "nodes": [
+    {
+      "id": "ch3-s3-001",
+      "name": "Webhook — Order Event",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "parameters": {
+        "path": "order-event",
+        "responseMode": "lastNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "ch3-s3-002",
+      "name": "Set — Normalize Order Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [400, 300],
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            { "name": "order_id",       "type": "string", "string": "={{ $json.id || $json.order_id }}" },
+            { "name": "payment_status", "type": "string", "string": "={{ ($json.financial_status || $json.payment_status || 'unpaid').toLowerCase() }}" },
+            { "name": "order_data",     "type": "object", "object": "={{ $json }}" },
+            { "name": "low_stock_threshold",   "type": "number", "number": 5 },
+            { "name": "high_value_threshold",  "type": "number", "number": 500 },
+            { "name": "received_at",    "type": "string", "string": "={{ $now.toISO() }}" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ch3-s3-003",
+      "name": "Sheets — Check Duplicate Order",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [600, 300],
+      "parameters": {
+        "operation": "read",
+        "documentId": { "value": "YOUR_ORDER_LOG_SHEET_ID" },
+        "sheetName":  { "value": "Orders" },
+        "filters": {
+          "conditions": [{ "keyName": "order_id", "condition": "equals", "keyValue": "={{ $json.order_id }}" }]
+        },
+        "options": { "returnFirstMatch": true }
+      },
+      "continueOnFail": true,
+      "credentials": { "googleSheetsOAuth2Api": { "id": "gsheets-cred", "name": "Google Sheets OAuth2" } }
+    },
+    {
+      "id": "ch3-s3-004",
+      "name": "IF — Skip Duplicate Orders",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [800, 300],
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            { "leftValue": "={{ $json.payment_status }}", "rightValue": "paid", "operator": { "type": "string", "operation": "equals" } },
+            { "leftValue": "={{ Object.keys($('Sheets — Check Duplicate Order').item?.json || {}).length }}", "rightValue": 0, "operator": { "type": "number", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "ch3-s3-005",
+      "name": "HTTP — Check Inventory (All SKUs)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1000, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "https://YOUR-STORE.myshopify.com/admin/api/2024-01/inventory_levels.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "X-Shopify-Access-Token", "value": "YOUR_SHOPIFY_ACCESS_TOKEN" }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "inventory_item_ids", "value": "={{ $json.order_data.line_items.map(i => i.inventory_item_id).join(',') }}" }
+          ]
+        },
+        "options": { "timeout": 5000 }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch3-s3-006",
+      "name": "Code — Evaluate Inventory State",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 300],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// [PASTE FULL INVENTORY EVALUATION ALGORITHM HERE — see code block above]"
+      }
+    },
+    {
+      "id": "ch3-s3-007",
+      "name": "Switch — Fulfillment Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1400, 300],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "rules": [
+            { "outputIndex": 0, "conditions": { "conditions": [{ "leftValue": "={{ $json.stock_state }}", "rightValue": "in_stock",    "operator": { "type": "string", "operation": "equals" } }] } },
+            { "outputIndex": 1, "conditions": { "conditions": [{ "leftValue": "={{ $json.stock_state }}", "rightValue": "low_stock",   "operator": { "type": "string", "operation": "equals" } }] } },
+            { "outputIndex": 2, "conditions": { "conditions": [{ "leftValue": "={{ $json.stock_state }}", "rightValue": "out_of_stock","operator": { "type": "string", "operation": "equals" } }] } }
+          ],
+          "fallbackOutput": 0
+        }
+      }
+    },
+    {
+      "id": "ch3-s3-008",
+      "name": "Gmail — Order Confirmation (In-Stock)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1600, 160],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "Your order #{{ $json.order_id }} is confirmed!",
+        "message": "<div style='font-family:sans-serif;max-width:600px'><h2>Order Confirmed ✓</h2><p>Hi {{ $json.customer_name }},</p><p>Great news — your order <strong>#{{ $json.order_id }}</strong> has been confirmed and is being processed. You'll receive a shipping notification within 1–2 business days.</p><p><strong>Order Total:</strong> ${{ $json.order_total }}</p><p>Thank you for your purchase!</p></div>",
+        "options": { "htmlMessage": true }
+      },
+      "credentials": { "gmailOAuth2": { "id": "gmail-cred", "name": "Gmail OAuth2" } },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch3-s3-009",
+      "name": "Slack — Low Stock Reorder Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1600, 300],
+      "parameters": {
+        "operation": "message",
+        "channel": "#inventory-alerts",
+        "text": "⚠️ *Low Stock Alert — Order Processing*\nOrder #{{ $json.order_id }} is processing but triggered a low-stock flag.\n*Affected SKUs:*\n{{ $json.reorder_skus.map(s => '• ' + s.sku + ': ' + s.qty_available + ' remaining').join('\\n') }}\n\nPlease review reorder quantities.",
+        "options": { "mrkdwn": true }
+      },
+      "credentials": { "slackApi": { "id": "slack-cred", "name": "Slack API" } },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch3-s3-010",
+      "name": "Gmail — Order On Hold (Out-of-Stock)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1600, 440],
+      "parameters": {
+        "operation": "send",
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "Update on your order #{{ $json.order_id }}",
+        "message": "<div style='font-family:sans-serif;max-width:600px'><h2>Order Update Required</h2><p>Hi {{ $json.customer_name }},</p><p>Thank you for your order. Unfortunately, one or more items you ordered are currently out of stock:</p><ul>{{ $json.unfulfillable_items.map(i => '<li>' + i.product_name + '</li>').join('') }}</ul><p>We have two options for you:</p><ol><li>We can hold your order and ship as soon as stock is replenished (estimated 5–7 business days)</li><li>We can cancel and provide a full refund</li></ol><p>Please reply to this email with your preference. We apologize for the inconvenience.</p></div>",
+        "options": { "htmlMessage": true }
+      },
+      "credentials": { "gmailOAuth2": { "id": "gmail-cred", "name": "Gmail OAuth2" } },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch3-s3-011",
+      "name": "Sheets — Unified Order Log",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1800, 300],
+      "parameters": {
+        "operation": "append",
+        "documentId": { "value": "YOUR_ORDER_LOG_SHEET_ID" },
+        "sheetName":  { "value": "Orders" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "order_id":       "={{ $json.order_id }}",
+            "customer_email": "={{ $json.customer_email }}",
+            "customer_name":  "={{ $json.customer_name }}",
+            "order_total":    "={{ $json.order_total }}",
+            "stock_state":    "={{ $json.stock_state }}",
+            "processing_status": "={{ $json.stock_state === 'out_of_stock' ? 'on_hold' : 'processing' }}",
+            "is_high_value":  "={{ $json.is_high_value }}",
+            "received_at":    "={{ $json.received_at }}"
+          }
+        }
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "gsheets-cred", "name": "Google Sheets OAuth2" } }
+    },
+    {
+      "id": "ch3-s3-012",
+      "name": "Respond — 200 Order Received",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2000, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ received: true, order_id: $json.order_id, processing_status: $json.stock_state === 'out_of_stock' ? 'on_hold' : 'processing', stock_state: $json.stock_state }) }}",
+        "options": { "responseCode": 200 }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook — Order Event":             { "main": [[{ "node": "Set — Normalize Order Payload",        "type": "main", "index": 0 }]] },
+    "Set — Normalize Order Payload":     { "main": [[{ "node": "Sheets — Check Duplicate Order",        "type": "main", "index": 0 }]] },
+    "Sheets — Check Duplicate Order":    { "main": [[{ "node": "IF — Skip Duplicate Orders",           "type": "main", "index": 0 }]] },
+    "IF — Skip Duplicate Orders": {
+      "main": [
+        [{ "node": "HTTP — Check Inventory (All SKUs)", "type": "main", "index": 0 }],
+        [{ "node": "Respond — 200 Order Received",      "type": "main", "index": 0 }]
+      ]
+    },
+    "HTTP — Check Inventory (All SKUs)": { "main": [[{ "node": "Code — Evaluate Inventory State",   "type": "main", "index": 0 }]] },
+    "Code — Evaluate Inventory State":   { "main": [[{ "node": "Switch — Fulfillment Router",        "type": "main", "index": 0 }]] },
+    "Switch — Fulfillment Router": {
+      "main": [
+        [{ "node": "Gmail — Order Confirmation (In-Stock)", "type": "main", "index": 0 }],
+        [
+          { "node": "Gmail — Order Confirmation (In-Stock)", "type": "main", "index": 0 },
+          { "node": "Slack — Low Stock Reorder Alert",       "type": "main", "index": 0 }
+        ],
+        [{ "node": "Gmail — Order On Hold (Out-of-Stock)",  "type": "main", "index": 0 }]
+      ]
+    },
+    "Gmail — Order Confirmation (In-Stock)":{ "main": [[{ "node": "Sheets — Unified Order Log", "type": "main", "index": 0 }]] },
+    "Gmail — Order On Hold (Out-of-Stock)": { "main": [[{ "node": "Sheets — Unified Order Log", "type": "main", "index": 0 }]] },
+    "Slack — Low Stock Reorder Alert":      { "main": [[{ "node": "Sheets — Unified Order Log", "type": "main", "index": 0 }]] },
+    "Sheets — Unified Order Log":           { "main": [[{ "node": "Respond — 200 Order Received","type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1", "saveManualExecutions": true }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">E — Economic Analysis</div>
+    <div class="pricing-grid">
+      <div class="pricing-card"><div class="pricing-tier">Core Build</div><div class="pricing-amount">$4,000</div><div class="pricing-period">project fee</div><div class="pricing-desc">3-branch routing + Shopify integration + Gmail + Sheets log. 2-week delivery.</div></div>
+      <div class="pricing-card featured"><div class="pricing-tier">Full Suite</div><div class="pricing-amount">$7,500</div><div class="pricing-period">+ $499/mo</div><div class="pricing-desc">Core + Slack + high-value order flag + 3PL integration + WMS API + monitoring retainer.</div></div>
+      <div class="pricing-card"><div class="pricing-tier">Template</div><div class="pricing-amount">$149</div><div class="pricing-period">one-time</div><div class="pricing-desc">Self-configurable template with Shopify + WooCommerce variants. Sell via Gumroad.</div></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SYSTEM S4 — MARKETING CAMPAIGN ENGINE
+═══════════════════════════════════════════════════════════════ -->
+<section class="chapter-section" id="s4">
+  <div class="lesson-header">
+    <span class="lesson-number">Portfolio System S4</span>
+    <h2 class="lesson-title">Multi-Channel Marketing Campaign Automation Engine</h2>
+    <p class="lesson-subtitle">AI-augmented campaign engine with RFM customer segmentation, segment-specific LLM content generation, SendGrid email scheduling, and social media distribution — production-grade marketing automation for SMB brands.</p>
+    <div class="lesson-tags"><span class="tag tag-pink">Advanced</span><span class="tag tag-amber">$5,000–$12,000 Value</span><span class="tag tag-green">Import-Ready JSON</span></div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">A — System Specification</div>
+    <div class="spec-grid">
+      <div class="spec-item"><div class="spec-label">System Name</div><div class="spec-value">n8n Marketing Campaign Engine v1.0</div></div>
+      <div class="spec-item"><div class="spec-label">Problem</div><div class="spec-value">Manual campaign creation and sending is slow, generic, and fails to personalize for customer segments — resulting in low engagement and revenue leakage.</div></div>
+      <div class="spec-item"><div class="spec-label">Functional Requirements</div><div class="spec-value">Load customer list, apply RFM segmentation, generate AI content per segment, schedule emails via SendGrid, post social caption, log campaign metrics to Sheets, notify team via Slack.</div></div>
+      <div class="spec-item"><div class="spec-label">Non-Functional</div><div class="spec-value">Handles 10,000+ customer lists, LLM content generation for 4 segments completes in &lt;30s, email scheduling idempotent (no double sends), full campaign audit trail.</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">C — RFM Segmentation Code Node</div>
+    <div class="json-section">
+      <div class="json-header"><span class="json-title">RFM Segmentation Algorithm — Code Node JavaScript</span><span class="json-badge">✓ Production Grade</span></div>
+      <div class="json-body">
+<pre>// RFM Segmentation Engine
+// Input: array of customer records
+// Output: same array with segment label added per customer
+
+const customers = $input.all().map(item => item.json);
+
+// ─── COMPUTE RFM SCORES ───────────────────────────────────────
+const now = new Date();
+
+const scored = customers.map(customer => {
+  // Recency: days since last purchase (lower = more recent = better)
+  const lastPurchase = new Date(customer.last_purchase_date || '2020-01-01');
+  const recencyDays  = Math.floor((now - lastPurchase) / (1000 * 60 * 60 * 24));
+
+  // Frequency: number of purchases
+  const frequency = parseInt(customer.purchase_count || 0, 10);
+
+  // Monetary: lifetime value
+  const monetary  = parseFloat(customer.lifetime_value || 0);
+
+  // ─── SCORE NORMALIZATION (1–5 scale) ─────────────────────────
+  // Recency scoring (lower days = higher score)
+  let r_score;
+  if      (recencyDays <= 30)  r_score = 5;
+  else if (recencyDays <= 90)  r_score = 4;
+  else if (recencyDays <= 180) r_score = 3;
+  else if (recencyDays <= 365) r_score = 2;
+  else                         r_score = 1;
+
+  // Frequency scoring
+  let f_score;
+  if      (frequency >= 10) f_score = 5;
+  else if (frequency >= 6)  f_score = 4;
+  else if (frequency >= 3)  f_score = 3;
+  else if (frequency >= 2)  f_score = 2;
+  else                      f_score = 1;
+
+  // Monetary scoring
+  let m_score;
+  if      (monetary >= 1000) m_score = 5;
+  else if (monetary >= 500)  m_score = 4;
+  else if (monetary >= 200)  m_score = 3;
+  else if (monetary >= 50)   m_score = 2;
+  else                       m_score = 1;
+
+  const rfm_total = r_score + f_score + m_score;
+
+  // ─── SEGMENT ASSIGNMENT ───────────────────────────────────────
+  let segment, segment_tone;
+
+  if (r_score >= 4 && f_score >= 4 && m_score >= 4) {
+    segment      = 'champions';
+    segment_tone = 'exclusive, VIP, grateful, reward-focused';
+  } else if (m_score >= 4 && r_score <= 2) {
+    segment      = 'at_risk';
+    segment_tone = 'warm, re-engagement focused, offer urgency, we miss you';
+  } else if (r_score >= 4 && f_score <= 2) {
+    segment      = 'new_customers';
+    segment_tone = 'welcoming, educational, introductory, excited to help';
+  } else if (r_score <= 2 && f_score <= 2) {
+    segment      = 'dormant';
+    segment_tone = 'light re-engagement, no pressure, nostalgic, incentive-led';
+  } else {
+    segment      = 'potential_loyalists';
+    segment_tone = 'encouraging, progress-focused, value-reinforcing';
+  }
+
+  return {
+    ...customer,
+    r_score, f_score, m_score, rfm_total,
+    recency_days: recencyDays,
+    segment,
+    segment_tone
+  };
+});
+
+// ─── GROUP BY SEGMENT ─────────────────────────────────────────
+const segmented = scored.reduce((acc, customer) => {
+  if (!acc[customer.segment]) acc[customer.segment] = [];
+  acc[customer.segment].push(customer);
+  return acc;
+}, {});
+
+// Return summary + full list for downstream processing
+return [{ json: {
+  total_customers: customers.length,
+  segments: Object.keys(segmented).map(seg => ({
+    name:       seg,
+    count:      segmented[seg].length,
+    tone:       segmented[seg][0]?.segment_tone || '',
+    customers:  segmented[seg]
+  })),
+  segmented_at: new Date().toISOString()
+}}];</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">C — Workflow JSON (Core Structure)</div>
+    <div class="json-section">
+      <div class="json-header"><span class="json-title">portfolio_s4_marketing_campaign_engine.json</span><span class="json-badge">✓ Import Ready</span></div>
+      <div class="json-body">
+<pre>{
+  "name": "S4 — Multi-Channel Marketing Campaign Engine v1.0",
+  "nodes": [
+    {
+      "id": "ch3-s4-001",
+      "name": "Cron — Daily Campaign Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [180, 300],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 9 * * *" }]
+        }
+      }
+    },
+    {
+      "id": "ch3-s4-002",
+      "name": "Sheets — Load Campaign Brief",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [380, 300],
+      "parameters": {
+        "operation": "read",
+        "documentId": { "value": "YOUR_CAMPAIGN_CONFIG_SHEET_ID" },
+        "sheetName":  { "value": "Active Campaign" },
+        "options":    { "returnFirstMatch": true }
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "gsheets-cred", "name": "Google Sheets OAuth2" } }
+    },
+    {
+      "id": "ch3-s4-003",
+      "name": "IF — Active Campaign Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [580, 300],
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            { "leftValue": "={{ $json.status }}", "rightValue": "active", "operator": { "type": "string", "operation": "equals" } }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ch3-s4-004",
+      "name": "Sheets — Load Customer List",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [780, 300],
+      "parameters": {
+        "operation": "read",
+        "documentId": { "value": "YOUR_CUSTOMER_LIST_SHEET_ID" },
+        "sheetName":  { "value": "Customers" },
+        "options":    {}
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "gsheets-cred", "name": "Google Sheets OAuth2" } }
+    },
+    {
+      "id": "ch3-s4-005",
+      "name": "Code — RFM Segmentation Engine",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 300],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// [PASTE FULL RFM SEGMENTATION ALGORITHM HERE — see algorithm block above]",
+        "mode": "runOnceForAllItems"
+      }
+    },
+    {
+      "id": "ch3-s4-006",
+      "name": "SplitInBatches — Process Each Segment",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [1180, 300],
+      "parameters": {
+        "batchSize": 1,
+        "options":   {}
+      }
+    },
+    {
+      "id": "ch3-s4-007",
+      "name": "OpenAI — Generate Segment Content",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [1380, 300],
+      "parameters": {
+        "resource":  "text",
+        "operation": "message",
+        "modelId":   "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a marketing copywriter specializing in email and social media for e-commerce brands. Create compelling, segment-specific campaign content. Always respond ONLY with a valid JSON object — no markdown, no extra text.\n\nSchema: { \"subject_line\": string, \"email_body\": string (plain text, under 200 words), \"social_caption\": string (under 280 chars, no hashtags unless brand-appropriate) }"
+            },
+            {
+              "role": "user",
+              "content": "={{ 'Campaign: ' + $('Sheets — Load Campaign Brief').item.json.campaign_name + '\\nObjective: ' + $('Sheets — Load Campaign Brief').item.json.objective + '\\nCore Message: ' + $('Sheets — Load Campaign Brief').item.json.core_message + '\\nProduct/Offer: ' + $('Sheets — Load Campaign Brief').item.json.promotion_details + '\\nBrand Voice: ' + $('Sheets — Load Campaign Brief').item.json.brand_voice + '\\n\\nTarget Segment: ' + $json.name.replace('_',' ').toUpperCase() + '\\nSegment Tone: ' + $json.tone + '\\nSegment Size: ' + $json.count + ' customers' }}"
+            }
+          ]
+        },
+        "options": { "temperature": 0.65, "maxTokens": 600 }
+      },
+      "credentials": { "openAiApi": { "id": "openai-cred", "name": "OpenAI API" } }
+    },
+    {
+      "id": "ch3-s4-008",
+      "name": "Code — Parse Content + Validate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1580, 300],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const item = $input.item.json;\nconst raw  = item.message?.content || item.choices?.[0]?.message?.content || '';\n\nlet content = { subject_line: 'Special offer for you', email_body: 'We have an exclusive offer.', social_caption: 'Check out our latest offer!' };\n\ntry {\n  const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());\n  if (parsed.subject_line && parsed.email_body) content = parsed;\n} catch(e) {}\n\nreturn [{ json: { ...item, generated_content: content } }];"
+      }
+    },
+    {
+      "id": "ch3-s4-009",
+      "name": "HTTP — SendGrid Schedule Campaign",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1780, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.sendgrid.com/v3/marketing/singlesends",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer YOUR_SENDGRID_API_KEY" },
+            { "name": "Content-Type",  "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ name: $('Sheets — Load Campaign Brief').item.json.campaign_name + ' — ' + $json.name, status: 'scheduled', email_config: { subject: $json.generated_content.subject_line, html_content: '<p>' + $json.generated_content.email_body.replace(/\\n/g,'</p><p>') + '</p>' }, send_to: { list_ids: [$json.sendgrid_list_id || 'YOUR_DEFAULT_LIST_ID'] }, send_at: $('Sheets — Load Campaign Brief').item.json.send_at_timestamp || Math.floor(Date.now()/1000) + 3600 }) }}"
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch3-s4-010",
+      "name": "HTTP — Buffer Social Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1780, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bufferapp.com/1/updates/create.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer YOUR_BUFFER_ACCESS_TOKEN" }
+          ]
+        },
+        "sendBody": true,
+        "bodyContentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "text",           "value": "={{ $json.generated_content.social_caption }}" },
+            { "name": "profile_ids[]",  "value": "YOUR_BUFFER_PROFILE_ID" },
+            { "name": "scheduled_at",   "value": "={{ $('Sheets — Load Campaign Brief').item.json.social_send_at || new Date(Date.now() + 3600000).toISOString() }}" }
+          ]
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "ch3-s4-011",
+      "name": "Sheets — Campaign Launch Log",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1980, 300],
+      "parameters": {
+        "operation": "append",
+        "documentId": { "value": "YOUR_CAMPAIGN_LOG_SHEET_ID" },
+        "sheetName":  { "value": "Campaign Log" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "campaign_name":  "={{ $('Sheets — Load Campaign Brief').item.json.campaign_name }}",
+            "segment":        "={{ $json.name }}",
+            "recipients":     "={{ $json.count }}",
+            "subject_line":   "={{ $json.generated_content.subject_line }}",
+            "social_caption": "={{ $json.generated_content.social_caption }}",
+            "launched_at":    "={{ $now.toISO() }}"
+          }
+        }
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "gsheets-cred", "name": "Google Sheets OAuth2" } }
+    },
+    {
+      "id": "ch3-s4-012",
+      "name": "IF — All Segments Processed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2180, 300],
+      "parameters": {
+        "conditions": {
+          "conditions": [{ "leftValue": "={{ $node['SplitInBatches — Process Each Segment'].context['noItemsLeft'] }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }]
+        }
+      }
+    },
+    {
+      "id": "ch3-s4-013",
+      "name": "Slack — Campaign Launch Summary",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [2380, 200],
+      "parameters": {
+        "operation": "message",
+        "channel": "#marketing",
+        "text": "🚀 *Campaign Launched: {{ $('Sheets — Load Campaign Brief').item.json.campaign_name }}*\nAll segments processed and scheduled.\nCheck the Campaign Log sheet for full details.",
+        "options": { "mrkdwn": true }
+      },
+      "credentials": { "slackApi": { "id": "slack-cred", "name": "Slack API" } }
+    }
+  ],
+  "connections": {
+    "Cron — Daily Campaign Trigger":       { "main": [[{ "node": "Sheets — Load Campaign Brief",        "type": "main", "index": 0 }]] },
+    "Sheets — Load Campaign Brief":        { "main": [[{ "node": "IF — Active Campaign Check",          "type": "main", "index": 0 }]] },
+    "IF — Active Campaign Check":          { "main": [[{ "node": "Sheets — Load Customer List",         "type": "main", "index": 0 }], []] },
+    "Sheets — Load Customer List":         { "main": [[{ "node": "Code — RFM Segmentation Engine",      "type": "main", "index": 0 }]] },
+    "Code — RFM Segmentation Engine":      { "main": [[{ "node": "SplitInBatches — Process Each Segment","type":"main","index":0}]] },
+    "SplitInBatches — Process Each Segment":{ "main": [[{ "node": "OpenAI — Generate Segment Content",  "type": "main", "index": 0 }]] },
+    "OpenAI — Generate Segment Content":   { "main": [[{ "node": "Code — Parse Content + Validate",     "type": "main", "index": 0 }]] },
+    "Code — Parse Content + Validate":     { "main": [[{ "node": "HTTP — SendGrid Schedule Campaign",   "type": "main", "index": 0 },{ "node": "HTTP — Buffer Social Post","type":"main","index":0}]] },
+    "HTTP — SendGrid Schedule Campaign":   { "main": [[{ "node": "Sheets — Campaign Launch Log",        "type": "main", "index": 0 }]] },
+    "HTTP — Buffer Social Post":           { "main": [[{ "node": "Sheets — Campaign Launch Log",        "type": "main", "index": 0 }]] },
+    "Sheets — Campaign Launch Log":        { "main": [[{ "node": "IF — All Segments Processed",         "type": "main", "index": 0 }]] },
+    "IF — All Segments Processed": {
+      "main": [
+        [{ "node": "Slack — Campaign Launch Summary",          "type": "main", "index": 0 }],
+        [{ "node": "SplitInBatches — Process Each Segment",    "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1", "saveManualExecutions": true }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">D — Deployment &amp; Configuration</div>
+    <ol class="step-list">
+      <li><div class="step-content"><strong>Campaign Brief Sheet Setup</strong><span>Create a Google Sheet "Campaign Config" with columns: campaign_name, status (active/inactive), objective, core_message, promotion_details, brand_voice, send_at_timestamp (Unix), social_send_at (ISO). When a campaign is ready to run, set status = 'active'.</span></div></li>
+      <li><div class="step-content"><strong>Customer List Sheet</strong><span>Sheet: "Customers" with columns: customer_id, name, email, last_purchase_date (ISO), purchase_count (integer), lifetime_value (float). The RFM algorithm reads these directly — no CRM API required for initial deployment.</span></div></li>
+      <li><div class="step-content"><strong>SendGrid Configuration</strong><span>Create SendGrid lists for each segment (Champions, At-Risk, New Customers, Dormant, Potential Loyalists). Populate sendgrid_list_id in the customer data or hardcode segment-to-list-ID mapping in the code node.</span></div></li>
+      <li><div class="step-content"><strong>Content Quality Review Process</strong><span>For first 3 campaign runs, add a manual review step: after content generation, route to a Slack message with the generated content requesting approval. Approve via button → continues to SendGrid scheduling. Build confidence in content quality before enabling full automation.</span></div></li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <div class="block-title">E — Economic Analysis</div>
+    <div class="pricing-grid">
+      <div class="pricing-card"><div class="pricing-tier">Core Build</div><div class="pricing-amount">$5,000</div><div class="pricing-period">project fee</div><div class="pricing-desc">Segmentation + AI content + SendGrid scheduling + Sheets log + Slack notify. 3-week delivery.</div></div>
+      <div class="pricing-card featured"><div class="pricing-tier">Full Suite</div><div class="pricing-amount">$9,500</div><div class="pricing-period">+ $649/mo</div><div class="pricing-desc">Core + Buffer social scheduling + campaign analytics dashboard + monthly content review retainer.</div></div>
+      <div class="pricing-card"><div class="pricing-tier">SaaS Product</div><div class="pricing-amount">$299</div><div class="pricing-period">per month</div><div class="pricing-desc">White-label: client connects their Sheets + SendGrid. Self-configure brand voice. 20 clients = $5,980 MRR.</div></div>
+    </div>
+
+    <div class="callout callout-teal" style="margin-top:1.5rem;">
+      <div class="callout-title">Full Portfolio Revenue Model — Chapters 2 &amp; 3 Combined</div>
+      <p>At 10 active retainer clients across S1–S4 system types, the monthly recurring revenue breakdown:<br><br>
+      5× S1 Maintenance retainers ($149/mo each) = $745 MRR<br>
+      3× S2 AI Support managed service ($799/mo each) = $2,397 MRR<br>
+      2× S3 Order engine retainer ($499/mo each) = $998 MRR<br>
+      10× S4 Template licenses ($299/mo each) = $2,990 MRR<br><br>
+      <strong>Total: $7,130 MRR</strong> — achievable within 12 months of consistent delivery and positioning. This is the bridge between freelancer and micro-SaaS founder, built on real client systems rather than speculative product development.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div style="background:var(--bg3);border-top:1px solid var(--border);padding:2rem 4rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+  <div>
+    <div style="font-family:var(--serif);font-size:1rem;color:var(--text);margin-bottom:.25rem;">Chapters 2 &amp; 3 — Turning Automations Into Income &amp; Mastering JSON</div>
+    <div style="font-size:11.5px;color:var(--text3);">Information Systems &amp; Automation Engineering · Academic Course Module</div>
+  </div>
+  <div style="font-family:var(--mono);font-size:11px;color:var(--text3);">v1.0 · 8 Lessons · 4 Portfolio Systems · 4 JSON Exports · 2 Chapters</div>
+</div>
+
+</main>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(item => item.classList.remove('active'));
+        const active = document.querySelector(`.nav-item[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.25, rootMargin: '-10% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
