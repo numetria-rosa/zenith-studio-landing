@@ -1,0 +1,480 @@
+{
+  "name": "Sleeping Inbox Assistant - Auto Reply Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "options": {"limit": 1},
+        "filters": {
+          "query": {
+            "from": "",
+            "in": "anywhere",
+            "newerThan": "",
+            "olderThan": "",
+            "hasAttachment": false,
+            "subject": ""
+          }
+        },
+        "additionalFields": {}
+      },
+      "id": "gmail-trigger-001",
+      "name": "Gmail - Watch New Emails",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [240, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "your-gmail-credential-id",
+          "name": "Gmail Account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "options": {"format": "metadata", "headers": "false"}
+      },
+      "id": "gmail-details-002",
+      "name": "Gmail - Get Email Details",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [480, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "your-gmail-credential-id",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an email categorization assistant. Classify each email into exactly ONE category: FAQ, SUPPORT, CONFIRMATION, INFO_REQUEST, MEETING_REQUEST, UNSUBSCRIBE, SPAM_PROMO, or NEEDS_HUMAN. Respond only with JSON: {category, confidence, sentiment, urgency}"
+            },
+            {
+              "role": "user",
+              "content": "From: {{ $json.from }} Subject: {{ $json.subject }} Body: {{ $json.text || $json.snippet }}"
+            }
+          ]
+        },
+        "options": {"temperature": 0.1, "maxTokens": 300}
+      },
+      "id": "openai-003",
+      "name": "OpenAI - Analyze Email",
+      "type": "@n8n/n8n-nodes-ai.openai",
+      "typeVersion": 1.3,
+      "position": [720, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "your-openai-credential-id",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [
+            {
+              "id": "check-faq",
+              "leftValue": "={{ $json.message.content }}",
+              "rightValue": "FAQ",
+              "operator": {"type": "string", "operation": "contains"}
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-faq-004",
+      "name": "IF - Is FAQ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [
+            {
+              "id": "check-support",
+              "leftValue": "={{ $json.message.content }}",
+              "rightValue": "SUPPORT",
+              "operator": {"type": "string", "operation": "contains"}
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-support-005",
+      "name": "IF - Is Support?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 320]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [
+            {
+              "id": "check-confirm",
+              "leftValue": "={{ $json.message.content }}",
+              "rightValue": "CONFIRMATION",
+              "operator": {"type": "string", "operation": "contains"}
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-confirm-006",
+      "name": "IF - Is Confirmation?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 440]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [
+            {
+              "id": "check-info",
+              "leftValue": "={{ $json.message.content }}",
+              "rightValue": "INFO_REQUEST",
+              "operator": {"type": "string", "operation": "contains"}
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-info-007",
+      "name": "IF - Is Info Request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 560]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [
+            {
+              "id": "check-meeting",
+              "leftValue": "={{ $json.message.content }}",
+              "rightValue": "MEETING_REQUEST",
+              "operator": {"type": "string", "operation": "contains"}
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-meeting-008",
+      "name": "IF - Is Meeting Request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 680]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [
+            {
+              "id": "check-unsub",
+              "leftValue": "={{ $json.message.content }}",
+              "rightValue": "UNSUBSCRIBE",
+              "operator": {"type": "string", "operation": "contains"}
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-unsub-009",
+      "name": "IF - Is Unsubscribe?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 800]
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@gmail.com",
+        "toEmail": "={{ $('Gmail - Get Email Details').item.json.from }}",
+        "subject": "=Re: {{ $('Gmail - Get Email Details').item.json.subject }}",
+        "emailType": "html",
+        "message": "=<div style='font-family: Arial, sans-serif; max-width: 600px; padding: 20px;'>\n<h2 style='color: #333;'>Hi there!</h2>\n<p>Great question! Here is the quick answer:</p>\n<p>I would be happy to help you with this.</p>\n<p>Want to dive deeper? Just reply to this email!</p>\n<p>Best,<br><strong>[Your Name]</strong></p>\n<br><p><small>P.S. This was sent by my automated assistant. Reply HUMAN for personal help.</small></p>\n</div>",
+        "options": {}
+      },
+      "id": "reply-faq-010",
+      "name": "Gmail - Reply (FAQ)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1200, 180],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "your-gmail-credential-id",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@gmail.com",
+        "toEmail": "={{ $('Gmail - Get Email Details').item.json.from }}",
+        "subject": "=Re: {{ $('Gmail - Get Email Details').item.json.subject }}",
+        "emailType": "html",
+        "message": "=<div style='font-family: Arial, sans-serif; max-width: 600px; padding: 20px;'>\n<h2 style='color: #333;'>Hi there!</h2>\n<p>I am really sorry to hear about this issue. That is not the experience we want for you.</p>\n<p>Let me look into this right away.</p>\n<p>Your ticket has been created and I will follow up by tomorrow.</p>\n<p>Thank you for your patience,<br><strong>[Your Name]</strong></p>\n</div>",
+        "options": {}
+      },
+      "id": "reply-support-011",
+      "name": "Gmail - Reply (Support)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1200, 310],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "your-gmail-credential-id",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@gmail.com",
+        "toEmail": "={{ $('Gmail - Get Email Details').item.json.from }}",
+        "subject": "=Re: {{ $('Gmail - Get Email Details').item.json.subject }}",
+        "emailType": "html",
+        "message": "=<div style='font-family: Arial, sans-serif; max-width: 600px; padding: 20px;'>\n<h2 style='color: #333;'>Got it!</h2>\n<p>Thanks for reaching out! I received your message and added it to my queue.</p>\n<p>Current response time: within 24 hours.</p>\n<p>Talk soon!<br><strong>[Your Name]</strong></p>\n</div>",
+        "options": {}
+      },
+      "id": "reply-confirm-012",
+      "name": "Gmail - Reply (Confirm)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1200, 440],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "your-gmail-credential-id",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@gmail.com",
+        "toEmail": "={{ $('Gmail - Get Email Details').item.json.from }}",
+        "subject": "=Re: {{ $('Gmail - Get Email Details').item.json.subject }} - Here Is What You Asked For",
+        "emailType": "html",
+        "message": "=<div style='font-family: Arial, sans-serif; max-width: 600px; padding: 20px;'>\n<h2 style='color: #333;'>Hey there!</h2>\n<p>Love that you are digging deeper! Here are some resources:</p>\n<ul style='color: #555;'>\n<li>Portfolio Link</li>\n<li>Video Demo</li>\n<li>Pricing Page</li>\n</ul>\n<p>Which interests you most? Happy to elaborate.</p>\n<p>Cheers,<br><strong>[Your Name]</strong></p>\n</div>",
+        "options": {}
+      },
+      "id": "reply-info-013",
+      "name": "Gmail - Reply (Info)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1200, 570],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "your-gmail-credential-id",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@gmail.com",
+        "toEmail": "={{ $('Gmail - Get Email Details').item.json.from }}",
+        "subject": "=Schedule Time - Let Us Make It Happen!",
+        "emailType": "html",
+        "message": "=<div style='font-family: Arial, sans-serif; max-width: 600px; padding: 20px;'>\n<h2 style='color: #333;'>Hi there!</h2>\n<p>Would love to connect!</p>\n<p>Here is my calendar:</p>\n<p>[Calendly Link]</p>\n<p>A few things that help me prepare:</p>\n<ul style='color: #555;'>\n<li>What is the main topic?</li>\n<li>How much time do you need?</li>\n</ul>\n<p>See you soon!<br><strong>[Your Name]</strong></p>\n</div>",
+        "options": {}
+      },
+      "id": "reply-meeting-014",
+      "name": "Gmail - Reply (Meeting)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1200, 700],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "your-gmail-credential-id",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@gmail.com",
+        "toEmail": "={{ $('Gmail - Get Email Details').item.json.from }}",
+        "subject": "=Sorry to See You Go",
+        "emailType": "html",
+        "message": "=<div style='font-family: Arial, sans-serif; max-width: 600px; padding: 20px;'>\n<h2 style='color: #333;'>Hi there,</h2>\n<p>No problem at all - you are now removed from our list.</p>\n<p>Wish you the best!</p>\n<p>Take care,<br><strong>[Your Name]</strong></p>\n</div>",
+        "options": {}
+      },
+      "id": "reply-unsub-015",
+      "name": "Gmail - Reply (Unsubscribe)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1200, 830],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "your-gmail-credential-id",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "operation": "add",
+        "name": "Auto-Replied",
+        "messageIds": ["={{ $('Gmail - Get Email Details').item.json.id }}"]
+      },
+      "id": "label-016",
+      "name": "Gmail - Add Auto-Replied Label",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1440, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "your-gmail-credential-id",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetName": "Email Log",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now.format('YYYY-MM-DD HH:mm') }}",
+            "From": "={{ $('Gmail - Get Email Details').item.json.from }}",
+            "Subject": "={{ $('Gmail - Get Email Details').item.json.subject }}",
+            "Category": "={{ $json.message.content }}",
+            "Replied": "=Yes",
+            "DateAdded": "={{ $now.format('YYYY-MM-DD') }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "sheets-log-017",
+      "name": "Google Sheets - Log Entry",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1680, 400],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "your-sheets-credential-id",
+          "name": "Google Sheets Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\": \"success\", \"message\": \"Email processed by Sleeping Inbox Assistant\", \"timestamp\": \"{{ $now.format('YYYY-MM-DD HH:mm') }}\"}",
+        "options": {"responseCode": 200}
+      },
+      "id": "respond-018",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1920, 400]
+    }
+  ],
+  "connections": {
+    "Gmail - Watch New Emails": {
+      "main": [[{"node": "Gmail - Get Email Details", "type": "main", "index": 0}]]
+    },
+    "Gmail - Get Email Details": {
+      "main": [[{"node": "OpenAI - Analyze Email", "type": "main", "index": 0}]]
+    },
+    "OpenAI - Analyze Email": {
+      "main": [
+        [{"node": "IF - Is FAQ?", "type": "main", "index": 0}],
+        [{"node": "IF - Is Support?", "type": "main", "index": 0}],
+        [{"node": "IF - Is Confirmation?", "type": "main", "index": 0}],
+        [{"node": "IF - Is Info Request?", "type": "main", "index": 0}],
+        [{"node": "IF - Is Meeting Request?", "type": "main", "index": 0}],
+        [{"node": "IF - Is Unsubscribe?", "type": "main", "index": 0}]
+      ]
+    },
+    "IF - Is FAQ?": {
+      "main": [[{"node": "Gmail - Reply (FAQ)", "type": "main", "index": 0}]]
+    },
+    "IF - Is Support?": {
+      "main": [[{"node": "Gmail - Reply (Support)", "type": "main", "index": 0}]]
+    },
+    "IF - Is Confirmation?": {
+      "main": [[{"node": "Gmail - Reply (Confirm)", "type": "main", "index": 0}]]
+    },
+    "IF - Is Info Request?": {
+      "main": [[{"node": "Gmail - Reply (Info)", "type": "main", "index": 0}]]
+    },
+    "IF - Is Meeting Request?": {
+      "main": [[{"node": "Gmail - Reply (Meeting)", "type": "main", "index": 0}]]
+    },
+    "IF - Is Unsubscribe?": {
+      "main": [[{"node": "Gmail - Reply (Unsubscribe)", "type": "main", "index": 0}]]
+    },
+    "Gmail - Reply (FAQ)": {
+      "main": [[{"node": "Gmail - Add Auto-Replied Label", "type": "main", "index": 0}]]
+    },
+    "Gmail - Reply (Support)": {
+      "main": [[{"node": "Gmail - Add Auto-Replied Label", "type": "main", "index": 0}]]
+    },
+    "Gmail - Reply (Confirm)": {
+      "main": [[{"node": "Gmail - Add Auto-Replied Label", "type": "main", "index": 0}]]
+    },
+    "Gmail - Reply (Info)": {
+      "main": [[{"node": "Gmail - Add Auto-Replied Label", "type": "main", "index": 0}]]
+    },
+    "Gmail - Reply (Meeting)": {
+      "main": [[{"node": "Gmail - Add Auto-Replied Label", "type": "main", "index": 0}]]
+    },
+    "Gmail - Reply (Unsubscribe)": {
+      "main": [[{"node": "Gmail - Add Auto-Replied Label", "type": "main", "index": 0}]]
+    },
+    "Gmail - Add Auto-Replied Label": {
+      "main": [[{"node": "Google Sheets - Log Entry", "type": "main", "index": 0}]]
+    },
+    "Google Sheets - Log Entry": {
+      "main": [[{"node": "Respond to Webhook", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": null
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Zenith Studio",
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "name": "Post #04",
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T14:30:00.000Z",
+  "versionId": "zenith-email-autoreply-v1-clean"
+}
