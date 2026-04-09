@@ -11,6 +11,10 @@
     {
       "source": "/posts/:slug",
       "destination": "/posts/:slug.html"
+    },
+    {
+      "source": "/Web3",
+      "destination": "/Web3/index.html"
     }
   ]
 }
