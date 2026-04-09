@@ -1,1553 +1,830 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>I Made $50 in One Afternoon with a Workflow I Built in 40 Minutes | Zenith Studio</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-primary: #0a0a0b;
-            --bg-secondary: #131316;
-            --bg-card: #1a1a1f;
-            --bg-elevated: #222228;
-            --text-primary: #ffffff;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent-green: #10b981;
-            --accent-green-dim: rgba(16, 185, 129, 0.15);
-            --accent-blue: #3b82f6;
-            --accent-blue-dim: rgba(59, 130, 246, 0.15);
-            --accent-purple: #8b5cf6;
-            --accent-purple-dim: rgba(139, 92, 246, 0.15);
-            --accent-orange: #f97316;
-            --accent-orange-dim: rgba(249, 115, 22, 0.15);
-            --accent-pink: #ec4899;
-            --border-color: #27272a;
-            --border-subtle: #1f1f23;
-            --gradient-main: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-            --shadow-glow: 0 0 60px rgba(16, 185, 129, 0.15);
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.7;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
-
-        /* Background Pattern */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 24px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header Badge */
-        .header-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--accent-green-dim);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 100px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--accent-green);
-            margin-top: 48px;
-            margin-bottom: 24px;
-        }
-
-        .header-badge i {
-            font-size: 11px;
-        }
-
-        /* Title Section */
-        .title-section {
-            text-align: center;
-            padding: 40px 0 48px;
-            border-bottom: 1px solid var(--border-subtle);
-            margin-bottom: 48px;
-        }
-
-        h1 {
-            font-size: clamp(28px, 5vw, 42px);
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 32px;
-        }
-
-        .meta-row {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .meta-item i {
-            color: var(--accent-green);
-        }
-
-        /* Content Sections */
-        .content-section {
-            margin-bottom: 56px;
-        }
-
-        h2 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        h2 .icon {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--gradient-main);
-            border-radius: 10px;
-            font-size: 16px;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 28px 0 12px;
-            color: var(--text-primary);
-        }
-
-        p {
-            font-size: 16px;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-        }
-
-        strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        /* Story Box */
-        .story-box {
-            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 32px;
-            margin: 24px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .story-box::before {
-            content: '"';
-            position: absolute;
-            top: 10px;
-            left: 20px;
-            font-size: 80px;
-            color: var(--accent-green);
-            opacity: 0.15;
-            font-family: Georgia, serif;
-            line-height: 1;
-        }
-
-        .story-text {
-            font-style: italic;
-            font-size: 18px;
-            color: var(--text-primary);
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Problem/Solution Cards */
-        .problem-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .mini-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .mini-card:hover {
-            border-color: var(--accent-green);
-            transform: translateY(-2px);
-        }
-
-        .mini-card.problem {
-            border-left: 3px solid var(--accent-orange);
-        }
-
-        .mini-card.solution {
-            border-left: 3px solid var(--accent-green);
-        }
-
-        .mini-card-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .mini-card.problem .mini-card-title i {
-            color: var(--accent-orange);
-        }
-
-        .mini-card.solution .mini-card-title i {
-            color: var(--accent-green);
-        }
-
-        .mini-card p {
-            font-size: 14px;
-            margin: 0;
-            color: var(--text-secondary);
-        }
-
-        /* Stats Row */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
-            margin: 32px 0;
-        }
-
-        .stat-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--accent-green);
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        /* Checklist */
-        .checklist {
-            list-style: none;
-            margin: 20px 0;
-        }
-
-        .checklist li {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 14px 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            font-size: 15px;
-            color: var(--text-secondary);
-            transition: all 0.2s ease;
-        }
-
-        .checklist li:hover {
-            border-color: var(--accent-green);
-            background: var(--bg-elevated);
-        }
-
-        .checklist li i {
-            color: var(--accent-green);
-            margin-top: 3px;
-            flex-shrink: 0;
-        }
-
-        /* Code Block */
-        .code-block {
-            background: #0d0d0f;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .code-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .code-lang {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .copy-btn {
-            font-size: 12px;
-            padding: 4px 12px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
-
-        .copy-btn:hover {
-            background: var(--accent-green-dim);
-            color: var(--accent-green);
-            border-color: var(--accent-green);
-        }
-
-        pre {
-            padding: 20px;
-            overflow-x: auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #e4e4e7;
-        }
-
-        code {
-            font-family: 'JetBrains Mono', monospace;
-            background: var(--bg-elevated);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 13px;
-            color: var(--accent-blue);
-        }
-
-        /* Node Card */
-        .node-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 24px;
-            margin: 24px 0;
-            position: relative;
-        }
-
-        .node-number {
-            position: absolute;
-            top: -12px;
-            left: 20px;
-            background: var(--gradient-main);
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .node-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 12px;
-            padding-left: 8px;
-        }
-
-        .settings-grid {
-            display: grid;
-            gap: 12px;
-            margin: 16px 0;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 14px;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .setting-label {
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .setting-value {
-            color: var(--accent-blue);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-        }
-
-        .pro-tip {
-            background: var(--accent-purple-dim);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 10px;
-            padding: 16px;
-            margin-top: 16px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .pro-tip strong {
-            color: var(--accent-purple);
-        }
-
-        /* Quick Win Box */
-        .quickwin-box {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
-            border: 2px solid var(--accent-green);
-            border-radius: 16px;
-            padding: 32px;
-            margin: 32px 0;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .quickwin-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .quickwin-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--gradient-main);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            color: white;
-        }
-
-        .quickwin-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .timeline-steps {
-            list-style: none;
-            counter-reset: step-counter;
-        }
-
-        .timeline-steps li {
-            counter-increment: step-counter;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border-subtle);
-            font-size: 15px;
-            color: var(--text-secondary);
-        }
-
-        .timeline-steps li:last-child {
-            border-bottom: none;
-        }
-
-        .timeline-steps li::before {
-            content: counter(step-counter);
-            width: 32px;
-            height: 32px;
-            background: var(--bg-card);
-            border: 2px solid var(--accent-green);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: var(--accent-green);
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .success-checklist {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        .success-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: 8px;
-            font-size: 14px;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .success-item i {
-            color: var(--accent-green);
-        }
-
-        /* Why It Works */
-        .reason-grid {
-            display: grid;
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .reason-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px 24px;
-            display: flex;
-            gap: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .reason-card:hover {
-            border-color: var(--accent-blue);
-            transform: translateX(4px);
-        }
-
-        .reason-num {
-            width: 32px;
-            height: 32px;
-            background: var(--accent-blue-dim);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: var(--accent-blue);
-            flex-shrink: 0;
-            font-size: 14px;
-        }
-
-        .reason-content h4 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 6px;
-        }
-
-        .reason-content p {
-            font-size: 14px;
-            margin: 0;
-            color: var(--text-muted);
-        }
-
-        /* CTA Section */
-        .cta-section {
-            margin: 56px 0;
-        }
-
-        .cta-card {
-            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
-            border: 2px solid var(--border-color);
-            border-radius: 20px;
-            padding: 36px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-card:hover {
-            border-color: var(--accent-purple);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .cta-card.featured {
-            border-color: var(--accent-green);
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--bg-card) 100%);
-        }
-
-        .cta-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: var(--accent-green);
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-radius: 100px;
-            margin-bottom: 16px;
-        }
-
-        .cta-badge.secondary {
-            background: var(--accent-blue);
-        }
-
-        .cta-badge.free {
-            background: var(--accent-purple);
-        }
-
-        .cta-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 12px;
-        }
-
-        .cta-desc {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .cta-features {
-            list-style: none;
-            margin-bottom: 20px;
-        }
-
-        .cta-features li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            color: var(--text-secondary);
-            padding: 6px 0;
-        }
-
-        .cta-features li i {
-            color: var(--accent-green);
-            font-size: 12px;
-        }
-
-        .cta-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 28px;
-            background: var(--gradient-main);
-            color: white;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .cta-button:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
-        }
-
-        .cta-button.secondary {
-            background: var(--accent-blue);
-        }
-
-        .cta-button.free {
-            background: var(--accent-purple);
-        }
-
-        .cta-price {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 12px;
-        }
-
-        .cta-price strong {
-            color: var(--accent-green);
-        }
-
-        /* Table */
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 24px 0;
-            background: var(--bg-card);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        .results-table th,
-        .results-table td {
-            padding: 16px 20px;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        .results-table th {
-            background: var(--bg-elevated);
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.05em;
-        }
-
-        .results-table td {
-            color: var(--text-secondary);
-            border-top: 1px solid var(--border-subtle);
-        }
-
-        .results-table td:first-child {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .results-table tr:hover td {
-            background: var(--bg-elevated);
-        }
-
-        .highlight-cell {
-            color: var(--accent-green) !important;
-            font-weight: 700 !important;
-        }
-
-        /* Footer */
-        .footer-ps {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 28px;
-            margin: 48px 0;
-            text-align: center;
-        }
-
-        .footer-ps p {
-            font-size: 16px;
-            color: var(--text-primary);
-            margin: 0;
-        }
-
-        .footer-ps em {
-            color: var(--accent-pink);
-            font-style: italic;
-        }
-
-        .signature {
-            text-align: center;
-            padding: 32px 0 64px;
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .signature strong {
-            color: var(--accent-green);
-        }
-
-        /* Responsive */
-        @media (max-width: 640px) {
-            .container {
-                padding: 0 16px;
-            }
-
-            h1 {
-                font-size: 26px;
-            }
-
-            .subtitle {
-                font-size: 16px;
-            }
-
-            h2 {
-                font-size: 20px;
-            }
-
-            .story-box,
-            .node-card,
-            .quickwin-box,
-            .cta-card {
-                padding: 24px 20px;
-            }
-
-            .stats-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .meta-row {
-                gap: 16px;
-            }
-        }
-
-        /* Smooth scroll */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Selection color */
-        ::selection {
-            background: var(--accent-green);
-            color: white;
-        }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>I Made $50 in One Afternoon with a Workflow I Built in 40 Minutes | Zenith Studio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --ink:      #e8e8ec;
+  --ink2:     rgba(232,232,236,.72);
+  --ink3:     rgba(232,232,236,.5);
+  --cream:    #0a0a0c;
+  --cream2:   #111115;
+  --cream3:   #1a1a1f;
+  --cream4:   #222228;
+  --green:    #00e676;
+  --green2:   #00c853;
+  --green3:   #69f0ae;
+  --green-bg:  rgba(0,230,118,.08);
+  --green-bdr: rgba(0,230,118,.22);
+  --muted:    rgba(255,255,255,.38);
+  --muted2:   rgba(255,255,255,.22);
+  --cyan:     #00bcd4;
+  --cyan2:    #26c6da;
+  --cyan-bg:  rgba(0,188,212,.08);
+  --cyan-bdr: rgba(0,188,212,.22);
+  --amber:    #ffab00;
+  --amber-bg: rgba(255,171,0,.08);
+  --amber-bdr:rgba(255,171,0,.22);
+  --red:      #ff5252;
+  --red-bg:   rgba(255,82,82,.07);
+  --red-bdr:  rgba(255,82,82,.2);
+  --serif:    'Cormorant Garamond', Georgia, serif;
+  --sans:     'DM Sans', system-ui, sans-serif;
+  --mono:     'DM Mono', monospace;
+  --max:      720px;
+  --wide:     1100px;
+  --spread:   1500px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.75;
+  font-weight:300;
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--cream2)}
+::-webkit-scrollbar-thumb{background:var(--green);border-radius:2px}
+
+.top-nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,10,12,.92);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--cream3);
+  padding:.6rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;
+}
+.nav-title{
+  font-family:var(--mono);font-size:.85rem;
+  font-weight:500;color:var(--green);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:420px;letter-spacing:.02em;
+}
+.nav-links{display:flex;gap:1.5rem;list-style:none;flex-wrap:nowrap;overflow-x:auto;}
+.nav-links a{
+  font-size:10.5px;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);
+  text-decoration:none;white-space:nowrap;transition:color .15s;
+}
+.nav-links a:hover{color:var(--green)}
+.nav-progress{height:2px;background:var(--cream3);position:fixed;top:0;left:0;right:0;z-index:200;}
+.nav-progress-bar{height:100%;background:var(--green);width:0%;transition:width .1s;}
+
+/* ── HERO ── */
+.hero{
+  background:#06060a;color:var(--ink);
+  padding:5rem 2rem 4.5rem;
+  position:relative;overflow:hidden;text-align:center;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,230,118,.1) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 100%, rgba(0,188,212,.06) 0%, transparent 60%);
+}
+.hero::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,230,118,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,230,118,.03) 1px, transparent 1px);
+  background-size:60px 60px;pointer-events:none;
+}
+.hero-inner{position:relative;max-width:780px;margin:0 auto;}
+.hero-badge{
+  display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--green);
+  border:1px solid var(--green-bdr);background:var(--green-bg);
+  padding:5px 14px;border-radius:3px;margin-bottom:2rem;
+}
+.hero h1{
+  font-family:var(--serif);font-size:clamp(2.2rem,4.5vw,3.6rem);
+  font-weight:300;line-height:1.15;color:var(--ink);margin-bottom:1.25rem;
+}
+.hero h1 em{font-style:italic;color:var(--green3);}
+.hero h1 strong{font-weight:600;}
+.hero-sub{font-size:1rem;color:var(--ink2);max-width:560px;margin:0 auto 2rem;font-weight:300;line-height:1.7;}
+.hero-hook{
+  display:inline-block;font-family:var(--serif);font-size:1.05rem;font-style:italic;
+  color:var(--green3);padding:.9rem 1.75rem;
+  border-top:1px solid var(--green-bdr);border-bottom:1px solid var(--green-bdr);
+  margin-bottom:2rem;
+}
+.hero-meta{
+  display:flex;align-items:center;justify-content:center;
+  gap:2.5rem;flex-wrap:wrap;padding-top:1.75rem;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.hero-stat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hero-stat-num{font-family:var(--serif);font-size:1.5rem;color:var(--green3);line-height:1;}
+.hero-stat-label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+
+/* ── TOC ── */
+.toc-section{background:var(--cream2);color:var(--ink);padding:3.5rem 2rem;border-bottom:1px solid var(--cream3);}
+.toc-inner{max-width:var(--wide);margin:0 auto;}
+.section-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--green);display:block;margin-bottom:.6rem;}
+.toc-title{font-family:var(--serif);font-size:clamp(1.6rem,2.5vw,2.2rem);font-weight:400;color:var(--ink);margin-bottom:2rem;line-height:1.2;}
+.toc-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1px;background:var(--cream3);border:1px solid var(--cream3);border-radius:8px;overflow:hidden;
+}
+.toc-item{
+  background:var(--cream2);padding:.9rem 1.25rem;text-decoration:none;
+  display:flex;align-items:flex-start;gap:.85rem;transition:background .15s;
+}
+.toc-item:hover{background:var(--cream3);}
+.toc-num{font-family:var(--mono);font-size:11px;color:var(--green);min-width:26px;flex-shrink:0;margin-top:2px;}
+.toc-label{font-size:13px;color:var(--ink2);line-height:1.4;}
+.toc-item:hover .toc-label{color:var(--ink);}
+
+/* ── SPREAD LAYOUT ── */
+.spread{
+  display:grid;grid-template-columns:1fr 1fr;
+  max-width:var(--spread);margin:0 auto;
+  border-bottom:1px solid var(--cream3);
+}
+.spread-dark{
+  background:#06060a;
+}
+
+/* ── PAGE (inside spread) ── */
+.page{
+  padding:3.5rem 2.75rem;
+  border-right:1px solid var(--cream3);
+  align-self:start;
+}
+.page:last-child{border-right:none;}
+.spread-dark .page{border-right-color:var(--cream3);}
+
+.page-eyebrow{display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;}
+.pg-num{
+  font-family:var(--mono);font-size:9.5px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--green);background:var(--green-bg);
+  border:1px solid var(--green-bdr);padding:2px 7px;border-radius:3px;
+}
+.pg-theme{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+.page h2{
+  font-family:var(--serif);font-size:clamp(1.55rem,2.2vw,2rem);
+  font-weight:400;color:var(--ink);line-height:1.2;margin-bottom:.75rem;
+}
+.page h2 em{font-style:italic;color:var(--green);}
+.page h2 .cyan-hl{color:var(--cyan2);}
+.page-lead{
+  font-family:var(--serif);font-size:1.02rem;color:var(--ink);font-weight:400;
+  line-height:1.65;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--cream3);font-style:italic;
+}
+.page h3{font-family:var(--serif);font-size:1.15rem;font-weight:500;color:var(--ink);margin:1.5rem 0 .5rem;line-height:1.3;}
+p{color:var(--ink2);margin-bottom:.7rem;line-height:1.75;font-size:14px;}
+p strong{color:var(--ink);font-weight:500;}
+p em{font-style:italic;color:var(--ink);}
+ul,ol{padding-left:1.2rem;color:var(--ink2);margin-bottom:.7rem;}
+li{margin-bottom:.35rem;line-height:1.65;font-size:14px;}
+li strong{color:var(--ink);}
+
+/* ── BOXES ── */
+.box{border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;position:relative;}
+.box-label{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.4rem;display:block;}
+.box p,.box ul{margin-bottom:0;font-size:13.5px;line-height:1.6;}
+.box ul{margin-top:.3rem;}
+.box li{margin-bottom:.25rem;font-size:13.5px;}
+
+.box-green{background:var(--green-bg);border:1px solid var(--green-bdr);border-left:3px solid var(--green);}
+.box-green .box-label{color:var(--green);}
+.box-cyan{background:var(--cyan-bg);border:1px solid var(--cyan-bdr);border-left:3px solid var(--cyan2);}
+.box-cyan .box-label{color:var(--cyan2);}
+.box-amber{background:var(--amber-bg);border:1px solid var(--amber-bdr);border-left:3px solid var(--amber);}
+.box-amber .box-label{color:var(--amber);}
+.box-red{background:var(--red-bg);border:1px solid var(--red-bdr);border-left:3px solid var(--red);}
+.box-red .box-label{color:var(--red);}
+.box-surface{background:var(--cream2);border:1px solid var(--cream3);border-left:3px solid var(--green);}
+.box-surface .box-label{color:var(--green);}
+.box-dark{background:var(--cream);border:1px solid var(--cream3);border-left:3px solid var(--green);}
+.box-dark .box-label{color:var(--green);}
+
+.box-mindset{
+  background:var(--cream2);border-radius:6px;padding:1.25rem 1.5rem;
+  margin:1.5rem 0;text-align:center;border:1px solid var(--cream3);
+}
+.box-mindset .box-label{color:var(--green);margin-bottom:.6rem;}
+.box-mindset p{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink);line-height:1.5;margin:0;}
+
+/* ── COMPARISON ── */
+.compare{width:100%;border-collapse:collapse;margin:1.25rem 0;font-size:12.5px;}
+.compare th{background:var(--cream);color:var(--ink);padding:.5rem .75rem;text-align:left;font-weight:500;font-size:10px;letter-spacing:.07em;text-transform:uppercase;border:1px solid var(--cream3);}
+.compare td{padding:.45rem .75rem;border:1px solid var(--cream3);color:var(--ink2);vertical-align:top;line-height:1.45;}
+.compare tr:nth-child(even) td{background:var(--cream2);}
+.compare td:first-child{color:var(--ink);font-weight:500;}
+.compare td.good{color:var(--green);font-weight:600;}
+.compare td.bad{color:var(--red);font-weight:600;}
+
+/* ── STAT ROW ── */
+.stat-row{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--cream3);border:1px solid var(--cream3);border-radius:8px;overflow:hidden;margin:1.25rem 0;}
+.stat-card{background:var(--cream2);padding:.85rem 1rem;text-align:center;}
+.stat-n{font-family:var(--serif);font-size:1.5rem;color:var(--green);line-height:1;}
+.stat-n.cyan{color:var(--cyan2);}
+.stat-n.amber{color:var(--amber);}
+.stat-l{font-size:10.5px;color:var(--muted);margin-top:.2rem;line-height:1.35;}
+
+/* ── DIVIDER ── */
+.divider{display:flex;align-items:center;gap:.75rem;margin:1.75rem 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--cream3);}
+.divider-sym{font-family:var(--serif);font-size:1.1rem;color:var(--green);opacity:.5;}
+
+/* ── QUOTES ── */
+.pull-quote{border-left:3px solid var(--green);padding:.75rem 0 .75rem 1.25rem;margin:1.5rem 0;}
+.pull-quote p{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink);line-height:1.5;margin:0;}
+.pull-quote-cyan{border-left:3px solid var(--cyan);padding:.75rem 0 .75rem 1.25rem;margin:1.5rem 0;}
+.pull-quote-cyan p{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--cyan2);line-height:1.5;margin:0;}
+
+/* ── STEP LIST ── */
+.step-list{list-style:none;padding:0;margin:.75rem 0 1.25rem;}
+.step-list li{display:flex;gap:.75rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--cream3);font-size:13.5px;line-height:1.55;}
+.step-list li:last-child{border-bottom:none;}
+.step-num{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--green);background:var(--green-bg);border:1px solid var(--green-bdr);padding:2px 6px;border-radius:3px;flex-shrink:0;margin-top:1px;}
+.step-num.cyan{color:var(--cyan2);background:var(--cyan-bg);border:1px solid var(--cyan-bdr);}
+.step-num.amber{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-bdr);}
+
+/* ── MONEY CARD ── */
+.money-card{background:var(--cream2);border:1px solid var(--green-bdr);border-radius:8px;padding:1.25rem 1.5rem;margin:1.25rem 0;text-align:center;}
+.money-card .money-num{font-family:var(--serif);font-size:2.4rem;color:var(--green);font-weight:600;line-height:1;}
+.money-card .money-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-top:.4rem;font-family:var(--mono);}
+.money-card .money-sub{font-size:12.5px;color:var(--ink2);margin-top:.4rem;}
+
+/* ── WORKFLOW DIAGRAM ── */
+.workflow{background:var(--cream);border-radius:8px;padding:1.25rem;margin:1.25rem 0;overflow-x:auto;border:1px solid var(--cream3);}
+.workflow-title{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--cream3);}
+.wf-flow{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem;}
+.wf-node{background:var(--cream2);border:1px solid var(--cream3);border-radius:5px;padding:.4rem .75rem;font-size:11.5px;color:var(--ink);font-weight:400;white-space:nowrap;}
+.wf-node.trigger{border-color:var(--green-bdr);color:var(--green3);background:var(--green-bg);}
+.wf-node.action{border-color:var(--cyan-bdr);color:var(--cyan2);background:var(--cyan-bg);}
+.wf-node.money{border-color:var(--green-bdr);color:var(--green);background:rgba(0,230,118,.12);font-weight:600;font-size:13px;}
+.wf-node.warn{border-color:var(--amber-bdr);color:var(--amber);background:var(amber-bg);}
+.wf-arrow{font-size:13px;color:var(--muted);flex-shrink:0;}
+
+/* ── VISUAL TAG ── */
+.visual-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--cream2);border:1px dashed var(--cream3);padding:3px 9px;border-radius:3px;margin:.6rem 0 1rem;}
+
+/* ── TERMINAL ── */
+.terminal{background:#06060a;border:1px solid var(--cream3);border-radius:6px;padding:1rem 1.25rem;margin:1.25rem 0;font-family:var(--mono);font-size:11.5px;line-height:1.75;overflow-x:auto;}
+.terminal .t-prompt{color:var(--green);}
+.terminal .t-cmd{color:var(--ink);}
+.terminal .t-output{color:var(--ink3);}
+.terminal .t-money{color:var(--green3);font-weight:500;}
+.terminal .t-label{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--cream3);display:block;}
+
+/* ── CTA ── */
+.cta-button{
+  display:inline-block;background:var(--green);color:#06060a;
+  font-family:var(--sans);font-weight:700;font-size:14px;
+  letter-spacing:.04em;padding:1rem 2.5rem;border-radius:5px;
+  text-decoration:none;margin-top:1.75rem;transition:background .15s, transform .15s, box-shadow .15s;
+  border:2px solid var(--green);
+}
+.cta-button:hover{background:var(--green3);border-color:var(--green3);transform:translateY(-2px);box-shadow:0 0 30px rgba(0,230,118,.25);}
+.cta-button-sub{display:block;font-size:10.5px;font-weight:400;letter-spacing:.05em;color:var(--muted);margin-top:.6rem;font-family:var(--mono);}
+
+/* ── CLOSING ── */
+.closing-section{background:#06060a;padding:4rem 2rem;text-align:center;border-top:1px solid var(--cream3);}
+.closing-inner{max-width:600px;margin:0 auto;}
+.closing-section h2{font-family:var(--serif);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:300;color:var(--ink);line-height:1.25;margin-bottom:1rem;}
+.closing-section h2 em{font-style:italic;color:var(--green3);}
+.closing-section p{color:var(--ink2);font-size:14.5px;line-height:1.75;}
+
+/* ── FOOTER ── */
+footer{background:#040408;padding:2rem 2rem;text-align:center;border-top:1px solid var(--cream3);}
+footer p{font-size:11.5px;color:var(--muted2);letter-spacing:.04em;}
+footer strong{color:var(--muted);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .spread{grid-template-columns:1fr;}
+  .page{border-right:none!important;border-bottom:1px solid var(--cream3);}
+  .page:last-child{border-bottom:none;}
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:700px){
+  .top-nav{padding:.5rem 1.25rem;}
+  .nav-links{display:none;}
+  .hero{padding:3.5rem 1.5rem 3rem;}
+  .toc-section{padding:2.5rem 1.5rem;}
+  .page{padding:2.75rem 1.5rem;}
+  .wf-flow{gap:.3rem;}
+  .wf-node{font-size:10.5px;padding:.35rem .6rem;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+}
+</style>
 </head>
 <body>
 
-<div class="container">
+<div class="nav-progress"><div class="nav-progress-bar" id="progressBar"></div></div>
 
-    <!-- Header Badge -->
-    <div class="header-badge">
-        <i class="fas fa-lock-open"></i>
-        PAID POST • UNLOCKED
+<nav class="top-nav">
+  <span class="nav-title">› $50 in 40 Minutes — The Lead Follow-Up Workflow</span>
+  <ul class="nav-links">
+    <li><a href="#toc">Contents</a></li>
+    <li><a href="#page1">Story</a></li>
+    <li><a href="#page2">Problem</a></li>
+    <li><a href="#page3">Solution</a></li>
+    <li><a href="#page4">Build Guide</a></li>
+    <li><a href="#page5">Quick Win</a></li>
+    <li><a href="#page6">Scale</a></li>
+  </ul>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Case Study + Ready-to-Import Template · Post #01</div>
+    <h1>I Made <em>$50</em> in One Afternoon<br>with a Workflow I Built<br>in <strong>40 Minutes</strong></h1>
+    <p class="hero-sub">Real breakdown of a client automation gig — the exact n8n workflow, what they paid, and how you can replicate it today (even with zero experience).</p>
+    <div class="hero-hook">"The businesses paying $50–$150/hr for this don't care about your credentials. They care that the problem goes away."</div>
+    <div class="hero-meta">
+      <div class="hero-stat"><span class="hero-stat-num">$50</span><span class="hero-stat-label">First Payment</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">40 min</span><span class="hero-stat-label">Build Time</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">$75/hr</span><span class="hero-stat-label">Effective Rate</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">$250+</span><span class="hero-stat-label">Total Revenue</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TOC ═══ -->
+<section class="toc-section" id="toc">
+  <div class="toc-inner">
+    <span class="section-label">What's Inside</span>
+    <h2 class="toc-title">The $50 Afternoon Blueprint</h2>
+    <div class="toc-grid">
+      <a href="#page1" class="toc-item"><span class="toc-num">01</span><span class="toc-label">The Backstory: How It Started</span></a>
+      <a href="#page2" class="toc-item"><span class="toc-num">02</span><span class="toc-label">The Client's Problem ($2K/mo Leaking)</span></a>
+      <a href="#page3" class="toc-item"><span class="toc-num">03</span><span class="toc-label">The Solution: 7-Node Auto-Followup System</span></a>
+      <a href="#page4" class="toc-item"><span class="toc-num">04</span><span class="toc-label">Node-by-Node Build Guide</span></a>
+      <a href="#page5" class="toc-item"><span class="toc-num">05</span><span class="toc-label">Your 20-Minute Quick Win</span></a>
+      <a href="#page6" class="toc-item"><span class="toc-num">→</span><span class="toc-label">Why This Works & How to Scale</span></a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SPREAD 1: PAGE 1 + PAGE 2
+═══════════════════════════════════════ -->
+<div class="spread">
+
+  <!-- PAGE 1 -->
+  <article class="page" id="page1">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 01</span>
+      <span class="pg-theme">The Origin Story</span>
+    </div>
+    <h2>The <em>"I Can't Believe This Worked"</em> Moment</h2>
+    <p class="page-lead">Three months ago, I was exactly where you are right now—messing around with n8n tutorials, wondering if this stuff could actually make money. Then a Facebook post changed everything.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Phone screen showing Facebook group post glowing green. "I'm drowning in lead follow-ups. Someone help." Faded below: same person relaxed, inbox organized, "$50 received" notification. Hero's journey in one frame.]</div>
+
+    <div class="box box-green" style="margin:1.5rem 0;">
+      <span class="box-label">The Post That Started It All</span>
+      <p style="font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink);line-height:1.5;">"I'm drowning in lead follow-ups. Someone help."</p>
+      <p style="margin-top:.75rem;">That was a Facebook group post from a local gym owner. Desperate. Losing money daily. Willing to pay someone—anyone—to make the pain stop.</p>
     </div>
 
-    <!-- Title Section -->
-    <section class="title-section">
-        <h1>I Made $50 in One Afternoon with a Workflow I Built in 40 Minutes</h1>
-        <p class="subtitle">Real breakdown of a client automation gig — the exact n8n workflow, what they paid, and how you can replicate it today (even with zero experience).</p>
-        
-        <div class="meta-row">
-            <span class="meta-item"><i class="fas fa-clock"></i> 8 min read</span>
-            <span class="meta-item"><i class="fas fa-layer-group"></i> Case Study + Template</span>
-            <span class="meta-item"><i class="fas fa-signal"></i> Beginner → Intermediate</span>
-        </div>
-    </section>
+    <p>I spent <strong>40 minutes</strong> building a simple workflow. No portfolio. No experience. Just n8n, a Gmail account, and a Google Sheet.</p>
 
-    <!-- The Backstory -->
-    <section class="content-section">
-        <h2><span class="icon"><i class="fas fa-book-open"></i></span> The Backstory</h2>
-        
-        <div class="story-box">
-            <p class="story-text">"I'm drowning in lead follow-ups. Someone help."</p>
-            <p style="position: relative; z-index: 1;">That was a Facebook group post from a local gym owner. Three months ago, I was exactly where you are right now—messing around with n8n tutorials, wondering if this stuff could actually make money.</p>
-        </div>
+    <p>Sent them a <strong>2-minute Loom video</strong> showing it working.</p>
 
-        <p>I spent <strong>40 minutes</strong> building a simple workflow. Sent them a 2-minute Loom video showing it working.</p>
-        
-        <p>They paid me <strong>$50 on the spot.</strong> No portfolio. No experience. Just proof it worked.</p>
+    <p>They paid me <strong>$50 on the spot.</strong></p>
 
-        <div class="stats-row">
-            <div class="stat-box">
-                <div class="stat-value">40m</div>
-                <div class="stat-label">Time to build</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value">$50</div>
-                <div class="stat-label">First payment</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value">$75/hr</div>
-                <div class="stat-label">Effective rate</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value">$250+</div>
-                <div class="stat-label">Total revenue</div>
-            </div>
-        </div>
+    <div class="divider"><span class="divider-sym">◆</span></div>
 
-        <p><strong>This post? It's that exact workflow, broken down step-by-step, plus the exportable file you can import today.</strong></p>
-    </section>
+    <h3>The Numbers That Matter</h3>
 
-    <!-- The Client Problem -->
-    <section class="content-section">
-        <h2><span class="icon"><i class="fas fa-exclamation-triangle"></i></span> The Client Problem</h2>
-        
-        <p>A local gym owner was manually:</p>
-
-        <div class="problem-grid">
-            <div class="mini-card problem">
-                <div class="mini-card-title"><i class="fas fa-copy"></i> Manual Data Entry</div>
-                <p>Copying leads from website forms into Google Sheets one by one</p>
-            </div>
-            <div class="mini-card problem">
-                <div class="mini-card-title"><i class="fas fa-envelope"></i> Individual Emails</div>
-                <p>Sending personalized welcome emails (5-7 mins each)</p>
-            </div>
-            <div class="mini-card problem">
-                <div class="mini-card-title"><i class="fas fa-bell"></i> Forgotten Follow-ups</div>
-                <p>Following up 3 days later... if they remembered</p>
-            </div>
-            <div class="mini-card problem">
-                <div class="mini-card-title"><i class="fas fa-chart-line-down"></i> Lost Revenue</div>
-                <p>Missing ~40% of leads because they fell through cracks</p>
-            </div>
-        </div>
-
-        <p style="text-align: center; font-size: 18px; color: var(--accent-orange); font-weight: 600; margin-top: 24px;">
-            <i class="fas fa-arrow-down"></i> They were losing ~$2,000/month in potential memberships <i class="fas fa-arrow-down"></i>
-        </p>
-    </section>
-
-    <!-- The Solution -->
-    <section class="content-section">
-        <h2><span class="icon"><i class="fas fa-wand-magic-sparkles"></i></span> The Solution: 3-Step Auto-Followup Workflow</h2>
-        
-        <ul class="checklist">
-            <li><i class="fas fa-check-circle"></i> <strong>Captures new form submissions automatically</strong> — No manual copying ever again</li>
-            <li><i class="fas fa-check-circle"></i> <strong>Sends personalized welcome email within 2 minutes</strong> — While the lead is still hot</li>
-            <li><i class="fas fa-check-circle"></i> <strong>Schedules follow-up email 72 hours later</strong> — Perfect timing, zero effort</li>
-            <li><i class="fas fa-check-circle"></i> <strong>Logs everything in Google Sheets</strong> — For the owner to see anytime</li>
-            <li><i class="fas fa-check-circle"></i> <strong>Flags "hot leads"</strong> who open both emails — Priority follow-up</li>
-        </ul>
-
-        <div class="stats-row" style="margin-top: 32px;">
-            <div class="stat-box">
-                <div class="stat-value">15-20m</div>
-                <div class="stat-label">Build time now</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value">$200-500</div>
-                <div class="stat-label">Pro pricing</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value">3-4 hrs</div>
-                <div class="stat-label">Client saves/week</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Step-by-Step Build Guide -->
-    <section class="content-section">
-        <h2><span class="icon"><i class="fas fa-hammer"></i></span> Step-by-Step Build Guide</h2>
-
-        <h3>📋 Prerequisites (5 minutes)</h3>
-        <ul class="checklist">
-            <li><i class="fas fa-circle"></i> n8n account (free cloud or self-hosted)</li>
-            <li><i class="fas fa-circle"></i> Gmail account (for sending emails)</li>
-            <li><i class="fas fa-circle"></i> Google Sheet (create blank sheet named "Lead Tracker")</li>
-            <li><i class="fas fa-circle"></i> Webhook URL from your form (or use test data below)</li>
-        </ul>
-
-        <!-- NODE 1 -->
-        <div class="node-card">
-            <div class="node-number">1</div>
-            <div class="node-name">Webhook Trigger (Receives Form Data)</div>
-            
-            <div class="settings-grid">
-                <div class="setting-item">
-                    <span class="setting-label">HTTP Method</span>
-                    <span class="setting-value">POST</span>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Path</span>
-                    <span class="setting-value">new-lead</span>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Response Code</span>
-                    <span class="setting-value">200</span>
-                </div>
-            </div>
-
-            <p style="margin-top: 16px;"><strong>What this does:</strong> Waits for data from your client's contact form. Every time someone submits, n8n wakes up and grabs the data instantly.</p>
-
-            <div class="pro-tip">
-                <strong>💡 Pro Tip:</strong> Test this first using Postman or curl. Send test data:
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-lang">JSON</span>
-                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
-                </div>
-                <pre><code>{
-  "name": "Test User",
-  "email": "test@example.com",
-  "phone": "555-1234",
-  "source": "website"
-}</code></pre>
-            </div>
-        </div>
-
-        <!-- NODE 2 -->
-        <div class="node-card">
-            <div class="node-number">2</div>
-            <div class="node-name">Google Sheets (Log the Lead)</div>
-            
-            <div class="settings-grid">
-                <div class="setting-item">
-                    <span class="setting-label">Operation</span>
-                    <span class="setting-value">Append</span>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Sheet</span>
-                    <span class="setting-value">Lead Tracker</span>
-                </div>
-            </div>
-
-            <p style="margin-top: 16px;"><strong>Columns to map:</strong></p>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-lang">Column Mapping</span>
-                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
-                </div>
-                <pre><code>Column A: Timestamp → {{ $now.format('YYYY-MM-DD HH:mm') }}
-Column B: Name      → {{ $json.body.name }}
-Column C: Email     → {{ $json.body.email }}
-Column D: Phone     → {{ $json.body.phone }}
-Column E: Source    → {{ $json.body.source }}
-Column F: Status    → "New"</code></pre>
-            </div>
-
-            <div class="pro-tip">
-                <strong>Why this matters:</strong> Clients LOVE seeing their data organized. This alone looks professional AF.
-            </div>
-        </div>
-
-        <!-- NODE 3 -->
-        <div class="node-card">
-            <div class="node-number">3</div>
-            <div class="node-name">Gmail / SendGrid (Welcome Email)</div>
-            
-            <div class="settings-grid">
-                <div class="setting-item">
-                    <span class="setting-label">Operation</span>
-                    <span class="setting-value">Send</span>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">To</span>
-                    <span class="setting-value">{{ $json.body.email }}</span>
-                </div>
-            </div>
-
-            <p style="margin-top: 16px;"><strong>Subject Line:</strong></p>
-            <div class="code-block">
-                <pre><code>Hey {{ $json.body.name.split(' ')[0] }}, welcome to [Business Name]! 🎉</code></pre>
-            </div>
-
-            <p><strong>Email Body (HTML):</strong></p>
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-lang">HTML Template</span>
-                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
-                </div>
-                <pre><code>&lt;h2&gt;Hi {{ $json.body.name.split(' ')[0] }},&lt;/h2&gt;
-
-&lt;p&gt;Thanks for reaching out! I got your message 
-and I'm excited to help.&lt;/p&gt;
-
-&lt;p&gt;Here's what happens next:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;I'll review your inquiry within 24 hours&lt;/li&gt;
-  &lt;li&gt;You'll get a personalized response 
-      (not a bot—I promise 😄)&lt;/li&gt;
-  &lt;li&gt;If it's urgent, just reply to this email&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Talk soon!&lt;br&gt;
-&lt;strong&gt;[Your/Client Name]&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;small&gt;P.S. Quick question—what's the #1 thing 
-you're hoping we can help with?&lt;/small&gt;&lt;/p&gt;</code></pre>
-            </div>
-
-            <div class="pro-tip">
-                <strong>🧠 PSYCHOLOGY HACK:</strong> That P.S. question? It doubles response rates. Seriously. Use it every time.
-            </div>
-        </div>
-
-        <!-- NODE 4 -->
-        <div class="node-card">
-            <div class="node-number">4</div>
-            <div class="node-name">Wait Node (The 72-Hour Delay)</div>
-            
-            <div class="settings-grid">
-                <div class="setting-item">
-                    <span class="setting-label">Amount</span>
-                    <span class="setting-value">72</span>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Unit</span>
-                    <span class="setting-value">Hours</span>
-                </div>
-            </div>
-
-            <p style="margin-top: 16px;"><strong>What this does:</strong> Pauses the workflow for exactly 3 days. The lead gets time to breathe, then...</p>
-        </div>
-
-        <!-- NODE 5 -->
-        <div class="node-card">
-            <div class="node-number">5</div>
-            <div class="node-name">IF Node (Smart Follow-up Logic)</div>
-            
-            <p><strong>Condition:</strong></p>
-            <div class="code-block">
-                <pre><code>Check if lead opened welcome email
-
-If using SendGrid:
-  Check webhook event = "open"
-
-If no email tracking available:
-  SKIP this node → always send follow-up</code></pre>
-            </div>
-
-            <div class="pro-tip">
-                <strong>Why:</strong> Only follow up with engaged leads. Don't spam people who didn't open email #1. This keeps your sender reputation clean.
-            </div>
-        </div>
-
-        <!-- NODE 6 -->
-        <div class="node-card">
-            <div class="node-number">6</div>
-            <div class="node-name">Second Email (Follow-Up)</div>
-            
-            <p><strong>Subject:</strong></p>
-            <div class="code-block">
-                <pre><code>Quick check-in, {{ $json.body.name.split(' ')[0] }} 👋</code></pre>
-            </div>
-
-            <p><strong>Body:</strong></p>
-            <div class="code-block">
-                <div class="code-header">
-                    <span class="code-lang">HTML Template</span>
-                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
-                </div>
-                <pre><code>&lt;h2&gt;Hey again!&lt;/h2&gt;
-
-&lt;p&gt;I wanted to follow up and see if you had 
-a chance to think about things.&lt;/p&gt;
-
-&lt;p&gt;No pressure at all—but if you have any 
-questions or want to move forward, 
-just hit reply.&lt;/p&gt;
-
-&lt;p&gt;If now's not the right timing, totally 
-understand. I'm here when you're ready.&lt;/p&gt;
-
-&lt;p&gt;Cheers,&lt;br&gt;[Name]&lt;/p&gt;</code></pre>
-            </div>
-
-            <div class="pro-tip">
-                <strong>TONE NOTE:</strong> Casual, low-pressure. Not salesy. Humans respond to humans. This isn't a funnel—it's a conversation.
-            </div>
-        </div>
-
-        <!-- NODE 7 -->
-        <div class="node-card">
-            <div class="node-number">7</div>
-            <div class="node-name">Google Sheets (Update Status)</div>
-            
-            <div class="settings-grid">
-                <div class="setting-item">
-                    <span class="setting-label">Operation</span>
-                    <span class="setting-value">Update</span>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Find by</span>
-                    <span class="setting-value">Email address</span>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Status →</span>
-                    <span class="setting-value">"Followed Up"</span>
-                </div>
-                <div class="setting-item">
-                    <span class="setting-label">Last Contact →</span>
-                    <span class="setting-value">{{ $now.format('YYYY-MM-DD') }}</span>
-                </div>
-            </div>
-
-            <p style="margin-top: 16px;"><strong>Result:</strong> Client opens their Sheet and sees exactly where every lead is at. Beautiful. Professional. Done.</p>
-        </div>
-    </section>
-
-    <!-- Ready-to-Import Workflow File -->
-    <section class="content-section">
-        <h2><span class="icon"><i class="fas fa-file-import"></i></span> Ready-to-Import Workflow File</h2>
-        
-        <div class="quickwin-box" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%); border-color: var(--accent-purple);">
-            <div class="quickwin-header">
-                <div class="quickwin-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);">
-                    <i class="fas fa-download"></i>
-                </div>
-                <div class="quickwin-title">📥 Download: zenith-lead-followup-workflow.json</div>
-            </div>
-            
-            <p style="color: var(--text-secondary); margin-bottom: 24px;">Included in this post—save and import directly into your n8n instance.</p>
-
-            <h3 style="margin-top: 0;">Import Steps:</h3>
-            <ol class="timeline-steps">
-                <li>Open your n8n dashboard</li>
-                <li>Click <strong>"+"</strong> → <strong>"Import from File"</strong></li>
-                <li>Upload the JSON file</li>
-                <li>Connect your credentials (Gmail + Google Sheets)</li>
-                <li>Test with fake data</li>
-                <li>Activate and watch it work ✨</li>
-            </ol>
-
-            <div class="pro-tip" style="margin-top: 24px;">
-                <strong>⚠️ Before importing:</strong> Have your Google API credentials ready. Need help setting those up? Scroll down—I included a mini-guide for exactly that.
-            </div>
-        </div>
-    </section>
-
-    <!-- Quick Win Section -->
-    <section class="content-section">
-        <h2><span class="icon"><i class="fas fa-bolt"></i></span> Your Quick Win (Do This in 20 Minutes Right Now)</h2>
-        
-        <div class="quickwin-box">
-            <div class="quickwin-header">
-                <div class="quickwin-icon">
-                    <i class="fas fa-rocket"></i>
-                </div>
-                <div class="quickwin-title">Goal: Get This Workflow Running with Test Data</div>
-            </div>
-
-            <ol class="timeline-steps">
-                <li><strong>[0-5 min]</strong> Import the workflow JSON into n8n ✓</li>
-                <li><strong>[5-10 min]</strong> Connect your Gmail credentials (or SendGrid) ✓</li>
-                <li><strong>[10-15 min]</strong> Create a blank Google Sheet and connect it ✓</li>
-                <li><strong>[15-18 min]</strong> Activate the workflow ✓</li>
-                <li><strong>[18-20 min]</strong> Send test data to your webhook URL and watch magic happen ✓</li>
-            </ol>
-
-            <h3 style="margin-top: 28px;">✅ Success Looks Like:</h3>
-            <div class="success-checklist">
-                <div class="success-item"><i class="fas fa-check"></i> Test lead appears in Google Sheet</div>
-                <div class="success-item"><i class="fas fa-check"></i> Welcome email lands in inbox</div>
-                <div class="success-item"><i class="fas fa-check"></i> Status updates automatically</div>
-                <div class="success-item"><i class="fas fa-check"></i> You feel like a wizard 🧙‍♂️</div>
-            </div>
-
-            <div class="pro-tip" style="margin-top: 24px;">
-                <strong>🚀 NEXT IMMEDIATE ACTION:</strong> Screenshot the working workflow. Post it somewhere (Twitter, LinkedIn, a Facebook group). Say:<br><br>
-                <em>"Just built an automated lead follow-up system. Takes 40 mins to set up, saves small businesses hours per week. DM me if you want one built."</em><br><br>
-                Watch what happens.
-            </div>
-        </div>
-    </section>
-
-    <!-- Why This Works -->
-    <section class="content-section">
-        <h2><span class="icon"><i class="fas fa-brain"></i></span> Why This Works (The Psychology + Strategy)</h2>
-        
-        <div class="reason-grid">
-            <div class="reason-card">
-                <div class="reason-num">1</div>
-                <div class="reason-content">
-                    <h4>Small Businesses Are Desperate for This</h4>
-                    <p>They're losing money daily to disorganization. They don't have time to learn automation. They WILL pay $50-500 for someone to solve this.</p>
-                </div>
-            </div>
-
-            <div class="reason-card">
-                <div class="reason-num">2</div>
-                <div class="reason-content">
-                    <h4>The "Proof First" Model Kills Objections</h4>
-                    <p>You're not selling promises—you're showing results. A 2-minute Loom demo > 100 sales emails. They see it work → trust is instant.</p>
-                </div>
-            </div>
-
-            <div class="reason-card">
-                <div class="reason-num">3</div>
-                <div class="reason-content">
-                    <h4>Stupidly Simple = Stupidly Valuable</h4>
-                    <p>7 nodes. Basic logic. No code. But to a non-technical business owner? It looks like sorcery. Complexity ≠ value. Solved problems = value.</p>
-                </div>
-            </div>
-
-            <div class="reason-card">
-                <div class="reason-num">4</div>
-                <div class="reason-content">
-                    <h4>$50 Is an Impulse Buy for Business Owners</h4>
-                    <p>They spend more on lunch. If it saves them 2 hours/week, ROI is obvious. Easy yes. No deliberation needed.</p>
-                </div>
-            </div>
-
-            <div class="reason-card">
-                <div class="reason-num">5</div>
-                <div class="reason-content">
-                    <h4>Foot-in-the-Door Effect</h4>
-                    <p>Once they pay $50, they'll pay $200 next. Then $500/month for maintenance. Then referrals. One small gig compounds fast.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Real Numbers -->
-    <section class="content-section">
-        <h2><span class="icon"><i class="fas fa-chart-bar"></i></span> Real Numbers From This Workflow</h2>
-        
-        <table class="results-table">
-            <thead>
-                <tr>
-                    <th>Metric</th>
-                    <th>Result</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Time to build</td>
-                    <td>40 minutes</td>
-                </tr>
-                <tr>
-                    <td>What I charged</td>
-                    <td>$50 (one-time)</td>
-                </tr>
-                <tr>
-                    <td>Hourly rate</td>
-                    <td class="highlight-cell">$75/hour</td>
-                </tr>
-                <tr>
-                    <td>Time client saves/week</td>
-                    <td>~3-4 hours</td>
-                </tr>
-                <tr>
-                    <td>Client's estimated monthly value</td>
-                    <td class="highlight-cell">$2,000+ in saved leads</td>
-                </tr>
-                <tr>
-                    <td>Referrals from this client</td>
-                    <td>2 (so far)</td>
-                </tr>
-                <tr>
-                    <td>Total revenue from ONE workflow</td>
-                    <td class="highlight-cell">$250+ (and counting)</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <p style="text-align: center; margin-top: 24px; font-size: 18px; color: var(--text-secondary);">
-            Not bad for a Tuesday afternoon, eh? <i class="fas fa-smile"></i>
-        </p>
-    </section>
-
-    <!-- Bonus: API Credentials Guide -->
-    <section class="content-section">
-        <h2><span class="icon"><i class="fas fa-gift"></i></span> Bonus: Google API Credentials Mini-Guide</h2>
-        
-        <p><strong>Because I know this part sucks.</strong></p>
-
-        <h3>For Gmail:</h3>
-        <ol class="timeline-steps">
-            <li>Go to <strong>Google Cloud Console</strong></li>
-            <li>Create project → Enable <strong>Gmail API</strong></li>
-            <li>Create <strong>OAuth 2.0 credentials</strong></li>
-            <li>Download JSON → Keep it secret 🔒</li>
-            <li>In n8n: Credentials → Google Gmail → Paste</li>
-        </ol>
-
-        <h3>For Google Sheets:</h3>
-        <ol class="timeline-steps">
-            <li>Same process as above</li>
-            <li>But enable <strong>"Google Sheets API"</strong> instead</li>
-            <li>Use same OAuth credentials (reuse!) ♻️</li>
-        </ol>
-
-        <div class="pro-tip">
-            <strong>⚡ Pro tip:</strong> Create ONE service account for both APIs. Saves time, fewer credentials to manage.
-        </div>
-
-        <p style="margin-top: 20px;"><strong>Need help?</strong> Reply to this post or join our Discord—we'll sort you out in 10 mins flat.</p>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="content-section cta-section">
-        <h2><span class="icon"><i class="fas fa-rocket"></i></span> What's Next? Your Path to $50/Hour</h2>
-        
-        <p>You just built your first monetizable workflow. Here's how to scale:</p>
-
-        <!-- CTA Option A -->
-        <div class="cta-card featured">
-            <span class="cta-badge">⭐ Recommended</span>
-            <div class="cta-title">Go Deeper: Full n8n Course</div>
-            <p class="cta-desc"><strong>"Zero to $50/Hour Automation Freelancer"</strong> — Everything you need to turn automation skills into consistent income.</p>
-            
-            <ul class="cta-features">
-                <li><i class="fas fa-check"></i> 40+ workflows like this (and way more advanced)</li>
-                <li><i class="fas fa-check"></i> Client acquisition system (no cold outreach needed)</li>
-                <li><i class="fas fa-check"></i> Pricing frameworks ($50 gigs vs $500 retainers)</li>
-                <li><i class="fas fa-check"></i> Portfolio-building strategy (zero experience OK)</li>
-                <li><i class="fas fa-check"></i> Private community access</li>
-            </ul>
-
-            <a href="#" class="cta-button">
-                Get Full Course <i class="fas fa-arrow-right"></i>
-            </a>
-            <p class="cta-price">Use code <strong>LEADWIN</strong> for 20% off — you earned it 🎯</p>
-        </div>
-
-        <!-- CTA Option B -->
-        <div class="cta-card">
-            <span class="cta-badge secondary">Quick Win</span>
-            <div class="cta-title">Another Quick Win: Cold DM Script (#07)</div>
-            <p class="cta-desc">The exact outreach message that landed me $150 in automation gigs. Includes follow-up sequence and audit offer template.</p>
-            
-            <ul class="cta-features">
-                <li><i class="fas fa-check"></i> Cold DM script (copy-paste ready)</li>
-                <li><i class="fas fa-check"></i> Follow-up timing & templates</li>
-                <li><i class="fas fa-check"></i> Audit offer that hooks business owners</li>
-                <li><i class="fas fa-check"></i> Works even with zero sales experience</li>
-            </ul>
-
-            <a href="#" class="cta-button secondary">
-                Get Post #07 — $0.99 <i class="fas fa-arrow-right"></i>
-            </a>
-            <p class="cta-price">Pair it with this workflow and you're dangerous 💪</p>
-        </div>
-
-        <!-- CTA Option C -->
-        <div class="cta-card">
-            <span class="cta-badge free">Free</span>
-            <div class="cta-title">Free Stuff First (No Pressure)</div>
-            <p class="cta-desc"><strong>"7-Day Automation Starter Kit"</strong> — Perfect if you're not ready to invest yet but want to keep learning.</p>
-            
-            <ul class="cta-features">
-                <li><i class="fas fa-check"></i> 3 beginner-friendly workflow templates</li>
-                <li><i class="fas fa-check"></i> Daily email lessons (5 mins each)</li>
-                <li><i class="fas fa-check"></i> Private Discord community access</li>
-                <li><i class="fas fa-check"></i> Zero cost. Zero risk. Pure value.</li>
-            </ul>
-
-            <a href="#" class="cta-button free">
-                Download Free Kit <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
-    </section>
-
-    <!-- Final Words -->
-    <section class="content-section">
-        <h2><span class="icon"><i class="fas fa-fire"></i></span> Final Words</h2>
-        
-        <p>Look—I'm not gonna hype this up and say "$50 will change your life."</p>
-        
-        <p>But here's what it <strong>will</strong> do:</p>
-
-        <ul class="checklist">
-            <li><i class="fas fa-check-circle"></i> Give you a real, paid workflow you can show off</li>
-            <li><i class="fas fa-check-circle"></i> Teach you the core logic behind 90% of freelance automation gigs</li>
-            <li><i class="fas fa-check-circle"></i> Build confidence that <strong>yes, you can actually do this</strong></li>
-            <li><i class="fas fa-check-circle"></i> Maybe make you $50 this week if you take action</li>
-        </ul>
-
-        <p style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-top: 24px;">The workflow works. The strategy works. The only variable is whether YOU execute.</p>
-
-        <p style="font-size: 20px; font-weight: 700; color: var(--accent-green); margin-top: 20px;">So... what are you waiting for?</p>
-
-        <p><strong>Go import that file. Send that test email. Post that screenshot.</strong></p>
-
-        <p>And when you land your first client? Come back and tell me about it. I'll be here. 🤝</p>
-    </section>
-
-    <!-- Footer PS -->
-    <div class="footer-ps">
-        <p><strong>P.S.</ Seriously—use that P.S. trick in emails. It's undefeated.</strong> <em>(See what I did there? 😉)</em></p>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-n">40m</div><div class="stat-l">Time to build</div></div>
+      <div class="stat-card"><div class="stat-n">$50</div><div class="stat-l">First payment</div></div>
+      <div class="stat-card"><div class="stat-n">$75/hr</div><div class="stat-l">Effective rate</div></div>
+      <div class="stat-card"><div class="stat-n">$250+</div><div class="stat-l">Total from this one gig</div></div>
     </div>
 
-    <!-- Signature -->
-    <div class="signature">
-        <p>— The <strong>Zenith Studio</strong> Team</p>
-        <p style="margin-top: 8px; font-size: 13px;">Building automations. Making money. Having fun.</p>
+    <p><strong>This post?</strong> It's that exact workflow. Broken down step-by-step. Plus the exportable JSON file you can import today.</p>
+
+    <div class="pull-quote">
+      <p>"No degree. No portfolio. No code. Just proof it worked. That's all they needed."</p>
     </div>
 
-</div>
+    <div class="box-mindset">
+      <span class="box-label">Mindset Shift</span>
+      <p>"You don't need to be the best automation engineer in the world. You need to be the person who shows up, understands the problem, and solves it before someone else does."</p>
+    </div>
+  </article>
 
-<!-- Copy to Clipboard Script -->
+  <!-- PAGE 2 -->
+  <article class="page" id="page2">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 02</span>
+      <span class="pg-theme">The Problem</span>
+    </div>
+    <h2>A Local Gym Was <em>Bleeding Leads</em></h2>
+    <p class="page-lead">The client wasn't complicated. A small business owner with a website form, a Gmail account, and a spreadsheet. The gap between those three things was costing them ~$2,000 every single month.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Split-screen pain diagram. LEFT: funnel with holes — "40 leads enter, 24 lost". RIGHT: calendar showing "3 days avg response time". Red/orange glow on losses. Clean data-viz aesthetic.]</div>
+
+    <h3>What They Were Doing Manually</h3>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Pain Point #1</span>
+      <p><strong>Copying leads from website forms into Google Sheets</strong> — One by one. Whenever they remembered. Sometimes days later.</p>
+    </div>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Pain Point #2</span>
+      <p><strong>Sending personalized welcome emails</strong> — 5-7 minutes each. Same template. Different name. Mind-numbing repetition.</p>
+    </div>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Pain Point #3</span>
+      <p><strong>Following up 3 days later</strong> — If they remembered. If they weren't swamped. If the lead hadn't already chosen a competitor.</p>
+    </div>
+
+    <div class="box box-surface">
+      <span class="box-label">Pain Point #4</span>
+      <p><strong>Missing ~40% of leads entirely</strong> — Because they fell through the cracks between form submission and human attention.</p>
+    </div>
+
+    <div class="money-card">
+      <div class="money-num">~$2,000</div>
+      <div class="money-label">Lost Per Month</div>
+      <div class="money-sub">In potential memberships. Not hypothetical. Real revenue walking out the door.</div>
+    </div>
+
+    <div class="pull-quote-cyan">
+      <p>"They didn't need a CRM. They didn't need a marketing platform. They needed someone to connect their form to their email to their spreadsheet. In 40 minutes. For $50."</p>
+    </div>
+
+    <div class="box box-amber">
+      <span class="box-label">The Insight</span>
+      <p><strong>The gap between "has tools" and "tools working together" is where you get paid.</strong> Every business has this gap. Most don't know how to close it. You do.</p>
+    </div>
+  </article>
+
+</div><!-- /spread 1 -->
+
+
+<!-- ══════════════════════════════════════
+     SPREAD 2: PAGE 3 + PAGE 4
+═══════════════════════════════════════ -->
+<div class="spread">
+
+  <!-- PAGE 3 -->
+  <article class="page" id="page3">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 03</span>
+      <span class="pg-theme">The Solution</span>
+    </div>
+    <h2>The <em>7-Node</em> Auto-Followup Engine</h2>
+    <p class="page-lead">Seven nodes. Zero code. Under 20 minutes to replicate now that you have this guide. Here's what the system actually does—and why clients will pay you to build it.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Glowing node flow diagram — Webhook → Sheets → Email → Wait → IF → Email → Sheets Update. Green pulse lines connecting. "$50" badge at end. Hacker dashboard meets income report.]</div>
+
+    <h3>What It Does (In Plain English)</h3>
+
+    <ul class="step-list">
+      <li><span class="step-num">✓</span><div><strong>Captures new form submissions automatically</strong> — No manual copying ever again</div></li>
+      <li><span class="step-num">✓</span><div><strong>Sends personalized welcome email within 2 minutes</strong> — While the lead is still hot</div></li>
+      <li><span class="step-num">✓</span><div><strong>Schedules follow-up email 72 hours later</strong> — Perfect timing, zero effort</div></li>
+      <li><span class="step-num">✓</span><div><strong>Logs everything in Google Sheets</strong> — Owner sees exactly where every lead is at</div></li>
+      <li><span class="step-num">✓</span><div><strong>Flags "hot leads"</strong> who open both emails — Priority follow-up</div></li>
+    </ul>
+
+    <div class="workflow">
+      <div class="workflow-title">The Simplest Money-Making Flow on the Internet</div>
+      <div class="wf-flow">
+        <span class="wf-node trigger">New lead submits form</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">n8n catches it</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">Sends to Sheets</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">Triggers welcome email</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">Waits 72 hours</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">Sends follow-up</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node money">$250-$500</span>
+      </div>
+      <p style="color:var(--ink3);font-size:11px;margin-top:.75rem;">7 nodes. 4 connections. One payment. No code required.</p>
+    </div>
+
+    <h3>The Value Proposition</h3>
+
+    <table class="compare">
+      <thead>
+        <tr><th>Metric</th><th>Before</th><th>After</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Lead response time</td><td class="bad">1-3 days</td><td class="good">&lt;2 minutes</td></tr>
+        <tr><td>Leads falling through</td><td class="bad">~40%</td><td class="good">&lt;5%</td></tr>
+        <tr><td>Time owner spends/week</td><td class="bad">3-4 hours</td><td class="good">15 minutes</td></tr>
+        <tr><td>Monthly revenue lost</td><td class="bad">~$2,000</td><td class="good">Near zero</td></tr>
+      </tbody>
+    </table>
+
+    <div class="money-card">
+      <div class="money-num">$200-500</div>
+      <div class="money-label">What Pros Charge for This</div>
+      <div class="money-sub">I charged $50 as my first gig. By gig #10? $350. Same workflow.</div>
+    </div>
+  </article>
+
+  <!-- PAGE 4 -->
+  <article class="page" id="page4">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 04</span>
+      <span class="pg-theme">Build Guide</span>
+    </div>
+    <h2>Node-by-Node:<br><em>Exact Configuration</em></h2>
+    <p class="page-lead">No vague instructions. Every setting. Every value. Copy this, import the JSON, connect your credentials, and you're live.</p>
+
+    <h3>⏱ Prerequisites (5 Minutes)</h3>
+    <ul class="step-list">
+      <li><span class="step-num">✓</span><div>n8n account (free cloud or self-hosted)</div></li>
+      <li><span class="step-num">✓</span><div>Gmail account (for sending emails)</div></li>
+      <li><span class="step-num">✓</span><div>Google Sheet named "Lead Tracker"</div></li>
+      <li><span class="step-num">✓</span><div>Webhook URL from your form (or test data)</div></li>
+    </ul>
+
+    <div class="divider"><span class="divider-sym">◆</span></div>
+
+    <h3>Node 1: Webhook Trigger</h3>
+    <div class="box box-dark">
+      <span class="box-label">Receives Form Data</span>
+      <p><strong>HTTP Method:</strong> POST &nbsp;|&nbsp; <strong>Path:</strong> new-lead &nbsp;|&nbsp; <strong>Response:</strong> 200 OK</p>
+      <p style="margin-top:.5rem;font-size:12.5px;color:var(--ink3);">Waits for data from client's contact form. Every submission wakes up n8n instantly.</p>
+    </div>
+
+    <div class="terminal">
+      <span class="t-label">Test Payload</span>
+<span class="t-prompt">$</span> <span class="t-cmd">curl -X POST your-webhook/new-lead \</span>
+<span class="t-output">  -H "Content-Type: application/json" \</span>
+<span class="t-output">  -d '{"name":"Test User","email":"test@example.com","phone":"555-1234","source":"website"}'</span>
+<span class="t-output"></span>
+<span class="t-money">→ {"status": "received", "message": "Lead captured! 🎯"}</span>
+    </div>
+
+    <h3>Node 2: Google Sheets (Log Lead)</h3>
+    <div class="box box-dark">
+      <span class="box-label">Append New Row</span>
+      <p><strong>Operation:</strong> Append &nbsp;|&nbsp; <strong>Sheet:</strong> Lead Tracker</p>
+    </div>
+
+    <div class="terminal">
+      <span class="t-label">Column Mapping</span>
+<span class="t-output">Column A: Timestamp → {{ $now.format('YYYY-MM-DD HH:mm') }}</span>
+<span class="t-output">Column B: Name      → {{ $json.body.name }}</span>
+<span class="t-output">Column C: Email     → {{ $json.body.email }}</span>
+<span class="t-output">Column D: Phone     → {{ $json.body.phone }}</span>
+<span class="t-output">Column E: Source    → {{ $json.body.source }}</span>
+<span class="t-output">Column F: Status    → "New"</span>
+    </div>
+
+    <div class="pro-tip">
+      <strong>💡 Why this matters:</strong> Clients LOVE seeing their data organized. This alone looks professional AF.
+    </div>
+
+    <h3>Node 3: Gmail (Welcome Email)</h3>
+    <div class="box box-dark">
+      <span class="box-label">Send Personalized Welcome</span>
+      <p><strong>To:</strong> {{ $json.body.email }} &nbsp;|&nbsp; <strong>Operation:</strong> Send</p>
+    </div>
+
+    <div class="terminal">
+      <span class="t-label">Subject Line</span>
+<span class="t-cmd">Hey {{ $json.body.name.split(' ')[0] }}, welcome! 🎉</span>
+    </div>
+
+    <div class="pro-tip">
+      <strong>🧠 PSYCHOLOGY HACK:</strong> Include a P.S. question like "What's the #1 thing you're hoping we can help with?" — It doubles response rates.
+    </div>
+
+    <h3>Nodes 4-7: Wait → IF → Follow-Up → Update</h3>
+    <div class="box box-dark">
+      <span class="box-label">The Automation Loop</span>
+      <ul style="margin:.5rem 0 0;padding-left:1rem;">
+        <li style="font-size:13px;"><strong>Node 4:</strong> Wait 72 hours (3-day delay)</li>
+        <li style="font-size:13px;"><strong>Node 5:</strong> IF check — only follow up engaged leads</li>
+        <li style="font-size:13px;"><strong>Node 6:</strong> Send casual follow-up email</li>
+        <li style="font-size:13px;"><strong>Node 7:</strong> Update Sheet status → "Followed Up"</li>
+      </ul>
+    </div>
+
+    <div class="pull-quote-green">
+      <p>"7 nodes. 40 minutes my first time. 15 minutes now. That's the template effect."</p>
+    </div>
+  </article>
+
+</div><!-- /spread 2 -->
+
+
+<!-- ══════════════════════════════════════
+     SPREAD 3: PAGE 5 + PAGE 6
+═══════════════════════════════════════ -->
+<div class="spread spread-dark">
+
+  <!-- PAGE 5 -->
+  <article class="page" id="page5">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 05</span>
+      <span class="pg-theme">Quick Win</span>
+    </div>
+    <h2>Your <em>20-Minute</em> Path to Proof</h2>
+    <p class="page-lead">No theory. No prep work. Import, connect, customize, test, activate. By the time you finish reading this page, you could have a working workflow.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Timeline graphic — 0min "Import", 5min "Connect Gmail", 8min "Connect Sheets", 12min "Edit Template", 15min "Test", 18min "ACTIVATE" with big green checkmark. Progress-bar feel.]</div>
+
+    <h3>The Timeline</h3>
+
+    <ol class="step-list">
+      <li>
+        <span class="step-num">0-3 min</span>
+        <div><strong>Import workflow JSON into n8n.</strong> Click "+" → "Import from File" → Upload. Done.</div>
+      </li>
+      <li>
+        <span class="step-num">3-6 min</span>
+        <div><strong>Connect Gmail credential.</strong> OAuth flow takes 2 minutes. Grant once, forget forever.</div>
+      </li>
+      <li>
+        <span class="step-num">6-9 min</span>
+        <div><strong>Connect Google Sheets credential.</strong> Blank sheet. Name it. Connect. 3 minutes max.</div>
+      </li>
+      <li>
+        <span class="step-num">9-14 min</span>
+        <div><strong>Customize email templates.</strong> Change [Your Name], add links, tweak tone. Start with welcome email.</div>
+      </li>
+      <li>
+        <span class="step-num">14-17 min</span>
+        <div><strong>Send test email from alternate address.</strong> Subject: "Question about pricing". Wait for magic.</div>
+      </li>
+      <li>
+        <span class="step-num">17-20 min</span>
+        <div><strong>Verify response arrived. Check Sheet log. Activate workflow.</strong> Toggle ON. Your first automated system is live.</div>
+      </li>
+    </ol>
+
+    <div class="box box-green">
+      <span class="box-label">Success Checklist</span>
+      <p>☑ Test lead appears in Google Sheet<br>
+☑ Welcome email lands in inbox<br>
+☑ Response addresses actual question asked<br>
+☑ Original email marked as "replied"<br>
+☑ You just built something that makes money 🧙‍♂️</p>
+    </div>
+
+    <div class="money-card">
+      <div class="money-num">20 min</div>
+      <div class="money-label">From Zero to Live</div>
+      <div class="money-sub">Less time than one episode of Netflix. And you'll save 28 hours this month.</div>
+    </div>
+
+    <div class="pull-quote-green">
+      <p>"The moment you see that auto-reply land in your test inbox — knowing you didn't touch anything — you'll understand why people charge $500 for this."</p>
+    </div>
+
+    <div class="box-mindset">
+      <span class="box-label">Next Action</span>
+      <p>Screenshot the working workflow. Post it somewhere. Say: "Just built an automated lead follow-up system." Watch what happens.</p>
+    </div>
+  </article>
+
+  <!-- PAGE 6 -->
+  <article class="page" id="page6">
+    <div class="page-eyebrow">
+      <span class="pg-num" style="background:rgba(0,230,118,.15);">Page 06</span>
+      <span class="pg-theme" style="color:var(--muted);">Scale</span>
+    </div>
+    <h2>Why This Works<br>(<em>& How to Turn It Into $500/mo</em>)</h2>
+    <p class="page-lead">This isn't a one-time trick. It's a repeatable system. Here's the psychology behind why clients pay, plus how to sell this exact workflow 10, 50, 100 times.</p>
+
+    <h3>The 5 Reasons Clients Say Yes</h3>
+
+    <div class="reason-grid" style="display:grid;gap:12px;margin:1.25rem 0;">
+      <div style="background:var(--cream2);border:1px solid var(--cream3);border-radius:8px;padding:1rem;display:flex;gap:12px;">
+        <div style="width:28px;height:28px;background:var(--green-bg);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--green);font-size:13px;flex-shrink:0;">1</div>
+        <div><h4 style="font-size:14px;font-weight:600;color:var(--ink);margin:0 0 4px;">Small Businesses Are Desperate</h4><p style="font-size:12.5px;color:var(--muted);margin:0;">They're losing money daily. They'll pay $50-500 for someone to make it stop.</p></div>
+      </div>
+      <div style="background:var(--cream2);border:1px solid var(--cream3);border-radius:8px;padding:1rem;display:flex;gap:12px;">
+        <div style="width:28px;height:28px;background:var(--green-bg);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--green);font-size:13px;flex-shrink:0;">2</div>
+        <div><h4 style="font-size:14px;font-weight:600;color:var(--ink);margin:0 0 4px;">Proof > Promises</h4><p style="font-size:12.5px;color:var(--muted);margin:0;">A 2-min Loom demo beats 100 sales emails. They see it work → trust is instant.</p></div>
+      </div>
+      <div style="background:var(--cream2);border:1px solid var(--cream3);border-radius:8px;padding:1rem;display:flex;gap:12px;">
+        <div style="width:28px;height:28px;background:var(--green-bg);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--green);font-size:13px;flex-shrink:0;">3</div>
+        <div><h4 style="font-size:14px;font-weight:600;color:var(--ink);margin:0 0 4px;">Simple = Valuable</h4><p style="font-size:12.5px;color:var(--muted);margin:0;">7 nodes looks like sorcery to non-technical owners. Complexity ≠ value.</p></div>
+      </div>
+      <div style="background:var(--cream2);border:1px solid var(--cream3);border-radius:8px;padding:1rem;display:flex;gap:12px;">
+        <div style="width:28px;height:28px;background:var(--green-bg);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--green);font-size:13px;flex-shrink:0;">4</div>
+        <div><h4 style="font-size:14px;font-weight:600;color:var(--ink);margin:0 0 4px;">$50 Is an Impulse Buy</h4><p style="font-size:12.5px;color:var(--muted);margin:0;">They spend more on lunch. ROI is obvious. Easy yes.</p></div>
+      </div>
+      <div style="background:var(--cream2);border:1px solid var(--cream3);border-radius:8px;padding:1rem;display:flex;gap:12px;">
+        <div style="width:28px;height:28px;background:var(--green-bg);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--green);font-size:13px;flex-shrink:0;">5</div>
+        <div><h4 style="font-size:14px;font-weight:600;color:var(--ink);margin:0 0 4px;">Foot-in-the-Door Effect</h4><p style="font-size:12.5px;color:var(--muted);margin:0;">$50 → $200 next → $500/mo maintenance → referrals. Compounds fast.</p></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2rem;">Real Numbers From This One Workflow</h3>
+
+    <table class="compare">
+      <thead>
+        <tr><th>Metric</th><th>Result</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Time to build</td><td>40 minutes</td></tr>
+        <tr><td>What I charged</td><td>$50 (one-time)</td></tr>
+        <tr><td>Hourly rate</td><td class="good">$75/hour</td></tr>
+        <tr><td>Client saves/week</td><td>~3-4 hours</td></tr>
+        <tr><td>Client's monthly value</td><td class="good">$2,000+ saved</td></tr>
+        <tr><td>Referrals from this</td><td>2 (so far)</td></tr>
+        <tr><td>Total revenue</td><td class="good">$250+ counting</td></tr>
+      </tbody>
+    </table>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.5rem 0;">
+      <div style="background:var(--green-bg);border:1px solid var(--green-bdr);border-radius:8px;padding:1.25rem;text-align:center;">
+        <div style="font-family:var(--serif);font-size:1.8rem;color:var(--green);line-height:1;">$0.99</div>
+        <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.4rem;font-family:var(--mono);">You Paid For This</div>
+        <div style="font-size:11.5px;color:var(--ink2);margin-top:.5rem;">Complete guide + JSON file</div>
+      </div>
+      <div style="background:var(--cyan-bg);border:1px solid var(--cyan-bdr);border-radius:8px;padding:1.25rem;text-align:center;">
+        <div style="font-family:var(--serif);font-size:1.8rem;color:var(--cyan);line-height:1;">$297+</div>
+        <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.4rem;font-family:var(--mono);">Charge Clients</div>
+        <div style="font-size:11.5px;color:var(--ink2);margin-top:.5rem;">Same workflow, sold as service</div>
+      </div>
+    </div>
+
+    <div style="margin:1.5rem 0;padding:1.5rem 1.25rem;background:var(--cream);border:2px solid var(--green-bdr);border-radius:8px;text-align:center;">
+      <p style="font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:.75rem;">Your Move</p>
+      <p style="font-family:var(--serif);font-size:1rem;color:var(--ink2);line-height:1.6;margin-bottom:1.25rem;">
+        Import the file. Customize the templates. Activate tonight.<br>
+        Tomorrow, prove it works. Then sell it.
+      </p>
+                  <a href="https://whop.com/zenithstudio/get-paid-to-build-n8n-workflows/" class="cta-button-green">GET THE FULL COURSE →</a>
+
+      <a href="#" class="cta-button">DOWNLOAD WORKFLOW JSON →</a>
+      <span class="cta-button-sub">Included with this post · Import-ready · Production-tested</span>
+    </div>
+
+    <div style="margin-top:1.25rem;padding:1rem;background:var(--cream2);border:1px solid var(--cream3);border-radius:6px;">
+      <p style="font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink2);line-height:1.5;text-align:center;margin:0;">
+        "The workflow works. The strategy works.<br>The only variable is whether YOU execute."
+      </p>
+    </div>
+
+    <div class="box-mindset" style="margin-top:1.5rem;">
+      <span class="box-label">Final Thought</span>
+      <p>"Not bad for a Tuesday afternoon, eh?" 😉</p>
+    </div>
+  </article>
+
+</div><!-- /spread 3 -->
+
+
+<!-- ═══ CLOSING ═══ -->
+<section class="closing-section">
+  <div class="closing-inner">
+    <div class="hero-badge" style="margin-bottom:1.25rem;border-color:var(--green-bdr);color:var(--green);background:var(--green-bg);">End of Post #01</div>
+    <h2>$50 Is Sitting on Upwork<br><em>Right Now,</em><br>Waiting for Someone to Claim It</h2>
+    <p style="margin-top:1rem;margin-bottom:1.5rem;">The client doesn't care about your resume. They care that leads stop falling through cracks. The tool is free. The market is empty. The only thing between you and that first $50 is deciding to start.</p>
+    <div style="display:flex;justify-content:center;gap:1.25rem;flex-wrap:wrap;margin-top:1.5rem;">
+      <a href="#" class="cta-button">GET THE FULL COURSE →</a>
+      <a href="#" style="display:inline-block;border:1px solid var(--cream3);color:var(--ink2);font-size:13px;padding:.7rem 1.5rem;border-radius:4px;text-decoration:none;letter-spacing:.04em;">Download Another Post</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Zenith Studio</strong> &nbsp;·&nbsp; Post #01: $50 in 40 Minutes &nbsp;·&nbsp; Case Study + Template</p>
+  <p style="margin-top:.35rem;">Build workflows. Charge money. Keep it all.</p>
+</footer>
+
 <script>
-function copyCode(button) {
-    const codeBlock = button.closest('.code-block').querySelector('code');
-    const text = codeBlock.textContent;
-    
-    navigator.clipboard.writeText(text).then(() => {
-        const originalText = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        button.style.background = 'rgba(16, 185, 129, 0.2)';
-        button.style.color = '#10b981';
-        button.style.borderColor = '#10b981';
-        
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.style.background = '';
-            button.style.color = '';
-            button.style.borderColor = '';
-        }, 2000);
-    });
-}
-
-// Smooth reveal animation on scroll
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, observerOptions);
-
-document.querySelectorAll('.content-section, .node-card, .cta-card').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
+window.addEventListener('scroll',function(){
+  var s=document.documentElement.scrollTop||document.body.scrollTop;
+  var h=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+  document.getElementById('progressBar').style.width=(s/h*100)+'%';
+});
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var t=document.querySelector(this.getAttribute('href'));
+    if(t){e.preventDefault();window.scrollTo({top:t.getBoundingClientRect().top+window.pageYOffset-60,behavior:'smooth'});}
+  });
 });
 </script>
-
 </body>
 </html>
