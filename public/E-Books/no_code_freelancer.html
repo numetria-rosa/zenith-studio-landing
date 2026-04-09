@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The $50/hr No-Code Freelancer Blueprint</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --ink:      #e8e8ec;
+  --ink2:     rgba(232,232,236,.72);
+  --ink3:     rgba(232,232,236,.5);
+  --cream:    #0a0a0c;
+  --cream2:   #111115;
+  --cream3:   #1a1a1f;
+  --cream4:   #222228;
+  --green:    #00e676;
+  --green2:   #00c853;
+  --green3:   #69f0ae;
+  --green-bg:  rgba(0,230,118,.08);
+  --green-bdr: rgba(0,230,118,.22);
+  --muted:    rgba(255,255,255,.38);
+  --muted2:   rgba(255,255,255,.22);
+  --cyan:     #00bcd4;
+  --cyan2:    #26c6da;
+  --cyan-bg:  rgba(0,188,212,.08);
+  --cyan-bdr: rgba(0,188,212,.22);
+  --amber:    #ffab00;
+  --amber-bg: rgba(255,171,0,.08);
+  --amber-bdr:rgba(255,171,0,.22);
+  --red:      #ff5252;
+  --red-bg:   rgba(255,82,82,.07);
+  --red-bdr:  rgba(255,82,82,.2);
+  --serif:    'Cormorant Garamond', Georgia, serif;
+  --sans:     'DM Sans', system-ui, sans-serif;
+  --mono:     'DM Mono', monospace;
+  --max:      720px;
+  --wide:     1100px;
+  --spread:   1500px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.75;
+  font-weight:300;
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--cream2)}
+::-webkit-scrollbar-thumb{background:var(--green);border-radius:2px}
+
+.top-nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,10,12,.92);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--cream3);
+  padding:.6rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;
+}
+.nav-title{
+  font-family:var(--mono);font-size:.85rem;
+  font-weight:500;color:var(--green);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:380px;letter-spacing:.02em;
+}
+.nav-links{display:flex;gap:1.5rem;list-style:none;flex-wrap:nowrap;overflow-x:auto;}
+.nav-links a{
+  font-size:10.5px;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);
+  text-decoration:none;white-space:nowrap;transition:color .15s;
+}
+.nav-links a:hover{color:var(--green)}
+.nav-progress{height:2px;background:var(--cream3);position:fixed;top:0;left:0;right:0;z-index:200;}
+.nav-progress-bar{height:100%;background:var(--green);width:0%;transition:width .1s;}
+
+/* ── HERO ── */
+.hero{
+  background:#06060a;color:var(--ink);
+  padding:5rem 2rem 4.5rem;
+  position:relative;overflow:hidden;text-align:center;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,230,118,.1) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 100%, rgba(0,188,212,.06) 0%, transparent 60%);
+}
+.hero::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,230,118,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,230,118,.03) 1px, transparent 1px);
+  background-size:60px 60px;pointer-events:none;
+}
+.hero-inner{position:relative;max-width:780px;margin:0 auto;}
+.hero-badge{
+  display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--green);
+  border:1px solid var(--green-bdr);background:var(--green-bg);
+  padding:5px 14px;border-radius:3px;margin-bottom:2rem;
+}
+.hero h1{
+  font-family:var(--serif);font-size:clamp(2.2rem,4.5vw,3.6rem);
+  font-weight:300;line-height:1.15;color:var(--ink);margin-bottom:1.25rem;
+}
+.hero h1 em{font-style:italic;color:var(--green3);}
+.hero h1 strong{font-weight:600;}
+.hero-sub{font-size:1rem;color:var(--ink2);max-width:560px;margin:0 auto 2rem;font-weight:300;line-height:1.7;}
+.hero-hook{
+  display:inline-block;font-family:var(--serif);font-size:1.05rem;font-style:italic;
+  color:var(--green3);padding:.9rem 1.75rem;
+  border-top:1px solid var(--green-bdr);border-bottom:1px solid var(--green-bdr);
+  margin-bottom:2rem;
+}
+.hero-meta{
+  display:flex;align-items:center;justify-content:center;
+  gap:2.5rem;flex-wrap:wrap;padding-top:1.75rem;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.hero-stat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hero-stat-num{font-family:var(--serif);font-size:1.5rem;color:var(--green3);line-height:1;}
+.hero-stat-label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+
+/* ── TOC ── */
+.toc-section{background:var(--cream2);color:var(--ink);padding:3.5rem 2rem;border-bottom:1px solid var(--cream3);}
+.toc-inner{max-width:var(--wide);margin:0 auto;}
+.section-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--green);display:block;margin-bottom:.6rem;}
+.toc-title{font-family:var(--serif);font-size:clamp(1.6rem,2.5vw,2.2rem);font-weight:400;color:var(--ink);margin-bottom:2rem;line-height:1.2;}
+.toc-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1px;background:var(--cream3);border:1px solid var(--cream3);border-radius:8px;overflow:hidden;
+}
+.toc-item{
+  background:var(--cream2);padding:.9rem 1.25rem;text-decoration:none;
+  display:flex;align-items:flex-start;gap:.85rem;transition:background .15s;
+}
+.toc-item:hover{background:var(--cream3);}
+.toc-num{font-family:var(--mono);font-size:11px;color:var(--green);min-width:26px;flex-shrink:0;margin-top:2px;}
+.toc-label{font-size:13px;color:var(--ink2);line-height:1.4;}
+.toc-item:hover .toc-label{color:var(--ink);}
+
+/* ── SPREAD LAYOUT ── */
+.spread{
+  display:grid;grid-template-columns:1fr 1fr;
+  max-width:var(--spread);margin:0 auto;
+  border-bottom:1px solid var(--cream3);
+}
+.spread-dark{
+  background:#06060a;
+}
+
+/* ── PAGE (inside spread) ── */
+.page{
+  padding:3.5rem 2.75rem;
+  border-right:1px solid var(--cream3);
+  align-self:start;
+}
+.page:last-child{border-right:none;}
+.spread-dark .page{border-right-color:var(--cream3);}
+
+.page-eyebrow{display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;}
+.pg-num{
+  font-family:var(--mono);font-size:9.5px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--green);background:var(--green-bg);
+  border:1px solid var(--green-bdr);padding:2px 7px;border-radius:3px;
+}
+.pg-theme{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+.page h2{
+  font-family:var(--serif);font-size:clamp(1.55rem,2.2vw,2rem);
+  font-weight:400;color:var(--ink);line-height:1.2;margin-bottom:.75rem;
+}
+.page h2 em{font-style:italic;color:var(--green);}
+.page h2 .cyan-hl{color:var(--cyan2);}
+.page-lead{
+  font-family:var(--serif);font-size:1.02rem;color:var(--ink);font-weight:400;
+  line-height:1.65;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--cream3);font-style:italic;
+}
+.page h3{font-family:var(--serif);font-size:1.15rem;font-weight:500;color:var(--ink);margin:1.5rem 0 .5rem;line-height:1.3;}
+p{color:var(--ink2);margin-bottom:.7rem;line-height:1.75;font-size:14px;}
+p strong{color:var(--ink);font-weight:500;}
+p em{font-style:italic;color:var(--ink);}
+ul,ol{padding-left:1.2rem;color:var(--ink2);margin-bottom:.7rem;}
+li{margin-bottom:.35rem;line-height:1.65;font-size:14px;}
+li strong{color:var(--ink);}
+
+/* ── BOXES ── */
+.box{border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;position:relative;}
+.box-label{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.4rem;display:block;}
+.box p,.box ul{margin-bottom:0;font-size:13.5px;line-height:1.6;}
+.box ul{margin-top:.3rem;}
+.box li{margin-bottom:.25rem;font-size:13.5px;}
+
+.box-green{background:var(--green-bg);border:1px solid var(--green-bdr);border-left:3px solid var(--green);}
+.box-green .box-label{color:var(--green);}
+.box-cyan{background:var(--cyan-bg);border:1px solid var(--cyan-bdr);border-left:3px solid var(--cyan2);}
+.box-cyan .box-label{color:var(--cyan2);}
+.box-amber{background:var(--amber-bg);border:1px solid var(--amber-bdr);border-left:3px solid var(--amber);}
+.box-amber .box-label{color:var(--amber);}
+.box-red{background:var(--red-bg);border:1px solid var(--red-bdr);border-left:3px solid var(--red);}
+.box-red .box-label{color:var(--red);}
+.box-surface{background:var(--cream2);border:1px solid var(--cream3);border-left:3px solid var(--green);}
+.box-surface .box-label{color:var(--green);}
+.box-dark{background:var(--cream);border:1px solid var(--cream3);border-left:3px solid var(--green);}
+.box-dark .box-label{color:var(--green);}
+
+.box-mindset{
+  background:var(--cream2);border-radius:6px;padding:1.25rem 1.5rem;
+  margin:1.5rem 0;text-align:center;border:1px solid var(--cream3);
+}
+.box-mindset .box-label{color:var(--green);margin-bottom:.6rem;}
+.box-mindset p{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink);line-height:1.5;margin:0;}
+
+/* ── COMPARISON ── */
+.compare{width:100%;border-collapse:collapse;margin:1.25rem 0;font-size:12.5px;}
+.compare th{background:var(--cream);color:var(--ink);padding:.5rem .75rem;text-align:left;font-weight:500;font-size:10px;letter-spacing:.07em;text-transform:uppercase;border:1px solid var(--cream3);}
+.compare td{padding:.45rem .75rem;border:1px solid var(--cream3);color:var(--ink2);vertical-align:top;line-height:1.45;}
+.compare tr:nth-child(even) td{background:var(--cream2);}
+.compare td:first-child{color:var(--ink);font-weight:500;}
+.compare td.good{color:var(--green);font-weight:600;}
+.compare td.bad{color:var(--red);font-weight:600;}
+
+/* ── STAT ROW ── */
+.stat-row{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--cream3);border:1px solid var(--cream3);border-radius:8px;overflow:hidden;margin:1.25rem 0;}
+.stat-card{background:var(--cream2);padding:.85rem 1rem;text-align:center;}
+.stat-n{font-family:var(--serif);font-size:1.5rem;color:var(--green);line-height:1;}
+.stat-n.cyan{color:var(--cyan2);}
+.stat-n.amber{color:var(--amber);}
+.stat-l{font-size:10.5px;color:var(--muted);margin-top:.2rem;line-height:1.35;}
+
+/* ── DIVIDER ── */
+.divider{display:flex;align-items:center;gap:.75rem;margin:1.75rem 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--cream3);}
+.divider-sym{font-family:var(--serif);font-size:1.1rem;color:var(--green);opacity:.5;}
+
+/* ── QUOTES ── */
+.pull-quote{border-left:3px solid var(--green);padding:.75rem 0 .75rem 1.25rem;margin:1.5rem 0;}
+.pull-quote p{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink);line-height:1.5;margin:0;}
+.pull-quote-cyan{border-left:3px solid var(--cyan);padding:.75rem 0 .75rem 1.25rem;margin:1.5rem 0;}
+.pull-quote-cyan p{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--cyan2);line-height:1.5;margin:0;}
+
+/* ── STEP LIST ── */
+.step-list{list-style:none;padding:0;margin:.75rem 0 1.25rem;}
+.step-list li{display:flex;gap:.75rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--cream3);font-size:13.5px;line-height:1.55;}
+.step-list li:last-child{border-bottom:none;}
+.step-num{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--green);background:var(--green-bg);border:1px solid var(--green-bdr);padding:2px 6px;border-radius:3px;flex-shrink:0;margin-top:1px;}
+.step-num.cyan{color:var(--cyan2);background:var(--cyan-bg);border:1px solid var(--cyan-bdr);}
+.step-num.amber{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-bdr);}
+
+/* ── MONEY CARD ── */
+.money-card{background:var(--cream2);border:1px solid var(--green-bdr);border-radius:8px;padding:1.25rem 1.5rem;margin:1.25rem 0;text-align:center;}
+.money-card .money-num{font-family:var(--serif);font-size:2.4rem;color:var(--green);font-weight:600;line-height:1;}
+.money-card .money-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-top:.4rem;font-family:var(--mono);}
+.money-card .money-sub{font-size:12.5px;color:var(--ink2);margin-top:.4rem;}
+
+/* ── WORKFLOW DIAGRAM ── */
+.workflow{background:var(--cream);border-radius:8px;padding:1.25rem;margin:1.25rem 0;overflow-x:auto;border:1px solid var(--cream3);}
+.workflow-title{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--cream3);}
+.wf-flow{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem;}
+.wf-node{background:var(--cream2);border:1px solid var(--cream3);border-radius:5px;padding:.4rem .75rem;font-size:11.5px;color:var(--ink);font-weight:400;white-space:nowrap;}
+.wf-node.trigger{border-color:var(--green-bdr);color:var(--green3);background:var(--green-bg);}
+.wf-node.action{border-color:var(--cyan-bdr);color:var(--cyan2);background:var(--cyan-bg);}
+.wf-node.money{border-color:var(--green-bdr);color:var(--green);background:rgba(0,230,118,.12);font-weight:600;font-size:13px;}
+.wf-node.warn{border-color:var(--amber-bdr);color:var(--amber);background:var(--amber-bg);}
+.wf-arrow{font-size:13px;color:var(--muted);flex-shrink:0;}
+
+/* ── VISUAL TAG ── */
+.visual-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--cream2);border:1px dashed var(--cream3);padding:3px 9px;border-radius:3px;margin:.6rem 0 1rem;}
+
+/* ── TERMINAL ── */
+.terminal{background:#06060a;border:1px solid var(--cream3);border-radius:6px;padding:1rem 1.25rem;margin:1.25rem 0;font-family:var(--mono);font-size:11.5px;line-height:1.75;overflow-x:auto;}
+.terminal .t-prompt{color:var(--green);}
+.terminal .t-cmd{color:var(--ink);}
+.terminal .t-output{color:var(--ink3);}
+.terminal .t-money{color:var(--green3);font-weight:500;}
+.terminal .t-label{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--cream3);display:block;}
+
+/* ── CTA ── */
+.cta-button{
+  display:inline-block;background:var(--green);color:#06060a;
+  font-family:var(--sans);font-weight:700;font-size:14px;
+  letter-spacing:.04em;padding:1rem 2.5rem;border-radius:5px;
+  text-decoration:none;margin-top:1.75rem;transition:background .15s, transform .15s, box-shadow .15s;
+  border:2px solid var(--green);
+}
+.cta-button:hover{background:var(--green3);border-color:var(--green3);transform:translateY(-2px);box-shadow:0 0 30px rgba(0,230,118,.25);}
+.cta-button-sub{display:block;font-size:10.5px;font-weight:400;letter-spacing:.05em;color:var(--muted);margin-top:.6rem;font-family:var(--mono);}
+
+/* ── CLOSING ── */
+.closing-section{background:#06060a;padding:4rem 2rem;text-align:center;border-top:1px solid var(--cream3);}
+.closing-inner{max-width:600px;margin:0 auto;}
+.closing-section h2{font-family:var(--serif);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:300;color:var(--ink);line-height:1.25;margin-bottom:1rem;}
+.closing-section h2 em{font-style:italic;color:var(--green3);}
+.closing-section p{color:var(--ink2);font-size:14.5px;line-height:1.75;}
+
+/* ── FOOTER ── */
+footer{background:#040408;padding:2rem 2rem;text-align:center;border-top:1px solid var(--cream3);}
+footer p{font-size:11.5px;color:var(--muted2);letter-spacing:.04em;}
+footer strong{color:var(--muted);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .spread{grid-template-columns:1fr;}
+  .page{border-right:none!important;border-bottom:1px solid var(--cream3);}
+  .page:last-child{border-bottom:none;}
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:700px){
+  .top-nav{padding:.5rem 1.25rem;}
+  .nav-links{display:none;}
+  .hero{padding:3.5rem 1.5rem 3rem;}
+  .toc-section{padding:2.5rem 1.5rem;}
+  .page{padding:2.75rem 1.5rem;}
+  .wf-flow{gap:.3rem;}
+  .wf-node{font-size:10.5px;padding:.35rem .6rem;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="nav-progress"><div class="nav-progress-bar" id="progressBar"></div></div>
+
+<nav class="top-nav">
+  <span class="nav-title">› The $50/hr No-Code Freelancer Blueprint</span>
+  <ul class="nav-links">
+    <li><a href="#toc">Contents</a></li>
+    <li><a href="#page1">Hook</a></li>
+    <li><a href="#page2">Selling</a></li>
+    <li><a href="#page3">Math</a></li>
+    <li><a href="#page4">Clients</a></li>
+    <li><a href="#page5">Fulfillment</a></li>
+    <li><a href="#page6">Course</a></li>
+  </ul>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Freelancer Blueprint · 2026 Edition</div>
+    <h1>The <em>$50/HR</em> No-Code<br><strong>Freelancer Blueprint</strong></h1>
+    <p class="hero-sub">No coding. No degree. No experience needed. Just a laptop, a free tool, and the willingness to connect two apps together for money.</p>
+    <div class="hero-hook">"The businesses paying $50–$150/hr for this don't care about your credentials. They care that the problem goes away."</div>
+    <div class="hero-meta">
+      <div class="hero-stat"><span class="hero-stat-num">$50/hr</span><span class="hero-stat-label">Starting Rate</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">$0</span><span class="hero-stat-label">Upfront Cost</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">5 hrs</span><span class="hero-stat-label">Per Average Gig</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">1 wk</span><span class="hero-stat-label">To First Client</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TOC ═══ -->
+<section class="toc-section" id="toc">
+  <div class="toc-inner">
+    <span class="section-label">What's Inside</span>
+    <h2 class="toc-title">The Blueprint</h2>
+    <div class="toc-grid">
+      <a href="#page1" class="toc-item"><span class="toc-num">01</span><span class="toc-label">The Hidden Economy of Connecting Apps</span></a>
+      <a href="#page2" class="toc-item"><span class="toc-num">02</span><span class="toc-label">What Exactly Are You Selling?</span></a>
+      <a href="#page3" class="toc-item"><span class="toc-num">03</span><span class="toc-label">The Math: How $50/hr Actually Works</span></a>
+      <a href="#page4" class="toc-item"><span class="toc-num">04</span><span class="toc-label">Client Acquisition: Get Your First Gig This Week</span></a>
+      <a href="#page5" class="toc-item"><span class="toc-num">05</span><span class="toc-label">The Fulfillment Secret: n8n</span></a>
+      <a href="#page6" class="toc-item"><span class="toc-num">→</span><span class="toc-label">Don't Learn From YouTube Tutorials</span></a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SPREAD 1: PAGE 1 + PAGE 2
+═══════════════════════════════════════ -->
+<div class="spread">
+
+  <!-- PAGE 1 -->
+  <article class="page" id="page1">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 01</span>
+      <span class="pg-theme">The Opportunity</span>
+    </div>
+    <h2>The <em>"Hidden"</em> Economy of Connecting Apps</h2>
+    <p class="page-lead">There's an entire economy running beneath the surface of the internet that most people have no idea exists. It doesn't require a degree. It doesn't require code. It pays $50–$150 per hour. And there are far more people who need the work than people who can do it.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Minimal flow diagram in glowing green lines — lead form icon → "n8n" node → Google Sheets icon → "$50" badge. Faded rows repeating below, suggesting scale. Subtle grid/scanline overlay. Hacker dashboard meets income report.]</div>
+
+    <p>Here's what's happening, right now, every single day:</p>
+
+    <p>A real estate agency gets 40 leads per day from their website. Those leads sit in a form. Nobody follows up for 3 days. By then, 60% have chosen a competitor. They need someone to make every new lead automatically go into their CRM and trigger a follow-up email within 60 seconds.</p>
+
+    <p>An e-commerce store gets 200 orders per day. Someone manually copies each order into a spreadsheet, then into shipping software, then sends a confirmation. It takes 4 hours per day. They need someone to automate that entire chain.</p>
+
+    <p>A coaching business manually schedules calls, sends reminders, updates their calendar. 10 hours per week on logistics instead of coaching. They need someone to fix it.</p>
+
+    <p><strong>These businesses have money. They have a problem. They need someone to solve it.</strong></p>
+
+    <p>And the solution — in every case — is the same: connect two or more apps together so data flows automatically. A form talks to a spreadsheet. A spreadsheet talks to an email tool. A payment processor talks to a CRM. That's it. That's the entire job.</p>
+
+    <div class="workflow">
+      <div class="workflow-title">The Simplest Money-Making Flow on the Internet</div>
+      <div class="wf-flow">
+        <span class="wf-node trigger">New lead submits form</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">n8n catches it</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">Sends to Sheets</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">Triggers email</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node money">$250</span>
+      </div>
+      <p style="color:var(--ink3);font-size:11px;margin-top:.75rem;">5 inputs. 4 connections. One payment. No code required.</p>
+    </div>
+
+    <h3>Why This Is "Hidden"</h3>
+    <p>Nobody talks about it. Not the way they talk about dropshipping or crypto or AI prompts. Automation freelancing isn't sexy. It's just quiet, reliable money.</p>
+
+    <p>The people doing this work don't post about it on Twitter. They find a client, build a workflow, collect $250–$2,500, and move on. It's boring in the best possible way.</p>
+
+    <h3>The Supply-Demand Gap</h3>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-n">71%</div><div class="stat-l">of businesses say automation is "top priority"</div></div>
+      <div class="stat-card"><div class="stat-n">4.2M</div><div class="stat-l">U.S. businesses with 1-10 employees</div></div>
+      <div class="stat-card"><div class="stat-n">&lt;2%</div><div class="stat-l">of freelancers offer this service</div></div>
+      <div class="stat-card"><div class="stat-n">0</div><div class="stat-l">years of coding required</div></div>
+    </div>
+
+    <p>Millions of businesses need this. Almost no freelancers offer it. The gap isn't favorable — it's absurd.</p>
+
+    <div class="box box-green">
+      <span class="box-label">The Opportunity</span>
+      <p><strong>This isn't a "side hustle" in the traditional sense.</strong> Side hustles compete on price in crowded markets. This is a service in an almost-empty market where budgets are already allocated and the skill barrier is lower than learning Instagram. You're walking into an empty restaurant with a kitchen full of food.</p>
+    </div>
+
+    <div class="box-mindset">
+      <span class="box-label">Mindset Shift</span>
+      <p>"You don't need to be the best. You need to be the person who shows up, understands the problem, and solves it. In this market, that alone puts you ahead of 95%."</p>
+    </div>
+  </article>
+
+  <!-- PAGE 2 -->
+  <article class="page" id="page2">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 02</span>
+      <span class="pg-theme">The Product</span>
+    </div>
+    <h2>What Exactly Are You <em>Selling?</em></h2>
+    <p class="page-lead">Here's what trips people up. They hear "freelance automation" and think they need to sell something complicated. They don't. You're not selling software. You're not selling code. You're selling one thing: time.</p>
+
+    <div class="visual-tag">[Visual: Split-screen. LEFT: stressed person at desk, 11pm clock, coffee cups — "BEFORE: 4 hrs/day." RIGHT: same person relaxed, green checkmark, 5pm — "AFTER: 0 hrs." Big green "$250" bridging both. Dark bg, green/cyan glow on "after."]</div>
+
+    <p>Every business owner drowns in tasks that take time but don't require thinking. Copying data between apps. Sending the same email repeatedly. Updating spreadsheets by hand. Forwarding information to the right person.</p>
+
+    <p>They know these tasks are stupid. They know they shouldn't be doing them. But they tried to "automate" once, got lost in Zapier's interface, hit a paywall, and gave up.</p>
+
+    <p><strong>You're selling the result: "I will make this task disappear from your life forever."</strong></p>
+
+    <p>You're not selling a workflow. You're not selling n8n. You're selling the feeling of logging in Monday morning and finding that the thing you dreaded has already been done — automatically, while you slept.</p>
+
+    <h3>Three Automations Clients Pay For</h3>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Automation #1 — Lead Capture to CRM</span>
+      <p><strong>Problem:</strong> Leads sit in a form inbox. Nobody follows up fast. Revenue lost.</p>
+      <p><strong>What you build:</strong> Form submission → CRM entry → 60-second follow-up email → owner notification. All automatic.</p>
+      <p><strong>Charge:</strong> <span style="color:var(--green);font-weight:600;">$250–$500</span> basic. $1,000+ with AI qualification.</p>
+    </div>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Automation #2 — Order Processing</span>
+      <p><strong>Problem:</strong> Manual invoice creation, spreadsheet updates, confirmation emails per order. 2-4 hours per day.</p>
+      <p><strong>What you build:</strong> Payment received → invoice generated → sheet updated → confirmation sent → receipt logged.</p>
+      <p><strong>Charge:</strong> <span style="color:var(--green);font-weight:600;">$500–$1,500</span> depending on complexity.</p>
+    </div>
+
+    <div class="box box-surface">
+      <span class="box-label">Automation #3 — Content Repurposing</span>
+      <p><strong>Problem:</strong> 3 hours manually resizing and reposting one piece of content to 5 platforms.</p>
+      <p><strong>What you build:</strong> Publish once → AI reformats → auto-posts to LinkedIn, Twitter, newsletter, blog on schedule.</p>
+      <p><strong>Charge:</strong> <span style="color:var(--green);font-weight:600;">$500–$2,000</span> (content automations command premium pricing).</p>
+    </div>
+
+    <h3>The Pattern</h3>
+    <p>None require building software. None require code. None require understanding APIs technically. They all follow: <strong>When [A happens], automatically do [B, C, D].</strong></p>
+
+    <p>A child could understand the logic. The only thing between you and getting paid is knowing which tool to use and how to click the right buttons.</p>
+
+    <div class="pull-quote">
+      <p>"You're not selling automations. You're selling the absence of a problem. 'I will make this thing you hate doing go away forever.' That sentence is worth $250 minimum."</p>
+    </div>
+
+    <div class="box box-amber">
+      <span class="box-label">Common Mistake</span>
+      <p><strong>Don't sell the tool. Sell the result.</strong> Clients don't care about n8n. They care about not copy-pasting lead data at 11pm on a Friday. Talk about their problem. The tool is just how you solve it — they never need to know its name.</p>
+    </div>
+  </article>
+
+</div><!-- /spread 1 -->
+
+
+<!-- ══════════════════════════════════════
+     SPREAD 2: PAGE 3 + PAGE 4
+═══════════════════════════════════════ -->
+<div class="spread">
+
+  <!-- PAGE 3 -->
+  <article class="page" id="page3">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 03</span>
+      <span class="pg-theme">The Numbers</span>
+    </div>
+    <h2>The Math: How <em>$50/HR</em> Actually Works</h2>
+    <p class="page-lead">People hear "$50 per hour" and assume there's a catch. There isn't. The math is embarrassingly simple. Real numbers from real projects.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Terminal-style readout in green monospace — "$250 ÷ 5 hours = $50/hr" large and glowing. Below: "$2,500 ÷ 5 hours = $500/hr" even bigger green glow. Hacker terminal meets income calculator.]</div>
+
+    <div class="terminal">
+      <span class="t-label">freelancer_math.sh</span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat project_breakdown.txt</span>
+
+<span class="t-output">Project: Lead Capture → CRM → Email</span>
+<span class="t-output">Client:  Local real estate agency</span>
+
+<span class="t-output">─── TIME ───</span>
+<span class="t-output">Client call &amp; requirements: <span class="t-money">45 min</span></span>
+<span class="t-output">Build workflow in n8n:      <span class="t-money">2.5 hrs</span></span>
+<span class="t-output">Test &amp; debug:               <span class="t-money">1 hr</span></span>
+<span class="t-output">Deploy &amp; handoff:           <span class="t-money">30 min</span></span>
+<span class="t-output">──────────────────────────────</span>
+<span class="t-output">Total:                     <span class="t-money">5 hours</span></span>
+
+<span class="t-output">─── REVENUE ───</span>
+<span class="t-output">Flat fee:                   <span class="t-money">$250</span></span>
+
+<span class="t-prompt">$</span> <span class="t-cmd">echo "250 / 5"</span>
+<span class="t-money">$50/hr</span>
+
+<span class="t-output">─── BONUS: REUSE ───</span>
+<span class="t-output">Same workflow × 10 clients:</span>
+<span class="t-prompt">$</span> <span class="t-cmd">echo "250 × 10"</span>
+<span class="t-money">$2,500</span>
+<span class="t-prompt">$</span> <span class="t-cmd">echo "2500 / 5"</span>
+<span class="t-money">$500/hr</span>
+    </div>
+
+    <h3>Two Levers</h3>
+
+    <p><strong>Lever 1: Flat Fee Pricing.</strong> You never quote hourly. You quote a flat fee based on the result's value. "I'll build you a lead capture automation. $250." The client doesn't care if it takes 5 hours or 5 minutes. The result — instant follow-up, higher conversions, hours eliminated — is worth far more. You're undercharging.</p>
+
+    <p><strong>Lever 2: The Template Effect.</strong> The second time you build the same workflow, it takes 25% of the original time. The fifth time, 15%. After that, you're copy-pasting a template, changing credentials, hitting "activate." You still charge $250.</p>
+
+    <div class="money-card">
+      <div class="money-num">$2,500</div>
+      <div class="money-label">Selling the same template 10 times</div>
+      <div class="money-sub">5 hrs to build once → 2 hrs to customize for 10 clients → $357/hr effective</div>
+    </div>
+
+    <h3>The Income Trajectory</h3>
+
+    <table class="compare">
+      <thead>
+        <tr><th>Phase</th><th>Gigs/Mo</th><th>Fee</th><th>Hrs/Gig</th><th>Income</th><th>$/hr</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Month 1-2</td><td>2</td><td>$250</td><td>5</td><td>$500</td><td>$50</td></tr>
+        <tr><td>Month 3-4</td><td>4</td><td>$350</td><td>3</td><td>$1,400</td><td>$117</td></tr>
+        <tr><td>Month 5-6</td><td>6</td><td>$500</td><td>2</td><td>$3,000</td><td>$250</td></tr>
+        <tr><td>Month 6+</td><td>4</td><td>$1,500</td><td>3</td><td>$6,000</td><td>$500</td></tr>
+      </tbody>
+    </table>
+
+    <div class="pull-quote-cyan">
+      <p>"The richest automation freelancers aren't the most technical. They're the ones who built the best templates and sold them 50 times."</p>
+    </div>
+
+    <div class="box box-green">
+      <span class="box-label">The Point</span>
+      <p><strong>$50/hr is the floor, not the ceiling.</strong> It's day-one pricing with zero experience. People at one year charge $100-200/hr. At two years, they sell packages for $5,000-15,000. They started exactly where you're starting.</p>
+    </div>
+  </article>
+
+  <!-- PAGE 4 -->
+  <article class="page" id="page4">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 04</span>
+      <span class="pg-theme">Getting Clients</span>
+    </div>
+    <h2>Get Your First Gig <em>This Week</em></h2>
+    <p class="page-lead">No website. No portfolio. No testimonials. No business cards. You need one thing: a profile where businesses are already searching for what you do.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Mock browser showing Upwork search — "Zapier automation" — with 3 job listings highlighted in green, budgets $200-500. Next to it: Fiverr gig card with green "Order Now." Red arrows pointing to money. Clean, minimalist.]</div>
+
+    <h3>The Step-by-Step</h3>
+
+    <ol class="step-list">
+      <li>
+        <span class="step-num">01</span>
+        <div><strong>Upwork profile.</strong> Title: "Workflow Automation Specialist | n8n | Zapier Alternative." Bio: "I help businesses automate repetitive tasks by connecting apps together using n8n — a free, powerful alternative to Zapier." Add a photo. Done.</div>
+      </li>
+      <li>
+        <span class="step-num">02</span>
+        <div><strong>Fiverr gig.</strong> Title: "I will automate your workflows using n8n." Basic $250 (one workflow, 3 steps). Standard $500 (6 steps + testing). Premium $1,000 (full system). Delivery: 3 days.</div>
+      </li>
+      <li>
+        <span class="step-num">03</span>
+        <div><strong>Search jobs.</strong> Search: "Zapier automation," "connect apps," "automate workflow," "data entry automation," "lead capture automation," "Google Sheets automation." Thousands of active jobs. $50-$2,000 budgets.</div>
+      </li>
+      <li>
+        <span class="step-num">04</span>
+        <div><strong>Apply to 20 jobs. Today.</strong> Not tomorrow. Not "when ready." Today. Use the template below. Every single time.</div>
+      </li>
+    </ol>
+
+    <div class="box box-surface">
+      <span class="box-label">Exact Proposal Template</span>
+      <p style="font-style:italic;color:var(--ink);">"Hi [Name], I saw you need to connect your Typeform leads to HubSpot and send automatic follow-up emails. I can build this in n8n — a free, self-hosted tool that does everything Zapier does but with no monthly fees. The workflow triggers on form submission, adds the contact to HubSpot, and sends a personalized email within 60 seconds. I can deliver in 2-3 days for $250. Want to hop on a quick call?"</p>
+    </div>
+
+    <h3>Why This Beats 90% of Proposals</h3>
+    <p>Most freelancers send generic copy-paste: "I have 5 years experience" and "I deliver quality work." Trashed instantly. Your proposal names their exact problem, exact tool, exact outcome, exact price. <strong>You sound like a human who read their posting.</strong> Top 5% instantly.</p>
+
+    <h3>The n8n Advantage in Proposals</h3>
+    <p>When you mention n8n, something powerful happens. Many clients already hate paying Zapier $299/month. Saying "I use n8n — free to run" means <strong>you're selling a way to eliminate a bill they already hate.</strong> That's not competing with Zapier freelancers. That's offering an upgrade at lower cost.</p>
+
+    <div class="pull-quote">
+      <p>"This proposal template has closed over $40,000 in projects. Not because it's clever — because it's specific. Problem, tool, outcome, price. That's all a client needs."</p>
+    </div>
+
+    <div class="box box-amber">
+      <span class="box-label">Warning</span>
+      <p><strong>Don't lie about experience.</strong> Don't say "I've built 50 automations" if you've built zero. Say "I specialize in n8n workflow automation" — true the moment you decide to. Clients care whether you can solve their problem, not your track record. Your first client doesn't need to know they're your first.</p>
+    </div>
+
+    <div class="box box-green">
+      <span class="box-label">If Nobody Responds</span>
+      <p>They will. But if zero responses after 20: add a profile photo, lower to $150 for the first gig, or stick to simpler projects ("connect form to spreadsheet"). People who fail apply to 3 jobs and quit. People who succeed apply to 20, close 1-2, and refine. <strong>Volume cures everything.</strong></p>
+    </div>
+  </article>
+
+</div><!-- /spread 2 -->
+
+
+<!-- ══════════════════════════════════════
+     SPREAD 3: PAGE 5 + PAGE 6
+═══════════════════════════════════════ -->
+<div class="spread spread-dark">
+
+  <!-- PAGE 5 -->
+  <article class="page" id="page5">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 05</span>
+      <span class="pg-theme">The Secret Weapon</span>
+    </div>
+    <h2>n8n Is Your <em>100% Profit Machine</em></h2>
+    <p class="page-lead">This is what makes automation freelancing different from every other skill. When you design websites, you pay for hosting. When you run ads, you pay for spend. When you build with n8n, you pay nothing. The client's $250 goes directly into your pocket.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Profit-flow diagram. "Client pays $250" green box → "n8n builds workflow" with "$0 tool cost" → "You keep $250" big green box. Faded comparison: "Zapier freelancer" shows "$49 fee deducted = $201." n8n feels like an unfair advantage.]</div>
+
+    <h3>Why Other Models Leak Money</h3>
+    <p>Web designers pay $20/mo hosting + $15 design tool + $10 stock photos. Marketers pay ad spend out of pocket. Over a year, $50/mo in tool costs = $600. That's 2.5 projects you worked for free just to cover tools.</p>
+
+    <p>n8n eliminates this. Self-hosted. $5-10/mo server (or your own computer). No per-task fees. No subscriptions. No limits. Build 10 or 10,000 workflows. Same cost.</p>
+
+    <table class="compare">
+      <thead>
+        <tr><th>Metric</th><th>Zapier Freelancer</th><th>n8n Freelancer</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Tool cost per project</td><td class="bad">$0–$49</td><td class="good">$0</td></tr>
+        <tr><td>Monthly subscription</td><td class="bad">$0–$299/mo</td><td class="good">$0</td></tr>
+        <tr><td>Execution limits</td><td class="bad">Pay to increase</td><td class="good">Unlimited</td></tr>
+        <tr><td>Profit on $250 project</td><td class="bad">80–99%</td><td class="good">96–100%</td></tr>
+        <tr><td>Client locked into bill?</td><td class="bad">Yes ($299/mo)</td><td class="good">No ($0/mo)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="money-card">
+      <div class="money-num">100%</div>
+      <div class="money-label">Profit margin on every project</div>
+      <div class="money-sub">Client pays $250. Tool costs $0. You keep $250.</div>
+    </div>
+
+    <h3>"Sell Once, Run Forever"</h3>
+    <p>When you build a Zapier workflow, the client inherits a $299/mo dependency. With n8n, the workflow runs on infrastructure costing pennies. <strong>You're not selling a dependency — you're selling freedom.</strong></p>
+
+    <p>"I'll automate your lead follow-up, and unlike Zapier, there's no $299/month to maintain it. It runs for free." That sentence closes deals.</p>
+
+    <div class="workflow">
+      <div class="workflow-title">Scaling Model: One Instance, Unlimited Clients</div>
+      <div class="wf-flow">
+        <span class="wf-node trigger">Client 1: $250</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">n8n Instance</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node money">$250</span>
+      </div>
+      <div style="margin:.4rem 0;">
+        <div class="wf-flow">
+          <span class="wf-node trigger">Client 5: $350</span>
+          <span class="wf-arrow">→</span>
+          <span class="wf-node action">Same Instance</span>
+          <span class="wf-arrow">→</span>
+          <span class="wf-node money">$350</span>
+        </div>
+      </div>
+      <div style="margin-top:.75rem;padding-top:.6rem;border-top:1px solid var(--cream3);">
+        <p style="color:var(--green);font-family:var(--mono);font-size:12px;margin:0;">
+          10 clients × $375 avg = $3,750/mo<br>
+          Tool cost: $5-10/mo (server)<br>
+          Profit margin: 99.7%
+        </p>
+      </div>
+    </div>
+
+    <div class="pull-quote-cyan">
+      <p>"n8n isn't just a tool. It's a business model. Zero marginal cost per client means every new project is almost pure profit. Name another freelance skill like that."</p>
+    </div>
+  </article>
+
+  <!-- PAGE 6 -->
+  <article class="page" id="page6">
+    <div class="page-eyebrow">
+      <span class="pg-num" style="background:rgba(0,230,118,.15);">Page 06</span>
+      <span class="pg-theme" style="color:var(--muted);">The Decision</span>
+    </div>
+    <h2>Don't Learn From <em>YouTube Tutorials.</em></h2>
+    <p class="page-lead">You could find 200 n8n tutorials on YouTube. Free. Watch them all. In 2-3 months, after piecing together fragmented info, fighting outdated interfaces, quitting three times — you might kind of know how to build something.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Two paths. LEFT "YouTube": winding broken gray/red road, "3 months" calendar, "$0 earned." RIGHT "Course": straight green-lit road, "4 hours" calendar, "$250 earned." Choice feels painfully obvious.]</div>
+
+    <p><strong>Or skip all of that.</strong></p>
+
+    <p>YouTube tutorials teach features, not the mental model. They don't teach what to build for clients, how to price, how to deliver. A 12-minute video about connecting Gmail to Sheets isn't education — it's entertainment dressed up as education.</p>
+
+    <h3>What "Free" Actually Costs You</h3>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-n amber">2-3 mo</div><div class="stat-l">to piece together real knowledge</div></div>
+      <div class="stat-card"><div class="stat-n amber">$0</div><div class="stat-l">earned during that time</div></div>
+      <div class="stat-card"><div class="stat-n amber">$1,500</div><div class="stat-l">missed income (6 gigs × $250)</div></div>
+      <div class="stat-card"><div class="stat-n amber">3×</div><div class="stat-l">times you'll quit and restart</div></div>
+    </div>
+
+    <p><strong>"Free" YouTube costs you $1,500 and 3 months.</strong></p>
+
+    <div class="divider"><span class="divider-sym">◆</span></div>
+
+    <h2 style="font-size:clamp(1.4rem,2vw,1.75rem);">n8n Full Course:<br><em>From $0 to $50/hr</em></h2>
+
+    <ol class="step-list" style="margin-top:1rem;">
+      <li><span class="step-num">01</span><div><strong>Install n8n in 15 min</strong> — click-for-click, no terminal needed</div></li>
+      <li><span class="step-num">02</span><div><strong>The Mental Model</strong> — triggers, nodes, data flow. The piece YouTube never covers</div></li>
+      <li><span class="step-num">03</span><div><strong>5 Money-Making Workflows</strong> — real client projects, not toy examples</div></li>
+      <li><span class="step-num">04</span><div><strong>AI Integration</strong> — what separates $250 gigs from $1,000+ gigs</div></li>
+      <li><span class="step-num">05</span><div><strong>Client Acquisition Playbook</strong> — the exact proposal, pricing, and platform strategy</div></li>
+      <li><span class="step-num">06</span><div><strong>Template Library</strong> — copy, paste, customize, deliver. The $500/hr lever</div></li>
+      <li><span class="step-num">07</span><div><strong>Pricing & Scaling</strong> — $250 gigs → $1,500 packages → monthly retainers</div></li>
+    </ol>
+
+    <div style="border:1px solid var(--green-bdr);border-radius:8px;padding:1.25rem;margin:1.25rem 0;text-align:center;background:var(--green-bg);">
+      <p style="font-family:var(--serif);font-size:1.15rem;font-style:italic;color:var(--green3);line-height:1.5;margin-bottom:.75rem;">
+        "By hour 4, you will have the skills<br>to fulfill a $250 gig."
+      </p>
+      <p style="font-size:12.5px;color:var(--ink2);line-height:1.5;margin:0;">
+        Course costs less than your first project pays.<br>
+        <strong style="color:var(--ink);">Every project after that is 100% income.</strong>
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.25rem 0;">
+      <div style="background:var(--red-bg);border:1px solid var(--red-bdr);border-radius:6px;padding:1rem;">
+        <div style="color:var(--red);font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">YouTube</div>
+        <ul style="padding-left:.75rem;margin:0;">
+          <li style="color:var(--ink2);font-size:12px;margin-bottom:.25rem;">2-3 months fragmented</li>
+          <li style="color:var(--ink2);font-size:12px;margin-bottom:.25rem;">No mental model</li>
+          <li style="color:var(--ink2);font-size:12px;margin-bottom:.25rem;">$0 earned</li>
+          <li style="color:var(--red);font-size:12px;font-weight:500;">You quit. Again.</li>
+        </ul>
+      </div>
+      <div style="background:var(--green-bg);border:1px solid var(--green-bdr);border-radius:6px;padding:1rem;">
+        <div style="color:var(--green);font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;">Course</div>
+        <ul style="padding-left:.75rem;margin:0;">
+          <li style="color:var(--ink2);font-size:12px;margin-bottom:.25rem;">4 hrs to first skill</li>
+          <li style="color:var(--ink2);font-size:12px;margin-bottom:.25rem;">Complete mental model</li>
+          <li style="color:var(--ink2);font-size:12px;margin-bottom:.25rem;">$250 earned week 1</li>
+          <li style="color:var(--green);font-size:12px;font-weight:500;">You're a freelancer.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin:1.5rem 0;padding:1.5rem 1.25rem;background:var(--cream);border:2px solid var(--green-bdr);border-radius:8px;text-align:center;">
+      <p style="font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:.75rem;">Your Move</p>
+      <p style="font-family:var(--serif);font-size:1rem;color:var(--ink2);line-height:1.6;margin-bottom:1.25rem;">
+        Keep scrolling YouTube. Keep leaving money on the table.<br>Or decide right now.
+      </p>
+      <a href="#" class="cta-button">YES! GIVE ME THE SKILLS TO CHARGE $50/HR</a>
+      <span class="cta-button-sub">One-time payment · Skills by hour 4 · First gig by end of week</span>
+    </div>
+
+    <div style="margin-top:1.25rem;padding:1rem;background:var(--cream2);border:1px solid var(--cream3);border-radius:6px;">
+      <p style="font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink2);line-height:1.5;text-align:center;margin:0;">
+        "The market doesn't reward people who know about the opportunity.<br>It rewards people who act on it."
+      </p>
+    </div>
+  </article>
+
+</div><!-- /spread 3 -->
+
+
+<!-- ═══ CLOSING ═══ -->
+<section class="closing-section">
+  <div class="closing-inner">
+    <div class="hero-badge" style="margin-bottom:1.25rem;border-color:var(--green-bdr);color:var(--green);background:var(--green-bg);">End of Blueprint</div>
+    <h2>$250 is sitting on Upwork<br><em>right now,</em><br>waiting for someone to claim it.</h2>
+    <p style="margin-top:1rem;margin-bottom:1.5rem;">The client doesn't care about your resume. They care that leads stop falling through cracks. The tool is free. The market is empty. The only thing between you and that first $250 is deciding to learn.</p>
+    <div style="display:flex;justify-content:center;gap:1.25rem;flex-wrap:wrap;margin-top:1.5rem;">
+      <a href="#page6" style="display:inline-block;background:var(--green);color:#06060a;font-weight:700;font-size:13px;padding:.7rem 1.5rem;border-radius:4px;text-decoration:none;letter-spacing:.04em;">Get the Course →</a>
+      <a href="#page1" style="display:inline-block;border:1px solid var(--cream3);color:var(--ink2);font-size:13px;padding:.7rem 1.5rem;border-radius:4px;text-decoration:none;letter-spacing:.04em;">Read from the beginning</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>The $50/hr No-Code Freelancer Blueprint</strong> &nbsp;·&nbsp; From Zero to Paid &nbsp;·&nbsp; 2026</p>
+  <p style="margin-top:.35rem;">Build workflows. Charge money. Keep it all.</p>
+</footer>
+
+<script>
+window.addEventListener('scroll',function(){
+  var s=document.documentElement.scrollTop||document.body.scrollTop;
+  var h=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+  document.getElementById('progressBar').style.width=(s/h*100)+'%';
+});
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var t=document.querySelector(this.getAttribute('href'));
+    if(t){e.preventDefault();window.scrollTo({top:t.getBoundingClientRect().top+window.pageYOffset-60,behavior:'smooth'});}
+  });
+});
+</script>
+</body>
+</html>
