@@ -7,6 +7,10 @@
     {
       "source": "/ebook/ai_automation",
       "destination": "/E-Books/ai_automation_playbook.html"
+    },
+    {
+      "source": "/posts/:slug",
+      "destination": "/posts/:slug.html"
     }
   ]
 }
