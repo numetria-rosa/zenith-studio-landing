@@ -8,30 +8,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-  --ink:      #e8e8ec;
-  --ink2:     rgba(232,232,236,.72);
-  --ink3:     rgba(232,232,236,.5);
-  --cream:    #0a0a0c;
-  --cream2:   #111115;
-  --cream3:   #1a1a1f;
-  --cream4:   #222228;
-  --green:    #00e676;
-  --green2:   #00c853;
-  --green3:   #69f0ae;
-  --green-bg:  rgba(0,230,118,.08);
-  --green-bdr: rgba(0,230,118,.22);
-  --muted:    rgba(255,255,255,.38);
-  --muted2:   rgba(255,255,255,.22);
-  --cyan:     #00bcd4;
-  --cyan2:    #26c6da;
-  --cyan-bg:  rgba(0,188,212,.08);
-  --cyan-bdr: rgba(0,188,212,.22);
-  --amber:    #ffab00;
-  --amber-bg: rgba(255,171,0,.08);
-  --amber-bdr:rgba(255,171,0,.22);
-  --red:      #ff5252;
-  --red-bg:   rgba(255,82,82,.07);
-  --red-bdr:  rgba(255,82,82,.2);
+  --ink:      #e4e4e7;
+  --ink2:     rgba(228,228,231,.72);
+  --ink3:     rgba(228,228,231,.5);
+  --cream:    #09090b;
+  --cream2:   #111113;
+  --cream3:   #18181b;
+  --cream4:   #27272a;
+  --green:    #a78bfa;
+  --green2:   #8b5cf6;
+  --green3:   #c4b5fd;
+  --green-bg:  rgba(167,139,250,.1);
+  --green-bdr: rgba(167,139,250,.25);
+  --muted:    rgba(255,255,255,.40);
+  --muted2:   rgba(255,255,255,.24);
+  --cyan:     #22d3ee;
+  --cyan2:    #67e8f9;
+  --cyan-bg:  rgba(34,211,238,.08);
+  --cyan-bdr: rgba(34,211,238,.25);
+  --amber:    #fbbf24;
+  --amber-bg: rgba(251,191,36,.08);
+  --amber-bdr:rgba(251,191,36,.25);
+  --red:      #f87171;
+  --red-bg:   rgba(248,113,113,.07);
+  --red-bdr:  rgba(248,113,113,.22);
   --serif:    'Cormorant Garamond', Georgia, serif;
   --sans:     'DM Sans', system-ui, sans-serif;
   --mono:     'DM Mono', monospace;
@@ -54,11 +54,11 @@ body{
 
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:var(--cream2)}
-::-webkit-scrollbar-thumb{background:var(--green);border-radius:2px}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg, var(--green2), var(--cyan));border-radius:2px}
 
 .top-nav{
   position:sticky;top:0;z-index:100;
-  background:rgba(10,10,12,.92);
+  background:rgba(9,9,11,.88);
   backdrop-filter:blur(14px);
   border-bottom:1px solid var(--cream3);
   padding:.6rem 2rem;
@@ -83,21 +83,21 @@ body{
 
 /* ── HERO ── */
 .hero{
-  background:#06060a;color:var(--ink);
+  background:#09090b;color:var(--ink);
   padding:5rem 2rem 4.5rem;
   position:relative;overflow:hidden;text-align:center;
 }
 .hero::before{
   content:'';position:absolute;inset:0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,230,118,.1) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 80% 100%, rgba(0,188,212,.06) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139,92,246,.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 85% 100%, rgba(34,211,238,.1) 0%, transparent 60%);
 }
 .hero::after{
   content:'';position:absolute;inset:0;
   background-image:
-    linear-gradient(rgba(0,230,118,.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,230,118,.03) 1px, transparent 1px);
+    linear-gradient(rgba(167,139,250,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(167,139,250,.05) 1px, transparent 1px);
   background-size:60px 60px;pointer-events:none;
 }
 .hero-inner{position:relative;max-width:780px;margin:0 auto;}
@@ -154,7 +154,7 @@ body{
   border-bottom:1px solid var(--cream3);
 }
 .spread-dark{
-  background:#06060a;
+  background:#09090b;
 }
 
 /* ── PAGE (inside spread) ── */
@@ -262,21 +262,21 @@ li strong{color:var(--ink);}
 .money-card .money-sub{font-size:12.5px;color:var(--ink2);margin-top:.4rem;}
 
 /* ── WORKFLOW DIAGRAM ── */
-.workflow{background:var(--cream);border-radius:8px;padding:1.25rem;margin:1.25rem 0;overflow-x:auto;border:1px solid var(--cream3);}
+.workflow{background:var(--cream);border-radius:8px;padding:1.25rem;margin:1.25rem 0;overflow-x:auto;border:1px solid var(--cream3);box-shadow:0 4px 20px rgba(0,0,0,.3);}
 .workflow-title{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--cream3);}
 .wf-flow{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem;}
 .wf-node{background:var(--cream2);border:1px solid var(--cream3);border-radius:5px;padding:.4rem .75rem;font-size:11.5px;color:var(--ink);font-weight:400;white-space:nowrap;}
 .wf-node.trigger{border-color:var(--green-bdr);color:var(--green3);background:var(--green-bg);}
 .wf-node.action{border-color:var(--cyan-bdr);color:var(--cyan2);background:var(--cyan-bg);}
-.wf-node.money{border-color:var(--green-bdr);color:var(--green);background:rgba(0,230,118,.12);font-weight:600;font-size:13px;}
-.wf-node.warn{border-color:var(--amber-bdr);color:var(--amber);background:var(amber-bg);}
+.wf-node.money{border-color:var(--green-bdr);color:var(--green3);background:rgba(167,139,250,.15);font-weight:600;font-size:13px;}
+.wf-node.warn{border-color:var(--amber-bdr);color:var(--amber);background:var(--amber-bg);}
 .wf-arrow{font-size:13px;color:var(--muted);flex-shrink:0;}
 
 /* ── VISUAL TAG ── */
 .visual-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--cream2);border:1px dashed var(--cream3);padding:3px 9px;border-radius:3px;margin:.6rem 0 1rem;}
 
 /* ── TERMINAL ── */
-.terminal{background:#06060a;border:1px solid var(--cream3);border-radius:6px;padding:1rem 1.25rem;margin:1.25rem 0;font-family:var(--mono);font-size:11.5px;line-height:1.75;overflow-x:auto;}
+.terminal{background:#0c0c0e;border:1px solid var(--cream3);border-radius:6px;padding:1rem 1.25rem;margin:1.25rem 0;font-family:var(--mono);font-size:11.5px;line-height:1.75;overflow-x:auto;}
 .terminal .t-prompt{color:var(--green);}
 .terminal .t-cmd{color:var(--ink);}
 .terminal .t-output{color:var(--ink3);}
@@ -285,24 +285,24 @@ li strong{color:var(--ink);}
 
 /* ── CTA ── */
 .cta-button{
-  display:inline-block;background:var(--green);color:#06060a;
+  display:inline-block;background:linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);color:#ffffff;
   font-family:var(--sans);font-weight:700;font-size:14px;
   letter-spacing:.04em;padding:1rem 2.5rem;border-radius:5px;
   text-decoration:none;margin-top:1.75rem;transition:background .15s, transform .15s, box-shadow .15s;
-  border:2px solid var(--green);
+  border:2px solid var(--green2);
 }
-.cta-button:hover{background:var(--green3);border-color:var(--green3);transform:translateY(-2px);box-shadow:0 0 30px rgba(0,230,118,.25);}
+.cta-button:hover{background:linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);border-color:var(--green3);transform:translateY(-2px);box-shadow:0 12px 35px rgba(139,92,246,.35);}
 .cta-button-sub{display:block;font-size:10.5px;font-weight:400;letter-spacing:.05em;color:var(--muted);margin-top:.6rem;font-family:var(--mono);}
 
 /* ── CLOSING ── */
-.closing-section{background:#06060a;padding:4rem 2rem;text-align:center;border-top:1px solid var(--cream3);}
+.closing-section{background:#09090b;padding:4rem 2rem;text-align:center;border-top:1px solid var(--cream3);}
 .closing-inner{max-width:600px;margin:0 auto;}
 .closing-section h2{font-family:var(--serif);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:300;color:var(--ink);line-height:1.25;margin-bottom:1rem;}
 .closing-section h2 em{font-style:italic;color:var(--green3);}
 .closing-section p{color:var(--ink2);font-size:14.5px;line-height:1.75;}
 
 /* ── FOOTER ── */
-footer{background:#040408;padding:2rem 2rem;text-align:center;border-top:1px solid var(--cream3);}
+footer{background:#050507;padding:2rem 2rem;text-align:center;border-top:1px solid var(--cream3);}
 footer p{font-size:11.5px;color:var(--muted2);letter-spacing:.04em;}
 footer strong{color:var(--muted);}
 
@@ -704,7 +704,7 @@ footer strong{color:var(--muted);}
   <!-- PAGE 6 -->
   <article class="page" id="page6">
     <div class="page-eyebrow">
-      <span class="pg-num" style="background:rgba(0,230,118,.15);">Page 06</span>
+      <span class="pg-num" style="background:rgba(167,139,250,.15);">Page 06</span>
       <span class="pg-theme" style="color:var(--muted);">Scale</span>
     </div>
     <h2>Why This Works<br>(<em>& How to Turn It Into $500/mo</em>)</h2>
