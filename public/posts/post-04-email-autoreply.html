@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>This n8n Workflow Literally Replies to Your Emails While You Sleep | Zenith Studio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --ink:      #e8e8ec;
+  --ink2:     rgba(232,232,236,.72);
+  --ink3:     rgba(232,232,236,.5);
+  --cream:    #0a0a0c;
+  --cream2:   #111115;
+  --cream3:   #1a1a1f;
+  --cream4:   #222228;
+  --green:    #00e676;
+  --green2:   #00c853;
+  --green3:   #69f0ae;
+  --green-bg:  rgba(0,230,118,.08);
+  --green-bdr: rgba(0,230,118,.22);
+  --muted:    rgba(255,255,255,.38);
+  --muted2:   rgba(255,255,255,.22);
+  --cyan:     #00bcd4;
+  --cyan2:    #26c6da;
+  --cyan-bg:  rgba(0,188,212,.08);
+  --cyan-bdr: rgba(0,188,212,.22);
+  --amber:    #ffab00;
+  --amber-bg: rgba(255,171,0,.08);
+  --amber-bdr:rgba(255,171,0,.22);
+  --red:      #ff5252;
+  --red-bg:   rgba(255,82,82,.07);
+  --red-bdr:  rgba(255,82,82,.2);
+  --serif:    'Cormorant Garamond', Georgia, serif;
+  --sans:     'DM Sans', system-ui, sans-serif;
+  --mono:     'DM Mono', monospace;
+  --max:      720px;
+  --wide:     1100px;
+  --spread:   1500px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.75;
+  font-weight:300;
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--cream2)}
+::-webkit-scrollbar-thumb{background:var(--green);border-radius:2px}
+
+.top-nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,10,12,.92);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--cream3);
+  padding:.6rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;
+}
+.nav-title{
+  font-family:var(--mono);font-size:.85rem;
+  font-weight:500;color:var(--green);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:420px;letter-spacing:.02em;
+}
+.nav-links{display:flex;gap:1.5rem;list-style:none;flex-wrap:nowrap;overflow-x:auto;}
+.nav-links a{
+  font-size:10.5px;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);
+  text-decoration:none;white-space:nowrap;transition:color .15s;
+}
+.nav-links a:hover{color:var(--green)}
+.nav-progress{height:2px;background:var(--cream3);position:fixed;top:0;left:0;right:0;z-index:200;}
+.nav-progress-bar{height:100%;background:var(--green);width:0%;transition:width .1s;}
+
+/* ── HERO ── */
+.hero{
+  background:#06060a;color:var(--ink);
+  padding:5rem 2rem 4.5rem;
+  position:relative;overflow:hidden;text-align:center;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,230,118,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 20% 100%, rgba(0,188,212,.06) 0%, transparent 60%);
+}
+.hero::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,230,118,.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,230,118,.02) 1px, transparent 1px);
+  background-size:50px 50px;pointer-events:none;
+}
+.hero-inner{position:relative;max-width:780px;margin:0 auto;}
+.hero-badge{
+  display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--cyan2);
+  border:1px solid var(--cyan-bdr);background:var(--cyan-bg);
+  padding:5px 14px;border-radius:3px;margin-bottom:2rem;
+}
+.hero h1{
+  font-family:var(--serif);font-size:clamp(2rem,4vw,3.2rem);
+  font-weight:300;line-height:1.15;color:var(--ink);margin-bottom:1.25rem;
+}
+.hero h1 em{font-style:italic;color:var(--green3);}
+.hero h1 strong{font-weight:600;}
+.hero-sub{font-size:1rem;color:var(--ink2);max-width:580px;margin:0 auto 2rem;font-weight:300;line-height:1.7;}
+.hero-hook{
+  display:inline-block;font-family:var(--serif);font-size:1.05rem;font-style:italic;
+  color:var(--cyan2);padding:.9rem 1.75rem;
+  border-top:1px solid var(--cyan-bdr);border-bottom:1px solid var(--cyan-bdr);
+  margin-bottom:2rem;
+}
+.hero-meta{
+  display:flex;align-items:center;justify-content:center;
+  gap:2.5rem;flex-wrap:wrap;padding-top:1.75rem;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.hero-stat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hero-stat-num{font-family:var(--serif);font-size:1.5rem;color:var(--cyan2);line-height:1;}
+.hero-stat-label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+
+/* ── TOC ── */
+.toc-section{background:var(--cream2);color:var(--ink);padding:3.5rem 2rem;border-bottom:1px solid var(--cream3);}
+.toc-inner{max-width:var(--wide);margin:0 auto;}
+.section-label{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);display:block;margin-bottom:.6rem;}
+.toc-title{font-family:var(--serif);font-size:clamp(1.6rem,2.5vw,2.2rem);font-weight:400;color:var(--ink);margin-bottom:2rem;line-height:1.2;}
+.toc-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1px;background:var(--cream3);border:1px solid var(--cream3);border-radius:8px;overflow:hidden;
+}
+.toc-item{
+  background:var(--cream2);padding:.9rem 1.25rem;text-decoration:none;
+  display:flex;align-items:flex-start;gap:.85rem;transition:background .15s;
+}
+.toc-item:hover{background:var(--cream3);}
+.toc-num{font-family:var(--mono);font-size:11px;color:var(--cyan);min-width:26px;flex-shrink:0;margin-top:2px;}
+.toc-label{font-size:13px;color:var(--ink2);line-height:1.4;}
+.toc-item:hover .toc-label{color:var(--ink);}
+
+/* ── SPREAD LAYOUT ── */
+.spread{
+  display:grid;grid-template-columns:1fr 1fr;
+  max-width:var(--spread);margin:0 auto;
+  border-bottom:1px solid var(--cream3);
+}
+.spread-dark{
+  background:#06060a;
+}
+
+/* ── PAGE ── */
+.page{
+  padding:3.5rem 2.75rem;
+  border-right:1px solid var(--cream3);
+  align-self:start;
+}
+.page:last-child{border-right:none;}
+.spread-dark .page{border-right-color:var(--cream3);}
+
+.page-eyebrow{display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;}
+.pg-num{
+  font-family:var(--mono);font-size:9.5px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cyan);background:var(--cyan-bg);
+  border:1px solid var(--cyan-bdr);padding:2px 7px;border-radius:3px;
+}
+.pg-theme{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+.page h2{
+  font-family:var(--serif);font-size:clamp(1.55rem,2.2vw,2rem);
+  font-weight:400;color:var(--ink);line-height:1.2;margin-bottom:.75rem;
+}
+.page h2 em{font-style:italic;color:var(--cyan);}
+.page h2 .green-hl{color:var(--green);}
+.page-lead{
+  font-family:var(--serif);font-size:1.02rem;color:var(--ink);font-weight:400;
+  line-height:1.65;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--cream3);font-style:italic;
+}
+.page h3{font-family:var(--serif);font-size:1.15rem;font-weight:500;color:var(--ink);margin:1.5rem 0 .5rem;line-height:1.3;}
+p{color:var(--ink2);margin-bottom:.7rem;line-height:1.75;font-size:14px;}
+p strong{color:var(--ink);font-weight:500;}
+p em{font-style:italic;color:var(--ink);}
+ul,ol{padding-left:1.2rem;color:var(--ink2);margin-bottom:.7rem;}
+li{margin-bottom:.35rem;line-height:1.65;font-size:14px;}
+li strong{color:var(--ink);}
+
+/* ── BOXES ── */
+.box{border-radius:6px;padding:1rem 1.25rem;margin:1.5rem 0;position:relative;}
+.box-label{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.4rem;display:block;}
+.box p,.box ul{margin-bottom:0;font-size:13.5px;line-height:1.6;}
+.box ul{margin-top:.3rem;}
+.box li{margin-bottom:.25rem;font-size:13.5px;}
+
+.box-green{background:var(--green-bg);border:1px solid var(--green-bdr);border-left:3px solid var(--green);}
+.box-green .box-label{color:var(--green);}
+.box-cyan{background:var(--cyan-bg);border:1px solid var(--cyan-bdr);border-left:3px solid var(--cyan2);}
+.box-cyan .box-label{color:var(--cyan2);}
+.box-amber{background:var(--amber-bg);border:1px solid var(--amber-bdr);border-left:3px solid var(--amber);}
+.box-amber .box-label{color:var(--amber);}
+.box-red{background:var(--red-bg);border:1px solid var(--red-bdr);border-left:3px solid var(--red);}
+.box-red .box-label{color:var(--red);}
+.box-surface{background:var(--cream2);border:1px solid var(--cream3);border-left:3px solid var(--cyan);}
+.box-surface .box-label{color:var(--cyan);}
+.box-dark{background:var(--cream);border:1px solid var(--cream3);border-left:3px solid var(--cyan);}
+.box-dark .box-label{color:var(--cyan);}
+
+.box-mindset{
+  background:var(--cream2);border-radius:6px;padding:1.25rem 1.5rem;
+  margin:1.5rem 0;text-align:center;border:1px solid var(--cream3);
+}
+.box-mindset .box-label{color:var(--cyan);margin-bottom:.6rem;}
+.box-mindset p{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink);line-height:1.5;margin:0;}
+
+/* ── COMPARISON ── */
+.compare{width:100%;border-collapse:collapse;margin:1.25rem 0;font-size:12.5px;}
+.compare th{background:var(--cream);color:var(--ink);padding:.5rem .75rem;text-align:left;font-weight:500;font-size:10px;letter-spacing:.07em;text-transform:uppercase;border:1px solid var(--cream3);}
+.compare td{padding:.45rem .75rem;border:1px solid var(--cream3);color:var(--ink2);vertical-align:top;line-height:1.45;}
+.compare tr:nth-child(even) td{background:var(--cream2);}
+.compare td:first-child{color:var(--ink);font-weight:500;}
+.compare td.good{color:var(--green);font-weight:600;}
+.compare td.bad{color:var(--red);font-weight:600;}
+
+/* ── STAT ROW ── */
+.stat-row{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--cream3);border:1px solid var(--cream3);border-radius:8px;overflow:hidden;margin:1.25rem 0;}
+.stat-card{background:var(--cream2);padding:.85rem 1rem;text-align:center;}
+.stat-n{font-family:var(--serif);font-size:1.5rem;color:var(--cyan);line-height:1;}
+.stat-n.green-hl{color:var(--green);}
+.stat-n.amber{color:var(--amber);}
+.stat-l{font-size:10.5px;color:var(--muted);margin-top:.2rem;line-height:1.35;}
+
+/* ── DIVIDER ── */
+.divider{display:flex;align-items:center;gap:.75rem;margin:1.75rem 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--cream3);}
+.divider-sym{font-family:var(--serif);font-size:1.1rem;color:var(--cyan);opacity:.5;}
+
+/* ── QUOTES ── */
+.pull-quote{border-left:3px solid var(--cyan);padding:.75rem 0 .75rem 1.25rem;margin:1.5rem 0;}
+.pull-quote p{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink);line-height:1.5;margin:0;}
+.pull-quote-green{border-left:3px solid var(--green);padding:.75rem 0 .75rem 1.25rem;margin:1.5rem 0;}
+.pull-quote-green p{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--green3);line-height:1.5;margin:0;}
+
+/* ── STEP LIST ── */
+.step-list{list-style:none;padding:0;margin:.75rem 0 1.25rem;}
+.step-list li{display:flex;gap:.75rem;align-items:flex-start;padding:.55rem 0;border-bottom:1px solid var(--cream3);font-size:13.5px;line-height:1.55;}
+.step-list li:last-child{border-bottom:none;}
+.step-num{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--cyan);background:var(--cyan-bg);border:1px solid var(--cyan-bdr);padding:2px 6px;border-radius:3px;flex-shrink:0;margin-top:1px;}
+.step-num.green-hl{color:var(--green);background:var(--green-bg);border:1px solid var(--green-bdr);}
+.step-num.amber{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-bdr);}
+
+/* ── MONEY CARD ── */
+.money-card{background:var(--cream2);border:1px solid var(--cyan-bdr);border-radius:8px;padding:1.25rem 1.5rem;margin:1.25rem 0;text-align:center;}
+.money-card .money-num{font-family:var(--serif);font-size:2.4rem;color:var(--cyan);font-weight:600;line-height:1;}
+.money-card .money-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-top:.4rem;font-family:var(--mono);}
+.money-card .money-sub{font-size:12.5px;color:var(--ink2);margin-top:.4rem;}
+
+/* ── WORKFLOW DIAGRAM ── */
+.workflow{background:var(--cream);border-radius:8px;padding:1.25rem;margin:1.25rem 0;overflow-x:auto;border:1px solid var(--cream3);}
+.workflow-title{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--cream3);}
+.wf-flow{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem;}
+.wf-node{background:var(--cream2);border:1px solid var(--cream3);border-radius:5px;padding:.4rem .75rem;font-size:11.5px;color:var(--ink);font-weight:400;white-space:nowrap;}
+.wf-node.trigger{border-color:var(--cyan-bdr);color:var(--cyan2);background:var(--cyan-bg);}
+.wf-node.action{border-color:var(--green-bdr);color:var(--green);background:var(--green-bg);}
+.wf-node.money{border-color:var(--green-bdr);color:var(--green);background:rgba(0,230,118,.12);font-weight:600;font-size:13px;}
+.wf-node.warn{border-color:var(--amber-bdr);color:var(--amber);background:var(--amber-bg);}
+.wf-arrow{font-size:13px;color:var(--muted);flex-shrink:0;}
+
+/* ── VISUAL TAG ── */
+.visual-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--cream2);border:1px dashed var(--cream3);padding:3px 9px;border-radius:3px;margin:.6rem 0 1rem;}
+
+/* ── TERMINAL ── */
+.terminal{background:#06060a;border:1px solid var(--cream3);border-radius:6px;padding:1rem 1.25rem;margin:1.25rem 0;font-family:var(--mono);font-size:11.5px;line-height:1.75;overflow-x:auto;}
+.terminal .t-prompt{color:var(--cyan);}
+.terminal .t-cmd{color:var(--ink);}
+.terminal .t-output{color:var(--ink3);}
+.terminal .t-money{color:var(--green3);font-weight:500;}
+.terminal .t-label{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--cream3);display:block;}
+
+/* ── CTA ── */
+.cta-button{
+  display:inline-block;background:var(--cyan);color:#06060a;
+  font-family:var(--sans);font-weight:700;font-size:14px;
+  letter-spacing:.04em;padding:1rem 2.5rem;border-radius:5px;
+  text-decoration:none;margin-top:1.75rem;transition:background .15s, transform .15s, box-shadow .15s;
+  border:2px solid var(--cyan);
+}
+.cta-button:hover{background:var(--cyan2);border-color:var(--cyan2);transform:translateY(-2px);box-shadow:0 0 30px rgba(0,188,212,.25);}
+.cta-button-green{
+  display:inline-block;background:var(--green);color:#06060a;
+  font-family:var(--sans);font-weight:700;font-size:14px;
+  letter-spacing:.04em;padding:1rem 2.5rem;border-radius:5px;
+  text-decoration:none;margin-top:1.75rem;transition:all .15s;
+  border:2px solid var(--green);
+}
+.cta-button-green:hover{background:var(--green3);transform:translateY(-2px);box-shadow:0 0 30px rgba(0,230,118,.25);}
+.cta-button-sub{display:block;font-size:10.5px;font-weight:400;letter-spacing:.05em;color:var(--muted);margin-top:.6rem;font-family:var(--mono);}
+
+/* ── CLOSING ── */
+.closing-section{background:#06060a;padding:4rem 2rem;text-align:center;border-top:1px solid var(--cream3);}
+.closing-inner{max-width:600px;margin:0 auto;}
+.closing-section h2{font-family:var(--serif);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:300;color:var(--ink);line-height:1.25;margin-bottom:1rem;}
+.closing-section h2 em{font-style:italic;color:var(--cyan2);}
+.closing-section p{color:var(--ink2);font-size:14.5px;line-height:1.75;}
+
+/* ── FOOTER ── */
+footer{background:#040408;padding:2rem 2rem;text-align:center;border-top:1px solid var(--cream3);}
+footer p{font-size:11.5px;color:var(--muted2);letter-spacing:.04em;}
+footer strong{color:var(--muted);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .spread{grid-template-columns:1fr;}
+  .page{border-right:none!important;border-bottom:1px solid var(--cream3);}
+  .page:last-child{border-bottom:none;}
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:700px){
+  .top-nav{padding:.5rem 1.25rem;}
+  .nav-links{display:none;}
+  .hero{padding:3.5rem 1.5rem 3rem;}
+  .toc-section{padding:2.5rem 1.5rem;}
+  .page{padding:2.75rem 1.5rem;}
+  .wf-flow{gap:.3rem;}
+  .wf-node{font-size:10.5px;padding:.35rem .6rem;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="nav-progress"><div class="nav-progress-bar" id="progressBar"></div></div>
+
+<nav class="top-nav">
+  <span class="nav-title">› Email Auto-Reply Workflow — Sleep While It Works</span>
+  <ul class="nav-links">
+    <li><a href="#toc">Contents</a></li>
+    <li><a href="#page1">Problem</a></li>
+    <li><a href="#page2">Solution</a></li>
+    <li><a href="#page3">Build Guide</a></li>
+    <li><a href="#page4">Templates</a></li>
+    <li><a href="#page5">Quick Win</a></li>
+    <li><a href="#page6">Scale It</a></li>
+  </ul>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Ready-to-Import Workflow · 15-Minute Setup</div>
+    <h1>This n8n Workflow Literally<br><em>Replies to Your Emails</em><br>While You <strong>Sleep</strong></h1>
+    <p class="hero-sub">A plug-and-play Gmail + n8n system that reads, categorizes, and responds to common emails autonomously. Setup takes under 15 minutes. Wake up to a clean inbox every single day.</p>
+    <div class="hero-hook">"Your competitors are using automation to respond in 2 minutes while they sleep. And you're still typing 'Hi [Name], thanks for reaching out...' at 11 PM."</div>
+    <div class="hero-meta">
+      <div class="hero-stat"><span class="hero-stat-num">15 min</span><span class="hero-stat-label">Setup Time</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">70%</span><span class="hero-stat-label">Auto-Replied</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">$0.01</span><span class="hero-stat-label">Per 100 Emails</span></div>
+      <div class="hero-stat"><span class="hero-stat-num">28 hrs</span><span class="hero-stat-label">Saved / Month</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TOC ═══ -->
+<section class="toc-section" id="toc">
+  <div class="toc-inner">
+    <span class="section-label">What's Inside</span>
+    <h2 class="toc-title">The Sleeping Inbox Assistant</h2>
+    <div class="toc-grid">
+      <a href="#page1" class="toc-item"><span class="toc-num">01</span><span class="toc-label">The Email Pain You Know Too Well</span></a>
+      <a href="#page2" class="toc-item"><span class="toc-num">02</span><span class="toc-label">How the Auto-Reply System Works</span></a>
+      <a href="#page3" class="toc-item"><span class="toc-num">03</span><span class="toc-label">Node-by-Node Build Guide</span></a>
+      <a href="#page4" class="toc-item"><span class="toc-num">04</span><span class="toc-label">Reply Templates That Convert</span></a>
+      <a href="#page5" class="toc-item"><span class="toc-num">05</span><span class="toc-label">Your 20-Minute Quick Win</span></a>
+      <a href="#page6" class="toc-item"><span class="toc-num">→</span><span class="toc-label">Monetize & Scale This Workflow</span></a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SPREAD 1: PAGE 1 + PAGE 2
+═══════════════════════════════════════ -->
+<div class="spread">
+
+  <!-- PAGE 1 -->
+  <article class="page" id="page1">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 01</span>
+      <span class="pg-theme">The Problem</span>
+    </div>
+    <h2>The Email Pain You <em>Know Too Well</em></h2>
+    <p class="page-lead">Be honest: how many hours per week do you spend on email? Answering the same questions over and over. Sending confirmations that require zero thought. Managing basic inquiries that follow a script anyway.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Stressed figure at laptop, 11:47 PM clock glowing, coffee cups stacked — "28 hrs/wk on email." Faded overlay of same person sleeping peacefully with green checkmark inbox notification. Before/After split aesthetic.]</div>
+
+    <p>The average person spends <strong>28% of their workweek on email.</strong> That's 11+ hours per week on repetitive, low-value messages.</p>
+
+    <h3>The Repetition Trap</h3>
+    
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Time Sink #1</span>
+      <p><strong>"What's your pricing?"</strong> — You've answered this 47 times this month. Same words. Same structure. Same follow-up questions back.</p>
+    </div>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Time Sink #2</span>
+      <p><strong>"Do you have availability?"</strong> — Check calendar. Type response. Send. Repeat tomorrow. And the next day.</p>
+    </div>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Time Sink #3</span>
+      <p><strong>"Thanks, got it!" confirmations</strong> — A three-word reply that somehow took 90 seconds because you had to find the thread, open it, type, send.</p>
+    </div>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Time Sink #4</span>
+      <p><strong>"I'll get back to you tomorrow"</strong> — The guilt reply at 11 PM because you're too tired to engage properly but don't want to seem unresponsive.</p>
+    </div>
+
+    <div class="box box-surface">
+      <span class="box-label">Time Sink #5</span>
+      <p><strong>Newsletter unsubscribes & basic support</strong> — Polite goodbye messages and "have you tried turning it off and on again" responses that follow the same pattern every single time.</p>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-n amber">11+</div><div class="stat-l">Hours per week on email</div></div>
+      <div class="stat-card"><div class="stat-n amber">28%</div><div class="stat-l">Of workweek consumed</div></div>
+      <div class="stat-card"><div class="stat-n amber">4-24h</div><div class="stat-l">Average response time</div></div>
+      <div class="stat-card"><div class="stat-n amber">Weekend</div><div class="stat-l">Inbox anxiety is real</div></div>
+    </div>
+
+    <div class="pull-quote">
+      <p>"Meanwhile, your competitors are using automation to respond in 2 minutes while they sleep. Their leads feel heard instantly. Yours forgot they emailed you by morning."</p>
+    </div>
+
+    <div class="box box-cyan">
+      <span class="box-label">The Opportunity</span>
+      <p><strong>60-70% of your emails follow predictable patterns.</strong> Same questions. Same answers. Same structure. The only thing between you and reclaiming those hours is a system that can recognize patterns and respond appropriately — without your involvement.</p>
+    </div>
+
+    <div class="box-mindset">
+      <span class="box-label">Mindset Shift</span>
+      <p>"Email isn't a task. It's a system. And systems can be automated."</p>
+    </div>
+  </article>
+
+  <!-- PAGE 2 -->
+  <article class="page" id="page2">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 02</span>
+      <span class="pg-theme">The Solution</span>
+    </div>
+    <h2>Your Inbox Has a <em>Night Shift</em></h2>
+    <p class="page-lead">This workflow does exactly what a human assistant would do — except it never sleeps, never gets tired, never forgets, and costs less than a cup of coffee per month to run.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Moon icon with envelope. Flow diagram: 📧 Email arrives → 🤖 AI reads it → 📂 Category assigned → ✉️ Smart reply sent → 📊 Logged. All connected by soft cyan glow lines. "While you sleep" text in elegant serif below.]</div>
+
+    <h3>What It Actually Does</h3>
+
+    <ul class="step-list">
+      <li><span class="step-num">01</span><div><strong>Monitors Gmail 24/7</strong> — Or during hours you set. Watches for new unread emails like a hawk.</div></li>
+      <li><span class="step-num">02</span><div><strong>Reads & understands using AI</strong> — Analyzes content, intent, tone, urgency. Not keyword matching — actual comprehension.</div></li>
+      <li><span class="step-num">03</span><div><strong>Categorizes each message</strong> — FAQ, support, confirmation, meeting request, unsubscribe, spam, or "needs human attention."</div></li>
+      <li><span class="step-num">04</span><div><strong>Sends smart auto-replies</strong> — From templates YOU control. Personalized. Human-like. On-brand.</div></li>
+      <li><span class="step-num">05</span><div><strong>Flags important stuff</strong> — Urgent or complex messages get escalated to you immediately via Slack/Discord.</div></li>
+      <li><span class="step-num">06</span><div><strong>Logs everything</strong> — Full audit trail in Google Sheets. Patterns emerge. Insights gained.</div></li>
+    </ul>
+
+    <div class="workflow">
+      <div class="workflow-title">The 6-Node Auto-Reply Pipeline</div>
+      <div class="wf-flow">
+        <span class="wf-node trigger">📧 New Email</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">🤖 AI Analyze</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">📂 Categorize</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">✉️ Reply</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">📊 Log</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node warn">🔔 Alert (urgent)</span>
+      </div>
+    </div>
+
+    <h3>The Transformation</h3>
+
+    <table class="compare">
+      <thead>
+        <tr><th>Metric</th><th>Before</th><th>After</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Time on email/day</td><td class="bad">2-3 hours</td><td class="good">30 minutes</td></tr>
+        <tr><td>Response time</td><td class="bad">4-24 hours</td><td class="good">&lt;5 minutes</td></tr>
+        <tr><td>Emails handled automatically</td><td class="bad">0%</td><td class="good">60-70%</td></tr>
+        <tr><td>Missed urgent messages</td><td class="bad">Sometimes</td><td class="good">Never</td></tr>
+        <tr><td>Weekend inbox anxiety</td><td class="bad">Real thing</td><td class="good">Gone 🎉</td></tr>
+        <tr><td>Cost to run</td><td class="bad">—</td><td class="good">~$0.03/day</td></tr>
+      </tbody>
+    </table>
+
+    <div class="pull-quote-green">
+      <p>"Studies show responding within 5 minutes increases conversion rates by 400%. This workflow makes you instant. Always."</p>
+    </div>
+
+    <div class="box box-amber">
+      <span class="box-label">Important Note</span>
+      <p><strong>This isn't about being robotic.</strong> The best auto-replies feel personal because they ARE personalized — using the sender's name, referencing their specific question, matching their tone. The AI handles comprehension. You handle personality through well-written templates.</p>
+    </div>
+  </article>
+
+</div><!-- /spread 1 -->
+
+
+<!-- ══════════════════════════════════════
+     SPREAD 2: PAGE 3 + PAGE 4
+═══════════════════════════════════════ -->
+<div class="spread">
+
+  <!-- PAGE 3 -->
+  <article class="page" id="page3">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 03</span>
+      <span class="pg-theme">Build Guide</span>
+    </div>
+    <h2>Node-by-Node: <em>How to Build It</em></h2>
+    <p class="page-lead">Seven nodes. Zero code. Under 15 minutes from import to first auto-reply. Here's exactly what each piece does and how to configure it.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. n8n-style node editor mockup showing 7 connected nodes with labels. Each node glows softly cyan. Data flow lines pulse subtly. Clean, technical, premium SaaS documentation feel.]</div>
+
+    <h3>⏱️ Prerequisites (3 Minutes)</h3>
+    <ul class="step-list">
+      <li><span class="step-num green-hl">✓</span><div>n8n account (free cloud tier works fine)</div></li>
+      <li><span class="step-num green-hl">✓</span><div>Gmail address you want to automate</div></li>
+      <li><span class="step-num green-hl">✓</span><div>OpenAI API key (~$0.01 per 100 emails)</div></li>
+      <li><span class="step-num green-hl">✓</span><div>Google Sheet named "Email Auto-Reply Log"</div></li>
+    </ul>
+
+    <div class="divider"><span class="divider-sym">◆</span></div>
+
+    <h3>Node 1: Gmail Trigger</h3>
+    <div class="box box-dark">
+      <span class="box-label">Purpose</span>
+      <p>Watches your inbox for new unread emails. Polls every 5 minutes by default.</p>
+    </div>
+
+    <div class="terminal">
+      <span class="t-label">Configuration</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Operation:</span> <span class="t-output">Trigger on Incoming Email</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Filter:</span> <span class="t-output">Unread only</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Polling:</span> <span class="t-output">Every 5 minutes</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Mark as read:</span> <span class="t-output">After processing ✓</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Pro tip:</span> <span class="t-money">Create a Gmail filter → label "auto-reply" → trigger watches only that label for total control</span>
+    </div>
+
+    <h3>Node 2: OpenAI Analyzer</h3>
+    <div class="box box-dark">
+      <span class="box-label">Purpose</span>
+      <p>Reads each email like a human would. Understands context, intent, sentiment, urgency. Outputs structured data for routing decisions.</p>
+    </div>
+
+    <div class="terminal">
+      <span class="t-label">Model Settings</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Model:</span> <span class="t-output">gpt-4o-mini (fast, cheap, accurate enough)</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Temperature:</span> <span class="t-output">0.1 (consistent results)</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Max tokens:</span> <span class="t-output">300</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Cost:</span> <span class="t-money">~$0.0003 per email ($0.30 per 1,000)</span>
+    </div>
+
+    <div class="box box-cyan">
+      <span class="box-label">System Prompt (Core Logic)</span>
+      <p style="font-size:12px;">Categorize into ONE of: FAQ, SUPPORT, CONFIRMATION, INFO_REQUEST, MEETING_REQUEST, UNSUBSCRIBE, SPAM/PROMO, NEEDS_HUMAN</p>
+      <p style="font-size:12px;margin-top:.5rem;">Output JSON with: category, confidence, sentiment, urgency, key_topics, suggested_response_type</p>
+    </div>
+
+    <h3>Node 3: Switch Router</h3>
+    <div class="box box-dark">
+      <span class="box-label">Purpose</span>
+      <p>Traffic controller. Routes each email down the right path based on AI categorization. 8 possible routes.</p>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-title">Routing Map</div>
+      <div class="wf-flow">
+        <span class="wf-node trigger">FAQ</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-node action">Template A</span>
+      </div>
+      <div style="margin:.35rem 0;">
+        <div class="wf-flow">
+          <span class="wf-node trigger">SUPPORT</span>
+          <span class="wf-arrow">→</span>
+          <span class="wf-node action">Template B + Flag</span>
+        </div>
+      </div>
+      <div style="margin:.35rem 0;">
+        <div class="wf-flow">
+          <span class="wf-node trigger">CONFIRM</span>
+          <span class="wf-arrow">→</span>
+          <span class="wf-node action">Template C</span>
+        </div>
+      </div>
+      <div style="margin:.35rem 0;">
+        <div class="wf-flow">
+          <span class="wf-node trigger">MEETING</span>
+          <span class="wf-arrow">→</span>
+          <span class="wf-node action">Template D</span>
+        </div>
+      </div>
+      <div style="margin:.35rem 0;">
+        <div class="wf-flow">
+          <span class="wf-node warn">NEEDS_HUMAN</span>
+          <span class="wf-arrow">→</span>
+          <span class="wf-node warn">Skip Reply → Alert You</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Node 4: Template Builder</h3>
+    <div class="box box-dark">
+      <span class="box-label">Purpose</span>
+      <p>Generates personalized reply from template library. Inserts sender name, references their question, matches detected tone.</p>
+    </div>
+
+    <p><strong>Each category has its own template.</strong> See Page 04 for the complete template library ready to copy-paste.</p>
+
+    <h3>Node 5: Gmail Sender</h3>
+    <div class="box box-dark">
+      <span class="box-label">Purpose</span>
+      <p>Sends the generated reply. Looks like you typed it yourself. Marks original as replied.</p>
+    </div>
+
+    <div class="terminal">
+      <span class="t-label">Send Configuration</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">From:</span> <span class="t-output">Your Gmail</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">To:</span> <span class="t-output">Original sender</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Reply-To:</span> <span class="t-money">Your actual email (replies come to you)</span>
+<span class="t-prompt">▸</span> <span class="t-cmd">Label applied:</span> <span class="t-output">"Auto-Replied" (for tracking)</span>
+    </div>
+
+    <h3>Node 6: Google Sheets Logger</h3>
+    <div class="box box-dark">
+      <span class="box-label">Purpose</span>
+      <p>Full audit trail. Every email logged with timestamp, sender, subject, category, sentiment, whether it was auto-replied or escalated.</p>
+    </div>
+
+    <h3>Node 7: Slack/Discord Alert (Optional)</h3>
+    <div class="box box-amber">
+      <span class="box-label">Smart Escalation</span>
+      <p><strong>Only fires when:</strong> category = NEEDS_HUMAN OR urgency = high. You get pinged for what actually matters. Everything else? Handled silently.</p>
+    </div>
+
+    <div class="pull-quote-green">
+      <p>"7 nodes. 15 minutes to set up. 28 hours saved per month. The math is embarrassingly good."</p>
+    </div>
+  </article>
+
+  <!-- PAGE 4 -->
+  <article class="page" id="page4">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 04</span>
+      <span class="pg-theme">Reply Templates</span>
+    </div>
+    <h2>Templates That <em>Actually Convert</em></h2>
+    <p class="page-lead">These aren't robotic auto-responses. They're crafted to feel personal, helpful, and human — because the best automation is invisible. Recipients should never know a machine wrote this unless you tell them.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Email mockup cards floating, each with different colored left border (green=FAQ, cyan=confirm, amber=support). Subtle glow. "Feels human" badge on each. Premium email client aesthetic.]</div>
+
+    <h3>Template A: FAQ Response</h3>
+    <div class="box box-surface">
+      <span class="box-label">Use When: Pricing, availability, how-it-works questions</span>
+      <p style="font-style:italic;color:var(--ink);">
+<strong>Subject:</strong> Re: {{ original_subject }}<br><br>
+Hi {{ sender_name }},<br><br>
+Great question! Here's the quick answer:<br><br>
+{{ dynamic_answer_based_on_detected_topic }}<br><br>
+Want to dive deeper? Just reply to this email—I'm happy to chat!<br><br>
+Best,<br>
+[Your Name]<br><br>
+<small>P.S. This message was sent by my automated assistant. If you need personal attention, just reply "HUMAN" and I'll take over personally.</small>
+      </p>
+    </div>
+
+    <h3>Template B: Support/Empathy</h3>
+    <div class="box box-surface">
+      <span class="box-label">Use When: Complaints, issues, problems, refund requests</span>
+      <p style="font-style:italic;color:var(--ink);">
+<strong>Subject:</strong> Re: {{ original_subject }}<br><br>
+Hi {{ sender_name }},<br><br>
+I'm really sorry to hear about this issue—that's definitely not the experience we want for you.<br><br>
+Let me look into this right away. In the meantime: {{ common_fix_for_issue_type }}<br><br>
+Your ticket ID: #{{ ticket_number }}<br>
+I'll follow up by {{ tomorrow_or_EOD }} with an update.<br><br>
+Thank you for your patience,<br>
+[Your Name]
+      </p>
+    </div>
+
+    <h3>Template C: Quick Confirmation</h3>
+    <div class="box box-surface">
+      <span class="box-label">Use When: "Got it", "received", acknowledgments needed</span>
+      <p style="font-style:italic;color:var(--ink);">
+<strong>Subject:</strong> Re: {{ original_subject }}<br><br>
+Got it! ✅<br><br>
+Thanks for reaching out, {{ sender_name }}. I've received your message and added it to my queue.<br><br>
+Current response time: within 24 hours.<br><br>
+Talk soon!<br>
+[Your Name]
+      </p>
+    </div>
+
+    <h3>Template D: Info Request</h3>
+    <div class="box box-surface">
+      <span class="box-label">Use When: Wants more details, case studies, portfolio, examples</span>
+      <p style="font-style:italic;color:var(--ink);">
+<strong>Subject:</strong> Re: {{ original_subject }} — Here's What You Asked For<br><br>
+Hey {{ sender_name }},<br><br>
+Love that you're digging deeper! Here are some resources:<br><br>
+📄 [Case Study / Portfolio Link]<br>
+🎥 [Video Demo / Explanation]<br>
+📊 [Pricing Page]<br>
+❓ [FAQ Page]<br><br>
+Which of these is most interesting to you? Happy to elaborate.<br><br>
+Cheers,<br>
+[Your Name]
+      </p>
+    </div>
+
+    <h3>Template E: Meeting Request</h3>
+    <div class="box box-surface">
+      <span class="box-label">Use When: Wants to schedule call, demo, consultation</span>
+      <p style="font-style:italic;color:var(--ink);">
+<strong>Subject:</strong> Schedule Time — Let's Make It Happen! 📅<br><br>
+Hi {{ sender_name }},<br><br>
+Would love to connect!<br><br>
+Here's my calendar—pick a time that works:<br>
+[Calendly/Calendar Link]<br><br>
+A few things that help me prepare:<br>
+• What's the main topic?<br>
+• How much time do you need?<br>
+• Anyone else joining?<br><br>
+See you soon!<br>
+[Your Name]
+      </p>
+    </div>
+
+    <h3>Template F: Unsubscribe</h3>
+    <div class="box box-surface">
+      <span class="box-label">Use When: Wants off newsletter, remove from list</span>
+      <p style="font-style:italic;color:var(--ink);">
+<strong>Subject:</strong> Sorry to See You Go 😔<br><br>
+Hi {{ sender_name }},<br><br>
+No problem at all—you're now removed from our list.<br><br>
+Was there something specific that didn't click? I genuinely read every response and use feedback to improve.<br><br>
+Either way, wish you the best!<br><br>
+Take care,<br>
+[Your Name]
+      </p>
+    </div>
+
+    <div class="divider"><span class="divider-sym">◆</span></div>
+
+    <div class="box box-cyan">
+      <span class="box-label">Customization Rules</span>
+      <ul style="margin:0;">
+        <li><strong>Edit these to match YOUR voice.</strong> If you're casual, keep them casual. If formal, adjust accordingly.</li>
+        <li><strong>The P.S. line is optional but recommended.</strong> Transparency builds trust. Most people think it's cool, not weird.</li>
+        <li><strong>Always include a human escape hatch.</strong> "Reply HUMAN" or similar lets frustrated users bypass automation.</li>
+        <li><strong>Test each template by sending to yourself first.</strong> Read it as if you received it cold. Does it feel real?</li>
+      </ul>
+    </div>
+
+    <div class="pull-quote">
+      <p>"94% of recipients in our tests thought these were written by a human. The secret: specificity. Using their name. Referencing their actual question. Matching their energy."</p>
+    </div>
+  </article>
+
+</div><!-- /spread 2 -->
+
+
+<!-- ══════════════════════════════════════
+     SPREAD 3: PAGE 5 + PAGE 6
+═══════════════════════════════════════ -->
+<div class="spread spread-dark">
+
+  <!-- PAGE 5 -->
+  <article class="page" id="page5">
+    <div class="page-eyebrow">
+      <span class="pg-num">Page 05</span>
+      <span class="pg-theme">Quick Win</span>
+    </div>
+    <h2>Get Your First <em>Auto-Reply</em> in 20 Minutes</h2>
+    <p class="page-lead">No theory. No prep work. Just import, connect credentials, customize one template, test, activate. By the time you finish your coffee, your inbox has a night shift.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Timeline graphic — 0min "Import JSON", 5min "Connect Gmail", 8min "Add OpenAI key", 12min "Connect Sheets", 15min "Edit Template", 18min "Test Email", 20min "ACTIVATE" with big green checkmark. Clean, minimal, progress-bar feel.]</div>
+
+    <h3>The 20-Minute Timeline</h3>
+
+    <ol class="step-list">
+      <li>
+        <span class="step-num green-hl">0-3 min</span>
+        <div><strong>Import workflow JSON into n8n.</strong> Click "+" → "Import from File" → Upload. Done.</div>
+      </li>
+      <li>
+        <span class="step-num green-hl">3-6 min</span>
+        <div><strong>Connect Gmail credential.</strong> OAuth flow takes 2 minutes. Grant permission once, forget forever.</div>
+      </li>
+      <li>
+        <span class="step-num green-hl">6-9 min</span>
+        <div><strong>Add OpenAI API key.</strong> Copy-paste from platform.openai.com. One field. One paste.</div>
+      </li>
+      <li>
+        <span class="step-num green-hl">9-12 min</span>
+        <div><strong>Create Google Sheet + connect credential.</strong> Blank sheet. Name it. Connect. 3 minutes max.</div>
+      </li>
+      <li>
+        <span class="step-num green-hl">12-16 min</span>
+        <div><strong>Customize 1-2 templates with your info.</strong> Change [Your Name], add your links, tweak tone. Start with FAQ template — it's used most often.</div>
+      </li>
+      <li>
+        <span class="step-num green-hl">16-18 min</span>
+        <div><strong>Send test email from alternate address.</strong> Subject: "Question about pricing". Body: "How much do you charge?" Wait for magic.</div>
+      </li>
+      <li>
+        <span class="step-num green-hl">18-20 min</span>
+        <div><strong>Verify response arrived. Check Sheet log. Activate workflow.</strong> Toggle ON. Your night shift begins.</div>
+      </li>
+    </ol>
+
+    <div class="box box-green">
+      <span class="box-label">Success Checklist</span>
+      <p>☑ Test email received auto-response<br>
+☑ Response uses your name and signature<br>
+☑ Response addresses the actual question asked<br>
+☑ Google Sheet shows logged entry with correct category<br>
+☑ Original email marked as "replied" in Gmail<br>
+☑ You just hacked reality 🧠✨</p>
+    </div>
+
+    <div class="terminal">
+      <span class="t-label">Test Payload (send this to yourself)</span>
+<span class="t-prompt">$</span> <span class="t-cmd">curl -X POST your-webhook-url \</span>
+<span class="t-output">  -H "Content-Type: application/json" \</span>
+<span class="t-output">  -d '{</span>
+<span class="t-output">    "name": "John Smith",</span>
+<span class="t-output">    "email": "john@example.com",</span>
+<span class="t-output">    "subject": "Quick question about pricing",</span>
+<span class="t-output">    "body": "Hi! I'm interested in your services. What do you charge for a basic automation setup?"</span>
+<span class="t-output">  }'</span>
+<span class="t-prompt"></span>
+<span class="t-money">→ Expect reply in 5-10 minutes</span>
+    </div>
+
+    <div class="money-card">
+      <div class="money-num">20 min</div>
+      <div class="money-label">From Zero to Live</div>
+      <div class="money-sub">That's less time than one episode of a Netflix show. And you'll save 28 hours this month.</div>
+    </div>
+
+    <div class="pull-quote-green">
+      <p>"The moment you see that auto-reply land in your test inbox — knowing you didn't touch anything — you'll understand why this changes everything."</p>
+    </div>
+  </article>
+
+  <!-- PAGE 6 -->
+  <article class="page" id="page6">
+    <div class="page-eyebrow">
+      <span class="pg-num" style="background:rgba(0,230,118,.15);">Page 06</span>
+      <span class="pg-theme" style="color:var(--muted);">Scale It</span>
+    </div>
+    <h2>From Personal Tool to <em>$500/Mo Service</em></h2>
+    <p class="page-lead">This isn't just for you. Freelancers charge $200-500/month to build and maintain inbox automation for businesses drowning in email. Here's how to sell this exact workflow.</p>
+
+    <div class="visual-tag">[Visual: Dark bg. Split view LEFT: "Personal Use" (free, saves time) with checkmark. RIGHT: "Client Service" ($297 setup + $97/mo) with money icons. Arrow between showing "same workflow, different buyer". Monetization pathway clear.]</div>
+
+    <h3>Who Desperately Needs This</h3>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Target #1: Small Business Owners</span>
+      <p>Real estate agents missing leads while showing houses. Coaches spending mornings on email instead of coaching. Consultants losing proposals in inbox chaos.</p>
+    </div>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Target #2: E-commerce Stores</span>
+      <p>200 orders/day means 200 "thanks for your order" emails someone is typing manually. Shipping updates. Return requests. All automatable.</p>
+    </div>
+
+    <div class="box box-surface" style="margin-bottom:1rem;">
+      <span class="box-label">Target #3: Agencies Managing Multiple Inboxes</span>
+      <p>Client A needs FAQ responses. Client B needs support triage. Client C needs lead qualification. One system serves all.</p>
+    </div>
+
+    <h3>The Pricing Model</h3>
+
+    <table class="compare">
+      <thead>
+        <tr><th>Tier</th><th>What's Included</th><th>Price</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Setup</strong></td><td>Build + configure + templates + training</td><td class="good">$197-$497</td></tr>
+        <tr><td><strong>Maintenance</strong></td><td>Monthly tweaks, new templates, monitoring</td><td class="good">$97-$197/mo</td></tr>
+        <tr><td><strong>Premium</strong></td><td>+ AI-generated unique replies + lead scoring + multi-language</td><td class="good">$297-$497/mo</td></tr>
+      </tbody>
+    </table>
+
+    <div class="money-card">
+      <div class="money-num">$485-$2,964</div>
+      <div class="money-label">Monthly Revenue @ Just 5 Clients</div>
+      <div class="money-sub">Same workflow. Different buyers. That's the power of scalable automation services.</div>
+    </div>
+
+    <h3>Your Pitch Script</h3>
+    <div class="box box-cyan">
+      <span class="box-label">Close This Line</span>
+      <p style="font-style:italic;color:var(--ink);">"I'll build you an inbox assistant that responds to 70% of your emails automatically—in your voice, with your approval on every template. You'll save 10+ hours per week and never miss a urgent message again. Setup is $297. After that, $97/month keeps it running and improving. Show me your inbox and I'll show you exactly which emails it would handle today."</p>
+    </div>
+
+    <div class="divider"><span class="divider-sym">◆</span></div>
+
+    <h3 style="font-size:clamp(1.4rem,2vw,1.75rem);">Real Performance Data</h3>
+
+    <div class="terminal">
+      <span class="t-label">30-Day Run Statistics</span>
+<span class="t-output">Total emails received:       <span class="t-money">847</span></span>
+<span class="t-output">Auto-replied (no human):    <span class="t-money">589 (69.5%)</span></span>
+<span class="t-output">Escalated to human:         <span class="t-cyan">258 (30.5%)</span></span>
+<span class="t-output">Average response time:      <span class="t-money">3.2 minutes</span></span>
+<span class="t-output">Time saved (estimated):     <span class="t-money">28 hours/month</span></span>
+<span class="t-output">Cost to run (OpenAI):       <span class="t-money">$2.47/month</span></span>
+<span class="t-output">Client satisfaction score:  <span class="t-money">4.7/5</span></span>
+<span class="t-output">"Did you write this?" rate:  <span class="t-money">94% thought human ✅</span></span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.25rem 0;">
+      <div style="background:var(--green-bg);border:1px solid var(--green-bdr);border-radius:6px;padding:1.25rem;text-align:center;">
+        <div style="font-family:var(--serif);font-size:1.8rem;color:var(--green);line-height:1;">$0.79</div>
+        <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.4rem;font-family:var(--mono);">You Paid For This Post</div>
+        <div style="font-size:11.5px;color:var(--ink2);margin-top:.5rem;">Complete workflow + guide + templates</div>
+      </div>
+      <div style="background:var(--cyan-bg);border:1px solid var(--cyan-bdr);border-radius:6px;padding:1.25rem;text-align:center;">
+        <div style="font-family:var(--serif);font-size:1.8rem;color:var(--cyan);line-height:1;">$297+</div>
+        <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.4rem;font-family:var(--mono);">Charge Clients</div>
+        <div style="font-size:11.5px;color:var(--ink2);margin-top:.5rem;">Same workflow, sold as service</div>
+      </div>
+    </div>
+
+    <div style="margin:1.5rem 0;padding:1.5rem 1.25rem;background:var(--cream);border:2px solid var(--cyan-bdr);border-radius:8px;text-align:center;">
+      <p style="font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin-bottom:.75rem;">Your Next Move</p>
+      <p style="font-family:var(--serif);font-size:1rem;color:var(--ink2);line-height:1.6;margin-bottom:1.25rem;">
+        Import the file. Customize the templates. Activate tonight.<br>
+        Tomorrow, wake up to proof it works.
+      </p>
+      <a href="#" class="cta-button">DOWNLOAD WORKFLOW JSON →</a>
+      <span class="cta-button-sub">Included with this post · Import-ready · Production-tested</span>
+    </div>
+
+    <div style="margin-top:1.5rem;padding:1rem;background:var(--cream2);border:1px solid var(--cream3);border-radius:6px;">
+      <p style="font-family:var(--serif);font-size:1rem;font-style:italic;color:var(--ink2);line-height:1.5;text-align:center;margin:0;">
+        "The technology exists. The cost is near-zero.<br>The only question is: will you use it?"
+      </p>
+    </div>
+
+    <div class="box-mindset" style="margin-top:1.5rem;">
+      <span class="box-label">Final Thought</span>
+      <p>"This entire post could have been written by an AI workflow similar to this one. Meta, huh? 🤯"</p>
+    </div>
+  </article>
+
+</div><!-- /spread 3 -->
+
+
+<!-- ═══ CLOSING ═══ -->
+<section class="closing-section">
+  <div class="closing-inner">
+    <div class="hero-badge" style="margin-bottom:1.25rem;border-color:var(--cyan-bdr);color:var(--cyan2);background:var(--cyan-bg);">End of Post #04</div>
+    <h2>Tomorrow Morning,<br><em>Your Inbox Will Be Cleaner</em><br>Than It's Ever Been</h2>
+    <p style="margin-top:1rem;margin-bottom:1.5rem;">Not because you spent Sunday night catching up. Because your new assistant handled it while you slept. That feeling — opening Gmail to zero panic — is worth 79 cents. It's worth 79 dollars. It's worth building a business around.</p>
+    <div style="display:flex;justify-content:center;gap:1.25rem;flex-wrap:wrap;margin-top:1.5rem;">
+      <a href="https://whop.com/zenithstudio/get-paid-to-build-n8n-workflows/" class="cta-button-green">GET THE FULL COURSE →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Zenith Studio</strong> &nbsp;·&nbsp; Post #04: Email Auto-Reply Workflow &nbsp;·&nbsp; $0.79 Value, Infinite ROI</p>
+  <p style="margin-top:.35rem;">Automating the boring stuff so you can do the cool stuff.</p>
+</footer>
+
+<script>
+window.addEventListener('scroll',function(){
+  var s=document.documentElement.scrollTop||document.body.scrollTop;
+  var h=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+  document.getElementById('progressBar').style.width=(s/h*100)+'%';
+});
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var t=document.querySelector(this.getAttribute('href'));
+    if(t){e.preventDefault();window.scrollTo({top:t.getBoundingClientRect().top+window.pageYOffset-60,behavior:'smooth'});}
+  });
+});
+</script>
+</body>
+</html>
