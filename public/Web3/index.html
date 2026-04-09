@@ -2800,9 +2800,8 @@
 </section>
 
 <div class="section-divider max-w-4xl mx-auto"></div>
-
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- CHAPTER 9: DEBT SYSTEMS & EXTERNAL DATA INTEGRITY           -->
+<!-- CHAPTER 9: COLLATERALIZED FINANCE & DATA INTEGRITY        -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <section id="chapter-9" class="py-20 px-6">
 <div class="max-w-4xl mx-auto">
@@ -2810,8 +2809,8 @@
         <span class="ch-orange text-[11px] font-mono font-semibold text-orange-400 px-4 py-1.5 rounded-full">Chapter 9</span>
         <span class="text-xs text-gray-500">Phase 3 · Week 9 · ~10 hours</span>
     </div>
-    <h2 class="text-3xl font-semibold tracking-tight mb-3">Debt Systems & External Data Integrity</h2>
-    <p class="text-gray-400 text-lg max-w-3xl leading-relaxed mb-12">Engineering collateralized debt systems and external data integration. These mechanisms manage systemic risk through overcollateralization, automated liquidation, and verified data feeds—preventing insolvency and cascade failures.</p>
+    <h2 class="text-3xl font-semibold tracking-tight mb-3">Collateralized Finance & External Data Integrity</h2>
+    <p class="text-gray-400 text-lg max-w-3xl leading-relaxed mb-12">Engineering asset-backed financing systems and external data integration. These mechanisms manage systemic risk through overcollateralization, performance-linked returns, automated liquidation, and verified data feeds—preventing insolvency and cascade failures while supporting multiple economic paradigms.</p>
 
     <!-- LESSON 9.1 -->
     <div class="lesson-card rounded-2xl overflow-hidden mb-8" id="l-9-1">
@@ -2821,48 +2820,48 @@
         </div>
         <div class="p-8 space-y-6">
             <div class="glass-card rounded-xl p-5">
-                <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="brain" class="w-4 h-4 text-purple-400"></i>System Model: Overcollateralized Debt Positions</h4>
-                <p class="text-gray-400 text-sm leading-relaxed mb-3">Collateralized debt systems require users to lock assets exceeding the debt value—this overcollateralization is the primary defense against system insolvency. If collateral value drops relative to debt, the position becomes undercollateralized and must be liquidated: the collateral is sold to repay the debt, and a liquidation incentive ensures external actors perform this maintenance. This mechanism prevents bad debt accumulation and maintains system solvency under market stress.</p>
-                <pre class="text-xs text-gray-300 leading-loose font-mono mt-3"><span class="text-gray-500">// Health Factor = (Collateral Value × LTV) / Debt Value</span>
-<span class="text-gray-500">// LTV = Loan-to-Value ratio (max allowed debt as fraction of collateral)</span>
+                <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="brain" class="w-4 h-4 text-purple-400"></i>System Model: Overcollateralized Asset Positions</h4>
+                <p class="text-gray-400 text-sm leading-relaxed mb-3">Collateralized finance systems require users to lock assets exceeding their position value—this overcollateralization is the primary defense against system insolvency. If collateral value drops relative to the position, it becomes undercollateralized and must be liquidated: the collateral is sold to cover the position, and a liquidation incentive ensures external actors perform this maintenance. This mechanism prevents bad position accumulation and maintains system solvency under market stress.</p>
+                <pre class="text-xs text-gray-300 leading-loose font-mono mt-3"><span class="text-gray-500">// Health Factor = (Collateral Value × LTV) / Position Value</span>
+<span class="text-gray-500">// LTV = Loan-to-Value ratio (max allowed position as fraction of collateral)</span>
 <span class="text-gray-500">//</span>
 <span class="text-gray-500">// Example:</span>
 <span class="text-gray-500">// Collateral: 10 ETH × $2,000 = $20,000</span>
-<span class="text-gray-500">// LTV: 75% (maximum debt threshold)</span>
-<span class="text-gray-500">// Max borrowable: $20,000 × 0.75 = $15,000</span>
-<span class="text-gray-500">// Actual borrow: $10,000</span>
+<span class="text-gray-500">// LTV: 75% (maximum position threshold)</span>
+<span class="text-gray-500">// Max position size: $20,000 × 0.75 = $15,000</span>
+<span class="text-gray-500">// Actual position: $10,000</span>
 <span class="text-gray-500">// Health Factor = ($20,000 × 0.75) / $10,000 = 1.5</span>
 <span class="text-gray-500">//</span>
 <span class="text-gray-500">// Market stress — ETH drops to $1,200:</span>
 <span class="text-gray-500">// Collateral: 10 ETH × $1,200 = $12,000</span>
 <span class="text-gray-500">// Health Factor = ($12,000 × 0.75) / $10,000 = 0.9</span>
 <span class="text-gray-500">// ⛔ Health Factor < 1.0 → LIQUIDATION TRIGGERED</span>
-<span class="text-gray-500">// System sells collateral to repay debt, preventing insolvency</span>
+<span class="text-gray-500">// System sells collateral to cover position, preventing insolvency</span>
 <span class="text-gray-500">// Liquidation incentive (5%) compensates the liquidator for execution</span></pre>
             </div>
             <div class="code-block rounded-xl p-5">
                 <div class="scan"></div>
                 <pre class="text-sm leading-relaxed"><code><span class="text-purple-400">function</span> <span class="text-blue-400">healthFactor</span>(<span class="text-purple-400">address</span> user) <span class="text-purple-400">public</span> <span class="text-purple-400">view</span> <span class="text-purple-400">returns</span> (<span class="text-purple-400">uint256</span>) {
     <span class="text-purple-400">uint256</span> collateralValue = getCollateralValue(user);
-    <span class="text-purple-400">uint256</span> debtValue = getDebtValue(user);
-    <span class="text-purple-400">if</span> (debtValue == <span class="text-green-400">0</span>) <span class="text-purple-400">return</span> <span class="text-green-400">type(uint256).max</span>;
-    <span class="text-purple-400">return</span> (collateralValue * <span class="text-green-400">1e18</span> * ltv) / debtValue; <span class="text-gray-500">// Scaled for precision</span>
+    <span class="text-purple-400">uint256</span> positionValue = getPositionValue(user);
+    <span class="text-purple-400">if</span> (positionValue == <span class="text-green-400">0</span>) <span class="text-purple-400">return</span> <span class="text-green-400">type(uint256).max</span>;
+    <span class="text-purple-400">return</span> (collateralValue * <span class="text-green-400">1e18</span> * ltv) / positionValue; <span class="text-gray-500">// Scaled for precision</span>
 }
 
 <span class="text-purple-400">function</span> <span class="text-blue-400">liquidate</span>(
-    <span class="text-purple-400">address</span> borrower,
+    <span class="text-purple-400">address</span> user,
     <span class="text-purple-400">uint256</span> repayAmount
 ) <span class="text-purple-400">external</span> {
-    <span class="text-purple-400">require</span>(healthFactor(borrower) < <span class="text-green-400">1e18</span>, <span class="text-green-400">"Position is healthy"</span>);
+    <span class="text-purple-400">require</span>(healthFactor(user) < <span class="text-green-400">1e18</span>, <span class="text-green-400">"Position is healthy"</span>);
 
     <span class="text-gray-500">// Liquidation incentive ensures external actors perform maintenance</span>
     <span class="text-purple-400">uint256</span> bonus = repayAmount * liquidationBonus / <span class="text-green-400">100</span>; <span class="text-gray-500">// e.g., 5%</span>
     <span class="text-purple-400">uint256</span> collateralToSeize = (repayAmount + bonus)
-        * getPrice(collateralToken) / getPrice(debtToken);
+        * getPrice(collateralToken) / getPrice(positionToken);
 
-    <span class="text-gray-500">// Debt reduction and collateral transfer</span>
-    debts[borrower] -= repayAmount;
-    collateral[borrower] -= collateralToSeize;
+    <span class="text-gray-500">// Position reduction and collateral transfer</span>
+    positions[user] -= repayAmount;
+    collateral[user] -= collateralToSeize;
     collateral[msg.sender] += collateralToSeize;
 }
 
@@ -2870,71 +2869,155 @@
 <span class="text-gray-500">// Using unverified on-chain prices enables manipulation → system failure</span></code></pre>
             </div>
             <div class="audit-warning rounded-xl p-5">
-                <div class="flex items-start gap-3"><i data-lucide="shield-alert" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i><div><h6 class="text-xs font-semibold text-red-400 mb-1">State Desynchronization: The "Donation Attack" Failure Mode</h6><p class="text-gray-300 text-xs leading-relaxed">An actor can transfer tokens directly to a borrower's address—tokens the protocol doesn't track in internal state. This creates desynchronization: the user's actual balance exceeds their tracked collateral, but healthFactor reflects only tracked state. While this doesn't directly drain funds, it can cause withdrawal failures if the protocol compares balanceOf() against internal accounting. <span class="text-white">Mitigation: use internal mappings for all state-dependent calculations, never balanceOf().</span></p></div></div>
+                <div class="flex items-start gap-3"><i data-lucide="shield-alert" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i><div><h6 class="text-xs font-semibold text-red-400 mb-1">State Desynchronization: The "Donation Attack" Failure Mode</h6><p class="text-gray-300 text-xs leading-relaxed">An actor can transfer tokens directly to a user's address—tokens the protocol doesn't track in internal state. This creates desynchronization: the user's actual balance exceeds their tracked collateral, but healthFactor reflects only tracked state. While this doesn't directly drain funds, it can cause withdrawal failures if the protocol compares balanceOf() against internal accounting. <span class="text-white">Mitigation: use internal mappings for all state-dependent calculations, never balanceOf().</span></p></div></div>
             </div>
             <div class="exercise-card rounded-xl p-5">
                 <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="pencil" class="w-4 h-4 text-gray-400"></i>Hands-On Task</h4>
-                <p class="text-gray-400 text-sm leading-relaxed mb-2">Implement deposit, borrow, repay, and liquidate functions. Tests: (1) healthy position rejects liquidation, (2) price drop triggers liquidation, (3) liquidator receives incentive, (4) partial liquidation functions correctly, (5) withdrawal blocked if healthFactor would drop below 1.0.</p>
+                <p class="text-gray-400 text-sm leading-relaxed mb-2">Implement deposit, open position, close position, and liquidate functions. Tests: (1) healthy position rejects liquidation, (2) price drop triggers liquidation, (3) liquidator receives incentive, (4) partial liquidation functions correctly, (5) withdrawal blocked if healthFactor would drop below 1.0.</p>
                 <div class="bg-white/[0.02] rounded-lg p-3 border border-white/5"><p class="text-xs text-gray-500"><span class="text-white font-medium">Expected Outcome:</span> 5+ tests. Health factor calculations verified with specific numerical values. Liquidation incentive correctly computed and transferred.</p></div>
             </div>
         </div>
     </div>
 
-    <!-- LESSON 9.2 -->
+    <!-- LESSON 9.2 - COMPLETELY REWRITTEN -->
     <div class="lesson-card rounded-2xl overflow-hidden mb-8" id="l-9-2">
         <div class="p-8 pb-0">
             <div class="flex items-center gap-3 mb-3"><span class="text-[10px] font-mono uppercase tracking-widest text-gray-500">Lesson 9.2</span><span class="w-1 h-1 rounded-full bg-gray-600"></span><span class="text-[10px] font-mono text-gray-600">~1.5 hours</span></div>
-            <h3 class="text-xl font-semibold tracking-tight mb-2">Interest Rate Models: System Equilibrium Through Dynamic Pricing</h3>
+            <h3 class="text-xl font-semibold tracking-tight mb-2">Dynamic Return Models: Performance-Linked Capital Allocation</h3>
         </div>
         <div class="p-8 space-y-6">
-            <p class="text-gray-400 text-sm leading-relaxed">Interest rate models serve as feedback control systems that maintain pool equilibrium. By dynamically adjusting the cost of borrowing based on utilization, these mechanisms prevent resource exhaustion and ensure depositors can always withdraw.</p>
+            <p class="text-gray-400 text-sm leading-relaxed">Performance-linked return models serve as feedback control systems that maintain pool equilibrium. By dynamically adjusting return allocation based on utilization and actual pool performance, these mechanisms ensure fair distribution between capital providers and system operators while preventing resource exhaustion. Unlike fixed-cost models where returns are guaranteed regardless of outcome, performance-linked systems tie compensation to real results—aligning incentives across all participants.</p>
+            
             <div class="glass-card rounded-xl p-5">
-                <pre class="text-xs text-gray-300 leading-loose font-mono"><span class="text-gray-500">// LINEAR MODEL: borrowRate = baseRate + utilization × slope1</span>
-<span class="text-gray-500">// Simple but insufficient penalty at high utilization</span>
+                <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="scale" class="w-4 h-4 text-blue-400"></i>Economic Paradigm Comparison</h4>
+                <pre class="text-xs text-gray-300 leading-loose font-mono"><span class="text-gray-500">// ════════════════════════════════════════════════════════</span>
+<span class="text-gray-500">// PARADIGM A: FIXED-COST MODEL (Guaranteed Returns)</span>
+<span class="text-gray-500">// ────────────────────────────────────────────────────</span>
+<span class="text-gray-500">// Characteristic: Capital provider receives predetermined %</span>
+<span class="text-gray-500">// Risk Profile: Provider bears default risk only</span>
+<span class="text-gray-500">// Return Structure: Fixed/Guaranteed (if no default)</span>
+<span class="text-gray-500">// Example: deposit $1000 → earn 5% annually regardless of pool performance</span>
 <span class="text-gray-500">//</span>
-<span class="text-gray-500">// utilization = totalBorrowed / totalDeposited</span>
-<span class="text-gray-500">// 0% utilization → 2% APR</span>
-<span class="text-gray-500">// 50% utilization → 2% + 50% × 20% = 12% APR</span>
-<span class="text-gray-500">// 100% utilization → 2% + 100% × 20% = 22% APR</span>
-<span class="text-gray-500">// FAILURE: at 99% utilization, rate is only 21.8% —</span>
-<span class="text-gray-500">// insufficient to push borrowers out before pool exhaustion</span>
+<span class="text-gray-500">// ════════════════════════════════════════════════════════</span>
+<span class="text-gray-500">// PARADIGM B: PERFORMANCE-LINKED MODEL (Variable Returns)</span>
+<span class="text-gray-500">// ────────────────────────────────────────────────────</span>
+<span class="text-gray-500">// Characteristic: Returns tied to actual pool revenue/performance</span>
+<span class="text-gray-500">// Risk Profile: Shared across ALL participants proportionally</span>
+<span class="text-gray-500">// Return Structure: Variable (no guarantees, based on results)</span>
+<span class="text-gray-500">// Example: invest $1000 → share in profits OR losses based on pool activity</span>
 <span class="text-gray-500">//</span>
-<span class="text-gray-500">// KINKED MODEL (Aave's design): dual-slope with threshold point</span>
-<span class="text-gray-500">//</span>
-<span class="text-gray-500">// Below kink (e.g., 80%): borrowRate = base + utilization × slope1</span>
-<span class="text-gray-500">//   0% → 2%, 80% → 12%</span>
-<span class="text-gray-500">//</span>
-<span class="text-gray-500">// Above kink: borrowRate = rateAtKink + (util - kink) × slope2</span>
-<span class="text-gray-500">//   80% → 12%, 90% → 12% + 10% × 150% = 27%, 100% → 42%</span>
-<span class="text-gray-500">//</span>
-<span class="text-gray-500">// The steep slope2 ABOVE the kink aggressively increases cost</span>
-<span class="text-gray-500">// to force borrowers out BEFORE utilization reaches 100%</span>
-<span class="text-gray-500">// This prevents pool exhaustion (state where withdrawals fail)</span></pre>
+<span class="text-gray-500">// ENGINEERING NOTE:</span>
+<span class="text-gray-500">// Both paradigms require dynamic pricing mechanics to maintain equilibrium.</span>
+<span class="text-gray-500">// We implement Paradigm B as our DEFAULT example (values-aligned).</span>
+<span class="text-gray-500">// Students may choose either paradigm for their final project.</span></pre>
             </div>
+
+            <div class="glass-card rounded-xl p-5">
+                <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-green-400"></i>System Model: Utilization-Based Return Allocation</h4>
+                <p class="text-gray-400 text-sm leading-relaxed mb-3">In performance-linked systems, return rates adjust dynamically based on pool utilization—the ratio of active positions to available capital. Low utilization means abundant capital (lower competition for opportunities). High utilization means scarce capital (higher demand, but also higher risk). The system uses a kinked model to gradually increase returns at low utilization, then aggressively increase them past a threshold—discouraging over-utilization that could lead to liquidity crises.</p>
+                <pre class="text-xs text-gray-300 leading-loose font-mono mt-3"><span class="text-gray-500">// PERFORMANCE-LINKED RETURN MODEL (Kinked Utilization Curve)</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// returnRate = baseReturn + utilization × slope1 (below threshold)</span>
+<span class="text-gray-500">// returnRate = rateAtThreshold + (util - threshold) × slope2 (above)</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// utilization = activePositions / totalCapital</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// SCENARIO ANALYSIS:</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// 0% utilization → 2% projected return (base rate, low demand)</span>
+<span class="text-gray-500">// 50% utilization → 2% + 50% × 20% = 12% projected return</span>
+<span class="text-gray-500">// 80% utilization (threshold) → 12% projected return</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// ABOVE THRESHOLD — Aggressive scaling begins:</span>
+<span class="text-gray-500">// 90% utilization → 12% + 10% × 150% = 27% projected return</span>
+<span class="text-gray-500">// 100% utilization → 42% projected return</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// WHY THE KINK?</span>
+<span class="text-gray-500">// Below threshold: Gradual increase encourages capital deployment</span>
+<span class="text-gray-500">// Above threshold: Sharp increase discourages over-extension</span>
+<span class="text-gray-500">// Prevents "liquidity run" scenarios where withdrawals fail</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// KEY DIFFERENCE FROM FIXED-COST MODELS:</span>
+<span class="text-gray-500">// These are PROJECTED returns based on historical performance</span>
+<span class="text-gray-500">// Actual returns depend on REAL pool revenue (not guaranteed)</span>
+<span class="text-gray-500">// If pool loses money → ALL participants share losses proportionally</span></pre>
+            </div>
+
             <div class="code-block rounded-xl p-5">
                 <div class="scan"></div>
-                <pre class="text-sm leading-relaxed"><code><span class="text-purple-400">function</span> <span class="text-blue-400">getBorrowRate</span>(<span class="text-purple-400">uint256</span> cash, <span class="text-purple-400">uint256</span> borrows, <span class="text-purple-400">uint256</span> reserves)
-    <span class="text-purple-400">public</span> <span class="text-purple-400">view</span> <span class="text-purple-400">returns</span> (<span class="text-purple-400">uint256</span>)
+                <pre class="text-sm leading-relaxed"><code><span class="text-purple-400">function</span> <span class="text-blue-400">getProjectedReturnRate</span>(
+    <span class="text-purple-400">uint256</span> cash, 
+    <span class="text-purple-400">uint256</span> activePositions, 
+    <span class="text-purple-400">uint256</span> reserves
+) <span class="text-purple-400">public</span> <span class="text-purple-400">view</span> <span class="text-purple-400">returns</span> (<span class="text-purple-400">uint256</span>)
 {
-    <span class="text-purple-400">uint256</span> util = borrows * <span class="text-green-400">1e18</span> / (cash + borrows - reserves);
+    <span class="text-purple-400">uint256</span> util = activePositions * <span class="text-green-400">1e18</span> / (cash + activePositions - reserves);
 
     <span class="text-purple-400">if</span> (util <= OPTIMAL_UTILIZATION) {
-        <span class="text-gray-500">// Below kink: gradual cost increase</span>
-        <span class="text-purple-400">return</span> BASE_RATE + util * SLOPE_1 / <span class="text-green-400">1e18</span>;
+        <span class="text-gray-500">// Below threshold: gradual return increase</span>
+        <span class="text-gray-500">// Encourages capital deployment when abundance exists</span>
+        <span class="text-purple-400">return</span> BASE_RETURN_RATE + util * SLOPE_1 / <span class="text-green-400">1e18</span>;
     } <span class="text-purple-400">else</span> {
-        <span class="text-gray-500">// Above kink: aggressive cost increase to prevent exhaustion</span>
+        <span class="text-gray-500">// Above threshold: aggressive return increase</span>
+        <span class="text-gray-500">// Discourages over-utilization, prevents exhaustion</span>
         <span class="text-purple-400">uint256</span> excessUtil = util - OPTIMAL_UTILIZATION;
-        <span class="text-purple-400">return</span> OPTIMAL_RATE + excessUtil * SLOPE_2 / <span class="text-green-400">1e18</span>;
+        <span class="text-purple-400">return</span> RATE_AT_THRESHOLD + excessUtil * SLOPE_2 / <span class="text-green-400">1e18</span>;
     }
 }
 
-<span class="text-gray-500">// Supply rate = borrowRate × utilization × (1 - reserveFactor)</span>
-<span class="text-gray-500">// Reserve factor (e.g., 10%) accumulates as protocol insurance reserve</span></code></pre>
+<span class="text-gray-500">// ACTUAL DISTRIBUTION: Based on REAL pool performance</span>
+<span class="text-purple-400">function</span> <span class="text-blue-400">distributeReturns</span>(<span class="text-purple-400">uint256</span> poolRevenue) <span class="text-purple-400">external</span> {
+    <span class="text-purple-400">uint256</span> totalSupply = getTotalSupply();
+    
+    <span class="text-gray-500">// Reserve accumulation (protocol sustainability fund)</span>
+    <span class="text-purple-400">uint256</span> protocolReserve = poolRevenue * reserveFactor / <span class="text-green-400">100</span>; <span class="text-gray-500">// e.g., 10%</span>
+    
+    <span class="text-gray-500">// Distributable amount to capital providers</span>
+    <span class="text-purple-400">uint256</span> distributable = poolRevenue - protocolReserve;
+    
+    <span class="text-gray-500">// Per-unit return calculation (proportional to contribution)</span>
+    <span class="text-purple-400">uint256</span> returnPerUnit = distributable * <span class="text-green-400">1e18</span> / totalSupply;
+    
+    <span class="text-gray-500">// Update each provider's accumulated returns</span>
+    <span class="text-purple-400">for</span> (<span class="text-purple-400">uint256</span> i = <span class="text-green-400">0</span>; i < providers.length; i++) {
+        <span class="text-purple-400">address</span> provider = providers[i];
+        <span class="text-purple-400">uint256</span> contribution = contributions[provider];
+        accumulatedReturns[provider] += contribution * returnPerUnit / <span class="text-green-400">1e18</span>;
+    }
+    
+    <span class="text-gray-500">// Note: If poolRevenue is zero or negative (loss),</span>
+    <span class="text-gray-500">// returnPerUnit is zero or negative → shared loss</span>
+    <span class="text-gray-500">// This is RISK SHARING, not guaranteed returns</span>
+}</code></pre>
             </div>
+
+            <div class="glass-card rounded-xl p-5">
+                <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="git-compare" class="w-4 h-4 text-yellow-400"></i>Implementation Comparison: Same Math, Different Economics</h4>
+                <pre class="text-xs text-gray-300 leading-loose font-mono mt-3"><span class="text-gray-500">// ════════════════════════════════════════════════════════</span>
+<span class="text-gray-500">// BOTH PARADIGMS USE IDENTICAL MATHEMATICAL STRUCTURES:</span>
+<span class="text-gray-500">// ════════════════════════════════════════════════════════</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// FIXED-COST MODEL:          PERFORMANCE-LINKED MODEL:</span>
+<span class="text-gray-500">// getBorrowRate(util)           getProjectedReturnRate(util)</span>
+<span class="text-gray-500">//     ↓                                 ↓</span>
+<span class="text-gray-500">// if util ≤ threshold:          if util ≤ threshold:</span>
+<span class="text-gray-500">//   return BASE + util×S1         return BASE + util×S1</span>
+<span class="text-gray-500">// else:                          else:</span>
+<span class="text-gray-500">//   return THRESH + excess×S2     return THRESH + excess×S2</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// THE MATH IS IDENTICAL. THE ECONOMICS DIFFER:</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// Fixed-Cost: Rate = COST to borrower (guaranteed payment)</span>
+<span class="text-gray-500">// Perf-Linked: Rate = PROJECTION of earnings (actual varies)</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// As an engineer, you implement the mechanism.</span>
+<span class="text-gray-500">// The economic paradigm is a design choice, not a technical constraint.</span></pre>
+            </div>
+
             <div class="exercise-card rounded-xl p-5">
                 <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="pencil" class="w-4 h-4 text-gray-400"></i>Hands-On Task</h4>
-                <p class="text-gray-400 text-sm leading-relaxed mb-2">Implement kinked interest rate model with Aave's parameters (base=2%, slope1=20%, slope2=150%, kink=80%). Tests: (1) rate at 0% utilization, (2) rate at kink threshold, (3) rate at 100% utilization, (4) rate at 99% utilization (verify aggressive penalty), (5) verify supply rate = borrow rate × utilization × (1 - reserve factor).</p>
-                <div class="bg-white/[0.02] rounded-lg p-3 border border-white/5"><p class="text-xs text-gray-500"><span class="text-white font-medium">Expected Outcome:</span> Rate at 80% = 12%, at 100% = 42%. Supply rate correctly accounts for reserve accumulation. All 5 tests pass.</p></div>
+                <p class="text-gray-400 text-sm leading-relaxed mb-2">Implement kinked utilization curve with parameters (base=2%, slope1=20%, slope2=150%, threshold=80%). Build distributeReturns() function that allocates actual pool revenue proportionally. Tests: (1) projected return at 0% utilization, (2) return at threshold point, (3) return at 100% utilization, (4) verify aggressive scaling above threshold, (5) test distribution with positive revenue, (6) test distribution with zero revenue (no losses shared in this simplified model), (7) verify reserve accumulation.</p>
+                <div class="bg-white/[0.02] rounded-lg p-3 border border-white/5"><p class="text-xs text-gray-500"><span class="text-white font-medium">Expected Outcome:</span> Return at 80% = 12%, at 100% = 42%. Distribution function correctly calculates per-unit returns. Reserve factor properly accumulates. All 7 tests pass. You now understand BOTH paradigms' mechanics.</p></div>
             </div>
         </div>
     </div>
@@ -2950,7 +3033,7 @@
             <div class="glass-card rounded-xl p-5">
                 <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="brain" class="w-4 h-4 text-purple-400"></i>Data Integrity Use Cases</h4>
                 <p class="text-gray-400 text-sm leading-relaxed mb-2">External data feeds enable deterministic systems to interact with real-world state:</p>
-                <pre class="text-xs text-gray-300 leading-loose font-mono"><span class="text-gray-500">// Collateralized debt: price feeds trigger liquidation decisions</span>
+                <pre class="text-xs text-gray-300 leading-loose font-mono"><span class="text-gray-500">// Collateralized finance: price feeds trigger liquidation decisions</span>
 <span class="text-gray-500">// Supply chain: shipment status triggers escrow release</span>
 <span class="text-gray-500">// Insurance: weather data triggers parametric policy payouts</span>
 <span class="text-gray-500">// Environmental: sensor data triggers carbon credit issuance</span>
@@ -3038,11 +3121,11 @@
 <span class="text-gray-500">// 30-sec TWAP on $1M pool: manipulation cost ≈ $5K (trivial)</span></pre>
             </div>
             <div class="audit-warning rounded-xl p-5">
-                <div class="flex items-start gap-3"><i data-lucide="shield-alert" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i><div><h6 class="text-xs font-semibold text-red-400 mb-1">Case Study: Value DeFi System Failure ($6M, May 2021)</h6><p class="text-gray-300 text-xs leading-relaxed">Value DeFi used on-chain DEX state as the data source for their debt system. An attacker manipulated the DEX state via atomic swaps, then extracted value at the manipulated price. The attack repeated across multiple pools. <span class="text-white">The fix was straightforward: switch to aggregated off-chain data. The vulnerability was entirely preventable through proper data source selection.</span></p></div></div>
+                <div class="flex items-start gap-3"><i data-lucide="shield-alert" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i><div><h6 class="text-xs font-semibold text-red-400 mb-1">Case Study: Value DeFi System Failure ($6M, May 2021)</h6><p class="text-gray-300 text-xs leading-relaxed">Value DeFi used on-chain DEX state as the data source for their finance system. An attacker manipulated the DEX state via atomic swaps, then extracted value at the manipulated price. The attack repeated across multiple pools. <span class="text-white">The fix was straightforward: switch to aggregated off-chain data. The vulnerability was entirely preventable through proper data source selection.</span></p></div></div>
             </div>
             <div class="exercise-card rounded-xl p-5">
                 <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="pencil" class="w-4 h-4 text-gray-400"></i>Hands-On Task: Simulate Data Manipulation</h4>
-                <p class="text-gray-400 text-sm leading-relaxed mb-2">Build a debt system using on-chain state as data source. Write an attacker contract: (1) atomic borrow from external pool, (2) swap to manipulate on-chain state, (3) extract value from debt system at manipulated price, (4) repay atomic borrow. Measure extraction. Then switch to aggregated data feed and verify the same attack fails.</p>
+                <p class="text-gray-400 text-sm leading-relaxed mb-2">Build a finance system using on-chain state as data source. Write an attacker contract: (1) atomic borrow from external pool, (2) swap to manipulate on-chain state, (3) extract value from finance system at manipulated price, (4) repay atomic borrow. Measure extraction. Then switch to aggregated data feed and verify the same attack fails.</p>
                 <div class="bg-white/[0.02] rounded-lg p-3 border border-white/5"><p class="text-xs text-gray-500"><span class="text-white font-medium">Expected Outcome:</span> Two tests: (1) on-chain data source enables extraction with measurable value, (2) aggregated data feed blocks the same attack. Demonstrates data source selection as critical design decision.</p></div>
             </div>
         </div>
@@ -3052,57 +3135,290 @@
     <div class="lesson-card rounded-2xl overflow-hidden mb-8" id="l-9-5">
         <div class="p-8 pb-0">
             <div class="flex items-center gap-3 mb-3"><span class="text-[10px] font-mono uppercase tracking-widest text-gray-500">Lesson 9.5</span><span class="w-1 h-1 rounded-full bg-gray-600"></span><span class="text-[10px] font-mono text-gray-600">~2.5 hours</span></div>
-            <h3 class="text-xl font-semibold tracking-tight mb-2">Building a Collateralized Debt System</h3>
+            <h3 class="text-xl font-semibold tracking-tight mb-2">Building a Collateralized Finance System</h3>
         </div>
         <div class="p-8 space-y-6">
-            <p class="text-gray-400 text-sm leading-relaxed">This lesson integrates overcollateralization logic, dynamic interest rates, verified external data, and automated liquidation into a complete debt management system. These mechanics are foundational for any system that extends credit against collateral—the same patterns apply whether managing tokenized assets, real-world asset loans, or margin systems.</p>
+            <p class="text-gray-400 text-sm leading-relaxed">This lesson integrates overcollateralization logic, performance-linked return allocation, verified external data, and automated liquidation into a complete asset-backed finance system. These mechanics are foundational for any system that extends positions against collateral—the same patterns apply whether managing tokenized assets, real-world asset financing, or margin systems.</p>
+            
             <div class="glass-card rounded-xl p-5">
-                <pre class="text-xs text-gray-300 leading-loose font-mono"><span class="text-gray-500">// Collateralized Debt System Architecture:</span>
+                <pre class="text-xs text-gray-300 leading-loose font-mono"><span class="text-gray-500">// ════════════════════════════════════════════════════════</span>
+<span class="text-gray-500">// COLLATERALIZED FINANCE SYSTEM ARCHITECTURE</span>
+<span class="text-gray-500">// ════════════════════════════════════════════════════════</span>
 <span class="text-gray-500">//</span>
-<span class="text-blue-400">DebtPool.sol</span>
+<span class="text-blue-400">FinancePool.sol</span>
 <span class="text-gray-500">├── deposit(asset, amount) — supply collateral</span>
-<span class="text-gray-500">├── borrow(asset, amount) — create debt against collateral</span>
-<span class="text-gray-500">├── repay(asset, amount) — reduce debt</span>
+<span class="text-gray-500">├── openPosition(asset, amount) — create position against collateral</span>
+<span class="text-gray-500">├── closePosition(asset, amount) — reduce position</span>
 <span class="text-gray-500">├── withdraw(asset, amount) — remove collateral</span>
-<span class="text-gray-500">├── liquidate(user, debtAsset, repayAmount) — liquidate undercollateralized position</span>
+<span class="text-gray-500">├── liquidate(user, positionAsset, closeAmount) — liquidate undercollateralized</span>
 <span class="text-gray-500">├── healthFactor(user) — calculate system health metric</span>
-<span class="text-gray-500">└── accrueInterest() — update interest indexes before any state change</span>
+<span class="text-gray-500">└── recordPerformance(revenue) — update returns based on actual results</span>
 <span class="text-gray-500">//</span>
-<span class="text-blue-400">InterestRateModel.sol</span>
-<span class="text-gray-500">├── getBorrowRate(utilization) — kinked equilibrium model</span>
-<span class="text-gray-500">└── getSupplyRate(utilization) — derived from borrow rate</span>
+<span class="text-blue-400">ReturnModel.sol</span>
+<span class="text-gray-500">├── getProjectedReturnRate(utilization) — kinked equilibrium model</span>
+<span class="text-gray-500">└── getDistributorRate(utilization) — derived from projected rate</span>
 <span class="text-gray-500">//</span>
 <span class="text-blue-400">DataFeed.sol</span>
 <span class="text-gray-500">├── getPrice(asset) — aggregated feed with integrity validation</span>
 <span class="text-gray-500">//</span>
 <span class="text-gray-500">// CRITICAL STATE ORDERING: every state-changing function must:</span>
-<span class="text-gray-500">// 1. accrueInterest() — update interest before any balance change</span>
-<span class="text-gray-500">// 2. Update state (deposits, borrows, collateral)</span>
-<span class="text-gray-500">// 3. Check health factor (for borrows and withdrawals)</span>
+<span class="text-gray-500">// 1. accruePerformance() — update return indexes before any balance change</span>
+<span class="text-gray-500">// 2. Update state (deposits, positions, collateral)</span>
+<span class="text-gray-500">// 3. Check health factor (for positions and withdrawals)</span>
 <span class="text-gray-500">// 4. Transfer tokens (interaction — LAST)</span></pre>
             </div>
-            <div class="pro-insight rounded-xl p-5">
-                <div class="flex items-start gap-3"><i data-lucide="zap" class="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5"></i><div><h6 class="text-xs font-semibold text-[#22C55E] mb-1">accrueInterest() — Primary Failure Point in Debt Systems</h6><p class="text-gray-300 text-xs leading-relaxed">Every state-changing function MUST call <span class="font-mono text-xs">accrueInterest()</span> first. This function calculates interest since the last update, adds it to totalBorrows, and updates borrow/supply indexes. Omitting this: (1) debt doesn't accumulate correctly, (2) suppliers don't receive proportional compensation, (3) the system leaks value silently. <span class="text-white">In production debt systems, this single function is responsible for more vulnerabilities than any other component.</span></p></div></div>
+
+            <div class="code-block rounded-xl p-5">
+                <div class="scan"></div>
+                <pre class="text-sm leading-relaxed"><code><span class="text-gray-500">// ════════════════════════════════════════════════════════</span>
+<span class="text-gray-500">// CORE IMPLEMENTATION: Performance-Linked Finance Pool</span>
+<span class="text-gray-500">// ════════════════════════════════════════════════════════</span>
+
+<span class="text-purple-400">contract</span> <span class="text-blue-400">FinancePool</span> {
+    
+    <span class="text-gray-500">// ─── STATE VARIABLES ───</span>
+    <span class="text-blue-400">IReturnModel</span> <span class="text-white">public</span> returnModel;
+    <span class="text-blue-400">IDataFeed</span> <span class="text-white">public</span> priceFeed;
+    
+    <span class="text-purple-400">uint256</span> <span class="text-white">public</span> constant LTV = <span class="text-green-400">75e16</span>; <span class="text-gray-500">// 75% max position-to-collateral ratio</span>
+    <span class="text-purple-400">uint256</span> <span class="text-white">public</span> constant LIQUIDATION_BONUS = <span class="text-green-400">5e16</span>; <span class="text-gray-500">// 5% incentive</span>
+    <span class="purple-400">uint256</span> <span class="text-white">public</span> constant RESERVE_FACTOR = <span class="text-green-400">10e16</span>; <span class="text-gray-500">// 10% protocol reserve</span>
+    
+    <span class="text-gray-500">// User accounting</span>
+    <span class="text-purple-400">mapping(address => mapping(address => uint256))</span> <span class="text-white">public</span> collateral;
+    <span class="text-purple-400">mapping(address => mapping(address => uint256))</span> <span class="text-white">public</span> positions;
+    <span class="text-purple-400">mapping(address => uint256)</span> <span class="text-white">public</span> accumulatedReturns;
+    
+    <span class="text-gray-500">// Global accounting</span>
+    <span class="text-purple-400">uint256</span> <span class="text-white">public</span> totalCollateral;
+    <span class="text-purple-400">uint256</span> <span class="text-white">public</span> totalPositions;
+    <span class="text-purple-400">uint256</span> <span class="text-white">public</span> totalReserve;
+    <span class="text-purple-400">uint256</span> <span class="text-white">public</span> totalRevenueRecorded;
+    
+    <span class="text-gray-500">// ─── EVENTS ───</span>
+    <span class="text-purple-400">event</span> Deposited(<span class="text-purple-400">address indexed</span> user, <span class="text-purple-400">address indexed</span> asset, <span class="text-purple-400">uint256</span> amount);
+    <span class="text-purple-400">event</span> PositionOpened(<span class="text-purple-400">address indexed</span> user, <span class="text-purple-400">address indexed</span> asset, <span class="text-purple-400">uint256</span> amount);
+    <span class="text-purple-400">event</span> PositionClosed(<span class="text-purple-400">address indexed</span> user, <span class="text-purple-400">address indexed</span> asset, <span class="text-purple-400">uint256</span> amount);
+    <span class="text-purple-400">event</span> Liquidated(<span class="text-purple-400">address indexed</span> user, <span class="text-purple-400">address indexed</span> liquidator, <span class="text-purple-400">uint256</span> amount);
+    <span class="text-purple-400">event</span> PerformanceRecorded(<span class="text-purple-400">uint256</span> revenue, <span class="text-purple-400">uint256</span> timestamp);
+    <span class="text-purple-400">event</span> ReturnsDistributed(<span class="text-purple-400">uint256</span> totalDistributed);
+    
+    <span class="text-gray-500">// ─── MODIFIERS ───</span>
+    <span class="text-purple-400">modifier</span> <span class="text-blue-400">updatePerformance</span>() {
+        <span class="text-gray_500">// CRITICAL: Always update before state changes</span>
+        _accruePerformance();
+        _;
+    }
+    
+    <span class="text-gray-500">// ─── CORE FUNCTIONS ───</span>
+    
+    <span class="text-purple-400">function</span> <span class="text-blue-400">deposit</span>(<span class="text-purple-400">address</span> asset, <span class="text-purple-400">uint256</span> amount) <span class="text-purple-400">external</span> <span class="text-blue-400">updatePerformance</span> {
+        <span class="text-purple-400">require</span>(amount > <span class="text-green-400">0</span>, <span class="text-green-400">"Zero amount"</span>);
+        
+        IERC20(asset).transferFrom(msg.sender, <span class="text-purple-400">address</span>(<span class="text-purple-400">this</span>), amount);
+        collateral[msg.sender][asset] += amount;
+        totalCollateral += amount;
+        
+        <span class="text-purple-400">emit</span> Deposited(msg.sender, asset, amount);
+    }
+    
+    <span class="text-purple-400">function</span> <span class="text-blue-400">openPosition</span>(
+        <span class="text-purple-400">address</span> collateralAsset,
+        <span class="text-purple-400">address</span> positionAsset,
+        <span class="text-purple-400">uint256</span> amount
+    ) <span class="text-purple-400">external</span> <span class="text-blue-400">updatePerformance</span> {
+        <span class="text-purple-400">require</span>(amount > <span class="text-green-400">0</span>, <span class="text-green-400">"Zero amount"</span>);
+        
+        <span class="text-gray-500">// Check health factor AFTER opening would fail</span>
+        <span class="text-purple-400">uint256</span> currentHealth = healthFactor(msg.sender);
+        
+        <span class="text-gray-500">// Simulate new position</span>
+        <span class="text-purple-400">uint256</span> newPositions = positions[msg.sender][positionAsset] + amount;
+        <span class="text-purple-400">uint256</span> newPositionValue = newPositions * getPrice(positionAsset);
+        <span class="text-purple-400">uint256</span> collateralValue = getCollateralValue(msg.sender);
+        
+        <span class="text-purple-400">uint256</span> projectedHealth = (collateralValue * LTV) / newPositionValue;
+        <span class="text-purple-400">require</span>(projectedHealth >= <span class="text-green-400">1e18</span>, <span class="text-green-400">"Insufficient collateral"</span>);
+        
+        <span class="text-gray-500">// Execute position opening</span>
+        IERC20(positionAsset).transferFrom(msg.sender, <span class="text-purple-400">address</span>(<span class="text-purple-400">this</span>), amount);
+        positions[msg.sender][positionAsset] += amount;
+        totalPositions += amount;
+        
+        <span class="text-purple-400">emit</span> PositionOpened(msg.sender, positionAsset, amount);
+    }
+    
+    <span class="text-purple-400">function</span> <span class="text-blue-400">closePosition</span>(<span class="text-purple-400">address</span> asset, <span class="text-purple-400">uint256</span> amount) <span class="text-purple-400">external</span> <span class="text-blue-400">updatePerformance</span> {
+        <span class="text-purple-400">require</span>(positions[msg.sender][asset] >= amount, <span class="text-green-400">"Insufficient position"</span>);
+        
+        positions[msg.sender][asset] -= amount;
+        totalPositions -= amount;
+        
+        IERC20(asset).transfer(msg.sender, amount);
+        
+        <span class="text-purple-400">emit</span> PositionClosed(msg.sender, asset, amount);
+    }
+    
+    <span class="text-purple-400">function</span> <span class="text-blue-400">withdraw</span>(<span class="text-purple-400">address</span> asset, <span class="text-purple-400">uint256</span> amount) <span class="text-purple-400">external</span> <span class="text-blue-400">updatePerformance</span> {
+        <span class="text-purple-400">require</span>(collateral[msg.sender][asset] >= amount, <span class="text-green-400">"Insufficient collateral"</span>);
+        
+        <span class="text-gray-500">// Simulate withdrawal</span>
+        <span class="text-purple-400">uint256</span> newCollateral = collateral[msg.sender][asset] - amount;
+        <span class="text-purple-400">uint256</span> newCollateralValue = newCollateral * getPrice(asset);
+        <span class="text-purple-400">uint256</span> positionValue = getPositionValue(msg.sender);
+        
+        <span class="text-gray-500">// Must maintain healthy position after withdrawal</span>
+        <span class="text-purple-400">if</span> (positionValue > <span class="text-green-400">0</span>) {
+            <span class="text-purple-400">uint256</span> projectedHealth = (newCollateralValue * LTV) / positionValue;
+            <span class="text-purple-400">require</span>(projectedHealth >= <span class="text-green-400">1e18</span>, <span class="text-green-400">"Withdrawal would undercollateralize"</span>);
+        }
+        
+        collateral[msg.sender][asset] -= amount;
+        totalCollateral -= amount;
+        
+        IERC20(asset).transfer(msg.sender, amount);
+    }
+    
+    <span class="text-purple-400">function</span> <span class="text-blue-400">liquidate</span>(
+        <span class="text-purple-400">address</span> user,
+        <span class="text-purple-400">address</span> positionAsset,
+        <span class="text-purple-400">uint256</span> closeAmount
+    ) <span class="text-purple-400">external</span> <span class="text-blue-400">updatePerformance</span> {
+        <span class="text-purple-400">require</span>(healthFactor(user) < <span class="text-green-400">1e18</span>, <span class="text-green-400">"Position is healthy"</span>);
+        <span class="text-purple-400">require</span>(closeAmount > <span class="text-green-400">0</span>, <span class="text-green-400">"Zero amount"</span>);
+        <span class="text-purple-400">require</span>(positions[user][positionAsset] >= closeAmount, <span class="text-green-400">"Exceeds position"</span>);
+        
+        <span class="text-gray-500">// Calculate liquidation incentive</span>
+        <span class="text-purple-400">uint256</span> bonus = closeAmount * LIQUIDATION_BONUS / <span class="text-green-400">1e18</span>;
+        <span class="text-purple-400">uint256</span> collateralToSeize = (closeAmount + bonus)
+            * getPrice(positionAsset) 
+            / getPrice(collateralToken);
+            
+        <span class="text-gray-500">// Ensure enough collateral exists</span>
+        <span class="text-purple-400">address</span> primaryCollateral = _getPrimaryCollateral(user);
+        <span class="text-purple-400">require</span>(collateral[user][primaryCollateral] >= collateralToSeize, <span class="text-green-400">"Insufficient collateral"</span>);
+        
+        <span class="text-gray-500">// Execute liquidation</span>
+        positions[user][positionAsset] -= closeAmount;
+        totalPositions -= closeAmount;
+        
+        collateral[user][primaryCollateral] -= collateralToSeize;
+        totalCollateral -= collateralToSeize;
+        
+        collateral[msg.sender][primaryCollateral] += collateralToSeize;
+        
+        <span class="text-gray-500">// Transfer position asset to liquidator (they close the position)</span>
+        IERC20(positionAsset).transfer(msg.sender, closeAmount);
+        
+        <span class="text-purple-400">emit</span> Liquidated(user, msg.sender, closeAmount);
+    }
+    
+    <span class="text-gray-500">// ─── PERFORMANCE TRACKING ───</span>
+    
+    <span class="text-purple-400">function</span> <span class="text-blue-400">recordPerformance</span>(<span class="text-purple-400">uint256</span> revenue) <span class="text-purple-400">external</span> onlyManager {
+        <span class="text-purple-400">require</span>(revenue > <span class="text-green-400">0</span>, <span class="text-green-400">"No revenue recorded"</span>);
+        
+        totalRevenueRecorded += revenue;
+        
+        <span class="text-gray-500">// Reserve accumulation (protocol sustainability)</span>
+        <span class="text-purple-400">uint256</span> reserveAmount = revenue * RESERVE_FACTOR / <span class="text-green-400">1e18</span>;
+        totalReserve += reserveAmount;
+        
+        <span class="text-gray-500">// Distributable to capital providers</span>
+        <span class="text-purple-400">uint256</span> distributable = revenue - reserveAmount;
+        
+        <span class="text-gray-500">// Per-unit distribution based on contribution share</span>
+        <span class="text-purple-400">uint256</span> returnPerUnit = distributable * <span class="text-green-400">1e18</span> / totalCollateral;
+        
+        <span class="text-gray-500">// Update each provider's accumulated returns</span>
+        <span class="text-comment">// (In production: use index-based accounting for gas efficiency)</span>
+        <span class="text-purple-400">for</span> (<span class="text-purple-400">uint256</span> i = <span class="text-green-400">0</span>; i < providers.length; i++) {
+            <span class="text-purple-400">address</span> provider = providers[i];
+            <span class="text-purple-400">uint256</span> contribution = collateral[provider][primaryAsset];
+            accumulatedReturns[provider] += contribution * returnPerUnit / <span class="text-green-400">1e18</span>;
+        }
+        
+        <span class="text-purple-400">emit</span> PerformanceRecorded(revenue, block.timestamp);
+        <span class="text-purple-400">emit</span> ReturnsDistributed(distributable);
+    }
+    
+    <span class="text-gray-500">// ─── VIEW FUNCTIONS ───</span>
+    
+    <span class="text-purple-400">function</span> <span class="text-blue-400">healthFactor</span>(<span class="text-purple-400">address</span> user) <span class="text-purple-400">public</span> <span class="text-purple-400">view</span> <span class="text-purple-400">returns</span> (<span class="text-purple-400">uint256</span>) {
+        <span class="text-purple-400">uint256</span> collateralValue = getCollateralValue(user);
+        <span class="text-purple-400">uint256</span> positionValue = getPositionValue(user);
+        
+        <span class="text-purple-400">if</span> (positionValue == <span class="text-green-400">0</span>) <span class="text-purple-400">return</span> <span class="text-green-400">type(uint256).max</span>;
+        
+        <span class="text-purple-400">return</span> (collateralValue * <span class="text-green-400">1e18</span> * LTV) / positionValue;
+    }
+    
+    <span class="text-purple-400">function</span> <span class="text-blue-400">getProjectedReturnRate</span>() <span class="text-purple-400">public</span> <span class="text-purple-400">view</span> <span class="text-purple-400">returns</span> (<span class="text-purple-400">uint256</span>) {
+        <span class="text-purple-400">return</span> returnModel.getProjectedReturnRate(
+            address(<span class="text-purple-400">this</span>).balance,
+            totalPositions,
+            totalReserve
+        );
+    }
+    
+    <span class="text-purple-400">function</span> <span class="text-blue-400">getCollateralValue</span>(<span class="text-purple-400">address</span> user) <span class="text-purple-400">internal</span> <span class="text-purple-400">returns</span> (<span class="text-purple-400">uint256</span>) {
+        <span class="text-purple-400">uint256</span> value = <span class="text-green-400">0</span>;
+        <span class="text-comment">// Sum all collateral assets priced via verified oracle</span>
+        <span class="text-purple-400">for</span> (<span class="text-purple-400">uint256</span> i = <span class="text-green-400">0</span>; i < supportedAssets.length; i++) {
+            <span class="text-purple-400">address</span> asset = supportedAssets[i];
+            <span class="text-purple-400">uint256</span> amount = collateral[user][asset];
+            <span class="text-purple-400">if</span> (amount > <span class="text-green-400">0</span>) {
+                value += amount * priceFeed.getPrice(asset);
+            }
+        }
+        <span class="text-purple-400">return</span> value;
+    }
+    
+    <span class="text-gray-500">// ... additional helper functions ...</span>
+}</code></pre>
             </div>
+
+            <div class="pro-insight rounded-xl p-5">
+                <div class="flex items-start gap-3"><i data-lucide="zap" class="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5"></i><div><h6 class="text-xs font-semibold text-[#22C55E] mb-1">recordPerformance() — Primary Failure Point in Finance Systems</h6><p class="text-gray-300 text-xs leading-relaxed">Every state-changing function MUST call <span class="font-mono text-xs">updatePerformance</span> modifier first. This ensures return indexes are calculated before any balance changes. Omitting this: (1) returns don't accumulate correctly, (2) providers don't receive proportional compensation, (3) the system leaks value silently. <span class="text-white">In production finance systems, this single mechanism is responsible for more vulnerabilities than any other component.</span></p></div></div>
+            </div>
+
+            <div class="glass-card rounded-xl p-5">
+                <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-blue-400"></i>Design Philosophy Note</h4>
+                <pre class="text-xs text-gray-300 leading-loose font-mono"><span class="text-gray-500">// This implementation uses PERFORMANCE-LINKED RETURNS as default.</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// WHY THIS PARADIGM?</span>
+<span class="text-gray-500">// • Returns tied to actual pool performance (not guaranteed)</span>
+<span class="text-gray-500">// • Risk shared proportionally among all participants</span>
+<span class="text-gray-500">// • Aligns incentives: everyone benefits when pool succeeds</span>
+<span class="text-gray-500">// • No party bears disproportionate risk unfairly</span>
+<span class="text-gray-500">// • Works across diverse user communities and value systems</span>
+<span class="text-gray-500">//</span>
+<span class="text-gray-500">// ALTERNATIVE: Fixed-cost models exist (see Paradigm A comparison).</span>
+<span class="text-gray-500">// Students may implement either paradigm for their final project.</span>
+<span class="text-gray-500">// The ENGINEERING MECHANICS (kinked curves, utilization math,</span>
+<span class="text-gray-500">// health factors, liquidation) remain identical regardless of choice.</span></pre>
+            </div>
+
             <div class="exercise-card rounded-xl p-5">
-                <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="pencil" class="w-4 h-4 text-gray-400"></i>Hands-On Task: Collateralized Debt System</h4>
-                <p class="text-gray-400 text-sm leading-relaxed mb-2">Build: DebtPool + InterestRateModel + Aggregated Data Feed. Support 2 assets (WETH + USDC). Tests: deposit, borrow, repay, withdraw, liquidation, interest accrual over time (use vm.warp), health factor edge cases, data manipulation resistance. Minimum 20 tests. Target: <span class="font-mono text-xs">forge coverage</span> ≥ 95%.</p>
-                <div class="bg-white/[0.02] rounded-lg p-3 border border-white/5"><p class="text-xs text-gray-500"><span class="text-white font-medium">Expected Outcome:</span> Complete collateralized debt system with 20+ tests, 95%+ coverage. Demonstrates understanding of risk management, data integrity, and defensive system design.</p></div>
+                <h4 class="text-sm font-medium text-white mb-2 flex items-center gap-2"><i data-lucide="pencil" class="w-4 h-4 text-gray-400"></i>Hands-On Task: Complete Finance System</h4>
+                <p class="text-gray-400 text-sm leading-relaxed mb-2">Build: FinancePool + ReturnModel + Aggregated Data Feed. Support 2 assets (WETH + USDC). Implement deposit, openPosition, closePosition, withdraw, liquidate, recordPerformance. Tests: (1) healthy position rejects liquidation, (2) price drop triggers liquidation with correct incentive, (3) partial liquidation works, (4) withdrawal blocked if undercollateralized, (5) performance recording distributes correctly, (6) reserve accumulation verified, (7) projected return rates match kinked curve, (8) data manipulation resistance test. Minimum 20 tests. Target: <span class="font-mono text-xs">forge coverage</span> ≥ 95%.</p>
+                <div class="bg-white/[0.02] rounded-lg p-3 border border-white/5"><p class="text-xs text-gray-500"><span class="text-white font-medium">Expected Outcome:</span> Complete collateralized finance system with 20+ tests, 95%+ coverage. Demonstrates understanding of risk management, performance-linked economics, data integrity, and defensive system design. Ready for production deployment patterns.</p></div>
             </div>
         </div>
     </div>
 
+    <!-- MILESTONE -->
     <div class="milestone-card rounded-2xl p-8 mb-8">
         <div class="flex items-center gap-3 mb-4"><i data-lucide="flag" class="w-5 h-5 text-purple-400"></i><h4 class="font-medium text-lg">Week 9 Milestone — Phase 3 Complete</h4></div>
         <div class="space-y-3 text-sm text-gray-400">
             <div class="checklist-item py-1" onclick="this.classList.toggle('checked')">Implement health factor with proper overcollateralization math</div>
-            <div class="checklist-item py-1" onclick="this.classList.toggle('checked')">Build kinked interest rate model for system equilibrium</div>
+            <div class="checklist-item py-1" onclick="this.classList.toggle('checked')">Build kinked utilization curve for dynamic return allocation</div>
             <div class="checklist-item py-1" onclick="this.classList.toggle('checked')">Integrate external data feed with complete integrity validation</div>
             <div class="checklist-item py-1" onclick="this.classList.toggle('checked')">Demonstrate on-chain data manipulation vulnerability (and mitigate)</div>
-            <div class="checklist-item py-1" onclick="this.classList.toggle('checked')">Complete collateralized debt system with 20+ tests and 95%+ coverage</div>
+            <div class="checklist-item py-1" onclick="this.classList.toggle('checked')">Complete collateralized finance system with 20+ tests and 95%+ coverage</div>
         </div>
         <div class="mt-6 pt-6 border-t border-purple-500/20">
-            <p class="text-xs text-purple-300 font-medium">Phase 3 Complete. You now possess: EVM execution model (Ch.1), production Solidity patterns (Ch.2), development toolchain (Ch.3), frontend integration (Ch.4), security analysis (Ch.5-6), upgradeable architecture (Ch.7), a complete AMM exchange system (Ch.8), and a collateralized debt system (Ch.9). These are the foundational systems of decentralized infrastructure—the remaining chapters specialize your capabilities.</p>
+            <p class="text-xs text-purple-300 font-medium">Phase 3 Complete. You now possess: EVM execution model (Ch.1), production Solidity patterns (Ch.2), development toolchain (Ch.3), frontend integration (Ch.4), security analysis (Ch.5-6), upgradeable architecture (Ch.7), a complete AMM exchange system (Ch.8), and a collateralized finance system (Ch.9). These are the foundational systems of decentralized infrastructure—the remaining chapters specialize your capabilities.</p>
         </div>
     </div>
 </div>
