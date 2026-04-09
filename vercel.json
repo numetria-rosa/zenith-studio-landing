@@ -5,8 +5,8 @@
       "destination": "/n8n_course/:chapter.html"
     },
     {
-      "source": "/ebook/ai_automation",
-      "destination": "/E-Books/ai_automation_playbook.html"
+      "source": "/ebook/:slug",
+      "destination": "/E-Books/:slug.html"
     },
     {
       "source": "/posts/:slug",
