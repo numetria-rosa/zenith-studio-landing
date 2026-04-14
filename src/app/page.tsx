@@ -290,67 +290,80 @@ export default function ZenithStudioLandingPage() {
         </section>
 
         {/* ── Contact / Socials Section ── */}
-        <section id="contact" className="mx-auto max-w-7xl py-10 sm:py-16 pb-24">
-          <div className="overflow-hidden rounded-[38px] border border-white/10 bg-white/[0.05] p-8 sm:p-10 lg:p-12 backdrop-blur-2xl">
-            <div className="text-center max-w-2xl mx-auto">
-              <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Connect</div>
-              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
-                Stay in the loop
-              </h2>
-              <p className="mt-4 text-white/62 leading-7">
-                Follow Zenith Studio for new product drops, workflow breakdowns, and behind-the-scenes builds.
-              </p>
-
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                {/* Email */}
+          <section id="contact" className="mx-auto max-w-7xl py-10 sm:py-16 pb-24">
+            <div className="overflow-hidden rounded-[38px] border border-white/10 bg-white/[0.05] p-8 sm:p-10 lg:p-12 backdrop-blur-2xl">
+              <div className="text-center max-w-2xl mx-auto">
+                <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Connect</div>
+                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
+                  Stay in the loop
+                </h2>
+                <p className="mt-4 text-white/62 leading-7">
+                  Follow Zenith Studio for new product drops, workflow breakdowns, and behind-the-scenes builds.
+                </p>
+          
+                {/* Whop Shop CTA */}
                 <a
-                  href="mailto:zenith.studio.s@outlook.com"
-                  className="group flex items-center gap-3 rounded-[24px] border border-white/10 bg-white/[0.04] px-6 py-4 backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/[0.08] hover:border-white/20"
-                >
-                  <svg className="h-5 w-5 text-white/60 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                  </svg>
-                  <div className="text-left">
-                    <div className="text-xs text-white/40 uppercase tracking-wider">Email</div>
-                    <div className="text-sm font-medium text-white/80">zenith.studio.s@outlook.com</div>
-                  </div>
-                </a>
-
-                {/* YouTube */}
-                <a
-                  href="https://www.youtube.com/@ZenithStudio-26"
+                  href="https://whop.com/zenithstudio"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-[24px] border border-white/10 bg-white/[0.04] px-6 py-4 backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/[0.08] hover:border-white/20"
+                  className="mt-8 inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-sm font-bold uppercase tracking-[0.12em] text-black transition hover:scale-[1.03] hover:shadow-[0_0_32px_rgba(255,255,255,0.2)]"
                 >
-                  <svg className="h-5 w-5 text-white/60 group-hover:text-[#FF0000] transition-colors" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                   </svg>
-                  <div className="text-left">
-                    <div className="text-xs text-white/40 uppercase tracking-wider">YouTube</div>
-                    <div className="text-sm font-medium text-white/80">Zenith Studio</div>
-                  </div>
+                  Get Our Products & Services
                 </a>
-
-                {/* Instagram */}
-                <a
-                  href="https://www.instagram.com/_zenithstudio_"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-[24px] border border-white/10 bg-white/[0.04] px-6 py-4 backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/[0.08] hover:border-white/20"
-                >
-                  <svg className="h-5 w-5 text-white/60 group-hover:text-[#E4405F] transition-colors" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-                  </svg>
-                  <div className="text-left">
-                    <div className="text-xs text-white/40 uppercase tracking-wider">Instagram</div>
-                    <div className="text-sm font-medium text-white/80">@_zenithstudio_</div>
-                  </div>
-                </a>
+          
+                <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                  {/* Email */}
+                  <a
+                    href="mailto:zenith.studio.s@outlook.com"
+                    className="group flex items-center gap-3 rounded-[24px] border border-white/10 bg-white/[0.04] px-6 py-4 backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/[0.08] hover:border-white/20"
+                  >
+                    <svg className="h-5 w-5 text-white/60 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                    </svg>
+                    <div className="text-left">
+                      <div className="text-xs text-white/40 uppercase tracking-wider">Email</div>
+                      <div className="text-sm font-medium text-white/80">zenith.studio.s@outlook.com</div>
+                    </div>
+                  </a>
+          
+                  {/* YouTube */}
+                  <a
+                    href="https://www.youtube.com/@ZenithStudio-26"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 rounded-[24px] border border-white/10 bg-white/[0.04] px-6 py-4 backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/[0.08] hover:border-white/20"
+                  >
+                    <svg className="h-5 w-5 text-white/60 group-hover:text-[#FF0000] transition-colors" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                    </svg>
+                    <div className="text-left">
+                      <div className="text-xs text-white/40 uppercase tracking-wider">YouTube</div>
+                      <div className="text-sm font-medium text-white/80">Zenith Studio</div>
+                    </div>
+                  </a>
+          
+                  {/* Instagram */}
+                  <a
+                    href="https://www.instagram.com/_zenithstudio_"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 rounded-[24px] border border-white/10 bg-white/[0.04] px-6 py-4 backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/[0.08] hover:border-white/20"
+                  >
+                    <svg className="h-5 w-5 text-white/60 group-hover:text-[#E4405F] transition-colors" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                    </svg>
+                    <div className="text-left">
+                      <div className="text-xs text-white/40 uppercase tracking-wider">Instagram</div>
+                      <div className="text-sm font-medium text-white/80">@_zenithstudio_</div>
+                    </div>
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
       </main>
 
       <footer className="relative z-10 border-t border-white/8 px-4 sm:px-6 lg:px-10 py-8 text-sm text-white/42">
