@@ -57,6 +57,49 @@ export default function ZenithStudioLandingPage() {
     },
   ];
 
+  const portfolio = [
+    {
+      name: "VoyAI",
+      category: "AI Travel SaaS",
+      tagline: "Your entire trip, planned in 60 seconds.",
+      description:
+        "An AI travel planner that turns a few prompts into real itineraries — live hotel prices, flights, and bookable tours. Powered by the Atlas & Awe platform.",
+      href: "https://voyai.site",
+      image: "/work/voyai.png",
+      accent: "from-sky-400/50 via-indigo-500/40 to-blue-600/50",
+    },
+    {
+      name: "SmartRevise",
+      category: "AI Study SaaS",
+      tagline: "Notes into exam-ready knowledge.",
+      description:
+        "Paste notes or a PDF and instantly get AI flashcards, spaced repetition, quizzes, mock exams, and a personal tutor. Powered by the A+ Academy platform.",
+      href: "https://smartrevise.site",
+      image: "/work/smartrevise.png",
+      accent: "from-emerald-300/50 via-teal-500/40 to-green-600/50",
+    },
+    {
+      name: "Atlas & Awe",
+      category: "Travel Platform",
+      tagline: "Travel, smartly.",
+      description:
+        "An independent European travel publication and the audience platform behind VoyAI — 120+ curated guides across 15+ countries.",
+      href: "https://atlasandawe.blog",
+      image: "/work/atlasandawe.png",
+      accent: "from-amber-300/50 via-orange-500/40 to-rose-500/50",
+    },
+    {
+      name: "A+ Academy",
+      category: "EdTech Platform",
+      tagline: "Online learning & exam-prep academy.",
+      description:
+        "The learning platform behind SmartRevise — courses, student tools, and a streamlined study experience.",
+      href: "https://aplusacademy.site",
+      image: null,
+      accent: "from-fuchsia-400/50 via-purple-500/40 to-pink-600/50",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-[#05060a] text-white overflow-x-hidden">
       <div className="fixed inset-0 pointer-events-none">
@@ -80,8 +123,8 @@ export default function ZenithStudioLandingPage() {
             </div>
 
             <nav className="hidden md:flex items-center gap-8 text-sm text-white/70">
+              <a href="#work" className="hover:text-white transition-colors">Work</a>
               <a href="#services" className="hover:text-white transition-colors">Services</a>
-              {/* <a href="#projects" className="hover:text-white transition-colors">Projects</a> */}
               <a href="#products" className="hover:text-white transition-colors">Products</a>
               <a href="#contact" className="hover:text-white transition-colors">Contact</a>
             </nav>
@@ -177,6 +220,73 @@ export default function ZenithStudioLandingPage() {
                 100% { transform: translateY(0px); }
               }
             `}</style>
+          </div>
+        </section>
+
+        {/* ── Portfolio / Our Products Section ── */}
+        <section id="work" className="mx-auto max-w-7xl py-10 sm:py-16">
+          <div className="mb-8 max-w-3xl">
+            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Portfolio · Our products</div>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
+              The studio behind the products
+            </h2>
+            <p className="mt-4 text-white/62 leading-7">
+              These aren&apos;t client logos — they&apos;re our own products. Zenith Studio designs, builds,
+              and runs them end-to-end: <span className="text-white/85">VoyAI</span> on the{" "}
+              <span className="text-white/85">Atlas &amp; Awe</span> platform, and{" "}
+              <span className="text-white/85">SmartRevise</span> on the{" "}
+              <span className="text-white/85">A+ Academy</span> platform.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:h-[460px] sm:flex-row lg:h-[500px]">
+            {portfolio.map((item, index) => (
+              <a
+                key={item.name}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative min-h-[200px] flex-1 overflow-hidden rounded-[28px] border border-white/10 transition-[flex] duration-500 ease-out sm:min-h-0 sm:hover:flex-[3.5]"
+              >
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={`${item.name} website`}
+                    className="absolute inset-0 h-full w-full object-cover object-top transition duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className={`absolute inset-0 bg-gradient-to-br ${item.accent}`} />
+                )}
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/10 transition-opacity duration-500 sm:from-black/90 sm:via-black/30 sm:to-transparent sm:group-hover:from-black/95 sm:group-hover:via-black/50" />
+
+                <div className="absolute right-4 top-4 z-10 text-xs font-medium uppercase tracking-[0.25em] text-white/45">
+                  0{index + 1}
+                </div>
+
+                <div className="absolute left-5 top-6 z-10 hidden text-sm font-medium tracking-[0.08em] text-white/85 [writing-mode:vertical-rl] transition-opacity duration-300 sm:block sm:group-hover:opacity-0">
+                  {item.name}
+                </div>
+
+                <div className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-7">
+                  <div className="transition-all duration-500 sm:translate-y-3 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/75 backdrop-blur-md">
+                        {item.category}
+                      </span>
+                      <span className="text-[11px] uppercase tracking-[0.25em] text-white/45">Built by Zenith</span>
+                    </div>
+                    <h3 className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl">{item.name}</h3>
+                    <p className="mt-1.5 text-base font-medium text-white/80">{item.tagline}</p>
+                    <p className="mt-3 max-w-md text-sm leading-7 text-white/60">{item.description}</p>
+                    <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-cyan-200">
+                      {item.href.replace("https://", "")}
+                      <span aria-hidden className="transition-transform group-hover:translate-x-1">↗</span>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
           </div>
         </section>
 
@@ -370,8 +480,8 @@ export default function ZenithStudioLandingPage() {
         <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>© 2026 Zenith Studio. Custom automation, digital products, and intelligent systems.</div>
           <div className="flex gap-5">
+            <a href="#work" className="hover:text-white/70">Work</a>
             <a href="#services" className="hover:text-white/70">Services</a>
-            {/* <a href="#projects" className="hover:text-white/70">Projects</a> */}
             <a href="#products" className="hover:text-white/70">Products</a>
             <a href="#contact" className="hover:text-white/70">Connect</a>
           </div>
