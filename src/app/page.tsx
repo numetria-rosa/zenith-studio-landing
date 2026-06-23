@@ -173,17 +173,19 @@ export default function ZenithStudioLandingPage() {
 
             <div className="mt-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
               {[
-                ["n8n Workflows", "AI automation, API chains, smart routing"],
-                ["Custom Scripting", "Python, Node.js, data pipelines from scratch"],
-                ["Niche Focus", "Built for operational bottlenecks and growth"],
-              ].map(([title, text]) => (
-                <div
+                ["01", "Ventures", "Our own SaaS — VoyAI & SmartRevise", "#work"],
+                ["02", "Services", "AI automation & custom engineering", "#services"],
+                ["03", "Products & Learning", "Templates, playbooks & courses", "#products"],
+              ].map(([num, title, text, href]) => (
+                <a
                   key={title}
-                  className="rounded-3xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl shadow-[0_0_40px_rgba(82,98,255,0.08)]"
+                  href={href}
+                  className="group rounded-3xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl shadow-[0_0_40px_rgba(82,98,255,0.08)] transition hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.06]"
                 >
-                  <div className="text-sm font-semibold text-white">{title}</div>
+                  <div className="text-[11px] font-medium tracking-[0.25em] text-cyan-200/60">{num}</div>
+                  <div className="mt-1 text-sm font-semibold text-white">{title}</div>
                   <div className="mt-2 text-sm leading-6 text-white/58">{text}</div>
-                </div>
+                </a>
               ))}
             </div>
           </div>
@@ -226,7 +228,7 @@ export default function ZenithStudioLandingPage() {
         {/* ── Portfolio / Our Products Section ── */}
         <section id="work" className="mx-auto max-w-7xl py-10 sm:py-16">
           <div className="mb-8 max-w-3xl">
-            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Portfolio · Our products</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Division 01 · Ventures</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
               The studio behind the products
             </h2>
@@ -293,7 +295,7 @@ export default function ZenithStudioLandingPage() {
         {/* ── Services Section ── */}
         <section id="services" className="mx-auto max-w-7xl py-10 sm:py-16">
           <div className="mb-8 max-w-2xl">
-            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Services</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Division 02 · Services</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">What Zenith Studio builds</h2>
             <p className="mt-4 text-white/62 leading-7">
               Systems designed to make businesses move faster, find better opportunities, and reduce repetitive work.
@@ -365,7 +367,7 @@ export default function ZenithStudioLandingPage() {
         {/* ── Products Section ── */}
         <section id="products" className="mx-auto max-w-7xl py-10 sm:py-16">
           <div className="mb-8 max-w-3xl">
-            <div className="text-xs uppercase tracking-[0.3em] text-blue-200/70">Products</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-blue-200/70">Division 03 · Products &amp; Learning</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">Ready-to-use automation assets</h2>
             <p className="mt-4 text-white/62 leading-7">
               Battle-tested playbooks, plug-and-play workflows, and step-by-step systems — everything you need to automate, earn, and scale without starting from zero.
