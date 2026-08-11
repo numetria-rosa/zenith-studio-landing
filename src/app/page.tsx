@@ -1,5 +1,5 @@
-// Every "Book a free audit" button on the page points here.
-const BOOKING_LINK = "https://cal.com/zenith-studio-ai/free-automation-audit";
+import Script from "next/script";
+import BookButton from "./BookButton";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -266,6 +266,18 @@ export default function ZenithStudioLandingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* Cal.com element-click embed. lazyOnload keeps it off the critical
+          path so Core Web Vitals are untouched; until it loads, the buttons
+          fall back to their plain href. */}
+      <Script id="cal-embed" strategy="lazyOnload">
+        {`(function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+Cal("init", "free-automation-audit", {origin:"https://app.cal.com"});
+Cal.config = Cal.config || {};
+Cal.config.forwardQueryParams = true;
+Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});`}
+      </Script>
+
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(111,144,255,0.18),transparent_26%),radial-gradient(circle_at_80%_18%,rgba(216,82,255,0.18),transparent_22%),radial-gradient(circle_at_50%_70%,rgba(0,183,255,0.12),transparent_28%)]" />
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.14)_1px,transparent_1px)] [background-size:64px_64px]" />
@@ -294,12 +306,9 @@ export default function ZenithStudioLandingPage() {
               <a href="#contact" className="hover:text-white transition-colors">Contact</a>
             </nav>
 
-            <a
-              href={BOOKING_LINK}
-              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
-            >
+            <BookButton className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]">
               Book a free audit
-            </a>
+            </BookButton>
           </div>
         </div>
       </header>
@@ -322,12 +331,9 @@ export default function ZenithStudioLandingPage() {
             </h1>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <a
-                href={BOOKING_LINK}
-                className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
-              >
+              <BookButton className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]">
                 Book a free automation audit
-              </a>
+              </BookButton>
               <a
                 href="#systems"
                 className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-xl transition hover:bg-white/10"
@@ -578,8 +584,7 @@ export default function ZenithStudioLandingPage() {
                   ))}
                 </ul>
 
-                <a
-                  href={BOOKING_LINK}
+                <BookButton
                   className={`mt-7 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
                     system.featured
                       ? "bg-white text-black"
@@ -587,7 +592,7 @@ export default function ZenithStudioLandingPage() {
                   }`}
                 >
                   Book a free audit
-                </a>
+                </BookButton>
               </div>
             ))}
           </div>
