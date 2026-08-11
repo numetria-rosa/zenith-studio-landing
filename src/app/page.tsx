@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Script from "next/script";
 import BookButton from "./BookButton";
 
@@ -105,8 +106,9 @@ export default function ZenithStudioLandingPage() {
     {
       title: "Zenith Lab",
       description:
-        "Coming Soon. Advanced academic-level courses for skills that won't be replaced by AI in 2026/2027. Each course includes a Career Path Edition, so you don't just learn, you know exactly where to apply it and how to get paid.",
-      tag: "Coming Soon",
+        "Career-path courses in automation, AI, data, and Web3: the skills that won't be replaced by AI in 2026/2027. Each course includes a Career Path Edition, so you don't just learn, you know exactly where to apply it and how to get paid. Founding cohort pricing is open now.",
+      tag: "Core Service",
+      href: "/lab",
     },
   ];
 
@@ -303,6 +305,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               <a href="#services" className="hover:text-white transition-colors">Services</a>
               <a href="#systems" className="hover:text-white transition-colors">Pricing</a>
               <a href="#products" className="hover:text-white transition-colors">Products</a>
+              <Link href="/lab" className="hover:text-white transition-colors">Lab</Link>
               <a href="#contact" className="hover:text-white transition-colors">Contact</a>
             </nav>
 
@@ -517,6 +520,15 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 </div>
                 <h3 className="mt-5 text-xl font-semibold">{service.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-white/60">{service.description}</p>
+                {service.href && (
+                  <Link
+                    href={service.href}
+                    className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-emerald-200 transition hover:gap-3"
+                  >
+                    Browse the courses
+                    <span aria-hidden>→</span>
+                  </Link>
+                )}
               </div>
             ))}
           </div>
@@ -784,6 +796,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
             <a href="#services" className="hover:text-white/70">Services</a>
             <a href="#systems" className="hover:text-white/70">Pricing</a>
             <a href="#products" className="hover:text-white/70">Products</a>
+            <Link href="/lab" className="hover:text-white/70">Lab</Link>
             <a href="#contact" className="hover:text-white/70">Connect</a>
           </div>
         </div>
