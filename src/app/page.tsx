@@ -2,6 +2,37 @@
 const BOOKING_LINK =
   "mailto:zenith.studio.s@outlook.com?subject=Free%20Automation%20Audit&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20book%20a%20free%20automation%20audit.%0A%0ABusiness%3A%20%0AWhat%20eats%20most%20of%20our%20time%3A%20%0A";
 
+const SITE_URL = "https://zenith-studio.site";
+
+// Written to match how people actually phrase these in search. Each one is
+// eligible for a Google rich snippet via the FAQPage schema below.
+const faqs = [
+  {
+    q: "How much does AI automation cost for a small business?",
+    a: "Our systems start at $800 setup plus $150 per month. The AI Lead Capture system is $1,000 setup plus $200 per month, and the AI Receptionist is $1,500 setup plus $300 per month. The monthly covers hosting, monitoring, and ongoing improvements. There is no lock-in contract.",
+  },
+  {
+    q: "How long does it take to set up an AI automation system?",
+    a: "Most systems are live within 2 to 7 days depending on which one you choose. The free audit gives you an exact timeline before you commit to anything.",
+  },
+  {
+    q: "Do I need technical knowledge to use it?",
+    a: "None at all. We build, host, and maintain everything. You use the system and get the time back. If something breaks, we are alerted before you notice.",
+  },
+  {
+    q: "What is n8n and why do you build with it?",
+    a: "n8n is a workflow automation platform that connects your apps and lets custom code run between them. We build with it because it handles complex multi-step logic that no-code tools cannot reach, and because self-hosting keeps your data under your control.",
+  },
+  {
+    q: "What tools does it integrate with?",
+    a: "The tools you already use. Gmail and Outlook, your CRM, Google Calendar and Cal.com, WhatsApp and SMS, Slack, and most platforms with an API. The system is built around your stack rather than asking you to switch.",
+  },
+  {
+    q: "Can I cancel the monthly plan?",
+    a: "Yes, anytime. There is no lock-in. The monthly fee covers hosting, monitoring, and improvements, and you keep everything that was built for you.",
+  },
+];
+
 export default function ZenithStudioLandingPage() {
   const aiSystems = [
     {
@@ -119,7 +150,7 @@ export default function ZenithStudioLandingPage() {
       description:
         "An AI travel planner that turns a few prompts into real itineraries with live hotel prices, flights, and bookable tours. Powered by the Atlas & Awe platform.",
       href: "https://voyai.site",
-      image: "/work/voyai.png",
+      image: "/work/voyai.webp",
       accent: "from-sky-400/50 via-indigo-500/40 to-blue-600/50",
       tint: "56,189,248",
       icon: (
@@ -133,7 +164,7 @@ export default function ZenithStudioLandingPage() {
       description:
         "Paste notes or a PDF and instantly get AI flashcards, spaced repetition, quizzes, mock exams, and a personal tutor. Powered by the A+ Academy platform.",
       href: "https://smartrevise.site",
-      image: "/work/smartrevise.png",
+      image: "/work/smartrevise.webp",
       accent: "from-emerald-300/50 via-teal-500/40 to-green-600/50",
       tint: "16,185,129",
       icon: (
@@ -147,7 +178,7 @@ export default function ZenithStudioLandingPage() {
       description:
         "An independent European travel publication and the audience platform behind VoyAI, with 120+ curated guides across 15+ countries.",
       href: "https://atlasandawe.blog",
-      image: "/work/atlasandawe.png",
+      image: "/work/atlasandawe.webp",
       accent: "from-amber-300/50 via-orange-500/40 to-rose-500/50",
       tint: "217,119,6",
       icon: (
@@ -164,7 +195,7 @@ export default function ZenithStudioLandingPage() {
       description:
         "The engineer-built study OS behind SmartRevise: systems-thinking and cognitive science applied to how students learn.",
       href: "https://aplusacademy.site",
-      image: "/work/aplusacademy.png",
+      image: "/work/aplusacademy.webp",
       accent: "from-fuchsia-400/50 via-purple-500/40 to-pink-600/50",
       tint: "168,85,247",
       icon: (
@@ -176,8 +207,66 @@ export default function ZenithStudioLandingPage() {
     },
   ];
 
+  // Structured data. Tells Google what this business is, what it sells and for
+  // how much, and makes the FAQ eligible for rich snippets.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ProfessionalService",
+        "@id": `${SITE_URL}/#organization`,
+        name: "Zenith Studio",
+        url: SITE_URL,
+        logo: `${SITE_URL}/icon.webp`,
+        image: `${SITE_URL}/opengraph-image`,
+        description:
+          "AI automation agency building done-for-you systems that capture leads, book appointments, and clear the inbox. n8n workflows, AI receptionists, and custom integrations.",
+        email: "zenith.studio.s@outlook.com",
+        priceRange: "$800 - $5000",
+        areaServed: { "@type": "Place", name: "Worldwide" },
+        sameAs: ["https://www.youtube.com/@ZenithStudio-26", "https://whop.com/zenithstudio"],
+        knowsAbout: [
+          "AI automation",
+          "n8n workflow automation",
+          "Business process automation",
+          "AI lead capture",
+          "AI receptionist systems",
+        ],
+        makesOffer: aiSystems.map((system) => ({
+          "@type": "Offer",
+          name: system.name,
+          description: system.description,
+          price: system.setup.replace(/[$,]/g, ""),
+          priceCurrency: "USD",
+          category: "AI automation system",
+        })),
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: "Zenith Studio",
+        publisher: { "@id": `${SITE_URL}/#organization` },
+        inLanguage: "en",
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${SITE_URL}/#faq`,
+        mainEntity: faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.q,
+          acceptedAnswer: { "@type": "Answer", text: faq.a },
+        })),
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-[#05060a] text-white overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(111,144,255,0.18),transparent_26%),radial-gradient(circle_at_80%_18%,rgba(216,82,255,0.18),transparent_22%),radial-gradient(circle_at_50%_70%,rgba(0,183,255,0.12),transparent_28%)]" />
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.14)_1px,transparent_1px)] [background-size:64px_64px]" />
@@ -188,7 +277,7 @@ export default function ZenithStudioLandingPage() {
           <div className="flex items-center justify-between px-5 sm:px-7 py-4">
             <div className="flex items-center gap-3">
               <img
-                src="/icon.png"
+                src="/icon.webp"
                 alt="Zenith Studio Icon"
                 className="h-9 w-9 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)]"
               />
@@ -274,7 +363,7 @@ export default function ZenithStudioLandingPage() {
 
             <div className="absolute inset-0 flex items-center justify-center -translate-y-14 lg:-translate-y-24">
               <img
-                src="/folder-glass.png"
+                src="/folder-glass.webp"
                 alt="Glass Folder"
                 className="pointer-events-none select-none drop-shadow-[0_40px_120px_rgba(0,0,0,0.7)] w-[520px] lg:w-[640px]"
                 style={{ animation: "zenithFloat 3.2s ease-in-out infinite" }}
@@ -583,6 +672,41 @@ export default function ZenithStudioLandingPage() {
                   </svg>
                 </a>
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── FAQ (also powers the FAQPage rich snippet) ── */}
+        <section id="faq" className="mx-auto max-w-7xl py-10 sm:py-16">
+          <div className="mb-8 max-w-3xl">
+            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">FAQ</div>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
+              Questions we get asked
+            </h2>
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            {faqs.map((faq) => (
+              <details
+                key={faq.q}
+                className="group rounded-[24px] border border-white/10 bg-white/[0.04] px-6 backdrop-blur-xl transition hover:border-white/20"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-base font-medium text-white marker:hidden [&::-webkit-details-marker]:hidden">
+                  {faq.q}
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    aria-hidden
+                    className="h-4 w-4 flex-shrink-0 text-cyan-200 transition-transform group-open:rotate-45"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </summary>
+                <p className="pb-5 text-sm leading-7 text-white/60">{faq.a}</p>
+              </details>
             ))}
           </div>
         </section>
