@@ -1,6 +1,5 @@
-// Swap this for a Cal.com / Calendly link once booking is set up.
-const BOOKING_LINK =
-  "mailto:zenith.studio.s@outlook.com?subject=Free%20Automation%20Audit&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20book%20a%20free%20automation%20audit.%0A%0ABusiness%3A%20%0AWhat%20eats%20most%20of%20our%20time%3A%20%0A";
+// Every "Book a free audit" button on the page points here.
+const BOOKING_LINK = "https://cal.com/zenith-studio-ai/free-automation-audit";
 
 const SITE_URL = "https://zenith-studio.site";
 
