@@ -3,25 +3,25 @@ export default function ZenithStudioLandingPage() {
     {
       title: "AI Automation Workflows",
       description:
-        "End-to-end intelligent automation built with n8n — from lead routing and CRM syncing to multi-step AI agent chains that handle complex business logic without human intervention.",
+        "End-to-end intelligent automation built with n8n: from lead routing and CRM syncing to multi-step AI agent chains that handle complex business logic without human intervention.",
       tag: "Core Service",
     },
     {
       title: "Advanced Coding & Scripting",
       description:
-        "Custom Python, Node.js, and API integrations that power the workflows no-code tools can't reach — data pipelines, web scrapers, internal tools, and backend systems built from scratch.",
+        "Custom Python, Node.js, and API integrations that power the workflows no-code tools can't reach: data pipelines, web scrapers, internal tools, and backend systems built from scratch.",
       tag: "Core Service",
     },
     {
       title: "Zenith AI",
       description:
-        "Coming Soon — Focused on building intelligent automation systems for modern businesses. We design and deploy scalable solutions that handle lead generation, customer communication, and operational workflows, allowing companies to grow faster with less manual effort and hours saved. One-time plug-and-play systems like AI Receptionist & Appointment Systems, AI Lead Capture & Follow-Up Systems, and more — for more quality and less wasted work hours.",
+        "Coming Soon. Focused on building intelligent automation systems for modern businesses. We design and deploy scalable solutions that handle lead generation, customer communication, and operational workflows, allowing companies to grow faster with less manual effort and hours saved. One-time plug-and-play systems like AI Receptionist & Appointment Systems, AI Lead Capture & Follow-Up Systems, and more, for more quality and less wasted work hours.",
       tag: "Coming Soon",
     },
     {
       title: "Zenith Lab",
       description:
-        "Coming Soon — Advanced academic-level courses for skills that won't be replaced by AI in 2026/2027. Each course includes a Career Path Edition, so you don't just learn — you know exactly where to apply it and how to get paid.",
+        "Coming Soon. Advanced academic-level courses for skills that won't be replaced by AI in 2026/2027. Each course includes a Career Path Edition, so you don't just learn, you know exactly where to apply it and how to get paid.",
       tag: "Coming Soon",
     },
   ];
@@ -31,21 +31,21 @@ export default function ZenithStudioLandingPage() {
       icon: "◈",
       title: "Get Paid to Build n8n Workflows",
       description:
-        "From $0 to $50/Hour with n8n Automation — a complete blueprint to turn workflow building into a paid skill, even if you're starting from zero.",
+        "From $0 to $50/Hour with n8n Automation: a complete blueprint to turn workflow building into a paid skill, even if you're starting from zero.",
       link: "https://whop.com/checkout/plan_aERQUZX70CcQ9",
     },
     {
       icon: "▣",
       title: "Build Your First $50 Workflow in 40 Minutes",
       description:
-        "I made $50 in one afternoon with a workflow I built in 40 minutes — step-by-step breakdown so you can replicate it the same day.",
+        "I made $50 in one afternoon with a workflow I built in 40 minutes: a step-by-step breakdown so you can replicate it the same day.",
       link: "https://whop.com/checkout/plan_tSZGq70OEyzsn",
     },
     {
       icon: "◉",
       title: "The $0 AI Automation Playbook For ANY Business",
       description:
-        "Replace a Full-Time Employee with Automated Workflows Without Spending a Dime — proven templates and strategies that work across every industry.",
+        "Replace a Full-Time Employee with Automated Workflows Without Spending a Dime. Proven templates and strategies that work across every industry.",
       link: "https://whop.com/checkout/plan_5mDFoE473UAcH",
     },
     {
@@ -63,7 +63,7 @@ export default function ZenithStudioLandingPage() {
       category: "AI Travel SaaS",
       tagline: "Your entire trip, planned in 60 seconds.",
       description:
-        "An AI travel planner that turns a few prompts into real itineraries — live hotel prices, flights, and bookable tours. Powered by the Atlas & Awe platform.",
+        "An AI travel planner that turns a few prompts into real itineraries with live hotel prices, flights, and bookable tours. Powered by the Atlas & Awe platform.",
       href: "https://voyai.site",
       image: "/work/voyai.png",
       accent: "from-sky-400/50 via-indigo-500/40 to-blue-600/50",
@@ -91,7 +91,7 @@ export default function ZenithStudioLandingPage() {
       category: "Travel Platform",
       tagline: "Travel, smartly.",
       description:
-        "An independent European travel publication and the audience platform behind VoyAI — 120+ curated guides across 15+ countries.",
+        "An independent European travel publication and the audience platform behind VoyAI, with 120+ curated guides across 15+ countries.",
       href: "https://atlasandawe.blog",
       image: "/work/atlasandawe.png",
       accent: "from-amber-300/50 via-orange-500/40 to-rose-500/50",
@@ -108,7 +108,7 @@ export default function ZenithStudioLandingPage() {
       category: "EdTech Platform",
       tagline: "Stop studying harder. Start studying like a system.",
       description:
-        "The engineer-built study OS behind SmartRevise — systems-thinking and cognitive science applied to how students learn.",
+        "The engineer-built study OS behind SmartRevise: systems-thinking and cognitive science applied to how students learn.",
       href: "https://aplusacademy.site",
       image: "/work/aplusacademy.png",
       accent: "from-fuchsia-400/50 via-purple-500/40 to-pink-600/50",
@@ -195,7 +195,7 @@ export default function ZenithStudioLandingPage() {
 
             <div className="mt-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
               {[
-                ["01", "Ventures", "Our own SaaS — VoyAI & SmartRevise", "#work"],
+                ["01", "Ventures", "Our own SaaS: VoyAI & SmartRevise", "#work"],
                 ["02", "Services", "AI automation & custom engineering", "#services"],
                 ["03", "Products & Learning", "Templates, playbooks & courses", "#products"],
               ].map(([num, title, text, href]) => (
@@ -255,7 +255,7 @@ export default function ZenithStudioLandingPage() {
               The studio behind the products
             </h2>
             <p className="mt-4 text-white/62 leading-7">
-              These aren&apos;t client logos — they&apos;re our own products. Zenith Studio designs, builds,
+              These aren&apos;t client logos. They&apos;re our own products. Zenith Studio designs, builds,
               and runs them end-to-end: <span className="text-white/85">VoyAI</span> on the{" "}
               <span className="text-white/85">Atlas &amp; Awe</span> platform, and{" "}
               <span className="text-white/85">SmartRevise</span> on the{" "}
@@ -272,7 +272,7 @@ export default function ZenithStudioLandingPage() {
                 rel="noopener noreferrer"
                 className="group relative min-h-[230px] flex-1 overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0c14] transition-[flex] duration-500 ease-out sm:min-h-0 sm:hover:flex-[3.5]"
               >
-                {/* Screenshot layer — shown on mobile, revealed on hover on desktop */}
+                {/* Screenshot layer: shown on mobile, revealed on hover on desktop */}
                 <div className="absolute inset-0 opacity-100 transition-opacity duration-500 sm:opacity-0 sm:group-hover:opacity-100">
                   <img
                     src={item.image}
@@ -289,7 +289,7 @@ export default function ZenithStudioLandingPage() {
                   </div>
                 </div>
 
-                {/* Medallion layer — the clean collapsed state (desktop) */}
+                {/* Medallion layer: the clean collapsed state (desktop) */}
                 <div
                   className="absolute inset-0 hidden flex-col items-center justify-center gap-4 sm:flex sm:transition-opacity sm:duration-500 sm:group-hover:opacity-0"
                   style={{ backgroundImage: `radial-gradient(circle at 50% 38%, rgba(${item.tint},0.30), rgba(10,12,20,0) 68%)` }}
@@ -309,7 +309,7 @@ export default function ZenithStudioLandingPage() {
                   0{index + 1}
                 </div>
 
-                {/* Details — shown on mobile, revealed on hover on desktop */}
+                {/* Details: shown on mobile, revealed on hover on desktop */}
                 <div className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-7">
                   <div className="transition-all duration-500 sm:translate-y-3 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
                     <div className="flex items-center gap-3">
@@ -373,7 +373,7 @@ export default function ZenithStudioLandingPage() {
           </div>
         </section>
 
-        {/* ── Projects / Live demos — COMMENTED OUT ──
+        {/* == Projects / Live demos (COMMENTED OUT) ==
         <section id="projects" className="mx-auto max-w-7xl py-10 sm:py-16">
           <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
@@ -410,7 +410,7 @@ export default function ZenithStudioLandingPage() {
             <div className="text-xs uppercase tracking-[0.3em] text-blue-200/70">Division 03 · Products &amp; Learning</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">Ready-to-use automation assets</h2>
             <p className="mt-4 text-white/62 leading-7">
-              Battle-tested playbooks, plug-and-play workflows, and step-by-step systems — everything you need to automate, earn, and scale without starting from zero.
+              Battle-tested playbooks, plug-and-play workflows, and step-by-step systems: everything you need to automate, earn, and scale without starting from zero.
             </p>
           </div>
 
