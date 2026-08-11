@@ -76,7 +76,7 @@ export default function OpengraphImage() {
         </div>
 
         <div style={{ display: "flex", gap: "14px", marginTop: 40 }}>
-          {["n8n workflows", "AI receptionist", "Lead capture"].map((tag) => (
+          {["Lead capture", "AI receptionist", "Inbox manager"].map((tag) => (
             <div
               key={tag}
               style={{

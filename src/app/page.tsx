@@ -20,8 +20,8 @@ const faqs = [
     a: "None at all. We build, host, and maintain everything. You use the system and get the time back. If something breaks, we are alerted before you notice.",
   },
   {
-    q: "What is n8n and why do you build with it?",
-    a: "n8n is a workflow automation platform that connects your apps and lets custom code run between them. We build with it because it handles complex multi-step logic that no-code tools cannot reach, and because self-hosting keeps your data under your control.",
+    q: "How is this different from hiring a virtual assistant?",
+    a: "A virtual assistant costs far more per month, works set hours, and needs managing. These systems run 24/7, answer in under a minute, never take a holiday, and cost a fraction of a salary. Most clients use both: the system handles the repetitive volume, the human handles the exceptions.",
   },
   {
     q: "What tools does it integrate with?",
@@ -88,7 +88,7 @@ export default function ZenithStudioLandingPage() {
     {
       title: "AI Automation Workflows",
       description:
-        "End-to-end intelligent automation built with n8n: from lead routing and CRM syncing to multi-step AI agent chains that handle complex business logic without human intervention.",
+        "End-to-end intelligent automation: from lead routing and CRM syncing to multi-step AI agent chains that handle complex business logic without human intervention.",
       tag: "Core Service",
     },
     {
@@ -114,9 +114,9 @@ export default function ZenithStudioLandingPage() {
   const products = [
     {
       icon: "◈",
-      title: "Get Paid to Build n8n Workflows",
+      title: "Get Paid to Build Automation Workflows",
       description:
-        "From $0 to $50/Hour with n8n Automation: a complete blueprint to turn workflow building into a paid skill, even if you're starting from zero.",
+        "From $0 to $50/Hour with automation: a complete blueprint to turn workflow building into a paid skill, even if you're starting from zero.",
       link: "https://whop.com/checkout/plan_aERQUZX70CcQ9",
     },
     {
@@ -135,9 +135,9 @@ export default function ZenithStudioLandingPage() {
     },
     {
       icon: "✦",
-      title: "AI Email Auto-Responder (Gmail + n8n)",
+      title: "AI Email Auto-Responder for Gmail",
       description:
-        "This n8n Workflow Literally Replies to Your Emails While You Sleep. Imagine waking up to a completely organized inbox with all your routine emails already answered. No more hours spent sorting through messages, drafting generic replies, or playing catch-up. Our plug-and-play Gmail + n8n system does the heavy lifting while you sleep.",
+        "This workflow literally replies to your emails while you sleep. Imagine waking up to a completely organized inbox with all your routine emails already answered. No more hours spent sorting through messages, drafting generic replies, or playing catch-up. Our plug-and-play Gmail system does the heavy lifting while you sleep.",
       link: "https://whop.com/checkout/plan_uCuJmMtPlV4fp",
     },
   ];
@@ -220,14 +220,14 @@ export default function ZenithStudioLandingPage() {
         logo: `${SITE_URL}/icon.webp`,
         image: `${SITE_URL}/opengraph-image`,
         description:
-          "AI automation agency building done-for-you systems that capture leads, book appointments, and clear the inbox. n8n workflows, AI receptionists, and custom integrations.",
+          "AI automation agency building done-for-you systems that capture leads, book appointments, and clear the inbox. AI receptionists, lead follow-up, and custom integrations.",
         email: "zenith.studio.s@outlook.com",
         priceRange: "$800 - $5000",
         areaServed: { "@type": "Place", name: "Worldwide" },
         sameAs: ["https://www.youtube.com/@ZenithStudio-26", "https://whop.com/zenithstudio"],
         knowsAbout: [
           "AI automation",
-          "n8n workflow automation",
+          "Workflow automation",
           "Business process automation",
           "AI lead capture",
           "AI receptionist systems",
