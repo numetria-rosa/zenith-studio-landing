@@ -4,12 +4,24 @@ import BookButton from "./BookButton";
 
 const SITE_URL = "https://zenith-studio.site";
 
+// Founding client offer. Set FOUNDING_SPOTS to 0 to switch the whole page back
+// to list pricing: the badges, struck-through prices, and banner all key off it.
+const FOUNDING_SPOTS = 5;
+const FOUNDING_DISCOUNT = 0.35; // applies to the setup fee only, never the monthly
+
+/** "$1,000" -> "$650" at 35% off, rounded to the nearest $5. */
+function foundingPrice(setup: string): string {
+  const value = Number(setup.replace(/[^0-9.]/g, ""));
+  const discounted = Math.round((value * (1 - FOUNDING_DISCOUNT)) / 5) * 5;
+  return `$${discounted.toLocaleString("en-US")}`;
+}
+
 // Written to match how people actually phrase these in search. Each one is
 // eligible for a Google rich snippet via the FAQPage schema below.
 const faqs = [
   {
     q: "How much does AI automation cost for a small business?",
-    a: "Our systems start at $800 setup plus $150 per month. The AI Lead Capture system is $1,000 setup plus $200 per month, and the AI Receptionist is $1,500 setup plus $300 per month. The monthly covers hosting, monitoring, and ongoing improvements. There is no lock-in contract.",
+    a: "Our systems start at $800 setup plus $150 per month. The AI Lead Capture system is $1,000 setup plus $200 per month, and the AI Receptionist is $1,500 setup plus $300 per month. Founding clients get 35% off the setup fee, so those become $520, $650, and $975. The monthly covers hosting, monitoring, and ongoing improvements, and there is no lock-in contract.",
   },
   {
     q: "How long does it take to set up an AI automation system?",
@@ -237,9 +249,20 @@ export default function ZenithStudioLandingPage() {
           "@type": "Offer",
           name: system.name,
           description: system.description,
-          price: system.setup.replace(/[$,]/g, ""),
+          // Advertise the price a buyer can actually get today.
+          price: (FOUNDING_SPOTS > 0 ? foundingPrice(system.setup) : system.setup).replace(/[$,]/g, ""),
           priceCurrency: "USD",
           category: "AI automation system",
+          ...(FOUNDING_SPOTS > 0
+            ? {
+                availability: "https://schema.org/LimitedAvailability",
+                eligibleQuantity: {
+                  "@type": "QuantitativeValue",
+                  value: FOUNDING_SPOTS,
+                  unitText: "founding client spots",
+                },
+              }
+            : {}),
         })),
       },
       {
@@ -548,6 +571,26 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
             </p>
           </div>
 
+          {FOUNDING_SPOTS > 0 && (
+            <div className="mb-8 flex flex-col gap-4 rounded-[28px] border border-emerald-300/30 bg-gradient-to-r from-emerald-400/[0.10] via-teal-400/[0.06] to-transparent p-6 backdrop-blur-xl sm:flex-row sm:items-center sm:gap-6">
+              <span className="inline-flex w-fit items-center gap-2 rounded-full bg-gradient-to-r from-emerald-300 to-teal-200 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-950">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-900 opacity-70" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-900" />
+                </span>
+                Founding client pricing
+              </span>
+              <p className="flex-1 text-sm leading-7 text-white/72">
+                <span className="font-semibold text-white">
+                  {Math.round(FOUNDING_DISCOUNT * 100)}% off setup for the first {FOUNDING_SPOTS} businesses.
+                </span>{" "}
+                I am taking on {FOUNDING_SPOTS} founding clients to build case studies. You get the
+                reduced setup fee and lifetime founding rates, I get to point at the results. Monthly
+                stays the same either way.
+              </p>
+            </div>
+          )}
+
           <div className="grid gap-5 lg:grid-cols-3">
             {aiSystems.map((system) => (
               <div
@@ -567,12 +610,32 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 <h3 className="text-xl font-semibold tracking-[-0.02em]">{system.name}</h3>
                 <p className="mt-2 text-sm font-medium text-white/80">{system.pitch}</p>
 
-                <div className="mt-5 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold tracking-[-0.04em]">{system.setup}</span>
-                  <span className="text-sm text-white/55">setup</span>
-                  <span className="text-sm font-medium text-emerald-200">+ {system.monthly}</span>
+                <div className="mt-5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  {FOUNDING_SPOTS > 0 ? (
+                    <>
+                      <span className="text-3xl font-semibold tracking-[-0.04em] text-emerald-200">
+                        {foundingPrice(system.setup)}
+                      </span>
+                      <span className="text-lg font-medium text-white/35 line-through">{system.setup}</span>
+                      <span className="text-sm text-white/55">setup</span>
+                      <span className="text-sm font-medium text-white/80">+ {system.monthly}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-3xl font-semibold tracking-[-0.04em]">{system.setup}</span>
+                      <span className="text-sm text-white/55">setup</span>
+                      <span className="text-sm font-medium text-emerald-200">+ {system.monthly}</span>
+                    </>
+                  )}
                 </div>
-                <div className="mt-1 text-xs uppercase tracking-[0.18em] text-white/40">{system.live}</div>
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs uppercase tracking-[0.18em] text-white/40">
+                  <span>{system.live}</span>
+                  {FOUNDING_SPOTS > 0 && (
+                    <span className="text-emerald-200/80">
+                      Founding price · {FOUNDING_SPOTS} spots
+                    </span>
+                  )}
+                </div>
 
                 <p className="mt-5 text-sm leading-7 text-white/60">{system.description}</p>
 
