@@ -1,4 +1,58 @@
+// Swap this for a Cal.com / Calendly link once booking is set up.
+const BOOKING_LINK =
+  "mailto:zenith.studio.s@outlook.com?subject=Free%20Automation%20Audit&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20book%20a%20free%20automation%20audit.%0A%0ABusiness%3A%20%0AWhat%20eats%20most%20of%20our%20time%3A%20%0A";
+
 export default function ZenithStudioLandingPage() {
+  const aiSystems = [
+    {
+      name: "AI Inbox Manager",
+      pitch: "Wake up to an inbox that is already handled.",
+      description:
+        "Sorts and prioritizes email, then drafts replies to the routine ones so your day starts with decisions, not admin.",
+      setup: "$800",
+      monthly: "$150/mo",
+      live: "Live in 2 to 4 days",
+      features: [
+        "Email sorting and prioritization",
+        "AI drafted replies for routine mail",
+        "Works with Gmail and Outlook",
+      ],
+      featured: false,
+    },
+    {
+      name: "AI Lead Capture & Follow-Up",
+      pitch: "Never lose a lead to a slow reply again.",
+      description:
+        "Captures every enquiry, qualifies it, and follows up by email and SMS until they book. The business that answers first wins the job.",
+      setup: "$1,000",
+      monthly: "$200/mo",
+      live: "Live in 3 to 5 days",
+      features: [
+        "Captures leads from every source",
+        "Auto qualifies and scores each one",
+        "Email and SMS follow-up sequences",
+        "Syncs to your CRM, with reporting",
+      ],
+      featured: true,
+    },
+    {
+      name: "AI Receptionist & Booking",
+      pitch: "Answers and books while you are on the job.",
+      description:
+        "Handles enquiries around the clock, books straight into your calendar, and sends the reminders that cut no-shows.",
+      setup: "$1,500",
+      monthly: "$300/mo",
+      live: "Live in 5 to 7 days",
+      features: [
+        "24/7 enquiry handling",
+        "Books into your existing calendar",
+        "Automated reminders to cut no-shows",
+        "Escalates anything it should not answer",
+      ],
+      featured: false,
+    },
+  ];
+
   const services = [
     {
       title: "AI Automation Workflows",
@@ -15,8 +69,8 @@ export default function ZenithStudioLandingPage() {
     {
       title: "Zenith AI",
       description:
-        "Coming Soon. Focused on building intelligent automation systems for modern businesses. We design and deploy scalable solutions that handle lead generation, customer communication, and operational workflows, allowing companies to grow faster with less manual effort and hours saved. One-time plug-and-play systems like AI Receptionist & Appointment Systems, AI Lead Capture & Follow-Up Systems, and more, for more quality and less wasted work hours.",
-      tag: "Coming Soon",
+        "Done-for-you automation systems that handle lead capture, customer communication, and bookings so companies grow faster with less manual effort. Plug-and-play installs like the AI Receptionist and the AI Lead Capture system, live in about a week. See pricing below.",
+      tag: "Core Service",
     },
     {
       title: "Zenith Lab",
@@ -147,15 +201,16 @@ export default function ZenithStudioLandingPage() {
             <nav className="hidden md:flex items-center gap-8 text-sm text-white/70">
               <a href="#work" className="hover:text-white transition-colors">Work</a>
               <a href="#services" className="hover:text-white transition-colors">Services</a>
+              <a href="#systems" className="hover:text-white transition-colors">Pricing</a>
               <a href="#products" className="hover:text-white transition-colors">Products</a>
               <a href="#contact" className="hover:text-white transition-colors">Contact</a>
             </nav>
 
             <a
-              href="#products"
-              className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[0_0_20px_rgba(255,255,255,0.05)] transition hover:bg-white/15"
+              href={BOOKING_LINK}
+              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
             >
-              Get Access
+              Book a free audit
             </a>
           </div>
         </div>
@@ -180,16 +235,16 @@ export default function ZenithStudioLandingPage() {
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <a
-                href="#services"
+                href={BOOKING_LINK}
                 className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
               >
-                Explore Services
+                Book a free automation audit
               </a>
               <a
-                href="#products"
+                href="#systems"
                 className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-xl transition hover:bg-white/10"
               >
-                View Products
+                See pricing
               </a>
             </div>
 
@@ -373,6 +428,97 @@ export default function ZenithStudioLandingPage() {
           </div>
         </section>
 
+        {/* ── Zenith AI Systems: priced offers ── */}
+        <section id="systems" className="mx-auto max-w-7xl py-10 sm:py-16">
+          <div className="mb-10 max-w-3xl">
+            <div className="text-xs uppercase tracking-[0.3em] text-emerald-200/70">Zenith AI · Done for you</div>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
+              Put your busywork on autopilot
+            </h2>
+            <p className="mt-4 text-white/62 leading-7">
+              Three systems we install for you, built once and tuned to your business. Fixed price,
+              no lock-in, live in about a week. Not sure which you need? The free audit tells you
+              exactly where to start.
+            </p>
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-3">
+            {aiSystems.map((system) => (
+              <div
+                key={system.name}
+                className={`relative flex flex-col rounded-[30px] border p-7 backdrop-blur-xl transition hover:-translate-y-1 ${
+                  system.featured
+                    ? "border-emerald-300/40 bg-emerald-400/[0.06] shadow-[0_0_50px_rgba(52,211,153,0.10)]"
+                    : "border-white/10 bg-white/[0.04] hover:bg-white/[0.06]"
+                }`}
+              >
+                {system.featured && (
+                  <span className="absolute -top-3 left-7 rounded-full bg-gradient-to-r from-emerald-300 to-teal-200 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-950">
+                    Most popular
+                  </span>
+                )}
+
+                <h3 className="text-xl font-semibold tracking-[-0.02em]">{system.name}</h3>
+                <p className="mt-2 text-sm font-medium text-white/80">{system.pitch}</p>
+
+                <div className="mt-5 flex items-baseline gap-2">
+                  <span className="text-3xl font-semibold tracking-[-0.04em]">{system.setup}</span>
+                  <span className="text-sm text-white/55">setup</span>
+                  <span className="text-sm font-medium text-emerald-200">+ {system.monthly}</span>
+                </div>
+                <div className="mt-1 text-xs uppercase tracking-[0.18em] text-white/40">{system.live}</div>
+
+                <p className="mt-5 text-sm leading-7 text-white/60">{system.description}</p>
+
+                <ul className="mt-5 flex-1 space-y-2.5">
+                  {system.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2.5 text-sm text-white/65">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2.2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                        className="mt-1 h-3.5 w-3.5 flex-shrink-0 text-emerald-300"
+                      >
+                        <path d="M5 12l5 5L20 7" />
+                      </svg>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <a
+                  href={BOOKING_LINK}
+                  className={`mt-7 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
+                    system.featured
+                      ? "bg-white text-black"
+                      : "border border-white/15 bg-white/5 text-white hover:bg-white/10"
+                  }`}
+                >
+                  Book a free audit
+                </a>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 grid gap-5 rounded-[30px] border border-white/10 bg-white/[0.03] p-7 backdrop-blur-xl sm:grid-cols-3">
+            {[
+              ["01", "Free 20 minute audit", "We map where your hours and leads are leaking, and whether automation is even worth it for you."],
+              ["02", "We build it", "You answer a few questions. We design, build, and connect the system to the tools you already use."],
+              ["03", "Go live and we maintain it", "Live in days. Your monthly covers hosting, monitoring, and improvements as it runs."],
+            ].map(([step, title, text]) => (
+              <div key={step}>
+                <div className="text-[11px] font-medium tracking-[0.25em] text-emerald-200/70">{step}</div>
+                <div className="mt-2 text-base font-semibold text-white">{title}</div>
+                <p className="mt-2 text-sm leading-6 text-white/55">{text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* == Projects / Live demos (COMMENTED OUT) ==
         <section id="projects" className="mx-auto max-w-7xl py-10 sm:py-16">
           <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -508,6 +654,7 @@ export default function ZenithStudioLandingPage() {
           <div className="flex gap-5">
             <a href="#work" className="hover:text-white/70">Work</a>
             <a href="#services" className="hover:text-white/70">Services</a>
+            <a href="#systems" className="hover:text-white/70">Pricing</a>
             <a href="#products" className="hover:text-white/70">Products</a>
             <a href="#contact" className="hover:text-white/70">Connect</a>
           </div>
