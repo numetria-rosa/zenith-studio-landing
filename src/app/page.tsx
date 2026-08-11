@@ -67,6 +67,10 @@ export default function ZenithStudioLandingPage() {
       href: "https://voyai.site",
       image: "/work/voyai.png",
       accent: "from-sky-400/50 via-indigo-500/40 to-blue-600/50",
+      tint: "56,189,248",
+      icon: (
+        <path d="M10.5 21l1.5-5 3.5-2 5.5 1.5a1.5 1.5 0 001-2.8L16 10l-1-6.5a1.3 1.3 0 00-2.4-.4L9.5 8 4 7a1.4 1.4 0 00-1 2.6L8 12l-1 4-3-.5a1.1 1.1 0 00-1 1.9L6 19l1.4 2.6a1.1 1.1 0 002-.2z" />
+      ),
     },
     {
       name: "SmartRevise",
@@ -77,6 +81,10 @@ export default function ZenithStudioLandingPage() {
       href: "https://smartrevise.site",
       image: "/work/smartrevise.png",
       accent: "from-emerald-300/50 via-teal-500/40 to-green-600/50",
+      tint: "16,185,129",
+      icon: (
+        <path d="M12 3a4 4 0 00-4 4 3.5 3.5 0 00-1.5 6.5A3 3 0 009 19a3 3 0 003 1 3 3 0 003-1 3 3 0 002.5-5.5A3.5 3.5 0 0016 7a4 4 0 00-4-4zM12 3v18" />
+      ),
     },
     {
       name: "Atlas & Awe",
@@ -87,16 +95,30 @@ export default function ZenithStudioLandingPage() {
       href: "https://atlasandawe.blog",
       image: "/work/atlasandawe.png",
       accent: "from-amber-300/50 via-orange-500/40 to-rose-500/50",
+      tint: "217,119,6",
+      icon: (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M15.5 8.5l-2 5-5 2 2-5z" />
+        </>
+      ),
     },
     {
       name: "A+ Academy",
       category: "EdTech Platform",
-      tagline: "Online learning & exam-prep academy.",
+      tagline: "Stop studying harder. Start studying like a system.",
       description:
-        "The learning platform behind SmartRevise — courses, student tools, and a streamlined study experience.",
+        "The engineer-built study OS behind SmartRevise — systems-thinking and cognitive science applied to how students learn.",
       href: "https://aplusacademy.site",
-      image: null,
+      image: "/work/aplusacademy.png",
       accent: "from-fuchsia-400/50 via-purple-500/40 to-pink-600/50",
+      tint: "168,85,247",
+      icon: (
+        <>
+          <path d="M12 3L2 8l10 5 10-5-10-5z" />
+          <path d="M6 10.5V16c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5.5" />
+        </>
+      ),
     },
   ];
 
@@ -248,28 +270,46 @@ export default function ZenithStudioLandingPage() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative min-h-[200px] flex-1 overflow-hidden rounded-[28px] border border-white/10 transition-[flex] duration-500 ease-out sm:min-h-0 sm:hover:flex-[3.5]"
+                className="group relative min-h-[230px] flex-1 overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0c14] transition-[flex] duration-500 ease-out sm:min-h-0 sm:hover:flex-[3.5]"
               >
-                {item.image ? (
+                {/* Screenshot layer — shown on mobile, revealed on hover on desktop */}
+                <div className="absolute inset-0 opacity-100 transition-opacity duration-500 sm:opacity-0 sm:group-hover:opacity-100">
                   <img
                     src={item.image}
                     alt={`${item.name} website`}
-                    className="absolute inset-0 h-full w-full object-cover object-top transition duration-700 group-hover:scale-105"
+                    className="absolute inset-0 h-full w-full object-cover object-top"
                   />
-                ) : (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${item.accent}`} />
-                )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10" />
+                  {/* browser chrome */}
+                  <div className="absolute inset-x-0 top-0 flex items-center gap-1.5 bg-black/45 px-3.5 py-2.5 backdrop-blur-md">
+                    <span className="h-2.5 w-2.5 rounded-full bg-white/25" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-white/25" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-white/25" />
+                    <span className="ml-2 truncate text-[11px] font-medium text-white/50">{item.href.replace("https://", "")}</span>
+                  </div>
+                </div>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/10 transition-opacity duration-500 sm:from-black/90 sm:via-black/30 sm:to-transparent sm:group-hover:from-black/95 sm:group-hover:via-black/50" />
+                {/* Medallion layer — the clean collapsed state (desktop) */}
+                <div
+                  className="absolute inset-0 hidden flex-col items-center justify-center gap-4 sm:flex sm:transition-opacity sm:duration-500 sm:group-hover:opacity-0"
+                  style={{ backgroundImage: `radial-gradient(circle at 50% 38%, rgba(${item.tint},0.30), rgba(10,12,20,0) 68%)` }}
+                >
+                  <div className="flex h-[70px] w-[70px] items-center justify-center rounded-2xl border border-white/15 bg-white/[0.06] text-white/90 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.4)]">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8">
+                      {item.icon}
+                    </svg>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold tracking-[-0.02em] text-white">{item.name}</div>
+                    <div className="mt-1.5 text-[10px] uppercase tracking-[0.28em] text-white/45">{item.category}</div>
+                  </div>
+                </div>
 
-                <div className="absolute right-4 top-4 z-10 text-xs font-medium uppercase tracking-[0.25em] text-white/45">
+                <div className="absolute right-4 top-4 z-20 text-xs font-medium uppercase tracking-[0.25em] text-white/40">
                   0{index + 1}
                 </div>
 
-                <div className="absolute left-5 top-6 z-10 hidden text-sm font-medium tracking-[0.08em] text-white/85 [writing-mode:vertical-rl] transition-opacity duration-300 sm:block sm:group-hover:opacity-0">
-                  {item.name}
-                </div>
-
+                {/* Details — shown on mobile, revealed on hover on desktop */}
                 <div className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-7">
                   <div className="transition-all duration-500 sm:translate-y-3 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
                     <div className="flex items-center gap-3">
