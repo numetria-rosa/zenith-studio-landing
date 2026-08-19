@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 8: Capstone — A Fault-Tolerant Lead Pipeline</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.progress{height:3px;background:var(--bd)}
+.progress i{display:block;height:100%;background:var(--lime);width:100%}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
+.def p{font-size:14.5px}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
+.callout b{color:var(--amber)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button.primary:hover{filter:brightness(1.08);color:var(--limed)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+
+/* brief */
+.brief{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:20px 24px;margin-top:18px}
+.brief .btag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:10px}
+.brief ul{margin-top:10px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:1.9}
+
+/* rubric */
+.rubric-cat{margin-top:20px}
+.rubric-cat .rctitle{font-size:13px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;justify-content:space-between}
+.rubric-item{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s}
+.rubric-item:hover{border-color:var(--bd2)}
+.rubric-item input{margin-top:3px;flex-shrink:0}
+.rubric-item .rtext{font-size:14px;color:var(--tx)}
+.rubric-item .rmod{font-size:11px;color:var(--mut2);margin-top:3px}
+.rubric-item.checked{border-color:var(--emerald);background:rgba(52,229,160,.06)}
+.rubricbar-wrap{margin-top:20px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px 18px}
+.rubricbar{height:10px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:10px}
+.rubricbar .fill{height:100%;background:var(--lime);width:0%;transition:width .3s}
+.rubricbar-wrap.done .fill{background:var(--emerald)}
+.rubric-summary{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--mut)}
+.rubric-summary b{font-family:'JetBrains Mono';font-size:20px;color:var(--tx)}
+
+/* reference solution */
+.refsol{margin-top:14px}
+.refsol .rsstep{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;margin-top:10px}
+.refsol .rsstep .rslbl{font-size:11px;color:var(--violet);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:6px}
+
+/* course recap */
+.recapgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+.recapcard{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px}
+.recapcard .rn{font-family:'JetBrains Mono';font-size:11px;color:var(--lime);font-weight:700}
+.recapcard .rt{font-size:13.5px;color:var(--tx);margin-top:4px;font-weight:600}
+.recapcard .rd{font-size:12.5px;color:var(--mut);margin-top:4px}
+@media (max-width:640px){ .recapgrid{grid-template-columns:1fr} }
+
+/* orientation panel */
+.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
+.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
+.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h3:first-of-type{margin-top:0}
+.orient p{font-size:14.5px;color:var(--mut)}
+.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
+.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
+.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
+
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
+.nextbtn{margin-left:auto}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+
+/* practice */
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
+.practice p{font-size:14px}
+.practice details{margin-top:12px}
+.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
+.practice summary::-webkit-details-marker{display:none}
+.practice summary:before{content:"▸ "}
+.practice details[open] summary:before{content:"▾ "}
+.practice details:not([open]) .ans{display:none}
+.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
+
+/* capstone parts */
+.textin{width:100%;font-family:'JetBrains Mono';font-size:12.5px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.fieldlbl{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;margin-top:16px;margin-bottom:6px;display:block}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+.designfield{margin-top:20px}
+.designfield .dflbl{font-size:13px;font-weight:700;color:var(--tx);display:flex;justify-content:space-between;align-items:baseline}
+.designfield .dfmod{font-size:11px;color:var(--mut2);font-weight:400}
+.designfield textarea{margin-top:8px}
+.dfstatus{margin-top:6px;font-size:12.5px;display:flex;align-items:center;gap:6px}
+.dfstatus.pass{color:var(--emerald)}
+.dfstatus.fail{color:var(--amber)}
+.dfstatus.empty{color:var(--mut2)}
+.partscore-wrap{margin-top:20px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px 18px}
+.partscore-bar{height:10px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:10px}
+.partscore-bar .fill{height:100%;background:var(--lime);width:0%;transition:width .3s}
+.partscore-bar.done .fill{background:var(--emerald)}
+.partscore-summary{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--mut)}
+.partscore-summary b{font-family:'JetBrains Mono';font-size:20px;color:var(--tx)}
+.testrow{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.testrow.pass{background:rgba(52,229,160,.08);border:1px solid rgba(52,229,160,.3);color:var(--emerald)}
+.testrow.fail{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3);color:var(--red)}
+.testrow .tname{flex:1}
+.testrow .thint{color:var(--mut);font-size:12px;margin-top:4px}
+.finalscore{margin-top:20px;background:var(--card2);border:1px solid var(--bd2);border-radius:12px;padding:22px 24px}
+.finalscore .fsrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)}
+.finalscore .fsrow:last-child{border-bottom:none}
+.finalscore .fslabel{font-size:13.5px;color:var(--tx)}
+.finalscore .fsval{font-family:'JetBrains Mono';font-weight:700;color:var(--mut)}
+.finalscore .fsval.pass{color:var(--emerald)}
+.finalscore .fsval.fail{color:var(--amber)}
+.finalscore .fstotal{font-size:18px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd2);display:flex;justify-content:space-between}
+.finalscore .fstotal b{font-family:'JetBrains Mono';color:var(--lime);font-size:24px}
+.debugcode{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;font-family:'JetBrains Mono';font-size:12.5px;color:var(--mut);white-space:pre-wrap;overflow-x:auto;margin-top:14px;line-height:1.7}
+.debugcode .ln{color:var(--mut2);display:inline-block;width:22px;user-select:none}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+
+@media (max-width:640px){
+  .wrap{padding:0 16px 60px}
+  h1{font-size:26px}
+  .kh h2{font-size:18px}
+  .interactive{padding:16px}
+  .orient{padding:20px 18px}
+}
+
+/* course navigation bar */
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--lime)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Automation Engineering · Module 8 of 8</span>
+</div></div>
+<div class="progress"><i></i></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="challenges.html">&larr; <span class="navlabel">Challenges</span></a><span class="navsep"></span></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 08 · Capstone</span>
+    <h1 class="serif">A Fault-Tolerant Lead Pipeline</h1>
+    <p class="sub">Synthesis. You are given a client brief: a lead-capture-to-CRM pipeline that must survive a flaky downstream API, duplicate webhook deliveries, and a traffic spike. You submit a formal design (DAG or state machine), an idempotency and retry strategy, and an SLO definition, graded against a rubric, not vibes.</p>
+
+    <div class="objectives">
+      <div class="lbl">Deliverables</div>
+      <ul>
+        <li>A written design specification applying every prior module</li>
+        <li>A working implementation of the critical path (idempotent ingestion + retry + dead-letter handling)</li>
+        <li>A one-page SLO document you could hand directly to a client</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="orient">
+    <div class="lbl">Before you start</div>
+    <h3 class="serif">What this module is, and isn't</h3>
+    <p>Every prior module taught one idea in isolation. This one teaches nothing new, it asks whether you can put seven ideas together under one brief without dropping any of them, which is the actual job. There's no new theory here, no new proofs, just the same rigor applied to a single realistic scenario end to end.</p>
+    <h3 class="serif">How grading works here</h3>
+    <p>This module replaces the usual multiple-choice checkpoint with three real deliverables, graded from what you actually submit, not from boxes you tick yourself. Part 1 inspects the actual text of your design document for the specific technical content each section needs. Part 2 runs real automated tests against code you write, including a genuine concurrent-duplicate-request test. Part 3 checks your diagnosis of a real bug against the actual failure mode. Part 4 combines all three into one score.</p>
+    <h3 class="serif">How to work through it</h3>
+    <ol>
+      <li>Read the brief carefully, twice, most real design failures come from missing a stated requirement, not from getting the theory wrong.</li>
+      <li>Write your design document directly into Part 1's fields, then check it, and fix whatever comes back flagged.</li>
+      <li>Complete the implementation in Part 2 and run the tests until they pass. A red test tells you exactly which behavior is wrong.</li>
+      <li>Diagnose the bug in Part 3, then compare against the reference solution outline afterward, not to copy it, but to see how the same requirements can be satisfied a different valid way.</li>
+    </ol>
+  </div>
+
+  <section>
+    <div class="kh"><span class="num">1</span><h2 class="serif">The brief</h2></div>
+    <div class="brief">
+      <div class="btag">Client brief: Northstar Realty Group</div>
+      <p>Northstar runs paid ad campaigns across three platforms that each send a webhook to your system whenever someone submits a "request a callback" form. Your system must capture the lead, enrich it via a third-party CRM API, score it, and hand it off to a sales rep, exactly the Module 1 pipeline shape.</p>
+      <p style="margin-top:10px">Three things are explicitly called out as risks in the brief, because they've each caused a production incident with Northstar's previous vendor:</p>
+      <ul>
+        <li><b>A flaky downstream API.</b> The CRM enrichment API has a documented 2% error rate and occasional multi-second latency spikes under its own load.</li>
+        <li><b>Duplicate webhook deliveries.</b> All three ad platforms document at-least-once webhook delivery, with retries on their side if they don't get a fast 200 response.</li>
+        <li><b>Traffic spikes.</b> Northstar runs occasional viral campaigns that can 8x their normal lead volume for a few hours with no advance warning.</li>
+      </ul>
+    </div>
+    <div class="callout"><b>What the brief is actually testing:</b> every one of those three risks maps directly to a module you've already completed. A flaky downstream API is Module 3 (circuit breakers, retries). Duplicate webhook deliveries is Modules 2 and 5 (idempotency keys, HMAC verification). A traffic spike is Module 4 (queueing, the utilization cliff) and Module 3 again (bulkheading so the spike doesn't take down unrelated work). The brief isn't hiding the answer, it's telling you exactly which tools to reach for, the skill is recognizing the mapping.</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Before scrolling further: for each of the three named risks, name the specific module concept you'd reach for first. Write it down, then compare against the callout above.</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Flaky downstream API → circuit breaker (Module 3), so a struggling CRM API fails fast instead of tying up resources. Duplicate webhooks → idempotency key with an atomic uniqueness check (Module 2) plus HMAC signature verification to confirm authenticity (Module 5). Traffic spike → capacity math to know where the utilization cliff sits (Module 4) and bulkheading so a spike in lead ingestion doesn't starve unrelated processing (Module 3). If your answers matched, you're already thinking in the right shape for this brief.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">2</span><h2 class="serif">Deliverable 1: the design specification</h2></div>
+    <p>A complete design specification names the pipeline's shape (Module 1), every non-idempotent operation and how it's made safe (Module 2), and every external dependency's failure-handling strategy (Module 3). It should be readable by someone who hasn't seen the brief and still understand exactly what happens at each step and why.</p>
+    <div class="def">
+      <div class="k">What "complete" means here, concretely</div>
+      <p>A DAG or FSM diagram (or both, per Module 1's Section 6, use whichever fits each part), with every node labeled by what it does and what it depends on. For each node with a real-world side effect, a stated idempotency approach. For each node calling an external service, a stated retry and circuit-breaker policy, including what "fails" means for that specific call.</p>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>The "receive webhook" step and the "enrich via CRM API" step both need failure-handling strategies, but not the same one. Why might they differ?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">"Receive webhook" is you accepting a request, its main failure-handling concern is idempotency and authenticity (was this delivery genuine, and have we already processed it), from Modules 2 and 5. "Enrich via CRM API" is you calling someone else's flaky service, its main concern is retry behavior and failing fast if that dependency is down, from Module 3. Different roles in the pipeline face different failure modes, a good spec doesn't apply one generic "add retries" policy everywhere, it reasons about each step's actual risk.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">3</span><h2 class="serif">Deliverable 2: idempotency, retry, and dead-letter handling</h2></div>
+    <p>This is the "working implementation of the critical path" the brief asks for, the part that actually has to run, not just be described.</p>
+    <div class="def">
+      <div class="k">The critical path, concretely</div>
+      <p>1. Webhook received, HMAC signature verified (Module 5) before anything else happens, an unverified payload is never trusted. 2. An idempotency key derived from the platform's own event ID is checked via an atomic unique-constraint insert (Module 2), not a check-then-insert race. 3. The CRM enrichment call is wrapped in a circuit breaker (Module 3): normal retries with backoff and jitter while the breaker is Closed, fail-fast with no call attempted while Open. 4. A job that exhausts its retries goes to a <b>dead-letter queue</b> instead of being silently dropped, a durable record of "this needs a human," rather than a job that just vanishes.</p>
+    </div>
+    <div class="callout"><b>Dead-letter handling, defined:</b> when a job fails every retry attempt, don't discard it, write it to a separate durable store (a "dead-letter queue") with the failure reason and enough context to retry it manually or investigate it later. This is what turns "we silently lost some leads during the outage" into "we have a list of exactly which 40 leads need manual follow-up," a categorically different conversation with a client.</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Why does HMAC verification (step 1) need to happen before idempotency-key checking (step 2), rather than after?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Because an unverified payload's claimed event ID can't be trusted at all, an attacker could send junk with a fabricated ID designed to collide with or pollute your idempotency store. Verify authenticity first, so that only genuine events ever reach the logic that assumes their contents are trustworthy. Checking order matters: idempotency protects against duplicates from a legitimate sender, it isn't a substitute for verifying the sender is legitimate in the first place.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4</span><h2 class="serif">Deliverable 3: the SLO document</h2></div>
+    <p>The brief asks for "a one-page SLO document you could hand directly to a client," which means it needs to be honest, specific, and grounded in the architecture you actually specified, not aspirational numbers, exactly Module 7's Section 3 process.</p>
+    <div class="def">
+      <div class="k">What belongs on that one page</div>
+      <p>An SLI tied to real business outcome ("percentage of leads that reach a rep within 5 minutes of form submission," not "server uptime"). An SLO with a stated time window. The error budget that implies. A one-line acknowledgment of the traffic-spike risk and how the design handles it (referencing your Module 4 capacity math). A one-line statement of the webhook contract's delivery/ordering/replay guarantees, Module 6's Section 4, so Northstar's own team knows what to expect if they ever build something downstream of your system.</p>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Why would "percentage of leads that reach a rep within 5 minutes" be a better SLI for this brief than "API uptime"?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Because API uptime can be 100% while leads still silently fail to reach a rep, stuck behind a circuit breaker that's open, or lost to an unhandled edge case, or delayed past the point of being useful. The SLI needs to measure the actual business outcome Northstar cares about, a lead in front of a rep, not a proxy metric that can look perfect while the real promise is being broken, exactly Module 7 Section 3's first rule: pick an SLI that reflects real user-facing behavior, not internal plumbing.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">5</span><h2 class="serif">Part 1 — Design document</h2></div>
+    <p class="mut">Write each section below for real, in your own words, addressing Northstar's brief specifically. This isn't a checkbox, submissions are inspected for the specific technical content each section needs, and you'll get told exactly what's missing, not just a pass/fail.</p>
+
+    <div class="interactive">
+      <span class="ilbl">Design submission</span>
+      <div id="designFields"></div>
+      <div class="dagctrl">
+        <button class="primary" id="btnValidateDesign">▶ Check my design document</button>
+      </div>
+      <div class="partscore-wrap" id="designScoreWrap">
+        <div class="partscore-summary"><span>Design document score</span><b id="designPct">not yet checked</b></div>
+        <div class="partscore-bar" id="designBar"><div class="fill" id="designFill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6</span><h2 class="serif">Part 2 — Implementation</h2></div>
+    <p class="mut">Complete the idempotent webhook handler below. Real test cases run your actual code, including a genuine concurrent-duplicate test, the exact race condition from Module 2.</p>
+
+    <div class="interactive">
+      <span class="ilbl">Code exercise · runs in your browser</span>
+      <p class="mut" style="margin-bottom:8px">Available to your code: <span class="mono-inline">await computeHmacHex(secret, message)</span> (real HMAC-SHA256), <span class="mono-inline">constantTimeEqual(a, b)</span> (constant-time compare), and <span class="mono-inline">store</span>, an object with <span class="mono-inline">store.insertKey(key)</span>, which atomically returns <span class="mono-inline">{inserted: true}</span> the first time a key is used and <span class="mono-inline">{inserted: false, cached: result}</span> on every call after, exactly modeling a database unique constraint from Module 2. <span class="mono-inline">store.processLead(payload)</span> is provided and returns a result object, call it only for genuinely new events.</p>
+      <textarea id="capstoneCodeEditor" class="textin" spellcheck="false" style="min-height:220px;font-size:13px" rows="13"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunCapstoneTests">▶ Run tests</button>
+        <button id="btnResetCapstoneCode">Reset to starter code</button>
+      </div>
+      <div id="capstoneTestResults" style="margin-top:14px"></div>
+      <div class="partscore-wrap" id="implScoreWrap">
+        <div class="partscore-summary"><span>Implementation score</span><b id="implPct">not yet run</b></div>
+        <div class="partscore-bar" id="implBar"><div class="fill" id="implFill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7</span><h2 class="serif">Part 3 — Debugging</h2></div>
+    <p class="mut">This code shipped to production and caused an incident. Read it, find the bug, and answer both questions, this tests whether you can recognize a familiar failure mode in code you didn't write.</p>
+
+    <div class="interactive">
+      <span class="ilbl">Broken code</span>
+      <div class="debugcode">async function callCrmWithRetry(leadId, attempt = 0) {
+  try {
+    return await callCrmApi(leadId);
+  } catch (err) {
+    if (attempt &gt;= 5) {
+      throw new Error("exhausted retries for " + leadId);
+    }
+    return callCrmWithRetry(leadId, attempt + 1);
+  }
+}</div>
+      <div class="qcard">
+        <div class="qtext">Which module's material does this bug violate?</div>
+        <div id="debugQ1opts"></div>
+        <div class="qexplain" id="debugQ1explain"></div>
+        <div class="dagctrl" style="margin-top:10px"><button id="btnRetryDebugQ1" style="display:none">↺ Retry this question</button></div>
+      </div>
+      <div class="qcard">
+        <div class="qtext">In one or two sentences, what specifically is wrong, and what would you change?</div>
+        <textarea id="debugAnswer" class="textin" placeholder="What's missing, and what's the fix..." style="min-height:70px"></textarea>
+        <div class="dagctrl"><button id="btnCheckDebug">Check my answer</button></div>
+        <div class="feedback" id="debugFeedback"></div>
+      </div>
+      <div class="partscore-wrap" id="debugScoreWrap">
+        <div class="partscore-summary"><span>Debugging score</span><b id="debugPct">not yet checked</b></div>
+        <div class="partscore-bar" id="debugBar"><div class="fill" id="debugFill"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8</span><h2 class="serif">Part 4 — Final capstone score</h2></div>
+    <p class="mut">Computed from what you actually submitted above, not from boxes you checked yourself.</p>
+    <div class="finalscore">
+      <div class="fsrow"><span class="fslabel">Part 1 — Design document</span><span class="fsval" id="fsDesign">not attempted</span></div>
+      <div class="fsrow"><span class="fslabel">Part 2 — Implementation (test pass rate)</span><span class="fsval" id="fsImpl">not attempted</span></div>
+      <div class="fsrow"><span class="fslabel">Part 3 — Debugging</span><span class="fsval" id="fsDebug">not attempted</span></div>
+      <div class="fstotal"><span>Overall capstone score</span><b id="fsTotal">0%</b></div>
+    </div>
+    <div class="dagctrl" style="margin-top:16px">
+      <button id="btnRecomputeFinal">Recompute final score</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">9</span><h2 class="serif">Reference solution outline</h2></div>
+    <p class="mut">Not the only valid answer, a valid one. Compare your design's reasoning against this, not its exact wording.</p>
+    <div class="refsol">
+      <div class="rsstep"><div class="rslbl">Pipeline shape</div>Receive Webhook → Verify HMAC → Check Idempotency Key → Enrich (circuit-breaker wrapped) → Score → Assign, a DAG for one lead's processing run, plus a separate FSM for the lead's overall lifecycle (New → Enriching → Scored → Assigned → Contacted → Won/Lost), exactly the Module 1 pattern of using both models for what each is suited to.</div>
+      <div class="rsstep"><div class="rslbl">Idempotency &amp; duplicates</div>Idempotency key = the ad platform's own event ID, stored in a table with a UNIQUE constraint, inserted via INSERT ... ON CONFLICT before any processing begins. A duplicate delivery's insert fails the constraint, and the handler returns the original result instead of reprocessing.</div>
+      <div class="rsstep"><div class="rslbl">Flaky dependency</div>The CRM enrichment call is wrapped in a circuit breaker: 5 consecutive failures trips it Open for 30 seconds, then Half-Open allows one probe. Retries within the Closed state use exponential backoff with full jitter, capped at 3 attempts before the job is written to a dead-letter queue with the failure reason and original payload.</div>
+      <div class="rsstep"><div class="rslbl">Traffic spikes</div>Capacity math (Module 4) against historical peak volume shows normal utilization around ρ=0.6; a viral 8x spike would push that well past 1, so ingestion is decoupled from processing via a queue, accepting webhooks fast (returning 200 immediately after signature verification and idempotency check) and processing enrichment asynchronously, so a spike produces a longer queue, not failed webhook deliveries. The enrichment worker pool is bulkheaded separately from any other integration's worker pool.</div>
+      <div class="rsstep"><div class="rslbl">SLO document</div>SLI: "% of leads reaching a rep within 5 minutes of submission." SLO: 98% over a rolling 7 days (conservative, given the flaky third-party dependency this design doesn't fully control). Error budget: 2%. Webhook contract: at-least-once delivery, ordering not guaranteed (sequence field provided), replay accepted up to 24 hours, consumers must be idempotent.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">10</span><h2 class="serif">The course, end to end</h2></div>
+    <p class="mut">Every module fed directly into this brief. Here's the full shape, one more time.</p>
+    <div class="recapgrid">
+      <div class="recapcard"><div class="rn">MODULE 1</div><div class="rt">Formal Models of Workflow Execution</div><div class="rd">Gave the pipeline its shape: a DAG for one run, an FSM for a lead's lifecycle.</div></div>
+      <div class="recapcard"><div class="rn">MODULE 2</div><div class="rt">Idempotency &amp; Exactly-Once Semantics</div><div class="rd">Made duplicate webhook delivery harmless instead of a double-processed lead.</div></div>
+      <div class="recapcard"><div class="rn">MODULE 3</div><div class="rt">Failure Handling &amp; Retry Theory</div><div class="rd">Kept a flaky CRM API from taking the whole pipeline down with it.</div></div>
+      <div class="recapcard"><div class="rn">MODULE 4</div><div class="rt">Queueing Theory for Job Systems</div><div class="rd">Turned "will an 8x spike break us" into a number you can check in advance.</div></div>
+      <div class="recapcard"><div class="rn">MODULE 5</div><div class="rt">Authentication &amp; Secure Integration</div><div class="rd">Made sure a webhook claiming to be from Northstar's ad platform actually was.</div></div>
+      <div class="recapcard"><div class="rn">MODULE 6</div><div class="rt">API Contract Design</div><div class="rd">Made the pipeline's promises explicit, so nothing breaks silently later.</div></div>
+      <div class="recapcard"><div class="rn">MODULE 7</div><div class="rt">Observability &amp; SLOs</div><div class="rd">Turned "it's usually fine" into a number you can defend to a client.</div></div>
+      <div class="recapcard"><div class="rn">MODULE 8</div><div class="rt">Capstone</div><div class="rd">Put all seven to work on one brief, under one set of constraints, at once.</div></div>
+    </div>
+    <div class="callout" style="margin-top:20px"><b>What this was actually for:</b> tutorials teach a tool, and tools get replaced. Everything in this course, idempotency, exactly-once semantics, queueing behavior, retry mathematics, is the engineering knowledge that doesn't expire when the next automation platform launches. It's what separates a template-assembler from an automation engineer clients trust with revenue-critical systems, and it's exactly what shows up, unlabeled, inside every brief like the one on this page.</div>
+  </section>
+
+  <footer>Zenith Lab · Automation Engineering · Module 8 of 8 · Course complete</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Capstone score: 0%</span>
+  <button class="primary nextbtn" id="btnNext" disabled>Score 70%+ to complete the course →</button>
+</div></div>
+
+<script src="course-progress.js?v=5"></script>
+<script src="sandbox-runner.js"></script>
+<script>
+const MODULE_ID = 8;
+CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Crypto helpers (real Web Crypto API, shared style with Module 5) ---------------- */
+function strToBytes(str){ return new TextEncoder().encode(str); }
+function bytesToHex(buf){
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+}
+async function computeHmacHex(secret, message){
+  const key = await crypto.subtle.importKey("raw", strToBytes(secret), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", key, strToBytes(message));
+  return bytesToHex(sig);
+}
+function constantTimeEqual(a, b){
+  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+/* ================= PART 1: Design document ================= */
+const designFieldsSpec = [
+  { id: "arch", label: "System architecture & data flow", mod: "Module 1",
+    placeholder: "Describe the pipeline as a DAG or FSM: what are the steps, and what depends on what?",
+    minWords: 25,
+    required: ["dag","dependency","depend","state machine","fsm","graph","step","node","workflow"] },
+  { id: "idem", label: "Idempotency strategy", mod: "Module 2",
+    placeholder: "How do you make duplicate webhook deliveries harmless? Be specific about the mechanism.",
+    minWords: 20,
+    required: ["idempoten","key","unique","constraint","duplicate"] },
+  { id: "retry", label: "Retry & failure-handling strategy", mod: "Module 3",
+    placeholder: "How does the pipeline handle the flaky CRM API? Backoff, jitter, circuit breaker, bulkhead?",
+    minWords: 20,
+    required: ["retry","backoff","circuit breaker","jitter","bulkhead"] },
+  { id: "capacity", label: "Capacity & traffic-spike reasoning", mod: "Module 4",
+    placeholder: "What's normal utilization? What happens to it during an 8x spike, and what's the plan?",
+    minWords: 15,
+    required: ["utilization","ρ","rho","queue","capacity","spike"] },
+  { id: "auth", label: "Authentication & webhook security", mod: "Module 5",
+    placeholder: "How do you confirm an incoming webhook is genuinely from Northstar's ad platforms?",
+    minWords: 12,
+    required: ["hmac","signature","verify","secret"] },
+  { id: "contract", label: "API / webhook contract", mod: "Module 6",
+    placeholder: "State the webhook's delivery, ordering, and replay guarantees explicitly.",
+    minWords: 12,
+    required: ["delivery","order","replay","at-least-once","at least once"] },
+  { id: "slo", label: "SLI / SLO / error budget", mod: "Module 7",
+    placeholder: "Define the SLI, the SLO with its time window, and the resulting error budget.",
+    minWords: 15,
+    required: ["sli","slo","error budget","window"] },
+];
+
+function buildDesignFields(){
+  const container = document.getElementById("designFields");
+  designFieldsSpec.forEach(f => {
+    const wrap = document.createElement("div");
+    wrap.className = "designfield";
+    wrap.innerHTML = `
+      <div class="dflbl"><span>${f.label}</span><span class="dfmod">${f.mod}</span></div>
+      <textarea class="textin" id="df-${f.id}" rows="3" placeholder="${f.placeholder}"></textarea>
+      <div class="dfstatus empty" id="dfstatus-${f.id}">Not written yet</div>
+    `;
+    container.appendChild(wrap);
+    const ta = wrap.querySelector("textarea");
+    ta.addEventListener("input", () => {
+      CourseProgress.setSection(MODULE_ID, "design_" + f.id, ta.value);
+    });
+  });
+}
+buildDesignFields();
+
+function wordCount(text){
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+let designScore = null; // null = not checked yet
+
+function validateDesign(){
+  let passCount = 0;
+  designFieldsSpec.forEach(f => {
+    const val = document.getElementById(`df-${f.id}`).value;
+    CourseProgress.setSection(MODULE_ID, "design_" + f.id, val);
+    const statusEl = document.getElementById(`dfstatus-${f.id}`);
+    const words = wordCount(val);
+    const lower = val.toLowerCase();
+    const hasKeyword = f.required.some(kw => lower.includes(kw));
+    const pass = words >= f.minWords && hasKeyword;
+    if (pass) passCount++;
+    statusEl.className = "dfstatus " + (pass ? "pass" : (val.trim() ? "fail" : "empty"));
+    if (!val.trim()) {
+      statusEl.textContent = "Not written yet";
+    } else if (words < f.minWords) {
+      statusEl.textContent = `Too brief (${words} words, needs ${f.minWords}+) — say more about the actual mechanism, not just that one exists`;
+    } else if (!hasKeyword) {
+      statusEl.textContent = `Missing the specific mechanism this section needs, mentions none of: ${f.required.slice(0,3).join(", ")}...`;
+    } else {
+      statusEl.textContent = "Looks complete";
+    }
+  });
+  designScore = Math.round((passCount / designFieldsSpec.length) * 100);
+  document.getElementById("designPct").textContent = designScore + "%";
+  document.getElementById("designFill").style.width = designScore + "%";
+  document.getElementById("designBar").className = "partscore-bar" + (designScore === 100 ? " done" : "");
+  CourseProgress.setSection(MODULE_ID, "designScore", designScore);
+  recomputeFinal();
+}
+document.getElementById("btnValidateDesign").addEventListener("click", validateDesign);
+
+/* ================= PART 2: Implementation ================= */
+const CAPSTONE_STARTER = `async function handleWebhook(rawBody, signatureHex, secret, store) {
+  // 1. Verify the HMAC signature over rawBody. If it doesn't match, reject
+  //    (return { ok: false, reason: "invalid signature" }) WITHOUT processing.
+
+  // 2. Parse rawBody as JSON. If it doesn't parse, reject with
+  //    { ok: false, reason: "malformed payload" }.
+
+  // 3. Use payload.event_id as the idempotency key. Call store.insertKey(key).
+  //    If it was already used, return the cached result instead of reprocessing.
+
+  // 4. Otherwise, this is genuinely new: call store.processLead(payload),
+  //    and return { ok: true, result }.
+
+}`;
+
+function loadCapstoneStarter(){
+  document.getElementById("capstoneCodeEditor").value = CAPSTONE_STARTER;
+  document.getElementById("capstoneTestResults").innerHTML = "";
+}
+loadCapstoneStarter();
+document.getElementById("btnResetCapstoneCode").addEventListener("click", loadCapstoneStarter);
+
+function makeMockStore(){
+  const keys = new Map();
+  let processCallCount = 0;
+  return {
+    insertKey(key){
+      if (keys.has(key)) return { inserted: false, cached: keys.get(key) };
+      keys.set(key, undefined); // reserve slot atomically before processing
+      return { inserted: true };
+    },
+    async processLead(payload){
+      processCallCount++;
+      const result = { leadId: payload.event_id, status: "processed" };
+      keys.set(payload.event_id, { ok: true, result });
+      return result;
+    },
+    _callCount(){ return processCallCount; },
+  };
+}
+
+let implScore = null;
+
+// Runs entirely inside a Web Worker via SandboxRunner, see sandbox-runner.js.
+async function capstoneHarness(code){
+  function strToBytes(str){ return new TextEncoder().encode(str); }
+  function bytesToHex(buf){ return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join(""); }
+  async function computeHmacHex(secret, message){
+    const key = await crypto.subtle.importKey("raw", strToBytes(secret), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
+    const sig = await crypto.subtle.sign("HMAC", key, strToBytes(message));
+    return bytesToHex(sig);
+  }
+  function constantTimeEqual(a, b){
+    if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+    let diff = 0;
+    for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    return diff === 0;
+  }
+  function makeMockStore(){
+    const keys = new Map();
+    let processCallCount = 0;
+    return {
+      insertKey(key){
+        if (keys.has(key)) return { inserted: false, cached: keys.get(key) };
+        keys.set(key, undefined);
+        return { inserted: true };
+      },
+      async processLead(payload){
+        processCallCount++;
+        const result = { leadId: payload.event_id, status: "processed" };
+        keys.set(payload.event_id, { ok: true, result });
+        return result;
+      },
+      _callCount(){ return processCallCount; },
+    };
+  }
+
+  let studentFn;
+  try {
+    const factory = new Function("computeHmacHex", "constantTimeEqual", code + "\nreturn handleWebhook;");
+    studentFn = factory(computeHmacHex, constantTimeEqual);
+    if (typeof studentFn !== "function") throw new Error("handleWebhook is not defined as a function.");
+  } catch (e) {
+    return { ranOk: false, error: e.message };
+  }
+
+  const secret = "northstar_whsec_1";
+  const results = [];
+
+  // Test 1: normal new request
+  {
+    const store = makeMockStore();
+    const payload = JSON.stringify({ event_id: "evt_1", name: "Jane Doe" });
+    const sig = await computeHmacHex(secret, payload);
+    let out, err;
+    try { out = await studentFn(payload, sig, secret, store); } catch (e) { err = e; }
+    const pass = !err && out && out.ok === true && store._callCount() === 1;
+    results.push({ name: "Normal request is processed", pass, hint: "A valid, new request should call store.processLead once and return ok: true." });
+  }
+
+  // Test 2: sequential duplicate
+  {
+    const store = makeMockStore();
+    const payload = JSON.stringify({ event_id: "evt_2", name: "Jane Doe" });
+    const sig = await computeHmacHex(secret, payload);
+    let err;
+    try {
+      await studentFn(payload, sig, secret, store);
+      await studentFn(payload, sig, secret, store);
+    } catch (e) { err = e; }
+    const pass = !err && store._callCount() === 1;
+    results.push({ name: "Duplicate request is not reprocessed", pass, hint: "The second call with the same event_id should return the cached result, not call processLead again." });
+  }
+
+  // Test 3: concurrent duplicate (the real race condition from Module 2)
+  {
+    const store = makeMockStore();
+    const payload = JSON.stringify({ event_id: "evt_3", name: "Jane Doe" });
+    const sig = await computeHmacHex(secret, payload);
+    let err;
+    try {
+      await Promise.all([
+        studentFn(payload, sig, secret, store),
+        studentFn(payload, sig, secret, store),
+      ]);
+    } catch (e) { err = e; }
+    const pass = !err && store._callCount() === 1;
+    results.push({ name: "Concurrent duplicate requests still process only once", pass, hint: "Two requests fired at once with the same event_id must still only trigger one processLead call, this is the atomic-insert pattern from Module 2." });
+  }
+
+  // Test 4: invalid signature
+  {
+    const store = makeMockStore();
+    const payload = JSON.stringify({ event_id: "evt_4", name: "Jane Doe" });
+    let out, err;
+    try { out = await studentFn(payload, "0000invalid0000", secret, store); } catch (e) { err = e; }
+    const pass = !err && out && out.ok === false && store._callCount() === 0;
+    results.push({ name: "Invalid signature is rejected before processing", pass, hint: "A bad signature should return ok: false and never call processLead. Verify the signature before doing anything else." });
+  }
+
+  // Test 5: malformed payload
+  {
+    const store = makeMockStore();
+    const badPayload = "{not valid json";
+    const sig = await computeHmacHex(secret, badPayload);
+    let out, err;
+    try { out = await studentFn(badPayload, sig, secret, store); } catch (e) { err = e; }
+    const pass = !err && out && out.ok === false && store._callCount() === 0;
+    results.push({ name: "Malformed payload is rejected, not crashed", pass, hint: "JSON.parse on invalid input throws, catch it and return ok: false instead of letting the exception escape." });
+  }
+
+  // Test 6: different event_ids both process independently
+  {
+    const store = makeMockStore();
+    const p1 = JSON.stringify({ event_id: "evt_6a", name: "A" });
+    const p2 = JSON.stringify({ event_id: "evt_6b", name: "B" });
+    const s1 = await computeHmacHex(secret, p1);
+    const s2 = await computeHmacHex(secret, p2);
+    let err;
+    try {
+      await studentFn(p1, s1, secret, store);
+      await studentFn(p2, s2, secret, store);
+    } catch (e) { err = e; }
+    const pass = !err && store._callCount() === 2;
+    results.push({ name: "Distinct events are not treated as duplicates of each other", pass, hint: "Only requests sharing the same event_id should be deduplicated, don't over-block unrelated events." });
+  }
+
+  return { ranOk: true, results };
+}
+
+async function runCapstoneTests(){
+  const resultsEl = document.getElementById("capstoneTestResults");
+  resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Running in a sandboxed worker…</div>`;
+  const code = document.getElementById("capstoneCodeEditor").value;
+
+  const outcome = await SandboxRunner.run(capstoneHarness.toString(), "capstoneHarness", [code]);
+  resultsEl.innerHTML = "";
+
+  if (!outcome.ok) {
+    resultsEl.innerHTML = `<div class="testrow fail"><div class="tname">Your code didn't run<div class="thint">${CourseProgress.escapeHtml(outcome.error)}</div></div></div>`;
+    implScore = 0;
+    document.getElementById("implPct").textContent = "0%";
+    document.getElementById("implFill").style.width = "0%";
+    recomputeFinal();
+    return;
+  }
+  const data = outcome.result;
+  if (!data.ranOk) {
+    resultsEl.innerHTML = `<div class="testrow fail"><div class="tname">Your code didn't run<div class="thint">${CourseProgress.escapeHtml(data.error)}</div></div></div>`;
+    implScore = 0;
+    document.getElementById("implPct").textContent = "0%";
+    document.getElementById("implFill").style.width = "0%";
+    recomputeFinal();
+    return;
+  }
+
+  const results = data.results;
+  let passCount = 0;
+  results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "testrow " + (r.pass ? "pass" : "fail");
+    row.innerHTML = `<div class="tname">${r.pass ? "PASS" : "FAIL"} — ${r.name}` + (r.pass ? "" : `<div class="thint">${r.hint}</div>`) + `</div>`;
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
+  summary.textContent = `${passCount} / ${results.length} tests passing`;
+  resultsEl.appendChild(summary);
+
+  implScore = Math.round((passCount / results.length) * 100);
+  document.getElementById("implPct").textContent = implScore + "%";
+  document.getElementById("implFill").style.width = implScore + "%";
+  document.getElementById("implBar").className = "partscore-bar" + (implScore === 100 ? " done" : "");
+  CourseProgress.setSection(MODULE_ID, "implScore", implScore);
+  CourseProgress.setSection(MODULE_ID, "implCode", code);
+  recomputeFinal();
+}
+document.getElementById("btnRunCapstoneTests").addEventListener("click", runCapstoneTests);
+
+/* ================= PART 3: Debugging ================= */
+const debugQ1Options = [
+  { text: "Module 3 — the retry has no backoff at all, it retries instantly in a tight loop and never uses jitter, exactly the thundering-herd risk", correct: true },
+  { text: "Module 2 — the retry function doesn't check an idempotency key before calling the CRM API", correct: false, reason: "Retrying the same outbound call to the CRM isn't a duplicate-processing problem for OUR system, the idempotency concern in this brief is about incoming webhooks, not this outbound retry." },
+  { text: "Module 5 — the retry function never verifies an HMAC signature", correct: false, reason: "This function calls an already-authenticated internal API, there's no incoming webhook signature to check at this point in the pipeline." },
+];
+let debugQ1Answered = false;
+function buildDebugQ1(){
+  const el = document.getElementById("debugQ1opts");
+  debugQ1Options.forEach((opt, i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.innerHTML = `<input type="radio" name="debugq1" value="${i}"><span>${opt.text}</span>`;
+    div.addEventListener("click", () => {
+      if (debugQ1Answered) return;
+      debugQ1Answered = true;
+      CourseProgress.setSection(MODULE_ID, "debugQ1", i);
+      document.querySelectorAll('#debugQ1opts .qopt').forEach((e2,j) => {
+        if (debugQ1Options[j].correct) e2.classList.add("correct");
+        else if (j === i) e2.classList.add("incorrect");
+      });
+      const ex = document.getElementById("debugQ1explain");
+      ex.style.display = "block";
+      ex.textContent = opt.correct
+        ? "Correct. Every retry attempt fires immediately with no delay and no randomness, this is plain unbounded instant retry, worse than even fixed-delay, and would hammer the CRM API in a tight loop exactly during the outage it's least able to handle."
+        : "Not quite. " + opt.reason;
+      document.getElementById("btnRetryDebugQ1").style.display = opt.correct ? "none" : "inline-flex";
+      checkDebugComplete();
+    });
+    el.appendChild(div);
+  });
+}
+buildDebugQ1();
+document.getElementById("btnRetryDebugQ1").addEventListener("click", () => {
+  debugQ1Answered = false;
+  CourseProgress.setSection(MODULE_ID, "debugQ1", undefined);
+  document.querySelectorAll('#debugQ1opts .qopt').forEach(e2 => {
+    e2.classList.remove("correct", "incorrect");
+    const input = e2.querySelector("input");
+    if (input) input.checked = false;
+  });
+  document.getElementById("debugQ1explain").style.display = "none";
+  document.getElementById("btnRetryDebugQ1").style.display = "none";
+});
+
+let debugAnswerChecked = false;
+document.getElementById("btnCheckDebug").addEventListener("click", () => {
+  const val = document.getElementById("debugAnswer").value.trim();
+  const fb = document.getElementById("debugFeedback");
+  fb.style.display = "block";
+  const lower = val.toLowerCase();
+  const mentionsBackoff = /backoff|delay|wait|jitter|sleep/.test(lower);
+  const tooShort = wordCount(val) < 8;
+  debugAnswerChecked = true;
+  CourseProgress.setSection(MODULE_ID, "debugAnswer", val);
+  CourseProgress.setSection(MODULE_ID, "debugAnswerOk", mentionsBackoff && !tooShort);
+  if (tooShort) {
+    fb.className = "feedback bad";
+    fb.textContent = "Say a bit more, what specifically would you add, and where in the function?";
+  } else if (mentionsBackoff) {
+    fb.className = "feedback ok";
+    fb.textContent = "Good, that's the fix: add an increasing delay (ideally with jitter) before each retry attempt, e.g. await sleep(baseDelay * 2 ** attempt) before the recursive call, so failed attempts spread out instead of hammering the dependency instantly.";
+  } else {
+    fb.className = "feedback bad";
+    fb.textContent = "Not quite, look again at how quickly the function calls itself after a failure. Compare against Module 3's exponential backoff formula.";
+  }
+  checkDebugComplete();
+});
+
+function checkDebugComplete(){
+  const bothDone = debugQ1Answered && debugAnswerChecked;
+  if (!bothDone) return;
+  const mcqCorrect = debugQ1Options[Number(CourseProgress.getModule(MODULE_ID).sections.debugQ1)]?.correct;
+  const textOk = CourseProgress.getModule(MODULE_ID).sections.debugAnswerOk;
+  const debugScore = Math.round(((mcqCorrect ? 1 : 0) + (textOk ? 1 : 0)) / 2 * 100);
+  document.getElementById("debugPct").textContent = debugScore + "%";
+  document.getElementById("debugFill").style.width = debugScore + "%";
+  document.getElementById("debugBar").className = "partscore-bar" + (debugScore === 100 ? " done" : "");
+  CourseProgress.setSection(MODULE_ID, "debugScore", debugScore);
+  recomputeFinal();
+}
+
+/* ================= PART 4: Final score ================= */
+function recomputeFinal(){
+  const sections = CourseProgress.getModule(MODULE_ID).sections || {};
+  const d = sections.designScore;
+  const i = sections.implScore;
+  const g = sections.debugScore;
+
+  document.getElementById("fsDesign").textContent = d === undefined ? "not attempted" : d + "%";
+  document.getElementById("fsDesign").className = "fsval" + (d >= 70 ? " pass" : d !== undefined ? " fail" : "");
+  document.getElementById("fsImpl").textContent = i === undefined ? "not attempted" : i + "%";
+  document.getElementById("fsImpl").className = "fsval" + (i >= 70 ? " pass" : i !== undefined ? " fail" : "");
+  document.getElementById("fsDebug").textContent = g === undefined ? "not attempted" : g + "%";
+  document.getElementById("fsDebug").className = "fsval" + (g >= 70 ? " pass" : g !== undefined ? " fail" : "");
+
+  const parts = [d, i, g].filter(v => v !== undefined);
+  const total = parts.length > 0 ? Math.round(parts.reduce((a,b)=>a+b,0) / 3) : 0;
+  // note: dividing by 3 always (not parts.length) so an unattempted part counts as 0, not excluded
+  document.getElementById("fsTotal").textContent = total + "%";
+  document.getElementById("scoreDisplay").textContent = `Capstone score: ${total}%`;
+
+  const btn = document.getElementById("btnNext");
+  const ready = total >= 80;
+  btn.disabled = !ready;
+  btn.textContent = ready ? "Complete the course →" : "Score 80%+ across all 3 parts to complete the course →";
+
+  CourseProgress.markComplete(MODULE_ID, total, 100);
+}
+document.getElementById("btnRecomputeFinal").addEventListener("click", recomputeFinal);
+recomputeFinal();
+
+document.getElementById("btnNext").addEventListener("click", () => {
+  window.location.href = "dashboard.html";
+});
+
+/* ---------------- Restore prior session state ---------------- */
+(function restoreCapstoneState(){
+  const sections = CourseProgress.getModule(MODULE_ID).sections || {};
+  designFieldsSpec.forEach(f => {
+    if (sections["design_" + f.id]) document.getElementById(`df-${f.id}`).value = sections["design_" + f.id];
+  });
+  if (sections.implCode) document.getElementById("capstoneCodeEditor").value = sections.implCode;
+  if (sections.debugAnswer) document.getElementById("debugAnswer").value = sections.debugAnswer;
+  if (sections.designScore !== undefined) { designScore = sections.designScore; document.getElementById("designPct").textContent = designScore + "%"; document.getElementById("designFill").style.width = designScore + "%"; }
+  if (sections.implScore !== undefined) { implScore = sections.implScore; document.getElementById("implPct").textContent = implScore + "%"; document.getElementById("implFill").style.width = implScore + "%"; }
+  recomputeFinal();
+})();
+</script>
+</body>
+</html>

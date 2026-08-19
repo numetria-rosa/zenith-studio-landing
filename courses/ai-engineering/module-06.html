@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 6: Reliability for LLM Systems</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.progress{height:3px;background:var(--bd)}
+.progress i{display:block;height:100%;background:var(--lime);width:75%}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
+.def p{font-size:14.5px}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
+.callout b{color:var(--amber)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button.primary:hover{filter:brightness(1.08);color:var(--limed)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+.statrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px}
+.stat{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;flex:1;min-width:130px}
+.stat.warn{border-color:var(--red)}
+.stat .sv{font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--tx)}
+.stat.warn .sv{color:var(--red)}
+.stat .sl{font-size:11px;color:var(--mut2);margin-top:2px}
+.sliderrow{margin-top:10px}
+.slbl{font-size:13px;color:var(--mut)}
+input[type=range]{width:100%;margin-top:8px;accent-color:var(--lime)}
+.testin{width:100%;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
+.numinput input{width:100px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
+.nextbtn{margin-left:auto}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
+.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
+.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h3:first-of-type{margin-top:0}
+.orient p{font-size:14.5px;color:var(--mut)}
+.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
+.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
+.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
+.practice p{font-size:14px}
+.practice details{margin-top:12px}
+.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
+.practice summary::-webkit-details-marker{display:none}
+.practice summary:before{content:"▸ "}
+.practice details[open] summary:before{content:"▾ "}
+.practice details:not([open]) .ans{display:none}
+.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
+.hintbox{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 20px;margin-top:14px}
+.hintbox .hlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.hintbox .husage{font-size:11px;color:var(--mut2);font-weight:400;text-transform:none;letter-spacing:0}
+.hintbox details{margin-top:8px;border-top:1px solid var(--bd);padding-top:8px}
+.hintbox details:first-of-type{border-top:none;padding-top:0}
+.hintbox summary{cursor:pointer;color:var(--amber);font-size:13px;list-style:none;font-weight:600}
+.hintbox summary::-webkit-details-marker{display:none}
+.hintbox summary:before{content:"▸ "}
+.hintbox details[open] summary:before{content:"▾ "}
+.hintbox .hbody{margin-top:8px;color:var(--tx);font-size:13.5px;line-height:1.7}
+.hintbox details.locked summary{color:var(--mut2);cursor:not-allowed}
+.barrow{display:flex;align-items:center;gap:10px;margin-top:8px}
+.barrow .barlbl{width:64px;font-family:'JetBrains Mono';font-size:11.5px;color:var(--mut2);flex-shrink:0}
+.barrow .bartrack{flex:1;height:18px;background:var(--bg2);border-radius:5px;overflow:hidden;position:relative}
+.barrow .barfill{height:100%;background:linear-gradient(90deg,var(--violet),var(--lime));border-radius:5px}
+.barrow .barval{width:78px;text-align:right;font-family:'JetBrains Mono';font-size:11.5px;color:var(--mut);flex-shrink:0}
+@media (max-width:640px){
+  .wrap{padding:0 16px 60px}
+  h1{font-size:26px}
+  .kh h2{font-size:18px}
+  .interactive{padding:16px}
+  .orient{padding:20px 18px}
+}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--lime)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">AI Engineering · Module 6 of 8</span>
+</div></div>
+<div class="progress"><i></i></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-05.html">&larr; <span class="navlabel">Module 5</span></a><span class="navsep"></span><a href="module-07.html" id="navNextTop">Module 7 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 06</span>
+    <h1 class="serif">Reliability for LLM Systems</h1>
+    <p class="sub">Model APIs fail: rate limits, timeouts, transient server errors. Some failures are worth retrying, some never will succeed no matter how many times you try, and treating them the same wastes time, money, and your users' patience.</p>
+    <div class="objectives">
+      <div class="lbl">Learning objectives</div>
+      <ul>
+        <li>Distinguish retryable (transient) failures from non-retryable (permanent) ones</li>
+        <li>Explain exponential backoff with full jitter, and why naive fixed-delay retries make things worse under load</li>
+        <li>Explain when and why a system should fall back to a secondary model instead of retrying forever</li>
+        <li>Implement a call wrapper that retries transient failures, fails fast on permanent ones, and falls back exactly once</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="orient">
+    <div class="lbl">Before you start</div>
+    <h3 class="serif">What this module assumes</h3>
+    <p>Every prior module assumed the model call itself succeeds. It won't always. Rate limits, timeouts, and transient server errors are a normal, expected part of calling any external API, model providers included, and a production system needs a deliberate strategy for them, not a bare try/catch that gives up on the first failure.</p>
+    <h3 class="serif">What's new</h3>
+    <p>This module isn't about the model's output anymore, it's about the reliability of getting a response at all. The logic here (retry, backoff, fallback) applies to the model call layer underneath everything Modules 1-5 built.</p>
+    <h3 class="serif">What's assumed</h3>
+    <div class="assume">Modules 1-5 completed. Comfort with Python's async/await, try/except, and loops.</div>
+    <h3 class="serif">How to work through it</h3>
+    <ol>
+      <li>Read each definition, then run the matching interactive.</li>
+      <li>Answer the practice check before revealing the answer.</li>
+      <li>Finish with the graded checkpoint.</li>
+    </ol>
+  </div>
+
+  <section>
+    <div class="kh"><span class="num">1</span><h2 class="serif">Not every failure deserves the same response</h2></div>
+    <p>When a model API call fails, the error tells you something important: whether trying again could possibly help. A rate limit (429) or a server-side timeout is <i>transient</i>, the exact same request might succeed a second later. A malformed request or an authentication failure is <i>permanent</i>, retrying the identical request will fail identically, every time, forever.</p>
+    <div class="def">
+      <div class="k">Definition: retryable vs. non-retryable error</div>
+      <p>A retryable error indicates a temporary condition (rate limiting, timeout, transient server fault) where an identical retry has a real chance of succeeding. A non-retryable error indicates the request itself is invalid or unauthorized, retrying without changing anything will not help.</p>
+    </div>
+    <p>Getting this classification wrong in either direction is a real cost: retrying a non-retryable error burns time and budget on guaranteed failures, while failing fast on a retryable one throws away requests that a second attempt would have succeeded on.</p>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>You integrate with a payment processor to charge cards during a flash sale. In the same minute, two calls fail: one returns HTTP 429 ("too many requests", the processor is throttling your API key under the traffic spike), the other returns HTTP 402 ("card declined, insufficient funds"). Which should your wrapper retry, and what's the actual risk of retrying the wrong one here, beyond just wasted time?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">The 429 is retryable, your API key got throttled, not rejected, the identical charge attempt has a real chance of succeeding once the window resets. The 402 is non-retryable, the card has insufficient funds right now, and retrying the identical charge won't change the customer's balance. Retrying the 402 doesn't just waste a retry slot, it delays the moment the customer learns they need a different card, and depending on the processor, repeated charge attempts against a declined card can itself look like suspicious activity. Classification here isn't just about efficiency, retrying the wrong kind of failure has a real user-facing cost.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">2</span><h2 class="serif">Interactive: exponential backoff with full jitter</h2></div>
+    <p class="mut">Retrying immediately, over and over, can make a rate-limiting problem worse, especially with many concurrent callers. Backoff spaces retries out, growing the delay each attempt; jitter randomizes it so many callers don't all retry in lockstep.</p>
+    <div class="interactive">
+      <span class="ilbl">Live calculation · base 200ms, cap 8000ms</span>
+      <div class="sliderrow">
+        <div class="slbl" id="attSliderLbl">Retry attempt number: <b id="attV">1</b></div>
+        <input type="range" id="attSlider" min="1" max="8" step="1" value="1" aria-labelledby="attSliderLbl">
+      </div>
+      <div class="statrow">
+        <div class="stat" id="capStat"><div class="sv" id="capVal">–</div><div class="sl">max possible delay before this attempt (ms)</div></div>
+      </div>
+      <p class="mut" style="margin-top:14px;font-size:13.5px">Full jitter picks a delay uniformly between 0 and this cap, not the cap itself, so two callers hitting the same limit at the same time don't retry at the same moment.</p>
+      <div class="barrow"><div class="barlbl">attempt 1</div><div class="bartrack"><div class="barfill" id="bar1" style="width:0%"></div></div><div class="barval" id="barv1">–</div></div>
+      <div class="barrow"><div class="barlbl">attempt 3</div><div class="bartrack"><div class="barfill" id="bar3" style="width:0%"></div></div><div class="barval" id="barv3">–</div></div>
+      <div class="barrow"><div class="barlbl">attempt 6</div><div class="bartrack"><div class="barfill" id="bar6" style="width:0%"></div></div><div class="barval" id="barv6">–</div></div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Two different users' requests both get rate-limited at the exact same moment. With NO jitter (fixed exponential delay only), what's likely to happen on their simultaneous retries? How does jitter change that outcome?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">With no jitter, both requests compute the identical delay and retry at the identical moment, likely colliding with the rate limit again, and any other similarly-timed callers pile on too, a "retry storm" that can make the underlying rate-limit problem worse instead of better. Full jitter spreads retries across a random window instead of a single instant, so simultaneous failures don't produce simultaneous retries, smoothing out load on the API instead of concentrating it.</div>
+      </details>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>An internal "pricing" microservice gets called by 500 instances of your checkout service. During a traffic spike, pricing starts returning 503s under load. All 500 checkout instances were deployed from the same image at the same time, and all implement exponential backoff with NO jitter. Walk through what happens over the next few retry rounds, and be specific about why "same code, same deploy time" makes this worse than if the 500 instances had staggered start times.</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Because all 500 instances share the same code and the same clock-relative starting point, they compute the exact same backoff delay for attempt 1, and all 500 retry in the same instant, hitting the already-overloaded pricing service with another synchronized spike, which fails again, computes the same attempt-2 delay, and repeats, a predictable wave of 500 simultaneous requests at every backoff step instead of a chance for the service to drain its queue. Staggered start times would have accidentally spread the retries out somewhat, but you shouldn't have to rely on accidental staggering, full jitter randomizes each caller's delay independently every round, so even 500 perfectly identical, perfectly synchronized callers end up retrying at 500 different moments instead of one.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">3</span><h2 class="serif">Fail fast on what retrying can't fix</h2></div>
+    <p>Retrying a non-retryable error isn't just wasted effort, it actively delays the moment your system (or your user) learns the request failed, and it does so while consuming the same retry budget a genuinely transient failure would have needed. The correct response to a non-retryable error is to stop immediately and surface it.</p>
+    <div class="callout"><b>Retrying blindly hides real bugs.</b> A malformed request retried 5 times with backoff doesn't become valid on attempt 5, it just takes 5 attempts (and the accumulated delay) to fail instead of one. If the bug is in your own request construction, fast, visible failure is what gets it fixed, silent retries just delay the failure without ever preventing it.</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>An error's classification (retryable or not) isn't always obvious from the HTTP status code alone, some providers return the same generic 500 for both a truly transient fault AND a request that will never succeed. What's the practical implication for how conservatively you should classify "unknown" errors?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">When classification is ambiguous, treating an error as retryable (with a bounded retry count, never unlimited) is usually the safer default, a spurious retry on a permanent failure costs one bounded extra attempt, while treating a genuinely transient failure as non-retryable throws away a request that a second try would have saved. The key safeguard either way is the SAME bound: a maximum retry count, so an ambiguous classification never turns into an unbounded retry loop.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4</span><h2 class="serif">When retries aren't enough: fallback</h2></div>
+    <p>Sometimes the primary model is down, overloaded, or exhausted its retry budget, and no amount of waiting fixes it in time. A <i>fallback</i>, a secondary model or provider, gives the system a path to still return a result instead of failing the entire request.</p>
+    <div class="def">
+      <div class="k">Definition: fallback</div>
+      <p>A secondary call path attempted after the primary path has failed (exhausted retries, or hit a non-retryable error), typically a different model or provider, used to still return a usable result when the primary is unavailable.</p>
+    </div>
+    <p>Fallback isn't free, it's often a different (sometimes lower-capability, sometimes more expensive) model, and switching to it is itself a decision worth logging and monitoring, a system quietly falling back on every request is a signal something's wrong with the primary path that deserves attention, not just automatic compensation.</p>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Should the fallback call itself be retried the same number of times as the primary, if it also fails?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">No, not with the same generous budget. If both the primary AND the fallback need extensive retries, the underlying issue is probably broader than one provider's outage, and the request should fail clearly rather than spend a second full retry budget hoping the fallback behaves better. A single fallback attempt (or a much smaller retry budget than the primary got) keeps total latency and cost bounded, the same "don't let a safety net become another unbounded loop" principle from Module 5's step limits.</div>
+      </details>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Your customer-facing chatbot's primary LLM provider has a partial outage: primary calls fail with 503s, retries with backoff exhaust the retry budget, and the wrapper falls back to a smaller, cheaper backup model. But the outage is severe enough that most of your traffic is now hitting the backup model at once, and IT starts returning occasional 503s too. Should the wrapper retry the fallback call with backoff the same way it retried the primary?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">No. Fallback still gets one bounded attempt, not a second retry cycle, even though the circumstances (a real, severe outage) make it tempting to fight harder for a result. Giving fallback the primary's full retry budget just moves the unbounded-cost risk from one path to the other, and if the fallback is now also under heavy load, retrying it aggressively adds MORE load to a system that's already struggling. The correct response to "even the backup is straining" isn't a bigger retry budget, it's returning a clear failure for that request and treating the fallback's own error rate as a signal (worth alerting on) that something bigger than one provider's outage is happening.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">5</span><h2 class="serif">Retry, fallback, and bounded cost, together</h2></div>
+    <p>Put together, a reliable call wrapper has a specific, bounded shape: try the primary, retrying only retryable failures up to a fixed limit; the moment a non-retryable error appears OR the retry limit is hit, stop retrying the primary and attempt the fallback exactly once; if that also fails, return a clear failure. Every path through this logic terminates, nothing loops forever.</p>
+    <div class="callout"><b>Every reliability mechanism in this course bounds something.</b> Module 2 bounded context (a token budget). Module 5 bounded steps (a step limit). This module bounds retries (a fixed retry count) and bounds the safety net itself (fallback tried once, not retried indefinitely). The pattern repeats because unbounded anything, tokens, steps, retries, is the same underlying risk each time.</div>
+
+    <div class="practice">
+      <div class="lbl">Cross-module check</div>
+      <p>An agent loop (Module 5) calls a model at each step. That model call now uses this module's retry-and-fallback wrapper internally. If the wrapper's own retry count and fallback aren't bounded, what happens to the loop's step-limit guarantee?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">The step COUNT stays bounded, the loop still only takes maxSteps iterations. But each individual step can now silently take far longer (and cost far more) than expected, since an unbounded retry-and-fallback wrapper inside one step defeats the purpose of bounding the number of steps. A step limit only actually bounds total cost and time if everything INSIDE each step is bounded too, which is exactly why this module's retry and fallback logic has its own hard limits.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6</span><h2 class="serif">Build it: retry with bounded fallback</h2></div>
+    <p>You've seen the classification (retryable vs. not) and the shape (bounded retries, single fallback attempt). Now implement it, and five real tests run against your actual code.</p>
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">async def call_with_retry_fallback(primary_call, fallback_call, max_retries)</span>. Both <span class="mono-inline">primary_call</span> and <span class="mono-inline">fallback_call</span> are <span class="mono-inline">async</span> functions, resolving on success or raising an <span class="mono-inline">Exception</span> that may have a <span class="mono-inline">.retryable</span> attribute set to <span class="mono-inline">True</span>/<span class="mono-inline">False</span> (treat missing/unset as retryable). Retry the primary on retryable failures up to <span class="mono-inline">max_retries</span> times (so up to <span class="mono-inline">max_retries + 1</span> total primary attempts). Stop retrying immediately on a non-retryable error. Once the primary path is exhausted or blocked, call <span class="mono-inline">fallback_call</span> exactly once. Return <span class="mono-inline">{"ok": True, "result": ..., "source": "primary"|"fallback"}</span> or <span class="mono-inline">{"ok": False, "error": ..., "source": "fallback"}</span>. Never let this function raise.</p>
+      <textarea id="relCodeEditor" aria-label="Python code editor for call_with_retry_fallback" class="testin" spellcheck="false" style="min-height:230px;font-size:13px" rows="14"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunRelTests">▶ Run tests</button>
+        <button id="btnResetRelCode">Reset to starter code</button>
+      </div>
+      <div id="relTestResults" style="margin-top:14px"></div>
+
+      <div class="hintbox" id="relHintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="relHintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1 — conceptual</summary><div class="hbody">This is a loop, not a fixed sequence: try the primary, and if it fails with a retryable error and you haven't hit max_retries, try it again. The loop ends either in success, or by falling through to the fallback path.</div></details>
+        <details data-hint="2"><summary>Hint 2 — specific</summary><div class="hbody">Track an attempt counter starting at 0. Wrap <span class="mono-inline">await primary_call()</span> in try/except inside a loop. On success, return immediately. On failure, check <span class="mono-inline">getattr(e, "retryable", True) is not False</span> (so unset counts as retryable) AND <span class="mono-inline">attempt &lt; max_retries</span>, if both hold, increment attempt and loop again, otherwise break out to the fallback step.</div></details>
+        <details data-hint="3"><summary>Hint 3 — near-solution</summary><div class="hbody">After the primary loop ends (without having returned), wrap a single <span class="mono-inline">await fallback_call()</span> attempt in its own try/except. On success return <span class="mono-inline">{"ok": True, "result": ..., "source": "fallback"}</span>, on failure return <span class="mono-inline">{"ok": False, "error": str(e), "source": "fallback"}</span>. Don't loop the fallback at all, it only ever gets one try.</div></details>
+        <details data-hint="solution" class="locked" id="relSolutionDetails"><summary id="relSolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">async def call_with_retry_fallback(primary_call, fallback_call, max_retries):
+    attempt = 0
+    while True:
+        try:
+            result = await primary_call()
+            return {"ok": True, "result": result, "source": "primary"}
+        except Exception as e:
+            retryable = getattr(e, "retryable", True) is not False
+            if not retryable or attempt >= max_retries:
+                break
+            attempt += 1
+
+    try:
+        result = await fallback_call()
+        return {"ok": True, "result": result, "source": "fallback"}
+    except Exception as e:
+        return {"ok": False, "error": str(e), "source": "fallback"}</pre></div></details>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Test 3 makes <span class="mono-inline">primary_call</span> raise a non-retryable error, with <span class="mono-inline">max_retries</span> set to 5. If your code checks <span class="mono-inline">attempt &gt;= max_retries</span> without ALSO checking <span class="mono-inline">retryable</span> first, what happens?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Without checking retryable first, a non-retryable error would keep getting retried until the attempt counter separately reaches max_retries, 6 total calls to a request that was guaranteed to fail on the very first one. The retryable check needs to short-circuit independently of the attempt count, a non-retryable error should stop the primary loop on attempt 1, regardless of how high max_retries is set.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7</span><h2 class="serif">Before the checkpoint: what you should now be able to do</h2></div>
+    <p class="mut">A short consolidation before you're graded on it.</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:2">
+      <li>Distinguish retryable from non-retryable failures, and explain why the distinction matters.</li>
+      <li>Explain exponential backoff with full jitter and the retry-storm problem it solves.</li>
+      <li>Explain why fallback should be attempted once, not retried with the same budget as the primary.</li>
+      <li>Implement a call wrapper with bounded retries and a single bounded fallback attempt.</li>
+    </ul>
+    <div class="practice">
+      <div class="lbl">Looking ahead</div>
+      <p>A reliable call wrapper gets you a response. It doesn't tell you whether that response is actually GOOD. Module 7 covers evaluation, how to systematically measure whether your system's outputs are correct, before and after you change anything about it.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Graded. Feedback is immediate and attempts are unlimited, the goal is understanding, not a single pass/fail moment.</p>
+
+    <div class="qcard">
+      <div class="qn">Question 1 of 5</div>
+      <div class="qtext">A model API call fails with a 429 (rate limited). Should this be retried?</div>
+      <div id="q1opts"></div>
+      <div class="qexplain" id="q1explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 2 of 5</div>
+      <div class="qtext">A model API call fails with a 400 (your own request body was malformed). Should this be retried as-is?</div>
+      <div id="q2opts"></div>
+      <div class="qexplain" id="q2explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 3 of 5</div>
+      <div class="qtext">With base delay 100ms, cap 1600ms, using this module's formula, what's the maximum possible delay (in ms) before retry attempt 5 (where the uncapped exponential value, 100 × 2⁴, already exceeds the cap)?</div>
+      <div class="numinput"><input type="number" id="q3input" aria-label="Your numeric answer"><button id="q3check">Check</button></div>
+      <div class="qexplain" id="q3explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 4 of 5</div>
+      <div class="qtext">After the primary model's retries are exhausted, what's the correct next step?</div>
+      <div id="q4opts"></div>
+      <div class="qexplain" id="q4explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 5 of 5 · new scenario</div>
+      <div class="qtext">An agent loop (Module 5) has a step limit of 10. Each step's model call now uses this module's retry-and-fallback wrapper, but with an unbounded retry count. What actually breaks?</div>
+      <div id="q5opts"></div>
+      <div class="qexplain" id="q5explain"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">9</span><h2 class="serif">Further reading</h2></div>
+    <p class="mut">If you want to go deeper than the browser can take you:</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--mut2);line-height:1.9">
+      <li>AWS's "Timeouts, retries, and backoff with jitter" architecture blog post is a widely-cited breakdown of why full jitter specifically outperforms fixed or exponential-only backoff under real concurrent load.</li>
+      <li>Circuit breakers (also covered in Automation Engineering) are a complementary pattern, once a certain fraction of recent calls to a provider have failed, stop calling it entirely for a cooldown period instead of retrying each request individually, useful when the failure is at the provider level, not the individual request level.</li>
+      <li>Most model providers publish explicit retry-after headers or documented retryable status codes, worth using directly instead of guessing at classification where available.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">10</span><h2 class="serif">Glossary</h2></div>
+    <div style="margin-top:14px;display:grid;gap:12px">
+      <div><b class="mono-inline">retryable error</b><span style="color:var(--mut);font-size:14px"> — a failure where an identical retry has a real chance of succeeding (rate limits, timeouts, transient server faults).</span></div>
+      <div><b class="mono-inline">non-retryable error</b><span style="color:var(--mut);font-size:14px"> — a failure where retrying the identical request will fail identically every time (malformed requests, auth errors).</span></div>
+      <div><b class="mono-inline">exponential backoff</b><span style="color:var(--mut);font-size:14px"> — growing the delay between retries exponentially with each attempt, up to a cap.</span></div>
+      <div><b class="mono-inline">full jitter</b><span style="color:var(--mut);font-size:14px"> — randomizing the actual delay uniformly between 0 and the backoff cap, to avoid synchronized retry storms.</span></div>
+      <div><b class="mono-inline">fallback</b><span style="color:var(--mut);font-size:14px"> — a secondary call path (often a different model or provider) attempted once the primary path has failed.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">11</span><h2 class="serif">Interactive: watch the retry storm form (and get spread out)</h2></div>
+    <p class="mut">A third-party shipping-rate API you depend on starts timing out under its own load. Every checkout instance calling it independently decides to retry. Adjust how many simultaneous callers are retrying, then compare where their retries land in time with fixed delay (no jitter) versus full jitter.</p>
+    <div class="interactive">
+      <span class="ilbl">Live simulation · cap 1600ms, 200ms buckets</span>
+      <div class="sliderrow">
+        <div class="slbl" id="thCallersLbl">Simultaneous callers retrying: <b id="thCallersV">30</b></div>
+        <input type="range" id="thCallersSlider" min="5" max="80" step="1" value="30" aria-labelledby="thCallersLbl">
+      </div>
+      <div class="dagctrl">
+        <button class="primary" id="thSimulateBtn">↻ Re-roll jitter</button>
+      </div>
+      <div class="statrow">
+        <div class="stat warn"><div class="sv" id="thFixedPeak">–</div><div class="sl">busiest 200ms window, fixed delay (no jitter)</div></div>
+        <div class="stat"><div class="sv" id="thJitterPeak">–</div><div class="sl">busiest 200ms window, full jitter</div></div>
+      </div>
+      <p class="mut" style="margin-top:14px;font-size:13.5px">Fixed delay: every caller computes the same backoff value, so they all land in one bucket, a synchronized spike hitting the already-struggling shipping API at once. Full jitter: each caller picks independently from 0-1600ms, spreading the same number of retries across every bucket instead.</p>
+      <div style="margin-top:14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2)">Fixed delay (no jitter)</div>
+      <div id="thFixedChart"></div>
+      <div style="margin-top:16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2)">Full jitter</div>
+      <div id="thJitterChart"></div>
+    </div>
+  </section>
+
+  <footer>Zenith Lab · AI Engineering · Module 6 of 8 · Next: Evaluation, Testing &amp; Observability</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const MODULE_ID = 6;
+CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Section 2: backoff calculator ---------------- */
+const BACKOFF_BASE = 200, BACKOFF_CAP = 8000;
+function cappedDelay(attempt){
+  return Math.min(BACKOFF_CAP, BACKOFF_BASE * Math.pow(2, attempt - 1));
+}
+function updateBackoff(){
+  const att = Number(document.getElementById("attSlider").value);
+  document.getElementById("attV").textContent = att;
+  const cap = cappedDelay(att);
+  document.getElementById("capVal").textContent = Math.round(cap);
+  document.getElementById("capStat").className = "stat" + (cap >= BACKOFF_CAP ? " warn" : "");
+  [1,3,6].forEach(a => {
+    const c = cappedDelay(a);
+    const pct = Math.round((c / BACKOFF_CAP) * 100);
+    document.getElementById("bar" + a).style.width = pct + "%";
+    document.getElementById("barv" + a).textContent = Math.round(c) + "ms cap";
+  });
+}
+document.getElementById("attSlider").addEventListener("input", updateBackoff);
+updateBackoff();
+
+/* ---------------- Section 11: retry storm simulation ---------------- */
+const TH_CAP = 1600, TH_BUCKET_SIZE = 200, TH_BUCKETS = TH_CAP / TH_BUCKET_SIZE;
+function thBucketLabel(i){
+  return (i * TH_BUCKET_SIZE) + "-" + ((i + 1) * TH_BUCKET_SIZE) + "ms";
+}
+function thRenderChart(containerId, counts, maxCount){
+  const el = document.getElementById(containerId);
+  el.innerHTML = "";
+  counts.forEach((c, i) => {
+    const pct = maxCount > 0 ? Math.round((c / maxCount) * 100) : 0;
+    const row = document.createElement("div");
+    row.className = "barrow";
+    row.innerHTML = `<div class="barlbl">${thBucketLabel(i)}</div><div class="bartrack"><div class="barfill" style="width:${pct}%"></div></div><div class="barval">${c}</div>`;
+    el.appendChild(row);
+  });
+}
+function runThunderSim(){
+  const n = Number(document.getElementById("thCallersSlider").value);
+  document.getElementById("thCallersV").textContent = n;
+
+  // Fixed delay: every caller computes the identical uncapped backoff value,
+  // capped the same way, so they all land in the same bucket (the cap itself).
+  const fixedCounts = new Array(TH_BUCKETS).fill(0);
+  fixedCounts[TH_BUCKETS - 1] = n;
+
+  // Full jitter: each caller independently picks a delay uniformly in [0, cap].
+  const jitterCounts = new Array(TH_BUCKETS).fill(0);
+  for (let i = 0; i < n; i++){
+    const delay = Math.random() * TH_CAP;
+    const bucket = Math.min(TH_BUCKETS - 1, Math.floor(delay / TH_BUCKET_SIZE));
+    jitterCounts[bucket]++;
+  }
+
+  const fixedPeak = Math.max(...fixedCounts);
+  const jitterPeak = Math.max(...jitterCounts);
+  document.getElementById("thFixedPeak").textContent = fixedPeak;
+  document.getElementById("thJitterPeak").textContent = jitterPeak;
+  thRenderChart("thFixedChart", fixedCounts, n);
+  thRenderChart("thJitterChart", jitterCounts, n);
+}
+document.getElementById("thCallersSlider").addEventListener("input", runThunderSim);
+document.getElementById("thSimulateBtn").addEventListener("click", runThunderSim);
+runThunderSim();
+
+/* ---------------- Section 6: retry+fallback exercise ---------------- */
+const REL_STARTER = `async def call_with_retry_fallback(primary_call, fallback_call, max_retries):
+    # primary_call/fallback_call: async functions, resolve on success,
+    # raise an Exception that may have .retryable = True/False (unset = retryable).
+    # Retry primary_call on retryable failures up to max_retries times.
+    # Stop retrying immediately on a non-retryable error.
+    # Once the primary path is exhausted/blocked, call fallback_call exactly once.
+    # Return {"ok": True, "result": ..., "source": "primary"|"fallback"}
+    #     or {"ok": False, "error": ..., "source": "fallback"}. Never raise.
+
+    # YOUR CODE HERE
+
+    pass`;
+function loadRelStarter(){
+  document.getElementById("relCodeEditor").value = REL_STARTER;
+  document.getElementById("relTestResults").innerHTML = "";
+}
+loadRelStarter();
+document.getElementById("btnResetRelCode").addEventListener("click", loadRelStarter);
+
+let relHasAttempted = false;
+function relHintUsageText(){
+  const used = (CourseProgress.getModule(6).sections || {}).relHintsUsed || 0;
+  return used > 0 ? `(${used} hint${used===1?"":"s"} used)` : "";
+}
+function refreshRelHintUsage(){
+  document.getElementById("relHintUsage").textContent = relHintUsageText();
+}
+document.querySelectorAll('#relHintbox details[data-hint]:not([data-hint="solution"])').forEach(d => {
+  d.addEventListener("toggle", () => {
+    if (!d.open) return;
+    const cur = CourseProgress.getModule(6).sections || {};
+    const used = new Set(cur.relHintsOpened || []);
+    used.add(d.dataset.hint);
+    CourseProgress.setSection(6, "relHintsOpened", Array.from(used));
+    CourseProgress.setSection(6, "relHintsUsed", used.size);
+    refreshRelHintUsage();
+  });
+});
+const relSolutionDetails = document.getElementById("relSolutionDetails");
+relSolutionDetails.addEventListener("toggle", () => {
+  if (relSolutionDetails.open && !relHasAttempted) relSolutionDetails.open = false;
+});
+function unlockRelSolution(){
+  relHasAttempted = true;
+  relSolutionDetails.classList.remove("locked");
+  document.getElementById("relSolutionSummary").textContent = "Solution";
+}
+(function restoreRelHints(){
+  refreshRelHintUsage();
+  const stored = CourseProgress.getModule(6).sections || {};
+  if (stored.retryFallbackExercise) unlockRelSolution();
+})();
+
+const REL_HARNESS_PY = [
+"async def harness(student_code):",
+"    ns = {}",
+"    try:",
+"        exec(student_code, ns)",
+"        fn = ns.get('call_with_retry_fallback')",
+"        if fn is None or not callable(fn):",
+"            return {'ranOk': False, 'error': 'call_with_retry_fallback is not defined as a function.'}",
+"    except Exception as e:",
+"        return {'ranOk': False, 'error': str(e)}",
+"",
+"    async def safe_call(primary, fallback, max_retries):",
+"        try:",
+"            return {'threw': False, 'out': await fn(primary, fallback, max_retries)}",
+"        except Exception as e:",
+"            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+"",
+"    def mk_error(msg, retryable=None):",
+"        e = Exception(msg)",
+"        if retryable is not None:",
+"            e.retryable = retryable",
+"        return e",
+"",
+"    results = []",
+"",
+"    fallback_calls = [0]",
+"    async def primary1():",
+"        return 'primary-ok'",
+"    async def fallback1():",
+"        fallback_calls[0] += 1",
+"        return 'fallback-ok'",
+"    r = await safe_call(primary1, fallback1, 3)",
+"    p = (not r['threw'] and r['out'] and r['out']['ok'] is True and r['out']['result'] == 'primary-ok'",
+"         and r['out']['source'] == 'primary' and fallback_calls[0] == 0)",
+"    results.append({'name': 'Primary succeeds on first try, fallback is never called', 'pass': p,",
+"        \"hint\": \"If primary_call() succeeds, return immediately with source: 'primary'. Don't call fallback_call at all in this case.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    primary_calls2 = [0]",
+"    fallback_calls2 = [0]",
+"    async def primary2():",
+"        primary_calls2[0] += 1",
+"        if primary_calls2[0] < 3:",
+"            raise mk_error('rate limited', True)",
+"        return 'recovered'",
+"    async def fallback2():",
+"        fallback_calls2[0] += 1",
+"        return 'fallback-ok'",
+"    r = await safe_call(primary2, fallback2, 2)",
+"    p = (not r['threw'] and r['out'] and r['out']['ok'] is True and r['out']['result'] == 'recovered'",
+"         and r['out']['source'] == 'primary' and primary_calls2[0] == 3 and fallback_calls2[0] == 0)",
+"    results.append({'name': 'Retries a retryable failure and succeeds on a later primary attempt, without ever calling fallback', 'pass': p,",
+"        \"hint\": \"On a retryable error (getattr(e, 'retryable', True) is not False), if you haven't hit max_retries yet, increment your attempt counter and call primary_call again, don't fall back yet.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    primary_calls3 = [0]",
+"    async def primary3():",
+"        primary_calls3[0] += 1",
+"        raise mk_error('bad request', False)",
+"    async def fallback3():",
+"        return 'fallback-ok'",
+"    r = await safe_call(primary3, fallback3, 5)",
+"    p = (not r['threw'] and r['out'] and r['out']['ok'] is True and r['out']['result'] == 'fallback-ok'",
+"         and r['out']['source'] == 'fallback' and primary_calls3[0] == 1)",
+"    results.append({'name': 'A non-retryable error stops retrying immediately (1 primary call) and goes straight to fallback, even with max_retries much higher', 'pass': p,",
+"        \"hint\": \"Check e.retryable first. If it's explicitly False, break out of the retry loop right away regardless of the attempt count or max_retries, don't wait for the retry budget to run out.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    primary_calls4 = [0]",
+"    fallback_calls4 = [0]",
+"    async def primary4():",
+"        primary_calls4[0] += 1",
+"        raise mk_error('still failing', True)",
+"    async def fallback4():",
+"        fallback_calls4[0] += 1",
+"        return 'fallback-ok'",
+"    r = await safe_call(primary4, fallback4, 2)",
+"    p = (not r['threw'] and r['out'] and r['out']['ok'] is True and r['out']['source'] == 'fallback'",
+"         and primary_calls4[0] == 3 and fallback_calls4[0] == 1)",
+"    results.append({'name': 'Exhausting max_retries on a retryable error still calls fallback exactly once (primary tried max_retries+1 times)', 'pass': p,",
+"        'hint': 'With max_retries=2, the primary should be attempted 3 total times (1 initial + 2 retries) before falling through to a SINGLE fallback attempt.',",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    async def primary5():",
+"        raise mk_error('primary down', True)",
+"    async def fallback5():",
+"        raise mk_error('fallback down', True)",
+"    r = await safe_call(primary5, fallback5, 1)",
+"    p = not r['threw'] and r['out'] and r['out']['ok'] is False and isinstance(r['out'].get('error'), str) and r['out']['source'] == 'fallback'",
+"    results.append({'name': 'If both primary and fallback fail, returns a clear structured failure instead of raising', 'pass': p,",
+"        \"hint\": \"Wrap the single fallback attempt in its own try/except. If it also raises, return {'ok': False, 'error': str(e), 'source': 'fallback'} rather than letting the exception propagate out of your function.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    return {'ranOk': True, 'results': results}",
+].join("\n");
+
+async function runRelTests(){
+  unlockRelSolution();
+  const resultsEl = document.getElementById("relTestResults");
+  resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Starting the Python sandbox (first run downloads the interpreter, can take anywhere from ~10s to a minute depending on your connection)…</div>`;
+  const code = document.getElementById("relCodeEditor").value;
+
+  const outcome = await PySandboxRunner.run(REL_HARNESS_PY, "harness", code);
+  resultsEl.innerHTML = "";
+  if (!outcome.ok) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">${CourseProgress.escapeHtml(outcome.error)}</div>`;
+    return;
+  }
+  const data = outcome.result;
+  if (!data.ranOk) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">Your code didn't run: ${CourseProgress.escapeHtml(data.error)}. Check for a syntax error, or that the function is named exactly call_with_retry_fallback.</div>`;
+    return;
+  }
+
+  const results = data.results;
+  let passCount = 0;
+  results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.style.display = "block"; row.style.marginTop = "8px";
+    const hintHtml = r.errorMessage
+      ? `Your code threw an unexpected error: ${CourseProgress.escapeHtml(r.errorMessage)}. ${r.hint}`
+      : r.hint;
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${r.name}` + (r.pass ? "" : `<br>${hintHtml}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
+  summary.textContent = `${passCount} / ${results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  CourseProgress.setSection(6, "retryFallbackExercise", { passCount, total: results.length });
+}
+document.getElementById("btnRunRelTests").addEventListener("click", runRelTests);
+
+/* ---------------- Quiz ---------------- */
+let score = 0;
+const answered = { q1:false, q2:false, q3:false, q4:false, q5:false };
+
+function updateScore(){
+  document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnNext");
+  btn.disabled = !allDone;
+  btn.textContent = allDone ? "Continue to Module 7 →" : "Complete all questions to continue →";
+  if (allDone) CourseProgress.markComplete(MODULE_ID, score, 5);
+}
+
+function buildMC(qkey, opts, elId){
+  const el = document.getElementById(elId);
+  opts.forEach((opt, i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.innerHTML = `<input type="radio" name="${qkey}" value="${i}"><span>${opt.text}</span>`;
+    div.addEventListener("click", () => {
+      if (answered[qkey]) return;
+      answered[qkey] = true;
+      CourseProgress.setAnswer(MODULE_ID, qkey, i);
+      document.querySelectorAll(`#${elId} .qopt`).forEach((e2,j) => {
+        if (opts[j].correct) e2.classList.add("correct");
+        else if (j === i) e2.classList.add("incorrect");
+      });
+      const ex = document.getElementById(qkey + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { score++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      updateScore();
+    });
+    el.appendChild(div);
+  });
+}
+
+buildMC("q1", [
+  { text: "Yes, a 429 is transient, the request itself is fine, retrying (with backoff) has a real chance of succeeding", correct: true, correctText: "Correct. Rate limiting is a textbook retryable condition, the request is valid, the timing just wasn't." },
+  { text: "No, a 429 means the request was rejected and must be changed before trying again", correct: false, reason: "A 429 doesn't mean the request was invalid, it means too many requests arrived too quickly. The identical request, sent again after a delay, is very likely to succeed." },
+  { text: "It depends only on which model provider returned the error", correct: false, reason: "429 has a consistent meaning (rate limiting) across virtually all HTTP APIs, provider identity doesn't change whether this specific error is transient." },
+], "q1opts");
+
+buildMC("q2", [
+  { text: "No, the request is malformed, retrying the exact same request will fail identically every time", correct: true, correctText: "Correct. A 400 from your own malformed request needs the request FIXED, not retried, retrying it as-is is a guaranteed repeat failure." },
+  { text: "Yes, with enough retries and backoff it will eventually succeed", correct: false, reason: "No amount of waiting fixes a structurally invalid request, backoff delays the failure without changing the outcome, it will fail on attempt 10 exactly as it failed on attempt 1." },
+  { text: "Yes, but only if fallback is also configured", correct: false, reason: "Fallback doesn't fix a malformed request either, if the request itself is invalid, the SAME malformed request sent to a fallback model has no reason to succeed there either." },
+], "q2opts");
+
+function checkQ3(){
+  if (answered.q3) return;
+  const val = Number(document.getElementById("q3input").value);
+  const ex = document.getElementById("q3explain");
+  ex.style.display = "block";
+  answered.q3 = true;
+  CourseProgress.setAnswer(MODULE_ID, "q3", val);
+  if (val === 1600) { score++; ex.textContent = "Correct. 100 × 2⁴ = 1600, which equals the cap exactly, so the max possible delay is capped at 1600ms (full jitter picks uniformly between 0 and this value)."; }
+  else { ex.textContent = "Not quite. 100 × 2⁴ (attempt 5, so exponent 4) = 1600, which is exactly at the cap, so the maximum possible delay is 1600ms, not the uncapped exponential value."; }
+  updateScore();
+}
+document.getElementById("q3check").addEventListener("click", checkQ3);
+
+buildMC("q4", [
+  { text: "Attempt the fallback exactly once, not with the same retry budget as the primary", correct: true, correctText: "Correct. Fallback is a single bounded attempt, a last resort with its own tight limit, not a second full retry cycle." },
+  { text: "Reset the retry counter and retry the primary again with a fresh budget", correct: false, reason: "Resetting the counter defeats the entire purpose of having a bound, it turns a bounded retry policy into an effectively unbounded one." },
+  { text: "Immediately return failure without attempting anything else", correct: false, reason: "Giving up entirely skips the value fallback provides, a secondary model or provider can often still return a usable result when the primary is unavailable." },
+], "q4opts");
+
+buildMC("q5", [
+  { text: "Each step can now take unpredictably long (or cost far more) internally, even though the loop's step COUNT stays capped at 10, an unbounded retry inside one step defeats the point of bounding the number of steps", correct: true, correctText: "Correct. A step limit only actually bounds total cost and time if everything inside each step is also bounded, an unbounded retry wrapper breaks that guarantee even while technically respecting the step count." },
+  { text: "Nothing breaks, the step limit of 10 caps total retries across the whole loop automatically", correct: false, reason: "The step limit counts LOOP iterations, it has no awareness of, or control over, how many times the retry wrapper retries WITHIN a single step, those are two separate, independent bounds." },
+  { text: "The agent loop itself will throw an error once retries exceed the step limit", correct: false, reason: "There's no automatic interaction between an internal retry count and the outer loop's step counter, they're unrelated mechanisms unless explicitly wired together, which an unbounded retry count specifically fails to do." },
+], "q5opts");
+
+document.getElementById("btnNext").addEventListener("click", () => {
+  window.location.href = "module-07.html";
+});
+
+/* ---------------- Retry checkpoint ---------------- */
+function maybeShowRetry(){
+  const anyAnswered = answered.q1 || answered.q2 || answered.q3 || answered.q4 || answered.q5;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnRetryCheckpoint");
+  btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  score = 0;
+  Object.keys(answered).forEach(k => answered[k] = false);
+  document.querySelectorAll(".qexplain").forEach(el => { el.style.display = "none"; el.textContent = ""; });
+  document.querySelectorAll(".qopt").forEach(el => el.classList.remove("correct","incorrect"));
+  document.querySelectorAll('input[type=radio]').forEach(el => el.checked = false);
+  document.getElementById("q3input").value = "";
+  updateScore();
+  maybeShowRetry();
+  window.scrollTo({ top: document.querySelector(".qcard").offsetTop - 100, behavior: "smooth" });
+});
+const scoreObserver = new MutationObserver(maybeShowRetry);
+scoreObserver.observe(document.getElementById("scoreDisplay"), { childList: true });
+</script>
+</body>
+</html>

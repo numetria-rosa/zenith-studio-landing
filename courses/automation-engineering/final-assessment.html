@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Competency Assessment — Automation Engineering</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(28px,4.5vw,40px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:15.5px;max-width:680px;margin-top:14px}
+section{padding:36px 0;border-bottom:1px solid var(--bd)}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:10px;font-size:13.5px;color:var(--mut);display:none}
+.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
+.numinput input{width:100px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+.logconsole{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;font-family:'JetBrains Mono';font-size:12px;line-height:1.9;margin:10px 0;overflow-x:auto}
+.logline{color:var(--mut)}
+.logline.err{color:var(--red)}
+.ltrace{color:var(--violet)}
+.lstep{color:var(--lime)}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+.qgrid{display:grid;gap:16px;margin-top:20px}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
+.nextbtn{margin-left:auto}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono'}
+.coursenav a:hover{color:var(--lime)}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:24px} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Automation Engineering · Final Assessment</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Final competency assessment</span>
+    <h1 class="serif">Ten scenarios you haven't seen</h1>
+    <p class="sub">Every scenario here uses different numbers, different names, and different framing than anything in the 8 modules. If you can only pass by recognizing a memorized pattern, you'll get these wrong, on purpose. Passing score: 80% (8/10). Unlimited attempts.</p>
+  </header>
+
+  <section><div class="qgrid" id="qgrid"></div>
+    <div class="feedback" id="overallFb" style="margin-top:20px"></div>
+  </section>
+  <footer>Zenith Lab · Automation Engineering · Final competency assessment</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">0 / 10 answered</span>
+  <button class="primary nextbtn" id="btnFinish" disabled>Finish assessment</button>
+</div></div>
+
+<script src="course-progress.js?v=5"></script>
+<script>
+const QUESTIONS = [
+  { id: "fa1", type: "mcq", tag: "DAG reasoning (novel graph)",
+    text: "A pipeline has tasks: A→C, B→C, C→D, D→B. Is this graph valid to execute, and why?",
+    opts: [
+      { t: "No, D→B creates a cycle (B→C→D→B), so no valid execution order exists", correct: true },
+      { t: "Yes, every task has a listed dependency so it's fine", correct: false, why: "Having dependencies listed doesn't guarantee acyclicity, B→C→D→B is a cycle: B waits on C, C waits on D... wait, D waits on B, so B indirectly waits on itself." },
+      { t: "Yes, because D only depends on one task (C)", correct: false, why: "Out-degree of one node doesn't rule out a cycle elsewhere in the graph, follow the chain: B→C→D→B loops." },
+    ]},
+  { id: "fa2", type: "mcq", tag: "Idempotency (novel scenario)",
+    text: "A booking system lets clients cancel a reservation by reservation_id, with no client-supplied idempotency key at all, just DELETE /reservations/{id}. Is this endpoint naturally idempotent, and why?",
+    opts: [
+      { t: "Yes, deleting an already-deleted (or already-cancelled) reservation can simply return the same 'cancelled' result again, no separate idempotency key needed for this shape of operation", correct: true },
+      { t: "No, any endpoint without a client-supplied idempotency key is unsafe to retry", correct: false, why: "Idempotency keys matter for operations that create new state (like charging money) where a naive retry duplicates a side effect. A delete-by-ID operation is naturally idempotent by design, repeating it doesn't create a second cancellation." },
+      { t: "No, DELETE requests can never be retried safely", correct: false, why: "DELETE is defined as idempotent in HTTP semantics precisely because repeating it has the same end state as doing it once." },
+    ]},
+  { id: "fa3", type: "calc", tag: "Retry backoff calculation (novel numbers)",
+    text: "Using exponential backoff with base delay 300ms, multiplier 2, and a cap of 4000ms, what is the delay (in ms, before jitter) for the 5th retry attempt (attempt index 4, zero-indexed)? Formula: min(cap, base × multiplier^attempt).",
+    correct: 4000, hint: "300 × 2^4 = 4800, which exceeds the 4000ms cap, so the cap applies.",
+  },
+  { id: "fa4", type: "calc", tag: "Queue capacity calculation (novel numbers)",
+    text: "Traffic is 60 req/min, each worker handles 15 req/min, target utilization must stay below 70% (ρ < 0.7). What is the minimum number of whole workers required?",
+    correct: 6, hint: "60 / 0.7 ≈ 85.7 req/min of capacity needed. 85.7 / 15 ≈ 5.7, rounds up to 6 (5 workers gives 75 req/min, ρ=0.8, which fails 0.7).",
+  },
+  { id: "fa5", type: "mcq", tag: "Security concept (novel scenario)",
+    text: "A team verifies webhook signatures using string equality (===) instead of a constant-time comparison. Under what threat does this actually matter?",
+    opts: [
+      { t: "A timing attack, where an attacker measures response-time differences to guess the correct signature byte by byte", correct: true },
+      { t: "It doesn't matter, === is fine as long as the secret is long enough", correct: false, why: "Secret length doesn't fix a timing side-channel, non-constant-time comparison leaks information regardless of secret length, through how long the comparison takes to fail." },
+      { t: "It only matters if the webhook is sent over plain HTTP instead of HTTPS", correct: false, why: "The timing side-channel exists independent of transport encryption, TLS protects the data in transit, it doesn't fix how the server internally compares the signature." },
+    ]},
+  { id: "fa6", type: "mcq", tag: "API contract classification (novel diff)",
+    text: "V1 returns a list endpoint with no pagination: { \"items\": [...] }. V2 adds pagination and now requires a page parameter with no default. Breaking or non-breaking?",
+    opts: [
+      { t: "Breaking, existing clients that call the endpoint without a page parameter will now behave differently or fail, where they previously got everything", correct: true },
+      { t: "Non-breaking, pagination is just an addition", correct: false, why: "It's not a pure addition, it's a behavior change with a required parameter that has no default, existing callers' requests are affected." },
+      { t: "Breaking only if the response format's JSON structure changed", correct: false, why: "Breaking changes aren't limited to structural/type changes, a newly-required parameter that alters behavior for existing callers is breaking too, even if the response envelope stayed the same shape." },
+    ]},
+  { id: "fa7", type: "debug", tag: "Debugging (novel log excerpt)",
+    logs: [
+      "10:00:00 [req_1] order-svc — POST /orders, idempotency_key=abc123",
+      "10:00:00 [req_1] order-svc — created order_501",
+      "10:00:05 [req_2] order-svc — POST /orders, idempotency_key=abc123",
+      "10:00:05 [req_2] order-svc — created order_502  (different order_id for the SAME idempotency_key)",
+    ],
+    text: "Given this log, what's the actual bug?",
+    opts: [
+      { t: "The idempotency-key lookup isn't working, the same key produced two different orders instead of returning the first result", correct: true },
+      { t: "The client sent two different keys by mistake", correct: false, why: "The log clearly shows idempotency_key=abc123 both times, identical, the client did its part correctly." },
+      { t: "This is expected, retries should always create a new record", correct: false, why: "That's the opposite of what idempotency means. The whole point of the key is that a retry with the same key returns the original result, not a new one." },
+    ]},
+  { id: "fa8", type: "calc", tag: "SLO / error budget calculation (novel numbers)",
+    text: "A service has an SLO of 99.9% success over a 30-day (43,200-minute) window. How many minutes of full downtime does the error budget allow over that window? Round to the nearest whole minute.",
+    correct: 43, hint: "0.1% of 43,200 minutes = 43.2, rounds to 43 minutes.",
+  },
+  { id: "fa9", type: "mcq", tag: "Architecture decision (scenario synthesis)",
+    text: "A service currently retries failed calls with fixed 1-second delays and no circuit breaker. Load testing shows that when the downstream dependency degrades, the service's own queue fills up within 90 seconds. What's the most complete fix, combining what you've learned?",
+    opts: [
+      { t: "Add jitter to the retry delays AND add a circuit breaker that fails fast once the dependency is confirmed down, so retries desynchronize and stop piling onto an already-struggling dependency", correct: true },
+      { t: "Just add more queue workers so it can absorb the load", correct: false, why: "More workers absorb symptoms without fixing the retry storm itself, and if the downstream dependency is actually down, more workers just means more failed calls in flight, not a real fix." },
+      { t: "Just increase the retry delay to 5 seconds", correct: false, why: "A longer fixed delay still synchronizes retries in lockstep (no jitter) and still keeps calling a dependency that's confirmed down (no circuit breaker), it slows the problem, it doesn't solve it." },
+    ]},
+  { id: "fa10", type: "mcq", tag: "Scenario analysis (multi-module synthesis)",
+    text: "An incident report says: 'error rate spiked, but latency and queue depth were both normal the whole time.' Given that pattern (errors up, but NOT a capacity/queue signature), which root cause is most consistent with the evidence?",
+    opts: [
+      { t: "A logic or validation bug rejecting requests quickly (fast failures), not a resource-exhaustion problem, since capacity symptoms (latency, queue depth) stayed normal", correct: true },
+      { t: "The queue hit its capacity limit", correct: false, why: "Queue depth was explicitly reported as normal, that rules out a capacity-driven root cause, which would show elevated queue depth and/or latency." },
+      { t: "A retry storm overwhelming the system", correct: false, why: "A retry storm would typically show up as elevated load, latency, and/or queue depth, none of which moved here, fast, normal-latency failures point at logic/validation, not load." },
+    ]},
+];
+
+let score = 0;
+const answered = {};
+const grid = document.getElementById("qgrid");
+
+QUESTIONS.forEach((q, idx) => {
+  const card = document.createElement("div");
+  card.className = "qcard";
+  if (q.type === "calc") {
+    card.innerHTML = `<div class="qn">Question ${idx+1} of ${QUESTIONS.length} · ${q.tag}</div><div class="qtext">${q.text}</div><div class="numinput"><input type="number" id="${q.id}input"><button id="${q.id}check">Check</button></div><div class="qexplain" id="${q.id}explain"></div>`;
+    grid.appendChild(card);
+    const check = () => {
+      if (answered[q.id]) return;
+      answered[q.id] = true;
+      const val = Number(document.getElementById(q.id + "input").value);
+      const correct = val === q.correct;
+      const ex = document.getElementById(q.id + "explain");
+      ex.style.display = "block";
+      ex.textContent = (correct ? "Correct. " : `Not quite, the answer is ${q.correct}. `) + q.hint;
+      if (correct) score++;
+      CourseProgress.setAnswer("finalAssessment", q.id, val);
+      updateProgress();
+    };
+    document.getElementById(q.id + "check").addEventListener("click", check);
+  } else {
+    let logsHtml = "";
+    if (q.logs) {
+      logsHtml = `<div class="logconsole">${q.logs.map(l => `<div class="logline${l.includes("(different") ? " err" : ""}">${l}</div>`).join("")}</div>`;
+    }
+    card.innerHTML = `<div class="qn">Question ${idx+1} of ${QUESTIONS.length} · ${q.tag}</div>${logsHtml}<div class="qtext">${q.text}</div><div id="${q.id}opts"></div><div class="qexplain" id="${q.id}explain"></div>`;
+    grid.appendChild(card);
+    const el = document.getElementById(q.id + "opts");
+    q.opts.forEach((opt, i) => {
+      const div = document.createElement("label");
+      div.className = "qopt";
+      div.innerHTML = `<input type="radio" name="${q.id}" value="${i}"><span>${opt.t}</span>`;
+      div.addEventListener("click", () => {
+        if (answered[q.id]) return;
+        answered[q.id] = true;
+        document.querySelectorAll(`#${q.id}opts .qopt`).forEach((e2, j) => {
+          if (q.opts[j].correct) e2.classList.add("correct");
+          else if (j === i) e2.classList.add("incorrect");
+        });
+        const ex = document.getElementById(q.id + "explain");
+        ex.style.display = "block";
+        ex.textContent = (opt.correct ? "Correct." : "Not quite. " + opt.why);
+        if (opt.correct) score++;
+        CourseProgress.setAnswer("finalAssessment", q.id, i);
+        updateProgress();
+      });
+      el.appendChild(div);
+    });
+  }
+});
+
+function updateProgress(){
+  const answeredCount = Object.keys(answered).length;
+  document.getElementById("scoreDisplay").textContent = `${answeredCount} / ${QUESTIONS.length} answered`;
+  const allDone = answeredCount === QUESTIONS.length;
+  document.getElementById("btnFinish").disabled = !allDone;
+  if (allDone) {
+    const passed = score / QUESTIONS.length >= 0.8;
+    const fb = document.getElementById("overallFb");
+    fb.className = "feedback " + (passed ? "ok" : "bad");
+    fb.textContent = `Final score: ${score} / ${QUESTIONS.length} (${Math.round(score/QUESTIONS.length*100)}%). ` +
+      (passed ? "You passed the final competency assessment." : "80% (8/10) is required to pass. Review the explanations above, this assessment stays open for retries.");
+    CourseProgress.setExtra("finalAssessment", { passCount: score, total: QUESTIONS.length, passed });
+  }
+}
+document.getElementById("btnFinish").addEventListener("click", () => { window.location.href = "dashboard.html"; });
+
+(function restore(){
+  const stored = CourseProgress.load().modules["finalAssessment"];
+  const a = (stored && stored.answers) || {};
+  QUESTIONS.forEach(q => {
+    if (a[q.id] === undefined || answered[q.id]) return;
+    if (q.type === "calc") {
+      document.getElementById(q.id + "input").value = a[q.id];
+      document.getElementById(q.id + "check").click();
+    } else {
+      document.querySelectorAll(`#${q.id}opts .qopt`)[a[q.id]]?.click();
+    }
+  });
+})();
+</script>
+</body>
+</html>

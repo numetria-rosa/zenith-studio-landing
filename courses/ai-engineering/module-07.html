@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 7: Evaluation, Testing &amp; Observability</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.progress{height:3px;background:var(--bd)}
+.progress i{display:block;height:100%;background:var(--lime);width:87.5%}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
+.def p{font-size:14.5px}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
+.callout b{color:var(--amber)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button.primary:hover{filter:brightness(1.08);color:var(--limed)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+.statrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px}
+.stat{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;flex:1;min-width:130px}
+.stat.warn{border-color:var(--red)}
+.stat .sv{font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--tx)}
+.stat.warn .sv{color:var(--red)}
+.stat .sl{font-size:11px;color:var(--mut2);margin-top:2px}
+.sliderrow{margin-top:10px}
+.slbl{font-size:13px;color:var(--mut)}
+input[type=range]{width:100%;margin-top:8px;accent-color:var(--lime)}
+.testin{width:100%;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
+.numinput input{width:100px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
+.nextbtn{margin-left:auto}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
+.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
+.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h3:first-of-type{margin-top:0}
+.orient p{font-size:14.5px;color:var(--mut)}
+.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
+.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
+.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
+.practice p{font-size:14px}
+.practice details{margin-top:12px}
+.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
+.practice summary::-webkit-details-marker{display:none}
+.practice summary:before{content:"▸ "}
+.practice details[open] summary:before{content:"▾ "}
+.practice details:not([open]) .ans{display:none}
+.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
+.hintbox{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 20px;margin-top:14px}
+.hintbox .hlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.hintbox .husage{font-size:11px;color:var(--mut2);font-weight:400;text-transform:none;letter-spacing:0}
+.hintbox details{margin-top:8px;border-top:1px solid var(--bd);padding-top:8px}
+.hintbox details:first-of-type{border-top:none;padding-top:0}
+.hintbox summary{cursor:pointer;color:var(--amber);font-size:13px;list-style:none;font-weight:600}
+.hintbox summary::-webkit-details-marker{display:none}
+.hintbox summary:before{content:"▸ "}
+.hintbox details[open] summary:before{content:"▾ "}
+.hintbox .hbody{margin-top:8px;color:var(--tx);font-size:13.5px;line-height:1.7}
+.hintbox details.locked summary{color:var(--mut2);cursor:not-allowed}
+.spotcard{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-top:10px;cursor:pointer;transition:.15s}
+.spotcard:hover{border-color:var(--bd2)}
+.spotcard pre{font-family:'JetBrains Mono';font-size:12.5px;white-space:pre-wrap;color:var(--tx);margin:0}
+.spotcard .sexp{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);font-size:13px;color:var(--mut);display:none}
+.spotcard.answered .sexp{display:block}
+.spotcard.answered.valid{border-color:var(--emerald)}
+.spotcard.answered.invalid{border-color:var(--red)}
+.spotcard .sbtns{display:flex;gap:8px;margin-top:10px}
+.spotcard .sbtns button{flex:1;font-size:12px;padding:7px 10px}
+.spotcard.answered .sbtns{display:none}
+@media (max-width:640px){
+  .wrap{padding:0 16px 60px}
+  h1{font-size:26px}
+  .kh h2{font-size:18px}
+  .interactive{padding:16px}
+  .orient{padding:20px 18px}
+}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--lime)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">AI Engineering · Module 7 of 8</span>
+</div></div>
+<div class="progress"><i></i></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-06.html">&larr; <span class="navlabel">Module 6</span></a><span class="navsep"></span><a href="module-08.html" id="navNextTop">Module 8 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 07</span>
+    <h1 class="serif">Evaluation, Testing &amp; Observability</h1>
+    <p class="sub">"I tried a few prompts and it looked good" isn't evaluation, it's a vibe check on a handful of lucky examples. Every system this course has built needs a systematic way to measure whether it's actually working, and whether a change made it better or worse.</p>
+    <div class="objectives">
+      <div class="lbl">Learning objectives</div>
+      <ul>
+        <li>Explain why an ad hoc "looks good" check doesn't substitute for a systematic eval</li>
+        <li>Design labeled eval test cases with an explicit, checkable criterion each</li>
+        <li>Explain the tradeoffs of LLM-as-judge scoring versus deterministic, rule-based checks</li>
+        <li>Implement an eval harness that scores outputs against test cases and flags regressions against a baseline</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="orient">
+    <div class="lbl">Before you start</div>
+    <h3 class="serif">What this module assumes</h3>
+    <p>Every module so far built a piece of a system: structured output, context management, retrieval, tools, an agent loop, reliability. None of them told you how to know, systematically, whether the whole thing is actually working, or whether your last change made it better or worse.</p>
+    <h3 class="serif">What's new</h3>
+    <p>Measurement as a first-class engineering activity, not an afterthought. An eval suite is code, tested and versioned like anything else, run every time something changes.</p>
+    <h3 class="serif">What's assumed</h3>
+    <div class="assume">Modules 1-6 completed. Arrays, functions as values, basic arithmetic (ratios and comparisons).</div>
+    <h3 class="serif">How to work through it</h3>
+    <ol>
+      <li>Read each definition, then run the matching interactive.</li>
+      <li>Answer the practice check before revealing the answer.</li>
+      <li>Finish with the graded checkpoint.</li>
+    </ol>
+  </div>
+
+  <section>
+    <div class="kh"><span class="num">1</span><h2 class="serif">"It looked fine" is not an evaluation</h2></div>
+    <p>Reading a handful of outputs and judging them by eye feels like evaluation, but it isn't systematic: it's not repeatable, it's biased toward whatever examples you happened to try, and it gives you no way to compare two versions objectively. If someone asks "is the new prompt better than the old one," a shrug and "seemed about the same" isn't an answer a production system can be built on.</p>
+    <div class="def">
+      <div class="k">Definition: evaluation (eval)</div>
+      <p>A systematic, repeatable process for scoring a system's outputs against a fixed set of test cases with defined criteria, producing a number (or set of numbers) that can be compared across versions, prompts, or models.</p>
+    </div>
+    <p>The point isn't to reach 100%, real tasks are often genuinely hard and some failure rate is expected. The point is having a number you trust enough to notice when it changes.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">2</span><h2 class="serif">Interactive: spot the usable eval test case</h2></div>
+    <p class="mut">A test case needs a checkable criterion, not just an input. For each candidate test case for a support-ticket summarizer, decide: usable as-is, or missing something an eval needs?</p>
+    <div id="spotCards"></div>
+    <div id="spotSummary" class="feedback" style="margin-top:16px"></div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>One of the cases above has an input but no defined pass/fail criterion at all, just an implicit "and then judge if it's good." Why can't that case be scored consistently, even by a careful human?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Without an explicit criterion, "good" is being redefined by whoever's looking at it in the moment, one reviewer might weight brevity, another might weight completeness, and the SAME reviewer might judge it differently on a different day. A usable eval case needs the criterion decided in advance and written down, exactly what Module 1's schema validation did for structured output, define correctness before you check it, not while you're checking it.</div>
+      </details>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A team building a sales-email personalization agent writes this test case: input is a prospect's job title and company name, expected is left blank, and the criterion is "check that the email feels personalized instead of generic." Rewrite the criterion as something a script could actually check, without a second model call.</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">"Feels personalized" is exactly the implicit, undefined judgment call this section warns about, two reviewers (or the same one on two days) could disagree. A checkable version replaces the feeling with a fact: does the output CONTAIN the prospect's exact job title and company name from the input, AND does it NOT contain any phrase from a fixed list of generic openers ("I hope this finds you well", "I came across your profile"). Both halves are exact-match / substring checks a script can run identically every time, no judgment required.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">3</span><h2 class="serif">LLM-as-judge: useful, but not free of the problem it's solving</h2></div>
+    <p>For genuinely subjective criteria (tone, helpfulness, coherence) where no exact-match rule applies, it's tempting to use a second model call to grade the first model's output. This works, up to a point, but it inherits the same unreliability as everything else this course has covered about model output: the judge can be inconsistent, biased toward certain phrasing styles, or simply wrong, and its grading is itself an unverified model output.</p>
+    <div class="callout"><b>A judge that scores inconsistently is worse than no automated score at all.</b> If the same output can get a 6 or an 8 from the judge model on different runs, that noise can mask a real regression, or manufacture a fake one, defeating the entire purpose of having a repeatable number to trust.</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Given the reliability concerns, when should LLM-as-judge scoring actually be used, versus avoided in favor of something else?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Reserve it for criteria that genuinely have no deterministic check, subjective quality dimensions like tone or helpfulness where "correct" isn't a fixed string or structure. Anything that CAN be checked deterministically (does the output parse as valid JSON, does it contain a required field, does it match an expected value) should be, deterministic checks are consistent, cheap, and fast, exactly the properties LLM-as-judge lacks.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4</span><h2 class="serif">Prefer deterministic checks wherever they apply</h2></div>
+    <p>A <i>deterministic</i> check, exact match, schema validation (Module 1), a numeric comparison against a known-correct value, produces the same result every time it's run against the same output. It costs nothing beyond running some code, and it's exactly reproducible, which makes it the strongest possible foundation for an eval suite wherever the task allows it.</p>
+    <div class="def">
+      <div class="k">Definition: deterministic check</div>
+      <p>A pass/fail (or scored) criterion evaluated by fixed logic, not by another model call, producing identical results on identical input every time it runs.</p>
+    </div>
+    <p>Most real eval suites are a mix: deterministic checks for anything with a defined correct answer or shape, LLM-as-judge only for what genuinely can't be checked any other way. Leaning as far as possible toward deterministic checks is the version of this module's discipline that costs the least and gives the most trustworthy numbers.</p>
+
+    <div class="practice">
+      <div class="lbl">Cross-module check</div>
+      <p>Module 1's structured-output validator already IS a deterministic check (does the output parse and match the schema). Does that mean structured-output tasks don't need a separate eval suite?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">They still need one, for a different reason: Module 1's validator checks a SINGLE output at the moment it's produced, in production, live. An eval suite runs that same kind of check (and others) across a whole labeled test set, repeatably, specifically to compare versions and catch regressions over time. Reusing the Module 1 validation logic AS one of the eval's deterministic checks is exactly the right move, but the eval suite is the thing that turns "this one output was valid" into "94% of our test set passes, versus 91% last week."</div>
+      </details>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A document-classification pipeline sorts inbound files into a fixed set of labels: invoice, contract, resume, other. Every test case in the eval set already has a known correct label attached. Should scoring this use a deterministic check or LLM-as-judge, and why?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Deterministic: exact-match the predicted label against the known correct label for each test case. There's nothing subjective to weigh here, the category set is fixed and each case already has a single correct answer, exactly the situation this section says to prefer fixed logic for. Reaching for LLM-as-judge would add cost and a new source of inconsistency to a question a one-line string comparison already answers exactly and for free.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">5</span><h2 class="serif">Catching regressions before they ship</h2></div>
+    <p>The real payoff of a repeatable eval score isn't the number itself, it's what it lets you compare. Running the same eval suite against the old prompt and the new prompt, the old model and a candidate replacement, tells you objectively whether a change helped, hurt, or made no measurable difference, before it ships to real users.</p>
+    <div class="def">
+      <div class="k">Definition: regression</div>
+      <p>A measurable drop in eval score after a change, compared to a known baseline score, signaling the change likely made the system worse on some dimension the eval suite covers.</p>
+    </div>
+    <p>A regression check is only as good as its baseline and its isolation, changing one thing at a time (one prompt, one retrieval parameter) and re-running the full eval suite tells you exactly what caused a score change. Changing several things at once and running the eval once tells you only that SOMETHING changed, not which part.</p>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A team changes both their system prompt (Module 1) and their retrieval top-k value (Module 3) in the same deploy, then runs the eval suite once and sees the score drop by 8 points. What's the practical cost of having changed both at once?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">They know something regressed, but not which change caused it, or whether one change improved things while the other hurt worse. Diagnosing it now requires re-running the eval with each change isolated (prompt change alone, top-k change alone) AFTER the fact, work that would have been unnecessary if the changes had been evaluated separately from the start. Isolating variables before evaluating, not after, is what actually makes the eval score actionable.</div>
+      </details>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A content-moderation tool is switching providers. Engineer A wants to swap the provider AND tighten the confidence threshold in the same deploy, then run the eval suite once against the 0.88 baseline. Engineer B wants to swap the provider alone first, run the full eval suite, compare that to baseline, and only then adjust the threshold in a separate isolated run. Whose approach actually tells the team whether the new provider itself is a regression risk?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Engineer B's. Changing the provider and the threshold together and evaluating once produces a single score that reflects the combined effect of both, if it drops, there's no way to tell whether the new provider is worse, the tighter threshold is worse, or one is masking the other. Running the eval with only the provider changed, against the same baseline, isolates that one variable and gives a clean answer about the provider specifically, exactly the discipline this section describes, just applied to a provider swap instead of a prompt change.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6</span><h2 class="serif">Build it: a deterministic eval harness</h2></div>
+    <p>You've seen the pieces: labeled test cases with explicit criteria, deterministic scoring, and regression detection against a baseline. Now implement an eval harness that ties them together, and five real tests run against your actual code.</p>
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">evaluate_model(test_cases, model_fn, baseline_score)</span>. <span class="mono-inline">test_cases</span> is a list of <span class="mono-inline">{"id":..., "input":..., "check":...}</span> dicts, where <span class="mono-inline">check(actual)</span> returns True/False. For each case, call <span class="mono-inline">model_fn(input)</span> to get the actual output (never let a raise from <span class="mono-inline">model_fn</span> OR <span class="mono-inline">check</span> crash your function, treat either as a failed case instead), then run <span class="mono-inline">check(actual)</span>. Return <span class="mono-inline">{"score":..., "passCount":..., "total":..., "results":..., "regression":...}</span>, where <span class="mono-inline">results</span> is a list of <span class="mono-inline">{"id":..., "pass":..., "actual":...}</span> in the same order as <span class="mono-inline">test_cases</span>, <span class="mono-inline">score</span> is <span class="mono-inline">passCount / total</span>, and <span class="mono-inline">regression</span> is <span class="mono-inline">True</span> only when <span class="mono-inline">baseline_score</span> is a real number AND <span class="mono-inline">score</span> is lower than it.</p>
+      <textarea id="evalCodeEditor" aria-label="Python code editor for evaluate_model" class="testin" spellcheck="false" style="min-height:220px;font-size:13px" rows="13"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunEvalTests">▶ Run tests</button>
+        <button id="btnResetEvalCode">Reset to starter code</button>
+      </div>
+      <div id="evalTestResults" style="margin-top:14px"></div>
+
+      <div class="hintbox" id="evalHintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="evalHintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1 — conceptual</summary><div class="hbody">Loop over test_cases: for each one, get an actual output, check it, and record the result. Then reduce that list of results down to a score, a pass count, and a regression flag.</div></details>
+        <details data-hint="2"><summary>Hint 2 — specific</summary><div class="hbody">Wrap the model_fn(tc["input"]) call in its own try/except, if it raises, that case is a fail with actual set to something describing the error, and check() is never called for that case. Separately, wrap tc["check"](actual) in try/except too, if IT raises, treat the case as a fail as well.</div></details>
+        <details data-hint="3"><summary>Hint 3 — near-solution</summary><div class="hbody">After building the results list, total is len(results), passCount is how many have pass is True, score is passCount / total (guard against total being 0). regression is only True if baseline_score is not None AND score &lt; baseline_score.</div></details>
+        <details data-hint="solution" class="locked" id="evalSolutionDetails"><summary id="evalSolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">def evaluate_model(test_cases, model_fn, baseline_score):
+    results = []
+    for tc in test_cases:
+        try:
+            actual = model_fn(tc["input"])
+        except Exception as e:
+            results.append({"id": tc["id"], "pass": False, "actual": "ERROR: " + str(e)})
+            continue
+
+        try:
+            passed = bool(tc["check"](actual))
+        except Exception:
+            passed = False
+
+        results.append({"id": tc["id"], "pass": passed, "actual": actual})
+
+    total = len(results)
+    pass_count = sum(1 for r in results if r["pass"])
+    score = pass_count / total if total > 0 else 0
+
+    has_baseline = baseline_score is not None
+    regression = has_baseline and score < baseline_score
+
+    return {"score": score, "passCount": pass_count, "total": total, "results": results, "regression": regression}</pre></div></details>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Test 5 uses a <span class="mono-inline">check</span> function that raises for one specific test case. If your code only wraps <span class="mono-inline">model_fn</span> in try/except but not <span class="mono-inline">check</span> itself, what happens?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">An exception from check() would propagate up out of your loop and crash the entire evaluate_model call, losing every result, not just the one problematic case. A single bad checker (a bug in the test case's own criterion) shouldn't be able to take down evaluation of every other test case, the same "one bad input shouldn't crash the whole batch" discipline that's shown up since Module 4's tool executor.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7</span><h2 class="serif">Before the checkpoint: what you should now be able to do</h2></div>
+    <p class="mut">A short consolidation before you're graded on it.</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:2">
+      <li>Explain why ad hoc spot-checking doesn't substitute for a systematic eval.</li>
+      <li>Design a test case with an explicit, checkable criterion, not an implicit "judge if it's good."</li>
+      <li>Explain when to prefer a deterministic check over LLM-as-judge, and why.</li>
+      <li>Implement an eval harness that scores a test set and flags regressions against a baseline.</li>
+    </ul>
+    <div class="practice">
+      <div class="lbl">Looking ahead</div>
+      <p>Every piece is now in place: structured outputs, context management, retrieval, tools, an agent loop, reliability, and evaluation. Module 8 is the capstone, combining all seven into one system, and a final competency assessment covering everything from Module 1 forward.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Graded. Feedback is immediate and attempts are unlimited, the goal is understanding, not a single pass/fail moment.</p>
+
+    <div class="qcard">
+      <div class="qn">Question 1 of 5</div>
+      <div class="qtext">Why doesn't "I read a few outputs and they looked fine" substitute for a systematic eval?</div>
+      <div id="q1opts"></div>
+      <div class="qexplain" id="q1explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 2 of 5</div>
+      <div class="qtext">What specific risk does LLM-as-judge scoring introduce that a deterministic exact-match check doesn't have?</div>
+      <div id="q2opts"></div>
+      <div class="qexplain" id="q2explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 3 of 5</div>
+      <div class="qtext">When a task's correctness CAN be checked with fixed logic (schema validation, exact match, a numeric comparison), which approach should be preferred?</div>
+      <div id="q3opts"></div>
+      <div class="qexplain" id="q3explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 4 of 5</div>
+      <div class="qtext">An eval run passes 7 of 10 test cases. The recorded baseline score is 0.75. Using this module's definition, is this a regression? (Enter 1 for yes, 0 for no.)</div>
+      <div class="numinput"><input type="number" id="q4input" aria-label="Your numeric answer"><button id="q4check">Check</button></div>
+      <div class="qexplain" id="q4explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 5 of 5 · new scenario</div>
+      <div class="qtext">A team changes their system prompt (Module 1) and their retrieval top-k (Module 3) in the same deploy, then runs the eval suite once and sees a score drop. What's the practical downside of evaluating both changes together instead of separately?</div>
+      <div id="q5opts"></div>
+      <div class="qexplain" id="q5explain"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">9</span><h2 class="serif">Further reading</h2></div>
+    <p class="mut">If you want to go deeper than the browser can take you:</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--mut2);line-height:1.9">
+      <li>Beyond a single aggregate score, production eval suites often track per-category breakdowns (which KINDS of test cases are failing), a flat score can hide a specific, fixable weakness.</li>
+      <li>"Golden datasets," curated, hand-labeled test sets that get updated carefully and deliberately over time, are a common foundation for eval suites, since the quality of an eval is bounded by the quality and coverage of its test cases.</li>
+      <li>Observability in production (logging real inputs, outputs, and scores from live traffic, not just the offline eval set) closes the loop, it's how you discover the test cases your eval set is missing.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">10</span><h2 class="serif">Glossary</h2></div>
+    <div style="margin-top:14px;display:grid;gap:12px">
+      <div><b class="mono-inline">eval (evaluation)</b><span style="color:var(--mut);font-size:14px"> — a systematic, repeatable process for scoring outputs against test cases with defined criteria.</span></div>
+      <div><b class="mono-inline">deterministic check</b><span style="color:var(--mut);font-size:14px"> — a pass/fail criterion evaluated by fixed logic, producing identical results on identical input every time.</span></div>
+      <div><b class="mono-inline">LLM-as-judge</b><span style="color:var(--mut);font-size:14px"> — using a model call to score another model's output, useful for subjective criteria, but inherits model unreliability.</span></div>
+      <div><b class="mono-inline">baseline</b><span style="color:var(--mut);font-size:14px"> — a previously recorded eval score used as the comparison point for detecting regressions.</span></div>
+      <div><b class="mono-inline">regression</b><span style="color:var(--mut);font-size:14px"> — a measurable drop in eval score after a change, compared to the baseline.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">11</span><h2 class="serif">Interactive: live regression detection</h2></div>
+    <p class="mut">A code-review-comment generator's eval suite recorded a baseline score of 0.82 on its last release (41 of 50 test cases passing). A candidate change just finished a run. Drag the slider to set the candidate's score and watch the regression check evaluate it live, exactly the comparison this module's harness makes in code.</p>
+    <div class="interactive">
+      <span class="ilbl">Live demo</span>
+      <div class="sliderrow">
+        <span class="slbl">Candidate run score: <b id="regDemoScoreLabel" class="mono-inline">0.82</b></span>
+        <input type="range" id="regDemoSlider" min="50" max="100" step="1" value="82" aria-label="Candidate eval score, percent">
+      </div>
+      <div class="statrow">
+        <div class="stat"><div class="sv mono" id="regDemoBaselineVal">0.82</div><div class="sl">Baseline score</div></div>
+        <div class="stat"><div class="sv mono" id="regDemoNewVal">0.82</div><div class="sl">Candidate score</div></div>
+        <div class="stat"><div class="sv mono" id="regDemoDeltaVal">+0.00</div><div class="sl">Delta vs. baseline</div></div>
+        <div class="stat" id="regDemoStatusCard"><div class="sv mono" id="regDemoStatusVal">PASS</div><div class="sl">regression flag</div></div>
+      </div>
+      <div id="regDemoFeedback" class="feedback ok" style="display:block;margin-top:14px">Candidate meets the baseline. <span class="mono-inline">regression</span> is <span class="mono-inline">False</span>, this candidate is safe to isolate-test against baseline as the next release.</div>
+    </div>
+  </section>
+
+  <footer>Zenith Lab · AI Engineering · Module 7 of 8 · Next: Capstone: A Production AI Agent</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const MODULE_ID = 7;
+CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Section 2: spot the usable eval test case ---------------- */
+const SPOT_CASES = [
+  { id: "c1", code: `{ input: "Ticket: \\"App crashes on login since v4.2\\"",\n  expected: "App crashes on login (regression, v4.2)",\n  check: (actual) => actual.includes("crash") && actual.includes("login") }`, valid: true,
+    explanation: "Has an input, a defined expected reference, AND an explicit, checkable criterion (specific keywords the summary must contain). Fully usable as-is." },
+  { id: "c2", code: `{ input: "Ticket: \\"Billing page shows wrong currency for EU customers\\"",\n  expected: "(judge if the summary is good)" }`, valid: false,
+    explanation: "Has an input but no explicit, checkable criterion, just an implicit request to judge quality. Different reviewers (or the same reviewer on different days) would score this inconsistently. Needs a defined check before it's usable." },
+  { id: "c3", code: `{ input: "Ticket: \\"Feature request: dark mode\\"",\n  expected: "Feature request: dark mode",\n  check: (actual) => actual.trim() === "Feature request: dark mode" }`, valid: true,
+    explanation: "Exact-match criterion, appropriate here since a short ticket summary has a clear, narrow correct form. Fully usable and fully deterministic." },
+  { id: "c4", code: `{ input: "Ticket: \\"Password reset email never arrives, tried 3 times\\"" }`, valid: false,
+    explanation: "No expected output and no check function at all, there's nothing here to score against. This is just an input with no criterion, not a usable test case yet." },
+];
+function renderSpotCards(){
+  const el = document.getElementById("spotCards");
+  el.innerHTML = "";
+  SPOT_CASES.forEach((c) => {
+    const div = document.createElement("div");
+    div.className = "spotcard";
+    div.dataset.id = c.id;
+    div.innerHTML = `<pre>${CourseProgress.escapeHtml(c.code)}</pre>
+      <div class="sbtns">
+        <button data-guess="true">Usable as-is</button>
+        <button data-guess="false">Missing something</button>
+      </div>
+      <div class="sexp">${CourseProgress.escapeHtml(c.explanation)}</div>`;
+    div.querySelectorAll("button[data-guess]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (div.classList.contains("answered")) return;
+        const guess = btn.dataset.guess === "true";
+        div.classList.add("answered", guess === c.valid ? "correct-guess" : "wrong-guess");
+        div.classList.add(c.valid ? "valid" : "invalid");
+        updateSpotSummary();
+      });
+    });
+    el.appendChild(div);
+  });
+}
+function updateSpotSummary(){
+  const total = SPOT_CASES.length;
+  const answered = document.querySelectorAll("#spotCards .spotcard.answered").length;
+  const correct = document.querySelectorAll("#spotCards .spotcard.correct-guess").length;
+  const el = document.getElementById("spotSummary");
+  if (answered < total) { el.style.display = "none"; return; }
+  el.className = "feedback " + (correct === total ? "ok" : "bad");
+  el.textContent = `${correct} / ${total} correctly classified. ` + (correct === total
+    ? "You correctly identified which cases have a real, checkable criterion."
+    : "Review the ones marked wrong above, a usable eval case needs both an input AND an explicit way to check the output, not just one or the other.");
+  CourseProgress.setExtra("m7SpotResult", { correct, total });
+}
+renderSpotCards();
+
+/* ---------------- Section 6: eval harness exercise ---------------- */
+const EVAL_STARTER = `def evaluate_model(test_cases, model_fn, baseline_score):
+    # test_cases: list of {"id":..., "input":..., "check": fn(actual) -> bool}
+    # For each case, call model_fn(input); never let a raise from model_fn OR
+    # check crash this function, treat either as a failed case instead.
+    # Return {"score":..., "passCount":..., "total":..., "results":..., "regression":...}
+    #   results: list of {"id":..., "pass":..., "actual":...}, same order as test_cases
+    #   score: passCount / total (guard against total == 0)
+    #   regression: True only if baseline_score is a real number AND score < baseline_score
+
+    # YOUR CODE HERE
+
+    pass`;
+function loadEvalStarter(){
+  document.getElementById("evalCodeEditor").value = EVAL_STARTER;
+  document.getElementById("evalTestResults").innerHTML = "";
+}
+loadEvalStarter();
+document.getElementById("btnResetEvalCode").addEventListener("click", loadEvalStarter);
+
+let evalHasAttempted = false;
+function evalHintUsageText(){
+  const used = (CourseProgress.getModule(7).sections || {}).evalHintsUsed || 0;
+  return used > 0 ? `(${used} hint${used===1?"":"s"} used)` : "";
+}
+function refreshEvalHintUsage(){
+  document.getElementById("evalHintUsage").textContent = evalHintUsageText();
+}
+document.querySelectorAll('#evalHintbox details[data-hint]:not([data-hint="solution"])').forEach(d => {
+  d.addEventListener("toggle", () => {
+    if (!d.open) return;
+    const cur = CourseProgress.getModule(7).sections || {};
+    const used = new Set(cur.evalHintsOpened || []);
+    used.add(d.dataset.hint);
+    CourseProgress.setSection(7, "evalHintsOpened", Array.from(used));
+    CourseProgress.setSection(7, "evalHintsUsed", used.size);
+    refreshEvalHintUsage();
+  });
+});
+const evalSolutionDetails = document.getElementById("evalSolutionDetails");
+evalSolutionDetails.addEventListener("toggle", () => {
+  if (evalSolutionDetails.open && !evalHasAttempted) evalSolutionDetails.open = false;
+});
+function unlockEvalSolution(){
+  evalHasAttempted = true;
+  evalSolutionDetails.classList.remove("locked");
+  document.getElementById("evalSolutionSummary").textContent = "Solution";
+}
+(function restoreEvalHints(){
+  refreshEvalHintUsage();
+  const stored = CourseProgress.getModule(7).sections || {};
+  if (stored.evalHarnessExercise) unlockEvalSolution();
+})();
+
+const EVAL_HARNESS_PY = [
+"def harness(student_code):",
+"    ns = {}",
+"    try:",
+"        exec(student_code, ns)",
+"        fn = ns.get('evaluate_model')",
+"        if fn is None or not callable(fn):",
+"            return {'ranOk': False, 'error': 'evaluate_model is not defined as a function.'}",
+"    except Exception as e:",
+"        return {'ranOk': False, 'error': str(e)}",
+"",
+"    def safe_call(test_cases, model_fn, baseline_score):",
+"        try:",
+"            return {'threw': False, 'out': fn(test_cases, model_fn, baseline_score)}",
+"        except Exception as e:",
+"            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+"",
+"    def approx_equal(a, b):",
+"        return abs(a - b) < 0.001",
+"",
+"    results = []",
+"",
+"    test_cases = [",
+"        {'id': 't1', 'input': 'a', 'check': lambda actual: actual == 'A'},",
+"        {'id': 't2', 'input': 'b', 'check': lambda actual: actual == 'B'},",
+"        {'id': 't3', 'input': 'c', 'check': lambda actual: actual == 'C'},",
+"    ]",
+"    model_fn = lambda x: x.upper()",
+"    r = safe_call(test_cases, model_fn, None)",
+"    p = (not r['threw'] and r['out'] and approx_equal(r['out']['score'], 1) and r['out']['passCount'] == 3",
+"         and r['out']['total'] == 3 and r['out']['regression'] is False)",
+"    results.append({'name': 'All test cases pass: score is 1, regression is false with no baseline provided', 'pass': p,",
+"        \"hint\": \"Call model_fn(tc['input']) then tc['check'](actual) for each case. score should be passCount/total. With no baseline_score, regression must be False, not None-but-truthy.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    test_cases2 = [",
+"        {'id': 't1', 'input': 2, 'check': lambda actual: actual == 4},",
+"        {'id': 't2', 'input': 3, 'check': lambda actual: actual == 999},",
+"        {'id': 't3', 'input': 4, 'check': lambda actual: actual == 8},",
+"        {'id': 't4', 'input': 5, 'check': lambda actual: actual == 111},",
+"    ]",
+"    model_fn2 = lambda x: x * 2",
+"    r = safe_call(test_cases2, model_fn2, None)",
+"    p = not r['threw'] and r['out'] and approx_equal(r['out']['score'], 0.5) and r['out']['passCount'] == 2 and r['out']['total'] == 4",
+"    if p:",
+"        by_id = {x['id']: x['pass'] for x in r['out']['results']}",
+"        p = by_id['t1'] is True and by_id['t2'] is False and by_id['t3'] is True and by_id['t4'] is False",
+"    results.append({'name': 'Mixed pass/fail: score reflects the true pass rate, and results correctly flag exactly which cases failed', 'pass': p,",
+"        \"hint\": \"Each entry in results should have pass set individually per test case, based on that case's own check(actual) call, not a single shared pass/fail value.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    test_cases3 = [",
+"        {'id': 'ok1', 'input': 'fine', 'check': lambda actual: actual == 'FINE'},",
+"        {'id': 'boom', 'input': 'explode', 'check': lambda actual: actual == 'EXPLODE'},",
+"        {'id': 'ok2', 'input': 'safe', 'check': lambda actual: actual == 'SAFE'},",
+"    ]",
+"    def model_fn3(x):",
+"        if x == 'explode':",
+"            raise Exception('model call failed')",
+"        return x.upper()",
+"    r = safe_call(test_cases3, model_fn3, None)",
+"    p = not r['threw'] and r['out'] and r['out']['total'] == 3 and r['out']['passCount'] == 2",
+"    if p:",
+"        by_id = {x['id']: x['pass'] for x in r['out']['results']}",
+"        p = by_id['ok1'] is True and by_id['boom'] is False and by_id['ok2'] is True",
+"    results.append({'name': 'A model_fn that raises for one case is caught and counted as a failure, without crashing the other cases', 'pass': p,",
+"        \"hint\": \"Wrap the model_fn(tc['input']) call in its own try/except. If it raises, that specific case is a fail, but keep processing the remaining test cases normally.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    test_cases_low = [",
+"        {'id': 't1', 'input': 1, 'check': lambda actual: actual == 999},",
+"        {'id': 't2', 'input': 2, 'check': lambda actual: actual == 999},",
+"    ]",
+"    test_cases_high = [",
+"        {'id': 't1', 'input': 1, 'check': lambda actual: actual == 1},",
+"        {'id': 't2', 'input': 2, 'check': lambda actual: actual == 2},",
+"    ]",
+"    model_fn4 = lambda x: x",
+"    low = safe_call(test_cases_low, model_fn4, 0.75)",
+"    high = safe_call(test_cases_high, model_fn4, 0.75)",
+"    p = not low['threw'] and not high['threw'] and low['out']['regression'] is True and high['out']['regression'] is False",
+"    results.append({'name': 'regression is true when score is below the baseline, and false when it meets or exceeds it', 'pass': p,",
+"        'hint': 'regression should be (baseline_score is not None) AND (score < baseline_score). A score equal to or above the baseline is NOT a regression.',",
+"        'errorMessage': (low.get('errorMessage') if low['threw'] else high.get('errorMessage') if high['threw'] else None)})",
+"",
+"    def bad_check(actual):",
+"        raise Exception('checker bug')",
+"    test_cases5 = [",
+"        {'id': 'safe', 'input': 'x', 'check': lambda actual: actual == 'X'},",
+"        {'id': 'badcheck', 'input': 'y', 'check': bad_check},",
+"    ]",
+"    model_fn5 = lambda x: x.upper()",
+"    r = safe_call(test_cases5, model_fn5, None)",
+"    p = not r['threw'] and r['out'] and r['out']['total'] == 2",
+"    if p:",
+"        by_id = {x['id']: x['pass'] for x in r['out']['results']}",
+"        p = by_id['safe'] is True and by_id['badcheck'] is False",
+"    results.append({'name': 'A check() function that raises is treated as a failing check, not a crash of the whole evaluation', 'pass': p,",
+"        \"hint\": \"Wrap tc['check'](actual) in its own try/except too, separate from the model_fn try/except. If check() raises, that case is a fail, but every other case should still be evaluated normally.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    return {'ranOk': True, 'results': results}",
+].join("\n");
+
+async function runEvalTests(){
+  unlockEvalSolution();
+  const resultsEl = document.getElementById("evalTestResults");
+  resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Starting the Python sandbox (first run downloads the interpreter, can take anywhere from ~10s to a minute depending on your connection)…</div>`;
+  const code = document.getElementById("evalCodeEditor").value;
+
+  const outcome = await PySandboxRunner.run(EVAL_HARNESS_PY, "harness", code);
+  resultsEl.innerHTML = "";
+  if (!outcome.ok) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">${CourseProgress.escapeHtml(outcome.error)}</div>`;
+    return;
+  }
+  const data = outcome.result;
+  if (!data.ranOk) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">Your code didn't run: ${CourseProgress.escapeHtml(data.error)}. Check for a syntax error, or that the function is named exactly evaluate_model.</div>`;
+    return;
+  }
+
+  const results = data.results;
+  let passCount = 0;
+  results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.style.display = "block"; row.style.marginTop = "8px";
+    const hintHtml = r.errorMessage
+      ? `Your code threw an unexpected error: ${CourseProgress.escapeHtml(r.errorMessage)}. ${r.hint}`
+      : r.hint;
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${r.name}` + (r.pass ? "" : `<br>${hintHtml}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
+  summary.textContent = `${passCount} / ${results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  CourseProgress.setSection(7, "evalHarnessExercise", { passCount, total: results.length });
+}
+document.getElementById("btnRunEvalTests").addEventListener("click", runEvalTests);
+
+/* ---------------- Section 11: live regression detector ---------------- */
+const REG_DEMO_BASELINE = 0.82;
+function updateRegDemo(){
+  const slider = document.getElementById("regDemoSlider");
+  const score = Number(slider.value) / 100;
+  const delta = score - REG_DEMO_BASELINE;
+  const regression = score < REG_DEMO_BASELINE;
+
+  document.getElementById("regDemoScoreLabel").textContent = score.toFixed(2);
+  document.getElementById("regDemoNewVal").textContent = score.toFixed(2);
+  document.getElementById("regDemoDeltaVal").textContent = (delta >= 0 ? "+" : "") + delta.toFixed(2);
+
+  const statusCard = document.getElementById("regDemoStatusCard");
+  const statusVal = document.getElementById("regDemoStatusVal");
+  const feedback = document.getElementById("regDemoFeedback");
+  statusCard.classList.toggle("warn", regression);
+  statusVal.textContent = regression ? "REGRESSION" : "PASS";
+
+  feedback.className = "feedback " + (regression ? "bad" : "ok");
+  feedback.style.display = "block";
+  if (regression) {
+    feedback.innerHTML = `Below baseline. <span class="mono-inline">regression</span> is <span class="mono-inline">True</span> (score ${score.toFixed(2)} &lt; baseline ${REG_DEMO_BASELINE.toFixed(2)}), this candidate should not ship as-is, isolate what changed since the last release and re-run before deciding what to do with it.`;
+  } else {
+    feedback.innerHTML = `Candidate meets the baseline. <span class="mono-inline">regression</span> is <span class="mono-inline">False</span>, this candidate is safe to isolate-test against baseline as the next release.`;
+  }
+}
+document.getElementById("regDemoSlider").addEventListener("input", updateRegDemo);
+updateRegDemo();
+
+/* ---------------- Quiz ---------------- */
+let score = 0;
+const answered = { q1:false, q2:false, q3:false, q4:false, q5:false };
+
+function updateScore(){
+  document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnNext");
+  btn.disabled = !allDone;
+  btn.textContent = allDone ? "Continue to Module 8 →" : "Complete all questions to continue →";
+  if (allDone) CourseProgress.markComplete(MODULE_ID, score, 5);
+}
+
+function buildMC(qkey, opts, elId){
+  const el = document.getElementById(elId);
+  opts.forEach((opt, i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.innerHTML = `<input type="radio" name="${qkey}" value="${i}"><span>${opt.text}</span>`;
+    div.addEventListener("click", () => {
+      if (answered[qkey]) return;
+      answered[qkey] = true;
+      CourseProgress.setAnswer(MODULE_ID, qkey, i);
+      document.querySelectorAll(`#${elId} .qopt`).forEach((e2,j) => {
+        if (opts[j].correct) e2.classList.add("correct");
+        else if (j === i) e2.classList.add("incorrect");
+      });
+      const ex = document.getElementById(qkey + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { score++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      updateScore();
+    });
+    el.appendChild(div);
+  });
+}
+
+buildMC("q1", [
+  { text: "It's an unrepresentative sample judged by inconsistent, undocumented criteria, with no way to compare versions objectively", correct: true, correctText: "Correct. A few spot-checked examples, judged by feel, give neither coverage nor a repeatable number to compare against later." },
+  { text: "It's fine for small projects, systematic eval is only needed once a system reaches production scale", correct: false, reason: "The problem isn't scale, it's rigor, a small project with no systematic eval still can't reliably tell whether a change helped or hurt, it just has fewer users affected by not knowing." },
+  { text: "It doesn't substitute for eval only when the outputs are structured (JSON), free-text outputs are fine to spot-check", correct: false, reason: "The reasoning applies regardless of output format, structured or free-text, an unrepresentative sample judged inconsistently doesn't produce a trustworthy, comparable signal either way." },
+], "q1opts");
+
+buildMC("q2", [
+  { text: "The judge's own grading is itself an unverified model output, it can be inconsistent or biased, unlike a fixed-logic check that behaves identically every time", correct: true, correctText: "Correct. LLM-as-judge inherits the exact unreliability it's being used to measure, since the judge is itself a model call." },
+  { text: "LLM-as-judge is always slower, that's its only real downside compared to deterministic checks", correct: false, reason: "Speed and cost are real downsides, but not the core risk this module highlights, the deeper issue is that the judge's scoring itself isn't guaranteed consistent or correct." },
+  { text: "There's no meaningful difference, both approaches carry identical reliability risk", correct: false, reason: "There is a meaningful difference, a deterministic check (exact match, schema validation) produces the exact same result every time on the same input, an LLM judge is not guaranteed to." },
+], "q2opts");
+
+buildMC("q3", [
+  { text: "The deterministic check, it's consistent, cheap, and exactly reproducible", correct: true, correctText: "Correct. Wherever a fixed correct answer or shape exists, a deterministic check is strictly more trustworthy and cheaper than an LLM-as-judge call." },
+  { text: "LLM-as-judge, it generalizes better even to cases with a known correct answer", correct: false, reason: "When a fixed correct answer or shape already exists, there's nothing for an LLM judge to 'generalize' that a deterministic check doesn't already handle exactly and consistently." },
+  { text: "Whichever is cheaper to run for this specific test case", correct: false, reason: "Cost isn't the deciding factor here, deterministic checks are both cheaper AND more reliable when they apply, there's no tradeoff to weigh in that scenario." },
+], "q3opts");
+
+function checkQ4(){
+  if (answered.q4) return;
+  const val = Number(document.getElementById("q4input").value);
+  const ex = document.getElementById("q4explain");
+  ex.style.display = "block";
+  answered.q4 = true;
+  CourseProgress.setAnswer(MODULE_ID, "q4", val);
+  if (val === 1) { score++; ex.textContent = "Correct. 7/10 = 0.70, which is below the 0.75 baseline, so this is a regression."; }
+  else { ex.textContent = "Not quite. 7/10 = 0.70, which is LOWER than the 0.75 baseline, so this does count as a regression (answer: 1)."; }
+  updateScore();
+}
+document.getElementById("q4check").addEventListener("click", checkQ4);
+
+buildMC("q5", [
+  { text: "They can't tell which change caused the drop, or whether one change improved things while the other hurt worse, isolating the cause now requires re-running the eval with each change separated", correct: true, correctText: "Correct. Evaluating both changes together conflates their effects, the score drop is real, but its cause is ambiguous until the changes are isolated and re-tested separately." },
+  { text: "Nothing, the eval score is the same either way regardless of how many things changed at once", correct: false, reason: "The score reflects the combined effect of both changes together, it can't distinguish which one, or how much of each, is responsible for the drop." },
+  { text: "The eval suite itself becomes invalid once more than one variable changes between runs", correct: false, reason: "The eval suite still produces a valid, meaningful score, the problem isn't the eval's validity, it's that the CAUSE of a score change becomes ambiguous when multiple variables change at once." },
+], "q5opts");
+
+document.getElementById("btnNext").addEventListener("click", () => {
+  window.location.href = "module-08.html";
+});
+
+/* ---------------- Retry checkpoint ---------------- */
+function maybeShowRetry(){
+  const anyAnswered = answered.q1 || answered.q2 || answered.q3 || answered.q4 || answered.q5;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnRetryCheckpoint");
+  btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  score = 0;
+  Object.keys(answered).forEach(k => answered[k] = false);
+  document.querySelectorAll(".qexplain").forEach(el => { el.style.display = "none"; el.textContent = ""; });
+  document.querySelectorAll(".qopt").forEach(el => el.classList.remove("correct","incorrect"));
+  document.querySelectorAll('input[type=radio]').forEach(el => el.checked = false);
+  document.getElementById("q4input").value = "";
+  updateScore();
+  maybeShowRetry();
+  window.scrollTo({ top: document.querySelector(".qcard").offsetTop - 100, behavior: "smooth" });
+});
+const scoreObserver = new MutationObserver(maybeShowRetry);
+scoreObserver.observe(document.getElementById("scoreDisplay"), { childList: true });
+</script>
+</body>
+</html>

@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 3: Failure Handling &amp; Retry Theory</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.progress{height:3px;background:var(--bd)}
+.progress i{display:block;height:100%;background:var(--lime);width:37.5%}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
+.def p{font-size:14.5px}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
+.callout b{color:var(--amber)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button.primary:hover{filter:brightness(1.08);color:var(--limed)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+select.stratsel{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 12px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx)}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+
+/* bar chart (outage sim) */
+.chartwrap{margin-top:16px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:16px}
+.chartrow{display:flex;align-items:flex-end;gap:4px;height:160px}
+.chartbar{flex:1;background:var(--card2);border:1px solid var(--bd2);border-radius:3px 3px 0 0;position:relative;min-height:2px;transition:height .25s}
+.chartbar.spike{background:rgba(255,107,107,.35);border-color:var(--red)}
+.chartbar.down{background:rgba(255,107,107,.12)}
+.chartbar .v{position:absolute;top:-18px;left:0;right:0;text-align:center;font-family:'JetBrains Mono';font-size:10px;color:var(--mut2)}
+.charticks{display:flex;gap:4px;margin-top:6px}
+.charticks span{flex:1;text-align:center;font-family:'JetBrains Mono';font-size:9px;color:var(--mut2)}
+.chartlegend{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+.chartlegend span{display:inline-flex;align-items:center;gap:6px}
+.chartlegend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.counter{margin-top:16px;display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:10px;background:var(--bg2);border:1px solid var(--bd)}
+.counter .n{font-family:'JetBrains Mono';font-size:26px;font-weight:700;color:var(--tx)}
+.counter.warn .n{color:var(--red)}
+.counter.ok .n{color:var(--emerald)}
+.counter .lbl2{font-size:13px;color:var(--mut)}
+
+/* FSM (circuit breaker) — reused pattern from Module 1 */
+.fsmState{display:inline-flex;align-items:center;gap:10px;background:var(--card2);border:2px solid var(--lime);border-radius:99px;padding:10px 22px;font-weight:700;font-size:15px;color:var(--lime)}
+.fsmState.open{border-color:var(--red);color:var(--red)}
+.fsmState.halfopen{border-color:var(--amber);color:var(--amber)}
+.fsmActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;justify-content:center}
+.fsmActions button{font-size:12.5px}
+.fsmLog{margin-top:18px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;max-height:160px;overflow-y:auto}
+.fsmLog .row{font-family:'JetBrains Mono';font-size:12px;color:var(--mut);padding:3px 0;display:flex;gap:8px}
+.fsmLog .row .arrow{color:var(--lime)}
+.fsmLog .row:first-child{color:var(--tx)}
+.fsmdiagram-wrap{margin-top:18px;border-radius:10px;border:1px solid var(--bd);background:var(--bg2);overflow-x:auto}
+#cbDiagram{display:block;min-width:520px}
+.fnode rect{fill:var(--card2);stroke:var(--bd2);stroke-width:1.6}
+.fnode text{fill:var(--tx);font-family:'Space Grotesk';font-size:12px;font-weight:600;text-anchor:middle;pointer-events:none}
+.fnode.open rect{stroke:var(--red);fill:rgba(255,107,107,.08)}
+.fnode.open text{fill:var(--red)}
+.fnode.halfopen rect{stroke:var(--amber);fill:rgba(255,207,77,.08)}
+.fnode.halfopen text{fill:var(--amber)}
+.fnode.closed rect{stroke:var(--lime)}
+.fedge2{stroke:var(--bd2);stroke-width:1.5;marker-end:url(#arrow3)}
+.fsmdiagram-cap{padding:10px 14px;font-size:12px;color:var(--mut2);border-top:1px solid var(--bd)}
+
+/* quiz */
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
+.numinput input{width:80px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
+.nextbtn{margin-left:auto}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+
+/* orientation panel */
+.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
+.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
+.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h3:first-of-type{margin-top:0}
+.orient p{font-size:14.5px;color:var(--mut)}
+.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
+.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
+.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
+
+/* practice */
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
+.practice p{font-size:14px}
+.practice details{margin-top:12px}
+.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
+.practice summary::-webkit-details-marker{display:none}
+.practice summary:before{content:"▸ "}
+.practice details[open] summary:before{content:"▾ "}
+.practice details:not([open]) .ans{display:none}
+.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
+
+/* tiered hints for code exercises */
+.hintbox{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 20px;margin-top:14px}
+.hintbox .hlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.hintbox .husage{font-size:11px;color:var(--mut2);font-weight:400;text-transform:none;letter-spacing:0}
+.hintbox details{margin-top:8px;border-top:1px solid var(--bd);padding-top:8px}
+.hintbox details:first-of-type{border-top:none;padding-top:0}
+.hintbox summary{cursor:pointer;color:var(--amber);font-size:13px;list-style:none;font-weight:600}
+.hintbox summary::-webkit-details-marker{display:none}
+.hintbox summary:before{content:"▸ "}
+.hintbox details[open] summary:before{content:"▾ "}
+.hintbox .hbody{margin-top:8px;color:var(--tx);font-size:13.5px;line-height:1.7}
+.hintbox details.locked summary{color:var(--mut2);cursor:not-allowed}
+
+@media (max-width:640px){
+  .wrap{padding:0 16px 60px}
+  h1{font-size:26px}
+  .kh h2{font-size:18px}
+  .interactive{padding:16px}
+  .orient{padding:20px 18px}
+  .chartrow{height:200px}
+}
+
+/* course navigation bar */
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--lime)}
+.coursenav .navsep{flex:1}
+.coursenav .navdim{color:var(--mut2);cursor:default;pointer-events:none}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Automation Engineering · Module 3 of 8</span>
+</div></div>
+<div class="progress"><i></i></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-02.html">&larr; <span class="navlabel">Module 2</span></a><span class="navsep"></span><a href="module-04.html" id="navNextTop">Module 4 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 03</span>
+    <h1 class="serif">Failure Handling &amp; Retry Theory</h1>
+    <p class="sub">Naive retry loops synchronize into thundering herds and take down the service they were trying to reach. This module derives exponential backoff with jitter mathematically, then covers circuit breakers and bulkheads as the two remaining primitives every resilient integration needs.</p>
+
+    <div class="objectives">
+      <div class="lbl">Learning objectives</div>
+      <ul>
+        <li>Derive and implement exponential backoff with decorrelated jitter, and explain why plain exponential backoff still fails under load</li>
+        <li>Design a circuit breaker state machine (closed / open / half-open) with correct transition conditions</li>
+        <li>Apply bulkheading to prevent one failing integration from starving the whole system</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="orient">
+    <div class="lbl">Before you start</div>
+    <h3 class="serif">What this module assumes</h3>
+    <p>Module 2 established that duplicate delivery is unavoidable and retries are how clients cope with uncertainty. This module assumes that's settled, and asks the next question: if retrying is mandatory, how do you retry without making the outage you're retrying against worse?</p>
+    <h3 class="serif">What's new</h3>
+    <p>The circuit breaker in Section 5 is a finite state machine, the exact formalism from Module 1, applied to a new problem. If Module 1's FSM section felt abstract, this is where it earns its keep: you'll specify guarded transitions for a real production pattern, not a toy example.</p>
+    <h3 class="serif">What's assumed</h3>
+    <div class="assume">Modules 1 and 2 completed. FSM notation and idempotency vocabulary are used without re-explanation.</div>
+    <div class="assume">No math background beyond basic algebra and reading a formula like a recipe, not a proof.</div>
+    <h3 class="serif">How to work through it</h3>
+    <ol>
+      <li>Read each definition and derivation, then run the matching interactive before moving on.</li>
+      <li>Answer the practice check before revealing the answer.</li>
+      <li>Finish with the graded checkpoint.</li>
+    </ol>
+  </div>
+
+  <section>
+    <div class="kh"><span class="num">1</span><h2 class="serif">The thundering herd</h2></div>
+    <p>A downstream service goes down, a deploy, a database failover, a certificate expiring. Every client currently calling it gets an error at roughly the same moment, because they were all calling it at roughly the same rate before. If every one of those clients retries using the same fixed delay, say, "wait 2 seconds and try again," they all retry at roughly the same moment too. The service, which may have just come back up and is still warming caches or reconnecting its own dependencies, gets hit by the full pre-outage load in a single instant instead of a gradual ramp. This can knock it back down, at which point every client fails again, waits the same fixed delay again, and retries again in the same synchronized wave. The retry logic that was supposed to help recovery is now the thing preventing it.</p>
+
+    <div class="def">
+      <div class="k">Definition: thundering herd (retry storm)</div>
+      <p>A failure mode where a large number of clients, having failed at approximately the same time, retry at approximately the same time, because their retry logic is deterministic and synchronized. The herd's arrival can exceed the recovering service's capacity even though the herd's <i>steady-state</i> load was well within that capacity.</p>
+    </div>
+
+    <div class="callout"><b>The counterintuitive part:</b> the problem isn't that clients retry, retrying is correct and necessary, as Module 2 established. The problem is that they retry <i>in sync</i>. A system that spreads the exact same number of retry attempts across a wider window can survive an outage that a perfectly synchronized version of itself cannot, with zero change to how many requests are eventually sent.</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Without looking back: why does a service recovering from an outage sometimes fail again immediately, even though the load it's receiving is, on average, no higher than what it normally handles?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Because "on average" hides the shape of the arrival pattern. If the same total number of requests arrives spread evenly over a minute versus all in the first second, the service sees wildly different peak concurrency even though the average is identical. Synchronized retries concentrate load into a spike at exactly the moment the service is least able to absorb it, right as it's coming back up.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">2</span><h2 class="serif">Interactive: simulating an outage and recovery</h2></div>
+    <p class="mut">Ten clients all start failing at tick 0. The service is down through tick 5 and starts accepting requests again at tick 6. Pick a retry strategy and watch how concentrated the attempts get at any single tick.</p>
+
+    <div class="interactive">
+      <span class="ilbl">Live simulation</span>
+      <div class="dagctrl">
+        <select class="stratsel" id="stratSelect">
+          <option value="none">No backoff (retry every tick)</option>
+          <option value="fixed">Fixed delay (every 3 ticks)</option>
+          <option value="exp">Exponential, no jitter</option>
+          <option value="expjit">Exponential + full jitter</option>
+        </select>
+        <button class="primary" id="btnRunOutage">▶ Run outage simulation</button>
+        <button id="btnResetOutage">Reset</button>
+      </div>
+      <div class="chartwrap">
+        <div class="chartrow" id="chartRow"></div>
+        <div class="charticks" id="chartTicks"></div>
+        <div class="chartlegend">
+          <span><i style="background:rgba(255,107,107,.12);border:1px solid var(--red)"></i>service down</span>
+          <span><i style="background:rgba(255,107,107,.35);border:1px solid var(--red)"></i>concurrent attempts ≥ 6 (spike)</span>
+        </div>
+      </div>
+      <div class="counter" id="peakCounter"><span class="n" id="peakN">–</span><span class="lbl2" id="peakLbl">peak concurrent retry attempts at any single tick</span></div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Run "No backoff" and "Exponential, no jitter" back to back and compare the peak concurrent-attempts number. Both are deterministic strategies, does exponential backoff alone fix the synchronized spike? Why or why not?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">No. Every client that failed at tick 0 computes the exact same delay sequence under plain exponential backoff, because the formula has no randomness in it, so they all land on the same retry ticks as each other. Exponential backoff changes <i>when</i> the synchronized spikes happen and how far apart they are, but it doesn't stop them from being synchronized. Only adding randomness (jitter) spreads clients across different ticks instead of the same ones.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">3</span><h2 class="serif">Deriving exponential backoff</h2></div>
+    <p>The starting intuition is right: don't retry immediately, wait longer after each successive failure, so a client that's failing repeatedly backs off and gives the service room to recover instead of hammering it. The standard formula:</p>
+    <div class="def">
+      <div class="k">Definition: exponential backoff</div>
+      <p><span class="mono-inline">delay(n) = min(cap, base × 2ⁿ)</span>, where <span class="mono-inline">n</span> is the number of consecutive failures so far (0-indexed), <span class="mono-inline">base</span> is the initial delay, and <span class="mono-inline">cap</span> is a maximum delay so the wait doesn't grow unbounded. With base = 1s: attempt 0 waits 1s, attempt 1 waits 2s, attempt 2 waits 4s, attempt 3 waits 8s, and so on until the cap.</p>
+    </div>
+    <p style="margin-top:12px">This solves a real problem: it reduces the <i>total</i> request rate a struggling service receives from any single persistently-failing client, and it reduces how long a client hammers a service that's genuinely down versus one having a brief blip. But as the practice check above should have made concrete, it does not solve the thundering herd, because it's entirely deterministic. If two clients fail at the same tick, they compute the same delay at every subsequent step and retry together, forever.</p>
+
+    <div class="def">
+      <div class="k">Claim: any deterministic backoff function preserves synchronization</div>
+      <p><b>Proof.</b> Suppose clients A and B both experience their first failure at the same time <span class="mono-inline">t₀</span>, and both use the same deterministic function <span class="mono-inline">delay(n)</span> with no randomness. By induction on <span class="mono-inline">n</span>: if A and B's <span class="mono-inline">n</span>-th retry happens at the same time <span class="mono-inline">tₙ</span> (true for <span class="mono-inline">n=0</span>, both retry at <span class="mono-inline">t₀ + delay(0)</span>), and both retries fail (the service is still down), then both compute <span class="mono-inline">delay(n+1)</span>, the same value since the function is deterministic and both have failed the same number of times, and so both schedule their next retry at <span class="mono-inline">tₙ + delay(n+1)</span>, again identical. By induction, A and B remain synchronized at every retry for as long as the outage lasts. <span class="mono-inline">∎</span></p>
+    </div>
+    <p style="margin-top:12px">The only way to break this induction is to make <span class="mono-inline">delay(n)</span> not purely a function of <span class="mono-inline">n</span>, to introduce randomness so that two clients with an identical failure history compute different delays anyway. That's jitter.</p>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>The proof above assumes both clients fail at exactly the same tick to begin with. In reality, could two clients that first failed at slightly <i>different</i> times still end up retrying at the same tick under plain exponential backoff? What does that imply about how robust the "just stagger the initial failures" idea is?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Yes, easily, because delay(n) only depends on n, not on wall-clock time, two clients whose failures are offset by a few milliseconds still compute delays that round to the same tick in any discretized system, and worse, delays can coincidentally realign later even if they start apart (e.g., one client's coarser retry cadence catches up to another's). Relying on "failures probably won't be perfectly simultaneous" is fragile, it only takes approximate alignment to reproduce the spike, which is exactly why jitter needs to be built into the delay function itself, not assumed away by initial conditions.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4</span><h2 class="serif">Jitter: breaking the synchronization</h2></div>
+    <p>Jitter adds randomness to the delay so that clients with identical failure counts still schedule different retry times. Not all jitter strategies are equally good, three are standard, of increasing quality:</p>
+    <div class="def">
+      <div class="k">Three jitter strategies</div>
+      <p><b>Full jitter:</b> <span class="mono-inline">delay(n) = random(0, min(cap, base × 2ⁿ))</span>. Simple and effective at desynchronizing, but the expected wait is only half of plain exponential backoff's value, and a client can get unlucky with a near-zero delay repeatedly.</p>
+      <p style="margin-top:8px"><b>Equal jitter:</b> <span class="mono-inline">delay(n) = half + random(0, half)</span> where <span class="mono-inline">half = min(cap, base × 2ⁿ) / 2</span>. Guarantees at least some backoff every time, trading off some of full jitter's desynchronizing power for a floor on the wait.</p>
+      <p style="margin-top:8px"><b>Decorrelated jitter:</b> <span class="mono-inline">delay(n) = min(cap, random(base, prev_delay × 3))</span>, each delay is randomized based on the <i>previous actual delay</i>, not just the attempt count. AWS's applied-engineering literature (Brooker, 2015) found this performs best in practice: it retains an increasing trend on average like exponential backoff, but the randomization compounds across attempts instead of resetting each time, spreading retries wider the longer an outage persists.</p>
+    </div>
+    <div class="callout"><b>Why "full jitter" being simpler doesn't make it worse in every case:</b> for a single outage of unknown length, full jitter is a completely reasonable default and is what most HTTP client libraries implement out of the box. Decorrelated jitter earns its complexity specifically at large scale, thousands of clients, long-lived outages, where its wider spread and increasing trend measurably reduce peak concurrent load compared to full jitter. Don't reach for it on a project with ten integrations calling one API; reach for it when you've measured that full jitter isn't enough.</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Go back to the Section 2 interactive and run "Exponential + full jitter" three or four times. Does the peak concurrent-attempts number stay exactly the same across runs, the way it does for the deterministic strategies? What does that tell you about jitter's guarantee?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">No, it varies run to run, because jitter is random by design. That's the honest tradeoff: jitter doesn't guarantee zero spike, it reduces the <i>expected</i> and <i>typical</i> peak by spreading attempts probabilistically. A truly unlucky draw could still cluster several clients on the same tick. What jitter buys you is a much lower expected peak and a much lower chance of the worst case, not a mathematical impossibility of any clustering at all.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">5</span><h2 class="serif">Build a production retry function</h2></div>
+    <p>You've watched backoff and jitter work in a simulation. Now you implement the actual function, and five real tests run against it, including checking that your delays genuinely respect the cap and genuinely vary under jitter, not just that your function eventually returns a value.</p>
+    <div class="interactive">
+      <span class="ilbl">Code exercise · runs in your browser</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">retryWithBackoff(operation, options, sleep)</span>. <span class="mono-inline">operation</span> is an async function that may reject. <span class="mono-inline">options</span> is <span class="mono-inline">{ maxRetries, baseDelay, maxDelay, jitter }</span>. Call the provided <span class="mono-inline">sleep(ms)</span> between attempts, don't use your own timer, the tests measure exactly what you pass to it.</p>
+      <textarea id="retryCodeEditor" class="textin" spellcheck="false" style="min-height:200px;font-size:13px" rows="12"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunRetryTests">▶ Run tests</button>
+        <button id="btnResetRetryCode">Reset to starter code</button>
+      </div>
+      <div id="retryTestResults" style="margin-top:14px"></div>
+
+      <div class="hintbox" id="retryHintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="retryHintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1 — conceptual</summary><div class="hbody">You need a loop that tries the operation, and on failure waits before trying again, with the wait growing each time. What has to stop the loop from waiting forever: a max number of attempts, or a max delay, or both?</div></details>
+        <details data-hint="2"><summary>Hint 2 — specific</summary><div class="hbody">Compute the capped delay as <span class="mono-inline">Math.min(options.maxDelay, options.baseDelay * 2 ** attempt)</span>. <span class="mono-inline">options.jitter</span> is a boolean, not a number, when it's true, use "full jitter": a random value between 0 and that capped delay, not the capped delay itself. Call <span class="mono-inline">await sleep(delay)</span> with that number, don't use <span class="mono-inline">setTimeout</span> directly.</div></details>
+        <details data-hint="3"><summary>Hint 3 — near-solution</summary><div class="hbody">Wrap the whole thing in a for-loop up to <span class="mono-inline">options.maxRetries + 1</span> attempts. Try/catch each call to <span class="mono-inline">operation()</span>; on success return immediately. On failure, if you're on the last allowed attempt, rethrow the error instead of sleeping again, otherwise compute the capped delay, then if <span class="mono-inline">jitter</span> is true replace it with <span class="mono-inline">Math.random() * capped</span> (never above the capped value, never negative), and <span class="mono-inline">await sleep(delay)</span> before the next loop iteration.</div></details>
+        <details data-hint="solution" class="locked" id="retrySolutionDetails"><summary id="retrySolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">async function retryWithBackoff(operation, options, sleep) {
+  const { maxRetries, baseDelay, maxDelay, jitter } = options;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (err) {
+      if (attempt === maxRetries) throw err;
+      const capped = Math.min(maxDelay, baseDelay * 2 ** attempt);
+      const delay = jitter ? Math.random() * capped : capped;
+      await sleep(delay);
+    }
+  }
+}</pre></div></details>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Test 4 checks that every recorded delay stays at or below <span class="mono-inline">maxDelay</span>. Which line of your implementation is responsible for that, and what would happen to Test 4 specifically if you forgot it?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">The <span class="mono-inline">Math.min(maxDelay, ...)</span> (or equivalent cap) applied to the computed exponential delay before it's passed to sleep. Without it, delay(n) grows unbounded as n increases, base × 2ⁿ, so a handful of retries would produce delays in the tens of thousands of milliseconds, and Test 4 would catch a recorded delay value exceeding maxDelay and fail specifically on that assertion, not on whether your function eventually succeeds.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6</span><h2 class="serif">Circuit breakers: stopping the call before it happens</h2></div>
+    <p>Backoff and jitter make retries spread out and slow down, but they don't stop a client from attempting a call to a service that's confirmed, repeatedly, to be down. A circuit breaker adds a layer above retries: after enough consecutive failures, it stops attempting the call at all for a while, failing immediately without touching the network, then cautiously tests whether the dependency has recovered before fully resuming.</p>
+    <div class="def">
+      <div class="k">Formal definition: circuit breaker as a finite state machine</div>
+      <p>Three states, exactly the formalism from Module 1: <span class="mono-inline">S</span> = {Closed, Open, Half-Open}, <span class="mono-inline">s₀</span> = Closed. <b>Closed</b>: requests flow through normally; failures are counted. <b>Open</b>: requests fail immediately without being attempted, "fail fast." <b>Half-Open</b>: a single probe request is allowed through to test recovery.</p>
+      <p style="margin-top:8px">Guarded transitions: Closed → Open when the failure count reaches a threshold within a window (e.g., 5 consecutive failures). Open → Half-Open when a cooldown timer elapses. Half-Open → Closed when the probe request succeeds. Half-Open → Open when the probe request fails.</p>
+    </div>
+
+    <div class="fsmdiagram-wrap">
+      <svg id="cbDiagram" viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Circuit breaker state machine: Closed transitions to Open on failure threshold reached. Open transitions to Half-Open after cooldown timer elapses. Half-Open transitions back to Open on probe failure, a short curve, or to Closed on probe success, a long curve.">
+        <defs>
+          <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#39414f"></path>
+          </marker>
+        </defs>
+        <g>
+          <line class="fedge2" x1="150" y1="80" x2="230" y2="80"></line>
+          <line class="fedge2" x1="360" y1="80" x2="490" y2="80"></line>
+          <path class="fedge2" d="M 530 100 Q 425 155 325 100" fill="none"></path>
+          <path class="fedge2" d="M 580 105 Q 320 225 60 100" fill="none"></path>
+        </g>
+        <g class="fnode closed"><rect x="20" y="60" width="130" height="40" rx="8"></rect><text x="85" y="85">CLOSED</text></g>
+        <g class="fnode open"><rect x="230" y="60" width="130" height="40" rx="8"></rect><text x="295" y="85">OPEN</text></g>
+        <g class="fnode halfopen"><rect x="490" y="60" width="130" height="40" rx="8"></rect><text x="555" y="85">HALF-OPEN</text></g>
+        <text x="190" y="70" font-size="10" fill="#5f6877" text-anchor="middle">threshold reached</text>
+        <text x="425" y="70" font-size="10" fill="#5f6877" text-anchor="middle">cooldown elapses</text>
+        <text x="425" y="172" font-size="10" fill="#5f6877" text-anchor="middle">probe fails</text>
+        <text x="320" y="242" font-size="10" fill="#5f6877" text-anchor="middle">probe succeeds</text>
+      </svg>
+      <div class="fsmdiagram-cap">Four transitions total: the short curve is Half-Open → Open on probe failure, re-arming the cooldown; the long curve is Half-Open → Closed on probe success, the recovery path.</div>
+    </div>
+
+    <div class="callout"><b>Why Half-Open matters, not just Closed and Open:</b> without it, the only options are "hammer a dead service" (no breaker) or "wait a fixed time then fully reopen the floodgates" (Closed/Open only), which just reproduces the thundering herd from Section 1 at the moment the breaker resets. Half-Open lets exactly one request test the waters, so a still-broken dependency gets one failed probe instead of a full traffic spike, and a recovered dependency gets confirmed before the breaker fully trusts it again.</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A circuit breaker is Half-Open and its single probe request succeeds. Should it immediately jump to sending 100% of traffic through as Closed, or is there a case for something more gradual? (There's no single correct answer graded here, reason it through.)</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">The basic three-state model does jump straight to Closed on one success, and that's a legitimate, simple design. But one success is a small sample, some real implementations add a gradual ramp (e.g., allow a slowly increasing percentage of traffic through while still Half-Open-like, only fully closing after several consecutive successes) specifically because a dependency can pass one probe and then immediately buckle under full load again. This is the same thundering-herd logic from Section 1 applied to the recovery side: a single success is weak evidence, and dumping full load on weak evidence risks re-triggering the exact failure you were protecting against.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7</span><h2 class="serif">Interactive: walking the circuit breaker</h2></div>
+    <p class="mut">Only valid transitions from the current state are ever offered, drive it through a failure, a cooldown, and a recovery.</p>
+    <div class="interactive">
+      <span class="ilbl">Live simulation</span>
+      <div style="text-align:center;padding:10px 0">
+        <div class="fsmState" id="cbCurrent">CLOSED</div>
+      </div>
+      <div class="fsmActions" id="cbActions"></div>
+      <div class="fsmLog" id="cbLog"><div class="row">Trace begins at <span style="color:var(--lime)">CLOSED</span></div></div>
+      <div class="dagctrl" style="margin-top:14px;justify-content:center">
+        <button id="btnCbReset">Reset trace</button>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Drive the breaker to Open, then to Half-Open, then fail the probe. What state does it land in, and what has to happen again before it gets another chance to recover?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">It lands back in Open, and the cooldown timer has to elapse again before it gets another Half-Open probe. A failed probe doesn't permanently lock the breaker, it just resets the wait, exactly mirroring how a real dependency that's still down should get progressively spaced-out health checks rather than being probed continuously or given up on forever.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8</span><h2 class="serif">Build a circuit breaker</h2></div>
+    <p>You've clicked through a circuit breaker's transitions by hand. Now you implement the state machine itself, and five tests verify it actually enforces the guarded transitions, not just that it has three state names.</p>
+    <div class="interactive">
+      <span class="ilbl">Code exercise · runs in your browser</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">createCircuitBreaker(options, clock)</span>, returning <span class="mono-inline">{ call(fn), getState() }</span>. <span class="mono-inline">options</span> is <span class="mono-inline">{ failureThreshold, cooldownMs }</span>. <span class="mono-inline">clock.now()</span> returns the current time in ms, use it instead of <span class="mono-inline">Date.now()</span> so tests can control time precisely. <span class="mono-inline">call(fn)</span> should invoke <span class="mono-inline">fn()</span> when Closed or probing Half-Open, and reject immediately without calling <span class="mono-inline">fn</span> at all when Open and the cooldown hasn't elapsed.</p>
+      <textarea id="cbCodeEditor" class="textin" spellcheck="false" style="min-height:220px;font-size:13px" rows="13"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunCbTests">▶ Run tests</button>
+        <button id="btnResetCbCode">Reset to starter code</button>
+      </div>
+      <div id="cbTestResults" style="margin-top:14px"></div>
+
+      <div class="hintbox" id="cbHintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="cbHintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1 — conceptual</summary><div class="hbody">You need to track two things across calls: how many consecutive failures have happened, and what state you're in (Closed, Open, Half-Open). Closed→Open happens on the threshold. Open→Half-Open happens on elapsed time, not on a new call arriving.</div></details>
+        <details data-hint="2"><summary>Hint 2 — specific</summary><div class="hbody">In <span class="mono-inline">call(fn)</span>, first check: if state is Open and <span class="mono-inline">clock.now() - openedAt < cooldownMs</span>, reject immediately without calling <span class="mono-inline">fn</span>. If the cooldown HAS elapsed, move to Half-Open and allow exactly one trial call through.</div></details>
+        <details data-hint="3"><summary>Hint 3 — near-solution</summary><div class="hbody">On a successful call while Half-Open, reset the failure count to 0 and go back to Closed. On a failed call while Half-Open, go straight back to Open and record a new <span class="mono-inline">openedAt = clock.now()</span>. On a failed call while Closed, increment the failure count, and if it reaches <span class="mono-inline">failureThreshold</span>, transition to Open.</div></details>
+        <details data-hint="solution" class="locked" id="cbSolutionDetails"><summary id="cbSolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">function createCircuitBreaker(options, clock) {
+  const { failureThreshold, cooldownMs } = options;
+  let state = "CLOSED", failures = 0, openedAt = 0;
+  return {
+    getState(){ return state; },
+    async call(fn) {
+      if (state === "OPEN") {
+        if (clock.now() - openedAt < cooldownMs) throw new Error("circuit open");
+        state = "HALF_OPEN";
+      }
+      try {
+        const result = await fn();
+        state = "CLOSED"; failures = 0;
+        return result;
+      } catch (err) {
+        failures++;
+        if (state === "HALF_OPEN" || failures >= failureThreshold) {
+          state = "OPEN"; openedAt = clock.now();
+        }
+        throw err;
+      }
+    },
+  };
+}</pre></div></details>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Test 3 checks that a call while Open never invokes the wrapped function at all, not that it invokes it and gets an error back. Why does that distinction matter for what a circuit breaker is actually for?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">The entire point of Open, per Section 6, is to fail fast without touching the network or tying up any resource waiting on a call that's very likely to fail anyway. If your implementation calls <span class="mono-inline">fn()</span> and then discards or catches its result while Open, you've built a breaker that still pays the full cost of every call, timeouts, threads, connections, it just ignores the outcome. That's not a circuit breaker, that's a circuit breaker-shaped wrapper that does nothing. Test 3 is checking the mechanism, not just the label.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">9</span><h2 class="serif">Bulkheads: containing the blast radius</h2></div>
+    <p>Backoff, jitter, and circuit breakers all describe how a client behaves toward <i>one</i> dependency. Bulkheading is about what happens when that one dependency is misbehaving and your system talks to several dependencies at once.</p>
+    <div class="def">
+      <div class="k">Definition: bulkhead</div>
+      <p>Partitioning shared resources (thread pools, connection pools, queues) so that one integration's failures can only exhaust <i>its own</i> partition, not the resources every other integration also depends on. Named after ship bulkheads: a hull breach floods one compartment, not the whole vessel.</p>
+    </div>
+    <p style="margin-top:12px">Without bulkheading, a common failure looks like this: your system has one shared pool of 50 worker threads, used for calling the CRM API, the email provider, and the SMS provider. The SMS provider starts timing out slowly instead of failing fast, each call ties up a worker thread for 30 seconds before giving up. If SMS traffic is even a modest fraction of total calls, enough workers get tied up waiting on a slow SMS provider that CRM and email calls, which have nothing to do with SMS, start queuing behind them and missing their own deadlines. One degraded dependency degrades everything.</p>
+    <div class="callout"><b>The fix:</b> give each dependency its own bounded pool, e.g., 15 threads for SMS, 15 for CRM, 15 for email, with 5 held in reserve. Now a fully-saturated SMS pool can only ever block SMS-related work. CRM and email keep running at full capacity, unaware anything is wrong. Combined with a circuit breaker on the SMS integration specifically, the system detects and isolates the failure instead of slowly bleeding out across every feature.</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A system with a shared connection pool across three integrations experiences one integration going slow. Without bulkheading, why does this eventually cause errors on the other two integrations, even though nothing about them changed?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Because the shared pool has a fixed size, and connections tied up waiting on the slow integration are connections unavailable to the healthy ones. Once enough connections are stuck, the healthy integrations start failing purely from resource starvation, not because anything about their own dependency changed, but because they're competing for a resource that a different, unrelated failure is monopolizing.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">10</span><h2 class="serif">Before the checkpoint: what you should now be able to do</h2></div>
+    <p class="mut">A short consolidation before you're graded on it.</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:2">
+      <li>Explain why synchronized retries can overwhelm a recovering service even when average load hasn't increased.</li>
+      <li>State the exponential backoff formula and explain, with the proof from Section 3, why determinism alone can't desynchronize clients.</li>
+      <li>Name the three jitter strategies and the core tradeoff each one makes.</li>
+      <li>Specify the circuit breaker's three states and all four guarded transitions between them, including why Half-Open exists.</li>
+      <li>Explain how bulkheading prevents one failing dependency from starving unrelated work, and identify a shared-resource setup at risk of it.</li>
+    </ul>
+
+    <div class="practice">
+      <div class="lbl">Cross-module check</div>
+      <p>Module 2 established that duplicate requests are unavoidable and must be handled idempotently. How does that interact with the retry material in this module, does adding retries make the idempotency requirement more important, less important, or unrelated?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">More important, and directly so. Every retry this module adds is itself a duplicate request from the receiving end's point of view, backoff and jitter change WHEN a retry happens, not WHETHER the operation needs to be safe to receive twice. A system with great backoff strategy but no idempotent handling on the receiving side still double-charges the card, it just does it on a nicer schedule. Retry theory and idempotency aren't separate concerns, retries are exactly what makes idempotency non-optional in the first place.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">11</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Graded. Feedback is immediate and attempts are unlimited, the goal is understanding, not a single pass/fail moment.</p>
+
+    <div class="qcard">
+      <div class="qn">Question 1 of 7</div>
+      <div class="qtext">Ten clients all fail at the same instant and all use plain exponential backoff (no jitter) with identical base and cap values. At their fourth retry attempt, what is true?</div>
+      <div id="q1opts"></div>
+      <div class="qexplain" id="q1explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 2 of 7</div>
+      <div class="qtext">True or false: decorrelated jitter computes its delay purely as a function of the attempt number n, the same way plain exponential backoff does.</div>
+      <div id="q2opts"></div>
+      <div class="qexplain" id="q2explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 3 of 7</div>
+      <div class="qtext">A circuit breaker is Closed. How many of its outgoing transitions (to any other state) require the failure threshold to be reached, versus other conditions? Enter the number of circuit-breaker transitions total, across the whole machine, in the diagram in Section 5.</div>
+      <div class="numinput">
+        <input type="number" id="q3input" min="0" max="10" placeholder="?">
+        <button id="q3check">Check</button>
+      </div>
+      <div class="qexplain" id="q3explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 4 of 7</div>
+      <div class="qtext">Why does a circuit breaker route through Half-Open instead of going directly from Open back to Closed once the cooldown timer elapses?</div>
+      <div id="q4opts"></div>
+      <div class="qexplain" id="q4explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 5 of 7 · calculation (new scenario)</div>
+      <div class="qtext">A different client uses exponential backoff with base = 2 seconds and cap = 30 seconds. Using delay(n) = min(cap, base × 2ⁿ), what is the delay, in seconds, for their 3rd retry attempt (n = 2, counting the first retry as n = 0)?</div>
+      <div class="numinput">
+        <input type="number" id="q5input" min="0" max="100" placeholder="?">
+        <button id="q5check">Check</button>
+      </div>
+      <div class="qexplain" id="q5explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 6 of 7 · scenario</div>
+      <div class="qtext">A system bulkheads its CRM integration into a dedicated 10-thread pool, kept separate from a 40-thread shared pool used by every other integration. The CRM integration starts timing out on every call and saturates its own 10 threads. What happens to an unrelated email-sending feature that uses the shared 40-thread pool?</div>
+      <div id="q6opts"></div>
+      <div class="qexplain" id="q6explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 7 of 7 · design (self-check, not auto-graded)</div>
+      <div class="qtext">A system has three integrations sharing one worker pool of 30. One integration (a legacy SOAP API) is known to be flaky and slow. Design a resilience strategy for it using at least three of the four concepts from this module (backoff+jitter, circuit breaker, bulkhead) and explain what each one specifically protects against. Write your answer before revealing the model answer.</div>
+      <textarea id="q5input" placeholder="Which strategies, applied where, protecting against what specifically..." style="width:100%;min-height:110px;margin-top:12px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px;color:var(--tx);resize:vertical"></textarea>
+      <details style="margin-top:12px">
+        <summary style="cursor:pointer;color:var(--violet);font-size:13px;font-weight:600;list-style:none">▸ Compare against a model answer</summary>
+        <div class="qexplain" style="display:block;color:var(--mut2);margin-top:10px">A reasonable answer: give the SOAP integration its own dedicated pool of, say, 8 threads (bulkhead), so its slowness can't starve the other two integrations' work. Wrap its calls with exponential backoff and full jitter on retry, so transient failures don't hammer it and don't synchronize across concurrent callers (backoff + jitter). Add a circuit breaker around it so that once it's confirmed down (repeated consecutive failures), calls fail fast instead of tying up bulkhead threads waiting on a doomed request, freeing those 8 threads for when it recovers, and Half-Open lets it self-test recovery without a full traffic surge (circuit breaker). Each piece protects a different failure mode: bulkhead protects the other integrations, backoff+jitter protects the SOAP service itself from a retry storm, and the circuit breaker protects your own system's threads from being wasted on calls that are very likely to fail anyway.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">12</span><h2 class="serif">Further reading</h2></div>
+    <p class="mut">If you want to go deeper than the browser can take you:</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--mut2);line-height:1.9">
+      <li>Marc Brooker, "Exponential Backoff and Jitter," AWS Architecture Blog, 2015, the source of the decorrelated jitter algorithm and the empirical comparison against full and equal jitter.</li>
+      <li>Michael Nygard, <i>Release It!</i> (2nd edition), the book that named and formalized the circuit breaker and bulkhead patterns for software systems.</li>
+      <li>Netflix Technology Blog, writings on Hystrix, an early widely-deployed circuit breaker library, for how these ideas scaled across hundreds of internal services.</li>
+      <li>In production, this shows up as retry-with-backoff configuration in nearly every HTTP client and SDK, and as circuit breaker middleware in service meshes like Istio and Linkerd.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">13</span><h2 class="serif">Glossary</h2></div>
+    <div style="margin-top:14px;display:grid;gap:12px">
+      <div><b class="mono-inline">thundering herd</b><span style="color:var(--mut);font-size:14px"> — many clients retrying in synchronization, overwhelming a recovering service despite normal average load.</span></div>
+      <div><b class="mono-inline">exponential backoff</b><span style="color:var(--mut);font-size:14px"> — delay(n) = min(cap, base × 2ⁿ); grows the wait after each consecutive failure.</span></div>
+      <div><b class="mono-inline">jitter</b><span style="color:var(--mut);font-size:14px"> — randomness added to a backoff delay so clients with identical failure counts still desynchronize.</span></div>
+      <div><b class="mono-inline">full / equal / decorrelated jitter</b><span style="color:var(--mut);font-size:14px"> — three standard jitter formulas trading off simplicity, minimum wait guarantees, and spread under sustained outages.</span></div>
+      <div><b class="mono-inline">circuit breaker</b><span style="color:var(--mut);font-size:14px"> — a 3-state FSM (Closed/Open/Half-Open) that stops attempting calls to a confirmed-failing dependency and cautiously tests recovery.</span></div>
+      <div><b class="mono-inline">bulkhead</b><span style="color:var(--mut);font-size:14px"> — partitioned resource pools so one dependency's failure can't exhaust resources shared with unrelated work.</span></div>
+    </div>
+  </section>
+
+  <footer>Zenith Lab · Automation Engineering · Module 3 of 8 · Next: Queueing Theory for Job Systems</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 6</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
+</div></div>
+
+<script src="course-progress.js?v=5"></script>
+<script src="sandbox-runner.js"></script>
+<script>
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ---------------- Interactive 1: outage / backoff comparison ---------------- */
+const TICKS = 15;
+const RECOVERY_TICK = 6;
+const NUM_CLIENTS = 10;
+
+function computeAttempts(strategy){
+  // returns array[client] = array of ticks that client attempts a request
+  const perClient = [];
+  for (let c=0;c<NUM_CLIENTS;c++){
+    const attempts = [];
+    let t = 0, n = 0, prevDelay = 1;
+    while (t < TICKS){
+      attempts.push(Math.round(t));
+      let delay;
+      if (strategy === "none") delay = 1;
+      else if (strategy === "fixed") delay = 3;
+      else if (strategy === "exp") delay = Math.min(8, Math.pow(2,n));
+      else { // expjit: full jitter
+        const cap = Math.min(8, Math.pow(2,n));
+        delay = Math.random() * cap;
+        if (delay < 0.15) delay = 0.15; // just enough floor to avoid a stuck/looping delay, not enough to erase randomness when cap is small
+      }
+      t += delay;
+      n++;
+    }
+    perClient.push(attempts);
+  }
+  return perClient;
+}
+
+function tallyByTick(perClient){
+  const counts = new Array(TICKS).fill(0);
+  perClient.forEach(attempts => {
+    const uniqueTicks = new Set(attempts.map(t => Math.min(TICKS-1, Math.round(t))));
+    uniqueTicks.forEach(bucket => {
+      counts[bucket]++;
+    });
+  });
+  return counts;
+}
+
+function renderChartSkeleton(){
+  const row = document.getElementById("chartRow");
+  const ticksEl = document.getElementById("chartTicks");
+  row.innerHTML = ""; ticksEl.innerHTML = "";
+  for (let i=0;i<TICKS;i++){
+    const bar = document.createElement("div");
+    bar.className = "chartbar" + (i < RECOVERY_TICK ? " down" : "");
+    bar.id = "bar" + i;
+    bar.innerHTML = '<span class="v" id="barv'+i+'"></span>';
+    row.appendChild(bar);
+    const tk = document.createElement("span");
+    tk.textContent = i;
+    ticksEl.appendChild(tk);
+  }
+}
+renderChartSkeleton();
+
+function resetOutage(){
+  renderChartSkeleton();
+  document.getElementById("peakN").textContent = "–";
+  document.getElementById("peakLbl").textContent = "peak concurrent retry attempts at any single tick";
+  document.getElementById("peakCounter").className = "counter";
+  document.getElementById("btnRunOutage").disabled = false;
+}
+
+async function runOutage(){
+  resetOutage();
+  document.getElementById("btnRunOutage").disabled = true;
+  const strategy = document.getElementById("stratSelect").value;
+  const perClient = computeAttempts(strategy);
+  const counts = tallyByTick(perClient);
+  const maxCount = Math.max(...counts, 1);
+
+  for (let i=0;i<TICKS;i++){
+    const bar = document.getElementById("bar"+i);
+    const v = document.getElementById("barv"+i);
+    const heightPx = Math.max(3, (counts[i]/maxCount) * 140);
+    bar.style.height = heightPx + "px";
+    v.textContent = counts[i];
+    if (counts[i] >= 6) bar.classList.add("spike");
+    await sleep(90);
+  }
+
+  // What matters for "does the herd hurt the recovering service" is load from
+  // tick RECOVERY_TICK onward, not the earliest retries while it's still confirmed down.
+  const recoveryWindow = counts.slice(RECOVERY_TICK);
+  const peak = Math.max(...recoveryWindow);
+  const peakTick = counts.indexOf(peak, RECOVERY_TICK);
+  const peakEl = document.getElementById("peakCounter");
+  document.getElementById("peakN").textContent = peak;
+  document.getElementById("peakLbl").textContent = "peak concurrent attempts from tick " + RECOVERY_TICK + " onward (after recovery), at tick " + peakTick;
+  peakEl.className = "counter " + (peak >= 6 ? "warn" : "ok");
+
+  document.getElementById("btnRunOutage").disabled = false;
+}
+
+document.getElementById("btnRunOutage").addEventListener("click", runOutage);
+document.getElementById("btnResetOutage").addEventListener("click", resetOutage);
+
+/* ---------------- Interactive 2: circuit breaker FSM ---------------- */
+const cbTransitions = {
+  CLOSED:    [{action:"failure threshold reached", to:"OPEN"}],
+  OPEN:      [{action:"cooldown timer elapses", to:"HALFOPEN"}],
+  HALFOPEN:  [{action:"probe succeeds", to:"CLOSED"}, {action:"probe fails", to:"OPEN"}],
+};
+const cbLabels = { CLOSED:"CLOSED", OPEN:"OPEN", HALFOPEN:"HALF-OPEN" };
+let cbState = "CLOSED";
+
+function renderCb(){
+  const cur = document.getElementById("cbCurrent");
+  cur.textContent = cbLabels[cbState];
+  cur.className = "fsmState" + (cbState === "OPEN" ? " open" : cbState === "HALFOPEN" ? " halfopen" : "");
+  const actionsEl = document.getElementById("cbActions");
+  actionsEl.innerHTML = "";
+  cbTransitions[cbState].forEach(o => {
+    const b = document.createElement("button");
+    b.textContent = o.action + "  →  " + cbLabels[o.to];
+    b.addEventListener("click", () => {
+      cbState = o.to;
+      const log = document.getElementById("cbLog");
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `<span class="arrow">→</span> ${o.action} <span class="arrow">→</span> <span style="color:var(--lime)">${cbLabels[o.to]}</span>`;
+      log.appendChild(row);
+      log.scrollTop = log.scrollHeight;
+      renderCb();
+    });
+    actionsEl.appendChild(b);
+  });
+}
+document.getElementById("btnCbReset").addEventListener("click", () => {
+  cbState = "CLOSED";
+  document.getElementById("cbLog").innerHTML = '<div class="row">Trace begins at <span style="color:var(--lime)">CLOSED</span></div>';
+  renderCb();
+});
+renderCb();
+
+/* ---------------- Section 5: retry-with-backoff implementation exercise ---------------- */
+const RETRY_STARTER = `async function retryWithBackoff(operation, options, sleep) {
+  // options = { maxRetries, baseDelay, maxDelay, jitter }
+  // Call sleep(ms) between attempts. Throw the last error once retries are exhausted.
+
+  // YOUR CODE HERE
+
+}`;
+function loadRetryStarter(){
+  document.getElementById("retryCodeEditor").value = RETRY_STARTER;
+  document.getElementById("retryTestResults").innerHTML = "";
+}
+loadRetryStarter();
+document.getElementById("btnResetRetryCode").addEventListener("click", loadRetryStarter);
+
+/* ---------------- Tiered hints (shared helper for both M3 exercises) ---------------- */
+function setupHints(prefix, sectionKey, resultSectionKey){
+  let hasAttempted = false;
+  function usageText(){
+    const used = (CourseProgress.getModule(3).sections || {})[sectionKey] || 0;
+    return used > 0 ? `(${used} hint${used===1?"":"s"} used)` : "";
+  }
+  function refresh(){ document.getElementById(prefix + "HintUsage").textContent = usageText(); }
+  document.querySelectorAll(`#${prefix}Hintbox details[data-hint]:not([data-hint="solution"])`).forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (!d.open) return;
+      const cur = CourseProgress.getModule(3).sections || {};
+      const used = new Set(cur[sectionKey + "Opened"] || []);
+      used.add(d.dataset.hint);
+      CourseProgress.setSection(3, sectionKey + "Opened", Array.from(used));
+      CourseProgress.setSection(3, sectionKey, used.size);
+      refresh();
+    });
+  });
+  const solEl = document.getElementById(prefix + "SolutionDetails");
+  solEl.addEventListener("toggle", () => { if (solEl.open && !hasAttempted) solEl.open = false; });
+  function unlock(){
+    hasAttempted = true;
+    solEl.classList.remove("locked");
+    document.getElementById(prefix + "SolutionSummary").textContent = "Solution";
+  }
+  refresh();
+  if ((CourseProgress.getModule(3).sections || {})[resultSectionKey]) unlock();
+  return unlock;
+}
+const unlockRetrySolution = setupHints("retry", "retryHintsUsed", "retryCodeExercise");
+
+// Runs entirely inside a Web Worker via SandboxRunner, see sandbox-runner.js.
+async function retryHarness(code){
+  function makeFlaky(failCount, resultValue){
+    let calls = 0;
+    const fn = async () => {
+      calls++;
+      if (calls <= failCount) throw new Error("simulated failure " + calls);
+      return resultValue !== undefined ? resultValue : { ok: true };
+    };
+    fn._callCount = () => calls;
+    return fn;
+  }
+  function makeAlwaysFails(){
+    let calls = 0;
+    const fn = async () => { calls++; throw new Error("always fails"); };
+    fn._callCount = () => calls;
+    return fn;
+  }
+
+  let studentFn;
+  try {
+    const factory = new Function(code + "\nreturn retryWithBackoff;");
+    studentFn = factory();
+    if (typeof studentFn !== "function") throw new Error("retryWithBackoff is not defined as a function.");
+  } catch (e) {
+    return { ranOk: false, error: e.message };
+  }
+
+  const results = [];
+
+  // Test 1: succeeds immediately
+  {
+    const delayLog = [];
+    const fakeSleep = (ms) => { delayLog.push(ms); return Promise.resolve(); };
+    const op = makeFlaky(0);
+    let out, err;
+    try { out = await studentFn(op, {maxRetries:3, baseDelay:100, maxDelay:1000, jitter:false}, fakeSleep); } catch(e){ err = e; }
+    const pass = !err && op._callCount() === 1 && delayLog.length === 0;
+    results.push({ name:"Succeeds immediately, no retries needed", pass, hint:"If the operation succeeds on the first call, don't retry and don't sleep at all." });
+  }
+  // Test 2: succeeds after 2 failures
+  {
+    const delayLog = [];
+    const fakeSleep = (ms) => { delayLog.push(ms); return Promise.resolve(); };
+    const op = makeFlaky(2);
+    let out, err;
+    try { out = await studentFn(op, {maxRetries:5, baseDelay:100, maxDelay:5000, jitter:false}, fakeSleep); } catch(e){ err = e; }
+    const pass = !err && op._callCount() === 3 && delayLog.length === 2 && out && out.ok === true;
+    results.push({ name:"Succeeds after 2 failures, on the 3rd attempt", pass, hint:"Retry on failure, but stop and return the result as soon as the operation succeeds, don't keep going to maxRetries." });
+  }
+  // Test 3: stops after max retries
+  {
+    const delayLog = [];
+    const fakeSleep = (ms) => { delayLog.push(ms); return Promise.resolve(); };
+    const op = makeAlwaysFails();
+    let threw = false;
+    try { await studentFn(op, {maxRetries:3, baseDelay:100, maxDelay:5000, jitter:false}, fakeSleep); } catch(e){ threw = true; }
+    const pass = threw && op._callCount() === 4 && delayLog.length === 3;
+    results.push({ name:"Stops after maxRetries and throws", pass, hint:"With maxRetries=3, you get 1 initial attempt + 3 retries = 4 total calls and 3 delays between them, then give up and rethrow the last error." });
+  }
+  // Test 4: delay respects cap
+  {
+    const delayLog = [];
+    const fakeSleep = (ms) => { delayLog.push(ms); return Promise.resolve(); };
+    const op = makeAlwaysFails();
+    try { await studentFn(op, {maxRetries:6, baseDelay:100, maxDelay:250, jitter:false}, fakeSleep); } catch(e){}
+    const pass = delayLog.length > 0 && delayLog.every(d => d <= 250);
+    results.push({ name:"Delay never exceeds maxDelay", pass, hint:`Recorded delays: [${delayLog.join(", ")}]. Cap each computed delay with Math.min(maxDelay, ...) before sleeping.` });
+  }
+  // Test 5: jitter is within expected range
+  {
+    const delayLog = [];
+    const fakeSleep = (ms) => { delayLog.push(ms); return Promise.resolve(); };
+    const op = makeAlwaysFails();
+    try { await studentFn(op, {maxRetries:4, baseDelay:100, maxDelay:2000, jitter:true}, fakeSleep); } catch(e){}
+    let expected = 100;
+    let pass = delayLog.length === 4;
+    for (let i = 0; i < delayLog.length && pass; i++){
+      if (delayLog[i] < 0 || delayLog[i] > expected) pass = false;
+      expected = Math.min(2000, expected * 2);
+    }
+    results.push({ name:"Jitter keeps each delay within [0, deterministic delay] for that attempt", pass, hint:`Recorded delays: [${delayLog.join(", ")}]. Full jitter means delay(n) = random(0, min(cap, base × 2ⁿ)), never negative, never above the uncapped exponential value for that attempt.` });
+  }
+
+  return { ranOk: true, results };
+}
+
+async function runRetryTests(){
+  unlockRetrySolution();
+  const resultsEl = document.getElementById("retryTestResults");
+  resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Running in a sandboxed worker…</div>`;
+  const code = document.getElementById("retryCodeEditor").value;
+
+  const outcome = await SandboxRunner.run(retryHarness.toString(), "retryHarness", [code]);
+  resultsEl.innerHTML = "";
+  if (!outcome.ok) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">${CourseProgress.escapeHtml(outcome.error)}</div>`;
+    return;
+  }
+  const data = outcome.result;
+  if (!data.ranOk) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">Your code didn't run: ${CourseProgress.escapeHtml(data.error)}. Check for a syntax error, or that the function is named exactly retryWithBackoff.</div>`;
+    return;
+  }
+
+  const results = data.results;
+  let passCount = 0;
+  results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.style.display = "block"; row.style.marginTop = "8px";
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${r.name}` + (r.pass ? "" : `<br>${r.hint}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
+  summary.textContent = `${passCount} / ${results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  CourseProgress.setSection(3, "retryCodeExercise", { passCount, total: results.length });
+}
+document.getElementById("btnRunRetryTests").addEventListener("click", runRetryTests);
+
+/* ---------------- Section 8: circuit breaker implementation exercise ---------------- */
+const CB_STARTER = `function createCircuitBreaker(options, clock) {
+  // options = { failureThreshold, cooldownMs }
+  // clock.now() returns the current time in ms.
+  // Return { call(fn), getState() }.
+  // States: "CLOSED", "OPEN", "HALF_OPEN".
+
+  // YOUR CODE HERE
+
+}`;
+function loadCbStarter(){
+  document.getElementById("cbCodeEditor").value = CB_STARTER;
+  document.getElementById("cbTestResults").innerHTML = "";
+}
+loadCbStarter();
+document.getElementById("btnResetCbCode").addEventListener("click", loadCbStarter);
+const unlockCbSolution = setupHints("cb", "cbHintsUsed", "cbCodeExercise");
+
+// Runs entirely inside a Web Worker via SandboxRunner, see sandbox-runner.js.
+// Note: CourseProgress (and its escapeHtml) is a main-thread-only global, it
+// does not exist inside the worker, so any error text a student's code could
+// influence is returned as a separate raw field and escaped at render time
+// on the main thread instead, never pre-formatted into HTML in here.
+async function cbHarness(code){
+  let factory;
+  try {
+    const wrap = new Function(code + "\nreturn createCircuitBreaker;");
+    factory = wrap();
+    if (typeof factory !== "function") throw new Error("createCircuitBreaker is not defined as a function.");
+  } catch (e) {
+    return { ranOk: false, error: e.message };
+  }
+
+  const results = [];
+  function makeClock(){ return { time: 0, now(){ return this.time; } }; }
+  function failing(){ let n=0; const f=async()=>{n++;throw new Error("fail");}; f._n=()=>n; return f; }
+  function succeeding(){ let n=0; const f=async()=>{n++;return "ok";}; f._n=()=>n; return f; }
+
+  async function safeTest(name, hintOnFail, testBody){
+    try {
+      const pass = await testBody();
+      results.push({ name, pass, hint: hintOnFail });
+    } catch (e) {
+      results.push({ name, pass: false, hint: hintOnFail, errorMessage: e.message });
+    }
+  }
+
+  // Test 1: stays closed under threshold
+  await safeTest("Stays Closed while under the failure threshold",
+    "2 failures with a threshold of 3 shouldn't trip the breaker yet, and each call should still actually invoke fn.",
+    async () => {
+      const clock = makeClock();
+      const breaker = factory({failureThreshold:3, cooldownMs:1000}, clock);
+      const fn = failing();
+      for (let i=0;i<2;i++){ try { await breaker.call(fn); } catch(e){} }
+      return breaker.getState() === "CLOSED" && fn._n() === 2;
+    });
+
+  // Test 2: opens after threshold failures
+  await safeTest("Opens after reaching the failure threshold",
+    "3 consecutive failures with threshold=3 should trip the breaker to Open.",
+    async () => {
+      const clock = makeClock();
+      const breaker = factory({failureThreshold:3, cooldownMs:1000}, clock);
+      const fn = failing();
+      for (let i=0;i<3;i++){ try { await breaker.call(fn); } catch(e){} }
+      return breaker.getState() === "OPEN";
+    });
+
+  // Test 3: fails fast when open, doesn't call fn
+  await safeTest("Fails fast while Open, never calls fn at all",
+    "While Open and before the cooldown elapses, call() should reject immediately without invoking fn, fn's call count should not increase.",
+    async () => {
+      const clock = makeClock();
+      const breaker = factory({failureThreshold:2, cooldownMs:1000}, clock);
+      if (!breaker || typeof breaker.getState !== "function" || typeof breaker.call !== "function") {
+        throw new Error("createCircuitBreaker did not return an object with call() and getState()");
+      }
+      const fn = failing();
+      for (let i=0;i<2;i++){ try { await breaker.call(fn); } catch(e){} }
+      if (breaker.getState() !== "OPEN") return false;
+      const callsBeforeOpen = fn._n();
+      let threw = false;
+      try { await breaker.call(fn); } catch(e){ threw = true; }
+      return threw && fn._n() === callsBeforeOpen;
+    });
+
+  // Test 4: half-open probe succeeds, closes
+  await safeTest("After cooldown, a successful probe closes the breaker",
+    "Once cooldownMs has elapsed, the next call should actually be attempted (Half-Open), and a success should transition the breaker back to Closed.",
+    async () => {
+      const clock = makeClock();
+      const breaker = factory({failureThreshold:2, cooldownMs:1000}, clock);
+      const fn = failing();
+      for (let i=0;i<2;i++){ try { await breaker.call(fn); } catch(e){} }
+      clock.time += 1000;
+      const probeFn = succeeding();
+      try { await breaker.call(probeFn); } catch(e){}
+      return breaker.getState() === "CLOSED" && probeFn._n() === 1;
+    });
+
+  // Test 5: half-open probe fails, reopens
+  await safeTest("After cooldown, a failed probe reopens the breaker",
+    "A failed Half-Open probe should send the breaker back to Open, not leave it Closed or stuck Half-Open.",
+    async () => {
+      const clock = makeClock();
+      const breaker = factory({failureThreshold:2, cooldownMs:1000}, clock);
+      const fn = failing();
+      for (let i=0;i<2;i++){ try { await breaker.call(fn); } catch(e){} }
+      clock.time += 1000;
+      try { await breaker.call(fn); } catch(e){}
+      return breaker.getState() === "OPEN";
+    });
+
+  return { ranOk: true, results };
+}
+
+async function runCbTests(){
+  unlockCbSolution();
+  const resultsEl = document.getElementById("cbTestResults");
+  resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Running in a sandboxed worker…</div>`;
+  const code = document.getElementById("cbCodeEditor").value;
+
+  const outcome = await SandboxRunner.run(cbHarness.toString(), "cbHarness", [code]);
+  resultsEl.innerHTML = "";
+  if (!outcome.ok) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">${CourseProgress.escapeHtml(outcome.error)}</div>`;
+    return;
+  }
+  const data = outcome.result;
+  if (!data.ranOk) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">Your code didn't run: ${CourseProgress.escapeHtml(data.error)}. Check for a syntax error, or that the function is named exactly createCircuitBreaker.</div>`;
+    return;
+  }
+
+  const results = data.results;
+  let passCount = 0;
+  results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.style.display = "block"; row.style.marginTop = "8px";
+    const hintHtml = r.errorMessage
+      ? `Your code threw an unexpected error: ${CourseProgress.escapeHtml(r.errorMessage)}. ${r.hint}`
+      : r.hint;
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${r.name}` + (r.pass ? "" : `<br>${hintHtml}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
+  summary.textContent = `${passCount} / ${results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  CourseProgress.setSection(3, "cbCodeExercise", { passCount, total: results.length });
+}
+document.getElementById("btnRunCbTests").addEventListener("click", runCbTests);
+
+/* ---------------- Quiz ---------------- */
+let score = 0;
+const answered = { q1:false, q2:false, q3:false, q4:false, q5:false, q6:false };
+
+const MODULE_ID = 3;
+function updateScore(){
+  document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 6`;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5 && answered.q6;
+  const btn = document.getElementById("btnNext");
+  btn.disabled = !allDone;
+  btn.textContent = allDone ? "Continue to Module 4 →" : "Complete all questions to continue →";
+  if (allDone) {
+    CourseProgress.markComplete(MODULE_ID, score, 6);
+    const navNext = document.getElementById("navNextTop");
+    if (navNext) navNext.classList.add("navnext-ready");
+  }
+}
+
+// Q1
+const q1Options = [
+  { text: "All ten clients retry at the same tick as each other, still perfectly synchronized", correct: true },
+  { text: "Each client retries at a different, randomly spread tick", correct: false, reason: "Randomness only enters with jitter. Plain exponential backoff is deterministic, so identical failure histories produce identical schedules." },
+  { text: "The clients stop retrying after four attempts automatically", correct: false, reason: "Exponential backoff controls the delay between attempts, not a maximum attempt count, that would be a separate policy layered on top." },
+];
+const q1el = document.getElementById("q1opts");
+q1Options.forEach((opt, i) => {
+  const div = document.createElement("label");
+  div.className = "qopt";
+  div.innerHTML = `<input type="radio" name="q1" value="${i}"><span>${opt.text}</span>`;
+  div.addEventListener("click", () => {
+    if (answered.q1) return;
+    answered.q1 = true;
+    CourseProgress.setAnswer(MODULE_ID, "q1", i);
+    document.querySelectorAll('#q1opts .qopt').forEach((el,j) => {
+      if (q1Options[j].correct) el.classList.add("correct");
+      else if (j === i) el.classList.add("incorrect");
+    });
+    const ex = document.getElementById("q1explain");
+    ex.style.display = "block";
+    if (opt.correct) {
+      score++;
+      ex.textContent = "Correct. Ten identical failure histories under a deterministic formula produce ten identical schedules, this is exactly the Section 3 proof.";
+    } else {
+      ex.textContent = "Not quite. " + opt.reason;
+    }
+    updateScore();
+  });
+  q1el.appendChild(div);
+});
+
+// Q2
+const q2Options = [
+  { text: "True", correct: false },
+  { text: "False", correct: true },
+];
+const q2el = document.getElementById("q2opts");
+q2Options.forEach((opt, i) => {
+  const div = document.createElement("label");
+  div.className = "qopt";
+  div.innerHTML = `<input type="radio" name="q2" value="${i}"><span>${opt.text}</span>`;
+  div.addEventListener("click", () => {
+    if (answered.q2) return;
+    answered.q2 = true;
+    CourseProgress.setAnswer(MODULE_ID, "q2", i);
+    document.querySelectorAll('#q2opts .qopt').forEach((el,j) => {
+      if (q2Options[j].correct) el.classList.add("correct");
+      else if (j === i) el.classList.add("incorrect");
+    });
+    const ex = document.getElementById("q2explain");
+    ex.style.display = "block";
+    if (opt.correct) {
+      score++;
+      ex.textContent = "Correct. Decorrelated jitter's formula is min(cap, random(base, prev_delay × 3)), it explicitly depends on the previous actual delay, not just n, which is exactly why it compounds spread across attempts instead of resetting.";
+    } else {
+      ex.textContent = "Not quite. Plain exponential backoff is a pure function of n. Decorrelated jitter deliberately breaks that by feeding the previous delay back in, so its randomness compounds across attempts rather than being redrawn identically from the same range each time.";
+    }
+    updateScore();
+  });
+  q2el.appendChild(div);
+});
+
+// Q3
+function checkQ3(){
+  if (answered.q3) return;
+  const val = Number(document.getElementById("q3input").value);
+  const ex = document.getElementById("q3explain");
+  ex.style.display = "block";
+  answered.q3 = true;
+  CourseProgress.setAnswer(MODULE_ID, "q3", val);
+  if (val === 4) {
+    score++;
+    ex.style.color = "var(--emerald)";
+    ex.textContent = "Correct. Four transitions total: Closed→Open, Open→Half-Open, Half-Open→Closed, Half-Open→Open. Only one of the four (Closed→Open) is gated by the failure threshold specifically.";
+  } else {
+    ex.style.color = "var(--red)";
+    ex.textContent = "Not quite. Count every arrow in the Section 5 diagram: Closed→Open, Open→Half-Open, Half-Open→Closed, and Half-Open→Open. That's 4.";
+  }
+  updateScore();
+}
+document.getElementById("q3check").addEventListener("click", checkQ3);
+document.getElementById("q3input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") checkQ3();
+});
+
+// Q4
+const q4Options = [
+  { text: "Because one success is weak evidence of recovery, and sending full traffic immediately risks re-triggering the same failure with a still-fragile dependency", correct: true },
+  { text: "Because the Open state technically cannot transition directly to Closed in any circuit breaker implementation", correct: false, reason: "It's not a hard technical impossibility, some simplified designs do skip straight back. Half-Open exists for a design reason, to test safely, not because a direct transition is impossible to build." },
+  { text: "Because Half-Open is required to reset the failure counter before Closed can be entered", correct: false, reason: "Resetting a counter doesn't require its own state, that could happen as part of any transition. Half-Open's purpose is specifically to test the dependency with limited exposure before committing to full traffic." },
+];
+const q4el = document.getElementById("q4opts");
+q4Options.forEach((opt, i) => {
+  const div = document.createElement("label");
+  div.className = "qopt";
+  div.innerHTML = `<input type="radio" name="q4" value="${i}"><span>${opt.text}</span>`;
+  div.addEventListener("click", () => {
+    if (answered.q4) return;
+    answered.q4 = true;
+    CourseProgress.setAnswer(MODULE_ID, "q4", i);
+    document.querySelectorAll('#q4opts .qopt').forEach((el,j) => {
+      if (q4Options[j].correct) el.classList.add("correct");
+      else if (j === i) el.classList.add("incorrect");
+    });
+    const ex = document.getElementById("q4explain");
+    ex.style.display = "block";
+    if (opt.correct) {
+      score++;
+      ex.textContent = "Correct. Half-Open limits exposure to a single probe, so a dependency that looks recovered but isn't gets one failed request instead of a full traffic surge, the same logic as Section 1's thundering herd, applied to the recovery path.";
+    } else {
+      ex.textContent = "Not quite. " + opt.reason;
+    }
+    updateScore();
+  });
+  q4el.appendChild(div);
+});
+
+// Q5 — novel-scenario calculation
+function checkQ5(){
+  if (answered.q5) return;
+  const val = Number(document.getElementById("q5input").value);
+  const ex = document.getElementById("q5explain");
+  ex.style.display = "block";
+  answered.q5 = true;
+  CourseProgress.setAnswer(MODULE_ID, "q5", val);
+  if (val === 8) {
+    score++;
+    ex.style.color = "var(--emerald)";
+    ex.textContent = "Correct. delay(2) = min(30, 2 × 2²) = min(30, 8) = 8 seconds. The cap doesn't bind yet at this attempt.";
+  } else {
+    ex.style.color = "var(--red)";
+    ex.textContent = "Not quite. delay(n) = min(cap, base × 2ⁿ). Here n=2: min(30, 2 × 2²) = min(30, 8) = 8 seconds.";
+  }
+  updateScore();
+}
+document.getElementById("q5check").addEventListener("click", checkQ5);
+document.getElementById("q5input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") checkQ5();
+});
+
+// Q6 — novel-scenario bulkhead reasoning
+const q6Options = [
+  { text: "Nothing, the email feature is unaffected, it draws from the separate 40-thread pool the saturated CRM integration was never able to touch", correct: true },
+  { text: "It also fails, since all threads in the system are drawn from one global pool regardless of how they're labeled", correct: false, reason: "That's exactly the failure mode bulkheading exists to prevent, per Section 7. If threads really were global and shared, this wouldn't be a bulkhead at all, it would be the original unpartitioned design." },
+  { text: "It slows down in proportion to how saturated the CRM pool is, since the system as a whole is under more load", correct: false, reason: "Bulkheading's entire point is that a partitioned pool's saturation has no mechanical effect on a different, separately-sized pool. Total system load isn't zero, but the email feature's own pool has no fewer threads available than before." },
+];
+const q6el = document.getElementById("q6opts");
+q6Options.forEach((opt, i) => {
+  const div = document.createElement("label");
+  div.className = "qopt";
+  div.innerHTML = `<input type="radio" name="q6" value="${i}"><span>${opt.text}</span>`;
+  div.addEventListener("click", () => {
+    if (answered.q6) return;
+    answered.q6 = true;
+    CourseProgress.setAnswer(MODULE_ID, "q6", i);
+    document.querySelectorAll('#q6opts .qopt').forEach((el,j) => {
+      if (q6Options[j].correct) el.classList.add("correct");
+      else if (j === i) el.classList.add("incorrect");
+    });
+    const ex = document.getElementById("q6explain");
+    ex.style.display = "block";
+    if (opt.correct) {
+      score++;
+      ex.textContent = "Correct. This is the whole payoff of bulkheading: the email feature's pool size and availability are completely unaffected by the CRM pool's saturation, they're mechanically separate resources.";
+    } else {
+      ex.textContent = "Not quite. " + opt.reason;
+    }
+    updateScore();
+  });
+  q6el.appendChild(div);
+});
+
+document.getElementById("btnNext").addEventListener("click", () => {
+  window.location.href = "module-04.html";
+});
+
+/* ---------------- Retry checkpoint ---------------- */
+function maybeShowRetry(){
+  const anyAnswered = answered.q1 || answered.q2 || answered.q3 || answered.q4 || answered.q5 || answered.q6;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5 && answered.q6;
+  const btn = document.getElementById("btnRetryCheckpoint");
+  btn.style.display = (anyAnswered && (allDone ? score < 6 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModule(MODULE_ID);
+  window.location.reload();
+});
+const _origUpdateScore = updateScore;
+updateScore = function(){
+  _origUpdateScore();
+  maybeShowRetry();
+};
+maybeShowRetry();
+
+/* ---------------- Progress persistence: restore on load ---------------- */
+CourseProgress.touchVisited(MODULE_ID);
+(function restoreQuizState(){
+  const stored = CourseProgress.getModule(MODULE_ID);
+  const a = stored.answers || {};
+  if (a.q1 !== undefined && !answered.q1) {
+    const label = document.querySelectorAll('#q1opts .qopt')[a.q1];
+    if (label) label.click();
+  }
+  if (a.q2 !== undefined && !answered.q2) {
+    const label = document.querySelectorAll('#q2opts .qopt')[a.q2];
+    if (label) label.click();
+  }
+  if (a.q3 !== undefined && !answered.q3) {
+    const inputEl = document.getElementById('q3input');
+    if (inputEl) { inputEl.value = a.q3; checkQ3(); }
+  }
+  if (a.q4 !== undefined && !answered.q4) {
+    const label = document.querySelectorAll('#q4opts .qopt')[a.q4];
+    if (label) label.click();
+  }
+  if (a.q5 !== undefined && !answered.q5) {
+    const inputEl = document.getElementById('q5input');
+    if (inputEl) { inputEl.value = a.q5; checkQ5(); }
+  }
+  if (a.q6 !== undefined && !answered.q6) {
+    const label = document.querySelectorAll('#q6opts .qopt')[a.q6];
+    if (label) label.click();
+  }
+})();
+</script>
+</body>
+</html>

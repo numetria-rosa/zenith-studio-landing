@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 1: Formal Models of Workflow Execution</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.progress{height:3px;background:var(--bd)}
+.progress i{display:block;height:100%;background:var(--lime);width:12.5%}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
+.def p{font-size:14.5px}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
+.callout b{color:var(--amber)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+
+/* DAG */
+#dagSvg,#builderSvg{width:100%;height:280px;background:var(--bg2);border-radius:10px;border:1px solid var(--bd)}
+.dnode{cursor:pointer;transition:.15s}
+.dnode circle{fill:var(--card2);stroke:var(--bd2);stroke-width:2}
+.dnode text{fill:var(--tx);font-family:'Space Grotesk';font-size:11px;font-weight:600;pointer-events:none}
+.dnode.done circle{fill:var(--lime);stroke:var(--lime)}
+.dnode.done text{fill:var(--limed)}
+.dnode.ready circle{fill:rgba(198,244,50,.15);stroke:var(--lime)}
+.dnode.clickedwrong circle{fill:rgba(255,107,107,.2);stroke:var(--red)}
+.dedge{stroke:var(--bd2);stroke-width:1.6;marker-end:url(#arrow)}
+.dedge.violated{stroke:var(--red);stroke-width:2.4}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button.primary:hover{filter:brightness(1.08);color:var(--limed)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.orderTrace{margin-top:14px;font-family:'JetBrains Mono';font-size:13px;color:var(--mut);min-height:20px}
+.orderTrace b{color:var(--lime)}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+
+/* FSM */
+.fsmState{display:inline-flex;align-items:center;gap:10px;background:var(--card2);border:2px solid var(--lime);border-radius:99px;padding:10px 22px;font-weight:700;font-size:15px;color:var(--lime)}
+.fsmState.terminal{border-color:var(--violet);color:var(--violet)}
+.fsmActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.fsmActions button{font-size:12.5px}
+.fsmLog{margin-top:18px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;max-height:160px;overflow-y:auto}
+.fsmLog .row{font-family:'JetBrains Mono';font-size:12px;color:var(--mut);padding:3px 0;display:flex;gap:8px}
+.fsmLog .row .arrow{color:var(--lime)}
+.fsmLog .row:first-child{color:var(--tx)}
+
+/* FSM overview diagram (static) */
+.fsmdiagram-wrap{margin-top:18px;border-radius:10px;border:1px solid var(--bd);background:var(--bg2);overflow-x:auto}
+#fsmDiagram{display:block;min-width:760px}
+.fnode rect{fill:var(--card2);stroke:var(--bd2);stroke-width:1.6}
+.fnode text{fill:var(--tx);font-family:'Space Grotesk';font-size:11px;font-weight:600;text-anchor:middle;pointer-events:none}
+.fnode.terminal rect{stroke:var(--violet);fill:rgba(167,139,250,.08)}
+.fnode.terminal text{fill:var(--violet)}
+.fnode.start rect{stroke:var(--lime)}
+.fedge2{stroke:var(--bd2);stroke-width:1.5;marker-end:url(#arrow2)}
+.fsmdiagram-cap{padding:10px 14px;font-size:12px;color:var(--mut2);border-top:1px solid var(--bd)}
+
+@media (max-width:640px){
+  .wrap{padding:0 16px 60px}
+  h1{font-size:26px}
+  .kh h2{font-size:18px}
+  .interactive{padding:16px}
+  #dagSvg,#builderSvg{height:400px}
+  .dnode .hit{r:40}
+  .orient{padding:20px 18px}
+}
+
+/* quiz */
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
+.numinput input{width:80px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
+.nextbtn{margin-left:auto}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+
+/* orientation panel */
+.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
+.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
+.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h3:first-of-type{margin-top:0}
+.orient p{font-size:14.5px;color:var(--mut)}
+.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
+.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
+.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
+
+/* practice (ungraded, self-check) */
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
+.practice p{font-size:14px}
+.practice details{margin-top:12px}
+.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
+.practice summary::-webkit-details-marker{display:none}
+.practice summary:before{content:"▸ "}
+.practice details[open] summary:before{content:"▾ "}
+.practice details:not([open]) .ans{display:none}
+.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
+
+/* course navigation bar */
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--lime)}
+.coursenav .navsep{flex:1}
+.coursenav .navdim{color:var(--mut2);cursor:default;pointer-events:none}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Automation Engineering · Module 1 of 8</span>
+</div></div>
+<div class="progress"><i></i></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><span class="navsep"></span><a href="module-02.html" id="navNextTop">Module 2 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 01</span>
+    <h1 class="serif">Formal Models of Workflow Execution</h1>
+    <p class="sub">Every automation platform you have ever used, whether it admits it or not, is executing a directed acyclic graph or a state machine underneath its drag-and-drop interface. This module makes that structure explicit, so you can reason about correctness instead of trusting the tool.</p>
+
+    <div class="objectives">
+      <div class="lbl">Learning objectives</div>
+      <ul>
+        <li>Model a business process as a directed acyclic graph (DAG) and compute a valid execution order</li>
+        <li>Explain why a cycle in a dependency graph makes a workflow unschedulable, and how that failure is detected</li>
+        <li>Specify a state machine with guarded transitions and trace a valid execution path through it</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="orient">
+    <div class="lbl">Before you start</div>
+    <h3 class="serif">What this course is</h3>
+    <p>Automation Engineering is an 8-module course on the ideas that every workflow tool, no-code or otherwise, is built on top of. The goal isn't to teach you a specific product's UI, it's to give you the small set of computer-science models (graphs, state machines, delivery guarantees) that let you predict how <i>any</i> automation system will behave before you build it, and diagnose it correctly when it doesn't.</p>
+
+    <h3 class="serif">What this module does</h3>
+    <p>Module 1 introduces the two models the rest of the course builds on: the <b>DAG</b> (for "what order do these steps run in, and what can happen at once") and the <b>finite state machine</b> (for "what state is this record in, and what's allowed to happen to it next"). Later modules, idempotency, retries, distributed state, all assume you can read and reason about both. That's the entire reason this module exists: everything after it is easier once these two are second nature.</p>
+
+    <h3 class="serif">What's assumed</h3>
+    <div class="assume">No prior computer science theory. Every term (vertex, in-degree, guard, transition) is defined the first time it's used.</div>
+    <div class="assume">Comfort with basic logic (if/then, true/false) is helpful but not required, the definitions are self-contained.</div>
+    <div class="assume">If a proof section feels dense on first read, that's normal, skim it once for the shape of the argument, then come back after the interactive below it.</div>
+
+    <h3 class="serif">How to work through it</h3>
+    <ol>
+      <li>Read the definition, then the short proof or explanation under it, proofs are there to show <i>why</i> a rule is true, not just to assert it.</li>
+      <li>Run the live interactive for that concept, it's the same logic as the definition, just executing in front of you.</li>
+      <li>Answer the <b>practice check</b> that follows, these are ungraded and self-scored, their only job is to catch whether the idea actually stuck before you move on. Do them, don't skip to the reveal.</li>
+      <li>Finish with the graded checkpoint at the end of the module.</li>
+    </ol>
+  </div>
+
+  <section>
+    <div class="kh"><span class="num">1</span><h2 class="serif">Workflows as graphs</h2></div>
+    <p>A workflow is a set of tasks with dependencies between them. Formally, this is a graph <span class="mono-inline">G = (V, E)</span> where <span class="mono-inline">V</span> is the set of tasks and a directed edge <span class="mono-inline">(u, v) ∈ E</span> means "task <span class="mono-inline">u</span> must complete before task <span class="mono-inline">v</span> can begin." For a workflow to be schedulable at all, that is, for there to exist <i>any</i> valid order to run the tasks in, the graph must be a <b>directed acyclic graph</b>: a graph with no directed cycles.</p>
+    <div class="def">
+      <div class="k">Definition: topological order</div>
+      <p>A topological order of a DAG is a linear ordering of its vertices such that for every directed edge <span class="mono-inline">(u, v)</span>, <span class="mono-inline">u</span> appears before <span class="mono-inline">v</span> in the ordering. A DAG can have more than one valid topological order; a graph with a cycle has none.</p>
+    </div>
+
+    <p class="mut" style="margin-top:14px">Below is a real pipeline: a lead comes in, gets validated, then two independent enrichment steps run (they don't depend on each other), and both must finish before the lead can be assigned to a rep. This is exactly the branching structure of the Lead Capture &amp; Follow-Up system.</p>
+
+    <div class="callout"><b>Why this matters beyond correctness:</b> a topological order is rarely unique, and that's not a curiosity, it's the whole reason production schedulers exist. In the pipeline below, <span class="mono-inline">Enrich Data</span> and <span class="mono-inline">Score Lead</span> both depend only on <span class="mono-inline">Validate</span> and neither depends on the other, so they form an <b>antichain</b>: a set of nodes with no path between any pair of them. Any two nodes in an antichain can run concurrently without violating a single dependency. A scheduler that only knows "some valid order exists" and runs steps one at a time is leaving that parallelism on the table; a scheduler that understands the DAG structure can identify the widest antichain at each layer and fan work out across workers. This is precisely what tools like Airflow, Temporal, and Dagster are doing under the hood when they say a DAG run has "parallel tasks", they're computing layers of the same graph you're about to run Kahn's algorithm on.</div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">2</span><h2 class="serif">Interactive: computing a valid execution order</h2></div>
+    <p class="mut">This graph is rendered live and the algorithm below actually runs against it, it is not a canned animation.</p>
+
+    <div class="interactive">
+      <span class="ilbl">Live simulation</span>
+      <svg id="dagSvg" viewBox="0 0 760 260" role="img" aria-label="Dependency graph: Receive Lead leads to Validate. Validate leads to both Enrich Data and Score Lead, which run independently. Both Enrich Data and Score Lead must complete before Assign to Rep. Assign to Rep leads to both Notify Rep and Log to CRM.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#39414f"></path>
+          </marker>
+        </defs>
+        <g id="edgeLayer"></g>
+        <g id="nodeLayer"></g>
+      </svg>
+
+      <div class="dagctrl">
+        <button class="primary" id="btnRunKahn">▶ Run Kahn's algorithm</button>
+        <button id="btnReset">Reset</button>
+        <span style="color:var(--mut2);font-size:12.5px;margin-left:4px">or click nodes below in the order you think is valid →</span>
+      </div>
+      <div class="orderTrace" id="orderTrace">Order so far: <i style="color:var(--mut2)">click "Run" or start clicking nodes</i></div>
+      <div class="feedback" id="dagFeedback"></div>
+    </div>
+
+    <p style="margin-top:16px">You just watched Kahn's algorithm run to completion without getting stuck. That wasn't luck, and it isn't specific to this particular graph. It's guaranteed, for every finite DAG, no matter its shape, and it's worth seeing exactly why before moving on, because the "why" is what tells you the algorithm can be trusted on a graph you've never seen.</p>
+
+    <div class="def">
+      <div class="k">Claim: every finite DAG has at least one topological order</div>
+      <p><b>Proof sketch, by induction on |V| = n.</b></p>
+      <ol style="margin-top:8px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:1.9">
+        <li><b>Base case (n = 1).</b> A graph with a single vertex and no edges trivially has a valid order: itself.</li>
+        <li><b>Inductive hypothesis.</b> Assume every DAG with fewer than <span class="mono-inline">n</span> vertices has a topological order.</li>
+        <li><b>A vertex with in-degree zero must exist.</b> Take a DAG <span class="mono-inline">G</span> with <span class="mono-inline">n</span> vertices. If every vertex had at least one incoming edge, you could walk backward along incoming edges forever; in a finite graph that walk must eventually repeat a vertex, which is a cycle, contradicting acyclicity. So some vertex <span class="mono-inline">v</span> has in-degree zero, this is exactly the "ready" state you watched nodes enter in the simulation above.</li>
+        <li><b>Remove it and recurse.</b> Removing <span class="mono-inline">v</span> and its outgoing edges leaves a graph with <span class="mono-inline">n − 1</span> vertices that is still a DAG (deleting a vertex cannot create a cycle). By the inductive hypothesis, it has a topological order.</li>
+        <li><b>Reassemble.</b> Prepend <span class="mono-inline">v</span> to that order. Every edge out of <span class="mono-inline">v</span> now points to something later in the sequence, and every other edge is unaffected, so the result is a valid topological order of <span class="mono-inline">G</span>. <span class="mono-inline">∎</span></li>
+      </ol>
+      <p style="margin-top:10px">This is exactly the argument Kahn's algorithm executes mechanically: repeatedly strip off an in-degree-zero vertex. The proof isn't just decorative, it's a certificate that the algorithm you just ran cannot get stuck on a true DAG. If it ever does get stuck, that's not a bug in the algorithm, it's proof the input wasn't acyclic, exactly what Section 3 turns into a detection technique. Run to completion, Kahn's algorithm does exactly one constant-time visit per vertex and one decrement per edge, so it runs in <span class="mono-inline">O(V + E)</span> time, linear in the size of the graph.</p>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Without scrolling back up: what property must a vertex have for Kahn's algorithm to be allowed to remove it next? And in the proof above, what goes wrong if <i>no</i> vertex in a nonempty graph has that property?</p>
+      <details>
+        <summary>Check your answer</summary>
+      <div class="ans">In-degree zero, no remaining unprocessed dependency. If no vertex in a nonempty graph has in-degree zero, the "walk backward along incoming edges" argument in the proof forces a repeated vertex, which is a cycle. So a nonempty DAG is guaranteed to always have at least one in-degree-zero vertex; if you ever see a nonempty graph with none, it isn't a DAG.</div>
+      </details>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Run Kahn's algorithm once above, then predict: if the edge <span class="mono-inline">D→E</span> (Score Lead → Assign to Rep) were removed entirely, would Enrich Data and Score Lead still have to appear in a fixed relative order to each other in every valid ordering? Why or why not?</p>
+      <details>
+        <summary>Check your answer</summary>
+      <div class="ans">No. C (Enrich) and D (Score) are only ordered relative to each other if some path connects them. There is no edge between C and D directly, and removing D→E removes the only place their outputs converge, so with that edge gone, D has no outgoing edges at all and could even be placed last in the order. C and D are an antichain either way, removing D→E just makes that more visible by disconnecting D from the rest of the graph's "downstream" side.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">3</span><h2 class="serif">Why cycles break scheduling</h2></div>
+    <p>Kahn's algorithm, which the simulation above just ran, repeatedly removes any node with <b>in-degree zero</b> (no remaining unprocessed dependencies) and appends it to the order. If at any point no node has in-degree zero but nodes remain, the graph contains a cycle, no valid order exists, and the algorithm halts with an unschedulable result rather than looping forever.</p>
+    <p style="margin-top:12px">This is precisely how you should detect a misconfigured workflow before deploying it: if step A waits on step B, and step B (transitively) waits on step A, no scheduler, however clever, can run it. The fix is architectural, not algorithmic.</p>
+
+    <div class="def">
+      <div class="k">Claim: Kahn's algorithm terminates with fewer than |V| nodes in the order if and only if a cycle exists</div>
+      <p><b>(⇐) If the algorithm outputs fewer than |V| nodes, a cycle exists.</b></p>
+      <ol style="margin-top:8px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:1.9">
+        <li>Suppose it halts having emitted <span class="mono-inline">k &lt; n</span> nodes. The remaining <span class="mono-inline">n − k</span> nodes all have in-degree ≥ 1 within the remaining subgraph, that's the only reason the algorithm would stop early.</li>
+        <li>Pick any remaining node <span class="mono-inline">v₀</span> and walk backward along one of its incoming edges to some <span class="mono-inline">v₁</span>, which is also remaining and also has in-degree ≥ 1. Repeat.</li>
+        <li>Since the remaining set is finite, this backward walk must eventually revisit a node. The segment of the walk between the two visits is a directed cycle. <span class="mono-inline">∎</span></li>
+      </ol>
+      <p style="margin-top:14px"><b>(⇒) If a cycle exists, the algorithm cannot emit all n nodes.</b></p>
+      <ol style="margin-top:8px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:1.9">
+        <li>Every node on a cycle has at least one incoming edge from another node on that same cycle.</li>
+        <li>For any node on the cycle to reach in-degree zero, every node on the cycle would need to have already been removed first, including itself, that's circular by construction.</li>
+        <li>So no node on the cycle can ever be removed, and the algorithm halts with those nodes stuck. <span class="mono-inline">∎</span></li>
+      </ol>
+    </div>
+
+    <p style="margin-top:12px">A second, independent way to detect the same condition is depth-first search with a "currently on stack" marker: if DFS ever follows an edge into a node that is still on the current recursion stack (as opposed to merely already visited), that back-edge is a cycle. Both approaches run in <span class="mono-inline">O(V + E)</span> time, Kahn's because each vertex and edge is processed exactly once as in-degrees are decremented, DFS-based detection because it's a single traversal. In practice, Kahn's algorithm is usually preferred for scheduling because it produces the valid order as a byproduct of detection; DFS-based detection is preferred when you only need a yes/no answer and want to report the exact cycle, since the recursion stack at the point of the back-edge <i>is</i> the cycle.</p>
+
+    <div class="callout"><b>Common failure in practice:</b> a "retry" step that re-triggers an earlier stage of the same pipeline on failure looks harmless in a visual builder, but it introduces exactly this kind of cycle if not handled as a distinct recovery path with its own termination condition. Module 3 covers the correct pattern.</div>
+
+    <div class="callout"><b>A second real-world example:</b> two independent systems, a CRM and a billing platform, are each configured to "sync on change" from the other: the CRM pushes an update to billing whenever a deal closes, and billing pushes an update to the CRM whenever an invoice status changes, and each of those pushes is itself modeled as a change that triggers the other side again. Drawn as a graph, <span class="mono-inline">CRM → Billing → CRM</span> is a two-node cycle. Unlike the retry case, there's no visual builder here at all, the cycle exists purely in the interaction between two systems that were each individually reviewed and looked fine. This is why cycle analysis has to be done at the level of the full dependency graph across systems, not per-system.</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Take the pipeline graph from Section 1 and add a single new edge from <span class="mono-inline">Assign to Rep (E)</span> back to <span class="mono-inline">Validate (B)</span>. Which nodes would Kahn's algorithm still be able to place in the order, and which would it get stuck on?</p>
+      <details>
+        <summary>Check your answer</summary>
+      <div class="ans">A (Receive Lead) still has in-degree zero and gets placed first. But once A is removed, B's in-degree only drops to 1, it still has the new incoming edge from E, so B can never reach in-degree zero (E can't run until C and D run, which can't run until B runs, which now can't run until E runs). B, C, D, and E are stuck in a cycle; F and G are stuck too since they depend on E. Only A gets placed, algorithm halts with 6 of 7 nodes unprocessed, correctly reporting the graph as unschedulable.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4</span><h2 class="serif">Workflows as state machines</h2></div>
+    <p>The DAG view describes <i>task dependencies</i>. A complementary view describes the <i>lifecycle of a single unit of work</i>, in this case, one lead, as it moves through the system. This is a finite state machine: a set of states, and a set of guarded transitions between them.</p>
+    <div class="def">
+      <div class="k">Formal definition: finite state machine</div>
+      <p>A finite state machine is a 5-tuple <span class="mono-inline">(S, Σ, δ, s₀, F)</span> where <span class="mono-inline">S</span> is a finite set of states, <span class="mono-inline">Σ</span> is a finite set of actions (the input alphabet), <span class="mono-inline">δ: S × Σ → S</span> is the transition function, <span class="mono-inline">s₀ ∈ S</span> is the initial state, and <span class="mono-inline">F ⊆ S</span> is the set of terminal states. For the lead lifecycle used throughout this module (the same one you'll run in Section 5), <span class="mono-inline">S</span> = {New, Validating, Validated, Enriching, Scored, Assigned, Contacted, Rejected, Won, Lost}, <span class="mono-inline">s₀</span> = New, and <span class="mono-inline">F</span> = {Rejected, Won, Lost}. Note that Assigned is <i>not</i> terminal, a lead that's assigned still has to be contacted and closed before the lifecycle ends.</p>
+    </div>
+
+    <div class="fsmdiagram-wrap">
+      <svg id="fsmDiagram" viewBox="0 0 1160 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="State machine diagram, start state New. New goes to Validating, which goes to either Validated or the terminal state Rejected. Validated goes to Enriching, then Scored. Scored goes to either Assigned or the terminal state Lost. Assigned goes to Contacted. Contacted goes to either the terminal state Won or the terminal state Lost.">
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#39414f"></path>
+          </marker>
+        </defs>
+        <g>
+          <line class="fedge2" x1="119" y1="170" x2="151" y2="170"></line>
+          <line class="fedge2" x1="260" y1="145" x2="310" y2="115"></line>
+          <line class="fedge2" x1="260" y1="200" x2="310" y2="230"></line>
+          <line class="fedge2" x1="419" y1="90"  x2="451" y2="90"></line>
+          <line class="fedge2" x1="569" y1="90"  x2="601" y2="90"></line>
+          <line class="fedge2" x1="715" y1="80"  x2="752" y2="72"></line>
+          <line class="fedge2" x1="711" y1="119" x2="909" y2="231"></line>
+          <line class="fedge2" x1="869" y1="60"  x2="901" y2="60"></line>
+          <line class="fedge2" x1="1007" y1="96" x2="1044" y2="124"></line>
+          <line class="fedge2" x1="960" y1="80"  x2="960" y2="240"></line>
+        </g>
+        <g class="fnode start"><rect x="1" y="150" width="118" height="40" rx="8"></rect><text x="60" y="175">NEW</text></g>
+        <g class="fnode"><rect x="151" y="150" width="118" height="40" rx="8"></rect><text x="210" y="175">VALIDATING</text></g>
+        <g class="fnode"><rect x="301" y="70" width="118" height="40" rx="8"></rect><text x="360" y="95">VALIDATED</text></g>
+        <g class="fnode terminal"><rect x="301" y="240" width="118" height="40" rx="8"></rect><text x="360" y="265">REJECTED</text></g>
+        <g class="fnode"><rect x="451" y="70" width="118" height="40" rx="8"></rect><text x="510" y="95">ENRICHING</text></g>
+        <g class="fnode"><rect x="601" y="70" width="118" height="40" rx="8"></rect><text x="660" y="95">SCORED</text></g>
+        <g class="fnode"><rect x="751" y="40" width="118" height="40" rx="8"></rect><text x="810" y="65">ASSIGNED</text></g>
+        <g class="fnode"><rect x="901" y="40" width="118" height="40" rx="8"></rect><text x="960" y="65">CONTACTED</text></g>
+        <g class="fnode terminal"><rect x="1031" y="140" width="118" height="40" rx="8"></rect><text x="1090" y="165">WON</text></g>
+        <g class="fnode terminal"><rect x="901" y="240" width="118" height="40" rx="8"></rect><text x="960" y="265">LOST</text></g>
+      </svg>
+      <div class="fsmdiagram-cap">Full state graph, all ten states and every transition at once. Lime border = start state, violet border = terminal (in <span class="mono-inline">F</span>). This is the whole machine; the interactive in Section 5 walks it one transition at a time.</div>
+    </div>
+
+    <div class="def">
+      <div class="k">Definition: guarded transition</div>
+      <p>A transition <span class="mono-inline">(s₁, action, s₂)</span> moves the system from state <span class="mono-inline">s₁</span> to state <span class="mono-inline">s₂</span> when <span class="mono-inline">action</span> occurs, but only if the transition's <b>guard</b> (a boolean condition) holds. A lead can only move from Scored to Assigned if the guard <span class="mono-inline">score ≥ 70</span> is satisfied; otherwise the Scored → Lost transition applies instead.</p>
+    </div>
+
+    <p style="margin-top:12px">Two things are worth being precise about here, because they're the two ways this model breaks in production. First, <b>determinism</b>: the formal <span class="mono-inline">δ: S × Σ → S</span> definition maps each (state, action) pair to exactly <i>one</i> next state, that's what makes the system predictable. In the guarded version we're actually using, the same action from the same state can have multiple candidate transitions (Scored →Assigned, Scored → Lost, both triggered by the same "score computed" event), and determinism is recovered only if the guards are <b>mutually exclusive</b> (no two guards can be true at once) and <b>jointly exhaustive</b> (at least one guard is always true). If you add a third outcome later, say, "needs manual review", and forget to also tighten the existing <span class="mono-inline">score ≥ 70</span> guard to exclude that new band, you've silently created a state where two transitions are simultaneously legal, and which one fires becomes an implementation detail rather than a specified behavior. That is a live bug class, not a hypothetical.</p>
+
+    <p style="margin-top:12px">Second, note that a strict automata-theory FSM only <i>accepts</i> or <i>rejects</i> a sequence of actions, it has no side effects. What we're actually modeling, a machine that performs work (send an email, write a CRM record) on each transition, is more precisely a <b>Mealy machine</b> (output attached to the transition) or <b>Moore machine</b> (output attached to the state). Almost every workflow engine you'll touch professionally, Stripe's subscription lifecycle, AWS Step Functions, a CRM's deal pipeline, is a Mealy machine wearing an FSM diagram. The distinction matters when debugging: if an action seems to have "not fired," check whether you're looking for it on the transition (Mealy) or expecting it to persist as long as you're in the resulting state (Moore).</p>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Write out the 5-tuple <span class="mono-inline">(S, Σ, δ, s₀, F)</span> for a simple traffic light that cycles Red → Green → Yellow → Red, with no other transitions. What is <span class="mono-inline">F</span>?</p>
+      <details>
+        <summary>Check your answer</summary>
+      <div class="ans">S = {Red, Green, Yellow}. Σ = {timer expires} (the only action, in this simplified version). δ(Red, timer expires) = Green, δ(Green, timer expires) = Yellow, δ(Yellow, timer expires) = Red. s₀ = Red (or whichever the light starts on). F = ∅, the empty set, because this machine never terminates, it cycles forever. That's a legitimate FSM: terminal states are optional, not every machine needs one.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">5</span><h2 class="serif">Interactive: walking the lead lifecycle</h2></div>
+    <p class="mut">Only valid transitions from the current state are ever offered as buttons, this is the guard concept made concrete: the system will not let you attempt an action that is not legal from where you are.</p>
+
+    <div class="interactive">
+      <span class="ilbl">Live simulation</span>
+      <div style="text-align:center;padding:10px 0">
+        <div class="fsmState" id="fsmCurrent">NEW</div>
+      </div>
+      <div class="fsmActions" id="fsmActions"></div>
+      <div class="fsmLog" id="fsmLog"><div class="row">Trace begins at <span style="color:var(--lime)">NEW</span></div></div>
+      <div class="dagctrl" style="margin-top:14px">
+        <button id="btnFsmReset">Reset trace</button>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Drive the trace above to the CONTACTED state. Without clicking further, list every action available from there, and identify which one leads to a terminal state versus which one keeps the lead active.</p>
+      <details>
+        <summary>Check your answer</summary>
+      <div class="ans">From CONTACTED: "deal closes won" → WON (terminal, in F), and "deal closes lost" → LOST (also terminal, in F). Both available actions from CONTACTED happen to lead to terminal states, there's no path back to an earlier stage like ASSIGNED, this FSM never lets a lead "regress." That's a deliberate design choice, not a limitation of FSMs in general, a different workflow could allow CONTACTED → back to ASSIGNED on a scheduling conflict.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6</span><h2 class="serif">Combining the two models</h2></div>
+    <p>The DAG and the FSM are not competing descriptions of the same thing, they answer different questions and a real system needs both. The DAG answers: <i>for one execution, what order must these steps run in, and what can run in parallel?</i> It's scoped to a single run and typically completes in seconds. The FSM answers: <i>where is this particular lead right now, in a lifecycle that may span days or weeks and involve waiting on a human?</i> It's scoped to one long-lived entity and has no notion of "finishing" in the DAG sense, Assigned and Lost are both valid resting points, not "success" and "failure" of a computation.</p>
+    <p style="margin-top:12px">Concretely, in the Lead Capture &amp; Follow-Up system: each time a lead moves through Validate → Enrich → Score, that's one DAG execution, scheduled and run to completion in milliseconds. The <i>result</i> of that DAG run (a score) is what fires a guarded transition in the lead's FSM. The FSM doesn't re-run the DAG logic and the DAG doesn't track history across leads, they're composed, not merged. This is also why the two failure modes look different: a cycle in the DAG is a static configuration error you can catch before deploying (as in Section 3), while an invalid FSM transition is a runtime error you only catch by attempting an action from a state that doesn't permit it, which is exactly what the guard-checked buttons in Section 5 were preventing you from doing.</p>
+    <div class="callout"><b>Rule of thumb:</b> if the question is "what order" or "what can happen at the same time," you're modeling a DAG. If the question is "what state is this record in" or "what's allowed to happen next," you're modeling an FSM. Reaching for the wrong one is the single most common structural mistake in workflow design, using an FSM for step ordering produces a combinatorial explosion of states (one state per subset of completed steps), and using a DAG for entity lifecycle loses the ability to represent "waiting indefinitely for a human."</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>For a customer onboarding process: is "has the welcome email been sent" better modeled as a step in a DAG or a state in an FSM? Justify in one sentence using the rule of thumb above.</p>
+      <details>
+        <summary>Check your answer</summary>
+      <div class="ans">It depends on scope, and that's the actual lesson. If it's one action within a single onboarding run that completes in seconds ("send welcome email" as a task with dependencies before/after it), it's a DAG step. If "welcome email sent" is a durable fact about a customer record that other, later, independent processes need to check days or weeks afterward ("has this customer been welcomed yet, regardless of how"), it's better modeled as a boolean or state on the customer's FSM. The tell is persistence and reference from outside the original run.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7</span><h2 class="serif">Build the execution graph</h2></div>
+    <p>Everything so far has you reasoning about a DAG someone else built. This is the other direction: you're given six tasks with no wiring between them, and a business requirement in plain English. You build the actual dependency graph, and a real validator checks it, not a reveal-the-answer box.</p>
+    <div class="brief" style="background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:20px 24px;margin-top:18px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:10px">The requirement</div>
+      <p style="font-size:14.5px">An order can't be paid until it's passed fraud screening. Inventory can be checked independently of payment, it doesn't depend on fraud screening or payment at all, only on the order existing. An invoice can only be generated once both payment is verified <i>and</i> inventory is confirmed. The customer is notified only after the invoice exists.</p>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Build it</span>
+      <p class="mut" style="margin-bottom:10px">Six tasks, no dependencies wired yet. Add the dependencies the requirement above describes, then validate.</p>
+      <div class="dagctrl">
+        <select class="stratsel" id="builderFrom"></select>
+        <span style="color:var(--mut2)">must happen before</span>
+        <select class="stratsel" id="builderTo"></select>
+        <button class="primary" id="btnAddEdge">+ Add dependency</button>
+      </div>
+      <div id="builderEdgeList" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px"></div>
+
+      <svg id="builderSvg" viewBox="0 0 760 260" style="margin-top:16px" role="img" aria-label="Student-built dependency graph, updates live as edges are added">
+        <g id="builderEdgeLayer"></g>
+        <g id="builderNodeLayer"></g>
+      </svg>
+
+      <div class="dagctrl">
+        <button class="primary" id="btnValidateBuilder">▶ Validate my graph</button>
+        <button id="btnResetBuilder">Reset</button>
+      </div>
+      <div class="feedback" id="builderFeedback"></div>
+      <div id="builderOrderSection" style="display:none;margin-top:14px">
+        <button id="btnGenerateOrder">Generate execution order</button>
+        <div class="orderTrace" id="builderOrderTrace"></div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Before validating: how many of the six tasks should have in-degree zero in a correct graph, that is, how many have no prerequisite at all?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Just one: Receive Order. Every other task depends on something, directly or transitively, on the order existing. This is worth checking on any graph you build, real workflows almost always have exactly one true starting point; more than one usually means you're missing a dependency, not that you've found extra parallelism.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8</span><h2 class="serif">Before the checkpoint: what you should now be able to do</h2></div>
+    <p class="mut">A short consolidation before you're graded on it. If any of these feel shaky, that's a signal to scroll back to the relevant section, not a reason to skip ahead.</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:2">
+      <li>State what a topological order is, and explain, without looking it up, <i>why</i> every finite DAG is guaranteed to have at least one.</li>
+      <li>Trace Kahn's algorithm by hand on a small graph, and explain what its failure to place every vertex tells you about that graph.</li>
+      <li>Given any two nodes in a DAG, determine whether they're forced into a fixed order or free to run in parallel (i.e., recognize an antichain).</li>
+      <li>Write out the 5-tuple <span class="mono-inline">(S, Σ, δ, s₀, F)</span> for a small state machine you're given, including identifying which states are terminal.</li>
+      <li>Spot a guard-design bug: two transitions off the same state, triggered by the same event, whose guards overlap or leave a gap.</li>
+      <li>Decide, for a given piece of workflow logic, whether it belongs in a DAG or an FSM, and justify the choice by scope (single-run vs. long-lived record).</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">9</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Graded. Feedback is immediate and attempts are unlimited, the goal is understanding, not a single pass/fail moment.</p>
+
+    <div class="qcard">
+      <div class="qn">Question 1 of 6</div>
+      <div class="qtext">Given the pipeline graph above (Receive → Validate → {Enrich, Score} → Assign → {Notify, Log}), which of the following is a <b>valid</b> execution order?</div>
+      <div id="q1opts"></div>
+      <div class="qexplain" id="q1explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 2 of 6</div>
+      <div class="qtext">True or false: a workflow whose dependency graph contains a cycle can still be scheduled by running topological sort, it will simply return one of the valid orders.</div>
+      <div id="q2opts"></div>
+      <div class="qexplain" id="q2explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 3 of 6</div>
+      <div class="qtext">What is the in-degree of the <span class="mono-inline">Assign to Rep</span> node in the pipeline graph, that is, how many edges point directly into it?</div>
+      <div class="numinput">
+        <input type="number" id="q3input" min="0" max="10" placeholder="?">
+        <button id="q3check">Check</button>
+      </div>
+      <div class="qexplain" id="q3explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 4 of 6</div>
+      <div class="qtext">In the proof that Kahn's algorithm correctly detects a cycle, why must the "walk backward along an incoming edge" eventually revisit a node?</div>
+      <div id="q4opts"></div>
+      <div class="qexplain" id="q4explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 5 of 6 · new scenario</div>
+      <div class="qtext">A junior engineer wires up an invoice-processing workflow with these dependencies: Receive Invoice → Validate; Validate → Match PO; Match PO → Approve; Approve → Pay; Pay → Archive; and, by mistake, Archive → Match PO (meant as "re-check after archiving," but wired as a dependency). You've never seen this graph before. Using Kahn's algorithm's logic, how many of the 6 nodes can actually be placed in a valid order before the algorithm gets stuck?</div>
+      <div class="numinput">
+        <input type="number" id="q5input" min="0" max="10" placeholder="?">
+        <button id="q5check">Check</button>
+      </div>
+      <div class="qexplain" id="q5explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 6 of 6 · design (self-check, not auto-graded)</div>
+      <div class="qtext">Sketch a DAG for a "customer refund" workflow with at least 5 steps and one pair of steps that can run in parallel. Then write the guard condition for the one transition in that workflow's FSM that would need a mutual-exclusivity check, i.e., two possible outcomes triggered by the same event. Write your answer below before revealing the model answer, comparing your own attempt against a reference is how this kind of question actually teaches you something.</div>
+      <textarea id="q6input" placeholder="List your steps in order, mark which pair is parallel, and write the two guard conditions..." style="width:100%;min-height:110px;margin-top:12px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px;color:var(--tx);resize:vertical"></textarea>
+      <details style="margin-top:12px">
+        <summary style="cursor:pointer;color:var(--violet);font-size:13px;font-weight:600;list-style:none">▸ Compare against a model answer</summary>
+        <div class="qexplain" style="display:block;color:var(--mut2);margin-top:10px">There's no single correct diagram here, the point is practicing the identification of an antichain (parallel-safe steps) and a guard-exclusivity boundary in a workflow you didn't design. A common answer: Receive Refund Request → Validate Order → {Check Fraud Signals, Check Return Policy} → Compute Refund Amount → {Issue Credit, Flag for Review}, where the last pair's guards are <span class="mono-inline">amount ≤ threshold</span> and <span class="mono-inline">amount &gt; threshold</span>. If your two guards leave a gap (some amount satisfies neither) or overlap (some amount satisfies both), that's the exact bug described in Section 4, go back and tighten the boundary.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">10</span><h2 class="serif">Further reading</h2></div>
+    <p class="mut">This module's DAG treatment follows the standard algorithms-course presentation. If you want to go deeper than the browser can take you:</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--mut2);line-height:1.9">
+      <li>A. B. Kahn, "Topological sorting of large networks," <i>Communications of the ACM</i>, 1962, the original paper describing the algorithm you ran in Section 2.</li>
+      <li>Cormen, Leiserson, Rivest &amp; Stein, <i>Introduction to Algorithms</i> (CLRS), Chapter 22, for the DFS-based topological sort and formal cycle-detection proofs in full rigor.</li>
+      <li>David Harel, "Statecharts: A visual formalism for complex systems," <i>Science of Computer Programming</i>, 1987, the paper that extended flat FSMs to the hierarchical and concurrent states used by most real workflow engines.</li>
+      <li>In production, the ideas here show up directly in Apache Airflow and Dagster (DAG scheduling), and in Temporal, AWS Step Functions, and Stripe's subscription/billing state machines (guarded FSM transitions).</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">11</span><h2 class="serif">Glossary</h2></div>
+    <p class="mut">Every term below was defined in place the first time it appeared, this is just a lookup table for later, when you're three modules ahead and need a one-line reminder.</p>
+    <div style="margin-top:14px;display:grid;gap:12px">
+      <div><b class="mono-inline">vertex / node</b><span style="color:var(--mut);font-size:14px"> — a single task (in a DAG) or a single state (in an FSM).</span></div>
+      <div><b class="mono-inline">in-degree</b><span style="color:var(--mut);font-size:14px"> — the number of edges pointing into a vertex; in-degree zero means no unmet dependencies.</span></div>
+      <div><b class="mono-inline">DAG</b><span style="color:var(--mut);font-size:14px"> — directed acyclic graph; a graph with directed edges and no cycles, the structure that makes scheduling possible at all.</span></div>
+      <div><b class="mono-inline">topological order</b><span style="color:var(--mut);font-size:14px"> — a linear ordering of a DAG's vertices consistent with every edge's direction; may not be unique.</span></div>
+      <div><b class="mono-inline">antichain</b><span style="color:var(--mut);font-size:14px"> — a set of vertices with no path between any pair; an antichain is exactly the set of steps safe to run in parallel.</span></div>
+      <div><b class="mono-inline">Kahn's algorithm</b><span style="color:var(--mut);font-size:14px"> — repeatedly remove an in-degree-zero vertex and append it to the order; O(V + E); failing to place every vertex proves a cycle.</span></div>
+      <div><b class="mono-inline">finite state machine (FSM)</b><span style="color:var(--mut);font-size:14px"> — a 5-tuple (S, Σ, δ, s₀, F): states, actions, transition function, start state, terminal states.</span></div>
+      <div><b class="mono-inline">guard</b><span style="color:var(--mut);font-size:14px"> — a boolean condition attached to a transition that must hold for the transition to fire.</span></div>
+      <div><b class="mono-inline">determinism</b><span style="color:var(--mut);font-size:14px"> — exactly one legal next state per (state, action) pair; with guards, this requires the guards to be mutually exclusive and jointly exhaustive.</span></div>
+      <div><b class="mono-inline">Mealy / Moore machine</b><span style="color:var(--mut);font-size:14px"> — an FSM with side effects: Mealy attaches output to the transition, Moore attaches it to the state.</span></div>
+    </div>
+  </section>
+
+  <footer>Zenith Lab · Automation Engineering · Module 1 of 8 · Next: Idempotency &amp; Exactly-Once Semantics</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
+</div></div>
+
+<script src="course-progress.js?v=5"></script>
+<script>
+/* ---------------- DAG: nodes, edges, coordinates ---------------- */
+const nodes = [
+  { id:"A", label:"Receive Lead", x:70,  y:130 },
+  { id:"B", label:"Validate",     x:220, y:130 },
+  { id:"C", label:"Enrich Data",  x:390, y:60  },
+  { id:"D", label:"Score Lead",   x:390, y:200 },
+  { id:"E", label:"Assign to Rep",x:550, y:130 },
+  { id:"F", label:"Notify Rep",   x:700, y:60  },
+  { id:"G", label:"Log to CRM",   x:700, y:200 },
+];
+const edges = [
+  ["A","B"], ["B","C"], ["B","D"], ["C","E"], ["D","E"], ["E","F"], ["E","G"]
+];
+const adj = {}; const indeg = {};
+nodes.forEach(n => { adj[n.id] = []; indeg[n.id] = 0; });
+edges.forEach(([u,v]) => { adj[u].push(v); indeg[v]++; });
+
+const svgNS = "http://www.w3.org/2000/svg";
+const edgeLayer = document.getElementById("edgeLayer");
+const nodeLayer = document.getElementById("nodeLayer");
+
+function nodeById(id){ return nodes.find(n => n.id === id); }
+
+edges.forEach(([u,v]) => {
+  const a = nodeById(u), b = nodeById(v);
+  const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx,dy);
+  const r = 26;
+  const x1 = a.x + dx/len*r, y1 = a.y + dy/len*r;
+  const x2 = b.x - dx/len*r, y2 = b.y - dy/len*r;
+  const line = document.createElementNS(svgNS, "line");
+  line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+  line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+  line.setAttribute("class", "dedge");
+  line.setAttribute("data-u", u); line.setAttribute("data-v", v);
+  edgeLayer.appendChild(line);
+});
+
+nodes.forEach(n => {
+  const g = document.createElementNS(svgNS, "g");
+  g.setAttribute("class", "dnode");
+  g.setAttribute("data-id", n.id);
+  g.setAttribute("transform", `translate(${n.x},${n.y})`);
+  const hit = document.createElementNS(svgNS, "circle");
+  hit.setAttribute("r", 34);
+  hit.setAttribute("class", "hit");
+  hit.setAttribute("fill", "transparent");
+  const circle = document.createElementNS(svgNS, "circle");
+  circle.setAttribute("r", 26);
+  const text = document.createElementNS(svgNS, "text");
+  text.setAttribute("text-anchor", "middle");
+  text.setAttribute("dy", -32);
+  text.textContent = n.label;
+  const idText = document.createElementNS(svgNS, "text");
+  idText.setAttribute("text-anchor", "middle");
+  idText.setAttribute("dy", 5);
+  idText.setAttribute("font-size", "13");
+  idText.setAttribute("font-weight", "700");
+  idText.textContent = n.id;
+  g.appendChild(hit); g.appendChild(circle); g.appendChild(idText); g.appendChild(text);
+  nodeLayer.appendChild(g);
+  g.addEventListener("click", () => onNodeClick(n.id));
+});
+
+let manualOrder = [];
+let kahnRunning = false;
+
+function resetDag(){
+  manualOrder = [];
+  document.querySelectorAll(".dnode").forEach(el => el.classList.remove("done","ready","clickedwrong"));
+  document.querySelectorAll(".dedge").forEach(el => el.classList.remove("violated"));
+  document.getElementById("orderTrace").innerHTML = 'Order so far: <i style="color:var(--mut2)">click "Run" or start clicking nodes</i>';
+  document.getElementById("dagFeedback").className = "feedback";
+  document.getElementById("dagFeedback").textContent = "";
+}
+
+function onNodeClick(id){
+  if (kahnRunning) return;
+  if (manualOrder.includes(id)) return;
+  // check every already-placed prerequisite is satisfied: for edge (u,id), u must be in manualOrder already
+  const violated = edges.filter(([u,v]) => v === id && !manualOrder.includes(u));
+  const nodeEl = document.querySelector(`.dnode[data-id="${id}"]`);
+  if (violated.length > 0) {
+    nodeEl.classList.add("clickedwrong");
+    violated.forEach(([u,v]) => {
+      document.querySelector(`.dedge[data-u="${u}"][data-v="${v}"]`).classList.add("violated");
+    });
+    document.getElementById("dagFeedback").className = "feedback bad";
+    document.getElementById("dagFeedback").textContent =
+      `Not yet: ${id} depends on ${violated.map(([u])=>u).join(", ")} which ${violated.length>1?"haven't":"hasn't"} run yet. This is exactly the check Kahn's algorithm performs.`;
+    setTimeout(()=>{ nodeEl.classList.remove("clickedwrong"); violated.forEach(([u,v]) => document.querySelector(`.dedge[data-u="${u}"][data-v="${v}"]`).classList.remove("violated")); }, 1400);
+    return;
+  }
+  manualOrder.push(id);
+  nodeEl.classList.add("done");
+  document.getElementById("orderTrace").innerHTML = "Order so far: <b>" + manualOrder.join(" → ") + "</b>";
+  if (manualOrder.length === nodes.length) {
+    document.getElementById("dagFeedback").className = "feedback ok";
+    document.getElementById("dagFeedback").textContent =
+      "Valid complete order. You just executed Kahn's algorithm by hand: at every step you could only pick a node whose dependencies were already satisfied.";
+  }
+}
+
+async function runKahn(){
+  resetDag();
+  kahnRunning = true;
+  document.getElementById("btnRunKahn").disabled = true;
+  const localIndeg = {...indeg};
+  const queue = nodes.filter(n => localIndeg[n.id] === 0).map(n=>n.id);
+  const order = [];
+  document.querySelectorAll(".dnode").forEach(el=>{
+    if (queue.includes(el.dataset.id)) el.classList.add("ready");
+  });
+  await sleep(500);
+  while (queue.length) {
+    const id = queue.shift();
+    document.querySelector(`.dnode[data-id="${id}"]`).classList.remove("ready");
+    document.querySelector(`.dnode[data-id="${id}"]`).classList.add("done");
+    order.push(id);
+    document.getElementById("orderTrace").innerHTML = "Order so far: <b>" + order.join(" → ") + "</b>";
+    await sleep(600);
+    adj[id].forEach(v => {
+      localIndeg[v]--;
+      if (localIndeg[v] === 0) {
+        queue.push(v);
+        document.querySelector(`.dnode[data-id="${v}"]`).classList.add("ready");
+      }
+    });
+    await sleep(200);
+  }
+  document.getElementById("dagFeedback").className = "feedback ok";
+  document.getElementById("dagFeedback").textContent =
+    "Kahn's algorithm complete. Order produced: " + order.join(" → ") + ". Note C and D could have swapped, both are valid, the graph does not fully determine a unique order, only a valid one.";
+  kahnRunning = false;
+  document.getElementById("btnRunKahn").disabled = false;
+}
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+document.getElementById("btnRunKahn").addEventListener("click", runKahn);
+document.getElementById("btnReset").addEventListener("click", resetDag);
+
+/* ---------------- Section 7: DAG builder exercise ---------------- */
+const builderNodes = [
+  { id:"O", label:"Receive Order",     x:70,  y:130 },
+  { id:"F", label:"Fraud Screening",   x:220, y:60  },
+  { id:"I", label:"Check Inventory",   x:220, y:200 },
+  { id:"P", label:"Verify Payment",    x:390, y:60  },
+  { id:"G", label:"Generate Invoice",  x:550, y:130 },
+  { id:"N", label:"Send Notification", x:700, y:130 },
+];
+const REQUIRED_EDGES = [["O","F"],["F","P"],["O","I"],["P","G"],["I","G"],["G","N"]];
+let builderEdges = [];
+
+function builderNodeById(id){ return builderNodes.find(n => n.id === id); }
+
+function populateBuilderSelects(){
+  const from = document.getElementById("builderFrom");
+  const to = document.getElementById("builderTo");
+  [from, to].forEach(sel => {
+    sel.innerHTML = "";
+    builderNodes.forEach(n => {
+      const opt = document.createElement("option");
+      opt.value = n.id;
+      opt.textContent = n.label;
+      sel.appendChild(opt);
+    });
+  });
+  to.selectedIndex = 1;
+}
+populateBuilderSelects();
+
+function renderBuilder(){
+  const edgeLayer = document.getElementById("builderEdgeLayer");
+  const nodeLayer = document.getElementById("builderNodeLayer");
+  edgeLayer.innerHTML = "";
+  nodeLayer.innerHTML = "";
+
+  builderEdges.forEach(([u,v]) => {
+    const a = builderNodeById(u), b = builderNodeById(v);
+    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx,dy) || 1;
+    const r = 30;
+    const x1 = a.x + dx/len*r, y1 = a.y + dy/len*r;
+    const x2 = b.x - dx/len*r, y2 = b.y - dy/len*r;
+    const line = document.createElementNS(svgNS, "line");
+    line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+    line.setAttribute("class", "dedge");
+    edgeLayer.appendChild(line);
+  });
+
+  builderNodes.forEach(n => {
+    const g = document.createElementNS(svgNS, "g");
+    g.setAttribute("class", "dnode");
+    g.setAttribute("transform", `translate(${n.x},${n.y})`);
+    const circle = document.createElementNS(svgNS, "circle");
+    circle.setAttribute("r", 30);
+    const text = document.createElementNS(svgNS, "text");
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dy", -38);
+    text.textContent = n.label;
+    const idText = document.createElementNS(svgNS, "text");
+    idText.setAttribute("text-anchor", "middle");
+    idText.setAttribute("dy", 5);
+    idText.setAttribute("font-size", "13");
+    idText.setAttribute("font-weight", "700");
+    idText.textContent = n.id;
+    g.appendChild(circle); g.appendChild(idText); g.appendChild(text);
+    nodeLayer.appendChild(g);
+  });
+}
+
+function renderEdgeList(){
+  const el = document.getElementById("builderEdgeList");
+  el.innerHTML = "";
+  if (builderEdges.length === 0){
+    el.innerHTML = '<span style="color:var(--mut2);font-size:13px">No dependencies added yet.</span>';
+    return;
+  }
+  builderEdges.forEach(([u,v], i) => {
+    const chip = document.createElement("span");
+    chip.style.cssText = "display:inline-flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--bd2);border-radius:99px;padding:5px 12px;font-family:'JetBrains Mono';font-size:12px;color:var(--tx)";
+    chip.innerHTML = `${builderNodeById(u).label} → ${builderNodeById(v).label} <button data-i="${i}" style="padding:2px 8px;font-size:11px">✕</button>`;
+    chip.querySelector("button").addEventListener("click", () => {
+      builderEdges.splice(i, 1);
+      renderEdgeList();
+      renderBuilder();
+      CourseProgress.setSection(1, "dagBuilderEdges", builderEdges);
+    });
+    el.appendChild(chip);
+  });
+}
+
+document.getElementById("btnAddEdge").addEventListener("click", () => {
+  const from = document.getElementById("builderFrom").value;
+  const to = document.getElementById("builderTo").value;
+  if (from === to) return;
+  if (builderEdges.some(([u,v]) => u === from && v === to)) return;
+  builderEdges.push([from, to]);
+  renderEdgeList();
+  renderBuilder();
+  document.getElementById("builderOrderSection").style.display = "none";
+  CourseProgress.setSection(1, "dagBuilderEdges", builderEdges);
+});
+
+document.getElementById("btnResetBuilder").addEventListener("click", () => {
+  builderEdges = [];
+  renderEdgeList();
+  renderBuilder();
+  document.getElementById("builderFeedback").className = "feedback";
+  document.getElementById("builderOrderSection").style.display = "none";
+  CourseProgress.setSection(1, "dagBuilderEdges", builderEdges);
+});
+
+function builderDetectCycleAndOrder(edgeSet){
+  const indeg = {}; const adj = {};
+  builderNodes.forEach(n => { indeg[n.id] = 0; adj[n.id] = []; });
+  edgeSet.forEach(([u,v]) => { adj[u].push(v); indeg[v]++; });
+  const queue = builderNodes.filter(n => indeg[n.id] === 0).map(n => n.id);
+  const order = [];
+  const localIndeg = {...indeg};
+  while (queue.length){
+    const id = queue.shift();
+    order.push(id);
+    adj[id].forEach(v => { localIndeg[v]--; if (localIndeg[v] === 0) queue.push(v); });
+  }
+  return { order, hasCycle: order.length < builderNodes.length };
+}
+
+document.getElementById("btnValidateBuilder").addEventListener("click", () => {
+  const fb = document.getElementById("builderFeedback");
+  const { order, hasCycle } = builderDetectCycleAndOrder(builderEdges);
+
+  const missing = REQUIRED_EDGES.filter(([u,v]) => !builderEdges.some(([a,b]) => a===u && b===v));
+
+  fb.style.display = "block";
+  document.getElementById("builderOrderSection").style.display = "none";
+
+  if (hasCycle){
+    fb.className = "feedback bad";
+    const stuck = builderNodes.map(n=>n.id).filter(id => !order.includes(id));
+    fb.innerHTML = `✗ Cycle detected. Kahn's algorithm placed ${order.length} of 6 nodes and got stuck on: ${stuck.map(id=>builderNodeById(id).label).join(", ")}. Check for a dependency that loops back on itself.`;
+    CourseProgress.setSection(1, "dagBuilderValid", false);
+    return;
+  }
+  if (missing.length > 0){
+    fb.className = "feedback bad";
+    fb.innerHTML = `✓ Graph is acyclic, but ${missing.length} required dependenc${missing.length===1?"y is":"ies are"} missing: ${missing.map(([u,v])=>`${builderNodeById(u).label} → ${builderNodeById(v).label}`).join("; ")}. Re-read the requirement above.`;
+    CourseProgress.setSection(1, "dagBuilderValid", false);
+    return;
+  }
+  fb.className = "feedback ok";
+  fb.innerHTML = `✓ Graph is acyclic<br>✓ All required dependencies satisfied<br>✓ Valid execution order exists`;
+  document.getElementById("builderOrderSection").style.display = "block";
+  CourseProgress.setSection(1, "dagBuilderValid", true);
+});
+
+document.getElementById("btnGenerateOrder").addEventListener("click", () => {
+  const { order } = builderDetectCycleAndOrder(builderEdges);
+  document.getElementById("builderOrderTrace").innerHTML =
+    "Order: <b>" + order.map(id => builderNodeById(id).label).join(" → ") + "</b>";
+});
+
+renderEdgeList();
+renderBuilder();
+(function restoreBuilder(){
+  const saved = CourseProgress.getModule(1).sections || {};
+  if (Array.isArray(saved.dagBuilderEdges)) {
+    builderEdges = saved.dagBuilderEdges;
+    renderEdgeList();
+    renderBuilder();
+  }
+})();
+
+/* ---------------- FSM ---------------- */
+const fsmTransitions = {
+  NEW:        [{action:"submit for validation", to:"VALIDATING"}],
+  VALIDATING: [{action:"validation passes", to:"VALIDATED"}, {action:"validation fails", to:"REJECTED"}],
+  VALIDATED:  [{action:"begin enrichment", to:"ENRICHING"}],
+  ENRICHING:  [{action:"enrichment complete", to:"SCORED"}],
+  SCORED:     [{action:"score ≥ 70 (assign)", to:"ASSIGNED"}, {action:"score < 70 (nurture)", to:"LOST"}],
+  ASSIGNED:   [{action:"rep makes contact", to:"CONTACTED"}],
+  CONTACTED:  [{action:"deal closes won", to:"WON"}, {action:"deal closes lost", to:"LOST"}],
+  REJECTED:   [],
+  WON:        [],
+  LOST:       [],
+};
+const terminalStates = new Set(["REJECTED","WON","LOST"]);
+let fsmState = "NEW";
+let fsmHistory = ["NEW"];
+
+function renderFsm(){
+  const cur = document.getElementById("fsmCurrent");
+  cur.textContent = fsmState;
+  cur.className = "fsmState" + (terminalStates.has(fsmState) ? " terminal" : "");
+  const actionsEl = document.getElementById("fsmActions");
+  actionsEl.innerHTML = "";
+  const opts = fsmTransitions[fsmState];
+  if (opts.length === 0) {
+    const span = document.createElement("span");
+    span.style.cssText = "color:var(--mut2);font-size:13px;padding:8px 0";
+    span.textContent = "Terminal state, no further transitions are defined. This branch of the lifecycle is complete.";
+    actionsEl.appendChild(span);
+  }
+  opts.forEach(o => {
+    const b = document.createElement("button");
+    b.textContent = o.action + "  →  " + o.to;
+    b.addEventListener("click", () => {
+      fsmState = o.to;
+      fsmHistory.push(o.to);
+      const log = document.getElementById("fsmLog");
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML = `<span class="arrow">→</span> ${o.action} <span class="arrow">→</span> <span style="color:var(--lime)">${o.to}</span>`;
+      log.appendChild(row);
+      log.scrollTop = log.scrollHeight;
+      renderFsm();
+    });
+    actionsEl.appendChild(b);
+  });
+}
+document.getElementById("btnFsmReset").addEventListener("click", () => {
+  fsmState = "NEW"; fsmHistory = ["NEW"];
+  document.getElementById("fsmLog").innerHTML = '<div class="row">Trace begins at <span style="color:var(--lime)">NEW</span></div>';
+  renderFsm();
+});
+renderFsm();
+
+/* ---------------- Quiz ---------------- */
+let score = 0;
+const answered = { q1:false, q2:false, q3:false, q4:false, q5:false };
+
+const MODULE_ID = 1;
+function updateScore(){
+  document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnNext");
+  btn.disabled = !allDone;
+  btn.textContent = allDone ? "Continue to Module 2 →" : "Complete all questions to continue →";
+  if (allDone) {
+    CourseProgress.markComplete(MODULE_ID, score, 5);
+    const navNext = document.getElementById("navNextTop");
+    if (navNext) navNext.classList.add("navnext-ready");
+  }
+}
+
+// Q1
+const q1Options = [
+  { text: "A, B, C, D, E, F, G", correct: true },
+  { text: "A, C, B, D, E, F, G", correct: false, reason: "Enrich (C) is listed before Validate (B), but the edge B→C means Validate must complete first." },
+  { text: "A, B, D, E, C, F, G", correct: false, reason: "Assign (E) is listed before Enrich (C), but the edge C→E means Enrich must complete before Assign." },
+];
+const q1el = document.getElementById("q1opts");
+q1Options.forEach((opt, i) => {
+  const div = document.createElement("label");
+  div.className = "qopt";
+  div.innerHTML = `<input type="radio" name="q1" value="${i}"><span class="mono-inline" style="background:none;color:var(--tx);padding:0">${opt.text}</span>`;
+  div.addEventListener("click", () => {
+    if (answered.q1) return;
+    answered.q1 = true;
+    CourseProgress.setAnswer(MODULE_ID, "q1", i);
+    document.querySelectorAll('#q1opts .qopt').forEach((el,j) => {
+      if (q1Options[j].correct) el.classList.add("correct");
+      else if (j === i) el.classList.add("incorrect");
+    });
+    const ex = document.getElementById("q1explain");
+    ex.style.display = "block";
+    if (opt.correct) {
+      score++;
+      ex.textContent = "Correct. Every edge's source appears before its target: this is a valid topological order.";
+    } else {
+      ex.textContent = "Not quite. " + opt.reason;
+    }
+    updateScore();
+  });
+  q1el.appendChild(div);
+});
+
+// Q2
+const q2Options = [
+  { text: "True", correct: false },
+  { text: "False", correct: true },
+];
+const q2el = document.getElementById("q2opts");
+q2Options.forEach((opt, i) => {
+  const div = document.createElement("label");
+  div.className = "qopt";
+  div.innerHTML = `<input type="radio" name="q2" value="${i}"><span>${opt.text}</span>`;
+  div.addEventListener("click", () => {
+    if (answered.q2) return;
+    answered.q2 = true;
+    CourseProgress.setAnswer(MODULE_ID, "q2", i);
+    document.querySelectorAll('#q2opts .qopt').forEach((el,j) => {
+      if (q2Options[j].correct) el.classList.add("correct");
+      else if (j === i) el.classList.add("incorrect");
+    });
+    const ex = document.getElementById("q2explain");
+    ex.style.display = "block";
+    if (opt.correct) {
+      score++;
+      ex.textContent = "Correct. A cyclic graph is unschedulable: Kahn's algorithm will terminate with nodes remaining and zero candidates left to place, that is precisely how the algorithm detects the cycle rather than looping forever.";
+    } else {
+      ex.textContent = "Not quite. If a cycle exists, at some point every remaining node has at least one unsatisfied dependency, none ever reach in-degree zero, and the algorithm halts with an incomplete order. This is the standard method for detecting a misconfigured, deadlocked workflow.";
+    }
+    updateScore();
+  });
+  q2el.appendChild(div);
+});
+
+// Q3
+function checkQ3(){
+  if (answered.q3) return;
+  const val = Number(document.getElementById("q3input").value);
+  const ex = document.getElementById("q3explain");
+  ex.style.display = "block";
+  answered.q3 = true;
+  CourseProgress.setAnswer(MODULE_ID, "q3", val);
+  if (val === 2) {
+    score++;
+    ex.style.color = "var(--emerald)";
+    ex.textContent = "Correct. Two edges point into Assign to Rep: C→E and D→E, so in-degree = 2. Both Enrich and Score must complete before Assign can run.";
+  } else {
+    ex.style.color = "var(--red)";
+    ex.textContent = "Not quite. Count the incoming edges to E in the graph above: C→E and D→E. That's 2.";
+  }
+  updateScore();
+}
+document.getElementById("q3check").addEventListener("click", checkQ3);
+document.getElementById("q3input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") checkQ3();
+});
+
+// Q4
+const q4Options = [
+  { text: "Because the remaining subgraph is finite, so an infinite backward walk without repeats is impossible", correct: true },
+  { text: "Because Kahn's algorithm sorts the nodes alphabetically before checking them", correct: false, reason: "Node ordering within the queue doesn't affect whether a cycle exists, it's a property of the graph, not of the algorithm's iteration order." },
+  { text: "Because every DAG has exactly one node with in-degree zero", correct: false, reason: "A DAG can have several in-degree-zero nodes simultaneously (that's what creates parallelism, see Section 1), or, in the cyclic case being analyzed here, none at all." },
+];
+const q4el = document.getElementById("q4opts");
+q4Options.forEach((opt, i) => {
+  const div = document.createElement("label");
+  div.className = "qopt";
+  div.innerHTML = `<input type="radio" name="q4" value="${i}"><span>${opt.text}</span>`;
+  div.addEventListener("click", () => {
+    if (answered.q4) return;
+    answered.q4 = true;
+    CourseProgress.setAnswer(MODULE_ID, "q4", i);
+    document.querySelectorAll('#q4opts .qopt').forEach((el,j) => {
+      if (q4Options[j].correct) el.classList.add("correct");
+      else if (j === i) el.classList.add("incorrect");
+    });
+    const ex = document.getElementById("q4explain");
+    ex.style.display = "block";
+    if (opt.correct) {
+      score++;
+      ex.textContent = "Correct. A finite set of nodes means a backward walk that never repeats can have at most |V| steps, so an unbounded backward walk is forced to revisit a node, and the loop formed between the two visits is a cycle by definition.";
+    } else {
+      ex.textContent = "Not quite. " + opt.reason;
+    }
+    updateScore();
+  });
+  q4el.appendChild(div);
+});
+
+// Q5 — novel scenario: cycle detection on an unseen graph
+function checkQ5(){
+  if (answered.q5) return;
+  const val = Number(document.getElementById("q5input").value);
+  const ex = document.getElementById("q5explain");
+  ex.style.display = "block";
+  answered.q5 = true;
+  CourseProgress.setAnswer(MODULE_ID, "q5", val);
+  if (val === 2) {
+    score++;
+    ex.style.color = "var(--emerald)";
+    ex.textContent = "Correct. Receive Invoice (in-degree 0) is placed first, then Validate (its only dependency now satisfied) is placed second. Match PO depends on both Validate AND Archive, Archive depends on Pay, which depends on Approve, which depends on Match PO itself, all four are stuck waiting on each other in a cycle, so none of them ever reach in-degree zero. Only 2 of 6 nodes get placed.";
+  } else {
+    ex.style.color = "var(--red)";
+    ex.textContent = "Not quite. Trace it: Receive Invoice has in-degree 0, place it, then Validate's only dependency is satisfied, place it too. Match PO needs both Validate and Archive, Archive needs Pay, Pay needs Approve, Approve needs Match PO, that's a 4-node cycle (Match PO → Approve → Pay → Archive → Match PO) that can never resolve. Only Receive Invoice and Validate ever get placed: 2 nodes.";
+  }
+  updateScore();
+}
+document.getElementById("q5check").addEventListener("click", checkQ5);
+document.getElementById("q5input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") checkQ5();
+});
+
+document.getElementById("btnNext").addEventListener("click", () => {
+  window.location.href = "module-02.html";
+});
+
+/* ---------------- Retry checkpoint ---------------- */
+function maybeShowRetry(){
+  const anyAnswered = answered.q1 || answered.q2 || answered.q3 || answered.q4 || answered.q5;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnRetryCheckpoint");
+  btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModule(MODULE_ID);
+  window.location.reload();
+});
+const _origUpdateScore = updateScore;
+updateScore = function(){
+  _origUpdateScore();
+  maybeShowRetry();
+};
+maybeShowRetry();
+
+/* ---------------- Progress persistence: restore on load ---------------- */
+CourseProgress.touchVisited(MODULE_ID);
+(function restoreQuizState(){
+  const stored = CourseProgress.getModule(MODULE_ID);
+  const a = stored.answers || {};
+  if (a.q1 !== undefined && !answered.q1) {
+    const label = document.querySelectorAll('#q1opts .qopt')[a.q1];
+    if (label) label.click();
+  }
+  if (a.q2 !== undefined && !answered.q2) {
+    const label = document.querySelectorAll('#q2opts .qopt')[a.q2];
+    if (label) label.click();
+  }
+  if (a.q3 !== undefined && !answered.q3) {
+    const inputEl = document.getElementById('q3input');
+    if (inputEl) { inputEl.value = a.q3; checkQ3(); }
+  }
+  if (a.q4 !== undefined && !answered.q4) {
+    const label = document.querySelectorAll('#q4opts .qopt')[a.q4];
+    if (label) label.click();
+  }
+  if (a.q5 !== undefined && !answered.q5) {
+    const inputEl = document.getElementById('q5input');
+    if (inputEl) { inputEl.value = a.q5; checkQ5(); }
+  }
+})();
+</script>
+</body>
+</html>

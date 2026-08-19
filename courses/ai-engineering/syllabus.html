@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineering: Syllabus</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65;overflow-x:hidden}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px}
+.bar{position:sticky;top:0;z-index:30;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:900px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em}
+.hero{padding:56px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--limed);background:var(--lime);padding:5px 12px;border-radius:2px}
+h1{font-size:clamp(34px,5.5vw,52px);font-weight:700;letter-spacing:-.02em;margin-top:18px;line-height:1.08}
+.sub{color:var(--mut);font-size:17px;max-width:680px;margin-top:14px}
+.metarow{display:flex;flex-wrap:wrap;gap:22px;margin-top:26px;padding-top:22px;border-top:1px solid var(--bd)}
+.metaitem .k{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--mut2)}
+.metaitem .v{font-size:15px;font-weight:600;margin-top:3px}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:20px}
+.kh .num{font-family:'Space Grotesk';font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:22px;font-weight:700;letter-spacing:-.01em}
+p.lead{color:var(--mut);max-width:680px}
+.prereq{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.prereq span{font-size:12px;background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:6px 12px;color:var(--mut)}
+.module{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:22px;margin-bottom:14px;position:relative}
+.module:hover{border-color:var(--bd2)}
+.module .mtop{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.module .mnum{font-family:'JetBrains Mono';font-size:12px;color:var(--lime);letter-spacing:.05em}
+.module h3{font-size:18px;font-weight:700;margin-top:4px;letter-spacing:-.01em}
+.module .wk{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2);white-space:nowrap}
+.module .desc{color:var(--mut);font-size:14px;margin-top:10px}
+.module .obj{margin-top:14px;padding-top:14px;border-top:1px dashed var(--bd)}
+.module .obj .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:8px}
+.module ul{list-style:none;display:grid;gap:6px}
+.module ul li{padding-left:18px;position:relative;color:var(--mut);font-size:13.5px}
+.module ul li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+.module .demo{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--violet);border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.08);border-radius:6px;padding:5px 10px}
+.badge-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--limed);background:var(--lime);padding:4px 10px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--bd)}
+th{color:var(--mut2);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.08em}
+tr:last-child td{border-bottom:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media (max-width:640px){ .grid2{grid-template-columns:1fr} .wrap{padding:0 16px} }
+.box{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:18px}
+.box h4{font-size:14px;font-weight:700;color:var(--lime);margin-bottom:8px}
+.box p{color:var(--mut);font-size:13.5px}
+.rigor{background:rgba(198,244,50,.05);border-left:3px solid var(--lime);padding:16px 20px;border-radius:0 8px 8px 0;margin-top:20px}
+.rigor b{color:var(--lime)}
+footer{padding:30px 0 60px;text-align:center;color:var(--mut2);font-size:13px}
+a.inline{color:var(--lime);text-decoration:none;border-bottom:1px solid rgba(198,244,50,.4)}
+a.cta{display:inline-flex;align-items:center;gap:8px;background:var(--lime);color:var(--limed);font-weight:700;font-size:14px;padding:12px 22px;border-radius:8px;text-decoration:none}
+a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Syllabus · AI Engineering</span>
+</div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Zenith Lab · 8-week accelerated program</span>
+    <h1 class="serif">AI Engineering</h1>
+    <p class="sub">Go from basic programming logic to shipping a production-shaped AI system in 8 weeks, at roughly 10 hours a week. Prompting and structured outputs, context and token economics, retrieval, tool use, agent control flow, reliability, and evaluation, applied directly through hands-on, Worker-sandboxed code exercises rather than multiple-choice trivia.</p>
+
+    <div class="metarow">
+      <div class="metaitem"><div class="k">Format</div><div class="v">8 modules + capstone</div></div>
+      <div class="metaitem"><div class="k">Level</div><div class="v">Beginner-friendly, professional bar</div></div>
+      <div class="metaitem"><div class="k">Duration</div><div class="v">8 weeks at ~10 hrs/week, self-paced</div></div>
+      <div class="metaitem"><div class="k">Assessment</div><div class="v">Per-module checkpoints + hands-on exercises + capstone + final assessment</div></div>
+    </div>
+    <div style="margin-top:24px">
+      <a href="dashboard.html" class="cta">Go to the dashboard &rarr;</a>
+      <span style="margin-left:12px;color:var(--mut2);font-size:12.5px">Module 1 is open now, no signup required</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Course description</h2></div>
+    <p class="lead">Most "AI engineering" content teaches you which library call wraps which API. This course teaches the engineering judgment underneath that call: why a model's output needs to be validated before you trust it, how to budget a context window instead of guessing, when retrieval actually helps versus when it just adds noise, how to make a tool call safe to retry, how to keep an agent loop from running forever, how to keep a flaky model API from taking your whole system down, and how to know, with a number, whether a change actually helped.</p>
+    <p class="lead" style="margin-top:12px">You will finish able to design, implement, and debug a small production-shaped AI system end to end, not just write a prompt that worked once in a demo.</p>
+
+    <div class="rigor">
+      <b>Why this bar, not a prompt-engineering bar:</b> a clever prompt can stop working the day a model is updated. The engineering discipline in this course, schema validation, token budgeting, relevance thresholds, idempotent execution, bounded control flow, retry logic, systematic evaluation, does not expire when the next model ships. It is what separates a prompt-tinkerer from an engineer a team trusts to build on top of a language model in production.
+    </div>
+
+    <div class="prereq">
+      <span>Prerequisite: basic programming fundamentals (variables, functions, loops, conditionals) in any language</span>
+      <span>No prior Python required, Python Foundations teaches it from the ground up before Module 1</span>
+      <span>No prior agent-framework or vector-database experience required</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Learning outcomes</h2></div>
+    <div class="grid2">
+      <div class="box"><h4>Trustworthy output</h4><p>Repair and validate model output against a schema before any downstream code acts on it, instead of assuming a requested format was actually produced.</p></div>
+      <div class="box"><h4>Budget-aware context</h4><p>Compute a token budget from a context window and reserved output, and chunk content without ever silently dropping it.</p></div>
+      <div class="box"><h4>Relevant retrieval</h4><p>Implement cosine-similarity retrieval with a minimum-relevance threshold, so "best available" doesn't get mistaken for "actually relevant."</p></div>
+      <div class="box"><h4>Safe, bounded execution</h4><p>Execute tool calls idempotently and run agent loops with a hard step limit and stuck-loop detection, so nothing runs, or costs, unboundedly.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Module sequence</h2></div>
+    <p class="lead" style="margin-bottom:20px">Each module pairs a concept with an interactive you manipulate directly, and closes with a graded checkpoint plus a real, Worker-sandboxed hands-on code exercise. Module 0 and Module 1 are both open for preview.</p>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 00 · ORIENTATION</div><h3>Introduction to AI Engineering</h3></div>
+        <div class="wk"><a href="module-00.html" class="badge-live" style="text-decoration:none">Preview open &rarr;</a></div>
+      </div>
+      <p class="desc">Ungraded and optional, but strongly recommended before Module 1. What AI Engineering actually is, what people in it build, how the field's specializations differ, what to prioritize learning, and exactly what this course teaches versus what you'll need to learn elsewhere.</p>
+      <div class="obj">
+        <div class="lbl">You will be able to</div>
+        <ul>
+          <li>Explain AI Engineering in your own words, and distinguish it from ML Engineering, Data Science, AI Research, and MLOps</li>
+          <li>Name the field's specialization directions and get an honest, non-binding read on where your own interests point</li>
+          <li>State precisely what Modules 1–8 teach, and what you'll need to learn outside this course</li>
+        </ul>
+      </div>
+      <div class="demo">▶ interactive: role classifier, priority table, path finder, self-check</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 01</div><h3>Prompting &amp; Structured Outputs</h3></div>
+        <div class="wk"><a href="module-01.html" class="badge-live" style="text-decoration:none">Preview open &rarr;</a></div>
+      </div>
+      <p class="desc">A model produces text, not guaranteed data. This module covers prompt anatomy, the repair-then-validate pattern for malformed JSON, and why "asked for a schema" isn't the same as "got the schema."</p>
+      <div class="obj">
+        <div class="lbl">You will be able to</div>
+        <ul>
+          <li>Spot the specific ways model output deviates from a requested structure</li>
+          <li>Apply the repair-then-validate order: strip fences, fix trailing commas, parse, then validate</li>
+          <li>Implement a structured-output validator/repair function, tested against 5 real cases</li>
+        </ul>
+      </div>
+      <div class="demo">▶ interactive: spot the malformed output</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 02</div><h3>Context Windows &amp; Token Economics</h3></div></div>
+      <p class="desc">Every prompt has a budget, measured in tokens. This module covers the token/character relationship, computing available input budget, why naive truncation is a silent-failure bug, and chunking with overlap.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Compute available input budget from a context window and reserved output</li>
+        <li>Explain why naive truncation silently discards content, and what chunking fixes</li>
+        <li>Implement a token-budget-aware chunker with overlap, tested against 5 real cases</li>
+      </ul></div>
+      <div class="demo">▶ interactive: live token-budget calculator</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 03</div><h3>Retrieval-Augmented Generation</h3></div></div>
+      <p class="desc">A model only knows what's in its prompt. This module covers embeddings, cosine similarity, top-k retrieval, and why a minimum-relevance threshold is what stops "best available" from becoming "confidently wrong."</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Explain why cosine similarity ignores vector magnitude, and why that's correct</li>
+        <li>Reason about when a relevance threshold should exclude a "best" match entirely</li>
+        <li>Implement cosine similarity and threshold-aware top-k retrieval, tested against 5 real cases</li>
+      </ul></div>
+      <div class="demo">▶ interactive: cosine-similarity slider + rank-the-chunks exercise</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 04</div><h3>Tool Use &amp; Function Calling</h3></div></div>
+      <p class="desc">A tool call is a proposal from the model, not an action, until your code executes it. This module covers schema validation before execution and idempotent execution that survives a retried request.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Validate a tool call's name and required arguments before the handler ever runs</li>
+        <li>Explain why a failed attempt must stay retryable while a success must not re-run</li>
+        <li>Implement an idempotent tool executor, tested against 5 real cases</li>
+      </ul></div>
+      <div class="demo">▶ interactive: spot the tool call that shouldn't execute</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 05</div><h3>Agent Architectures &amp; Control Flow</h3></div></div>
+      <p class="desc">An agent loop's stopping condition is not guaranteed by the model. This module covers the reason-act-observe cycle, hard step limits, and detecting a loop that's repeating itself without progress.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Distinguish success, step-limit, and stuck as three separate loop endings</li>
+        <li>Explain why idempotency alone doesn't bound a loop's total iterations</li>
+        <li>Implement a bounded agent loop with stuck-detection, tested against 5 real cases</li>
+      </ul></div>
+      <div class="demo">▶ interactive: step through a real agent trace</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 06</div><h3>Reliability for LLM Systems</h3></div></div>
+      <p class="desc">Model APIs fail transiently and permanently, and the correct response differs. This module covers retryable-vs-not classification, exponential backoff with full jitter, and a single bounded fallback.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Classify an error as retryable or non-retryable and explain why the distinction matters</li>
+        <li>Explain the retry-storm problem full jitter solves</li>
+        <li>Implement retry-with-bounded-fallback logic, tested against 5 real cases</li>
+      </ul></div>
+      <div class="demo">▶ interactive: exponential backoff with full jitter calculator</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 07</div><h3>Evaluation, Testing &amp; Observability</h3></div></div>
+      <p class="desc">"It looked fine" isn't evaluation. This module covers designing checkable test cases, deterministic checks versus LLM-as-judge, and regression detection against a recorded baseline.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Design an eval test case with an explicit, checkable criterion</li>
+        <li>Explain when to prefer a deterministic check over LLM-as-judge scoring</li>
+        <li>Implement a deterministic eval harness with regression detection, tested against 5 real cases</li>
+      </ul></div>
+      <div class="demo">▶ interactive: spot the usable eval test case</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 08</div><h3>Capstone: A Production AI Agent</h3></div></div>
+      <p class="desc">Synthesis. A client brief: a support bot that must answer from a knowledge base, act on tools safely, and survive a flaky model API. You submit a design document, a working implementation, and a debugging diagnosis, graded against a rubric, not vibes.</p>
+      <div class="obj"><div class="lbl">Deliverable</div><ul>
+        <li>A written design specification applying all seven prior modules</li>
+        <li>A working implementation of the critical path (retrieval threshold + idempotent tool execution)</li>
+        <li>A diagnosis of a real reliability bug in code you didn't write</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Week-by-week schedule</h2></div>
+    <p class="lead">A realistic plan at ~10 hours/week, 8 weeks, ~80 hours total, for someone who already meets the prerequisite below. Lesson time comes from each module's own stated length; project and challenge time is estimated from scope, not wished into round numbers. Weeks 5 and 8 run heavier than 10 hours, weeks 2 and 6 run lighter, use the light weeks as buffer if you fall behind.</p>
+    <table>
+      <tr><th>Week</th><th>Focus</th><th>Est. hours</th></tr>
+      <tr><td>1</td><td>Module 1: Prompting &amp; Structured Outputs + Project 1 (Structured Output Validator) + Quiz 1. Python Foundations as needed if you're rusty.</td><td>~7–9</td></tr>
+      <tr><td>2</td><td>Module 2: Context Windows &amp; Token Economics + Project 2 (Token-Budget-Aware Chunker) + Quiz 2</td><td>~6 (light week — bank the slack)</td></tr>
+      <tr><td>3</td><td>Module 3: Retrieval-Augmented Generation + Project 3 (Vector Similarity Search Engine)</td><td>~8–9</td></tr>
+      <tr><td>4</td><td>Module 4: Tool Use &amp; Function Calling + Project 4 (Idempotent Tool-Calling Executor)</td><td>~8–9</td></tr>
+      <tr><td>5</td><td>Module 5: Agent Architectures &amp; Control Flow + Project 5 (Bounded ReAct Agent Loop) + Cross-module challenge: Reliable Payment Pipeline</td><td>~10–11 (heaviest week)</td></tr>
+      <tr><td>6</td><td>Module 6: Reliability for LLM Systems + Project 6 (Resilient LLM API Client)</td><td>~8 (light week — bank the slack)</td></tr>
+      <tr><td>7</td><td>Module 7: Evaluation, Testing &amp; Observability + Project 7 (Prompt Evaluation Harness) + Cross-module challenge: Incident Investigation</td><td>~9–10</td></tr>
+      <tr><td>8</td><td>Module 8 capstone (Production AI Agent Platform) + Final Assessment + Portfolio + Career Path review</td><td>~10–12</td></tr>
+    </table>
+    <div class="rigor" style="margin-top:20px">
+      <b>Honest about the fit:</b> this schedule works if you already meet the prerequisite below. If you're starting from genuinely zero programming background, budget real extra time before Week 1, Python Foundations here is a refresher, not a from-scratch intro-to-programming course, and won't get a true beginner to Module 1 inside this schedule's slack.
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Assessment structure</h2></div>
+    <table>
+      <tr><th>Component</th><th>Format</th></tr>
+      <tr><td>Per-module checkpoints (×7)</td><td>5 questions each, ≥80% required, unlimited attempts, immediate feedback</td></tr>
+      <tr><td>Hands-on code exercises (×7 + capstone)</td><td>Real automated tests, running in a sandboxed Web Worker, 5/5 (or 6/6) required to gate module completion</td></tr>
+      <tr><td>Cross-module challenges</td><td>Two scenario-based problem sets combining Modules 1–7</td></tr>
+      <tr><td>Capstone</td><td>Design document + implementation tests + debugging diagnosis, 80%+ combined</td></tr>
+      <tr><td>Final competency assessment</td><td>Novel scenarios spanning all 7 core modules, drawn from a pool and randomized per attempt</td></tr>
+    </table>
+  </section>
+
+  <section style="border-bottom:none">
+    <div class="kh"><span class="num">§</span><h2>Beyond the modules</h2></div>
+    <p class="lead">Completing the 8 modules is not the finish line. The <a href="projects.html" class="inline">Projects Library</a> gives you 8 build-based projects that scale from beginner to capstone-level, tracked in a <a href="portfolio.html" class="inline">Portfolio</a> you can point to as real work. The <a href="career.html" class="inline">Career Path</a> page honestly separates what this course teaches from what additional skills a given role still requires, it does not promise a job.</p>
+  </section>
+
+  <footer>
+    Zenith Lab · AI Engineering Syllabus
+  </footer>
+</div>
+</body>
+</html>

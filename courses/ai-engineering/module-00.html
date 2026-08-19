@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 0: Introduction to AI Engineering</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--violet)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--violet)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-weight:700;font-size:12px;color:var(--violet);border:1px solid var(--violet);border-radius:99px;width:34px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
+.def p{font-size:14.5px}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
+.callout b{color:var(--amber)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);background:rgba(167,139,250,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--violet);box-shadow:0 0 8px var(--violet)}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button.primary:hover{filter:brightness(1.08);color:var(--limed)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:block;width:100%;text-align:left;font-family:'Space Grotesk',sans-serif;display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px;background:var(--card2);color:var(--tx)}
+.qopt:hover{border-color:var(--bd2)}
+.qopt:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
+.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:12px}
+.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h3:first-of-type{margin-top:0}
+.orient p{font-size:14.5px;color:var(--mut)}
+.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
+.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
+.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
+.practice p{font-size:14px}
+.practice details{margin-top:12px}
+.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
+.practice summary::-webkit-details-marker{display:none}
+.practice summary:before{content:"▸ "}
+.practice details[open] summary:before{content:"▾ "}
+.practice details:not([open]) .ans{display:none}
+.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--lime)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+
+/* role classify cards */
+.classifygrid{display:grid;gap:10px;margin-top:14px}
+.taskcard{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.taskcard .ttext{font-size:14px;color:var(--tx)}
+.taskcard .tsel{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.taskcard .tsel button{font-size:12px;padding:6px 12px}
+.taskcard .tsel button.picked{border-color:var(--violet);color:var(--violet)}
+.taskcard .tsel button.right{border-color:var(--emerald);color:var(--emerald);background:rgba(52,229,160,.08)}
+.taskcard .tsel button.wrong{border-color:var(--red);color:var(--red);background:rgba(255,107,107,.08)}
+.taskcard .texp{margin-top:10px;font-size:13px;color:var(--mut);display:none;padding-top:10px;border-top:1px solid var(--bd)}
+.taskcard.answered .texp{display:block}
+
+/* pipeline flow */
+.flowcol{display:flex;flex-direction:column;gap:0;margin-top:16px}
+.flowstep{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:12px 16px;font-size:13.5px;color:var(--tx);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.flowstep.ai{border-color:var(--violet);background:rgba(167,139,250,.08)}
+.flowstep .fname{font-weight:600}
+.flowstep .ftag{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut2)}
+.flowstep.ai .ftag{color:var(--violet)}
+.flowarrow{text-align:center;color:var(--mut2);font-size:14px;padding:2px 0}
+
+/* role cards */
+.rolegrid{display:grid;gap:14px;margin-top:16px}
+.rolecard{background:var(--card2);border:1px solid var(--bd2);border-radius:12px;padding:18px 20px}
+.rolecard h4{font-size:15.5px;font-weight:700;color:var(--tx)}
+.rolerow{display:grid;grid-template-columns:130px 1fr;gap:10px;margin-top:10px;font-size:13px}
+.rolerow .rk{color:var(--mut2);text-transform:uppercase;font-size:10.5px;letter-spacing:.06em;font-weight:700;padding-top:2px}
+.rolerow .rv{color:var(--mut)}
+
+/* priority table */
+.ptable{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px}
+.ptable th,.ptable td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--bd);vertical-align:top}
+.ptable th{color:var(--mut2);font-weight:700;text-transform:uppercase;font-size:10.5px;letter-spacing:.06em}
+.ptable tr:last-child td{border-bottom:none}
+.plabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:99px;display:inline-block;white-space:nowrap}
+.plabel.now{background:rgba(52,229,160,.15);color:var(--emerald)}
+.plabel.next{background:rgba(255,207,77,.14);color:var(--amber)}
+.plabel.spec{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
+.pfilters{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.pfilterbtn{font-family:'JetBrains Mono';font-size:11.5px;padding:6px 12px;border-radius:99px}
+.pfilterbtn.active{background:var(--violet);color:#150e2b;border-color:var(--violet)}
+.ptable tr.hidden{display:none}
+.tablewrap{overflow-x:auto}
+
+/* ecosystem categories */
+.ecogrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+@media (max-width:640px){ .ecogrid{grid-template-columns:1fr} }
+.ecocard{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px 18px}
+.ecocard .ename{font-size:13.5px;font-weight:700;color:var(--violet)}
+.ecocard .ewhy{font-size:12.5px;color:var(--mut);margin-top:6px}
+.ecocard .eex{font-size:11.5px;color:var(--mut2);margin-top:8px;font-family:'JetBrains Mono'}
+
+/* roadmap */
+.roadmap{margin-top:18px;display:flex;flex-direction:column;gap:0}
+.rstep{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 18px}
+.rstep.taught{border-color:var(--emerald)}
+.rstep.partial{border-color:var(--amber)}
+.rstep .rstop{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.rstep .rname{font-weight:700;font-size:14px;color:var(--tx)}
+.rstep .rtag{font-size:10px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:3px 9px;border-radius:99px}
+.rstep.taught .rtag{background:rgba(52,229,160,.15);color:var(--emerald)}
+.rstep.partial .rtag{background:rgba(255,207,77,.14);color:var(--amber)}
+.rstep.not .rtag{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
+.rstep .rwhy{font-size:12.5px;color:var(--mut);margin-top:6px}
+.rarrow{text-align:center;color:var(--mut2);font-size:13px;padding:3px 0}
+
+/* path quiz */
+.pquiz-q{margin-top:16px}
+.pquiz-q .pqtext{font-size:14.5px;font-weight:600;color:var(--tx);margin-bottom:10px}
+.pqopts{display:grid;gap:8px}
+.pqopt{text-align:left;font-size:13.5px;padding:10px 14px}
+.pqopt.picked{border-color:var(--violet);color:var(--violet);background:rgba(167,139,250,.08)}
+.pathresult{background:var(--card2);border:1px solid var(--violet);border-radius:12px;padding:20px 22px;margin-top:18px;display:none}
+.pathresult.show{display:block}
+.pathresult .prtitle{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--violet);font-weight:700;margin-bottom:10px}
+.matchcard{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:12px 16px;margin-top:8px}
+.matchcard .mname{font-weight:700;font-size:14px;color:var(--tx)}
+.matchcard .mscore{font-family:'JetBrains Mono';font-size:11.5px;color:var(--mut2)}
+
+/* self-check */
+.selfcheck-part{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px 22px;margin-top:16px}
+.selfcheck-part .sclbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--violet);font-weight:700;margin-bottom:10px}
+.selfcheck-part textarea{width:100%;min-height:80px;font-family:'Space Grotesk';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.selfcheck-part textarea:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.scstatus{margin-top:8px;font-size:12.5px}
+.scstatus.pass{color:var(--emerald)}
+.scstatus.fail{color:var(--amber)}
+.scstatus.empty{color:var(--mut2)}
+.finalscore{margin-top:20px;background:var(--card2);border:1px solid var(--bd2);border-radius:12px;padding:22px 24px;text-align:center}
+.finalscore .fsval{font-family:'JetBrains Mono';font-size:32px;font-weight:700;color:var(--violet)}
+.finalscore .fslbl{font-size:12px;color:var(--mut2);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+.optnote{font-size:12px;color:var(--mut2);margin-top:12px;font-style:italic}
+@media (max-width:640px){
+  .wrap{padding:0 16px 60px}
+  h1{font-size:26px}
+  .kh h2{font-size:18px}
+  .interactive{padding:16px}
+  .orient{padding:20px 18px}
+  .rolerow{grid-template-columns:100px 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">AI Engineering · Orientation</span>
+</div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><span class="navsep"></span><a href="python-foundations.html">Python Foundations</a><a href="module-01.html" id="navNextTop">Module 1 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 0 · Start here</span>
+    <h1 class="serif">Introduction to AI Engineering</h1>
+    <p class="sub">Before any code: what this field actually is, what people in it actually build, where you might fit, and exactly what the next 8 modules will (and won't) teach you. This module is ungraded and doesn't block Module 1, you can skip ahead any time, but 20 minutes here will make everything after it make more sense.</p>
+    <div class="objectives">
+      <div class="lbl">By the end of this module you'll be able to</div>
+      <ul>
+        <li>Explain what AI Engineering is, and how it differs from ML Engineering, Data Science, AI Research, and MLOps</li>
+        <li>Describe the production lifecycle an AI application goes through, and where an AI engineer's work concentrates in it</li>
+        <li>Name the AI Engineering specialization directions and roughly where your own interests point</li>
+        <li>Prioritize what to actually learn, tools included, instead of feeling like you need to know everything at once</li>
+        <li>State exactly what Modules 1–8 will teach you, and what you'll need to learn elsewhere</li>
+      </ul>
+    </div>
+  </header>
+
+  <section>
+    <div class="kh"><span class="num">0.1</span><h2 class="serif">What is AI Engineering?</h2></div>
+    <p><b>AI Engineering</b> is the discipline of building production software that uses AI models, mostly large language models today, as a core working part of the system. Not training models from scratch. Not researching new architectures. Taking a model that already exists (usually reached through an API) and doing the real engineering work to make it reliable, safe, cost-aware, and genuinely useful inside an application people depend on.</p>
+    <div class="def">
+      <div class="k">Definition: AI Engineer</div>
+      <p>A software engineer who specializes in integrating, orchestrating, and operating AI models inside production systems: prompting and validating model output, managing context and retrieval, wiring up tools and agents, and making the whole thing reliable and measurable, everything this course's 8 modules cover, in order.</p>
+    </div>
+    <p>Concrete example: a company wants an internal support bot that answers employee questions from their documentation. An <b>AI engineer</b> builds the retrieval pipeline, writes the prompts, wires up the tools it can call, adds reliability and evaluation, and ships it. A <b>data scientist</b> might separately analyze which questions employees ask most, to decide what documentation is missing. An <b>ML engineer</b> might fine-tune a smaller embedding model if off-the-shelf retrieval quality isn't good enough. An <b>AI researcher</b> is who published the paper the fine-tuning technique came from. An <b>MLOps/AI infrastructure engineer</b> is who keeps the whole thing running at 2am when GPU costs spike. Same project, five different, overlapping jobs.</p>
+
+    <div class="def">
+      <div class="k">How the adjacent fields differ</div>
+      <p><b>vs. Traditional Software Engineering</b> — same engineering discipline (APIs, testing, reliability, deployment), but working with a component (the model) that is non-deterministic and can be confidently wrong, which is exactly why Modules 1 and 7 of this course exist.</p>
+      <p style="margin-top:10px"><b>vs. Machine Learning Engineering</b> — ML engineers typically train, fine-tune, and deploy models themselves. AI engineers typically consume an already-trained model through an API and build the system around it. Some roles blend both.</p>
+      <p style="margin-top:10px"><b>vs. Data Science</b> — data scientists analyze data to answer questions and inform decisions (often with statistics and classical ML). AI engineers build software systems that use AI models to do something in production, on an ongoing basis.</p>
+      <p style="margin-top:10px"><b>vs. AI Research</b> — researchers push the boundary of what models CAN do (new architectures, training techniques, published papers). AI engineers take what already exists and make it work reliably for a real use case.</p>
+      <p style="margin-top:10px"><b>vs. MLOps / AI Infrastructure</b> — infrastructure engineers build and operate the platforms models run on (serving, scaling, GPU cost, deployment pipelines). AI engineers build what runs ON those platforms. Small teams, one person often wears both hats.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.1</span><h2 class="serif">Interactive: whose job is this, actually?</h2></div>
+    <p class="mut">Six real tasks from a company shipping an AI product. For each, guess which role owns it primarily.</p>
+    <div class="interactive">
+      <span class="ilbl">Classify the task</span>
+      <div class="classifygrid" id="classifyGrid"></div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Two of the six tasks above could reasonably be argued as belonging to more than one role. Why does that not mean the classification exercise is wrong?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Because these are overlapping career directions, not rigid job-title boundaries, especially at smaller companies where one person covers several of them. The point of naming a "primary" owner isn't to draw a hard legal boundary, it's to build the vocabulary to recognize which SKILL a given task actually requires, so you know what to learn regardless of what your eventual job title says.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.2</span><h2 class="serif">What does an AI Engineer actually build?</h2></div>
+    <p>In practice, most AI engineering work falls into a handful of recognizable shapes:</p>
+    <ul style="margin-top:12px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:2">
+      <li><b>AI chat applications</b> — a conversational interface backed by a model, with memory and context management.</li>
+      <li><b>RAG systems</b> — retrieval-augmented generation: answering questions grounded in a specific document set, not just the model's training data.</li>
+      <li><b>AI agents</b> — systems that reason across multiple steps, calling tools and taking actions to complete a task, not just answering one question.</li>
+      <li><b>AI copilots</b> — assistants embedded inside an existing product (a code editor, a design tool, a CRM), helping a user do their existing job faster.</li>
+      <li><b>AI automation systems</b> — replacing a manual, rules-based workflow with one that uses a model to handle the judgment calls.</li>
+      <li><b>Document intelligence</b> — extracting structured data out of unstructured documents (contracts, invoices, forms).</li>
+      <li><b>AI-powered SaaS</b> — a product whose core value proposition IS an AI capability, not a bolt-on feature.</li>
+      <li><b>Voice AI</b> — speech-in, speech-out systems, often combining a model with speech-to-text and text-to-speech.</li>
+      <li><b>Multimodal applications</b> — systems that reason over images, audio, or video alongside text.</li>
+      <li><b>AI integrations</b> — connecting a model into existing business systems (a CRM, a support desk, an internal tool) so it can read and act on real company data.</li>
+    </ul>
+
+    <div class="interactive">
+      <span class="ilbl">The production lifecycle</span>
+      <p class="mut" style="margin-bottom:4px">A simplified flow from idea to a monitored, running system. The highlighted stages are where AI engineering work concentrates.</p>
+      <div class="flowcol" id="flowCol"></div>
+    </div>
+    <p style="margin-top:16px">Notice what's <i>not</i> highlighted: raw data collection/labeling and deep infrastructure/ops work are real, adjacent disciplines (data science and platform engineering, respectively), not the center of gravity for this role, though AI engineers touch both at the edges.</p>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>"Evaluation" and "Monitoring" both appear near the end of the flow, after Deployment. Why does Evaluation appear a second time, conceptually, even before a system ships?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Evaluation happens twice in practice: BEFORE shipping (as a gate, deciding whether a change is good enough to deploy, exactly Module 7's subject) and continuously AFTER shipping (as monitoring, catching regressions and drift in production traffic the offline eval set never saw). The diagram shows one flow for simplicity, but real systems loop back from Monitoring into Evaluation constantly.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.3</span><h2 class="serif">AI Engineering specializations</h2></div>
+    <p class="mut">These are overlapping directions within the field, not rigid categories. Most people's actual job blends two or three of these.</p>
+    <div class="rolegrid" id="roleGrid"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.4</span><h2 class="serif">What programming do I actually need?</h2></div>
+    <p>You do not need to master every language on this page before you start. Most working AI engineers lean heavily on one or two languages and pick up the rest as specific projects require it. Here's the practical priority order.</p>
+    <div class="interactive">
+      <span class="ilbl">Priority table</span>
+      <div class="pfilters" id="pFilters"></div>
+      <div class="tablewrap">
+        <table class="ptable" id="pTable">
+          <thead><tr><th>Technology</th><th>Priority</th><th>Why AI engineers use it</th><th>How much a beginner needs initially</th><th>Where it becomes useful</th></tr></thead>
+          <tbody id="pTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="def">
+      <div class="k">What programming languages should an AI engineer learn?</div>
+      <p><b>Python — Priority #1.</b> The AI/ML ecosystem is built on it: virtually every model provider's SDK, every retrieval and agent framework, every eval library ships Python-first. This is the language this course's exercises, projects, and capstone are built in.</p>
+      <p style="margin-top:10px"><b>SQL — Priority #2.</b> Retrieval, logging, and evaluation results all end up persisted somewhere. Databases and data retrieval are a constant in real RAG and analytics work.</p>
+      <p style="margin-top:10px"><b>JavaScript / TypeScript — Priority #3.</b> Essential once you're building the user-facing side of an AI product: Node.js backends, frontends, full-stack AI SaaS. Not needed to start, genuinely useful once you are shipping a product.</p>
+      <p style="margin-top:10px"><b>Bash / Linux — Important supporting skill.</b> Most AI infrastructure runs on Linux; comfort with a shell speeds up servers, environments, deployment, and automation.</p>
+      <p style="margin-top:10px"><b>C++ and other specialized languages.</b> Relevant only for specific paths (high-throughput inference engines, systems-level tooling), depending on which specialization you eventually lean into. Not required for the typical AI application engineering path, and not something you need to master everything else on this list before starting.</p>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>SQL is marked "Need to know now" even though this course's exercises don't use a database at all. Why?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Because almost every real AI system this course's concepts get applied to sits on top of some kind of persistent storage, a document store for retrieval, a table logging tool calls for idempotency, an eval-results table. This course teaches the LOGIC (retrieval, idempotent execution, evaluation) using Python and in-memory data so the concepts stay isolated and testable, real projects will need SQL to actually persist that logic's data.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.5</span><h2 class="serif">The AI Engineering toolbox</h2></div>
+    <p class="mut">Tool names change constantly. The categories below don't. Learn what each category is FOR, treat the example names as illustrations, not requirements.</p>
+    <div class="ecogrid" id="ecoGrid"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.6</span><h2 class="serif">What do I need to learn, in order?</h2></div>
+    <p class="mut">A rough dependency chain. "Taught here" marks exactly what Modules 1–8 of this course cover.</p>
+    <div class="roadmap" id="roadmapCol"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.7</span><h2 class="serif">Find your AI Engineering path</h2></div>
+    <p class="mut">Six quick questions. This is an orientation tool, not a promise of career suitability or employment, and you don't have to choose a specialization now. Most people's answer changes as they build more.</p>
+    <div class="interactive">
+      <span class="ilbl">Path finder</span>
+      <div id="pathQuizArea"></div>
+      <div class="dagctrl">
+        <button class="primary" id="btnPathResult" disabled>See my possible directions</button>
+        <button id="btnPathReset">Reset</button>
+      </div>
+      <div class="pathresult" id="pathResult"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.8</span><h2 class="serif">Your journey through this course</h2></div>
+    <div class="orient">
+      <div class="lbl">What you need before starting</div>
+      <p>Basic programming fundamentals: variables, conditions, loops, functions, basic data structures (lists, dictionaries), and a rough idea of what an API call is. That's it.</p>
+      <div class="assume">You do NOT need prior Python, AI/ML, LLM, RAG, vector-database, or agent-framework experience. This course teaches the Python and the AI engineering skills required to progress, in that order, together.</div>
+      <h3 class="serif">Core skills taught in this course</h3>
+      <p><b>Python for AI Engineering</b> (the language every exercise, project, and the capstone are built in), APIs, structured outputs, context/token management, retrieval-augmented generation, vector search, tool calling, agents, evaluation, reliability, AI application architecture, and 8 hands-on projects.</p>
+      <h3 class="serif">Skills to develop after the core course</h3>
+      <p>Advanced Python, advanced SQL, advanced backend engineering, Docker, cloud platforms, CI/CD, Kubernetes, classical ML, model fine-tuning, and large-scale infrastructure. These are genuinely useful NEXT-STAGE skills, not prerequisites for starting here, you don't need any of them to begin Module 1.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">✓</span><h2 class="serif">Can you explain AI Engineering?</h2></div>
+    <p class="mut">A short self-check, five parts. This is ungraded and does not block Module 1, it's here so you can honestly check whether this module did its job before moving on.</p>
+
+    <div class="selfcheck-part">
+      <div class="sclbl">1. Define AI Engineering in your own words</div>
+      <textarea id="sc1" placeholder="In a sentence or two, what is AI Engineering..."></textarea>
+      <div class="scstatus empty" id="sc1status">Not written yet</div>
+    </div>
+
+    <div class="selfcheck-part">
+      <div class="sclbl">2. Which role would primarily handle this task?</div>
+      <div class="qcard" style="margin-top:0">
+        <div class="qtext">"Fine-tune a smaller open-source embedding model because off-the-shelf retrieval quality isn't good enough for a niche domain."</div>
+        <div id="sc2opts"></div>
+        <div class="qexplain" id="sc2explain"></div>
+      </div>
+    </div>
+
+    <div class="selfcheck-part">
+      <div class="sclbl">3. Which technologies should a complete beginner prioritize first?</div>
+      <div class="qcard" style="margin-top:0">
+        <div class="qtext">Pick the pair that both belong in "need to know now."</div>
+        <div id="sc3opts"></div>
+        <div class="qexplain" id="sc3explain"></div>
+      </div>
+    </div>
+
+    <div class="selfcheck-part">
+      <div class="sclbl">4. Identify the stages of an AI engineering workflow</div>
+      <div class="qcard" style="margin-top:0">
+        <div class="qtext">In the production lifecycle from Lesson 0.2, what comes immediately after "Model / AI API" and before "RAG / Tools / Agents"?</div>
+        <div id="sc4opts"></div>
+        <div class="qexplain" id="sc4explain"></div>
+      </div>
+    </div>
+
+    <div class="selfcheck-part">
+      <div class="sclbl">5. Which skill do you need before going deeper into this course?</div>
+      <div class="qcard" style="margin-top:0">
+        <div class="qtext">Modules 1–8 assume comfort with which of these?</div>
+        <div id="sc5opts"></div>
+        <div class="qexplain" id="sc5explain"></div>
+      </div>
+    </div>
+
+    <div class="finalscore" id="scFinalBox" style="display:none">
+      <div class="fsval" id="scFinalVal">0%</div>
+      <div class="fslbl">Self-check score</div>
+    </div>
+    <div class="optnote">This self-check is a reflection tool. It is not a mastery gate, unlike the checkpoints in Modules 1–8, and completing it is optional before continuing.</div>
+  </section>
+
+  <footer>Zenith Lab · AI Engineering · Module 0 · Orientation</footer>
+</div>
+
+<div class="scoreboard" style="position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0"><div class="in" style="max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px">
+  <span class="mono" style="font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--violet)" id="m0StatusText">Orientation · not required to proceed</span>
+  <button class="primary" id="btnNext" style="margin-left:auto">Continue to Module 1 →</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+CourseProgress.setExtra("module0", Object.assign({ visited: true }, CourseProgress.getExtra("module0") || {}));
+
+/* ---------------- Section 0.1: classify the task ---------------- */
+const TASKS = [
+  { id: "t1", text: "Write the retrieval pipeline and prompts for an internal support bot.", role: "AI Engineer",
+    explain: "This is core AI engineering work: retrieval, prompting, and wiring it into a production system, exactly Modules 1 and 3's territory." },
+  { id: "t2", text: "Analyze which questions employees ask the support bot most often, to find gaps in the documentation.", role: "Data Scientist",
+    explain: "Analyzing usage data to find a pattern and inform a decision is classic data science, not building the system itself." },
+  { id: "t3", text: "Fine-tune a smaller embedding model because off-the-shelf retrieval isn't accurate enough for this company's jargon.", role: "ML Engineer",
+    explain: "Training/fine-tuning a model is ML engineering territory, the AI engineer would consume the resulting model, not produce it." },
+  { id: "t4", text: "Publish a paper proposing a new attention mechanism that reduces context-window cost.", role: "AI Researcher",
+    explain: "Pushing the boundary of what's technically possible, and publishing it, is research, not applied engineering." },
+  { id: "t5", text: "Keep GPU costs under control and make sure the model-serving cluster survives a traffic spike.", role: "AI Infrastructure / MLOps",
+    explain: "Operating and scaling the platform models run on is infrastructure/MLOps work, distinct from building what runs on top of it." },
+  { id: "t6", text: "Add a minimum-relevance threshold so the bot says 'I don't know' instead of guessing from an irrelevant document.", role: "AI Engineer",
+    explain: "Directly building the reliability/quality logic of the AI system, this is Module 3's relevance-threshold concept in a real support-bot context." },
+];
+const ROLES = ["AI Engineer", "Data Scientist", "ML Engineer", "AI Researcher", "AI Infrastructure / MLOps"];
+function renderClassify(){
+  const grid = document.getElementById("classifyGrid");
+  grid.innerHTML = "";
+  TASKS.forEach(t => {
+    const card = document.createElement("div");
+    card.className = "taskcard";
+    card.innerHTML = `<div class="ttext">${CourseProgress.escapeHtml(t.text)}</div>
+      <div class="tsel">${ROLES.map(r => `<button type="button" data-role="${CourseProgress.escapeHtml(r)}">${CourseProgress.escapeHtml(r)}</button>`).join("")}</div>
+      <div class="texp">${CourseProgress.escapeHtml(t.explain)}</div>`;
+    card.querySelectorAll("button[data-role]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (card.classList.contains("answered")) return;
+        card.classList.add("answered");
+        card.querySelectorAll("button[data-role]").forEach(b => {
+          b.classList.add("picked");
+          if (b.dataset.role === t.role) b.classList.add("right");
+          else if (b === btn) b.classList.add("wrong");
+        });
+      });
+    });
+    grid.appendChild(card);
+  });
+}
+renderClassify();
+
+/* ---------------- Section 0.2: production flow ---------------- */
+const FLOW = [
+  { name: "Idea", ai: false }, { name: "Data", ai: false }, { name: "Model / AI API", ai: true },
+  { name: "Backend", ai: true }, { name: "RAG / Tools / Agents", ai: true }, { name: "Application", ai: true },
+  { name: "Evaluation", ai: true }, { name: "Deployment", ai: false }, { name: "Monitoring", ai: true },
+];
+function renderFlow(){
+  const col = document.getElementById("flowCol");
+  col.innerHTML = "";
+  FLOW.forEach((f, i) => {
+    if (i > 0) { const ar = document.createElement("div"); ar.className = "flowarrow"; ar.textContent = "↓"; col.appendChild(ar); }
+    const div = document.createElement("div");
+    div.className = "flowstep" + (f.ai ? " ai" : "");
+    div.innerHTML = `<span class="fname">${f.name}</span><span class="ftag">${f.ai ? "AI engineer's focus" : "adjacent discipline"}</span>`;
+    col.appendChild(div);
+  });
+}
+renderFlow();
+
+/* ---------------- Section 0.3: role cards ---------------- */
+const ROLE_DETAILS = [
+  { name: "AI Application Engineer", build: "End-user-facing AI features: chatbots, copilots, AI-powered product surfaces.", with: "Model APIs, frontend/backend glue, prompt and context management.", prog: "JavaScript/TypeScript or Python, comfortable full-stack.", tools: "An LLM SDK, a frontend framework, a vector DB.", math: "Minimal, arithmetic-level.", projects: "A support chatbot, an AI writing assistant, a copilot inside an existing app." },
+  { name: "LLM / Generative AI Engineer", build: "The core LLM-powered logic: prompting systems, RAG pipelines, agent loops.", with: "Model APIs, embeddings, retrieval, tool/function calling.", prog: "Python primarily, strong async/API skills.", tools: "LLM SDKs, a vector DB, an orchestration framework.", math: "Light linear algebra (embeddings, similarity).", projects: "A RAG system, a multi-step agent, a structured-extraction pipeline." },
+  { name: "AI/ML Engineer", build: "Systems that may include model training/fine-tuning alongside LLM integration.", with: "Training frameworks, evaluation metrics, data pipelines, LLM APIs.", prog: "Python, comfortable with ML frameworks.", tools: "PyTorch/TensorFlow, experiment tracking, an LLM SDK.", math: "Moderate: linear algebra, probability, optimization basics.", projects: "A fine-tuned classifier, a hybrid ML+LLM pipeline." },
+  { name: "AI Integration Engineer", build: "Connecting AI capability into existing business systems (CRM, support desk, internal tools).", with: "APIs, webhooks, auth, existing enterprise systems.", prog: "Any backend language, strong API/integration skills.", tools: "REST/GraphQL clients, auth libraries, an LLM SDK.", math: "Minimal.", projects: "An AI feature wired into a CRM, an automated ticket-triage integration." },
+  { name: "AI Automation Engineer", build: "Replacing manual, judgment-heavy workflows with AI-assisted automation.", with: "Workflow tools, APIs, LLMs for the judgment-call steps.", prog: "Python or JavaScript, workflow/scripting comfort.", tools: "Automation platforms, an LLM SDK, a task queue.", math: "Minimal.", projects: "Automated document processing, an AI-assisted approval workflow." },
+  { name: "AI Platform / Infrastructure Engineer", build: "The platform other engineers deploy AI systems on top of.", with: "Model serving, GPU infrastructure, deployment pipelines.", prog: "Python plus strong systems/infra skills (Go/Rust helpful, not required to start).", tools: "Kubernetes, Terraform, a metrics/tracing stack, an inference server.", math: "Minimal to moderate depending on optimization work.", projects: "A model-serving platform, an internal LLM gateway with cost tracking." },
+  { name: "MLOps-oriented roles", build: "Operationalizing ML/AI: CI/CD for models, monitoring, reproducibility.", with: "Experiment tracking, model registries, deployment pipelines.", prog: "Python, strong DevOps/CI-CD skills.", tools: "MLflow or similar, CI/CD tooling, containerization.", math: "Light.", projects: "A model deployment pipeline, an automated retraining/monitoring system." },
+  { name: "AI Product Engineer", build: "Deciding WHAT to build with AI, prototyping features, balancing capability against user value.", with: "LLM APIs, rapid prototyping tools, user feedback loops.", prog: "Whatever ships fastest, often JavaScript/Python.", tools: "An LLM SDK, prototyping/no-code tools, analytics.", math: "Minimal.", projects: "A rapid AI feature prototype, an A/B-tested AI product surface." },
+];
+function renderRoles(){
+  const grid = document.getElementById("roleGrid");
+  grid.innerHTML = "";
+  ROLE_DETAILS.forEach(r => {
+    const card = document.createElement("div");
+    card.className = "rolecard";
+    card.innerHTML = `<h4>${CourseProgress.escapeHtml(r.name)}</h4>
+      <div class="rolerow"><div class="rk">Builds</div><div class="rv">${CourseProgress.escapeHtml(r.build)}</div></div>
+      <div class="rolerow"><div class="rk">Works with</div><div class="rv">${CourseProgress.escapeHtml(r.with)}</div></div>
+      <div class="rolerow"><div class="rk">Programming</div><div class="rv">${CourseProgress.escapeHtml(r.prog)}</div></div>
+      <div class="rolerow"><div class="rk">Key tools</div><div class="rv">${CourseProgress.escapeHtml(r.tools)}</div></div>
+      <div class="rolerow"><div class="rk">Math</div><div class="rv">${CourseProgress.escapeHtml(r.math)}</div></div>
+      <div class="rolerow"><div class="rk">Typical projects</div><div class="rv">${CourseProgress.escapeHtml(r.projects)}</div></div>`;
+    grid.appendChild(card);
+  });
+}
+renderRoles();
+
+/* ---------------- Section 0.4: priority table ---------------- */
+const PRIORITY = [
+  { tech: "Python", pri: "now", why: "The dominant language for AI/ML tooling, most SDKs and frameworks ship Python-first.", now: "Enough to write scripts, call APIs, handle JSON.", later: "Deepens continuously throughout your career." },
+  { tech: "Git / GitHub", pri: "now", why: "Version control is non-negotiable for any real software work, AI projects included.", now: "Commit, branch, push, pull, resolve a basic conflict.", later: "Becomes second nature quickly." },
+  { tech: "HTTP / REST / JSON", pri: "now", why: "Every model API call is an HTTP request returning JSON, this is the literal substrate of the field.", now: "Understand requests, responses, status codes, and JSON structure.", later: "Deepens with auth, webhooks, streaming responses." },
+  { tech: "SQL", pri: "now", why: "Nearly every real AI system persists something: logs, retrieval documents, eval results, idempotency keys.", now: "SELECT/INSERT/UPDATE, basic joins.", later: "Query optimization, schema design as systems grow." },
+  { tech: "JavaScript / TypeScript", pri: "next", why: "Needed if you're building the user-facing side of an AI product, or working in a JS-first stack.", now: "Not required to start if you're Python-first.", later: "Essential for AI application engineers building UIs/copilots." },
+  { tech: "Linux / Bash", pri: "next", why: "Most AI infrastructure runs on Linux; comfort with a shell speeds up everything.", now: "Basic navigation, running scripts.", later: "Becomes important once you're deploying or debugging in production." },
+  { tech: "Docker", pri: "next", why: "Standard way to package and run AI services consistently across environments.", now: "Not required to start.", later: "Matters once you deploy anything real." },
+  { tech: "C++ / Rust / Go", pri: "spec", why: "Performance-critical inference engines and high-throughput serving infrastructure.", now: "Not needed to start, at all.", later: "Only if you move deep into AI platform/infrastructure work." },
+];
+function renderPriorityTable(filter){
+  const body = document.getElementById("pTableBody");
+  body.innerHTML = "";
+  const labelMap = { now: '<span class="plabel now">Need to know now</span>', next: '<span class="plabel next">Should learn next</span>', spec: '<span class="plabel spec">Specialized / optional</span>' };
+  PRIORITY.forEach(p => {
+    const tr = document.createElement("tr");
+    if (filter && filter !== "all" && p.pri !== filter) tr.className = "hidden";
+    tr.innerHTML = `<td><b>${CourseProgress.escapeHtml(p.tech)}</b></td><td>${labelMap[p.pri]}</td><td>${CourseProgress.escapeHtml(p.why)}</td><td>${CourseProgress.escapeHtml(p.now)}</td><td>${CourseProgress.escapeHtml(p.later)}</td>`;
+    body.appendChild(tr);
+  });
+}
+let activePFilter = "all";
+function renderPFilters(){
+  const wrap = document.getElementById("pFilters");
+  wrap.innerHTML = "";
+  [["all","All"],["now","Need now"],["next","Should learn next"],["spec","Specialized"]].forEach(([key,label]) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "pfilterbtn" + (activePFilter === key ? " active" : "");
+    b.textContent = label;
+    b.addEventListener("click", () => { activePFilter = key; renderPFilters(); renderPriorityTable(key); });
+    wrap.appendChild(b);
+  });
+}
+renderPFilters();
+renderPriorityTable("all");
+
+/* ---------------- Section 0.5: ecosystem categories ---------------- */
+const ECOSYSTEM = [
+  { name: "Development", why: "The daily tools for writing, versioning, and running code, category is timeless even as specific tools change.", ex: "e.g. VS Code, Git, GitHub, a CLI" },
+  { name: "Languages", why: "What you actually write the system in, Python dominates AI-specific tooling, JS/TS dominates the application layer.", ex: "e.g. Python, JavaScript, TypeScript, SQL" },
+  { name: "AI Models / APIs", why: "The actual intelligence your system calls out to, swappable in principle if your code isn't tightly coupled to one vendor.", ex: "e.g. OpenAI, Anthropic, Google/Gemini, Hugging Face, open-source models" },
+  { name: "Frameworks", why: "Pre-built orchestration for prompting, retrieval, and agent logic, useful, but everything they do is learnable from first principles (which is what this course teaches).", ex: "e.g. LangChain, LangGraph, LlamaIndex, and comparable alternatives" },
+  { name: "Data", why: "Where your system's persistent knowledge and state actually live.", ex: "e.g. PostgreSQL, a vector database, Redis for caching" },
+  { name: "Infrastructure", why: "How your system gets packaged, deployed, and kept running at scale.", ex: "e.g. Docker, a cloud platform, Linux, CI/CD" },
+  { name: "Evaluation / Observability", why: "How you know whether the system is actually working, and where it's failing, in production.", ex: "e.g. structured logging, tracing, an eval framework, monitoring dashboards" },
+];
+function renderEcosystem(){
+  const grid = document.getElementById("ecoGrid");
+  grid.innerHTML = "";
+  ECOSYSTEM.forEach(e => {
+    const card = document.createElement("div");
+    card.className = "ecocard";
+    card.innerHTML = `<div class="ename">${CourseProgress.escapeHtml(e.name)}</div><div class="ewhy">${CourseProgress.escapeHtml(e.why)}</div><div class="eex">${CourseProgress.escapeHtml(e.ex)}</div>`;
+    grid.appendChild(card);
+  });
+}
+renderEcosystem();
+
+/* ---------------- Section 0.6: roadmap ---------------- */
+const ROADMAP = [
+  { name: "Programming Fundamentals", taught: "not", why: "Everything else assumes you can already write and reason about code.", },
+  { name: "Python", taught: "not", why: "The dominant language for AI-specific tooling in the real world." },
+  { name: "Git / GitHub", taught: "not", why: "Version control for any real project." },
+  { name: "HTTP / APIs / JSON", taught: "partial", why: "This course assumes familiarity, and reinforces it through every model-call example, but doesn't teach HTTP from zero." },
+  { name: "SQL / Databases", taught: "not", why: "Persistence for retrieval documents, logs, and eval results in real systems." },
+  { name: "Backend Fundamentals", taught: "not", why: "Servers, request/response cycles, basic architecture." },
+  { name: "AI / ML Fundamentals", taught: "not", why: "What a model is, at a conceptual level, this course assumes you already have a rough idea." },
+  { name: "LLMs", taught: "partial", why: "This course teaches how to USE LLMs reliably, not how they're built internally." },
+  { name: "Prompting + Structured Outputs", taught: "taught", why: "Module 1." },
+  { name: "Context Windows & Token Economics", taught: "taught", why: "Module 2." },
+  { name: "Retrieval-Augmented Generation", taught: "taught", why: "Module 3." },
+  { name: "Tool Use / Function Calling", taught: "taught", why: "Module 4." },
+  { name: "Agent Architectures", taught: "taught", why: "Module 5." },
+  { name: "Reliability & Evaluation", taught: "taught", why: "Modules 6 and 7." },
+  { name: "Deployment", taught: "not", why: "Shipping a real service to production infrastructure." },
+  { name: "Production AI Engineering", taught: "partial", why: "The capstone (Module 8) synthesizes everything taught here into one system, real production work adds deployment, scale, and ongoing operations on top." },
+];
+function renderRoadmap(){
+  const col = document.getElementById("roadmapCol");
+  col.innerHTML = "";
+  const tagMap = { taught: '<span class="rtag">Taught here</span>', partial: '<span class="rtag">Partially taught</span>', not: '<span class="rtag">Learn separately</span>' };
+  ROADMAP.forEach((r, i) => {
+    if (i > 0) { const ar = document.createElement("div"); ar.className = "rarrow"; ar.textContent = "↓"; col.appendChild(ar); }
+    const div = document.createElement("div");
+    div.className = "rstep " + r.taught;
+    div.innerHTML = `<div class="rstop"><span class="rname">${CourseProgress.escapeHtml(r.name)}</span>${tagMap[r.taught]}</div><div class="rwhy">${CourseProgress.escapeHtml(r.why)}</div>`;
+    col.appendChild(div);
+  });
+}
+renderRoadmap();
+
+/* ---------------- Section 0.7: path finder quiz ---------------- */
+const PATH_QUESTIONS = [
+  { q: "Do you enjoy building things end-users directly interact with, or the systems underneath that other engineers rely on?", opts: [
+    { t: "End-user-facing features", tags: { "ai-engineer": 1, "llm-app": 2 } },
+    { t: "Underlying systems and infrastructure", tags: { "ai-infra": 2, "backend-ai": 1 } } ] },
+  { q: "Would you rather wire together existing model APIs, or work on training/fine-tuning models yourself?", opts: [
+    { t: "Wire together existing APIs", tags: { "llm-app": 1, "ai-engineer": 1 } },
+    { t: "Train or fine-tune models", tags: { "ai-ml": 2 } } ] },
+  { q: "Do you prefer customer-facing integration work, or general-purpose reliability engineering?", opts: [
+    { t: "Customer-facing integration", tags: { "backend-ai": 2 } },
+    { t: "General-purpose reliability engineering", tags: { "ai-infra": 1, "ai-engineer": 1 } } ] },
+  { q: "How much do you enjoy writing deployment/infrastructure tooling versus writing product-facing code?", opts: [
+    { t: "I'd rather write infrastructure tooling", tags: { "ai-infra": 2 } },
+    { t: "I'd rather write product-facing code", tags: { "llm-app": 1, "ai-engineer": 1 } } ] },
+  { q: "Do you want a mostly-Python role, or a full-stack role touching both JavaScript and Python?", opts: [
+    { t: "Mostly Python", tags: { "ai-ml": 1, "ai-infra": 1 } },
+    { t: "Full-stack (JS + Python)", tags: { "llm-app": 2, "ai-engineer": 1 } } ] },
+  { q: "When something breaks in production, are you more drawn to debugging the model's behavior, or debugging the infrastructure it runs on?", opts: [
+    { t: "The model's behavior / output quality", tags: { "ai-engineer": 1, "llm-app": 1 } },
+    { t: "The infrastructure it runs on", tags: { "ai-infra": 2, "backend-ai": 1 } } ] },
+];
+const PATH_NAMES = { "ai-engineer": "AI Engineer", "llm-app": "LLM Application Engineer", "ai-ml": "AI/ML Engineer", "backend-ai": "Backend / AI Integration Engineer", "ai-infra": "AI Platform / Infrastructure Engineer" };
+let pathAnswers = {};
+function renderPathQuiz(){
+  const area = document.getElementById("pathQuizArea");
+  area.innerHTML = "";
+  PATH_QUESTIONS.forEach((pq, qi) => {
+    const div = document.createElement("div");
+    div.className = "pquiz-q";
+    div.innerHTML = `<div class="pqtext">${qi+1}. ${CourseProgress.escapeHtml(pq.q)}</div><div class="pqopts" id="pq_${qi}"></div>`;
+    area.appendChild(div);
+    const optsEl = div.querySelector(`#pq_${qi}`);
+    pq.opts.forEach((opt, oi) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pqopt";
+      btn.textContent = opt.t;
+      btn.addEventListener("click", () => {
+        pathAnswers[qi] = oi;
+        optsEl.querySelectorAll(".pqopt").forEach((b, j) => b.classList.toggle("picked", j === oi));
+        document.getElementById("btnPathResult").disabled = Object.keys(pathAnswers).length < PATH_QUESTIONS.length;
+      });
+      optsEl.appendChild(btn);
+    });
+  });
+}
+renderPathQuiz();
+
+document.getElementById("btnPathResult").addEventListener("click", () => {
+  const scores = { "ai-engineer": 0, "llm-app": 0, "ai-ml": 0, "backend-ai": 0, "ai-infra": 0 };
+  PATH_QUESTIONS.forEach((pq, qi) => {
+    const opt = pq.opts[pathAnswers[qi]];
+    if (!opt) return;
+    Object.entries(opt.tags).forEach(([k, v]) => { scores[k] += v; });
+  });
+  const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1]).filter(([,v]) => v > 0).slice(0, 3);
+  const box = document.getElementById("pathResult");
+  box.className = "pathresult show";
+  box.innerHTML = `<div class="prtitle">Your possible directions</div>` +
+    ranked.map(([k, v]) => `<div class="matchcard"><div class="mname">${PATH_NAMES[k]}</div><div class="mscore">Affinity score: ${v}</div></div>`).join("") +
+    `<p style="margin-top:14px;font-size:13px;color:var(--mut)">Remember: this is a rough orientation signal from 6 questions, not a placement test. Explore any of these (or none of them) freely, see <a href="career.html" style="color:var(--violet)">Career Path</a> for the full honest breakdown of what each direction needs beyond this course.</p>`;
+  CourseProgress.setExtra("module0", Object.assign({}, CourseProgress.getExtra("module0") || {}, { pathQuizDone: true, pathQuizTop: ranked.map(r => r[0]) }));
+  box.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+document.getElementById("btnPathReset").addEventListener("click", () => {
+  pathAnswers = {};
+  document.getElementById("btnPathResult").disabled = true;
+  document.getElementById("pathResult").className = "pathresult";
+  renderPathQuiz();
+});
+
+/* ---------------- Self-check ---------------- */
+function wordCount(text){ return text.trim().split(/\s+/).filter(Boolean).length; }
+let sc1Checked = false;
+document.getElementById("sc1").addEventListener("blur", () => {
+  const val = document.getElementById("sc1").value;
+  const status = document.getElementById("sc1status");
+  const words = wordCount(val);
+  const lower = val.toLowerCase();
+  const hasKeyword = ["ai model", "language model", "llm", "production", "integrat", "build"].some(k => lower.includes(k));
+  sc1Checked = words >= 12 && hasKeyword;
+  status.className = "scstatus " + (sc1Checked ? "pass" : (val.trim() ? "fail" : "empty"));
+  status.textContent = !val.trim() ? "Not written yet" : sc1Checked ? "Looks like a solid definition" : "Try mentioning what an AI engineer actually integrates or builds, not just 'works with AI'";
+  updateSelfCheckScore();
+});
+
+const scAnswered = {};
+let scScore = 0;
+function buildSC(id, opts, containerId){
+  const el = document.getElementById(containerId);
+  opts.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "qopt";
+    btn.textContent = opt.t;
+    btn.addEventListener("click", () => {
+      if (scAnswered[id]) return;
+      scAnswered[id] = true;
+      el.querySelectorAll(".qopt").forEach((b, j) => {
+        if (opts[j].correct) b.classList.add("correct");
+        else if (j === i) b.classList.add("incorrect");
+      });
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { scScore++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      updateSelfCheckScore();
+    });
+    el.appendChild(btn);
+  });
+}
+buildSC("sc2", [
+  { t: "ML Engineer", correct: true, correctText: "Correct. Fine-tuning a model is ML engineering work; the AI engineer would consume the resulting model afterward." },
+  { t: "AI Engineer", correct: false, reason: "AI engineers typically consume already-trained models through an API, training/fine-tuning is ML engineering territory." },
+  { t: "AI Researcher", correct: false, reason: "Fine-tuning an existing model for a practical need isn't the same as researching a new technique or architecture." },
+], "sc2opts");
+buildSC("sc3", [
+  { t: "Python and HTTP/REST/JSON", correct: true, correctText: "Correct. Both are marked 'need to know now', the dominant AI tooling language and the literal substrate every model API call runs on." },
+  { t: "Docker and C++", correct: false, reason: "Both are 'should learn next' or 'specialized', not day-one priorities for a beginner." },
+  { t: "Rust and Kubernetes", correct: false, reason: "Both are specialized/infrastructure-leaning tools, not where a beginner should start." },
+], "sc3opts");
+buildSC("sc4", [
+  { t: "Backend", correct: true, correctText: "Correct. Backend sits between the raw model/API call and the RAG/tools/agent logic built on top of it." },
+  { t: "Deployment", correct: false, reason: "Deployment comes much later in the flow, after Application and Evaluation." },
+  { t: "Data", correct: false, reason: "Data comes near the beginning of the flow, before a model is even called." },
+], "sc4opts");
+buildSC("sc5", [
+  { t: "Basic programming fundamentals (variables, functions, loops, dictionaries) — no prior Python required", correct: true, correctText: "Correct. This course teaches the Python you need as you go, only general programming fundamentals are assumed going in." },
+  { t: "Production Kubernetes experience", correct: false, reason: "Infrastructure depth like this is explicitly out of scope for this course, not a prerequisite." },
+  { t: "Prior Python or AI/ML experience", correct: false, reason: "Prior Python isn't required, this course teaches the Python needed for the AI engineering work that follows, from the fundamentals up." },
+], "sc5opts");
+
+function updateSelfCheckScore(){
+  const mcCount = Object.keys(scAnswered).length;
+  const totalParts = 5;
+  const doneParts = (sc1Checked ? 1 : 0) + mcCount;
+  if (doneParts === 0) return;
+  const pct = Math.round(((sc1Checked ? 1 : 0) + scScore) / totalParts * 100);
+  const box = document.getElementById("scFinalBox");
+  box.style.display = "block";
+  document.getElementById("scFinalVal").textContent = pct + "%";
+  CourseProgress.setExtra("module0", Object.assign({}, CourseProgress.getExtra("module0") || {}, {
+    selfCheckScore: (sc1Checked ? 1 : 0) + scScore, selfCheckTotal: totalParts,
+    completed: doneParts >= totalParts,
+  }));
+  if (doneParts >= totalParts) {
+    document.getElementById("m0StatusText").textContent = `Orientation self-check: ${pct}% · complete`;
+  }
+}
+
+document.getElementById("btnNext").addEventListener("click", () => { window.location.href = "module-01.html"; });
+
+/* ---------------- restore ---------------- */
+(function restore(){
+  const stored = CourseProgress.getExtra("module0") || {};
+  if (Number.isFinite(stored.selfCheckScore) && Number.isFinite(stored.selfCheckTotal) && stored.selfCheckTotal > 0) {
+    const pct = Math.round(stored.selfCheckScore / stored.selfCheckTotal * 100);
+    document.getElementById("scFinalBox").style.display = "block";
+    document.getElementById("scFinalVal").textContent = pct + "%";
+    if (stored.completed) document.getElementById("m0StatusText").textContent = `Orientation self-check: ${pct}% · complete`;
+  }
+})();
+</script>
+</body>
+</html>

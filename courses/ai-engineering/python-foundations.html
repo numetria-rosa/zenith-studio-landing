@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Foundations for AI Engineering</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--emerald)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--emerald)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-weight:700;font-size:12px;color:var(--emerald);border:1px solid var(--emerald);border-radius:99px;width:34px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.why{background:rgba(52,229,160,.06);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:14px 20px;margin-bottom:18px}
+.why .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:6px}
+.why p{font-size:14.5px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
+.def p{font-size:14.5px}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+pre.codeblock{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px 18px;margin-top:14px;overflow-x:auto;color:var(--tx);line-height:1.7}
+.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
+.callout b{color:var(--amber)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);background:rgba(52,229,160,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald)}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button.primary:hover{filter:brightness(1.08);color:var(--limed)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+.testin{width:100%;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:block;width:100%;text-align:left;font-family:'Space Grotesk',sans-serif;display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px;background:var(--card2);color:var(--tx)}
+.qopt:hover{border-color:var(--bd2)}
+.qopt:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--emerald)}
+.nextbtn{margin-left:auto}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
+.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:12px}
+.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h3:first-of-type{margin-top:0}
+.orient p{font-size:14.5px;color:var(--mut)}
+.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
+.practice p{font-size:14px}
+.hintbox{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 20px;margin-top:14px}
+.hintbox .hlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.hintbox .husage{font-size:11px;color:var(--mut2);font-weight:400;text-transform:none;letter-spacing:0}
+.hintbox details{margin-top:8px;border-top:1px solid var(--bd);padding-top:8px}
+.hintbox details:first-of-type{border-top:none;padding-top:0}
+.hintbox summary{cursor:pointer;color:var(--amber);font-size:13px;list-style:none;font-weight:600}
+.hintbox summary::-webkit-details-marker{display:none}
+.hintbox summary:before{content:"▸ "}
+.hintbox details[open] summary:before{content:"▾ "}
+.hintbox .hbody{margin-top:8px;color:var(--tx);font-size:13.5px;line-height:1.7}
+.hintbox details.locked summary{color:var(--mut2);cursor:not-allowed}
+.cannow{background:rgba(52,229,160,.06);border:1px solid rgba(52,229,160,.25);border-radius:12px;padding:20px 24px;margin-top:20px}
+.cannow .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px}
+.cannow ul{list-style:none;display:grid;gap:6px}
+.cannow li{padding-left:20px;position:relative;font-size:14px;color:var(--tx)}
+.cannow li:before{content:"✓";position:absolute;left:0;color:var(--emerald);font-weight:700}
+@media (max-width:640px){
+  .wrap{padding:0 16px 60px}
+  h1{font-size:26px}
+  .kh h2{font-size:18px}
+  .interactive{padding:16px}
+  .orient{padding:20px 18px}
+}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--lime)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">AI Engineering · Python Foundations</span>
+</div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-00.html">&larr; <span class="navlabel">Module 0</span></a><span class="navsep"></span><a href="module-01.html">Module 1 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Python Foundations</div>
+    <h1 class="serif">The Python you need, taught through the AI engineering you're about to build</h1>
+    <p class="sub">Every exercise below runs real Python, in your browser, via a genuine CPython interpreter (Pyodide), not a simulation. No prior Python required. Each topic is taught through the exact kind of problem Modules 1-8 will ask you to solve: parsing model output, chunking text, filtering retrieval results, handling failures.</p>
+    <div class="objectives">
+      <div class="lbl">By the end of this page you can</div>
+      <ul>
+        <li>Read and write core Python: variables, strings, lists, dicts, conditionals, loops, functions.</li>
+        <li>Handle failure with try/except instead of letting a program crash.</li>
+        <li>Parse and produce JSON, the format every model API speaks.</li>
+        <li>Write and reason about a basic async function, the shape every model API call takes.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="orient">
+    <div class="lbl">Before you start</div>
+    <h3 class="serif">What this page assumes</h3>
+    <p>Nothing about Python specifically. If you've ever written a variable assignment or a loop in any language, you're ready. If you haven't, the WHY and CONCEPT sections below explain everything from first principles before any code appears.</p>
+    <h3 class="serif">How to work through it</h3>
+    <ol>
+      <li>Read the WHY, then the CONCEPT, then the worked EXAMPLE.</li>
+      <li>Write the exercise function yourself, then click Run tests, real Python, real results.</li>
+      <li>Use the hints if stuck. The solution unlocks after your first attempt.</li>
+    </ol>
+  </div>
+
+  <!-- ============ TOPIC 1: Variables & types ============ -->
+  <section id="t1">
+    <div class="kh"><span class="num">1</span><h2 class="serif">Variables, types, and numbers</h2></div>
+    <div class="why"><div class="lbl">Why this matters here</div><p>Module 2 is entirely about counting: how many tokens does a piece of text cost. That's arithmetic on a variable, nothing more, but if you're not fluent with Python's basic types first, the arithmetic itself becomes the obstacle.</p></div>
+    <p>A variable is a name pointing at a value. Python figures out the type from the value itself, you don't declare it up front.</p>
+    <div class="def">
+      <div class="k">Concept: core types</div>
+      <p><span class="mono-inline">int</span> (whole numbers), <span class="mono-inline">float</span> (decimals), <span class="mono-inline">str</span> (text), <span class="mono-inline">bool</span> (True/False). <span class="mono-inline">len(x)</span> returns the length of a string, list, or dict. <span class="mono-inline">//</span> is integer (floor) division, it drops any remainder, which matters when you're estimating a whole number of tokens.</p>
+    </div>
+    <pre class="codeblock">text = "Reset your password from Settings."
+char_count = len(text)          # 35
+approx_tokens = char_count // 4  # 8  (floor division, no remainder)
+print(approx_tokens)</pre>
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Why floor division (<span class="mono-inline">//</span>) instead of regular division (<span class="mono-inline">/</span>) for a token estimate?</p>
+      <details><summary>Check your answer</summary><div class="ans">A token count has to be a whole number, you can't have "7.25 tokens." Regular division would give a float; floor division gives a clean integer, matching what a real token count actually is.</div></details>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">estimate_tokens(text)</span>. This is the exact character/4 estimate the rest of this course uses. Return an <span class="mono-inline">int</span>, using floor division.</p>
+      <textarea id="t1CodeEditor" aria-label="Python code editor for estimate_tokens" class="testin" spellcheck="false" style="min-height:120px;font-size:13px" rows="6"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunT1">▶ Run tests</button>
+        <button id="btnResetT1">Reset to starter code</button>
+      </div>
+      <div id="t1Results" style="margin-top:14px"></div>
+      <div class="hintbox" id="t1Hintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="t1HintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1</summary><div class="hbody">Get the character count with <span class="mono-inline">len(text)</span>, then floor-divide by 4.</div></details>
+        <details data-hint="solution" class="locked" id="t1SolutionDetails"><summary id="t1SolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">def estimate_tokens(text):
+    return len(text) // 4</pre></div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOPIC 2: Strings ============ -->
+  <section id="t2">
+    <div class="kh"><span class="num">2</span><h2 class="serif">Strings and basic pattern matching</h2></div>
+    <div class="why"><div class="lbl">Why this matters here</div><p>Module 1 opens with a real, common failure: a model wraps its JSON answer in a markdown code fence. Before you can parse that as JSON, you have to strip the fence off as a plain string operation.</p></div>
+    <p>Python strings support slicing, methods like <span class="mono-inline">.strip()</span> and <span class="mono-inline">.startswith()</span>, and the <span class="mono-inline">re</span> module for pattern matching when a fixed check isn't enough.</p>
+    <div class="def">
+      <div class="k">Concept: regex for structural stripping</div>
+      <p><span class="mono-inline">re.match(pattern, text)</span> tests whether <span class="mono-inline">text</span> starts with a match for <span class="mono-inline">pattern</span> and gives you access to captured groups. <span class="mono-inline">match.group(1)</span> returns whatever the first <span class="mono-inline">(...)</span> in the pattern captured.</p>
+    </div>
+    <pre class="codeblock">import re
+
+raw = '```json\n{"status": "ok"}\n```'
+m = re.match(r"^```(?:json)?\s*([\s\S]*?)\s*```$", raw)
+inner = m.group(1) if m else raw.strip()
+print(inner)   # {"status": "ok"}</pre>
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>What should your function do if the text ISN'T wrapped in a fence at all?</p>
+      <details><summary>Check your answer</summary><div class="ans">Return the text unchanged (just stripped of surrounding whitespace). A fence-stripping function shouldn't assume every input has a fence, plenty of valid model output won't.</div></details>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">strip_code_fence(text)</span>. If <span class="mono-inline">text</span> is wrapped in a markdown code fence (with or without a language tag like <span class="mono-inline">json</span>), return only the content inside. Otherwise, return <span class="mono-inline">text.strip()</span> unchanged.</p>
+      <textarea id="t2CodeEditor" aria-label="Python code editor for strip_code_fence" class="testin" spellcheck="false" style="min-height:140px;font-size:13px" rows="7"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunT2">▶ Run tests</button>
+        <button id="btnResetT2">Reset to starter code</button>
+      </div>
+      <div id="t2Results" style="margin-top:14px"></div>
+      <div class="hintbox" id="t2Hintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="t2HintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1</summary><div class="hbody">Use <span class="mono-inline">re.match(r"^```(?:\w+)?\s*([\s\S]*?)\s*```$", text.strip())</span>. If it matches, return <span class="mono-inline">group(1)</span>. If not, return <span class="mono-inline">text.strip()</span>.</div></details>
+        <details data-hint="solution" class="locked" id="t2SolutionDetails"><summary id="t2SolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">import re
+
+def strip_code_fence(text):
+    stripped = text.strip()
+    m = re.match(r"^```(?:\w+)?\s*([\s\S]*?)\s*```$", stripped)
+    if m:
+        return m.group(1)
+    return stripped</pre></div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOPIC 3: Lists ============ -->
+  <section id="t3">
+    <div class="kh"><span class="num">3</span><h2 class="serif">Lists and iteration</h2></div>
+    <div class="why"><div class="lbl">Why this matters here</div><p>Module 2's chunker splits a document into pieces that fit a token budget. Before tackling that token-aware version, get comfortable with the simpler idea underneath it: splitting a list into fixed-size groups.</p></div>
+    <p>A Python list is an ordered, mutable sequence. <span class="mono-inline">list[start:end]</span> slices it; <span class="mono-inline">.append(x)</span> adds to the end.</p>
+    <div class="def">
+      <div class="k">Concept: building a list of lists</div>
+      <p>A common pattern: start with an empty result list, loop over your input in fixed-size steps, and <span class="mono-inline">.append()</span> each slice as its own sub-list.</p>
+    </div>
+    <pre class="codeblock">items = [1, 2, 3, 4, 5]
+size = 2
+batches = []
+for i in range(0, len(items), size):
+    batches.append(items[i:i + size])
+print(batches)   # [[1, 2], [3, 4], [5]]</pre>
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>What does <span class="mono-inline">items[i:i+size]</span> return when <span class="mono-inline">i+size</span> goes past the end of the list?</p>
+      <details><summary>Check your answer</summary><div class="ans">Python slicing never raises an out-of-range error, it just returns whatever is left, even if that's fewer than <span class="mono-inline">size</span> items (or an empty list). This is why the last batch above has only 1 item, not a crash.</div></details>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">batch(items, size)</span>. Split <span class="mono-inline">items</span> into a list of lists, each with at most <span class="mono-inline">size</span> items, preserving order. An empty input returns an empty list.</p>
+      <textarea id="t3CodeEditor" aria-label="Python code editor for batch" class="testin" spellcheck="false" style="min-height:120px;font-size:13px" rows="6"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunT3">▶ Run tests</button>
+        <button id="btnResetT3">Reset to starter code</button>
+      </div>
+      <div id="t3Results" style="margin-top:14px"></div>
+      <div class="hintbox" id="t3Hintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="t3HintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1</summary><div class="hbody">Loop with <span class="mono-inline">for i in range(0, len(items), size)</span>, appending <span class="mono-inline">items[i:i+size]</span> each time.</div></details>
+        <details data-hint="solution" class="locked" id="t3SolutionDetails"><summary id="t3SolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">def batch(items, size):
+    result = []
+    for i in range(0, len(items), size):
+        result.append(items[i:i + size])
+    return result</pre></div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOPIC 4: Dictionaries ============ -->
+  <section id="t4">
+    <div class="kh"><span class="num">4</span><h2 class="serif">Dictionaries</h2></div>
+    <div class="why"><div class="lbl">Why this matters here</div><p>Nearly everything an AI system configures, model parameters, tool schemas, retrieval settings, is a dict. A common pattern across every module ahead: start from sane defaults, then let a caller override just the parts they care about.</p></div>
+    <p>A dict maps keys to values. <span class="mono-inline">{**a, **b}</span> builds a new dict by unpacking <span class="mono-inline">a</span> first, then <span class="mono-inline">b</span>, so <span class="mono-inline">b</span>'s keys win on any overlap, without mutating either original dict.</p>
+    <div class="def">
+      <div class="k">Concept: non-destructive merging</div>
+      <p>Mutating a shared defaults dict in place is a common bug, the next caller gets a defaults dict that's no longer default. Building a NEW dict avoids that entirely.</p>
+    </div>
+    <pre class="codeblock">defaults = {"temperature": 0.7, "max_tokens": 500}
+overrides = {"max_tokens": 1000}
+config = {**defaults, **overrides}
+print(config)          # {'temperature': 0.7, 'max_tokens': 1000}
+print(defaults)         # unchanged: {'temperature': 0.7, 'max_tokens': 500}</pre>
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Why does <span class="mono-inline">defaults</span> stay unchanged after building <span class="mono-inline">config</span>?</p>
+      <details><summary>Check your answer</summary><div class="ans"><span class="mono-inline">{**defaults, **overrides}</span> creates a brand-new dict, it reads from both inputs but writes to neither. Contrast with <span class="mono-inline">defaults.update(overrides)</span>, which WOULD mutate <span class="mono-inline">defaults</span> in place, a common source of bugs when the same defaults dict is reused across calls.</div></details>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">merge_config(defaults, overrides)</span>. Return a new dict combining both, with <span class="mono-inline">overrides</span> winning on any shared key. Never mutate either input dict.</p>
+      <textarea id="t4CodeEditor" aria-label="Python code editor for merge_config" class="testin" spellcheck="false" style="min-height:100px;font-size:13px" rows="5"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunT4">▶ Run tests</button>
+        <button id="btnResetT4">Reset to starter code</button>
+      </div>
+      <div id="t4Results" style="margin-top:14px"></div>
+      <div class="hintbox" id="t4Hintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="t4HintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1</summary><div class="hbody">Return <span class="mono-inline">{**defaults, **overrides}</span> directly.</div></details>
+        <details data-hint="solution" class="locked" id="t4SolutionDetails"><summary id="t4SolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">def merge_config(defaults, overrides):
+    return {**defaults, **overrides}</pre></div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOPIC 5: Conditionals & loops ============ -->
+  <section id="t5">
+    <div class="kh"><span class="num">5</span><h2 class="serif">Conditionals, loops, and sorting</h2></div>
+    <div class="why"><div class="lbl">Why this matters here</div><p>Module 3's whole job is retrieval: score every candidate, throw out the irrelevant ones, keep only the best few. That's a filter, a sort, and a slice, the exact combination this topic builds.</p></div>
+    <p><span class="mono-inline">sorted(iterable, key=..., reverse=True)</span> returns a new sorted list without changing the original. A list comprehension like <span class="mono-inline">[x for x in items if condition]</span> filters in one line.</p>
+    <div class="def">
+      <div class="k">Concept: filter, sort, then limit, in that order</div>
+      <p>Filtering AFTER sorting (or slicing before filtering) can silently drop a result that should have made the cut. The safe order is always: score everything, filter out what doesn't qualify, sort what's left, then take only as many as you need.</p>
+    </div>
+    <pre class="codeblock">docs = [{"id": "a", "score": 0.9}, {"id": "b", "score": 0.2}, {"id": "c", "score": 0.6}]
+qualified = [d for d in docs if d["score"] >= 0.4]
+ranked = sorted(qualified, key=lambda d: d["score"], reverse=True)
+top2 = ranked[:2]
+print(top2)   # [{'id': 'a', 'score': 0.9}, {'id': 'c', 'score': 0.6}]</pre>
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Why filter by the minimum score BEFORE slicing to the limit, rather than after?</p>
+      <details><summary>Check your answer</summary><div class="ans">Slicing first (say, taking the top 2 by score, then checking if they clear the threshold) can leave you with fewer than you should have, or wrongly include a low scorer if you slice before sorting. Filtering first guarantees every candidate you keep already qualifies, however many end up in the final slice.</div></details>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">top_matches(docs, min_score, limit)</span>. <span class="mono-inline">docs</span> is a list of <span class="mono-inline">{"id":..., "score":...}</span> dicts. Return the qualifying docs (score &gt;= min_score), sorted by score descending, limited to at most <span class="mono-inline">limit</span> results.</p>
+      <textarea id="t5CodeEditor" aria-label="Python code editor for top_matches" class="testin" spellcheck="false" style="min-height:110px;font-size:13px" rows="5"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunT5">▶ Run tests</button>
+        <button id="btnResetT5">Reset to starter code</button>
+      </div>
+      <div id="t5Results" style="margin-top:14px"></div>
+      <div class="hintbox" id="t5Hintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="t5HintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1</summary><div class="hbody">Filter with a list comprehension, sort with <span class="mono-inline">sorted(..., key=lambda d: d["score"], reverse=True)</span>, then slice with <span class="mono-inline">[:limit]</span>.</div></details>
+        <details data-hint="solution" class="locked" id="t5SolutionDetails"><summary id="t5SolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">def top_matches(docs, min_score, limit):
+    qualified = [d for d in docs if d["score"] >= min_score]
+    ranked = sorted(qualified, key=lambda d: d["score"], reverse=True)
+    return ranked[:limit]</pre></div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOPIC 6: Functions & exceptions ============ -->
+  <section id="t6">
+    <div class="kh"><span class="num">6</span><h2 class="serif">Functions and handling failure with try/except</h2></div>
+    <div class="why"><div class="lbl">Why this matters here</div><p>Module 7's eval harness has one hard rule: a single broken test case can never crash the whole evaluation run. That discipline starts here, with the basic shape of a function that fails safely instead of taking the whole program down with it.</p></div>
+    <p>A function that might fail should say so through its return value, not by letting an exception escape uncaught. <span class="mono-inline">try/except</span> catches an error and lets you decide what happens next.</p>
+    <div class="def">
+      <div class="k">Concept: try/except</div>
+      <p><span class="mono-inline">try:</span> wraps code that might raise. <span class="mono-inline">except Exception as e:</span> catches it, <span class="mono-inline">e</span> is the exception object, <span class="mono-inline">str(e)</span> gives its message. Code inside <span class="mono-inline">except</span> runs only if the <span class="mono-inline">try</span> block actually raised.</p>
+    </div>
+    <pre class="codeblock">def safe_score(a, b):
+    try:
+        return a / b
+    except ZeroDivisionError:
+        return None
+
+print(safe_score(10, 2))   # 5.0
+print(safe_score(5, 0))    # None, no crash</pre>
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>What would happen to a caller looping over many <span class="mono-inline">(a, b)</span> pairs if <span class="mono-inline">safe_score</span> DIDN'T catch the exception?</p>
+      <details><summary>Check your answer</summary><div class="ans">A single <span class="mono-inline">b=0</span> pair anywhere in the loop would raise, uncaught, and crash the ENTIRE loop, losing every result computed so far, not just the one bad pair. This is exactly the "one bad input shouldn't take down the whole batch" principle that shows up again in Module 4's tool executor and Module 7's eval harness.</div></details>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">safe_score(a, b)</span>. Return <span class="mono-inline">a / b</span>. If <span class="mono-inline">b</span> is 0, catch the <span class="mono-inline">ZeroDivisionError</span> and return <span class="mono-inline">None</span> instead of letting it raise.</p>
+      <textarea id="t6CodeEditor" aria-label="Python code editor for safe_score" class="testin" spellcheck="false" style="min-height:110px;font-size:13px" rows="5"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunT6">▶ Run tests</button>
+        <button id="btnResetT6">Reset to starter code</button>
+      </div>
+      <div id="t6Results" style="margin-top:14px"></div>
+      <div class="hintbox" id="t6Hintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="t6HintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1</summary><div class="hbody">Wrap the division in <span class="mono-inline">try: ... except ZeroDivisionError: return None</span>.</div></details>
+        <details data-hint="solution" class="locked" id="t6SolutionDetails"><summary id="t6SolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">def safe_score(a, b):
+    try:
+        return a / b
+    except ZeroDivisionError:
+        return None</pre></div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOPIC 7: JSON ============ -->
+  <section id="t7">
+    <div class="kh"><span class="num">7</span><h2 class="serif">Working with JSON</h2></div>
+    <div class="why"><div class="lbl">Why this matters here</div><p>Every model API speaks JSON. Module 1's entire premise is that a model's JSON-shaped output can't be trusted until it's actually been parsed and validated, starting with just getting <span class="mono-inline">json.loads()</span> to succeed.</p></div>
+    <p>Python's built-in <span class="mono-inline">json</span> module converts between JSON text and Python objects. <span class="mono-inline">json.loads(text)</span> parses text into a dict/list/etc; <span class="mono-inline">json.dumps(obj)</span> does the reverse.</p>
+    <div class="def">
+      <div class="k">Concept: json.loads() raises on invalid input</div>
+      <p>Malformed JSON doesn't return <span class="mono-inline">None</span>, it raises <span class="mono-inline">json.JSONDecodeError</span>. If you want a function that never crashes on bad input, you have to catch that explicitly.</p>
+    </div>
+    <pre class="codeblock">import json
+
+print(json.loads('{"status": "ok"}'))   # {'status': 'ok'}
+print(json.loads('[1, 2, 3]'))          # [1, 2, 3]
+try:
+    json.loads("not json at all")
+except json.JSONDecodeError as e:
+    print("failed:", e)</pre>
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Why is returning <span class="mono-inline">None</span> on failure better than letting <span class="mono-inline">json.JSONDecodeError</span> propagate out of your own function?</p>
+      <details><summary>Check your answer</summary><div class="ans">A caller expecting "either parsed data or a clear signal it failed" can check <span class="mono-inline">if result is None</span> and handle it gracefully. An uncaught exception instead forces every single caller to wrap every single call in its own try/except, or risk a crash, exactly the repair-then-validate discipline Module 1 builds on.</div></details>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">parse_or_none(text)</span>. Try <span class="mono-inline">json.loads(text)</span> and return the result. If it raises, catch the exception and return <span class="mono-inline">None</span> instead.</p>
+      <textarea id="t7CodeEditor" aria-label="Python code editor for parse_or_none" class="testin" spellcheck="false" style="min-height:110px;font-size:13px" rows="5"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunT7">▶ Run tests</button>
+        <button id="btnResetT7">Reset to starter code</button>
+      </div>
+      <div id="t7Results" style="margin-top:14px"></div>
+      <div class="hintbox" id="t7Hintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="t7HintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1</summary><div class="hbody">Import <span class="mono-inline">json</span>, wrap <span class="mono-inline">json.loads(text)</span> in try/except catching <span class="mono-inline">Exception</span> (broad is fine here), return <span class="mono-inline">None</span> on failure.</div></details>
+        <details data-hint="solution" class="locked" id="t7SolutionDetails"><summary id="t7SolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">import json
+
+def parse_or_none(text):
+    try:
+        return json.loads(text)
+    except Exception:
+        return None</pre></div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOPIC 8: Async/await ============ -->
+  <section id="t8">
+    <div class="kh"><span class="num">8</span><h2 class="serif">Async functions: the shape of a model API call</h2></div>
+    <div class="why"><div class="lbl">Why this matters here</div><p>Every real model API call is asynchronous, your code sends a request and waits for a response without freezing everything else. Module 6's entire retry-and-fallback system is built from <span class="mono-inline">async def</span> functions and <span class="mono-inline">await</span>. This is the minimum shape you need before that module.</p></div>
+    <p><span class="mono-inline">async def</span> defines a function that can be <span class="mono-inline">await</span>ed. Inside an async function, <span class="mono-inline">await some_async_call()</span> pauses until that call finishes, without blocking anything else.</p>
+    <div class="def">
+      <div class="k">Concept: trying calls in order until one works</div>
+      <p>A common async pattern (and the direct precursor to Module 6's fallback logic): try a list of async operations one at a time, and use the first one that succeeds, catching failures along the way instead of stopping at the first error.</p>
+    </div>
+    <pre class="codeblock">async def fetch_first_success(calls):
+    for call in calls:
+        try:
+            return await call()
+        except Exception:
+            continue
+    return None
+
+# calls is a list of async functions with no arguments, e.g.:
+# async def primary(): raise Exception("down")
+# async def backup(): return "backup result"
+# await fetch_first_success([primary, backup])  ->  "backup result"</pre>
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>If EVERY call in the list raises, what should <span class="mono-inline">fetch_first_success</span> return, and why not let the last exception propagate?</p>
+      <details><summary>Check your answer</summary><div class="ans">It should return <span class="mono-inline">None</span> (a clear, structured "nothing worked" signal), not let an exception escape. This is the exact same "never let this function raise, report failure through the return value" discipline from topics 6 and 7, now applied to async code, and it's precisely what Module 6's <span class="mono-inline">call_with_retry_fallback</span> builds on directly.</div></details>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">async def fetch_first_success(calls)</span>. <span class="mono-inline">calls</span> is a list of async, no-argument functions. Try each in order with <span class="mono-inline">await</span>; return the first result that succeeds without raising. If every call raises, return <span class="mono-inline">None</span>. Never let this function raise.</p>
+      <textarea id="t8CodeEditor" aria-label="Python code editor for fetch_first_success" class="testin" spellcheck="false" style="min-height:120px;font-size:13px" rows="6"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunT8">▶ Run tests</button>
+        <button id="btnResetT8">Reset to starter code</button>
+      </div>
+      <div id="t8Results" style="margin-top:14px"></div>
+      <div class="hintbox" id="t8Hintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="t8HintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1</summary><div class="hbody">Loop over <span class="mono-inline">calls</span>, wrapping <span class="mono-inline">await call()</span> in a try/except. On success, <span class="mono-inline">return</span> immediately. On exception, <span class="mono-inline">continue</span> to the next one. After the loop, return <span class="mono-inline">None</span>.</div></details>
+        <details data-hint="solution" class="locked" id="t8SolutionDetails"><summary id="t8SolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">async def fetch_first_success(calls):
+    for call in calls:
+        try:
+            return await call()
+        except Exception:
+            continue
+    return None</pre></div></details>
+      </div>
+    </div>
+  </section>
+
+  <div class="cannow">
+    <div class="lbl">You can now...</div>
+    <ul>
+      <li>Estimate a token count from raw text using floor division.</li>
+      <li>Strip a markdown code fence from a string with a regex.</li>
+      <li>Split a list into fixed-size batches.</li>
+      <li>Merge two dicts into a new one without mutating either.</li>
+      <li>Filter, sort, and limit a list of scored candidates in the correct order.</li>
+      <li>Write a function that fails safely with try/except instead of crashing its caller.</li>
+      <li>Parse JSON safely, returning a clear failure signal instead of an uncaught exception.</li>
+      <li>Write and reason about a basic async function that tries multiple paths in order.</li>
+    </ul>
+  </div>
+
+  <section>
+    <div class="kh"><span class="num">9</span><h2 class="serif">Self-check</h2></div>
+    <p class="mut">Not graded, not gating. A quick gut-check before Module 1.</p>
+
+    <div class="qcard">
+      <div class="qn">Question 1 of 5</div>
+      <div class="qtext">What does <span class="mono-inline">len("hello") // 4</span> evaluate to?</div>
+      <div id="scq1opts"></div>
+      <div class="qexplain" id="scq1explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">Question 2 of 5</div>
+      <div class="qtext">If a string is NOT wrapped in a markdown fence, what should a well-behaved <span class="mono-inline">strip_code_fence</span> function do?</div>
+      <div id="scq2opts"></div>
+      <div class="qexplain" id="scq2explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">Question 3 of 5</div>
+      <div class="qtext">What does <span class="mono-inline">{**defaults, **overrides}</span> do to the original <span class="mono-inline">defaults</span> dict?</div>
+      <div id="scq3opts"></div>
+      <div class="qexplain" id="scq3explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">Question 4 of 5</div>
+      <div class="qtext">What does <span class="mono-inline">json.loads()</span> do when given text that isn't valid JSON?</div>
+      <div id="scq4opts"></div>
+      <div class="qexplain" id="scq4explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">Question 5 of 5</div>
+      <div class="qtext">Inside an <span class="mono-inline">async def</span> function, what does <span class="mono-inline">await some_call()</span> do?</div>
+      <div id="scq5opts"></div>
+      <div class="qexplain" id="scq5explain"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">10</span><h2 class="serif">Ready for Module 1</h2></div>
+    <p class="mut">Every exercise above ran real Python. That's not a coincidence, every module from here forward runs real Python too, the exact same sandbox, the exact same discipline: write a function, test it against real cases, see it actually work.</p>
+  </section>
+
+  <footer>Zenith Lab · AI Engineering · Python Foundations</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Self-check: 0 / 5</span>
+  <button class="primary nextbtn" id="btnNext">Continue to Module 1 →</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+CourseProgress.touchVisited && null;
+const PF_KEY = "pythonFoundations";
+function pfState(){ return CourseProgress.getExtra(PF_KEY) || { exercises: {}, selfCheck: {} }; }
+function pfSave(state){ CourseProgress.setExtra(PF_KEY, state); }
+
+/* ---------- generic exercise wiring helper ---------- */
+function wireExercise(cfg){
+  const { id, starter, harnessPy, harnessName, fnLabel } = cfg;
+  const editor = document.getElementById(id + "CodeEditor");
+  const resultsEl = document.getElementById(id + "Results");
+  const solutionDetails = document.getElementById(id + "SolutionDetails");
+  const solutionSummary = document.getElementById(id + "SolutionSummary");
+  const hintUsageEl = document.getElementById(id + "HintUsage");
+  let hasAttempted = false;
+
+  function loadStarter(){
+    editor.value = starter;
+    resultsEl.innerHTML = "";
+  }
+  loadStarter();
+  document.getElementById("btnReset" + id.charAt(0).toUpperCase() + id.slice(1)).addEventListener("click", loadStarter);
+
+  function hintUsageText(){
+    const st = pfState();
+    const used = (st.exercises[id] || {}).hintsUsed || 0;
+    return used > 0 ? `(${used} hint${used===1?"":"s"} used)` : "";
+  }
+  function refreshHintUsage(){ hintUsageEl.textContent = hintUsageText(); }
+  document.querySelectorAll('#' + id + 'Hintbox details[data-hint]:not([data-hint="solution"])').forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (!d.open) return;
+      const st = pfState();
+      const cur = st.exercises[id] || {};
+      const used = new Set(cur.hintsOpened || []);
+      used.add(d.dataset.hint);
+      cur.hintsOpened = Array.from(used);
+      cur.hintsUsed = used.size;
+      st.exercises[id] = cur;
+      pfSave(st);
+      refreshHintUsage();
+    });
+  });
+  solutionDetails.addEventListener("toggle", () => {
+    if (solutionDetails.open && !hasAttempted) solutionDetails.open = false;
+  });
+  function unlockSolution(){
+    hasAttempted = true;
+    solutionDetails.classList.remove("locked");
+    solutionSummary.textContent = "Solution";
+  }
+  (function restore(){
+    refreshHintUsage();
+    const st = pfState();
+    if ((st.exercises[id] || {}).passCount !== undefined) unlockSolution();
+  })();
+
+  async function run(){
+    unlockSolution();
+    resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Starting the Python sandbox (first run downloads the interpreter, can take anywhere from ~10s to a minute depending on your connection)…</div>`;
+    const code = editor.value;
+    const outcome = await PySandboxRunner.run(harnessPy, harnessName, code);
+    resultsEl.innerHTML = "";
+    if (!outcome.ok) {
+      resultsEl.innerHTML = `<div class="feedback bad" style="display:block">${CourseProgress.escapeHtml(outcome.error)}</div>`;
+      return;
+    }
+    const data = outcome.result;
+    if (!data.ranOk) {
+      resultsEl.innerHTML = `<div class="feedback bad" style="display:block">Your code didn't run: ${CourseProgress.escapeHtml(data.error)}. Check for a syntax error, or that the function is named exactly ${fnLabel}.</div>`;
+      return;
+    }
+    const results = data.results;
+    let passCount = 0;
+    results.forEach(r => {
+      if (r.pass) passCount++;
+      const row = document.createElement("div");
+      row.className = "feedback " + (r.pass ? "ok" : "bad");
+      row.style.display = "block"; row.style.marginTop = "8px";
+      const hintHtml = r.errorMessage
+        ? `Your code raised an unexpected error: ${CourseProgress.escapeHtml(r.errorMessage)}. ${r.hint}`
+        : r.hint;
+      row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${r.name}` + (r.pass ? "" : `<br>${hintHtml}`);
+      resultsEl.appendChild(row);
+    });
+    const summary = document.createElement("div");
+    summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
+    summary.textContent = `${passCount} / ${results.length} tests passing`;
+    resultsEl.appendChild(summary);
+    const st = pfState();
+    const cur = st.exercises[id] || {};
+    cur.passCount = passCount; cur.total = results.length;
+    st.exercises[id] = cur;
+    pfSave(st);
+  }
+  document.getElementById("btnRun" + id.charAt(0).toUpperCase() + id.slice(1)).addEventListener("click", run);
+}
+
+/* ---------- Topic 1: estimate_tokens ---------- */
+wireExercise({
+  id: "t1",
+  fnLabel: "estimate_tokens",
+  starter: `def estimate_tokens(text):
+    # Return the character count divided by 4, using floor division,
+    # as an int.
+
+    # YOUR CODE HERE
+
+    pass`,
+  harnessName: "harness",
+  harnessPy: [
+    "def harness(student_code):",
+    "    ns = {}",
+    "    try:",
+    "        exec(student_code, ns)",
+    "        fn = ns.get('estimate_tokens')",
+    "        if fn is None or not callable(fn):",
+    "            return {'ranOk': False, 'error': 'estimate_tokens is not defined as a function.'}",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': str(e)}",
+    "    def safe_call(text):",
+    "        try:",
+    "            return {'threw': False, 'out': fn(text)}",
+    "        except Exception as e:",
+    "            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+    "    results = []",
+    "    cases = [('', 0), ('abcd', 1), ('a' * 40, 10), ('a' * 7, 1), ('a' * 3, 0)]",
+    "    for text, expected in cases:",
+    "        r = safe_call(text)",
+    "        p = not r['threw'] and r['out'] == expected and isinstance(r['out'], int)",
+    "        results.append({'name': f'estimate_tokens with {len(text)} characters returns {expected}', 'pass': p,",
+    "            'hint': 'Use len(text) // 4 (floor division), and make sure you return an int.',",
+    "            'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n"),
+});
+
+/* ---------- Topic 2: strip_code_fence ---------- */
+wireExercise({
+  id: "t2",
+  fnLabel: "strip_code_fence",
+  starter: `import re
+
+def strip_code_fence(text):
+    # If text is wrapped in a markdown code fence (with or without a
+    # language tag), return only the content inside.
+    # Otherwise, return text.strip() unchanged.
+
+    # YOUR CODE HERE
+
+    pass`,
+  harnessName: "harness",
+  harnessPy: [
+    "def harness(student_code):",
+    "    ns = {}",
+    "    try:",
+    "        exec(student_code, ns)",
+    "        fn = ns.get('strip_code_fence')",
+    "        if fn is None or not callable(fn):",
+    "            return {'ranOk': False, 'error': 'strip_code_fence is not defined as a function.'}",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': str(e)}",
+    "    def safe_call(text):",
+    "        try:",
+    "            return {'threw': False, 'out': fn(text)}",
+    "        except Exception as e:",
+    "            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+    "    results = []",
+    "    cases = [",
+    "        ('```json\\n{\"a\": 1}\\n```', '{\"a\": 1}'),",
+    "        ('```\\nhello\\n```', 'hello'),",
+    "        ('no fence here', 'no fence here'),",
+    "        ('  \\n  plain text  \\n  ', 'plain text'),",
+    "        ('```python\\nline1\\nline2\\n```', 'line1\\nline2'),",
+    "    ]",
+    "    for text, expected in cases:",
+    "        r = safe_call(text)",
+    "        p = not r['threw'] and r['out'] == expected",
+    "        results.append({'name': 'strip_code_fence handles: ' + repr(text)[:40], 'pass': p,",
+    "            'hint': 'Match a leading and trailing ``` (with optional language tag) and return the captured inner content; otherwise return text.strip().',",
+    "            'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n"),
+});
+
+/* ---------- Topic 3: batch ---------- */
+wireExercise({
+  id: "t3",
+  fnLabel: "batch",
+  starter: `def batch(items, size):
+    # Split items into a list of lists, each with at most size items,
+    # preserving order. Empty input returns an empty list.
+
+    # YOUR CODE HERE
+
+    pass`,
+  harnessName: "harness",
+  harnessPy: [
+    "def harness(student_code):",
+    "    ns = {}",
+    "    try:",
+    "        exec(student_code, ns)",
+    "        fn = ns.get('batch')",
+    "        if fn is None or not callable(fn):",
+    "            return {'ranOk': False, 'error': 'batch is not defined as a function.'}",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': str(e)}",
+    "    def safe_call(items, size):",
+    "        try:",
+    "            return {'threw': False, 'out': fn(items, size)}",
+    "        except Exception as e:",
+    "            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+    "    results = []",
+    "    cases = [",
+    "        ([1,2,3,4,5], 2, [[1,2],[3,4],[5]]),",
+    "        ([], 3, []),",
+    "        ([1,2,3], 10, [[1,2,3]]),",
+    "        ([1,2,3], 1, [[1],[2],[3]]),",
+    "        (['a','b','c','d'], 2, [['a','b'],['c','d']]),",
+    "    ]",
+    "    for items, size, expected in cases:",
+    "        r = safe_call(items, size)",
+    "        p = not r['threw'] and r['out'] == expected",
+    "        results.append({'name': f'batch({items}, {size}) == {expected}', 'pass': p,",
+    "            'hint': 'Loop with for i in range(0, len(items), size), appending items[i:i+size] each time.',",
+    "            'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n"),
+});
+
+/* ---------- Topic 4: merge_config ---------- */
+wireExercise({
+  id: "t4",
+  fnLabel: "merge_config",
+  starter: `def merge_config(defaults, overrides):
+    # Return a new dict combining both, with overrides winning on any
+    # shared key. Never mutate either input dict.
+
+    # YOUR CODE HERE
+
+    pass`,
+  harnessName: "harness",
+  harnessPy: [
+    "def harness(student_code):",
+    "    ns = {}",
+    "    try:",
+    "        exec(student_code, ns)",
+    "        fn = ns.get('merge_config')",
+    "        if fn is None or not callable(fn):",
+    "            return {'ranOk': False, 'error': 'merge_config is not defined as a function.'}",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': str(e)}",
+    "    def safe_call(defaults, overrides):",
+    "        try:",
+    "            return {'threw': False, 'out': fn(dict(defaults), dict(overrides))}",
+    "        except Exception as e:",
+    "            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+    "    results = []",
+    "    d = {'temperature': 0.7, 'max_tokens': 500}",
+    "    o = {'max_tokens': 1000}",
+    "    r = safe_call(d, o)",
+    "    p = not r['threw'] and r['out'] == {'temperature': 0.7, 'max_tokens': 1000}",
+    "    results.append({'name': 'overrides win on shared keys', 'pass': p,",
+    "        'hint': 'Return {**defaults, **overrides}.', 'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    d2 = {'a': 1, 'b': 2}",
+    "    r = safe_call(d2, {})",
+    "    p = not r['threw'] and r['out'] == {'a': 1, 'b': 2}",
+    "    results.append({'name': 'empty overrides returns an equivalent copy', 'pass': p,",
+    "        'hint': 'With no overrides, the result should equal defaults exactly.', 'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    d3 = {'x': 1}",
+    "    r = safe_call(d3, {'y': 2})",
+    "    p = not r['threw'] and r['out'] == {'x': 1, 'y': 2}",
+    "    results.append({'name': 'keys only in overrides are added', 'pass': p,",
+    "        'hint': 'A key present only in overrides should still appear in the result.', 'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    d4 = {'k': 1}",
+    "    original = dict(d4)",
+    "    fn(d4, {'k': 2})",
+    "    p = d4 == original",
+    "    results.append({'name': 'the original defaults dict is never mutated', 'pass': p,",
+    "        'hint': 'Build and return a NEW dict, e.g. {**defaults, **overrides}, do not call defaults.update(overrides).',",
+    "        'errorMessage': None})",
+    "    d5 = {'a': 1, 'b': 2}",
+    "    o5 = {'b': 3, 'c': 4}",
+    "    r = safe_call(d5, o5)",
+    "    p = not r['threw'] and r['out'] == {'a': 1, 'b': 3, 'c': 4}",
+    "    results.append({'name': 'a mix of shared and unique keys merges correctly', 'pass': p,",
+    "        'hint': 'Every key from both dicts should appear, with overrides winning any conflicts.', 'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n"),
+});
+
+/* ---------- Topic 5: top_matches ---------- */
+wireExercise({
+  id: "t5",
+  fnLabel: "top_matches",
+  starter: `def top_matches(docs, min_score, limit):
+    # docs: list of {"id":..., "score":...} dicts.
+    # Return qualifying docs (score >= min_score), sorted by score
+    # descending, limited to at most 'limit' results.
+
+    # YOUR CODE HERE
+
+    pass`,
+  harnessName: "harness",
+  harnessPy: [
+    "def harness(student_code):",
+    "    ns = {}",
+    "    try:",
+    "        exec(student_code, ns)",
+    "        fn = ns.get('top_matches')",
+    "        if fn is None or not callable(fn):",
+    "            return {'ranOk': False, 'error': 'top_matches is not defined as a function.'}",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': str(e)}",
+    "    def safe_call(docs, min_score, limit):",
+    "        try:",
+    "            return {'threw': False, 'out': fn(docs, min_score, limit)}",
+    "        except Exception as e:",
+    "            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+    "    results = []",
+    "    docs = [{'id': 'a', 'score': 0.9}, {'id': 'b', 'score': 0.2}, {'id': 'c', 'score': 0.6}]",
+    "    r = safe_call(docs, 0.4, 2)",
+    "    p = not r['threw'] and [d['id'] for d in r['out']] == ['a', 'c']",
+    "    results.append({'name': 'filters below threshold, sorts descending, limits to 2', 'pass': p,",
+    "        'hint': 'Filter score >= min_score first, then sort descending by score, then slice to limit.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    r = safe_call(docs, 0.0, 10)",
+    "    p = not r['threw'] and [d['id'] for d in r['out']] == ['a', 'c', 'b']",
+    "    results.append({'name': 'limit higher than qualifying count returns all qualifying docs, sorted', 'pass': p,",
+    "        'hint': 'Slicing past the end of a list just returns everything available, no error.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    r = safe_call(docs, 0.95, 5)",
+    "    p = not r['threw'] and r['out'] == []",
+    "    results.append({'name': 'no docs qualifying returns an empty list', 'pass': p,",
+    "        'hint': 'If nothing clears min_score, the filtered list is empty before sorting/slicing even runs.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    unordered = [{'id': 'low', 'score': 0.1}, {'id': 'high', 'score': 0.99}, {'id': 'mid', 'score': 0.5}]",
+    "    r = safe_call(unordered, 0.0, 3)",
+    "    p = not r['threw'] and [d['id'] for d in r['out']] == ['high', 'mid', 'low']",
+    "    results.append({'name': 'result is correctly sorted regardless of input order', 'pass': p,",
+    "        'hint': 'Always sort AFTER filtering, using key=lambda d: d[\"score\"], reverse=True.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    r = safe_call(docs, 0.5, 1)",
+    "    p = not r['threw'] and len(r['out']) == 1 and r['out'][0]['id'] == 'a'",
+    "    results.append({'name': 'limit=1 returns only the single best qualifying match', 'pass': p,",
+    "        'hint': 'After filtering and sorting, [:limit] with limit=1 keeps only the top entry.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n"),
+});
+
+/* ---------- Topic 6: safe_score ---------- */
+wireExercise({
+  id: "t6",
+  fnLabel: "safe_score",
+  starter: `def safe_score(a, b):
+    # Return a / b. If b is 0, catch the ZeroDivisionError and
+    # return None instead of letting it raise.
+
+    # YOUR CODE HERE
+
+    pass`,
+  harnessName: "harness",
+  harnessPy: [
+    "def harness(student_code):",
+    "    ns = {}",
+    "    try:",
+    "        exec(student_code, ns)",
+    "        fn = ns.get('safe_score')",
+    "        if fn is None or not callable(fn):",
+    "            return {'ranOk': False, 'error': 'safe_score is not defined as a function.'}",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': str(e)}",
+    "    def safe_call(a, b):",
+    "        try:",
+    "            return {'threw': False, 'out': fn(a, b)}",
+    "        except Exception as e:",
+    "            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+    "    results = []",
+    "    cases = [(10, 2, 5), (5, 0, None), (0, 5, 0), (-4, 2, -2), (7, 2, 3.5)]",
+    "    for a, b, expected in cases:",
+    "        r = safe_call(a, b)",
+    "        p = not r['threw'] and r['out'] == expected",
+    "        results.append({'name': f'safe_score({a}, {b}) == {expected}', 'pass': p,",
+    "            'hint': 'Wrap a / b in try/except ZeroDivisionError, returning None on that specific exception.',",
+    "            'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n"),
+});
+
+/* ---------- Topic 7: parse_or_none ---------- */
+wireExercise({
+  id: "t7",
+  fnLabel: "parse_or_none",
+  starter: `import json
+
+def parse_or_none(text):
+    # Try json.loads(text) and return the result.
+    # If it raises, catch the exception and return None instead.
+
+    # YOUR CODE HERE
+
+    pass`,
+  harnessName: "harness",
+  harnessPy: [
+    "def harness(student_code):",
+    "    ns = {}",
+    "    try:",
+    "        exec(student_code, ns)",
+    "        fn = ns.get('parse_or_none')",
+    "        if fn is None or not callable(fn):",
+    "            return {'ranOk': False, 'error': 'parse_or_none is not defined as a function.'}",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': str(e)}",
+    "    def safe_call(text):",
+    "        try:",
+    "            return {'threw': False, 'out': fn(text)}",
+    "        except Exception as e:",
+    "            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+    "    results = []",
+    "    r = safe_call('{\"status\": \"ok\"}')",
+    "    p = not r['threw'] and r['out'] == {'status': 'ok'}",
+    "    results.append({'name': 'valid JSON object parses to a dict', 'pass': p,",
+    "        'hint': 'json.loads() of a valid object string returns a dict directly.', 'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    r = safe_call('[1, 2, 3]')",
+    "    p = not r['threw'] and r['out'] == [1, 2, 3]",
+    "    results.append({'name': 'valid JSON array parses to a list', 'pass': p,",
+    "        'hint': 'json.loads() also handles top-level arrays, returning a list.', 'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    r = safe_call('not json at all')",
+    "    p = not r['threw'] and r['out'] is None",
+    "    results.append({'name': 'invalid JSON returns None, never raises', 'pass': p,",
+    "        'hint': 'Catch the exception json.loads() raises on invalid input and return None instead of letting it propagate.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    r = safe_call('')",
+    "    p = not r['threw'] and r['out'] is None",
+    "    results.append({'name': 'empty string returns None', 'pass': p,",
+    "        'hint': 'An empty string is not valid JSON either, it should be caught the same way.', 'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    r = safe_call('42')",
+    "    p = not r['threw'] and r['out'] == 42",
+    "    results.append({'name': \"a bare JSON number string like '42' parses to an int\", 'pass': p,",
+    "        'hint': 'JSON top-level values can be numbers too, not just objects/arrays, json.loads(\"42\") returns 42.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n"),
+});
+
+/* ---------- Topic 8: fetch_first_success (async) ---------- */
+wireExercise({
+  id: "t8",
+  fnLabel: "fetch_first_success",
+  starter: `async def fetch_first_success(calls):
+    # calls: list of async, no-argument functions.
+    # Try each in order with await; return the first result that
+    # succeeds without raising. If every call raises, return None.
+    # Never let this function raise.
+
+    # YOUR CODE HERE
+
+    pass`,
+  harnessName: "harness",
+  harnessPy: [
+    "async def harness(student_code):",
+    "    ns = {}",
+    "    try:",
+    "        exec(student_code, ns)",
+    "        fn = ns.get('fetch_first_success')",
+    "        if fn is None or not callable(fn):",
+    "            return {'ranOk': False, 'error': 'fetch_first_success is not defined as a function.'}",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': str(e)}",
+    "    async def safe_call(calls):",
+    "        try:",
+    "            return {'threw': False, 'out': await fn(calls)}",
+    "        except Exception as e:",
+    "            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+    "    results = []",
+    "    calls_made = [0]",
+    "    async def ok1():",
+    "        calls_made[0] += 1",
+    "        return 'primary result'",
+    "    async def unused1():",
+    "        calls_made[0] += 1",
+    "        return 'should not run'",
+    "    r = await safe_call([ok1, unused1])",
+    "    p = not r['threw'] and r['out'] == 'primary result' and calls_made[0] == 1",
+    "    results.append({'name': 'first call succeeding returns its result without trying the rest', 'pass': p,",
+    "        'hint': 'Return immediately from inside the loop on the first successful await, do not continue to later calls.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    async def bad2():",
+    "        raise Exception('primary down')",
+    "    async def ok2():",
+    "        return 'backup result'",
+    "    r = await safe_call([bad2, ok2])",
+    "    p = not r['threw'] and r['out'] == 'backup result'",
+    "    results.append({'name': 'first call raising falls through to the second, which succeeds', 'pass': p,",
+    "        'hint': 'Catch the exception from the failed call and continue the loop to the next one instead of stopping.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    async def bad3a():",
+    "        raise Exception('a down')",
+    "    async def bad3b():",
+    "        raise Exception('b down')",
+    "    r = await safe_call([bad3a, bad3b])",
+    "    p = not r['threw'] and r['out'] is None",
+    "    results.append({'name': 'every call raising returns None, never raises out of the function', 'pass': p,",
+    "        'hint': 'After the loop finishes without any call succeeding, return None as a clear failure signal.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    attempted = []",
+    "    async def track_a():",
+    "        attempted.append('a')",
+    "        raise Exception('a down')",
+    "    async def track_b():",
+    "        attempted.append('b')",
+    "        return 'b result'",
+    "    async def track_c():",
+    "        attempted.append('c')",
+    "        return 'c result'",
+    "    r = await safe_call([track_a, track_b, track_c])",
+    "    p = not r['threw'] and r['out'] == 'b result' and attempted == ['a', 'b']",
+    "    results.append({'name': 'stops trying further calls once one succeeds (c is never attempted)', 'pass': p,",
+    "        'hint': 'Once a call succeeds, return right away, do not keep looping through the remaining calls.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    async def only():",
+    "        return 'only result'",
+    "    r = await safe_call([only])",
+    "    p = not r['threw'] and r['out'] == 'only result'",
+    "    results.append({'name': 'a single-call list that succeeds returns its result', 'pass': p,",
+    "        'hint': 'The logic should work identically for a list of exactly one call.',",
+    "        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n"),
+});
+
+/* ---------- Self-check quiz (not gating) ---------- */
+let scScore = 0;
+const scAnswered = { scq1:false, scq2:false, scq3:false, scq4:false, scq5:false };
+function scUpdate(){
+  document.getElementById("scoreDisplay").textContent = `Self-check: ${scScore} / 5`;
+  const st = pfState();
+  st.selfCheck = { score: scScore, answered: Object.keys(scAnswered).filter(k => scAnswered[k]).length };
+  pfSave(st);
+}
+function buildSC(qkey, opts, elId){
+  const el = document.getElementById(elId);
+  opts.forEach((opt, i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.innerHTML = `<input type="radio" name="${qkey}" value="${i}"><span>${opt.text}</span>`;
+    div.addEventListener("click", () => {
+      if (scAnswered[qkey]) return;
+      scAnswered[qkey] = true;
+      document.querySelectorAll(`#${elId} .qopt`).forEach((e2,j) => {
+        if (opts[j].correct) e2.classList.add("correct");
+        else if (j === i) e2.classList.add("incorrect");
+      });
+      const ex = document.getElementById(qkey + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { scScore++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      scUpdate();
+    });
+    el.appendChild(div);
+  });
+}
+buildSC("scq1", [
+  { text: "1", correct: true, correctText: "Correct. len(\"hello\") is 5, and 5 // 4 is 1 (floor division drops the remainder)." },
+  { text: "1.25", correct: false, reason: "// is floor division, it always returns a whole number (an int), never a float with a fractional part." },
+  { text: "2", correct: false, reason: "5 // 4 rounds DOWN, not up, floor division truncates toward zero here, giving 1." },
+], "scq1opts");
+buildSC("scq2", [
+  { text: "Return the text stripped of surrounding whitespace, unchanged otherwise", correct: true, correctText: "Correct. A fence-stripping function shouldn't assume every input has a fence, unfenced input should pass through safely." },
+  { text: "Raise an exception, since a fence was expected", correct: false, reason: "Not every valid model response uses a fence, treating the absence of one as an error would reject perfectly good input." },
+  { text: "Return an empty string", correct: false, reason: "Discarding valid content because it wasn't fenced would silently lose real data for no reason." },
+], "scq2opts");
+buildSC("scq3", [
+  { text: "Nothing, it creates a new dict and leaves defaults unchanged", correct: true, correctText: "Correct. Dict-unpacking builds a fresh dict, reading from both inputs but mutating neither." },
+  { text: "It updates defaults in place with overrides' keys", correct: false, reason: "That describes defaults.update(overrides), a different operation. {**defaults, **overrides} does not touch defaults at all." },
+  { text: "It empties out defaults after copying its keys", correct: false, reason: "Dict-unpacking never empties or mutates the dicts it reads from, it only reads their key/value pairs to build a new dict." },
+], "scq3opts");
+buildSC("scq4", [
+  { text: "It raises json.JSONDecodeError", correct: true, correctText: "Correct. Invalid JSON is a real, raised exception, not a silent None or empty result, you have to catch it explicitly if you want graceful handling." },
+  { text: "It returns None silently", correct: false, reason: "json.loads() does not return None on failure, it raises. Returning None on bad input is something YOUR code has to add explicitly." },
+  { text: "It returns the original text unchanged", correct: false, reason: "There's no automatic fallback to the raw text, an invalid-JSON call raises rather than returning anything." },
+], "scq4opts");
+buildSC("scq5", [
+  { text: "Pauses execution until that call finishes, without blocking anything else", correct: true, correctText: "Correct. That's the core behavior async/await provides, waiting for a slow operation (like a model API call) without freezing the whole program." },
+  { text: "Runs the call in the background and immediately continues without waiting", correct: false, reason: "That's what NOT awaiting would do (or a separate background task). await specifically means 'wait for this to finish before continuing.'" },
+  { text: "Has no effect unless the function is also decorated as async", correct: false, reason: "await is only valid INSIDE an async function in the first place, its effect (pausing for the result) is immediate and always applies there." },
+], "scq5opts");
+
+document.getElementById("btnNext").addEventListener("click", () => {
+  window.location.href = "module-01.html";
+});
+</script>
+</body>
+</html>

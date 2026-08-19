@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automation Engineering: Syllabus</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65;overflow-x:hidden}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px}
+.bar{position:sticky;top:0;z-index:30;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:900px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em}
+.hero{padding:56px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--limed);background:var(--lime);padding:5px 12px;border-radius:2px}
+h1{font-size:clamp(34px,5.5vw,52px);font-weight:700;letter-spacing:-.02em;margin-top:18px;line-height:1.08}
+.sub{color:var(--mut);font-size:17px;max-width:680px;margin-top:14px}
+.metarow{display:flex;flex-wrap:wrap;gap:22px;margin-top:26px;padding-top:22px;border-top:1px solid var(--bd)}
+.metaitem .k{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--mut2)}
+.metaitem .v{font-size:15px;font-weight:600;margin-top:3px}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:20px}
+.kh .num{font-family:'Space Grotesk';font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:22px;font-weight:700;letter-spacing:-.01em}
+p.lead{color:var(--mut);max-width:680px}
+.prereq{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.prereq span{font-size:12px;background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:6px 12px;color:var(--mut)}
+.module{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:22px;margin-bottom:14px;position:relative}
+.module:hover{border-color:var(--bd2)}
+.module .mtop{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.module .mnum{font-family:'JetBrains Mono';font-size:12px;color:var(--lime);letter-spacing:.05em}
+.module h3{font-size:18px;font-weight:700;margin-top:4px;letter-spacing:-.01em}
+.module .wk{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2);white-space:nowrap}
+.module .desc{color:var(--mut);font-size:14px;margin-top:10px}
+.module .obj{margin-top:14px;padding-top:14px;border-top:1px dashed var(--bd)}
+.module .obj .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:8px}
+.module ul{list-style:none;display:grid;gap:6px}
+.module ul li{padding-left:18px;position:relative;color:var(--mut);font-size:13.5px}
+.module ul li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+.module .demo{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--violet);border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.08);border-radius:6px;padding:5px 10px}
+.badge-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--limed);background:var(--lime);padding:4px 10px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--bd)}
+th{color:var(--mut2);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.08em}
+tr:last-child td{border-bottom:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.box{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:18px}
+.box h4{font-size:14px;font-weight:700;color:var(--lime);margin-bottom:8px}
+.box p{color:var(--mut);font-size:13.5px}
+.rigor{background:rgba(198,244,50,.05);border-left:3px solid var(--lime);padding:16px 20px;border-radius:0 8px 8px 0;margin-top:20px}
+.rigor b{color:var(--lime)}
+footer{padding:30px 0 60px;text-align:center;color:var(--mut2);font-size:13px}
+a.inline{color:var(--lime);text-decoration:none;border-bottom:1px solid rgba(198,244,50,.4)}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Syllabus · Automation Engineering</span>
+</div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Founding cohort · Open now</span>
+    <h1 class="serif">Automation Engineering</h1>
+    <p class="sub">A graduate-level treatment of production automation: the formal models, failure semantics, and distributed-systems theory underneath every workflow platform you've ever used, applied directly to systems you will ship for paying clients.</p>
+
+    <div class="metarow">
+      <div class="metaitem"><div class="k">Format</div><div class="v">8 modules + capstone</div></div>
+      <div class="metaitem"><div class="k">Level</div><div class="v">Advanced / professional</div></div>
+      <div class="metaitem"><div class="k">Duration</div><div class="v">8 weeks, self-paced</div></div>
+      <div class="metaitem"><div class="k">Assessment</div><div class="v">Per-module problem sets + capstone build</div></div>
+      <div class="metaitem"><div class="k">Price</div><div class="v">$79 founding <span style="color:var(--mut2);text-decoration:line-through;font-weight:400">$199</span></div></div>
+    </div>
+    <div style="margin-top:24px">
+      <a href="dashboard.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--lime);color:var(--limed);font-weight:700;font-size:14px;padding:12px 22px;border-radius:8px;text-decoration:none">Start the free preview &rarr;</a>
+      <span style="margin-left:12px;color:var(--mut2);font-size:12.5px">Module 1 is open now, no signup required</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Course description</h2></div>
+    <p class="lead">Most automation courses teach you which buttons to click in a drag-and-drop builder. This one does not. It teaches the theory that makes automation systems <i>correct</i> and <i>reliable</i> under real-world failure, the same material a distributed-systems engineer would study, applied specifically to the workflow-automation domain: lead pipelines, integration chains, and event-driven business logic.</p>
+    <p class="lead" style="margin-top:12px">You will finish able to design a workflow system from a formal specification, reason rigorously about failure modes before they happen in production, and defend your architectural decisions to a technical client, not just assemble one from a template.</p>
+
+    <div class="rigor">
+      <b>Why this bar, not a tutorial bar:</b> tutorials teach a tool. Tools get replaced. The theory in this course, idempotency, exactly-once semantics, queueing behavior, retry mathematics, does not expire when the next automation platform launches. It is the actual engineering knowledge that separates a $50/hr template-assembler from an automation engineer clients trust with revenue-critical systems.
+    </div>
+
+    <div class="prereq">
+      <span>Prerequisite: comfortable writing code (any language)</span>
+      <span>Prerequisite: basic HTTP / REST familiarity</span>
+      <span>No prior automation-platform experience required</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Learning outcomes</h2></div>
+    <div class="grid2">
+      <div class="box"><h4>Formal reasoning</h4><p>Model any workflow as a directed graph or state machine and prove properties about it: reachability, termination, valid execution orders.</p></div>
+      <div class="box"><h4>Failure-first design</h4><p>Design for exactly-once delivery, idempotent operations, and graceful degradation before a single failure happens in production.</p></div>
+      <div class="box"><h4>Capacity reasoning</h4><p>Apply queueing theory to predict whether a workflow system will keep up under load, and where it will break first.</p></div>
+      <div class="box"><h4>Secure integration</h4><p>Implement OAuth2 flows and HMAC-signed webhooks correctly, understanding the cryptographic reasoning, not just copy-pasting a library call.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Module sequence</h2></div>
+    <p class="lead" style="margin-bottom:20px">Each module pairs a formal concept with an interactive simulation you manipulate directly, and closes with a graded problem set. Module 1 is open for preview.</p>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 01</div><h3>Formal Models of Workflow Execution</h3></div>
+        <div class="wk">Week 1 <a href="module-01.html" class="badge-live" style="margin-left:8px;text-decoration:none">Preview open &rarr;</a></div>
+      </div>
+      <p class="desc">Every workflow is a directed acyclic graph or a state machine, whether the tool that built it admits this or not. This module formalizes that claim: nodes, edges, topological ordering, and the state-machine semantics that govern valid transitions in a running pipeline.</p>
+      <div class="obj">
+        <div class="lbl">You will be able to</div>
+        <ul>
+          <li>Model a business process as a DAG and compute a valid execution order via topological sort</li>
+          <li>Distinguish a workflow that can deadlock from one that provably cannot</li>
+          <li>Specify a state machine with guards and prove which transitions are reachable</li>
+        </ul>
+      </div>
+      <div class="demo">▶ interactive: DAG execution-order simulator + state-machine walker</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 02</div><h3>Idempotency & Exactly-Once Semantics</h3></div><div class="wk">Week 2</div></div>
+      <p class="desc">Networks fail mid-request. Clients retry. Without idempotency, a retried "charge the card" becomes two charges. This module derives idempotency key design from first principles and distinguishes at-most-once, at-least-once, and exactly-once delivery, and why the third one is usually a lie your tooling tells you.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Design an idempotency-key scheme that survives concurrent duplicate requests</li>
+        <li>Explain why "exactly-once" is achieved via at-least-once delivery plus idempotent handling, not a magic transport guarantee</li>
+        <li>Identify non-idempotent operations in an existing workflow and fix them</li>
+      </ul></div>
+      <div class="demo">▶ interactive: duplicate-request race simulator</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 03</div><h3>Failure Handling & Retry Theory</h3></div><div class="wk">Week 3</div></div>
+      <p class="desc">Naive retry loops synchronize into thundering herds and take down the service they were trying to reach. This module derives exponential backoff with jitter mathematically, then covers circuit breakers and bulkheads as the two remaining primitives every resilient integration needs.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Derive and implement exponential backoff with decorrelated jitter, and explain why plain exponential backoff still fails under load</li>
+        <li>Design a circuit breaker state machine (closed / open / half-open) with correct transition conditions</li>
+        <li>Apply bulkheading to prevent one failing integration from starving the whole system</li>
+      </ul></div>
+      <div class="demo">▶ interactive: backoff-strategy comparison under simulated outage</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 04</div><h3>Queueing Theory for Job Systems</h3></div><div class="wk">Week 4</div></div>
+      <p class="desc">Will your workflow queue keep up at 10x lead volume, or fall over? This module introduces the M/M/1 queue model and Little's Law, giving you the actual math to answer that question before it happens to a client in production.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Apply Little's Law to relate arrival rate, service rate, and queue length</li>
+        <li>Compute utilization and expected wait time for a single-server job queue</li>
+        <li>Recognize when a system is approaching the utilization cliff where wait times explode</li>
+      </ul></div>
+      <div class="demo">▶ interactive: live queue simulator, adjustable arrival/service rate</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 05</div><h3>Authentication & Secure Integration</h3></div><div class="wk">Week 5</div></div>
+      <p class="desc">OAuth2 is not one protocol, it is a family of flows for different trust models, and most integration bugs come from choosing the wrong one. This module covers the authorization-code and client-credentials flows in full, JWT structure and verification, and HMAC request signing for webhook authenticity.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Choose the correct OAuth2 flow for a given integration (user-delegated vs. service-to-service)</li>
+        <li>Decode and verify a JWT's signature manually, understanding what each claim protects against</li>
+        <li>Implement and verify HMAC-signed webhook payloads, and explain the timing-attack risk in naive comparison</li>
+      </ul></div>
+      <div class="demo">▶ interactive: JWT decoder/verifier, HMAC signature workbench</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 06</div><h3>API Contract Design</h3></div><div class="wk">Week 6</div></div>
+      <p class="desc">A workflow is only as reliable as the contracts between its steps. This module covers idempotent HTTP method semantics, webhook delivery guarantees, and schema versioning strategy so an upstream change doesn't silently break every client running your system.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Design REST endpoints whose idempotency matches their HTTP method semantics</li>
+        <li>Specify a webhook contract with delivery, ordering, and replay guarantees stated explicitly</li>
+        <li>Version an API schema without breaking existing integrations</li>
+      </ul></div>
+      <div class="demo">▶ interactive: contract-breaking-change detector</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 07</div><h3>Observability & SLOs</h3></div><div class="wk">Week 7</div></div>
+      <p class="desc">You cannot fix what you cannot see, and you cannot promise a client reliability you haven't defined numerically. This module covers SLIs, SLOs, and error budgets as a rigorous framework, plus structured logging and distributed tracing basics for diagnosing a failure across a multi-step pipeline.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Define an SLI/SLO/error-budget triplet for a real client system and justify the numbers</li>
+        <li>Design structured log events that make a specific failure diagnosable in under five minutes</li>
+        <li>Trace a single business event across every step of a multi-stage pipeline</li>
+      </ul></div>
+      <div class="demo">▶ interactive: trace-the-failure diagnostic exercise</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop"><div><div class="mnum">MODULE 08</div><h3>Capstone: A Fault-Tolerant Lead Pipeline</h3></div><div class="wk">Week 8</div></div>
+      <p class="desc">Synthesis. You are given a client brief: a lead-capture-to-CRM pipeline that must survive a flaky downstream API, duplicate webhook deliveries, and a traffic spike. You submit a formal design (DAG or state machine), an idempotency and retry strategy, and an SLO definition, graded against a rubric, not vibes.</p>
+      <div class="obj"><div class="lbl">Deliverable</div><ul>
+        <li>A written design specification applying every prior module</li>
+        <li>A working implementation of the critical path (idempotent ingestion + retry + dead-letter handling)</li>
+        <li>A one-page SLO document you could hand directly to a client</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Assessment structure</h2></div>
+    <table>
+      <tr><th>Component</th><th>Weight</th><th>Format</th></tr>
+      <tr><td>Per-module problem sets (×7)</td><td>50%</td><td>Applied technical problems, graded against a rubric, not multiple choice trivia</td></tr>
+      <tr><td>Interactive checkpoint exercises</td><td>15%</td><td>Embedded in each module, immediate feedback, unlimited attempts</td></tr>
+      <tr><td>Capstone design specification</td><td>20%</td><td>Written, reviewed against the same bar a technical client would apply</td></tr>
+      <tr><td>Capstone implementation</td><td>15%</td><td>Working code, evaluated for correctness under the failure modes specified in the brief</td></tr>
+    </table>
+  </section>
+
+  <section style="border-bottom:none">
+    <div class="kh"><span class="num">§</span><h2>Career Path Edition</h2></div>
+    <p class="lead">Completing the modules is not the finish line. The Career Path Edition, included with every enrollment, covers what to charge for this level of work, how to talk about idempotency and SLOs on a sales call without sounding like a textbook, and a portfolio brief structured around your capstone so it functions as a real work sample, not a certificate nobody asked to see.</p>
+  </section>
+
+  <footer>
+    Zenith Lab · Automation Engineering Syllabus · Module 1 preview linked from the course catalog
+  </footer>
+</div>
+</body>
+</html>

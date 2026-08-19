@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Portfolio — Automation Engineering</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono'}
+.coursenav a:hover{color:var(--lime)}
+.hero{padding:40px 0 20px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(26px,4vw,36px);font-weight:700;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:680px;margin-top:10px}
+.emptystate{background:var(--card);border:1px dashed var(--bd2);border-radius:14px;padding:40px;text-align:center;color:var(--mut);margin-top:24px}
+.emptystate a{color:var(--lime)}
+.grid{display:grid;gap:16px;margin-top:24px}
+.pfcard{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px 24px}
+.pfcard .ptop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.pfcard .pt{font-weight:700;font-size:17px}
+.pfcard .pdate{font-size:12px;color:var(--mut2);font-family:'JetBrains Mono'}
+.pfcard .pdesc{font-size:14px;color:var(--tx);margin-top:10px}
+.pfrow{display:flex;gap:20px;flex-wrap:wrap;margin-top:14px;font-size:12.5px}
+.pfrow div b{display:block;color:var(--mut2);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;font-weight:700}
+.scorebig{font-family:'JetBrains Mono';font-size:22px;font-weight:700;color:var(--lime)}
+.pfcard a.ghlink{color:var(--violet);font-family:'JetBrains Mono';font-size:12.5px;text-decoration:none}
+.pfcard a.ghlink:hover{text-decoration:underline}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+.summarybox{background:var(--card2);border:1px solid var(--bd2);border-radius:12px;padding:20px 22px;margin-top:28px}
+.summarybox h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--violet);margin-bottom:12px}
+.summarybox textarea{width:100%;min-height:160px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:14px;color:var(--tx);resize:vertical}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="projects.html">Projects</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">My Portfolio</span>
+    <h1 class="serif">What you've actually built</h1>
+    <p class="sub">Every completed project from the Projects library, with the skills it demonstrates, your self-assessed score, and a generated summary you can paste into a resume or portfolio site.</p>
+  </header>
+
+  <div id="content"></div>
+
+  <div class="summarybox" id="summaryBox" style="display:none">
+    <h3>Generated portfolio summary</h3>
+    <textarea id="summaryText" readonly></textarea>
+    <button class="primary" id="btnCopySummary" style="margin-top:12px">Copy summary</button>
+  </div>
+
+  <footer>Zenith Lab · Automation Engineering · Portfolio</footer>
+</div>
+
+<script src="course-progress.js?v=5"></script>
+<script>
+const SKILL_PHRASES = {
+  1: "DAG-based workflow modeling, dependency validation, and cycle detection",
+  2: "idempotent API design, duplicate-request handling, and input validation",
+  3: "resilient retry logic with exponential backoff, jitter, and circuit breaking",
+  4: "capacity planning and queueing-theory-based utilization analysis",
+  5: "HMAC-based authentication, signature verification, and replay protection",
+  6: "API contract design and non-breaking schema evolution",
+  7: "structured observability, correlation-ID tracing, and SLO definition",
+  8: "an integrated, fault-tolerant automation pipeline combining reliability, security, and observability",
+};
+
+function render(){
+  const projects = CourseProgress.PROJECTS.map(p => ({ meta: p, state: CourseProgress.getProject(p.id) })).filter(x => x.state.completed);
+  const content = document.getElementById("content");
+  const summaryBox = document.getElementById("summaryBox");
+  if (projects.length === 0) {
+    content.innerHTML = `<div class="emptystate">No completed projects yet. Head to <a href="projects.html">Projects</a> to build and submit your first one, it'll appear here automatically.</div>`;
+    summaryBox.style.display = "none";
+    return;
+  }
+  const grid = document.createElement("div");
+  grid.className = "grid";
+  projects.forEach(({ meta, state }) => {
+    const card = document.createElement("div");
+    card.className = "pfcard";
+    const date = state.completedAt ? new Date(state.completedAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "";
+    const esc = CourseProgress.escapeHtml;
+    const scoreNum = Number(state.score);
+    const scoreDisplay = Number.isFinite(scoreNum) ? Math.max(0, Math.min(100, Math.round(scoreNum))) : 0;
+    const safeUrl = CourseProgress.safeHttpUrl(state.githubUrl);
+    const ghCell = state.githubUrl
+      ? (safeUrl ? `<a class="ghlink" href="${esc(safeUrl)}" target="_blank" rel="noopener noreferrer">${esc(state.githubUrl)}</a>` : `<span style="color:var(--mut2)">${esc(state.githubUrl)} (not a valid http/https URL)</span>`)
+      : "—";
+    card.innerHTML = `
+      <div class="ptop">
+        <div><div class="pt">${esc(meta.title)}</div><div class="pdate">Completed ${esc(date)}</div></div>
+        <div class="scorebig">${scoreDisplay}%</div>
+      </div>
+      <div class="pdesc">${state.description ? esc(state.description) : "<i style='color:var(--mut2)'>No description provided.</i>"}</div>
+      <div class="pfrow">
+        <div><b>Skills demonstrated</b>${esc(SKILL_PHRASES[meta.id])}</div>
+      </div>
+      <div class="pfrow">
+        <div><b>Technologies</b>${state.technologies ? esc(state.technologies) : "—"}</div>
+        <div><b>Tests passed</b>${state.testsPassed ? esc(state.testsPassed) : "—"}</div>
+        <div><b>GitHub</b>${ghCell}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  content.innerHTML = "";
+  content.appendChild(grid);
+
+  summaryBox.style.display = "block";
+  const lines = projects.map(({ meta, state }) => {
+    return `${meta.title}${state.score ? ` (self-assessed ${state.score}%)` : ""} — implemented ${SKILL_PHRASES[meta.id]}.${state.githubUrl ? " " + state.githubUrl : ""}`;
+  });
+  document.getElementById("summaryText").value =
+    `Automation Engineering — Portfolio Summary\n${projects.length} project${projects.length===1?"":"s"} completed\n\n` + lines.join("\n\n");
+}
+
+document.getElementById("btnCopySummary").addEventListener("click", () => {
+  const ta = document.getElementById("summaryText");
+  navigator.clipboard?.writeText(ta.value).catch(() => {});
+  const btn = document.getElementById("btnCopySummary");
+  btn.textContent = "Copied";
+  setTimeout(() => { btn.textContent = "Copy summary"; }, 1200);
+});
+
+render();
+</script>
+</body>
+</html>

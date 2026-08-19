@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 2: Context Windows &amp; Token Economics</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.progress{height:3px;background:var(--bd)}
+.progress i{display:block;height:100%;background:var(--lime);width:25%}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
+.def p{font-size:14.5px}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
+.callout b{color:var(--amber)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button.primary:hover{filter:brightness(1.08);color:var(--limed)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+.statrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px}
+.stat{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;flex:1;min-width:130px}
+.stat.warn{border-color:var(--red)}
+.stat .sv{font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--tx)}
+.stat.warn .sv{color:var(--red)}
+.stat .sl{font-size:11px;color:var(--mut2);margin-top:2px}
+.sliderrow{margin-top:10px}
+.slbl{font-size:13px;color:var(--mut)}
+input[type=range]{width:100%;margin-top:8px;accent-color:var(--lime)}
+.testin{width:100%;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
+.numinput input{width:100px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
+.nextbtn{margin-left:auto}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
+.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
+.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h3:first-of-type{margin-top:0}
+.orient p{font-size:14.5px;color:var(--mut)}
+.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
+.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
+.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
+.practice p{font-size:14px}
+.practice details{margin-top:12px}
+.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
+.practice summary::-webkit-details-marker{display:none}
+.practice summary:before{content:"▸ "}
+.practice details[open] summary:before{content:"▾ "}
+.practice details:not([open]) .ans{display:none}
+.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
+.hintbox{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 20px;margin-top:14px}
+.hintbox .hlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.hintbox .husage{font-size:11px;color:var(--mut2);font-weight:400;text-transform:none;letter-spacing:0}
+.hintbox details{margin-top:8px;border-top:1px solid var(--bd);padding-top:8px}
+.hintbox details:first-of-type{border-top:none;padding-top:0}
+.hintbox summary{cursor:pointer;color:var(--amber);font-size:13px;list-style:none;font-weight:600}
+.hintbox summary::-webkit-details-marker{display:none}
+.hintbox summary:before{content:"▸ "}
+.hintbox details[open] summary:before{content:"▾ "}
+.hintbox .hbody{margin-top:8px;color:var(--tx);font-size:13.5px;line-height:1.7}
+.hintbox details.locked summary{color:var(--mut2);cursor:not-allowed}
+@media (max-width:640px){
+  .wrap{padding:0 16px 60px}
+  h1{font-size:26px}
+  .kh h2{font-size:18px}
+  .interactive{padding:16px}
+  .orient{padding:20px 18px}
+}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--lime)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">AI Engineering · Module 2 of 8</span>
+</div></div>
+<div class="progress"><i></i></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-01.html">&larr; <span class="navlabel">Module 1</span></a><span class="navsep"></span><a href="module-03.html" id="navNextTop">Module 3 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 02</span>
+    <h1 class="serif">Context Windows &amp; Token Economics</h1>
+    <p class="sub">Every prompt has a budget, measured in tokens, not characters or "how much text feels reasonable." This module gives you the actual arithmetic for what fits, what it costs, and what to do when your content doesn't fit.</p>
+    <div class="objectives">
+      <div class="lbl">Learning objectives</div>
+      <ul>
+        <li>Distinguish tokens from characters and words, and estimate token counts for planning purposes</li>
+        <li>Compute how much input fits in a context window given a reserved output budget</li>
+        <li>Explain why naive truncation silently drops information, and what a chunking strategy does instead</li>
+        <li>Implement a token-budget-aware chunker that preserves context across chunk boundaries</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="orient">
+    <div class="lbl">Before you start</div>
+    <h3 class="serif">What this module assumes</h3>
+    <p>Module 1 treated a single prompt/response pair as if it had unlimited room. It doesn't. Every model has a maximum context window, a hard ceiling on how many tokens of input plus output fit in one call, and every token has a cost.</p>
+    <h3 class="serif">What's new</h3>
+    <p>This is the first module with real arithmetic. You'll compute actual numbers: token estimates, budgets, and chunk boundaries, then implement a chunker that a real ingestion pipeline could use.</p>
+    <h3 class="serif">What's assumed</h3>
+    <div class="assume">Module 1 completed. Basic algebra, Python lists, and loops.</div>
+    <h3 class="serif">How to work through it</h3>
+    <ol>
+      <li>Read each definition, then run the matching interactive.</li>
+      <li>Answer the practice check before revealing the answer.</li>
+      <li>Finish with the graded checkpoint.</li>
+    </ol>
+  </div>
+
+  <section>
+    <div class="kh"><span class="num">1</span><h2 class="serif">A token is not a word, and not a character</h2></div>
+    <p>Models don't process text as characters or whole words, they process <i>tokens</i>, sub-word chunks produced by a specific tokenizer. "Token economics" isn't jargon for its own sake, everything about what fits in a prompt, what it costs, and how fast it responds is measured in tokens, not in the units you're used to thinking in.</p>
+    <div class="def">
+      <div class="k">Definition: token</div>
+      <p>The atomic unit a model's tokenizer splits text into, roughly, but not exactly, 4 characters or three-quarters of a word in English. Punctuation, whitespace, and rare words often cost more tokens than intuition suggests.</p>
+    </div>
+    <p>This course uses a simplified estimate, <span class="mono-inline">tokens ≈ characters / 4</span>, close enough for planning purposes and exactly what the exercises in this module use. Real tokenizers are more precise and vary by model provider, but the planning discipline is identical either way.</p>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A legal-contract summarizer receives a 52,000-character NDA and is about to send it to a model with a 12,000-token context window, 1,500 tokens of which are reserved for the output summary. Using this course's estimate, roughly how many tokens is the raw NDA text alone, and does it fit as plain input in a single call?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">52,000 ÷ 4 = 13,000 tokens for the NDA text. Available input budget is 12,000 − 1,500 = 10,500 tokens. 13,000 is bigger than 10,500, so it does not fit, by about 2,500 tokens. This isn't a rare edge case for this kind of system, contracts routinely run long, and "just send the whole document" silently becomes impossible the moment the document is bigger than the math allows. The pipeline needs either a bigger-context model or a chunking strategy, not a bigger hope.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">2</span><h2 class="serif">Interactive: how much actually fits</h2></div>
+    <p class="mut">Adjust the context window and the reserved output budget, and watch the available input budget change.</p>
+    <div class="interactive">
+      <span class="ilbl">Live calculation</span>
+      <div class="sliderrow">
+        <div class="slbl" id="ctxWinLbl">Context window <b id="ctxWinV">8000</b> tokens</div>
+        <input type="range" id="ctxWin" min="2000" max="32000" step="500" value="8000" aria-labelledby="ctxWinLbl">
+      </div>
+      <div class="sliderrow">
+        <div class="slbl" id="ctxOutLbl">Reserved for output <b id="ctxOutV">1000</b> tokens</div>
+        <input type="range" id="ctxOut" min="200" max="4000" step="100" value="1000" aria-labelledby="ctxOutLbl">
+      </div>
+      <div class="statrow">
+        <div class="stat" id="ctxAvailStat"><div class="sv" id="ctxAvail">–</div><div class="sl">available input budget (tokens)</div></div>
+        <div class="stat"><div class="sv" id="ctxAvailWords">–</div><div class="sl">≈ input words (÷ 4 chars/token × ~5.3 chars/word)</div></div>
+        <div class="stat"><div class="sv" id="ctxAvailPct">–</div><div class="sl">% of window reserved for output</div></div>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Move reserved-output up to 4000 while the context window is at its minimum, 2000. What happens to the available input budget, and why is this a realistic scenario, not an edge case someone made up?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">The available input budget goes negative, there's no room left for input at all, the reserved output alone exceeds the whole window. This is realistic: a smaller/cheaper model with a short context window combined with a task that genuinely needs a long, detailed response (e.g. "write a 3000-word report") is exactly this situation. The fix isn't a UI trick, it's choosing a model with enough context headroom for the task, or reducing what you're asking the output to contain.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">3</span><h2 class="serif">Naive truncation silently destroys information</h2></div>
+    <p>The laziest way to fit content into a budget is "cut it off at the limit." This is almost always the wrong move: it doesn't fail loudly, it succeeds while quietly discarding whatever came after the cut point, often the conclusion of a document, the most recent messages in a conversation, or the specific detail your task actually needed.</p>
+    <div class="callout"><b>Truncation without a strategy is a silent data-loss bug.</b> It doesn't throw an error. It doesn't log a warning by default. The system appears to work right up until someone asks a question the cut-off content would have answered.</div>
+    <p>A <i>chunking</i> strategy is the alternative: split content into pieces that each fit the budget, instead of throwing away everything past the first piece. Module 3 (retrieval) is what lets a system search across chunks instead of needing all of them in one prompt at once.</p>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A support-ticket summarizer truncates each ticket's text to the first 500 tokens before summarizing. A customer's actual complaint is in the last paragraph, after a long chronological narrative. What does the summary say, and why is "the code worked without errors" not the same as "the code worked correctly"?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">The summary describes the chronological narrative and never mentions the actual complaint, because that paragraph was silently cut off before the model ever saw it. No exception was thrown, no log entry flagged it, the pipeline "worked" in the sense that it ran to completion and produced a plausible-looking summary. This is exactly the danger: a technically successful run that's functionally wrong, the kind of bug that survives testing because nothing in the execution path failed.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4</span><h2 class="serif">Why chunks overlap</h2></div>
+    <p>If you split a document into non-overlapping chunks, a sentence or idea that spans a chunk boundary gets cut in half, in one chunk you get the setup with no conclusion, in the next you get the conclusion with no setup. <i>Overlap</i>, repeating the last portion of one chunk at the start of the next, keeps that boundary content readable in both directions.</p>
+    <div class="def">
+      <div class="k">Definition: chunk overlap</div>
+      <p>A deliberate repetition of content at the boundary between adjacent chunks, so no idea is split with zero context on either side. Typically 10-20% of the chunk size.</p>
+    </div>
+    <p>Overlap isn't free, it means the same content gets processed (and paid for) more than once. The right amount is a tradeoff between boundary-continuity and cost, not a fixed universal number.</p>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A meeting-transcript analyzer chunks a 3-hour transcript for action-item extraction, using 15% overlap. After a few action items turn out to have been split across chunk boundaries and missed, the team bumps overlap to 60% instead of touching chunk size. What does jumping to 60% overlap actually cost, and would increasing chunk size instead have addressed the same failure more cheaply?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">At 60% overlap, most of each chunk is a repeat of content the previous chunk already covered, so the total tokens processed across the transcript balloons well past the transcript's actual length, more cost, more latency, for a fix that's really just papering over chunks that are too small for the unit of meaning (one action item's full context) to fit inside one. Increasing chunk size so a typical action-item discussion fits within a single chunk addresses the root cause directly, and a modest overlap (10-20%) is then enough to catch the rare item still split at a boundary. Overlap should catch the occasional edge case, not compensate for chunks sized too small for the content.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">5</span><h2 class="serif">Cost and latency both scale with tokens</h2></div>
+    <p>Two practical consequences follow directly from everything above: cost is (roughly) <span class="mono-inline">tokens × price-per-token</span>, and latency generally grows with how many tokens the model has to read and generate. A chunking or truncation decision isn't just a correctness question, it's a cost and speed question too.</p>
+    <div class="callout"><b>Overlap and chunk count trade off against cost.</b> More overlap and smaller chunks mean more total chunks, which means more total tokens processed across the whole document, which means more cost and more total latency if chunks are processed sequentially.</div>
+
+    <div class="practice">
+      <div class="lbl">Cross-module check</div>
+      <p>Module 1's validator rejects malformed output and (in a real system) triggers a retry with the parse error included in the next prompt. Using this module's terms, what does a retry actually cost, beyond just "trying again"?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">A retry re-sends the original prompt tokens PLUS the new error-context tokens PLUS generates a new output, it's not free, it's close to double the token cost (and double the latency) of a single successful call. This is exactly why Module 1's repair pass tries deterministic, free fixes (stripping a fence, a trailing comma) before ever falling back to an expensive model retry, the cheap fix should always be tried first.</div>
+      </details>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A multi-document RAG ingestion pipeline chunks 200 source documents into roughly 3,000 chunks total, each embedded with its own model call. If 4% of those calls fail validation and get retried once, roughly how many total model calls does the ingestion run actually make, and why does chunk count matter just as much as retry rate when estimating a pipeline's total cost?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">3,000 × 0.04 = 120 failed calls, each retried once, so the run makes roughly 3,000 + 120 = 3,120 total calls, about 4% more than the naive "3,000 chunks, 3,000 calls" estimate. Chunk count matters as much as retry rate because it's a multiplier sitting right next to it: the same 4% retry rate on a pipeline with smaller chunks (or heavier overlap, see the previous section) produces more total chunks, and 4% of a bigger number is a bigger number. Cost estimates for a chunking pipeline have to account for chunk count and retry rate together, not either one in isolation.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6</span><h2 class="serif">Build it: a token-budget-aware chunker</h2></div>
+    <p>You've seen the failure mode (silent truncation) and the fix (overlapping chunks). Now implement it, and five real tests run against your actual code.</p>
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">chunk_text(words, max_tokens_per_chunk, overlap_words, estimate_tokens)</span>. <span class="mono-inline">words</span> is a list of word strings (already split, don't split further). <span class="mono-inline">estimate_tokens(word)</span> is a function returning the token count for one word, call it per word. Return a list of chunks, each chunk a list of words. No chunk's total estimated tokens may exceed <span class="mono-inline">max_tokens_per_chunk</span>, UNLESS a single word alone exceeds the budget, in which case it still gets its own chunk, never silently dropped. Each chunk (except the last) should end with the same <span class="mono-inline">overlap_words</span> words that the next chunk starts with.</p>
+      <textarea id="chunkCodeEditor" aria-label="Python code editor for chunk_text" class="testin" spellcheck="false" style="min-height:220px;font-size:13px" rows="13"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunChunkTests">▶ Run tests</button>
+        <button id="btnResetChunkCode">Reset to starter code</button>
+      </div>
+      <div id="chunkTestResults" style="margin-top:14px"></div>
+
+      <div class="hintbox" id="chunkHintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="chunkHintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1 — conceptual</summary><div class="hbody">Walk through the words with two pointers: build the current chunk word-by-word until adding the next word would exceed the budget, then start the next chunk a few words BACK from where you stopped, that's the overlap.</div></details>
+        <details data-hint="2"><summary>Hint 2 — specific</summary><div class="hbody">Track a running token total for the current chunk. Before adding a word, check if <span class="mono-inline">running_total + estimate_tokens(word) > max_tokens_per_chunk</span>. If so, and the chunk already has at least one word, stop this chunk here. If the chunk is still empty, add the word anyway (that's the oversized-single-word case).</div></details>
+        <details data-hint="3"><summary>Hint 3 — near-solution</summary><div class="hbody">After finishing a chunk ending at word index <span class="mono-inline">j</span> (exclusive), start the next chunk at index <span class="mono-inline">j - overlap_words</span> (clamped to not go below 0, and not below where the current chunk started). Stop the outer loop once a chunk reaches the end of the words list.</div></details>
+        <details data-hint="solution" class="locked" id="chunkSolutionDetails"><summary id="chunkSolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">def chunk_text(words, max_tokens_per_chunk, overlap_words, estimate_tokens):
+    chunks = []
+    i = 0
+    while i < len(words):
+        chunk = []
+        tokens = 0
+        j = i
+        while j < len(words):
+            t = estimate_tokens(words[j])
+            if tokens + t > max_tokens_per_chunk and len(chunk) > 0:
+                break
+            chunk.append(words[j])
+            tokens += t
+            j += 1
+        chunks.append(chunk)
+        if j >= len(words):
+            break
+        i = max(i + 1, j - overlap_words)
+    return chunks</pre></div></details>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Test 3 feeds your chunker a single word whose own token estimate is larger than <span class="mono-inline">maxTokensPerChunk</span>. If your budget check runs unconditionally, even when the current chunk is still empty, what happens to that word?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">It gets silently dropped, exactly the failure mode this whole module is about. If the check "would this exceed the budget" applies even to an empty chunk, the word never gets added anywhere, and the chunker moves on without it, ever. The fix is the same guard used in the reference solution: only enforce the budget once the chunk already has at least one word, an oversized word still needs a home, even a chunk that technically exceeds budget by itself.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7</span><h2 class="serif">Before the checkpoint: what you should now be able to do</h2></div>
+    <p class="mut">A short consolidation before you're graded on it.</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:2">
+      <li>Estimate token counts for planning, and compute available input budget from context window minus reserved output.</li>
+      <li>Explain why naive truncation is a silent-failure bug, not a correctness shortcut.</li>
+      <li>Explain what overlap buys you at a chunk boundary, and that it isn't free.</li>
+      <li>Implement a chunker that never silently drops content, even for an oversized single unit.</li>
+    </ul>
+    <div class="practice">
+      <div class="lbl">Looking ahead</div>
+      <p>Chunking solves "how do I fit content." It doesn't solve "which chunk is actually relevant to this question." Module 3 is retrieval, the mechanism that searches across chunks instead of hoping the right one made it into the prompt.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Graded. Feedback is immediate and attempts are unlimited, the goal is understanding, not a single pass/fail moment.</p>
+
+    <div class="qcard">
+      <div class="qn">Question 1 of 5</div>
+      <div class="qtext">Using this course's estimate of tokens ≈ characters / 4, roughly how many tokens is a 400-character prompt?</div>
+      <div class="numinput"><input type="number" id="q1input" aria-label="Your numeric answer"><button id="q1check">Check</button></div>
+      <div class="qexplain" id="q1explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 2 of 5</div>
+      <div class="qtext">A context window is 4000 tokens, and 800 tokens are reserved for output. What's the available input budget?</div>
+      <div class="numinput"><input type="number" id="q2input" aria-label="Your numeric answer"><button id="q2check">Check</button></div>
+      <div class="qexplain" id="q2explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 3 of 5</div>
+      <div class="qtext">Why is naive truncation described as a "silent" failure mode specifically?</div>
+      <div id="q3opts"></div>
+      <div class="qexplain" id="q3explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 4 of 5</div>
+      <div class="qtext">What does increasing chunk overlap cost you?</div>
+      <div id="q4opts"></div>
+      <div class="qexplain" id="q4explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 5 of 5 · new scenario</div>
+      <div class="qtext">A model call that failed validation (Module 1) gets retried with the original prompt (600 tokens) plus an error explanation (150 tokens) plus a new response (200 tokens). Roughly how many total tokens did that one failed-then-retried request actually cost, across both attempts, compared to a single successful call of the same size?</div>
+      <div id="q5opts"></div>
+      <div class="qexplain" id="q5explain"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">9</span><h2 class="serif">Further reading</h2></div>
+    <p class="mut">If you want to go deeper than the browser can take you:</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--mut2);line-height:1.9">
+      <li>Every major model provider publishes an exact tokenizer (e.g. tiktoken-style byte-pair encoding), worth using directly in production instead of the character/4 estimate this course uses for planning.</li>
+      <li>"Lost in the middle" research on long-context models shows that even models with large context windows don't attend to all of it equally, position within the prompt matters, not just whether content technically fits.</li>
+      <li>In production, this shows up as ingestion pipelines with configurable chunk size and overlap, and as cost dashboards that break spend down by prompt tokens vs. completion tokens separately, since they're often priced differently.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">10</span><h2 class="serif">Glossary</h2></div>
+    <div style="margin-top:14px;display:grid;gap:12px">
+      <div><b class="mono-inline">token</b><span style="color:var(--mut);font-size:14px"> — the atomic unit a model processes text as, roughly 4 characters in English.</span></div>
+      <div><b class="mono-inline">context window</b><span style="color:var(--mut);font-size:14px"> — the maximum total tokens (input + output) a single model call can hold.</span></div>
+      <div><b class="mono-inline">truncation</b><span style="color:var(--mut);font-size:14px"> — cutting content off at a limit; naive truncation silently discards whatever comes after the cut.</span></div>
+      <div><b class="mono-inline">chunking</b><span style="color:var(--mut);font-size:14px"> — splitting content into budget-sized pieces instead of discarding what doesn't fit.</span></div>
+      <div><b class="mono-inline">chunk overlap</b><span style="color:var(--mut);font-size:14px"> — repeating boundary content between adjacent chunks so no idea is split with zero context.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">11</span><h2 class="serif">Interactive: sizing a RAG ingestion run</h2></div>
+    <p class="mut">A multi-document RAG ingestion pipeline is about to chunk a document collection. Adjust the total input size, chunk size, and overlap, and watch how many chunks the run produces and how much of the total token spend is pure overlap overhead.</p>
+    <div class="interactive">
+      <span class="ilbl">Live calculation</span>
+      <div class="sliderrow">
+        <div class="slbl" id="ragDocCharsLbl">Total collection size <b id="ragDocCharsV">400,000</b> characters</div>
+        <input type="range" id="ragDocChars" min="20000" max="2000000" step="20000" value="400000" aria-labelledby="ragDocCharsLbl">
+      </div>
+      <div class="sliderrow">
+        <div class="slbl" id="ragChunkSizeLbl">Chunk size <b id="ragChunkSizeV">500</b> tokens</div>
+        <input type="range" id="ragChunkSize" min="100" max="4000" step="100" value="500" aria-labelledby="ragChunkSizeLbl">
+      </div>
+      <div class="sliderrow">
+        <div class="slbl" id="ragOverlapPctLbl">Overlap <b id="ragOverlapPctV">15</b>%</div>
+        <input type="range" id="ragOverlapPct" min="0" max="80" step="5" value="15" aria-labelledby="ragOverlapPctLbl">
+      </div>
+      <div class="statrow">
+        <div class="stat" id="ragChunksStat"><div class="sv" id="ragChunks">–</div><div class="sl">chunks produced</div></div>
+        <div class="stat"><div class="sv" id="ragTotalTokens">–</div><div class="sl">total tokens processed across all chunks</div></div>
+        <div class="stat" id="ragOverheadStat"><div class="sv" id="ragOverheadPct">–</div><div class="sl">of that is pure overlap overhead</div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Zenith Lab · AI Engineering · Module 2 of 8 · Next: Retrieval-Augmented Generation</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const MODULE_ID = 2;
+CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Section 2: context budget calculator ---------------- */
+function updateCtx(){
+  const win = Number(document.getElementById("ctxWin").value);
+  const out = Number(document.getElementById("ctxOut").value);
+  document.getElementById("ctxWinV").textContent = win;
+  document.getElementById("ctxOutV").textContent = out;
+  const avail = win - out;
+  const availWords = Math.max(0, Math.round(avail / 4 * (4/5.3)));
+  document.getElementById("ctxAvail").textContent = avail;
+  document.getElementById("ctxAvailWords").textContent = avail > 0 ? ("~" + availWords) : "0";
+  document.getElementById("ctxAvailPct").textContent = Math.round((out/win)*100) + "%";
+  document.getElementById("ctxAvailStat").className = "stat" + (avail <= 0 ? " warn" : "");
+}
+document.getElementById("ctxWin").addEventListener("input", updateCtx);
+document.getElementById("ctxOut").addEventListener("input", updateCtx);
+updateCtx();
+
+/* ---------------- Section 11: RAG ingestion chunk/overlap-cost calculator ---------------- */
+function updateRag(){
+  const docChars = Number(document.getElementById("ragDocChars").value);
+  const chunkSize = Number(document.getElementById("ragChunkSize").value);
+  const overlapPct = Number(document.getElementById("ragOverlapPct").value);
+  document.getElementById("ragDocCharsV").textContent = docChars.toLocaleString();
+  document.getElementById("ragChunkSizeV").textContent = chunkSize;
+  document.getElementById("ragOverlapPctV").textContent = overlapPct;
+
+  const docTokens = docChars / 4;
+  const overlapTokens = Math.round(chunkSize * (overlapPct / 100));
+  const newTokensPerChunk = chunkSize - overlapTokens;
+
+  const chunksStat = document.getElementById("ragChunksStat");
+  const overheadStat = document.getElementById("ragOverheadStat");
+
+  if (newTokensPerChunk <= 0) {
+    document.getElementById("ragChunks").textContent = "∞";
+    document.getElementById("ragTotalTokens").textContent = "–";
+    document.getElementById("ragOverheadPct").textContent = "n/a";
+    chunksStat.className = "stat warn";
+    overheadStat.className = "stat warn";
+    return;
+  }
+
+  const numChunks = docTokens <= chunkSize
+    ? 1
+    : 1 + Math.ceil((docTokens - chunkSize) / newTokensPerChunk);
+  const totalTokens = numChunks * chunkSize;
+  const overheadTokens = Math.max(0, totalTokens - docTokens);
+  const overheadPct = docTokens > 0 ? Math.round((overheadTokens / totalTokens) * 100) : 0;
+
+  document.getElementById("ragChunks").textContent = numChunks.toLocaleString();
+  document.getElementById("ragTotalTokens").textContent = Math.round(totalTokens).toLocaleString();
+  document.getElementById("ragOverheadPct").textContent = overheadPct + "%";
+  chunksStat.className = "stat";
+  overheadStat.className = "stat" + (overheadPct >= 40 ? " warn" : "");
+}
+document.getElementById("ragDocChars").addEventListener("input", updateRag);
+document.getElementById("ragChunkSize").addEventListener("input", updateRag);
+document.getElementById("ragOverlapPct").addEventListener("input", updateRag);
+updateRag();
+
+/* ---------------- Section 6: chunker exercise (Python) ---------------- */
+const CHUNK_STARTER = `def chunk_text(words, max_tokens_per_chunk, overlap_words, estimate_tokens):
+    # Never silently drop a word, even one that alone exceeds max_tokens_per_chunk.
+    # Each chunk (except the last) should end with the same overlap_words words
+    # that the next chunk starts with.
+
+    # YOUR CODE HERE
+
+    pass`;
+function loadChunkStarter(){
+  document.getElementById("chunkCodeEditor").value = CHUNK_STARTER;
+  document.getElementById("chunkTestResults").innerHTML = "";
+}
+loadChunkStarter();
+document.getElementById("btnResetChunkCode").addEventListener("click", loadChunkStarter);
+
+let chunkHasAttempted = false;
+function chunkHintUsageText(){
+  const used = (CourseProgress.getModule(2).sections || {}).chunkHintsUsed || 0;
+  return used > 0 ? `(${used} hint${used===1?"":"s"} used)` : "";
+}
+function refreshChunkHintUsage(){
+  document.getElementById("chunkHintUsage").textContent = chunkHintUsageText();
+}
+document.querySelectorAll('#chunkHintbox details[data-hint]:not([data-hint="solution"])').forEach(d => {
+  d.addEventListener("toggle", () => {
+    if (!d.open) return;
+    const cur = CourseProgress.getModule(2).sections || {};
+    const used = new Set(cur.chunkHintsOpened || []);
+    used.add(d.dataset.hint);
+    CourseProgress.setSection(2, "chunkHintsOpened", Array.from(used));
+    CourseProgress.setSection(2, "chunkHintsUsed", used.size);
+    refreshChunkHintUsage();
+  });
+});
+const chunkSolutionDetails = document.getElementById("chunkSolutionDetails");
+chunkSolutionDetails.addEventListener("toggle", () => {
+  if (chunkSolutionDetails.open && !chunkHasAttempted) chunkSolutionDetails.open = false;
+});
+function unlockChunkSolution(){
+  chunkHasAttempted = true;
+  chunkSolutionDetails.classList.remove("locked");
+  document.getElementById("chunkSolutionSummary").textContent = "Solution";
+}
+(function restoreChunkHints(){
+  refreshChunkHintUsage();
+  const stored = CourseProgress.getModule(2).sections || {};
+  if (stored.chunkerExercise) unlockChunkSolution();
+})();
+
+const CHUNK_HARNESS_PY = [
+"def harness(student_code):",
+"    ns = {}",
+"    try:",
+"        exec(student_code, ns)",
+"        fn = ns.get('chunk_text')",
+"        if fn is None or not callable(fn):",
+"            return {'ranOk': False, 'error': 'chunk_text is not defined as a function.'}",
+"    except Exception as e:",
+"        return {'ranOk': False, 'error': str(e)}",
+"",
+"    def safe_call(words, max_tokens, overlap, estimator):",
+"        try:",
+"            return {'threw': False, 'out': fn(words, max_tokens, overlap, estimator)}",
+"        except Exception as e:",
+"            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+"",
+"    def one_token_per_word(w):",
+"        return 1",
+"",
+"    results = []",
+"",
+"    words = ['a', 'b', 'c', 'd', 'e']",
+"    r = safe_call(words, 100, 1, one_token_per_word)",
+"    p = (not r['threw'] and isinstance(r['out'], list) and len(r['out']) == 1 and r['out'][0] == words)",
+"    results.append({'name': 'Generous budget produces a single chunk with everything', 'pass': p,",
+"        'hint': 'If the whole input fits under max_tokens_per_chunk, you should end up with exactly one chunk containing all the words.',",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    words = ['one', 'two', 'three', 'four', 'five', 'six']",
+"    r = safe_call(words, 3, 1, one_token_per_word)",
+"    p = not r['threw'] and isinstance(r['out'], list) and len(r['out']) >= 2",
+"    if p:",
+"        out = r['out']",
+"        for i in range(len(out) - 1):",
+"            cur, nxt = out[i], out[i + 1]",
+"            if len(cur) == 0 or len(nxt) == 0 or cur[-1] != nxt[0]:",
+"                p = False",
+"                break",
+"        if p:",
+"            for c in out:",
+"                if sum(one_token_per_word(w) for w in c) > 3:",
+"                    p = False",
+"    results.append({'name': 'Multi-chunk split respects the token budget and overlaps correctly', 'pass': p,",
+"        'hint': \"With max_tokens_per_chunk=3 and 1 token/word, each chunk should hold at most 3 words, and each chunk's last word should equal the next chunk's first word (overlap_words=1).\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    words = ['averylongsingleword']",
+"    r = safe_call(words, 1, 0, lambda w: 999)",
+"    p = (not r['threw'] and isinstance(r['out'], list) and len(r['out']) == 1",
+"         and r['out'][0] == ['averylongsingleword'])",
+"    results.append({'name': 'A single word exceeding the budget alone still gets its own chunk', 'pass': p,",
+"        'hint': 'Never drop content. If a chunk is still empty, add the word even if it alone exceeds max_tokens_per_chunk, that is the only way to guarantee no word is silently lost.',",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    words = ['w' + str(i) for i in range(20)]",
+"    r = safe_call(words, 4, 1, one_token_per_word)",
+"    p = not r['threw'] and isinstance(r['out'], list) and len(r['out']) > 1",
+"    if p:",
+"        seen = set()",
+"        for c in r['out']:",
+"            seen.update(c)",
+"        p = all(w in seen for w in words)",
+"    results.append({'name': 'Every word appears in at least one chunk (nothing silently dropped)', 'pass': p,",
+"        \"hint\": \"Walk through your loop's termination condition carefully, a longer input is where an off-by-one in the overlap math tends to drop the last few words.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    words = ['w1', 'w2', 'w3', 'w4', 'w5', 'w6']",
+"    r = safe_call(words, 3, 0, one_token_per_word)",
+"    p = (not r['threw'] and isinstance(r['out'], list) and len(r['out']) == 2",
+"         and r['out'][0] == ['w1', 'w2', 'w3'] and r['out'][1] == ['w4', 'w5', 'w6'])",
+"    results.append({'name': 'Zero overlap produces a clean, non-repeating partition', 'pass': p,",
+"        'hint': \"With overlap_words=0, chunk boundaries shouldn't repeat any word, [w1,w2,w3] then [w4,w5,w6], nothing shared between them.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    return {'ranOk': True, 'results': results}",
+].join("\n");
+
+async function runChunkTests(){
+  unlockChunkSolution();
+  const resultsEl = document.getElementById("chunkTestResults");
+  resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Starting the Python sandbox (first run downloads the interpreter, can take anywhere from ~10s to a minute depending on your connection)…</div>`;
+  const code = document.getElementById("chunkCodeEditor").value;
+
+  const outcome = await PySandboxRunner.run(CHUNK_HARNESS_PY, "harness", code);
+  resultsEl.innerHTML = "";
+  if (!outcome.ok) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">${CourseProgress.escapeHtml(outcome.error)}</div>`;
+    return;
+  }
+  const data = outcome.result;
+  if (!data.ranOk) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">Your code didn't run: ${CourseProgress.escapeHtml(data.error)}. Check for a syntax error, or that the function is named exactly chunk_text.</div>`;
+    return;
+  }
+
+  const results = data.results;
+  let passCount = 0;
+  results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.style.display = "block"; row.style.marginTop = "8px";
+    const hintHtml = r.errorMessage
+      ? `Your code threw an unexpected error: ${CourseProgress.escapeHtml(r.errorMessage)}. ${r.hint}`
+      : r.hint;
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${r.name}` + (r.pass ? "" : `<br>${hintHtml}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
+  summary.textContent = `${passCount} / ${results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  CourseProgress.setSection(2, "chunkerExercise", { passCount, total: results.length });
+}
+document.getElementById("btnRunChunkTests").addEventListener("click", runChunkTests);
+
+/* ---------------- Quiz ---------------- */
+let score = 0;
+const answered = { q1:false, q2:false, q3:false, q4:false, q5:false };
+
+function updateScore(){
+  document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnNext");
+  btn.disabled = !allDone;
+  btn.textContent = allDone ? "Continue to Module 3 →" : "Complete all questions to continue →";
+  if (allDone) CourseProgress.markComplete(MODULE_ID, score, 5);
+}
+
+function checkQ1(){
+  if (answered.q1) return;
+  const val = Number(document.getElementById("q1input").value);
+  const ex = document.getElementById("q1explain");
+  ex.style.display = "block";
+  answered.q1 = true;
+  CourseProgress.setAnswer(MODULE_ID, "q1", val);
+  if (val === 100) { score++; ex.textContent = "Correct. 400 / 4 = 100 tokens, using this course's estimate."; }
+  else { ex.textContent = "Not quite. 400 characters ÷ 4 chars/token = 100 tokens."; }
+  updateScore();
+}
+document.getElementById("q1check").addEventListener("click", checkQ1);
+
+function checkQ2(){
+  if (answered.q2) return;
+  const val = Number(document.getElementById("q2input").value);
+  const ex = document.getElementById("q2explain");
+  ex.style.display = "block";
+  answered.q2 = true;
+  CourseProgress.setAnswer(MODULE_ID, "q2", val);
+  if (val === 3200) { score++; ex.textContent = "Correct. 4000 − 800 = 3200 tokens available for input."; }
+  else { ex.textContent = "Not quite. Available input = context window − reserved output = 4000 − 800 = 3200."; }
+  updateScore();
+}
+document.getElementById("q2check").addEventListener("click", checkQ2);
+
+const q3Options = [
+  { text: "It succeeds without error while discarding whatever content came after the cut point", correct: true },
+  { text: "It raises a visible exception every time content is too long", correct: false, reason: "That's the opposite of what makes it dangerous, if it raised a visible exception, it would be a loud, easy-to-catch bug, not a silent one." },
+  { text: "It only affects performance, not correctness", correct: false, reason: "It affects correctness directly, whatever content was cut off is simply unavailable to the model, that's a correctness problem, not a performance one." },
+];
+const q3el = document.getElementById("q3opts");
+q3Options.forEach((opt, i) => {
+  const div = document.createElement("label");
+  div.className = "qopt";
+  div.innerHTML = `<input type="radio" name="q3" value="${i}"><span>${opt.text}</span>`;
+  div.addEventListener("click", () => {
+    if (answered.q3) return;
+    answered.q3 = true;
+    CourseProgress.setAnswer(MODULE_ID, "q3", i);
+    document.querySelectorAll('#q3opts .qopt').forEach((el,j) => {
+      if (q3Options[j].correct) el.classList.add("correct");
+      else if (j === i) el.classList.add("incorrect");
+    });
+    const ex = document.getElementById("q3explain");
+    ex.style.display = "block";
+    if (opt.correct) { score++; ex.textContent = "Correct. It runs to completion and produces plausible-looking output while quietly missing content."; }
+    else { ex.textContent = "Not quite. " + opt.reason; }
+    updateScore();
+  });
+  q3el.appendChild(div);
+});
+
+const q4Options = [
+  { text: "More total tokens processed across the whole document, since boundary content is repeated, which raises cost and total latency", correct: true },
+  { text: "Nothing, overlap is free since it reuses content that was already fetched", correct: false, reason: "'Already fetched' doesn't mean free to process, the model still has to read those repeated tokens again in the next chunk, that's real additional token cost, not a free reuse." },
+  { text: "It reduces the number of chunks needed", correct: false, reason: "Overlap doesn't reduce chunk count, if anything, more overlap per chunk boundary means slightly MORE total chunks are needed to cover the same content, not fewer." },
+];
+const q4el = document.getElementById("q4opts");
+q4Options.forEach((opt, i) => {
+  const div = document.createElement("label");
+  div.className = "qopt";
+  div.innerHTML = `<input type="radio" name="q4" value="${i}"><span>${opt.text}</span>`;
+  div.addEventListener("click", () => {
+    if (answered.q4) return;
+    answered.q4 = true;
+    CourseProgress.setAnswer(MODULE_ID, "q4", i);
+    document.querySelectorAll('#q4opts .qopt').forEach((el,j) => {
+      if (q4Options[j].correct) el.classList.add("correct");
+      else if (j === i) el.classList.add("incorrect");
+    });
+    const ex = document.getElementById("q4explain");
+    ex.style.display = "block";
+    if (opt.correct) { score++; ex.textContent = "Correct. Overlap trades cost for boundary continuity, it isn't free."; }
+    else { ex.textContent = "Not quite. " + opt.reason; }
+    updateScore();
+  });
+  q4el.appendChild(div);
+});
+
+const q5Options = [
+  { text: "Roughly 950 tokens total (600 + 150 + 200), noticeably more than a single successful ~800-token call (600 prompt + 200 response)", correct: true },
+  { text: "The same as a single call, retries don't add token cost, only latency", correct: false, reason: "Retries absolutely add token cost, the original prompt is sent again (plus new error context), and a new response is generated, that's real additional tokens billed, not just extra wait time." },
+  { text: "Less than a single call, since the second attempt is shorter", correct: false, reason: "The second attempt isn't a replacement for the first, both attempts' tokens count, the original 600-token prompt was already sent (and paid for) on the first, failed attempt." },
+];
+const q5el = document.getElementById("q5opts");
+q5Options.forEach((opt, i) => {
+  const div = document.createElement("label");
+  div.className = "qopt";
+  div.innerHTML = `<input type="radio" name="q5" value="${i}"><span>${opt.text}</span>`;
+  div.addEventListener("click", () => {
+    if (answered.q5) return;
+    answered.q5 = true;
+    CourseProgress.setAnswer(MODULE_ID, "q5", i);
+    document.querySelectorAll('#q5opts .qopt').forEach((el,j) => {
+      if (q5Options[j].correct) el.classList.add("correct");
+      else if (j === i) el.classList.add("incorrect");
+    });
+    const ex = document.getElementById("q5explain");
+    ex.style.display = "block";
+    if (opt.correct) { score++; ex.textContent = "Correct. A failed-then-retried call costs roughly the sum of both attempts' tokens, not just one."; }
+    else { ex.textContent = "Not quite. " + opt.reason; }
+    updateScore();
+  });
+  q5el.appendChild(div);
+});
+
+document.getElementById("btnNext").addEventListener("click", () => {
+  window.location.href = "module-03.html";
+});
+
+/* ---------------- Retry checkpoint ---------------- */
+function maybeShowRetry(){
+  const anyAnswered = answered.q1 || answered.q2 || answered.q3 || answered.q4 || answered.q5;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnRetryCheckpoint");
+  btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModule(MODULE_ID);
+  window.location.reload();
+});
+const _origUpdateScore = updateScore;
+updateScore = function(){
+  _origUpdateScore();
+  maybeShowRetry();
+};
+maybeShowRetry();
+
+/* ---------------- Progress persistence: restore on load ---------------- */
+(function restoreQuizState(){
+  const stored = CourseProgress.getModule(MODULE_ID);
+  const a = stored.answers || {};
+  if (a.q1 !== undefined && !answered.q1) { document.getElementById("q1input").value = a.q1; checkQ1(); }
+  if (a.q2 !== undefined && !answered.q2) { document.getElementById("q2input").value = a.q2; checkQ2(); }
+  if (a.q3 !== undefined && !answered.q3) {
+    const label = document.querySelectorAll('#q3opts .qopt')[a.q3];
+    if (label) label.click();
+  }
+  if (a.q4 !== undefined && !answered.q4) {
+    const label = document.querySelectorAll('#q4opts .qopt')[a.q4];
+    if (label) label.click();
+  }
+  if (a.q5 !== undefined && !answered.q5) {
+    const label = document.querySelectorAll('#q5opts .qopt')[a.q5];
+    if (label) label.click();
+  }
+})();
+</script>
+</body>
+</html>

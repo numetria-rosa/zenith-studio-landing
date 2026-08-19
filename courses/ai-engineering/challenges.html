@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cross-Module Challenges — AI Engineering</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(28px,4.5vw,40px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:15.5px;max-width:680px;margin-top:14px}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.pipeline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:'JetBrains Mono';font-size:12.5px;margin-top:6px}
+.pipeline span{background:var(--card2);border:1px solid var(--bd2);border-radius:6px;padding:6px 10px}
+.pipeline i{color:var(--mut2)}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:10px;font-size:13.5px;color:var(--mut);display:none}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button.primary:hover{filter:brightness(1.08);color:var(--limed)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+.logconsole{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;font-family:'JetBrains Mono';font-size:12px;line-height:1.9;margin-top:14px;overflow-x:auto}
+.logline{color:var(--mut)}
+.logline.err{color:var(--red)}
+.ltrace{color:var(--violet)}
+.lstep{color:var(--lime)}
+.statrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px}
+.stat{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;flex:1;min-width:130px}
+.stat .sv{font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--tx)}
+.stat .sl{font-size:11px;color:var(--mut2);margin-top:2px}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
+.nextbtn{margin-left:auto}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:24px} .interactive{padding:16px} }
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--lime)}
+.coursenav .navsep{flex:1}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">AI Engineering · Cross-Module Challenges</span>
+</div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-07.html">&larr; Module 7</a><span class="navsep"></span><a href="module-08.html" id="navNextTop">Capstone &rarr;</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Before the capstone</span>
+    <h1 class="serif">Cross-module challenges</h1>
+    <p class="sub">Two scenarios that don't belong to any single module. Both require combining context budgeting, retrieval, tool idempotency, agent control flow, reliability, and evaluation, the same way a real production AI system does. Pass both to unlock the capstone.</p>
+  </header>
+
+  <section>
+    <div class="kh"><span class="num">1</span><h2 class="serif">Reliable RAG Support Bot</h2></div>
+    <p class="mut">You're designing a retrieval-augmented support bot for a client. Make the calls a senior AI engineer would actually have to make.</p>
+    <div class="interactive">
+      <span class="ilbl">System under design</span>
+      <div class="pipeline">
+        <span>User query</span><i>&rarr;</i><span>Retrieval (embed + search)</span><i>&rarr;</i><span>Context assembly</span><i>&rarr;</i><span>Model call (with tools)</span><i>&rarr;</i><span>Tool execution</span><i>&rarr;</i><span>Response</span>
+      </div>
+      <p class="mut" style="margin-top:14px">Known failure modes you must design around: retrieved content exceeding the token budget, model API rate limits under load, a tool call retried after a lost response, an agent loop repeating the same search without progress, and low-relevance chunks getting forced into context anyway.</p>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Context budget</div>
+      <div class="qtext">Retrieved chunks for a query total 7500 tokens. The context window is 8000 tokens, with 1500 reserved for output. What should happen?</div>
+      <div id="pQ1opts"></div>
+      <div class="qexplain" id="pQ1explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">Reliability</div>
+      <div class="qtext">Mid-conversation, the model API returns a 429 (rate limited). What should the bot do?</div>
+      <div id="pQ2opts"></div>
+      <div class="qexplain" id="pQ2explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">Tool use</div>
+      <div class="qtext">The bot calls a create_support_ticket tool; the network drops the response after the ticket was actually created server-side, and the agent retries with the same call ID. What should happen?</div>
+      <div id="pQ3opts"></div>
+      <div class="qexplain" id="pQ3explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">Agent control flow</div>
+      <div class="qtext">The bot's agent loop calls search_kb with the exact same query three times in a row without making progress. What should the loop do?</div>
+      <div id="pQ4opts"></div>
+      <div class="qexplain" id="pQ4explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">Retrieval quality</div>
+      <div class="qtext">The relevance threshold is set at cosine similarity 0.4. The top result for a query scores 0.22. What should the bot do?</div>
+      <div id="pQ5opts"></div>
+      <div class="qexplain" id="pQ5explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">Evaluation</div>
+      <div class="qtext">After tuning the retrieval top-k value, how do you know whether the change actually helped, before shipping it?</div>
+      <div id="pQ6opts"></div>
+      <div class="qexplain" id="pQ6explain"></div>
+    </div>
+    <div class="feedback" id="pOverallFb"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">2</span><h2 class="serif">Agent Failure Investigation</h2></div>
+    <p class="mut">A completely new incident. You did not build this system, you're investigating it cold, the way an on-call engineer would.</p>
+
+    <div class="interactive">
+      <span class="ilbl">Incident symptoms, 09:00–09:06 UTC</span>
+      <div class="statrow" style="margin-top:0">
+        <div class="stat"><div class="sv" style="color:var(--red)">2x</div><div class="sl">duplicate customer emails reported</div></div>
+        <div class="stat"><div class="sv">avg 8.4 steps</div><div class="sl">agent steps per request (baseline: 3.1)</div></div>
+        <div class="stat"><div class="sv" style="color:var(--red)">eval score −11pts</div><div class="sl">vs. last week's baseline</div></div>
+      </div>
+      <div class="logconsole">
+        <div class="logline"><span class="lt">09:02:01</span> <span class="ltrace">[req_771]</span> <span class="lstep">agent-loop</span> — step 1, reason: "need order status"</div>
+        <div class="logline"><span class="lt">09:02:02</span> <span class="ltrace">[req_771]</span> <span class="lstep">tool_call</span> — get_order_status(orderId: "5521") → success</div>
+        <div class="logline"><span class="lt">09:02:03</span> <span class="ltrace">[req_771]</span> <span class="lstep">agent-loop</span> — step 2, reason: "notify customer of delay"</div>
+        <div class="logline err"><span class="lt">09:02:04</span> <span class="ltrace">[req_771]</span> <span class="lstep">tool_call</span> — send_email(customerId:"c88", template:"delay") call_id=call_A → ERROR timeout (response lost, outcome unknown)</div>
+        <div class="logline"><span class="lt">09:02:09</span> <span class="ltrace">[req_771]</span> <span class="lstep">agent-loop</span> — step 3, reason: "retry: notify customer of delay"</div>
+        <div class="logline err"><span class="lt">09:02:09</span> <span class="ltrace">[req_771]</span> <span class="lstep">tool_call</span> — send_email(customerId:"c88", template:"delay") call_id=call_B → success (DUPLICATE: same customer + template as call_A, different call_id)</div>
+        <div class="logline"><span class="lt">09:00:00</span> <span class="ltrace">[SYSTEM]</span> <span class="lstep">deploy-log</span> — agent-orchestrator v3.2 deployed (tool retries now generate a NEW call_id each attempt; previously reused the original call_id)</div>
+        <div class="logline err"><span class="lt">09:05:44</span> <span class="ltrace">[req_902]</span> <span class="lstep">agent-loop</span> — step 9, reason: "search_kb: refund policy" (7th consecutive identical search_kb call this request)</div>
+        <div class="logline err"><span class="lt">09:05:45</span> <span class="ltrace">[SYSTEM]</span> <span class="lstep">agent-loop</span> — step-limit (10) reached for req_902, no final answer returned</div>
+      </div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">WHAT happened</div>
+      <div id="iQ1opts"></div>
+      <div class="qexplain" id="iQ1explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">WHY did it happen</div>
+      <div id="iQ2opts"></div>
+      <div class="qexplain" id="iQ2explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">WHAT evidence proves it (not "I think", cite the log line)</div>
+      <div id="iQ3opts"></div>
+      <div class="qexplain" id="iQ3explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">WHAT should be fixed first</div>
+      <div id="iQ4opts"></div>
+      <div class="qexplain" id="iQ4explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn">HOW should the system change to prevent recurrence</div>
+      <div id="iQ5opts"></div>
+      <div class="qexplain" id="iQ5explain"></div>
+    </div>
+    <div class="feedback" id="iOverallFb"></div>
+  </section>
+
+  <footer>Zenith Lab · AI Engineering · Cross-module challenges</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Pass both challenges to unlock the capstone</span>
+  <button class="primary nextbtn" id="btnNext" disabled>Continue to the capstone &rarr;</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+function mkOpts(containerId, opts, onGraded){
+  const el = document.getElementById(containerId);
+  let answered = false;
+  opts.forEach((opt, i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.innerHTML = `<input type="radio" name="${containerId}" value="${i}"><span>${opt.t}</span>`;
+    div.addEventListener("click", () => {
+      if (answered) return;
+      answered = true;
+      document.querySelectorAll(`#${containerId} .qopt`).forEach((e2, j) => {
+        if (opts[j].correct) e2.classList.add("correct");
+        else if (j === i) e2.classList.add("incorrect");
+      });
+      const ex = document.getElementById(containerId.replace("opts","explain"));
+      ex.style.display = "block";
+      ex.textContent = (opt.correct ? "Correct. " : "Not quite. ") + (opt.why || (opt.correct ? "" : "See the correct option above."));
+      onGraded(opt.correct, i);
+    });
+    el.appendChild(div);
+  });
+  return { restore: (idx) => { if (!answered && el.children[idx]) el.children[idx].click(); } };
+}
+
+/* -------- Challenge 1: Reliable RAG Support Bot -------- */
+const pAnswered = {};
+let pScore = 0;
+const pQuestions = [
+  { id: "pQ1", opts: [
+    { t: "Retrieval should return fewer or higher-threshold chunks so total content fits the 6500-token available input budget, not send all 7500 tokens and risk truncation or exceeding the window", correct: true },
+    { t: "Send all 7500 tokens anyway, most model providers tolerate going slightly over", correct: false, why: "7500 exceeds the 6500-token AVAILABLE input budget (8000 window − 1500 reserved output), this isn't a minor overage tolerance question, it risks exceeding the hard context window ceiling entirely." },
+    { t: "Truncate the combined chunk text at 6500 tokens by cutting off whatever comes last", correct: false, why: "Naive truncation (Module 2) silently drops content, often the most relevant chunk if it happened to be assembled last. The fix is retrieving a smaller, better-fitting set up front, not truncating after the fact." },
+  ]},
+  { id: "pQ2", opts: [
+    { t: "Retry with exponential backoff and jitter, a 429 is a transient, retryable failure", correct: true },
+    { t: "Immediately fail the whole request and tell the user to try again later", correct: false, why: "A 429 is exactly the kind of transient failure a bounded retry has a real chance of resolving, giving up immediately throws away requests a short wait would have saved." },
+    { t: "Switch to the fallback model on the very first 429, without attempting any retries on the primary", correct: false, why: "A single rate-limit response doesn't mean the primary is unavailable, retrying with backoff first (per Module 6) is the correct response, fallback is for when retries are exhausted or the primary is genuinely down." },
+  ]},
+  { id: "pQ3", opts: [
+    { t: "The idempotent executor recognizes the repeated call ID and returns the original cached result, without creating a second ticket", correct: true },
+    { t: "Create a new ticket, since the first attempt's outcome is genuinely unknown from the client's perspective", correct: false, why: "The point of an idempotency key is exactly to make the client's uncertainty irrelevant, the server already knows this call ID succeeded, and should return that result rather than act again." },
+    { t: "Reject the retry outright as a duplicate error", correct: false, why: "Rejecting isn't useful either, the caller still needs the actual result. Returning the cached success is more useful than an error and prevents a duplicate ticket." },
+  ]},
+  { id: "pQ4", opts: [
+    { t: "Detect the 3 identical consecutive actions and stop the loop early as 'stuck', rather than continuing to burn steps", correct: true },
+    { t: "Keep going, the model will eventually try something different on its own", correct: false, why: "That's the exact trap Module 5 warns about, an unguarded loop has no reason to assume the model will spontaneously change approach, and keeps burning steps (and cost) waiting." },
+    { t: "Increase the step limit so the loop has more room to keep trying", correct: false, why: "More steps doesn't fix repeating the identical action, it just means more identical, unproductive attempts before hitting the (now higher) limit." },
+  ]},
+  { id: "pQ5", opts: [
+    { t: "Treat it as below the relevance threshold and exclude it, returning 'no relevant information found' rather than forcing a low-relevance chunk into context", correct: true },
+    { t: "Include it anyway, since it's still the single best-scoring option available", correct: false, why: "Top-k without a threshold has exactly this failure mode, 'best available' isn't the same as 'actually relevant.' A confidently wrong answer built on a bad match is worse than admitting no good match exists." },
+    { t: "Lower the relevance threshold to 0.2 so this result qualifies", correct: false, why: "Changing the threshold to fit whatever result happens to come back defeats the purpose of having one, the threshold should reflect what counts as genuinely relevant, not be tuned after the fact to include a specific weak match." },
+  ]},
+  { id: "pQ6", opts: [
+    { t: "Re-run the eval suite with only the top-k change applied, and compare the score to the recorded baseline", correct: true },
+    { t: "Read through a handful of new responses and judge whether they feel better", correct: false, why: "That's exactly the ad hoc spot-check Module 7 warns isn't a substitute for systematic evaluation, no repeatable number, no reliable way to compare against the baseline." },
+    { t: "Ship it, and monitor user complaints over the following weeks to see if quality dropped", correct: false, why: "Waiting for user complaints means shipping a possible regression to real users first. The eval suite exists specifically to catch this BEFORE it ships, not after." },
+  ]},
+];
+pQuestions.forEach(q => {
+  mkOpts(q.id + "opts", q.opts, (correct, idx) => {
+    if (correct) pScore++;
+    pAnswered[q.id] = true;
+    CourseProgress.setAnswer("cross", "rag_" + q.id, idx);
+    updateRagProgress();
+  });
+});
+function updateRagProgress(){
+  const allDone = pQuestions.every(q => pAnswered[q.id]);
+  if (!allDone) return;
+  const passed = pScore === pQuestions.length;
+  const fb = document.getElementById("pOverallFb");
+  fb.className = "feedback " + (passed ? "ok" : "bad");
+  fb.textContent = `${pScore} / ${pQuestions.length} correct. ` + (passed
+    ? "You designed a RAG bot that respects its token budget, retries correctly, executes tools idempotently, bounds its own loop, enforces a relevance threshold, and gets evaluated before shipping changes."
+    : "Review the explanations above, every wrong answer here is a real production incident waiting to happen.");
+  CourseProgress.setExtra("crossRagBot", { passCount: pScore, total: pQuestions.length, passed });
+  updateOverall();
+}
+
+/* -------- Challenge 2: Agent Failure Investigation -------- */
+const iAnswered = {};
+let iScore = 0;
+const iQuestions = [
+  { id: "iQ1", opts: [
+    { t: "A deploy broke tool-call idempotency by generating a new call ID on every retry, causing duplicate customer emails, while a separate agent request got stuck repeating an identical search and burned its entire step budget with no answer", correct: true },
+    { t: "The model provider had an outage that caused all these symptoms", correct: false, why: "Nothing in the evidence points at a provider outage, both symptoms trace directly to the 09:00:00 deploy's retry-logic change and a loop that lacked working stuck-detection." },
+    { t: "Customers simply submitted duplicate requests on their own", correct: false, why: "The log clearly shows call_A and call_B originating from the SAME agent request (req_771) retrying its own tool call, not two separate customer-initiated requests." },
+  ]},
+  { id: "iQ2", opts: [
+    { t: "The v3.2 deploy changed tool-call retries to mint a new call ID each attempt, breaking the idempotency guarantee that depends on a STABLE id across retries; separately, req_902's loop shows the repeated-action guard wasn't actually catching the 7x identical search_kb call", correct: true },
+    { t: "A transient network blip that resolved on its own", correct: false, why: "The 09:00:00 deploy-log entry is a direct, timed match to when the duplicate-email pattern started, that's not a transient blip, that's a version-specific behavior change." },
+    { t: "The customer's email provider was rejecting messages, causing retries", correct: false, why: "There's no evidence of email delivery failure, the log shows the SECOND send succeeding, the problem is that a second send happened at all for the same customer and template." },
+  ]},
+  { id: "iQ3", opts: [
+    { t: "The 09:00:00 deploy-log line stating call IDs are now regenerated per retry, combined with call_A and call_B targeting the identical customer+template, plus the step-limit-reached line for req_902 after 7 identical search_kb calls", correct: true },
+    { t: "The 2x duplicate-email count by itself", correct: false, why: "That number shows something is wrong, but on its own doesn't prove WHY, you need the deploy-log line and the matching call_A/call_B pattern to establish the actual causal chain." },
+    { t: "General intuition that agent systems are inherently unreliable", correct: false, why: "That's a prior belief, not evidence from this incident. The task requires citing specific log lines that actually happened here." },
+  ]},
+  { id: "iQ4", opts: [
+    { t: "Revert or hotfix the retry logic so it reuses the ORIGINAL call ID across retries of the same logical tool call, restoring the idempotency guarantee that's directly causing duplicate customer-facing actions", correct: true },
+    { t: "Raise the agent loop's step limit so req_902-style requests have more room to finish", correct: false, why: "A higher step limit doesn't fix repeating an identical action, it would just let the same unproductive pattern run longer before hitting the new, higher cap." },
+    { t: "Disable retries on tool calls entirely", correct: false, why: "Removing retries sacrifices a real reliability mechanism for genuinely transient failures. The actual bug is that retries now break idempotency, not that retries exist at all." },
+  ]},
+  { id: "iQ5", opts: [
+    { t: "Add regression tests to the eval suite that specifically check call-ID stability across tool-call retries and stuck-loop early-termination, so a future deploy breaking either gets caught by a dropping eval score before shipping, not discovered via duplicate customer emails", correct: true },
+    { t: "Nothing systemic, this was a one-off deploy mistake", correct: false, why: "A deploy silently changing a core reliability guarantee (stable call IDs) is a repeatable process gap, not a one-off, without a systemic check it can recur on any future deploy touching retry logic." },
+    { t: "Just monitor duplicate-email complaints more closely going forward", correct: false, why: "Better monitoring helps you notice faster after the fact, it doesn't prevent the root cause (broken call-ID stability) from shipping again on the next deploy." },
+  ]},
+];
+iQuestions.forEach(q => {
+  mkOpts(q.id + "opts", q.opts, (correct, idx) => {
+    if (correct) iScore++;
+    iAnswered[q.id] = true;
+    CourseProgress.setAnswer("cross", "inc_" + q.id, idx);
+    updateIncidentProgress();
+  });
+});
+function updateIncidentProgress(){
+  const allDone = iQuestions.every(q => iAnswered[q.id]);
+  if (!allDone) return;
+  const passed = iScore === iQuestions.length;
+  const fb = document.getElementById("iOverallFb");
+  fb.className = "feedback " + (passed ? "ok" : "bad");
+  fb.textContent = `${iScore} / ${iQuestions.length} correct. ` + (passed
+    ? "You traced the incident to its actual root cause using evidence, not guesses, and picked the fix that addresses the cause, not just the symptom."
+    : "Review the explanations above, some of your answers described a plausible-sounding story that the evidence doesn't actually support.");
+  CourseProgress.setExtra("crossFailureInvestigation", { passCount: iScore, total: iQuestions.length, passed });
+  updateOverall();
+}
+
+function updateOverall(){
+  const rag = CourseProgress.getExtra("crossRagBot");
+  const inc = CourseProgress.getExtra("crossFailureInvestigation");
+  const ragDone = rag && rag.passed;
+  const incDone = inc && inc.passed;
+  document.getElementById("scoreDisplay").textContent =
+    `RAG support bot: ${rag ? rag.passCount + "/" + rag.total : "not attempted"} · Failure investigation: ${inc ? inc.passCount + "/" + inc.total : "not attempted"}`;
+  document.getElementById("btnNext").disabled = !(ragDone && incDone);
+}
+document.getElementById("btnNext").addEventListener("click", () => {
+  window.location.href = "module-08.html";
+});
+updateOverall();
+
+/* -------- restore on load -------- */
+(function restore(){
+  const cross = CourseProgress.load().modules["cross"];
+  const a = (cross && cross.answers) || {};
+  pQuestions.forEach(q => {
+    const v = a["rag_" + q.id];
+    if (v !== undefined) document.querySelectorAll(`#${q.id}opts .qopt`)[v]?.click();
+  });
+  iQuestions.forEach(q => {
+    const v = a["inc_" + q.id];
+    if (v !== undefined) document.querySelectorAll(`#${q.id}opts .qopt`)[v]?.click();
+  });
+})();
+</script>
+</body>
+</html>

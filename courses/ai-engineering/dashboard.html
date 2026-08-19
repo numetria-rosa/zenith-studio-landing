@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineering — Course Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:980px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.hero{padding:50px 0 30px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(28px,4.5vw,40px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:15.5px;max-width:640px;margin-top:12px}
+
+.sysgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:28px}
+@media (max-width:900px){ .sysgrid{grid-template-columns:repeat(3,1fr)} }
+@media (max-width:640px){ .sysgrid{grid-template-columns:repeat(2,1fr)} }
+.syscard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 14px;text-decoration:none;color:inherit;display:flex;flex-direction:column;align-items:flex-start;gap:4px;transition:.15s}
+.syscard:hover,.syscard:focus-visible{border-color:var(--lime);transform:translateY(-1px)}
+.syscard:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.syscard .sysicon{color:var(--lime)}
+.syscard .sysicon svg{width:22px;height:22px;display:block}
+.icon{display:inline-block;vertical-align:-2px}
+.icon svg{width:1em;height:1em;display:block}
+.syscard .systitle{font-weight:700;font-size:13.5px;color:var(--tx);margin-top:4px}
+.syscard .sysdesc{font-size:11px;color:var(--mut2);line-height:1.4}
+.modgrid-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mut2);margin-top:32px}
+.overallwrap{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:24px 26px;margin-top:28px}
+.overallrow{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+.overallrow .ov-lbl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut2)}
+.overallrow .ov-val{font-family:'JetBrains Mono';font-size:26px;font-weight:700;color:var(--lime)}
+.overallbar{height:10px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-top:14px;border:1px solid var(--bd)}
+.overallbar .fill{height:100%;background:var(--lime);width:0%;transition:width .4s}
+.overallbar.done .fill{background:var(--emerald)}
+.nextaction{margin-top:16px;padding:14px 16px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.nextaction .nalbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--lime);font-weight:700}
+.nextaction .natext{font-size:14px;color:var(--tx);flex:1;min-width:180px}
+.nextaction a.nabtn{background:var(--lime);color:var(--limed);font-weight:700;font-size:13px;padding:8px 16px;border-radius:8px;text-decoration:none;white-space:nowrap}
+.storage-note{font-size:12px;color:var(--mut2);margin-top:16px;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.storage-note button{
+  font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;
+  padding:8px 14px;border-radius:8px;border:1px solid var(--bd2);
+  background:var(--card2);color:var(--mut);cursor:pointer;
+  transition:.15s ease;display:inline-flex;align-items:center;gap:6px;
+}
+.storage-note button:before{content:"↺";font-size:13px;line-height:1}
+.storage-note button:hover{border-color:var(--red);color:var(--red);background:rgba(255,107,107,.08)}
+.storage-note button:active{transform:scale(.97)}
+.skillrow{display:flex;align-items:flex-start;gap:12px;padding:10px 4px;font-size:14px}
+.skillrow .sicon{flex-shrink:0;width:20px;text-align:center;font-weight:700}
+.skillrow.earned .sicon{color:var(--emerald)}
+.skillrow.earned .stext{color:var(--tx)}
+.skillrow:not(.earned) .sicon{color:var(--mut2)}
+.skillrow:not(.earned) .stext{color:var(--mut2)}
+.skillrow .sevidence{font-size:11.5px;color:var(--mut2);margin-top:2px}
+
+.modgrid{display:grid;gap:14px;margin-top:28px}
+.modcard{display:flex;gap:18px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;text-decoration:none;color:inherit;transition:.15s;position:relative}
+.modcard:hover,.modcard:focus-visible{border-color:var(--bd2)}
+.modcard:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.modcard.locked{opacity:.55;cursor:not-allowed}
+.modnum{flex-shrink:0;width:46px;height:46px;border-radius:10px;display:grid;place-items:center;font-family:'JetBrains Mono';font-weight:700;font-size:15px;background:var(--card2);border:1px solid var(--bd2);color:var(--mut)}
+.modcard.completed .modnum{background:rgba(52,229,160,.12);border-color:var(--emerald);color:var(--emerald)}
+.modcard.in-progress .modnum{background:rgba(198,244,50,.1);border-color:var(--lime);color:var(--lime)}
+.modbody{flex:1;min-width:0}
+.modtitle{font-weight:700;font-size:15.5px;color:var(--tx)}
+.moddesc{font-size:13px;color:var(--mut);margin-top:3px}
+.modmeta{display:flex;gap:14px;margin-top:8px;font-size:11.5px;color:var(--mut2);flex-wrap:wrap}
+.modstatus{flex-shrink:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:5px 11px;border-radius:99px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.modstatus .icon svg{width:11px;height:11px}
+.modstatus.completed{background:rgba(52,229,160,.15);color:var(--emerald)}
+.modstatus.in-progress{background:rgba(198,244,50,.12);color:var(--lime)}
+.modstatus.not-started{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
+.modstatus.locked{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
+
+.completebanner{margin-top:28px;background:linear-gradient(135deg,rgba(198,244,50,.1),rgba(167,139,250,.08));border:1px solid var(--lime);border-radius:14px;padding:28px;text-align:center;display:none}
+.completebanner.show{display:block}
+.completebanner .cbtitle{font-size:22px;font-weight:700;font-family:'Source Serif 4',serif;display:flex;align-items:center;justify-content:center}
+.completebanner .cbtitle .icon svg{color:var(--lime)}
+.completebanner .cbsub{color:var(--mut);font-size:14px;margin-top:8px}
+
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+@media (max-width:640px){
+  .modcard{flex-direction:column;align-items:flex-start;gap:10px}
+  .modstatus{align-self:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">AI Engineering</span>
+</div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Course Dashboard</span>
+    <h1 class="serif">AI Engineering</h1>
+    <p class="sub">Eight modules, prompting through a production-agent capstone. Build real products with language models: structured outputs, retrieval, tools, agents, reliability, and evaluation. Your progress is saved in this browser automatically as you go.</p>
+  </header>
+
+  <div class="sysgrid">
+    <a class="syscard" href="syllabus.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="systitle">Syllabus</span><span class="sysdesc">Full course outline &amp; outcomes</span></a>
+    <a class="syscard" href="quiz-center.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 2-2.4 3.7"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="systitle">Quiz Center</span><span class="sysdesc">Module, mixed &amp; cumulative quizzes</span></a>
+    <a class="syscard" href="cheatsheets.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 14.5h6M9 18h3.5"/></svg></span><span class="systitle">Cheat Sheets</span><span class="sysdesc">Quick reference for every module</span></a>
+    <a class="syscard" href="projects.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2z"/></svg></span><span class="systitle">Projects</span><span class="sysdesc">Build 8 portfolio-worthy projects</span></a>
+    <a class="syscard" href="portfolio.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5"/><path d="M3.5 12.5h17"/></svg></span><span class="systitle">My Portfolio</span><span class="sysdesc">Your completed project record</span></a>
+    <a class="syscard" href="career.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6z"/></svg></span><span class="systitle">Career Path</span><span class="sysdesc">Readiness score &amp; role pathways</span></a>
+  </div>
+
+  <div class="overallwrap">
+    <div class="overallrow">
+      <span class="ov-lbl">Overall course progress</span>
+      <span class="ov-val" id="ovVal">0 / 8 modules — 0%</span>
+    </div>
+    <div class="overallbar" id="ovBar"><div class="fill" id="ovFill"></div></div>
+    <div class="nextaction" id="nextAction" style="display:none">
+      <span class="nalbl">Next</span>
+      <span class="natext" id="naText"></span>
+      <a class="nabtn" id="naBtn" href="#">Continue &rarr;</a>
+    </div>
+    <div class="storage-note">Progress is stored locally in this browser only, it will not follow you to another device or browser profile. <button id="btnReset">Reset all progress</button></div>
+  </div>
+
+  <h2 class="modgrid-lbl">Start here</h2>
+  <div class="modgrid" id="module0Grid" style="margin-top:14px"></div>
+  <div class="modgrid" id="pyFoundationsGrid" style="margin-top:14px"></div>
+
+  <h2 class="modgrid-lbl">Modules</h2>
+
+  <div class="completebanner" id="completeBanner">
+    <div class="cbtitle"><span class="icon" style="width:22px;height:22px;margin-right:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.3 2.7 3 6 3s6-1.7 6-3v-5"/><path d="M22 9v6"/></svg></span>Course complete</div>
+    <div class="cbsub">All 8 modules passed at 80%+, cross-module challenges cleared, and the final assessment passed. Nice work.</div>
+  </div>
+
+  <div class="modgrid" id="modGrid"></div>
+
+  <div class="overallwrap" id="skillsWrap" style="margin-top:28px">
+    <div class="ov-lbl" style="margin-bottom:14px">Skills demonstrated</div>
+    <div id="skillsList" style="display:grid;gap:10px"></div>
+  </div>
+
+  <footer>Zenith Lab · AI Engineering</footer>
+</div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+const LOCK_ICON = '<span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>';
+const descriptions = {
+  1: "Repair and validate structured model output before trusting it.",
+  2: "Token budgets, naive truncation, and a chunker that never drops content.",
+  3: "Embeddings, cosine similarity, and a relevance threshold.",
+  4: "Validated, idempotent tool execution that's safe to retry.",
+  5: "Bounded agent loops with real stuck-loop detection.",
+  6: "Retry, backoff, jitter, and a single bounded fallback.",
+  7: "Deterministic evaluation and regression detection before shipping.",
+  8: "Synthesis: design, implement, and debug a production AI agent.",
+};
+
+function renderModule0Card(){
+  const wrap = document.getElementById("module0Grid");
+  const m0 = CourseProgress.getExtra("module0") || {};
+  const done = !!m0.completed;
+  const visited = !!m0.visited;
+  const card = document.createElement("a");
+  card.href = "module-00.html";
+  card.className = "modcard " + (done ? "completed" : visited ? "in-progress" : "not-started");
+  const statusLabel = done ? "✓ Completed" : visited ? "→ In progress" : "○ Not started";
+  const statusClass = done ? "completed" : visited ? "in-progress" : "not-started";
+  let meta = "~20 min · ungraded, doesn't block Module 1";
+  if (Number.isFinite(m0.selfCheckScore) && Number.isFinite(m0.selfCheckTotal) && m0.selfCheckTotal > 0) {
+    meta = `Self-check: ${Math.round(m0.selfCheckScore / m0.selfCheckTotal * 100)}% · ${meta}`;
+  }
+  card.innerHTML = `
+    <div class="modnum">${done ? "✓" : "0"}</div>
+    <div class="modbody">
+      <div class="modtitle">Module 0 — Introduction to AI Engineering</div>
+      <div class="moddesc">What the field is, what you'll build, your possible paths, and what this course teaches vs. what to learn elsewhere.</div>
+      <div class="modmeta"><span>${meta}</span></div>
+    </div>
+    <div class="modstatus ${statusClass}">${statusLabel}</div>
+  `;
+  wrap.innerHTML = "";
+  wrap.appendChild(card);
+}
+
+function renderPyFoundationsCard(){
+  const wrap = document.getElementById("pyFoundationsGrid");
+  const pf = CourseProgress.getExtra("pythonFoundations") || {};
+  const exercises = pf.exercises || {};
+  const total = 8;
+  const done = Object.values(exercises).filter(e => e && e.passCount === e.total && e.total > 0).length;
+  const anyProgress = Object.keys(exercises).length > 0 || (pf.selfCheck && pf.selfCheck.answered > 0);
+  const completed = done === total;
+  const card = document.createElement("a");
+  card.href = "python-foundations.html";
+  card.className = "modcard " + (completed ? "completed" : anyProgress ? "in-progress" : "not-started");
+  const statusLabel = completed ? "✓ Completed" : anyProgress ? "→ In progress" : "○ Not started";
+  const statusClass = completed ? "completed" : anyProgress ? "in-progress" : "not-started";
+  const meta = `${done} / ${total} exercises passing · ~30 min · ungraded, doesn't block Module 1`;
+  card.innerHTML = `
+    <div class="modnum">${completed ? "✓" : "Py"}</div>
+    <div class="modbody">
+      <div class="modtitle">Python Foundations for AI Engineering</div>
+      <div class="moddesc">The Python you need before Module 1, real code, real tests, no prior Python required.</div>
+      <div class="modmeta"><span>${meta}</span></div>
+    </div>
+    <div class="modstatus ${statusClass}">${statusLabel}</div>
+  `;
+  wrap.innerHTML = "";
+  wrap.appendChild(card);
+}
+
+function renderDashboard(){
+  renderModule0Card();
+  renderPyFoundationsCard();
+  const grid = document.getElementById("modGrid");
+  grid.innerHTML = "";
+  CourseProgress.MODULES.forEach(m => {
+    const status = CourseProgress.statusOf(m.id);
+    const unlocked = CourseProgress.isUnlocked(m.id);
+    const mod = CourseProgress.getModule(m.id);
+    const card = document.createElement(unlocked ? "a" : "div");
+    if (unlocked) card.href = m.file;
+    else card.tabIndex = 0;
+    card.className = "modcard " + status + (unlocked ? "" : " locked");
+
+    const statusLabel = !unlocked ? LOCK_ICON + " Locked" :
+      status === "completed" ? "✓ Completed" :
+      status === "in-progress" ? "→ In progress" : "○ Not started";
+    const statusClass = !unlocked ? "locked" : status;
+
+    let metaBits = [`~${m.minutes} min`];
+    const modScore = Number(mod.score), modTotal = Number(mod.total);
+    if (Number.isFinite(modTotal) && modTotal > 0) metaBits.push(`Last score: ${Number.isFinite(modScore) ? modScore : 0}/${modTotal}`);
+    if (!unlocked && m.id === 8) metaBits.push(`Unlocks after Module 7 + Cross-Module Challenges`);
+    else if (!unlocked) metaBits.push(`Unlocks after Module ${m.id - 1}`);
+
+    card.innerHTML = `
+      <div class="modnum">${status === "completed" ? "✓" : m.id}</div>
+      <div class="modbody">
+        <div class="modtitle">Module ${m.id} — ${m.title}</div>
+        <div class="moddesc">${descriptions[m.id]}</div>
+        <div class="modmeta">${metaBits.map(b=>`<span>${b}</span>`).join("")}</div>
+      </div>
+      <div class="modstatus ${statusClass}">${statusLabel}</div>
+    `;
+    grid.appendChild(card);
+
+    if (m.id === 7) {
+      const m7done = CourseProgress.isModuleComplete(7);
+      const crossDone = CourseProgress.crossChallengesComplete();
+      const cUnlocked = m7done;
+      const cStatus = crossDone ? "completed" : (cUnlocked ? "in-progress" : "not-started");
+      const cCard = document.createElement(cUnlocked ? "a" : "div");
+      if (cUnlocked) cCard.href = "challenges.html"; else cCard.tabIndex = 0;
+      cCard.className = "modcard " + cStatus + (cUnlocked ? "" : " locked");
+      const cLabel = !cUnlocked ? LOCK_ICON + " Locked" : crossDone ? "✓ Completed" : "→ In progress";
+      const cMeta = cUnlocked ? "~30 min" : "Unlocks after Module 7";
+      cCard.innerHTML = `
+        <div class="modnum">${crossDone ? "✓" : "★"}</div>
+        <div class="modbody">
+          <div class="modtitle">Cross-Module Challenges — Reliable RAG Support Bot &amp; Agent Failure Investigation</div>
+          <div class="moddesc">Combine everything from Modules 1–7 into two realistic, evidence-based scenarios.</div>
+          <div class="modmeta"><span>${cMeta}</span></div>
+        </div>
+        <div class="modstatus ${!cUnlocked ? "locked" : cStatus}">${cLabel}</div>
+      `;
+      grid.appendChild(cCard);
+    }
+
+    if (m.id === 8) {
+      const m8done = CourseProgress.isModuleComplete(8);
+      const fa = CourseProgress.getExtra("finalAssessment");
+      const faDone = !!(fa && fa.passed);
+      const fUnlocked = m8done;
+      const fStatus = faDone ? "completed" : (fUnlocked ? "in-progress" : "not-started");
+      const fCard = document.createElement(fUnlocked ? "a" : "div");
+      if (fUnlocked) fCard.href = "final-assessment.html"; else fCard.tabIndex = 0;
+      fCard.className = "modcard " + fStatus + (fUnlocked ? "" : " locked");
+      const fLabel = !fUnlocked ? LOCK_ICON + " Locked" : faDone ? "✓ Completed" : "→ In progress";
+      const faScore = fa ? Number(fa.passCount) : NaN, faTotal = fa ? Number(fa.total) : NaN;
+      const fMeta = fUnlocked ? (fa && Number.isFinite(faScore) && Number.isFinite(faTotal) ? `Last score: ${faScore}/${faTotal}` : "~25 min, novel scenarios") : "Unlocks after the capstone";
+      fCard.innerHTML = `
+        <div class="modnum">${faDone ? "✓" : "★"}</div>
+        <div class="modbody">
+          <div class="modtitle">Final Competency Assessment</div>
+          <div class="moddesc">Novel scenarios spanning Modules 1–7. Not recycled from the lessons.</div>
+          <div class="modmeta"><span>${fMeta}</span></div>
+        </div>
+        <div class="modstatus ${!fUnlocked ? "locked" : fStatus}">${fLabel}</div>
+      `;
+      grid.appendChild(fCard);
+    }
+  });
+
+  const ov = CourseProgress.overall();
+  document.getElementById("ovVal").textContent = `${ov.completed} / ${ov.total} modules — ${ov.pct}%`;
+  document.getElementById("ovFill").style.width = ov.pct + "%";
+  const fa = CourseProgress.getExtra("finalAssessment");
+  const fullyDone = ov.pct === 100 && CourseProgress.crossChallengesComplete() && !!(fa && fa.passed);
+  document.getElementById("ovBar").className = "overallbar" + (fullyDone ? " done" : "");
+  document.getElementById("completeBanner").className = "completebanner" + (fullyDone ? " show" : "");
+
+  renderNextAction(fullyDone, fa);
+  renderSkills();
+}
+
+function renderNextAction(fullyDone){
+  const box = document.getElementById("nextAction");
+  if (fullyDone) { box.style.display = "none"; return; }
+  let target = null, text = "";
+  for (const m of CourseProgress.MODULES) {
+    if (!CourseProgress.isModuleComplete(m.id)) {
+      if (!CourseProgress.isUnlocked(m.id)) {
+        if (m.id === 8) { target = "challenges.html"; text = "Finish the cross-module challenges to unlock the capstone."; }
+        break;
+      }
+      target = m.file;
+      text = CourseProgress.statusOf(m.id) === "in-progress"
+        ? `Continue Module ${m.id} — ${m.title}.`
+        : `Start Module ${m.id} — ${m.title}.`;
+      break;
+    }
+  }
+  if (!target && CourseProgress.isModuleComplete(7) && !CourseProgress.crossChallengesComplete()) {
+    target = "challenges.html"; text = "Complete the cross-module challenges.";
+  }
+  if (!target && CourseProgress.isModuleComplete(8)) {
+    const fa = CourseProgress.getExtra("finalAssessment");
+    if (!fa || !fa.passed) { target = "final-assessment.html"; text = "Take the final competency assessment."; }
+  }
+  if (!target) { box.style.display = "none"; return; }
+  box.style.display = "flex";
+  document.getElementById("naText").textContent = text;
+  document.getElementById("naBtn").href = target;
+}
+
+function passedAll(sections, key){
+  const v = sections && sections[key];
+  return !!(v && v.total > 0 && v.passCount === v.total);
+}
+function done(m, id){
+  return CourseProgress.isModuleDataComplete(id, m.modules[id]);
+}
+
+const SKILLS = [
+  { label: "Repair, parse, and schema-validate malformed structured model output",
+    evidence: "Module 1 checkpoint + 5/5 on the structured-output code exercise",
+    check: (m) => done(m, 1) },
+  { label: "Compute a token budget and implement a chunker that never silently drops content",
+    evidence: "Module 2 checkpoint + 5/5 on the chunker code exercise",
+    check: (m) => done(m, 2) },
+  { label: "Implement cosine similarity and threshold-aware top-k retrieval from scratch",
+    evidence: "Module 3 checkpoint + 5/5 on the retrieval code exercise",
+    check: (m) => done(m, 3) },
+  { label: "Validate and execute a tool call idempotently, without double-running a retried side effect",
+    evidence: "Module 4 checkpoint + 5/5 on the tool executor code exercise",
+    check: (m) => done(m, 4) },
+  { label: "Implement a bounded agent loop with step-limit and repeated-action guards",
+    evidence: "Module 5 checkpoint + 5/5 on the agent loop code exercise",
+    check: (m) => done(m, 5) },
+  { label: "Implement retry-with-backoff-and-fallback reliability logic for model calls",
+    evidence: "Module 6 checkpoint + 5/5 on the reliability code exercise",
+    check: (m) => done(m, 6) },
+  { label: "Implement a deterministic eval harness that scores outputs and flags regressions",
+    evidence: "Module 7 checkpoint + 5/5 on the evaluation code exercise",
+    check: (m) => done(m, 7) },
+  { label: "Design a RAG bot that respects its token budget, retries correctly, and enforces a relevance threshold",
+    evidence: "Reliable RAG Support Bot cross-module challenge",
+    check: (m) => m.extra && m.extra.crossRagBot && m.extra.crossRagBot.passed === true },
+  { label: "Investigate a multi-symptom agent-system incident and justify a fix with evidence, not guesses",
+    evidence: "Agent Failure Investigation cross-module challenge",
+    check: (m) => m.extra && m.extra.crossFailureInvestigation && m.extra.crossFailureInvestigation.passed === true },
+  { label: "Design, implement, and debug a production AI agent combining all seven prior skills",
+    evidence: "Capstone: design validation + implementation tests + debugging exercise, 80%+ across all three",
+    check: (m) => done(m, 8) },
+  { label: "Pass a final assessment of entirely novel scenarios across all 7 core modules",
+    evidence: "Final competency assessment (≥ 80%)",
+    check: (m) => m.extra && m.extra.finalAssessment && m.extra.finalAssessment.passed === true },
+];
+
+function renderSkills(){
+  const data = CourseProgress.load();
+  if (!data.modules) data.modules = {};
+  const el = document.getElementById("skillsList");
+  el.innerHTML = "";
+  SKILLS.forEach(s => {
+    const earned = !!s.check(data);
+    const row = document.createElement("div");
+    row.className = "skillrow" + (earned ? " earned" : "");
+    row.innerHTML = `<span class="sicon">${earned ? "✓" : "○"}</span><div><div class="stext">${s.label}</div><div class="sevidence">${earned ? "Demonstrated via: " : "Not yet demonstrated. Evidence needed: "}${s.evidence}</div></div>`;
+    el.appendChild(row);
+  });
+}
+
+document.getElementById("btnReset").addEventListener("click", () => {
+  if (confirm("Reset all course progress in this browser? This cannot be undone.")){
+    CourseProgress.resetAll();
+    renderDashboard();
+  }
+});
+
+renderDashboard();
+</script>
+</body>
+</html>

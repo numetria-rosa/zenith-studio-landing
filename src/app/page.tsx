@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Script from "next/script";
 import BookButton from "./BookButton";
+import { getService, getSetupCheckoutUrl } from "@/lib/services";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -48,6 +49,7 @@ const faqs = [
 export default function ZenithStudioLandingPage() {
   const aiSystems = [
     {
+      id: "ai-inbox-manager",
       name: "AI Inbox Manager",
       pitch: "Wake up to an inbox that is already handled.",
       description:
@@ -63,6 +65,7 @@ export default function ZenithStudioLandingPage() {
       featured: false,
     },
     {
+      id: "ai-lead-capture",
       name: "AI Lead Capture & Follow-Up",
       pitch: "Never lose a lead to a slow reply again.",
       description:
@@ -79,6 +82,7 @@ export default function ZenithStudioLandingPage() {
       featured: true,
     },
     {
+      id: "ai-receptionist",
       name: "AI Receptionist & Booking",
       pitch: "Answers and books while you are on the job.",
       description:
@@ -102,18 +106,23 @@ export default function ZenithStudioLandingPage() {
       description:
         "End-to-end intelligent automation: from lead routing and CRM syncing to multi-step AI agent chains that handle complex business logic without human intervention.",
       tag: "Core Service",
+      icon: <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />,
     },
     {
       title: "Advanced Coding & Scripting",
       description:
         "Custom Python, Node.js, and API integrations that power the workflows no-code tools can't reach: data pipelines, web scrapers, internal tools, and backend systems built from scratch.",
       tag: "Core Service",
+      icon: <path d="M17.25 6.75L22.5 12l-5.25 5.25M6.75 17.25L1.5 12l5.25-5.25M14.25 3.75l-4.5 16.5" />,
     },
     {
       title: "Zenith AI",
       description:
         "Done-for-you automation systems that handle lead capture, customer communication, and bookings so companies grow faster with less manual effort. Plug-and-play installs like the AI Receptionist and the AI Lead Capture system, live in about a week. See pricing below.",
       tag: "Core Service",
+      icon: (
+        <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.456-2.456L14.25 6l1.035-.259a3.375 3.375 0 002.456-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+      ),
     },
     {
       title: "Zenith Lab",
@@ -121,6 +130,9 @@ export default function ZenithStudioLandingPage() {
         "Career-path courses in automation, AI, data, and Web3: the skills that won't be replaced by AI in 2026/2027. Each course includes a Career Path Edition, so you don't just learn, you know exactly where to apply it and how to get paid. Founding cohort pricing is open now.",
       tag: "Core Service",
       href: "/lab",
+      icon: (
+        <path d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347M4.26 10.147a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814M4.26 10.147A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443" />
+      ),
     },
   ];
 
@@ -529,12 +541,16 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               >
                 <div className="flex items-center justify-between">
                   <div
-                    className={`h-12 w-12 rounded-2xl shadow-[0_0_30px_rgba(110,130,255,0.16)] ${
+                    className={`flex h-12 w-12 items-center justify-center rounded-2xl border shadow-[0_0_30px_rgba(110,130,255,0.16)] ${
                       service.tag === "Coming Soon"
-                        ? "bg-gradient-to-br from-fuchsia-400/30 via-purple-500/25 to-pink-500/30"
-                        : "bg-gradient-to-br from-cyan-300/30 via-blue-500/25 to-fuchsia-500/30"
+                        ? "border-fuchsia-400/20 bg-gradient-to-br from-fuchsia-400/30 via-purple-500/25 to-pink-500/30 text-fuchsia-200"
+                        : "border-white/10 bg-gradient-to-br from-cyan-300/30 via-blue-500/25 to-fuchsia-500/30 text-cyan-100"
                     }`}
-                  />
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                      {service.icon}
+                    </svg>
+                  </div>
                   {service.tag === "Coming Soon" && (
                     <span className="rounded-full border border-fuchsia-400/25 bg-fuchsia-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-fuchsia-200/80">
                       Coming Soon
@@ -668,6 +684,26 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 >
                   Book a free audit
                 </BookButton>
+
+                {(() => {
+                  // Additive only — "Book a free audit" stays the primary,
+                  // working CTA above. This appears only once a real Whop
+                  // checkout link is configured for this service (none are
+                  // yet), for clients who already know what they want.
+                  const catalogService = getService(system.id);
+                  const setupUrl = catalogService ? getSetupCheckoutUrl(catalogService) : null;
+                  if (!setupUrl) return null;
+                  return (
+                    <a
+                      href={setupUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 text-center text-xs text-white/50 underline decoration-white/20 underline-offset-4 transition hover:text-white/80"
+                    >
+                      Already know what you need? Buy setup directly →
+                    </a>
+                  );
+                })()}
               </div>
             ))}
           </div>
@@ -718,7 +754,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
         </section>
         ── END COMMENTED OUT ── */}
 
-        {/* ── Products Section ── */}
+        {/* ── Products Section (disabled, kept for a possible relaunch) ──
         <section id="products" className="mx-auto max-w-7xl py-10 sm:py-16">
           <div className="mb-8 max-w-3xl">
             <div className="text-xs uppercase tracking-[0.3em] text-blue-200/70">Division 03 · Products &amp; Learning</div>
@@ -754,6 +790,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
             ))}
           </div>
         </section>
+        */}
 
         {/* ── FAQ (also powers the FAQPage rich snippet) ── */}
         <section id="faq" className="mx-auto max-w-7xl py-10 sm:py-16">

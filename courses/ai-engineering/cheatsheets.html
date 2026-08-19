@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheets — AI Engineering</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.6}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono'}
+.coursenav a:hover{color:var(--lime)}
+.hero{padding:36px 0 20px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(26px,4vw,36px);font-weight:700;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:680px;margin-top:10px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px}
+.toolbar input[type=search]{flex:1;min-width:200px;font-family:'Space Grotesk';font-size:14px;background:var(--card2);border:1px solid var(--bd2);border-radius:8px;padding:9px 14px;color:var(--tx)}
+.filterbtn{font-family:'JetBrains Mono';font-size:12px;padding:7px 12px;border-radius:99px;border:1px solid var(--bd2);background:var(--card2);color:var(--mut);cursor:pointer}
+.filterbtn.active{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+.filterbtn:hover{border-color:var(--lime)}
+button.plain{font-family:'Space Grotesk';font-weight:600;font-size:12.5px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;display:inline-flex;align-items:center}
+.icon{display:inline-block;vertical-align:-2px}
+.icon svg{width:1em;height:1em;display:block}
+button.plain:hover{border-color:var(--lime);color:var(--lime)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+
+.sheetgrid{display:grid;gap:20px;margin-top:24px}
+.sheet{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:26px 28px}
+.sheet .shead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.sheet h2{font-size:19px;font-weight:700}
+.sheet .stag{font-size:11px;color:var(--lime);text-transform:uppercase;letter-spacing:.08em;font-family:'JetBrains Mono'}
+.sheet .sactions{display:flex;gap:8px}
+.bookmarkbtn{background:none;border:1px solid var(--bd2);border-radius:8px;padding:7px 10px;cursor:pointer;color:var(--mut2);font-size:14px}
+.bookmarkbtn.on{color:var(--amber);border-color:var(--amber)}
+.sec{margin-top:18px}
+.sec .slbl{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--violet);margin-bottom:8px}
+.sec ul{padding-left:18px;color:var(--tx);font-size:13.5px;line-height:1.85}
+.sec ul li b{color:var(--tx)}
+.formula{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 18px;font-family:'JetBrains Mono';font-size:15px;color:var(--lime);margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.formula button{flex-shrink:0}
+.checklist{margin-top:8px}
+.checklist label{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;padding:4px 0;color:var(--tx)}
+code{font-family:'JetBrains Mono';font-size:12.5px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.copybtn{font-family:'JetBrains Mono';font-size:11px;padding:4px 9px;border-radius:6px;border:1px solid var(--bd2);background:var(--card2);color:var(--mut);cursor:pointer}
+.copybtn:hover{color:var(--lime);border-color:var(--lime)}
+.copybtn.done{color:var(--emerald);border-color:var(--emerald)}
+.emptystate{color:var(--mut2);text-align:center;padding:40px 0;font-size:14px}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} .sheet{padding:18px} }
+@media print {
+  .bar,.coursenav,.toolbar,.bookmarkbtn,footer{display:none !important}
+  body{background:#fff;color:#000}
+  .sheet{background:#fff;border:1px solid #999;break-inside:avoid;page-break-inside:avoid;margin-bottom:16px}
+  .sheet h2,.sec .slbl{color:#000}
+  .formula{background:#f3f3f3;color:#000;border:1px solid #999}
+  code{background:#eee;color:#000}
+  .copybtn{display:none}
+}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Cheat Sheets</span>
+    <h1 class="serif">Quick reference, not another lesson</h1>
+    <p class="sub">Built to keep open beside your editor. Search finds a term across all sheets; module filters narrow the list; print gives you a clean black-and-white handout.</p>
+    <div class="toolbar">
+      <input type="search" id="searchBox" placeholder="Search cheat sheets (e.g. &quot;jitter&quot;, &quot;cosine&quot;, &quot;idempoten&quot;)...">
+      <button class="plain" id="btnPrint"><span class="icon" style="width:13px;height:13px;margin-right:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="1.5"/><rect x="7" y="14" width="10" height="7"/></svg></span>Print</button>
+      <button class="plain" id="btnBookmarkedOnly">★ Bookmarked only</button>
+    </div>
+    <div class="toolbar" id="filterRow"></div>
+  </header>
+
+  <div class="sheetgrid" id="sheetGrid"></div>
+  <div class="emptystate" id="emptyState" style="display:none">No cheat sheets match your search.</div>
+
+  <footer>Zenith Lab · AI Engineering · Cheat Sheets</footer>
+</div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+const SHEETS = [
+  { id: 0, title: "AI Engineering Orientation Cheat Sheet", tag: "Module 0",
+    sections: [
+      { label: "The field, in one line", items: ["AI Engineering = integrating, orchestrating, and operating already-trained AI models (mostly LLMs via API) inside production software, not training models from scratch."] },
+      { label: "Adjacent fields, the fast distinction", items: ["<b>ML Engineer</b> — trains/fine-tunes models themselves.", "<b>Data Scientist</b> — analyzes data to inform decisions.", "<b>AI Researcher</b> — pushes what models CAN do, publishes.", "<b>MLOps / AI Infra</b> — builds/operates the platform models run on.", "<b>AI Engineer (you)</b> — builds what runs ON TOP of an existing model, reliably."] },
+      { label: "Learn-now priority (in order)", items: ["Python, Git/GitHub, HTTP/REST/JSON, SQL — all 'need to know now.'", "JavaScript/TypeScript, Linux/Bash, Docker — 'should learn next.'", "C++/Rust/Go — specialized, only relevant deep in infra/platform work."] },
+      { label: "The production lifecycle", items: ["IDEA → DATA → MODEL/API → BACKEND → RAG/TOOLS/AGENTS → APPLICATION → EVALUATION → DEPLOYMENT → MONITORING.", "An AI engineer's work concentrates from Model/API through Monitoring, not the raw Data or Deployment infrastructure stages."] },
+      { label: "Specialization directions (overlapping, not rigid)", items: ["AI Application Engineer, LLM/Generative AI Engineer, AI/ML Engineer, AI Integration Engineer, AI Automation Engineer, AI Platform/Infrastructure Engineer, MLOps-oriented roles, AI Product Engineer."] },
+      { label: "What this course teaches vs. doesn't", items: ["Teaches: Python fundamentals, prompting/structured outputs, context budgeting, RAG, tool use, agents, reliability, evaluation (Python Foundations + Modules 1–8).", "Doesn't teach: advanced Python, SQL, deployment/cloud, model training/fine-tuning, production vector-DB ops, a specific vendor's SDK syntax."] },
+    ] },
+  { id: 9, title: "Python Foundations Cheat Sheet", tag: "Python Foundations",
+    sections: [
+      { label: "Core types", items: ["<code>int</code>, <code>float</code> — numbers. <code>str</code> — text. <code>bool</code> — True/False. <code>None</code> — explicitly no value.", "<code>list</code> — ordered, mutable. <code>dict</code> — key/value pairs. Both are the shapes model responses and tool arguments come back as."] },
+      { label: "String basics", items: ["<code>f\"{x} tokens\"</code> — f-strings, the standard way to build a string from variables.", "<code>s.strip()</code>, <code>s.startswith(\"```\")</code>, <code>s.replace(\",\", \"\")</code> — the string methods this course's repair patterns lean on most.", "<code>len(s)</code> works on strings, lists, and dicts alike — the length/count you'll compute constantly for budgets and validation."] },
+      { label: "Lists and iteration", items: ["<code>for item in items:</code> — the loop shape behind chunking, retrieval scoring, and eval suites.", "<code>[x for x in items if cond]</code> — a list comprehension, a filter written in one line, exactly the shape of a threshold filter.", "Slicing: <code>items[:k]</code> — first k items, the mechanism behind top-k."] },
+      { label: "Dictionaries", items: ["<code>d.get(\"key\", default)</code> — read a key that might not exist, without raising, use this instead of <code>d[\"key\"]</code> whenever a field might be missing.", "<code>\"key\" in d</code> — checks presence only, an empty string still counts as present, presence isn't the same as usable.", "<code>d[\"key\"] = value</code> — set/overwrite a key."] },
+      { label: "Functions and try/except", items: ["<code>def f(a, b=default):</code> — a function with a default argument.", "<code>try: ... except Exception as e: ...</code> — catch a failure instead of letting it crash the whole program, the pattern behind every safe_call wrapper in this course.", "Never use a bare <code>except:</code> with no type, it silently swallows even a genuine bug (like a typo) alongside the failure you meant to catch."] },
+      { label: "JSON", items: ["<code>json.loads(text)</code> — text to a Python object (dict/list). Raises on malformed input.", "<code>json.dumps(obj)</code> — a Python object back to a JSON string.", "A raised <code>json.JSONDecodeError</code> from <code>loads()</code> is exactly the signal this course's repair pass exists to catch and fix before re-attempting."] },
+      { label: "Async, in one paragraph", items: ["<code>async def f(): ...</code> defines a coroutine. <code>await f()</code> runs it and waits for the result, this is the shape every real model-API call takes (a network call you wait on), even though this course's Worker/Pyodide sandboxes run your exercise code synchronously for simplicity."] },
+      { label: "Common mistakes", items: ["Using <code>d[\"key\"]</code> on a field that might be missing instead of <code>d.get(\"key\")</code>, causing an uncaught <code>KeyError</code>.", "A bare <code>except:</code> that hides real bugs along with expected failures.", "Comparing floats with <code>==</code> when a small rounding difference is expected, use a tolerance instead."] },
+    ] },
+  { id: 1, title: "Structured Outputs Cheat Sheet", tag: "Module 1",
+    sections: [
+      { label: "Repair order (always this sequence)", items: ["1. Strip a markdown code fence if present.", "2. Strip trailing commas before <code>}</code> or <code>]</code>.", "3. <code>json.loads()</code> the result.", "4. Validate the parsed object against the schema.", "Never validate before you've successfully parsed."] },
+      { label: "What repair CAN fix", items: ["A markdown fence wrapped around otherwise-valid JSON.", "A single trailing comma before a closing brace/bracket.", "A trailing newline after valid JSON (whitespace is ignored by <code>json.loads()</code>)."] },
+      { label: "What repair CANNOT fix", items: ["Prose that never attempted JSON at all — there's no structure to repair.", "A field with the wrong TYPE (a string where a number was required) — that's a validation failure, not a parse failure.", "A missing required field — same, a validation failure."] },
+      { label: "Decision rule", items: ["Parse fails after repair → escalate to an expensive model retry with the error included.", "Parse succeeds, schema fails → reject with a structured error naming the specific field.", "Both succeed → safe to use."] },
+      { label: "Common mistakes", items: ["Stripping the trailing comma AFTER attempting <code>json.loads()</code> instead of before.", "Silently defaulting a missing required field instead of rejecting.", "Treating prose-only output the same as a fixable syntax defect."] },
+      { label: "Implementation checklist", checklist: ["Fence-stripping happens before parse.", "Trailing-comma stripping happens before parse.", "A parse failure returns a structured error, never raises uncaught.", "A validation failure names the specific missing/wrong-typed field."] },
+    ] },
+  { id: 2, title: "Context & Token Budget Cheat Sheet", tag: "Module 2",
+    sections: [
+      { label: "Planning estimate", items: ["This course's estimate: <code>tokens ≈ characters / 4</code> for English text.", "Real tokenizers vary by provider and are more precise, use this for planning only."] },
+      { label: "Key formula", formula: "available_input = context_window − reserved_output" },
+      { label: "Chunking rules", items: ["Never silently drop content — an oversized single word still gets its own chunk, even if it alone exceeds the budget.", "Overlap repeats boundary content so no idea is split with zero context on either side, typically 10–20% of chunk size.", "More overlap = more total tokens processed = more cost, it's a tradeoff, not a free win."] },
+      { label: "The oversized-word guard", formula: "if tokens + t > max and len(chunk) > 0: break  # only enforce once chunk is non-empty" },
+      { label: "Common mistakes", items: ["Truncating instead of chunking — silently drops whatever came after the cut, with no error.", "Enforcing the budget check even on an empty chunk, silently dropping an oversized single word.", "Forgetting that a retry re-sends the ENTIRE original prompt plus new context, roughly doubling token cost."] },
+      { label: "Implementation checklist", checklist: ["Available input budget is computed, not assumed.", "Chunker never drops a word, oversized or not.", "Overlap is applied consistently at every chunk boundary except the last."] },
+    ] },
+  { id: 3, title: "Retrieval (RAG) Cheat Sheet", tag: "Module 3",
+    sections: [
+      { label: "Cosine similarity", formula: "cos(a,b) = dot(a,b) / (‖a‖ × ‖b‖)" },
+      { label: "Key properties", items: ["Range: -1 (opposite) to 1 (identical direction), 0 = perpendicular/unrelated.", "Scale-invariant — magnitude is divided out, only direction (meaning) matters.", "Guard against a zero-magnitude vector before dividing, or Python will raise <code>ZeroDivisionError</code>."] },
+      { label: "Top-k + threshold pattern", items: ["1. Score every candidate.", "2. FILTER out anything below the minimum relevance threshold.", "3. SORT the remaining candidates descending.", "4. SLICE to the top k.", "Filter before slicing — slicing first can wrongly exclude a high scorer that appeared late in an unsorted list."] },
+      { label: "Why a threshold matters", items: ["Top-k alone always returns k results, even from an irrelevant collection, it has no concept of 'not good enough.'", "'Best available' is not the same as 'actually relevant' — a wrong-topic chunk sharing a keyword can still score moderately positive."] },
+      { label: "Common mistakes", items: ["Sorting or slicing before filtering by threshold.", "Not guarding a zero-vector, letting <code>ZeroDivisionError</code> crash the whole retrieval call.", "Assuming a non-zero score means relevant, without ever setting a threshold at all."] },
+      { label: "Implementation checklist", checklist: ["Zero-vector inputs return score 0, never a raised exception.", "Results are filtered by threshold before being sliced to k.", "Ties/near-ties are broken by score, not by input list order."] },
+    ] },
+  { id: 4, title: "Tool Use & Idempotency Cheat Sheet", tag: "Module 4",
+    sections: [
+      { label: "Validation order (before ANY execution)", items: ["1. Does the named tool exist in the registry?", "2. Are all required arguments present (and correctly typed)?", "3. Has this call ID already succeeded (idempotency check)?", "Only after all three does the handler actually run."] },
+      { label: "Idempotent executor pattern", formula: "if call_id in seen: return seen[call_id]\ntry:\n    result = handler(args); seen[call_id] = result\nexcept Exception as e:\n    return {'ok': False, 'error': str(e)}  # do NOT cache" },
+      { label: "Cache successes, never failures", items: ["A success gets cached against the call ID — a repeat returns the cached result, the handler never re-runs.", "A failure must NOT be cached — the side effect never happened, so a genuine retry deserves a real second attempt."] },
+      { label: "Two validation layers", items: ["<b>Schema validation</b> — is the shape/type correct? (structural)", "<b>Business-rule validation</b> — does the VALUE make sense for this specific case? (e.g. a refund amount within the order's actual total)", "A call can pass schema validation and still be unsafe to execute."] },
+      { label: "Common mistakes", items: ["Checking the idempotency cache AFTER calling the handler instead of before.", "Caching a result before knowing if the handler actually succeeded.", "Treating schema-valid as \"safe to execute\" without a business-rule check."] },
+      { label: "Implementation checklist", checklist: ["Unknown tool names are rejected before any handler runs.", "A cached success returns without re-invoking the handler.", "A raised error is never written to the idempotency cache."] },
+    ] },
+  { id: 5, title: "Agent Control Flow Cheat Sheet", tag: "Module 5",
+    sections: [
+      { label: "The three valid loop endings", items: ["<b>Success</b> — the model emits a distinct final-answer signal.", "<b>Step limit</b> — the hard cap is reached with no final answer.", "<b>Stuck</b> — the same action repeats some threshold number of times in a row (this course uses 3)."] },
+      { label: "Stuck-detection pattern", formula: "if action == last_action:\n    repeat_count += 1\nelse:\n    last_action, repeat_count = action, 1\nif repeat_count >= 3: return {'status': 'stuck'}" },
+      { label: "Why a step limit is non-negotiable", items: ["\"The model will know when to stop\" is a hope, not a mechanism.", "Every step is a real cost: tokens, latency, and often a tool execution with its own side effects.", "Hitting the limit is CORRECT behavior for a hard task, not a bug to hide."] },
+      { label: "Common mistakes", items: ["Forgetting to reset the repeat counter when the action changes — causes false 'stuck' triggers on legitimately alternating actions.", "Treating idempotent tool execution as if it also bounds the loop — it doesn't, it only protects individual calls from duplicate side effects.", "Silently returning a partial answer when the step limit is hit instead of clearly reporting 'did not finish.'"] },
+      { label: "Implementation checklist", checklist: ["Step limit is enforced with a real hard cap, not just a suggestion.", "3 identical consecutive actions trigger 'stuck' well before the step limit.", "Alternating different actions never falsely trigger stuck-detection."] },
+    ] },
+  { id: 6, title: "Reliability Cheat Sheet", tag: "Module 6",
+    sections: [
+      { label: "Full jitter backoff", formula: "delay = random.random() * min(cap, base * 2 ** attempt)" },
+      { label: "Retryable vs. non-retryable", items: ["<b>Retryable</b> — 429 (rate limit), timeouts, transient 5xx: the identical request has a real chance of succeeding on retry.", "<b>Non-retryable</b> — 400 (malformed request), auth failures: identical retry fails identically, every time."] },
+      { label: "Bounded call shape", items: ["Retry the primary on retryable failures, up to a fixed max.", "Stop retrying immediately on a non-retryable error, don't wait out the budget.", "Once primary is exhausted/blocked, try fallback exactly ONCE, not with the same generous budget."] },
+      { label: "Why jitter, not just backoff", items: ["Fixed or pure-exponential delays synchronize many callers into a simultaneous retry storm.", "Full jitter (random between 0 and the cap) spreads retries across a window instead of a single instant."] },
+      { label: "Common mistakes", items: ["Retrying a non-retryable error until the attempt count runs out instead of failing fast.", "Giving fallback the same retry budget as the primary.", "Using fixed delay or exponential-without-jitter under real concurrent load."] },
+      { label: "Implementation checklist", checklist: ["Retryable classification is checked independently of the attempt counter.", "Primary retries are capped; fallback gets exactly one attempt.", "Both primary and fallback failing returns a clear structured failure, never an uncaught exception."] },
+    ] },
+  { id: 7, title: "Evaluation Cheat Sheet", tag: "Module 7",
+    sections: [
+      { label: "What makes a usable eval case", items: ["An input AND an explicit, checkable criterion — not an implicit \"judge if it's good.\"", "Deterministic checks (exact match, schema validation) wherever a fixed correct answer/shape exists.", "LLM-as-judge reserved for genuinely subjective criteria with no deterministic check available."] },
+      { label: "Regression definition", formula: "regression = (baseline is a real number) AND (new_score < baseline)" },
+      { label: "Isolating variables", items: ["Change ONE thing (one prompt, one retrieval parameter), then re-run the full eval suite.", "Changing several things and evaluating once tells you SOMETHING changed, not WHICH part."] },
+      { label: "Deterministic vs. LLM-as-judge", items: ["Deterministic: consistent, cheap, exactly reproducible — always prefer when it applies.", "LLM-as-judge: inherits the exact unreliability it's measuring, the judge's own grading is an unverified model output."] },
+      { label: "Common mistakes", items: ["Spot-checking a handful of outputs instead of running a systematic, repeatable eval.", "Not wrapping each check() call in its own try/except — one bad checker can crash the whole evaluation.", "Changing multiple variables in one deploy, then evaluating once."] },
+      { label: "Implementation checklist", checklist: ["Every eval case has an explicit pass/fail criterion, not an implicit judgment call.", "model_fn and check() failures are each caught independently, never crashing the whole run.", "A baseline score is recorded and compared before every ship."] },
+    ] },
+  { id: 8, title: "Capstone Synthesis Cheat Sheet", tag: "Module 8",
+    sections: [
+      { label: "The seven layers, in call order", items: ["1. <b>Structured output</b> (M1) — repair + validate every model response before acting on it.", "2. <b>Context budget</b> (M2) — keep retrieved content + conversation under the available input budget.", "3. <b>Retrieval</b> (M3) — cosine similarity + relevance threshold, honest \"no answer\" when nothing clears it.", "4. <b>Tool execution</b> (M4) — validate, then execute idempotently.", "5. <b>Agent control flow</b> (M5) — hard step limit + stuck detection around the whole loop.", "6. <b>Reliability</b> (M6) — retry + backoff + one bounded fallback around every model call.", "7. <b>Evaluation</b> (M7) — labeled eval set with a recorded baseline, re-run before every ship."] },
+      { label: "Design-doc checklist (what graders look for)", checklist: ["Structured output: names the specific repair/validate mechanism, not just \"we validate.\"", "Context budget: states the actual budget arithmetic, not just \"we manage tokens.\"", "Retrieval: names the similarity metric AND the relevance threshold.", "Tool execution: names the idempotency key and what gets cached vs. not.", "Agent control flow: names the step limit AND the stuck-detection rule.", "Reliability: names retry count, backoff formula, and fallback behavior.", "Evaluation: names the baseline comparison and regression rule."] },
+      { label: "The recurring pattern across every module", items: ["Every reliability mechanism in this course bounds SOMETHING: tokens (M2), steps (M5), retries (M6), fallback attempts (M6).", "Unbounded anything — tokens, steps, retries — is the same underlying risk showing up in a different layer."] },
+      { label: "Common capstone mistakes", items: ["Describing a mechanism in one sentence with no specifics (\"we handle errors\") instead of naming the actual logic.", "Forgetting that a failed attempt must stay retryable — caching failures the same way as successes.", "Treating the design document and the implementation as unrelated, they should describe the same system."] },
+    ] },
+];
+
+function bookmarks(){ const v = CourseProgress.getExtra("cheatsheetBookmarks"); return Array.isArray(v) ? v : []; }
+function toggleBookmark(id){
+  const b = bookmarks();
+  const idx = b.indexOf(id);
+  if (idx === -1) b.push(id); else b.splice(idx, 1);
+  CourseProgress.setExtra("cheatsheetBookmarks", b);
+}
+
+let activeModule = null;
+let bookmarkedOnly = false;
+
+function renderFilters(){
+  const row = document.getElementById("filterRow");
+  row.innerHTML = "";
+  const allBtn = document.createElement("button");
+  allBtn.className = "filterbtn" + (activeModule === null ? " active" : "");
+  allBtn.textContent = "All modules";
+  allBtn.addEventListener("click", () => { activeModule = null; renderFilters(); renderSheets(); });
+  row.appendChild(allBtn);
+  SHEETS.forEach(s => {
+    const btn = document.createElement("button");
+    btn.className = "filterbtn" + (activeModule === s.id ? " active" : "");
+    btn.textContent = s.tag;
+    btn.addEventListener("click", () => { activeModule = s.id; renderFilters(); renderSheets(); });
+    row.appendChild(btn);
+  });
+}
+
+function sectionMatches(sec, term){
+  const hay = [sec.label, ...(sec.items || []), ...((sec.checklist)||[]), sec.formula || "", ...((sec.formulas||[]).map(f=>f.label+" "+f.f))].join(" ").toLowerCase();
+  return hay.includes(term);
+}
+
+function renderSheets(){
+  const term = document.getElementById("searchBox").value.trim().toLowerCase();
+  const bm = bookmarks();
+  const grid = document.getElementById("sheetGrid");
+  grid.innerHTML = "";
+  let visibleCount = 0;
+  SHEETS.forEach(sheet => {
+    if (activeModule !== null && sheet.id !== activeModule) return;
+    if (bookmarkedOnly && !bm.includes(sheet.id)) return;
+    const matches = !term || sheet.title.toLowerCase().includes(term) || sheet.sections.some(s => sectionMatches(s, term));
+    if (!matches) return;
+    visibleCount++;
+    const el = document.createElement("div");
+    el.className = "sheet";
+    const isBookmarked = bm.includes(sheet.id);
+    let secHtml = "";
+    sheet.sections.forEach(sec => {
+      if (term && !sectionMatches(sec, term) && !sheet.title.toLowerCase().includes(term)) return;
+      secHtml += `<div class="sec"><div class="slbl">${sec.label}</div>`;
+      if (sec.items) secHtml += `<ul>${sec.items.map(i => `<li>${i}</li>`).join("")}</ul>`;
+      if (sec.formula) secHtml += `<div class="formula"><span>${sec.formula}</span><button class="copybtn" data-copy="${sec.formula.replace(/"/g,'&quot;')}">Copy</button></div>`;
+      if (sec.formulas) sec.formulas.forEach(f => { secHtml += `<div class="formula"><span><b style="color:var(--mut);font-family:'Space Grotesk';font-weight:600;font-size:12px;margin-right:10px">${f.label}</b>${f.f}</span><button class="copybtn" data-copy="${f.f.replace(/"/g,'&quot;')}">Copy</button></div>`; });
+      if (sec.checklist) secHtml += `<div class="checklist">${sec.checklist.map(c => `<label><input type="checkbox">${c}</label>`).join("")}</div>`;
+      secHtml += `</div>`;
+    });
+    el.innerHTML = `
+      <div class="shead">
+        <div><div class="stag">${sheet.tag}</div><h2 class="serif">${sheet.title}</h2></div>
+        <div class="sactions"><button class="bookmarkbtn${isBookmarked ? " on" : ""}" data-id="${sheet.id}">${isBookmarked ? "★" : "☆"}</button></div>
+      </div>
+      ${secHtml}
+    `;
+    grid.appendChild(el);
+  });
+  document.getElementById("emptyState").style.display = visibleCount === 0 ? "block" : "none";
+
+  grid.querySelectorAll(".bookmarkbtn").forEach(btn => {
+    btn.addEventListener("click", () => { toggleBookmark(Number(btn.dataset.id)); renderSheets(); });
+  });
+  grid.querySelectorAll(".copybtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const text = btn.dataset.copy;
+      navigator.clipboard?.writeText(text).catch(() => {});
+      btn.textContent = "Copied"; btn.classList.add("done");
+      setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1200);
+    });
+  });
+}
+
+document.getElementById("searchBox").addEventListener("input", renderSheets);
+document.getElementById("btnPrint").addEventListener("click", () => window.print());
+document.getElementById("btnBookmarkedOnly").addEventListener("click", (e) => {
+  bookmarkedOnly = !bookmarkedOnly;
+  e.target.style.borderColor = bookmarkedOnly ? "var(--amber)" : "";
+  e.target.style.color = bookmarkedOnly ? "var(--amber)" : "";
+  renderSheets();
+});
+
+renderFilters();
+renderSheets();
+</script>
+</body>
+</html>

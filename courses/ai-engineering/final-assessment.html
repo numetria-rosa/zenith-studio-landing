@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Competency Assessment — AI Engineering</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(28px,4.5vw,40px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:15.5px;max-width:680px;margin-top:14px}
+section{padding:36px 0;border-bottom:1px solid var(--bd)}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:10px;font-size:13.5px;color:var(--mut);display:none}
+.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
+.numinput input{width:100px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+.logconsole{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;font-family:'JetBrains Mono';font-size:12px;line-height:1.9;margin:10px 0;overflow-x:auto}
+.logline{color:var(--mut)}
+.logline.err{color:var(--red)}
+.ltrace{color:var(--violet)}
+.lstep{color:var(--lime)}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+.qgrid{display:grid;gap:16px;margin-top:20px}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
+.nextbtn{margin-left:auto}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono'}
+.coursenav a:hover{color:var(--lime)}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:24px} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">AI Engineering · Final Assessment</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Final competency assessment</span>
+    <h1 class="serif" id="pageTitle">Ten scenarios you haven't seen</h1>
+    <p class="sub">Drawn randomly from a 12-question pool of entirely novel scenarios, different numbers, different framing, different systems than anything in the 8 modules or the Quiz Center. Answer order is also randomized. If you can only pass by recognizing a memorized pattern, you'll get these wrong, on purpose. Passing score: 80% (8/10). Unlimited attempts, each with a fresh random draw.</p>
+  </header>
+
+  <section id="introSection">
+    <p class="mut">Ready when you are. Each attempt draws 10 of 12 possible scenarios in a new random order, with answer choices also shuffled, so retaking the assessment is a genuine re-test, not a chance to recall which button you clicked last time.</p>
+    <div style="margin-top:18px"><button class="primary" id="btnStart">Start the assessment &rarr;</button></div>
+  </section>
+
+  <section id="qSection" style="display:none">
+    <div class="qgrid" id="qgrid"></div>
+    <div class="feedback" id="overallFb" style="margin-top:20px"></div>
+  </section>
+
+  <footer>Zenith Lab · AI Engineering · Final competency assessment</footer>
+</div>
+
+<div class="scoreboard" id="scoreboard" style="display:none"><div class="in">
+  <span class="mono sc" id="scoreDisplay">0 / 10 answered</span>
+  <button id="btnRetake" style="display:none">↺ Retake with new scenarios</button>
+  <button class="primary nextbtn" id="btnFinish" disabled>Finish assessment</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script src="quiz-data.js"></script>
+<script>
+const POOL = [
+  { id: "fa_repair_order", type: "mcq", tag: "Structured outputs (novel scenario)",
+    text: "A model returns: Here's the data you wanted: {\"id\": 88, \"active\": true,}\\n (prose prefix, then JSON with a trailing comma). What's the correct sequence of operations before this can be trusted as data?",
+    opts: [
+      { t: "Extract the JSON substring, strip the trailing comma, parse it, then validate against the schema", correct: true },
+      { t: "Validate the whole raw string against the schema directly, schema validators can skip past prose automatically", correct: false, why: "Schema validators operate on parsed objects, not raw text mixed with prose, the JSON has to be isolated, repaired, and parsed first." },
+      { t: "Reject it outright, a prose prefix means the model failed the task entirely", correct: false, why: "A prose prefix around otherwise-valid JSON is a mechanically extractable and repairable defect, rejecting outright throws away recoverable data." },
+    ]},
+  { id: "fa_token_budget", type: "calc", tag: "Token budget (novel numbers)",
+    text: "Context window is 12000 tokens. Reserved output is 2500 tokens. Retrieved context is 8200 tokens, and the user's question is 300 tokens. Is this call within the available input budget? Enter 1 for yes, 0 for no.",
+    correct: 1, hint: "Available input budget = 12000 − 2500 = 9500. Retrieved context + question = 8200 + 300 = 8500, which is under 9500, so yes, it fits (answer: 1).",
+  },
+  { id: "fa_retrieval_scale", type: "mcq", tag: "Retrieval (novel vectors)",
+    text: "Query vector [4, 0]. Document A's vector is [1, 0], Document B's vector is [40, 0]. Which scores higher on cosine similarity, and why does this feel counter-intuitive if you're thinking about vector length?",
+    opts: [
+      { t: "They score identically (both 1.0), cosine similarity divides out magnitude entirely, it only measures direction, not length", correct: true },
+      { t: "Document B scores higher, because its vector is much longer", correct: false, why: "Cosine similarity specifically divides out magnitude, a 'longer' vector pointing the same direction doesn't score higher, only DIRECTION affects the score." },
+      { t: "Document A scores higher, because it's closer in raw magnitude to the query", correct: false, why: "Magnitude closeness isn't what cosine similarity measures at all, it's the ANGLE between vectors, both A and B point in the exact same direction as the query here." },
+    ]},
+  { id: "fa_idempotent_tool", type: "mcq", tag: "Tool execution (novel scenario)",
+    text: "A model's tool call to send_notification(userId, message) has NO call ID at all, just the arguments. The model retries this exact call after a timeout. What can go wrong that a stable call-ID scheme would have prevented?",
+    opts: [
+      { t: "Without a call ID to check against, the executor has no way to recognize the retry as the SAME logical request, so it re-runs the handler and sends the notification twice", correct: true },
+      { t: "Nothing, tool calls without IDs are automatically deduplicated by argument content", correct: false, why: "There's no automatic deduplication based on arguments alone in this course's model, without an explicit call ID to track, the executor has no signal that this is a repeat, not a new request." },
+      { t: "The model itself will refuse to retry a call with no ID", correct: false, why: "The model has no built-in awareness of call IDs or retry safety, that responsibility belongs entirely to the executor's own logic, which needs a stable ID to check against." },
+    ]},
+  { id: "fa_agent_stuck", type: "mcq", tag: "Agent control flow (novel trace)",
+    text: "An agent's trace shows: search_docs('refund'), search_docs('refund'), search_docs('refund'), then a final answer on the 4th call. Should this trigger stuck-detection with a 3-repeat threshold?",
+    opts: [
+      { t: "Yes, the same action repeated exactly 3 times in a row should trigger stuck-detection immediately on the 3rd repeat, the loop shouldn't need to reach a 4th call at all", correct: true },
+      { t: "No, since a final answer eventually followed, the repetition was fine in hindsight", correct: false, why: "Stuck-detection has to trigger in the moment, based on the pattern observed so far, not retroactively excused because a later step happened to produce an answer, waiting to see if it 'worked out' defeats the purpose of an early guard." },
+      { t: "No, 3 repeats is not enough to be considered stuck, only 5 or more should count", correct: false, why: "This course's threshold is 3 identical consecutive actions specifically, using a much higher threshold would let a genuinely stuck loop burn significantly more of its step budget before being caught." },
+    ]},
+  { id: "fa_backoff_calc", type: "calc", tag: "Reliability (novel numbers)",
+    text: "Base delay 400ms, cap 6000ms, formula min(cap, base × 2^attempt). What's the maximum possible delay (in ms) before retry attempt 4 (attempt index 3, since 400 × 2^3 = 3200, under the cap)?",
+    correct: 3200, hint: "400 × 2^3 = 3200, which is under the 6000ms cap, so the cap doesn't apply here, the answer is the uncapped exponential value: 3200.",
+  },
+  { id: "fa_eval_regression", type: "mcq", tag: "Evaluation (novel scenario)",
+    text: "A team's eval baseline is 0.82. After adding a new retrieval re-ranking step, the new score is 0.82 exactly, unchanged. Is this a regression by this course's definition?",
+    opts: [
+      { t: "No, the definition is strictly 'score lower than baseline,' an unchanged score does not meet that definition", correct: true },
+      { t: "Yes, any change to the system that doesn't strictly improve the score counts as a regression", correct: false, why: "That's a stricter standard than this course's definition, which specifically requires the new score to be LOWER than baseline, not merely unimproved." },
+      { t: "It can't be determined without re-running the eval a second time", correct: false, why: "The regression definition only needs the recorded score compared to baseline, 0.82 is not less than 0.82, so by definition this isn't a regression, no second run is required to determine that." },
+    ]},
+  { id: "fa_llm_judge", type: "mcq", tag: "Evaluation (novel scenario)",
+    text: "A team needs to score whether a customer-support response has an appropriately empathetic tone, there's no fixed 'correct' string. Which approach fits this specific criterion best, and why?",
+    opts: [
+      { t: "LLM-as-judge, since tone is a genuinely subjective quality dimension with no deterministic check available, exactly the case this scoring approach is reserved for", correct: true },
+      { t: "A deterministic exact-match check against a list of empathetic phrases", correct: false, why: "Tone isn't reducible to matching specific phrases, a response can be genuinely empathetic without using any phrase from a fixed list, exact-match doesn't fit this kind of subjective criterion." },
+      { t: "No evaluation is possible for subjective criteria like tone, it should be skipped entirely", correct: false, why: "Subjective criteria aren't unevaluable, they're exactly what LLM-as-judge scoring is reserved for, when a deterministic check genuinely doesn't apply." },
+    ]},
+  { id: "fa_debug_logs", type: "debug", tag: "Debugging (novel log excerpt)",
+    logs: [
+      "11:02:00 [req_44] tool_call — charge_card(orderId:\"o9\") call_id=call_X → ERROR timeout",
+      "11:02:03 [req_44] tool_call — charge_card(orderId:\"o9\") call_id=call_Y → success (DIFFERENT call_id than call_X, same order)",
+      "11:02:03 [SYSTEM] deploy-log — retry wrapper now mints a fresh call_id per attempt (was: reuses original call_id)",
+    ],
+    text: "Given this log, what's the actual bug?",
+    opts: [
+      { t: "The retry wrapper generates a new call ID on every retry instead of reusing the original, which breaks the idempotency executor's ability to recognize this as the same logical request, risking a duplicate charge", correct: true },
+      { t: "The customer submitted two separate orders by mistake", correct: false, why: "The log shows the SAME order (o9) retried after a timeout, this is one logical request retried, not two separate customer actions." },
+      { t: "This is expected behavior, retries should always get a fresh call ID for security reasons", correct: false, why: "A fresh call ID on every retry defeats idempotency entirely, the whole mechanism depends on a STABLE id across retries of the same logical request, this is the deploy-log line confirming exactly what broke." },
+    ]},
+  { id: "fa_context_vs_retrieval", type: "mcq", tag: "Synthesis (Modules 2 + 3)",
+    text: "A RAG system retrieves 5 chunks that together total 9000 tokens, but the available input budget is only 6000 tokens. What's the most correct fix, combining what you know about token budgets and retrieval?",
+    opts: [
+      { t: "Retrieve fewer chunks or apply a stricter relevance threshold up front, so what's actually retrieved already fits the budget, rather than truncating after the fact", correct: true },
+      { t: "Truncate the combined chunk text at 6000 tokens, cutting off whichever chunk comes last", correct: false, why: "Naive truncation risks silently cutting off a highly relevant chunk that simply got assembled last, the better fix is retrieving a smaller, better-fitting set to begin with." },
+      { t: "Increase the context window setting so all 9000 tokens fit", correct: false, why: "The context window is a fixed property of the model being used, not a setting you can arbitrarily increase to make a budget problem disappear." },
+    ]},
+  { id: "fa_tool_vs_agent", type: "mcq", tag: "Synthesis (Modules 4 + 5)",
+    text: "An idempotent tool executor is correctly implemented and working. Does this guarantee the surrounding agent loop can't get stuck retrying that same tool forever?",
+    opts: [
+      { t: "No, idempotency prevents a REPEAT from causing a duplicate side effect, it says nothing about how many times the loop itself keeps deciding to call the tool, that's the loop's own step-limit and stuck-detection job", correct: true },
+      { t: "Yes, a correctly idempotent executor automatically caps how many times any tool can be called in a session", correct: false, why: "Idempotency has no concept of a call-count cap, it only tracks whether a SPECIFIC call ID already succeeded, a narrower guarantee than bounding the loop's total behavior." },
+      { t: "Yes, because idempotent execution means the loop will always terminate quickly", correct: false, why: "Idempotency affects correctness of REPEATED calls, not how many times the loop chooses to call in the first place, a loop can still spin, calling a perfectly idempotent tool over and over with fresh call IDs each time." },
+    ]},
+  { id: "fa_reliability_vs_eval", type: "mcq", tag: "Synthesis (Modules 6 + 7)",
+    text: "A team's eval score dropped after they deployed BOTH a new retry-backoff configuration AND a new fallback model, in the same release, evaluated together in one eval run. What's the practical cost of bundling these two changes?",
+    opts: [
+      { t: "They can't isolate which change caused the drop, or whether one change helped while the other hurt worse, diagnosing the actual cause now requires re-running the eval with each change isolated", correct: true },
+      { t: "Nothing, the eval score accurately reflects the system's quality either way", correct: false, why: "The score itself is accurate as an aggregate outcome, but it conflates the effects of two separate changes, making the CAUSE of the drop ambiguous, which is the real practical cost." },
+      { t: "The eval suite becomes unusable once more than one change ships in a release", correct: false, why: "The eval suite still produces a valid, meaningful score, the issue isn't that the suite broke, it's that attributing WHICH change caused the drop becomes genuinely ambiguous without isolating variables." },
+    ]},
+];
+
+let ASSESSMENT = [];
+let score = 0;
+const answered = {};
+
+function buildAssessment(){
+  const drawn = QuizData.shuffle(POOL).slice(0, 10);
+  ASSESSMENT = drawn.map(q => {
+    if (q.opts) {
+      return Object.assign({}, q, { opts: QuizData.shuffle(q.opts) });
+    }
+    return q;
+  });
+}
+
+function renderAssessment(){
+  const grid = document.getElementById("qgrid");
+  grid.innerHTML = "";
+  score = 0;
+  Object.keys(answered).forEach(k => delete answered[k]);
+
+  ASSESSMENT.forEach((q, idx) => {
+    const card = document.createElement("div");
+    card.className = "qcard";
+    if (q.type === "calc") {
+      card.innerHTML = `<div class="qn">Question ${idx+1} of ${ASSESSMENT.length} · ${q.tag}</div><div class="qtext">${q.text}</div><div class="numinput"><input type="number" id="${q.id}input" aria-label="Your numeric answer"><button id="${q.id}check">Check</button></div><div class="qexplain" id="${q.id}explain"></div>`;
+      grid.appendChild(card);
+      const check = () => {
+        if (answered[q.id]) return;
+        answered[q.id] = true;
+        const val = Number(document.getElementById(q.id + "input").value);
+        const correct = val === q.correct;
+        const ex = document.getElementById(q.id + "explain");
+        ex.style.display = "block";
+        ex.textContent = (correct ? "Correct. " : `Not quite, the answer is ${q.correct}. `) + q.hint;
+        if (correct) score++;
+        updateProgress();
+      };
+      document.getElementById(q.id + "check").addEventListener("click", check);
+    } else {
+      let logsHtml = "";
+      if (q.logs) {
+        logsHtml = `<div class="logconsole">${q.logs.map(l => `<div class="logline${l.includes("(DIFFERENT") ? " err" : ""}">${CourseProgress.escapeHtml(l)}</div>`).join("")}</div>`;
+      }
+      card.innerHTML = `<div class="qn">Question ${idx+1} of ${ASSESSMENT.length} · ${q.tag}</div>${logsHtml}<div class="qtext">${q.text}</div><div id="${q.id}opts"></div><div class="qexplain" id="${q.id}explain"></div>`;
+      grid.appendChild(card);
+      const el = document.getElementById(q.id + "opts");
+      q.opts.forEach((opt, i) => {
+        const div = document.createElement("label");
+        div.className = "qopt";
+        div.innerHTML = `<input type="radio" name="${q.id}" value="${i}"><span>${opt.t}</span>`;
+        div.addEventListener("click", () => {
+          if (answered[q.id]) return;
+          answered[q.id] = true;
+          document.querySelectorAll(`#${q.id}opts .qopt`).forEach((e2, j) => {
+            if (q.opts[j].correct) e2.classList.add("correct");
+            else if (j === i) e2.classList.add("incorrect");
+          });
+          const ex = document.getElementById(q.id + "explain");
+          ex.style.display = "block";
+          ex.textContent = (opt.correct ? "Correct." : "Not quite. " + opt.why);
+          if (opt.correct) score++;
+          updateProgress();
+        });
+        el.appendChild(div);
+      });
+    }
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const answeredCount = Object.keys(answered).length;
+  document.getElementById("scoreDisplay").textContent = `${answeredCount} / ${ASSESSMENT.length} answered`;
+  const allDone = answeredCount === ASSESSMENT.length;
+  document.getElementById("btnFinish").disabled = !allDone;
+  if (allDone) {
+    const passed = score / ASSESSMENT.length >= 0.8;
+    const fb = document.getElementById("overallFb");
+    fb.className = "feedback " + (passed ? "ok" : "bad");
+    fb.textContent = `Final score: ${score} / ${ASSESSMENT.length} (${Math.round(score/ASSESSMENT.length*100)}%). ` +
+      (passed ? "You passed the final competency assessment." : "80% (8/10) is required to pass. Review the explanations above, then retake with a fresh set of scenarios.");
+    CourseProgress.setExtra("finalAssessment", { passCount: score, total: ASSESSMENT.length, passed, lastAt: new Date().toISOString() });
+    document.getElementById("btnRetake").style.display = "inline-flex";
+  }
+}
+
+document.getElementById("btnStart").addEventListener("click", () => {
+  document.getElementById("introSection").style.display = "none";
+  document.getElementById("qSection").style.display = "block";
+  document.getElementById("scoreboard").style.display = "block";
+  buildAssessment();
+  renderAssessment();
+});
+
+document.getElementById("btnRetake").addEventListener("click", () => {
+  document.getElementById("overallFb").style.display = "none";
+  buildAssessment();
+  renderAssessment();
+  window.scrollTo({ top: document.getElementById("qSection").offsetTop - 80, behavior: "smooth" });
+});
+
+document.getElementById("btnFinish").addEventListener("click", () => { window.location.href = "dashboard.html"; });
+</script>
+</body>
+</html>

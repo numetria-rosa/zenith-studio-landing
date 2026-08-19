@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 5: Agent Architectures &amp; Control Flow</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
+.progress{height:3px;background:var(--bd)}
+.progress i{display:block;height:100%;background:var(--lime);width:62.5%}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
+p{color:var(--tx);font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
+.def p{font-size:14.5px}
+code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
+.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
+.callout b{color:var(--amber)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button.primary:hover{filter:brightness(1.08);color:var(--limed)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
+.statrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px}
+.stat{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;flex:1;min-width:130px}
+.stat.warn{border-color:var(--red)}
+.stat .sv{font-family:'JetBrains Mono';font-size:20px;font-weight:700;color:var(--tx)}
+.stat.warn .sv{color:var(--red)}
+.stat .sl{font-size:11px;color:var(--mut2);margin-top:2px}
+.sliderrow{margin-top:10px}
+.slbl{font-size:13px;color:var(--mut)}
+input[type=range]{width:100%;margin-top:8px;accent-color:var(--lime)}
+.testin{width:100%;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
+.numinput input{width:100px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
+.nextbtn{margin-left:auto}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
+.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
+.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h3:first-of-type{margin-top:0}
+.orient p{font-size:14.5px;color:var(--mut)}
+.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
+.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
+.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
+.practice p{font-size:14px}
+.practice details{margin-top:12px}
+.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
+.practice summary::-webkit-details-marker{display:none}
+.practice summary:before{content:"▸ "}
+.practice details[open] summary:before{content:"▾ "}
+.practice details:not([open]) .ans{display:none}
+.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
+.hintbox{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 20px;margin-top:14px}
+.hintbox .hlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.hintbox .husage{font-size:11px;color:var(--mut2);font-weight:400;text-transform:none;letter-spacing:0}
+.hintbox details{margin-top:8px;border-top:1px solid var(--bd);padding-top:8px}
+.hintbox details:first-of-type{border-top:none;padding-top:0}
+.hintbox summary{cursor:pointer;color:var(--amber);font-size:13px;list-style:none;font-weight:600}
+.hintbox summary::-webkit-details-marker{display:none}
+.hintbox summary:before{content:"▸ "}
+.hintbox details[open] summary:before{content:"▾ "}
+.hintbox .hbody{margin-top:8px;color:var(--tx);font-size:13.5px;line-height:1.7}
+.hintbox details.locked summary{color:var(--mut2);cursor:not-allowed}
+.tracebox{display:grid;gap:8px;min-height:60px}
+.traceline{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg2);font-size:13.5px;opacity:0;transform:translateY(4px);animation:tracein .25s forwards}
+@keyframes tracein{to{opacity:1;transform:translateY(0)}}
+.traceline .trole{font-family:'JetBrains Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:5px;flex-shrink:0;margin-top:1px}
+.traceline.reason .trole{background:rgba(167,139,250,.15);color:var(--violet)}
+.traceline.act .trole{background:rgba(198,244,50,.15);color:var(--lime)}
+.traceline.observe .trole{background:rgba(255,207,77,.15);color:var(--amber)}
+.traceline.final .trole{background:rgba(52,229,160,.15);color:var(--emerald)}
+@media (max-width:640px){
+  .wrap{padding:0 16px 60px}
+  h1{font-size:26px}
+  .kh h2{font-size:18px}
+  .interactive{padding:16px}
+  .orient{padding:20px 18px}
+}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--lime)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">AI Engineering · Module 5 of 8</span>
+</div></div>
+<div class="progress"><i></i></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-04.html">&larr; <span class="navlabel">Module 4</span></a><span class="navsep"></span><a href="module-06.html" id="navNextTop">Module 6 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 05</span>
+    <h1 class="serif">Agent Architectures &amp; Control Flow</h1>
+    <p class="sub">One validated tool call is a single step. An agent is what happens when a model chains steps together, reasoning about each result before deciding the next action, in a loop it controls. That loop needs boundaries, or it doesn't stop on its own.</p>
+    <div class="objectives">
+      <div class="lbl">Learning objectives</div>
+      <ul>
+        <li>Describe the reason-act-observe cycle and how it differs from a single prompt/response call</li>
+        <li>Explain why an agent loop needs a hard step limit, not just a "the model will know when to stop" assumption</li>
+        <li>Distinguish a legitimate termination condition from a stuck loop repeating the same failing action</li>
+        <li>Implement a bounded agent loop with step-limit and repeated-action guards</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="orient">
+    <div class="lbl">Before you start</div>
+    <h3 class="serif">What this module assumes</h3>
+    <p>Module 4 made a single tool call safe to execute. This module is about what happens when a model doesn't stop after one call, it uses a tool's result to decide what to do next, calls another tool, and keeps going until it has an answer, or until something has to stop it.</p>
+    <h3 class="serif">What's new</h3>
+    <p>Control flow you don't fully control. The model decides how many steps it takes and what each one is, your code's job is to bound that process so it can't run forever or spin on a failure.</p>
+    <h3 class="serif">What's assumed</h3>
+    <div class="assume">Modules 1-4 completed. Comfort with loops, arrays, and functions that return different shapes depending on what happened.</div>
+    <h3 class="serif">How to work through it</h3>
+    <ol>
+      <li>Read each definition, then run the matching interactive.</li>
+      <li>Answer the practice check before revealing the answer.</li>
+      <li>Finish with the graded checkpoint.</li>
+    </ol>
+  </div>
+
+  <section>
+    <div class="kh"><span class="num">1</span><h2 class="serif">From one call to a loop</h2></div>
+    <p>Every module so far has been a single request: send a prompt (with the right context, the right tools available), get a response. An <i>agent</i> changes the shape of the interaction, instead of one response, the model reasons about a goal, takes an action (usually a tool call), observes the result, and decides whether it's done or needs another step.</p>
+    <div class="def">
+      <div class="k">Definition: ReAct loop (reason, act, observe)</div>
+      <p>A control pattern where a model alternates between reasoning about what to do next, taking an action (typically a tool call), and observing the result, repeating until it has enough information to produce a final answer.</p>
+    </div>
+    <p>Nothing about this pattern is magic, it's a loop, with the model's own text as the thing that decides whether the loop continues. Which means your code, not the model, has to be the thing that guarantees the loop eventually stops.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">2</span><h2 class="serif">Interactive: watch a trace unfold</h2></div>
+    <p class="mut">A simplified real trace: an agent answering "What's the status of order #4471, and should the customer be notified?" Step through it.</p>
+    <div class="interactive">
+      <span class="ilbl">Agent trace · step through</span>
+      <div class="tracebox" id="traceBox"></div>
+      <div class="dagctrl">
+        <button class="primary" id="btnTraceNext">▶ Show next step</button>
+        <button id="btnTraceReset">Restart trace</button>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Count the tool calls (act steps) in the trace above. Each one is a validated, idempotent execution per Module 4. What does Module 4 NOT protect against here, even though every individual call is safe?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Module 4 guarantees each individual call is validated and safe to repeat without duplicating side effects. It says nothing about how many DIFFERENT steps the loop takes overall, or whether the loop ever decides to stop. A perfectly safe tool call, executed as step 40 of an agent that should have finished at step 3, is still a problem, just not the kind Module 4 was built to catch. That's this module's job.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">3</span><h2 class="serif">Why a hard step limit is non-negotiable</h2></div>
+    <p>"The model will know when to stop" is not a control mechanism, it's a hope. Models can reason in circles, misjudge whether they have enough information, or simply fail to emit a clean final-answer signal. Every agent loop needs an explicit, code-enforced maximum number of steps, independent of whatever the model itself thinks.</p>
+    <div class="def">
+      <div class="k">Definition: step limit</div>
+      <p>A hard maximum on how many reason-act-observe cycles a loop will execute before forcibly stopping, regardless of whether the model has produced a final answer. A circuit breaker for control flow, not a suggestion.</p>
+    </div>
+    <div class="callout"><b>An unbounded loop is an unbounded bill.</b> Every step is a model call (tokens, cost, latency) plus, often, a tool execution with its own cost or side effects. A loop with no step limit doesn't fail loudly, it just keeps running, and keeps costing, until something external kills it.</div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A step limit is reached before the model produced a final answer. Is that a bug in your loop, or expected, correct behavior?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Expected, correct behavior, assuming the limit is reasonable for the task. Hitting the cap is the loop doing exactly its job: refusing to run forever. The right response is to surface a clear "couldn't complete within the step budget" outcome (to the caller or the user), not to silently pretend it succeeded, and not to treat reaching the limit itself as an error condition to hide.</div>
+      </details>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A customer-troubleshooting agent debugging a "can't connect" ticket runs 10 different diagnostics in a row, run_diagnostic("wifi_signal"), run_diagnostic("dns_lookup"), run_diagnostic("dhcp_lease"), and so on, each a different check, and hits the step limit with the issue still unresolved. A second agent, on a different ticket, calls run_diagnostic("dns_lookup") with the exact same argument four times in a row and also hasn't resolved anything. Should both cases be handled the same way, just as "ran out of budget"?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">No. The first agent is legitimately working through a hard, multi-step diagnosis, each step is a different action, so it's a step-limit case, and the fix (if this pattern is common) is likely a larger step budget, not a bug. The second agent is issuing the SAME diagnostic with the SAME argument repeatedly, that's the stuck signal from earlier in this module, and it should be cut off well before step limit regardless of how large the budget is, since raising the limit would just mean more identical failed checks, not a better outcome.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4</span><h2 class="serif">Three ways a loop can end</h2></div>
+    <p>A well-bounded agent loop has exactly three possible endings, and your code needs to handle all three distinctly, not collapse them into one generic "done."</p>
+    <div class="def">
+      <div class="k">Definition: termination conditions</div>
+      <p><b>Success</b>: the model emits an explicit final-answer signal, distinct from an ordinary action. <b>Step limit</b>: the cap is reached with no final answer. <b>Stuck</b>: the loop detects it's repeating the same action without progress, and stops early rather than burning the rest of its step budget on a pattern that clearly isn't working.</p>
+    </div>
+    <p>These three need different handling downstream. A success has an answer to return. A step-limit or stuck outcome doesn't, and pretending it does (returning a partial or fabricated answer as if it were complete) is worse than clearly reporting that the loop didn't finish.</p>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Why distinguish "stuck" (repeated action) from "step limit" (ran out of budget) instead of just treating both as "didn't finish, same as each other"?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">They point to different problems. Hitting the step limit on a genuinely hard, multi-step task suggests the budget itself might be too small. Getting stuck after 3 identical actions suggests something is actually broken, a tool returning an error the model doesn't know how to act on, or a reasoning dead-end, regardless of how large the step budget is. Logging and alerting on these separately gives you a much better signal for what to actually fix.</div>
+      </details>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A research-assistant agent answering "what caused the 2024 CrowdStrike outage" calls web_search with a different query each step, wire, patch, sensor, root cause, timeline, and by step 12 has gathered enough in its reasoning text to write a solid answer. But it never emits the loop's explicit final-answer signal, and step 12 is the configured step limit. Should your loop code treat this as a success, since the material for a good answer is clearly there?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">No. Success is defined by the model emitting the explicit final-answer signal, not by whether an outside observer thinks the accumulated observations look sufficient. Your loop has no reliable way to judge "is this good enough" from the outside, that judgment is exactly what the final-answer signal is for. If the model never produces it, this is a step-limit ending: report it as such, don't fabricate a "success" by scraping the last reasoning text for something that looks like an answer.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">5</span><h2 class="serif">The repeated-failure trap</h2></div>
+    <p>A model that gets an error back from a tool call doesn't always adjust, sometimes it retries the exact same action, gets the exact same error, and repeats that cycle indefinitely, never making progress but never explicitly failing either. Without a guard, this looks identical to normal operation from the outside: the loop is "running," it just isn't going anywhere.</p>
+    <div class="callout"><b>Detecting "stuck" is a pattern-match, not a guess.</b> The simplest reliable signal is exact repetition: if the model issues the same action (same tool, same arguments) some small number of times in a row, that's a strong signal it's not reasoning its way forward, and the loop should stop rather than let the step limit be the only backstop.</div>
+
+    <div class="practice">
+      <div class="lbl">Cross-module check</div>
+      <p>Module 4's idempotent executor would happily return the SAME cached result for a repeated call with the same ID. Does that make stuck-loop detection unnecessary?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">No, they solve different problems, and a repeated call with a NEW call ID each time (which is realistic, an agent re-reasoning about the same action typically generates a fresh call) wouldn't even hit Module 4's cache, idempotency keys off the ID, not the semantic content of the call. Even if it did hit the cache every time, the loop would still be burning steps (and tokens) doing nothing productive. Idempotency protects individual calls from duplicate side effects. Stuck-loop detection protects the loop itself from spinning.</div>
+      </details>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>A coding agent loops run_tests, observe a failure, apply_patch, run_tests again, six times in a row. Every step calls the tool apply_patch, but the diff argument is different each time, it's genuinely trying a new fix on each iteration. Should stuck-detection flag this as a repeated action because the tool name apply_patch keeps recurring?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">No, not if it's matching on tool name alone. The stuck signal defined earlier in this module is exact repetition, same tool AND same arguments, not "the same tool got called again." A coding agent trying six different diffs is taking six different actions that happen to share a tool name, that's iterative debugging, not spinning. If the SAME diff (identical arguments) got submitted twice in a row, that would be the real signal, the model resubmitting a patch that already failed without changing anything. Matching on tool name only would falsely kill a lot of legitimate agent behavior.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6</span><h2 class="serif">Build it: a bounded agent loop</h2></div>
+    <p>You've seen all three endings, success, step limit, and stuck. Now implement a loop that correctly distinguishes them, and five real tests run against your actual code.</p>
+    <div class="interactive">
+      <span class="ilbl">Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)</span>
+      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">run_agent_loop(initial_state, step, max_steps)</span>. Call <span class="mono-inline">step(state)</span> each iteration, it returns either <span class="mono-inline">{"type": "final", "answer": ...}</span> or <span class="mono-inline">{"type": "action", "action": ..., "nextState": ...}</span>. Track actions taken in a <span class="mono-inline">trace</span> list (append each <span class="mono-inline">action</span> string). If <span class="mono-inline">step</span> returns final, return <span class="mono-inline">{"status": "success", "answer": ..., "stepsUsed": ..., "trace": trace}</span>. If the SAME action string repeats 3 times in a row, stop immediately and return <span class="mono-inline">{"status": "stuck", "stepsUsed": ..., "trace": trace}</span>, don't wait for max_steps. If <span class="mono-inline">max_steps</span> is reached with no final answer and no stuck detection, return <span class="mono-inline">{"status": "max_steps", "stepsUsed": max_steps, "trace": trace}</span>.</p>
+      <textarea id="agentCodeEditor" aria-label="Python code editor for run_agent_loop" class="testin" spellcheck="false" style="min-height:220px;font-size:13px" rows="13"></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunAgentTests">▶ Run tests</button>
+        <button id="btnResetAgentCode">Reset to starter code</button>
+      </div>
+      <div id="agentTestResults" style="margin-top:14px"></div>
+
+      <div class="hintbox" id="agentHintbox">
+        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="agentHintUsage"></span></div>
+        <details data-hint="1"><summary>Hint 1 — conceptual</summary><div class="hbody">Loop up to max_steps times. Each iteration, call step(state) once. Check its type: if "final," you're done. If "action," record it and check whether it's a repeat of the last action before continuing.</div></details>
+        <details data-hint="2"><summary>Hint 2 — specific</summary><div class="hbody">Keep two variables outside the loop: the last action seen, and how many times in a row it's repeated. Each "action" result, compare it to the last action, if equal increment the repeat counter, if different reset the counter to 1 and update "last action."</div></details>
+        <details data-hint="3"><summary>Hint 3 — near-solution</summary><div class="hbody">Check the repeat counter AFTER appending the current action to trace and updating the counter, if it reaches 3, return the stuck result right there, don't keep looping. If the loop finishes all max_steps iterations without returning, that's your max_steps case, return it after the loop.</div></details>
+        <details data-hint="solution" class="locked" id="agentSolutionDetails"><summary id="agentSolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">def run_agent_loop(initial_state, step, max_steps):
+    state = initial_state
+    trace = []
+    last_action = None
+    repeat_count = 0
+
+    for i in range(max_steps):
+        result = step(state)
+
+        if result["type"] == "final":
+            return {"status": "success", "answer": result["answer"], "stepsUsed": i + 1, "trace": trace}
+
+        trace.append(result["action"])
+        if result["action"] == last_action:
+            repeat_count += 1
+        else:
+            last_action = result["action"]
+            repeat_count = 1
+
+        if repeat_count >= 3:
+            return {"status": "stuck", "stepsUsed": i + 1, "trace": trace}
+
+        state = result["nextState"]
+
+    return {"status": "max_steps", "stepsUsed": max_steps, "trace": trace}</pre></div></details>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Test 4 feeds your loop 4 different actions in a row before a final answer on step 5. If your repeat-detection logic doesn't reset the counter when the action CHANGES, what false failure could this test trigger?</p>
+      <details>
+        <summary>Check your answer</summary>
+        <div class="ans">Without resetting on change, an off-by-one counter bug could accumulate across DIFFERENT actions and falsely trigger the stuck condition even though nothing actually repeated, incorrectly cutting off a loop that was making real progress. The counter has to be scoped to "how many times in a row has THIS SPECIFIC action just repeated," which means it must reset to 1 (not 0) the moment a different action appears.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7</span><h2 class="serif">Before the checkpoint: what you should now be able to do</h2></div>
+    <p class="mut">A short consolidation before you're graded on it.</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:2">
+      <li>Describe the reason-act-observe cycle and why the model, not your code, decides each step's content.</li>
+      <li>Explain why a step limit is required regardless of how capable the model is.</li>
+      <li>Distinguish success, step-limit, and stuck as three separate, differently-handled outcomes.</li>
+      <li>Implement a loop that enforces a step limit and detects repeated-action stalls.</li>
+    </ul>
+    <div class="practice">
+      <div class="lbl">Looking ahead</div>
+      <p>A bounded loop stops it from running forever. It says nothing about what happens when an individual model call inside that loop fails, times out, or comes back malformed. Module 6 covers making each call itself resilient: retries, backoff, and fallback.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Graded. Feedback is immediate and attempts are unlimited, the goal is understanding, not a single pass/fail moment.</p>
+
+    <div class="qcard">
+      <div class="qn">Question 1 of 5</div>
+      <div class="qtext">What's the core risk of an agent loop with no maximum step count?</div>
+      <div id="q1opts"></div>
+      <div class="qexplain" id="q1explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 2 of 5</div>
+      <div class="qtext">An agent issues the exact same tool call, same tool, same arguments, three times in a row. What should the loop do?</div>
+      <div id="q2opts"></div>
+      <div class="qexplain" id="q2explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 3 of 5</div>
+      <div class="qtext">Module 4's idempotent executor prevents a repeated tool call (same ID) from re-running its side effect. Does that alone prevent an agent loop from spinning on the same failing action forever?</div>
+      <div id="q3opts"></div>
+      <div class="qexplain" id="q3explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 4 of 5</div>
+      <div class="qtext">Which of these are valid, distinct termination conditions for a well-bounded agent loop?</div>
+      <div id="q4opts"></div>
+      <div class="qexplain" id="q4explain"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qn">Question 5 of 5 · new scenario</div>
+      <div class="qtext">An agent loop with no step limit runs 40 steps, and each step re-sends the model the FULL growing trace history as context, not just the latest step. Using Module 2's terms, what compounds here beyond just "it's taking a while"?</div>
+      <div id="q5opts"></div>
+      <div class="qexplain" id="q5explain"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">9</span><h2 class="serif">Further reading</h2></div>
+    <p class="mut">If you want to go deeper than the browser can take you:</p>
+    <ul style="margin-top:10px;padding-left:20px;color:var(--mut2);line-height:1.9">
+      <li>The original ReAct paper (Yao et al.) is the source of the reason-act-observe framing used throughout this module, worth reading directly for the reasoning traces it shows.</li>
+      <li>Production agent frameworks typically add richer stuck-detection than exact repetition, semantic similarity between recent actions, or explicit "no progress" signals from the model itself, at the cost of more complexity.</li>
+      <li>Some architectures use a planner/executor split instead of a single reasoning loop, a separate step decomposes the task into a fixed plan upfront, which sidesteps some (not all) of the unbounded-loop risk by bounding the plan length before execution starts.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">10</span><h2 class="serif">Glossary</h2></div>
+    <div style="margin-top:14px;display:grid;gap:12px">
+      <div><b class="mono-inline">agent loop / ReAct</b><span style="color:var(--mut);font-size:14px"> — a cycle of reasoning, taking an action, and observing the result, repeated until a final answer or a stop condition.</span></div>
+      <div><b class="mono-inline">step limit</b><span style="color:var(--mut);font-size:14px"> — a hard cap on how many loop iterations run before forcibly stopping.</span></div>
+      <div><b class="mono-inline">termination condition</b><span style="color:var(--mut);font-size:14px"> — any of the defined ways a loop is allowed to end: success, step limit, or stuck.</span></div>
+      <div><b class="mono-inline">stuck loop</b><span style="color:var(--mut);font-size:14px"> — a loop repeating the same action without progress, detected and stopped early rather than exhausting the step budget.</span></div>
+      <div><b class="mono-inline">trace</b><span style="color:var(--mut);font-size:14px"> — the ordered record of actions (and often reasoning) an agent loop produced, used for debugging and for detecting repetition.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">11</span><h2 class="serif">Interactive: tune the stuck threshold</h2></div>
+    <p class="mut">A travel-booking agent chaining search_flights, compare_prices, and book_flight against a route where the airline keeps rejecting the booking. Step through its trace and see how the repeat threshold you set decides whether the loop calls this "stuck" or just keeps going until it hits the step limit.</p>
+    <div class="interactive">
+      <span class="ilbl">Trace player · adjustable stuck threshold</span>
+      <div class="sliderrow">
+        <div class="slbl">Consecutive identical actions required to trigger "stuck": <b id="travelThresholdVal">3</b></div>
+        <input type="range" id="travelThreshold" min="2" max="6" step="1" value="3">
+      </div>
+      <div class="tracebox" id="travelTraceBox" style="margin-top:16px"></div>
+      <div class="dagctrl">
+        <button class="primary" id="btnTravelNext">▶ Show next step</button>
+        <button id="btnTravelReset">Restart trace</button>
+      </div>
+      <div class="statrow">
+        <div class="stat"><div class="sv" id="travelStepStat">0 / 8</div><div class="sl">Steps used / max</div></div>
+        <div class="stat"><div class="sv" id="travelStreakStat">0</div><div class="sl">Current repeat streak</div></div>
+        <div class="stat" id="travelStatusStatBox"><div class="sv" id="travelStatusStat">Not started</div><div class="sl">Loop status</div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Zenith Lab · AI Engineering · Module 5 of 8 · Next: Reliability for LLM Systems</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const MODULE_ID = 5;
+CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Section 2: trace step-through ---------------- */
+const TRACE_STEPS = [
+  { role: "reason", text: "I need to check the status of order #4471 before I can decide whether to notify the customer." },
+  { role: "act", text: "get_order_status(orderId: \"4471\")" },
+  { role: "observe", text: "Order #4471: status = \"delayed\", expected delivery moved from Jun 3 to Jun 9." },
+  { role: "reason", text: "The order is delayed by 6 days. That's a significant enough change that the customer should be notified proactively." },
+  { role: "act", text: "send_notification(customerId: \"cus_201\", template: \"delay_notice\", newDate: \"Jun 9\")" },
+  { role: "observe", text: "Notification sent successfully, confirmation id ntf_5521." },
+  { role: "final", text: "Order #4471 is delayed to Jun 9. The customer has been notified." },
+];
+let traceIdx = 0;
+function renderTraceStep(){
+  const box = document.getElementById("traceBox");
+  const s = TRACE_STEPS[traceIdx];
+  const div = document.createElement("div");
+  div.className = "traceline " + s.role;
+  div.innerHTML = `<span class="trole">${s.role}</span><span>${CourseProgress.escapeHtml(s.text)}</span>`;
+  box.appendChild(div);
+  traceIdx++;
+  const btn = document.getElementById("btnTraceNext");
+  if (traceIdx >= TRACE_STEPS.length) { btn.disabled = true; btn.textContent = "Trace complete"; }
+}
+function resetTrace(){
+  traceIdx = 0;
+  document.getElementById("traceBox").innerHTML = "";
+  const btn = document.getElementById("btnTraceNext");
+  btn.disabled = false;
+  btn.textContent = "▶ Show next step";
+}
+document.getElementById("btnTraceNext").addEventListener("click", renderTraceStep);
+document.getElementById("btnTraceReset").addEventListener("click", resetTrace);
+
+/* ---------------- Section 11: travel-booking trace player ---------------- */
+const TRAVEL_MAX_STEPS = 8;
+const TRAVEL_STEPS = [
+  { action: "search_flights(route: \"JFK-CDG\", date: \"2026-09-10\")", observe: "3 candidate flights found, cheapest is AF1780." },
+  { action: "compare_prices(candidates: 3)", observe: "AF1780 economy selected: $612, best price/duration tradeoff." },
+  { action: "book_flight(flightId: \"AF1780\", fare: \"economy\")", observe: "Booking rejected: seat_unavailable." },
+  { action: "book_flight(flightId: \"AF1780\", fare: \"economy\")", observe: "Booking rejected: seat_unavailable." },
+  { action: "book_flight(flightId: \"AF1780\", fare: \"economy\")", observe: "Booking rejected: seat_unavailable." },
+  { action: "book_flight(flightId: \"AF1780\", fare: \"economy\")", observe: "Booking rejected: seat_unavailable." },
+  { action: "book_flight(flightId: \"AF1780\", fare: \"economy\")", observe: "Booking rejected: seat_unavailable." },
+  { action: "book_flight(flightId: \"AF1780\", fare: \"economy\")", observe: "Booking rejected: seat_unavailable." },
+];
+let travelIdx = 0;
+let travelLastAction = null;
+let travelStreak = 0;
+let travelEnded = false;
+
+function travelThreshold(){
+  return parseInt(document.getElementById("travelThreshold").value, 10);
+}
+function setTravelStatus(text, cls){
+  const box = document.getElementById("travelStatusStatBox");
+  const stat = document.getElementById("travelStatusStat");
+  stat.textContent = text;
+  box.classList.toggle("warn", cls === "warn");
+}
+function appendTravelLine(role, text){
+  const box = document.getElementById("travelTraceBox");
+  const div = document.createElement("div");
+  div.className = "traceline " + role;
+  div.innerHTML = `<span class="trole">${role}</span><span>${CourseProgress.escapeHtml(text)}</span>`;
+  box.appendChild(div);
+}
+function travelStep(){
+  if (travelEnded || travelIdx >= TRAVEL_STEPS.length) return;
+  const s = TRAVEL_STEPS[travelIdx];
+  appendTravelLine("act", s.action);
+  appendTravelLine("observe", s.observe);
+
+  if (s.action === travelLastAction) travelStreak++;
+  else { travelLastAction = s.action; travelStreak = 1; }
+
+  travelIdx++;
+  document.getElementById("travelStepStat").textContent = `${travelIdx} / ${TRAVEL_MAX_STEPS}`;
+  document.getElementById("travelStreakStat").textContent = String(travelStreak);
+
+  const btn = document.getElementById("btnTravelNext");
+  if (travelStreak >= travelThreshold()) {
+    appendTravelLine("final", `Stopped: same action repeated ${travelStreak} times in a row (threshold ${travelThreshold()}).`);
+    setTravelStatus("Stuck", "warn");
+    travelEnded = true;
+    btn.disabled = true;
+  } else if (travelIdx >= TRAVEL_MAX_STEPS) {
+    appendTravelLine("final", "Stopped: max_steps reached with no final answer.");
+    setTravelStatus("Step limit", "warn");
+    travelEnded = true;
+    btn.disabled = true;
+  } else {
+    setTravelStatus("Running", "");
+  }
+}
+function resetTravelTrace(){
+  travelIdx = 0;
+  travelLastAction = null;
+  travelStreak = 0;
+  travelEnded = false;
+  document.getElementById("travelTraceBox").innerHTML = "";
+  document.getElementById("travelStepStat").textContent = `0 / ${TRAVEL_MAX_STEPS}`;
+  document.getElementById("travelStreakStat").textContent = "0";
+  setTravelStatus("Not started", "");
+  document.getElementById("btnTravelNext").disabled = false;
+}
+document.getElementById("btnTravelNext").addEventListener("click", travelStep);
+document.getElementById("btnTravelReset").addEventListener("click", resetTravelTrace);
+document.getElementById("travelThreshold").addEventListener("input", (e) => {
+  document.getElementById("travelThresholdVal").textContent = e.target.value;
+  resetTravelTrace();
+});
+resetTravelTrace();
+
+/* ---------------- Section 6: agent loop exercise ---------------- */
+const AGENT_STARTER = `def run_agent_loop(initial_state, step, max_steps):
+    # Call step(state) each iteration:
+    #   {"type": "final", "answer": ...}                     -> loop is done
+    #   {"type": "action", "action": ..., "nextState": ...}  -> record action, continue with nextState
+    # Append each action string to a trace list as it happens.
+    # If the SAME action string repeats 3 times in a row, stop immediately: "stuck".
+    # If max_steps is reached with no final answer and no stuck detection: "max_steps".
+    # Return {"status": ..., "answer"?: ..., "stepsUsed": ..., "trace": ...} matching whichever ending occurred.
+
+    # YOUR CODE HERE
+
+    pass`;
+function loadAgentStarter(){
+  document.getElementById("agentCodeEditor").value = AGENT_STARTER;
+  document.getElementById("agentTestResults").innerHTML = "";
+}
+loadAgentStarter();
+document.getElementById("btnResetAgentCode").addEventListener("click", loadAgentStarter);
+
+let agentHasAttempted = false;
+function agentHintUsageText(){
+  const used = (CourseProgress.getModule(5).sections || {}).agentHintsUsed || 0;
+  return used > 0 ? `(${used} hint${used===1?"":"s"} used)` : "";
+}
+function refreshAgentHintUsage(){
+  document.getElementById("agentHintUsage").textContent = agentHintUsageText();
+}
+document.querySelectorAll('#agentHintbox details[data-hint]:not([data-hint="solution"])').forEach(d => {
+  d.addEventListener("toggle", () => {
+    if (!d.open) return;
+    const cur = CourseProgress.getModule(5).sections || {};
+    const used = new Set(cur.agentHintsOpened || []);
+    used.add(d.dataset.hint);
+    CourseProgress.setSection(5, "agentHintsOpened", Array.from(used));
+    CourseProgress.setSection(5, "agentHintsUsed", used.size);
+    refreshAgentHintUsage();
+  });
+});
+const agentSolutionDetails = document.getElementById("agentSolutionDetails");
+agentSolutionDetails.addEventListener("toggle", () => {
+  if (agentSolutionDetails.open && !agentHasAttempted) agentSolutionDetails.open = false;
+});
+function unlockAgentSolution(){
+  agentHasAttempted = true;
+  agentSolutionDetails.classList.remove("locked");
+  document.getElementById("agentSolutionSummary").textContent = "Solution";
+}
+(function restoreAgentHints(){
+  refreshAgentHintUsage();
+  const stored = CourseProgress.getModule(5).sections || {};
+  if (stored.agentLoopExercise) unlockAgentSolution();
+})();
+
+const AGENT_HARNESS_PY = [
+"def harness(student_code):",
+"    ns = {}",
+"    try:",
+"        exec(student_code, ns)",
+"        fn = ns.get('run_agent_loop')",
+"        if fn is None or not callable(fn):",
+"            return {'ranOk': False, 'error': 'run_agent_loop is not defined as a function.'}",
+"    except Exception as e:",
+"        return {'ranOk': False, 'error': str(e)}",
+"",
+"    def safe_call(initial_state, step, max_steps):",
+"        try:",
+"            return {'threw': False, 'out': fn(initial_state, step, max_steps)}",
+"        except Exception as e:",
+"            return {'threw': True, 'out': None, 'errorMessage': str(e)}",
+"",
+"    results = []",
+"",
+"    calls = [0]",
+"    def step1(state):",
+"        calls[0] += 1",
+"        if calls[0] < 3:",
+"            return {'type': 'action', 'action': 'search_' + str(calls[0]), 'nextState': state}",
+"        return {'type': 'final', 'answer': 'done'}",
+"    r = safe_call({}, step1, 10)",
+"    p = not r['threw'] and r['out'] and r['out']['status'] == 'success' and r['out']['answer'] == 'done' and r['out']['stepsUsed'] == 3",
+"    results.append({'name': 'Loop terminates successfully when step returns a final answer', 'pass': p,",
+"        \"hint\": \"When step(state) returns {'type': 'final', 'answer': ...}, immediately return {'status': 'success', 'answer': ..., 'stepsUsed': ..., 'trace': trace}, stepsUsed should count this final call too.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    calls2 = [0]",
+"    def step2(state):",
+"        calls2[0] += 1",
+"        return {'type': 'action', 'action': 'act_' + str(calls2[0]), 'nextState': state}",
+"    r = safe_call({}, step2, 5)",
+"    p = (not r['threw'] and r['out'] and r['out']['status'] == 'max_steps' and r['out']['stepsUsed'] == 5",
+"         and isinstance(r['out']['trace'], list) and len(r['out']['trace']) == 5)",
+"    results.append({'name': 'Loop stops at max_steps when step never finishes and never repeats', 'pass': p,",
+"        \"hint\": \"If the loop runs max_steps times without hitting 'final' or a stuck condition, return {'status': 'max_steps', 'stepsUsed': max_steps, 'trace': trace} after the loop ends.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    def step3(state):",
+"        return {'type': 'action', 'action': 'poll_status', 'nextState': {}}",
+"    r = safe_call({}, step3, 10)",
+"    p = not r['threw'] and r['out'] and r['out']['status'] == 'stuck' and r['out']['stepsUsed'] == 3 and r['out']['stepsUsed'] < 10",
+"    results.append({'name': \"3 identical consecutive actions trigger 'stuck' well before max_steps is reached\", 'pass': p,",
+"        \"hint\": \"Track the last action and a repeat counter. If the current action equals the last one, increment the counter; if it reaches 3, return {'status': 'stuck', 'stepsUsed': ..., 'trace': trace} immediately, don't keep looping to max_steps.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    calls4 = [0]",
+"    seq4 = ['fetch', 'parse', 'fetch', 'parse']",
+"    def step4(state):",
+"        calls4[0] += 1",
+"        if calls4[0] <= 4:",
+"            return {'type': 'action', 'action': seq4[calls4[0] - 1], 'nextState': state}",
+"        return {'type': 'final', 'answer': 'resolved'}",
+"    r = safe_call({}, step4, 10)",
+"    p = not r['threw'] and r['out'] and r['out']['status'] == 'success' and r['out']['answer'] == 'resolved' and r['out']['stepsUsed'] == 5",
+"    results.append({'name': 'Alternating different actions reach success without falsely triggering stuck detection', 'pass': p,",
+"        'hint': 'Your repeat counter must reset to 1 whenever the current action differs from the last one, not just increment unconditionally. fetch, parse, fetch, parse never repeats 3 TIMES IN A ROW.',",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    calls5 = [0]",
+"    seq5 = ['fetch_page', 'parse_data', 'validate_result']",
+"    def step5(state):",
+"        calls5[0] += 1",
+"        if calls5[0] <= 3:",
+"            return {'type': 'action', 'action': seq5[calls5[0] - 1], 'nextState': state}",
+"        return {'type': 'final', 'answer': 'ok'}",
+"    r = safe_call({}, step5, 10)",
+"    p = not r['threw'] and r['out'] and isinstance(r['out']['trace'], list) and r['out']['trace'] == seq5",
+"    results.append({'name': 'trace records the exact sequence of actions taken, in the order they occurred', 'pass': p,",
+"        \"hint\": \"Append result['action'] onto the trace list every time step returns an 'action' result, before continuing the loop. Don't append anything for the final result itself.\",",
+"        'errorMessage': r.get('errorMessage') if r['threw'] else None})",
+"",
+"    return {'ranOk': True, 'results': results}",
+].join("\n");
+
+async function runAgentTests(){
+  unlockAgentSolution();
+  const resultsEl = document.getElementById("agentTestResults");
+  resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Starting the Python sandbox (first run downloads the interpreter, can take anywhere from ~10s to a minute depending on your connection)…</div>`;
+  const code = document.getElementById("agentCodeEditor").value;
+
+  const outcome = await PySandboxRunner.run(AGENT_HARNESS_PY, "harness", code);
+  resultsEl.innerHTML = "";
+  if (!outcome.ok) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">${CourseProgress.escapeHtml(outcome.error)}</div>`;
+    return;
+  }
+  const data = outcome.result;
+  if (!data.ranOk) {
+    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">Your code didn't run: ${CourseProgress.escapeHtml(data.error)}. Check for a syntax error, or that the function is named exactly run_agent_loop.</div>`;
+    return;
+  }
+
+  const results = data.results;
+  let passCount = 0;
+  results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.style.display = "block"; row.style.marginTop = "8px";
+    const hintHtml = r.errorMessage
+      ? `Your code threw an unexpected error: ${CourseProgress.escapeHtml(r.errorMessage)}. ${r.hint}`
+      : r.hint;
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${r.name}` + (r.pass ? "" : `<br>${hintHtml}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
+  summary.textContent = `${passCount} / ${results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  CourseProgress.setSection(5, "agentLoopExercise", { passCount, total: results.length });
+}
+document.getElementById("btnRunAgentTests").addEventListener("click", runAgentTests);
+
+/* ---------------- Quiz ---------------- */
+let score = 0;
+const answered = { q1:false, q2:false, q3:false, q4:false, q5:false };
+
+function updateScore(){
+  document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnNext");
+  btn.disabled = !allDone;
+  btn.textContent = allDone ? "Continue to Module 6 →" : "Complete all questions to continue →";
+  if (allDone) CourseProgress.markComplete(MODULE_ID, score, 5);
+}
+
+function buildMC(qkey, opts, elId){
+  const el = document.getElementById(elId);
+  opts.forEach((opt, i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.innerHTML = `<input type="radio" name="${qkey}" value="${i}"><span>${opt.text}</span>`;
+    div.addEventListener("click", () => {
+      if (answered[qkey]) return;
+      answered[qkey] = true;
+      CourseProgress.setAnswer(MODULE_ID, qkey, i);
+      document.querySelectorAll(`#${elId} .qopt`).forEach((e2,j) => {
+        if (opts[j].correct) e2.classList.add("correct");
+        else if (j === i) e2.classList.add("incorrect");
+      });
+      const ex = document.getElementById(qkey + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { score++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      updateScore();
+    });
+    el.appendChild(div);
+  });
+}
+
+buildMC("q1", [
+  { text: "It can keep running (and costing tokens, time, and possibly real-world side effects) indefinitely if the model never emits a clean final answer", correct: true, correctText: "Correct. Without an explicit, code-enforced cap, the loop's duration is entirely at the mercy of the model producing a stop signal, which isn't guaranteed." },
+  { text: "It will crash the browser or server process automatically after a fixed number of iterations", correct: false, reason: "There's no automatic crash, that's exactly the danger, a loop with no step limit just keeps calling the model and executing tools with no forced stopping point." },
+  { text: "Nothing, models are trained to stop agent loops on their own reliably", correct: false, reason: "Models are not guaranteed to reliably self-terminate, reasoning failures, ambiguous tasks, and edge cases can all lead to a model that keeps taking action instead of concluding." },
+], "q1opts");
+
+buildMC("q2", [
+  { text: "Stop the loop early and report a 'stuck' outcome, rather than letting it keep repeating up to the step limit", correct: true, correctText: "Correct. Three identical consecutive actions is a strong signal of no progress, stopping early conserves budget and gives a clearer diagnostic signal than waiting for the step limit." },
+  { text: "Keep retrying, the model will eventually try something different on its own", correct: false, reason: "That's exactly the trap this module warns about, an unguarded loop has no reason to assume the model will spontaneously change approach, and burns steps (and cost) waiting for something that may never happen." },
+  { text: "Immediately raise the step limit so the loop has more room to try again", correct: false, reason: "Raising the limit doesn't address the actual problem, repeating the identical action isn't a budget issue, more steps just means more identical failed attempts." },
+], "q2opts");
+
+buildMC("q3", [
+  { text: "No, idempotency prevents a repeat from causing a NEW side effect, it doesn't limit how many times the loop itself keeps trying", correct: true, correctText: "Correct. Idempotency and stuck-loop detection solve different problems, one protects individual call side effects, the other protects the loop's own progress and budget." },
+  { text: "Yes, an idempotent executor automatically caps how many times a loop can call the same tool", correct: false, reason: "Idempotency has no concept of a loop-wide call count or step limit, it only tracks whether a SPECIFIC call ID has already succeeded, which is a narrower guarantee." },
+  { text: "Yes, because a cached result means the loop effectively stops making tool calls after the first one", correct: false, reason: "The loop can still keep calling step() and issuing new tool-call attempts (often with new call IDs) indefinitely, a cached result for one specific ID doesn't stop the surrounding loop from continuing." },
+], "q3opts");
+
+buildMC("q4", [
+  { text: "All three: reaching the step limit, the model emitting a distinct final-answer signal, and detecting a repeated identical action", correct: true, correctText: "Correct. A well-bounded loop needs to recognize and handle all three endings distinctly, not just the happy path." },
+  { text: "Only the model emitting a final answer, that's the only real way an agent loop should end", correct: false, reason: "Relying on only one termination path is exactly the failure mode this module addresses, a model that never emits a clean final answer would leave the loop with no way to stop." },
+  { text: "Only reaching the step limit, since that's the only condition guaranteed to actually trigger", correct: false, reason: "Step limit alone is a valid backstop, but relying on it exclusively means every task runs to the maximum budget even when it's clearly stuck or clearly finished early, wasting cost either way." },
+], "q4opts");
+
+buildMC("q5", [
+  { text: "The input token cost compounds every step, since the full trace history gets resent each time, growing the prompt (and cost, and risk of exceeding the context window) with every additional step", correct: true, correctText: "Correct. Re-sending the growing trace each step means token cost isn't flat per step, it increases, an unbounded loop compounds both time AND the Module 2 token budget problem simultaneously." },
+  { text: "Nothing beyond time, token cost stays flat per step regardless of how much history is included", correct: false, reason: "Token cost is directly tied to how much text is in the prompt, resending a growing trace each step means each step's input tokens increase, it is not flat." },
+  { text: "The context window issue only matters if the model provider bills per-request rather than per-token", correct: false, reason: "The context window limit and per-token cost both apply regardless of billing model, a growing trace can hit the hard context window ceiling (Module 2) even setting cost aside entirely." },
+], "q5opts");
+
+document.getElementById("btnNext").addEventListener("click", () => {
+  window.location.href = "module-06.html";
+});
+
+/* ---------------- Retry checkpoint ---------------- */
+function maybeShowRetry(){
+  const anyAnswered = answered.q1 || answered.q2 || answered.q3 || answered.q4 || answered.q5;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnRetryCheckpoint");
+  btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  score = 0;
+  Object.keys(answered).forEach(k => answered[k] = false);
+  document.querySelectorAll(".qexplain").forEach(el => { el.style.display = "none"; el.textContent = ""; });
+  document.querySelectorAll(".qopt").forEach(el => el.classList.remove("correct","incorrect"));
+  document.querySelectorAll('input[type=radio]').forEach(el => el.checked = false);
+  updateScore();
+  maybeShowRetry();
+  window.scrollTo({ top: document.querySelector(".qcard").offsetTop - 100, behavior: "smooth" });
+});
+const scoreObserver = new MutationObserver(maybeShowRetry);
+scoreObserver.observe(document.getElementById("scoreDisplay"), { childList: true });
+</script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getCourse, getCheckoutUrl } from "@/lib/courses";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -59,7 +60,7 @@ const courses = [
     status: "Next up",
     open: false,
     summary:
-      "Build real products with language models: prompting, retrieval, agents, tool use, structured outputs, and evaluation. The exact stack behind VoyAI and SmartRevise.",
+      "An 8-week accelerated program, ~10 hours a week: prompting, retrieval, agents, tool use, structured outputs, and evaluation. The exact stack behind VoyAI and SmartRevise. Basic programming logic required, no prior Python needed.",
     careerPath:
       "Move into AI engineering work, whether freelance or hired, with a shipped product and evals you can point at.",
     founding: "$99",
@@ -334,16 +335,30 @@ export default function ZenithLabPage() {
                   </span>
                 </div>
 
-                <a
-                  href={WAITLIST_LINK}
-                  className={`mt-6 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
-                    course.open
-                      ? "bg-white text-black"
-                      : "border border-white/15 bg-white/5 text-white hover:bg-white/10"
-                  }`}
-                >
-                  {course.open ? "Join the founding cohort" : "Join the waitlist"}
-                </a>
+                {(() => {
+                  // Once a course exists in the central catalog (src/lib/courses.ts) with a
+                  // real Whop checkout URL configured, this button starts pointing there
+                  // automatically — no page edit needed. Until then it falls back to the
+                  // waitlist, same as every course that isn't in the catalog yet.
+                  const catalogCourse = getCourse(course.id);
+                  const { url, isRealCheckout } = catalogCourse
+                    ? getCheckoutUrl(catalogCourse)
+                    : { url: WAITLIST_LINK, isRealCheckout: false };
+                  return (
+                    <a
+                      href={url}
+                      target={isRealCheckout ? "_blank" : undefined}
+                      rel={isRealCheckout ? "noopener noreferrer" : undefined}
+                      className={`mt-6 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
+                        course.open
+                          ? "bg-white text-black"
+                          : "border border-white/15 bg-white/5 text-white hover:bg-white/10"
+                      }`}
+                    >
+                      {isRealCheckout ? "Get access →" : course.open ? "Join the founding cohort" : "Join the waitlist"}
+                    </a>
+                  );
+                })()}
               </div>
             ))}
           </div>

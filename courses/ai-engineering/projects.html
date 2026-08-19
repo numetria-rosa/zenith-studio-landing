@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects — AI Engineering</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
+  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
+  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
+}
+body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
+.serif{font-family:'Source Serif 4',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono'}
+.coursenav a:hover{color:var(--lime)}
+.hero{padding:40px 0 20px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
+h1{font-size:clamp(26px,4vw,36px);font-weight:700;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:680px;margin-top:10px}
+.disclosure{background:rgba(255,207,77,.08);border:1px solid rgba(255,207,77,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
+.disclosure b{color:var(--amber)}
+.grid{display:grid;gap:14px;margin-top:20px}
+.pcard{display:block;width:100%;text-align:left;font-family:'Space Grotesk',sans-serif;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px 22px;cursor:pointer;transition:.15s}
+.pcard:hover,.pcard:focus-visible{border-color:var(--bd2)}
+.pcard:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.pcard .ptop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.pcard .pt{font-weight:700;font-size:16px}
+.pcard .pd{font-size:13px;color:var(--mut);margin-top:6px}
+.pcard .pmeta{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.badge{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:99px}
+.badge.beginner{background:rgba(52,229,160,.15);color:var(--emerald)}
+.badge.intermediate{background:rgba(198,244,50,.12);color:var(--lime)}
+.badge.capstone{background:rgba(167,139,250,.15);color:var(--violet)}
+.badge.done{background:rgba(52,229,160,.15);color:var(--emerald)}
+.badge.progress{background:rgba(255,207,77,.14);color:var(--amber)}
+.badge.notstarted{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
+.pscore{font-family:'JetBrains Mono';font-size:12px;color:var(--mut)}
+
+#detailView{display:none}
+button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--lime);color:var(--lime)}
+button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.section{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px 24px;margin-top:16px}
+.section h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--violet);margin-bottom:12px}
+.section ul{padding-left:18px;font-size:14px;line-height:1.85}
+.section ol{padding-left:18px;font-size:14px;line-height:1.85}
+.checklist label{display:flex;gap:8px;align-items:flex-start;font-size:14px;padding:6px 0;cursor:pointer}
+.checklist input{margin-top:3px}
+details{margin-top:8px}
+summary{cursor:pointer;color:var(--violet);font-size:13.5px;font-weight:600;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary:before{content:"▸ "}
+details[open] summary:before{content:"▾ "}
+.hinttier{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:12px 16px;margin-top:8px;font-size:13.5px;color:var(--mut)}
+.rubricrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)}
+.rubricrow:last-child{border-bottom:none}
+.rubricrow .rlabel{font-size:14px}
+.rubricrow .rweight{font-size:11px;color:var(--mut2);font-family:'JetBrains Mono'}
+.rubricrow select{font-family:'Space Grotesk';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:6px;padding:5px 8px;color:var(--tx)}
+.rubrictotal{margin-top:14px;padding-top:14px;border-top:2px solid var(--bd2);display:flex;justify-content:space-between;align-items:baseline}
+.rubrictotal b{font-family:'JetBrains Mono';font-size:24px;color:var(--tx)}
+.formrow{margin-top:12px}
+.formrow label{font-size:12.5px;color:var(--mut2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+.formrow input, .formrow textarea{width:100%;font-family:'Space Grotesk';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px;color:var(--tx)}
+.formrow textarea{min-height:70px;resize:vertical}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
+
+<div class="wrap">
+  <div id="listView">
+    <header class="hero">
+      <span class="eyebrow">Projects</span>
+      <h1 class="serif">Combine concepts. Build something real.</h1>
+      <p class="sub">Exercises teach one concept at a time. Projects require you to build something that stands on its own, outside the browser, in your own editor and repo.</p>
+      <div class="disclosure"><b>How grading works here:</b> this is a static, client-side course with no backend, it cannot execute or grade code you write in your own environment. Each project gives you a real rubric, real test cases to verify against, and a self-assessment checklist, honest self-scoring, not an automated grader pretending to run your code.</div>
+    </header>
+    <div class="grid" id="projectGrid"></div>
+  </div>
+
+  <div id="detailView">
+    <header class="hero">
+      <button id="btnBack">&larr; All projects</button>
+      <div class="eyebrow" id="detailTag" style="margin-top:16px"></div>
+      <h1 class="serif" id="detailTitle"></h1>
+      <p class="sub" id="detailSummary"></p>
+    </header>
+
+    <div class="section"><h3>Requirements</h3><ul id="detailRequirements"></ul></div>
+    <div class="section"><h3>Starting point</h3><p id="detailStart" style="font-size:14px;color:var(--tx)"></p></div>
+    <div class="section"><h3>Acceptance criteria (self-check)</h3><div class="checklist" id="detailAcceptance"></div></div>
+    <div class="section"><h3>Test cases to verify against</h3><ul id="detailTests"></ul></div>
+    <div class="section"><h3>Hints</h3><div id="detailHints"></div></div>
+    <div class="section"><h3>Common mistakes</h3><ul id="detailMistakes"></ul></div>
+    <div class="section"><details><summary>Suggested solution outline</summary><div id="detailSolution" style="margin-top:12px;font-size:14px;color:var(--mut)"></div></details></div>
+
+    <div class="section">
+      <h3>Rubric self-assessment</h3>
+      <div id="rubricRows"></div>
+      <div class="rubrictotal"><span>Estimated score</span><b id="rubricTotalVal">0%</b></div>
+    </div>
+
+    <div class="section">
+      <h3>Submission</h3>
+      <div class="formrow"><label for="ghUrl">GitHub URL (optional)</label><input type="url" id="ghUrl" placeholder="https://github.com/you/project-name"></div>
+      <div class="formrow"><label for="projDesc">Short description</label><textarea id="projDesc" placeholder="One or two sentences describing what you built..."></textarea></div>
+      <div class="formrow"><label for="projTech">Technologies used</label><input type="text" id="projTech" placeholder="e.g. Python, OpenAI SDK, pytest"></div>
+      <div class="formrow"><label for="projTests">Tests passed (self-reported, e.g. 18/20)</label><input type="text" id="projTests" placeholder="18/20"></div>
+      <button class="primary" id="btnSaveProject" style="margin-top:16px">Save project</button>
+      <div class="feedback" id="saveFb"></div>
+    </div>
+  </div>
+
+  <footer>Zenith Lab · AI Engineering · Projects</footer>
+</div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+const DETAILS = {
+  1: {
+    requirements: ["Accept raw model output text and a target JSON schema (required fields at minimum).", "Strip markdown code fences if present.", "Strip trailing commas before parsing.", "Parse the repaired text as JSON.", "Validate the parsed object against the schema, reporting the SPECIFIC missing/wrong-typed field."],
+    start: "Start from Module 1's exercise function signature and generalize it: accept an arbitrary schema object instead of a hardcoded one, so the same validator works across different response shapes.",
+    acceptance: ["A response wrapped in a markdown fence is correctly repaired and validated.", "A response with a trailing comma is correctly repaired and validated.", "A response missing a required field is rejected with that field named specifically, not a generic error.", "Prose with no JSON structure at all is rejected gracefully, never raises uncaught.", "A wrong-typed field (string where number expected) is caught and reported."],
+    tests: ["Clean, valid JSON matching schema → passes.", "Fenced JSON (```json ... ```) → repaired and passes.", "Trailing comma before closing brace → repaired and passes.", "Missing required field → fails, names the field.", "Pure prose, no JSON at all → fails gracefully, no exception escapes."],
+    mistakes: ["Stripping the trailing comma AFTER attempting json.loads() instead of before.", "A generic 'validation failed' error instead of naming the specific field.", "Letting a json.loads() exception propagate uncaught instead of catching and returning a structured failure."],
+    solution: "1. Strip a leading/trailing markdown fence via regex.<br>2. Strip trailing commas before <code>}</code>/<code>]</code> via regex.<br>3. <code>json.loads()</code> the result, catching failures.<br>4. Walk the schema's required fields, checking presence and type, collecting every violation, not just the first.",
+  },
+  2: {
+    requirements: ["Accept an array of words, a max-tokens-per-chunk budget, an overlap size, and a token estimator function.", "Never drop a word, even one that alone exceeds the budget.", "Apply overlap consistently at every chunk boundary except the last.", "Return an array of chunks (each an array of words)."],
+    start: "Start from Module 2's exercise function and add a real token estimator (characters/4, or a real tokenizer library if you want to go further) instead of the 1-token-per-word test mock.",
+    acceptance: ["A generous budget produces one chunk containing everything.", "A tight budget produces multiple chunks, each respecting the token limit.", "An oversized single word still gets its own chunk, never dropped.", "Overlap words appear at the end of one chunk AND the start of the next, consistently.", "Every word from the input appears in at least one output chunk (full coverage, verified programmatically, not just visually)."],
+    tests: ["20-word input, generous budget → 1 chunk, all 20 words.", "20-word input, tight budget → multiple chunks, verify total unique words covered equals 20.", "A single word with an estimated token count far exceeding the budget → its own chunk, not dropped.", "Zero overlap → chunks partition cleanly with no repeated words.", "Overlap=2 → verify the last 2 words of chunk N equal the first 2 words of chunk N+1."],
+    mistakes: ["Enforcing the budget check even on an empty chunk, silently dropping an oversized word.", "Off-by-one in the overlap math causing the last few words to be dropped on longer inputs.", "Testing only with tiny inputs where an overlap bug wouldn't surface."],
+    solution: "1. Walk words with two pointers, building the current chunk until adding the next word would exceed budget (only enforced once the chunk is non-empty).<br>2. Start the next chunk at <code>max(current chunk start + 1, end - overlap)</code>.<br>3. Stop when a chunk reaches the end of the input.<br>4. Verify full coverage by collecting all words across all output chunks into a Python <code>set</code> and comparing its length against the input length.",
+  },
+  3: {
+    requirements: ["Implement cosine similarity from scratch (no library).", "Implement top-k retrieval with a minimum-relevance threshold.", "Guard against a zero-magnitude vector without raising or producing NaN.", "Accept a small in-memory document set (id + vector pairs) to search over."],
+    start: "Start from Module 3's exercise function and add a small CLI or script that loads a handful of precomputed embeddings (you can hardcode small vectors, this project is about the search logic, not calling an embeddings API) and runs real queries against them.",
+    acceptance: ["Cosine similarity is verified against known hand-computed values (e.g. identical vectors → 1.0, perpendicular → 0.0, opposite → -1.0).", "Top-k correctly returns the k highest-scoring documents, sorted descending, regardless of input order.", "A minimum-relevance threshold correctly excludes low-scoring documents even when k would allow more results.", "A zero-vector document scores 0 and never raises or produces NaN.", "Scale-invariance is verified: two vectors with the same direction but different magnitude score identically against the same query."],
+    tests: ["Identical vectors → similarity 1.0.", "Perpendicular vectors → similarity 0.0.", "Opposite vectors → similarity -1.0.", "5-document set, k=2, threshold=0 → exactly the 2 highest-scoring documents, correctly ordered.", "Same set, threshold=0.5 with only 1 document scoring above it → exactly 1 result, even though k allows more.", "Zero-vector document included in the set → included in results with score 0, no crash."],
+    mistakes: ["Sorting or slicing to k before filtering by threshold, producing wrong results when a high scorer is excluded by an early slice.", "Not guarding the zero-magnitude case, letting a division-by-zero exception (or NaN, if using a library) silently propagate.", "Testing only with 2D toy vectors and never verifying against a higher-dimensional case."],
+    solution: "1. <code>cosine_similarity(a, b)</code>: dot product over (magnitude_a × magnitude_b), returning 0 if either magnitude is 0.<br>2. Score every document, filter by threshold, sort descending, slice to k, in that order specifically.<br>3. Verify scale-invariance and the zero-vector case with dedicated unit tests, not just eyeballing output.",
+  },
+  4: {
+    requirements: ["Validate a tool call's name against a registry before execution.", "Validate required arguments are present before execution.", "Execute idempotently: a repeated call ID returns the cached result without re-running the handler.", "A failed handler attempt must NOT be cached, so a retry with the same call ID gets a real second attempt."],
+    start: "Start from Module 4's exercise function and wire it to 2-3 real mock tools (e.g. a fake 'send_email' and 'create_ticket') with their own schemas, instead of the single test-mock tool used in the exercise.",
+    acceptance: ["An unknown tool name is rejected with a structured error before any handler runs.", "A missing required argument is rejected before any handler runs.", "Calling the same tool with the same call ID twice only invokes the handler once, both calls return the identical cached result.", "A handler that raises returns a structured failure and is NOT cached, a retry with the same call ID gets a genuine second attempt.", "Two different call IDs for the same tool execute independently (not falsely deduplicated)."],
+    tests: ["Unknown tool name → rejected, handler call count stays 0.", "Missing required argument → rejected, handler call count stays 0.", "Same call ID called twice → handler call count is 1, both results identical.", "Handler raises on first call, succeeds on second call with the SAME call ID → first result is a structured failure, second is a success.", "Two different call IDs, same tool → handler call count is 2."],
+    mistakes: ["Checking the idempotency cache after invoking the handler instead of before.", "Caching a result before confirming the handler actually succeeded.", "Deduplicating based on argument similarity instead of call ID, incorrectly blocking legitimate independent calls."],
+    solution: "1. Look up the tool in the registry, reject if missing.<br>2. Validate every required field is present in the arguments.<br>3. Check the idempotency store for the call ID, return the cached value if present.<br>4. Try/except the handler call: on success cache and return; on failure return a structured error WITHOUT caching.",
+  },
+  5: {
+    requirements: ["Implement a loop calling a step function repeatedly, tracking a trace of actions taken.", "Enforce a hard maximum step count.", "Detect 3 identical consecutive actions and stop early as 'stuck', before exhausting the step budget.", "Correctly distinguish success, step-limit, and stuck as three separate outcomes."],
+    start: "Start from Module 5's exercise function and wire it to a small set of mock 'tools' the step function can call (e.g. a fake search and a fake calculator), so you can construct real multi-step traces, not just single-action test cases.",
+    acceptance: ["A loop that reaches a final answer within the step budget returns success with the correct step count.", "A loop that never reaches a final answer and never repeats hits the step limit and returns that outcome, with a full trace.", "A loop that repeats the exact same action 3 times in a row stops immediately as stuck, well before the step limit.", "Alternating different actions never falsely triggers stuck-detection, even across many steps.", "The trace array accurately records every action taken, in order."],
+    tests: ["3 varied actions then a final answer → success, stepsUsed=4, trace has 3 entries.", "10 varied, never-repeating actions, max_steps=10 → max_steps outcome, trace has 10 entries.", "Same action 5 times in a row, max_steps=20 → stuck outcome, stepsUsed=3, far under 20.", "4 alternating actions (A,B,A,B) then final → success, no false stuck trigger.", "Trace order exactly matches the sequence of actions returned by the mock step function."],
+    mistakes: ["Not resetting the repeat counter when the action changes, causing false stuck triggers on alternating sequences.", "Continuing to loop after detecting stuck instead of returning immediately.", "Off-by-one in stepsUsed when the loop ends on a 'final' result."],
+    solution: "1. Loop up to max_steps times, calling step(state) each iteration.<br>2. On 'final', return success immediately with the current step count.<br>3. On 'action', append to trace, compare to the last action, increment or reset the repeat counter, return stuck if it hits 3.<br>4. If the loop completes without returning, report max_steps.",
+  },
+  6: {
+    requirements: ["Classify errors as retryable or non-retryable based on a status code or explicit flag.", "Implement exponential backoff with full jitter, with a configurable base delay and cap.", "Retry only retryable failures, up to a fixed maximum.", "Fall back to a secondary function exactly once after the primary is exhausted or blocked."],
+    start: "Start from Module 6's exercise function and wire real (or realistically mocked) delay timing using an injected sleep function, so your tests can run fast with a fake clock instead of actually waiting.",
+    acceptance: ["A primary call that succeeds immediately never touches the fallback.", "A retryable failure is retried up to the configured max, with delay growing per the full-jitter formula.", "A non-retryable failure stops retrying immediately, regardless of how high the max retry count is set.", "Exhausting retries on the primary triggers exactly one fallback attempt, not a second full retry cycle.", "Both primary and fallback failing returns a clear structured failure, never an uncaught rejection."],
+    tests: ["Primary succeeds on the first call → fallback never invoked.", "Primary fails twice (retryable) then succeeds → primary invoked 3 times, fallback never invoked.", "Primary fails once with a non-retryable error, max_retries=5 → primary invoked exactly once, fallback invoked once.", "Primary always fails (retryable), max_retries=2 → primary invoked 3 times, fallback invoked exactly once.", "Both primary and fallback fail → function returns normally (doesn't raise) with a structured failure object."],
+    mistakes: ["Checking the retry count before checking retryability, wasting the whole budget on a guaranteed-permanent failure.", "Giving fallback the same retry budget as the primary instead of a single bounded attempt.", "Using a real asyncio.sleep() in tests instead of an injected fake, making the suite slow."],
+    solution: "1. Loop: <code>await</code> primary, on success return immediately.<br>2. On exception, check <code>getattr(e, 'retryable', True) is not False</code>; if non-retryable or out of retries, break to fallback.<br>3. Otherwise increment attempt and retry (with a jittered delay in a real system, injected/mocked in tests).<br>4. After the loop, try fallback exactly once, returning its result or a structured failure.",
+  },
+  7: {
+    requirements: ["Accept a labeled test set (input + a per-case checkable criterion function).", "Run each case against a model function, catching failures from both the model call AND the checker.", "Compute an aggregate score and compare against an optional recorded baseline.", "Flag a regression when the new score is below the baseline."],
+    start: "Start from Module 7's exercise function and wire it to a small real labeled test set for a task you care about (e.g. 5-10 hand-written prompt/expected-output pairs), instead of the synthetic mock functions used in the exercise.",
+    acceptance: ["All test cases passing produces a score of 1.0 and no regression (with no baseline).", "A mix of pass/fail cases produces the correct score and correctly identifies exactly which cases failed.", "A model_fn that raises for one case is caught and counted as a failure without crashing the other cases.", "A check() function that raises for one case is caught and counted as a failure without crashing the other cases.", "A score below a provided baseline is correctly flagged as a regression; a score at or above baseline is not."],
+    tests: ["5/5 cases pass → score 1.0, regression false (no baseline).", "2/4 cases pass → score 0.5, results list correctly flags which 2 failed.", "model_fn raises for 1 of 3 cases → that case fails, the other 2 are evaluated normally.", "check() raises for 1 of 2 cases → that case fails, the other case is evaluated normally.", "Score 0.6 vs baseline 0.75 → regression true. Score 0.8 vs baseline 0.75 → regression false."],
+    mistakes: ["Not wrapping the check() call in its own try/except, letting one bad checker crash the whole run.", "Computing score as pass_count/total without guarding total=0 (division by zero).", "Treating an unchanged score as a regression instead of using a strict less-than comparison."],
+    solution: "1. Loop over test cases: try the model_fn call in a try/except, mark failed if it raises.<br>2. Separately try the check() call in its own try/except, mark failed if it raises.<br>3. Aggregate pass_count/total into a score.<br>4. Compare against baseline (if provided) using strict less-than for the regression flag.",
+  },
+  8: {
+    requirements: ["Combine structured-output validation, token-budget-aware context assembly, threshold-gated retrieval, idempotent tool execution, a bounded agent loop, retry-with-fallback reliability, and a labeled eval set into one system.", "Provide an architecture diagram or written design doc.", "Provide a README explaining design decisions.", "Document at least 3 concrete failure scenarios and how the system handles each.", "Provide automated tests.", "Record an eval baseline and demonstrate a regression check."],
+    start: "Pick one coherent scenario, e.g. a documentation support bot or an internal Q&A agent, don't demo each module's concept as an unrelated add-on, they should work together as one system the way they do in Module 8's capstone.",
+    acceptance: ["Model output going into any downstream logic is repaired and schema-validated first.", "Context sent to the model stays within a computed token budget.", "Retrieval applies a real relevance threshold, with an honest 'no answer' path when nothing clears it.", "At least one tool call is idempotency-key protected.", "The agent's control flow (if any) has a hard step limit and stuck-detection.", "At least one model call has retry+backoff+fallback.", "An eval set with a recorded baseline demonstrates at least one regression catch (a deliberately worse version scoring lower)."],
+    tests: ["End-to-end happy path succeeds and produces a well-formed final answer.", "A query with no relevant KB match returns an honest 'no answer' rather than a confident guess.", "A duplicate tool call (same call ID) doesn't double-execute its side effect.", "An injected model-API failure triggers retry then fallback without crashing the request.", "Running the eval suite against a deliberately-regressed version (e.g. no threshold) shows a lower score than the baseline."],
+    mistakes: ["Building each module's feature as an isolated demo instead of one integrated pipeline.", "Skipping tests for the 'boring' parts (schema validation, idempotency) in favor of only testing the interesting failure paths.", "An architecture diagram or README that doesn't match what the code actually does."],
+    solution: "This is intentionally the least prescriptive project, the previous 7 projects and the Module 8 capstone exercise are your reference implementations for each individual piece, the work here is INTEGRATING them into one coherent, documented system, not inventing new techniques.",
+  },
+};
+
+function projectState(id){ return CourseProgress.getProject(id); }
+function rubricTotal(id){
+  const rubric = CourseProgress.rubricForProject(id);
+  const state = projectState(id);
+  let total = 0;
+  rubric.forEach(r => {
+    const raw = Number(state.rubricScores[r.key]);
+    const clamped = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
+    total += clamped / 100 * r.weight;
+  });
+  return Math.max(0, Math.min(100, Math.round(total)));
+}
+
+function renderList(){
+  const grid = document.getElementById("projectGrid");
+  grid.innerHTML = "";
+  CourseProgress.PROJECTS.forEach(p => {
+    const state = projectState(p.id);
+    const score = rubricTotal(p.id);
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "pcard";
+    const diffCls = p.difficulty === "Beginner" ? "beginner" : p.difficulty === "Capstone-level" ? "capstone" : "intermediate";
+    let statusBadge = `<span class="badge notstarted">Not started</span>`;
+    if (state.completed) statusBadge = `<span class="badge done">✓ Completed</span>`;
+    else if (score > 0) statusBadge = `<span class="badge progress">In progress</span>`;
+    card.innerHTML = `
+      <div class="ptop"><div class="pt">Project ${p.id} — ${p.title}</div><span class="badge ${diffCls}">${p.difficulty}</span></div>
+      <div class="pd">${p.summary}</div>
+      <div class="pmeta">${statusBadge}<span class="pscore">Modules ${p.modules.join(", ")}${score > 0 ? ` · Rubric: ${score}%` : ""}</span></div>
+    `;
+    card.addEventListener("click", () => openProject(p.id));
+    grid.appendChild(card);
+  });
+}
+
+let currentProjectId = null;
+function openProject(id){
+  currentProjectId = id;
+  const p = CourseProgress.PROJECTS.find(x => x.id === id);
+  const d = DETAILS[id];
+  const state = projectState(id);
+  document.getElementById("listView").style.display = "none";
+  document.getElementById("detailView").style.display = "block";
+  document.getElementById("detailTag").textContent = `Project ${id} · ${p.difficulty} · Modules ${p.modules.join(", ")}`;
+  document.getElementById("detailTitle").textContent = p.title;
+  document.getElementById("detailSummary").textContent = p.summary;
+  document.getElementById("detailRequirements").innerHTML = d.requirements.map(r => `<li>${r}</li>`).join("");
+  document.getElementById("detailStart").textContent = d.start;
+  document.getElementById("detailAcceptance").innerHTML = d.acceptance.map((a, i) => `<label><input type="checkbox" data-key="acc_${i}" ${state.checklist["acc_"+i] ? "checked" : ""}>${a}</label>`).join("");
+  document.getElementById("detailTests").innerHTML = d.tests.map(t => `<li>${t}</li>`).join("");
+  document.getElementById("detailMistakes").innerHTML = d.mistakes.map(m => `<li>${m}</li>`).join("");
+  document.getElementById("detailSolution").innerHTML = d.solution;
+  document.getElementById("detailHints").innerHTML = `
+    <details><summary>Hint 1 — conceptual</summary><div class="hinttier">Re-read the relevant module's cheat sheet section before diving into code, the requirements above map directly onto concepts already covered.</div></details>
+    <details><summary>Hint 2 — specific</summary><div class="hinttier">Look at the "Common mistakes" list above first, most students hit exactly one of those, identify which one applies to your current approach before writing more code.</div></details>
+    <details><summary>Hint 3 — near-solution</summary><div class="hinttier">${d.solution.replace(/<br>/g, " ")}</div></details>
+  `;
+  document.querySelectorAll('#detailAcceptance input').forEach(cb => {
+    cb.addEventListener("change", () => {
+      const cur = projectState(id);
+      cur.checklist[cb.dataset.key] = cb.checked;
+      CourseProgress.setProject(id, { checklist: cur.checklist });
+    });
+  });
+
+  const rubric = CourseProgress.rubricForProject(id);
+  const rows = document.getElementById("rubricRows");
+  rows.innerHTML = "";
+  rubric.forEach(r => {
+    const row = document.createElement("div");
+    row.className = "rubricrow";
+    const val = state.rubricScores[r.key] || 0;
+    row.innerHTML = `<div><span class="rlabel">${r.label}</span> <span class="rweight">${r.weight}%</span></div>
+      <select data-key="${r.key}">
+        <option value="0" ${val==0?"selected":""}>Not attempted</option>
+        <option value="50" ${val==50?"selected":""}>Partial</option>
+        <option value="80" ${val==80?"selected":""}>Good</option>
+        <option value="100" ${val==100?"selected":""}>Excellent</option>
+      </select>`;
+    rows.appendChild(row);
+  });
+  rows.querySelectorAll("select").forEach(sel => {
+    sel.addEventListener("change", () => {
+      const cur = projectState(id);
+      cur.rubricScores[sel.dataset.key] = Number(sel.value);
+      CourseProgress.setProject(id, { rubricScores: cur.rubricScores });
+      document.getElementById("rubricTotalVal").textContent = rubricTotal(id) + "%";
+    });
+  });
+  document.getElementById("rubricTotalVal").textContent = rubricTotal(id) + "%";
+
+  document.getElementById("ghUrl").value = state.githubUrl || "";
+  document.getElementById("projDesc").value = state.description || "";
+  document.getElementById("projTech").value = state.technologies || "";
+  document.getElementById("projTests").value = state.testsPassed || "";
+  document.getElementById("saveFb").className = "feedback";
+}
+
+document.getElementById("btnSaveProject").addEventListener("click", () => {
+  const id = currentProjectId;
+  CourseProgress.setProject(id, {
+    githubUrl: document.getElementById("ghUrl").value.trim(),
+    description: document.getElementById("projDesc").value.trim(),
+    technologies: document.getElementById("projTech").value.trim(),
+    testsPassed: document.getElementById("projTests").value.trim(),
+    completed: true,
+    completedAt: new Date().toISOString(),
+    score: rubricTotal(id),
+  });
+  const fb = document.getElementById("saveFb");
+  fb.className = "feedback ok";
+  fb.textContent = "Saved. This project now appears in My Portfolio.";
+  renderList();
+});
+
+document.getElementById("btnBack").addEventListener("click", () => {
+  document.getElementById("detailView").style.display = "none";
+  document.getElementById("listView").style.display = "block";
+  renderList();
+});
+
+renderList();
+</script>
+</body>
+</html>
