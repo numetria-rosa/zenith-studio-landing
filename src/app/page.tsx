@@ -100,6 +100,82 @@ export default function ZenithStudioLandingPage() {
     },
   ];
 
+  // Vertical offers. Deliberately a different shape from aiSystems above:
+  // these are sold as roles you hire (priced against a salary) rather than
+  // systems you install, because that framing is what carries the price.
+  const verticalSystems = [
+    {
+      id: "law-firms",
+      eyebrow: "For law firms",
+      headline: "Your firm works 49 hours a week and bills 37.",
+      lede: "That twelve hour gap is roughly $230,000 per attorney, per year. It is not lost to competitors or bad marketing. It is work you already did and never invoiced.",
+      accent: "text-amber-200",
+      accentSoft: "text-amber-200/70",
+      glow: "from-amber-300/[0.07] via-orange-400/[0.04] to-transparent",
+      stats: [
+        ["38%", "average attorney utilization"],
+        ["88%", "average realization rate"],
+        ["6% vs 18%", "write-downs at 14 days vs 45"],
+      ],
+      roster: [
+        {
+          role: "AI Billing Clerk",
+          text: "Reconstructs billable time from your calendar, email, and documents, drafts entries with real narratives, and gets invoices out inside the 14 day window where write-downs run 6% instead of 18%.",
+          anchor: "Priced on what it recovers.",
+        },
+        {
+          role: "AI Intake Coordinator",
+          text: "Answers every call and enquiry around the clock, qualifies against your case criteria, runs a conflicts pre-check, books the consult, and opens the matter.",
+          anchor: "A human intake coordinator costs $58,000 to $88,000 a year.",
+        },
+        {
+          role: "AI Follow-Up Clerk",
+          text: "Works the leads that did not retain on the first call. You already paid for every one of them, and most firms never touch them again.",
+          anchor: "Legal leads average $131 each, the highest of any industry.",
+        },
+      ],
+      guardrail:
+        "You approve every entry. Nothing leaves the firm without a partner signing off.",
+      offer:
+        "We will reconstruct one past month of your unbilled time before you pay anything. You get a number. If it is not worth acting on, we are done.",
+    },
+    {
+      id: "brokerages",
+      eyebrow: "For brokerages",
+      headline: "Your agents are not leaving for a better split.",
+      lede: "They are leaving because they are doing four jobs at once: prospecting, follow-up, paperwork, and a database nobody has touched in a year. Every agent who walks costs you $15,000 to $50,000.",
+      accent: "text-sky-200",
+      accentSoft: "text-sky-200/70",
+      glow: "from-sky-300/[0.07] via-indigo-400/[0.04] to-transparent",
+      stats: [
+        ["917 min", "average agent lead response time"],
+        ["21x", "likelier to convert inside 5 minutes"],
+        ["1 in 10", "recruited agents still there in year five"],
+      ],
+      roster: [
+        {
+          role: "AI Inside Sales Agent",
+          text: "Answers new leads in seconds, qualifies motivation, timeline, and financing, then books the appointment before a competitor picks up the phone.",
+          anchor: "Coaches say you need 500 prospects to justify an ISA hire. This one makes sense at fifty.",
+        },
+        {
+          role: "AI Transaction Coordinator",
+          text: "Contract to close. Deadlines tracked, documents chased, and every party updated without anyone having to ask.",
+          anchor: "Outsourced coordinators run $350 to $450 a file.",
+        },
+        {
+          role: "AI Database Manager",
+          text: "Wakes up the dormant contacts and past clients already sitting in your CRM. Not new leads, the ones you already paid for.",
+          anchor: "Repeat and referral is most of an agent's business, and almost nobody works it.",
+        },
+      ],
+      guardrail:
+        "It is also the best recruiting pitch you have. A team on day one lands harder than another point of commission.",
+      offer:
+        "We will run your dormant database first. You pay out of what it produces.",
+    },
+  ];
+
   const services = [
     {
       title: "AI Automation Workflows",
@@ -720,6 +796,76 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 <p className="mt-2 text-sm leading-6 text-white/55">{text}</p>
               </div>
             ))}
+          </div>
+
+          {/* ── Vertical offers: hire an AI team, priced against the human role it replaces ── */}
+          <div className="mt-16">
+            <div className="mb-8 max-w-2xl">
+              <div className="text-xs uppercase tracking-[0.3em] text-white/40">Built for one industry at a time</div>
+              <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">
+                Or hire a full AI team for your business
+              </h3>
+              <p className="mt-3 text-white/55 leading-7">
+                Same install, same maintenance, tuned to how your industry actually works and priced
+                against the role it replaces, not against other software.
+              </p>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              {verticalSystems.map((v) => (
+                <div
+                  key={v.id}
+                  className="relative overflow-hidden rounded-[30px] border border-white/10 bg-white/[0.03] p-7 backdrop-blur-xl sm:p-8"
+                >
+                  <div
+                    className={`pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-gradient-to-br ${v.glow} blur-[70px]`}
+                  />
+                  <div className="relative">
+                    <div className={`text-xs font-semibold uppercase tracking-[0.25em] ${v.accentSoft}`}>
+                      {v.eyebrow}
+                    </div>
+                    <h4 className="mt-3 text-2xl font-semibold leading-tight tracking-[-0.03em] sm:text-[1.75rem]">
+                      {v.headline}
+                    </h4>
+                    <p className="mt-4 text-sm leading-7 text-white/62">{v.lede}</p>
+
+                    <div className="mt-6 grid grid-cols-3 gap-3 border-y border-white/10 py-5">
+                      {v.stats.map(([stat, label]) => (
+                        <div key={label}>
+                          <div className={`font-mono text-lg font-semibold sm:text-xl ${v.accent}`}>{stat}</div>
+                          <div className="mt-1 text-[11px] leading-4 text-white/45">{label}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 space-y-5">
+                      {v.roster.map((r) => (
+                        <div key={r.role}>
+                          <div className="text-sm font-semibold text-white">{r.role}</div>
+                          <p className="mt-1.5 text-sm leading-6 text-white/60">{r.text}</p>
+                          <p className={`mt-1.5 text-xs font-medium ${v.accent}`}>{r.anchor}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4">
+                      <p className="text-xs leading-5 text-white/50">{v.guardrail}</p>
+                    </div>
+
+                    <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-4">
+                      <div className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${v.accentSoft}`}>
+                        Start here, before you pay anything
+                      </div>
+                      <p className="mt-1.5 text-sm leading-6 text-white/72">{v.offer}</p>
+                    </div>
+
+                    <BookButton className="mt-6 inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10">
+                      Book a free audit
+                    </BookButton>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
