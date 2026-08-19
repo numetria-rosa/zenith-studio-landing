@@ -112,6 +112,8 @@ export default function ZenithStudioLandingPage() {
       accent: "text-amber-200",
       accentSoft: "text-amber-200/70",
       glow: "from-amber-300/[0.07] via-orange-400/[0.04] to-transparent",
+      monthly: "$2,000/mo",
+      monthlyNote: "For the Intake Coordinator + Follow-Up Clerk, as one team. The Billing Clerk is priced on what it recovers, not a flat fee.",
       stats: [
         ["38%", "average attorney utilization"],
         ["88%", "average realization rate"],
@@ -147,6 +149,8 @@ export default function ZenithStudioLandingPage() {
       accent: "text-sky-200",
       accentSoft: "text-sky-200/70",
       glow: "from-sky-300/[0.07] via-indigo-400/[0.04] to-transparent",
+      monthly: "$1,200/mo",
+      monthlyNote: "For the Inside Sales Agent + Database Manager, as one team. Transaction Coordination is billed per file, $150 to $200.",
       stats: [
         ["917 min", "average agent lead response time"],
         ["21x", "likelier to convert inside 5 minutes"],
@@ -828,6 +832,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       {v.headline}
                     </h4>
                     <p className="mt-4 text-sm leading-7 text-white/62">{v.lede}</p>
+
+                    <div className="mt-6 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                      <span className={`text-3xl font-semibold tracking-[-0.04em] ${v.accent}`}>{v.monthly}</span>
+                      <span className="text-sm text-white/55">for the AI team</span>
+                    </div>
+                    <p className="mt-1.5 text-xs leading-5 text-white/45">{v.monthlyNote}</p>
 
                     <div className="mt-6 grid grid-cols-3 gap-3 border-y border-white/10 py-5">
                       {v.stats.map(([stat, label]) => (
