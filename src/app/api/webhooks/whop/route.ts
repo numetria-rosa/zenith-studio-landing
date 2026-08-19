@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import type { Payment, Membership } from "@whop/sdk/resources.js";
-import { whop } from "@/lib/whop";
+import { getWhopClient } from "@/lib/whop";
 import { db } from "@/lib/db";
 import { courseIdForWhopProductId } from "@/lib/courses";
 import { serviceKindForWhopPlanId } from "@/lib/services";
@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
   const rawBody = await request.text();
   const headers = Object.fromEntries(request.headers);
 
+  const whop = getWhopClient();
   let event: Awaited<ReturnType<typeof whop.webhooks.unwrap>>;
   try {
     event = whop.webhooks.unwrap(rawBody, { headers });
