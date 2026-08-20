@@ -43,3 +43,7 @@ next-env.d.ts
 # local-only working folders (never deploy or push)
 /playbook
 /zenith-ai-kit
+# internal sales material — not app code, and clients/ will hold real
+# client financial/contact data that shouldn't sit in a shared repo.
+/law-firm-client-scripts
+/real-estate-client-scripts
