@@ -77,7 +77,11 @@ const PRODUCTS = [
         title: "Monthly",
         description: "Hosting, monitoring, and improvements, billed monthly.",
         plan_type: "renewal",
-        initial_price: 150,
+        // initial_price is an EXTRA one-time fee Whop stacks on top of the
+        // first renewal_price charge, not "the first month's amount" — 0
+        // means day-one charge is exactly renewal_price, nothing doubled.
+        // Learned this the hard way; see scripts/fix-whop-renewal-prices.mjs.
+        initial_price: 0,
         renewal_price: 150,
         billing_period: 30,
       },
@@ -102,7 +106,7 @@ const PRODUCTS = [
         title: "Monthly",
         description: "Hosting, monitoring, and improvements, billed monthly.",
         plan_type: "renewal",
-        initial_price: 200,
+        initial_price: 0, // see the note on the Inbox Manager monthly plan above
         renewal_price: 200,
         billing_period: 30,
       },
@@ -127,7 +131,7 @@ const PRODUCTS = [
         title: "Monthly",
         description: "Hosting, monitoring, and improvements, billed monthly.",
         plan_type: "renewal",
-        initial_price: 300,
+        initial_price: 0, // see the note on the Inbox Manager monthly plan above
         renewal_price: 300,
         billing_period: 30,
       },
@@ -145,7 +149,7 @@ const PRODUCTS = [
         title: "Monthly",
         description: "AI Intake Coordinator + AI Follow-Up Clerk, billed monthly.",
         plan_type: "renewal",
-        initial_price: 2000,
+        initial_price: 0, // see the note on the Inbox Manager monthly plan above
         renewal_price: 2000,
         billing_period: 30,
       },
@@ -163,7 +167,7 @@ const PRODUCTS = [
         title: "Monthly",
         description: "AI Inside Sales Agent + AI Database Manager, billed monthly.",
         plan_type: "renewal",
-        initial_price: 1200,
+        initial_price: 0, // see the note on the Inbox Manager monthly plan above
         renewal_price: 1200,
         billing_period: 30,
       },
