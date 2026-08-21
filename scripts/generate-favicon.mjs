@@ -1,31 +1,35 @@
-// One-off script: rebuilds the favicon set as a bold, saturated gradient
-// disc (cyan -> blue -> fuchsia, the same gradient used throughout
-// src/app/page.tsx) with a bold hand-drawn Z glyph in solid white on top.
-// Re-run any time the design changes.
+// One-off script: rebuilds the favicon set from the real brand mark
+// (public/icon.webp — the same illustrated Z used in-app headers), sized
+// large/dominant on a vivid gradient disc.
 //
-// v3 note — two failed attempts before this one, both worth remembering:
-//   v1 was a dark "glass orb" with a thin neon rim. Looked fine at 512px,
-//   disappeared into a near-black blob in a real dark browser tab bar —
-//   not saturated/high-contrast enough at actual favicon size.
-//   v2 fixed that with a vivid disc, but used a white silhouette cut from
-//   the illustrated source mark's alpha channel. The illustrated mark's
-//   swoosh/ring linework, flattened to solid white, reads as a plain
-//   donut/ring shape, not a Z — the letterform depended on internal color
-//   shading that a silhouette throws away.
-// v3 draws an actual bold Z glyph directly (three overlapping bars), which
-// stays legible and unambiguous at every size from 16px to 512px.
+// History, worth keeping — three earlier attempts, each fixing the last
+// one's problem and (until this version) introducing a new one:
+//   v1: dark "glass orb" with a thin neon rim. Fine at 512px, disappeared
+//   into a near-black blob in a real dark browser tab — not saturated
+//   enough at actual favicon size.
+//   v2: fixed contrast with a vivid disc, but used a white silhouette cut
+//   from the illustrated mark's alpha channel. Flattened to solid white,
+//   the swoosh/ring linework reads as a plain donut, not a Z — the
+//   letterform depended on internal color shading a silhouette discards.
+//   v3: dropped the real mark entirely for a bold hand-drawn Z glyph.
+//   Legible at every size, but user feedback: this isn't "our icon" —
+//   wanted the actual illustrated brand mark back, just sized to dominate
+//   the circle instead of looking small inside it.
+// v4 (this version): the real mark from public/icon.webp, sized to ~88% of
+// the disc diameter — most of what's visible at any size is the icon
+// itself, with just a thin ring of the vivid disc showing as a frame.
 //
 // Usage: node scripts/generate-favicon.mjs
 //
-// Regenerates every file under public/favicon/ and src/app/favicon.ico —
-// does not touch public/icon.webp (the in-app header logo, a separate
-// illustrated asset).
+// Regenerates every file under public/favicon/ and src/app/favicon.ico.
+// Reads from public/icon.webp but does not modify it.
 
 import sharp from "sharp";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const FAVICON_DIR = join(process.cwd(), "public", "favicon");
+const SOURCE_MARK = join(process.cwd(), "public", "icon.webp");
 const MASTER_SIZE = 1024;
 
 // Fully saturated gradient disc, edge to edge — no dark base, no glass, no
@@ -43,28 +47,20 @@ const discSvg = `
 </svg>
 `;
 
-// Bold Z glyph, hand-drawn as three overlapping white bars (top, bottom,
-// and a rotated diagonal rod connecting them) — verified separately to
-// read unambiguously as "Z" at both 16px and 512px, unlike a silhouette
-// cut from the illustrated mark. Slight overshoot past the bar edges at
-// the diagonal's two ends is intentional, echoing the source mark's sharp
-// pointed extensions.
-const zGlyphSvg = `
-<svg width="${MASTER_SIZE}" height="${MASTER_SIZE}" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-  <g fill="#ffffff">
-    <rect x="200" y="200" width="624" height="150"/>
-    <rect x="200" y="674" width="624" height="150"/>
-    <rect x="137" y="437" width="750" height="150" transform="rotate(152.5 512 512)"/>
-  </g>
-</svg>
-`;
-
 async function buildMaster() {
   const disc = await sharp(Buffer.from(discSvg)).png().toBuffer();
-  const glyph = await sharp(Buffer.from(zGlyphSvg)).png().toBuffer();
+
+  // Sized to dominate the circle — only a thin ring of the disc shows
+  // around it, rather than the mark looking small inside a lot of empty
+  // bubble margin.
+  const markSize = Math.round(MASTER_SIZE * 0.88);
+  const mark = await sharp(SOURCE_MARK)
+    .resize(markSize, markSize, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .toBuffer();
+  const offset = Math.round((MASTER_SIZE - markSize) / 2);
 
   return sharp(disc)
-    .composite([{ input: glyph }])
+    .composite([{ input: mark, left: offset, top: offset }])
     .png()
     .toBuffer();
 }
