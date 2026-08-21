@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# generated output from one-off scripts
+whop-created-products.json
+
 # local-only working folders (never deploy or push)
 /playbook
 /zenith-ai-kit
