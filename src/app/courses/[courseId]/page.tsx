@@ -1,8 +1,31 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
 import { hasCourseAccess } from "@/lib/entitlements";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ courseId: string }>;
+}): Promise<Metadata> {
+  const { courseId } = await params;
+  const course = getCourse(courseId);
+  if (!course || !course.published) return {};
+
+  return {
+    title: course.title,
+    description: course.description,
+    alternates: { canonical: `https://zenith-studio.site/courses/${course.id}` },
+    openGraph: {
+      type: "website",
+      url: `https://zenith-studio.site/courses/${course.id}`,
+      title: `${course.title} | Zenith Studio`,
+      description: course.description,
+    },
+  };
+}
 
 /* Phase 17 error states live here: not logged in -> sign in; logged in but
    not entitled -> "you don't have access yet" + Get Access. If the visitor

@@ -112,6 +112,7 @@ export default function ZenithStudioLandingPage() {
       lede: "That twelve hour gap is roughly $230,000 per attorney, per year. It is not lost to competitors or bad marketing. It is work you already did and never invoiced.",
       accent: "text-amber-200",
       accentSoft: "text-amber-200/70",
+      accentBtn: "border-amber-300/30 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20",
       glow: "from-amber-300/[0.07] via-orange-400/[0.04] to-transparent",
       monthly: "$2,000/mo",
       monthlyNote: "For the Intake Coordinator + Follow-Up Clerk, as one team. The Billing Clerk is priced on what it recovers, not a flat fee.",
@@ -150,6 +151,7 @@ export default function ZenithStudioLandingPage() {
       lede: "They are leaving because they are doing four jobs at once: prospecting, follow-up, paperwork, and a database nobody has touched in a year. Every agent who walks costs you $15,000 to $50,000.",
       accent: "text-sky-200",
       accentSoft: "text-sky-200/70",
+      accentBtn: "border-sky-300/30 bg-sky-400/10 text-sky-200 hover:bg-sky-400/20",
       glow: "from-sky-300/[0.07] via-indigo-400/[0.04] to-transparent",
       monthly: "$1,200/mo",
       monthlyNote: "For the Inside Sales Agent + Database Manager, as one team. Transaction Coordination is billed per file, $150 to $200.",
@@ -421,7 +423,6 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               <a href="#work" className="hover:text-white transition-colors">Work</a>
               <a href="#services" className="hover:text-white transition-colors">Services</a>
               <a href="#systems" className="hover:text-white transition-colors">Pricing</a>
-              <a href="#products" className="hover:text-white transition-colors">Products</a>
               <Link href="/lab" className="hover:text-white transition-colors">Lab</Link>
               <a href="#contact" className="hover:text-white transition-colors">Contact</a>
             </nav>
@@ -462,11 +463,10 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               </a>
             </div>
 
-            <div className="mt-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="mt-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
               {[
                 ["01", "Ventures", "Our own SaaS: VoyAI & SmartRevise", "#work"],
                 ["02", "Services", "AI automation & custom engineering", "#services"],
-                ["03", "Products & Learning", "Templates, playbooks & courses", "#products"],
               ].map(([num, title, text, href]) => (
                 <a
                   key={title}
@@ -757,35 +757,36 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                   ))}
                 </ul>
 
-                <BookButton
-                  className={`mt-7 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
-                    system.featured
-                      ? "bg-white text-black"
-                      : "border border-white/15 bg-white/5 text-white hover:bg-white/10"
-                  }`}
-                >
-                  Book a free audit
-                </BookButton>
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <BookButton
+                    className={`inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
+                      system.featured
+                        ? "bg-white text-black"
+                        : "border border-white/15 bg-white/5 text-white hover:bg-white/10"
+                    }`}
+                  >
+                    Book a free audit
+                  </BookButton>
 
-                {(() => {
-                  // Additive only — "Book a free audit" stays the primary,
-                  // working CTA above. This appears only once a real Whop
-                  // checkout link is configured for this service (none are
-                  // yet), for clients who already know what they want.
-                  const catalogService = getService(system.id);
-                  const setupUrl = catalogService ? getSetupCheckoutUrl(catalogService) : null;
-                  if (!setupUrl) return null;
-                  return (
-                    <a
-                      href={setupUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 text-center text-xs text-white/50 underline decoration-white/20 underline-offset-4 transition hover:text-white/80"
-                    >
-                      Already know what you need? Buy setup directly →
-                    </a>
-                  );
-                })()}
+                  {(() => {
+                    // "Book a free audit" stays the primary CTA. This is a
+                    // real button, not a footnote link, so clients who
+                    // already know what they want don't have to hunt for it.
+                    const catalogService = getService(system.id);
+                    const setupUrl = catalogService ? getSetupCheckoutUrl(catalogService) : null;
+                    if (!setupUrl) return null;
+                    return (
+                      <a
+                        href={setupUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-400/10 px-6 py-3 text-sm font-semibold text-emerald-200 transition hover:scale-[1.02] hover:bg-emerald-400/20"
+                      >
+                        Buy setup directly →
+                      </a>
+                    );
+                  })()}
+                </div>
               </div>
             ))}
           </div>
@@ -871,26 +872,22 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       <p className="mt-1.5 text-sm leading-6 text-white/72">{v.offer}</p>
                     </div>
 
-                    <BookButton className="mt-6 inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10">
-                      Book a free audit
-                    </BookButton>
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <BookButton className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10">
+                        Book a free audit
+                      </BookButton>
 
-                    {(() => {
-                      // Additive only — "Book a free audit" stays the primary
-                      // CTA above. Appears only once a real Whop checkout
-                      // link is configured for this vertical.
-                      if (!v.whopCheckoutUrl) return null;
-                      return (
+                      {v.whopCheckoutUrl && (
                         <a
                           href={v.whopCheckoutUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-3 block text-center text-xs text-white/50 underline decoration-white/20 underline-offset-4 transition hover:text-white/80"
+                          className={`inline-flex items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${v.accentBtn}`}
                         >
-                          Already know what you need? Subscribe directly →
+                          Subscribe directly →
                         </a>
-                      );
-                    })()}
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1070,7 +1067,6 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
             <a href="#work" className="hover:text-white/70">Work</a>
             <a href="#services" className="hover:text-white/70">Services</a>
             <a href="#systems" className="hover:text-white/70">Pricing</a>
-            <a href="#products" className="hover:text-white/70">Products</a>
             <Link href="/lab" className="hover:text-white/70">Lab</Link>
             <a href="#contact" className="hover:text-white/70">Connect</a>
           </div>
