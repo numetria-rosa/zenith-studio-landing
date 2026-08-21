@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheets — Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--amber)}
+.hero{padding:36px 0 20px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:680px;margin-top:10px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px}
+.toolbar input[type=search]{flex:1;min-width:200px;font-family:'IBM Plex Sans';font-size:14px;background:var(--card2);border:1px solid var(--bd2);border-radius:8px;padding:9px 14px;color:var(--tx)}
+.filterbtn{font-family:'IBM Plex Mono';font-size:12px;padding:7px 12px;border-radius:99px;border:1px solid var(--bd2);background:var(--card2);color:var(--mut);cursor:pointer}
+.filterbtn.active{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+.filterbtn:hover{border-color:var(--amber)}
+button.plain{font-family:'IBM Plex Sans';font-weight:600;font-size:12.5px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;display:inline-flex;align-items:center}
+.icon{display:inline-block;vertical-align:-2px}
+.icon svg{width:1em;height:1em;display:block}
+button.plain:hover{border-color:var(--amber);color:var(--amber)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.sheetgrid{display:grid;gap:20px;margin-top:24px}
+.sheet{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:26px 28px}
+.sheet .shead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.sheet h2{font-size:19px;font-weight:600}
+.sheet .stag{font-size:11px;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
+.sheet .sactions{display:flex;gap:8px}
+.bookmarkbtn{background:none;border:1px solid var(--bd2);border-radius:8px;padding:7px 10px;cursor:pointer;color:var(--mut2);font-size:14px}
+.bookmarkbtn.on{color:var(--amber);border-color:var(--amber)}
+.sec{margin-top:18px}
+.sec .slbl{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);margin-bottom:8px;font-family:'IBM Plex Mono'}
+.sec ul{padding-left:18px;color:var(--tx);font-size:13.5px;line-height:1.85}
+.sec ul li b{color:var(--tx)}
+.formula{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 18px;font-family:'IBM Plex Mono';font-size:14px;color:var(--amber);margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.formula button{flex-shrink:0}
+.checklist{margin-top:8px}
+.checklist label{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;padding:4px 0;color:var(--tx)}
+code{font-family:'IBM Plex Mono';font-size:12.5px;background:rgba(240,180,41,.1);color:var(--amber);padding:1px 6px;border-radius:4px}
+.copybtn{font-family:'IBM Plex Mono';font-size:11px;padding:4px 9px;border-radius:6px;border:1px solid var(--bd2);background:var(--card2);color:var(--mut);cursor:pointer}
+.copybtn:hover{color:var(--amber);border-color:var(--amber)}
+.copybtn.done{color:var(--good);border-color:var(--good)}
+.emptystate{color:var(--mut2);text-align:center;padding:40px 0;font-size:14px}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} .sheet{padding:18px} }
+@media print {
+  .bar,.coursenav,.toolbar,.bookmarkbtn,footer{display:none !important}
+  body{background:#fff;color:#000}
+  .sheet{background:#fff;border:1px solid #999;break-inside:avoid;page-break-inside:avoid;margin-bottom:16px}
+  .sheet h2,.sec .slbl{color:#000}
+  .formula{background:#f3f3f3;color:#000;border:1px solid #999}
+  code{background:#eee;color:#000}
+  .copybtn{display:none}
+}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Cheat Sheets</span>
+    <h1 class="serif">Quick reference, not another lesson</h1>
+    <p class="sub">Built to keep open beside your spreadsheet, notebook, or SQL client. Search finds a term across all sheets; module filters narrow the list; print gives you a clean black-and-white handout.</p>
+    <div class="toolbar">
+      <input type="search" id="searchBox" placeholder="Search cheat sheets (e.g. &quot;xlookup&quot;, &quot;groupby&quot;, &quot;join&quot;)...">
+      <button class="plain" id="btnPrint"><span class="icon" style="width:13px;height:13px;margin-right:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="1.5"/><rect x="7" y="14" width="10" height="7"/></svg></span>Print</button>
+      <button class="plain" id="btnBookmarkedOnly">★ Bookmarked only</button>
+    </div>
+    <div class="toolbar" id="filterRow"></div>
+  </header>
+
+  <div class="sheetgrid" id="sheetGrid"></div>
+  <div class="emptystate" id="emptyState" style="display:none">No cheat sheets match your search.</div>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Cheat Sheets</footer>
+</div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+const SHEETS = [
+  { id: 1, title: "Excel Formulas & Shortcuts", tag: "Module 1",
+    sections: [
+      { label: "The five core formulas", items: ["<code>SUM(range)</code>, <code>AVERAGE(range)</code> — total and mean of a range.", "<code>COUNTIF(range, criteria)</code> — count of cells matching a condition.", "<code>IF(condition, true_val, false_val)</code> — branch on a condition.", "<code>XLOOKUP(key, lookup_range, return_range)</code> — find a value in one table using a key from another."] },
+      { label: "Other everyday formulas", items: ["<code>COUNTA(range)</code> — count non-empty cells.", "<code>SUMIF(range, criteria, sum_range)</code> — sum only matching rows.", "<code>TRIM(cell)</code> — strip leading/trailing whitespace, the fix for a huge share of 'why doesn't this match' bugs.", "<code>TEXT(cell, format)</code> — force consistent formatting on a mixed-format column."] },
+      { label: "Sorting & filtering", items: ["Both are non-destructive, they never change the underlying data.", "Sort ascending/descending by clicking a column header or using the Sort dialog for multi-column sorts.", "Filter to hide non-matching rows without deleting them."] },
+      { label: "Tidy data checklist", checklist: ["Every column is one variable.", "Every row is one observation.", "Every cell holds exactly one value, no lists crammed into a cell.", "One consistent format per column (dates, currency, casing)."] },
+      { label: "Common mistakes", items: ["Mixing date formats in one column (breaks sorting and any date formula).", "A number stored as text (won't SUM correctly, often left-aligned instead of right-aligned).", "Merged cells, they silently break sorting and most formulas that touch them."] },
+    ] },
+  { id: 2, title: "Python for Data Cheat Sheet", tag: "Module 2",
+    sections: [
+      { label: "Core types", items: ["<code>int</code>, <code>float</code> — numbers. <code>str</code> — text. <code>bool</code> — True/False.", "<code>list</code> — ordered, mutable. <code>dict</code> — key/value pairs, the natural shape for one row of data."] },
+      { label: "Reading a CSV by hand", formula: "for line in open('file.csv'):\n    fields = line.strip().split(',')" },
+      { label: "Common patterns", items: ["<code>[x for x in items if cond]</code> — a list comprehension, a one-line filter.", "<code>float(text)</code> / <code>int(text)</code> — convert text read from a file into a real number.", "<code>d.get('key', default)</code> — read a key that might not exist, without crashing."] },
+      { label: "Common mistakes", items: ["Forgetting everything read from a file starts as a string, even numbers.", "Using <code>d['key']</code> instead of <code>d.get('key')</code> on a field that might be missing.", "Off-by-one errors when skipping a header row."] },
+    ] },
+  { id: 3, title: "Pandas & NumPy Quick Reference", tag: "Module 3",
+    sections: [
+      { label: "Load & inspect", items: ["<code>df = pd.read_csv('file.csv')</code>", "<code>df.head()</code>, <code>df.info()</code>, <code>df.describe()</code> — first look at any new dataset."] },
+      { label: "Select & filter", items: ["<code>df['col']</code> — one column. <code>df[['a','b']]</code> — multiple columns.", "<code>df[df['revenue'] > 1000]</code> — filter rows by a condition."] },
+      { label: "Group & aggregate", formula: "df.groupby('region')['revenue'].sum()" },
+      { label: "Merge & join", formula: "pd.merge(orders, customers, on='customer_id', how='left')" },
+      { label: "NumPy vectorization", items: ["<code>df['total'] = df['price'] * df['qty']</code> — whole-column math, no explicit loop needed.", "Vectorized operations are far faster than looping row by row in Python."] },
+      { label: "Common mistakes", items: ["Merging on a key that isn't unique on one side, silently multiplying row count.", "Chained indexing warnings (<code>df[df.x>1]['y'] = ...</code>), use <code>.loc[]</code> instead.", "Forgetting <code>groupby()</code> returns a new object, it doesn't modify the original DataFrame."] },
+    ] },
+  { id: 4, title: "Data Cleaning Checklist", tag: "Module 4",
+    sections: [
+      { label: "The smell test, in order", checklist: ["Check for missing values (<code>df.isna().sum()</code>).", "Check for duplicate rows (<code>df.duplicated().sum()</code>).", "Check each column's dtype matches what it should be.", "Check categorical columns for inconsistent labels (<code>df['col'].unique()</code>).", "Check for outliers with a quick <code>describe()</code> or histogram."] },
+      { label: "Fixing text-stored numbers", formula: "df['price'] = df['price'].str.replace('$','').str.replace(',','').astype(float)" },
+      { label: "Normalizing categories", formula: "df['status'] = df['status'].str.strip().str.lower()" },
+      { label: "Missing-value decision", items: ["Random and small % missing → often safe to drop those rows.", "Systematic missingness (correlated with another variable) → dropping can bias the analysis, consider flagging instead.", "Never fill silently with 0 unless 0 is a genuinely meaningful value for that column."] },
+      { label: "Common mistakes", items: ["Deleting an outlier before investigating whether it's real.", "Fixing a symptom (one bad row) instead of the underlying pattern (a whole column's format).", "Not re-checking row count after a cleaning step, silently losing more data than intended."] },
+    ] },
+  { id: 5, title: "Descriptive Statistics Cheat Sheet", tag: "Module 5",
+    sections: [
+      { label: "The core numbers", items: ["<b>Mean</b> — average, sensitive to outliers.", "<b>Median</b> — middle value, resistant to outliers.", "<b>Mode</b> — most frequent value, useful for categorical data.", "<b>Standard deviation</b> — how spread out values are around the mean."] },
+      { label: "Correlation vs. causation", items: ["Two things moving together does NOT mean one causes the other.", "Always ask: could a third factor explain both?", "A controlled experiment (A/B test), not just observed correlation, is what establishes causation."] },
+      { label: "Signal vs. noise", items: ["A small sample can easily produce a difference that looks real but isn't.", "A hypothesis test (t-test, chi-square) gives a principled answer to 'is this difference likely real.'"] },
+      { label: "Common mistakes", items: ["Reporting a mean without checking whether outliers are distorting it.", "Concluding causation from correlation alone.", "Trusting a small-sample comparison without checking if the gap could just be noise."] },
+    ] },
+  { id: 6, title: "Chart-Type Decision Tree", tag: "Module 6",
+    sections: [
+      { label: "Pick by question", items: ["Trend over time → <b>line chart</b>.", "Compare categories → <b>bar chart</b>.", "Distribution / shape of one variable → <b>histogram</b>.", "Relationship between two numeric variables → <b>scatter plot</b>.", "Part-to-whole, 2-3 categories only → pie chart, otherwise avoid it."] },
+      { label: "Red flags in a chart", items: ["A y-axis that doesn't start at zero for a bar chart (exaggerates differences).", "Dual axes with independently-scaled lines implying a false relationship.", "Too many categories crammed into one pie chart."] },
+      { label: "Building the 'so what' visual", checklist: ["One chart, one clear point.", "Title states the finding, not just the metric name.", "Remove gridlines/decoration that don't help the reader.", "Highlight the one data point that matters most."] },
+    ] },
+  { id: 7, title: "SQL Query Patterns", tag: "Module 7",
+    sections: [
+      { label: "The basic shape", formula: "SELECT col1, SUM(col2)\nFROM table\nWHERE condition\nGROUP BY col1\nHAVING SUM(col2) > 1000\nORDER BY 2 DESC" },
+      { label: "JOIN types", items: ["<b>INNER JOIN</b> — only rows matching in both tables.", "<b>LEFT JOIN</b> — all rows from the left table, matched data where it exists.", "Choose LEFT JOIN when you want to keep unmatched rows (e.g. customers with zero orders)."] },
+      { label: "WHERE vs. HAVING", items: ["<code>WHERE</code> filters rows before aggregation.", "<code>HAVING</code> filters groups after aggregation, use it to filter on a SUM/COUNT/AVG."] },
+      { label: "Common mistakes", items: ["Trying to filter an aggregated value with WHERE instead of HAVING.", "Joining on a non-unique key and not noticing the row count multiplied.", "Forgetting NULLs don't match in a standard join or an <code>=</code> comparison."] },
+    ] },
+  { id: 8, title: "Dashboard & Executive Summary Template", tag: "Module 8",
+    sections: [
+      { label: "Executive summary structure", checklist: ["Sentence 1: the recommendation or key finding.", "Sentence 2-3: the evidence that supports it, briefly.", "Last line: what you need from the reader (a decision, approval, or next step)."] },
+      { label: "Dashboard design rules", items: ["Lead with the metric that answers the main question, biggest and first.", "Use color to mean something (status, over/under target), not decoration.", "Cut any metric that doesn't change a decision."] },
+      { label: "Common mistakes", items: ["Leading with methodology instead of the finding.", "A dashboard with 15 equally-sized charts and no visual hierarchy.", "No recommendation at all, just a report of numbers."] },
+    ] },
+  { id: 9, title: "Job Search & Interview Cheat Sheet", tag: "Career Path",
+    sections: [
+      { label: "Resume bullet formula", formula: "[Action verb] + [what you analyzed] + [tool] + [business result]" },
+      { label: "Worked example", items: ["\"Analyzed 18 months of e-commerce order data in Python and pandas to identify a 23% cart-abandonment spike at checkout, informing a UX fix.\""] },
+      { label: "Where to find the work", items: ["Freelance: Upwork, Fiverr (start near the low end of the range, build reviews).", "Entry-level roles: LinkedIn easy-apply plus direct informational outreach.", "Cold outreach: a free mini-analysis for a local business in exchange for a testimonial."] },
+      { label: "Interview prep", items: ["Technical screen: expect a live pandas or SQL exercise, not just conceptual questions.", "Take-home case study: practice explaining your approach out loud, not just the code.", "Behavioral: use the STAR method (Situation, Task, Action, Result) against a real portfolio project."] },
+      { label: "Common mistakes", items: ["A portfolio of tutorial-clean notebooks instead of real, messy-data work.", "Leading an interview answer with the tool used instead of the business result.", "No follow-up outreach after the first cold message goes unanswered."] },
+    ] },
+];
+
+function bookmarks(){ const v = CourseProgress.getExtra("cheatsheetBookmarks"); return Array.isArray(v) ? v : []; }
+function toggleBookmark(id){
+  const b = bookmarks();
+  const idx = b.indexOf(id);
+  if (idx === -1) b.push(id); else b.splice(idx, 1);
+  CourseProgress.setExtra("cheatsheetBookmarks", b);
+}
+
+let activeModule = null;
+let bookmarkedOnly = false;
+
+function renderFilters(){
+  const row = document.getElementById("filterRow");
+  row.innerHTML = "";
+  const allBtn = document.createElement("button");
+  allBtn.className = "filterbtn" + (activeModule === null ? " active" : "");
+  allBtn.textContent = "All modules";
+  allBtn.addEventListener("click", () => { activeModule = null; renderFilters(); renderSheets(); });
+  row.appendChild(allBtn);
+  SHEETS.forEach(s => {
+    const btn = document.createElement("button");
+    btn.className = "filterbtn" + (activeModule === s.id ? " active" : "");
+    btn.textContent = s.tag;
+    btn.addEventListener("click", () => { activeModule = s.id; renderFilters(); renderSheets(); });
+    row.appendChild(btn);
+  });
+}
+
+function sectionMatches(sec, term){
+  const hay = [sec.label, ...(sec.items || []), ...((sec.checklist)||[]), sec.formula || ""].join(" ").toLowerCase();
+  return hay.includes(term);
+}
+
+function renderSheets(){
+  const term = document.getElementById("searchBox").value.trim().toLowerCase();
+  const bm = bookmarks();
+  const grid = document.getElementById("sheetGrid");
+  grid.innerHTML = "";
+  let visibleCount = 0;
+  SHEETS.forEach(sheet => {
+    if (activeModule !== null && sheet.id !== activeModule) return;
+    if (bookmarkedOnly && !bm.includes(sheet.id)) return;
+    const matches = !term || sheet.title.toLowerCase().includes(term) || sheet.sections.some(s => sectionMatches(s, term));
+    if (!matches) return;
+    visibleCount++;
+    const el = document.createElement("div");
+    el.className = "sheet";
+    const isBookmarked = bm.includes(sheet.id);
+    let secHtml = "";
+    sheet.sections.forEach(sec => {
+      if (term && !sectionMatches(sec, term) && !sheet.title.toLowerCase().includes(term)) return;
+      secHtml += `<div class="sec"><div class="slbl">${sec.label}</div>`;
+      if (sec.items) secHtml += `<ul>${sec.items.map(i => `<li>${i}</li>`).join("")}</ul>`;
+      if (sec.formula) secHtml += `<div class="formula"><span>${sec.formula}</span><button class="copybtn" data-copy="${sec.formula.replace(/"/g,'&quot;')}">Copy</button></div>`;
+      if (sec.checklist) secHtml += `<div class="checklist">${sec.checklist.map(c => `<label><input type="checkbox">${c}</label>`).join("")}</div>`;
+      secHtml += `</div>`;
+    });
+    el.innerHTML = `
+      <div class="shead">
+        <div><div class="stag">${sheet.tag}</div><h2 class="serif">${sheet.title}</h2></div>
+        <div class="sactions"><button class="bookmarkbtn${isBookmarked ? " on" : ""}" data-id="${sheet.id}">${isBookmarked ? "★" : "☆"}</button></div>
+      </div>
+      ${secHtml}
+    `;
+    grid.appendChild(el);
+  });
+  document.getElementById("emptyState").style.display = visibleCount === 0 ? "block" : "none";
+
+  grid.querySelectorAll(".bookmarkbtn").forEach(btn => {
+    btn.addEventListener("click", () => { toggleBookmark(Number(btn.dataset.id)); renderSheets(); });
+  });
+  grid.querySelectorAll(".copybtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const text = btn.dataset.copy;
+      navigator.clipboard?.writeText(text).catch(() => {});
+      btn.textContent = "Copied"; btn.classList.add("done");
+      setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1200);
+    });
+  });
+}
+
+document.getElementById("searchBox").addEventListener("input", renderSheets);
+document.getElementById("btnPrint").addEventListener("click", () => window.print());
+document.getElementById("btnBookmarkedOnly").addEventListener("click", (e) => {
+  bookmarkedOnly = !bookmarkedOnly;
+  e.target.style.borderColor = bookmarkedOnly ? "var(--amber)" : "";
+  e.target.style.color = bookmarkedOnly ? "var(--amber)" : "";
+  renderSheets();
+});
+
+renderFilters();
+renderSheets();
+</script>
+</body>
+</html>

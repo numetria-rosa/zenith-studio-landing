@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Science &amp; Analysis — Course Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;
+}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:980px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
+.hero{padding:50px 0 30px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(28px,4.5vw,40px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:15.5px;max-width:640px;margin-top:12px}
+.sysgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:28px}
+@media (max-width:900px){ .sysgrid{grid-template-columns:repeat(3,1fr)} }
+@media (max-width:640px){ .sysgrid{grid-template-columns:repeat(2,1fr)} }
+.syscard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 14px;text-decoration:none;color:inherit;display:flex;flex-direction:column;align-items:flex-start;gap:4px;transition:.15s}
+.syscard:hover,.syscard:focus-visible{border-color:var(--amber);transform:translateY(-1px)}
+.syscard:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.syscard .sysicon{color:var(--amber)}
+.syscard .sysicon svg{width:22px;height:22px;display:block}
+.icon{display:inline-block;vertical-align:-2px}
+.icon svg{width:1em;height:1em;display:block}
+.syscard .systitle{font-weight:700;font-size:13.5px;color:var(--tx);margin-top:4px}
+.syscard .sysdesc{font-size:11px;color:var(--mut2);line-height:1.4}
+.modgrid-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mut2);margin-top:32px;font-family:'IBM Plex Mono'}
+.overallwrap{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:24px 26px;margin-top:28px}
+.overallrow{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+.overallrow .ov-lbl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut2);font-family:'IBM Plex Mono'}
+.overallrow .ov-val{font-family:'IBM Plex Mono';font-size:26px;font-weight:700;color:var(--amber)}
+.overallbar{height:10px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-top:14px;border:1px solid var(--bd)}
+.overallbar .fill{height:100%;background:var(--amber);width:0%;transition:width .4s}
+.overallbar.done .fill{background:var(--good)}
+.nextaction{margin-top:16px;padding:14px 16px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.nextaction .nalbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);font-weight:700;font-family:'IBM Plex Mono'}
+.nextaction .natext{font-size:14px;color:var(--tx);flex:1;min-width:180px}
+.nextaction a.nabtn{background:var(--amber);color:var(--amberd);font-weight:700;font-size:13px;padding:8px 16px;border-radius:8px;text-decoration:none;white-space:nowrap}
+.storage-note{font-size:12px;color:var(--mut2);margin-top:16px;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.storage-note button{font-family:'IBM Plex Sans';font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;border:1px solid var(--bd2);background:var(--card2);color:var(--mut);cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.storage-note button:before{content:"↺";font-size:13px;line-height:1}
+.storage-note button:hover{border-color:var(--bad);color:var(--bad);background:rgba(255,133,133,.08)}
+.skillrow{display:flex;align-items:flex-start;gap:12px;padding:10px 4px;font-size:14px}
+.skillrow .sicon{flex-shrink:0;width:20px;text-align:center;font-weight:700}
+.skillrow.earned .sicon{color:var(--good)}
+.skillrow.earned .stext{color:var(--tx)}
+.skillrow:not(.earned) .sicon{color:var(--mut2)}
+.skillrow:not(.earned) .stext{color:var(--mut2)}
+.skillrow .sevidence{font-size:11.5px;color:var(--mut2);margin-top:2px}
+.modgrid{display:grid;gap:14px;margin-top:28px}
+.modcard{display:flex;gap:18px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;text-decoration:none;color:inherit;transition:.15s;position:relative}
+.modcard:hover,.modcard:focus-visible{border-color:var(--bd2)}
+.modcard:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.modcard.locked{opacity:.55;cursor:not-allowed}
+.modnum{flex-shrink:0;width:46px;height:46px;border-radius:10px;display:grid;place-items:center;font-family:'IBM Plex Mono';font-weight:700;font-size:15px;background:var(--card2);border:1px solid var(--bd2);color:var(--mut)}
+.modcard.completed .modnum{background:rgba(74,222,149,.12);border-color:var(--good);color:var(--good)}
+.modcard.in-progress .modnum{background:rgba(240,180,41,.1);border-color:var(--amber);color:var(--amber)}
+.modbody{flex:1;min-width:0}
+.modtitle{font-weight:700;font-size:15.5px;color:var(--tx)}
+.moddesc{font-size:13px;color:var(--mut);margin-top:3px}
+.modmeta{display:flex;gap:14px;margin-top:8px;font-size:11.5px;color:var(--mut2);flex-wrap:wrap}
+.modstatus{flex-shrink:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:5px 11px;border-radius:99px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.modstatus.completed{background:rgba(74,222,149,.15);color:var(--good)}
+.modstatus.in-progress{background:rgba(240,180,41,.1);color:var(--amber)}
+.modstatus.not-started{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
+.modstatus.locked{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
+.completebanner{margin-top:28px;background:linear-gradient(135deg,rgba(240,180,41,.1),rgba(95,194,232,.08));border:1px solid var(--amber);border-radius:14px;padding:28px;text-align:center;display:none}
+.completebanner.show{display:block}
+.completebanner .cbtitle{font-size:22px;font-weight:600;font-family:'Fraunces',serif;display:flex;align-items:center;justify-content:center}
+.completebanner .cbtitle .icon svg{color:var(--amber)}
+.completebanner .cbsub{color:var(--mut);font-size:14px;margin-top:8px}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .modcard{flex-direction:column;align-items:flex-start;gap:10px} .modstatus{align-self:flex-start} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Data Science &amp; Analysis</span>
+</div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Course Dashboard</span>
+    <h1 class="serif">Data Science &amp; Analysis</h1>
+    <p class="sub">Nine modules, spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards, and a Career Path Edition built around getting paid. Your progress is saved in this browser automatically as you go.</p>
+  </header>
+
+  <div class="sysgrid">
+    <a class="syscard" href="syllabus.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="systitle">Syllabus</span><span class="sysdesc">Full course outline &amp; tracks</span></a>
+    <a class="syscard" href="quiz-center.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 2-2.4 3.7"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="systitle">Quiz Center</span><span class="sysdesc">Module &amp; cumulative quizzes</span></a>
+    <a class="syscard" href="cheatsheets.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 14.5h6M9 18h3.5"/></svg></span><span class="systitle">Cheat Sheets</span><span class="sysdesc">Excel, pandas, SQL &amp; more</span></a>
+    <a class="syscard" href="projects.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2z"/></svg></span><span class="systitle">Projects</span><span class="sysdesc">4 portfolio-grade scenarios</span></a>
+    <a class="syscard" href="portfolio.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5"/><path d="M3.5 12.5h17"/></svg></span><span class="systitle">My Portfolio</span><span class="sysdesc">Your completed work</span></a>
+    <a class="syscard" href="career.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6z"/></svg></span><span class="systitle">Career Path</span><span class="sysdesc">Readiness &amp; job-landing playbook</span></a>
+  </div>
+
+  <div class="overallwrap">
+    <div class="overallrow">
+      <span class="ov-lbl">Overall course progress</span>
+      <span class="ov-val" id="ovVal">0 / 9 modules — 0%</span>
+    </div>
+    <div class="overallbar" id="ovBar"><div class="fill" id="ovFill"></div></div>
+    <div class="nextaction" id="nextAction" style="display:none">
+      <span class="nalbl">Next</span>
+      <span class="natext" id="naText"></span>
+      <a class="nabtn" id="naBtn" href="#">Continue &rarr;</a>
+    </div>
+    <div class="storage-note">Progress is stored locally in this browser only, it will not follow you to another device or browser profile. <button id="btnReset">Reset all progress</button></div>
+  </div>
+
+  <h2 class="modgrid-lbl">Start here</h2>
+  <div class="modgrid" id="module0Grid" style="margin-top:14px"></div>
+
+  <h2 class="modgrid-lbl">Modules</h2>
+
+  <div class="completebanner" id="completeBanner">
+    <div class="cbtitle"><span class="icon" style="width:22px;height:22px;margin-right:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.3 2.7 3 6 3s6-1.7 6-3v-5"/><path d="M22 9v6"/></svg></span>Course complete</div>
+    <div class="cbsub">All 9 modules passed at 80%+ and the final assessment passed. Nice work.</div>
+  </div>
+
+  <div class="modgrid" id="modGrid"></div>
+
+  <div class="overallwrap" id="skillsWrap" style="margin-top:28px">
+    <div class="ov-lbl" style="margin-bottom:14px">Skills demonstrated</div>
+    <div id="skillsList" style="display:grid;gap:10px"></div>
+  </div>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis</footer>
+</div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+const LOCK_ICON = '<span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>';
+const descriptions = {
+  1: "Rows, columns, five core formulas, and the tidy-data idea everything else depends on.",
+  2: "Variables, loops, functions, and hand-parsing a CSV before pandas exists for you.",
+  3: "DataFrames, groupby, and merging two mismatched sources into one clean table.",
+  4: "Missing values, duplicates, inconsistent labels, and a reusable cleaning checklist.",
+  5: "Descriptive stats, correlation vs. causation, and telling signal from noise.",
+  6: "Chart selection, matplotlib/seaborn, and spotting a misleading chart before it ships.",
+  7: "SELECT, JOIN, GROUP BY, and translating a business question into a query.",
+  8: "Building a dashboard and a recommendation a stakeholder can actually act on.",
+  9: "One full end-to-end analysis, chosen from four real business scenarios.",
+};
+
+function renderModule0Card(){
+  const wrap = document.getElementById("module0Grid");
+  const m0 = CourseProgress.getExtra("module0") || {};
+  const done = !!m0.completed;
+  const visited = !!m0.visited;
+  const card = document.createElement("a");
+  card.href = "module-00.html";
+  card.className = "modcard " + (done ? "completed" : visited ? "in-progress" : "not-started");
+  const statusLabel = done ? "✓ Completed" : visited ? "→ In progress" : "○ Not started";
+  const statusClass = done ? "completed" : visited ? "in-progress" : "not-started";
+  let meta = "~15 min · ungraded, doesn't block Module 1";
+  if (Number.isFinite(m0.selfCheckScore) && Number.isFinite(m0.selfCheckTotal) && m0.selfCheckTotal > 0) {
+    meta = `Self-check: ${Math.round(m0.selfCheckScore / m0.selfCheckTotal * 100)}% · ${meta}`;
+  }
+  if (m0.placementTrack) meta += ` · Placement: Track ${m0.placementTrack.toUpperCase()}`;
+  card.innerHTML = `
+    <div class="modnum">${done ? "✓" : "0"}</div>
+    <div class="modbody">
+      <div class="modtitle">Module 0 — Placement &amp; What This Job Actually Is</div>
+      <div class="moddesc">A short self-check that routes you to Module 1, 3, or 5, plus what the role actually is.</div>
+      <div class="modmeta"><span>${meta}</span></div>
+    </div>
+    <div class="modstatus ${statusClass}">${statusLabel}</div>
+  `;
+  wrap.innerHTML = "";
+  wrap.appendChild(card);
+}
+
+function renderDashboard(){
+  renderModule0Card();
+  const grid = document.getElementById("modGrid");
+  grid.innerHTML = "";
+  CourseProgress.MODULES.forEach(m => {
+    const status = CourseProgress.statusOf(m.id);
+    const unlocked = CourseProgress.isUnlocked(m.id);
+    const mod = CourseProgress.getModule(m.id);
+    const card = document.createElement(unlocked ? "a" : "div");
+    if (unlocked) card.href = m.file;
+    else card.tabIndex = 0;
+    card.className = "modcard " + status + (unlocked ? "" : " locked");
+
+    const statusLabel = !unlocked ? LOCK_ICON + " Locked" :
+      status === "completed" ? "✓ Completed" :
+      status === "in-progress" ? "→ In progress" : "○ Not started";
+    const statusClass = !unlocked ? "locked" : status;
+
+    let metaBits = [`~${m.minutes} min`];
+    const modScore = Number(mod.score), modTotal = Number(mod.total);
+    if (Number.isFinite(modTotal) && modTotal > 0) metaBits.push(`Last score: ${Number.isFinite(modScore) ? modScore : 0}/${modTotal}`);
+    if (!unlocked) metaBits.push(`Unlocks after Module ${m.id - 1}`);
+
+    card.innerHTML = `
+      <div class="modnum">${status === "completed" ? "✓" : m.id}</div>
+      <div class="modbody">
+        <div class="modtitle">Module ${m.id} — ${m.title}</div>
+        <div class="moddesc">${descriptions[m.id]}</div>
+        <div class="modmeta">${metaBits.map(b=>`<span>${b}</span>`).join("")}</div>
+      </div>
+      <div class="modstatus ${statusClass}">${statusLabel}</div>
+    `;
+    grid.appendChild(card);
+
+    if (m.id === 9) {
+      const m9done = CourseProgress.isModuleComplete(9);
+      const fa = CourseProgress.getExtra("finalAssessment");
+      const faDone = !!(fa && fa.passed);
+      const fUnlocked = m9done;
+      const fStatus = faDone ? "completed" : (fUnlocked ? "in-progress" : "not-started");
+      const fCard = document.createElement(fUnlocked ? "a" : "div");
+      if (fUnlocked) fCard.href = "final-assessment.html"; else fCard.tabIndex = 0;
+      fCard.className = "modcard " + fStatus + (fUnlocked ? "" : " locked");
+      const fLabel = !fUnlocked ? LOCK_ICON + " Locked" : faDone ? "✓ Completed" : "→ In progress";
+      const faScore = fa ? Number(fa.passCount) : NaN, faTotal = fa ? Number(fa.total) : NaN;
+      const fMeta = fUnlocked ? (fa && Number.isFinite(faScore) && Number.isFinite(faTotal) ? `Last score: ${faScore}/${faTotal}` : "~25 min, novel scenarios") : "Unlocks after the capstone";
+      fCard.innerHTML = `
+        <div class="modnum">${faDone ? "✓" : "★"}</div>
+        <div class="modbody">
+          <div class="modtitle">Final Competency Assessment</div>
+          <div class="moddesc">Novel scenarios spanning Modules 1–8. Not recycled from the lessons.</div>
+          <div class="modmeta"><span>${fMeta}</span></div>
+        </div>
+        <div class="modstatus ${!fUnlocked ? "locked" : fStatus}">${fLabel}</div>
+      `;
+      grid.appendChild(fCard);
+    }
+  });
+
+  const ov = CourseProgress.overall();
+  document.getElementById("ovVal").textContent = `${ov.completed} / ${ov.total} modules — ${ov.pct}%`;
+  document.getElementById("ovFill").style.width = ov.pct + "%";
+  const fa = CourseProgress.getExtra("finalAssessment");
+  const fullyDone = ov.pct === 100 && !!(fa && fa.passed);
+  document.getElementById("ovBar").className = "overallbar" + (fullyDone ? " done" : "");
+  document.getElementById("completeBanner").className = "completebanner" + (fullyDone ? " show" : "");
+
+  renderNextAction(fullyDone);
+  renderSkills();
+}
+
+function renderNextAction(fullyDone){
+  const box = document.getElementById("nextAction");
+  if (fullyDone) { box.style.display = "none"; return; }
+  let target = null, text = "";
+  for (const m of CourseProgress.MODULES) {
+    if (!CourseProgress.isModuleComplete(m.id)) {
+      if (!CourseProgress.isUnlocked(m.id)) break;
+      target = m.file;
+      text = CourseProgress.statusOf(m.id) === "in-progress"
+        ? `Continue Module ${m.id} — ${m.title}.`
+        : `Start Module ${m.id} — ${m.title}.`;
+      break;
+    }
+  }
+  if (!target && CourseProgress.isModuleComplete(9)) {
+    const fa = CourseProgress.getExtra("finalAssessment");
+    if (!fa || !fa.passed) { target = "final-assessment.html"; text = "Take the final competency assessment."; }
+  }
+  if (!target) { box.style.display = "none"; return; }
+  box.style.display = "flex";
+  document.getElementById("naText").textContent = text;
+  document.getElementById("naBtn").href = target;
+}
+
+function done(m, id){ return CourseProgress.isModuleDataComplete(id, m.modules[id]); }
+
+const SKILLS = [
+  { label: "Write core spreadsheet formulas and explain what makes data tidy",
+    evidence: "Module 1 checkpoint + summary-table exercise", check: (m) => done(m, 1) },
+  { label: "Write basic Python and hand-parse a CSV without a library",
+    evidence: "Module 2 checkpoint + CSV-parsing exercise", check: (m) => done(m, 2) },
+  { label: "Select, filter, group, and merge real tabular data with pandas",
+    evidence: "Module 3 checkpoint + merge/join exercise", check: (m) => done(m, 3) },
+  { label: "Diagnose and fix a genuinely messy, real-world dataset",
+    evidence: "Module 4 checkpoint + cleaning-pipeline exercise", check: (m) => done(m, 4) },
+  { label: "Compute descriptive statistics and tell correlation from causation",
+    evidence: "Module 5 checkpoint + hypothesis-test exercise", check: (m) => done(m, 5) },
+  { label: "Choose the right chart and spot a misleading one",
+    evidence: "Module 6 checkpoint + chart-build exercise", check: (m) => done(m, 6) },
+  { label: "Translate a business question into a working SQL query",
+    evidence: "Module 7 checkpoint + SQL exercise", check: (m) => done(m, 7) },
+  { label: "Build a dashboard and a recommendation a stakeholder can act on",
+    evidence: "Module 8 checkpoint + dashboard-build exercise", check: (m) => done(m, 8) },
+  { label: "Run a full analysis end to end and present a recommendation",
+    evidence: "Capstone project, rubric-scored across 5 categories", check: (m) => done(m, 9) },
+  { label: "Pass a final assessment of entirely novel scenarios",
+    evidence: "Final competency assessment (≥ 80%)",
+    check: (m) => m.extra && m.extra.finalAssessment && m.extra.finalAssessment.passed === true },
+];
+
+function renderSkills(){
+  const data = CourseProgress.load();
+  if (!data.modules) data.modules = {};
+  const el = document.getElementById("skillsList");
+  el.innerHTML = "";
+  SKILLS.forEach(s => {
+    const earned = !!s.check(data);
+    const row = document.createElement("div");
+    row.className = "skillrow" + (earned ? " earned" : "");
+    row.innerHTML = `<span class="sicon">${earned ? "✓" : "○"}</span><div><div class="stext">${s.label}</div><div class="sevidence">${earned ? "Demonstrated via: " : "Not yet demonstrated. Evidence needed: "}${s.evidence}</div></div>`;
+    el.appendChild(row);
+  });
+}
+
+document.getElementById("btnReset").addEventListener("click", () => {
+  if (confirm("Reset all course progress in this browser? This cannot be undone.")){
+    CourseProgress.resetAll();
+    renderDashboard();
+  }
+});
+
+renderDashboard();
+</script>
+</body>
+</html>

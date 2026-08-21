@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 0: Placement &amp; What This Job Actually Is</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--info)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--info);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(30px,5vw,44px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.08}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--good);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--good);margin-bottom:10px;font-weight:700;font-family:'IBM Plex Mono'}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--amber)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-family:'IBM Plex Mono';font-weight:700;font-size:12px;color:var(--info);border:1px solid var(--info);border-radius:99px;width:34px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-family:'Fraunces';font-size:21px;font-weight:600;letter-spacing:-.01em}
+p{font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);margin-bottom:6px;font-family:'IBM Plex Mono'}
+.def p{font-size:14.5px}
+code,.mono-inline{font-family:'IBM Plex Mono';font-size:13px;background:rgba(240,180,41,.1);color:var(--amber);padding:1px 6px;border-radius:4px}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px;font-family:'IBM Plex Mono'}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--info);box-shadow:0 0 8px var(--info)}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button.primary:hover{filter:brightness(1.08);color:var(--amberd)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:block;width:100%;text-align:left;font-family:'IBM Plex Sans';display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px;background:var(--card2);color:var(--tx)}
+.qopt:hover{border-color:var(--bd2)}
+.qopt.correct{border-color:var(--good);background:rgba(74,222,149,.08)}
+.qopt.incorrect{border-color:var(--bad);background:rgba(255,133,133,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
+.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);margin-bottom:12px;font-family:'IBM Plex Mono'}
+.orient h3{font-family:'Fraunces';font-size:16px;font-weight:600;margin:18px 0 8px}
+.orient h3:first-of-type{margin-top:0}
+.orient p{font-size:14.5px;color:var(--mut)}
+.assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
+.assume:before{content:"✓";color:var(--good);font-weight:700;flex-shrink:0}
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);margin-bottom:8px;font-family:'IBM Plex Mono'}
+.practice p{font-size:14px}
+.practice details{margin-top:12px}
+.practice summary{cursor:pointer;color:var(--info);font-size:13px;list-style:none;font-weight:600}
+.practice summary::-webkit-details-marker{display:none}
+.practice summary:before{content:"▸ "}
+.practice details[open] summary:before{content:"▾ "}
+.practice details:not([open]) .ans{display:none}
+.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--amber)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+.classifygrid{display:grid;gap:10px;margin-top:14px}
+.taskcard{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.taskcard .ttext{font-size:14px}
+.taskcard .tsel{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.taskcard .tsel button{font-size:12px;padding:6px 12px}
+.taskcard .tsel button.picked{border-color:var(--info);color:var(--info)}
+.taskcard .tsel button.right{border-color:var(--good);color:var(--good);background:rgba(74,222,149,.08)}
+.taskcard .tsel button.wrong{border-color:var(--bad);color:var(--bad);background:rgba(255,133,133,.08)}
+.taskcard .texp{margin-top:10px;font-size:13px;color:var(--mut);display:none;padding-top:10px;border-top:1px solid var(--bd)}
+.taskcard.answered .texp{display:block}
+.ptable{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px}
+.ptable th,.ptable td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--bd);vertical-align:top}
+.ptable th{color:var(--mut2);font-weight:700;text-transform:uppercase;font-size:10.5px;letter-spacing:.06em;font-family:'IBM Plex Mono'}
+.ptable tr:last-child td{border-bottom:none}
+.plabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:99px;display:inline-block;white-space:nowrap;font-family:'IBM Plex Mono'}
+.plabel.now{background:rgba(74,222,149,.15);color:var(--good)}
+.plabel.next{background:rgba(240,180,41,.14);color:var(--amber)}
+.plabel.spec{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
+.pfilters{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.pfilterbtn.active{background:var(--info);color:#062330;border-color:var(--info)}
+.ptable tr.hidden{display:none}
+.tablewrap{overflow-x:auto}
+.roadmap{margin-top:18px;display:flex;flex-direction:column;gap:0}
+.rstep{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 18px}
+.rstep.taught{border-color:var(--good)}
+.rstep.partial{border-color:var(--amber)}
+.rstep .rstop{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.rstep .rname{font-weight:700;font-size:14px}
+.rstep .rtag{font-size:10px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;padding:3px 9px;border-radius:99px;font-family:'IBM Plex Mono'}
+.rstep.taught .rtag{background:rgba(74,222,149,.15);color:var(--good)}
+.rstep.partial .rtag{background:rgba(240,180,41,.14);color:var(--amber)}
+.rstep.not .rtag{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
+.rstep .rwhy{font-size:12.5px;color:var(--mut);margin-top:6px}
+.rarrow{text-align:center;color:var(--mut2);font-size:13px;padding:3px 0}
+.pquiz-q{margin-top:16px}
+.pquiz-q .pqtext{font-size:14.5px;font-weight:600;margin-bottom:10px}
+.pqopts{display:grid;gap:8px}
+.pqopt{text-align:left;font-size:13.5px;padding:10px 14px}
+.pqopt.picked{border-color:var(--info);color:var(--info);background:rgba(95,194,232,.08)}
+.pathresult{background:var(--card2);border:1px solid var(--info);border-radius:12px;padding:20px 22px;margin-top:18px;display:none}
+.pathresult.show{display:block}
+.pathresult .prtitle{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--info);font-weight:700;margin-bottom:10px;font-family:'IBM Plex Mono'}
+.matchcard{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:12px 16px;margin-top:8px}
+.matchcard .mname{font-weight:700;font-size:14px}
+.matchcard .mscore{font-family:'IBM Plex Mono';font-size:11.5px;color:var(--mut2)}
+.selfcheck-part{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px 22px;margin-top:16px}
+.selfcheck-part .sclbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--info);font-weight:700;margin-bottom:10px;font-family:'IBM Plex Mono'}
+.selfcheck-part textarea{width:100%;min-height:80px;font-family:'IBM Plex Sans';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.scstatus{margin-top:8px;font-size:12.5px}
+.scstatus.pass{color:var(--good)}
+.scstatus.fail{color:var(--amber)}
+.scstatus.empty{color:var(--mut2)}
+.finalscore{margin-top:20px;background:var(--card2);border:1px solid var(--bd2);border-radius:12px;padding:22px 24px;text-align:center}
+.finalscore .fsval{font-family:'IBM Plex Mono';font-size:32px;font-weight:700;color:var(--info)}
+.finalscore .fslbl{font-size:12px;color:var(--mut2);margin-top:4px;text-transform:uppercase;letter-spacing:.06em;font-family:'IBM Plex Mono'}
+.optnote{font-size:12px;color:var(--mut2);margin-top:12px;font-style:italic}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:26px} .kh h2{font-size:18px} .interactive{padding:16px} .orient{padding:20px 18px} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Data Science &amp; Analysis · Orientation</span>
+</div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><span class="navsep"></span><a href="module-01.html" id="navNextTop">Module 1 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 0 · Start here</span>
+    <h1 class="serif">Placement &amp; What This Job Actually Is</h1>
+    <p class="sub">Before anything else: a short, honest self-check that routes you to Module 1, 3, or 5, plus what data analysts and data scientists actually do, how the roles differ, and exactly what Modules 1&ndash;9 will (and won't) teach you. This module is ungraded and doesn't block Module 1, but 15 minutes here will save you from starting in the wrong place.</p>
+    <div class="objectives">
+      <div class="lbl">By the end of this module you'll be able to</div>
+      <ul>
+        <li>Pick the module you should actually start at, honestly, before paying for content you don't need</li>
+        <li>Explain what a data analyst does, and how that differs from a data scientist, a BI analyst, and an analytics engineer</li>
+        <li>Name the tools this field actually runs on, and which ones to prioritize first</li>
+        <li>State exactly what Modules 1&ndash;9 will teach you, and what's out of scope</li>
+      </ul>
+    </div>
+  </header>
+
+  <section>
+    <div class="kh"><span class="num">0.1</span><h2 class="serif">What is data analysis, actually?</h2></div>
+    <p><b>Data analysis</b> is the discipline of turning raw, usually messy, records into an answer a business can act on. Not building a machine-learning model. Not writing production software. Taking data that already exists, cleaning it, finding the real pattern in it, and explaining, in plain language, what it means and what to do about it.</p>
+    <div class="def">
+      <div class="k">Definition: Data Analyst</div>
+      <p>Someone who takes existing data (spreadsheets, databases, exports from other systems), cleans it, analyzes it with statistics and visualization, and turns it into a recommendation a non-technical stakeholder can act on, everything this course's 9 modules cover, in order.</p>
+    </div>
+    <p>Concrete example: a retail company notices revenue is flat this quarter. A <b>data analyst</b> pulls the order data, cleans it, finds that the drop is concentrated in one region and one product line, and recommends what to check next. A <b>data scientist</b> might separately build a model that predicts which customers are about to churn. A <b>BI analyst</b> maintains the live dashboard that surfaced the flat-revenue number in the first place. An <b>analytics engineer</b> is who built and maintains the pipeline that gets raw order data into a queryable table every night. Same company, four different, overlapping jobs.</p>
+    <div class="def">
+      <div class="k">How the adjacent roles differ</div>
+      <p><b>vs. Data Scientist</b> — data scientists lean more on statistics, experimentation, and often machine learning to answer harder, more open-ended questions. Data analysts answer more immediate business questions with existing data and simpler methods. The line is blurry and many analysts grow into data science work.</p>
+      <p style="margin-top:10px"><b>vs. BI (Business Intelligence) Analyst</b> — a BI analyst mostly builds and maintains recurring dashboards and reports. A data analyst does that too, but also does one-off, open-ended investigations that don't have a dashboard yet.</p>
+      <p style="margin-top:10px"><b>vs. Analytics Engineer</b> — analytics engineers build and maintain the data pipelines and models that get raw data into a clean, queryable state. Analysts consume what analytics engineers build. Some companies don't distinguish the roles at all.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.2</span><h2 class="serif">Interactive: whose job is this, actually?</h2></div>
+    <p class="mut">Six real tasks from a company trying to understand a revenue drop. For each, guess which role owns it primarily.</p>
+    <div class="interactive">
+      <span class="ilbl">Classify the task</span>
+      <div class="classifygrid" id="classifyGrid"></div>
+    </div>
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Two of the six tasks above could reasonably be argued as belonging to more than one role. Why doesn't that mean the classification is wrong?</p>
+      <details><summary>Check your answer</summary>
+        <div class="ans">Because these are overlapping career directions, not rigid job-title boundaries, especially at smaller companies where one person covers several of them. The point isn't a hard legal boundary, it's building the vocabulary to recognize which SKILL a task actually needs, regardless of what the job title on the door says.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.3</span><h2 class="serif">What tools do I actually need?</h2></div>
+    <p>You do not need to master every tool on this page before you start. Here's the practical priority order this course follows.</p>
+    <div class="interactive">
+      <span class="ilbl">Priority table</span>
+      <div class="pfilters" id="pFilters"></div>
+      <div class="tablewrap"><table class="ptable" id="pTable">
+        <thead><tr><th>Tool</th><th>Priority</th><th>Why analysts use it</th><th>How much a beginner needs initially</th></tr></thead>
+        <tbody id="pTableBody"></tbody>
+      </table></div>
+    </div>
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>SQL is marked "need to know now" even though Module 1 doesn't use it at all. Why?</p>
+      <details><summary>Check your answer</summary>
+        <div class="ans">Because a huge share of real analyst work starts with pulling data OUT of a database before any spreadsheet or pandas work can even begin. Module 1 starts with spreadsheets deliberately, to build the "what is a dataset" intuition first, SQL (Module 7) builds directly on that same intuition once you're ready.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.4</span><h2 class="serif">What do I need to learn, in order?</h2></div>
+    <p class="mut">A rough dependency chain. "Taught here" marks exactly what Modules 1&ndash;9 of this course cover.</p>
+    <div class="roadmap" id="roadmapCol"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.5</span><h2 class="serif">Find your starting module</h2></div>
+    <p class="mut">Five quick questions. This is a placement tool, not a test, answer honestly and it will tell you the module to actually start at.</p>
+    <div class="interactive">
+      <span class="ilbl">Placement quiz</span>
+      <div id="pathQuizArea"></div>
+      <div class="dagctrl">
+        <button class="primary" id="btnPathResult" disabled>See my starting module</button>
+        <button id="btnPathReset">Reset</button>
+      </div>
+      <div class="pathresult" id="pathResult"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">0.6</span><h2 class="serif">Your journey through this course</h2></div>
+    <div class="orient">
+      <div class="lbl">What you need before starting</div>
+      <p>Nothing. Track A starts from a completely blank spreadsheet. If you can use a computer and read a table, you can start Module 1.</p>
+      <div class="assume">You do NOT need prior coding, statistics, Excel, or database experience. This course teaches all of it, in order, starting from wherever your placement result says.</div>
+      <h3 class="serif">Core skills taught in this course</h3>
+      <p>Spreadsheet fundamentals, Python for data, pandas and NumPy, real-world data cleaning, statistics you can defend in a meeting, chart selection and visualization, SQL, dashboard building, and a full capstone analysis you can put on a portfolio.</p>
+      <h3 class="serif">Skills to develop after the core course</h3>
+      <p>Machine learning, advanced statistics (regression modeling, Bayesian methods), a dedicated BI tool (Tableau, Power BI) beyond the tool-agnostic dashboard skill taught here, and advanced SQL (window-function depth, query optimization). Genuinely useful next-stage skills, not prerequisites for starting here.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">✓</span><h2 class="serif">Can you explain the job?</h2></div>
+    <p class="mut">A short self-check, three parts. Ungraded, doesn't block Module 1, here so you can honestly check whether this module did its job.</p>
+
+    <div class="selfcheck-part">
+      <div class="sclbl">1. Define data analysis in your own words</div>
+      <textarea id="sc1" placeholder="In a sentence or two, what does a data analyst actually do..."></textarea>
+      <div class="scstatus empty" id="sc1status">Not written yet</div>
+    </div>
+
+    <div class="selfcheck-part">
+      <div class="sclbl">2. Which role would primarily handle this task?</div>
+      <div class="qcard" style="margin-top:0">
+        <div class="qtext">"Build and maintain the nightly pipeline that pulls raw order data into a clean, queryable table."</div>
+        <div id="sc2opts"></div>
+        <div class="qexplain" id="sc2explain"></div>
+      </div>
+    </div>
+
+    <div class="selfcheck-part">
+      <div class="sclbl">3. Which starting point is right for you?</div>
+      <div class="qcard" style="margin-top:0">
+        <div class="qtext">If you've never written a line of code and rarely use spreadsheets, where should you start?</div>
+        <div id="sc3opts"></div>
+        <div class="qexplain" id="sc3explain"></div>
+      </div>
+    </div>
+
+    <div class="finalscore" id="scFinalBox" style="display:none">
+      <div class="fsval" id="scFinalVal">0%</div>
+      <div class="fslbl">Self-check score</div>
+    </div>
+    <div class="optnote">This self-check is a reflection tool, not a mastery gate, unlike the checkpoints in Modules 1&ndash;9.</div>
+  </section>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Module 0 · Orientation</footer>
+</div>
+
+<div class="scoreboard" style="position:sticky;bottom:0;background:rgba(13,15,20,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0"><div class="in" style="max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px">
+  <span class="mono" style="font-family:'IBM Plex Mono';font-weight:700;font-size:15px;color:var(--info)" id="m0StatusText">Orientation · not required to proceed</span>
+  <button class="primary" id="btnNext" style="margin-left:auto">Continue to Module 1 →</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+CourseProgress.setExtra("module0", Object.assign({ visited: true }, CourseProgress.getExtra("module0") || {}));
+
+/* ---------------- 0.2: classify the task ---------------- */
+const TASKS = [
+  { id:"t1", text:"Pull the order data, clean it, and find why revenue dropped this quarter.", role:"Data Analyst",
+    explain:"An open-ended, one-off investigation into a specific business question, this is core analyst work, exactly Modules 4 and 5's territory." },
+  { id:"t2", text:"Build a model that predicts which customers are about to churn.", role:"Data Scientist",
+    explain:"Predictive modeling on a harder, more open-ended question leans toward data science, not day-to-day analyst work." },
+  { id:"t3", text:"Maintain the live revenue dashboard that leadership checks every Monday.", role:"BI Analyst",
+    explain:"A recurring, maintained dashboard is classic BI work, distinct from a one-off investigation." },
+  { id:"t4", text:"Build the nightly pipeline that gets raw order data into a clean, queryable table.", role:"Analytics Engineer",
+    explain:"Building and maintaining the data pipeline itself, what analysts and scientists both consume, is analytics engineering." },
+  { id:"t5", text:"Write the SQL query that answers 'which customers haven't ordered in 90 days.'", role:"Data Analyst",
+    explain:"Translating a specific business question into a query is squarely Module 7's territory, core analyst work." },
+  { id:"t6", text:"Decide whether the flat revenue is a real trend or normal quarter-to-quarter noise.", role:"Data Analyst",
+    explain:"Statistical judgment applied to a specific, immediate business question, exactly Module 5's signal-vs-noise skill." },
+];
+const ROLES = ["Data Analyst","Data Scientist","BI Analyst","Analytics Engineer"];
+function renderClassify(){
+  const grid = document.getElementById("classifyGrid");
+  grid.innerHTML = "";
+  TASKS.forEach(t => {
+    const card = document.createElement("div");
+    card.className = "taskcard";
+    card.innerHTML = `<div class="ttext">${CourseProgress.escapeHtml(t.text)}</div>
+      <div class="tsel">${ROLES.map(r => `<button type="button" data-role="${CourseProgress.escapeHtml(r)}">${CourseProgress.escapeHtml(r)}</button>`).join("")}</div>
+      <div class="texp">${CourseProgress.escapeHtml(t.explain)}</div>`;
+    card.querySelectorAll("button[data-role]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (card.classList.contains("answered")) return;
+        card.classList.add("answered");
+        card.querySelectorAll("button[data-role]").forEach(b => {
+          b.classList.add("picked");
+          if (b.dataset.role === t.role) b.classList.add("right");
+          else if (b === btn) b.classList.add("wrong");
+        });
+      });
+    });
+    grid.appendChild(card);
+  });
+}
+renderClassify();
+
+/* ---------------- 0.3: priority table ---------------- */
+const PRIORITY = [
+  { tech:"Spreadsheets (Excel/Sheets)", pri:"now", why:"Where most real business data still lives day to day, and the fastest way to build data intuition.", now:"SUM, AVERAGE, COUNTIF, IF, XLOOKUP, sorting and filtering." },
+  { tech:"Python", pri:"now", why:"The dominant language for real data work once a spreadsheet stops scaling.", now:"Variables, loops, functions, reading a CSV." },
+  { tech:"pandas", pri:"now", why:"The library that automates spreadsheet-style work at real scale.", now:"Selecting, filtering, and grouping a DataFrame." },
+  { tech:"SQL", pri:"now", why:"Most real data lives in a database first, you need it out before you can analyze it.", now:"SELECT, WHERE, GROUP BY, JOIN." },
+  { tech:"Statistics", pri:"now", why:"The judgment layer, without it you can compute a number but not know if it means anything.", now:"Mean, median, std, correlation vs. causation." },
+  { tech:"A charting library", pri:"next", why:"Turning an analysis into something a non-technical reader actually understands.", now:"Not required to start Module 1." },
+  { tech:"A BI tool (Tableau/Power BI)", pri:"spec", why:"Common in larger companies, but the underlying skill (this course teaches it tool-agnostically) transfers directly.", now:"Not needed to start, at all." },
+  { tech:"Machine learning", pri:"spec", why:"A genuinely different, deeper skill set, most analyst roles don't require it day one.", now:"Not needed to start, at all." },
+];
+function renderPriorityTable(filter){
+  const body = document.getElementById("pTableBody");
+  body.innerHTML = "";
+  const labelMap = { now:'<span class="plabel now">Need to know now</span>', next:'<span class="plabel next">Should learn next</span>', spec:'<span class="plabel spec">Specialized / optional</span>' };
+  PRIORITY.forEach(p => {
+    const tr = document.createElement("tr");
+    if (filter && filter !== "all" && p.pri !== filter) tr.className = "hidden";
+    tr.innerHTML = `<td><b>${CourseProgress.escapeHtml(p.tech)}</b></td><td>${labelMap[p.pri]}</td><td>${CourseProgress.escapeHtml(p.why)}</td><td>${CourseProgress.escapeHtml(p.now)}</td>`;
+    body.appendChild(tr);
+  });
+}
+let activePFilter = "all";
+function renderPFilters(){
+  const wrap = document.getElementById("pFilters");
+  wrap.innerHTML = "";
+  [["all","All"],["now","Need now"],["next","Learn next"],["spec","Specialized"]].forEach(([key,label]) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "pfilterbtn" + (activePFilter === key ? " active" : "");
+    b.textContent = label;
+    b.addEventListener("click", () => { activePFilter = key; renderPFilters(); renderPriorityTable(key); });
+    wrap.appendChild(b);
+  });
+}
+renderPFilters();
+renderPriorityTable("all");
+
+/* ---------------- 0.4: roadmap ---------------- */
+const ROADMAP = [
+  { name:"General computer literacy", taught:"not", why:"Everything else assumes basic comfort with a computer and files." },
+  { name:"Spreadsheets", taught:"taught", why:"Module 1." },
+  { name:"Python fundamentals", taught:"taught", why:"Module 2." },
+  { name:"pandas / NumPy", taught:"taught", why:"Module 3." },
+  { name:"Data cleaning & validation", taught:"taught", why:"Module 4." },
+  { name:"Statistics & EDA", taught:"taught", why:"Module 5." },
+  { name:"Data visualization", taught:"taught", why:"Module 6." },
+  { name:"SQL", taught:"taught", why:"Module 7." },
+  { name:"Dashboards & communication", taught:"taught", why:"Module 8." },
+  { name:"Capstone analysis project", taught:"taught", why:"Module 9, synthesizes everything above into one portfolio piece." },
+  { name:"Machine learning", taught:"not", why:"A genuinely separate, deeper discipline, worth learning after this course, not required for it." },
+  { name:"A dedicated BI tool", taught:"partial", why:"Module 8 teaches the underlying dashboard skill tool-agnostically, a specific tool's UI is easy to pick up once you have the skill." },
+];
+function renderRoadmap(){
+  const col = document.getElementById("roadmapCol");
+  col.innerHTML = "";
+  const tagMap = { taught:'<span class="rtag">Taught here</span>', partial:'<span class="rtag">Partially taught</span>', not:'<span class="rtag">Learn separately</span>' };
+  ROADMAP.forEach((r, i) => {
+    if (i > 0) { const ar = document.createElement("div"); ar.className="rarrow"; ar.textContent="↓"; col.appendChild(ar); }
+    const div = document.createElement("div");
+    div.className = "rstep " + r.taught;
+    div.innerHTML = `<div class="rstop"><span class="rname">${CourseProgress.escapeHtml(r.name)}</span>${tagMap[r.taught]}</div><div class="rwhy">${CourseProgress.escapeHtml(r.why)}</div>`;
+    col.appendChild(div);
+  });
+}
+renderRoadmap();
+
+/* ---------------- 0.5: placement quiz ---------------- */
+const PATH_QUESTIONS = [
+  { q:"Have you ever written any code, in any language, even a little?", opts:[
+    { t:"No, never", tags:{ a:2 } },
+    { t:"A little (a course, a bootcamp intro, self-taught basics)", tags:{ b:2 } },
+    { t:"Yes, I'm comfortable writing code", tags:{ c:2 } } ] },
+  { q:"How comfortable are you with spreadsheets (formulas, sorting, filtering)?", opts:[
+    { t:"Rarely use them", tags:{ a:2 } },
+    { t:"Comfortable with the basics", tags:{ b:1, c:1 } },
+    { t:"Very comfortable, including formulas like VLOOKUP", tags:{ c:2 } } ] },
+  { q:"Are you switching careers into data from a different technical or spreadsheet-heavy role (finance, ops, support)?", opts:[
+    { t:"No, this is a new direction for me entirely", tags:{ a:1 } },
+    { t:"Somewhat, I use data casually in my current role", tags:{ b:1 } },
+    { t:"Yes, data is already part of my job, I want to go deeper", tags:{ c:2 } } ] },
+  { q:"Do you know what pandas or a DataFrame is?", opts:[
+    { t:"No idea", tags:{ a:2 } },
+    { t:"I've heard of it, haven't used it", tags:{ b:1 } },
+    { t:"Yes, I've used it or something similar", tags:{ c:2 } } ] },
+  { q:"How would you rather spend your first week of this course?", opts:[
+    { t:"Slow and thorough, starting from zero", tags:{ a:2 } },
+    { t:"A quick refresher, then moving fast", tags:{ b:2 } },
+    { t:"Skipping straight to real analysis work", tags:{ c:2 } } ] },
+];
+const PATH_NAMES = { a:"Track A · Never coded — start at Module 1", b:"Track B · Some code — start at Module 3", c:"Track C · Career changer — start at Module 5" };
+let pathAnswers = {};
+function renderPathQuiz(){
+  const area = document.getElementById("pathQuizArea");
+  area.innerHTML = "";
+  PATH_QUESTIONS.forEach((pq, qi) => {
+    const div = document.createElement("div");
+    div.className = "pquiz-q";
+    div.innerHTML = `<div class="pqtext">${qi+1}. ${CourseProgress.escapeHtml(pq.q)}</div><div class="pqopts" id="pq_${qi}"></div>`;
+    area.appendChild(div);
+    const optsEl = div.querySelector(`#pq_${qi}`);
+    pq.opts.forEach((opt, oi) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pqopt";
+      btn.textContent = opt.t;
+      btn.addEventListener("click", () => {
+        pathAnswers[qi] = oi;
+        optsEl.querySelectorAll(".pqopt").forEach((b,j) => b.classList.toggle("picked", j === oi));
+        document.getElementById("btnPathResult").disabled = Object.keys(pathAnswers).length < PATH_QUESTIONS.length;
+      });
+      optsEl.appendChild(btn);
+    });
+  });
+}
+renderPathQuiz();
+
+document.getElementById("btnPathResult").addEventListener("click", () => {
+  const scores = { a:0, b:0, c:0 };
+  PATH_QUESTIONS.forEach((pq, qi) => {
+    const opt = pq.opts[pathAnswers[qi]];
+    if (!opt) return;
+    Object.entries(opt.tags).forEach(([k,v]) => { scores[k] += v; });
+  });
+  const top = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+  const box = document.getElementById("pathResult");
+  box.className = "pathresult show";
+  box.innerHTML = `<div class="prtitle">Your recommended starting point</div>
+    <div class="matchcard"><div class="mname">${PATH_NAMES[top]}</div></div>
+    <p style="margin-top:14px;font-size:13px;color:var(--mut)">This is a placement signal from 5 questions, not a binding rule. If it feels wrong once you're in the module, jump anywhere, the sequence is here to help, not gate you.</p>`;
+  CourseProgress.setExtra("module0", Object.assign({}, CourseProgress.getExtra("module0")||{}, { placementDone:true, placementTrack: top }));
+  box.scrollIntoView({ behavior:"smooth", block:"center" });
+});
+document.getElementById("btnPathReset").addEventListener("click", () => {
+  pathAnswers = {};
+  document.getElementById("btnPathResult").disabled = true;
+  document.getElementById("pathResult").className = "pathresult";
+  renderPathQuiz();
+});
+
+/* ---------------- Self-check ---------------- */
+function wordCount(text){ return text.trim().split(/\s+/).filter(Boolean).length; }
+let sc1Checked = false;
+document.getElementById("sc1").addEventListener("blur", () => {
+  const val = document.getElementById("sc1").value;
+  const status = document.getElementById("sc1status");
+  const words = wordCount(val);
+  const lower = val.toLowerCase();
+  const hasKeyword = ["data","analy","clean","recommend","business"].some(k => lower.includes(k));
+  sc1Checked = words >= 10 && hasKeyword;
+  status.className = "scstatus " + (sc1Checked ? "pass" : (val.trim() ? "fail" : "empty"));
+  status.textContent = !val.trim() ? "Not written yet" : sc1Checked ? "Looks like a solid definition" : "Try mentioning cleaning data and turning it into a recommendation, not just 'working with numbers'";
+  updateSelfCheckScore();
+});
+
+const scAnswered = {};
+let scScore = 0;
+function buildSC(id, opts, containerId){
+  const el = document.getElementById(containerId);
+  opts.forEach((opt,i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "qopt";
+    btn.textContent = opt.t;
+    btn.addEventListener("click", () => {
+      if (scAnswered[id]) return;
+      scAnswered[id] = true;
+      el.querySelectorAll(".qopt").forEach((b,j) => {
+        if (opts[j].correct) b.classList.add("correct");
+        else if (j === i) b.classList.add("incorrect");
+      });
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { scScore++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      updateSelfCheckScore();
+    });
+    el.appendChild(btn);
+  });
+}
+buildSC("sc2", [
+  { t:"Analytics Engineer", correct:true, correctText:"Correct. Building and maintaining the pipeline itself is analytics engineering, distinct from analyzing what comes out of it." },
+  { t:"Data Analyst", correct:false, reason:"An analyst typically consumes a clean table, they don't usually build and maintain the nightly pipeline that produces it." },
+  { t:"BI Analyst", correct:false, reason:"A BI analyst builds dashboards on top of clean data, not the pipeline that cleans and delivers the raw data in the first place." },
+], "sc2opts");
+buildSC("sc3", [
+  { t:"Module 1, Track A", correct:true, correctText:"Correct. Track A exists exactly for this, starting from spreadsheets, no code required to begin." },
+  { t:"Module 5, Track C", correct:false, reason:"Track C assumes you're already comfortable with code or spreadsheets, jumping there without that would skip real foundations." },
+  { t:"Module 3, Track B", correct:false, reason:"Track B assumes at least a little prior coding experience, without that the pandas/NumPy content in Module 3 will feel like a wall." },
+], "sc3opts");
+
+function updateSelfCheckScore(){
+  const mcCount = Object.keys(scAnswered).length;
+  const totalParts = 3;
+  const doneParts = (sc1Checked ? 1 : 0) + mcCount;
+  if (doneParts === 0) return;
+  const pct = Math.round(((sc1Checked?1:0) + scScore) / totalParts * 100);
+  const box = document.getElementById("scFinalBox");
+  box.style.display = "block";
+  document.getElementById("scFinalVal").textContent = pct + "%";
+  CourseProgress.setExtra("module0", Object.assign({}, CourseProgress.getExtra("module0")||{}, {
+    selfCheckScore: (sc1Checked?1:0) + scScore, selfCheckTotal: totalParts, completed: doneParts >= totalParts,
+  }));
+  if (doneParts >= totalParts) document.getElementById("m0StatusText").textContent = `Orientation self-check: ${pct}% · complete`;
+}
+
+document.getElementById("btnNext").addEventListener("click", () => { window.location.href = "module-01.html"; });
+
+(function restore(){
+  const stored = CourseProgress.getExtra("module0") || {};
+  if (Number.isFinite(stored.selfCheckScore) && Number.isFinite(stored.selfCheckTotal) && stored.selfCheckTotal > 0) {
+    const pct = Math.round(stored.selfCheckScore / stored.selfCheckTotal * 100);
+    document.getElementById("scFinalBox").style.display = "block";
+    document.getElementById("scFinalVal").textContent = pct + "%";
+    if (stored.completed) document.getElementById("m0StatusText").textContent = `Orientation self-check: ${pct}% · complete`;
+  }
+})();
+</script>
+</body>
+</html>

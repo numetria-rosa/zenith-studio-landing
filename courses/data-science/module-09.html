@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 9: Capstone Analysis Project</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--amber)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(30px,5vw,44px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.08}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--good);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--good);margin-bottom:10px;font-weight:700;font-family:'IBM Plex Mono'}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--amber)}
+section{padding:40px 0}
+.soon{background:var(--card);border:1px solid var(--bd2);border-radius:16px;padding:32px;text-align:center}
+.soon .badge{display:inline-flex;font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);border:1px solid rgba(95,194,232,.3);padding:6px 14px;border-radius:99px}
+.soon h2{font-family:'Fraunces';font-size:22px;margin-top:16px;font-weight:600}
+.soon p{color:var(--mut);font-size:14.5px;max-width:520px;margin:12px auto 0}
+.covers{text-align:left;margin-top:22px;padding-top:22px;border-top:1px solid var(--bd);max-width:520px;margin-left:auto;margin-right:auto}
+.covers .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2);margin-bottom:10px;font-family:'IBM Plex Mono'}
+.covers ul{list-style:none;display:grid;gap:8px}
+.covers li{padding-left:20px;position:relative;font-size:13.5px;color:var(--mut)}
+.covers li:before{content:"→";position:absolute;left:0;color:var(--amber)}
+a.cta{display:inline-flex;margin-top:22px;align-items:center;gap:8px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:14px;padding:11px 20px;border-radius:8px;text-decoration:none}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Data Science &amp; Analysis · Module 9 · Capstone</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-08.html">&larr; <span class="navlabel">Module 8</span></a><span class="navsep"></span><a href="projects.html">Portfolio Projects <span class="navlabel">&rarr;</span></a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 9 of 9 · Capstone</span>
+    <h1 class="serif">Capstone Analysis Project</h1>
+    <p class="sub">One full end-to-end analysis, chosen from four realistic business scenarios. Messy raw data through to a written recommendation, a dashboard, and a recorded five-minute findings pitch, the closest simulation of a first week on the job this course offers.</p>
+    <div class="objectives">
+      <div class="lbl">By the end of this module you'll be able to</div>
+      <ul>
+        <li>Run a real analysis start to finish, on your own, on data nobody cleaned for you first</li>
+        <li>Choose your own approach to an ambiguous business question</li>
+        <li>Build a dashboard and a written recommendation someone can act on</li>
+        <li>Present a finding and a recommendation the way you would in a first week on the job</li>
+      </ul>
+    </div>
+  </header>
+  <section>
+    <div class="soon">
+      <span class="badge">In production</span>
+      <h2 class="serif">The capstone build and pitch exercise are being finished</h2>
+      <p>The four scenario options are already specified in full. See <a href="projects.html" style="color:var(--amber)">Portfolio Projects</a> for "The Leaky Funnel," "The Understaffed Quarter," "The Campaign That Didn't Work," and "The Slow Season," any of which becomes your capstone and your first portfolio piece.</p>
+      <div class="covers">
+        <div class="lbl">What the capstone requires</div>
+        <ul>
+          <li>Pick one of the four scenarios (or complete more than one for a deeper portfolio)</li>
+          <li>Clean the raw, deliberately messy dataset yourself</li>
+          <li>Produce a written recommendation memo and a dashboard</li>
+          <li>Record a five-minute findings pitch, as if presenting in a first week on the job</li>
+        </ul>
+      </div>
+      <a href="projects.html" class="cta">See the four scenarios &rarr;</a>
+    </div>
+  </section>
+  <footer>Zenith Lab · Data Science &amp; Analysis · Module 9 of 9 · Capstone</footer>
+</div>
+</body>
+</html>

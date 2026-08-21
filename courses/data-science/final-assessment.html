@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Competency Assessment — Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(28px,4.5vw,40px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:15.5px;max-width:680px;margin-top:14px}
+section{padding:36px 0;border-bottom:1px solid var(--bd)}
+p.mut{color:var(--mut)}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px}
+.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-family:'IBM Plex Mono'}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt input{margin-top:3px}
+.qopt.correct{border-color:var(--good);background:rgba(74,222,149,.08)}
+.qopt.incorrect{border-color:var(--bad);background:rgba(255,133,133,.08)}
+.qexplain{margin-top:10px;font-size:13.5px;color:var(--mut);display:none}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{display:block;background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.qgrid{display:grid;gap:16px;margin-top:20px}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+.scoreboard{position:sticky;bottom:0;background:rgba(13,15,20,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;color:var(--amber)}
+.nextbtn{margin-left:auto}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--amber)}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:24px} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Data Science &amp; Analysis · Final Assessment</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Final competency assessment</span>
+    <h1 class="serif" id="pageTitle">Eight scenarios you haven't seen</h1>
+    <p class="sub">Novel scenarios, different numbers and framing than anything in the 9 modules or the Quiz Center. Answer order is randomized. If you can only pass by recognizing a memorized pattern, you'll get these wrong, on purpose. Passing score: 80% (7/8, rounded). Unlimited attempts, each with a fresh shuffle.</p>
+  </header>
+
+  <section id="introSection">
+    <p class="mut">Ready when you are. Each attempt shuffles question and answer order, so retaking the assessment is a genuine re-test.</p>
+    <div style="margin-top:18px"><button class="primary" id="btnStart">Start the assessment &rarr;</button></div>
+  </section>
+
+  <section id="qSection" style="display:none">
+    <div class="qgrid" id="qgrid"></div>
+    <div class="feedback" id="overallFb" style="margin-top:20px"></div>
+  </section>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Final competency assessment</footer>
+</div>
+
+<div class="scoreboard" id="scoreboard" style="display:none"><div class="in">
+  <span class="mono sc" id="scoreDisplay">0 / 8 answered</span>
+  <button id="btnRetake" style="display:none">↺ Retake with new scenarios</button>
+  <button class="primary nextbtn" id="btnFinish" disabled>Finish assessment</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+const POOL = [
+  { id: "fa_tidy", tag: "Data literacy (novel scenario)",
+    text: "A 'discount' column has some rows as \"15%\" (text) and others as 0.15 (a decimal number). A SUM formula on this column silently ignores the text rows. What's the actual problem?",
+    opts: [
+      { t: "The column mixes two representations of the same value, breaking any formula that expects a consistent numeric type", correct: true },
+      { t: "Nothing, SUM automatically converts percentage text to decimals", correct: false, why: "SUM does not auto-convert text percentages, it silently skips non-numeric cells, which is exactly why this bug is dangerous, no error, just a wrong total." },
+      { t: "The column needs more decimal places", correct: false, why: "Precision isn't the issue here, the two formats are fundamentally different data types (text vs. number), that's what breaks the formula." },
+    ]},
+  { id: "fa_merge", tag: "Pandas (novel scenario)",
+    text: "Merging a 500-row orders table with a 500-row customers table on customer_id produces 620 rows. What does this tell you?",
+    opts: [
+      { t: "customer_id isn't unique in at least one of the two tables, causing some rows to match more than once", correct: true },
+      { t: "This is normal, merges always add rows", correct: false, why: "Merges don't inherently add rows, extra rows specifically signal a non-unique join key on one or both sides." },
+      { t: "The merge failed and needs to be re-run", correct: false, why: "The merge didn't fail, it ran successfully, it's just revealing that the join key isn't unique somewhere, which needs investigating before trusting the result." },
+    ]},
+  { id: "fa_outlier", tag: "Data cleaning (novel scenario)",
+    text: "One row in a shipping-cost column shows -$4,500 when every other value is positive and under $200. What's the right first move?",
+    opts: [
+      { t: "Investigate it, a negative shipping cost could be a real refund/credit or a data-entry error, don't assume either without checking", correct: true },
+      { t: "Delete the row immediately, negative costs are always errors", correct: false, why: "A negative value could be a legitimate refund or credit entry, deleting without checking risks throwing away real, correct data." },
+      { t: "Leave it as-is without checking, one row won't affect the analysis", correct: false, why: "A single extreme outlier like this can meaningfully distort a sum or average, it needs at least a quick check before trusting any total that includes it." },
+    ]},
+  { id: "fa_stats", tag: "Statistics (novel scenario)",
+    text: "A company's average customer age is 42. The median customer age is 29. What does this gap most likely suggest?",
+    opts: [
+      { t: "The distribution is skewed, likely by a smaller number of much older customers pulling the mean upward", correct: true },
+      { t: "The data must be wrong, mean and median should always be equal", correct: false, why: "Mean and median are only equal for a perfectly symmetric distribution, a real gap between them is common and usually meaningful, not an error." },
+      { t: "Median is calculated incorrectly if it differs from the mean", correct: false, why: "Both statistics can be calculated correctly and still differ substantially, that's exactly what a skewed distribution produces." },
+    ]},
+  { id: "fa_chart", tag: "Visualization (novel scenario)",
+    text: "A bar chart compares five products' monthly sales, with the y-axis starting at 8,000 instead of 0, all five bars are close in value (8,200–8,900) but the chart makes them look wildly different. What's the fix?",
+    opts: [
+      { t: "Start the y-axis at 0, so the bar heights honestly reflect the small real differences between the values", correct: true },
+      { t: "Nothing, a zoomed-in axis just shows more detail", correct: false, why: "It doesn't just show detail, it visually exaggerates small differences into what looks like a huge gap, misleading anyone reading it quickly." },
+      { t: "Switch to a pie chart instead", correct: false, why: "A pie chart with five very close values would be even harder to compare accurately, this is a truncated-axis problem, not a chart-type problem." },
+    ]},
+  { id: "fa_sql", tag: "SQL (novel scenario)",
+    text: "You need total revenue per customer, but ONLY for customers with more than 3 orders. Where does the '> 3' condition belong?",
+    opts: [
+      { t: "In a HAVING clause, since it filters on an aggregated count, after GROUP BY", correct: true },
+      { t: "In the WHERE clause, since it's a filter", correct: false, why: "WHERE filters rows before aggregation happens, a condition on COUNT (an aggregated value) has to go in HAVING, which filters after grouping." },
+      { t: "In the ORDER BY clause", correct: false, why: "ORDER BY only controls sort order, it doesn't filter out any rows or groups at all." },
+    ]},
+  { id: "fa_dashboard", tag: "Dashboards (novel scenario)",
+    text: "A stakeholder looks at your 12-metric dashboard and asks 'okay, but what should I actually do?' What does this feedback most likely mean?",
+    opts: [
+      { t: "The dashboard reports numbers but doesn't lead with a clear recommendation or highlight which metric matters most", correct: true },
+      { t: "The dashboard has a bug and is showing wrong numbers", correct: false, why: "Nothing in the question suggests the numbers are wrong, the complaint is about actionability, not accuracy." },
+      { t: "The stakeholder needs more metrics added, not fewer", correct: false, why: "More metrics would likely make this worse, the actual problem is too little clarity about what matters, not too little data." },
+    ]},
+  { id: "fa_correlation", tag: "Statistics (novel scenario)",
+    text: "A company finds that stores with more staff on shift also have higher sales, and concludes 'adding staff increases sales.' What's missing before that conclusion is safe to act on?",
+    opts: [
+      { t: "Ruling out reverse causation or a shared cause, e.g. busier stores might simply schedule more staff BECAUSE they expect higher sales", correct: true },
+      { t: "Nothing, a clear correlation like this is enough to justify the conclusion", correct: false, why: "Correlation alone doesn't establish which way the causation runs, or whether a third factor explains both, this is exactly the trap correlation-vs-causation reasoning exists to catch." },
+      { t: "The company needs a bigger dataset before any interpretation is possible", correct: false, why: "Sample size isn't the core issue here, the issue is the DIRECTION of causation is unclear, more of the same kind of data wouldn't resolve that on its own." },
+    ]},
+];
+
+let ASSESSMENT = [];
+let answered = {};
+let score = 0;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildAssessment(){
+  ASSESSMENT = shuffle(POOL).map(q => {
+    const withIdx = q.opts.map((o,i) => ({ ...o, origIdx: i }));
+    return Object.assign({}, q, { opts: shuffle(withIdx) });
+  });
+  answered = {};
+  score = 0;
+}
+
+function renderQuestions(){
+  const grid = document.getElementById("qgrid");
+  grid.innerHTML = "";
+  ASSESSMENT.forEach((q, qi) => {
+    const card = document.createElement("div");
+    card.className = "qcard";
+    card.innerHTML = `<div class="qn">Scenario ${qi+1} of ${ASSESSMENT.length} · ${q.tag}</div><div class="qtext">${q.text}</div><div id="qopts_${qi}"></div><div class="qexplain" id="qex_${qi}"></div>`;
+    grid.appendChild(card);
+    const optsEl = card.querySelector(`#qopts_${qi}`);
+    q.opts.forEach((opt, oi) => {
+      const div = document.createElement("label");
+      div.className = "qopt";
+      div.innerHTML = `<input type="radio" name="q${qi}" value="${oi}"><span>${opt.t}</span>`;
+      div.addEventListener("click", () => {
+        if (answered[qi] !== undefined) return;
+        answered[qi] = oi;
+        card.querySelectorAll(".qopt").forEach((e2,j) => {
+          if (q.opts[j].correct) e2.classList.add("correct");
+          else if (j === oi) e2.classList.add("incorrect");
+        });
+        const ex = document.getElementById(`qex_${qi}`);
+        ex.style.display = "block";
+        if (opt.correct) { score++; ex.textContent = "Correct."; }
+        else { ex.textContent = "Not quite. " + opt.why; }
+        checkDone();
+      });
+      optsEl.appendChild(div);
+    });
+  });
+}
+
+function checkDone(){
+  const allDone = Object.keys(answered).length === ASSESSMENT.length;
+  document.getElementById("scoreDisplay").textContent = `${Object.keys(answered).length} / ${ASSESSMENT.length} answered`;
+  document.getElementById("btnFinish").disabled = !allDone;
+  if (allDone) {
+    const passed = score / ASSESSMENT.length >= 0.8;
+    const fb = document.getElementById("overallFb");
+    fb.className = "feedback " + (passed ? "ok" : "bad");
+    fb.textContent = `Score: ${score} / ${ASSESSMENT.length} (${Math.round(score/ASSESSMENT.length*100)}%). ${passed ? "Passed." : "Not yet at 80%, retake with a fresh shuffle any time."}`;
+    CourseProgress.setExtra("finalAssessment", { passCount: score, total: ASSESSMENT.length, passed, lastAt: new Date().toISOString() });
+    document.getElementById("btnRetake").style.display = "inline-flex";
+  }
+}
+
+document.getElementById("btnStart").addEventListener("click", () => {
+  document.getElementById("introSection").style.display = "none";
+  document.getElementById("qSection").style.display = "block";
+  document.getElementById("scoreboard").style.display = "block";
+  buildAssessment();
+  renderQuestions();
+});
+document.getElementById("btnRetake").addEventListener("click", () => {
+  buildAssessment();
+  renderQuestions();
+  document.getElementById("overallFb").className = "feedback";
+  document.getElementById("btnRetake").style.display = "none";
+  document.getElementById("scoreDisplay").textContent = `0 / ${ASSESSMENT.length} answered`;
+  document.getElementById("btnFinish").disabled = true;
+});
+document.getElementById("btnFinish").addEventListener("click", () => { window.location.href = "dashboard.html"; });
+</script>
+</body>
+</html>

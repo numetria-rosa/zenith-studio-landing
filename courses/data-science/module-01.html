@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 1: Spreadsheet &amp; Data Literacy Foundations</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
+.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(30px,5vw,44px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.08}
+.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--good);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--good);margin-bottom:10px;font-weight:700;font-family:'IBM Plex Mono'}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--amber)}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-family:'IBM Plex Mono';font-weight:700;font-size:12px;color:var(--amber);border:1px solid var(--amber);border-radius:99px;width:34px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-family:'Fraunces';font-size:21px;font-weight:600;letter-spacing:-.01em}
+p{font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:6px;font-family:'IBM Plex Mono'}
+.def p{font-size:14.5px}
+code{font-family:'IBM Plex Mono';font-size:13px;background:rgba(240,180,41,.1);color:var(--amber);padding:1px 6px;border-radius:4px}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px;font-family:'IBM Plex Mono'}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--info);box-shadow:0 0 8px var(--info)}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button.primary:hover{filter:brightness(1.08);color:var(--amberd)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px;background:var(--card2)}
+.qopt:hover{border-color:var(--bd2)}
+.qopt.correct{border-color:var(--good);background:rgba(74,222,149,.08)}
+.qopt.incorrect{border-color:var(--bad);background:rgba(255,133,133,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
+.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);margin-bottom:8px;font-family:'IBM Plex Mono'}
+.practice p{font-size:14px}
+.practice details{margin-top:12px}
+.practice summary{cursor:pointer;color:var(--info);font-size:13px;list-style:none;font-weight:600}
+.practice summary::-webkit-details-marker{display:none}
+.practice summary:before{content:"▸ "}
+.practice details[open] summary:before{content:"▾ "}
+.practice details:not([open]) .ans{display:none}
+.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--amber)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+.scoreboard{position:sticky;bottom:0;background:rgba(13,15,20,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;color:var(--amber)}
+/* --- sheet simulator --- */
+.sheetwrap{overflow-x:auto;margin-top:14px;border:1px solid var(--bd2);border-radius:10px}
+table.sheet{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.sheet th,table.sheet td{padding:9px 12px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+table.sheet thead th{background:var(--card2);cursor:pointer;user-select:none;font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+table.sheet thead th:hover{color:var(--amber)}
+table.sheet thead th.sorted{color:var(--amber)}
+table.sheet tbody tr:hover{background:var(--card2)}
+table.sheet td.num{font-family:'IBM Plex Mono';text-align:right}
+.formulagrid{display:grid;gap:10px;margin-top:14px}
+.fcard{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.fcard .ftext{font-size:14px}
+.fcard .fsel{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.fcard .fsel button{font-size:12px;padding:6px 12px;font-family:'IBM Plex Mono'}
+.fcard .fsel button.right{border-color:var(--good);color:var(--good);background:rgba(74,222,149,.08)}
+.fcard .fsel button.wrong{border-color:var(--bad);color:var(--bad);background:rgba(255,133,133,.08)}
+.fcard .fexp{margin-top:10px;font-size:13px;color:var(--mut);display:none;padding-top:10px;border-top:1px solid var(--bd)}
+.fcard.answered .fexp{display:block}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:26px} .kh h2{font-size:18px} .interactive{padding:16px} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Data Science &amp; Analysis · Module 1</span>
+</div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-00.html">&larr; <span class="navlabel">Module 0</span></a><span class="navsep"></span><a href="module-02.html" id="navNextTop">Module 2 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 1 of 9</span>
+    <h1 class="serif">Spreadsheet &amp; Data Literacy Foundations</h1>
+    <p class="sub">Before any code: rows, columns, and cells as the mental model for what a "dataset" is, the five formulas that cover most real spreadsheet work, sorting and filtering, and why "tidy data" is the idea everything after this module depends on.</p>
+    <div class="objectives">
+      <div class="lbl">By the end of this module you'll be able to</div>
+      <ul>
+        <li>Write and explain SUM, AVERAGE, COUNTIF, IF, and XLOOKUP</li>
+        <li>Sort and filter a real dataset to answer a specific question</li>
+        <li>Explain what "tidy data" means, and spot a dataset that isn't</li>
+        <li>Build a summary table that answers a real business question from raw rows</li>
+      </ul>
+    </div>
+  </header>
+
+  <section>
+    <div class="kh"><span class="num">1.1</span><h2 class="serif">What a dataset actually is</h2></div>
+    <p>A dataset is a table. Each <b>row</b> is one observation (one order, one employee, one survey response). Each <b>column</b> is one variable about that observation (the date, the amount, the region). Every real analysis technique in this course, spreadsheets, pandas, SQL, is a different way of asking questions of that same row/column structure.</p>
+    <div class="def">
+      <div class="k">Definition: Tidy data</div>
+      <p>A dataset where every column is a single variable, every row is a single observation, and every cell is a single value. Not two dates crammed into one cell. Not a column that's sometimes text and sometimes a number. Tidy data is what makes a formula, a pandas function, or a SQL query behave predictably instead of silently doing the wrong thing.</p>
+    </div>
+    <p>Most real data you'll be handed is not tidy. Module 4 is dedicated entirely to fixing that. This module just needs you to recognize it.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">1.2</span><h2 class="serif">The five formulas that cover most real work</h2></div>
+    <div class="def">
+      <div class="k">SUM &amp; AVERAGE</div>
+      <p><code>=SUM(B2:B50)</code> adds a range. <code>=AVERAGE(B2:B50)</code> means it. These are almost always your first move on a new dataset, just to get a feel for the scale of the numbers.</p>
+    </div>
+    <div class="def">
+      <div class="k">COUNTIF</div>
+      <p><code>=COUNTIF(C2:C50,"Returned")</code> counts how many cells in a range match a condition. The workhorse for "how many of X happened."</p>
+    </div>
+    <div class="def">
+      <div class="k">IF</div>
+      <p><code>=IF(B2&gt;1000,"High","Low")</code> branches on a condition. Nest a few of these and you have a basic categorization system without touching code.</p>
+    </div>
+    <div class="def">
+      <div class="k">XLOOKUP (and VLOOKUP)</div>
+      <p><code>=XLOOKUP(A2,Sheet2!A:A,Sheet2!B:B)</code> finds a value in one table using a key from another. This is a spreadsheet doing a JOIN, the exact same operation Module 7's SQL JOIN and Module 3's pandas <code>merge()</code> both do, just with different syntax.</p>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Formula match</span>
+      <p class="mut">Six real questions. For each, pick the formula that actually answers it.</p>
+      <div class="formulagrid" id="formulaGrid"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">1.3</span><h2 class="serif">Sorting, filtering, and building a summary table</h2></div>
+    <p>Sorting reorders rows without changing them. Filtering hides rows that don't match a condition, also without changing them. Both are non-destructive, which is exactly why they're the first thing to reach for before writing any formula: they let you SEE the answer before you have to compute it.</p>
+    <p>Below is a small, real (if simplified) sales ledger. Click a column header to sort by it, ascending then descending.</p>
+
+    <div class="interactive">
+      <span class="ilbl">Retail Sales Ledger · click a header to sort</span>
+      <div class="sheetwrap"><table class="sheet" id="sheetTable"></table></div>
+    </div>
+
+    <div class="interactive" style="margin-top:20px">
+      <span class="ilbl">Exercise: build a summary table</span>
+      <p class="mut" style="margin-bottom:8px">Use the sortable table above to answer these four questions about the data. This is your Module 1 graded exercise.</p>
+      <div id="exerciseArea"></div>
+      <div class="dagctrl">
+        <span class="mono" id="exerciseScore" style="font-size:13px;color:var(--mut2)">0 / 4 correct</span>
+      </div>
+    </div>
+
+    <div class="practice">
+      <div class="lbl">Practice check</div>
+      <p>Sorting and filtering never change the underlying data. Why does that matter more than it sounds like it should?</p>
+      <details><summary>Check your answer</summary>
+        <div class="ans">Because it means you can explore a dataset freely, sort ten different ways, filter to five different subsets, without any risk of corrupting the source data. A formula that writes a new value can make a mistake permanent; sorting and filtering are always safe to undo, which is exactly why they're the right first move on unfamiliar data.</div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">✓</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Five questions. Score 80% or higher (4 of 5) to unlock Module 2.</p>
+
+    <div class="qcard">
+      <div class="qn mono" style="font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Question 1</div>
+      <div class="qtext">A column has some dates written as "03/04/2026" and others as "March 4, 2026." What does this violate?</div>
+      <div id="q1opts"></div>
+      <div class="qexplain" id="q1explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn mono" style="font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Question 2</div>
+      <div class="qtext">Which formula counts how many rows in a column equal "Returned"?</div>
+      <div id="q2opts"></div>
+      <div class="qexplain" id="q2explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn mono" style="font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Question 3</div>
+      <div class="qtext">What does XLOOKUP fundamentally do?</div>
+      <div id="q3opts"></div>
+      <div class="qexplain" id="q3explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn mono" style="font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Question 4</div>
+      <div class="qtext">Why is sorting a safer first step than writing a formula that overwrites a column?</div>
+      <div id="q4opts"></div>
+      <div class="qexplain" id="q4explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qn mono" style="font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Question 5</div>
+      <div class="qtext">In tidy data, what should a single cell contain?</div>
+      <div id="q5opts"></div>
+      <div class="qexplain" id="q5explain"></div>
+    </div>
+  </section>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Module 1 of 9 · Next: Python Foundations for Data</footer>
+</div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete the exercise and checkpoint to continue →</button>
+</div></div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+const MODULE_ID = 1;
+CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- 1.2: formula match ---------------- */
+const FORMULAS = [
+  { id:"f1", text:"How many orders were returned?", answer:"COUNTIF", explain:"Correct. COUNTIF counts rows matching a condition, exactly 'how many of X.'" },
+  { id:"f2", text:"What's the average order value?", answer:"AVERAGE", explain:"Correct. AVERAGE means a range directly." },
+  { id:"f3", text:"Label each order 'High' or 'Low' value based on a $1,000 threshold.", answer:"IF", explain:"Correct. IF branches on a condition, exactly a threshold-based label." },
+  { id:"f4", text:"Pull each customer's region from a separate customer table, using their ID.", answer:"XLOOKUP", explain:"Correct. XLOOKUP finds a value in one table using a key from another, a spreadsheet JOIN." },
+  { id:"f5", text:"What's the total revenue across all orders?", answer:"SUM", explain:"Correct. SUM adds a range directly." },
+  { id:"f6", text:"How many orders came from the 'West' region?", answer:"COUNTIF", explain:"Correct. Still counting rows matching a condition, COUNTIF again." },
+];
+const FOPTS = ["SUM","AVERAGE","COUNTIF","IF","XLOOKUP"];
+function renderFormulaGrid(){
+  const grid = document.getElementById("formulaGrid");
+  grid.innerHTML = "";
+  FORMULAS.forEach(f => {
+    const card = document.createElement("div");
+    card.className = "fcard";
+    card.innerHTML = `<div class="ftext">${CourseProgress.escapeHtml(f.text)}</div>
+      <div class="fsel">${FOPTS.map(o => `<button type="button" data-o="${o}">${o}</button>`).join("")}</div>
+      <div class="fexp">${CourseProgress.escapeHtml(f.explain)}</div>`;
+    card.querySelectorAll("button[data-o]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (card.classList.contains("answered")) return;
+        card.classList.add("answered");
+        card.querySelectorAll("button[data-o]").forEach(b => {
+          if (b.dataset.o === f.answer) b.classList.add("right");
+          else if (b === btn) b.classList.add("wrong");
+        });
+      });
+    });
+    grid.appendChild(card);
+  });
+}
+renderFormulaGrid();
+
+/* ---------------- 1.3: sortable sheet ---------------- */
+const SHEET_COLS = [
+  { key:"region", label:"Region", type:"text" },
+  { key:"product", label:"Product Line", type:"text" },
+  { key:"units", label:"Units", type:"num" },
+  { key:"revenue", label:"Revenue", type:"num" },
+];
+const SHEET_DATA = [
+  { region:"West", product:"Outdoor", units:412, revenue:38940 },
+  { region:"East", product:"Apparel", units:588, revenue:29500 },
+  { region:"North", product:"Outdoor", units:201, revenue:19850 },
+  { region:"South", product:"Electronics", units:340, revenue:61200 },
+  { region:"West", product:"Apparel", units:275, revenue:14025 },
+  { region:"East", product:"Electronics", units:190, revenue:34580 },
+  { region:"South", product:"Apparel", units:502, revenue:24098 },
+  { region:"North", product:"Electronics", units:88, revenue:15840 },
+];
+let sortKey = null, sortDir = 1;
+function renderSheet(){
+  const table = document.getElementById("sheetTable");
+  const rows = [...SHEET_DATA];
+  if (sortKey) rows.sort((a,b) => {
+    const av = a[sortKey], bv = b[sortKey];
+    if (typeof av === "number") return (av - bv) * sortDir;
+    return String(av).localeCompare(String(bv)) * sortDir;
+  });
+  const thead = `<thead><tr>${SHEET_COLS.map(c => `<th data-k="${c.key}" class="${sortKey===c.key?'sorted':''}">${c.label}${sortKey===c.key ? (sortDir>0?' ↑':' ↓') : ''}</th>`).join("")}</tr></thead>`;
+  const tbody = `<tbody>${rows.map(r => `<tr>${SHEET_COLS.map(c => `<td class="${c.type==='num'?'num':''}">${c.type==='num' ? (c.key==='revenue' ? '$'+r[c.key].toLocaleString('en-US') : r[c.key].toLocaleString('en-US')) : CourseProgress.escapeHtml(r[c.key])}</td>`).join("")}</tr>`).join("")}</tbody>`;
+  table.innerHTML = thead + tbody;
+  table.querySelectorAll("thead th").forEach(th => {
+    th.addEventListener("click", () => {
+      const k = th.dataset.k;
+      if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = 1; }
+      renderSheet();
+    });
+  });
+}
+renderSheet();
+
+/* ---------------- 1.3: graded exercise ---------------- */
+const EXERCISE_Q = [
+  { q:"Sort by Revenue, descending. Which product line earns the single highest-revenue row?", opts:["Electronics","Apparel","Outdoor"], answer:"Electronics",
+    explain:"Correct. South/Electronics at $61,200 is the highest single row once sorted by Revenue descending." },
+  { q:"Sort by Units, descending. Which region has the highest-unit single row?", opts:["West","East","South"], answer:"East",
+    explain:"Correct. East/Apparel at 588 units is the highest when sorted by Units descending." },
+  { q:"Which region appears most often across all 8 rows?", opts:["West","East (tied)","All regions appear exactly twice"], answer:"All regions appear exactly twice",
+    explain:"Correct. Each of West, East, North, and South appears in exactly 2 of the 8 rows." },
+  { q:"Sort by Region alphabetically ascending. Which region's rows appear first?", opts:["East","North","West"], answer:"East",
+    explain:"Correct. Alphabetically, East comes before North, South, and West." },
+];
+let exCorrect = 0;
+const exAnswered = {};
+function renderExercise(){
+  const area = document.getElementById("exerciseArea");
+  area.innerHTML = "";
+  EXERCISE_Q.forEach((eq, i) => {
+    const div = document.createElement("div");
+    div.className = "qcard";
+    div.style.marginTop = i === 0 ? "0" : "14px";
+    div.innerHTML = `<div class="qtext">${i+1}. ${CourseProgress.escapeHtml(eq.q)}</div><div id="ex_${i}"></div><div class="qexplain" id="exexplain_${i}"></div>`;
+    area.appendChild(div);
+    const optsEl = div.querySelector(`#ex_${i}`);
+    eq.opts.forEach(opt => {
+      const btn = document.createElement("div");
+      btn.className = "qopt";
+      btn.textContent = opt;
+      btn.addEventListener("click", () => {
+        if (exAnswered[i]) return;
+        exAnswered[i] = true;
+        optsEl.querySelectorAll(".qopt").forEach(el => {
+          if (el.textContent === eq.answer) el.classList.add("correct");
+          else if (el === btn) el.classList.add("incorrect");
+        });
+        const ex = document.getElementById(`exexplain_${i}`);
+        ex.style.display = "block";
+        if (opt === eq.answer) { exCorrect++; ex.textContent = eq.explain; }
+        else { ex.textContent = "Not quite. " + eq.explain; }
+        document.getElementById("exerciseScore").textContent = `${exCorrect} / ${EXERCISE_Q.length} correct`;
+        if (Object.keys(exAnswered).length === EXERCISE_Q.length) {
+          CourseProgress.setSection(MODULE_ID, "summaryTableExercise", { passCount: exCorrect, total: EXERCISE_Q.length });
+        }
+      });
+      optsEl.appendChild(btn);
+    });
+  });
+}
+renderExercise();
+
+/* ---------------- Checkpoint quiz ---------------- */
+let score = 0;
+const answered = { q1:false,q2:false,q3:false,q4:false,q5:false };
+function updateScore(){
+  document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const exDone = Object.keys(exAnswered).length === EXERCISE_Q.length;
+  const btn = document.getElementById("btnNext");
+  btn.disabled = !(allDone && exDone);
+  btn.textContent = (allDone && exDone) ? "Continue to Module 2 →" : "Complete the exercise and checkpoint to continue →";
+  if (allDone) CourseProgress.markComplete(MODULE_ID, score, 5);
+}
+function buildQ(id, opts, containerId){
+  const el = document.getElementById(containerId);
+  opts.forEach((opt,i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.innerHTML = `<input type="radio" name="${id}" value="${i}"><span>${opt.text}</span>`;
+    div.addEventListener("click", () => {
+      if (answered[id]) return;
+      answered[id] = true;
+      CourseProgress.setAnswer(MODULE_ID, id, i);
+      el.querySelectorAll(".qopt").forEach((e,j) => {
+        if (opts[j].correct) e.classList.add("correct");
+        else if (j === i) e.classList.add("incorrect");
+      });
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { score++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      updateScore();
+    });
+    el.appendChild(div);
+  });
+}
+buildQ("q1", [
+  { text:"Tidy data, one column should hold one consistent format, not a mix of date styles", correct:true, correctText:"Correct. Mixed date formats in one column is a classic tidy-data violation, and it breaks sorting and formulas silently." },
+  { text:"Nothing, spreadsheets read both formats identically", correct:false, reason:"Spreadsheets often silently misparse one of the two formats, or store them as text instead of real dates, breaking any date-based formula." },
+  { text:"This only matters for pandas, not spreadsheets", correct:false, reason:"This is a spreadsheet-level problem first, it just gets worse once the same messy column reaches pandas or SQL later." },
+], "q1opts");
+buildQ("q2", [
+  { text:"COUNTIF", correct:true, correctText:"Correct. COUNTIF counts rows in a range matching a condition." },
+  { text:"SUM", correct:false, reason:"SUM adds numeric values, it doesn't count how many rows match a text condition." },
+  { text:"XLOOKUP", correct:false, reason:"XLOOKUP finds a single matching value from another table, it doesn't count occurrences." },
+], "q2opts");
+buildQ("q3", [
+  { text:"Finds a value in one table using a matching key from another, a spreadsheet JOIN", correct:true, correctText:"Correct. This is exactly what a JOIN does in SQL and merge() does in pandas, same idea, different syntax." },
+  { text:"Sorts a column alphabetically", correct:false, reason:"That's what clicking a column header does, XLOOKUP is a lookup across two tables, not a sort." },
+  { text:"Averages a range of numbers", correct:false, reason:"That's AVERAGE, XLOOKUP doesn't compute anything, it retrieves a matching value." },
+], "q3opts");
+buildQ("q4", [
+  { text:"Sorting never changes the underlying data, so it's always safe to undo", correct:true, correctText:"Correct. A formula that overwrites a column can make a mistake permanent, sorting and filtering never touch the source data." },
+  { text:"Sorting is faster to type than a formula", correct:false, reason:"Speed isn't the point, the real reason is that sorting is non-destructive and a bad formula can silently corrupt data." },
+  { text:"Formulas can't be undone once written, sorting can't either", correct:false, reason:"Most spreadsheet formulas CAN be undone (Ctrl+Z), the real distinction is that sorting/filtering never modify the underlying values in the first place." },
+], "q4opts");
+buildQ("q5", [
+  { text:"A single value", correct:true, correctText:"Correct. One value per cell is the third rule of tidy data, right alongside one variable per column and one observation per row." },
+  { text:"A formula, always, never a raw value", correct:false, reason:"Tidy data says nothing about whether a cell holds a formula or a literal value, only that it holds exactly one value either way." },
+  { text:"Multiple values separated by commas, if they're related", correct:false, reason:"That's exactly what tidy data forbids, cramming multiple values into one cell breaks sorting, filtering, and every formula that touches it." },
+], "q5opts");
+
+document.getElementById("btnNext").addEventListener("click", () => { window.location.href = "module-02.html"; });
+
+function maybeShowRetry(){
+  const anyAnswered = answered.q1||answered.q2||answered.q3||answered.q4||answered.q5;
+  const allDone = answered.q1&&answered.q2&&answered.q3&&answered.q4&&answered.q5;
+  const btn = document.getElementById("btnRetryCheckpoint");
+  btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModule(MODULE_ID);
+  window.location.reload();
+});
+const _origUpdateScore = updateScore;
+updateScore = function(){ _origUpdateScore(); maybeShowRetry(); };
+maybeShowRetry();
+
+(function restoreQuizState(){
+  const stored = CourseProgress.getModule(MODULE_ID);
+  const a = stored.answers || {};
+  ["q1","q2","q3","q4","q5"].forEach(id => {
+    if (a[id] !== undefined && !answered[id]) {
+      const label = document.querySelectorAll(`#${id}opts .qopt`)[a[id]];
+      if (label) label.click();
+    }
+  });
+})();
+</script>
+</body>
+</html>

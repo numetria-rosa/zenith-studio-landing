@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects — Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--amber)}
+.hero{padding:40px 0 20px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:680px;margin-top:10px}
+.disclosure{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
+.disclosure b{color:var(--amber)}
+.grid{display:grid;gap:14px;margin-top:20px}
+.pcard{display:block;width:100%;text-align:left;font-family:'IBM Plex Sans';background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px 22px;cursor:pointer;transition:.15s}
+.pcard:hover,.pcard:focus-visible{border-color:var(--bd2)}
+.pcard:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.pcard .ptop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.pcard .pt{font-weight:700;font-size:16px}
+.pcard .pd{font-size:13px;color:var(--mut);margin-top:6px}
+.pcard .pmeta{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.badge{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:99px}
+.badge.capstone{background:rgba(95,194,232,.15);color:var(--info)}
+.badge.done{background:rgba(74,222,149,.15);color:var(--good)}
+.badge.progress{background:rgba(240,180,41,.14);color:var(--amber)}
+.badge.notstarted{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
+.pscore{font-family:'IBM Plex Mono';font-size:12px;color:var(--mut)}
+#detailView{display:none}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.section{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px 24px;margin-top:16px}
+.section h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);margin-bottom:12px;font-family:'IBM Plex Mono'}
+.section ul{padding-left:18px;font-size:14px;line-height:1.85}
+.section ol{padding-left:18px;font-size:14px;line-height:1.85}
+.checklist label{display:flex;gap:8px;align-items:flex-start;font-size:14px;padding:6px 0;cursor:pointer}
+.checklist input{margin-top:3px}
+details{margin-top:8px}
+summary{cursor:pointer;color:var(--info);font-size:13.5px;font-weight:600;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary:before{content:"▸ "}
+details[open] summary:before{content:"▾ "}
+.hinttier{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:12px 16px;margin-top:8px;font-size:13.5px;color:var(--mut)}
+.rubricrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)}
+.rubricrow:last-child{border-bottom:none}
+.rubricrow .rlabel{font-size:14px}
+.rubricrow .rweight{font-size:11px;color:var(--mut2);font-family:'IBM Plex Mono'}
+.rubricrow select{font-family:'IBM Plex Sans';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:6px;padding:5px 8px;color:var(--tx)}
+.rubrictotal{margin-top:14px;padding-top:14px;border-top:2px solid var(--bd2);display:flex;justify-content:space-between;align-items:baseline}
+.rubrictotal b{font-family:'IBM Plex Mono';font-size:24px;color:var(--tx)}
+.formrow{margin-top:12px}
+.formrow label{font-size:12.5px;color:var(--mut2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono'}
+.formrow input, .formrow textarea{width:100%;font-family:'IBM Plex Sans';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px;color:var(--tx)}
+.formrow textarea{min-height:70px;resize:vertical}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
+
+<div class="wrap">
+  <div id="listView">
+    <header class="hero">
+      <span class="eyebrow">Projects</span>
+      <h1 class="serif">Four scenarios. Pick your capstone.</h1>
+      <p class="sub">Exercises teach one skill at a time. These four are full, realistic analyses: messy raw data, an ambiguous business question, and a real deliverable. Complete one as your Module 9 capstone, or complete more for a deeper portfolio.</p>
+      <div class="disclosure"><b>How grading works here:</b> this is a static, client-side course with no backend, it cannot grade your written analysis or dashboard automatically. Each project gives you a real rubric, sanity checks to verify your own numbers against, and a self-assessment checklist, honest self-scoring, not an automated grader.</div>
+    </header>
+    <div class="grid" id="projectGrid"></div>
+  </div>
+
+  <div id="detailView">
+    <header class="hero">
+      <button id="btnBack">&larr; All projects</button>
+      <div class="eyebrow" id="detailTag" style="margin-top:16px"></div>
+      <h1 class="serif" id="detailTitle"></h1>
+      <p class="sub" id="detailSummary"></p>
+    </header>
+
+    <div class="section"><h3>Requirements</h3><ul id="detailRequirements"></ul></div>
+    <div class="section"><h3>Starting point</h3><p id="detailStart" style="font-size:14px;color:var(--tx)"></p></div>
+    <div class="section"><h3>Acceptance criteria (self-check)</h3><div class="checklist" id="detailAcceptance"></div></div>
+    <div class="section"><h3>Sanity checks for your numbers</h3><ul id="detailTests"></ul></div>
+    <div class="section"><h3>Hints</h3><div id="detailHints"></div></div>
+    <div class="section"><h3>Common mistakes</h3><ul id="detailMistakes"></ul></div>
+    <div class="section"><details><summary>Suggested approach outline</summary><div id="detailSolution" style="margin-top:12px;font-size:14px;color:var(--mut)"></div></details></div>
+
+    <div class="section">
+      <h3>Rubric self-assessment</h3>
+      <div id="rubricRows"></div>
+      <div class="rubrictotal"><span>Estimated score</span><b id="rubricTotalVal">0%</b></div>
+    </div>
+
+    <div class="section">
+      <h3>Submission</h3>
+      <div class="formrow"><label for="ghUrl">Link to your work (optional)</label><input type="url" id="ghUrl" placeholder="https://... (Google Sheets, GitHub, a written report, etc.)"></div>
+      <div class="formrow"><label for="projDesc">Short description</label><textarea id="projDesc" placeholder="One or two sentences describing your finding and recommendation..."></textarea></div>
+      <div class="formrow"><label for="projTech">Tools used</label><input type="text" id="projTech" placeholder="e.g. Excel, Python, pandas, matplotlib"></div>
+      <div class="formrow"><label for="projTests">Deliverables completed (self-reported)</label><input type="text" id="projTests" placeholder="e.g. memo + dashboard + chart"></div>
+      <button class="primary" id="btnSaveProject" style="margin-top:16px">Save project</button>
+      <div class="feedback" id="saveFb"></div>
+    </div>
+  </div>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Projects</footer>
+</div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+const DETAILS = {
+  1: {
+    requirements: ["Clean the E-commerce Orders file (File 04): duplicates, inconsistent SKU casing, missing shipping dates.", "Identify the funnel stages the raw data actually supports (e.g. cart created → checkout started → payment → shipped).", "Quantify where the biggest drop-off happens, with a real number, not just 'checkout seems slow.'", "Estimate the weekly cost of that drop-off in lost revenue.", "Produce a written recommendation memo and a dashboard."],
+    start: "Load File 04 and run the Module 4 cleaning checklist against it before any funnel analysis, duplicate orders will otherwise inflate every stage of the funnel.",
+    acceptance: ["Duplicates and inconsistent SKU casing are resolved and documented.", "Each funnel stage's row count is computed from the cleaned data, not the raw file.", "The single largest drop-off point is identified and quantified as a percentage.", "A weekly revenue-loss estimate is calculated and shown with its assumptions stated.", "The memo leads with the recommendation, not the cleaning process."],
+    tests: ["Total distinct orders after cleaning is less than or equal to the raw row count (duplicates removed, never added).", "Funnel stage counts are monotonically non-increasing (a later stage can't have more orders than an earlier one).", "The revenue-loss estimate, divided by the average order value, roughly matches the number of lost orders you calculated.", "Every number quoted in the memo can be traced back to a specific formula, query, or pandas operation."],
+    mistakes: ["Computing the funnel on the raw, uncleaned data and getting inflated drop-off numbers from leftover duplicates.", "Reporting a percentage drop-off with no absolute number (revenue or order count) behind it.", "Leading the memo with 'here's how I cleaned the data' instead of the actual finding."],
+    solution: "1. Clean File 04 using the Module 4 checklist, documenting every fix.<br>2. Define funnel stages from the available columns/status field.<br>3. Count distinct orders at each stage, compute stage-to-stage drop-off %.<br>4. Multiply the lost-order count at the worst stage by average order value to estimate weekly cost.<br>5. Write the memo lead-first: the number, then the evidence, then the recommendation.",
+  },
+  2: {
+    requirements: ["Clean the Employee Headcount file (File 02): mismatched IDs across sheets, split data.", "Compute attrition rate and average overtime hours by team or department.", "Determine whether apparent understaffing is a real headcount gap or a scheduling problem.", "Produce a written recommendation memo and a dashboard."],
+    start: "Load File 02 (multi-sheet) and merge the sheets on the shared employee ID first, mismatched IDs across sheets are the main obstacle before any real analysis can start.",
+    acceptance: ["The multi-sheet merge is verified: no employee silently dropped or duplicated by the join.", "Attrition rate is computed per team/department, not just company-wide.", "Overtime hours are compared against headcount to distinguish 'too few people' from 'people scheduled badly.'", "The memo states a specific, falsifiable recommendation (e.g. hire N more people vs. rebalance the schedule).", "A dashboard shows the department(s) most affected, clearly ranked."],
+    tests: ["Post-merge employee count matches the expected total from the source sheets (no silent row multiplication from a non-unique join key).", "Attrition rate as a percentage is between 0 and 100 for every department (a basic sanity bound).", "The department flagged as most overworked in your dashboard is also the one with the highest overtime-to-headcount ratio in your underlying numbers."],
+    mistakes: ["Merging on a non-unique key and not noticing the row count is wrong afterward.", "Concluding 'understaffed' from overtime hours alone without checking headcount and turnover together.", "A dashboard that ranks departments inconsistently with the written memo's own numbers."],
+    solution: "1. Merge headcount and overtime sheets on employee ID, verify row count before/after.<br>2. Compute attrition rate and average overtime per department.<br>3. Cross-reference: high overtime AND high attrition AND low headcount growth points to a real gap; high overtime with stable headcount points to scheduling.<br>4. Recommend accordingly, with the numbers that justify it.",
+  },
+  3: {
+    requirements: ["Clean the Marketing Campaign Results file (File 05).", "Attribute outcomes to channels correctly, accounting for small-sample noise (Module 5's signal-vs-noise skill).", "Identify which channel is over- or under-credited relative to its real contribution.", "Produce a written recommendation memo and a dashboard."],
+    start: "Load File 05 and start with descriptive statistics per channel before attribution, you need to know the sample size behind each channel's numbers before trusting any comparison between them.",
+    acceptance: ["Sample size per channel is stated alongside every conversion-rate comparison.", "A channel's apparent advantage is checked against whether the gap could plausibly be noise at that sample size.", "The over-credited and under-credited channels are named specifically, with numbers.", "The memo's recommendation is about where to shift spend, not just 'channel X did well.'"],
+    tests: ["Every conversion rate reported has its underlying sample size shown next to it, not just the percentage alone.", "Recomputing total conversions across all channels matches the raw file's total conversion count.", "The channel recommended for more spend has both a defensible sample size and a real, stated performance edge."],
+    mistakes: ["Comparing two channels' conversion rates without ever mentioning how many visitors/leads each is based on.", "Treating a 2-percentage-point gap on a tiny sample as a confident finding.", "Recommending a budget shift with no quantified expected impact."],
+    solution: "1. Clean File 05, compute conversion rate and sample size per channel.<br>2. Flag any channel comparison where the gap is plausibly noise given the sample size.<br>3. Identify the channel(s) with a real, defensible edge.<br>4. Recommend a specific spend shift, with the expected impact stated.",
+  },
+  4: {
+    requirements: ["Clean the Small-Business P&L Statement file (File 08): inconsistent period labels.", "Compute quarter-over-quarter and year-over-year variance.", "Build a simple cash-flow forecast for the next quarter.", "Determine whether a slow quarter is normal seasonality or a real problem.", "Produce a written recommendation memo and a dashboard."],
+    start: "Load File 08 and normalize the period labels first (e.g. 'Q1 2025' vs '2025-Q1' vs 'Jan-Mar 25'), inconsistent period labels will otherwise break every variance calculation downstream.",
+    acceptance: ["Period labels are normalized to one consistent format before any variance is computed.", "Variance is computed both quarter-over-quarter and year-over-year (seasonality only shows up in the second one).", "The forecast states its method and assumptions explicitly, not just a number with no reasoning shown.", "The memo gives a clear verdict: seasonal, or a real problem, with the evidence that supports it."],
+    tests: ["Year-over-year comparison for the same quarter across at least 2 years is shown, this is what actually tests for seasonality.", "The forecasted next-quarter number falls within a plausible range of the last 4-8 quarters, or the memo explains why it doesn't.", "Every variance percentage can be recomputed by hand from the two raw numbers it's derived from."],
+    mistakes: ["Only comparing quarter-over-quarter and missing that the same drop happened at the same point last year too (i.e. it's seasonal).", "A forecast with no stated method, just a guessed number.", "Normalizing period labels inconsistently, causing some quarters to be silently excluded from the analysis."],
+    solution: "1. Normalize period labels to one format across the whole file.<br>2. Compute QoQ and YoY variance for revenue and key expense lines.<br>3. Check whether this quarter's drop mirrors the same quarter in prior years (seasonal signature).<br>4. Build a simple forecast (e.g. average of the last few comparable quarters, adjusted for any real trend) and state the method used.<br>5. Give a clear verdict with the evidence.",
+  },
+};
+
+function projectState(id){ return CourseProgress.getProject(id); }
+function rubricTotal(id){
+  const rubric = CourseProgress.rubricForProject(id);
+  const state = projectState(id);
+  let total = 0;
+  rubric.forEach(r => {
+    const raw = Number(state.rubricScores[r.key]);
+    const clamped = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
+    total += clamped / 100 * r.weight;
+  });
+  return Math.max(0, Math.min(100, Math.round(total)));
+}
+
+function renderList(){
+  const grid = document.getElementById("projectGrid");
+  grid.innerHTML = "";
+  CourseProgress.PROJECTS.forEach(p => {
+    const state = projectState(p.id);
+    const score = rubricTotal(p.id);
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "pcard";
+    let statusBadge = `<span class="badge notstarted">Not started</span>`;
+    if (state.completed) statusBadge = `<span class="badge done">✓ Completed</span>`;
+    else if (score > 0) statusBadge = `<span class="badge progress">In progress</span>`;
+    card.innerHTML = `
+      <div class="ptop"><div class="pt">${p.title}</div><span class="badge capstone">${p.difficulty}</span></div>
+      <div class="pd">${p.summary}</div>
+      <div class="pmeta">${statusBadge}<span class="pscore">${score > 0 ? `Rubric: ${score}%` : "Module 9 capstone option"}</span></div>
+    `;
+    card.addEventListener("click", () => openProject(p.id));
+    grid.appendChild(card);
+  });
+}
+
+let currentProjectId = null;
+function openProject(id){
+  currentProjectId = id;
+  const p = CourseProgress.PROJECTS.find(x => x.id === id);
+  const d = DETAILS[id];
+  const state = projectState(id);
+  document.getElementById("listView").style.display = "none";
+  document.getElementById("detailView").style.display = "block";
+  document.getElementById("detailTag").textContent = `${p.difficulty}`;
+  document.getElementById("detailTitle").textContent = p.title;
+  document.getElementById("detailSummary").textContent = p.summary;
+  document.getElementById("detailRequirements").innerHTML = d.requirements.map(r => `<li>${r}</li>`).join("");
+  document.getElementById("detailStart").textContent = d.start;
+  document.getElementById("detailAcceptance").innerHTML = d.acceptance.map((a, i) => `<label><input type="checkbox" data-key="acc_${i}" ${state.checklist["acc_"+i] ? "checked" : ""}>${a}</label>`).join("");
+  document.getElementById("detailTests").innerHTML = d.tests.map(t => `<li>${t}</li>`).join("");
+  document.getElementById("detailMistakes").innerHTML = d.mistakes.map(m => `<li>${m}</li>`).join("");
+  document.getElementById("detailSolution").innerHTML = d.solution;
+  document.getElementById("detailHints").innerHTML = `
+    <details><summary>Hint 1 — conceptual</summary><div class="hinttier">Re-read the relevant module's cheat sheet section before diving in, the requirements above map directly onto concepts already covered.</div></details>
+    <details><summary>Hint 2 — specific</summary><div class="hinttier">Look at the "Common mistakes" list above first, most students hit exactly one of those, identify which one applies to your current approach before going further.</div></details>
+    <details><summary>Hint 3 — near-solution</summary><div class="hinttier">${d.solution.replace(/<br>/g, " ")}</div></details>
+  `;
+  document.querySelectorAll('#detailAcceptance input').forEach(cb => {
+    cb.addEventListener("change", () => {
+      const cur = projectState(id);
+      cur.checklist[cb.dataset.key] = cb.checked;
+      CourseProgress.setProject(id, { checklist: cur.checklist });
+    });
+  });
+
+  const rubric = CourseProgress.rubricForProject(id);
+  const rows = document.getElementById("rubricRows");
+  rows.innerHTML = "";
+  rubric.forEach(r => {
+    const row = document.createElement("div");
+    row.className = "rubricrow";
+    const val = state.rubricScores[r.key] || 0;
+    row.innerHTML = `<div><span class="rlabel">${r.label}</span> <span class="rweight">${r.weight}%</span></div>
+      <select data-key="${r.key}">
+        <option value="0" ${val==0?"selected":""}>Not attempted</option>
+        <option value="50" ${val==50?"selected":""}>Partial</option>
+        <option value="80" ${val==80?"selected":""}>Good</option>
+        <option value="100" ${val==100?"selected":""}>Excellent</option>
+      </select>`;
+    rows.appendChild(row);
+  });
+  rows.querySelectorAll("select").forEach(sel => {
+    sel.addEventListener("change", () => {
+      const cur = projectState(id);
+      cur.rubricScores[sel.dataset.key] = Number(sel.value);
+      CourseProgress.setProject(id, { rubricScores: cur.rubricScores });
+      document.getElementById("rubricTotalVal").textContent = rubricTotal(id) + "%";
+    });
+  });
+  document.getElementById("rubricTotalVal").textContent = rubricTotal(id) + "%";
+
+  document.getElementById("ghUrl").value = state.githubUrl || "";
+  document.getElementById("projDesc").value = state.description || "";
+  document.getElementById("projTech").value = state.technologies || "";
+  document.getElementById("projTests").value = state.testsPassed || "";
+  document.getElementById("saveFb").className = "feedback";
+}
+
+document.getElementById("btnSaveProject").addEventListener("click", () => {
+  const id = currentProjectId;
+  CourseProgress.setProject(id, {
+    githubUrl: document.getElementById("ghUrl").value.trim(),
+    description: document.getElementById("projDesc").value.trim(),
+    technologies: document.getElementById("projTech").value.trim(),
+    testsPassed: document.getElementById("projTests").value.trim(),
+    completed: true,
+    completedAt: new Date().toISOString(),
+    score: rubricTotal(id),
+  });
+  const fb = document.getElementById("saveFb");
+  fb.className = "feedback ok";
+  fb.textContent = "Saved. This project now appears in My Portfolio.";
+  renderList();
+});
+
+document.getElementById("btnBack").addEventListener("click", () => {
+  document.getElementById("detailView").style.display = "none";
+  document.getElementById("listView").style.display = "block";
+  renderList();
+});
+
+renderList();
+</script>
+</body>
+</html>

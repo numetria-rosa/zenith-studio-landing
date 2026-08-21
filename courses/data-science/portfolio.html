@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Portfolio — Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--amber)}
+.hero{padding:40px 0 20px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:680px;margin-top:10px}
+.emptystate{background:var(--card);border:1px dashed var(--bd2);border-radius:14px;padding:40px;text-align:center;color:var(--mut);margin-top:24px}
+.emptystate a{color:var(--amber)}
+.grid{display:grid;gap:16px;margin-top:24px}
+.pfcard{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px 24px}
+.pfcard .ptop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.pfcard .pt{font-weight:700;font-size:17px}
+.pfcard .pdate{font-size:12px;color:var(--mut2);font-family:'IBM Plex Mono'}
+.pfcard .pdesc{font-size:14px;color:var(--tx);margin-top:10px}
+.pfrow{display:flex;gap:20px;flex-wrap:wrap;margin-top:14px;font-size:12.5px}
+.pfrow div b{display:block;color:var(--mut2);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;font-weight:700}
+.scorebig{font-family:'IBM Plex Mono';font-size:22px;font-weight:700;color:var(--amber)}
+.pfcard a.ghlink{color:var(--info);font-family:'IBM Plex Mono';font-size:12.5px;text-decoration:none}
+.pfcard a.ghlink:hover{text-decoration:underline}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.summarybox{background:var(--card2);border:1px solid var(--bd2);border-radius:12px;padding:20px 22px;margin-top:28px}
+.summarybox h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);margin-bottom:12px;font-family:'IBM Plex Mono'}
+.summarybox textarea{width:100%;min-height:160px;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:14px;color:var(--tx);resize:vertical}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="projects.html">Projects</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">My Portfolio</span>
+    <h1 class="serif">What you've actually built</h1>
+    <p class="sub">Every completed project from the Projects library, with the skills it demonstrates, your self-assessed score, and a generated summary you can paste into a resume or the static portfolio template.</p>
+  </header>
+
+  <div id="content"></div>
+
+  <div class="summarybox" id="summaryBox" style="display:none">
+    <h3>Generated portfolio summary</h3>
+    <textarea id="summaryText" readonly></textarea>
+    <button class="primary" id="btnCopySummary" style="margin-top:12px">Copy summary</button>
+  </div>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Portfolio</footer>
+</div>
+
+<script src="course-progress.js?v=1"></script>
+<script>
+const SKILL_PHRASES = {
+  1: "e-commerce funnel analysis: cleaning messy order data and quantifying conversion drop-off in real revenue terms",
+  2: "HR/people analytics: multi-source data merging and distinguishing a real headcount gap from a scheduling problem",
+  3: "marketing attribution analysis: channel performance comparison that accounts for sample-size noise, not just raw percentages",
+  4: "financial variance analysis: seasonality-aware P&L review and a simple, assumption-stated cash-flow forecast",
+};
+
+function render(){
+  const projects = CourseProgress.PROJECTS.map(p => ({ meta: p, state: CourseProgress.getProject(p.id) })).filter(x => x.state.completed);
+  const content = document.getElementById("content");
+  const summaryBox = document.getElementById("summaryBox");
+  if (projects.length === 0) {
+    content.innerHTML = `<div class="emptystate">No completed projects yet. Head to <a href="projects.html">Projects</a> to build and submit your first one, it'll appear here automatically.</div>`;
+    summaryBox.style.display = "none";
+    return;
+  }
+  const grid = document.createElement("div");
+  grid.className = "grid";
+  projects.forEach(({ meta, state }) => {
+    const card = document.createElement("div");
+    card.className = "pfcard";
+    const date = state.completedAt ? new Date(state.completedAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "";
+    const esc = CourseProgress.escapeHtml;
+    const scoreNum = Number(state.score);
+    const scoreDisplay = Number.isFinite(scoreNum) ? Math.max(0, Math.min(100, Math.round(scoreNum))) : 0;
+    const safeUrl = CourseProgress.safeHttpUrl(state.githubUrl);
+    const ghCell = state.githubUrl
+      ? (safeUrl ? `<a class="ghlink" href="${esc(safeUrl)}" target="_blank" rel="noopener noreferrer">${esc(state.githubUrl)}</a>` : `<span style="color:var(--mut2)">${esc(state.githubUrl)} (not a valid http/https URL)</span>`)
+      : "—";
+    card.innerHTML = `
+      <div class="ptop">
+        <div><div class="pt">${esc(meta.title)}</div><div class="pdate">Completed ${esc(date)}</div></div>
+        <div class="scorebig">${scoreDisplay}%</div>
+      </div>
+      <div class="pdesc">${state.description ? esc(state.description) : "<i style='color:var(--mut2)'>No description provided.</i>"}</div>
+      <div class="pfrow">
+        <div><b>Skills demonstrated</b>${esc(SKILL_PHRASES[meta.id])}</div>
+      </div>
+      <div class="pfrow">
+        <div><b>Tools used</b>${state.technologies ? esc(state.technologies) : "—"}</div>
+        <div><b>Deliverables</b>${state.testsPassed ? esc(state.testsPassed) : "—"}</div>
+        <div><b>Link</b>${ghCell}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  content.innerHTML = "";
+  content.appendChild(grid);
+
+  summaryBox.style.display = "block";
+  const lines = projects.map(({ meta, state }) => {
+    return `${meta.title}${state.score ? ` (self-assessed ${state.score}%)` : ""} — ${SKILL_PHRASES[meta.id]}.${state.githubUrl ? " " + state.githubUrl : ""}`;
+  });
+  document.getElementById("summaryText").value =
+    `Data Science & Analysis — Portfolio Summary\n${projects.length} project${projects.length===1?"":"s"} completed\n\n` + lines.join("\n\n");
+}
+
+document.getElementById("btnCopySummary").addEventListener("click", () => {
+  const ta = document.getElementById("summaryText");
+  navigator.clipboard?.writeText(ta.value).catch(() => {});
+  const btn = document.getElementById("btnCopySummary");
+  btn.textContent = "Copied";
+  setTimeout(() => { btn.textContent = "Copy summary"; }, 1200);
+});
+
+render();
+</script>
+</body>
+</html>

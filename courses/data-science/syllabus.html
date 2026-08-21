@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Science & Analysis: Syllabus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65;overflow-x:hidden}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px}
+.bar{position:sticky;top:0;z-index:30;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:900px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;font-family:'IBM Plex Mono'}
+.hero{padding:56px 0 30px;border-bottom:1px solid var(--bd)}
+.eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--amberd);background:var(--amber);padding:5px 12px;border-radius:3px;font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(34px,5.5vw,52px);font-weight:600;letter-spacing:-.02em;margin-top:18px;line-height:1.06}
+.sub{color:var(--mut);font-size:17px;max-width:680px;margin-top:14px}
+.metarow{display:flex;flex-wrap:wrap;gap:22px;margin-top:26px;padding-top:22px;border-top:1px solid var(--bd)}
+.metaitem .k{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--mut2);font-family:'IBM Plex Mono'}
+.metaitem .v{font-size:15px;font-weight:600;margin-top:3px}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:20px}
+.kh .num{font-family:'IBM Plex Mono';font-weight:700;font-size:13px;color:var(--amber);border:1px solid var(--amber);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-family:'Fraunces';font-size:22px;font-weight:600;letter-spacing:-.01em}
+p.lead{color:var(--mut);max-width:680px}
+.prereq{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.prereq span{font-size:12px;background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:6px 12px;color:var(--mut)}
+.module{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:22px;margin-bottom:14px;position:relative}
+.module:hover{border-color:var(--bd2)}
+.module .mtop{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.module .mnum{font-family:'IBM Plex Mono';font-size:12px;color:var(--amber);letter-spacing:.05em}
+.module h3{font-family:'Fraunces';font-size:18px;font-weight:600;margin-top:4px;letter-spacing:-.01em}
+.module .wk{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2);white-space:nowrap;font-family:'IBM Plex Mono'}
+.module .desc{color:var(--mut);font-size:14px;margin-top:10px}
+.module .obj{margin-top:14px;padding-top:14px;border-top:1px dashed var(--bd)}
+.module .obj .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--good);margin-bottom:8px;font-family:'IBM Plex Mono'}
+.module ul{list-style:none;display:grid;gap:6px}
+.module ul li{padding-left:18px;position:relative;color:var(--mut);font-size:13.5px}
+.module ul li:before{content:"→";position:absolute;left:0;color:var(--amber)}
+.module .demo{margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--info);border:1px solid rgba(95,194,232,.3);background:rgba(95,194,232,.08);border-radius:6px;padding:5px 10px;font-family:'IBM Plex Mono'}
+.badge-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--amberd);background:var(--amber);padding:4px 10px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em;font-family:'IBM Plex Mono'}
+.badge-soon{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--mut);background:var(--bg2);border:1px solid var(--bd2);padding:4px 10px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em;font-family:'IBM Plex Mono'}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--bd)}
+th{color:var(--mut2);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.08em;font-family:'IBM Plex Mono'}
+tr:last-child td{border-bottom:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+@media (max-width:640px){ .grid2,.grid3{grid-template-columns:1fr} .wrap{padding:0 16px} }
+.box{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:18px}
+.box h4{font-size:14px;font-weight:700;color:var(--amber);margin-bottom:8px}
+.box p{color:var(--mut);font-size:13.5px}
+.rigor{background:rgba(240,180,41,.06);border-left:3px solid var(--amber);padding:16px 20px;border-radius:0 8px 8px 0;margin-top:20px}
+.rigor b{color:var(--amber)}
+.tracks{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-top:20px}
+@media (max-width:760px){.tracks{grid-template-columns:1fr}}
+.track{background:var(--card);padding:20px}
+.track .th{font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2)}
+.track .tn{font-family:'Fraunces';font-size:17px;font-weight:600;margin-top:5px}
+.track .td{margin-top:8px;font-size:13px;color:var(--mut)}
+.track .ts{margin-top:12px;display:inline-flex;font-family:'IBM Plex Mono';font-size:12px;background:rgba(240,180,41,.12);color:var(--amber);padding:5px 10px;border-radius:6px}
+footer{padding:30px 0 60px;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+a.inline{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(240,180,41,.4)}
+a.cta{display:inline-flex;align-items:center;gap:8px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:14px;padding:12px 22px;border-radius:8px;text-decoration:none}
+a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Syllabus · Data Science &amp; Analysis</span>
+</div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Zenith Lab · 12-week program, three entry points</span>
+    <h1 class="serif">Data Science &amp; Analysis</h1>
+    <p class="sub">Go from a blank spreadsheet to a portfolio of real analysis work in 12 weeks, at roughly 8&ndash;10 hours a week. Spreadsheets, Python, pandas, real data cleaning, statistics, visualization, SQL, and dashboards, taught on messy, realistic datasets instead of tidy tutorial CSVs, and closing with a Career Path Edition built around actually getting paid.</p>
+
+    <div class="metarow">
+      <div class="metaitem"><div class="k">Format</div><div class="v">10 modules + capstone + Career Path Edition</div></div>
+      <div class="metaitem"><div class="k">Level</div><div class="v">Three entry tracks, no track requires prior code</div></div>
+      <div class="metaitem"><div class="k">Duration</div><div class="v">12 weeks at ~8&ndash;10 hrs/week, self-paced</div></div>
+      <div class="metaitem"><div class="k">Assessment</div><div class="v">Per-module checkpoints + 28 hands-on exercises + capstone + final assessment</div></div>
+    </div>
+    <div style="margin-top:24px">
+      <a href="dashboard.html" class="cta">Go to the dashboard &rarr;</a>
+      <span style="margin-left:12px;color:var(--mut2);font-size:12.5px">Module 0 and Module 1 are open now, no signup required</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Course description</h2></div>
+    <p class="lead">Most intro data courses hand you a dataset that's already clean and ask you to make a chart. That is not what the job is. The job is a spreadsheet with three date formats in one column, a "total" that doesn't match finance's total, and a stakeholder who wants to know why, by Friday. This course teaches the judgment underneath the tooling: how to tell whether a summary statistic is lying to you, how to clean data without quietly deleting the signal along with the noise, how to pick the chart that doesn't mislead, and how to turn a finding into a recommendation someone actually acts on.</p>
+    <p class="lead" style="margin-top:12px">You will finish with a portfolio of real, messy-data analysis work, not a folder of tutorial notebooks that all look the same.</p>
+
+    <div class="rigor">
+      <b>Why real mess, not clean sample data:</b> a tutorial dataset teaches you the syntax. It does not teach you what to do when a column of "numbers" is actually text, when a date parses wrong for half the rows, or when two "duplicate" records are actually different customers with the same name. Every dataset in this course has at least one of those problems on purpose, because that is the actual skill a hiring manager is checking for.
+    </div>
+
+    <div class="prereq">
+      <span>No prerequisite: three entry tracks route you to the right starting module</span>
+      <span>Never coded before? Module 1 starts with spreadsheets, not code</span>
+      <span>Already comfortable with code or spreadsheets? Test out at Module 3 or Module 5</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Three entry tracks</h2></div>
+    <p class="lead" style="margin-bottom:6px">Module 0 is a short, honest self-check, not a sales page. It routes you to your real starting point before you've paid for content you don't need. All three tracks share every module from Module 5 onward.</p>
+    <div class="tracks">
+      <div class="track">
+        <div class="th">Track A</div>
+        <div class="tn">Never coded</div>
+        <div class="td">Used a spreadsheet casually at most. No programming background.</div>
+        <span class="ts">Starts at Module 1</span>
+      </div>
+      <div class="track">
+        <div class="th">Track B</div>
+        <div class="tn">Some code</div>
+        <div class="td">A bootcamp intro, a CS elective, or self-taught basics in any language.</div>
+        <span class="ts">Starts at Module 3</span>
+      </div>
+      <div class="track">
+        <div class="th">Track C</div>
+        <div class="tn">Career changer</div>
+        <div class="td">Already technical or spreadsheet-fluent in another role, switching lanes on purpose.</div>
+        <span class="ts">Starts at Module 5</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Learning outcomes</h2></div>
+    <div class="grid2">
+      <div class="box"><h4>Real data cleaning</h4><p>Diagnose and fix the problems that actually show up in the wild: missing values, duplicates, inconsistent categories, numbers stored as text, mixed currencies and units.</p></div>
+      <div class="box"><h4>Statistics you can defend</h4><p>Compute and explain descriptive statistics, tell correlation from causation, and know when a difference is signal versus noise, not just run a function and report the number.</p></div>
+      <div class="box"><h4>Charts that don't mislead</h4><p>Pick the right chart for the question, spot a genuinely misleading chart (truncated axes, dual-axis tricks), and build a one-page visual a non-technical reader actually understands.</p></div>
+      <div class="box"><h4>A recommendation, not just a report</h4><p>Turn a finding into a dashboard and a written "here's what to do" a stakeholder can act on in the same meeting.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Module sequence</h2></div>
+    <p class="lead" style="margin-bottom:20px">Each module pairs a concept with hands-on exercises against a real, named, imperfect dataset, and closes with a graded checkpoint quiz. Module 0 and Module 1 are both open for preview; Modules 2&ndash;9 are in production.</p>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 00 · ORIENTATION</div><h3>Placement &amp; What This Job Actually Is</h3></div>
+        <div class="wk"><a href="module-00.html" class="badge-live" style="text-decoration:none">Preview open &rarr;</a></div>
+      </div>
+      <p class="desc">Ungraded and optional, but strongly recommended before Module 1. A short self-check that routes you to Module 1, 3, or 5, plus what data analysts and data scientists actually do day to day, how the roles differ, and exactly what this course teaches versus what's out of scope.</p>
+      <div class="obj">
+        <div class="lbl">You will be able to</div>
+        <ul>
+          <li>Pick the module you should actually start at, honestly, before paying for content you don't need</li>
+          <li>Explain the difference between a data analyst, a data scientist, and a BI/analytics engineer role</li>
+          <li>State precisely what Modules 1&ndash;9 teach, and what's out of scope</li>
+        </ul>
+      </div>
+      <div class="demo">▶ interactive: self-check placement quiz</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 01</div><h3>Spreadsheet &amp; Data Literacy Foundations</h3></div>
+        <div class="wk"><a href="module-01.html" class="badge-live" style="text-decoration:none">Preview open &rarr;</a></div>
+      </div>
+      <p class="desc">Rows, columns, and cells as the mental model for what a "dataset" actually is, before any code exists. Sorting, filtering, and the core formulas (SUM, AVERAGE, COUNTIF, IF, XLOOKUP), and what makes data "tidy."</p>
+      <div class="obj">
+        <div class="lbl">You will be able to</div>
+        <ul>
+          <li>Write and explain the five formulas that cover most real spreadsheet work</li>
+          <li>Sort and filter a real dataset to answer a specific question</li>
+          <li>Explain what "tidy data" means and why it matters before you touch code</li>
+        </ul>
+      </div>
+      <div class="demo">▶ interactive: formula-match drill, sort/filter challenge</div>
+    </div>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 02</div><h3>Python Foundations for Data</h3></div>
+        <div class="wk"><span class="badge-soon">In production</span></div>
+      </div>
+      <p class="desc">Variables, data types, lists and dictionaries, loops, functions, and reading a CSV with plain Python, before pandas exists for you, so pandas later reads as automation of something you already understand, not magic.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Write basic Python: variables, loops, functions, conditionals</li>
+        <li>Parse a CSV file by hand, without a library, to see what pandas is really doing for you</li>
+      </ul></div>
+    </div>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 03</div><h3>Pandas &amp; NumPy Fundamentals</h3></div>
+        <div class="wk"><span class="badge-soon">In production</span></div>
+      </div>
+      <p class="desc">DataFrames and Series, selection and filtering, groupby, merging and joining multiple sources, and thinking in whole columns instead of row-by-row loops.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Select, filter, and group real tabular data with pandas</li>
+        <li>Merge two mismatched data sources into one clean table</li>
+      </ul></div>
+    </div>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 04</div><h3>Data Cleaning &amp; Validation</h3></div>
+        <div class="wk"><span class="badge-soon">In production</span></div>
+      </div>
+      <p class="desc">The center of gravity of real analyst work: missing values, duplicates, inconsistent categorical labels, numbers and dates stored as text, mixed currencies and units, outlier triage, and a reusable cleaning checklist.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Diagnose what's actually wrong with a real, messy dataset before touching it</li>
+        <li>Build a repeatable cleaning pipeline instead of a one-off script</li>
+      </ul></div>
+    </div>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 05</div><h3>Exploratory Data Analysis &amp; Statistics</h3></div>
+        <div class="wk"><span class="badge-soon">In production</span></div>
+      </div>
+      <p class="desc">Descriptive statistics, distributions, correlation versus causation, and enough hypothesis-testing intuition to know when a difference is real versus noise. Includes a lesson built on Anscombe's quartet.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Compute and correctly interpret mean, median, std, and percentiles</li>
+        <li>Tell correlation from causation, with a real example each time you're tempted not to</li>
+      </ul></div>
+    </div>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 06</div><h3>Data Visualization &amp; Storytelling</h3></div>
+        <div class="wk"><span class="badge-soon">In production</span></div>
+      </div>
+      <p class="desc">Chart-type selection, matplotlib and seaborn basics, a critique exercise on genuinely misleading charts, and building a one-page "so what" visual for a non-technical reader.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Pick the right chart for a given question, and explain why a pie chart usually isn't it</li>
+        <li>Spot and fix a misleading chart before it ships</li>
+      </ul></div>
+    </div>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 07</div><h3>SQL for Analysts</h3></div>
+        <div class="wk"><span class="badge-soon">In production</span></div>
+      </div>
+      <p class="desc">SELECT, WHERE, GROUP BY, JOIN, and window functions against a small in-browser database. The real skill is translating a business question into a query, not SQL trivia.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Write a JOIN and a GROUP BY that answer a real business question</li>
+        <li>Translate "which customers haven't ordered in 90 days" into working SQL</li>
+      </ul></div>
+    </div>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 08</div><h3>Dashboards &amp; Business Communication</h3></div>
+        <div class="wk"><span class="badge-soon">In production</span></div>
+      </div>
+      <p class="desc">Building a real dashboard, writing an executive summary, and practicing the question every stakeholder actually asks: "so what should we do."</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Build a dashboard a non-technical stakeholder can read in under a minute</li>
+        <li>Write a one-page recommendation, not just a report of numbers</li>
+      </ul></div>
+    </div>
+
+    <div class="module">
+      <div class="mtop">
+        <div><div class="mnum">MODULE 09 · CAPSTONE</div><h3>Capstone Analysis Project</h3></div>
+        <div class="wk"><span class="badge-soon">In production</span></div>
+      </div>
+      <p class="desc">One full end-to-end analysis, chosen from four realistic business scenarios (see Portfolio). Messy raw data through to a written recommendation, a dashboard, and a recorded five-minute findings pitch.</p>
+      <div class="obj"><div class="lbl">You will be able to</div><ul>
+        <li>Run a real analysis start to finish, on your own, on data nobody cleaned for you first</li>
+        <li>Present a finding and a recommendation the way you would in a first week on the job</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">§</span><h2>Career Path Edition</h2></div>
+    <p class="lead">Not a bonus module tacked on at the end, it's the point of the course: where the work is, what to charge, and a live portfolio built from your own capstone. See <a href="career.html" class="inline">career.html</a>, <a href="portfolio.html" class="inline">portfolio.html</a>, and <a href="projects.html" class="inline">projects.html</a>.</p>
+    <div class="grid3">
+      <div class="box"><h4>4 portfolio projects</h4><p>Real industry scenarios: e-commerce, HR, marketing, finance. Pick one for your capstone, or complete more for a deeper portfolio.</p></div>
+      <div class="box"><h4>A portfolio site</h4><p>A static, dark-mode portfolio template you customize with your own case studies, ready to link from a resume or LinkedIn.</p></div>
+      <div class="box"><h4>The job-landing playbook</h4><p>Where entry-level and freelance work actually is, a resume bullet formula, cold-outreach templates, and interview prep.</p></div>
+    </div>
+  </section>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · <a href="dashboard.html" class="inline">Dashboard</a> · <a href="cheatsheets.html" class="inline">Cheatsheets</a> · <a href="quiz-center.html" class="inline">Quiz Center</a></footer>
+</div>
+
+</body>
+</html>

@@ -51,6 +51,26 @@ export const COURSES: Course[] = [
       "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20AI%20Engineering%0A",
     published: true,
   },
+  {
+    id: "data-science",
+    slug: "data-science",
+    title: "Data Science & Analysis",
+    description:
+      "Twelve weeks, three entry tracks, spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards, and a Career Path Edition built around actually getting paid. No prior coding required.",
+    thumbnail: "/lab/data-science.webp",
+    whopAccessPassId: "",
+    whopPlanId: "",
+    checkoutUrl: "",
+    contentDir: "courses/data-science",
+    firstLessonPath: "dashboard.html",
+    waitlistUrl:
+      "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20Data%20Science%20%26%20Analysis%0A",
+    // Module 0 and Module 1 are built and live; Modules 2-9 and the Career Path
+    // Edition pages exist as real, on-brand shells with placeholder lesson
+    // content. Flip to true once a real Whop product exists and enough of the
+    // module content is filled in to actually sell.
+    published: false,
+  },
 ];
 
 export function getCourse(id: string): Course | undefined {
