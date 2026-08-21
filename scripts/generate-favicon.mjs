@@ -1,73 +1,62 @@
-// One-off script: rebuilds the favicon set from the real brand mark
-// (public/icon.webp — the same illustrated Z used in-app headers), sized
-// large/dominant on a vivid gradient disc.
+// One-off script: rebuilds the favicon set directly from
+// public/favicon/zenith_logo_main.png — the real logo file, cropped to just
+// the Z icon (dropping the "ZENITH STUDIO" wordmark below it, which isn't
+// legible at favicon sizes), padded to a square canvas, and resized to
+// every required size.
 //
-// History, worth keeping — three earlier attempts, each fixing the last
-// one's problem and (until this version) introducing a new one:
-//   v1: dark "glass orb" with a thin neon rim. Fine at 512px, disappeared
-//   into a near-black blob in a real dark browser tab — not saturated
-//   enough at actual favicon size.
+// History, worth keeping — four earlier attempts:
+//   v1: dark "glass orb" bubble with a thin neon rim. Disappeared into a
+//   near-black blob in a real dark browser tab — not saturated enough.
 //   v2: fixed contrast with a vivid disc, but used a white silhouette cut
-//   from the illustrated mark's alpha channel. Flattened to solid white,
-//   the swoosh/ring linework reads as a plain donut, not a Z — the
-//   letterform depended on internal color shading a silhouette discards.
-//   v3: dropped the real mark entirely for a bold hand-drawn Z glyph.
-//   Legible at every size, but user feedback: this isn't "our icon" —
-//   wanted the actual illustrated brand mark back, just sized to dominate
-//   the circle instead of looking small inside it.
-// v4 (this version): the real mark from public/icon.webp, sized to ~88% of
-// the disc diameter — most of what's visible at any size is the icon
-// itself, with just a thin ring of the vivid disc showing as a frame.
+//   from the mark's alpha channel, which read as a plain donut, not a Z.
+//   v3: dropped the real mark for a bold hand-drawn Z glyph. Legible, but
+//   not "our icon."
+//   v4: real mark (public/icon.webp) on a vivid disc, sized to dominate —
+//   closer, but still a redesign, not literally the provided asset.
+// v5 (this version): no bubble, no disc, no recoloring — literally the
+// user-provided zenith_logo_main.png, cropped to the icon and sized
+// correctly for every favicon slot. Nothing else.
 //
 // Usage: node scripts/generate-favicon.mjs
 //
 // Regenerates every file under public/favicon/ and src/app/favicon.ico.
-// Reads from public/icon.webp but does not modify it.
+// Reads from public/favicon/zenith_logo_main.png, does not modify it.
 
 import sharp from "sharp";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const FAVICON_DIR = join(process.cwd(), "public", "favicon");
-const SOURCE_MARK = join(process.cwd(), "public", "icon.webp");
+const SOURCE_LOGO = join(FAVICON_DIR, "zenith_logo_main.png");
 const MASTER_SIZE = 1024;
 
-// Fully saturated gradient disc, edge to edge — no dark base, no glass, no
-// glow blur. This is what actually stays visible against a dark browser UI.
-const discSvg = `
-<svg width="${MASTER_SIZE}" height="${MASTER_SIZE}" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="fill" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#67e8f9"/>
-      <stop offset="50%" stop-color="#3b82f6"/>
-      <stop offset="100%" stop-color="#c026d3"/>
-    </linearGradient>
-  </defs>
-  <circle cx="512" cy="512" r="512" fill="url(#fill)"/>
-</svg>
-`;
+// Crop region isolating just the Z icon from the full logo lockup (source
+// is 1024x1024 with the icon roughly in the top half and "ZENITH STUDIO"
+// text below it) — tuned by hand to include the full icon plus its
+// sparkle accents with a little breathing room, without clipping into the
+// wordmark. Re-tune these four numbers if the source logo file changes.
+const ICON_CROP = { left: 140, top: 90, width: 740, height: 520 };
+
+// Sampled from the source file's own corner pixel, so the padding used to
+// square up the crop is invisible against the icon's existing background.
+const BG_COLOR = { r: 14, g: 14, b: 25 };
 
 async function buildMaster() {
-  const disc = await sharp(Buffer.from(discSvg)).png().toBuffer();
+  const cropped = await sharp(SOURCE_LOGO).extract(ICON_CROP).toBuffer();
 
-  // Sized to dominate the circle — only a thin ring of the disc shows
-  // around it, rather than the mark looking small inside a lot of empty
-  // bubble margin.
-  const markSize = Math.round(MASTER_SIZE * 0.88);
-  const mark = await sharp(SOURCE_MARK)
-    .resize(markSize, markSize, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
-    .toBuffer();
-  const offset = Math.round((MASTER_SIZE - markSize) / 2);
-
-  return sharp(disc)
-    .composite([{ input: mark, left: offset, top: offset }])
+  // Pad to a square canvas (the crop itself is wider than tall) using the
+  // source's own background color, then upscale to the working master size.
+  return sharp(cropped)
+    .resize(MASTER_SIZE, MASTER_SIZE, {
+      fit: "contain",
+      background: BG_COLOR,
+    })
     .png()
     .toBuffer();
 }
 
 function buildIco(pngBuffers) {
   // Minimal PNG-in-ICO writer (Vista+ format, supported everywhere modern).
-  // No new dependency needed — sharp already gives us the PNG bytes per size.
   const count = pngBuffers.length;
   const header = Buffer.alloc(6); // ICONDIR is exactly 6 bytes.
   header.writeUInt16LE(0, 0); // reserved
@@ -94,7 +83,7 @@ function buildIco(pngBuffers) {
 }
 
 async function main() {
-  console.log("Building master gradient-disc icon...");
+  console.log("Cropping and squaring the real logo icon...");
   const master = await buildMaster();
 
   const targets = [
@@ -110,7 +99,10 @@ async function main() {
   const icoBuffers = [];
 
   for (const { file, size } of targets) {
-    const buf = await sharp(master).resize(size, size).png().toBuffer();
+    // ensureAlpha(): the source logo has no alpha channel (plain RGB), but
+    // Turbopack's ICO decoder requires RGBA PNGs inside the .ico container
+    // or the production build fails with "The PNG is not in RGBA format!".
+    const buf = await sharp(master).resize(size, size).ensureAlpha().png().toBuffer();
     writeFileSync(join(FAVICON_DIR, file), buf);
     console.log(`Wrote ${file} (${size}x${size})`);
     if (icoSizes.includes(size)) icoBuffers.push({ size, buffer: buf });
