@@ -42,6 +42,7 @@ next-env.d.ts
 
 # generated output from one-off scripts
 whop-created-products.json
+public/favicon/favicon-master-1024.png
 
 # local-only working folders (never deploy or push)
 /playbook
