@@ -7,22 +7,17 @@ const SITE_URL = "https://zenith-studio.site";
 
 // Founding client offer. Set FOUNDING_SPOTS to 0 to switch the whole page back
 // to list pricing: the badges, struck-through prices, and banner all key off it.
+// Founding prices are set directly per system (see aiSystems' `founding` field)
+// rather than derived from one flat discount — they don't share a clean ratio
+// to the list price.
 const FOUNDING_SPOTS = 5;
-const FOUNDING_DISCOUNT = 0.35; // applies to the setup fee only, never the monthly
-
-/** "$1,000" -> "$650" at 35% off, rounded to the nearest $5. */
-function foundingPrice(setup: string): string {
-  const value = Number(setup.replace(/[^0-9.]/g, ""));
-  const discounted = Math.round((value * (1 - FOUNDING_DISCOUNT)) / 5) * 5;
-  return `$${discounted.toLocaleString("en-US")}`;
-}
 
 // Written to match how people actually phrase these in search. Each one is
 // eligible for a Google rich snippet via the FAQPage schema below.
 const faqs = [
   {
     q: "How much does AI automation cost for a small business?",
-    a: "Our systems start at $800 setup plus $150 per month. The AI Lead Capture system is $1,000 setup plus $200 per month, and the AI Receptionist is $1,500 setup plus $300 per month. Founding clients get 35% off the setup fee, so those become $520, $650, and $975. The monthly covers hosting, monitoring, and ongoing improvements, and there is no lock-in contract.",
+    a: "Our systems start at $800 setup plus $150 per month. The AI Lead Capture system is $1,000 setup plus $200 per month, and the AI Receptionist is $1,500 setup plus $300 per month. Founding clients pay a reduced setup fee instead, $190, $270, and $360. The monthly covers hosting, monitoring, and ongoing improvements, and there is no lock-in contract.",
   },
   {
     q: "How long does it take to set up an AI automation system?",
@@ -55,6 +50,7 @@ export default function ZenithStudioLandingPage() {
       description:
         "Sorts and prioritizes email, then drafts replies to the routine ones so your day starts with decisions, not admin.",
       setup: "$800",
+      founding: "$190",
       monthly: "$150/mo",
       live: "Live in 2 to 4 days",
       features: [
@@ -71,6 +67,7 @@ export default function ZenithStudioLandingPage() {
       description:
         "Captures every enquiry, qualifies it, and follows up by email and SMS until they book. The business that answers first wins the job.",
       setup: "$1,000",
+      founding: "$270",
       monthly: "$200/mo",
       live: "Live in 3 to 5 days",
       features: [
@@ -88,6 +85,7 @@ export default function ZenithStudioLandingPage() {
       description:
         "Handles enquiries around the clock, books straight into your calendar, and sends the reminders that cut no-shows.",
       setup: "$1,500",
+      founding: "$360",
       monthly: "$300/mo",
       live: "Live in 5 to 7 days",
       features: [
@@ -346,7 +344,7 @@ export default function ZenithStudioLandingPage() {
           name: system.name,
           description: system.description,
           // Advertise the price a buyer can actually get today.
-          price: (FOUNDING_SPOTS > 0 ? foundingPrice(system.setup) : system.setup).replace(/[$,]/g, ""),
+          price: (FOUNDING_SPOTS > 0 ? system.founding : system.setup).replace(/[$,]/g, ""),
           priceCurrency: "USD",
           category: "AI automation system",
           ...(FOUNDING_SPOTS > 0
@@ -680,7 +678,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               </span>
               <p className="flex-1 text-sm leading-7 text-white/72">
                 <span className="font-semibold text-white">
-                  {Math.round(FOUNDING_DISCOUNT * 100)}% off setup for the first {FOUNDING_SPOTS} businesses.
+                  Up to 76% off setup for the first {FOUNDING_SPOTS} businesses.
                 </span>{" "}
                 I am taking on {FOUNDING_SPOTS} founding clients to build case studies. You get the
                 reduced setup fee and lifetime founding rates, I get to point at the results. Monthly
@@ -712,7 +710,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                   {FOUNDING_SPOTS > 0 ? (
                     <>
                       <span className="text-3xl font-semibold tracking-[-0.04em] text-emerald-200">
-                        {foundingPrice(system.setup)}
+                        {system.founding}
                       </span>
                       <span className="text-lg font-medium text-white/35 line-through">{system.setup}</span>
                       <span className="text-sm text-white/55">setup</span>
