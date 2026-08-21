@@ -106,7 +106,7 @@ export default function ZenithStudioLandingPage() {
   const verticalSystems = [
     {
       id: "law-firms",
-      whopCheckoutUrlEnvKey: "WHOP_LAW_FIRM_AI_TEAM_CHECKOUT_URL",
+      whopCheckoutUrl: "https://whop.com/checkout/plan_kTlL5gBlJTsqy",
       eyebrow: "For law firms",
       headline: "Your firm works 49 hours a week and bills 37.",
       lede: "That twelve hour gap is roughly $230,000 per attorney, per year. It is not lost to competitors or bad marketing. It is work you already did and never invoiced.",
@@ -144,7 +144,7 @@ export default function ZenithStudioLandingPage() {
     },
     {
       id: "brokerages",
-      whopCheckoutUrlEnvKey: "WHOP_BROKERAGE_AI_TEAM_CHECKOUT_URL",
+      whopCheckoutUrl: "https://whop.com/checkout/plan_m3i6RwMYvMATE",
       eyebrow: "For brokerages",
       headline: "Your agents are not leaving for a better split.",
       lede: "They are leaving because they are doing four jobs at once: prospecting, follow-up, paperwork, and a database nobody has touched in a year. Every agent who walks costs you $15,000 to $50,000.",
@@ -879,11 +879,10 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       // Additive only — "Book a free audit" stays the primary
                       // CTA above. Appears only once a real Whop checkout
                       // link is configured for this vertical.
-                      const checkoutUrl = process.env[v.whopCheckoutUrlEnvKey];
-                      if (!checkoutUrl) return null;
+                      if (!v.whopCheckoutUrl) return null;
                       return (
                         <a
-                          href={checkoutUrl}
+                          href={v.whopCheckoutUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="mt-3 block text-center text-xs text-white/50 underline decoration-white/20 underline-offset-4 transition hover:text-white/80"

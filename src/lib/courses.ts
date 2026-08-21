@@ -4,6 +4,11 @@
    (checkout buttons, the dashboard, the webhook handler) should hardcode a
    checkout link or a product ID — they all read through this file.
 
+   Whop IDs are literal values, not env vars — they're not secrets (only
+   WHOP_API_KEY and WHOP_WEBHOOK_SECRET are), and hardcoding them here means
+   one file to update instead of keeping .env and Vercel's env vars in sync.
+   Created via scripts/create-whop-products.mjs on 2026-08-21.
+
    Adding a fifth course later means adding one entry here, not touching the
    access-control system. */
 
@@ -13,12 +18,12 @@ export type Course = {
   title: string;
   description: string;
   thumbnail: string;
-  /** Env var name holding the real Whop access_pass_id for this course, once created. */
-  whopAccessPassIdEnvKey: string;
-  /** Env var name holding the real Whop plan_id for this course, once created. */
-  whopPlanIdEnvKey: string;
-  /** Env var name holding the real purchase_url (checkout link) for this course, once created. */
-  checkoutUrlEnvKey: string;
+  /** Real Whop access_pass_id (product id) for this course, once created. Empty string until then. */
+  whopAccessPassId: string;
+  /** Real Whop plan_id for this course, once created. Empty string until then. */
+  whopPlanId: string;
+  /** Real Whop purchase_url (checkout link) for this course, once created. Empty string until then. */
+  checkoutUrl: string;
   /** Where content actually lives on disk, served only through the guarded route. */
   contentDir: string;
   /** First page inside contentDir a newly-entitled user should land on. */
@@ -37,9 +42,9 @@ export const COURSES: Course[] = [
     description:
       "An 8-week accelerated program, ~10 hours a week: prompting, retrieval, agents, tool use, structured outputs, and evaluation. The exact stack behind VoyAI and SmartRevise. Basic programming logic required, no prior Python needed.",
     thumbnail: "/lab/ai-engineering.webp",
-    whopAccessPassIdEnvKey: "WHOP_AI_ENGINEERING_ACCESS_PASS_ID",
-    whopPlanIdEnvKey: "WHOP_AI_ENGINEERING_PLAN_ID",
-    checkoutUrlEnvKey: "WHOP_AI_ENGINEERING_CHECKOUT_URL",
+    whopAccessPassId: "prod_CKyY55RfnSTlU",
+    whopPlanId: "plan_VSU3hyAITNsNk",
+    checkoutUrl: "https://whop.com/checkout/plan_VSU3hyAITNsNk",
     contentDir: "courses/ai-engineering",
     firstLessonPath: "dashboard.html",
     waitlistUrl:
@@ -58,17 +63,14 @@ export function getCourseBySlug(slug: string): Course | undefined {
 
 /** Real purchase_url if configured, else the waitlist fallback — a button is never dead. */
 export function getCheckoutUrl(course: Course): { url: string; isRealCheckout: boolean } {
-  const configured = process.env[course.checkoutUrlEnvKey];
-  if (configured) return { url: configured, isRealCheckout: true };
+  if (course.checkoutUrl) return { url: course.checkoutUrl, isRealCheckout: true };
   return { url: course.waitlistUrl, isRealCheckout: false };
 }
 
-/** Whop access_pass_id -> internal course id, built from env at call time so it
-    picks up whatever's actually configured without needing a code change. */
+/** Whop access_pass_id -> internal course id. */
 export function courseIdForWhopProductId(whopProductId: string): string | null {
   for (const course of COURSES) {
-    const configuredId = process.env[course.whopAccessPassIdEnvKey];
-    if (configuredId && configuredId === whopProductId) return course.id;
+    if (course.whopAccessPassId && course.whopAccessPassId === whopProductId) return course.id;
   }
   return null;
 }
