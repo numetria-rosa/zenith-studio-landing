@@ -1,0 +1,155 @@
+expense_id,employee,date,category,amount
+EX-1,Noah Osei,2026-01-20,office supplies,176.92
+EX-2,Noah Petrova,2026-08-25,Travel,"€95,46"
+EX-3,Ivy Petrova,2026-03-18,Travel,97.48
+EX-4,Priya Kowalski,2026-05-27,Meals,$164.36
+EX-5,Lena Nguyen,2026-09-05,Meals,179.19
+EX-6,Noah Chen,2026-05-25,travel ,$40.76
+EX-7,Carlos Garcia,2026-08-01,Office Supplies,"€57,74"
+EX-8,James Kowalski,2026-02-05,meals,25.65
+EX-9,Nadia Garcia,2026-01-05,office supplies,"€86,57"
+EX-10,Ivy Kowalski,2026-06-14,Trvl,243.18
+EX-11,Ruth Kowalski,2026-12-03,Meals,"€152,51"
+EX-12,Omar Silva,2026-07-14,office supplies,$87.15
+EX-13,Tom Kowalski,2026-02-02,meals,"€10,67"
+EX-14,Ivy Smith,2026-07-22,Travel,$125.11
+EX-15,Leo Petrova,2026-07-13,Office Supplies,81.31
+EX-16,Ruth Smith,2026-05-23,meals,"€88,23"
+EX-17,Omar Khan,2026-08-26,office supplies,86.58
+EX-18,Priya Smith,2026-12-05,Travel,48.76
+EX-19,Ruth Chen,2026-02-21,Travel,$230.11
+EX-20,Omar Silva,2026-01-07,meals,"€95,97"
+EX-21,Noah Ndiaye,2026-06-09,office supplies,112.38
+EX-22,Aisha Khan,2026-08-23,office supplies,$61.98
+EX-23,James Kowalski,2026-11-21,office supplies,$112.76
+EX-24,Nadia Silva,2026-09-18,Travel,$134.59
+EX-25,Tom Khan,2026-04-02,meals,$136.32
+EX-26,Priya Khan,2026-02-27,Meals,$52.69
+EX-27,Wei Nguyen,2026-12-02,meals,82.4
+EX-28,James Nguyen,2026-03-17,Software,$77.82
+EX-29,Noah Khan,2026-02-28,meals,$110.38
+EX-30,Priya Smith,2026-01-01,Meals,45.34
+EX-31,Priya Chen,2026-03-24,travel ,$129.04
+EX-32,Priya Garcia,2026-03-21,Office Supplies,$32.04
+EX-33,Aisha Khan,2026-07-12,meals,"€35,73"
+EX-34,Wei Smith,2026-08-12,Trvl,$17.11
+EX-35,Maria Ndiaye,2026-07-16,Trvl,$134.62
+EX-36,James Khan,2026-09-27,Software,107.49
+EX-37,Leo Silva,2026-10-12,Trvl,$64.53
+EX-38,Lena Nguyen,2026-11-17,Meals,"€134,72"
+EX-39,Omar Kowalski,2026-02-06,Travel,235.54
+EX-40,Tom Chen,2026-10-15,Software,159.49
+EX-41,Leo Silva,2026-06-19,meals,103.09
+EX-42,Priya Chen,2026-09-10,Meals,$82.19
+EX-43,Lena Nguyen,2026-10-14,Trvl,"€184,64"
+EX-44,Tom Ndiaye,2026-10-04,Meals,"€144,13"
+EX-45,Grace Smith,2026-02-13,travel ,"€51,96"
+EX-46,Leo Kowalski,2026-03-23,office supplies,"€122,74"
+EX-47,Wei Chen,2026-01-28,office supplies,90.93
+EX-48,Wei Osei,2026-06-02,travel ,84.98
+EX-49,Carlos Ndiaye,2026-07-03,Software,138.06
+EX-50,James Nguyen,2026-03-05,Meals,"€87,96"
+EX-51,Wei Garcia,2026-03-13,travel ,$91.41
+EX-52,Noah Petrova,2026-11-10,Meals,$125.53
+EX-53,Carlos Khan,2026-11-14,Office Supplies,$140.38
+EX-54,Leo Ndiaye,2026-07-17,Trvl,$158.12
+EX-55,Omar Khan,2026-10-18,Trvl,$183.17
+EX-56,Priya Petrova,2026-06-27,Office Supplies,$40.33
+EX-57,Tom Ndiaye,2026-12-12,meals,"€153,73"
+EX-58,Sam Petrova,2026-11-16,Office Supplies,$149.81
+EX-59,Omar Garcia,2026-07-04,Trvl,"€105,52"
+EX-60,Ivy Garcia,2026-10-22,Office Supplies,$104.63
+EX-61,Tom Petrova,2026-06-02,Meals,73.79
+EX-62,Tom Chen,2026-05-23,Software,$134.92
+EX-63,Lena Silva,2026-07-14,Travel,$83.31
+EX-64,Lena Smith,2026-03-20,Office Supplies,$123.48
+EX-65,Tom Garcia,2026-08-09,Travel,136.16
+EX-66,Omar Nguyen,2026-06-12,Software,$92.96
+EX-67,Carlos Silva,2026-10-08,travel ,"€61,36"
+EX-68,Noah Nguyen,2026-11-27,travel ,196.61
+EX-69,Lena Ndiaye,2026-12-10,Software,"€105,38"
+EX-70,James Osei,2026-06-05,travel ,"€335,18"
+EX-71,Ruth Osei,2026-04-17,Software,$27.94
+EX-72,Wei Kowalski,2026-02-19,Office Supplies,147.99
+EX-73,Grace Chen,2026-09-03,Software,$165.79
+EX-74,Lena Silva,2026-03-16,office supplies,"€147,49"
+EX-75,James Petrova,2026-07-08,Travel,"€71,64"
+EX-76,Nadia Smith,2026-09-06,Meals,$69.81
+EX-77,Wei Kowalski,2026-03-14,meals,$101.01
+EX-78,Omar Ndiaye,2026-04-27,Office Supplies,"€187,86"
+EX-79,Sam Silva,2026-01-12,meals,"€71,62"
+EX-80,Omar Nguyen,2026-08-13,Office Supplies,$97.4
+EX-81,Omar Petrova,2026-09-13,Meals,"€228,91"
+EX-82,Aisha Nguyen,2026-10-28,Trvl,$28.78
+EX-83,Omar Chen,2026-11-13,Office Supplies,67.88
+EX-84,Nadia Osei,2026-04-15,meals,$139.31
+EX-85,Ruth Osei,2026-09-15,Office Supplies,"€92,60"
+EX-86,Sam Chen,2026-10-16,meals,143.06
+EX-87,Ruth Chen,2026-03-20,Software,"€58,77"
+EX-88,Carlos Petrova,2026-09-26,Software,$130.2
+EX-89,Wei Chen,2026-11-22,Software,$38.3
+EX-90,Nadia Osei,2026-08-17,travel ,$84.41
+EX-91,Grace Petrova,2026-10-22,Meals,$148.91
+EX-92,Omar Smith,2026-09-28,office supplies,31.42
+EX-93,Priya Silva,2026-01-09,travel ,146.02
+EX-94,Nadia Chen,2026-08-22,Travel,$175.79
+EX-95,Ruth Smith,2026-01-22,Meals,147.09
+EX-96,Ruth Silva,2026-05-01,meals,206.78
+EX-97,Maria Kowalski,2026-03-20,Software,"€146,17"
+EX-98,Ruth Smith,2026-12-11,Software,134.77
+EX-99,Lena Chen,2026-11-25,Office Supplies,$159.63
+EX-100,Omar Petrova,2026-10-23,Software,$120.58
+EX-101,Nadia Osei,2026-10-10,Meals,$60.29
+EX-102,Wei Osei,2026-01-16,Office Supplies,"€121,36"
+EX-103,Ivy Kowalski,2026-12-07,meals,80.79
+EX-104,Aisha Silva,2026-07-20,Software,$28.67
+EX-105,James Khan,2026-06-17,office supplies,197.73
+EX-106,Carlos Kowalski,2026-02-02,Meals,78.41
+EX-107,Wei Ndiaye,2026-09-06,Office Supplies,43.31
+EX-108,Omar Silva,2026-04-27,Trvl,$83.34
+EX-109,Leo Petrova,2026-04-15,meals,$227.65
+EX-110,Aisha Garcia,2026-10-16,Trvl,$259.79
+EX-111,Lena Nguyen,2026-03-16,Meals,80.33
+EX-112,Sam Silva,2026-09-20,meals,"€138,93"
+EX-113,Grace Petrova,2026-12-26,Meals,$80.25
+EX-114,Priya Nguyen,2026-01-14,Office Supplies,106.68
+EX-115,Sam Osei,2026-07-27,Software,"€129,43"
+EX-116,Carlos Nguyen,2026-03-09,meals,$104.8
+EX-117,Tom Petrova,2026-03-08,meals,451.17
+EX-118,Carlos Kowalski,2026-11-27,office supplies,$56.58
+EX-119,Grace Kowalski,2026-10-01,Meals,"€27,76"
+EX-120,Maria Smith,2026-04-13,travel ,$149.0
+EX-121,Lena Nguyen,2026-05-26,Meals,"€91,16"
+EX-122,Ruth Petrova,2026-12-04,meals,74.09
+EX-123,Priya Nguyen,2026-02-07,Office Supplies,144.29
+EX-124,Tom Nguyen,2026-05-21,Trvl,52.65
+EX-125,Wei Petrova,2026-02-25,Trvl,$292.07
+EX-126,Leo Osei,2026-04-03,Travel,18.11
+EX-127,Noah Khan,2026-07-04,Software,162.34
+EX-128,Lena Kowalski,2026-08-13,office supplies,$174.7
+EX-129,Carlos Khan,2026-10-18,travel ,"€41,44"
+EX-130,Omar Kowalski,2026-11-28,travel ,$161.14
+EX-131,Priya Osei,2026-06-01,Travel,"€248,69"
+EX-132,Maria Nguyen,2026-06-13,office supplies,47.35
+EX-133,Tom Silva,2026-05-13,office supplies,43.48
+EX-134,Grace Silva,2026-07-22,office supplies,$101.38
+EX-135,Carlos Nguyen,2026-06-07,office supplies,"€29,77"
+EX-136,James Petrova,2026-05-21,Software,$96.26
+EX-137,Omar Chen,2026-09-01,Software,"€222,25"
+EX-138,Sam Nguyen,2026-04-19,meals,"€53,61"
+EX-139,James Chen,2026-08-04,Meals,35.81
+EX-140,Maria Garcia,2026-01-26,Meals,"€118,91"
+EX-141,Carlos Silva,2026-12-15,travel ,"€38,94"
+EX-142,James Ndiaye,2026-09-07,travel ,$52.94
+EX-143,Ivy Kowalski,2026-10-05,meals,$226.78
+EX-144,Nadia Osei,2026-03-19,Travel,"€135,46"
+EX-145,Noah Osei,2026-10-16,travel ,$73.31
+EX-146,Carlos Chen,2026-11-15,office supplies,$71.23
+EX-147,Aisha Khan,2026-10-24,Software,$356.66
+EX-148,Noah Nguyen,2026-10-20,Software,$175.71
+EX-149,Sam Chen,2026-07-16,Meals,"€164,25"
+EX-150,Aisha Kowalski,2026-06-24,Software,"€122,36"
+,,,,
+,,,,
+,,,,
+,,,,
