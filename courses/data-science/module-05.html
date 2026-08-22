@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 5: Exploratory Data Analysis &amp; Statistics</title>
+<title>Module 5: Statistics for Analysts</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;--violet:#b39dff;
+}
+html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
 .serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
 .wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
 .bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
 .bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
 .bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
 .bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
 .bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
-.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
-.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
-.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
-.coursenav a:hover{color:var(--amber)}
-.coursenav .navsep{flex:1}
-@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
 .hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
 h1{font-family:'Fraunces';font-size:clamp(30px,5vw,44px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.08}
@@ -31,59 +31,706 @@ h1{font-family:'Fraunces';font-size:clamp(30px,5vw,44px);font-weight:600;letter-
 .objectives ul{list-style:none;display:grid;gap:6px}
 .objectives li{padding-left:20px;position:relative;font-size:14.5px}
 .objectives li:before{content:"→";position:absolute;left:0;color:var(--amber)}
-section{padding:40px 0}
-.soon{background:var(--card);border:1px solid var(--bd2);border-radius:16px;padding:32px;text-align:center}
-.soon .badge{display:inline-flex;font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);border:1px solid rgba(95,194,232,.3);padding:6px 14px;border-radius:99px}
-.soon h2{font-family:'Fraunces';font-size:22px;margin-top:16px;font-weight:600}
-.soon p{color:var(--mut);font-size:14.5px;max-width:520px;margin:12px auto 0}
-.covers{text-align:left;margin-top:22px;padding-top:22px;border-top:1px solid var(--bd);max-width:520px;margin-left:auto;margin-right:auto}
-.covers .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2);margin-bottom:10px;font-family:'IBM Plex Mono'}
-.covers ul{list-style:none;display:grid;gap:8px}
-.covers li{padding-left:20px;position:relative;font-size:13.5px;color:var(--mut)}
-.covers li:before{content:"→";position:absolute;left:0;color:var(--amber)}
-a.cta{display:inline-flex;margin-top:22px;align-items:center;gap:8px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:14px;padding:11px 20px;border-radius:8px;text-decoration:none}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-family:'IBM Plex Mono';font-weight:700;font-size:12px;color:var(--amber);border:1px solid var(--amber);border-radius:99px;width:34px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-family:'Fraunces';font-size:21px;font-weight:600;letter-spacing:-.01em}
+p{font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:6px;font-family:'IBM Plex Mono'}
+.def p{font-size:14.5px}
+code,.mono-inline{font-family:'IBM Plex Mono';font-size:13px;background:rgba(240,180,41,.1);color:var(--amber);padding:1px 6px;border-radius:4px}
+pre.codeblock{font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px;margin-top:14px;overflow-x:auto;line-height:1.7;color:var(--tx)}
+pre.codeblock .c{color:var(--mut2)}
+pre.codeblock .kw{color:var(--info)}
+pre.codeblock .s{color:var(--good)}
+.demoresult{margin-top:10px;font-family:'IBM Plex Mono';font-size:12.5px;color:var(--good);background:rgba(74,222,149,.08);border:1px solid rgba(74,222,149,.3);border-radius:8px;padding:10px 14px;white-space:pre-wrap;overflow-x:auto}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:20px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px;font-family:'IBM Plex Mono'}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--info);box-shadow:0 0 8px var(--info)}
+.interactive.discovery{border-color:var(--violet)}
+.interactive.discovery .ilbl{color:var(--violet);background:rgba(179,157,255,.12)}
+.interactive.discovery .ilbl:before{background:var(--violet);box-shadow:0 0 8px var(--violet)}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button.primary:hover{filter:brightness(1.08);color:var(--amberd)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.testin{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
+.testin:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{display:block;background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.feedback.wait{display:block;background:var(--bg2);border:1px solid var(--bd2);color:var(--mut2)}
+.testsummary{margin-top:10px;font-family:'IBM Plex Mono';font-size:13px}
+.outbox{margin-top:12px;font-family:'IBM Plex Mono';font-size:12.5px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;white-space:pre-wrap;overflow-x:auto;color:var(--mut);max-height:380px;overflow-y:auto}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:block;width:100%;text-align:left;font-family:'IBM Plex Sans';display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px;background:var(--card2);color:var(--tx)}
+.qopt:hover{border-color:var(--bd2)}
+.qopt.correct{border-color:var(--good);background:rgba(74,222,149,.08)}
+.qopt.incorrect{border-color:var(--bad);background:rgba(255,133,133,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--amber)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+.scoreboard{position:sticky;bottom:0;background:rgba(13,15,20,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;color:var(--amber)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+.why{border-left:3px solid var(--info);background:rgba(95,194,232,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
+.why b{color:var(--info)}
+.beginner{border-left:3px solid var(--good);background:rgba(74,222,149,.05);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:12px;font-size:13.5px;color:var(--mut)}
+.beginner b{color:var(--good)}
+.warn{border-left:3px solid var(--bad);background:rgba(255,133,133,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
+.warn b{color:var(--bad)}
+details.challenge{margin-top:14px}
+details.challenge summary{cursor:pointer;color:var(--amber);font-size:13px;font-weight:600;list-style:none}
+details.challenge summary::-webkit-details-marker{display:none}
+details.challenge summary:before{content:"▸ "}
+details.challenge[open] summary:before{content:"▾ "}
+details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px;color:var(--mut)}
+.logbox{width:100%;font-family:'IBM Plex Sans';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;min-height:130px;line-height:1.6}
+.logbox:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.rubric{display:grid;gap:8px;margin-top:14px}
+.rubric label{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--mut);cursor:pointer}
+.rubric input{margin-top:3px;flex-shrink:0}
+.tablewrap{overflow-x:auto}
+.dictable{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.dictable th,.dictable td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--bd)}
+.dictable th{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut2)}
+.dictable td{color:var(--mut)}
+.dictable td:first-child{font-family:'IBM Plex Mono';color:var(--amber)}
+.statcompare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+@media (max-width:640px){ .statcompare{grid-template-columns:1fr} }
+.statbox{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px}
+.statbox .sname{font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut2)}
+.statbox .sval{font-family:'IBM Plex Mono';font-size:22px;font-weight:700;margin-top:6px}
+.statbox.trust .sval{color:var(--good)}
+.statbox.distrust .sval{color:var(--bad)}
+.statbox .snote{font-size:12.5px;color:var(--mut);margin-top:8px}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:26px} .kh h2{font-size:18px} .interactive{padding:16px} }
 </style>
 </head>
 <body>
-<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Data Science &amp; Analysis · Module 5</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-04.html">&larr; <span class="navlabel">Module 4</span></a><span class="navsep"></span><a href="module-06.html">Module 6 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Data Science &amp; Analysis · Module 5</span>
+</div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-04.html">&larr; <span class="navlabel">Module 4</span></a><span class="navsep"></span><a href="module-06.html" id="navNextTop">Module 6 <span class="navlabel">&rarr;</span></a></div></div>
+
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Module 5 of 9 · Track C starts here</span>
-    <h1 class="serif">Exploratory Data Analysis &amp; Statistics</h1>
-    <p class="sub">Descriptive statistics, distributions, correlation versus causation, and enough hypothesis-testing intuition to know when a difference is real versus noise. Includes a lesson built on Anscombe's quartet: four datasets, identical summary statistics, completely different shapes.</p>
+    <h1 class="serif">Statistics for Analysts</h1>
+    <p class="sub">Not a maths course. Every concept here exists to answer one question a stakeholder will actually ask you: <i>is this difference real, or did we just get lucky?</i> You'll compute the numbers, and more importantly, learn when not to trust them.</p>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
-        <li>Compute and correctly interpret mean, median, std, and percentiles</li>
-        <li>Tell correlation from causation, with a real example every time</li>
-        <li>Know when a difference between two groups is signal versus noise</li>
-        <li>Explain why a summary statistic alone can lie about the shape of data</li>
+        <li>Choose between mean and median, and explain why to a non-technical manager</li>
+        <li>Use standard deviation to answer "which of these is more consistent?"</li>
+        <li>Recognise when a sample is too small to conclude anything</li>
+        <li>Run and interpret a significance test, and say what the p-value does <i>not</i> mean</li>
+        <li>Tell the difference between statistical significance and business significance</li>
+        <li>Explain why a correlation does not license a causal claim</li>
       </ul>
     </div>
   </header>
+
   <section>
-    <div class="soon">
-      <span class="badge">In production</span>
-      <h2 class="serif">This module's full interactive lesson is being built</h2>
-      <p>Track C starts here. Two real files (Marketing Campaign Results, Customer Survey Responses), four exercises including a mini hypothesis test.</p>
-      <div class="covers">
-        <div class="lbl">What this module will cover</div>
-        <ul>
-          <li>Descriptive statistics: mean, median, mode, standard deviation, percentiles</li>
-          <li>Distributions, and why the shape of data matters as much as its average</li>
-          <li>Correlation vs. causation, with a real marketing-data example</li>
-          <li>A conceptual, applied intro to hypothesis testing (t-test, chi-square)</li>
-          <li>Anscombe's quartet: identical statistics, four completely different datasets</li>
-        </ul>
+    <div class="kh"><span class="num">5.1</span><h2 class="serif">Mean, median, and which one is lying to you</h2></div>
+    <p>The mean is the average. The median is the middle value when you sort them. When the two disagree substantially, that disagreement is itself the finding.</p>
+    <div class="def">
+      <div class="k">The rule</div>
+      <p>Mean gets dragged by extreme values; median doesn't. If mean &gt; median, something large is pulling the average up. If they're close, the data is roughly symmetric and either is fine.</p>
+    </div>
+    <div class="why"><b>The business version of this:</b> "average order value is $180" sounds healthy. If the median is $40, what you actually have is a lot of small orders and a handful of enormous ones &mdash; a completely different business, needing a completely different strategy. Reporting only the mean would be technically true and practically misleading.</div>
+    <div class="beginner"><b>Never used these before?</b> For <code>[1, 2, 3, 4, 100]</code>: the mean is 22 (add them, divide by 5), the median is 3 (the middle one). Notice the mean isn't near <i>any</i> actual value in the list. That's the whole lesson.</div>
+
+    <div class="interactive">
+      <span class="ilbl">Exercise 1 · graded against the real survey file</span>
+      <p class="mut" style="margin-bottom:10px">The survey file has a <code>satisfaction_score</code> column meant to run 1&ndash;5. It contains both blanks <b>and</b> impossible values (0 and 6) that someone entered by mistake &mdash; you saw this class of problem in Module 4.</p>
+      <p class="mut" style="margin-bottom:10px">Write <code>valid_satisfaction_stats(df)</code> that keeps only genuinely valid scores (1 to 5 inclusive, no blanks) and returns a dict with keys <code>count</code>, <code>mean</code>, <code>median</code>, <code>std</code> &mdash; mean and std rounded to 2 decimals.</p>
+      <textarea id="ex1Editor" class="testin" spellcheck="false" rows="7">def valid_satisfaction_stats(df):
+    # 1. convert satisfaction_score to numeric (blanks become NaN)
+    # 2. keep only rows where the score is between 1 and 5 inclusive
+    # 3. return {"count": int, "mean": float, "median": float, "std": float}
+    return {}</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunEx1">▶ Run tests</button>
+        <button id="btnResetEx1">Reset starter code</button>
       </div>
-      <a href="dashboard.html" class="cta">Back to dashboard &rarr;</a>
+      <div id="ex1Results"></div>
     </div>
   </section>
-  <footer>Zenith Lab · Data Science &amp; Analysis · Module 5 of 9</footer>
+
+  <section>
+    <div class="kh"><span class="num">5.2</span><h2 class="serif">Standard deviation: the consistency question</h2></div>
+    <p>Standard deviation measures spread &mdash; how far values typically sit from the mean. Low means tightly clustered and predictable; high means volatile.</p>
+    <div class="why"><b>When you'd actually reach for it:</b> a stakeholder asks "which product line should we build the forecast around?" Two products both average $50k a month. One has a standard deviation of $3k, the other $28k. Same average, wildly different planning risk. The mean alone cannot answer their question; the standard deviation can.</div>
+    <div class="def">
+      <div class="k">How to explain it to a manager without saying "standard deviation"</div>
+      <p>"Product A does about $50k a month, give or take $3k. Product B also averages $50k, but it swings between $22k and $78k. If we're committing to inventory, A is the safer bet." You have just communicated a standard deviation without using the term. That translation is the actual skill.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">5.3</span><h2 class="serif">The small-sample trap</h2></div>
+    <p>Here is the most common way analysts get embarrassed in meetings. Look at these two marketing channels, both from the real campaign file.</p>
+    <div class="statcompare">
+      <div class="statbox distrust">
+        <div class="sname">Referral</div>
+        <div class="sval">9.52%</div>
+        <div class="snote">conversion rate<br>2 conversions from 21 clicks</div>
+      </div>
+      <div class="statbox trust">
+        <div class="sname">Email</div>
+        <div class="sval">7.04%</div>
+        <div class="snote">conversion rate<br>20 conversions from 284 clicks</div>
+      </div>
+    </div>
+    <p style="margin-top:16px">Referral looks like the best channel we have. It is 35% better than Email. An analyst who stops here recommends moving budget into Referral.</p>
+    <div class="warn"><b>But look at the sample.</b> Referral converted 2 people. If one of those two had not converted, the rate drops to 4.8% &mdash; worse than Email. A single person flipping changes the entire recommendation. That is not a finding; that is noise wearing a finding's clothes.</div>
+    <div class="def">
+      <div class="k">Confidence interval: the honest version of a number</div>
+      <p>A 95% confidence interval is the range the true value plausibly sits in, given how much data you have. Computed from the real numbers above:</p>
+      <p style="margin-top:10px"><b>Referral:</b> &minus;3.0% to 22.1% &nbsp;&mdash;&nbsp; so wide it includes <i>negative</i> conversion, which is impossible. That is the maths telling you it has no idea.<br>
+      <b>Email:</b> 4.1% to 10.0% &nbsp;&mdash;&nbsp; a usable range you could plan against.</p>
+    </div>
+    <div class="beginner"><b>The plain-English rule:</b> before comparing two rates, look at the denominators. If either is small (a rough rule of thumb: fewer than ~30 events), be very sceptical. Percentages computed from tiny numbers are unstable, and presenting them as findings is how analysts lose credibility.</div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">5.4</span><h2 class="serif">Significance testing, and what a p-value is not</h2></div>
+    <p>A significance test answers exactly one question: <i>if there were genuinely no difference between these two groups, how surprising would data like this be?</i> The p-value is that surprise, as a probability.</p>
+    <div class="def">
+      <div class="k">Reading a p-value</div>
+      <p><b>p = 0.671</b> &mdash; data like this would be completely unsurprising even if there were no real difference. Conclude nothing.<br>
+      <b>p = 0.0002</b> &mdash; data like this would be very surprising if there were no real difference. Something is probably going on.<br>
+      The conventional cutoff is 0.05, but it's a convention, not a law of nature.</p>
+    </div>
+    <div class="warn"><b>What a p-value does NOT mean</b> (this trips up experienced people, not just beginners):<br>
+    It is <b>not</b> the probability that your hypothesis is true.<br>
+    It is <b>not</b> the probability the result was a fluke.<br>
+    It says nothing about how <i>big</i> or <i>important</i> the difference is.<br>
+    A tiny, commercially irrelevant difference will produce a very small p-value if your sample is large enough. Significance is about detectability, not importance.</div>
+    <div class="why"><b>Statistical vs. business significance:</b> with 5 million users you can prove a 0.01% conversion lift is real (p &lt; 0.001). That does not make it worth a six-month engineering project. Conversely a 5% lift on a small test might not reach significance yet still be worth investigating further. The test tells you whether the effect exists; only you and the business can say whether it matters.</div>
+
+    <div class="interactive discovery">
+      <span class="ilbl">Run the real tests yourself</span>
+      <p class="mut" style="margin-bottom:10px">This runs two-proportion tests on the real campaign data: Referral vs Email (the tempting comparison), and Search vs Social (a much larger one). Read both results before answering the questions.</p>
+      <textarea id="sigEditor" class="testin" spellcheck="false" rows="16">import math
+
+def two_prop_test(c1, n1, c2, n2, label):
+    p1, p2 = c1/n1, c2/n2
+    p = (c1+c2)/(n1+n2)
+    se = math.sqrt(p*(1-p)*(1/n1 + 1/n2))
+    z = (p1-p2)/se
+    pval = 2*(1 - 0.5*(1 + math.erf(abs(z)/math.sqrt(2))))
+    print(f"{label}: {p1*100:.2f}% vs {p2*100:.2f}%  ->  p = {pval:.4f}")
+    print(f"   verdict: {'REAL difference' if pval < 0.05 else 'NOT distinguishable from noise'}")
+    print()
+
+df = pd.read_csv("marketing_campaign_results.csv")
+g = df.groupby("channel").agg(clicks=("clicks","sum"), conv=("conversions","sum"))
+print(g)
+print()
+
+two_prop_test(g.loc["Referral","conv"], g.loc["Referral","clicks"],
+              g.loc["Email","conv"],    g.loc["Email","clicks"],    "Referral vs Email")
+two_prop_test(g.loc["Search","conv"],   g.loc["Search","clicks"],
+              g.loc["Social","conv"],   g.loc["Social","clicks"],   "Search vs Social")
+</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunSig">▶ Run code</button>
+        <button id="btnResetSig">Reset</button>
+      </div>
+      <div id="sigOut"></div>
+
+      <div class="qcard" style="margin-top:22px">
+        <div class="qtext">S1. Referral has the highest conversion rate in the entire dataset, yet the test says it is not distinguishable from Email. What do you tell the marketing director?</div>
+        <div id="s1opts"></div>
+        <div class="qexplain" id="s1explain"></div>
+      </div>
+      <div class="qcard">
+        <div class="qtext">S2. Search vs Social returns p = 0.0002. Which statement is accurate?</div>
+        <div id="s2opts"></div>
+        <div class="qexplain" id="s2explain"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">5.5</span><h2 class="serif">Correlation, and the claim you must not make</h2></div>
+    <p>Correlation measures whether two things move together, on a scale from &minus;1 to +1. Zero means no <i>linear</i> relationship. It does not, ever, on its own, establish that one thing causes the other.</p>
+    <div class="def">
+      <div class="k">Three explanations for every correlation you find</div>
+      <p><b>1. A causes B</b> &mdash; the one everyone jumps to.<br>
+      <b>2. B causes A</b> &mdash; reverse causation. Busy stores schedule more staff, rather than more staff creating busyness.<br>
+      <b>3. C causes both</b> &mdash; a confounder. Ice cream sales and drowning both rise in summer; neither causes the other.<br>
+      A correlation alone cannot distinguish between these. Only an experiment, or strong domain knowledge, can.</p>
+    </div>
+    <div class="warn"><b>The sentence that ends careers:</b> "Customers who use feature X retain better, so we should push everyone to feature X." Maybe X causes retention. Or maybe already-engaged customers are the ones who find X. Push X on everyone and you may learn, expensively, that it was the second one.</div>
+
+    <div class="interactive">
+      <span class="ilbl">Exercise 2 · graded against the real survey file</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>tenure_satisfaction_corr(df)</code> that filters to valid satisfaction scores (1&ndash;5, as in Exercise 1) and returns the correlation between <code>tenure_months</code> and <code>satisfaction_score</code>, rounded to 3 decimals.</p>
+      <textarea id="ex2Editor" class="testin" spellcheck="false" rows="5">def tenure_satisfaction_corr(df):
+    # filter to valid scores, then use .corr() between the two columns
+    return 0.0</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunEx2">▶ Run tests</button>
+        <button id="btnResetEx2">Reset starter code</button>
+      </div>
+      <div id="ex2Results"></div>
+    </div>
+    <div class="qcard">
+      <div class="qtext">Interpret your result. The correlation you just computed is about &minus;0.04. What is the honest reading?</div>
+      <div id="s3opts"></div>
+      <div class="qexplain" id="s3explain"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">★</span><h2 class="serif">Mini-project: the channel recommendation</h2></div>
+    <p>The marketing director wants to know which channel deserves more budget next quarter. You have the real campaign data, and you now have the tools to answer honestly rather than impressively.</p>
+
+    <div class="interactive">
+      <span class="ilbl">Required exercise · this module's graded checkpoint work</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>channel_analysis(df)</code> returning a dict keyed by channel name, where each value is a dict with:</p>
+      <ul style="margin:10px 0 12px 20px;font-size:14px;color:var(--mut);line-height:1.9">
+        <li><code>cvr</code> &mdash; conversion rate as a percentage (conversions ÷ clicks × 100), rounded to 2dp</li>
+        <li><code>cpa</code> &mdash; cost per acquisition (spend ÷ conversions), rounded to 2dp</li>
+        <li><code>reliable</code> &mdash; <code>True</code> only if that channel has <b>at least 30 clicks AND at least 5 conversions</b>, otherwise <code>False</code></li>
+      </ul>
+      <p class="mut" style="margin-bottom:10px">That <code>reliable</code> flag is the point of the exercise. It's the difference between a report that says "Referral is our best channel" and one that says "Referral looks best but is based on 21 clicks, so I would not move budget on it yet."</p>
+      <textarea id="ex3Editor" class="testin" spellcheck="false" rows="10">def channel_analysis(df):
+    # group by channel, sum clicks / conversions / spend
+    # for each channel compute cvr, cpa, and the reliable flag
+    # return {"Email": {"cvr": .., "cpa": .., "reliable": ..}, ...}
+    return {}</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunEx3">▶ Run tests</button>
+        <button id="btnResetEx3">Reset starter code</button>
+      </div>
+      <div id="ex3Results"></div>
+    </div>
+
+    <div class="interactive" style="margin-top:20px">
+      <span class="ilbl">Written recommendation · self-assessed, not auto-graded</span>
+      <p class="mut" style="margin-bottom:10px">Write what you'd actually send the marketing director. Three to five sentences. It must name a recommended channel, cite the numbers behind it, and explicitly address why Referral's headline rate isn't the answer.</p>
+      <div class="warn" style="margin-top:0"><b>Honest limitation:</b> no automatic grader can judge whether a written recommendation is <i>good</i> &mdash; there's no single correct wording, and pretending to score it would be fake rigour. Use the checklist and the model answer to assess yourself honestly. This is saved with your progress and is portfolio material.</div>
+      <textarea id="recBox" class="logbox" placeholder="Example shape (write your own):
+
+Recommendation: increase Search budget, hold Email, do not scale Referral yet.
+
+Search converts at 4.79% across 1,815 clicks, and its advantage over Social (2.37%) is statistically significant (p = 0.0002), so this is a real difference rather than noise. Email converts highest among reliable channels at 7.04% on 284 clicks, but its total volume is small — worth growing, not yet worth reallocating heavily into.
+
+Referral shows the highest headline rate at 9.52%, but this comes from just 2 conversions on 21 clicks. Its 95% confidence interval spans -3% to 22%, meaning the data cannot distinguish it from any channel here. I recommend deliberately spending into Referral to build sample size before making a budget decision on it.
+
+Caveat: this analysis covers 8 weeks and does not account for seasonality or differences in traffic quality between channels."></textarea>
+      <div class="rubric" id="recRubric"></div>
+      <div class="dagctrl"><button class="primary" id="btnSaveRec">Save recommendation</button><span id="recSaved" style="font-size:13px;color:var(--good)"></span></div>
+      <details class="challenge">
+        <summary>Model answer (open after writing your own)</summary>
+        <div class="chbody">
+          <b>Recommendation:</b> Scale Search, protect Email, hold Referral pending more data.<br><br>
+          <b>Evidence.</b> Search delivers 87 conversions from 1,815 clicks (4.79%) at a $28.37 CPA. Its advantage over Social (2.37%, $51.93 CPA) is statistically significant at p = 0.0002 — with samples this size, that difference is real, not noise. Social is our most expensive channel per acquisition and the weakest converter; it's the obvious source of reallocated budget.<br><br>
+          <b>Email</b> converts best among channels with enough data to trust (7.04% on 284 clicks, $24.17 CPA — our cheapest acquisition). The constraint is volume, not performance. I'd grow list size rather than shift spend.<br><br>
+          <b>Referral</b> shows 9.52%, the highest number on the page, and I want to be explicit that I am <i>not</i> recommending it on that basis. It rests on 2 conversions from 21 clicks. Its 95% interval runs from −3% to 22%, which is another way of saying we have no idea. One conversion either way swings it from best to below average. Recommendation: spend a small fixed test budget specifically to build sample size, and revisit in 4–6 weeks.<br><br>
+          <b>Limitations.</b> Eight weeks of data, no seasonality adjustment, and no control for traffic quality differences between channels. CPA excludes fixed costs and creative production.
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">✓</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Five questions on interpretation and judgement. Score 80% or higher (4 of 5) to unlock Module 6.</p>
+    <div class="qcard"><div class="qtext">1. Average order value is $180; median is $40. What's the honest interpretation?</div><div id="q1opts"></div><div class="qexplain" id="q1explain"></div></div>
+    <div class="qcard"><div class="qtext">2. Two products both average $50k/month. Product A's standard deviation is $3k, Product B's is $28k. Which question does this answer?</div><div id="q2opts"></div><div class="qexplain" id="q2explain"></div></div>
+    <div class="qcard"><div class="qtext">3. A test returns p = 0.03. Which statement is correct?</div><div id="q3opts"></div><div class="qexplain" id="q3explain"></div></div>
+    <div class="qcard"><div class="qtext">4. With 5 million users, an A/B test shows a 0.01% conversion lift at p &lt; 0.001. Should you ship it?</div><div id="q4opts"></div><div class="qexplain" id="q4explain"></div></div>
+    <div class="qcard"><div class="qtext">5. Customers using feature X retain 20% better. What can you conclude?</div><div id="q5opts"></div><div class="qexplain" id="q5explain"></div></div>
+  </section>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Module 5 of 9 · Next: SQL for Analysts</footer>
 </div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete the exercises and checkpoint to continue →</button>
+</div></div>
+
 <script src="course-progress.js?v=1"></script>
-<script src="course-rail.js"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const MODULE_ID = 5;
+CourseProgress.touchVisited(MODULE_ID);
+
+const DATASETS = {};
+async function loadDatasets() {
+  if (DATASETS.survey) return DATASETS;
+  const [survey, marketing] = await Promise.all([
+    fetch("datasets/survey_responses.csv").then(r => r.text()),
+    fetch("datasets/marketing_campaign_results.csv").then(r => r.text()),
+  ]);
+  DATASETS.survey = survey; DATASETS.marketing = marketing;
+  return DATASETS;
+}
+const PREAMBLE = ["import pandas as pd, io, math, json", "def _mk(txt): return pd.read_csv(io.StringIO(txt))"].join("\n");
+const exerciseState = {};
+
+async function runPlayground(editorId, outId, buttonId) {
+  const btn = document.getElementById(buttonId), outEl = document.getElementById(outId);
+  btn.disabled = true;
+  outEl.innerHTML = `<div class="feedback wait">Loading data and starting Python&hellip; (first run downloads pandas, 20&ndash;60s)</div>`;
+  let ds;
+  try { ds = await loadDatasets(); }
+  catch (e) { outEl.innerHTML = `<div class="feedback bad">Could not load datasets: ${CourseProgress.escapeHtml(String(e))}</div>`; btn.disabled = false; return; }
+  const userCode = document.getElementById(editorId).value;
+  const harness = [
+    PREAMBLE,
+    "def harness(payload):",
+    "    code, survey_txt, mkt_txt = payload",
+    "    import sys, io as _io",
+    "    buf = _io.StringIO(); _stdout = sys.stdout; sys.stdout = buf",
+    "    def _read_csv(path, *a, **k):",
+    "        mapping = {'survey_responses.csv': survey_txt, 'marketing_campaign_results.csv': mkt_txt}",
+    "        key = str(path).split('/')[-1]",
+    "        if key in mapping: return pd.read_csv(_io.StringIO(mapping[key]), *a, **k)",
+    "        raise FileNotFoundError('Available files: ' + ', '.join(mapping))",
+    "    class _PdShim:",
+    "        def __getattr__(self, n): return getattr(pd, n)",
+    "        read_csv = staticmethod(_read_csv)",
+    "    ns = {'pd': _PdShim(), 'math': math}",
+    "    err = None",
+    "    try: exec(code, ns)",
+    "    except Exception as e: err = f'{type(e).__name__}: {e}'",
+    "    finally: sys.stdout = _stdout",
+    "    return {'ranOk': True, 'out': buf.getvalue(), 'err': err}",
+  ].join("\n");
+  let outcome;
+  try { outcome = await PySandboxRunner.run(harness, "harness", [userCode, ds.survey, ds.marketing], 20000, 90000); }
+  finally { btn.disabled = false; }
+  if (!outcome.ok) { outEl.innerHTML = `<div class="feedback bad">${CourseProgress.escapeHtml(outcome.error)}</div>`; return; }
+  const r = outcome.result;
+  let html = "";
+  if (r.out) html += `<div class="outbox">${CourseProgress.escapeHtml(r.out)}</div>`;
+  if (r.err) html += `<div class="feedback bad">${CourseProgress.escapeHtml(r.err)}</div>`;
+  if (!r.out && !r.err) html = `<div class="feedback wait">Ran with no output — add a print() to see something.</div>`;
+  outEl.innerHTML = html;
+  CourseProgress.setExtra("module5_ran_" + editorId, true);
+  updateNextButton();
+}
+document.getElementById("btnRunSig").addEventListener("click", () => runPlayground("sigEditor", "sigOut", "btnRunSig"));
+const SIG_STARTER = document.getElementById("sigEditor").value;
+document.getElementById("btnResetSig").addEventListener("click", () => {
+  document.getElementById("sigEditor").value = SIG_STARTER;
+  document.getElementById("sigOut").innerHTML = "";
+});
+
+function harnessFor(fnName, checks) {
+  return [
+    PREAMBLE,
+    "def harness(payload):",
+    "    code, survey_txt, mkt_txt = payload",
+    "    ns = {'pd': pd, 'math': math}",
+    "    try: exec(code, ns)",
+    "    except Exception as e: return {'ranOk': False, 'error': f'{type(e).__name__}: {e}'}",
+    `    fn = ns.get('${fnName}')`,
+    "    if fn is None:",
+    `        return {'ranOk': True, 'results': [{'name': '${fnName} is defined', 'pass': False, 'hint': 'Define a function named exactly ${fnName}.'}]}`,
+    "    survey = _mk(survey_txt); mkt = _mk(mkt_txt)",
+    "    results = []",
+    ...checks,
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n");
+}
+
+const EX1 = () => harnessFor("valid_satisfaction_stats", [
+  "    try:",
+  "        out = fn(survey.copy())",
+  "        if not isinstance(out, dict):",
+  "            results.append({'name': 'Returns a dictionary', 'pass': False, 'hint': f'Expected a dict, got {type(out).__name__}.'})",
+  "        else:",
+  "            results.append({'name': 'Returns a dictionary', 'pass': True, 'hint': ''})",
+  "            need = {'count','mean','median','std'}",
+  "            results.append({'name': 'Has keys count, mean, median, std', 'pass': set(out)==need, 'hint': f'Expected {sorted(need)}, got {sorted(out)}.'})",
+  "            if set(out)==need:",
+  "                results.append({'name': 'Excludes blanks AND impossible values (count is 208)', 'pass': out['count']==208, 'hint': f\"Expected count 208, got {out['count']!r}. 220 rows minus 6 blanks minus 6 impossible (0 or 6) values.\"})",
+  "                ok = abs(float(out['mean'])-3.0)<0.02 and abs(float(out['median'])-3.0)<0.02 and abs(float(out['std'])-1.42)<0.02",
+  "                results.append({'name': 'mean, median and std are correct', 'pass': ok, 'hint': f\"Expected mean 3.0, median 3.0, std 1.42 — got mean {out['mean']}, median {out['median']}, std {out['std']}.\"})",
+  "    except Exception as e: results.append({'name': 'valid_satisfaction_stats runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+
+const EX2 = () => harnessFor("tenure_satisfaction_corr", [
+  "    try:",
+  "        out = fn(survey.copy())",
+  "        p = abs(float(out) - (-0.041)) < 0.01",
+  "        results.append({'name': 'Correlation is about -0.041', 'pass': p, 'hint': f'Expected about -0.041, got {out!r}. Filter to valid 1-5 scores first, then .corr().'})",
+  "    except Exception as e: results.append({'name': 'tenure_satisfaction_corr runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+
+const EX3 = () => harnessFor("channel_analysis", [
+  "    try:",
+  "        out = fn(mkt.copy())",
+  "        if not isinstance(out, dict):",
+  "            results.append({'name': 'Returns a dictionary', 'pass': False, 'hint': f'Expected a dict, got {type(out).__name__}.'})",
+  "        else:",
+  "            results.append({'name': 'Returns a dictionary keyed by channel', 'pass': set(out)=={'Email','Referral','Search','Social'}, 'hint': f\"Expected the 4 channels, got {sorted(out)}.\"})",
+  "            exp = {'Email': (7.04, 24.17, True), 'Referral': (9.52, 16.07, False), 'Search': (4.79, 28.37, True), 'Social': (2.37, 51.93, True)}",
+  "            if set(out)==set(exp):",
+  "                bad_cvr = [f'{k}: yours={out[k].get(\"cvr\")} expected={v[0]}' for k,v in exp.items() if abs(float(out[k].get('cvr',0))-v[0])>0.02]",
+  "                results.append({'name': 'Conversion rates are correct', 'pass': not bad_cvr, 'hint': ('; '.join(bad_cvr)) if bad_cvr else ''})",
+  "                bad_cpa = [f'{k}: yours={out[k].get(\"cpa\")} expected={v[1]}' for k,v in exp.items() if abs(float(out[k].get('cpa',0))-v[1])>0.02]",
+  "                results.append({'name': 'Cost per acquisition is correct', 'pass': not bad_cpa, 'hint': ('; '.join(bad_cpa)) if bad_cpa else ''})",
+  "                bad_rel = [f'{k}: yours={out[k].get(\"reliable\")} expected={v[2]}' for k,v in exp.items() if bool(out[k].get('reliable'))!=v[2]]",
+  "                results.append({'name': 'Reliability flag correctly marks Referral as unreliable', 'pass': not bad_rel, 'hint': ('; '.join(bad_rel) + '. Reliable requires >=30 clicks AND >=5 conversions.') if bad_rel else ''})",
+  "            else:",
+  "                results.append({'name': 'Conversion rates are correct', 'pass': False, 'hint': 'Fix the channel keys first.'})",
+  "    except Exception as e: results.append({'name': 'channel_analysis runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+
+const STARTERS = {
+  ex1: 'def valid_satisfaction_stats(df):\n    # 1. convert satisfaction_score to numeric (blanks become NaN)\n    # 2. keep only rows where the score is between 1 and 5 inclusive\n    # 3. return {"count": int, "mean": float, "median": float, "std": float}\n    return {}',
+  ex2: 'def tenure_satisfaction_corr(df):\n    # filter to valid scores, then use .corr() between the two columns\n    return 0.0',
+  ex3: 'def channel_analysis(df):\n    # group by channel, sum clicks / conversions / spend\n    # for each channel compute cvr, cpa, and the reliable flag\n    # return {"Email": {"cvr": .., "cpa": .., "reliable": ..}, ...}\n    return {}',
+};
+const HARNESSES = { ex1: EX1, ex2: EX2, ex3: EX3 };
+const SECTION_KEYS = { ex3: "hypothesisTestExercise" };
+
+async function runGraded(id, buildHarness, buttonId, sectionKey) {
+  const btn = document.getElementById(buttonId), resultsEl = document.getElementById(id + "Results");
+  btn.disabled = true;
+  resultsEl.innerHTML = `<div class="feedback wait">Loading data and starting Python&hellip;</div>`;
+  let ds;
+  try { ds = await loadDatasets(); }
+  catch (e) { resultsEl.innerHTML = `<div class="feedback bad">Could not load datasets: ${CourseProgress.escapeHtml(String(e))}</div>`; btn.disabled = false; return; }
+  const code = document.getElementById(id + "Editor").value;
+  let outcome;
+  try { outcome = await PySandboxRunner.run(buildHarness(), "harness", [code, ds.survey, ds.marketing], 20000, 90000); }
+  finally { btn.disabled = false; }
+  if (!outcome.ok) { resultsEl.innerHTML = `<div class="feedback bad">${CourseProgress.escapeHtml(outcome.error)}</div>`; return; }
+  const data = outcome.result;
+  if (!data.ranOk) { resultsEl.innerHTML = `<div class="feedback bad">Your code didn't run: ${CourseProgress.escapeHtml(data.error || "unknown")}</div>`; return; }
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  data.results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.className = "testsummary";
+  summary.style.color = passCount === data.results.length ? "var(--good)" : "var(--mut)";
+  summary.textContent = `${passCount} / ${data.results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  exerciseState[id] = { passCount, total: data.results.length };
+  CourseProgress.setExtra("module5_" + id, { passCount, total: data.results.length });
+  if (sectionKey) CourseProgress.setSection(MODULE_ID, sectionKey, { passCount, total: data.results.length });
+  updateNextButton();
+}
+["ex1","ex2","ex3"].forEach(id => {
+  const cap = id.charAt(0).toUpperCase() + id.slice(1);
+  document.getElementById("btnRun" + cap).addEventListener("click", () => runGraded(id, HARNESSES[id], "btnRun" + cap, SECTION_KEYS[id] || null));
+  document.getElementById("btnReset" + cap).addEventListener("click", () => {
+    document.getElementById(id + "Editor").value = STARTERS[id];
+    document.getElementById(id + "Results").innerHTML = "";
+  });
+});
+
+/* ---------------- interpretation questions ---------------- */
+const interpAnswered = {};
+function buildInterp(id, opts, containerId){
+  const el = document.getElementById(containerId);
+  opts.forEach((opt,i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.textContent = opt.text;
+    div.addEventListener("click", () => {
+      if (interpAnswered[id]) return;
+      interpAnswered[id] = true;
+      el.querySelectorAll(".qopt").forEach((e,j) => {
+        if (opts[j].correct) e.classList.add("correct");
+        else if (j === i) e.classList.add("incorrect");
+      });
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      ex.textContent = opt.correct ? opt.correctText : "Not quite. " + opt.reason;
+      CourseProgress.setExtra("module5_interp_" + id, { correct: !!opt.correct });
+      updateNextButton();
+    });
+    el.appendChild(div);
+  });
+}
+buildInterp("s1", [
+  { text: "Referral looks best but rests on 2 conversions from 21 clicks, so we can't distinguish it from any other channel yet — I'd spend a small test budget to build sample size before reallocating", correct: true, correctText: "Correct. This is the answer that protects both the business and your credibility: it doesn't dismiss Referral, it correctly identifies that we don't yet know." },
+  { text: "Referral is our best channel and we should move budget into it immediately", correct: false, reason: "This is exactly the trap. One conversion either way swings Referral from best to below average — the number isn't stable enough to spend against." },
+  { text: "Referral is a bad channel and we should stop using it", correct: false, reason: "Equally unsupported in the opposite direction. Not having enough data to confirm a channel is good is not the same as evidence it's bad." },
+], "s1opts");
+buildInterp("s2", [
+  { text: "If there were genuinely no difference between Search and Social, data this extreme would occur only about 2 times in 10,000 — so the difference is very likely real", correct: true, correctText: "Correct — and note the careful phrasing. The p-value describes how surprising the data would be under 'no difference', not the probability that any hypothesis is true." },
+  { text: "There is a 0.02% chance that Search and Social perform identically", correct: false, reason: "This is the single most common misreading of a p-value. It is not the probability that the null hypothesis is true — it's the probability of data this extreme IF the null were true." },
+  { text: "Search is 0.0002 times better than Social", correct: false, reason: "A p-value says nothing about effect size. The actual difference here is 4.79% vs 2.37%; the p-value only tells you that gap is unlikely to be noise." },
+], "s2opts");
+buildInterp("s3", [
+  { text: "There is essentially no linear relationship between tenure and satisfaction in this data — and importantly, that's a finding worth reporting, not a failed analysis", correct: true, correctText: "Correct. A near-zero correlation genuinely answers the question 'does satisfaction drift with tenure?' with 'no, not linearly.' Null results are real results." },
+  { text: "Longer-tenured employees are significantly less satisfied", correct: false, reason: "-0.04 is essentially zero. Treating it as a meaningful negative relationship would be reading a pattern into noise." },
+  { text: "The data must be wrong, since tenure should obviously affect satisfaction", correct: false, reason: "Expecting a relationship isn't evidence there is one. This is exactly the bias analysis exists to check — and here it says the expected relationship isn't visible." },
+], "s3opts");
+
+/* ---------------- written recommendation ---------------- */
+const REC_RUBRIC = [
+  "I named one specific recommended action, not just observations",
+  "I cited the actual numbers (rate, sample size, or CPA) behind the recommendation",
+  "I explicitly addressed why Referral's headline rate is not the answer",
+  "I distinguished a statistically real difference from an unreliable one",
+  "I stated at least one limitation or caveat of the analysis",
+];
+(function buildRubric(){
+  const el = document.getElementById("recRubric");
+  const saved = CourseProgress.getExtra("module5_recRubric") || {};
+  REC_RUBRIC.forEach((text, i) => {
+    const lab = document.createElement("label");
+    const cb = document.createElement("input");
+    cb.type = "checkbox"; cb.checked = !!saved["r"+i];
+    cb.addEventListener("change", () => {
+      const cur = CourseProgress.getExtra("module5_recRubric") || {};
+      cur["r"+i] = cb.checked;
+      CourseProgress.setExtra("module5_recRubric", cur);
+    });
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(text));
+    el.appendChild(lab);
+  });
+})();
+document.getElementById("btnSaveRec").addEventListener("click", () => {
+  CourseProgress.setExtra("module5_recommendation", document.getElementById("recBox").value);
+  const el = document.getElementById("recSaved");
+  el.textContent = "Saved.";
+  setTimeout(() => { el.textContent = ""; }, 2000);
+  updateNextButton();
+});
+
+/* ---------------- checkpoint ---------------- */
+let score = 0;
+const answered = { q1:false,q2:false,q3:false,q4:false,q5:false };
+function requiredExercisesPassing(){
+  return ["ex1","ex2","ex3"].every(id => exerciseState[id] && exerciseState[id].passCount === exerciseState[id].total);
+}
+function interpDone(){ return ["s1","s2","s3"].every(id => interpAnswered[id]); }
+function updateNextButton(){
+  const allQ = ["q1","q2","q3","q4","q5"].every(k => answered[k]);
+  const ready = allQ && requiredExercisesPassing() && interpDone();
+  const btn = document.getElementById("btnNext");
+  btn.disabled = !ready;
+  btn.textContent = ready ? "Continue to Module 6 →" : "Complete the exercises and checkpoint to continue →";
+  if (allQ) CourseProgress.markComplete(MODULE_ID, score, 5);
+}
+function buildQ(id, opts, containerId){
+  const el = document.getElementById(containerId);
+  opts.forEach((opt,i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.textContent = opt.text;
+    div.addEventListener("click", () => {
+      if (answered[id]) return;
+      answered[id] = true;
+      CourseProgress.setAnswer(MODULE_ID, id, i);
+      el.querySelectorAll(".qopt").forEach((e,j) => {
+        if (opts[j].correct) e.classList.add("correct");
+        else if (j === i) e.classList.add("incorrect");
+      });
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { score++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+      updateNextButton();
+    });
+    el.appendChild(div);
+  });
+}
+buildQ("q1", [
+  { text: "Most orders are small, and a few very large ones are pulling the average up — report the median, or report both", correct: true, correctText: "Correct. A large mean-median gap is a finding in itself: it tells you the distribution is skewed and the average is not representative of a typical customer." },
+  { text: "The data is wrong, since the mean and median should match", correct: false, reason: "They only match for symmetric distributions. Real revenue data is almost always skewed, and a gap is expected rather than erroneous." },
+  { text: "Average order value is $180 and that's the number to report", correct: false, reason: "Technically true, practically misleading. Nobody in the business would picture a $40-median customer base from that number." },
+], "q1opts");
+buildQ("q2", [
+  { text: "Which product is more predictable to plan and forecast around", correct: true, correctText: "Correct. Same mean, very different volatility. B swings roughly $22k–$78k month to month, which is a real operational and inventory risk the average conceals." },
+  { text: "Which product is more profitable", correct: false, reason: "Standard deviation says nothing about profitability — both average $50k. It describes consistency, not level." },
+  { text: "Which product has more customers", correct: false, reason: "Nothing here measures customer count. Standard deviation describes how much the monthly figure varies around its own mean." },
+], "q2opts");
+buildQ("q3", [
+  { text: "If there were no real difference, data this extreme would appear about 3% of the time — conventionally we'd call this significant, but it says nothing about how large the effect is", correct: true, correctText: "Correct on both halves: the conditional interpretation, and the crucial caveat that significance is not the same as importance." },
+  { text: "There's a 3% probability the result is wrong", correct: false, reason: "A very common misstatement. The p-value is the probability of the data given no effect, not the probability that your conclusion is mistaken." },
+  { text: "The effect is 3% in size", correct: false, reason: "The p-value is not an effect size. A 0.01% effect can produce a tiny p-value with a large enough sample." },
+], "q3opts");
+buildQ("q4", [
+  { text: "Probably not on these numbers alone — it's statistically real but a 0.01% lift may not justify the cost, so the decision is commercial rather than statistical", correct: true, correctText: "Correct. This is the statistical-vs-business-significance distinction, and recognising it is what separates an analyst from a calculator." },
+  { text: "Yes — p < 0.001 means it's definitely worth shipping", correct: false, reason: "Significance only establishes the effect is detectable, not that it's worth the engineering and opportunity cost. Huge samples make trivial effects significant." },
+  { text: "No — a p-value that small indicates a broken test", correct: false, reason: "A small p-value with 5 million users is entirely expected and not suspicious. The issue is the effect's size, not the test's validity." },
+], "q4opts");
+buildQ("q5", [
+  { text: "Nothing causal yet — engaged customers may simply be the ones who discover feature X, so you'd need an experiment before recommending a push", correct: true, correctText: "Correct, and this is the reverse-causation case specifically. The correct next step is a controlled test, not a rollout." },
+  { text: "Feature X causes 20% better retention, so push it to all users", correct: false, reason: "This assumes the direction of causation without testing it. If already-loyal users self-select into X, pushing X on everyone will not reproduce the effect." },
+  { text: "Feature X is unrelated to retention", correct: false, reason: "Also unsupported — there is a real association. The honest position is that the association exists but its cause is not yet established." },
+], "q5opts");
+
+function maybeShowRetry(){
+  const any = ["q1","q2","q3","q4","q5"].some(k => answered[k]);
+  const all = ["q1","q2","q3","q4","q5"].every(k => answered[k]);
+  document.getElementById("btnRetryCheckpoint").style.display = (any && (all ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModule(MODULE_ID); window.location.reload();
+});
+const _origUpdate = updateNextButton;
+updateNextButton = function(){ _origUpdate(); maybeShowRetry(); };
+document.getElementById("btnNext").addEventListener("click", () => { window.location.href = "module-06.html"; });
+
+(function restore(){
+  const stored = CourseProgress.getModule(MODULE_ID);
+  const a = stored.answers || {};
+  ["q1","q2","q3","q4","q5"].forEach(id => {
+    if (a[id] !== undefined && !answered[id]) {
+      const label = document.querySelectorAll(`#${id}opts .qopt`)[a[id]];
+      if (label) label.click();
+    }
+  });
+  ["ex1","ex2","ex3"].forEach(id => {
+    const saved = CourseProgress.getExtra("module5_" + id);
+    if (saved && saved.total > 0) {
+      exerciseState[id] = saved;
+      const passed = saved.passCount === saved.total;
+      document.getElementById(id + "Results").innerHTML =
+        `<div class="feedback ${passed ? "ok" : "bad"}">Restored from your last visit: ${saved.passCount} / ${saved.total} tests passing. Edit and re-run any time.</div>`;
+    }
+  });
+  ["s1","s2","s3"].forEach(id => {
+    const saved = CourseProgress.getExtra("module5_interp_" + id);
+    if (saved) {
+      interpAnswered[id] = true;
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      ex.textContent = saved.correct ? "Answered correctly on a previous visit." : "Answered on a previous visit (incorrectly). Re-read the section — the reasoning matters more than the score.";
+    }
+  });
+  const savedRec = CourseProgress.getExtra("module5_recommendation");
+  if (typeof savedRec === "string") document.getElementById("recBox").value = savedRec;
+  updateNextButton();
+})();
+</script>
 </body>
 </html>
