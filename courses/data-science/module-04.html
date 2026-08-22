@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 4: Data Cleaning &amp; Validation</title>
+<title>Module 4: Real-World Data Cleaning</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;--violet:#b39dff;
+}
+html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
 .serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
 .wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
 .bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
 .bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
 .bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
 .bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
 .bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
-.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
-.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
-.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
-.coursenav a:hover{color:var(--amber)}
-.coursenav .navsep{flex:1}
-@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
 .hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
 h1{font-family:'Fraunces';font-size:clamp(30px,5vw,44px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.08}
@@ -31,59 +31,871 @@ h1{font-family:'Fraunces';font-size:clamp(30px,5vw,44px);font-weight:600;letter-
 .objectives ul{list-style:none;display:grid;gap:6px}
 .objectives li{padding-left:20px;position:relative;font-size:14.5px}
 .objectives li:before{content:"→";position:absolute;left:0;color:var(--amber)}
-section{padding:40px 0}
-.soon{background:var(--card);border:1px solid var(--bd2);border-radius:16px;padding:32px;text-align:center}
-.soon .badge{display:inline-flex;font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);border:1px solid rgba(95,194,232,.3);padding:6px 14px;border-radius:99px}
-.soon h2{font-family:'Fraunces';font-size:22px;margin-top:16px;font-weight:600}
-.soon p{color:var(--mut);font-size:14.5px;max-width:520px;margin:12px auto 0}
-.covers{text-align:left;margin-top:22px;padding-top:22px;border-top:1px solid var(--bd);max-width:520px;margin-left:auto;margin-right:auto}
-.covers .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2);margin-bottom:10px;font-family:'IBM Plex Mono'}
-.covers ul{list-style:none;display:grid;gap:8px}
-.covers li{padding-left:20px;position:relative;font-size:13.5px;color:var(--mut)}
-.covers li:before{content:"→";position:absolute;left:0;color:var(--amber)}
-a.cta{display:inline-flex;margin-top:22px;align-items:center;gap:8px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:14px;padding:11px 20px;border-radius:8px;text-decoration:none}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-family:'IBM Plex Mono';font-weight:700;font-size:12px;color:var(--amber);border:1px solid var(--amber);border-radius:99px;width:34px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-family:'Fraunces';font-size:21px;font-weight:600;letter-spacing:-.01em}
+p{font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:6px;font-family:'IBM Plex Mono'}
+.def p{font-size:14.5px}
+code,.mono-inline{font-family:'IBM Plex Mono';font-size:13px;background:rgba(240,180,41,.1);color:var(--amber);padding:1px 6px;border-radius:4px}
+pre.codeblock{font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px;margin-top:14px;overflow-x:auto;line-height:1.7;color:var(--tx)}
+pre.codeblock .c{color:var(--mut2)}
+pre.codeblock .kw{color:var(--info)}
+pre.codeblock .s{color:var(--good)}
+.demoresult{margin-top:10px;font-family:'IBM Plex Mono';font-size:12.5px;color:var(--good);background:rgba(74,222,149,.08);border:1px solid rgba(74,222,149,.3);border-radius:8px;padding:10px 14px;white-space:pre-wrap;overflow-x:auto}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:20px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px;font-family:'IBM Plex Mono'}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--info);box-shadow:0 0 8px var(--info)}
+.interactive.discovery{border-color:var(--violet)}
+.interactive.discovery .ilbl{color:var(--violet);background:rgba(179,157,255,.12)}
+.interactive.discovery .ilbl:before{background:var(--violet);box-shadow:0 0 8px var(--violet)}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button.primary:hover{filter:brightness(1.08);color:var(--amberd)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.testin{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
+.testin:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{display:block;background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.feedback.wait{display:block;background:var(--bg2);border:1px solid var(--bd2);color:var(--mut2)}
+.testsummary{margin-top:10px;font-family:'IBM Plex Mono';font-size:13px}
+.outbox{margin-top:12px;font-family:'IBM Plex Mono';font-size:12.5px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;white-space:pre-wrap;overflow-x:auto;color:var(--mut);max-height:380px;overflow-y:auto}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:block;width:100%;text-align:left;font-family:'IBM Plex Sans';display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px;background:var(--card2);color:var(--tx)}
+.qopt:hover{border-color:var(--bd2)}
+.qopt.correct{border-color:var(--good);background:rgba(74,222,149,.08)}
+.qopt.incorrect{border-color:var(--bad);background:rgba(255,133,133,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--amber)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+.scoreboard{position:sticky;bottom:0;background:rgba(13,15,20,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0}
+.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;color:var(--amber)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+.why{border-left:3px solid var(--info);background:rgba(95,194,232,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
+.why b{color:var(--info)}
+.beginner{border-left:3px solid var(--good);background:rgba(74,222,149,.05);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:12px;font-size:13.5px;color:var(--mut)}
+.beginner b{color:var(--good)}
+.warn{border-left:3px solid var(--bad);background:rgba(255,133,133,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
+.warn b{color:var(--bad)}
+details.challenge{margin-top:14px}
+details.challenge summary{cursor:pointer;color:var(--amber);font-size:13px;font-weight:600;list-style:none}
+details.challenge summary::-webkit-details-marker{display:none}
+details.challenge summary:before{content:"▸ "}
+details.challenge[open] summary:before{content:"▾ "}
+details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px;color:var(--mut)}
+.steps{counter-reset:step;display:grid;gap:12px;margin-top:16px}
+.step{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 18px;position:relative;padding-left:52px}
+.step:before{counter-increment:step;content:counter(step);position:absolute;left:16px;top:14px;font-family:'IBM Plex Mono';font-size:12px;font-weight:700;color:var(--amberd);background:var(--amber);width:22px;height:22px;border-radius:50%;display:grid;place-items:center}
+.step .sname{font-weight:700;font-size:14px}
+.step .sdesc{font-size:13.5px;color:var(--mut);margin-top:4px}
+.logbox{width:100%;font-family:'IBM Plex Sans';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;min-height:150px;line-height:1.6}
+.logbox:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.rubric{display:grid;gap:8px;margin-top:14px}
+.rubric label{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--mut);cursor:pointer}
+.rubric input{margin-top:3px;flex-shrink:0}
+.tablewrap{overflow-x:auto}
+.dictable{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.dictable th,.dictable td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--bd)}
+.dictable th{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut2)}
+.dictable td{color:var(--mut)}
+.dictable td:first-child{font-family:'IBM Plex Mono';color:var(--amber)}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:26px} .kh h2{font-size:18px} .interactive{padding:16px} }
 </style>
 </head>
 <body>
-<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Data Science &amp; Analysis · Module 4</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-03.html">&larr; <span class="navlabel">Module 3</span></a><span class="navsep"></span><a href="module-05.html">Module 5 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Data Science &amp; Analysis · Module 4</span>
+</div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-03.html">&larr; <span class="navlabel">Module 3</span></a><span class="navsep"></span><a href="module-05.html" id="navNextTop">Module 5 <span class="navlabel">&rarr;</span></a></div></div>
+
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Module 4 of 9</span>
-    <h1 class="serif">Data Cleaning &amp; Validation</h1>
-    <p class="sub">The center of gravity of real analyst work: missing values, duplicates, inconsistent categorical labels, numbers and dates stored as text, mixed currencies and units, outlier triage, and a reusable cleaning checklist, not a one-off script.</p>
+    <h1 class="serif">Real-World Data Cleaning</h1>
+    <p class="sub">This is where most analyst time actually goes. Nobody is going to hand you a list of what's wrong with a file &mdash; finding the problems <i>is</i> the skill. In this module you get raw data and an audit to perform, not a checklist to follow.</p>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
-        <li>Diagnose what's actually wrong with a real, messy dataset before touching it</li>
-        <li>Fix missing values, duplicates, and inconsistent categories with a repeatable process</li>
-        <li>Coerce numbers and dates stored as text into their real types safely</li>
-        <li>Build a cleaning checklist you can reuse on the next messy file</li>
+        <li>Audit an unfamiliar dataset and find its problems without being told what they are</li>
+        <li>Distinguish a data-entry error from a real, surprising value</li>
+        <li>Fix duplicates, inconsistent categories, mixed currencies, and broken types</li>
+        <li>Decide between dropping, filling, and flagging &mdash; and justify the choice</li>
+        <li>Validate that your cleaning worked, instead of assuming it did</li>
+        <li>Document what you changed and why, so someone can audit your work</li>
       </ul>
     </div>
   </header>
+
   <section>
-    <div class="soon">
-      <span class="badge">In production</span>
-      <h2 class="serif">This module's full interactive lesson is being built</h2>
-      <p>The heart of the course. Two real messy files (Expense Reports, E-commerce Orders), a diagnostic exercise, two cleaning-pipeline builds, and a validation-rules writeup.</p>
-      <div class="covers">
-        <div class="lbl">What this module will cover</div>
-        <ul>
-          <li>Diagnosing a messy dataset: missing values, duplicates, inconsistent labels</li>
-          <li>Numbers and dates stored as text, and how to coerce them safely</li>
-          <li>Mixed currencies and units, and merged-cell spreadsheet artifacts</li>
-          <li>Outlier triage: real signal vs. a data-entry mistake</li>
-          <li>Building a reusable cleaning checklist, not a one-off script</li>
-        </ul>
+    <div class="kh"><span class="num">4.1</span><h2 class="serif">The discipline: never clean before you investigate</h2></div>
+    <p>The instinct of a new analyst is to see something odd and immediately fix it. The instinct of a good analyst is to ask <i>why it is there</i> first. A negative quantity might be a typo, or it might be how this company records a return &mdash; and those two answers lead to opposite actions.</p>
+    <div class="def">
+      <div class="k">The six-step loop, used for every problem you find</div>
+      <div class="steps">
+        <div class="step"><div class="sname">Detect</div><div class="sdesc">Find the anomaly. Counts, uniques, ranges, and type checks surface almost everything.</div></div>
+        <div class="step"><div class="sname">Investigate</div><div class="sdesc">Look at the actual rows. How many? Are they clustered in one source, one date, one category?</div></div>
+        <div class="step"><div class="sname">Decide</div><div class="sdesc">Drop, fix, fill, or flag &mdash; and be able to say why in one sentence.</div></div>
+        <div class="step"><div class="sname">Clean</div><div class="sdesc">Apply the fix, ideally to a copy, never to your only version of the raw file.</div></div>
+        <div class="step"><div class="sname">Validate</div><div class="sdesc">Re-run the detection. Did the count go to zero? Did the row count change by the amount you expected?</div></div>
+        <div class="step"><div class="sname">Document</div><div class="sdesc">Write down what you changed and why. This is what makes your number defensible.</div></div>
       </div>
-      <a href="dashboard.html" class="cta">Back to dashboard &rarr;</a>
+    </div>
+    <div class="warn"><b>The rule that matters most:</b> never silently delete data. Every row you drop is a decision you must be able to defend to someone who disagrees with you. "It looked wrong" is not a defence. "7 rows had negative quantities, all in the same week, none matched a return record, so I excluded them and flagged it to Ops" is.</div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4.2</span><h2 class="serif">Your detection toolkit</h2></div>
+    <p>Six commands surface the overwhelming majority of real data problems. Learn these as a routine you run on every new file, before doing anything else.</p>
+    <div class="tablewrap"><table class="dictable">
+      <thead><tr><th>Command</th><th>Finds</th></tr></thead>
+      <tbody>
+        <tr><td>df.isna().sum()</td><td>Missing values, per column</td></tr>
+        <tr><td>df.duplicated().sum()</td><td>Exact duplicate rows</td></tr>
+        <tr><td>df["col"].duplicated().sum()</td><td>A key column that should be unique but isn't</td></tr>
+        <tr><td>df["col"].unique()</td><td>Inconsistent categories, casing, spelling variants</td></tr>
+        <tr><td>df.describe()</td><td>Impossible values: negatives, absurd maximums, zero where zero is impossible</td></tr>
+        <tr><td>df.dtypes</td><td>Numbers or dates that loaded as text</td></tr>
+      </tbody>
+    </table></div>
+    <div class="beginner"><b>A tip that saves hours:</b> <code>df["col"].value_counts()</code> is often better than <code>.unique()</code>, because it shows you <i>how many</i> of each value there are. A category variant appearing 200 times is a systemic issue; one appearing twice is probably a typo. The count changes what you should do about it.</div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4.3</span><h2 class="serif">The audit: find the problems yourself</h2></div>
+    <p>Here is <code>ecommerce_orders.csv</code> &mdash; 412 rows of real order data from the funnel of an online store. <b>It has at least four distinct problems.</b> You are not going to be told what they are.</p>
+    <p class="mut">Use the toolkit above. Run whatever you want; add lines, change lines, re-run as often as you like. When you think you've found them, answer the questions below &mdash; those are graded, and they check whether you actually found the problems rather than guessed.</p>
+
+    <div class="def">
+      <div class="k">ecommerce_orders.csv &nbsp;·&nbsp; <a href="datasets/ecommerce_orders.csv" download style="color:var(--info)">download</a></div>
+      <div class="tablewrap"><table class="dictable">
+        <thead><tr><th>Column</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>order_id</td><td>Should uniquely identify one order</td></tr>
+          <tr><td>customer_id</td><td>Who placed it</td></tr>
+          <tr><td>order_date</td><td>When it was placed</td></tr>
+          <tr><td>sku</td><td>Product code</td></tr>
+          <tr><td>product_category</td><td>Apparel, Home, Electronics, or Beauty</td></tr>
+          <tr><td>quantity</td><td>Units ordered</td></tr>
+          <tr><td>unit_price</td><td>Price per unit</td></tr>
+          <tr><td>status</td><td>Funnel stage reached: cart_created, checkout_started, payment, shipped</td></tr>
+          <tr><td>shipped_date</td><td>When it shipped, if it shipped</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="interactive discovery">
+      <span class="ilbl">Audit workspace · nobody will tell you what's wrong</span>
+      <textarea id="auditEditor" class="testin" spellcheck="false" rows="14">df = pd.read_csv("ecommerce_orders.csv")
+
+print("shape:", df.shape)
+print()
+print(df.dtypes)
+print()
+print(df.head(5))
+
+# Your investigation goes here. Some starting points:
+#   df.duplicated().sum()
+#   df["order_id"].duplicated().sum()
+#   df["sku"].nunique()
+#   df["quantity"].describe()
+#   df["order_date"].head(20)
+#   df["shipped_date"].value_counts(dropna=False).head()
+</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunAudit">▶ Run code</button>
+        <button id="btnResetAudit">Reset</button>
+      </div>
+      <div id="auditOut"></div>
+
+      <div class="qcard" style="margin-top:22px">
+        <div class="qtext">A1. How many <b>exact duplicate rows</b> does the file contain?</div>
+        <div id="a1opts"></div>
+        <div class="qexplain" id="a1explain"></div>
+      </div>
+      <div class="qcard">
+        <div class="qtext">A2. The <code>sku</code> column reports 122 unique values. After fixing one specific problem, the true number of distinct products is 79. What is that problem?</div>
+        <div id="a2opts"></div>
+        <div class="qexplain" id="a2explain"></div>
+      </div>
+      <div class="qcard">
+        <div class="qtext">A3. Look at <code>quantity</code>. What did you find, and what should you do about it?</div>
+        <div id="a3opts"></div>
+        <div class="qexplain" id="a3explain"></div>
+      </div>
+      <div class="qcard">
+        <div class="qtext">A4. <code>order_date</code> loaded as text. Look at the actual values &mdash; why would <code>pd.to_datetime()</code> struggle here in a way it didn't for the retail file in Module 3?</div>
+        <div id="a4opts"></div>
+        <div class="qexplain" id="a4explain"></div>
+      </div>
+      <div class="qcard">
+        <div class="qtext">A5. 133 rows have a blank <code>shipped_date</code>, and exactly 1 row has the literal text <code>"MISSING"</code>. Are these the same kind of problem?</div>
+        <div id="a5opts"></div>
+        <div class="qexplain" id="a5explain"></div>
+      </div>
     </div>
   </section>
-  <footer>Zenith Lab · Data Science &amp; Analysis · Module 4 of 9</footer>
+
+  <section>
+    <div class="kh"><span class="num">4.4</span><h2 class="serif">Fixing what you found</h2></div>
+    <p>Now the techniques, in the order you'd apply them. Each one is a tool; the judgement about <i>whether</i> to use it is the part that makes you an analyst.</p>
+
+    <div class="def">
+      <div class="k">Exact duplicates</div>
+      <p><code>df.drop_duplicates()</code> removes rows identical across every column. Nearly always safe &mdash; a genuinely identical row is almost always a loading or export artifact. Compare row counts before and after so you know how many went.</p>
+    </div>
+    <div class="def">
+      <div class="k">Inconsistent text (casing, whitespace)</div>
+      <p><code>df["sku"] = df["sku"].str.strip().str.upper()</code>. For categories, <code>.str.title()</code> is usually the right normalisation. Always check <code>.nunique()</code> before and after &mdash; a big drop tells you how much phantom variety you just collapsed.</p>
+    </div>
+    <div class="def">
+      <div class="k">Numbers trapped in text (currency symbols, thousands separators)</div>
+      <p><code>df["amount"].str.replace("$", "", regex=False).astype(float)</code>. Watch for European formatting, where <code>,</code> is the decimal separator, not a thousands separator &mdash; <code>€95,46</code> is ninety-five euros, not nine thousand.</p>
+    </div>
+    <div class="def">
+      <div class="k">Mixed date formats</div>
+      <p><code>pd.to_datetime(df["order_date"], format="mixed", dayfirst=False)</code> handles several formats in one column. Without <code>format="mixed"</code>, newer pandas raises rather than guessing &mdash; which is the safer behaviour, because a wrong guess silently swaps days and months.</p>
+    </div>
+    <div class="warn"><b>The most dangerous fix in this list:</b> date parsing. <code>03/04/2026</code> is March 4th to an American system and April 3rd to a European one. There is no way to tell from the value alone. If the data source is ambiguous, you ask &mdash; you do not guess and hope.</div>
+
+    <div class="interactive">
+      <span class="ilbl">Exercise 1 · graded against the real file</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>dedupe_count(df)</code> that removes exact duplicate rows and returns the number of rows remaining, as an integer.</p>
+      <textarea id="ex1Editor" class="testin" spellcheck="false" rows="4">def dedupe_count(df):
+    # your code here — return an integer
+    return 0</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunEx1">▶ Run tests</button>
+        <button id="btnResetEx1">Reset starter code</button>
+      </div>
+      <div id="ex1Results"></div>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Exercise 2 · graded against the real file</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>true_product_count(df)</code> that normalises the <code>sku</code> column (strip whitespace, uppercase) and returns the number of genuinely distinct products, as an integer.</p>
+      <textarea id="ex2Editor" class="testin" spellcheck="false" rows="4">def true_product_count(df):
+    # your code here — return an integer
+    return 0</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunEx2">▶ Run tests</button>
+        <button id="btnResetEx2">Reset starter code</button>
+      </div>
+      <div id="ex2Results"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4.5</span><h2 class="serif">Missing values: drop, fill, or flag</h2></div>
+    <p>There is no universally correct answer. There is only a correct answer <i>for this column, this analysis, and this business context</i> &mdash; and a requirement that you can explain it.</p>
+    <div class="def">
+      <div class="k">Drop the rows</div>
+      <p><code>df.dropna(subset=["units"])</code>. Reasonable when the missing rows are few and there's no reason to think they're systematically different. Dangerous when missingness correlates with something &mdash; if high-value orders are likelier to be missing a field, dropping them biases every number you produce afterwards.</p>
+    </div>
+    <div class="def">
+      <div class="k">Fill with a value</div>
+      <p><code>df["units"].fillna(0)</code> or <code>.fillna(df["units"].median())</code>. Only when the filler is genuinely meaningful. Filling a missing price with 0 turns "we don't know" into "it was free," which will quietly wreck a revenue total.</p>
+    </div>
+    <div class="def">
+      <div class="k">Leave it and report it</div>
+      <p>Often the most honest option. pandas skips <code>NaN</code> in <code>.sum()</code> and <code>.mean()</code> anyway, so you can compute on what you have &mdash; as long as you state the count alongside the result. "Average order value was $47.20, computed across 393 of 400 orders; 7 lacked a valid quantity."</p>
+    </div>
+    <div class="why"><b>The distinction that separates blank from "MISSING":</b> in the orders file, 133 blank <code>shipped_date</code> values are <i>structural</i> &mdash; those orders never shipped, so of course there's no date. That's not dirty data, it's information. The single <code>"MISSING"</code> string is different: a row that claims to have shipped but has no date, with a placeholder someone typed by hand. The first is expected and meaningful; the second is a genuine defect. Treating them the same would be a mistake in both directions.</div>
+
+    <div class="interactive">
+      <span class="ilbl">Exercise 3 · graded against the real file</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>clean_revenue(df)</code> that: removes exact duplicates, excludes rows with a negative <code>quantity</code>, computes <code>quantity × unit_price</code>, and returns the total rounded to 2 decimal places.</p>
+      <textarea id="ex3Editor" class="testin" spellcheck="false" rows="6">def clean_revenue(df):
+    # 1. drop exact duplicates
+    # 2. keep only rows with quantity > 0
+    # 3. compute quantity * unit_price and sum it
+    return 0.0</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunEx3">▶ Run tests</button>
+        <button id="btnResetEx3">Reset starter code</button>
+      </div>
+      <div id="ex3Results"></div>
+    </div>
+    <details class="challenge">
+      <summary>Advanced extension (optional, not graded)</summary>
+      <div class="chbody">Compute revenue two ways: excluding negative-quantity rows, and treating them as returns (i.e. letting them subtract). How much do the two totals differ? Which would you present to a finance stakeholder, and what one sentence would you attach to it? There is no single right answer here &mdash; but there is a wrong one, which is presenting either number without saying which choice you made.</div>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">4.6</span><h2 class="serif">Validation: prove the cleaning worked</h2></div>
+    <p>Cleaning without validation is hoping. After every fix, re-run the detection that found the problem and confirm it's gone &mdash; and confirm you didn't break something else in the process.</p>
+    <pre class="codeblock"><span class="c"># before</span>
+<span class="kw">print</span>(<span class="s">"dupes:"</span>, df.duplicated().sum(), <span class="s">"rows:"</span>, len(df))
+clean = df.drop_duplicates()
+<span class="c"># after — both numbers should have moved by exactly the amount you expect</span>
+<span class="kw">print</span>(<span class="s">"dupes:"</span>, clean.duplicated().sum(), <span class="s">"rows:"</span>, len(clean))</pre>
+    <div class="def">
+      <div class="k">Validation questions worth asking every time</div>
+      <p>Did the row count change by exactly the number I intended?<br>
+      Is the anomaly count now zero?<br>
+      Did a total I care about move more than I expected? (a large swing means you removed more than you thought)<br>
+      Do the categories now match the list the business actually uses?</p>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Exercise 4 · graded against the real file</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>validate_cleaning(df)</code> that returns a dictionary reporting the effect of cleaning, with exactly these four keys:<br>
+      <code>rows_before</code>, <code>rows_after</code> (after dropping exact duplicates and negative quantities), <code>duplicates_removed</code>, <code>negative_qty_removed</code>.</p>
+      <textarea id="ex4Editor" class="testin" spellcheck="false" rows="8">def validate_cleaning(df):
+    # return a dict with these four integer keys:
+    #   rows_before, rows_after, duplicates_removed, negative_qty_removed
+    return {}</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunEx4">▶ Run tests</button>
+        <button id="btnResetEx4">Reset starter code</button>
+      </div>
+      <div id="ex4Results"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">★</span><h2 class="serif">Mini-project: clean a second, unfamiliar file</h2></div>
+    <p>New file, no walkthrough. <code>expense_reports.csv</code> is a corporate expense export with several problems &mdash; some you've seen, at least one you haven't.</p>
+    <div class="def">
+      <div class="k">expense_reports.csv &nbsp;·&nbsp; <a href="datasets/expense_reports.csv" download style="color:var(--info)">download</a></div>
+      <p style="margin-top:8px">Columns: <code>expense_id</code>, <code>employee</code>, <code>date</code>, <code>category</code>, <code>amount</code>. Finance wants total spend per category. That's the whole brief &mdash; the same amount of guidance you'd get in a real job.</p>
+    </div>
+    <div class="why"><b>Before you write the final function, explore the file below.</b> Two things in particular will bite you if you don't look first: the <code>category</code> column, and the <code>amount</code> column. Neither is what it appears to be at a glance.</div>
+
+    <div class="interactive discovery">
+      <span class="ilbl">Explore first</span>
+      <textarea id="expEditor" class="testin" spellcheck="false" rows="10">df = pd.read_csv("expense_reports.csv")
+print("shape:", df.shape)
+print()
+print(df["category"].value_counts(dropna=False))
+print()
+print(df["amount"].head(12).tolist())
+print()
+print("fully blank rows:", df.isna().all(axis=1).sum())
+</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunExp">▶ Run code</button>
+        <button id="btnResetExp">Reset</button>
+      </div>
+      <div id="expOut"></div>
+    </div>
+
+    <div class="interactive">
+      <span class="ilbl">Required exercise · this module's graded checkpoint work</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>usd_spend_by_category(df)</code> returning a dictionary of <b>USD-only</b> spend per cleaned category, rounded to 2 decimals, with exactly 4 keys.</p>
+      <p class="mut" style="margin-bottom:10px">What you'll need to handle: fully blank rows; category variants (<code>"travel "</code>, <code>"Trvl"</code>, <code>"office supplies"</code>) collapsing to 4 real categories; and the <code>amount</code> column, which mixes plain numbers, <code>$</code>-prefixed values, and <code>€</code> values that use a comma as the decimal separator.</p>
+      <div class="warn" style="margin-top:0"><b>The judgement call, and it's the important part:</b> you cannot add euros to dollars and call it a total. There's no exchange rate in the file, and inventing one would be fabricating data. So this function reports USD only &mdash; and in a real job, the euro rows are what you raise with finance rather than quietly bury. Exclude them from the total.</div>
+      <textarea id="ex5Editor" class="testin" spellcheck="false" rows="12">def usd_spend_by_category(df):
+    # 1. drop fully-blank rows
+    # 2. normalise category: strip, title-case, and map "Trvl" -> "Travel"
+    # 3. parse amount: skip € rows entirely, strip $ from the rest, convert to float
+    # 4. group by category, sum, round to 2dp
+    # 5. return a dict with exactly 4 keys
+    return {}</textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnRunEx5">▶ Run tests</button>
+        <button id="btnResetEx5">Reset starter code</button>
+      </div>
+      <div id="ex5Results"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">✎</span><h2 class="serif">Your cleaning log</h2></div>
+    <p>The last step of the six-step loop is documentation, and it's the one that makes your work defensible. Write the log now, while the decisions are fresh.</p>
+    <div class="warn"><b>Honest limitation:</b> this box cannot be automatically graded &mdash; there is no single correct wording, and pretending otherwise would be fake rigour. It's saved with your progress so you can carry it into your portfolio. Grade yourself against the checklist underneath, honestly; the value is entirely in whether you can defend the decisions, not in ticking the boxes.</div>
+    <textarea id="cleaningLog" class="logbox" placeholder="For each problem you found in ecommerce_orders.csv and expense_reports.csv, write one short entry:
+
+PROBLEM — what you found, and how many rows it affected
+INVESTIGATION — what you checked before deciding
+DECISION — drop / fix / fill / flag, and why
+VALIDATION — how you confirmed it worked
+IMPACT — what changed in the final numbers
+
+Example:
+PROBLEM: 12 exact duplicate rows (412 -> 400).
+INVESTIGATION: All 12 duplicated an existing order_id exactly, across every column — consistent with a double export rather than genuine repeat orders.
+DECISION: Dropped them. A genuine second order would have its own order_id.
+VALIDATION: df.duplicated().sum() went to 0; row count fell by exactly 12.
+IMPACT: Revenue total fell about 3%, which is the overcount we would have reported."></textarea>
+    <div class="rubric" id="logRubric"></div>
+    <div class="dagctrl"><button class="primary" id="btnSaveLog">Save cleaning log</button><span id="logSaved" style="font-size:13px;color:var(--good)"></span></div>
+    <details class="challenge">
+      <summary>Model answer (open after writing your own)</summary>
+      <div class="chbody">
+        <b>ecommerce_orders.csv</b><br>
+        1. <b>12 exact duplicate rows</b> (412&rarr;400). All duplicated an existing order_id across every column — an export artifact, not repeat orders. Dropped. Validated: duplicated().sum() == 0.<br>
+        2. <b>SKU casing</b>: 122 apparent products, 79 real ones. 67 rows had lowercase SKUs. Uppercased. Validated: nunique() fell to 79. Impact: any per-product analysis would otherwise have split the same product into two.<br>
+        3. <b>7 negative quantities.</b> No matching returns table exists in this data, and status values don't indicate returns, so these read as data-entry errors. Excluded and flagged — but I'd confirm with Ops before publishing, because if they <i>are</i> returns, excluding them overstates net revenue.<br>
+        4. <b>Three date formats</b> in one column (2026-04-03, 05/30/2026, 03-Apr-2026). Parsed with format="mixed". The ambiguous DD/MM vs MM/DD cases would need confirming with the source system — I did not guess.<br>
+        5. <b>shipped_date</b>: 133 blanks are structural (order never shipped) and were left alone. The single "MISSING" string is a real defect and was flagged.<br><br>
+        <b>expense_reports.csv</b><br>
+        6. <b>4 fully blank rows</b> — merged-cell artifact from the spreadsheet export. Dropped.<br>
+        7. <b>8 category spellings &rarr; 4 real categories</b> (whitespace, casing, and "Trvl"). Normalised.<br>
+        8. <b>Mixed currencies.</b> 108 USD rows, 42 EUR rows using comma decimals. Reported USD only ($12,688.90) rather than inventing an exchange rate, and raised the 42 EUR rows with finance as an open item. This is the decision I'd most expect to be challenged on, and the one I'd lead with when presenting.
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">✓</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Five questions on judgement, not syntax. Score 80% or higher (4 of 5) to unlock Module 5.</p>
+    <div class="qcard">
+      <div class="qtext">1. You find 7 negative quantities in an orders table. What's the correct first move?</div>
+      <div id="q1opts"></div><div class="qexplain" id="q1explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qtext">2. A price column has 30 missing values. Why is <code>.fillna(0)</code> usually the worst option?</div>
+      <div id="q2opts"></div><div class="qexplain" id="q2explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qtext">3. Why does a mixed-format date column deserve more caution than a mixed-case text column?</div>
+      <div id="q3opts"></div><div class="qexplain" id="q3explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qtext">4. After cleaning, your revenue total dropped 40%. What should you do?</div>
+      <div id="q4opts"></div><div class="qexplain" id="q4explain"></div>
+    </div>
+    <div class="qcard">
+      <div class="qtext">5. Why document cleaning decisions at all, if the cleaned numbers are correct?</div>
+      <div id="q5opts"></div><div class="qexplain" id="q5explain"></div>
+    </div>
+  </section>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Module 4 of 9 · Next: Statistics for Analysts</footer>
 </div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete the audit, exercises and checkpoint to continue →</button>
+</div></div>
+
 <script src="course-progress.js?v=1"></script>
-<script src="course-rail.js"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const MODULE_ID = 4;
+CourseProgress.touchVisited(MODULE_ID);
+
+const DATASETS = {};
+async function loadDatasets() {
+  if (DATASETS.orders) return DATASETS;
+  const [orders, expenses] = await Promise.all([
+    fetch("datasets/ecommerce_orders.csv").then(r => r.text()),
+    fetch("datasets/expense_reports.csv").then(r => r.text()),
+  ]);
+  DATASETS.orders = orders; DATASETS.expenses = expenses;
+  return DATASETS;
+}
+const PREAMBLE = ["import pandas as pd, io, json", "def _mk(txt): return pd.read_csv(io.StringIO(txt))"].join("\n");
+const exerciseState = {};
+
+async function runPlayground(editorId, outId, buttonId) {
+  const btn = document.getElementById(buttonId), outEl = document.getElementById(outId);
+  btn.disabled = true;
+  outEl.innerHTML = `<div class="feedback wait">Loading datasets and starting Python&hellip; (first run downloads pandas, 20&ndash;60s)</div>`;
+  let ds;
+  try { ds = await loadDatasets(); }
+  catch (e) { outEl.innerHTML = `<div class="feedback bad">Could not load datasets: ${CourseProgress.escapeHtml(String(e))}</div>`; btn.disabled = false; return; }
+  const userCode = document.getElementById(editorId).value;
+  const harness = [
+    PREAMBLE,
+    "def harness(payload):",
+    "    code, orders_txt, exp_txt = payload",
+    "    import sys, io as _io",
+    "    buf = _io.StringIO(); _stdout = sys.stdout; sys.stdout = buf",
+    "    def _read_csv(path, *a, **k):",
+    "        mapping = {'ecommerce_orders.csv': orders_txt, 'expense_reports.csv': exp_txt}",
+    "        key = str(path).split('/')[-1]",
+    "        if key in mapping: return pd.read_csv(_io.StringIO(mapping[key]), *a, **k)",
+    "        raise FileNotFoundError('Available files: ' + ', '.join(mapping))",
+    "    class _PdShim:",
+    "        def __getattr__(self, n): return getattr(pd, n)",
+    "        read_csv = staticmethod(_read_csv)",
+    "    ns = {'pd': _PdShim()}",
+    "    err = None",
+    "    try: exec(code, ns)",
+    "    except Exception as e: err = f'{type(e).__name__}: {e}'",
+    "    finally: sys.stdout = _stdout",
+    "    return {'ranOk': True, 'out': buf.getvalue(), 'err': err}",
+  ].join("\n");
+  let outcome;
+  try { outcome = await PySandboxRunner.run(harness, "harness", [userCode, ds.orders, ds.expenses], 20000, 90000); }
+  finally { btn.disabled = false; }
+  if (!outcome.ok) { outEl.innerHTML = `<div class="feedback bad">${CourseProgress.escapeHtml(outcome.error)}</div>`; return; }
+  const r = outcome.result;
+  let html = "";
+  if (r.out) html += `<div class="outbox">${CourseProgress.escapeHtml(r.out)}</div>`;
+  if (r.err) html += `<div class="feedback bad">${CourseProgress.escapeHtml(r.err)}</div>`;
+  if (!r.out && !r.err) html = `<div class="feedback wait">Ran with no output — add a print() to see something.</div>`;
+  outEl.innerHTML = html;
+  CourseProgress.setExtra("module4_explored_" + editorId, true);
+  updateNextButton();
+}
+document.getElementById("btnRunAudit").addEventListener("click", () => runPlayground("auditEditor", "auditOut", "btnRunAudit"));
+document.getElementById("btnRunExp").addEventListener("click", () => runPlayground("expEditor", "expOut", "btnRunExp"));
+
+const AUDIT_STARTER = 'df = pd.read_csv("ecommerce_orders.csv")\n\nprint("shape:", df.shape)\nprint()\nprint(df.dtypes)\nprint()\nprint(df.head(5))\n\n# Your investigation goes here. Some starting points:\n#   df.duplicated().sum()\n#   df["order_id"].duplicated().sum()\n#   df["sku"].nunique()\n#   df["quantity"].describe()\n#   df["order_date"].head(20)\n#   df["shipped_date"].value_counts(dropna=False).head()\n';
+const EXP_STARTER = 'df = pd.read_csv("expense_reports.csv")\nprint("shape:", df.shape)\nprint()\nprint(df["category"].value_counts(dropna=False))\nprint()\nprint(df["amount"].head(12).tolist())\nprint()\nprint("fully blank rows:", df.isna().all(axis=1).sum())\n';
+document.getElementById("btnResetAudit").addEventListener("click", () => {
+  document.getElementById("auditEditor").value = AUDIT_STARTER; document.getElementById("auditOut").innerHTML = "";
+});
+document.getElementById("btnResetExp").addEventListener("click", () => {
+  document.getElementById("expEditor").value = EXP_STARTER; document.getElementById("expOut").innerHTML = "";
+});
+
+/* ---------------- graded exercises ---------------- */
+function harnessFor(fnName, checks) {
+  return [
+    PREAMBLE,
+    "def harness(payload):",
+    "    code, orders_txt, exp_txt = payload",
+    "    ns = {'pd': pd}",
+    "    try: exec(code, ns)",
+    "    except Exception as e: return {'ranOk': False, 'error': f'{type(e).__name__}: {e}'}",
+    `    fn = ns.get('${fnName}')`,
+    "    if fn is None:",
+    `        return {'ranOk': True, 'results': [{'name': '${fnName} is defined', 'pass': False, 'hint': 'Define a function named exactly ${fnName}.'}]}`,
+    "    orders = _mk(orders_txt); expenses = _mk(exp_txt)",
+    "    results = []",
+    ...checks,
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n");
+}
+
+const EX1 = () => harnessFor("dedupe_count", [
+  "    try:",
+  "        out = fn(orders.copy())",
+  "        results.append({'name': '400 rows remain after removing exact duplicates', 'pass': out == 400, 'hint': f'Expected 400, got {out!r}. df.drop_duplicates() then len().'})",
+  "    except Exception as e: results.append({'name': 'dedupe_count runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        small = pd.concat([orders.head(5), orders.head(5)])",
+  "        out2 = fn(small)",
+  "        results.append({'name': 'Works on a different frame (not hardcoded)', 'pass': out2 == 5, 'hint': f'A 10-row frame of 5 duplicated rows should return 5, got {out2!r}.'})",
+  "    except Exception as e: results.append({'name': 'Works on a different frame (not hardcoded)', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+
+const EX2 = () => harnessFor("true_product_count", [
+  "    try:",
+  "        out = fn(orders.copy())",
+  "        results.append({'name': '79 genuinely distinct products', 'pass': out == 79, 'hint': f'Expected 79, got {out!r}. Strip and uppercase the sku column, then count unique values.'})",
+  "    except Exception as e: results.append({'name': 'true_product_count runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        d = orders.copy(); d['sku'] = 'sku-1'",
+  "        out2 = fn(d)",
+  "        results.append({'name': 'Recomputes from data (not hardcoded)', 'pass': out2 == 1, 'hint': f'If every sku is identical the answer must be 1, got {out2!r}.'})",
+  "    except Exception as e: results.append({'name': 'Recomputes from data (not hardcoded)', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+
+const EX3 = () => harnessFor("clean_revenue", [
+  "    try:",
+  "        out = fn(orders.copy())",
+  "        p = abs(float(out) - 46287.08) < 1.0",
+  "        results.append({'name': 'Clean revenue total is correct', 'pass': p, 'hint': f'Expected about 46287.08, got {out!r}. Drop duplicates, keep quantity > 0, then sum quantity * unit_price.'})",
+  "    except Exception as e: results.append({'name': 'clean_revenue runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        d = orders.copy(); d['quantity'] = -1",
+  "        out2 = fn(d)",
+  "        results.append({'name': 'Excludes negative quantities (all-negative frame totals 0)', 'pass': abs(float(out2)) < 0.001, 'hint': f'If every quantity is negative the total must be 0, got {out2!r}. Are you filtering quantity > 0?'})",
+  "    except Exception as e: results.append({'name': 'Excludes negative quantities', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+
+const EX4 = () => harnessFor("validate_cleaning", [
+  "    try:",
+  "        out = fn(orders.copy())",
+  "        if not isinstance(out, dict):",
+  "            results.append({'name': 'Returns a dictionary', 'pass': False, 'hint': f'Expected a dict, got {type(out).__name__}.'})",
+  "        else:",
+  "            results.append({'name': 'Returns a dictionary', 'pass': True, 'hint': ''})",
+  "            need = {'rows_before','rows_after','duplicates_removed','negative_qty_removed'}",
+  "            results.append({'name': 'Has exactly the four required keys', 'pass': set(out) == need, 'hint': f'Expected keys {sorted(need)}, got {sorted(out)}.'})",
+  "            exp = {'rows_before': 412, 'rows_after': 393, 'duplicates_removed': 12, 'negative_qty_removed': 7}",
+  "            if set(out) == need:",
+  "                bad = [f'{k}: yours={out[k]} expected={v}' for k, v in exp.items() if out[k] != v]",
+  "                results.append({'name': 'All four counts are correct', 'pass': not bad, 'hint': ('Mismatch — ' + '; '.join(bad)) if bad else ''})",
+  "            else:",
+  "                results.append({'name': 'All four counts are correct', 'pass': False, 'hint': 'Fix the keys first.'})",
+  "    except Exception as e: results.append({'name': 'validate_cleaning runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+
+const EX5 = () => harnessFor("usd_spend_by_category", [
+  "    try:",
+  "        out = fn(expenses.copy())",
+  "        if not isinstance(out, dict):",
+  "            results.append({'name': 'Returns a dictionary', 'pass': False, 'hint': f'Expected a dict, got {type(out).__name__}.'})",
+  "        else:",
+  "            results.append({'name': 'Returns a dictionary', 'pass': True, 'hint': ''})",
+  "            exp = {'Meals': 3637.27, 'Office Supplies': 2891.73, 'Software': 2147.96, 'Travel': 4011.94}",
+  "            results.append({'name': 'Exactly 4 cleaned categories', 'pass': len(out) == 4, 'hint': f'Expected 4 categories, got {len(out)}: {sorted(out)}. Strip, title-case, and map Trvl to Travel.'})",
+  "            keys_ok = set(out) == set(exp)",
+  "            results.append({'name': 'Category names are Meals, Office Supplies, Software, Travel', 'pass': keys_ok, 'hint': f'Got {sorted(out)}, expected {sorted(exp)}.'})",
+  "            if keys_ok:",
+  "                bad = [f'{k}: yours={out[k]} expected={v}' for k, v in exp.items() if abs(float(out[k]) - v) > 0.05]",
+  "                results.append({'name': 'USD-only totals are correct (euro rows excluded)', 'pass': not bad, 'hint': ('Mismatch — ' + '; '.join(bad) + '. Did you exclude the euro rows rather than converting or mis-parsing them?') if bad else ''})",
+  "            else:",
+  "                results.append({'name': 'USD-only totals are correct (euro rows excluded)', 'pass': False, 'hint': 'Fix the category names first.'})",
+  "    except Exception as e: results.append({'name': 'usd_spend_by_category runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+
+const STARTERS = {
+  ex1: 'def dedupe_count(df):\n    # your code here — return an integer\n    return 0',
+  ex2: 'def true_product_count(df):\n    # your code here — return an integer\n    return 0',
+  ex3: 'def clean_revenue(df):\n    # 1. drop exact duplicates\n    # 2. keep only rows with quantity > 0\n    # 3. compute quantity * unit_price and sum it\n    return 0.0',
+  ex4: 'def validate_cleaning(df):\n    # return a dict with these four integer keys:\n    #   rows_before, rows_after, duplicates_removed, negative_qty_removed\n    return {}',
+  ex5: 'def usd_spend_by_category(df):\n    # 1. drop fully-blank rows\n    # 2. normalise category: strip, title-case, and map "Trvl" -> "Travel"\n    # 3. parse amount: skip € rows entirely, strip $ from the rest, convert to float\n    # 4. group by category, sum, round to 2dp\n    # 5. return a dict with exactly 4 keys\n    return {}',
+};
+const HARNESSES = { ex1: EX1, ex2: EX2, ex3: EX3, ex4: EX4, ex5: EX5 };
+const SECTION_KEYS = { ex5: "cleaningPipelineExercise" };
+
+async function runGraded(id, buildHarness, buttonId, sectionKey) {
+  const btn = document.getElementById(buttonId), resultsEl = document.getElementById(id + "Results");
+  btn.disabled = true;
+  resultsEl.innerHTML = `<div class="feedback wait">Loading datasets and starting Python&hellip;</div>`;
+  let ds;
+  try { ds = await loadDatasets(); }
+  catch (e) { resultsEl.innerHTML = `<div class="feedback bad">Could not load datasets: ${CourseProgress.escapeHtml(String(e))}</div>`; btn.disabled = false; return; }
+  const code = document.getElementById(id + "Editor").value;
+  let outcome;
+  try { outcome = await PySandboxRunner.run(buildHarness(), "harness", [code, ds.orders, ds.expenses], 20000, 90000); }
+  finally { btn.disabled = false; }
+  if (!outcome.ok) { resultsEl.innerHTML = `<div class="feedback bad">${CourseProgress.escapeHtml(outcome.error)}</div>`; return; }
+  const data = outcome.result;
+  if (!data.ranOk) { resultsEl.innerHTML = `<div class="feedback bad">Your code didn't run: ${CourseProgress.escapeHtml(data.error || "unknown")}</div>`; return; }
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  data.results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.className = "testsummary";
+  summary.style.color = passCount === data.results.length ? "var(--good)" : "var(--mut)";
+  summary.textContent = `${passCount} / ${data.results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  exerciseState[id] = { passCount, total: data.results.length };
+  CourseProgress.setExtra("module4_" + id, { passCount, total: data.results.length });
+  if (sectionKey) CourseProgress.setSection(MODULE_ID, sectionKey, { passCount, total: data.results.length });
+  updateNextButton();
+}
+["ex1","ex2","ex3","ex4","ex5"].forEach(id => {
+  const cap = id.charAt(0).toUpperCase() + id.slice(1);
+  document.getElementById("btnRun" + cap).addEventListener("click", () => runGraded(id, HARNESSES[id], "btnRun" + cap, SECTION_KEYS[id] || null));
+  document.getElementById("btnReset" + cap).addEventListener("click", () => {
+    document.getElementById(id + "Editor").value = STARTERS[id];
+    document.getElementById(id + "Results").innerHTML = "";
+  });
+});
+
+/* ---------------- audit discovery questions ---------------- */
+const auditAnswered = {};
+function buildAudit(id, opts, containerId){
+  const el = document.getElementById(containerId);
+  opts.forEach((opt,i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.textContent = opt.text;
+    div.addEventListener("click", () => {
+      if (auditAnswered[id]) return;
+      auditAnswered[id] = true;
+      el.querySelectorAll(".qopt").forEach((e,j) => {
+        if (opts[j].correct) e.classList.add("correct");
+        else if (j === i) e.classList.add("incorrect");
+      });
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      ex.textContent = opt.correct ? opt.correctText : "Not quite. " + opt.reason;
+      CourseProgress.setExtra("module4_audit_" + id, { correct: !!opt.correct });
+      updateNextButton();
+    });
+    el.appendChild(div);
+  });
+}
+buildAudit("a1", [
+  { text: "12", correct: true, correctText: "Correct — df.duplicated().sum() returns 12, taking the file from 412 rows to 400 once removed." },
+  { text: "0 — every row is unique", correct: false, reason: "Run df.duplicated().sum() in the workspace above. There are genuine exact-duplicate rows in this file." },
+  { text: "133", correct: false, reason: "133 is the number of blank shipped_date values, which is a different problem entirely (and mostly not even a problem — see A5)." },
+], "a1opts");
+buildAudit("a2", [
+  { text: "Inconsistent casing — 67 SKUs are lowercase, so SKU-1005 and sku-1005 count as two different products", correct: true, correctText: "Correct. .str.upper() collapses 122 apparent products down to the real 79. Any per-product analysis run on the raw column would silently split products in half." },
+  { text: "43 products were discontinued and should be removed", correct: false, reason: "Nothing in the data indicates discontinuation. The gap is entirely explained by casing — uppercase the column and the count resolves to 79." },
+  { text: "Some SKUs are missing and need filling in", correct: false, reason: "The sku column has no missing values. The inflation comes from the same SKU appearing in two different cases." },
+], "a2opts");
+buildAudit("a3", [
+  { text: "7 rows have negative quantities; investigate whether they're returns before deciding, since the data has no returns table to confirm it", correct: true, correctText: "Correct — and the investigation is the point. If they're data-entry errors you exclude them; if they're returns, excluding them overstates net revenue. The file alone can't tell you, so you flag it." },
+  { text: "7 rows have negative quantities; delete them immediately since quantities can't be negative", correct: false, reason: "Too fast. Negative quantities are how many systems record returns. Deleting them without checking could remove real business events and overstate revenue." },
+  { text: "Nothing is wrong with the quantity column", correct: false, reason: "Run df['quantity'].describe() or (df['quantity'] < 0).sum() — there are 7 negative values." },
+], "a3opts");
+buildAudit("a4", [
+  { text: "The column mixes at least three date formats (2026-04-03, 05/30/2026, 03-Apr-2026), and some are ambiguous about whether day or month comes first", correct: true, correctText: "Correct. format='mixed' handles the parsing, but the DD/MM vs MM/DD ambiguity is a genuine unknown you'd confirm with the source system rather than guess." },
+  { text: "The dates are all in the future and therefore invalid", correct: false, reason: "The dates are within a normal range for the dataset. The difficulty is format inconsistency, not the values themselves." },
+  { text: "The column is entirely empty", correct: false, reason: "The column is fully populated — run df['order_date'].head(20) and you'll see several different formats." },
+], "a4opts");
+buildAudit("a5", [
+  { text: "No — the 133 blanks are structural (those orders never shipped, so no date should exist), while the single 'MISSING' string is a real defect on a row that claims to have shipped", correct: true, correctText: "Correct, and this distinction matters: filling or dropping the 133 structural blanks would destroy real information about the funnel. Only the 'MISSING' row is genuinely dirty." },
+  { text: "Yes — both are missing values and should be handled identically", correct: false, reason: "Treating them identically loses real information. A blank shipped_date on a cart_created order is correct and expected — that order never shipped." },
+  { text: "Yes — both should be filled with today's date", correct: false, reason: "This would fabricate shipping events that never happened, corrupting any delivery-time analysis built on the column afterwards." },
+], "a5opts");
+
+/* ---------------- cleaning log ---------------- */
+const LOG_RUBRIC = [
+  "I named each problem and how many rows it affected",
+  "I described what I checked before deciding (not just what I changed)",
+  "I stated a decision and a reason for each problem",
+  "I validated each fix and recorded the result",
+  "I noted at least one decision I would raise with a stakeholder rather than decide alone",
+];
+(function buildRubric(){
+  const el = document.getElementById("logRubric");
+  const saved = CourseProgress.getExtra("module4_logRubric") || {};
+  LOG_RUBRIC.forEach((text, i) => {
+    const lab = document.createElement("label");
+    const cb = document.createElement("input");
+    cb.type = "checkbox"; cb.checked = !!saved["r"+i];
+    cb.addEventListener("change", () => {
+      const cur = CourseProgress.getExtra("module4_logRubric") || {};
+      cur["r"+i] = cb.checked;
+      CourseProgress.setExtra("module4_logRubric", cur);
+    });
+    lab.appendChild(cb);
+    lab.appendChild(document.createTextNode(text));
+    el.appendChild(lab);
+  });
+})();
+document.getElementById("btnSaveLog").addEventListener("click", () => {
+  CourseProgress.setExtra("module4_cleaningLog", document.getElementById("cleaningLog").value);
+  const el = document.getElementById("logSaved");
+  el.textContent = "Saved.";
+  setTimeout(() => { el.textContent = ""; }, 2000);
+  updateNextButton();
+});
+
+/* ---------------- checkpoint ---------------- */
+let score = 0;
+const answered = { q1:false,q2:false,q3:false,q4:false,q5:false };
+function requiredExercisesPassing(){
+  return ["ex1","ex2","ex3","ex4","ex5"].every(id => exerciseState[id] && exerciseState[id].passCount === exerciseState[id].total);
+}
+function auditDone(){ return ["a1","a2","a3","a4","a5"].every(id => auditAnswered[id]); }
+function updateNextButton(){
+  const allQ = ["q1","q2","q3","q4","q5"].every(k => answered[k]);
+  const ready = allQ && requiredExercisesPassing() && auditDone();
+  const btn = document.getElementById("btnNext");
+  btn.disabled = !ready;
+  btn.textContent = ready ? "Continue to Module 5 →" : "Complete the audit, exercises and checkpoint to continue →";
+  if (allQ) CourseProgress.markComplete(MODULE_ID, score, 5);
+}
+function buildQ(id, opts, containerId){
+  const el = document.getElementById(containerId);
+  opts.forEach((opt,i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.textContent = opt.text;
+    div.addEventListener("click", () => {
+      if (answered[id]) return;
+      answered[id] = true;
+      CourseProgress.setAnswer(MODULE_ID, id, i);
+      el.querySelectorAll(".qopt").forEach((e,j) => {
+        if (opts[j].correct) e.classList.add("correct");
+        else if (j === i) e.classList.add("incorrect");
+      });
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { score++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+      updateNextButton();
+    });
+    el.appendChild(div);
+  });
+}
+buildQ("q1", [
+  { text: "Investigate what they represent — check whether the business records returns this way — before deciding anything", correct: true, correctText: "Correct. Detect, then investigate, then decide. The same value means opposite things depending on the business context." },
+  { text: "Delete them, since a negative quantity is obviously impossible", correct: false, reason: "Many systems record returns as negative quantities. Deleting them without checking can remove real events and overstate net revenue." },
+  { text: "Convert them to positive with abs(), since it's clearly a sign error", correct: false, reason: "This silently doubles their contribution if they were genuinely returns — turning a subtraction into an addition. It's the most destructive option here." },
+], "q1opts");
+buildQ("q2", [
+  { text: "It converts 'we don't know' into 'it was free', which silently corrupts every total and average computed afterwards", correct: true, correctText: "Correct. A fill value has to be genuinely meaningful for that column. For prices, zero almost never is." },
+  { text: "Because fillna() is slower than dropna()", correct: false, reason: "Performance is irrelevant here. The problem is that zero is a factually wrong claim about the price." },
+  { text: "Because pandas doesn't allow filling numeric columns with zero", correct: false, reason: "pandas allows it. The issue is analytical honesty, not a technical restriction." },
+], "q2opts");
+buildQ("q3", [
+  { text: "Because 03/04/2026 is genuinely ambiguous — it could be March 4th or April 3rd — and a wrong guess produces plausible-looking but wrong dates that nothing will flag", correct: true, correctText: "Correct. Casing errors are obvious once collapsed; a silently mis-parsed date looks completely normal and can shift a whole month's analysis." },
+  { text: "Because date columns take longer to process", correct: false, reason: "Speed isn't the concern. The risk is silent, invisible incorrectness." },
+  { text: "Because dates can't be fixed once loaded incorrectly", correct: false, reason: "They can be re-parsed from the raw file. The danger is not noticing they were wrong in the first place." },
+], "q3opts");
+buildQ("q4", [
+  { text: "Stop and investigate — a drop that large means you removed far more than intended, and you should reconcile the row counts before trusting the number", correct: true, correctText: "Correct. This is exactly what the validation step is for. A 3% change from removing 12 duplicates is plausible; 40% means something went wrong." },
+  { text: "Report the new figure — cleaned data is by definition more accurate", correct: false, reason: "Cleaning can introduce errors as easily as it removes them. An unexplained 40% swing is a signal to check your work, not to publish it." },
+  { text: "Revert all cleaning and use the raw data instead", correct: false, reason: "Overcorrecting in the other direction. The right move is to find which step caused the drop, not to abandon cleaning entirely." },
+], "q4opts");
+buildQ("q5", [
+  { text: "Because someone will eventually question a number, and 'here's exactly what I changed and why' is the difference between a defensible analysis and an untrustworthy one", correct: true, correctText: "Correct. It also lets you (or a colleague) reproduce the work months later, and makes genuine mistakes findable instead of permanent." },
+  { text: "Because documentation is required by pandas", correct: false, reason: "Nothing technical requires it. The requirement comes from working with other people who need to trust and reproduce your numbers." },
+  { text: "It isn't necessary if you're confident the numbers are right", correct: false, reason: "Confidence isn't evidence. Undocumented cleaning is unreproducible and unauditable, which means nobody else can verify it — including future you." },
+], "q5opts");
+
+function maybeShowRetry(){
+  const any = ["q1","q2","q3","q4","q5"].some(k => answered[k]);
+  const all = ["q1","q2","q3","q4","q5"].every(k => answered[k]);
+  document.getElementById("btnRetryCheckpoint").style.display = (any && (all ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModule(MODULE_ID); window.location.reload();
+});
+const _origUpdate = updateNextButton;
+updateNextButton = function(){ _origUpdate(); maybeShowRetry(); };
+document.getElementById("btnNext").addEventListener("click", () => { window.location.href = "module-05.html"; });
+
+(function restore(){
+  const stored = CourseProgress.getModule(MODULE_ID);
+  const a = stored.answers || {};
+  ["q1","q2","q3","q4","q5"].forEach(id => {
+    if (a[id] !== undefined && !answered[id]) {
+      const label = document.querySelectorAll(`#${id}opts .qopt`)[a[id]];
+      if (label) label.click();
+    }
+  });
+  ["ex1","ex2","ex3","ex4","ex5"].forEach(id => {
+    const saved = CourseProgress.getExtra("module4_" + id);
+    if (saved && saved.total > 0) {
+      exerciseState[id] = saved;
+      const passed = saved.passCount === saved.total;
+      document.getElementById(id + "Results").innerHTML =
+        `<div class="feedback ${passed ? "ok" : "bad"}">Restored from your last visit: ${saved.passCount} / ${saved.total} tests passing. Edit and re-run any time.</div>`;
+    }
+  });
+  ["a1","a2","a3","a4","a5"].forEach(id => {
+    const saved = CourseProgress.getExtra("module4_audit_" + id);
+    if (saved) {
+      auditAnswered[id] = true;
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      ex.textContent = saved.correct ? "Answered correctly on a previous visit." : "Answered on a previous visit (incorrectly). Re-read the section — the reasoning matters more than the score.";
+    }
+  });
+  const savedLog = CourseProgress.getExtra("module4_cleaningLog");
+  if (typeof savedLog === "string") document.getElementById("cleaningLog").value = savedLog;
+  updateNextButton();
+})();
+</script>
 </body>
 </html>
