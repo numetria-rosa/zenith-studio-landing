@@ -152,13 +152,13 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
       <div class="k">The rule</div>
       <p>Mean gets dragged by extreme values; median doesn't. If mean &gt; median, something large is pulling the average up. If they're close, the data is roughly symmetric and either is fine.</p>
     </div>
-    <div class="why"><b>The business version of this:</b> "average order value is $180" sounds healthy. If the median is $40, what you actually have is a lot of small orders and a handful of enormous ones &mdash; a completely different business, needing a completely different strategy. Reporting only the mean would be technically true and practically misleading.</div>
+    <div class="why"><b>The business version of this:</b> "average order value is $180" sounds healthy. If the median is $40, what you actually have is a lot of small orders and a handful of enormous ones, a completely different business, needing a completely different strategy. Reporting only the mean would be technically true and practically misleading.</div>
     <div class="beginner"><b>Never used these before?</b> For <code>[1, 2, 3, 4, 100]</code>: the mean is 22 (add them, divide by 5), the median is 3 (the middle one). Notice the mean isn't near <i>any</i> actual value in the list. That's the whole lesson.</div>
 
     <div class="interactive">
       <span class="ilbl">Exercise 1 · graded against the real survey file</span>
-      <p class="mut" style="margin-bottom:10px">The survey file has a <code>satisfaction_score</code> column meant to run 1&ndash;5. It contains both blanks <b>and</b> impossible values (0 and 6) that someone entered by mistake &mdash; you saw this class of problem in Module 4.</p>
-      <p class="mut" style="margin-bottom:10px">Write <code>valid_satisfaction_stats(df)</code> that keeps only genuinely valid scores (1 to 5 inclusive, no blanks) and returns a dict with keys <code>count</code>, <code>mean</code>, <code>median</code>, <code>std</code> &mdash; mean and std rounded to 2 decimals.</p>
+      <p class="mut" style="margin-bottom:10px">The survey file has a <code>satisfaction_score</code> column meant to run 1&ndash;5. It contains both blanks <b>and</b> impossible values (0 and 6) that someone entered by mistake, you saw this class of problem in Module 4.</p>
+      <p class="mut" style="margin-bottom:10px">Write <code>valid_satisfaction_stats(df)</code> that keeps only genuinely valid scores (1 to 5 inclusive, no blanks) and returns a dict with keys <code>count</code>, <code>mean</code>, <code>median</code>, <code>std</code>, mean and std rounded to 2 decimals.</p>
       <textarea id="ex1Editor" class="testin" spellcheck="false" rows="7">def valid_satisfaction_stats(df):
     # 1. convert satisfaction_score to numeric (blanks become NaN)
     # 2. keep only rows where the score is between 1 and 5 inclusive
@@ -174,7 +174,7 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
 
   <section>
     <div class="kh"><span class="num">5.2</span><h2 class="serif">Standard deviation: the consistency question</h2></div>
-    <p>Standard deviation measures spread &mdash; how far values typically sit from the mean. Low means tightly clustered and predictable; high means volatile.</p>
+    <p>Standard deviation measures spread, how far values typically sit from the mean. Low means tightly clustered and predictable; high means volatile.</p>
     <div class="why"><b>When you'd actually reach for it:</b> a stakeholder asks "which product line should we build the forecast around?" Two products both average $50k a month. One has a standard deviation of $3k, the other $28k. Same average, wildly different planning risk. The mean alone cannot answer their question; the standard deviation can.</div>
     <div class="def">
       <div class="k">How to explain it to a manager without saying "standard deviation"</div>
@@ -198,12 +198,12 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
       </div>
     </div>
     <p style="margin-top:16px">Referral looks like the best channel we have. It is 35% better than Email. An analyst who stops here recommends moving budget into Referral.</p>
-    <div class="warn"><b>But look at the sample.</b> Referral converted 2 people. If one of those two had not converted, the rate drops to 4.8% &mdash; worse than Email. A single person flipping changes the entire recommendation. That is not a finding; that is noise wearing a finding's clothes.</div>
+    <div class="warn"><b>But look at the sample.</b> Referral converted 2 people. If one of those two had not converted, the rate drops to 4.8%, worse than Email. A single person flipping changes the entire recommendation. That is not a finding; that is noise wearing a finding's clothes.</div>
     <div class="def">
       <div class="k">Confidence interval: the honest version of a number</div>
       <p>A 95% confidence interval is the range the true value plausibly sits in, given how much data you have. Computed from the real numbers above:</p>
-      <p style="margin-top:10px"><b>Referral:</b> &minus;3.0% to 22.1% &nbsp;&mdash;&nbsp; so wide it includes <i>negative</i> conversion, which is impossible. That is the maths telling you it has no idea.<br>
-      <b>Email:</b> 4.1% to 10.0% &nbsp;&mdash;&nbsp; a usable range you could plan against.</p>
+      <p style="margin-top:10px"><b>Referral:</b> &minus;3.0% to 22.1%, so wide it includes <i>negative</i> conversion, which is impossible. That is the maths telling you it has no idea.<br>
+      <b>Email:</b> 4.1% to 10.0%, a usable range you could plan against.</p>
     </div>
     <div class="beginner"><b>The plain-English rule:</b> before comparing two rates, look at the denominators. If either is small (a rough rule of thumb: fewer than ~30 events), be very sceptical. Percentages computed from tiny numbers are unstable, and presenting them as findings is how analysts lose credibility.</div>
   </section>
@@ -213,8 +213,8 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
     <p>A significance test answers exactly one question: <i>if there were genuinely no difference between these two groups, how surprising would data like this be?</i> The p-value is that surprise, as a probability.</p>
     <div class="def">
       <div class="k">Reading a p-value</div>
-      <p><b>p = 0.671</b> &mdash; data like this would be completely unsurprising even if there were no real difference. Conclude nothing.<br>
-      <b>p = 0.0002</b> &mdash; data like this would be very surprising if there were no real difference. Something is probably going on.<br>
+      <p><b>p = 0.671</b>, data like this would be completely unsurprising even if there were no real difference. Conclude nothing.<br>
+      <b>p = 0.0002</b>, data like this would be very surprising if there were no real difference. Something is probably going on.<br>
       The conventional cutoff is 0.05, but it's a convention, not a law of nature.</p>
     </div>
     <div class="warn"><b>What a p-value does NOT mean</b> (this trips up experienced people, not just beginners):<br>
@@ -273,9 +273,9 @@ two_prop_test(g.loc["Search","conv"],   g.loc["Search","clicks"],
     <p>Correlation measures whether two things move together, on a scale from &minus;1 to +1. Zero means no <i>linear</i> relationship. It does not, ever, on its own, establish that one thing causes the other.</p>
     <div class="def">
       <div class="k">Three explanations for every correlation you find</div>
-      <p><b>1. A causes B</b> &mdash; the one everyone jumps to.<br>
-      <b>2. B causes A</b> &mdash; reverse causation. Busy stores schedule more staff, rather than more staff creating busyness.<br>
-      <b>3. C causes both</b> &mdash; a confounder. Ice cream sales and drowning both rise in summer; neither causes the other.<br>
+      <p><b>1. A causes B</b>, the one everyone jumps to.<br>
+      <b>2. B causes A</b>, reverse causation. Busy stores schedule more staff, rather than more staff creating busyness.<br>
+      <b>3. C causes both</b>, a confounder. Ice cream sales and drowning both rise in summer; neither causes the other.<br>
       A correlation alone cannot distinguish between these. Only an experiment, or strong domain knowledge, can.</p>
     </div>
     <div class="warn"><b>The sentence that ends careers:</b> "Customers who use feature X retain better, so we should push everyone to feature X." Maybe X causes retention. Or maybe already-engaged customers are the ones who find X. Push X on everyone and you may learn, expensively, that it was the second one.</div>
@@ -307,9 +307,9 @@ two_prop_test(g.loc["Search","conv"],   g.loc["Search","clicks"],
       <span class="ilbl">Required exercise · this module's graded checkpoint work</span>
       <p class="mut" style="margin-bottom:10px">Write <code>channel_analysis(df)</code> returning a dict keyed by channel name, where each value is a dict with:</p>
       <ul style="margin:10px 0 12px 20px;font-size:14px;color:var(--mut);line-height:1.9">
-        <li><code>cvr</code> &mdash; conversion rate as a percentage (conversions ÷ clicks × 100), rounded to 2dp</li>
-        <li><code>cpa</code> &mdash; cost per acquisition (spend ÷ conversions), rounded to 2dp</li>
-        <li><code>reliable</code> &mdash; <code>True</code> only if that channel has <b>at least 30 clicks AND at least 5 conversions</b>, otherwise <code>False</code></li>
+        <li><code>cvr</code>, conversion rate as a percentage (conversions ÷ clicks × 100), rounded to 2dp</li>
+        <li><code>cpa</code>, cost per acquisition (spend ÷ conversions), rounded to 2dp</li>
+        <li><code>reliable</code>, <code>True</code> only if that channel has <b>at least 30 clicks AND at least 5 conversions</b>, otherwise <code>False</code></li>
       </ul>
       <p class="mut" style="margin-bottom:10px">That <code>reliable</code> flag is the point of the exercise. It's the difference between a report that says "Referral is our best channel" and one that says "Referral looks best but is based on 21 clicks, so I would not move budget on it yet."</p>
       <textarea id="ex3Editor" class="testin" spellcheck="false" rows="10">def channel_analysis(df):
@@ -327,7 +327,7 @@ two_prop_test(g.loc["Search","conv"],   g.loc["Search","clicks"],
     <div class="interactive" style="margin-top:20px">
       <span class="ilbl">Written recommendation · self-assessed, not auto-graded</span>
       <p class="mut" style="margin-bottom:10px">Write what you'd actually send the marketing director. Three to five sentences. It must name a recommended channel, cite the numbers behind it, and explicitly address why Referral's headline rate isn't the answer.</p>
-      <div class="warn" style="margin-top:0"><b>Honest limitation:</b> no automatic grader can judge whether a written recommendation is <i>good</i> &mdash; there's no single correct wording, and pretending to score it would be fake rigour. Use the checklist and the model answer to assess yourself honestly. This is saved with your progress and is portfolio material.</div>
+      <div class="warn" style="margin-top:0"><b>Honest limitation:</b> no automatic grader can judge whether a written recommendation is <i>good</i>, there's no single correct wording, and pretending to score it would be fake rigour. Use the checklist and the model answer to assess yourself honestly. This is saved with your progress and is portfolio material.</div>
       <textarea id="recBox" class="logbox" placeholder="Example shape (write your own):
 
 Recommendation: increase Search budget, hold Email, do not scale Referral yet.

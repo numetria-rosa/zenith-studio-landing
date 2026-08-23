@@ -104,14 +104,14 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <header class="hero">
     <span class="eyebrow">Module 6 of 9</span>
     <h1 class="serif">SQL for Analysts</h1>
-    <p class="sub">A real SQLite database, running entirely in this page, with a real messy shop's worth of customers, orders, and products &mdash; NULLs, cancelled orders, and duplicate-row traps included. Every exercise starts from a business question, not a syntax drill, and every answer is checked by running your query against the live database, not by comparing to a memorized number.</p>
+    <p class="sub">A real SQLite database, running entirely in this page, with a real messy shop's worth of customers, orders, and products, NULLs, cancelled orders, and duplicate-row traps included. Every exercise starts from a business question, not a syntax drill, and every answer is checked by running your query against the live database, not by comparing to a memorized number.</p>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
         <li>Write SELECT / WHERE / ORDER BY / GROUP BY queries that answer a real business question</li>
         <li>Recognize and handle NULL values correctly, instead of silently dropping them</li>
         <li>Join tables without accidentally inflating your row count (the single most common real-world SQL bug)</li>
-        <li>Find "the absence of a match" &mdash; customers, products, or events that never happened</li>
+        <li>Find "the absence of a match", customers, products, or events that never happened</li>
         <li>Combine joins, filters, and aggregation to answer a question that needs more than one skill at once</li>
       </ul>
     </div>
@@ -119,14 +119,14 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
   <section>
     <div class="kh"><span class="num">6.0</span><h2 class="serif">The database</h2></div>
-    <p>A small outdoor-gear retailer. Four tables, real relationships, real problems &mdash; the same shape of database you'd find at an actual small business.</p>
+    <p>A small outdoor-gear retailer. Four tables, real relationships, real problems, the same shape of database you'd find at an actual small business.</p>
     <div class="schemacard"><h4>customers</h4><p class="mut" style="font-size:13px">customer_id, name, country, signup_date</p></div>
     <div class="schemacard"><h4>products</h4><p class="mut" style="font-size:13px">sku, product_name, category, unit_cost</p></div>
     <div class="schemacard"><h4>orders</h4><p class="mut" style="font-size:13px">order_id, customer_id, order_date, status (completed / cancelled / refunded), channel (web / mobile / phone / <b style="color:var(--bad)">NULL</b>, not always recorded)</p></div>
-    <div class="schemacard"><h4>order_items</h4><p class="mut" style="font-size:13px">order_item_id, order_id, sku, quantity, unit_price &mdash; one order can have several line items</p></div>
+    <div class="schemacard"><h4>order_items</h4><p class="mut" style="font-size:13px">order_item_id, order_id, sku, quantity, unit_price, one order can have several line items</p></div>
     <div class="interactive">
       <span class="ilbl">Explore it yourself · real SQLite, runs in this page</span>
-      <p class="mut" style="margin-bottom:10px">Try <code>SELECT * FROM orders LIMIT 10</code> or <code>SELECT * FROM customers LIMIT 10</code> before you start &mdash; look at real rows before you query them for real.</p>
+      <p class="mut" style="margin-bottom:10px">Try <code>SELECT * FROM orders LIMIT 10</code> or <code>SELECT * FROM customers LIMIT 10</code> before you start, look at real rows before you query them for real.</p>
       <textarea id="exploreEditor" class="testin" spellcheck="false" rows="3">SELECT * FROM orders LIMIT 10;</textarea>
       <div class="dagctrl"><button class="primary" id="btnRunExplore">▶ Run query</button></div>
       <div id="exploreResults"></div>
@@ -136,7 +136,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <section>
     <div class="kh"><span class="num">6.1</span><h2 class="serif">SELECT, WHERE, ORDER BY, LIMIT</h2></div>
     <p><b>Business question:</b> "Which 5 customers signed up most recently?"</p>
-    <div class="def"><div class="k">Pattern</div><p><code>SELECT columns FROM table ORDER BY column DESC LIMIT n</code> &mdash; pick the columns you want, sort by the one that defines "most recent," take the top few.</p></div>
+    <div class="def"><div class="k">Pattern</div><p><code>SELECT columns FROM table ORDER BY column DESC LIMIT n</code>, pick the columns you want, sort by the one that defines "most recent," take the top few.</p></div>
     <div class="interactive">
       <span class="ilbl">Exercise 1 · runs against the real database</span>
       <p class="mut" style="margin-bottom:10px">Return each customer's <code>name</code> and <code>signup_date</code>, for the 5 most recently signed-up customers, most recent first.</p>
@@ -153,8 +153,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <section>
     <div class="kh"><span class="num">6.2</span><h2 class="serif">Aggregates and GROUP BY</h2></div>
     <p><b>Business question:</b> "Which product category sells the most units?"</p>
-    <div class="def"><div class="k">Pattern</div><p><code>SELECT category, SUM(quantity) FROM ... JOIN ... GROUP BY category</code> &mdash; GROUP BY collapses many rows into one row per category, SUM adds up the quantity within each group.</p></div>
-    <div class="why"><b>Why this needs a join:</b> <code>order_items</code> has the quantity, <code>products</code> has the category &mdash; neither table has both, so you join them on <code>sku</code> first.</div>
+    <div class="def"><div class="k">Pattern</div><p><code>SELECT category, SUM(quantity) FROM ... JOIN ... GROUP BY category</code>, GROUP BY collapses many rows into one row per category, SUM adds up the quantity within each group.</p></div>
+    <div class="why"><b>Why this needs a join:</b> <code>order_items</code> has the quantity, <code>products</code> has the category, neither table has both, so you join them on <code>sku</code> first.</div>
     <div class="interactive">
       <span class="ilbl">Exercise 2 · runs against the real database</span>
       <p class="mut" style="margin-bottom:10px">Return <code>category</code> and total <code>units</code> (sum of quantity) sold in each category, across ALL order_items regardless of order status, highest first.</p>
@@ -172,8 +172,8 @@ FROM order_items oi
   <section>
     <div class="kh"><span class="num">6.3</span><h2 class="serif">The NULL trap</h2></div>
     <p><b>Business question:</b> "How many orders came through each channel?"</p>
-    <div class="trap"><b>The trap:</b> 11 orders have no recorded channel at all &mdash; the value is genuinely <code>NULL</code>, not the text "unknown." <code>COUNT(channel)</code> silently skips NULLs; <code>COUNT(*)</code> doesn't. A filter like <code>WHERE channel != 'web'</code> also silently excludes every NULL row, because SQL's three-valued logic treats <code>NULL != anything</code> as unknown, not true.</div>
-    <div class="def"><div class="k">Pattern</div><p><code>GROUP BY channel</code> puts NULL rows into their own group automatically &mdash; you'll see it appear as a group with no label. Use <code>IS NULL</code> / <code>IS NOT NULL</code> to test for it explicitly, never <code>=</code> or <code>!=</code>.</p></div>
+    <div class="trap"><b>The trap:</b> 11 orders have no recorded channel at all, the value is genuinely <code>NULL</code>, not the text "unknown." <code>COUNT(channel)</code> silently skips NULLs; <code>COUNT(*)</code> doesn't. A filter like <code>WHERE channel != 'web'</code> also silently excludes every NULL row, because SQL's three-valued logic treats <code>NULL != anything</code> as unknown, not true.</div>
+    <div class="def"><div class="k">Pattern</div><p><code>GROUP BY channel</code> puts NULL rows into their own group automatically, you'll see it appear as a group with no label. Use <code>IS NULL</code> / <code>IS NOT NULL</code> to test for it explicitly, never <code>=</code> or <code>!=</code>.</p></div>
     <div class="interactive">
       <span class="ilbl">Exercise 3 · runs against the real database</span>
       <p class="mut" style="margin-bottom:10px">Return <code>channel</code> and the count of orders (<code>n</code>) for each channel, including the NULL group, highest count first.</p>
@@ -190,7 +190,7 @@ FROM order_items oi
   <section>
     <div class="kh"><span class="num">6.4</span><h2 class="serif">Joins, and the row-multiplication trap</h2></div>
     <p><b>Business question:</b> "What's our total completed revenue by product category?"</p>
-    <div class="trap"><b>The trap:</b> most orders have more than one line item. Joining <code>orders</code> to <code>order_items</code> means each order can appear multiple times in the joined result &mdash; one row per item, not per order. If you <code>COUNT(*)</code> completed orders after this join, you'll get a bigger, wrong number (this database's real numbers: 77 completed orders, but 155 rows after joining to order_items). Revenue math is usually fine (you WANT one row per item to sum item revenue), but any count of orders after a join needs <code>COUNT(DISTINCT order_id)</code>, not <code>COUNT(*)</code>.</div>
+    <div class="trap"><b>The trap:</b> most orders have more than one line item. Joining <code>orders</code> to <code>order_items</code> means each order can appear multiple times in the joined result, one row per item, not per order. If you <code>COUNT(*)</code> completed orders after this join, you'll get a bigger, wrong number (this database's real numbers: 77 completed orders, but 155 rows after joining to order_items). Revenue math is usually fine (you WANT one row per item to sum item revenue), but any count of orders after a join needs <code>COUNT(DISTINCT order_id)</code>, not <code>COUNT(*)</code>.</div>
     <div class="def"><div class="k">Pattern</div><p>Join <code>order_items</code> &rarr; <code>orders</code> &rarr; <code>products</code>, filter <code>WHERE status = 'completed'</code>, then <code>GROUP BY category</code> summing <code>quantity * unit_price</code>.</p></div>
     <div class="interactive">
       <span class="ilbl">Exercise 4 · runs against the real database</span>
@@ -213,9 +213,9 @@ JOIN products p ON p.sku = oi.sku
 
   <section>
     <div class="kh"><span class="num">6.5</span><h2 class="serif">Finding what ISN'T there</h2></div>
-    <p><b>Business question:</b> "Which customers have never placed an order?" &mdash; a real re-engagement/win-back list.</p>
+    <p><b>Business question:</b> "Which customers have never placed an order?", a real re-engagement/win-back list.</p>
     <div class="why"><b>Why this is harder than it sounds:</b> there's no "never ordered" flag anywhere. You have to find customers who don't show up in <code>orders</code> at all, the absence of a match, not a value you can filter on directly.</div>
-    <div class="def"><div class="k">Pattern</div><p><code>WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id)</code> &mdash; for each customer, check whether any matching order exists at all. A LEFT JOIN + <code>WHERE order_id IS NULL</code> answers the same question a different way; either is correct.</p></div>
+    <div class="def"><div class="k">Pattern</div><p><code>WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id)</code>, for each customer, check whether any matching order exists at all. A LEFT JOIN + <code>WHERE order_id IS NULL</code> answers the same question a different way; either is correct.</p></div>
     <div class="interactive">
       <span class="ilbl">Exercise 5 · runs against the real database</span>
       <p class="mut" style="margin-bottom:10px">Return <code>customer_id</code> and <code>name</code> for every customer with zero orders, ordered by <code>customer_id</code> ascending.</p>
@@ -232,7 +232,7 @@ ORDER BY customer_id</textarea>
 
   <section>
     <div class="kh"><span class="num">6.6</span><h2 class="serif">Required exercise: combine everything</h2></div>
-    <p><b>Business question, the kind a manager actually asks:</b> "Which country's customers are worth the most to us, per customer?" Not raw country revenue &mdash; a big country wins that by default. Revenue <i>per customer</i>, so a small but valuable market doesn't get overlooked.</p>
+    <p><b>Business question, the kind a manager actually asks:</b> "Which country's customers are worth the most to us, per customer?" Not raw country revenue, a big country wins that by default. Revenue <i>per customer</i>, so a small but valuable market doesn't get overlooked.</p>
     <div class="def"><div class="k">This needs, together</div><p>A join across all three of <code>customers</code>, <code>orders</code>, and <code>order_items</code> &middot; a filter to <code>completed</code> orders only &middot; <code>GROUP BY</code> country &middot; <code>COUNT(DISTINCT customer_id)</code> so the fan-out trap from 6.4 doesn't inflate your customer count &middot; and dividing total revenue by that customer count.</p></div>
     <div class="interactive">
       <span class="ilbl">Required exercise · this module's graded checkpoint work</span>
@@ -249,7 +249,7 @@ FROM customers c
       </div>
       <div id="ex6Results"></div>
     </div>
-    <div class="why" style="margin-top:16px"><b>The real finding:</b> once you get this right, look at the result. The United Kingdom has the most customers and the most total revenue &mdash; and is NOT the top country per customer. That gap is a real, defensible insight, exactly the kind Module 8's dashboard work will ask you to explain to a stakeholder.</div>
+    <div class="why" style="margin-top:16px"><b>The real finding:</b> once you get this right, look at the result. The United Kingdom has the most customers and the most total revenue, and is NOT the top country per customer. That gap is a real, defensible insight, exactly the kind Module 8's dashboard work will ask you to explain to a stakeholder.</div>
   </section>
 
   <section>

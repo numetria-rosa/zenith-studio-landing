@@ -116,7 +116,7 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
   <header class="hero">
     <span class="eyebrow">Module 3 of 9 · Track B starts here</span>
     <h1 class="serif">pandas &amp; NumPy Fundamentals</h1>
-    <p class="sub">In Module 2 you parsed a CSV by hand with a loop. pandas does that in one line &mdash; and then gives you filtering, grouping, and joining on top. Everything here runs against the same real datasets you'll use for the rest of the course.</p>
+    <p class="sub">In Module 2 you parsed a CSV by hand with a loop. pandas does that in one line, and then gives you filtering, grouping, and joining on top. Everything here runs against the same real datasets you'll use for the rest of the course.</p>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
@@ -172,7 +172,7 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
         </tbody>
       </table></div>
     </div>
-    <div class="beginner"><b>Never opened a CSV before?</b> It's a plain text file where each line is a row and commas separate the columns &mdash; exactly what you parsed by hand in Module 2. Open one in Excel, Google Sheets, or even Notepad. It's not a special format; it's just text laid out in a predictable way.</div>
+    <div class="beginner"><b>Never opened a CSV before?</b> It's a plain text file where each line is a row and commas separate the columns, exactly what you parsed by hand in Module 2. Open one in Excel, Google Sheets, or even Notepad. It's not a special format; it's just text laid out in a predictable way.</div>
   </section>
 
   <section>
@@ -180,10 +180,10 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
     <p>When someone hands you a file you've never seen, you do the same four things every time, before any analysis. This sequence is a habit worth building now.</p>
     <div class="def">
       <div class="k">The first-look sequence</div>
-      <p><code>df.shape</code> &mdash; how many rows and columns am I dealing with?<br>
-      <code>df.head()</code> &mdash; what does a row actually look like?<br>
-      <code>df.dtypes</code> &mdash; did each column load as the type I expected? (a number column that loaded as text is a real and common problem)<br>
-      <code>df.describe()</code> &mdash; what's the range of the numbers? Anything absurd?</p>
+      <p><code>df.shape</code>, how many rows and columns am I dealing with?<br>
+      <code>df.head()</code>, what does a row actually look like?<br>
+      <code>df.dtypes</code>, did each column load as the type I expected? (a number column that loaded as text is a real and common problem)<br>
+      <code>df.describe()</code>, what's the range of the numbers? Anything absurd?</p>
     </div>
     <pre class="codeblock"><span class="kw">import</span> pandas <span class="kw">as</span> pd
 
@@ -198,11 +198,11 @@ product_line   object
 units          float64
 unit_price     float64
 revenue        float64</div>
-    <div class="why"><b>Read that dtypes output carefully:</b> <code>object</code> means text. Notice <code>order_date</code> loaded as text, not as a date &mdash; pandas does not guess dates by default. Until you convert it (section 3.6), you cannot do date maths on it. And notice <code>units</code> is <code>float64</code> (a decimal) rather than a whole number, which is pandas telling you something: a column of whole numbers becomes a float when it contains a missing value.</div>
+    <div class="why"><b>Read that dtypes output carefully:</b> <code>object</code> means text. Notice <code>order_date</code> loaded as text, not as a date, pandas does not guess dates by default. Until you convert it (section 3.6), you cannot do date maths on it. And notice <code>units</code> is <code>float64</code> (a decimal) rather than a whole number, which is pandas telling you something: a column of whole numbers becomes a float when it contains a missing value.</div>
 
     <div class="interactive">
       <span class="ilbl">Run it yourself · real pandas, real file</span>
-      <p class="mut" style="margin-bottom:10px">This runs the first-look sequence on the real file. Change the code and re-run as much as you like &mdash; this one is for exploring, it isn't graded.</p>
+      <p class="mut" style="margin-bottom:10px">This runs the first-look sequence on the real file. Change the code and re-run as much as you like, this one is for exploring, it isn't graded.</p>
       <textarea id="playEditor" class="testin" spellcheck="false" rows="7">df = pd.read_csv("retail_sales_ledger.csv")
 print("shape:", df.shape)
 print()
@@ -225,7 +225,7 @@ print(df.isna().sum())</textarea>
 df[[<span class="s">"region"</span>, <span class="s">"revenue"</span>]]  <span class="c"># several columns (note the double brackets)</span>
 df[df[<span class="s">"revenue"</span>] &gt; 50000]  <span class="c"># only rows where the condition is True</span>
 df[(df[<span class="s">"region"</span>] == <span class="s">"West"</span>) &amp; (df[<span class="s">"revenue"</span>] &gt; 20000)]  <span class="c"># two conditions</span></pre>
-    <div class="beginner"><b>Why the strange <code>&amp;</code> and the extra brackets?</b> In pandas you combine conditions with <code>&amp;</code> (and) and <code>|</code> (or), not the words <code>and</code>/<code>or</code>. Each condition needs its own parentheses. This trips up nearly everyone once &mdash; if you get a confusing error about "truth value is ambiguous," this is almost always why.</div>
+    <div class="beginner"><b>Why the strange <code>&amp;</code> and the extra brackets?</b> In pandas you combine conditions with <code>&amp;</code> (and) and <code>|</code> (or), not the words <code>and</code>/<code>or</code>. Each condition needs its own parentheses. This trips up nearly everyone once, if you get a confusing error about "truth value is ambiguous," this is almost always why.</div>
 
     <div class="interactive">
       <span class="ilbl">Exercise 1 · graded against the real file</span>
@@ -247,20 +247,20 @@ df[(df[<span class="s">"region"</span>] == <span class="s">"West"</span>) &amp; 
 
   <section>
     <div class="kh"><span class="num">3.3</span><h2 class="serif">Calculated columns and missing values</h2></div>
-    <p>A calculated column is a new column derived from existing ones. This is where "thinking in whole columns" starts paying off &mdash; no loop required.</p>
+    <p>A calculated column is a new column derived from existing ones. This is where "thinking in whole columns" starts paying off, no loop required.</p>
     <pre class="codeblock">df[<span class="s">"line_total"</span>] = df[<span class="s">"units"</span>] * df[<span class="s">"unit_price"</span>]  <span class="c"># whole column at once</span></pre>
-    <div class="why"><b>The missing-value trap:</b> the retail file has one row with a missing <code>units</code> value. Multiply that row and you get <code>NaN</code> ("not a number") &mdash; pandas' marker for missing. <code>NaN</code> is contagious: any arithmetic touching it produces <code>NaN</code>. But <code>.sum()</code> and <code>.mean()</code> quietly <i>skip</i> NaN by default. That inconsistency is exactly why you check <code>df.isna().sum()</code> early, so you know it's there before it changes a number you report.</div>
+    <div class="why"><b>The missing-value trap:</b> the retail file has one row with a missing <code>units</code> value. Multiply that row and you get <code>NaN</code> ("not a number"), pandas' marker for missing. <code>NaN</code> is contagious: any arithmetic touching it produces <code>NaN</code>. But <code>.sum()</code> and <code>.mean()</code> quietly <i>skip</i> NaN by default. That inconsistency is exactly why you check <code>df.isna().sum()</code> early, so you know it's there before it changes a number you report.</div>
     <div class="def">
       <div class="k">Three honest options for a missing value</div>
-      <p><b>Drop it</b> (<code>df.dropna(subset=["units"])</code>) &mdash; fine when it's rare and random, dangerous when it isn't.<br>
-      <b>Fill it</b> (<code>df["units"].fillna(0)</code>) &mdash; only when zero (or the mean, or whatever you choose) is genuinely meaningful for that column.<br>
-      <b>Leave it and be explicit</b> &mdash; often the most honest choice; report the count alongside the result.<br>
+      <p><b>Drop it</b> (<code>df.dropna(subset=["units"])</code>), fine when it's rare and random, dangerous when it isn't.<br>
+      <b>Fill it</b> (<code>df["units"].fillna(0)</code>), only when zero (or the mean, or whatever you choose) is genuinely meaningful for that column.<br>
+      <b>Leave it and be explicit</b>, often the most honest choice; report the count alongside the result.<br>
       Module 4 goes much deeper on how to actually decide. For now, notice that "do nothing" silently makes the choice for you.</p>
     </div>
 
     <div class="interactive">
       <span class="ilbl">Exercise 2 · graded against the real file</span>
-      <p class="mut" style="margin-bottom:10px">Write <code>recompute_revenue(df)</code> that adds a column <code>line_total</code> = units × unit_price, then returns the <b>rounded-to-2-decimals sum</b> of that column. Missing values should be skipped, not filled (that's <code>.sum()</code>'s default, so you don't need to do anything special &mdash; but you should know that's what's happening).</p>
+      <p class="mut" style="margin-bottom:10px">Write <code>recompute_revenue(df)</code> that adds a column <code>line_total</code> = units × unit_price, then returns the <b>rounded-to-2-decimals sum</b> of that column. Missing values should be skipped, not filled (that's <code>.sum()</code>'s default, so you don't need to do anything special, but you should know that's what's happening).</p>
       <textarea id="ex2Editor" class="testin" spellcheck="false" rows="4">def recompute_revenue(df):
     # your code here, add line_total, return round(total, 2)
     return 0.0</textarea>
@@ -305,20 +305,20 @@ West     349244.88</div>
 
   <section>
     <div class="kh"><span class="num">3.5</span><h2 class="serif">Merging two datasets</h2></div>
-    <p>A merge (a join) combines two tables using a shared key column. This is XLOOKUP from Module 1, and SQL's JOIN from Module 6 &mdash; same idea, three syntaxes.</p>
+    <p>A merge (a join) combines two tables using a shared key column. This is XLOOKUP from Module 1, and SQL's JOIN from Module 6, same idea, three syntaxes.</p>
     <pre class="codeblock">merged = headcount.merge(overtime, on=<span class="s">"employee_id"</span>, how=<span class="s">"inner"</span>)</pre>
     <div class="def">
       <div class="k">The four join types, plainly</div>
-      <p><b>inner</b> &mdash; keep only rows that matched in both. The default choice, and the one that silently drops data.<br>
-      <b>left</b> &mdash; keep every row from the left table, fill blanks where there was no match. Use when the left table is your "source of truth."<br>
-      <b>right</b> &mdash; the mirror image; rarely used, since you can usually just swap the tables.<br>
-      <b>outer</b> &mdash; keep everything from both. Useful for finding what <i>didn't</i> match.</p>
+      <p><b>inner</b>, keep only rows that matched in both. The default choice, and the one that silently drops data.<br>
+      <b>left</b>, keep every row from the left table, fill blanks where there was no match. Use when the left table is your "source of truth."<br>
+      <b>right</b>, the mirror image; rarely used, since you can usually just swap the tables.<br>
+      <b>outer</b>, keep everything from both. Useful for finding what <i>didn't</i> match.</p>
     </div>
     <div class="why"><b>The rule that separates careful analysts from careless ones:</b> always check the row count before and after a merge. If it went <i>up</i>, your key wasn't unique and rows got duplicated. If it dropped sharply, an inner join threw away data you may have needed. Neither raises an error. Both quietly change your answer.</div>
 
     <div class="interactive discovery">
       <span class="ilbl">Discovery exercise · find the problem yourself</span>
-      <p class="mut" style="margin-bottom:10px">Below, the two employee files are merged. <b>Nobody is going to tell you what's wrong with the result.</b> Run it, read the output, and work out what happened to the row count and why. Then answer the two questions underneath &mdash; those are graded.</p>
+      <p class="mut" style="margin-bottom:10px">Below, the two employee files are merged. <b>Nobody is going to tell you what's wrong with the result.</b> Run it, read the output, and work out what happened to the row count and why. Then answer the two questions underneath, those are graded.</p>
       <textarea id="discEditor" class="testin" spellcheck="false" rows="12">hc = pd.read_csv("employee_headcount.csv")
 ot = pd.read_csv("employee_overtime.csv")
 
@@ -368,12 +368,12 @@ print("merged rows:   ", len(merged))
 
   <section>
     <div class="kh"><span class="num">3.6</span><h2 class="serif">Working with dates</h2></div>
-    <p>Remember from 3.1 that <code>order_date</code> loaded as text. Until you convert it, <code>"2026-05-03"</code> is just a string &mdash; you can't ask which month it's in, or sort it reliably when formats vary.</p>
+    <p>Remember from 3.1 that <code>order_date</code> loaded as text. Until you convert it, <code>"2026-05-03"</code> is just a string, you can't ask which month it's in, or sort it reliably when formats vary.</p>
     <pre class="codeblock">df[<span class="s">"order_date"</span>] = pd.to_datetime(df[<span class="s">"order_date"</span>])
 df[<span class="s">"order_date"</span>].dt.month   <span class="c"># 1-12</span>
 df[<span class="s">"order_date"</span>].dt.year
 df[<span class="s">"order_date"</span>].dt.day_name()</pre>
-    <div class="beginner"><b>What <code>.dt</code> means:</b> once a column holds real dates, <code>.dt</code> unlocks date-specific accessors on the whole column at once &mdash; month, year, weekday, and so on. If you get an error saying <code>.dt</code> isn't available, it means the column is still text and you skipped the <code>to_datetime</code> step.</div>
+    <div class="beginner"><b>What <code>.dt</code> means:</b> once a column holds real dates, <code>.dt</code> unlocks date-specific accessors on the whole column at once, month, year, weekday, and so on. If you get an error saying <code>.dt</code> isn't available, it means the column is still text and you skipped the <code>to_datetime</code> step.</div>
 
     <div class="interactive">
       <span class="ilbl">Exercise 5 · graded against the real file</span>
@@ -394,15 +394,15 @@ df[<span class="s">"order_date"</span>].dt.day_name()</pre>
     <p>Everything above was one skill at a time. This is the whole chain: load, clean the join, group, and produce a defensible number.</p>
     <div class="def">
       <div class="k">The stakeholder's request</div>
-      <p>"Which department is burning the most overtime? I want one number per department so I can decide where to add headcount. And please make sure the numbers are right &mdash; last time someone gave me a report where Sales appeared three times."</p>
+      <p>"Which department is burning the most overtime? I want one number per department so I can decide where to add headcount. And please make sure the numbers are right, last time someone gave me a report where Sales appeared three times."</p>
     </div>
     <p class="mut" style="margin-top:14px">That last sentence is the actual task. You already found both problems in 3.5: duplicate employee IDs inflating the join, and department names with inconsistent capitalisation splitting one department into several groups.</p>
 
     <div class="interactive">
       <span class="ilbl">Required exercise · this module's graded checkpoint work</span>
       <p class="mut" style="margin-bottom:10px">Write <code>overtime_by_department(hc, ot)</code> that returns a dictionary mapping <b>4</b> clean department names to their total overtime hours, rounded to 1 decimal place.<br><br>
-      To get this right you must: de-duplicate employees on <code>employee_id</code>, normalise <code>department</code> (strip whitespace, then title-case &mdash; so <code>"SALES "</code>, <code>"sales"</code>, and <code>"Sales"</code> all become <code>"Sales"</code>), inner-merge, group, sum, and round.<br><br>
-      <b>One judgement call is yours:</b> the file contains both <code>"Operations"</code> and <code>"Ops"</code>. Title-casing alone will not merge those two. Decide whether they're the same department and handle it &mdash; the tests expect exactly 4 departments in the result.</p>
+      To get this right you must: de-duplicate employees on <code>employee_id</code>, normalise <code>department</code> (strip whitespace, then title-case, so <code>"SALES "</code>, <code>"sales"</code>, and <code>"Sales"</code> all become <code>"Sales"</code>), inner-merge, group, sum, and round.<br><br>
+      <b>One judgement call is yours:</b> the file contains both <code>"Operations"</code> and <code>"Ops"</code>. Title-casing alone will not merge those two. Decide whether they're the same department and handle it, the tests expect exactly 4 departments in the result.</p>
       <textarea id="ex6Editor" class="testin" spellcheck="false" rows="10">def overtime_by_department(hc, ot):
     # 1. de-duplicate hc on employee_id
     # 2. normalise the department column
@@ -418,7 +418,7 @@ df[<span class="s">"order_date"</span>].dt.day_name()</pre>
     </div>
     <details class="challenge">
       <summary>Advanced extension (optional, not graded)</summary>
-      <div class="chbody">Overtime <i>total</i> rewards big departments. Recompute as overtime hours <b>per active employee</b> instead (remember <code>status</code> exists in the headcount file), and see whether your recommendation to the stakeholder changes. This is the difference between "which team logs the most hours" and "which team is actually stretched" &mdash; and it is exactly the kind of distinction that makes an analyst useful rather than merely accurate.</div>
+      <div class="chbody">Overtime <i>total</i> rewards big departments. Recompute as overtime hours <b>per active employee</b> instead (remember <code>status</code> exists in the headcount file), and see whether your recommendation to the stakeholder changes. This is the difference between "which team logs the most hours" and "which team is actually stretched", and it is exactly the kind of distinction that makes an analyst useful rather than merely accurate.</div>
     </details>
   </section>
 

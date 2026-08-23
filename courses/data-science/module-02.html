@@ -104,7 +104,7 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
   <header class="hero">
     <span class="eyebrow">Module 2 of 9</span>
     <h1 class="serif">Python Foundations for Data</h1>
-    <p class="sub">Six ideas, each taught through a real analyst task, each with code you actually write and run in a real Python interpreter in this browser. Not a general programming course &mdash; every concept exists here because Module 3 onward needs it.</p>
+    <p class="sub">Six ideas, each taught through a real analyst task, each with code you actually write and run in a real Python interpreter in this browser. Not a general programming course, every concept exists here because Module 3 onward needs it.</p>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
@@ -141,14 +141,14 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
     </div>
     <details class="challenge">
       <summary>Challenge (optional): handle a negative amount</summary>
-      <div class="chbody">Extend your function so a negative amount (a refund) prints as <code>"Outdoor: -$45.00"</code> instead of <code>"Outdoor: $-45.00"</code>. Not graded &mdash; try it in the editor above and re-run.</div>
+      <div class="chbody">Extend your function so a negative amount (a refund) prints as <code>"Outdoor: -$45.00"</code> instead of <code>"Outdoor: $-45.00"</code>. Not graded, try it in the editor above and re-run.</div>
     </details>
   </section>
 
   <section>
     <div class="kh"><span class="num">2.2</span><h2 class="serif">Lists and loops</h2></div>
-    <p>A list holds many values in order &mdash; think of it as one spreadsheet column pulled into Python. A <code>for</code> loop runs the same code once per item in a list.</p>
-    <div class="why"><b>Why an analyst needs this:</b> a column of 10,000 sale amounts is a list of 10,000 numbers. You almost never process one value at a time by hand &mdash; you loop.</div>
+    <p>A list holds many values in order, think of it as one spreadsheet column pulled into Python. A <code>for</code> loop runs the same code once per item in a list.</p>
+    <div class="why"><b>Why an analyst needs this:</b> a column of 10,000 sale amounts is a list of 10,000 numbers. You almost never process one value at a time by hand, you loop.</div>
     <pre class="codeblock"><span class="kw">sales</span> = [120, 340, 75, 900]
 <span class="kw">total</span> = 0
 <span class="kw">for</span> amount <span class="kw">in</span> sales:
@@ -159,7 +159,7 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
 
     <div class="interactive">
       <span class="ilbl">Exercise 2 · runs in a real Python interpreter</span>
-      <p class="mut" style="margin-bottom:10px">Write <code>count_above_threshold(sales, threshold)</code> that returns how many values in the <code>sales</code> list are <b>strictly greater than</b> <code>threshold</code>. Use a loop, not a shortcut function &mdash; the point of this exercise is the loop.</p>
+      <p class="mut" style="margin-bottom:10px">Write <code>count_above_threshold(sales, threshold)</code> that returns how many values in the <code>sales</code> list are <b>strictly greater than</b> <code>threshold</code>. Use a loop, not a shortcut function, the point of this exercise is the loop.</p>
       <textarea id="ex2Editor" class="testin" spellcheck="false" rows="5">def count_above_threshold(sales, threshold):
     count = 0
     # your code here
@@ -174,8 +174,8 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
 
   <section>
     <div class="kh"><span class="num">2.3</span><h2 class="serif">Dictionaries</h2></div>
-    <p>A dictionary stores named fields &mdash; think of it as one row of a spreadsheet, where each column has a label. You write it as <code>{"key": value, "key2": value2}</code> and read a field with <code>record["key"]</code>.</p>
-    <div class="why"><b>Why an analyst needs this:</b> a single customer, order, or survey response is naturally a dictionary &mdash; several named fields belonging to one record. This is exactly what Module 3's pandas rows are built from.</div>
+    <p>A dictionary stores named fields, think of it as one row of a spreadsheet, where each column has a label. You write it as <code>{"key": value, "key2": value2}</code> and read a field with <code>record["key"]</code>.</p>
+    <div class="why"><b>Why an analyst needs this:</b> a single customer, order, or survey response is naturally a dictionary, several named fields belonging to one record. This is exactly what Module 3's pandas rows are built from.</div>
     <pre class="codeblock"><span class="kw">customer</span> = {<span class="s">"name"</span>: <span class="s">"Priya"</span>, <span class="s">"orders"</span>: [42.0, 18.5, 9.0]}
 <span class="kw">print</span>(customer[<span class="s">"name"</span>])
 <span class="kw">print</span>(<span class="kw">sum</span>(customer[<span class="s">"orders"</span>]))</pre>
@@ -197,7 +197,7 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
 
   <section>
     <div class="kh"><span class="num">2.4</span><h2 class="serif">Conditions</h2></div>
-    <p>An <code>if</code> / <code>elif</code> / <code>else</code> chain branches on a condition &mdash; the exact same logic as the nested <code>IF</code> formula from Module 1, just written as code instead of a formula.</p>
+    <p>An <code>if</code> / <code>elif</code> / <code>else</code> chain branches on a condition, the exact same logic as the nested <code>IF</code> formula from Module 1, just written as code instead of a formula.</p>
     <div class="why"><b>Why an analyst needs this:</b> Module 1's <code>=IF(B2&gt;1000,"High","Low")</code> only handles two buckets. Real categorization usually needs three or more, and code makes that easy to read.</div>
     <pre class="codeblock"><span class="kw">def</span> classify(amount):
     <span class="kw">if</span> amount &gt;= 1000:
@@ -210,7 +210,7 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
 
     <div class="interactive">
       <span class="ilbl">Exercise 4 · runs in a real Python interpreter</span>
-      <p class="mut" style="margin-bottom:10px">Write <code>classify_order(amount)</code> exactly as shown above: <code>"High"</code> for 1000 and up, <code>"Medium"</code> for 200 up to (not including) 1000, <code>"Low"</code> below 200. Get the boundaries exactly right &mdash; the tests check them.</p>
+      <p class="mut" style="margin-bottom:10px">Write <code>classify_order(amount)</code> exactly as shown above: <code>"High"</code> for 1000 and up, <code>"Medium"</code> for 200 up to (not including) 1000, <code>"Low"</code> below 200. Get the boundaries exactly right, the tests check them.</p>
       <textarea id="ex4Editor" class="testin" spellcheck="false" rows="6">def classify_order(amount):
     # your code here
     return "Low"</textarea>

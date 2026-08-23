@@ -139,7 +139,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <section>
     <div class="kh"><span class="num">8.1</span><h2 class="serif">Headline KPIs from a messy source</h2></div>
     <p><b>The dataset:</b> <code>pnl_statement.csv</code>, the same 12-quarter P&amp;L from Module 7, three period-label formats included.</p>
-    <p><b>Business question:</b> "What are this quarter's headline numbers?" &mdash; the numbers that go at the top of any dashboard, above everything else.</p>
+    <p><b>Business question:</b> "What are this quarter's headline numbers?", the numbers that go at the top of any dashboard, above everything else.</p>
     <div class="interactive">
       <span class="ilbl">Exercise 1 · real data, real Python, graded</span>
       <p class="mut" style="margin-bottom:10px">Write <code>headline_kpis(df)</code>: standardize the periods (as in Module 7), find the most recent quarter, and return <code>{"latest_quarter": "2026-Q4", "latest_revenue": 239740.84, "yoy_growth_pct": 6.35, "latest_margin_pct": 29.7}</code>. <code>yoy_growth_pct</code> compares the latest quarter's revenue to the same quarter one year earlier. <code>latest_margin_pct</code> is <code>net_income / revenue * 100</code> for the latest quarter.</p>

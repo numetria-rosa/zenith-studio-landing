@@ -128,14 +128,14 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
   <header class="hero">
     <span class="eyebrow">Module 4 of 9</span>
     <h1 class="serif">Real-World Data Cleaning</h1>
-    <p class="sub">This is where most analyst time actually goes. Nobody is going to hand you a list of what's wrong with a file &mdash; finding the problems <i>is</i> the skill. In this module you get raw data and an audit to perform, not a checklist to follow.</p>
+    <p class="sub">This is where most analyst time actually goes. Nobody is going to hand you a list of what's wrong with a file, finding the problems <i>is</i> the skill. In this module you get raw data and an audit to perform, not a checklist to follow.</p>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
         <li>Audit an unfamiliar dataset and find its problems without being told what they are</li>
         <li>Distinguish a data-entry error from a real, surprising value</li>
         <li>Fix duplicates, inconsistent categories, mixed currencies, and broken types</li>
-        <li>Decide between dropping, filling, and flagging &mdash; and justify the choice</li>
+        <li>Decide between dropping, filling, and flagging, and justify the choice</li>
         <li>Validate that your cleaning worked, instead of assuming it did</li>
         <li>Document what you changed and why, so someone can audit your work</li>
       </ul>
@@ -144,13 +144,13 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
 
   <section>
     <div class="kh"><span class="num">4.1</span><h2 class="serif">The discipline: never clean before you investigate</h2></div>
-    <p>The instinct of a new analyst is to see something odd and immediately fix it. The instinct of a good analyst is to ask <i>why it is there</i> first. A negative quantity might be a typo, or it might be how this company records a return &mdash; and those two answers lead to opposite actions.</p>
+    <p>The instinct of a new analyst is to see something odd and immediately fix it. The instinct of a good analyst is to ask <i>why it is there</i> first. A negative quantity might be a typo, or it might be how this company records a return, and those two answers lead to opposite actions.</p>
     <div class="def">
       <div class="k">The six-step loop, used for every problem you find</div>
       <div class="steps">
         <div class="step"><div class="sname">Detect</div><div class="sdesc">Find the anomaly. Counts, uniques, ranges, and type checks surface almost everything.</div></div>
         <div class="step"><div class="sname">Investigate</div><div class="sdesc">Look at the actual rows. How many? Are they clustered in one source, one date, one category?</div></div>
-        <div class="step"><div class="sname">Decide</div><div class="sdesc">Drop, fix, fill, or flag &mdash; and be able to say why in one sentence.</div></div>
+        <div class="step"><div class="sname">Decide</div><div class="sdesc">Drop, fix, fill, or flag, and be able to say why in one sentence.</div></div>
         <div class="step"><div class="sname">Clean</div><div class="sdesc">Apply the fix, ideally to a copy, never to your only version of the raw file.</div></div>
         <div class="step"><div class="sname">Validate</div><div class="sdesc">Re-run the detection. Did the count go to zero? Did the row count change by the amount you expected?</div></div>
         <div class="step"><div class="sname">Document</div><div class="sdesc">Write down what you changed and why. This is what makes your number defensible.</div></div>
@@ -178,8 +178,8 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
 
   <section>
     <div class="kh"><span class="num">4.3</span><h2 class="serif">The audit: find the problems yourself</h2></div>
-    <p>Here is <code>ecommerce_orders.csv</code> &mdash; 412 rows of real order data from the funnel of an online store. <b>It has at least four distinct problems.</b> You are not going to be told what they are.</p>
-    <p class="mut">Use the toolkit above. Run whatever you want; add lines, change lines, re-run as often as you like. When you think you've found them, answer the questions below &mdash; those are graded, and they check whether you actually found the problems rather than guessed.</p>
+    <p>Here is <code>ecommerce_orders.csv</code>, 412 rows of real order data from the funnel of an online store. <b>It has at least four distinct problems.</b> You are not going to be told what they are.</p>
+    <p class="mut">Use the toolkit above. Run whatever you want; add lines, change lines, re-run as often as you like. When you think you've found them, answer the questions below, those are graded, and they check whether you actually found the problems rather than guessed.</p>
 
     <div class="def">
       <div class="k">ecommerce_orders.csv &nbsp;·&nbsp; <a href="datasets/ecommerce_orders.csv" download style="color:var(--info)">download</a></div>
@@ -239,7 +239,7 @@ print(df.head(5))
         <div class="qexplain" id="a3explain"></div>
       </div>
       <div class="qcard">
-        <div class="qtext">A4. <code>order_date</code> loaded as text. Look at the actual values &mdash; why would <code>pd.to_datetime()</code> struggle here in a way it didn't for the retail file in Module 3?</div>
+        <div class="qtext">A4. <code>order_date</code> loaded as text. Look at the actual values, why would <code>pd.to_datetime()</code> struggle here in a way it didn't for the retail file in Module 3?</div>
         <div id="a4opts"></div>
         <div class="qexplain" id="a4explain"></div>
       </div>
@@ -257,21 +257,21 @@ print(df.head(5))
 
     <div class="def">
       <div class="k">Exact duplicates</div>
-      <p><code>df.drop_duplicates()</code> removes rows identical across every column. Nearly always safe &mdash; a genuinely identical row is almost always a loading or export artifact. Compare row counts before and after so you know how many went.</p>
+      <p><code>df.drop_duplicates()</code> removes rows identical across every column. Nearly always safe, a genuinely identical row is almost always a loading or export artifact. Compare row counts before and after so you know how many went.</p>
     </div>
     <div class="def">
       <div class="k">Inconsistent text (casing, whitespace)</div>
-      <p><code>df["sku"] = df["sku"].str.strip().str.upper()</code>. For categories, <code>.str.title()</code> is usually the right normalisation. Always check <code>.nunique()</code> before and after &mdash; a big drop tells you how much phantom variety you just collapsed.</p>
+      <p><code>df["sku"] = df["sku"].str.strip().str.upper()</code>. For categories, <code>.str.title()</code> is usually the right normalisation. Always check <code>.nunique()</code> before and after, a big drop tells you how much phantom variety you just collapsed.</p>
     </div>
     <div class="def">
       <div class="k">Numbers trapped in text (currency symbols, thousands separators)</div>
-      <p><code>df["amount"].str.replace("$", "", regex=False).astype(float)</code>. Watch for European formatting, where <code>,</code> is the decimal separator, not a thousands separator &mdash; <code>€95,46</code> is ninety-five euros, not nine thousand.</p>
+      <p><code>df["amount"].str.replace("$", "", regex=False).astype(float)</code>. Watch for European formatting, where <code>,</code> is the decimal separator, not a thousands separator, <code>€95,46</code> is ninety-five euros, not nine thousand.</p>
     </div>
     <div class="def">
       <div class="k">Mixed date formats</div>
-      <p><code>pd.to_datetime(df["order_date"], format="mixed", dayfirst=False)</code> handles several formats in one column. Without <code>format="mixed"</code>, newer pandas raises rather than guessing &mdash; which is the safer behaviour, because a wrong guess silently swaps days and months.</p>
+      <p><code>pd.to_datetime(df["order_date"], format="mixed", dayfirst=False)</code> handles several formats in one column. Without <code>format="mixed"</code>, newer pandas raises rather than guessing, which is the safer behaviour, because a wrong guess silently swaps days and months.</p>
     </div>
-    <div class="warn"><b>The most dangerous fix in this list:</b> date parsing. <code>03/04/2026</code> is March 4th to an American system and April 3rd to a European one. There is no way to tell from the value alone. If the data source is ambiguous, you ask &mdash; you do not guess and hope.</div>
+    <div class="warn"><b>The most dangerous fix in this list:</b> date parsing. <code>03/04/2026</code> is March 4th to an American system and April 3rd to a European one. There is no way to tell from the value alone. If the data source is ambiguous, you ask, you do not guess and hope.</div>
 
     <div class="interactive">
       <span class="ilbl">Exercise 1 · graded against the real file</span>
@@ -302,10 +302,10 @@ print(df.head(5))
 
   <section>
     <div class="kh"><span class="num">4.5</span><h2 class="serif">Missing values: drop, fill, or flag</h2></div>
-    <p>There is no universally correct answer. There is only a correct answer <i>for this column, this analysis, and this business context</i> &mdash; and a requirement that you can explain it.</p>
+    <p>There is no universally correct answer. There is only a correct answer <i>for this column, this analysis, and this business context</i>, and a requirement that you can explain it.</p>
     <div class="def">
       <div class="k">Drop the rows</div>
-      <p><code>df.dropna(subset=["units"])</code>. Reasonable when the missing rows are few and there's no reason to think they're systematically different. Dangerous when missingness correlates with something &mdash; if high-value orders are likelier to be missing a field, dropping them biases every number you produce afterwards.</p>
+      <p><code>df.dropna(subset=["units"])</code>. Reasonable when the missing rows are few and there's no reason to think they're systematically different. Dangerous when missingness correlates with something, if high-value orders are likelier to be missing a field, dropping them biases every number you produce afterwards.</p>
     </div>
     <div class="def">
       <div class="k">Fill with a value</div>
@@ -313,9 +313,9 @@ print(df.head(5))
     </div>
     <div class="def">
       <div class="k">Leave it and report it</div>
-      <p>Often the most honest option. pandas skips <code>NaN</code> in <code>.sum()</code> and <code>.mean()</code> anyway, so you can compute on what you have &mdash; as long as you state the count alongside the result. "Average order value was $47.20, computed across 393 of 400 orders; 7 lacked a valid quantity."</p>
+      <p>Often the most honest option. pandas skips <code>NaN</code> in <code>.sum()</code> and <code>.mean()</code> anyway, so you can compute on what you have, as long as you state the count alongside the result. "Average order value was $47.20, computed across 393 of 400 orders; 7 lacked a valid quantity."</p>
     </div>
-    <div class="why"><b>The distinction that separates blank from "MISSING":</b> in the orders file, 133 blank <code>shipped_date</code> values are <i>structural</i> &mdash; those orders never shipped, so of course there's no date. That's not dirty data, it's information. The single <code>"MISSING"</code> string is different: a row that claims to have shipped but has no date, with a placeholder someone typed by hand. The first is expected and meaningful; the second is a genuine defect. Treating them the same would be a mistake in both directions.</div>
+    <div class="why"><b>The distinction that separates blank from "MISSING":</b> in the orders file, 133 blank <code>shipped_date</code> values are <i>structural</i>, those orders never shipped, so of course there's no date. That's not dirty data, it's information. The single <code>"MISSING"</code> string is different: a row that claims to have shipped but has no date, with a placeholder someone typed by hand. The first is expected and meaningful; the second is a genuine defect. Treating them the same would be a mistake in both directions.</div>
 
     <div class="interactive">
       <span class="ilbl">Exercise 3 · graded against the real file</span>
@@ -333,13 +333,13 @@ print(df.head(5))
     </div>
     <details class="challenge">
       <summary>Advanced extension (optional, not graded)</summary>
-      <div class="chbody">Compute revenue two ways: excluding negative-quantity rows, and treating them as returns (i.e. letting them subtract). How much do the two totals differ? Which would you present to a finance stakeholder, and what one sentence would you attach to it? There is no single right answer here &mdash; but there is a wrong one, which is presenting either number without saying which choice you made.</div>
+      <div class="chbody">Compute revenue two ways: excluding negative-quantity rows, and treating them as returns (i.e. letting them subtract). How much do the two totals differ? Which would you present to a finance stakeholder, and what one sentence would you attach to it? There is no single right answer here, but there is a wrong one, which is presenting either number without saying which choice you made.</div>
     </details>
   </section>
 
   <section>
     <div class="kh"><span class="num">4.6</span><h2 class="serif">Validation: prove the cleaning worked</h2></div>
-    <p>Cleaning without validation is hoping. After every fix, re-run the detection that found the problem and confirm it's gone &mdash; and confirm you didn't break something else in the process.</p>
+    <p>Cleaning without validation is hoping. After every fix, re-run the detection that found the problem and confirm it's gone, and confirm you didn't break something else in the process.</p>
     <pre class="codeblock"><span class="c"># before</span>
 <span class="kw">print</span>(<span class="s">"dupes:"</span>, df.duplicated().sum(), <span class="s">"rows:"</span>, len(df))
 clean = df.drop_duplicates()
@@ -371,10 +371,10 @@ clean = df.drop_duplicates()
 
   <section>
     <div class="kh"><span class="num">★</span><h2 class="serif">Mini-project: clean a second, unfamiliar file</h2></div>
-    <p>New file, no walkthrough. <code>expense_reports.csv</code> is a corporate expense export with several problems &mdash; some you've seen, at least one you haven't.</p>
+    <p>New file, no walkthrough. <code>expense_reports.csv</code> is a corporate expense export with several problems, some you've seen, at least one you haven't.</p>
     <div class="def">
       <div class="k">expense_reports.csv &nbsp;·&nbsp; <a href="datasets/expense_reports.csv" download style="color:var(--info)">download</a></div>
-      <p style="margin-top:8px">Columns: <code>expense_id</code>, <code>employee</code>, <code>date</code>, <code>category</code>, <code>amount</code>. Finance wants total spend per category. That's the whole brief &mdash; the same amount of guidance you'd get in a real job.</p>
+      <p style="margin-top:8px">Columns: <code>expense_id</code>, <code>employee</code>, <code>date</code>, <code>category</code>, <code>amount</code>. Finance wants total spend per category. That's the whole brief, the same amount of guidance you'd get in a real job.</p>
     </div>
     <div class="why"><b>Before you write the final function, explore the file below.</b> Two things in particular will bite you if you don't look first: the <code>category</code> column, and the <code>amount</code> column. Neither is what it appears to be at a glance.</div>
 
@@ -400,7 +400,7 @@ print("fully blank rows:", df.isna().all(axis=1).sum())
       <span class="ilbl">Required exercise · this module's graded checkpoint work</span>
       <p class="mut" style="margin-bottom:10px">Write <code>usd_spend_by_category(df)</code> returning a dictionary of <b>USD-only</b> spend per cleaned category, rounded to 2 decimals, with exactly 4 keys.</p>
       <p class="mut" style="margin-bottom:10px">What you'll need to handle: fully blank rows; category variants (<code>"travel "</code>, <code>"Trvl"</code>, <code>"office supplies"</code>) collapsing to 4 real categories; and the <code>amount</code> column, which mixes plain numbers, <code>$</code>-prefixed values, and <code>€</code> values that use a comma as the decimal separator.</p>
-      <div class="warn" style="margin-top:0"><b>The judgement call, and it's the important part:</b> you cannot add euros to dollars and call it a total. There's no exchange rate in the file, and inventing one would be fabricating data. So this function reports USD only &mdash; and in a real job, the euro rows are what you raise with finance rather than quietly bury. Exclude them from the total.</div>
+      <div class="warn" style="margin-top:0"><b>The judgement call, and it's the important part:</b> you cannot add euros to dollars and call it a total. There's no exchange rate in the file, and inventing one would be fabricating data. So this function reports USD only, and in a real job, the euro rows are what you raise with finance rather than quietly bury. Exclude them from the total.</div>
       <textarea id="ex5Editor" class="testin" spellcheck="false" rows="12">def usd_spend_by_category(df):
     # 1. drop fully-blank rows
     # 2. normalise category: strip, title-case, and map "Trvl" -> "Travel"
@@ -419,7 +419,7 @@ print("fully blank rows:", df.isna().all(axis=1).sum())
   <section>
     <div class="kh"><span class="num">✎</span><h2 class="serif">Your cleaning log</h2></div>
     <p>The last step of the six-step loop is documentation, and it's the one that makes your work defensible. Write the log now, while the decisions are fresh.</p>
-    <div class="warn"><b>Honest limitation:</b> this box cannot be automatically graded &mdash; there is no single correct wording, and pretending otherwise would be fake rigour. It's saved with your progress so you can carry it into your portfolio. Grade yourself against the checklist underneath, honestly; the value is entirely in whether you can defend the decisions, not in ticking the boxes.</div>
+    <div class="warn"><b>Honest limitation:</b> this box cannot be automatically graded, there is no single correct wording, and pretending otherwise would be fake rigour. It's saved with your progress so you can carry it into your portfolio. Grade yourself against the checklist underneath, honestly; the value is entirely in whether you can defend the decisions, not in ticking the boxes.</div>
     <textarea id="cleaningLog" class="logbox" placeholder="For each problem you found in ecommerce_orders.csv and expense_reports.csv, write one short entry:
 
 PROBLEM, what you found, and how many rows it affected
