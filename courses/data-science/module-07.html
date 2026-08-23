@@ -3,86 +3,742 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 7: Data Visualization & Storytelling</title>
+<title>Module 7: Data Visualization &amp; Storytelling</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;
+}
+html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
 .serif{font-family:'Fraunces',serif}
-.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px 80px}
 .bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
-.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .in{max-width:960px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
 .bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
 .bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
 .bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
-.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
-.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
-.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
-.coursenav a:hover{color:var(--amber)}
-.coursenav .navsep{flex:1}
-@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
 .hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
 h1{font-family:'Fraunces';font-size:clamp(30px,5vw,44px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.08}
-.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.sub{color:var(--mut);font-size:16px;max-width:700px;margin-top:14px}
 .objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--good);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
 .objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--good);margin-bottom:10px;font-weight:700;font-family:'IBM Plex Mono'}
 .objectives ul{list-style:none;display:grid;gap:6px}
 .objectives li{padding-left:20px;position:relative;font-size:14.5px}
 .objectives li:before{content:"→";position:absolute;left:0;color:var(--amber)}
-section{padding:40px 0}
-.soon{background:var(--card);border:1px solid var(--bd2);border-radius:16px;padding:32px;text-align:center}
-.soon .badge{display:inline-flex;font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);border:1px solid rgba(95,194,232,.3);padding:6px 14px;border-radius:99px}
-.soon h2{font-family:'Fraunces';font-size:22px;margin-top:16px;font-weight:600}
-.soon p{color:var(--mut);font-size:14.5px;max-width:520px;margin:12px auto 0}
-.covers{text-align:left;margin-top:22px;padding-top:22px;border-top:1px solid var(--bd);max-width:520px;margin-left:auto;margin-right:auto}
-.covers .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2);margin-bottom:10px;font-family:'IBM Plex Mono'}
-.covers ul{list-style:none;display:grid;gap:8px}
-.covers li{padding-left:20px;position:relative;font-size:13.5px;color:var(--mut)}
-.covers li:before{content:"→";position:absolute;left:0;color:var(--amber)}
-a.cta{display:inline-flex;margin-top:22px;align-items:center;gap:8px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:14px;padding:11px 20px;border-radius:8px;text-decoration:none}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-family:'IBM Plex Mono';font-weight:700;font-size:12px;color:var(--amber);border:1px solid var(--amber);border-radius:99px;width:34px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-family:'Fraunces';font-size:21px;font-weight:600;letter-spacing:-.01em}
+p{font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:6px;font-family:'IBM Plex Mono'}
+.def p{font-size:14.5px}
+code{font-family:'IBM Plex Mono';font-size:13px;background:rgba(240,180,41,.1);color:var(--amber);padding:1px 6px;border-radius:4px}
+.why{border-left:3px solid var(--info);background:rgba(95,194,232,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
+.why b{color:var(--info)}
+.trap{border-left:3px solid var(--bad);background:rgba(255,133,133,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
+.trap b{color:var(--bad)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:20px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px;font-family:'IBM Plex Mono'}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--info);box-shadow:0 0 8px var(--info)}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button.primary:hover{filter:brightness(1.08);color:var(--amberd)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.testin{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
+.testin:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{display:block;background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.feedback.wait{display:block;background:var(--bg2);border:1px solid var(--bd2);color:var(--mut2)}
+.testsummary{margin-top:10px;font-family:'IBM Plex Mono';font-size:12.5px;font-weight:700}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:block;width:100%;text-align:left;font-family:'IBM Plex Sans';display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px;background:var(--card2);color:var(--tx)}
+.qopt:hover{border-color:var(--bd2)}
+.qopt.correct{border-color:var(--good);background:rgba(74,222,149,.08)}
+.qopt.incorrect{border-color:var(--bad);background:rgba(255,133,133,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:960px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--amber)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+.scoreboard{position:sticky;bottom:0;background:rgba(13,15,20,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0}
+.scoreboard .in{max-width:960px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;color:var(--amber)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+.chartbox{margin-top:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px 10px}
+.chartbox .clbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut2);font-family:'IBM Plex Mono';margin-bottom:8px}
+.chartrow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:700px){ .chartrow{grid-template-columns:1fr} }
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:26px} .kh h2{font-size:18px} .interactive{padding:16px} }
 </style>
 </head>
 <body>
-<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Data Science &amp; Analysis · Module 7</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-06.html">&larr; <span class="navlabel">Module 6</span></a><span class="navsep"></span><a href="module-08.html">Module 8 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Data Science &amp; Analysis · Module 7</span>
+</div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-06.html">&larr; <span class="navlabel">Module 6</span></a><span class="navsep"></span><a href="module-08.html" id="navNextTop">Module 8 <span class="navlabel">&rarr;</span></a></div></div>
+
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Module 7 of 9</span>
     <h1 class="serif">Data Visualization &amp; Storytelling</h1>
-    <p class="sub">Not "here's a bar chart, here's a line chart." Every exercise starts from a real dataset and a question, and asks you to choose and defend the visualization, including a deliberately misleading chart you have to diagnose.</p>
+    <p class="sub">Every chart here is drawn from numbers your own pandas code computes and Python actually verifies, not a static picture. The hard part was never the charting syntax, it's choosing the right chart for the question, and knowing when a chart is honest or when it's quietly lying.</p>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
-        <li>Choose the right chart for a given question, and explain why, not just recognize chart types</li>
-        <li>Build real charts from real data with matplotlib and seaborn</li>
-        <li>Spot and explain what makes a chart misleading, not just "off"</li>
-        <li>Distinguish a real pattern from something that only looks like one</li>
+        <li>Match a question to the right chart family: distribution, comparison, or trend</li>
+        <li>Use a histogram to catch data-quality problems a table hides</li>
+        <li>Recognize when a rate calculated from a tiny sample is misleading, no matter how good it looks</li>
+        <li>Choose between a line and a bar chart based on which one actually reveals the pattern</li>
+        <li>Build the correct, honest chart for a real stakeholder question, and defend the choice</li>
       </ul>
     </div>
   </header>
+
   <section>
-    <div class="soon">
-      <span class="badge">In production</span>
-      <h2 class="serif">This module's full interactive lesson is being built</h2>
-      <p>Built on the same real-execution pattern as Modules 2&ndash;6: real charts rendered from the real App Analytics dataset, not descriptions of what a good chart looks like.</p>
-      <div class="covers">
-        <div class="lbl">What this module will cover</div>
-        <ul>
-          <li>Chart-type selection driven by the question being asked, not the data type alone</li>
-          <li>matplotlib and seaborn, building real charts from the real App Analytics events file</li>
-          <li>A deliberately misleading chart (truncated axis, dual-axis trick) you have to diagnose, not just read about</li>
-          <li>Correlation vs. causation, applied to a chart you're looking at, not just defined in the abstract</li>
-        </ul>
-      </div>
-      <a href="dashboard.html" class="cta">Back to dashboard &rarr;</a>
+    <div class="kh"><span class="num">7.0</span><h2 class="serif">The three questions a chart can answer</h2></div>
+    <p>Almost every chart is answering one of three questions. Get this wrong and no amount of polish saves the chart.</p>
+    <div class="def"><div class="k">Distribution</div><p>"What do the values in this column look like, spread out?" Are they clustered, spread wide, skewed, or is there something that shouldn't be there at all? <b>Histogram</b> is the default tool.</p></div>
+    <div class="def"><div class="k">Comparison</div><p>"How do these categories compare to each other, right now?" Product A vs B vs C, channel vs channel, stage vs stage. <b>Bar chart</b> is the default tool, ranked so the eye doesn't have to hunt.</p></div>
+    <div class="def"><div class="k">Trend</div><p>"How did this number move over time?" <b>Line chart</b> is the default tool, but only when there's enough underlying signal to be worth connecting the dots, section 7.3 shows a case where it isn't.</p></div>
+    <div class="trap"><b>Why not pie charts:</b> the human eye is bad at comparing angles and areas, good at comparing bar lengths and dot positions. A bar chart almost always communicates the same comparison faster and more accurately than a pie chart. You won't find one in this module.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Quick check · practice, not graded</span>
+      <p class="mut" style="margin-bottom:10px">Match each question to the chart family that answers it. This doesn't affect your progress, it's just a warm-up before the real exercises below.</p>
+      <div class="qcard" style="margin-top:0"><div class="qtext">"What's the typical order value, and are most orders clustered near it or spread out?"</div><div id="w1opts"></div></div>
+      <div class="qcard"><div class="qtext">"Which of our 4 product categories sold the most last quarter?"</div><div id="w2opts"></div></div>
+      <div class="qcard"><div class="qtext">"Has daily signups been trending up or down over the last two months?"</div><div id="w3opts"></div></div>
     </div>
   </section>
-  <footer>Zenith Lab · Data Science &amp; Analysis · Module 7 of 9</footer>
+
+  <section>
+    <div class="kh"><span class="num">7.1</span><h2 class="serif">Distribution: what a histogram catches that a table hides</h2></div>
+    <p><b>The dataset:</b> <code>survey_responses.csv</code>, the same satisfaction survey from Module 5. <code>satisfaction_score</code> is meant to be a 1&ndash;5 rating.</p>
+    <div class="why"><b>Why bother charting it if you already computed mean/median in Module 5:</b> a mean and a median are two numbers, they can't show you the shape. A histogram shows every value at once, including ones that don't belong.</div>
+    <div class="def"><div class="k">Pattern</div><p>Convert the column to numeric, count how many rows fall into each distinct score value (don't drop anything yet), and look at the full shape, not just the valid range.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Exercise 1 · real data, real Python, graded</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>score_histogram(df)</code>: convert <code>satisfaction_score</code> to numeric, and return a dict mapping every distinct numeric score value present (as a string key, e.g. <code>"0"</code>) to its row count. Do <b>not</b> filter anything out first, count every numeric value that appears, blanks excluded.</p>
+      <textarea id="ex1Editor" class="testin" spellcheck="false" rows="5">def score_histogram(df):
+    # convert to numeric, count rows per distinct score value (don't filter the range)
+    # return {"0": 4, "1": 47, ...} as a plain dict with string keys
+    return {}</textarea>
+      <div class="dagctrl">
+        <button id="btnRunEx1">Run tests</button>
+        <button id="btnResetEx1">Reset</button>
+      </div>
+      <div id="ex1Results"></div>
+      <div id="ex1Chart"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7.2</span><h2 class="serif">Comparison: the funnel as a bar chart</h2></div>
+    <p><b>The dataset:</b> <code>app_analytics_events.csv</code>, 11,635 real product-analytics events across one month, four stages: <code>view_item</code>, <code>add_to_cart</code>, <code>start_checkout</code>, <code>purchase</code>.</p>
+    <p><b>Business question:</b> "Where in the funnel are we losing the most people?"</p>
+    <div class="def"><div class="k">Pattern</div><p>Count events per stage, then look at the ratio from one stage to the next, not just the raw counts, a stage with a small count isn't automatically the problem if it started from a small pool.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Exercise 2 · real data, real Python, graded</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>funnel_counts(df)</code>: return a dict with keys <code>"view_item"</code>, <code>"add_to_cart"</code>, <code>"start_checkout"</code>, <code>"purchase"</code>, each mapped to its total event count.</p>
+      <textarea id="ex2Editor" class="testin" spellcheck="false" rows="4">def funnel_counts(df):
+    # count rows per event_name for these 4 stages
+    return {}</textarea>
+      <div class="dagctrl">
+        <button id="btnRunEx2">Run tests</button>
+        <button id="btnResetEx2">Reset</button>
+      </div>
+      <div id="ex2Results"></div>
+      <div id="ex2Chart"></div>
+    </div>
+    <div class="qcard" id="ex2interpCard" style="display:none"><div class="qtext">Looking at the chart you just built: which stage-to-stage transition loses the largest <i>percentage</i> of people?</div><div id="ex2interpOpts"></div><div class="qexplain" id="ex2interpExplain"></div></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7.3</span><h2 class="serif">Trend: when a line chart is the wrong chart</h2></div>
+    <p><b>The dataset:</b> the same event log, filtered to <code>purchase</code> events, across 30 days of May.</p>
+    <p><b>Business question:</b> "Is there a weekly pattern in when people buy?"</p>
+    <div class="trap"><b>The trap:</b> a daily line chart of 30 noisy points invites you to eyeball a "trend" in what might just be day-to-day noise. The real pattern here isn't a trend over time at all, it's a repeating pattern by day of week, which a daily line chart is the wrong tool to reveal.</div>
+    <div class="def"><div class="k">Pattern</div><p>Build both: a daily line (30 points, noisy) and a day-of-week bar chart (7 points, aggregated across all 30 days). Compare which one actually answers the question.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Exercise 3 · real data, real Python, graded</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>purchase_trends(df)</code>: return <code>{"daily": {"2026-05-01": 46, ...}, "by_dow": {"Monday": ..., "Tuesday": ..., ..., "Sunday": ...}}</code>, using each purchase's date and day-of-week name.</p>
+      <textarea id="ex3Editor" class="testin" spellcheck="false" rows="6">def purchase_trends(df):
+    # filter to purchase events, parse timestamp
+    # daily: count per calendar date, as "YYYY-MM-DD" strings
+    # by_dow: count per day-of-week name (Monday..Sunday)
+    return {"daily": {}, "by_dow": {}}</textarea>
+      <div class="dagctrl">
+        <button id="btnRunEx3">Run tests</button>
+        <button id="btnResetEx3">Reset</button>
+      </div>
+      <div id="ex3Results"></div>
+      <div id="ex3Chart"></div>
+    </div>
+    <div class="qcard" id="ex3interpCard" style="display:none"><div class="qtext">Which chart actually answers "is there a weekly pattern"?</div><div id="ex3interpOpts"></div><div class="qexplain" id="ex3interpExplain"></div></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7.4</span><h2 class="serif">The misleading chart: a rate from a tiny sample</h2></div>
+    <p><b>The dataset:</b> <code>marketing_campaign_results.csv</code>, the same 4-channel data from Module 5.</p>
+    <div class="chartbox">
+      <div class="clbl">A chart someone on the marketing team already made</div>
+      <div id="badChart"></div>
+      <p class="mut" style="font-size:13px;margin-top:8px">Referral looks like the best-performing channel by far. Before you recommend shifting budget to it, look at the sample it's built on.</p>
+    </div>
+    <div class="trap"><b>The trap:</b> Referral's conversion rate (9.52%) comes from 21 clicks and 2 conversions. One more or one fewer conversion swings that rate by roughly 5 points. Search's 4.79% comes from 1,815 clicks, that number barely moves if a handful of conversions go the other way. A bar chart with no sample size shown treats both numbers as equally trustworthy, they aren't.</div>
+    <div class="def"><div class="k">Pattern (same "reliable" rule as Module 5)</div><p>A channel's rate is only comparable once it clears a minimum sample: at least 30 clicks <b>and</b> at least 5 conversions. Below that, report the number but don't rank it.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Exercise 4 · real data, real Python, graded</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>reliable_channel_rates(df)</code>: group by channel, compute each channel's conversion rate (<code>conversions/clicks*100</code>) and total clicks, then return only the channels meeting the reliable threshold above, as <code>{"Search": {"cvr": 4.79, "clicks": 1815}, ...}</code> (values rounded to 2 decimals).</p>
+      <textarea id="ex4Editor" class="testin" spellcheck="false" rows="6">def reliable_channel_rates(df):
+    # group by channel: sum clicks and conversions, compute cvr
+    # keep only channels with clicks >= 30 and conversions >= 5
+    return {}</textarea>
+      <div class="dagctrl">
+        <button id="btnRunEx4">Run tests</button>
+        <button id="btnResetEx4">Reset</button>
+      </div>
+      <div id="ex4Results"></div>
+      <div id="ex4Chart"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7.5</span><h2 class="serif">Required exercise: build the honest recommendation</h2></div>
+    <p><b>The kind of ask you'll actually get:</b> "Which channel should we put more budget behind?" A real stakeholder wants one defensible answer, not a caveat-filled dump of every number.</p>
+    <div class="def"><div class="k">This needs, together</div><p>The reliable-only filter from 7.4 (so a lucky small sample can't win) &middot; the highest conversion rate among what's left &middot; and a chart type chosen on purpose, not by default.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Required exercise · this module's graded checkpoint work</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>best_channel_recommendation(df)</code>: apply the reliable-only filter, then return <code>{"channel": "...", "cvr": ..., "clicks": ...}</code> for the single best reliable channel by conversion rate.</p>
+      <textarea id="ex5Editor" class="testin" spellcheck="false" rows="5">def best_channel_recommendation(df):
+    # reuse the reliable-only filter, then pick the highest cvr among what's left
+    return {"channel": "", "cvr": 0, "clicks": 0}</textarea>
+      <div class="dagctrl">
+        <button id="btnRunEx5">Run tests</button>
+        <button id="btnResetEx5">Reset</button>
+      </div>
+      <div id="ex5Results"></div>
+      <div id="ex5Chart"></div>
+    </div>
+    <div class="qcard" id="ex5interpCard" style="display:none"><div class="qtext">Which chart should go in the deck alongside this recommendation?</div><div id="ex5interpOpts"></div><div class="qexplain" id="ex5interpExplain"></div></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">7.6</span><h2 class="serif">Test transfer: a shape you haven't seen yet</h2></div>
+    <p><b>The dataset:</b> <code>pnl_statement.csv</code>, 12 quarters of revenue. Nothing above told you this dataset existed, and its period labels are a mess on purpose: <code>"Jan-Mar-2024"</code>, <code>"Q1 2025"</code>, and <code>"2025-Q2"</code> all appear in the same column, three different formats for the same idea.</p>
+    <div class="why"><b>No step-by-step here:</b> you already know how to standardize a messy column (Module 4) and how to build a trend chart (7.3). This asks you to combine both on a shape you haven't practiced. Q1 = Jan&ndash;Mar, Q2 = Apr&ndash;Jun, Q3 = Jul&ndash;Sep, Q4 = Oct&ndash;Dec.</div>
+    <div class="interactive">
+      <span class="ilbl">Exercise 6 · real data, real Python, graded</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>revenue_by_quarter(df)</code>: parse every period into a consistent <code>"YYYY-Q#"</code> label (e.g. <code>"2024-Q1"</code>), then return a dict of that label to <code>revenue</code>, sorted chronologically (insertion order matters, oldest first).</p>
+      <textarea id="ex6Editor" class="testin" spellcheck="false" rows="6">def revenue_by_quarter(df):
+    # standardize the three period formats to "YYYY-Q#", sort chronologically
+    return {}</textarea>
+      <div class="dagctrl">
+        <button id="btnRunEx6">Run tests</button>
+        <button id="btnResetEx6">Reset</button>
+      </div>
+      <div id="ex6Results"></div>
+      <div id="ex6Chart"></div>
+    </div>
+    <div class="qcard" id="ex6interpCard" style="display:none"><div class="qtext">Once the chart renders in proper chronological order, what pattern actually shows up?</div><div id="ex6interpOpts"></div><div class="qexplain" id="ex6interpExplain"></div></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">✓</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Five questions on judgement, not syntax. Score 80% or higher (4 of 5) to unlock Module 8.</p>
+    <div class="qcard"><div class="qtext">1. A colleague wants a pie chart comparing 6 product categories' revenue share. What's the better alternative, and why?</div><div id="q1opts"></div><div class="qexplain" id="q1explain"></div></div>
+    <div class="qcard"><div class="qtext">2. A channel shows a 15% conversion rate from 8 clicks. What's the correct way to present that number?</div><div id="q2opts"></div><div class="qexplain" id="q2explain"></div></div>
+    <div class="qcard"><div class="qtext">3. You want to know if a numeric column has invalid or out-of-range values hiding in it. What's the fastest way to check visually?</div><div id="q3opts"></div><div class="qexplain" id="q3explain"></div></div>
+    <div class="qcard"><div class="qtext">4. 30 days of noisy daily data might be hiding a weekly pattern. What should you chart instead of the raw daily line?</div><div id="q4opts"></div><div class="qexplain" id="q4explain"></div></div>
+    <div class="qcard"><div class="qtext">5. Someone asks "which is the best chart type?" as a general question. What's the honest answer?</div><div id="q5opts"></div><div class="qexplain" id="q5explain"></div></div>
+  </section>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Module 7 of 9 · Next: Dashboards &amp; Business Communication</footer>
 </div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete all 6 exercises and the checkpoint to continue →</button>
+</div></div>
+
 <script src="course-progress.js?v=2"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const MODULE_ID = 7;
+CourseProgress.touchVisited(MODULE_ID);
+const esc = CourseProgress.escapeHtml;
+
+/* ---------------- tiny SVG chart helpers, driven entirely by real numbers ---------------- */
+function barChart(items, opts) {
+  opts = opts || {};
+  const w = 600, barH = 30, gap = 9, padL = opts.padL || 130, padR = 66, padT = 8;
+  const max = Math.max(1, ...items.map(i => i.value));
+  const h = padT * 2 + items.length * (barH + gap) - gap;
+  let bars = "";
+  items.forEach((it, i) => {
+    const y = padT + i * (barH + gap);
+    const bw = Math.max(2, (it.value / max) * (w - padL - padR));
+    const color = it.color || "var(--amber)";
+    bars += `<text x="${padL - 10}" y="${y + barH/2 + 4}" text-anchor="end" font-size="12" fill="var(--mut)">${esc(it.label)}</text>`;
+    bars += `<rect x="${padL}" y="${y}" width="${bw}" height="${barH}" rx="4" fill="${color}"></rect>`;
+    bars += `<text x="${padL + bw + 8}" y="${y + barH/2 + 4}" font-size="12" fill="var(--tx)" font-family="IBM Plex Mono">${esc(opts.fmt ? opts.fmt(it.value) : it.value)}</text>`;
+  });
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;font-family:'IBM Plex Sans',sans-serif">${bars}</svg>`;
+}
+
+function lineChart(points, opts) {
+  opts = opts || {};
+  const w = 620, h = 200, padL = 40, padR = 14, padT = 14, padB = 26;
+  const vals = points.map(p => p.value);
+  const maxY = Math.max(1, ...vals) * 1.15;
+  const xScale = i => padL + (points.length <= 1 ? 0 : (i / (points.length - 1)) * (w - padL - padR));
+  const yScale = v => padT + (1 - v / maxY) * (h - padT - padB);
+  let path = points.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(i).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(" ");
+  let dots = points.map((p, i) => `<circle cx="${xScale(i).toFixed(1)}" cy="${yScale(p.value).toFixed(1)}" r="2.6" fill="var(--amber)"></circle>`).join("");
+  const step = Math.max(1, Math.ceil(points.length / 7));
+  let labels = "";
+  points.forEach((p, i) => {
+    if (i % step === 0 || i === points.length - 1) {
+      labels += `<text x="${xScale(i).toFixed(1)}" y="${h - 6}" font-size="10" fill="var(--mut2)" text-anchor="middle">${esc(p.label)}</text>`;
+    }
+  });
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;font-family:'IBM Plex Sans',sans-serif">
+    <line x1="${padL}" y1="${h - padB}" x2="${w - padR}" y2="${h - padB}" stroke="var(--bd2)"></line>
+    <path d="${path}" fill="none" stroke="var(--amber)" stroke-width="2"></path>
+    ${dots}${labels}
+  </svg>`;
+}
+
+/* ---------------- Pandas harness plumbing (Pyodide, real pandas, no faking) ---------------- */
+const DATASETS = {};
+async function loadDatasets() {
+  if (DATASETS.survey) return DATASETS;
+  const [survey, events, marketing, pnl] = await Promise.all([
+    fetch("datasets/survey_responses.csv").then(r => r.text()),
+    fetch("datasets/app_analytics_events.csv").then(r => r.text()),
+    fetch("datasets/marketing_campaign_results.csv").then(r => r.text()),
+    fetch("datasets/pnl_statement.csv").then(r => r.text()),
+  ]);
+  Object.assign(DATASETS, { survey, events, marketing, pnl });
+  return DATASETS;
+}
+const PREAMBLE = ["import pandas as pd, io, math, json", "def _mk(txt): return pd.read_csv(io.StringIO(txt))"].join("\n");
+const exerciseState = {};
+
+function harnessFor(fnName, dfVar, checks) {
+  return [
+    PREAMBLE,
+    "def harness(payload):",
+    "    code, survey_txt, events_txt, mkt_txt, pnl_txt = payload",
+    "    ns = {'pd': pd, 'math': math}",
+    "    try: exec(code, ns)",
+    "    except Exception as e: return {'ranOk': False, 'error': f'{type(e).__name__}: {e}'}",
+    `    fn = ns.get('${fnName}')`,
+    "    if fn is None:",
+    `        return {'ranOk': True, 'results': [{'name': '${fnName} is defined', 'pass': False, 'hint': 'Define a function named exactly ${fnName}.'}], 'chartData': None}`,
+    "    survey = _mk(survey_txt); events = _mk(events_txt); mkt = _mk(mkt_txt); pnl = _mk(pnl_txt)",
+    "    results = []",
+    "    chartData = None",
+    ...checks,
+    "    return {'ranOk': True, 'results': results, 'chartData': chartData}",
+  ].join("\n");
+}
+
+async function runGraded(id, buildHarness, buttonId, sectionKey, onChart) {
+  const btn = document.getElementById(buttonId), resultsEl = document.getElementById(id + "Results"), chartEl = document.getElementById(id + "Chart");
+  btn.disabled = true;
+  resultsEl.innerHTML = `<div class="feedback wait">Loading data and starting Python&hellip; (first run downloads pandas, 20&ndash;60s)</div>`;
+  if (chartEl) chartEl.innerHTML = "";
+  let ds;
+  try { ds = await loadDatasets(); }
+  catch (e) { resultsEl.innerHTML = `<div class="feedback bad">Could not load datasets: ${esc(String(e))}</div>`; btn.disabled = false; return; }
+  const code = document.getElementById(id + "Editor").value;
+  let outcome;
+  try { outcome = await PySandboxRunner.run(buildHarness(), "harness", [code, ds.survey, ds.events, ds.marketing, ds.pnl], 20000, 90000); }
+  finally { btn.disabled = false; }
+  if (!outcome.ok) { resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error)}</div>`; return; }
+  const data = outcome.result;
+  if (!data.ranOk) { resultsEl.innerHTML = `<div class="feedback bad">Your code didn't run: ${esc(data.error || "unknown")}</div>`; return; }
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  data.results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${esc(r.name)}` + (r.pass ? "" : `<br>${esc(r.hint || "")}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.className = "testsummary";
+  summary.style.color = passCount === data.results.length ? "var(--good)" : "var(--mut)";
+  summary.textContent = `${passCount} / ${data.results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  const allPass = passCount === data.results.length;
+  if (allPass && data.chartData && chartEl && onChart) onChart(chartEl, data.chartData);
+  exerciseState[id] = { passCount, total: data.results.length };
+  CourseProgress.setExtra("module7_" + id, { passCount, total: data.results.length });
+  if (sectionKey) CourseProgress.setSection(MODULE_ID, sectionKey, { passCount, total: data.results.length });
+  updateNextButton();
+}
+
+/* ---------------- Exercise 1: histogram ---------------- */
+const EX1 = () => harnessFor("score_histogram", "survey", [
+  "    try:",
+  "        out = fn(survey.copy())",
+  "        if not isinstance(out, dict):",
+  "            results.append({'name': 'Returns a dict', 'pass': False, 'hint': f'Expected a dict, got {type(out).__name__}.'})",
+  "        else:",
+  "            exp = {'0': 4, '1': 47, '2': 30, '3': 45, '4': 48, '5': 38, '6': 2}",
+  "            got = {str(k): int(v) for k, v in out.items()}",
+  "            results.append({'name': 'Includes every distinct score value, 0-6', 'pass': set(got)==set(exp), 'hint': f'Expected keys {sorted(exp)}, got {sorted(got)}. Do not filter the range before counting.'})",
+  "            if set(got)==set(exp):",
+  "                bad = {k: got[k] for k in exp if got.get(k) != exp[k]}",
+  "                results.append({'name': 'Counts per value are correct', 'pass': not bad, 'hint': f'Mismatches: {bad}' if bad else ''})",
+  "                if not bad: chartData = exp",
+  "    except Exception as e: results.append({'name': 'score_histogram runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+function renderEx1Chart(el, data) {
+  const items = ["0","1","2","3","4","5","6"].map(k => ({ label: k, value: data[k] || 0, color: (k==="0"||k==="6") ? "var(--bad)" : "var(--amber)" }));
+  el.innerHTML = `<div class="chartbox"><div class="clbl">Score distribution, including invalid values (red)</div>${barChart(items)}<p class="mut" style="font-size:13px;margin-top:8px">4 rows scored 0 and 2 rows scored 6, both outside the valid 1&ndash;5 range, exactly what Module 5's cleaning step filtered out. The histogram makes that visible at a glance; a mean or median alone never would have.</p></div>`;
+}
+
+/* ---------------- Exercise 2: funnel bar chart ---------------- */
+const EX2 = () => harnessFor("funnel_counts", "events", [
+  "    try:",
+  "        out = fn(events.copy())",
+  "        exp = {'view_item': 6580, 'add_to_cart': 2735, 'start_checkout': 1451, 'purchase': 869}",
+  "        got = {k: int(v) for k, v in out.items()} if isinstance(out, dict) else {}",
+  "        results.append({'name': 'Has all 4 funnel stages', 'pass': set(got)==set(exp), 'hint': f'Expected keys {sorted(exp)}, got {sorted(got)}.'})",
+  "        if set(got)==set(exp):",
+  "            bad = {k: got[k] for k in exp if got[k] != exp[k]}",
+  "            results.append({'name': 'Counts per stage are correct', 'pass': not bad, 'hint': f'Mismatches: {bad}' if bad else ''})",
+  "            if not bad: chartData = exp",
+  "    except Exception as e: results.append({'name': 'funnel_counts runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+function renderEx2Chart(el, data) {
+  const stages = ["view_item","add_to_cart","start_checkout","purchase"];
+  const items = stages.map(s => ({ label: s, value: data[s] }));
+  el.innerHTML = `<div class="chartbox"><div class="clbl">Funnel stage counts</div>${barChart(items)}</div>`;
+  document.getElementById("ex2interpCard").style.display = "block";
+}
+
+/* ---------------- Exercise 3: daily line vs day-of-week bar ---------------- */
+const EX3 = () => harnessFor("purchase_trends", "events", [
+  "    try:",
+  "        out = fn(events.copy())",
+  "        daily = out.get('daily', {}) if isinstance(out, dict) else {}",
+  "        by_dow = out.get('by_dow', {}) if isinstance(out, dict) else {}",
+  "        results.append({'name': \"daily has 30 dates\", 'pass': len(daily)==30, 'hint': f'Expected 30 distinct dates, got {len(daily)}.'})",
+  "        exp_dow = {'Monday':110,'Tuesday':100,'Wednesday':106,'Thursday':130,'Friday':151,'Saturday':145,'Sunday':127}",
+  "        got_dow = {str(k): int(v) for k, v in by_dow.items()}",
+  "        results.append({'name': 'by_dow has all 7 days', 'pass': set(got_dow)==set(exp_dow), 'hint': f'Expected {sorted(exp_dow)}, got {sorted(got_dow)}.'})",
+  "        if set(got_dow)==set(exp_dow):",
+  "            bad = {k: got_dow[k] for k in exp_dow if got_dow[k] != exp_dow[k]}",
+  "            results.append({'name': 'by_dow counts are correct', 'pass': not bad, 'hint': f'Mismatches: {bad}' if bad else ''})",
+  "            if not bad and len(daily)==30: chartData = {'daily': daily, 'by_dow': exp_dow}",
+  "    except Exception as e: results.append({'name': 'purchase_trends runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+function renderEx3Chart(el, data) {
+  const dailyPoints = Object.keys(data.daily).sort().map(d => ({ label: d.slice(5), value: data.daily[d] }));
+  const dowOrder = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  const dowItems = dowOrder.map(d => ({ label: d, value: data.by_dow[d] }));
+  el.innerHTML = `<div class="chartrow">
+    <div class="chartbox"><div class="clbl">Daily purchases, 30 points (noisy)</div>${lineChart(dailyPoints)}</div>
+    <div class="chartbox"><div class="clbl">By day of week, 7 points (aggregated)</div>${barChart(dowItems, { padL: 90 })}</div>
+  </div>`;
+  document.getElementById("ex3interpCard").style.display = "block";
+}
+
+/* ---------------- Exercise 4: reliable-only rates ---------------- */
+const EX4 = () => harnessFor("reliable_channel_rates", "mkt", [
+  "    try:",
+  "        out = fn(mkt.copy())",
+  "        exp = {'Email': (7.04, 284), 'Search': (4.79, 1815), 'Social': (2.37, 1478)}",
+  "        got = out if isinstance(out, dict) else {}",
+  "        results.append({'name': 'Excludes Referral (fails the reliable threshold)', 'pass': 'Referral' not in got, 'hint': 'Referral has only 21 clicks and 2 conversions, below the 30-click/5-conversion minimum.' if 'Referral' in got else ''})",
+  "        results.append({'name': 'Includes exactly Email, Search, Social', 'pass': set(got)==set(exp), 'hint': f'Expected {sorted(exp)}, got {sorted(got)}.'})",
+  "        if set(got)==set(exp):",
+  "            bad = [k for k in exp if abs(float(got[k].get('cvr',0))-exp[k][0])>0.02 or int(got[k].get('clicks',0))!=exp[k][1]]",
+  "            results.append({'name': 'cvr and clicks are correct for each', 'pass': not bad, 'hint': f'Check: {bad}' if bad else ''})",
+  "            if not bad: chartData = {k: {'cvr': exp[k][0], 'clicks': exp[k][1]} for k in exp}",
+  "    except Exception as e: results.append({'name': 'reliable_channel_rates runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+function renderEx4Chart(el, data) {
+  const items = Object.keys(data).sort((a,b) => data[b].cvr - data[a].cvr).map(k => ({ label: `${k} (n=${data[k].clicks})`, value: data[k].cvr, color: "var(--good)" }));
+  el.innerHTML = `<div class="chartbox"><div class="clbl">Conversion rate, reliable channels only</div>${barChart(items, { fmt: v => v.toFixed(2) + "%", padL: 170 })}</div>`;
+}
+
+/* ---------------- Exercise 5: required, the recommendation ---------------- */
+const EX5 = () => harnessFor("best_channel_recommendation", "mkt", [
+  "    try:",
+  "        out = fn(mkt.copy())",
+  "        if not isinstance(out, dict):",
+  "            results.append({'name': 'Returns a dict', 'pass': False, 'hint': f'Expected a dict, got {type(out).__name__}.'})",
+  "        else:",
+  "            results.append({'name': \"Recommends Email (highest reliable rate)\", 'pass': out.get('channel')=='Email', 'hint': f\"Referral's rate is higher but its sample (21 clicks) is too small to trust. Among the reliable channels, Email has the highest rate at 7.04%. Got {out.get('channel')!r}.\"})",
+  "            if out.get('channel')=='Email':",
+  "                ok = abs(float(out.get('cvr',0))-7.04)<0.05 and int(out.get('clicks',0))==284",
+  "                results.append({'name': 'cvr (7.04) and clicks (284) are correct', 'pass': ok, 'hint': f\"Got cvr={out.get('cvr')}, clicks={out.get('clicks')}.\" if not ok else ''})",
+  "                if ok: chartData = {'channel': 'Email', 'cvr': 7.04, 'clicks': 284, 'runnerup_cvr': 4.79, 'runnerup': 'Search'}",
+  "    except Exception as e: results.append({'name': 'best_channel_recommendation runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+function renderEx5Chart(el, data) {
+  const items = [
+    { label: data.channel + " (recommended)", value: data.cvr, color: "var(--good)" },
+    { label: data.runnerup, value: data.runnerup_cvr, color: "var(--amber)" },
+  ];
+  el.innerHTML = `<div class="chartbox"><div class="clbl">The two most defensible options, side by side</div>${barChart(items, { fmt: v => v.toFixed(2) + "%", padL: 150 })}</div>`;
+  document.getElementById("ex5interpCard").style.display = "block";
+}
+
+/* ---------------- Exercise 6: transfer, mixed period formats ---------------- */
+const EX6 = () => harnessFor("revenue_by_quarter", "pnl", [
+  "    try:",
+  "        out = fn(pnl.copy())",
+  "        exp_order = ['2024-Q1','2024-Q2','2024-Q3','2024-Q4','2025-Q1','2025-Q2','2025-Q3','2025-Q4','2026-Q1','2026-Q2','2026-Q3','2026-Q4']",
+  "        exp_rev = {'2024-Q1':180468.72,'2024-Q2':192661.41,'2024-Q3':153886.19,'2024-Q4':194618.05,'2025-Q1':206078.81,'2025-Q2':215852.52,'2025-Q3':172177.86,'2025-Q4':225418.89,'2026-Q1':220620.34,'2026-Q2':237996.38,'2026-Q3':184554.77,'2026-Q4':239740.84}",
+  "        got = out if isinstance(out, dict) else {}",
+  "        results.append({'name': 'All 12 quarters present, labeled YYYY-Q#', 'pass': set(got)==set(exp_order), 'hint': f'Expected {exp_order}, got {sorted(got)}. Every one of the three label formats maps to one of these.'})",
+  "        if set(got)==set(exp_order):",
+  "            bad = [k for k in exp_order if abs(float(got[k])-exp_rev[k])>0.02]",
+  "            results.append({'name': 'Revenue values are correct', 'pass': not bad, 'hint': f'Check: {bad}' if bad else ''})",
+  "            got_order = list(got.keys())",
+  "            results.append({'name': 'Sorted chronologically, oldest first', 'pass': got_order==exp_order, 'hint': f'Got order {got_order}.' if got_order!=exp_order else ''})",
+  "            if not bad and got_order==exp_order: chartData = {k: exp_rev[k] for k in exp_order}",
+  "    except Exception as e: results.append({'name': 'revenue_by_quarter runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+function renderEx6Chart(el, data) {
+  const points = Object.keys(data).map(k => ({ label: k, value: data[k] }));
+  el.innerHTML = `<div class="chartbox"><div class="clbl">Revenue by quarter, chronological</div>${lineChart(points, {})}</div>`;
+  document.getElementById("ex6interpCard").style.display = "block";
+}
+
+const STARTERS = {
+  ex1: 'def score_histogram(df):\n    # convert to numeric, count rows per distinct score value (don\'t filter the range)\n    # return {"0": 4, "1": 47, ...} as a plain dict with string keys\n    return {}',
+  ex2: 'def funnel_counts(df):\n    # count rows per event_name for these 4 stages\n    return {}',
+  ex3: 'def purchase_trends(df):\n    # filter to purchase events, parse timestamp\n    # daily: count per calendar date, as "YYYY-MM-DD" strings\n    # by_dow: count per day-of-week name (Monday..Sunday)\n    return {"daily": {}, "by_dow": {}}',
+  ex4: 'def reliable_channel_rates(df):\n    # group by channel: sum clicks and conversions, compute cvr\n    # keep only channels with clicks >= 30 and conversions >= 5\n    return {}',
+  ex5: 'def best_channel_recommendation(df):\n    # reuse the reliable-only filter, then pick the highest cvr among what\'s left\n    return {"channel": "", "cvr": 0, "clicks": 0}',
+  ex6: 'def revenue_by_quarter(df):\n    # standardize the three period formats to "YYYY-Q#", sort chronologically\n    return {}',
+};
+const HARNESSES = { ex1: EX1, ex2: EX2, ex3: EX3, ex4: EX4, ex5: EX5, ex6: EX6 };
+const CHART_RENDERERS = { ex1: renderEx1Chart, ex2: renderEx2Chart, ex3: renderEx3Chart, ex4: renderEx4Chart, ex5: renderEx5Chart, ex6: renderEx6Chart };
+const SECTION_KEYS = { ex5: "chartBuildExercise" };
+
+["ex1","ex2","ex3","ex4","ex5","ex6"].forEach(id => {
+  const cap = id.charAt(0).toUpperCase() + id.slice(1);
+  document.getElementById("btnRun" + cap).addEventListener("click", () => runGraded(id, HARNESSES[id], "btnRun" + cap, SECTION_KEYS[id] || null, CHART_RENDERERS[id]));
+  document.getElementById("btnReset" + cap).addEventListener("click", () => {
+    document.getElementById(id + "Editor").value = STARTERS[id];
+    document.getElementById(id + "Results").innerHTML = "";
+    document.getElementById(id + "Chart").innerHTML = "";
+  });
+});
+
+/* ---------------- The "chart someone already made" teaching example, 7.4 ---------------- */
+(function () {
+  const items = [
+    { label: "Referral (n=21)", value: 9.52, color: "var(--bad)" },
+    { label: "Email (n=284)", value: 7.04 },
+    { label: "Search (n=1815)", value: 4.79 },
+    { label: "Social (n=1478)", value: 2.37 },
+  ];
+  document.getElementById("badChart").innerHTML = barChart(items, { fmt: v => v.toFixed(2) + "%", padL: 150 });
+})();
+
+/* ---------------- warm-up matching quiz (7.0, ungraded) ---------------- */
+function buildWarmup(id, opts, containerId) {
+  const el = document.getElementById(containerId);
+  let done = false;
+  opts.forEach((opt, i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.textContent = opt.text;
+    div.addEventListener("click", () => {
+      if (done) return;
+      done = true;
+      el.querySelectorAll(".qopt").forEach((e, j) => {
+        if (opts[j].correct) e.classList.add("correct");
+        else if (j === i) e.classList.add("incorrect");
+      });
+    });
+    el.appendChild(div);
+  });
+}
+buildWarmup("w1", [
+  { text: "Histogram, it's asking about the spread and shape of a distribution", correct: true },
+  { text: "Bar chart", correct: false },
+  { text: "Pie chart", correct: false },
+], "w1opts");
+buildWarmup("w2", [
+  { text: "Bar chart, it's a comparison across a small number of categories", correct: true },
+  { text: "Line chart", correct: false },
+  { text: "Histogram", correct: false },
+], "w2opts");
+buildWarmup("w3", [
+  { text: "Line chart, it's asking about direction of change over time", correct: true },
+  { text: "Bar chart", correct: false },
+  { text: "Histogram", correct: false },
+], "w3opts");
+
+/* ---------------- in-section interpretation questions (tied to exercise charts) ---------------- */
+function buildInterp(id, opts, containerId) {
+  const el = document.getElementById(containerId);
+  opts.forEach((opt, i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.textContent = opt.text;
+    div.addEventListener("click", () => {
+      const ex = document.getElementById(id + "Explain");
+      if (ex.style.display === "block") return;
+      el.querySelectorAll(".qopt").forEach((e, j) => {
+        if (opts[j].correct) e.classList.add("correct");
+        else if (j === i) e.classList.add("incorrect");
+      });
+      ex.style.display = "block";
+      ex.textContent = opt.correct ? opt.correctText : ("Not quite. " + opt.reason);
+    });
+    el.appendChild(div);
+  });
+}
+buildInterp("ex2interp", [
+  { text: "add_to_cart → start_checkout, roughly 47% of carts never reach checkout", correct: true, correctText: "Correct. 2735 → 1451 is about a 47% drop, the largest of the three transitions, and the one worth investigating first." },
+  { text: "view_item → add_to_cart, since it loses the most raw people (3845)", correct: false, reason: "That transition starts from the largest pool, so a big raw drop is expected. Compare the percentage lost at each step, not the raw count." },
+  { text: "start_checkout → purchase, since purchase has the smallest count", correct: false, reason: "Having the smallest final count doesn't mean that step lost the highest percentage, check the ratio between consecutive stages." },
+], "ex2interpOpts");
+buildInterp("ex3interp", [
+  { text: "The day-of-week bar chart, aggregating 30 noisy days into 7 categories reveals the repeating pattern the daily line buries in noise", correct: true, correctText: "Correct. Friday and Saturday consistently outperform Tuesday, a pattern invisible in the daily line but obvious once aggregated by day of week." },
+  { text: "The daily line chart, more data points always show more truth", correct: false, reason: "More points isn't automatically more signal, 30 noisy daily points can bury a 7-category weekly pattern instead of revealing it." },
+  { text: "Neither, this question can't be answered with a chart", correct: false, reason: "It can, just not with the default choice (a raw daily line). Aggregating to the right granularity is the fix." },
+], "ex3interpOpts");
+buildInterp("ex5interp", [
+  { text: "A bar chart of Email vs Search only, both reliable, Email ahead, the small-sample Referral number left out entirely", correct: true, correctText: "Correct. Showing only the defensible comparison avoids handing a stakeholder a chart that invites the wrong conclusion." },
+  { text: "A bar chart with all 4 channels, including Referral, so nothing is hidden", correct: false, reason: "Including it without context reintroduces the exact trap from 7.4, a viewer will see the tallest bar and remember that, not a caveat in the footnote." },
+  { text: "A pie chart of all 4 channels' share of total conversions", correct: false, reason: "That answers a different question (share of total), not 'which channel converts best,' and pie charts are a weak comparison tool regardless." },
+], "ex5interpOpts");
+buildInterp("ex6interp", [
+  { text: "Revenue dips every Q3 (Jul-Sep), in 2024, 2025, and 2026 alike, a recurring seasonal pattern, not a one-time event", correct: true, correctText: "Correct. Once the periods are in true chronological order, the same quarter dips every single year, that's a seasonal pattern worth planning around, not noise." },
+  { text: "Revenue is trending steadily downward overall", correct: false, reason: "Look again at the non-Q3 quarters, the overall trend across years is upward, it's specifically Q3 that dips each time." },
+  { text: "There's no visible pattern once the data is sorted correctly", correct: false, reason: "There is one, and it only becomes visible once the three label formats are standardized and sorted, that's the entire point of this exercise." },
+], "ex6interpOpts");
+
+/* ---------------- Checkpoint quiz ---------------- */
+let score = 0;
+const answered = { q1:false,q2:false,q3:false,q4:false,q5:false };
+function allExercisesPassing(){
+  const ids = ["ex1","ex2","ex3","ex4","ex5","ex6"];
+  return ids.every(id => exerciseState[id] && exerciseState[id].passCount === exerciseState[id].total);
+}
+function updateNextButton(){
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnNext");
+  const ready = allDone && allExercisesPassing();
+  btn.disabled = !ready;
+  btn.textContent = ready ? "Continue to Module 8 →" : "Complete all 6 exercises and the checkpoint to continue →";
+  if (allDone) CourseProgress.markComplete(MODULE_ID, score, 5);
+  maybeShowRetry();
+}
+function buildQ(id, opts, containerId){
+  const el = document.getElementById(containerId);
+  opts.forEach((opt,i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.textContent = opt.text;
+    div.addEventListener("click", () => {
+      if (answered[id]) return;
+      answered[id] = true;
+      CourseProgress.setAnswer(MODULE_ID, id, i);
+      el.querySelectorAll(".qopt").forEach((e,j) => {
+        if (opts[j].correct) e.classList.add("correct");
+        else if (j === i) e.classList.add("incorrect");
+      });
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { score++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+      updateNextButton();
+    });
+    el.appendChild(div);
+  });
+}
+buildQ("q1", [
+  { text: "A bar chart ranked by revenue share, the eye compares bar length accurately, angle and area comparisons in a pie chart are much harder to judge", correct: true, correctText: "Correct. This is true regardless of category count, but it gets worse as the number of slices grows." },
+  { text: "A 3D pie chart, it adds visual interest", correct: false, reason: "3D effects distort the apparent size of slices even further, making an already weak chart type worse, not better." },
+  { text: "There's no better alternative, pie charts are the standard for share-of-total questions", correct: false, reason: "Bar charts communicate the same share-of-total comparison faster and more accurately for almost any number of categories." },
+], "q1opts");
+buildQ("q2", [
+  { text: "Report the rate alongside the sample size (e.g. 15% from 8 clicks), and don't rank it against rates built on much larger samples until it clears a reasonable minimum", correct: true, correctText: "Correct. The number isn't fake, it's just not comparable yet, showing the sample size lets the reader judge that for themselves." },
+  { text: "Round it to a cleaner number like 15% and present it as-is", correct: false, reason: "Rounding doesn't fix the underlying problem, the rate is still built on too little data to be stable." },
+  { text: "Discard it entirely and don't mention that channel", correct: false, reason: "The channel and its (small) data still exist, hiding it entirely is worse than reporting it honestly with context." },
+], "q2opts");
+buildQ("q3", [
+  { text: "Plot a histogram of the column and look at the full range of bars, including any far outside where valid values should be", correct: true, correctText: "Correct. A histogram shows every value present at once, an out-of-range bar is immediately visible in a way a single mean or median can't reveal." },
+  { text: "Sort the column and read the first and last 5 rows", correct: false, reason: "That works for small datasets but doesn't scale, and it's easy to miss a small cluster of bad values buried in the middle of a sort." },
+  { text: "Compute the mean and see if it looks reasonable", correct: false, reason: "A mean can look perfectly reasonable even with a handful of invalid values mixed in, especially in a larger dataset, it's not a reliable check." },
+], "q3opts");
+buildQ("q4", [
+  { text: "Aggregate to day-of-week (7 bars) instead of plotting all 30 raw days, then look for a repeating pattern across weeks", correct: true, correctText: "Correct. Aggregating to the right granularity for the question is often more useful than more raw data points." },
+  { text: "Plot the same 30 daily points but change the line color", correct: false, reason: "Styling doesn't change what the underlying data can reveal, the noise is still there at the daily level." },
+  { text: "Switch to a pie chart of the 30 days", correct: false, reason: "A pie chart with 30 slices is unreadable, and pie charts aren't suited to trend or pattern questions regardless of slice count." },
+], "q4opts");
+buildQ("q5", [
+  { text: "There isn't one, the right chart depends entirely on the question, distribution, comparison, and trend each have a different default tool", correct: true, correctText: "Correct. \"Best chart\" is always relative to what question is being asked of the data, that's the core judgement this module was about." },
+  { text: "Bar charts, they work for everything", correct: false, reason: "Bar charts are the right default for comparison, but a distribution question needs a histogram and a trend question usually needs a line, not a bar." },
+  { text: "Whichever chart looks the most visually impressive", correct: false, reason: "Visual impressiveness has nothing to do with whether a chart actually and honestly answers the question being asked." },
+], "q5opts");
+
+function maybeShowRetry(){
+  const anyAnswered = answered.q1||answered.q2||answered.q3||answered.q4||answered.q5;
+  const allDone = answered.q1&&answered.q2&&answered.q3&&answered.q4&&answered.q5;
+  const btn = document.getElementById("btnRetryCheckpoint");
+  btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModule(MODULE_ID);
+  window.location.reload();
+});
+document.getElementById("btnNext").addEventListener("click", () => { window.location.href = "module-08.html"; });
+
+(function restore(){
+  const stored = CourseProgress.getModule(MODULE_ID);
+  const a = stored.answers || {};
+  ["q1","q2","q3","q4","q5"].forEach(id => {
+    if (a[id] !== undefined && !answered[id]) {
+      const label = document.querySelectorAll(`#${id}opts .qopt`)[a[id]];
+      if (label) label.click();
+    }
+  });
+  ["ex1","ex2","ex3","ex4","ex5","ex6"].forEach((id) => {
+    const saved = CourseProgress.getExtra("module7_" + id);
+    if (saved && saved.total > 0) {
+      exerciseState[id] = saved;
+      const resultsEl = document.getElementById(id + "Results");
+      const passed = saved.passCount === saved.total;
+      resultsEl.innerHTML = `<div class="feedback ${passed ? "ok" : "bad"}">Restored from your last visit: ${passed ? "passing" : "not yet passing"}. Edit and re-run to update the chart.</div>`;
+    }
+  });
+  updateNextButton();
+})();
+</script>
 <script src="course-rail.js"></script>
 </body>
 </html>
