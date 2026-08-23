@@ -176,9 +176,9 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
     <p>Concrete example: a retail company notices revenue is flat this quarter. A <b>data analyst</b> pulls the order data, cleans it, finds that the drop is concentrated in one region and one product line, and recommends what to check next. A <b>data scientist</b> might separately build a model that predicts which customers are about to churn. A <b>BI analyst</b> maintains the live dashboard that surfaced the flat-revenue number in the first place. An <b>analytics engineer</b> is who built and maintains the pipeline that gets raw order data into a queryable table every night. Same company, four different, overlapping jobs.</p>
     <div class="def">
       <div class="k">How the adjacent roles differ</div>
-      <p><b>vs. Data Scientist</b> — data scientists lean more on statistics, experimentation, and often machine learning to answer harder, more open-ended questions. Data analysts answer more immediate business questions with existing data and simpler methods. The line is blurry and many analysts grow into data science work.</p>
-      <p style="margin-top:10px"><b>vs. BI (Business Intelligence) Analyst</b> — a BI analyst mostly builds and maintains recurring dashboards and reports. A data analyst does that too, but also does one-off, open-ended investigations that don't have a dashboard yet.</p>
-      <p style="margin-top:10px"><b>vs. Analytics Engineer</b> — analytics engineers build and maintain the data pipelines and models that get raw data into a clean, queryable state. Analysts consume what analytics engineers build. Some companies don't distinguish the roles at all.</p>
+      <p><b>vs. Data Scientist</b>, data scientists lean more on statistics, experimentation, and often machine learning to answer harder, more open-ended questions. Data analysts answer more immediate business questions with existing data and simpler methods. The line is blurry and many analysts grow into data science work.</p>
+      <p style="margin-top:10px"><b>vs. BI (Business Intelligence) Analyst</b>, a BI analyst mostly builds and maintains recurring dashboards and reports. A data analyst does that too, but also does one-off, open-ended investigations that don't have a dashboard yet.</p>
+      <p style="margin-top:10px"><b>vs. Analytics Engineer</b>, analytics engineers build and maintain the data pipelines and models that get raw data into a clean, queryable state. Analysts consume what analytics engineers build. Some companies don't distinguish the roles at all.</p>
     </div>
   </section>
 
@@ -429,7 +429,7 @@ const PATH_QUESTIONS = [
     { t:"A quick refresher, then moving fast", tags:{ b:2 } },
     { t:"Skipping straight to real analysis work", tags:{ c:2 } } ] },
 ];
-const PATH_NAMES = { a:"Track A · Never coded — start at Module 1", b:"Track B · Some code — start at Module 3", c:"Track C · Career changer — start at Module 5" };
+const PATH_NAMES = { a:"Track A · Never coded, start at Module 1", b:"Track B · Some code, start at Module 3", c:"Track C · Career changer, start at Module 5" };
 let pathAnswers = {};
 function renderPathQuiz(){
   const area = document.getElementById("pathQuizArea");

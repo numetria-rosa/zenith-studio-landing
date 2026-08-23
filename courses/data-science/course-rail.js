@@ -1,4 +1,4 @@
-/* Zenith Lab — Data Science & Analysis persistent course sidebar.
+/* Zenith Lab, Data Science & Analysis persistent course sidebar.
    Loaded as the last script on every course page. Wraps the page's
    existing content (unchanged) in a flex shell and prepends a sticky
    left rail: course nav plus a live module list with lock/progress
@@ -84,7 +84,7 @@
         const inner = `<span class="rmnum">${m.id}</span><span class="rmdot"></span>${m.title}`;
         modsHtml += unlocked
           ? `<a href="${m.file}" class="${cls.join(" ")}" title="${m.title}">${inner}</a>`
-          : `<span class="${cls.join(" ")}" title="Locked — complete Module ${m.id - 1} first">${inner}</span>`;
+          : `<span class="${cls.join(" ")}" title="Locked, complete Module ${m.id - 1} first">${inner}</span>`;
       });
     } else {
       modsHtml = `<span class="rail-note">Module status loads once CourseProgress is available on this page.</span>`;

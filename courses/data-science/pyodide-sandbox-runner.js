@@ -1,4 +1,4 @@
-/* Zenith Lab — Web Worker Python sandbox for student code exercises, powered by Pyodide
+/* Zenith Lab, Web Worker Python sandbox for student code exercises, powered by Pyodide
    (CPython compiled to WebAssembly, running entirely client-side, no backend).
 
    Same safety architecture as the AI Engineering course's sandbox: a genuinely

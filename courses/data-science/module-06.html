@@ -440,22 +440,22 @@ function buildQ(id, opts, containerId){
 }
 buildQ("q1", [
   { text: "COUNT(channel) returns 82 (excludes the 11 NULLs), COUNT(*) returns 93 (counts every row)", correct: true, correctText: "Correct. COUNT(col) only counts non-NULL values in that column; COUNT(*) counts rows regardless of NULLs." },
-  { text: "Both return 93, NULL has no effect on COUNT", correct: false, reason: "NULL absolutely affects COUNT(column) — it's specifically excluded, that's the whole trap." },
+  { text: "Both return 93, NULL has no effect on COUNT", correct: false, reason: "NULL absolutely affects COUNT(column), it's specifically excluded, that's the whole trap." },
   { text: "COUNT(channel) errors out on NULL values", correct: false, reason: "COUNT(column) doesn't error on NULLs, it just quietly skips them, which is exactly what makes this bug easy to miss." },
 ], "q1opts");
 buildQ("q2", [
-  { text: "COUNT(*) inflates, since each order can now appear once per line item instead of once total", correct: true, correctText: "Correct. This exact database has 77 completed orders but 155 rows after joining to order_items — nearly double." },
+  { text: "COUNT(*) inflates, since each order can now appear once per line item instead of once total", correct: true, correctText: "Correct. This exact database has 77 completed orders but 155 rows after joining to order_items, nearly double." },
   { text: "COUNT(*) stays accurate, joins never change row counts", correct: false, reason: "Joins change row counts constantly, especially a one-to-many join like orders to order_items, that's the entire trap this section is about." },
-  { text: "COUNT(*) undercounts instead of overcounting", correct: false, reason: "A one-to-many join multiplies rows, it doesn't lose them — the count goes up, not down." },
+  { text: "COUNT(*) undercounts instead of overcounting", correct: false, reason: "A one-to-many join multiplies rows, it doesn't lose them, the count goes up, not down." },
 ], "q2opts");
 buildQ("q3", [
-  { text: "SQL's NULL comparisons return 'unknown,' not true or false, so a NULL row never satisfies != and gets silently filtered out along with everything else that fails the WHERE", correct: true, correctText: "Correct. NULL represents 'no value recorded,' and no comparison operator (=, !=, <, >) ever evaluates to true against it — only IS NULL / IS NOT NULL do." },
-  { text: "!= treats NULL the same as any other value, like the empty string", correct: false, reason: "NULL isn't a value at all in SQL's model, it's the absence of one — that's exactly why normal comparison operators can't test for it." },
+  { text: "SQL's NULL comparisons return 'unknown,' not true or false, so a NULL row never satisfies != and gets silently filtered out along with everything else that fails the WHERE", correct: true, correctText: "Correct. NULL represents 'no value recorded,' and no comparison operator (=, !=, <, >) ever evaluates to true against it, only IS NULL / IS NOT NULL do." },
+  { text: "!= treats NULL the same as any other value, like the empty string", correct: false, reason: "NULL isn't a value at all in SQL's model, it's the absence of one, that's exactly why normal comparison operators can't test for it." },
   { text: "This is a bug in this specific database, not a general SQL behavior", correct: false, reason: "This is standard SQL behavior everywhere (three-valued logic), not specific to this course's database." },
 ], "q3opts");
 buildQ("q4", [
   { text: "Check for the ABSENCE of a matching row in orders for each customer (NOT EXISTS, or LEFT JOIN with IS NULL), since there's no 'never ordered' flag to filter on directly", correct: true, correctText: "Correct. You're looking for customers with zero matches in another table, which needs a subquery or outer join, not a simple WHERE on a column." },
-  { text: "Filter customers WHERE orders = 0", correct: false, reason: "There's no 'orders' column on the customers table to filter on — order history lives in a separate table entirely." },
+  { text: "Filter customers WHERE orders = 0", correct: false, reason: "There's no 'orders' column on the customers table to filter on, order history lives in a separate table entirely." },
   { text: "It can't be done in SQL, this needs to be done in Python", correct: false, reason: "This is a completely standard SQL pattern (NOT EXISTS / anti-join), no external tool needed." },
 ], "q4opts");
 buildQ("q5", [

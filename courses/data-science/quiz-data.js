@@ -1,4 +1,4 @@
-/* Zenith Lab — Data Science & Analysis Quiz Center question pools.
+/* Zenith Lab, Data Science & Analysis Quiz Center question pools.
    Each core module (1-8) has a 6-question pool; a quiz attempt shuffles the
    pool and randomizes option order, so repeat attempts genuinely differ.
    Module 9 is the capstone (rubric-graded, not multiple-choice) and has no

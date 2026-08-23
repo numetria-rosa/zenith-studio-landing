@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Center — Data Science &amp; Analysis</title>
+<title>Quiz Center, Data Science &amp; Analysis</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -186,7 +186,7 @@ function renderList(){
   const faBadge = document.getElementById("faBadge");
   if (fa) {
     const faScore = safeInt(fa.passCount, 0), faTotal = safeInt(fa.total, 0);
-    faBadge.textContent = fa.passed ? `Passed — ${faScore}/${faTotal}` : `${faScore}/${faTotal} — retry needed`;
+    faBadge.textContent = fa.passed ? `Passed, ${faScore}/${faTotal}` : `${faScore}/${faTotal}, retry needed`;
     faBadge.className = "badge " + (fa.passed ? "mastered" : "revisit");
   }
 }
@@ -238,7 +238,7 @@ function renderQuestions(){
           ex.innerHTML = `<b>Correct.</b> Learning objective: ${q.objective}`;
         } else {
           const correctOpt = q.opts.find(o => o.correct);
-          ex.innerHTML = `<b>Not quite.</b> ${opt.why} <br><br><b>Remember:</b> ${correctOpt.t} — this maps to: ${q.objective}`;
+          ex.innerHTML = `<b>Not quite.</b> ${opt.why} <br><br><b>Remember:</b> ${correctOpt.t}, this maps to: ${q.objective}`;
         }
         checkQuizDone();
       });

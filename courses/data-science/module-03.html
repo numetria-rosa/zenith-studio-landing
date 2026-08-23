@@ -231,7 +231,7 @@ df[(df[<span class="s">"region"</span>] == <span class="s">"West"</span>) &amp; 
       <span class="ilbl">Exercise 1 · graded against the real file</span>
       <p class="mut" style="margin-bottom:10px">Write <code>high_value_west(df)</code> that returns the number of rows (an integer) where the region is exactly <code>"West"</code> <b>and</b> revenue is greater than 20000.</p>
       <textarea id="ex1Editor" class="testin" spellcheck="false" rows="4">def high_value_west(df):
-    # your code here — return an integer count
+    # your code here, return an integer count
     return 0</textarea>
       <div class="dagctrl">
         <button class="primary" id="btnRunEx1">▶ Run tests</button>
@@ -262,7 +262,7 @@ df[(df[<span class="s">"region"</span>] == <span class="s">"West"</span>) &amp; 
       <span class="ilbl">Exercise 2 · graded against the real file</span>
       <p class="mut" style="margin-bottom:10px">Write <code>recompute_revenue(df)</code> that adds a column <code>line_total</code> = units × unit_price, then returns the <b>rounded-to-2-decimals sum</b> of that column. Missing values should be skipped, not filled (that's <code>.sum()</code>'s default, so you don't need to do anything special &mdash; but you should know that's what's happening).</p>
       <textarea id="ex2Editor" class="testin" spellcheck="false" rows="4">def recompute_revenue(df):
-    # your code here — add line_total, return round(total, 2)
+    # your code here, add line_total, return round(total, 2)
     return 0.0</textarea>
       <div class="dagctrl">
         <button class="primary" id="btnRunEx2">▶ Run tests</button>
@@ -289,7 +289,7 @@ West     349244.88</div>
       <span class="ilbl">Exercise 3 · graded against the real file</span>
       <p class="mut" style="margin-bottom:10px">Write <code>top_region_by_revenue(df)</code> that returns the name (a string) of the region with the highest <b>total</b> revenue.</p>
       <textarea id="ex3Editor" class="testin" spellcheck="false" rows="4">def top_region_by_revenue(df):
-    # your code here — return a string like "West"
+    # your code here, return a string like "West"
     return ""</textarea>
       <div class="dagctrl">
         <button class="primary" id="btnRunEx3">▶ Run tests</button>
@@ -356,7 +356,7 @@ print("merged rows:   ", len(merged))
       <span class="ilbl">Exercise 4 · graded against the real files</span>
       <p class="mut" style="margin-bottom:10px">Now fix it. Write <code>clean_merge_row_count(hc, ot)</code> that de-duplicates <code>hc</code> on <code>employee_id</code> (keeping the first occurrence of each), inner-merges with <code>ot</code>, and returns the resulting row count as an integer.</p>
       <textarea id="ex4Editor" class="testin" spellcheck="false" rows="5">def clean_merge_row_count(hc, ot):
-    # your code here — dedupe hc on employee_id, then merge, then return len()
+    # your code here, dedupe hc on employee_id, then merge, then return len()
     return 0</textarea>
       <div class="dagctrl">
         <button class="primary" id="btnRunEx4">▶ Run tests</button>
@@ -379,7 +379,7 @@ df[<span class="s">"order_date"</span>].dt.day_name()</pre>
       <span class="ilbl">Exercise 5 · graded against the real file</span>
       <p class="mut" style="margin-bottom:10px">Write <code>orders_in_month(df, year, month)</code> that converts <code>order_date</code> to real dates and returns how many orders fall in that year and month, as an integer.</p>
       <textarea id="ex5Editor" class="testin" spellcheck="false" rows="5">def orders_in_month(df, year, month):
-    # your code here — convert to datetime, filter on year and month, return the count
+    # your code here, convert to datetime, filter on year and month, return the count
     return 0</textarea>
       <div class="dagctrl">
         <button class="primary" id="btnRunEx5">▶ Run tests</button>
@@ -519,7 +519,7 @@ async function runGraded(id, buildHarness, buttonId, sectionKey) {
     if (r.pass) passCount++;
     const row = document.createElement("div");
     row.className = "feedback " + (r.pass ? "ok" : "bad");
-    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
     resultsEl.appendChild(row);
   });
   const summary = document.createElement("div");
@@ -710,7 +710,7 @@ const EX6 = () => harnessSingle("overtime_by_department", [
   "            results.append({'name': 'Exactly 4 departments after normalising', 'pass': len(out) == 4, 'hint': f'Expected 4 departments, got {len(out)}: {sorted(out)}. Strip whitespace, title-case, and decide what to do about Ops vs Operations.'})",
   "            expected = {'Sales': 189.4, 'Support': 241.5, 'Operations': 272.7, 'Engineering': 585.6}",
   "            keys_ok = set(k.strip() for k in out) == set(expected)",
-  "            results.append({'name': 'Department names are Sales, Support, Operations, Engineering', 'pass': keys_ok, 'hint': f'Got {sorted(out)}. Expected {sorted(expected)} — remember Ops and Operations are the same department.'})",
+  "            results.append({'name': 'Department names are Sales, Support, Operations, Engineering', 'pass': keys_ok, 'hint': f'Got {sorted(out)}. Expected {sorted(expected)}, remember Ops and Operations are the same department.'})",
   "            if keys_ok:",
   "                vals_ok = all(abs(float(out[k]) - v) < 0.2 for k, v in expected.items())",
   "                detail = ', '.join(f'{k}: yours={out.get(k)} expected={v}' for k, v in expected.items())",
@@ -722,11 +722,11 @@ const EX6 = () => harnessSingle("overtime_by_department", [
 ]);
 
 const STARTERS = {
-  ex1: 'def high_value_west(df):\n    # your code here — return an integer count\n    return 0',
-  ex2: 'def recompute_revenue(df):\n    # your code here — add line_total, return round(total, 2)\n    return 0.0',
-  ex3: 'def top_region_by_revenue(df):\n    # your code here — return a string like "West"\n    return ""',
-  ex4: 'def clean_merge_row_count(hc, ot):\n    # your code here — dedupe hc on employee_id, then merge, then return len()\n    return 0',
-  ex5: 'def orders_in_month(df, year, month):\n    # your code here — convert to datetime, filter on year and month, return the count\n    return 0',
+  ex1: 'def high_value_west(df):\n    # your code here, return an integer count\n    return 0',
+  ex2: 'def recompute_revenue(df):\n    # your code here, add line_total, return round(total, 2)\n    return 0.0',
+  ex3: 'def top_region_by_revenue(df):\n    # your code here, return a string like "West"\n    return ""',
+  ex4: 'def clean_merge_row_count(hc, ot):\n    # your code here, dedupe hc on employee_id, then merge, then return len()\n    return 0',
+  ex5: 'def orders_in_month(df, year, month):\n    # your code here, convert to datetime, filter on year and month, return the count\n    return 0',
   ex6: 'def overtime_by_department(hc, ot):\n    # 1. de-duplicate hc on employee_id\n    # 2. normalise the department column\n    # 3. merge with ot on employee_id\n    # 4. group by department, sum overtime_hours, round to 1dp\n    # 5. return a dict like {"Sales": 206.8, ...} with exactly 4 keys\n    return {}',
 };
 const HARNESSES = { ex1: EX1, ex2: EX2, ex3: EX3, ex4: EX4, ex5: EX5, ex6: EX6 };
@@ -768,12 +768,12 @@ function buildDisc(id, opts, containerId){
 }
 buildDisc("d1", [
   { text: "employee_id is not unique in the headcount table, so some employees matched the overtime rows more than once", correct: true, correctText: "Correct. There are 3 duplicated employee_id values in headcount. Each duplicate multiplies that employee's overtime rows, inflating both the row count and any total you compute from it." },
-  { text: "The overtime table simply has more rows than the headcount table", correct: false, reason: "Row counts alone don't cause inflation — an inner join on a unique key can only ever return at most as many rows as the smaller side's matches. The inflation specifically means a key repeated." },
-  { text: "An inner join always returns the sum of both tables' rows", correct: false, reason: "It doesn't — an inner join returns matched pairs. If both keys were unique you'd get fewer rows than either table, not more." },
+  { text: "The overtime table simply has more rows than the headcount table", correct: false, reason: "Row counts alone don't cause inflation, an inner join on a unique key can only ever return at most as many rows as the smaller side's matches. The inflation specifically means a key repeated." },
+  { text: "An inner join always returns the sum of both tables' rows", correct: false, reason: "It doesn't, an inner join returns matched pairs. If both keys were unique you'd get fewer rows than either table, not more." },
 ], "d1opts");
 buildDisc("d2", [
   { text: "The department column has inconsistent capitalisation and spacing, so 'Sales', 'sales', and 'SALES ' are treated as three different departments", correct: true, correctText: "Correct. groupby matches strings exactly, so every spelling variant becomes its own group. You'll fix this properly in Module 4, and in this module's mini-project." },
-  { text: "There genuinely are 9 departments in the company", correct: false, reason: "Look at the group names in your output — you'll see the same department appearing several times with different capitalisation and trailing spaces." },
+  { text: "There genuinely are 9 departments in the company", correct: false, reason: "Look at the group names in your output, you'll see the same department appearing several times with different capitalisation and trailing spaces." },
   { text: "groupby created extra empty groups automatically", correct: false, reason: "groupby only creates a group per distinct value actually present in the column. The extra groups are real distinct strings, they're just different spellings of the same department." },
 ], "d2opts");
 
@@ -818,28 +818,28 @@ function buildQ(id, opts, containerId){
   });
 }
 buildQ("q1", [
-  { text: "It's stored as text, so date operations like .dt.month won't work until you convert it with pd.to_datetime", correct: true, correctText: "Correct. object means text. pandas doesn't parse dates automatically — you have to ask." },
+  { text: "It's stored as text, so date operations like .dt.month won't work until you convert it with pd.to_datetime", correct: true, correctText: "Correct. object means text. pandas doesn't parse dates automatically, you have to ask." },
   { text: "It's a date column and is ready to use for date filtering", correct: false, reason: "object specifically means text/mixed. A real date column shows as datetime64. Until you convert, .dt operations will fail." },
-  { text: "The column contains errors and should be deleted", correct: false, reason: "Nothing is wrong with the data — it just hasn't been typed as a date yet. Converting is a one-line fix, not a reason to drop the column." },
+  { text: "The column contains errors and should be deleted", correct: false, reason: "Nothing is wrong with the data, it just hasn't been typed as a date yet. Converting is a one-line fix, not a reason to drop the column." },
 ], "q1opts");
 buildQ("q2", [
-  { text: "The join key isn't unique in at least one table, so rows matched multiple times", correct: true, correctText: "Correct, and it's silent — no error, just a quietly wrong total afterwards. Check .duplicated().sum() on the key." },
+  { text: "The join key isn't unique in at least one table, so rows matched multiple times", correct: true, correctText: "Correct, and it's silent, no error, just a quietly wrong total afterwards. Check .duplicated().sum() on the key." },
   { text: "That's normal behaviour for merges and can be ignored", correct: false, reason: "It's a signal, not normal. Any total computed from an inflated merge will overcount, which is exactly how wrong numbers reach stakeholders." },
   { text: "The two tables have different column names", correct: false, reason: "Mismatched column names cause a merge error or zero matches, not extra rows. Extra rows point specifically at a repeated key." },
 ], "q2opts");
 buildQ("q3", [
-  { text: "mean — the average order value per group", correct: true, correctText: "Correct. 'Biggest orders' is about the size of a typical order, which is the mean (or median). sum would answer 'where does the most money come from', which is a different question." },
-  { text: "sum — the total revenue per group", correct: false, reason: "sum tells you where the most total money comes from. A region can top that chart purely by volume while having small individual orders." },
-  { text: "size — the number of orders per group", correct: false, reason: "size counts activity, not order value. A region could have the most orders and the smallest ones." },
+  { text: "mean, the average order value per group", correct: true, correctText: "Correct. 'Biggest orders' is about the size of a typical order, which is the mean (or median). sum would answer 'where does the most money come from', which is a different question." },
+  { text: "sum, the total revenue per group", correct: false, reason: "sum tells you where the most total money comes from. A region can top that chart purely by volume while having small individual orders." },
+  { text: "size, the number of orders per group", correct: false, reason: "size counts activity, not order value. A region could have the most orders and the smallest ones." },
 ], "q3opts");
 buildQ("q4", [
-  { text: "The column contains at least one missing value — pandas uses float to represent NaN", correct: true, correctText: "Correct. It's a useful tell: an unexpected float on a whole-number column almost always means missing data hiding in there." },
+  { text: "The column contains at least one missing value, pandas uses float to represent NaN", correct: true, correctText: "Correct. It's a useful tell: an unexpected float on a whole-number column almost always means missing data hiding in there." },
   { text: "The numbers are too large to store as integers", correct: false, reason: "pandas integers handle very large values fine. The float here is about representing NaN, not magnitude." },
   { text: "The column was loaded incorrectly and the file is corrupt", correct: false, reason: "The file is fine. pandas is accurately signalling that some values are absent." },
 ], "q4opts");
 buildQ("q5", [
   { text: "Because a merge can silently duplicate or drop rows, and neither raises an error", correct: true, correctText: "Correct. It's a two-second check that catches one of the most common sources of wrong numbers in real analysis." },
-  { text: "Because merges are slow and the count tells you how long it took", correct: false, reason: "Performance isn't the concern — correctness is. The row count is a data-integrity check, not a timing one." },
+  { text: "Because merges are slow and the count tells you how long it took", correct: false, reason: "Performance isn't the concern, correctness is. The row count is a data-integrity check, not a timing one." },
   { text: "Because pandas requires you to verify the count before using the result", correct: false, reason: "pandas requires nothing of the sort; it will happily hand you an inflated table. That's precisely why the discipline has to come from you." },
 ], "q5opts");
 
@@ -884,7 +884,7 @@ document.getElementById("btnNext").addEventListener("click", () => { window.loca
       ex.style.display = "block";
       ex.textContent = saved.correct
         ? "Answered correctly on a previous visit."
-        : "Answered on a previous visit (incorrectly). Re-read the section above — the reasoning matters more than the score here.";
+        : "Answered on a previous visit (incorrectly). Re-read the section above, the reasoning matters more than the score here.";
     }
   });
   updateNextButton();

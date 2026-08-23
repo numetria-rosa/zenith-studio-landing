@@ -332,7 +332,7 @@ two_prop_test(g.loc["Search","conv"],   g.loc["Search","clicks"],
 
 Recommendation: increase Search budget, hold Email, do not scale Referral yet.
 
-Search converts at 4.79% across 1,815 clicks, and its advantage over Social (2.37%) is statistically significant (p = 0.0002), so this is a real difference rather than noise. Email converts highest among reliable channels at 7.04% on 284 clicks, but its total volume is small — worth growing, not yet worth reallocating heavily into.
+Search converts at 4.79% across 1,815 clicks, and its advantage over Social (2.37%) is statistically significant (p = 0.0002), so this is a real difference rather than noise. Email converts highest among reliable channels at 7.04% on 284 clicks, but its total volume is small, worth growing, not yet worth reallocating heavily into.
 
 Referral shows the highest headline rate at 9.52%, but this comes from just 2 conversions on 21 clicks. Its 95% confidence interval spans -3% to 22%, meaning the data cannot distinguish it from any channel here. I recommend deliberately spending into Referral to build sample size before making a budget decision on it.
 
@@ -343,8 +343,8 @@ Caveat: this analysis covers 8 weeks and does not account for seasonality or dif
         <summary>Model answer (open after writing your own)</summary>
         <div class="chbody">
           <b>Recommendation:</b> Scale Search, protect Email, hold Referral pending more data.<br><br>
-          <b>Evidence.</b> Search delivers 87 conversions from 1,815 clicks (4.79%) at a $28.37 CPA. Its advantage over Social (2.37%, $51.93 CPA) is statistically significant at p = 0.0002 — with samples this size, that difference is real, not noise. Social is our most expensive channel per acquisition and the weakest converter; it's the obvious source of reallocated budget.<br><br>
-          <b>Email</b> converts best among channels with enough data to trust (7.04% on 284 clicks, $24.17 CPA — our cheapest acquisition). The constraint is volume, not performance. I'd grow list size rather than shift spend.<br><br>
+          <b>Evidence.</b> Search delivers 87 conversions from 1,815 clicks (4.79%) at a $28.37 CPA. Its advantage over Social (2.37%, $51.93 CPA) is statistically significant at p = 0.0002, with samples this size, that difference is real, not noise. Social is our most expensive channel per acquisition and the weakest converter; it's the obvious source of reallocated budget.<br><br>
+          <b>Email</b> converts best among channels with enough data to trust (7.04% on 284 clicks, $24.17 CPA, our cheapest acquisition). The constraint is volume, not performance. I'd grow list size rather than shift spend.<br><br>
           <b>Referral</b> shows 9.52%, the highest number on the page, and I want to be explicit that I am <i>not</i> recommending it on that basis. It rests on 2 conversions from 21 clicks. Its 95% interval runs from −3% to 22%, which is another way of saying we have no idea. One conversion either way swings it from best to below average. Recommendation: spend a small fixed test budget specifically to build sample size, and revisit in 4–6 weeks.<br><br>
           <b>Limitations.</b> Eight weeks of data, no seasonality adjustment, and no control for traffic quality differences between channels. CPA excludes fixed costs and creative production.
         </div>
@@ -427,7 +427,7 @@ async function runPlayground(editorId, outId, buttonId) {
   let html = "";
   if (r.out) html += `<div class="outbox">${CourseProgress.escapeHtml(r.out)}</div>`;
   if (r.err) html += `<div class="feedback bad">${CourseProgress.escapeHtml(r.err)}</div>`;
-  if (!r.out && !r.err) html = `<div class="feedback wait">Ran with no output — add a print() to see something.</div>`;
+  if (!r.out && !r.err) html = `<div class="feedback wait">Ran with no output, add a print() to see something.</div>`;
   outEl.innerHTML = html;
   CourseProgress.setExtra("module5_ran_" + editorId, true);
   updateNextButton();
@@ -469,7 +469,7 @@ const EX1 = () => harnessFor("valid_satisfaction_stats", [
   "            if set(out)==need:",
   "                results.append({'name': 'Excludes blanks AND impossible values (count is 208)', 'pass': out['count']==208, 'hint': f\"Expected count 208, got {out['count']!r}. 220 rows minus 6 blanks minus 6 impossible (0 or 6) values.\"})",
   "                ok = abs(float(out['mean'])-3.0)<0.02 and abs(float(out['median'])-3.0)<0.02 and abs(float(out['std'])-1.42)<0.02",
-  "                results.append({'name': 'mean, median and std are correct', 'pass': ok, 'hint': f\"Expected mean 3.0, median 3.0, std 1.42 — got mean {out['mean']}, median {out['median']}, std {out['std']}.\"})",
+  "                results.append({'name': 'mean, median and std are correct', 'pass': ok, 'hint': f\"Expected mean 3.0, median 3.0, std 1.42, got mean {out['mean']}, median {out['median']}, std {out['std']}.\"})",
   "    except Exception as e: results.append({'name': 'valid_satisfaction_stats runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 
@@ -529,7 +529,7 @@ async function runGraded(id, buildHarness, buttonId, sectionKey) {
     if (r.pass) passCount++;
     const row = document.createElement("div");
     row.className = "feedback " + (r.pass ? "ok" : "bad");
-    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
     resultsEl.appendChild(row);
   });
   const summary = document.createElement("div");
@@ -576,19 +576,19 @@ function buildInterp(id, opts, containerId){
   });
 }
 buildInterp("s1", [
-  { text: "Referral looks best but rests on 2 conversions from 21 clicks, so we can't distinguish it from any other channel yet — I'd spend a small test budget to build sample size before reallocating", correct: true, correctText: "Correct. This is the answer that protects both the business and your credibility: it doesn't dismiss Referral, it correctly identifies that we don't yet know." },
-  { text: "Referral is our best channel and we should move budget into it immediately", correct: false, reason: "This is exactly the trap. One conversion either way swings Referral from best to below average — the number isn't stable enough to spend against." },
+  { text: "Referral looks best but rests on 2 conversions from 21 clicks, so we can't distinguish it from any other channel yet, I'd spend a small test budget to build sample size before reallocating", correct: true, correctText: "Correct. This is the answer that protects both the business and your credibility: it doesn't dismiss Referral, it correctly identifies that we don't yet know." },
+  { text: "Referral is our best channel and we should move budget into it immediately", correct: false, reason: "This is exactly the trap. One conversion either way swings Referral from best to below average, the number isn't stable enough to spend against." },
   { text: "Referral is a bad channel and we should stop using it", correct: false, reason: "Equally unsupported in the opposite direction. Not having enough data to confirm a channel is good is not the same as evidence it's bad." },
 ], "s1opts");
 buildInterp("s2", [
-  { text: "If there were genuinely no difference between Search and Social, data this extreme would occur only about 2 times in 10,000 — so the difference is very likely real", correct: true, correctText: "Correct — and note the careful phrasing. The p-value describes how surprising the data would be under 'no difference', not the probability that any hypothesis is true." },
-  { text: "There is a 0.02% chance that Search and Social perform identically", correct: false, reason: "This is the single most common misreading of a p-value. It is not the probability that the null hypothesis is true — it's the probability of data this extreme IF the null were true." },
+  { text: "If there were genuinely no difference between Search and Social, data this extreme would occur only about 2 times in 10,000, so the difference is very likely real", correct: true, correctText: "Correct: and note the careful phrasing. The p-value describes how surprising the data would be under 'no difference', not the probability that any hypothesis is true." },
+  { text: "There is a 0.02% chance that Search and Social perform identically", correct: false, reason: "This is the single most common misreading of a p-value. It is not the probability that the null hypothesis is true, it's the probability of data this extreme IF the null were true." },
   { text: "Search is 0.0002 times better than Social", correct: false, reason: "A p-value says nothing about effect size. The actual difference here is 4.79% vs 2.37%; the p-value only tells you that gap is unlikely to be noise." },
 ], "s2opts");
 buildInterp("s3", [
-  { text: "There is essentially no linear relationship between tenure and satisfaction in this data — and importantly, that's a finding worth reporting, not a failed analysis", correct: true, correctText: "Correct. A near-zero correlation genuinely answers the question 'does satisfaction drift with tenure?' with 'no, not linearly.' Null results are real results." },
+  { text: "There is essentially no linear relationship between tenure and satisfaction in this data, and importantly, that's a finding worth reporting, not a failed analysis", correct: true, correctText: "Correct. A near-zero correlation genuinely answers the question 'does satisfaction drift with tenure?' with 'no, not linearly.' Null results are real results." },
   { text: "Longer-tenured employees are significantly less satisfied", correct: false, reason: "-0.04 is essentially zero. Treating it as a meaningful negative relationship would be reading a pattern into noise." },
-  { text: "The data must be wrong, since tenure should obviously affect satisfaction", correct: false, reason: "Expecting a relationship isn't evidence there is one. This is exactly the bias analysis exists to check — and here it says the expected relationship isn't visible." },
+  { text: "The data must be wrong, since tenure should obviously affect satisfaction", correct: false, reason: "Expecting a relationship isn't evidence there is one. This is exactly the bias analysis exists to check, and here it says the expected relationship isn't visible." },
 ], "s3opts");
 
 /* ---------------- written recommendation ---------------- */
@@ -663,29 +663,29 @@ function buildQ(id, opts, containerId){
   });
 }
 buildQ("q1", [
-  { text: "Most orders are small, and a few very large ones are pulling the average up — report the median, or report both", correct: true, correctText: "Correct. A large mean-median gap is a finding in itself: it tells you the distribution is skewed and the average is not representative of a typical customer." },
+  { text: "Most orders are small, and a few very large ones are pulling the average up, report the median, or report both", correct: true, correctText: "Correct. A large mean-median gap is a finding in itself: it tells you the distribution is skewed and the average is not representative of a typical customer." },
   { text: "The data is wrong, since the mean and median should match", correct: false, reason: "They only match for symmetric distributions. Real revenue data is almost always skewed, and a gap is expected rather than erroneous." },
   { text: "Average order value is $180 and that's the number to report", correct: false, reason: "Technically true, practically misleading. Nobody in the business would picture a $40-median customer base from that number." },
 ], "q1opts");
 buildQ("q2", [
   { text: "Which product is more predictable to plan and forecast around", correct: true, correctText: "Correct. Same mean, very different volatility. B swings roughly $22k–$78k month to month, which is a real operational and inventory risk the average conceals." },
-  { text: "Which product is more profitable", correct: false, reason: "Standard deviation says nothing about profitability — both average $50k. It describes consistency, not level." },
+  { text: "Which product is more profitable", correct: false, reason: "Standard deviation says nothing about profitability, both average $50k. It describes consistency, not level." },
   { text: "Which product has more customers", correct: false, reason: "Nothing here measures customer count. Standard deviation describes how much the monthly figure varies around its own mean." },
 ], "q2opts");
 buildQ("q3", [
-  { text: "If there were no real difference, data this extreme would appear about 3% of the time — conventionally we'd call this significant, but it says nothing about how large the effect is", correct: true, correctText: "Correct on both halves: the conditional interpretation, and the crucial caveat that significance is not the same as importance." },
+  { text: "If there were no real difference, data this extreme would appear about 3% of the time, conventionally we'd call this significant, but it says nothing about how large the effect is", correct: true, correctText: "Correct on both halves: the conditional interpretation, and the crucial caveat that significance is not the same as importance." },
   { text: "There's a 3% probability the result is wrong", correct: false, reason: "A very common misstatement. The p-value is the probability of the data given no effect, not the probability that your conclusion is mistaken." },
   { text: "The effect is 3% in size", correct: false, reason: "The p-value is not an effect size. A 0.01% effect can produce a tiny p-value with a large enough sample." },
 ], "q3opts");
 buildQ("q4", [
-  { text: "Probably not on these numbers alone — it's statistically real but a 0.01% lift may not justify the cost, so the decision is commercial rather than statistical", correct: true, correctText: "Correct. This is the statistical-vs-business-significance distinction, and recognising it is what separates an analyst from a calculator." },
-  { text: "Yes — p < 0.001 means it's definitely worth shipping", correct: false, reason: "Significance only establishes the effect is detectable, not that it's worth the engineering and opportunity cost. Huge samples make trivial effects significant." },
-  { text: "No — a p-value that small indicates a broken test", correct: false, reason: "A small p-value with 5 million users is entirely expected and not suspicious. The issue is the effect's size, not the test's validity." },
+  { text: "Probably not on these numbers alone, it's statistically real but a 0.01% lift may not justify the cost, so the decision is commercial rather than statistical", correct: true, correctText: "Correct. This is the statistical-vs-business-significance distinction, and recognising it is what separates an analyst from a calculator." },
+  { text: "Yes, p < 0.001 means it's definitely worth shipping", correct: false, reason: "Significance only establishes the effect is detectable, not that it's worth the engineering and opportunity cost. Huge samples make trivial effects significant." },
+  { text: "No, a p-value that small indicates a broken test", correct: false, reason: "A small p-value with 5 million users is entirely expected and not suspicious. The issue is the effect's size, not the test's validity." },
 ], "q4opts");
 buildQ("q5", [
-  { text: "Nothing causal yet — engaged customers may simply be the ones who discover feature X, so you'd need an experiment before recommending a push", correct: true, correctText: "Correct, and this is the reverse-causation case specifically. The correct next step is a controlled test, not a rollout." },
+  { text: "Nothing causal yet, engaged customers may simply be the ones who discover feature X, so you'd need an experiment before recommending a push", correct: true, correctText: "Correct, and this is the reverse-causation case specifically. The correct next step is a controlled test, not a rollout." },
   { text: "Feature X causes 20% better retention, so push it to all users", correct: false, reason: "This assumes the direction of causation without testing it. If already-loyal users self-select into X, pushing X on everyone will not reproduce the effect." },
-  { text: "Feature X is unrelated to retention", correct: false, reason: "Also unsupported — there is a real association. The honest position is that the association exists but its cause is not yet established." },
+  { text: "Feature X is unrelated to retention", correct: false, reason: "Also unsupported, there is a real association. The honest position is that the association exists but its cause is not yet established." },
 ], "q5opts");
 
 function maybeShowRetry(){
@@ -724,7 +724,7 @@ document.getElementById("btnNext").addEventListener("click", () => { window.loca
       interpAnswered[id] = true;
       const ex = document.getElementById(id + "explain");
       ex.style.display = "block";
-      ex.textContent = saved.correct ? "Answered correctly on a previous visit." : "Answered on a previous visit (incorrectly). Re-read the section — the reasoning matters more than the score.";
+      ex.textContent = saved.correct ? "Answered correctly on a previous visit." : "Answered on a previous visit (incorrectly). Re-read the section, the reasoning matters more than the score.";
     }
   });
   const savedRec = CourseProgress.getExtra("module5_recommendation");

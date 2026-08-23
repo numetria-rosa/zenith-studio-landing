@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Projects — Data Science &amp; Analysis</title>
+<title>Projects, Data Science &amp; Analysis</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -216,9 +216,9 @@ function openProject(id){
   document.getElementById("detailMistakes").innerHTML = d.mistakes.map(m => `<li>${m}</li>`).join("");
   document.getElementById("detailSolution").innerHTML = d.solution;
   document.getElementById("detailHints").innerHTML = `
-    <details><summary>Hint 1 — conceptual</summary><div class="hinttier">Re-read the relevant module's cheat sheet section before diving in, the requirements above map directly onto concepts already covered.</div></details>
-    <details><summary>Hint 2 — specific</summary><div class="hinttier">Look at the "Common mistakes" list above first, most students hit exactly one of those, identify which one applies to your current approach before going further.</div></details>
-    <details><summary>Hint 3 — near-solution</summary><div class="hinttier">${d.solution.replace(/<br>/g, " ")}</div></details>
+    <details><summary>Hint 1, conceptual</summary><div class="hinttier">Re-read the relevant module's cheat sheet section before diving in, the requirements above map directly onto concepts already covered.</div></details>
+    <details><summary>Hint 2, specific</summary><div class="hinttier">Look at the "Common mistakes" list above first, most students hit exactly one of those, identify which one applies to your current approach before going further.</div></details>
+    <details><summary>Hint 3, near-solution</summary><div class="hinttier">${d.solution.replace(/<br>/g, " ")}</div></details>
   `;
   document.querySelectorAll('#detailAcceptance input').forEach(cb => {
     cb.addEventListener("change", () => {

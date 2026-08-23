@@ -1,8 +1,8 @@
-/* Zenith Lab — Data Science & Analysis course progress system.
+/* Zenith Lab, Data Science & Analysis course progress system.
    Single source of truth for module completion, quiz state, and navigation gating.
    Persisted via localStorage, mirrored to the server when authenticated.
    Architecture is a direct port of the AI Engineering / Automation Engineering
-   course-progress.js — same public API, same storage shape — with the module
+   course-progress.js, same public API, same storage shape, with the module
    list, projects, and rubric swapped for this course's content. */
 (function (global) {
   const STORAGE_KEY = "zenith_ds_progress_v1";

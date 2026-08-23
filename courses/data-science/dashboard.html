@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Science &amp; Analysis — Course Dashboard</title>
+<title>Data Science &amp; Analysis, Course Dashboard</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -112,7 +112,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <div class="overallwrap">
     <div class="overallrow">
       <span class="ov-lbl">Overall course progress</span>
-      <span class="ov-val" id="ovVal">0 / 9 modules — 0%</span>
+      <span class="ov-val" id="ovVal">0 / 9 modules, 0%</span>
     </div>
     <div class="overallbar" id="ovBar"><div class="fill" id="ovFill"></div></div>
     <div class="nextaction" id="nextAction" style="display:none">
@@ -176,7 +176,7 @@ function renderModule0Card(){
   card.innerHTML = `
     <div class="modnum">${done ? "✓" : "0"}</div>
     <div class="modbody">
-      <div class="modtitle">Module 0 — Placement &amp; What This Job Actually Is</div>
+      <div class="modtitle">Module 0, Placement &amp; What This Job Actually Is</div>
       <div class="moddesc">A short self-check that routes you to Module 1, 3, or 5, plus what the role actually is.</div>
       <div class="modmeta"><span>${meta}</span></div>
     </div>
@@ -212,7 +212,7 @@ function renderDashboard(){
     card.innerHTML = `
       <div class="modnum">${status === "completed" ? "✓" : m.id}</div>
       <div class="modbody">
-        <div class="modtitle">Module ${m.id} — ${m.title}</div>
+        <div class="modtitle">Module ${m.id}, ${m.title}</div>
         <div class="moddesc">${descriptions[m.id]}</div>
         <div class="modmeta">${metaBits.map(b=>`<span>${b}</span>`).join("")}</div>
       </div>
@@ -246,7 +246,7 @@ function renderDashboard(){
   });
 
   const ov = CourseProgress.overall();
-  document.getElementById("ovVal").textContent = `${ov.completed} / ${ov.total} modules — ${ov.pct}%`;
+  document.getElementById("ovVal").textContent = `${ov.completed} / ${ov.total} modules, ${ov.pct}%`;
   document.getElementById("ovFill").style.width = ov.pct + "%";
   const fa = CourseProgress.getExtra("finalAssessment");
   const fullyDone = ov.pct === 100 && !!(fa && fa.passed);
@@ -266,8 +266,8 @@ function renderNextAction(fullyDone){
       if (!CourseProgress.isUnlocked(m.id)) break;
       target = m.file;
       text = CourseProgress.statusOf(m.id) === "in-progress"
-        ? `Continue Module ${m.id} — ${m.title}.`
-        : `Start Module ${m.id} — ${m.title}.`;
+        ? `Continue Module ${m.id}, ${m.title}.`
+        : `Start Module ${m.id}, ${m.title}.`;
       break;
     }
   }

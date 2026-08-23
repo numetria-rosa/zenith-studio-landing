@@ -365,7 +365,7 @@ async function runExercise(id, harnessPy, harnessName, buttonId, sectionKey, onP
     if (r.pass) passCount++;
     const row = document.createElement("div");
     row.className = "feedback " + (r.pass ? "ok" : "bad");
-    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
     resultsEl.appendChild(row);
   });
   const summary = document.createElement("div");
@@ -571,7 +571,7 @@ async function runEx6() {
     if (r.pass) passCount++;
     const row = document.createElement("div");
     row.className = "feedback " + (r.pass ? "ok" : "bad");
-    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
     resultsEl.appendChild(row);
   });
   const summary = document.createElement("div");

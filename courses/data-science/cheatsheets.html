@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cheat Sheets — Data Science &amp; Analysis</title>
+<title>Cheat Sheets, Data Science &amp; Analysis</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -96,26 +96,26 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 const SHEETS = [
   { id: 1, title: "Excel Formulas & Shortcuts", tag: "Module 1",
     sections: [
-      { label: "The five core formulas", items: ["<code>SUM(range)</code>, <code>AVERAGE(range)</code> — total and mean of a range.", "<code>COUNTIF(range, criteria)</code> — count of cells matching a condition.", "<code>IF(condition, true_val, false_val)</code> — branch on a condition.", "<code>XLOOKUP(key, lookup_range, return_range)</code> — find a value in one table using a key from another."] },
-      { label: "Other everyday formulas", items: ["<code>COUNTA(range)</code> — count non-empty cells.", "<code>SUMIF(range, criteria, sum_range)</code> — sum only matching rows.", "<code>TRIM(cell)</code> — strip leading/trailing whitespace, the fix for a huge share of 'why doesn't this match' bugs.", "<code>TEXT(cell, format)</code> — force consistent formatting on a mixed-format column."] },
+      { label: "The five core formulas", items: ["<code>SUM(range)</code>, <code>AVERAGE(range)</code>, total and mean of a range.", "<code>COUNTIF(range, criteria)</code>, count of cells matching a condition.", "<code>IF(condition, true_val, false_val)</code>, branch on a condition.", "<code>XLOOKUP(key, lookup_range, return_range)</code>, find a value in one table using a key from another."] },
+      { label: "Other everyday formulas", items: ["<code>COUNTA(range)</code>, count non-empty cells.", "<code>SUMIF(range, criteria, sum_range)</code>, sum only matching rows.", "<code>TRIM(cell)</code>, strip leading/trailing whitespace, the fix for a huge share of 'why doesn't this match' bugs.", "<code>TEXT(cell, format)</code>, force consistent formatting on a mixed-format column."] },
       { label: "Sorting & filtering", items: ["Both are non-destructive, they never change the underlying data.", "Sort ascending/descending by clicking a column header or using the Sort dialog for multi-column sorts.", "Filter to hide non-matching rows without deleting them."] },
       { label: "Tidy data checklist", checklist: ["Every column is one variable.", "Every row is one observation.", "Every cell holds exactly one value, no lists crammed into a cell.", "One consistent format per column (dates, currency, casing)."] },
       { label: "Common mistakes", items: ["Mixing date formats in one column (breaks sorting and any date formula).", "A number stored as text (won't SUM correctly, often left-aligned instead of right-aligned).", "Merged cells, they silently break sorting and most formulas that touch them."] },
     ] },
   { id: 2, title: "Python for Data Cheat Sheet", tag: "Module 2",
     sections: [
-      { label: "Core types", items: ["<code>int</code>, <code>float</code> — numbers. <code>str</code> — text. <code>bool</code> — True/False.", "<code>list</code> — ordered, mutable. <code>dict</code> — key/value pairs, the natural shape for one row of data."] },
+      { label: "Core types", items: ["<code>int</code>, <code>float</code>, numbers. <code>str</code>, text. <code>bool</code>, True/False.", "<code>list</code>, ordered, mutable. <code>dict</code>, key/value pairs, the natural shape for one row of data."] },
       { label: "Reading a CSV by hand", formula: "for line in open('file.csv'):\n    fields = line.strip().split(',')" },
-      { label: "Common patterns", items: ["<code>[x for x in items if cond]</code> — a list comprehension, a one-line filter.", "<code>float(text)</code> / <code>int(text)</code> — convert text read from a file into a real number.", "<code>d.get('key', default)</code> — read a key that might not exist, without crashing."] },
+      { label: "Common patterns", items: ["<code>[x for x in items if cond]</code>, a list comprehension, a one-line filter.", "<code>float(text)</code> / <code>int(text)</code>, convert text read from a file into a real number.", "<code>d.get('key', default)</code>, read a key that might not exist, without crashing."] },
       { label: "Common mistakes", items: ["Forgetting everything read from a file starts as a string, even numbers.", "Using <code>d['key']</code> instead of <code>d.get('key')</code> on a field that might be missing.", "Off-by-one errors when skipping a header row."] },
     ] },
   { id: 3, title: "Pandas & NumPy Quick Reference", tag: "Module 3",
     sections: [
-      { label: "Load & inspect", items: ["<code>df = pd.read_csv('file.csv')</code>", "<code>df.head()</code>, <code>df.info()</code>, <code>df.describe()</code> — first look at any new dataset."] },
-      { label: "Select & filter", items: ["<code>df['col']</code> — one column. <code>df[['a','b']]</code> — multiple columns.", "<code>df[df['revenue'] > 1000]</code> — filter rows by a condition."] },
+      { label: "Load & inspect", items: ["<code>df = pd.read_csv('file.csv')</code>", "<code>df.head()</code>, <code>df.info()</code>, <code>df.describe()</code>, first look at any new dataset."] },
+      { label: "Select & filter", items: ["<code>df['col']</code>, one column. <code>df[['a','b']]</code>, multiple columns.", "<code>df[df['revenue'] > 1000]</code>, filter rows by a condition."] },
       { label: "Group & aggregate", formula: "df.groupby('region')['revenue'].sum()" },
       { label: "Merge & join", formula: "pd.merge(orders, customers, on='customer_id', how='left')" },
-      { label: "NumPy vectorization", items: ["<code>df['total'] = df['price'] * df['qty']</code> — whole-column math, no explicit loop needed.", "Vectorized operations are far faster than looping row by row in Python."] },
+      { label: "NumPy vectorization", items: ["<code>df['total'] = df['price'] * df['qty']</code>, whole-column math, no explicit loop needed.", "Vectorized operations are far faster than looping row by row in Python."] },
       { label: "Common mistakes", items: ["Merging on a key that isn't unique on one side, silently multiplying row count.", "Chained indexing warnings (<code>df[df.x>1]['y'] = ...</code>), use <code>.loc[]</code> instead.", "Forgetting <code>groupby()</code> returns a new object, it doesn't modify the original DataFrame."] },
     ] },
   { id: 4, title: "Data Cleaning Checklist", tag: "Module 4",
@@ -128,7 +128,7 @@ const SHEETS = [
     ] },
   { id: 5, title: "Descriptive Statistics Cheat Sheet", tag: "Module 5",
     sections: [
-      { label: "The core numbers", items: ["<b>Mean</b> — average, sensitive to outliers.", "<b>Median</b> — middle value, resistant to outliers.", "<b>Mode</b> — most frequent value, useful for categorical data.", "<b>Standard deviation</b> — how spread out values are around the mean."] },
+      { label: "The core numbers", items: ["<b>Mean</b>, average, sensitive to outliers.", "<b>Median</b>, middle value, resistant to outliers.", "<b>Mode</b>, most frequent value, useful for categorical data.", "<b>Standard deviation</b>, how spread out values are around the mean."] },
       { label: "Correlation vs. causation", items: ["Two things moving together does NOT mean one causes the other.", "Always ask: could a third factor explain both?", "A controlled experiment (A/B test), not just observed correlation, is what establishes causation."] },
       { label: "Signal vs. noise", items: ["A small sample can easily produce a difference that looks real but isn't.", "A hypothesis test (t-test, chi-square) gives a principled answer to 'is this difference likely real.'"] },
       { label: "Common mistakes", items: ["Reporting a mean without checking whether outliers are distorting it.", "Concluding causation from correlation alone.", "Trusting a small-sample comparison without checking if the gap could just be noise."] },
@@ -142,7 +142,7 @@ const SHEETS = [
   { id: 6, title: "SQL Query Patterns", tag: "Module 6",
     sections: [
       { label: "The basic shape", formula: "SELECT col1, SUM(col2)\nFROM table\nWHERE condition\nGROUP BY col1\nHAVING SUM(col2) > 1000\nORDER BY 2 DESC" },
-      { label: "JOIN types", items: ["<b>INNER JOIN</b> — only rows matching in both tables.", "<b>LEFT JOIN</b> — all rows from the left table, matched data where it exists.", "Choose LEFT JOIN when you want to keep unmatched rows (e.g. customers with zero orders)."] },
+      { label: "JOIN types", items: ["<b>INNER JOIN</b>, only rows matching in both tables.", "<b>LEFT JOIN</b>, all rows from the left table, matched data where it exists.", "Choose LEFT JOIN when you want to keep unmatched rows (e.g. customers with zero orders)."] },
       { label: "WHERE vs. HAVING", items: ["<code>WHERE</code> filters rows before aggregation.", "<code>HAVING</code> filters groups after aggregation, use it to filter on a SUM/COUNT/AVG."] },
       { label: "Common mistakes", items: ["Trying to filter an aggregated value with WHERE instead of HAVING.", "Joining on a non-unique key and not noticing the row count multiplied.", "Forgetting NULLs don't match in a standard join or an <code>=</code> comparison."] },
     ] },

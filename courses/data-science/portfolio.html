@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Portfolio — Data Science &amp; Analysis</title>
+<title>My Portfolio, Data Science &amp; Analysis</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -100,7 +100,7 @@ function render(){
     const safeUrl = CourseProgress.safeHttpUrl(state.githubUrl);
     const ghCell = state.githubUrl
       ? (safeUrl ? `<a class="ghlink" href="${esc(safeUrl)}" target="_blank" rel="noopener noreferrer">${esc(state.githubUrl)}</a>` : `<span style="color:var(--mut2)">${esc(state.githubUrl)} (not a valid http/https URL)</span>`)
-      : "—";
+      : ", ";
     card.innerHTML = `
       <div class="ptop">
         <div><div class="pt">${esc(meta.title)}</div><div class="pdate">Completed ${esc(date)}</div></div>
@@ -111,8 +111,8 @@ function render(){
         <div><b>Skills demonstrated</b>${esc(SKILL_PHRASES[meta.id])}</div>
       </div>
       <div class="pfrow">
-        <div><b>Tools used</b>${state.technologies ? esc(state.technologies) : "—"}</div>
-        <div><b>Deliverables</b>${state.testsPassed ? esc(state.testsPassed) : "—"}</div>
+        <div><b>Tools used</b>${state.technologies ? esc(state.technologies) : ", "}</div>
+        <div><b>Deliverables</b>${state.testsPassed ? esc(state.testsPassed) : ", "}</div>
         <div><b>Link</b>${ghCell}</div>
       </div>
     `;
@@ -123,10 +123,10 @@ function render(){
 
   summaryBox.style.display = "block";
   const lines = projects.map(({ meta, state }) => {
-    return `${meta.title}${state.score ? ` (self-assessed ${state.score}%)` : ""} — ${SKILL_PHRASES[meta.id]}.${state.githubUrl ? " " + state.githubUrl : ""}`;
+    return `${meta.title}${state.score ? ` (self-assessed ${state.score}%)` : ""}, ${SKILL_PHRASES[meta.id]}.${state.githubUrl ? " " + state.githubUrl : ""}`;
   });
   document.getElementById("summaryText").value =
-    `Data Science & Analysis — Portfolio Summary\n${projects.length} project${projects.length===1?"":"s"} completed\n\n` + lines.join("\n\n");
+    `Data Science & Analysis, Portfolio Summary\n${projects.length} project${projects.length===1?"":"s"} completed\n\n` + lines.join("\n\n");
 }
 
 document.getElementById("btnCopySummary").addEventListener("click", () => {

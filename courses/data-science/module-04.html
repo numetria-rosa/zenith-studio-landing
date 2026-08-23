@@ -277,7 +277,7 @@ print(df.head(5))
       <span class="ilbl">Exercise 1 · graded against the real file</span>
       <p class="mut" style="margin-bottom:10px">Write <code>dedupe_count(df)</code> that removes exact duplicate rows and returns the number of rows remaining, as an integer.</p>
       <textarea id="ex1Editor" class="testin" spellcheck="false" rows="4">def dedupe_count(df):
-    # your code here — return an integer
+    # your code here, return an integer
     return 0</textarea>
       <div class="dagctrl">
         <button class="primary" id="btnRunEx1">▶ Run tests</button>
@@ -290,7 +290,7 @@ print(df.head(5))
       <span class="ilbl">Exercise 2 · graded against the real file</span>
       <p class="mut" style="margin-bottom:10px">Write <code>true_product_count(df)</code> that normalises the <code>sku</code> column (strip whitespace, uppercase) and returns the number of genuinely distinct products, as an integer.</p>
       <textarea id="ex2Editor" class="testin" spellcheck="false" rows="4">def true_product_count(df):
-    # your code here — return an integer
+    # your code here, return an integer
     return 0</textarea>
       <div class="dagctrl">
         <button class="primary" id="btnRunEx2">▶ Run tests</button>
@@ -343,7 +343,7 @@ print(df.head(5))
     <pre class="codeblock"><span class="c"># before</span>
 <span class="kw">print</span>(<span class="s">"dupes:"</span>, df.duplicated().sum(), <span class="s">"rows:"</span>, len(df))
 clean = df.drop_duplicates()
-<span class="c"># after — both numbers should have moved by exactly the amount you expect</span>
+<span class="c"># after, both numbers should have moved by exactly the amount you expect</span>
 <span class="kw">print</span>(<span class="s">"dupes:"</span>, clean.duplicated().sum(), <span class="s">"rows:"</span>, len(clean))</pre>
     <div class="def">
       <div class="k">Validation questions worth asking every time</div>
@@ -422,15 +422,15 @@ print("fully blank rows:", df.isna().all(axis=1).sum())
     <div class="warn"><b>Honest limitation:</b> this box cannot be automatically graded &mdash; there is no single correct wording, and pretending otherwise would be fake rigour. It's saved with your progress so you can carry it into your portfolio. Grade yourself against the checklist underneath, honestly; the value is entirely in whether you can defend the decisions, not in ticking the boxes.</div>
     <textarea id="cleaningLog" class="logbox" placeholder="For each problem you found in ecommerce_orders.csv and expense_reports.csv, write one short entry:
 
-PROBLEM — what you found, and how many rows it affected
-INVESTIGATION — what you checked before deciding
-DECISION — drop / fix / fill / flag, and why
-VALIDATION — how you confirmed it worked
-IMPACT — what changed in the final numbers
+PROBLEM, what you found, and how many rows it affected
+INVESTIGATION, what you checked before deciding
+DECISION, drop / fix / fill / flag, and why
+VALIDATION, how you confirmed it worked
+IMPACT, what changed in the final numbers
 
 Example:
 PROBLEM: 12 exact duplicate rows (412 -> 400).
-INVESTIGATION: All 12 duplicated an existing order_id exactly, across every column — consistent with a double export rather than genuine repeat orders.
+INVESTIGATION: All 12 duplicated an existing order_id exactly, across every column, consistent with a double export rather than genuine repeat orders.
 DECISION: Dropped them. A genuine second order would have its own order_id.
 VALIDATION: df.duplicated().sum() went to 0; row count fell by exactly 12.
 IMPACT: Revenue total fell about 3%, which is the overcount we would have reported."></textarea>
@@ -440,13 +440,13 @@ IMPACT: Revenue total fell about 3%, which is the overcount we would have report
       <summary>Model answer (open after writing your own)</summary>
       <div class="chbody">
         <b>ecommerce_orders.csv</b><br>
-        1. <b>12 exact duplicate rows</b> (412&rarr;400). All duplicated an existing order_id across every column — an export artifact, not repeat orders. Dropped. Validated: duplicated().sum() == 0.<br>
+        1. <b>12 exact duplicate rows</b> (412&rarr;400). All duplicated an existing order_id across every column, an export artifact, not repeat orders. Dropped. Validated: duplicated().sum() == 0.<br>
         2. <b>SKU casing</b>: 122 apparent products, 79 real ones. 67 rows had lowercase SKUs. Uppercased. Validated: nunique() fell to 79. Impact: any per-product analysis would otherwise have split the same product into two.<br>
-        3. <b>7 negative quantities.</b> No matching returns table exists in this data, and status values don't indicate returns, so these read as data-entry errors. Excluded and flagged — but I'd confirm with Ops before publishing, because if they <i>are</i> returns, excluding them overstates net revenue.<br>
-        4. <b>Three date formats</b> in one column (2026-04-03, 05/30/2026, 03-Apr-2026). Parsed with format="mixed". The ambiguous DD/MM vs MM/DD cases would need confirming with the source system — I did not guess.<br>
+        3. <b>7 negative quantities.</b> No matching returns table exists in this data, and status values don't indicate returns, so these read as data-entry errors. Excluded and flagged, but I'd confirm with Ops before publishing, because if they <i>are</i> returns, excluding them overstates net revenue.<br>
+        4. <b>Three date formats</b> in one column (2026-04-03, 05/30/2026, 03-Apr-2026). Parsed with format="mixed". The ambiguous DD/MM vs MM/DD cases would need confirming with the source system, I did not guess.<br>
         5. <b>shipped_date</b>: 133 blanks are structural (order never shipped) and were left alone. The single "MISSING" string is a real defect and was flagged.<br><br>
         <b>expense_reports.csv</b><br>
-        6. <b>4 fully blank rows</b> — merged-cell artifact from the spreadsheet export. Dropped.<br>
+        6. <b>4 fully blank rows</b>, merged-cell artifact from the spreadsheet export. Dropped.<br>
         7. <b>8 category spellings &rarr; 4 real categories</b> (whitespace, casing, and "Trvl"). Normalised.<br>
         8. <b>Mixed currencies.</b> 108 USD rows, 42 EUR rows using comma decimals. Reported USD only ($12,688.90) rather than inventing an exchange rate, and raised the 42 EUR rows with finance as an open item. This is the decision I'd most expect to be challenged on, and the one I'd lead with when presenting.
       </div>
@@ -543,7 +543,7 @@ async function runPlayground(editorId, outId, buttonId) {
   let html = "";
   if (r.out) html += `<div class="outbox">${CourseProgress.escapeHtml(r.out)}</div>`;
   if (r.err) html += `<div class="feedback bad">${CourseProgress.escapeHtml(r.err)}</div>`;
-  if (!r.out && !r.err) html = `<div class="feedback wait">Ran with no output — add a print() to see something.</div>`;
+  if (!r.out && !r.err) html = `<div class="feedback wait">Ran with no output, add a print() to see something.</div>`;
   outEl.innerHTML = html;
   CourseProgress.setExtra("module4_explored_" + editorId, true);
   updateNextButton();
@@ -628,7 +628,7 @@ const EX4 = () => harnessFor("validate_cleaning", [
   "            exp = {'rows_before': 412, 'rows_after': 393, 'duplicates_removed': 12, 'negative_qty_removed': 7}",
   "            if set(out) == need:",
   "                bad = [f'{k}: yours={out[k]} expected={v}' for k, v in exp.items() if out[k] != v]",
-  "                results.append({'name': 'All four counts are correct', 'pass': not bad, 'hint': ('Mismatch — ' + '; '.join(bad)) if bad else ''})",
+  "                results.append({'name': 'All four counts are correct', 'pass': not bad, 'hint': ('Mismatch: ' + '; '.join(bad)) if bad else ''})",
   "            else:",
   "                results.append({'name': 'All four counts are correct', 'pass': False, 'hint': 'Fix the keys first.'})",
   "    except Exception as e: results.append({'name': 'validate_cleaning runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
@@ -647,15 +647,15 @@ const EX5 = () => harnessFor("usd_spend_by_category", [
   "            results.append({'name': 'Category names are Meals, Office Supplies, Software, Travel', 'pass': keys_ok, 'hint': f'Got {sorted(out)}, expected {sorted(exp)}.'})",
   "            if keys_ok:",
   "                bad = [f'{k}: yours={out[k]} expected={v}' for k, v in exp.items() if abs(float(out[k]) - v) > 0.05]",
-  "                results.append({'name': 'USD-only totals are correct (euro rows excluded)', 'pass': not bad, 'hint': ('Mismatch — ' + '; '.join(bad) + '. Did you exclude the euro rows rather than converting or mis-parsing them?') if bad else ''})",
+  "                results.append({'name': 'USD-only totals are correct (euro rows excluded)', 'pass': not bad, 'hint': ('Mismatch: ' + '; '.join(bad) + '. Did you exclude the euro rows rather than converting or mis-parsing them?') if bad else ''})",
   "            else:",
   "                results.append({'name': 'USD-only totals are correct (euro rows excluded)', 'pass': False, 'hint': 'Fix the category names first.'})",
   "    except Exception as e: results.append({'name': 'usd_spend_by_category runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 
 const STARTERS = {
-  ex1: 'def dedupe_count(df):\n    # your code here — return an integer\n    return 0',
-  ex2: 'def true_product_count(df):\n    # your code here — return an integer\n    return 0',
+  ex1: 'def dedupe_count(df):\n    # your code here, return an integer\n    return 0',
+  ex2: 'def true_product_count(df):\n    # your code here, return an integer\n    return 0',
   ex3: 'def clean_revenue(df):\n    # 1. drop exact duplicates\n    # 2. keep only rows with quantity > 0\n    # 3. compute quantity * unit_price and sum it\n    return 0.0',
   ex4: 'def validate_cleaning(df):\n    # return a dict with these four integer keys:\n    #   rows_before, rows_after, duplicates_removed, negative_qty_removed\n    return {}',
   ex5: 'def usd_spend_by_category(df):\n    # 1. drop fully-blank rows\n    # 2. normalise category: strip, title-case, and map "Trvl" -> "Travel"\n    # 3. parse amount: skip € rows entirely, strip $ from the rest, convert to float\n    # 4. group by category, sum, round to 2dp\n    # 5. return a dict with exactly 4 keys\n    return {}',
@@ -683,7 +683,7 @@ async function runGraded(id, buildHarness, buttonId, sectionKey) {
     if (r.pass) passCount++;
     const row = document.createElement("div");
     row.className = "feedback " + (r.pass ? "ok" : "bad");
-    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${CourseProgress.escapeHtml(r.name)}` + (r.pass ? "" : `<br>${CourseProgress.escapeHtml(r.hint || "")}`);
     resultsEl.appendChild(row);
   });
   const summary = document.createElement("div");
@@ -730,29 +730,29 @@ function buildAudit(id, opts, containerId){
   });
 }
 buildAudit("a1", [
-  { text: "12", correct: true, correctText: "Correct — df.duplicated().sum() returns 12, taking the file from 412 rows to 400 once removed." },
-  { text: "0 — every row is unique", correct: false, reason: "Run df.duplicated().sum() in the workspace above. There are genuine exact-duplicate rows in this file." },
-  { text: "133", correct: false, reason: "133 is the number of blank shipped_date values, which is a different problem entirely (and mostly not even a problem — see A5)." },
+  { text: "12", correct: true, correctText: "Correct: df.duplicated().sum() returns 12, taking the file from 412 rows to 400 once removed." },
+  { text: "0, every row is unique", correct: false, reason: "Run df.duplicated().sum() in the workspace above. There are genuine exact-duplicate rows in this file." },
+  { text: "133", correct: false, reason: "133 is the number of blank shipped_date values, which is a different problem entirely (and mostly not even a problem, see A5)." },
 ], "a1opts");
 buildAudit("a2", [
-  { text: "Inconsistent casing — 67 SKUs are lowercase, so SKU-1005 and sku-1005 count as two different products", correct: true, correctText: "Correct. .str.upper() collapses 122 apparent products down to the real 79. Any per-product analysis run on the raw column would silently split products in half." },
-  { text: "43 products were discontinued and should be removed", correct: false, reason: "Nothing in the data indicates discontinuation. The gap is entirely explained by casing — uppercase the column and the count resolves to 79." },
+  { text: "Inconsistent casing, 67 SKUs are lowercase, so SKU-1005 and sku-1005 count as two different products", correct: true, correctText: "Correct. .str.upper() collapses 122 apparent products down to the real 79. Any per-product analysis run on the raw column would silently split products in half." },
+  { text: "43 products were discontinued and should be removed", correct: false, reason: "Nothing in the data indicates discontinuation. The gap is entirely explained by casing, uppercase the column and the count resolves to 79." },
   { text: "Some SKUs are missing and need filling in", correct: false, reason: "The sku column has no missing values. The inflation comes from the same SKU appearing in two different cases." },
 ], "a2opts");
 buildAudit("a3", [
-  { text: "7 rows have negative quantities; investigate whether they're returns before deciding, since the data has no returns table to confirm it", correct: true, correctText: "Correct — and the investigation is the point. If they're data-entry errors you exclude them; if they're returns, excluding them overstates net revenue. The file alone can't tell you, so you flag it." },
+  { text: "7 rows have negative quantities; investigate whether they're returns before deciding, since the data has no returns table to confirm it", correct: true, correctText: "Correct: and the investigation is the point. If they're data-entry errors you exclude them; if they're returns, excluding them overstates net revenue. The file alone can't tell you, so you flag it." },
   { text: "7 rows have negative quantities; delete them immediately since quantities can't be negative", correct: false, reason: "Too fast. Negative quantities are how many systems record returns. Deleting them without checking could remove real business events and overstate revenue." },
-  { text: "Nothing is wrong with the quantity column", correct: false, reason: "Run df['quantity'].describe() or (df['quantity'] < 0).sum() — there are 7 negative values." },
+  { text: "Nothing is wrong with the quantity column", correct: false, reason: "Run df['quantity'].describe() or (df['quantity'] < 0).sum(), there are 7 negative values." },
 ], "a3opts");
 buildAudit("a4", [
   { text: "The column mixes at least three date formats (2026-04-03, 05/30/2026, 03-Apr-2026), and some are ambiguous about whether day or month comes first", correct: true, correctText: "Correct. format='mixed' handles the parsing, but the DD/MM vs MM/DD ambiguity is a genuine unknown you'd confirm with the source system rather than guess." },
   { text: "The dates are all in the future and therefore invalid", correct: false, reason: "The dates are within a normal range for the dataset. The difficulty is format inconsistency, not the values themselves." },
-  { text: "The column is entirely empty", correct: false, reason: "The column is fully populated — run df['order_date'].head(20) and you'll see several different formats." },
+  { text: "The column is entirely empty", correct: false, reason: "The column is fully populated, run df['order_date'].head(20) and you'll see several different formats." },
 ], "a4opts");
 buildAudit("a5", [
-  { text: "No — the 133 blanks are structural (those orders never shipped, so no date should exist), while the single 'MISSING' string is a real defect on a row that claims to have shipped", correct: true, correctText: "Correct, and this distinction matters: filling or dropping the 133 structural blanks would destroy real information about the funnel. Only the 'MISSING' row is genuinely dirty." },
-  { text: "Yes — both are missing values and should be handled identically", correct: false, reason: "Treating them identically loses real information. A blank shipped_date on a cart_created order is correct and expected — that order never shipped." },
-  { text: "Yes — both should be filled with today's date", correct: false, reason: "This would fabricate shipping events that never happened, corrupting any delivery-time analysis built on the column afterwards." },
+  { text: "No, the 133 blanks are structural (those orders never shipped, so no date should exist), while the single 'MISSING' string is a real defect on a row that claims to have shipped", correct: true, correctText: "Correct, and this distinction matters: filling or dropping the 133 structural blanks would destroy real information about the funnel. Only the 'MISSING' row is genuinely dirty." },
+  { text: "Yes, both are missing values and should be handled identically", correct: false, reason: "Treating them identically loses real information. A blank shipped_date on a cart_created order is correct and expected, that order never shipped." },
+  { text: "Yes, both should be filled with today's date", correct: false, reason: "This would fabricate shipping events that never happened, corrupting any delivery-time analysis built on the column afterwards." },
 ], "a5opts");
 
 /* ---------------- cleaning log ---------------- */
@@ -828,9 +828,9 @@ function buildQ(id, opts, containerId){
   });
 }
 buildQ("q1", [
-  { text: "Investigate what they represent — check whether the business records returns this way — before deciding anything", correct: true, correctText: "Correct. Detect, then investigate, then decide. The same value means opposite things depending on the business context." },
+  { text: "Investigate what they represent, check whether the business records returns this way, before deciding anything", correct: true, correctText: "Correct. Detect, then investigate, then decide. The same value means opposite things depending on the business context." },
   { text: "Delete them, since a negative quantity is obviously impossible", correct: false, reason: "Many systems record returns as negative quantities. Deleting them without checking can remove real events and overstate net revenue." },
-  { text: "Convert them to positive with abs(), since it's clearly a sign error", correct: false, reason: "This silently doubles their contribution if they were genuinely returns — turning a subtraction into an addition. It's the most destructive option here." },
+  { text: "Convert them to positive with abs(), since it's clearly a sign error", correct: false, reason: "This silently doubles their contribution if they were genuinely returns, turning a subtraction into an addition. It's the most destructive option here." },
 ], "q1opts");
 buildQ("q2", [
   { text: "It converts 'we don't know' into 'it was free', which silently corrupts every total and average computed afterwards", correct: true, correctText: "Correct. A fill value has to be genuinely meaningful for that column. For prices, zero almost never is." },
@@ -838,19 +838,19 @@ buildQ("q2", [
   { text: "Because pandas doesn't allow filling numeric columns with zero", correct: false, reason: "pandas allows it. The issue is analytical honesty, not a technical restriction." },
 ], "q2opts");
 buildQ("q3", [
-  { text: "Because 03/04/2026 is genuinely ambiguous — it could be March 4th or April 3rd — and a wrong guess produces plausible-looking but wrong dates that nothing will flag", correct: true, correctText: "Correct. Casing errors are obvious once collapsed; a silently mis-parsed date looks completely normal and can shift a whole month's analysis." },
+  { text: "Because 03/04/2026 is genuinely ambiguous, it could be March 4th or April 3rd, and a wrong guess produces plausible-looking but wrong dates that nothing will flag", correct: true, correctText: "Correct. Casing errors are obvious once collapsed; a silently mis-parsed date looks completely normal and can shift a whole month's analysis." },
   { text: "Because date columns take longer to process", correct: false, reason: "Speed isn't the concern. The risk is silent, invisible incorrectness." },
   { text: "Because dates can't be fixed once loaded incorrectly", correct: false, reason: "They can be re-parsed from the raw file. The danger is not noticing they were wrong in the first place." },
 ], "q3opts");
 buildQ("q4", [
-  { text: "Stop and investigate — a drop that large means you removed far more than intended, and you should reconcile the row counts before trusting the number", correct: true, correctText: "Correct. This is exactly what the validation step is for. A 3% change from removing 12 duplicates is plausible; 40% means something went wrong." },
-  { text: "Report the new figure — cleaned data is by definition more accurate", correct: false, reason: "Cleaning can introduce errors as easily as it removes them. An unexplained 40% swing is a signal to check your work, not to publish it." },
+  { text: "Stop and investigate, a drop that large means you removed far more than intended, and you should reconcile the row counts before trusting the number", correct: true, correctText: "Correct. This is exactly what the validation step is for. A 3% change from removing 12 duplicates is plausible; 40% means something went wrong." },
+  { text: "Report the new figure, cleaned data is by definition more accurate", correct: false, reason: "Cleaning can introduce errors as easily as it removes them. An unexplained 40% swing is a signal to check your work, not to publish it." },
   { text: "Revert all cleaning and use the raw data instead", correct: false, reason: "Overcorrecting in the other direction. The right move is to find which step caused the drop, not to abandon cleaning entirely." },
 ], "q4opts");
 buildQ("q5", [
   { text: "Because someone will eventually question a number, and 'here's exactly what I changed and why' is the difference between a defensible analysis and an untrustworthy one", correct: true, correctText: "Correct. It also lets you (or a colleague) reproduce the work months later, and makes genuine mistakes findable instead of permanent." },
   { text: "Because documentation is required by pandas", correct: false, reason: "Nothing technical requires it. The requirement comes from working with other people who need to trust and reproduce your numbers." },
-  { text: "It isn't necessary if you're confident the numbers are right", correct: false, reason: "Confidence isn't evidence. Undocumented cleaning is unreproducible and unauditable, which means nobody else can verify it — including future you." },
+  { text: "It isn't necessary if you're confident the numbers are right", correct: false, reason: "Confidence isn't evidence. Undocumented cleaning is unreproducible and unauditable, which means nobody else can verify it, including future you." },
 ], "q5opts");
 
 function maybeShowRetry(){
@@ -889,7 +889,7 @@ document.getElementById("btnNext").addEventListener("click", () => { window.loca
       auditAnswered[id] = true;
       const ex = document.getElementById(id + "explain");
       ex.style.display = "block";
-      ex.textContent = saved.correct ? "Answered correctly on a previous visit." : "Answered on a previous visit (incorrectly). Re-read the section — the reasoning matters more than the score.";
+      ex.textContent = saved.correct ? "Answered correctly on a previous visit." : "Answered on a previous visit (incorrectly). Re-read the section, the reasoning matters more than the score.";
     }
   });
   const savedLog = CourseProgress.getExtra("module4_cleaningLog");
