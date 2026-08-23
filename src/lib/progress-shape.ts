@@ -7,7 +7,7 @@
    "Progress" section for why that distinction is real and stays real. */
 
 const MAX_PAYLOAD_BYTES = 200_000; // generous for 8 modules of quiz/exercise state, still bounded
-const VALID_MODULE_IDS = new Set(["1", "2", "3", "4", "5", "6", "7", "8"]);
+const VALID_MODULE_IDS = new Set(["1", "2", "3", "4", "5", "6", "7", "8", "9"]);
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   return !!v && typeof v === "object" && !Array.isArray(v);
