@@ -412,7 +412,12 @@ const EX1 = () => harnessFor("score_histogram", "survey", [
   "            if set(got)==set(exp):",
   "                bad = {k: got[k] for k in exp if got.get(k) != exp[k]}",
   "                results.append({'name': 'Counts per value are correct', 'pass': not bad, 'hint': f'Mismatches: {bad}' if bad else ''})",
-  "                if not bad: chartData = exp",
+  "                if not bad:",
+  "                    chartData = exp",
+  "                    half = survey.head(len(survey)//2).copy()",
+  "                    out2 = fn(half)",
+  "                    got2 = {str(k): int(v) for k, v in out2.items()} if isinstance(out2, dict) else {}",
+  "                    results.append({'name': 'Not hardcoded: result changes on a different slice of the data', 'pass': got2 != got, 'hint': 'Your function returned the identical result on half the dataset as on the full dataset. That almost always means the numbers are hardcoded instead of computed from df.'})",
   "    except Exception as e: results.append({'name': 'score_histogram runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 function renderEx1Chart(el, data) {
@@ -430,7 +435,12 @@ const EX2 = () => harnessFor("funnel_counts", "events", [
   "        if set(got)==set(exp):",
   "            bad = {k: got[k] for k in exp if got[k] != exp[k]}",
   "            results.append({'name': 'Counts per stage are correct', 'pass': not bad, 'hint': f'Mismatches: {bad}' if bad else ''})",
-  "            if not bad: chartData = exp",
+  "            if not bad:",
+  "                chartData = exp",
+  "                half = events.head(len(events)//2).copy()",
+  "                out2 = fn(half)",
+  "                got2 = {k: int(v) for k, v in out2.items()} if isinstance(out2, dict) else {}",
+  "                results.append({'name': 'Not hardcoded: result changes on a different slice of the data', 'pass': got2 != got, 'hint': 'Your function returned the identical result on half the dataset as on the full dataset. That almost always means the numbers are hardcoded instead of computed from df.'})",
   "    except Exception as e: results.append({'name': 'funnel_counts runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 function renderEx2Chart(el, data) {
@@ -453,7 +463,12 @@ const EX3 = () => harnessFor("purchase_trends", "events", [
   "        if set(got_dow)==set(exp_dow):",
   "            bad = {k: got_dow[k] for k in exp_dow if got_dow[k] != exp_dow[k]}",
   "            results.append({'name': 'by_dow counts are correct', 'pass': not bad, 'hint': f'Mismatches: {bad}' if bad else ''})",
-  "            if not bad and len(daily)==30: chartData = {'daily': daily, 'by_dow': exp_dow}",
+  "            if not bad and len(daily)==30:",
+  "                chartData = {'daily': daily, 'by_dow': exp_dow}",
+  "                half = events.head(len(events)//2).copy()",
+  "                out2 = fn(half)",
+  "                got2_dow = {str(k): int(v) for k, v in out2.get('by_dow', {}).items()} if isinstance(out2, dict) else {}",
+  "                results.append({'name': 'Not hardcoded: result changes on a different slice of the data', 'pass': got2_dow != got_dow, 'hint': 'Your function returned the identical by_dow result on half the dataset as on the full dataset. That almost always means the numbers are hardcoded instead of computed from df.'})",
   "    except Exception as e: results.append({'name': 'purchase_trends runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 function renderEx3Chart(el, data) {
@@ -478,7 +493,12 @@ const EX4 = () => harnessFor("reliable_channel_rates", "mkt", [
   "        if set(got)==set(exp):",
   "            bad = [k for k in exp if abs(float(got[k].get('cvr',0))-exp[k][0])>0.02 or int(got[k].get('clicks',0))!=exp[k][1]]",
   "            results.append({'name': 'cvr and clicks are correct for each', 'pass': not bad, 'hint': f'Check: {bad}' if bad else ''})",
-  "            if not bad: chartData = {k: {'cvr': exp[k][0], 'clicks': exp[k][1]} for k in exp}",
+  "            if not bad:",
+  "                chartData = {k: {'cvr': exp[k][0], 'clicks': exp[k][1]} for k in exp}",
+  "                half = mkt.head(len(mkt)//2).copy()",
+  "                out2 = fn(half)",
+  "                got2 = out2 if isinstance(out2, dict) else {}",
+  "                results.append({'name': 'Not hardcoded: result changes on a different slice of the data', 'pass': got2 != got, 'hint': 'Your function returned the identical result on half the dataset as on the full dataset. That almost always means the numbers are hardcoded instead of computed from df.'})",
   "    except Exception as e: results.append({'name': 'reliable_channel_rates runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 function renderEx4Chart(el, data) {
@@ -497,7 +517,12 @@ const EX5 = () => harnessFor("best_channel_recommendation", "mkt", [
   "            if out.get('channel')=='Email':",
   "                ok = abs(float(out.get('cvr',0))-7.04)<0.05 and int(out.get('clicks',0))==284",
   "                results.append({'name': 'cvr (7.04) and clicks (284) are correct', 'pass': ok, 'hint': f\"Got cvr={out.get('cvr')}, clicks={out.get('clicks')}.\" if not ok else ''})",
-  "                if ok: chartData = {'channel': 'Email', 'cvr': 7.04, 'clicks': 284, 'runnerup_cvr': 4.79, 'runnerup': 'Search'}",
+  "                if ok:",
+  "                    chartData = {'channel': 'Email', 'cvr': 7.04, 'clicks': 284, 'runnerup_cvr': 4.79, 'runnerup': 'Search'}",
+  "                    half = mkt.head(len(mkt)//2).copy()",
+  "                    out2 = fn(half)",
+  "                    got2 = out2 if isinstance(out2, dict) else {}",
+  "                    results.append({'name': 'Not hardcoded: result changes on a different slice of the data', 'pass': got2 != out, 'hint': 'Your function returned the identical result on half the dataset as on the full dataset. That almost always means the numbers are hardcoded instead of computed from df.'})",
   "    except Exception as e: results.append({'name': 'best_channel_recommendation runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 function renderEx5Chart(el, data) {
@@ -522,7 +547,16 @@ const EX6 = () => harnessFor("revenue_by_quarter", "pnl", [
   "            results.append({'name': 'Revenue values are correct', 'pass': not bad, 'hint': f'Check: {bad}' if bad else ''})",
   "            got_order = list(got.keys())",
   "            results.append({'name': 'Sorted chronologically, oldest first', 'pass': got_order==exp_order, 'hint': f'Got order {got_order}.' if got_order!=exp_order else ''})",
-  "            if not bad and got_order==exp_order: chartData = {k: exp_rev[k] for k in exp_order}",
+  "            if not bad and got_order==exp_order:",
+  "                chartData = {k: exp_rev[k] for k in exp_order}",
+  "                try:",
+  "                    half = pnl.head(len(pnl)//2).copy()",
+  "                    out2 = fn(half)",
+  "                    got2 = out2 if isinstance(out2, dict) else {}",
+  "                    not_hardcoded = got2 != got",
+  "                except Exception:",
+  "                    not_hardcoded = True",
+  "                results.append({'name': 'Not hardcoded: result changes on a different slice of the data', 'pass': not_hardcoded, 'hint': 'Your function returned the identical result on half the dataset as on the full dataset. That almost always means the numbers are hardcoded instead of computed from df.'})",
   "    except Exception as e: results.append({'name': 'revenue_by_quarter runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 function renderEx6Chart(el, data) {

@@ -248,6 +248,16 @@ const EX1 = () => harnessFor("funnel_after_cleaning", [
   "            results.append({'name': f'{k} is correct', 'pass': ok, 'hint': hint if not ok else ''})",
   "        ok_stage = got.get('biggest_drop_stage')==exp['biggest_drop_stage']",
   "        results.append({'name': 'biggest_drop_stage is correct', 'pass': ok_stage, 'hint': f\"Got {got.get('biggest_drop_stage')!r}, expected {exp['biggest_drop_stage']!r}.\" if not ok_stage else ''})",
+  "        allok = all(int(got.get(k, -1)) == exp[k] for k in ['total','reached_checkout','reached_payment','reached_shipped','distinct_skus']) and ok_stage",
+  "        if allok:",
+  "            try:",
+  "                half = orders.head(len(orders)//2).copy()",
+  "                out2 = fn(half)",
+  "                got2 = out2 if isinstance(out2, dict) else {}",
+  "                not_hardcoded = got2 != got",
+  "            except Exception:",
+  "                not_hardcoded = True",
+  "            results.append({'name': 'Not hardcoded: result changes on a different slice of the data', 'pass': not_hardcoded, 'hint': 'Your function returned the identical result on half the dataset as on the full dataset. That almost always means the numbers are hardcoded instead of computed from df.'})",
   "    except Exception as e: results.append({'name': 'funnel_after_cleaning runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 
