@@ -7,82 +7,367 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;
+}
+html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
 .serif{font-family:'Fraunces',serif}
-.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px 80px}
 .bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
-.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .in{max-width:960px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
 .bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
 .bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
 .bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
-.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
-.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
-.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
-.coursenav a:hover{color:var(--amber)}
-.coursenav .navsep{flex:1}
-@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
 .hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
 h1{font-family:'Fraunces';font-size:clamp(30px,5vw,44px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.08}
-.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.sub{color:var(--mut);font-size:16px;max-width:700px;margin-top:14px}
 .objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--good);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
 .objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--good);margin-bottom:10px;font-weight:700;font-family:'IBM Plex Mono'}
 .objectives ul{list-style:none;display:grid;gap:6px}
 .objectives li{padding-left:20px;position:relative;font-size:14.5px}
 .objectives li:before{content:"→";position:absolute;left:0;color:var(--amber)}
-section{padding:40px 0}
-.soon{background:var(--card);border:1px solid var(--bd2);border-radius:16px;padding:32px;text-align:center}
-.soon .badge{display:inline-flex;font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);border:1px solid rgba(95,194,232,.3);padding:6px 14px;border-radius:99px}
-.soon h2{font-family:'Fraunces';font-size:22px;margin-top:16px;font-weight:600}
-.soon p{color:var(--mut);font-size:14.5px;max-width:520px;margin:12px auto 0}
-.covers{text-align:left;margin-top:22px;padding-top:22px;border-top:1px solid var(--bd);max-width:520px;margin-left:auto;margin-right:auto}
-.covers .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2);margin-bottom:10px;font-family:'IBM Plex Mono'}
-.covers ul{list-style:none;display:grid;gap:8px}
-.covers li{padding-left:20px;position:relative;font-size:13.5px;color:var(--mut)}
-.covers li:before{content:"→";position:absolute;left:0;color:var(--amber)}
-a.cta{display:inline-flex;margin-top:22px;align-items:center;gap:8px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:14px;padding:11px 20px;border-radius:8px;text-decoration:none}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-family:'IBM Plex Mono';font-weight:700;font-size:12px;color:var(--amber);border:1px solid var(--amber);border-radius:99px;width:34px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-family:'Fraunces';font-size:21px;font-weight:600;letter-spacing:-.01em}
+p{font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:6px;font-family:'IBM Plex Mono'}
+.def p{font-size:14.5px}
+code{font-family:'IBM Plex Mono';font-size:13px;background:rgba(240,180,41,.1);color:var(--amber);padding:1px 6px;border-radius:4px}
+.why{border-left:3px solid var(--info);background:rgba(95,194,232,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
+.why b{color:var(--info)}
+.disclosure{border-left:3px solid var(--amber);background:rgba(240,180,41,.08);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
+.disclosure b{color:var(--amber)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:20px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px;font-family:'IBM Plex Mono'}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--info);box-shadow:0 0 8px var(--info)}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button.primary:hover{filter:brightness(1.08);color:var(--amberd)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.testin{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
+.testin:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{display:block;background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.feedback.wait{display:block;background:var(--bg2);border:1px solid var(--bd2);color:var(--mut2)}
+.testsummary{margin-top:10px;font-family:'IBM Plex Mono';font-size:12.5px;font-weight:700}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:block;width:100%;text-align:left;font-family:'IBM Plex Sans';display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px;background:var(--card2);color:var(--tx)}
+.qopt:hover{border-color:var(--bd2)}
+.qopt.correct{border-color:var(--good);background:rgba(74,222,149,.08)}
+.qopt.incorrect{border-color:var(--bad);background:rgba(255,133,133,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:960px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--amber)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+.scoreboard{position:sticky;bottom:0;background:rgba(13,15,20,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0}
+.scoreboard .in{max-width:960px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;color:var(--amber)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:16px}
+.pcard{display:block;background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px;text-decoration:none;color:var(--tx);transition:.15s}
+.pcard:hover{border-color:var(--amber)}
+.pcard .pt{font-weight:700;font-size:14px}
+.pcard .pd{font-size:12.5px;color:var(--mut);margin-top:6px}
+.pcard .pdiff{font-size:10.5px;color:var(--info);text-transform:uppercase;letter-spacing:.05em;margin-top:10px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:26px} .kh h2{font-size:18px} .interactive{padding:16px} }
 </style>
 </head>
 <body>
-<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Data Science &amp; Analysis · Module 9 · Capstone</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-08.html">&larr; <span class="navlabel">Module 8</span></a><span class="navsep"></span><a href="projects.html">Portfolio Projects <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Data Science &amp; Analysis · Module 9</span>
+</div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-08.html">&larr; <span class="navlabel">Module 8</span></a><span class="navsep"></span><a href="projects.html" id="navNextTop">Projects <span class="navlabel">&rarr;</span></a></div></div>
+
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Module 9 of 9 · Capstone</span>
     <h1 class="serif">Capstone Analysis Project</h1>
-    <p class="sub">One full end-to-end analysis, chosen from four realistic business scenarios. Messy raw data through to a written recommendation, a dashboard, and a recorded five-minute findings pitch, the closest simulation of a first week on the job this course offers.</p>
+    <p class="sub">No numbered steps this time. Every module up to here taught one skill against one dataset with a defined shape. A real analysis rarely comes with a defined shape, that's what this module actually tests: whether you can put the last eight modules together on your own.</p>
     <div class="objectives">
-      <div class="lbl">By the end of this module you'll be able to</div>
+      <div class="lbl">What this module actually checks</div>
       <ul>
-        <li>Run a real analysis start to finish, on your own, on data nobody cleaned for you first</li>
-        <li>Choose your own approach to an ambiguous business question</li>
-        <li>Build a dashboard and a written recommendation someone can act on</li>
-        <li>Present a finding and a recommendation the way you would in a first week on the job</li>
+        <li>Cleaning and a business calculation, combined in one function, with no numbered steps telling you the order</li>
+        <li>A messy raw file whose problems you have to find yourself, the same way Module 4 taught</li>
+        <li>Whether your result changes correctly on a database you haven't seen the "right" answer for before</li>
+        <li>Choosing and completing one of four open-ended capstone scenarios in <a href="projects.html" style="color:var(--amber)">Projects</a></li>
       </ul>
     </div>
   </header>
+
   <section>
-    <div class="soon">
-      <span class="badge">In production</span>
-      <h2 class="serif">The capstone build and pitch exercise are being finished</h2>
-      <p>The four scenario options are already specified in full. See <a href="projects.html" style="color:var(--amber)">Portfolio Projects</a> for "The Leaky Funnel," "The Understaffed Quarter," "The Campaign That Didn't Work," and "The Slow Season," any of which becomes your capstone and your first portfolio piece.</p>
-      <div class="covers">
-        <div class="lbl">What the capstone requires</div>
-        <ul>
-          <li>Pick one of the four scenarios (or complete more than one for a deeper portfolio)</li>
-          <li>Clean the raw, deliberately messy dataset yourself</li>
-          <li>Produce a written recommendation memo and a dashboard</li>
-          <li>Record a five-minute findings pitch, as if presenting in a first week on the job</li>
-        </ul>
-      </div>
-      <a href="projects.html" class="cta">See the four scenarios &rarr;</a>
-    </div>
+    <div class="kh"><span class="num">9.0</span><h2 class="serif">Two different kinds of capstone work</h2></div>
+    <p>This module has two parts, and they're graded differently, on purpose.</p>
+    <div class="def"><div class="k">Part one, below · auto-graded</div><p>One integration exercise. Real messy data, a business question, no steps. Your code runs against the actual file and is checked against the actual correct answer, same as every exercise since Module 2.</p></div>
+    <div class="def"><div class="k">Part two, in Projects · self-assessed</div><p>Pick one of four full scenarios and produce a real deliverable (a memo, a dashboard, both). This page has no backend, it cannot run your dashboard or read your memo, so that part uses a detailed rubric and sanity checks for your own numbers instead of an automated grader.</p></div>
+    <div class="disclosure"><b>Why the split:</b> auto-grading only works when there's one verifiably correct answer to check code against. A written recommendation or a dashboard layout doesn't have one right answer, pretending otherwise would mean either faking the grading or refusing to let you build the parts of this course that most resemble real analyst work. Better to be honest about which is which.</div>
   </section>
-  <footer>Zenith Lab · Data Science &amp; Analysis · Module 9 of 9 · Capstone</footer>
+
+  <section>
+    <div class="kh"><span class="num">9.1</span><h2 class="serif">Integration exercise: the funnel, uncleaned</h2></div>
+    <p><b>The dataset:</b> <code>ecommerce_orders.csv</code>, 412 raw order records. Nobody has told you what's wrong with it yet.</p>
+    <p><b>Business question:</b> "Of everyone who started an order, how many actually reach each stage, and where's the biggest drop?" The <code>status</code> column records each order's current stage: <code>cart_created</code>, <code>checkout_started</code>, <code>payment</code>, or <code>shipped</code>, in that order.</p>
+    <div class="why"><b>No steps given on purpose:</b> you already know how to find duplicate rows (Module 4), how to spot a quantity that can't be real (Module 4), and how to build a stage-by-stage funnel (Module 7). This asks you to notice which of those this specific file needs, and in what order, without being told.</div>
+    <div class="interactive">
+      <span class="ilbl">Required exercise · real data, real Python, graded</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>funnel_after_cleaning(df)</code>. Return <code>{"total": ..., "reached_checkout": ..., "reached_payment": ..., "reached_shipped": ..., "distinct_skus": ..., "biggest_drop_stage": "..."}</code>. Each <code>reached_*</code> value is the count of cleaned orders whose status is at or beyond that stage. <code>biggest_drop_stage</code> is one of <code>"cart_to_checkout"</code>, <code>"checkout_to_payment"</code>, or <code>"payment_to_shipped"</code>, whichever transition loses the largest percentage.</p>
+      <textarea id="ex1Editor" class="testin" spellcheck="false" rows="6">def funnel_after_cleaning(df):
+    # this file has more than one problem in it. find them before you trust any count.
+    return {"total": 0, "reached_checkout": 0, "reached_payment": 0, "reached_shipped": 0, "distinct_skus": 0, "biggest_drop_stage": ""}</textarea>
+      <div class="dagctrl">
+        <button id="btnRunEx1">Run tests</button>
+        <button id="btnResetEx1">Reset</button>
+      </div>
+      <div id="ex1Results"></div>
+    </div>
+    <details style="margin-top:14px"><summary style="cursor:pointer;color:var(--amber);font-size:13px;font-weight:600">Stuck for more than a few minutes? One hint</summary>
+      <div style="margin-top:10px;padding:14px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px;color:var(--mut)">Run <code>df.duplicated().sum()</code>, <code>(df.quantity&lt;0).sum()</code>, and <code>df.sku.str.upper().nunique()</code> versus <code>df.sku.nunique()</code> in a scratch cell first, each one tells you whether that specific problem is present in this file at all, before you decide how to handle it.</div>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">9.2</span><h2 class="serif">Choose your capstone</h2></div>
+    <p>Four real scenarios, each with a genuinely messy dataset and an ambiguous business question, in <a href="projects.html" style="color:var(--amber)">Projects</a>. Pick one, work it in your own environment (Excel, Python, whatever you'd actually use), and self-assess against the rubric there.</p>
+    <div class="pgrid" id="projectGrid"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">✓</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Five questions synthesizing judgment from across the whole course. Score 80% or higher (4 of 5) to complete Module 9.</p>
+    <div class="qcard"><div class="qtext">1. You're handed a new dataset with no documentation. What should you check before writing any analysis code?</div><div id="q1opts"></div><div class="qexplain" id="q1explain"></div></div>
+    <div class="qcard"><div class="qtext">2. A stage-by-stage funnel you built shows MORE orders at "payment" than at "checkout_started." What does that tell you?</div><div id="q2opts"></div><div class="qexplain" id="q2explain"></div></div>
+    <div class="qcard"><div class="qtext">3. Why can't this course's projects.html automatically grade your written memo or dashboard the way it grades your pandas code?</div><div id="q3opts"></div><div class="qexplain" id="q3explain"></div></div>
+    <div class="qcard"><div class="qtext">4. A capstone teammate says "I didn't have time to check for duplicates, but the numbers look about right." What's the risk?</div><div id="q4opts"></div><div class="qexplain" id="q4explain"></div></div>
+    <div class="qcard"><div class="qtext">5. Across this whole course, what's the one habit that shows up in every module, from Excel to SQL to dashboards?</div><div id="q5opts"></div><div class="qexplain" id="q5explain"></div></div>
+  </section>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Module 9 of 9 · The last one</footer>
 </div>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete the exercise and checkpoint to finish →</button>
+</div></div>
+
 <script src="course-progress.js?v=2"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const MODULE_ID = 9;
+CourseProgress.touchVisited(MODULE_ID);
+const esc = CourseProgress.escapeHtml;
+
+const DATASETS = {};
+async function loadDatasets() {
+  if (DATASETS.orders) return DATASETS;
+  DATASETS.orders = await (await fetch("datasets/ecommerce_orders.csv")).text();
+  return DATASETS;
+}
+const PREAMBLE = ["import pandas as pd, io, math, json", "def _mk(txt): return pd.read_csv(io.StringIO(txt))"].join("\n");
+const exerciseState = {};
+
+function harnessFor(fnName, checks) {
+  return [
+    PREAMBLE,
+    "def harness(payload):",
+    "    code, orders_txt = payload",
+    "    ns = {'pd': pd, 'math': math}",
+    "    try: exec(code, ns)",
+    "    except Exception as e: return {'ranOk': False, 'error': f'{type(e).__name__}: {e}'}",
+    `    fn = ns.get('${fnName}')`,
+    "    if fn is None:",
+    `        return {'ranOk': True, 'results': [{'name': '${fnName} is defined', 'pass': False, 'hint': 'Define a function named exactly ${fnName}.'}]}`,
+    "    orders = _mk(orders_txt)",
+    "    results = []",
+    ...checks,
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n");
+}
+
+async function runGraded(id, buildHarness, buttonId) {
+  const btn = document.getElementById(buttonId), resultsEl = document.getElementById(id + "Results");
+  btn.disabled = true;
+  resultsEl.innerHTML = `<div class="feedback wait">Loading data and starting Python&hellip; (first run downloads pandas, 20&ndash;60s)</div>`;
+  let ds;
+  try { ds = await loadDatasets(); }
+  catch (e) { resultsEl.innerHTML = `<div class="feedback bad">Could not load datasets: ${esc(String(e))}</div>`; btn.disabled = false; return; }
+  const code = document.getElementById(id + "Editor").value;
+  let outcome;
+  try { outcome = await PySandboxRunner.run(buildHarness(), "harness", [code, ds.orders], 20000, 90000); }
+  finally { btn.disabled = false; }
+  if (!outcome.ok) { resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error)}</div>`; return; }
+  const data = outcome.result;
+  if (!data.ranOk) { resultsEl.innerHTML = `<div class="feedback bad">Your code didn't run: ${esc(data.error || "unknown")}</div>`; return; }
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  data.results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${esc(r.name)}` + (r.pass ? "" : `<br>${esc(r.hint || "")}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.className = "testsummary";
+  summary.style.color = passCount === data.results.length ? "var(--good)" : "var(--mut)";
+  summary.textContent = `${passCount} / ${data.results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  exerciseState[id] = { passCount, total: data.results.length };
+  CourseProgress.setExtra("module9_" + id, { passCount, total: data.results.length });
+  updateNextButton();
+}
+
+const EX1 = () => harnessFor("funnel_after_cleaning", [
+  "    try:",
+  "        out = fn(orders.copy())",
+  "        exp = {'total': 393, 'reached_checkout': 362, 'reached_payment': 301, 'reached_shipped': 265, 'distinct_skus': 79, 'biggest_drop_stage': 'checkout_to_payment'}",
+  "        got = out if isinstance(out, dict) else {}",
+  "        for k in ['total','reached_checkout','reached_payment','reached_shipped','distinct_skus']:",
+  "            ok = int(got.get(k, -1)) == exp[k]",
+  "            hint = f\"Got {got.get(k)!r}, expected {exp[k]}.\"",
+  "            if k=='total' and not ok: hint += ' Check for exact duplicate rows and impossible (negative) quantities.'",
+  "            if k=='distinct_skus' and not ok: hint += ' SKU casing is inconsistent (e.g. sku-1010 vs SKU-1010), normalize before counting distinct values.'",
+  "            results.append({'name': f'{k} is correct', 'pass': ok, 'hint': hint if not ok else ''})",
+  "        ok_stage = got.get('biggest_drop_stage')==exp['biggest_drop_stage']",
+  "        results.append({'name': 'biggest_drop_stage is correct', 'pass': ok_stage, 'hint': f\"Got {got.get('biggest_drop_stage')!r}, expected {exp['biggest_drop_stage']!r}.\" if not ok_stage else ''})",
+  "    except Exception as e: results.append({'name': 'funnel_after_cleaning runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+
+document.getElementById("btnRunEx1").addEventListener("click", () => runGraded("ex1", EX1, "btnRunEx1"));
+const EX1_STARTER = document.getElementById("ex1Editor").value;
+document.getElementById("btnResetEx1").addEventListener("click", () => {
+  document.getElementById("ex1Editor").value = EX1_STARTER;
+  document.getElementById("ex1Results").innerHTML = "";
+});
+
+/* ---------------- 9.2 project cards, mirroring projects.html ---------------- */
+(function renderProjectCards(){
+  const grid = document.getElementById("projectGrid");
+  CourseProgress.PROJECTS.forEach(p => {
+    const state = CourseProgress.getProject(p.id);
+    const card = document.createElement("a");
+    card.href = "projects.html";
+    card.className = "pcard";
+    card.innerHTML = `<div class="pt">${esc(p.title)}${state.completed ? " ✓" : ""}</div><div class="pd">${esc(p.summary)}</div><div class="pdiff">${esc(p.difficulty)}</div>`;
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------------- Checkpoint quiz ---------------- */
+let score = 0;
+const answered = { q1:false,q2:false,q3:false,q4:false,q5:false };
+function allExercisesPassing(){
+  const ids = ["ex1"];
+  return ids.every(id => exerciseState[id] && exerciseState[id].passCount === exerciseState[id].total);
+}
+function updateNextButton(){
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnNext");
+  const ready = allDone && allExercisesPassing();
+  btn.disabled = !ready;
+  btn.textContent = ready ? "View your Portfolio →" : "Complete the exercise and checkpoint to finish →";
+  if (allDone) CourseProgress.markComplete(MODULE_ID, score, 5);
+  maybeShowRetry();
+}
+function buildQ(id, opts, containerId){
+  const el = document.getElementById(containerId);
+  opts.forEach((opt,i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.textContent = opt.text;
+    div.addEventListener("click", () => {
+      if (answered[id]) return;
+      answered[id] = true;
+      CourseProgress.setAnswer(MODULE_ID, id, i);
+      el.querySelectorAll(".qopt").forEach((e,j) => {
+        if (opts[j].correct) e.classList.add("correct");
+        else if (j === i) e.classList.add("incorrect");
+      });
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { score++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+      updateNextButton();
+    });
+    el.appendChild(div);
+  });
+}
+buildQ("q1", [
+  { text: "Row count, column meanings, duplicates, missing values, and whether any numeric column contains impossible values", correct: true, correctText: "Correct. This is the same audit from Module 4, and it applies to literally every new dataset, documented or not." },
+  { text: "Nothing, jump straight to the business question, the data audit can wait until something looks wrong", correct: false, reason: "Waiting for something to \"look wrong\" is how a duplicate row or a negative quantity quietly inflates every downstream number without anyone noticing." },
+  { text: "Only the column names, since the analysis logic matters more than the data quality", correct: false, reason: "Column names tell you nothing about duplicates, missing values, or impossible entries, all of which silently break analysis logic that's otherwise correct." },
+], "q1opts");
+buildQ("q2", [
+  { text: "The stage order assumed in the funnel is wrong, or the data itself is inconsistent (e.g. some orders show payment without ever showing checkout_started), either way it needs investigating before the funnel is trusted", correct: true, correctText: "Correct. A funnel should never show a later stage with more people than an earlier one, that's the same monotonic sanity check projects.html asks you to verify on your own capstone." },
+  { text: "This is normal, funnels don't have to be monotonically decreasing", correct: false, reason: "A funnel represents progressively narrowing stages, if it's not decreasing, either the stage definitions or the underlying data has a real problem worth finding." },
+  { text: "It means the business is doing better at payment than at checkout", correct: false, reason: "That's not a valid business interpretation, a later funnel stage can't structurally contain more people than an earlier one unless something's wrong with how the stages were defined." },
+], "q2opts");
+buildQ("q3", [
+  { text: "A written memo or dashboard layout doesn't have one single verifiably correct answer the way a computed number does, there's no reference output to compare against automatically", correct: true, correctText: "Correct. Pandas code has a correct output; a well-written recommendation is a judgment call, that's why it uses a rubric and sanity checks instead of pass/fail grading." },
+  { text: "It's a technical limitation that could be fixed with more code", correct: false, reason: "This isn't a solvable engineering problem, free-form writing and visual design genuinely don't have one correct answer to grade against, no amount of code changes that." },
+  { text: "The course doesn't consider written communication important enough to grade", correct: false, reason: "The opposite is true, Module 8 built an entire graded module around it, this is specifically about what CAN and CAN'T be automatically checked, not about importance." },
+], "q3opts");
+buildQ("q4", [
+  { text: "Duplicate rows silently inflate every count that follows, \"looks about right\" isn't the same as being right, and there's no way to know how far off without actually checking", correct: true, correctText: "Correct. This exact mistake showed up in this module's own exercise, uncleaned duplicates changed the total by exactly 12 orders, small enough to not look obviously wrong." },
+  { text: "None, if the final numbers seem reasonable the duplicates probably didn't matter", correct: false, reason: "\"Seems reasonable\" is not a check, it's a guess, and duplicates can shift a result by a meaningful amount while still looking plausible." },
+  { text: "None, duplicate rows only matter for very large datasets", correct: false, reason: "Dataset size doesn't determine whether duplicates matter, what matters is whether they're present at all, this course's 412-row file had exactly this problem." },
+], "q4opts");
+buildQ("q5", [
+  { text: "Verify your own numbers before trusting them, whether that's checking a formula, a join's row count, a query against a reference answer, or a funnel's monotonic shape", correct: true, correctText: "Correct. Every module built a different flavor of this same habit: sanity-check the result, don't just trust that the code ran without an error." },
+  { text: "Always use the newest, most advanced tool available for the job", correct: false, reason: "This course deliberately used plain formulas, hand-parsed CSVs, and simple methods where they were the right tool, sophistication was never the goal." },
+  { text: "Always visualize the data before doing anything else", correct: false, reason: "Useful often, but not universal, Module 3's join-integrity check and Module 6's SQL exercises didn't start with a chart, they started with verifying the data itself." },
+], "q5opts");
+
+function maybeShowRetry(){
+  const anyAnswered = answered.q1||answered.q2||answered.q3||answered.q4||answered.q5;
+  const allDone = answered.q1&&answered.q2&&answered.q3&&answered.q4&&answered.q5;
+  const btn = document.getElementById("btnRetryCheckpoint");
+  btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModule(MODULE_ID);
+  window.location.reload();
+});
+document.getElementById("btnNext").addEventListener("click", () => { window.location.href = "portfolio.html"; });
+
+(function restore(){
+  const stored = CourseProgress.getModule(MODULE_ID);
+  const a = stored.answers || {};
+  ["q1","q2","q3","q4","q5"].forEach(id => {
+    if (a[id] !== undefined && !answered[id]) {
+      const label = document.querySelectorAll(`#${id}opts .qopt`)[a[id]];
+      if (label) label.click();
+    }
+  });
+  const saved = CourseProgress.getExtra("module9_ex1");
+  if (saved && saved.total > 0) {
+    exerciseState["ex1"] = saved;
+    const resultsEl = document.getElementById("ex1Results");
+    const passed = saved.passCount === saved.total;
+    resultsEl.innerHTML = `<div class="feedback ${passed ? "ok" : "bad"}">Restored from your last visit: ${passed ? "passing" : "not yet passing"}. Edit and re-run to update.</div>`;
+  }
+  updateNextButton();
+})();
+</script>
 <script src="course-rail.js"></script>
 </body>
 </html>
