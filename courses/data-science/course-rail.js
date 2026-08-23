@@ -38,7 +38,9 @@
     .rail-note{margin-top:14px;padding:0 9px;font-size:10.5px;color:var(--mut2,#676e7d);line-height:1.5}
     @media (max-width:860px){
       .courseshell{flex-direction:column}
-      .courserail{width:100%;height:auto;max-height:none;position:static;border-right:none;border-bottom:1px solid var(--bd,#232838)}
+      .courserail{width:100%;height:auto;max-height:none;position:static;border-right:none;
+        border-top:1px solid var(--bd,#232838);order:2}
+      .coursemain{order:1}
     }
   `;
 
