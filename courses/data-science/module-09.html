@@ -44,8 +44,19 @@ p+p{margin-top:14px}
 code{font-family:'IBM Plex Mono';font-size:13px;background:rgba(240,180,41,.1);color:var(--amber);padding:1px 6px;border-radius:4px}
 .why{border-left:3px solid var(--info);background:rgba(95,194,232,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
 .why b{color:var(--info)}
-.disclosure{border-left:3px solid var(--amber);background:rgba(240,180,41,.08);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
-.disclosure b{color:var(--amber)}
+.brief{background:var(--card);border:1px solid var(--amber);border-radius:14px;padding:26px 28px;margin-top:24px}
+.brief .blbl{font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);font-weight:700;margin-bottom:10px}
+.brief .brow{display:flex;gap:10px;margin-top:10px;font-size:14.5px}
+.brief .brow b{flex-shrink:0;width:64px;color:var(--mut2);font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;padding-top:2px}
+.brief .bq{margin-top:16px;padding-top:16px;border-top:1px dashed var(--bd2)}
+.brief .bq ul{list-style:none;display:grid;gap:6px;margin-top:8px}
+.brief .bq li{padding-left:20px;position:relative;font-size:14px;color:var(--mut)}
+.brief .bq li:before{content:"?";position:absolute;left:0;color:var(--amber);font-weight:700}
+.deliverables{display:grid;gap:8px;margin-top:14px}
+.deliverables .drow{display:flex;align-items:center;gap:10px;font-size:14px;padding:8px 12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px}
+.deliverables .dletter{font-family:'IBM Plex Mono';font-weight:700;color:var(--amber);width:18px;flex-shrink:0}
+.deliverables .dstatus{margin-left:auto;font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--card2);color:var(--mut2)}
+.deliverables .dstatus.done{background:rgba(74,222,149,.12);color:var(--good)}
 .interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:20px}
 .interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px;font-family:'IBM Plex Mono'}
 .interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--info);box-shadow:0 0 8px var(--info)}
@@ -58,11 +69,17 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
 .testin{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
 .testin:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.proseIn{width:100%;font-family:'IBM Plex Sans';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
+.proseIn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px;display:none}
 .feedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
 .feedback.bad{display:block;background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
 .feedback.wait{display:block;background:var(--bg2);border:1px solid var(--bd2);color:var(--mut2)}
 .testsummary{margin-top:10px;font-family:'IBM Plex Mono';font-size:12.5px;font-weight:700}
+.resulttable{margin-top:10px;overflow-x:auto;border:1px solid var(--bd2);border-radius:8px}
+table.qres{width:100%;border-collapse:collapse;font-size:12.5px}
+table.qres th,table.qres td{padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap;font-family:'IBM Plex Mono'}
+table.qres th{background:var(--card2);color:var(--mut2);text-transform:uppercase;font-size:10.5px;letter-spacing:.05em}
 .qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
 .qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
 .qopt{display:block;width:100%;text-align:left;font-family:'IBM Plex Sans';display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px;background:var(--card2);color:var(--tx)}
@@ -80,6 +97,12 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .scoreboard .in{max-width:960px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
 .scoreboard .sc{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;color:var(--amber)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+.hint{margin-top:12px}
+.hint summary{cursor:pointer;color:var(--info);font-size:12.5px;font-weight:600;list-style:none}
+.hint summary::-webkit-details-marker{display:none}
+.hint summary:before{content:"💡 "}
+.hint .hbody{margin-top:8px;padding:12px 14px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13px;color:var(--mut)}
+.chartframe{width:100%;height:420px;border:1px solid var(--bd2);border-radius:10px;margin-top:14px;background:#fff}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:16px}
 .pcard{display:block;background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px;text-decoration:none;color:var(--tx);transition:.15s}
 .pcard:hover{border-color:var(--amber)}
@@ -100,63 +123,176 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Module 9 of 9 · Capstone</span>
-    <h1 class="serif">Capstone Analysis Project</h1>
-    <p class="sub">No numbered steps this time. Every module up to here taught one skill against one dataset with a defined shape. A real analysis rarely comes with a defined shape, that's what this module actually tests: whether you can put the last eight modules together on your own.</p>
+    <h1 class="serif">The Northstar Retail Capstone</h1>
+    <p class="sub">One real client, one real ambiguous problem, every skill from Modules 1&ndash;8 in service of answering it. No numbered steps. You decide what to clean, what to query, what to chart, and what to recommend.</p>
     <div class="objectives">
-      <div class="lbl">What this module actually checks</div>
+      <div class="lbl">By the end of this capstone you'll have</div>
       <ul>
-        <li>Cleaning and a business calculation, combined in one function, with no numbered steps telling you the order</li>
-        <li>A messy raw file whose problems you have to find yourself, the same way Module 4 taught</li>
-        <li>Whether your result changes correctly on a database you haven't seen the "right" answer for before</li>
-        <li>Choosing and completing one of four open-ended capstone scenarios in <a href="projects.html" style="color:var(--amber)">Projects</a></li>
+        <li>Audited and cleaned a real messy export, on your own judgment</li>
+        <li>Written a real SQL query against a live database to answer the client's actual question</li>
+        <li>Put a dollar figure on a business problem, with a stated method</li>
+        <li>Built a real, honest, interactive chart from your own analysis</li>
+        <li>Written a stakeholder-ready recommendation and explained it in plain English</li>
       </ul>
     </div>
   </header>
 
   <section>
-    <div class="kh"><span class="num">9.0</span><h2 class="serif">Two different kinds of capstone work</h2></div>
-    <p>This module has two parts, and they're graded differently, on purpose.</p>
-    <div class="def"><div class="k">Part one, below · auto-graded</div><p>One integration exercise. Real messy data, a business question, no steps. Your code runs against the actual file and is checked against the actual correct answer, same as every exercise since Module 2.</p></div>
-    <div class="def"><div class="k">Part two, in Projects · self-assessed</div><p>Pick one of four full scenarios and produce a real deliverable (a memo, a dashboard, both). This page has no backend, it cannot run your dashboard or read your memo, so that part uses a detailed rubric and sanity checks for your own numbers instead of an automated grader.</p></div>
-    <div class="disclosure"><b>Why the split:</b> auto-grading only works when there's one verifiably correct answer to check code against. A written recommendation or a dashboard layout doesn't have one right answer, pretending otherwise would mean either faking the grading or refusing to let you build the parts of this course that most resemble real analyst work. Better to be honest about which is which.</div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">9.1</span><h2 class="serif">Integration exercise: the funnel, uncleaned</h2></div>
-    <p><b>The dataset:</b> <code>ecommerce_orders.csv</code>, 412 raw order records. Nobody has told you what's wrong with it yet.</p>
-    <p><b>Business question:</b> "Of everyone who started an order, how many actually reach each stage, and where's the biggest drop?" The <code>status</code> column records each order's current stage: <code>cart_created</code>, <code>checkout_started</code>, <code>payment</code>, or <code>shipped</code>, in that order.</p>
-    <div class="why"><b>No steps given on purpose:</b> you already know how to find duplicate rows (Module 4), how to spot a quantity that can't be real (Module 4), and how to build a stage-by-stage funnel (Module 7). This asks you to notice which of those this specific file needs, and in what order, without being told.</div>
-    <div class="interactive">
-      <span class="ilbl">Required exercise · real data, real Python, graded</span>
-      <p class="mut" style="margin-bottom:10px">Write <code>funnel_after_cleaning(df)</code>. Return <code>{"total": ..., "reached_checkout": ..., "reached_payment": ..., "reached_shipped": ..., "distinct_skus": ..., "biggest_drop_stage": "..."}</code>. Each <code>reached_*</code> value is the count of cleaned orders whose status is at or beyond that stage. <code>biggest_drop_stage</code> is one of <code>"cart_to_checkout"</code>, <code>"checkout_to_payment"</code>, or <code>"payment_to_shipped"</code>, whichever transition loses the largest percentage.</p>
-      <textarea id="ex1Editor" class="testin" spellcheck="false" rows="6">def funnel_after_cleaning(df):
-    # this file has more than one problem in it. find them before you trust any count.
-    return {"total": 0, "reached_checkout": 0, "reached_payment": 0, "reached_shipped": 0, "distinct_skus": 0, "biggest_drop_stage": ""}</textarea>
-      <div class="dagctrl">
-        <button id="btnRunEx1">Run tests</button>
-        <button id="btnResetEx1">Reset</button>
+    <div class="brief">
+      <div class="blbl">The brief</div>
+      <div class="brow"><b>Client</b> Northstar Retail, a mid-size multi-category retailer</div>
+      <div class="brow"><b>Role</b> Junior Data Analyst (that's you)</div>
+      <div class="brow"><b>Problem</b> Revenue is up. Leadership is pleased, until Finance flagged that gross profit hasn't grown to match. You've been asked to find out why, and what to do about it.</div>
+      <div class="bq">
+        <p style="font-size:13px;color:var(--mut2);text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono'">What the client actually wants to know</p>
+        <ul>
+          <li>What is happening to profitability, exactly?</li>
+          <li>Why is it happening?</li>
+          <li>How much is it costing the business?</li>
+          <li>What should Northstar do about it?</li>
+        </ul>
       </div>
-      <div id="ex1Results"></div>
+      <div class="why" style="margin-top:16px"><b>What you have:</b> a raw order export from the ecommerce platform (nobody has cleaned it), and a live database with a cleaned copy of the same orders plus monthly operating expenses, already loaded for the SQL stage, the same way you'd often have both a raw export and an existing warehouse table on a real job. Nothing below tells you which columns matter or what query to write. That's the job.</div>
     </div>
-    <details style="margin-top:14px"><summary style="cursor:pointer;color:var(--amber);font-size:13px;font-weight:600">Stuck for more than a few minutes? One hint</summary>
-      <div style="margin-top:10px;padding:14px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px;color:var(--mut)">Run <code>df.duplicated().sum()</code>, <code>(df.quantity&lt;0).sum()</code>, and <code>df.sku.str.upper().nunique()</code> versus <code>df.sku.nunique()</code> in a scratch cell first, each one tells you whether that specific problem is present in this file at all, before you decide how to handle it.</div>
-    </details>
+    <div class="deliverables">
+      <div class="drow"><span class="dletter">A</span> Cleaned dataset, with your own audit of what was wrong <span class="dstatus" id="dstatusA">Not started</span></div>
+      <div class="drow"><span class="dletter">B</span> A real SQL query answering the client's actual question <span class="dstatus" id="dstatusB">Not started</span></div>
+      <div class="drow"><span class="dletter">C</span> The business impact, quantified in dollars <span class="dstatus" id="dstatusC">Not started</span></div>
+      <div class="drow"><span class="dletter">D</span> A real, interactive chart built from your own analysis <span class="dstatus" id="dstatusD">Not started</span></div>
+      <div class="drow"><span class="dletter">E</span> A written executive summary with a recommendation <span class="dstatus" id="dstatusE">Not started</span></div>
+      <div class="drow"><span class="dletter">F</span> A plain-English explanation for a non-technical stakeholder <span class="dstatus" id="dstatusF">Not started</span></div>
+    </div>
   </section>
 
   <section>
-    <div class="kh"><span class="num">9.2</span><h2 class="serif">Choose your capstone</h2></div>
-    <p>Four real scenarios, each with a genuinely messy dataset and an ambiguous business question, in <a href="projects.html" style="color:var(--amber)">Projects</a>. Pick one, work it in your own environment (Excel, Python, whatever you'd actually use), and self-assess against the rubric there.</p>
-    <div class="pgrid" id="projectGrid"></div>
+    <div class="kh"><span class="num">A</span><h2 class="serif">Audit and clean the raw export</h2></div>
+    <p>Nobody has told you what's wrong with <code>northstar_orders.csv</code>. Find out yourself, the same way you did in Module 4.</p>
+    <div class="interactive">
+      <span class="ilbl">Required · real data, real Python, graded</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>audit_and_clean(df)</code>. Investigate the raw file, decide what needs fixing, and return <code>{"rows_raw": ..., "rows_clean": ..., "duplicates_removed": ..., "negative_qty_removed": ..., "missing_channel_removed": ...}</code>, all integers.</p>
+      <textarea id="exAEditor" class="testin" spellcheck="false" rows="6">def audit_and_clean(df):
+    # investigate df yourself first: df.duplicated().sum(), (df.quantity<0).sum(),
+    # df.channel.isna().sum(), df.category.unique(), before deciding what to fix
+    return {"rows_raw": 0, "rows_clean": 0, "duplicates_removed": 0, "negative_qty_removed": 0, "missing_channel_removed": 0}</textarea>
+      <details class="hint"><summary>Stuck for a few minutes? One hint</summary><div class="hbody">Three separate problems live in this file: exact duplicate rows, an impossible negative quantity on a handful of rows, and some rows with no channel recorded at all. Category casing is also inconsistent (compare <code>df.category.unique()</code> to what a clean list should look like), but that doesn't change the row count, only the SQL stage cares about it, since the database already has it normalized.</div></details>
+      <div class="dagctrl">
+        <button id="btnRunExA">▶ Run tests</button>
+        <button id="btnResetExA">Reset</button>
+      </div>
+      <div id="exAResults"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">B</span><h2 class="serif">Answer it with SQL</h2></div>
+    <p>The client's question, precisely: <b>which product category is dragging profitability down, and by how much has its margin actually changed?</b> The cleaned data is already loaded into a live database, <code>orders</code> (order_id, order_date, category, channel, quantity, revenue, cogs) and <code>monthly_opex</code> (month, opex).</p>
+    <div class="interactive">
+      <span class="ilbl">Explore it yourself · real SQLite, runs in this page</span>
+      <textarea id="exploreEditor" class="testin" spellcheck="false" rows="3">SELECT * FROM orders LIMIT 10;</textarea>
+      <div class="dagctrl"><button class="primary" id="btnRunExplore">▶ Run query</button></div>
+      <div id="exploreResults"></div>
+    </div>
+    <div class="interactive">
+      <span class="ilbl">Required · real SQLite, this is the SQL requirement, graded against the live database</span>
+      <p class="mut" style="margin-bottom:10px">Write one query. Return <code>category</code>, a period label of <code>'H1'</code> or <code>'H2'</code> (H1 is before <code>2025-10-01</code>), total <code>revenue</code>, total <code>cogs</code>, and <code>margin_pct</code> (<code>(revenue-cogs)/revenue*100</code>, rounded to 2 decimals), grouped by category and period.</p>
+      <textarea id="exBEditor" class="testin" spellcheck="false" rows="8">-- your query here
+SELECT category
+FROM orders</textarea>
+      <details class="hint"><summary>Stuck for a few minutes? One hint</summary><div class="hbody">A <code>CASE WHEN order_date &lt; '2025-10-01' THEN 'H1' ELSE 'H2' END</code> expression gives you the period label inline. Group by both the category column and that expression, SUM revenue and cogs per group, then compute the margin from the summed totals, not a row-by-row average.</div></details>
+      <div class="dagctrl">
+        <button id="btnRunOnlyB">Run query</button>
+        <button class="primary" id="btnCheckB">✓ Check answer</button>
+      </div>
+      <div id="exBResults"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">C</span><h2 class="serif">Put a number on it</h2></div>
+    <p>You now know which category's margin moved, and by how much. The client didn't ask for a percentage, they asked what it's costing them.</p>
+    <div class="interactive">
+      <span class="ilbl">Required · real data, real Python, graded</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>quantify_impact(df)</code>. Using the cleaned data (clean it the same way as part A inside this function), estimate the gross profit Northstar would have kept in H2 if the category you identified had held its H1 margin rate. Return <code>{"category": "...", "h1_margin_pct": ..., "h2_margin_pct": ..., "estimated_lost_profit": ...}</code>.</p>
+      <textarea id="exCEditor" class="testin" spellcheck="false" rows="6">def quantify_impact(df):
+    # clean df the same way as part A, filter to the category you identified in part B,
+    # split into H1/H2, compute each half's margin %, then estimate what H2 gross profit
+    # would have been at the H1 margin rate, versus what it actually was
+    return {"category": "", "h1_margin_pct": 0, "h2_margin_pct": 0, "estimated_lost_profit": 0}</textarea>
+      <details class="hint"><summary>Stuck for a few minutes? One hint</summary><div class="hbody">"What H2 gross profit would have been at the H1 margin rate" is <code>h2_revenue * h1_margin_pct</code>. Compare that to the actual H2 gross profit (<code>h2_revenue - h2_cogs</code>), the difference is the estimated lost profit.</div></details>
+      <div class="dagctrl">
+        <button id="btnRunExC">▶ Run tests</button>
+        <button id="btnResetExC">Reset</button>
+      </div>
+      <div id="exCResults"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">D</span><h2 class="serif">Show it</h2></div>
+    <p>A number in a sentence is easy to skim past. Build the chart that makes the finding impossible to miss.</p>
+    <div class="interactive">
+      <span class="ilbl">Required · real Plotly, real Python, graded</span>
+      <p class="mut" style="margin-bottom:10px">Build a chart of margin % by category, comparing H1 to H2, so the one category that moved stands out against the others that didn't. <code>df</code> is the raw file, already loaded, uncleaned, clean it yourself first.</p>
+      <textarea id="exDEditor" class="testin" spellcheck="false" rows="10">import plotly.express as px
+
+# clean df, compute margin % per category per half, then build fig
+fig = px.bar(title="Margin % by category, H1 vs H2")</textarea>
+      <details class="hint"><summary>Stuck for a few minutes? One hint</summary><div class="hbody"><code>px.bar(data, x="category", y="margin_pct", color="half", barmode="group")</code> puts H1 and H2 bars side by side for each category, exactly the comparison that makes one outlier category visible.</div></details>
+      <div class="dagctrl">
+        <button id="btnRunExD">▶ Run &amp; build chart</button>
+        <button id="btnResetExD">Reset</button>
+      </div>
+      <div id="exDResults"></div>
+      <iframe id="exDChart" class="chartframe" style="display:none"></iframe>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">E</span><h2 class="serif">Write the executive summary</h2></div>
+    <p>Same structure as Module 8: DATA &rarr; FINDING &rarr; IMPACT &rarr; RECOMMENDATION &rarr; ACTION, using the numbers you actually computed above.</p>
+    <div class="interactive">
+      <span class="ilbl">Required · checked for structure and your own numbers, not prose quality</span>
+      <div style="display:grid;gap:12px">
+        <div><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);font-family:'IBM Plex Mono';display:block;margin-bottom:6px">Data</label><textarea id="wData" class="proseIn" rows="2" placeholder="The specific numbers: which category, the margin change, the dollar figure from part C."></textarea></div>
+        <div><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);font-family:'IBM Plex Mono';display:block;margin-bottom:6px">Finding</label><textarea id="wFinding" class="proseIn" rows="2" placeholder="The pattern: what changed, for which category, between H1 and H2."></textarea></div>
+        <div><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);font-family:'IBM Plex Mono';display:block;margin-bottom:6px">Business impact</label><textarea id="wImpact" class="proseIn" rows="2" placeholder="Why it matters, in dollars."></textarea></div>
+        <div><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);font-family:'IBM Plex Mono';display:block;margin-bottom:6px">Recommendation</label><textarea id="wRecommendation" class="proseIn" rows="2" placeholder="What Northstar should do."></textarea></div>
+        <div><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);font-family:'IBM Plex Mono';display:block;margin-bottom:6px">Action</label><textarea id="wAction" class="proseIn" rows="2" placeholder="The specific next step."></textarea></div>
+      </div>
+      <div class="dagctrl">
+        <button class="primary" id="btnCheckWrite">✓ Check my summary</button>
+      </div>
+      <div id="writeResults"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">F</span><h2 class="serif">Can you explain it?</h2></div>
+    <p>Your executive summary is for the CFO. This is different: explain the same finding to a store manager who has never heard the word "margin" used the way you're using it, and who will ask "so did we do something wrong?"</p>
+    <div class="interactive">
+      <span class="ilbl">Required · checked for concepts, not writing quality</span>
+      <textarea id="explainBox" class="proseIn" rows="5" placeholder="Explain the finding and what it means, in plain language, to someone with no data background..."></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnCheckExplain">✓ Check my explanation</button>
+      </div>
+      <div id="explainResults"></div>
+    </div>
   </section>
 
   <section>
     <div class="kh"><span class="num">✓</span><h2 class="serif">Checkpoint</h2></div>
     <p class="mut">Five questions synthesizing judgment from across the whole course. Score 80% or higher (4 of 5) to complete Module 9.</p>
     <div class="qcard"><div class="qtext">1. You're handed a new dataset with no documentation. What should you check before writing any analysis code?</div><div id="q1opts"></div><div class="qexplain" id="q1explain"></div></div>
-    <div class="qcard"><div class="qtext">2. A stage-by-stage funnel you built shows MORE orders at "payment" than at "checkout_started." What does that tell you?</div><div id="q2opts"></div><div class="qexplain" id="q2explain"></div></div>
-    <div class="qcard"><div class="qtext">3. Why can't this course's projects.html automatically grade your written memo or dashboard the way it grades your pandas code?</div><div id="q3opts"></div><div class="qexplain" id="q3explain"></div></div>
-    <div class="qcard"><div class="qtext">4. A capstone teammate says "I didn't have time to check for duplicates, but the numbers look about right." What's the risk?</div><div id="q4opts"></div><div class="qexplain" id="q4explain"></div></div>
+    <div class="qcard"><div class="qtext">2. Revenue grew but gross profit didn't. Which is the more useful next question?</div><div id="q2opts"></div><div class="qexplain" id="q2explain"></div></div>
+    <div class="qcard"><div class="qtext">3. A margin dropped in one category. A colleague says "the company is failing." What's wrong with that framing?</div><div id="q3opts"></div><div class="qexplain" id="q3explain"></div></div>
+  <div class="qcard"><div class="qtext">4. Why does this capstone check your SQL query against a live reference query on the real database, instead of a fixed expected value?</div><div id="q4opts"></div><div class="qexplain" id="q4explain"></div></div>
     <div class="qcard"><div class="qtext">5. Across this whole course, what's the one habit that shows up in every module, from Excel to SQL to dashboards?</div><div id="q5opts"></div><div class="qexplain" id="q5explain"></div></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">+</span><h2 class="serif">Optional: build a second portfolio piece</h2></div>
+    <p>Northstar is a real, complete analysis on its own. If you want a second, different industry for your portfolio, pick one from <a href="projects.html" style="color:var(--amber)">Projects</a>, self-assessed against a detailed rubric there.</p>
+    <div class="pgrid" id="projectGrid"></div>
   </section>
 
   <footer>Zenith Lab · Data Science &amp; Analysis · Module 9 of 9 · The last one</footer>
@@ -165,53 +301,97 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 <div class="scoreboard"><div class="in">
   <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
   <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
-  <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete the exercise and checkpoint to finish →</button>
+  <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete the capstone and checkpoint to finish →</button>
 </div></div>
 
-<script src="course-progress.js?v=2"></script>
-<script src="pyodide-sandbox-runner.js"></script>
+<script src="course-progress.js?v=3"></script>
+<script src="plotly-sandbox-runner.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
 <script>
 const MODULE_ID = 9;
 CourseProgress.touchVisited(MODULE_ID);
 const esc = CourseProgress.escapeHtml;
+const exerciseState = {};
 
+function markDeliverable(letter) {
+  const el = document.getElementById("dstatus" + letter);
+  if (el) { el.textContent = "Done"; el.classList.add("done"); }
+}
+
+/* ================= Part A: audit & clean (Pyodide) ================= */
 const DATASETS = {};
 async function loadDatasets() {
   if (DATASETS.orders) return DATASETS;
-  DATASETS.orders = await (await fetch("datasets/ecommerce_orders.csv")).text();
+  const orders = await (await fetch("datasets/northstar_orders.csv")).text();
+  DATASETS.orders = orders;
   return DATASETS;
 }
-const PREAMBLE = ["import pandas as pd, io, math, json", "def _mk(txt): return pd.read_csv(io.StringIO(txt))"].join("\n");
-const exerciseState = {};
+const PREAMBLE = "import pandas as pd, io, json";
 
-function harnessFor(fnName, checks) {
+function harnessFor(setupPy, checksArr) {
   return [
     PREAMBLE,
     "def harness(payload):",
-    "    code, orders_txt = payload",
-    "    ns = {'pd': pd, 'math': math}",
-    "    try: exec(code, ns)",
-    "    except Exception as e: return {'ranOk': False, 'error': f'{type(e).__name__}: {e}'}",
-    `    fn = ns.get('${fnName}')`,
-    "    if fn is None:",
-    `        return {'ranOk': True, 'results': [{'name': '${fnName} is defined', 'pass': False, 'hint': 'Define a function named exactly ${fnName}.'}]}`,
-    "    orders = _mk(orders_txt)",
+    "    code, data = payload",
+    "    data = data.to_py() if hasattr(data, 'to_py') else data",
+    setupPy,
+    "    ns = {'pd': pd}",
+    "    ns.update(_extra_ns)",
+    "    try:",
+    "        exec(code, ns)",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': f'{type(e).__name__}: {e}'}",
     "    results = []",
-    ...checks,
-    "    return {'ranOk': True, 'results': results}",
+    "    chartHtmls = {}",
+    ...checksArr,
+    "    return {'ranOk': True, 'results': results, 'chartHtmls': chartHtmls}",
   ].join("\n");
 }
+
+const ORDERS_SETUP = "    orders_txt = data['orders']\n    _extra_ns = {'df': pd.read_csv(io.StringIO(orders_txt))}";
+
+const EXA = () => harnessFor(ORDERS_SETUP, [
+  "    fn = ns.get('audit_and_clean')",
+  "    if fn is None:",
+  "        results.append({'name': 'audit_and_clean is defined', 'pass': False, 'hint': 'Define a function named exactly audit_and_clean.'})",
+  "    else:",
+  "        try:",
+  "            out = fn(_extra_ns['df'].copy())",
+  "            exp = {'rows_raw': 3649, 'rows_clean': 3613, 'duplicates_removed': 15, 'negative_qty_removed': 9, 'missing_channel_removed': 12}",
+  "            got = out if isinstance(out, dict) else {}",
+  "            for k, v in exp.items():",
+  "                ok = int(got.get(k, -1)) == v",
+  "                results.append({'name': f'{k} is correct', 'pass': ok, 'hint': f'Expected {v}, got {got.get(k)!r}.' if not ok else ''})",
+  "            allok = all(int(got.get(k,-1))==v for k,v in exp.items())",
+  "            if allok:",
+  "                half = _extra_ns['df'].head(len(_extra_ns['df'])//2)",
+  "                try:",
+  "                    out2 = fn(half)",
+  "                    not_hardcoded = int(out2.get('rows_raw',-1)) != exp['rows_raw']",
+  "                except Exception:",
+  "                    not_hardcoded = True",
+  "                results.append({'name': 'Not hardcoded: recomputes on a different slice', 'pass': not_hardcoded, 'hint': 'On half the file your function reported the same rows_raw as the full file, that means it is hardcoded rather than reading len(df).'})",
+  "        except Exception as e:",
+  "            results.append({'name': 'audit_and_clean runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+
+document.getElementById("btnRunExA").addEventListener("click", () => runGraded("exA", EXA, "btnRunExA"));
+const EXA_STARTER = document.getElementById("exAEditor").value;
+document.getElementById("btnResetExA").addEventListener("click", () => {
+  document.getElementById("exAEditor").value = EXA_STARTER;
+  document.getElementById("exAResults").innerHTML = "";
+});
 
 async function runGraded(id, buildHarness, buttonId) {
   const btn = document.getElementById(buttonId), resultsEl = document.getElementById(id + "Results");
   btn.disabled = true;
-  resultsEl.innerHTML = `<div class="feedback wait">Loading data and starting Python&hellip; (first run downloads pandas, 20&ndash;60s)</div>`;
+  resultsEl.innerHTML = `<div class="feedback wait">Loading data and starting Python&hellip;</div>`;
   let ds;
   try { ds = await loadDatasets(); }
   catch (e) { resultsEl.innerHTML = `<div class="feedback bad">Could not load datasets: ${esc(String(e))}</div>`; btn.disabled = false; return; }
   const code = document.getElementById(id + "Editor").value;
   let outcome;
-  try { outcome = await PySandboxRunner.run(buildHarness(), "harness", [code, ds.orders], 20000, 90000); }
+  try { outcome = await PlotlySandboxRunner.run(buildHarness(), "harness", [code, ds], 15000, 90000); }
   finally { btn.disabled = false; }
   if (!outcome.ok) { resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error)}</div>`; return; }
   const data = outcome.result;
@@ -230,45 +410,243 @@ async function runGraded(id, buildHarness, buttonId) {
   summary.style.color = passCount === data.results.length ? "var(--good)" : "var(--mut)";
   summary.textContent = `${passCount} / ${data.results.length} tests passing`;
   resultsEl.appendChild(summary);
+  const allPass = passCount === data.results.length;
   exerciseState[id] = { passCount, total: data.results.length };
   CourseProgress.setExtra("module9_" + id, { passCount, total: data.results.length });
+  if (allPass) {
+    const letterMap = { exA: "A", exC: "C", exD: "D" };
+    if (letterMap[id]) markDeliverable(letterMap[id]);
+    if (id === "exD" && data.chartHtmls && data.chartHtmls.exD) {
+      const el = document.getElementById("exDChart");
+      el.srcdoc = data.chartHtmls.exD;
+      el.style.display = "block";
+    }
+  }
   updateNextButton();
 }
 
-const EX1 = () => harnessFor("funnel_after_cleaning", [
-  "    try:",
-  "        out = fn(orders.copy())",
-  "        exp = {'total': 393, 'reached_checkout': 362, 'reached_payment': 301, 'reached_shipped': 265, 'distinct_skus': 79, 'biggest_drop_stage': 'checkout_to_payment'}",
-  "        got = out if isinstance(out, dict) else {}",
-  "        for k in ['total','reached_checkout','reached_payment','reached_shipped','distinct_skus']:",
-  "            ok = int(got.get(k, -1)) == exp[k]",
-  "            hint = f\"Got {got.get(k)!r}, expected {exp[k]}.\"",
-  "            if k=='total' and not ok: hint += ' Check for exact duplicate rows and impossible (negative) quantities.'",
-  "            if k=='distinct_skus' and not ok: hint += ' SKU casing is inconsistent (e.g. sku-1010 vs SKU-1010), normalize before counting distinct values.'",
-  "            results.append({'name': f'{k} is correct', 'pass': ok, 'hint': hint if not ok else ''})",
-  "        ok_stage = got.get('biggest_drop_stage')==exp['biggest_drop_stage']",
-  "        results.append({'name': 'biggest_drop_stage is correct', 'pass': ok_stage, 'hint': f\"Got {got.get('biggest_drop_stage')!r}, expected {exp['biggest_drop_stage']!r}.\" if not ok_stage else ''})",
-  "        allok = all(int(got.get(k, -1)) == exp[k] for k in ['total','reached_checkout','reached_payment','reached_shipped','distinct_skus']) and ok_stage",
-  "        if allok:",
-  "            try:",
-  "                half = orders.head(len(orders)//2).copy()",
-  "                out2 = fn(half)",
-  "                got2 = out2 if isinstance(out2, dict) else {}",
-  "                not_hardcoded = got2 != got",
-  "            except Exception:",
-  "                not_hardcoded = True",
-  "            results.append({'name': 'Not hardcoded: result changes on a different slice of the data', 'pass': not_hardcoded, 'hint': 'Your function returned the identical result on half the dataset as on the full dataset. That almost always means the numbers are hardcoded instead of computed from df.'})",
-  "    except Exception as e: results.append({'name': 'funnel_after_cleaning runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
-]);
-
-document.getElementById("btnRunEx1").addEventListener("click", () => runGraded("ex1", EX1, "btnRunEx1"));
-const EX1_STARTER = document.getElementById("ex1Editor").value;
-document.getElementById("btnResetEx1").addEventListener("click", () => {
-  document.getElementById("ex1Editor").value = EX1_STARTER;
-  document.getElementById("ex1Results").innerHTML = "";
+/* ================= Part B: SQL (sql.js) ================= */
+let dbPromise = null;
+function getDb() {
+  if (!dbPromise) {
+    dbPromise = (async () => {
+      const SQL = await initSqlJs({ locateFile: f => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/" + f });
+      const sqlText = await (await fetch("datasets/northstar.sql")).text();
+      const db = new SQL.Database();
+      db.run(sqlText);
+      return db;
+    })();
+  }
+  return dbPromise;
+}
+function execToRows(db, query) {
+  const res = db.exec(query);
+  if (!res.length) return { columns: [], rows: [] };
+  return { columns: res[0].columns, rows: res[0].values };
+}
+function renderResultTable(container, columns, rows, limit) {
+  if (!columns.length) { container.innerHTML = `<div class="feedback bad">Query ran but returned no rows.</div>`; return; }
+  const shown = limit ? rows.slice(0, limit) : rows;
+  let html = `<div class="resulttable"><table class="qres"><thead><tr>${columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>`;
+  shown.forEach(r => { html += `<tr>${r.map(v=>`<td>${v===null?'<i style="color:var(--mut2)">NULL</i>':esc(String(v))}</td>`).join("")}</tr>`; });
+  html += `</tbody></table></div>`;
+  if (limit && rows.length > limit) html += `<div style="margin-top:6px;font-size:11.5px;color:var(--mut2)">Showing first ${limit} of ${rows.length} rows.</div>`;
+  container.innerHTML = html;
+}
+async function runOnly(editorId, resultsId) {
+  const resultsEl = document.getElementById(resultsId);
+  resultsEl.innerHTML = `<div class="feedback wait">Running&hellip;</div>`;
+  try {
+    const db = await getDb();
+    const { columns, rows } = execToRows(db, document.getElementById(editorId).value);
+    resultsEl.innerHTML = "";
+    renderResultTable(resultsEl, columns, rows, 20);
+  } catch (e) {
+    resultsEl.innerHTML = `<div class="feedback bad">SQL error: ${esc(e.message)}</div>`;
+  }
+}
+function rowsEqual(a, b) {
+  if (a.length !== b.length) return false;
+  const norm = r => JSON.stringify(r.map(v => v === null ? null : (typeof v === "number" ? Math.round(v*100)/100 : v)));
+  const as = a.map(norm).sort(), bs = b.map(norm).sort();
+  return as.every((v,i) => v === bs[i]);
+}
+document.getElementById("btnRunExplore").addEventListener("click", () => runOnly("exploreEditor", "exploreResults"));
+document.getElementById("btnRunOnlyB").addEventListener("click", () => runOnly("exBEditor", "exBResults"));
+document.getElementById("btnCheckB").addEventListener("click", async () => {
+  const resultsEl = document.getElementById("exBResults");
+  resultsEl.innerHTML = `<div class="feedback wait">Running your query and the reference query against the live database&hellip;</div>`;
+  let db;
+  try { db = await getDb(); } catch (e) { resultsEl.innerHTML = `<div class="feedback bad">Could not load the database: ${esc(e.message)}</div>`; return; }
+  const studentSql = document.getElementById("exBEditor").value;
+  let studentResult;
+  try { studentResult = execToRows(db, studentSql); }
+  catch (e) {
+    resultsEl.innerHTML = `<div class="feedback bad">Your query has an error: ${esc(e.message)}</div>`;
+    exerciseState.exB = { passCount: 0, total: 1 };
+    CourseProgress.setExtra("module9_exB", exerciseState.exB);
+    updateNextButton();
+    return;
+  }
+  const referenceSql = `SELECT category, CASE WHEN order_date < '2025-10-01' THEN 'H1' ELSE 'H2' END AS half,
+    ROUND(SUM(revenue),2) AS revenue, ROUND(SUM(cogs),2) AS cogs,
+    ROUND((SUM(revenue)-SUM(cogs))/SUM(revenue)*100,2) AS margin_pct
+    FROM orders GROUP BY category, half ORDER BY category, half`;
+  const refResult = execToRows(db, referenceSql);
+  const pass = rowsEqual(studentResult.rows, refResult.rows);
+  resultsEl.innerHTML = "";
+  renderResultTable(resultsEl, studentResult.columns, studentResult.rows, 20);
+  const verdict = document.createElement("div");
+  verdict.className = "feedback " + (pass ? "ok" : "bad");
+  verdict.innerHTML = pass
+    ? "<b>Correct.</b> Checked by running the reference query against the same live database, not by comparing to a fixed number, this cannot be hardcoded."
+    : `<b>Not quite.</b> Your query ran, but the results don't match. Row count: yours ${studentResult.rows.length}, expected ${refResult.rows.length}.`;
+  resultsEl.appendChild(verdict);
+  exerciseState.exB = { passCount: pass ? 1 : 0, total: 1 };
+  CourseProgress.setExtra("module9_exB", exerciseState.exB);
+  if (pass) markDeliverable("B");
+  updateNextButton();
 });
 
-/* ---------------- 9.2 project cards, mirroring projects.html ---------------- */
+/* ================= Part C: quantify impact (Pyodide) ================= */
+const EXC = () => harnessFor(ORDERS_SETUP, [
+  "    fn = ns.get('quantify_impact')",
+  "    if fn is None:",
+  "        results.append({'name': 'quantify_impact is defined', 'pass': False, 'hint': 'Define a function named exactly quantify_impact.'})",
+  "    else:",
+  "        try:",
+  "            out = fn(_extra_ns['df'].copy())",
+  "            got = out if isinstance(out, dict) else {}",
+  "            results.append({'name': \"Identifies Electronics as the category\", 'pass': str(got.get('category','')).strip().lower()=='electronics', 'hint': f\"Got {got.get('category')!r}.\"})",
+  "            ok_h1 = abs(float(got.get('h1_margin_pct',0))-44.96)<0.5",
+  "            results.append({'name': 'h1_margin_pct is correct (about 44.96)', 'pass': ok_h1, 'hint': f\"Got {got.get('h1_margin_pct')!r}.\"})",
+  "            ok_h2 = abs(float(got.get('h2_margin_pct',0))-32.02)<0.5",
+  "            results.append({'name': 'h2_margin_pct is correct (about 32.02)', 'pass': ok_h2, 'hint': f\"Got {got.get('h2_margin_pct')!r}.\"})",
+  "            ok_lost = abs(float(got.get('estimated_lost_profit',0))-21840.58)<200",
+  "            results.append({'name': 'estimated_lost_profit is correct (about 21840.58)', 'pass': ok_lost, 'hint': f\"Got {got.get('estimated_lost_profit')!r}.\"})",
+  "        except Exception as e:",
+  "            results.append({'name': 'quantify_impact runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+document.getElementById("btnRunExC").addEventListener("click", () => runGraded("exC", EXC, "btnRunExC"));
+const EXC_STARTER = document.getElementById("exCEditor").value;
+document.getElementById("btnResetExC").addEventListener("click", () => {
+  document.getElementById("exCEditor").value = EXC_STARTER;
+  document.getElementById("exCResults").innerHTML = "";
+});
+
+/* ================= Part D: visualization (real Plotly) ================= */
+const EXD = () => harnessFor(ORDERS_SETUP, [
+  "    fig = ns.get('fig')",
+  "    if fig is None:",
+  "        results.append({'name': 'fig is defined', 'pass': False, 'hint': 'Assign your chart to a variable named exactly fig.'})",
+  "    else:",
+  "        try:",
+  "            cats = set(str(v).strip().title() for v in fig.data[0].x)",
+  "            has_electronics = 'Electronics' in cats",
+  "            results.append({'name': 'Chart includes Electronics among the categories', 'pass': has_electronics, 'hint': f'Got categories {cats}.'})",
+  "            two_series = len(fig.data) >= 2",
+  "            results.append({'name': 'Shows both H1 and H2 (two series or two groups)', 'pass': two_series, 'hint': f'Expected at least 2 traces (H1 and H2), got {len(fig.data)}.'})",
+  "            type_ok = fig.data[0].type=='bar'",
+  "            results.append({'name': 'Uses a bar chart (comparison across categories)', 'pass': type_ok, 'hint': f'Expected a bar chart, got {fig.data[0].type}.'})",
+  "            allok = has_electronics and two_series and type_ok",
+  "            if allok: chartHtmls['exD'] = fig.to_html(include_plotlyjs='cdn', full_html=False)",
+  "        except Exception as e:",
+  "            results.append({'name': 'Chart data is readable', 'pass': False, 'hint': f'Could not read chart data: {type(e).__name__}: {e}'})",
+]);
+document.getElementById("btnRunExD").addEventListener("click", () => runGraded("exD", EXD, "btnRunExD"));
+const EXD_STARTER = document.getElementById("exDEditor").value;
+document.getElementById("btnResetExD").addEventListener("click", () => {
+  document.getElementById("exDEditor").value = EXD_STARTER;
+  document.getElementById("exDResults").innerHTML = "";
+  const el = document.getElementById("exDChart"); el.style.display = "none"; el.srcdoc = "";
+});
+
+/* ================= Part E: written executive summary ================= */
+function checkWrite() {
+  const vals = {
+    data: document.getElementById("wData").value.trim(),
+    finding: document.getElementById("wFinding").value.trim(),
+    impact: document.getElementById("wImpact").value.trim(),
+    recommendation: document.getElementById("wRecommendation").value.trim(),
+    action: document.getElementById("wAction").value.trim(),
+  };
+  const checks = [];
+  const dataOk = /electronics/i.test(vals.data) && /\d/.test(vals.data);
+  checks.push({ name: "Data section names the category and includes a number", pass: dataOk, hint: "Name Electronics specifically, and include a real figure (the margin % or the dollar impact from part C)." });
+  const findingOk = /electronics/i.test(vals.finding) && /(margin|profit|cost)/i.test(vals.finding);
+  checks.push({ name: "Finding names the pattern (which category, what changed)", pass: findingOk, hint: "Mention Electronics and describe what happened to its margin or cost." });
+  const impactOk = /\$|dollar/i.test(vals.impact) && vals.impact.length > 10;
+  checks.push({ name: "Business impact is stated in dollars", pass: impactOk, hint: "State the impact in dollars, using your part C figure, not just \"significant\"." });
+  const recOk = vals.recommendation.length > 12 && vals.recommendation.toLowerCase() !== vals.finding.toLowerCase();
+  checks.push({ name: "Recommendation is present and distinct from the finding", pass: recOk, hint: "Say what Northstar should do about it." });
+  const actionOk = vals.action.length > 8 && vals.action.toLowerCase() !== vals.recommendation.toLowerCase();
+  checks.push({ name: "Action is a concrete next step, distinct from the recommendation", pass: actionOk, hint: "Name a specific next step." });
+  const allFilled = Object.values(vals).every(v => v.length > 0);
+  checks.push({ name: "All five fields are filled in", pass: allFilled, hint: "Every field needs real content." });
+
+  const resultsEl = document.getElementById("writeResults");
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  checks.forEach(c => {
+    if (c.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (c.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${c.pass ? "PASS" : "FAIL"}</b>, ${esc(c.name)}` + (c.pass ? "" : `<br>${esc(c.hint)}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.className = "testsummary";
+  summary.style.color = passCount === checks.length ? "var(--good)" : "var(--mut)";
+  summary.textContent = `${passCount} / ${checks.length} checks passing`;
+  resultsEl.appendChild(summary);
+  const state = { passCount, total: checks.length };
+  exerciseState["write"] = state;
+  CourseProgress.setExtra("module9_write", { ...state, vals });
+  if (passCount === checks.length) markDeliverable("E");
+  updateNextButton();
+}
+document.getElementById("btnCheckWrite").addEventListener("click", checkWrite);
+
+/* ================= Part F: explain it in plain English ================= */
+function checkExplain() {
+  const text = document.getElementById("explainBox").value.trim();
+  const lower = text.toLowerCase();
+  const checks = [];
+  const mentionsCategory = /electronics/.test(lower);
+  checks.push({ name: "Names Electronics specifically, not just \"a category\"", pass: mentionsCategory, hint: "A store manager needs to know which category, be specific." });
+  const noJargonDump = !/(p-value|confidence interval|regression|standard deviation)/.test(lower);
+  checks.push({ name: "Avoids unexplained statistical jargon", pass: noJargonDump, hint: "This is for someone with no data background, terms like p-value or confidence interval will lose them, explain the idea in plain words instead." });
+  const hasNumber = /\d/.test(text);
+  checks.push({ name: "Includes at least one concrete number", pass: hasNumber, hint: "A vague \"it's a problem\" is weaker than a real figure." });
+  const noOverclaim = !/(prove[sd]?|guarantee[sd]?|definitely caused)/.test(lower);
+  checks.push({ name: "Doesn't overclaim certainty (\"proves\", \"guarantees\")", pass: noOverclaim, hint: "You found a real pattern in the data, that's not the same as absolute proof, avoid words like \"proves\" or \"guarantees\"." });
+  const longEnough = text.length > 60;
+  checks.push({ name: "A real explanation, not a one-liner", pass: longEnough, hint: "Give it at least a couple of sentences, enough to actually explain the finding and what it means." });
+
+  const resultsEl = document.getElementById("explainResults");
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  checks.forEach(c => {
+    if (c.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (c.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${c.pass ? "PASS" : "FAIL"}</b>, ${esc(c.name)}` + (c.pass ? "" : `<br>${esc(c.hint)}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.className = "testsummary";
+  summary.style.color = passCount === checks.length ? "var(--good)" : "var(--mut)";
+  summary.textContent = `${passCount} / ${checks.length} checks passing`;
+  resultsEl.appendChild(summary);
+  const state = { passCount, total: checks.length };
+  exerciseState["explain"] = state;
+  CourseProgress.setExtra("module9_explain", { ...state, text });
+  if (passCount === checks.length) markDeliverable("F");
+  updateNextButton();
+}
+document.getElementById("btnCheckExplain").addEventListener("click", checkExplain);
+
+/* ================= Project bridge cards ================= */
 (function renderProjectCards(){
   const grid = document.getElementById("projectGrid");
   CourseProgress.PROJECTS.forEach(p => {
@@ -281,19 +659,19 @@ document.getElementById("btnResetEx1").addEventListener("click", () => {
   });
 })();
 
-/* ---------------- Checkpoint quiz ---------------- */
+/* ================= Checkpoint quiz ================= */
 let score = 0;
 const answered = { q1:false,q2:false,q3:false,q4:false,q5:false };
-function allExercisesPassing(){
-  const ids = ["ex1"];
+function requiredPassing(){
+  const ids = ["exA","exB","exC","exD","write","explain"];
   return ids.every(id => exerciseState[id] && exerciseState[id].passCount === exerciseState[id].total);
 }
 function updateNextButton(){
   const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
   const btn = document.getElementById("btnNext");
-  const ready = allDone && allExercisesPassing();
+  const ready = allDone && requiredPassing();
   btn.disabled = !ready;
-  btn.textContent = ready ? "View your Portfolio →" : "Complete the exercise and checkpoint to finish →";
+  btn.textContent = ready ? "View your Portfolio →" : "Complete the capstone and checkpoint to finish →";
   if (allDone) CourseProgress.markComplete(MODULE_ID, score, 5);
   maybeShowRetry();
 }
@@ -323,28 +701,28 @@ function buildQ(id, opts, containerId){
 }
 buildQ("q1", [
   { text: "Row count, column meanings, duplicates, missing values, and whether any numeric column contains impossible values", correct: true, correctText: "Correct. This is the same audit from Module 4, and it applies to literally every new dataset, documented or not." },
-  { text: "Nothing, jump straight to the business question, the data audit can wait until something looks wrong", correct: false, reason: "Waiting for something to \"look wrong\" is how a duplicate row or a negative quantity quietly inflates every downstream number without anyone noticing." },
-  { text: "Only the column names, since the analysis logic matters more than the data quality", correct: false, reason: "Column names tell you nothing about duplicates, missing values, or impossible entries, all of which silently break analysis logic that's otherwise correct." },
+  { text: "Nothing, jump straight to the business question", correct: false, reason: "Waiting for something to \"look wrong\" is how a duplicate row quietly inflates every downstream number without anyone noticing." },
+  { text: "Only the column names", correct: false, reason: "Column names tell you nothing about duplicates, missing values, or impossible entries." },
 ], "q1opts");
 buildQ("q2", [
-  { text: "The stage order assumed in the funnel is wrong, or the data itself is inconsistent (e.g. some orders show payment without ever showing checkout_started), either way it needs investigating before the funnel is trusted", correct: true, correctText: "Correct. A funnel should never show a later stage with more people than an earlier one, that's the same monotonic sanity check projects.html asks you to verify on your own capstone." },
-  { text: "This is normal, funnels don't have to be monotonically decreasing", correct: false, reason: "A funnel represents progressively narrowing stages, if it's not decreasing, either the stage definitions or the underlying data has a real problem worth finding." },
-  { text: "It means the business is doing better at payment than at checkout", correct: false, reason: "That's not a valid business interpretation, a later funnel stage can't structurally contain more people than an earlier one unless something's wrong with how the stages were defined." },
+  { text: "Which specific category, channel, or cost line is driving the gap, a company-wide number hides where the real problem is", correct: true, correctText: "Correct. \"Profit didn't grow\" is a symptom, finding which slice of the business it's concentrated in is what makes it actionable." },
+  { text: "Whether the accounting team made an error", correct: false, reason: "That's a reasonable check eventually, but jumping straight to \"the numbers must be wrong\" skips the actual investigation." },
+  { text: "How to increase revenue further", correct: false, reason: "More revenue at the same shrinking margin makes the underlying problem worse, not better, that's exactly the trap this capstone is built around." },
 ], "q2opts");
 buildQ("q3", [
-  { text: "A written memo or dashboard layout doesn't have one single verifiably correct answer the way a computed number does, there's no reference output to compare against automatically", correct: true, correctText: "Correct. Pandas code has a correct output; a well-written recommendation is a judgment call, that's why it uses a rubric and sanity checks instead of pass/fail grading." },
-  { text: "It's a technical limitation that could be fixed with more code", correct: false, reason: "This isn't a solvable engineering problem, free-form writing and visual design genuinely don't have one correct answer to grade against, no amount of code changes that." },
-  { text: "The course doesn't consider written communication important enough to grade", correct: false, reason: "The opposite is true, Module 8 built an entire graded module around it, this is specifically about what CAN and CAN'T be automatically checked, not about importance." },
+  { text: "One category's margin compression isn't \"the company failing,\" it's a specific, fixable cost problem, most of the business (4 of 5 categories) shows a perfectly stable margin", correct: true, correctText: "Correct. Precision matters, overstating the problem is as misleading as understating it." },
+  { text: "Nothing, that framing is accurate", correct: false, reason: "It overstates a specific, isolated cost problem into a sweeping claim the data doesn't support." },
+  { text: "The colleague needs to see the SQL query", correct: false, reason: "The real issue isn't proof, it's that the conclusion doesn't match the actual scope of the finding, regardless of how it was computed." },
 ], "q3opts");
 buildQ("q4", [
-  { text: "Duplicate rows silently inflate every count that follows, \"looks about right\" isn't the same as being right, and there's no way to know how far off without actually checking", correct: true, correctText: "Correct. This exact mistake showed up in this module's own exercise, uncleaned duplicates changed the total by exactly 12 orders, small enough to not look obviously wrong." },
-  { text: "None, if the final numbers seem reasonable the duplicates probably didn't matter", correct: false, reason: "\"Seems reasonable\" is not a check, it's a guess, and duplicates can shift a result by a meaningful amount while still looking plausible." },
-  { text: "None, duplicate rows only matter for very large datasets", correct: false, reason: "Dataset size doesn't determine whether duplicates matter, what matters is whether they're present at all, this course's 412-row file had exactly this problem." },
+  { text: "So a hardcoded or memorized answer can't pass, the reference query runs fresh against the live database every time, exactly like Module 6", correct: true, correctText: "Correct. This is the same anti-cheat principle used throughout the course, whenever it's feasible, comparing against a live recomputation beats comparing against a stored value." },
+  { text: "Because SQL can't be graded any other way", correct: false, reason: "A fixed expected value is technically possible, it's just weaker, exactly the gap this course closed in Modules 2-9 this session." },
+  { text: "It's just a stylistic choice with no real benefit", correct: false, reason: "It has a concrete, demonstrated benefit: it's the reason a hardcoded literal answer fails here and would pass under simpler grading." },
 ], "q4opts");
 buildQ("q5", [
-  { text: "Verify your own numbers before trusting them, whether that's checking a formula, a join's row count, a query against a reference answer, or a funnel's monotonic shape", correct: true, correctText: "Correct. Every module built a different flavor of this same habit: sanity-check the result, don't just trust that the code ran without an error." },
-  { text: "Always use the newest, most advanced tool available for the job", correct: false, reason: "This course deliberately used plain formulas, hand-parsed CSVs, and simple methods where they were the right tool, sophistication was never the goal." },
-  { text: "Always visualize the data before doing anything else", correct: false, reason: "Useful often, but not universal, Module 3's join-integrity check and Module 6's SQL exercises didn't start with a chart, they started with verifying the data itself." },
+  { text: "Verify your own numbers before trusting them, whether that's checking a formula, a join's row count, a query against a reference answer, or a chart against the real underlying data", correct: true, correctText: "Correct. Every module built a different flavor of this same habit." },
+  { text: "Always use the newest, most advanced tool available", correct: false, reason: "This course deliberately used plain formulas and simple methods where they were the right tool." },
+  { text: "Always visualize the data before doing anything else", correct: false, reason: "Useful often, but not universal, this capstone's own SQL stage came before its chart stage." },
 ], "q5opts");
 
 function maybeShowRetry(){
@@ -368,12 +746,32 @@ document.getElementById("btnNext").addEventListener("click", () => { window.loca
       if (label) label.click();
     }
   });
-  const saved = CourseProgress.getExtra("module9_ex1");
-  if (saved && saved.total > 0) {
-    exerciseState["ex1"] = saved;
-    const resultsEl = document.getElementById("ex1Results");
-    const passed = saved.passCount === saved.total;
-    resultsEl.innerHTML = `<div class="feedback ${passed ? "ok" : "bad"}">Restored from your last visit: ${passed ? "passing" : "not yet passing"}. Edit and re-run to update.</div>`;
+  ["exA","exB","exC","exD"].forEach((id) => {
+    const saved = CourseProgress.getExtra("module9_" + id);
+    if (saved && saved.total > 0) {
+      exerciseState[id] = saved;
+      const resultsEl = document.getElementById(id + "Results");
+      const passed = saved.passCount === saved.total;
+      resultsEl.innerHTML = `<div class="feedback ${passed ? "ok" : "bad"}">Restored from your last visit: ${passed ? "passing" : "not yet passing"}. Edit and re-run to update.</div>`;
+      const letterMap = { exA: "A", exB: "B", exC: "C", exD: "D" };
+      if (passed && letterMap[id]) markDeliverable(letterMap[id]);
+    }
+  });
+  const savedWrite = CourseProgress.getExtra("module9_write");
+  if (savedWrite && savedWrite.vals) {
+    exerciseState["write"] = { passCount: savedWrite.passCount, total: savedWrite.total };
+    document.getElementById("wData").value = savedWrite.vals.data || "";
+    document.getElementById("wFinding").value = savedWrite.vals.finding || "";
+    document.getElementById("wImpact").value = savedWrite.vals.impact || "";
+    document.getElementById("wRecommendation").value = savedWrite.vals.recommendation || "";
+    document.getElementById("wAction").value = savedWrite.vals.action || "";
+    if (savedWrite.passCount === savedWrite.total) markDeliverable("E");
+  }
+  const savedExplain = CourseProgress.getExtra("module9_explain");
+  if (savedExplain && savedExplain.text !== undefined) {
+    exerciseState["explain"] = { passCount: savedExplain.passCount, total: savedExplain.total };
+    document.getElementById("explainBox").value = savedExplain.text || "";
+    if (savedExplain.passCount === savedExplain.total) markDeliverable("F");
   }
   updateNextButton();
 })();
