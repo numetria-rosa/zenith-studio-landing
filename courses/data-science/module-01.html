@@ -439,6 +439,12 @@ maybeShowRetry();
 
 (function restoreQuizState(){
   const stored = CourseProgress.getModule(MODULE_ID);
+  const savedEx = stored.sections && stored.sections.summaryTableExercise;
+  if (savedEx && savedEx.total > 0) {
+    for (let i = 0; i < savedEx.total; i++) exAnswered[i] = true;
+    exCorrect = savedEx.passCount;
+    document.getElementById("exerciseScore").textContent = `${exCorrect} / ${EXERCISE_Q.length} correct (restored from your last visit, edit is locked, use Retry to redo it)`;
+  }
   const a = stored.answers || {};
   ["q1","q2","q3","q4","q5"].forEach(id => {
     if (a[id] !== undefined && !answered[id]) {
@@ -446,6 +452,7 @@ maybeShowRetry();
       if (label) label.click();
     }
   });
+  if (savedEx && savedEx.total > 0) updateScore();
 })();
 </script>
 <script src="course-rail.js?v=2"></script>
