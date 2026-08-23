@@ -34,7 +34,7 @@
     .rail-mod .rmdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--bd2,#333a4c)}
     .rail-mod.done .rmdot{background:var(--good,#4ade95)}
     .rail-mod.progress .rmdot{background:var(--amber,#f0b429)}
-    span.rail-mod.locked{opacity:.4;cursor:not-allowed}
+    .rail-mod.locked{opacity:.55}
     .rail-note{margin-top:14px;padding:0 9px;font-size:10.5px;color:var(--mut2,#676e7d);line-height:1.5}
     @media (max-width:860px){
       .courseshell{flex-direction:column}
@@ -82,9 +82,8 @@
         else if (status === "completed") cls.push("done");
         else if (status === "in-progress") cls.push("progress");
         const inner = `<span class="rmnum">${m.id}</span><span class="rmdot"></span>${m.title}`;
-        modsHtml += unlocked
-          ? `<a href="${m.file}" class="${cls.join(" ")}" title="${m.title}">${inner}</a>`
-          : `<span class="${cls.join(" ")}" title="Locked, complete Module ${m.id - 1} first">${inner}</span>`;
+        const title = unlocked ? m.title : `Recommended after Module ${m.id - 1}, click to jump ahead anyway`;
+        modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
       });
     } else {
       modsHtml = `<span class="rail-note">Module status loads once CourseProgress is available on this page.</span>`;

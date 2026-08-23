@@ -64,7 +64,7 @@ h1{font-family:'Fraunces';font-size:clamp(28px,4.5vw,40px);font-weight:600;lette
 .modcard{display:flex;gap:18px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;text-decoration:none;color:inherit;transition:.15s;position:relative}
 .modcard:hover,.modcard:focus-visible{border-color:var(--bd2)}
 .modcard:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-.modcard.locked{opacity:.55;cursor:not-allowed}
+.modcard.locked{opacity:.7}
 .modnum{flex-shrink:0;width:46px;height:46px;border-radius:10px;display:grid;place-items:center;font-family:'IBM Plex Mono';font-weight:700;font-size:15px;background:var(--card2);border:1px solid var(--bd2);color:var(--mut)}
 .modcard.completed .modnum{background:rgba(74,222,149,.12);border-color:var(--good);color:var(--good)}
 .modcard.in-progress .modnum{background:rgba(240,180,41,.1);border-color:var(--amber);color:var(--amber)}
@@ -194,12 +194,11 @@ function renderDashboard(){
     const status = CourseProgress.statusOf(m.id);
     const unlocked = CourseProgress.isUnlocked(m.id);
     const mod = CourseProgress.getModule(m.id);
-    const card = document.createElement(unlocked ? "a" : "div");
-    if (unlocked) card.href = m.file;
-    else card.tabIndex = 0;
+    const card = document.createElement("a");
+    card.href = m.file;
     card.className = "modcard " + status + (unlocked ? "" : " locked");
 
-    const statusLabel = !unlocked ? LOCK_ICON + " Locked" :
+    const statusLabel = !unlocked ? LOCK_ICON + " Not yet reached" :
       status === "completed" ? "✓ Completed" :
       status === "in-progress" ? "→ In progress" : "○ Not started";
     const statusClass = !unlocked ? "locked" : status;
@@ -207,7 +206,7 @@ function renderDashboard(){
     let metaBits = [`~${m.minutes} min`];
     const modScore = Number(mod.score), modTotal = Number(mod.total);
     if (Number.isFinite(modTotal) && modTotal > 0) metaBits.push(`Last score: ${Number.isFinite(modScore) ? modScore : 0}/${modTotal}`);
-    if (!unlocked) metaBits.push(`Unlocks after Module ${m.id - 1}`);
+    if (!unlocked) metaBits.push(`Recommended after Module ${m.id - 1}, click to jump ahead anyway`);
 
     card.innerHTML = `
       <div class="modnum">${status === "completed" ? "✓" : m.id}</div>
@@ -330,6 +329,6 @@ document.getElementById("btnReset").addEventListener("click", () => {
 
 renderDashboard();
 </script>
-<script src="course-rail.js"></script>
+<script src="course-rail.js?v=2"></script>
 </body>
 </html>
