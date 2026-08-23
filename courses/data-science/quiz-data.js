@@ -203,7 +203,7 @@ const POOLS = {
         opt("The mode of response times", false, "The most frequent single value doesn't answer a percentile-based threshold question.") ] },
   ] },
 
-  6: { title: "Data Visualization & Storytelling", questions: [
+  7: { title: "Data Visualization & Storytelling", questions: [
     { id: "m6q1", type: "application", difficulty: "medium",
       objective: "Choose the right chart type",
       text: "You want to show how monthly revenue changed over the last two years. Which chart fits best?",
@@ -242,7 +242,7 @@ const POOLS = {
         opt("It's only a problem if both lines are the same color", false, "The color of the lines isn't the issue, the manipulable relationship between the two independent scales is.") ] },
   ] },
 
-  7: { title: "SQL for Analysts", questions: [
+  6: { title: "SQL for Analysts", questions: [
     { id: "m7q1", type: "application", difficulty: "medium",
       objective: "Write a basic aggregation query",
       text: "You want total revenue per region from an `orders` table. Which query is correct?",

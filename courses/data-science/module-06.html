@@ -3,86 +3,500 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 6: Data Visualization &amp; Storytelling</title>
+<title>Module 6: SQL for Analysts</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;
+}
+html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
 .serif{font-family:'Fraunces',serif}
-.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px 80px}
 .bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
-.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .in{max-width:960px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
 .bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
 .bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
 .bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
-.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
-.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
-.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
-.coursenav a:hover{color:var(--amber)}
-.coursenav .navsep{flex:1}
-@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
 .hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
 h1{font-family:'Fraunces';font-size:clamp(30px,5vw,44px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.08}
-.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
+.sub{color:var(--mut);font-size:16px;max-width:700px;margin-top:14px}
 .objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--good);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
 .objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--good);margin-bottom:10px;font-weight:700;font-family:'IBM Plex Mono'}
 .objectives ul{list-style:none;display:grid;gap:6px}
 .objectives li{padding-left:20px;position:relative;font-size:14.5px}
 .objectives li:before{content:"→";position:absolute;left:0;color:var(--amber)}
-section{padding:40px 0}
-.soon{background:var(--card);border:1px solid var(--bd2);border-radius:16px;padding:32px;text-align:center}
-.soon .badge{display:inline-flex;font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);border:1px solid rgba(95,194,232,.3);padding:6px 14px;border-radius:99px}
-.soon h2{font-family:'Fraunces';font-size:22px;margin-top:16px;font-weight:600}
-.soon p{color:var(--mut);font-size:14.5px;max-width:520px;margin:12px auto 0}
-.covers{text-align:left;margin-top:22px;padding-top:22px;border-top:1px solid var(--bd);max-width:520px;margin-left:auto;margin-right:auto}
-.covers .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut2);margin-bottom:10px;font-family:'IBM Plex Mono'}
-.covers ul{list-style:none;display:grid;gap:8px}
-.covers li{padding-left:20px;position:relative;font-size:13.5px;color:var(--mut)}
-.covers li:before{content:"→";position:absolute;left:0;color:var(--amber)}
-a.cta{display:inline-flex;margin-top:22px;align-items:center;gap:8px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:14px;padding:11px 20px;border-radius:8px;text-decoration:none}
+section{padding:40px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-family:'IBM Plex Mono';font-weight:700;font-size:12px;color:var(--amber);border:1px solid var(--amber);border-radius:99px;width:34px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-family:'Fraunces';font-size:21px;font-weight:600;letter-spacing:-.01em}
+p{font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:14px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:6px;font-family:'IBM Plex Mono'}
+.def p{font-size:14.5px}
+code{font-family:'IBM Plex Mono';font-size:13px;background:rgba(240,180,41,.1);color:var(--amber);padding:1px 6px;border-radius:4px}
+.why{border-left:3px solid var(--info);background:rgba(95,194,232,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
+.why b{color:var(--info)}
+.trap{border-left:3px solid var(--bad);background:rgba(255,133,133,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
+.trap b{color:var(--bad)}
+.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:20px}
+.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--info);background:rgba(95,194,232,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px;font-family:'IBM Plex Mono'}
+.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--info);box-shadow:0 0 8px var(--info)}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button.primary:hover{filter:brightness(1.08);color:var(--amberd)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.testin{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
+.testin:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{display:block;background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.feedback.wait{display:block;background:var(--bg2);border:1px solid var(--bd2);color:var(--mut2)}
+.resulttable{margin-top:10px;overflow-x:auto;border:1px solid var(--bd2);border-radius:8px}
+table.qres{width:100%;border-collapse:collapse;font-size:12.5px}
+table.qres th,table.qres td{padding:7px 10px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap;font-family:'IBM Plex Mono'}
+table.qres th{background:var(--card2);color:var(--mut2);text-transform:uppercase;font-size:10.5px;letter-spacing:.05em}
+table.qres tr:last-child td{border-bottom:none}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
+.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
+.qopt{display:block;width:100%;text-align:left;font-family:'IBM Plex Sans';display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px;background:var(--card2);color:var(--tx)}
+.qopt:hover{border-color:var(--bd2)}
+.qopt.correct{border-color:var(--good);background:rgba(74,222,149,.08)}
+.qopt.incorrect{border-color:var(--bad);background:rgba(255,133,133,.08)}
+.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:960px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.coursenav a:hover{color:var(--amber)}
+.coursenav .navsep{flex:1}
+@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
+.scoreboard{position:sticky;bottom:0;background:rgba(13,15,20,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0}
+.scoreboard .in{max-width:960px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.scoreboard .sc{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;color:var(--amber)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+.schematable{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px}
+.schematable th,.schematable td{padding:8px 12px;border-bottom:1px solid var(--bd);text-align:left}
+.schematable th{color:var(--mut2);font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em}
+.schemacard{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px;margin-top:12px}
+.schemacard h4{font-family:'IBM Plex Mono';font-size:13px;color:var(--amber);margin-bottom:6px}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:26px} .kh h2{font-size:18px} .interactive{padding:16px} }
 </style>
 </head>
 <body>
-<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Data Science &amp; Analysis · Module 6</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-05.html">&larr; <span class="navlabel">Module 5</span></a><span class="navsep"></span><a href="module-07.html">Module 7 <span class="navlabel">&rarr;</span></a></div></div>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Data Science &amp; Analysis · Module 6</span>
+</div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-05.html">&larr; <span class="navlabel">Module 5</span></a><span class="navsep"></span><a href="module-07.html" id="navNextTop">Module 7 <span class="navlabel">&rarr;</span></a></div></div>
+
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Module 6 of 9</span>
-    <h1 class="serif">Data Visualization &amp; Storytelling</h1>
-    <p class="sub">Choosing the right chart for the question (and when not to use a pie chart), matplotlib and seaborn basics, a critique exercise on genuinely misleading charts, and building a one-page "so what" visual for a non-technical reader.</p>
+    <h1 class="serif">SQL for Analysts</h1>
+    <p class="sub">A real SQLite database, running entirely in this page, with a real messy shop's worth of customers, orders, and products &mdash; NULLs, cancelled orders, and duplicate-row traps included. Every exercise starts from a business question, not a syntax drill, and every answer is checked by running your query against the live database, not by comparing to a memorized number.</p>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
-        <li>Pick the right chart for a given question</li>
-        <li>Build clean charts with matplotlib and seaborn</li>
-        <li>Spot and fix a misleading chart before it ships</li>
-        <li>Design a one-page visual a non-technical reader understands in seconds</li>
+        <li>Write SELECT / WHERE / ORDER BY / GROUP BY queries that answer a real business question</li>
+        <li>Recognize and handle NULL values correctly, instead of silently dropping them</li>
+        <li>Join tables without accidentally inflating your row count (the single most common real-world SQL bug)</li>
+        <li>Find "the absence of a match" &mdash; customers, products, or events that never happened</li>
+        <li>Combine joins, filters, and aggregation to answer a question that needs more than one skill at once</li>
       </ul>
     </div>
   </header>
+
   <section>
-    <div class="soon">
-      <span class="badge">In production</span>
-      <h2 class="serif">This module's full interactive lesson is being built</h2>
-      <p>One real file (App Analytics Events), three exercises: a chart-type matching drill, a misleading-chart critique, and a build-a-chart-from-raw-data exercise.</p>
-      <div class="covers">
-        <div class="lbl">What this module will cover</div>
-        <ul>
-          <li>Chart-type selection: bar, line, scatter, histogram, and when not to use a pie chart</li>
-          <li>matplotlib and seaborn basics</li>
-          <li>A critique exercise on genuinely misleading charts (truncated axes, dual-axis tricks)</li>
-          <li>Building a one-page "so what" visual for a non-technical stakeholder</li>
-        </ul>
-      </div>
-      <a href="dashboard.html" class="cta">Back to dashboard &rarr;</a>
+    <div class="kh"><span class="num">6.0</span><h2 class="serif">The database</h2></div>
+    <p>A small outdoor-gear retailer. Four tables, real relationships, real problems &mdash; the same shape of database you'd find at an actual small business.</p>
+    <div class="schemacard"><h4>customers</h4><p class="mut" style="font-size:13px">customer_id, name, country, signup_date</p></div>
+    <div class="schemacard"><h4>products</h4><p class="mut" style="font-size:13px">sku, product_name, category, unit_cost</p></div>
+    <div class="schemacard"><h4>orders</h4><p class="mut" style="font-size:13px">order_id, customer_id, order_date, status (completed / cancelled / refunded), channel (web / mobile / phone / <b style="color:var(--bad)">NULL</b>, not always recorded)</p></div>
+    <div class="schemacard"><h4>order_items</h4><p class="mut" style="font-size:13px">order_item_id, order_id, sku, quantity, unit_price &mdash; one order can have several line items</p></div>
+    <div class="interactive">
+      <span class="ilbl">Explore it yourself · real SQLite, runs in this page</span>
+      <p class="mut" style="margin-bottom:10px">Try <code>SELECT * FROM orders LIMIT 10</code> or <code>SELECT * FROM customers LIMIT 10</code> before you start &mdash; look at real rows before you query them for real.</p>
+      <textarea id="exploreEditor" class="testin" spellcheck="false" rows="3">SELECT * FROM orders LIMIT 10;</textarea>
+      <div class="dagctrl"><button class="primary" id="btnRunExplore">▶ Run query</button></div>
+      <div id="exploreResults"></div>
     </div>
   </section>
-  <footer>Zenith Lab · Data Science &amp; Analysis · Module 6 of 9</footer>
+
+  <section>
+    <div class="kh"><span class="num">6.1</span><h2 class="serif">SELECT, WHERE, ORDER BY, LIMIT</h2></div>
+    <p><b>Business question:</b> "Which 5 customers signed up most recently?"</p>
+    <div class="def"><div class="k">Pattern</div><p><code>SELECT columns FROM table ORDER BY column DESC LIMIT n</code> &mdash; pick the columns you want, sort by the one that defines "most recent," take the top few.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Exercise 1 · runs against the real database</span>
+      <p class="mut" style="margin-bottom:10px">Return each customer's <code>name</code> and <code>signup_date</code>, for the 5 most recently signed-up customers, most recent first.</p>
+      <textarea id="ex1Editor" class="testin" spellcheck="false" rows="3">SELECT name, signup_date FROM customers
+-- your ORDER BY and LIMIT here</textarea>
+      <div class="dagctrl">
+        <button id="btnRunOnly1">Run query</button>
+        <button class="primary" id="btnCheck1">✓ Check answer</button>
+      </div>
+      <div id="ex1Results"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6.2</span><h2 class="serif">Aggregates and GROUP BY</h2></div>
+    <p><b>Business question:</b> "Which product category sells the most units?"</p>
+    <div class="def"><div class="k">Pattern</div><p><code>SELECT category, SUM(quantity) FROM ... JOIN ... GROUP BY category</code> &mdash; GROUP BY collapses many rows into one row per category, SUM adds up the quantity within each group.</p></div>
+    <div class="why"><b>Why this needs a join:</b> <code>order_items</code> has the quantity, <code>products</code> has the category &mdash; neither table has both, so you join them on <code>sku</code> first.</div>
+    <div class="interactive">
+      <span class="ilbl">Exercise 2 · runs against the real database</span>
+      <p class="mut" style="margin-bottom:10px">Return <code>category</code> and total <code>units</code> (sum of quantity) sold in each category, across ALL order_items regardless of order status, highest first.</p>
+      <textarea id="ex2Editor" class="testin" spellcheck="false" rows="4">SELECT p.category, SUM(oi.quantity) AS units
+FROM order_items oi
+-- your JOIN, GROUP BY, and ORDER BY here</textarea>
+      <div class="dagctrl">
+        <button id="btnRunOnly2">Run query</button>
+        <button class="primary" id="btnCheck2">✓ Check answer</button>
+      </div>
+      <div id="ex2Results"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6.3</span><h2 class="serif">The NULL trap</h2></div>
+    <p><b>Business question:</b> "How many orders came through each channel?"</p>
+    <div class="trap"><b>The trap:</b> 11 orders have no recorded channel at all &mdash; the value is genuinely <code>NULL</code>, not the text "unknown." <code>COUNT(channel)</code> silently skips NULLs; <code>COUNT(*)</code> doesn't. A filter like <code>WHERE channel != 'web'</code> also silently excludes every NULL row, because SQL's three-valued logic treats <code>NULL != anything</code> as unknown, not true.</div>
+    <div class="def"><div class="k">Pattern</div><p><code>GROUP BY channel</code> puts NULL rows into their own group automatically &mdash; you'll see it appear as a group with no label. Use <code>IS NULL</code> / <code>IS NOT NULL</code> to test for it explicitly, never <code>=</code> or <code>!=</code>.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Exercise 3 · runs against the real database</span>
+      <p class="mut" style="margin-bottom:10px">Return <code>channel</code> and the count of orders (<code>n</code>) for each channel, including the NULL group, highest count first.</p>
+      <textarea id="ex3Editor" class="testin" spellcheck="false" rows="3">SELECT channel, COUNT(*) AS n FROM orders
+-- your GROUP BY and ORDER BY here</textarea>
+      <div class="dagctrl">
+        <button id="btnRunOnly3">Run query</button>
+        <button class="primary" id="btnCheck3">✓ Check answer</button>
+      </div>
+      <div id="ex3Results"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6.4</span><h2 class="serif">Joins, and the row-multiplication trap</h2></div>
+    <p><b>Business question:</b> "What's our total completed revenue by product category?"</p>
+    <div class="trap"><b>The trap:</b> most orders have more than one line item. Joining <code>orders</code> to <code>order_items</code> means each order can appear multiple times in the joined result &mdash; one row per item, not per order. If you <code>COUNT(*)</code> completed orders after this join, you'll get a bigger, wrong number (this database's real numbers: 77 completed orders, but 155 rows after joining to order_items). Revenue math is usually fine (you WANT one row per item to sum item revenue), but any count of orders after a join needs <code>COUNT(DISTINCT order_id)</code>, not <code>COUNT(*)</code>.</div>
+    <div class="def"><div class="k">Pattern</div><p>Join <code>order_items</code> &rarr; <code>orders</code> &rarr; <code>products</code>, filter <code>WHERE status = 'completed'</code>, then <code>GROUP BY category</code> summing <code>quantity * unit_price</code>.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Exercise 4 · runs against the real database</span>
+      <p class="mut" style="margin-bottom:10px">Return <code>category</code> and <code>revenue</code> (<code>ROUND(SUM(quantity*unit_price),2)</code>), counting only <code>completed</code> orders, highest revenue first.</p>
+      <textarea id="ex4Editor" class="testin" spellcheck="false" rows="6">SELECT p.category, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue
+FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+JOIN products p ON p.sku = oi.sku
+-- your WHERE, GROUP BY, and ORDER BY here</textarea>
+      <div class="dagctrl">
+        <button id="btnRunOnly4">Run query</button>
+        <button class="primary" id="btnCheck4">✓ Check answer</button>
+      </div>
+      <div id="ex4Results"></div>
+    </div>
+    <details style="margin-top:14px"><summary style="cursor:pointer;color:var(--amber);font-size:13px;font-weight:600">Challenge (optional): prove the fan-out trap to yourself</summary>
+      <div style="margin-top:10px;padding:14px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px;color:var(--mut)">Run <code>SELECT COUNT(*) FROM orders o JOIN order_items oi ON oi.order_id=o.order_id WHERE o.status='completed'</code> in the explorer above, then compare it to <code>SELECT COUNT(*) FROM orders WHERE status='completed'</code>. The gap between the two numbers is entirely orders with more than one line item.</div>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6.5</span><h2 class="serif">Finding what ISN'T there</h2></div>
+    <p><b>Business question:</b> "Which customers have never placed an order?" &mdash; a real re-engagement/win-back list.</p>
+    <div class="why"><b>Why this is harder than it sounds:</b> there's no "never ordered" flag anywhere. You have to find customers who don't show up in <code>orders</code> at all, the absence of a match, not a value you can filter on directly.</div>
+    <div class="def"><div class="k">Pattern</div><p><code>WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id)</code> &mdash; for each customer, check whether any matching order exists at all. A LEFT JOIN + <code>WHERE order_id IS NULL</code> answers the same question a different way; either is correct.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Exercise 5 · runs against the real database</span>
+      <p class="mut" style="margin-bottom:10px">Return <code>customer_id</code> and <code>name</code> for every customer with zero orders, ordered by <code>customer_id</code> ascending.</p>
+      <textarea id="ex5Editor" class="testin" spellcheck="false" rows="4">SELECT customer_id, name FROM customers c
+WHERE -- your NOT EXISTS (or LEFT JOIN ... IS NULL) here
+ORDER BY customer_id</textarea>
+      <div class="dagctrl">
+        <button id="btnRunOnly5">Run query</button>
+        <button class="primary" id="btnCheck5">✓ Check answer</button>
+      </div>
+      <div id="ex5Results"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">6.6</span><h2 class="serif">Required exercise: combine everything</h2></div>
+    <p><b>Business question, the kind a manager actually asks:</b> "Which country's customers are worth the most to us, per customer?" Not raw country revenue &mdash; a big country wins that by default. Revenue <i>per customer</i>, so a small but valuable market doesn't get overlooked.</p>
+    <div class="def"><div class="k">This needs, together</div><p>A join across all three of <code>customers</code>, <code>orders</code>, and <code>order_items</code> &middot; a filter to <code>completed</code> orders only &middot; <code>GROUP BY</code> country &middot; <code>COUNT(DISTINCT customer_id)</code> so the fan-out trap from 6.4 doesn't inflate your customer count &middot; and dividing total revenue by that customer count.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Required exercise · this module's graded checkpoint work</span>
+      <p class="mut" style="margin-bottom:10px">Return <code>country</code>, <code>total_revenue</code>, <code>n_customers</code>, and <code>revenue_per_customer</code> (all rounded to 2 decimals where relevant), for completed orders only, highest <code>revenue_per_customer</code> first.</p>
+      <textarea id="ex6Editor" class="testin" spellcheck="false" rows="9">SELECT c.country,
+  ROUND(SUM(oi.quantity*oi.unit_price),2) AS total_revenue,
+  COUNT(DISTINCT c.customer_id) AS n_customers,
+  ROUND(SUM(oi.quantity*oi.unit_price) / COUNT(DISTINCT c.customer_id),2) AS revenue_per_customer
+FROM customers c
+-- your JOINs, WHERE, GROUP BY, and ORDER BY here</textarea>
+      <div class="dagctrl">
+        <button id="btnRunOnly6">Run query</button>
+        <button class="primary" id="btnCheck6">✓ Check answer</button>
+      </div>
+      <div id="ex6Results"></div>
+    </div>
+    <div class="why" style="margin-top:16px"><b>The real finding:</b> once you get this right, look at the result. The United Kingdom has the most customers and the most total revenue &mdash; and is NOT the top country per customer. That gap is a real, defensible insight, exactly the kind Module 8's dashboard work will ask you to explain to a stakeholder.</div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">✓</span><h2 class="serif">Checkpoint</h2></div>
+    <p class="mut">Five questions, only about what this module actually taught. Score 80% or higher (4 of 5) to unlock Module 7.</p>
+
+    <div class="qcard"><div class="qtext">1. A column has 11 NULL values out of 93 rows. What does <code>COUNT(channel)</code> return, versus <code>COUNT(*)</code>?</div><div id="q1opts"></div><div class="qexplain" id="q1explain"></div></div>
+    <div class="qcard"><div class="qtext">2. After joining <code>orders</code> to <code>order_items</code> (several items per order), what happens to <code>COUNT(*)</code> if you're trying to count orders?</div><div id="q2opts"></div><div class="qexplain" id="q2explain"></div></div>
+    <div class="qcard"><div class="qtext">3. Why does <code>WHERE channel != 'web'</code> silently exclude every row where channel is NULL?</div><div id="q3opts"></div><div class="qexplain" id="q3explain"></div></div>
+    <div class="qcard"><div class="qtext">4. What's the right approach to find customers who have never placed an order?</div><div id="q4opts"></div><div class="qexplain" id="q4explain"></div></div>
+    <div class="qcard"><div class="qtext">5. A country has the highest TOTAL revenue but the lowest revenue PER customer. What does that actually tell you?</div><div id="q5opts"></div><div class="qexplain" id="q5explain"></div></div>
+  </section>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Module 6 of 9 · Next: Data Visualization &amp; Storytelling</footer>
 </div>
-<script src="course-progress.js?v=1"></script>
+
+<div class="scoreboard"><div class="in">
+  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
+  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
+  <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete all 6 exercises and the checkpoint to continue →</button>
+</div></div>
+
+<script src="course-progress.js?v=2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+<script>
+const MODULE_ID = 6;
+CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Lazy-loaded shared SQLite database ---------------- */
+let dbPromise = null;
+function getDb() {
+  if (!dbPromise) {
+    dbPromise = (async () => {
+      const SQL = await initSqlJs({ locateFile: f => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/" + f });
+      const sqlText = await (await fetch("datasets/shop.sql")).text();
+      const db = new SQL.Database();
+      db.run(sqlText);
+      return db;
+    })();
+  }
+  return dbPromise;
+}
+
+function execToRows(db, query) {
+  const res = db.exec(query);
+  if (!res.length) return { columns: [], rows: [] };
+  return { columns: res[0].columns, rows: res[0].values };
+}
+
+function renderResultTable(container, columns, rows, limit) {
+  if (!columns.length) { container.innerHTML = `<div class="feedback bad">Query ran but returned no rows.</div>`; return; }
+  const shown = limit ? rows.slice(0, limit) : rows;
+  let html = `<div class="resulttable"><table class="qres"><thead><tr>${columns.map(c=>`<th>${CourseProgress.escapeHtml(c)}</th>`).join("")}</tr></thead><tbody>`;
+  shown.forEach(r => { html += `<tr>${r.map(v=>`<td>${v===null?'<i style="color:var(--mut2)">NULL</i>':CourseProgress.escapeHtml(String(v))}</td>`).join("")}</tr>`; });
+  html += `</tbody></table></div>`;
+  if (limit && rows.length > limit) html += `<div style="margin-top:6px;font-size:11.5px;color:var(--mut2)">Showing first ${limit} of ${rows.length} rows.</div>`;
+  container.innerHTML = html;
+}
+
+async function runOnly(editorId, resultsId) {
+  const resultsEl = document.getElementById(resultsId);
+  resultsEl.innerHTML = `<div class="feedback wait">Running&hellip;</div>`;
+  try {
+    const db = await getDb();
+    const { columns, rows } = execToRows(db, document.getElementById(editorId).value);
+    resultsEl.innerHTML = "";
+    renderResultTable(resultsEl, columns, rows, 20);
+  } catch (e) {
+    resultsEl.innerHTML = `<div class="feedback bad">SQL error: ${CourseProgress.escapeHtml(e.message)}</div>`;
+  }
+}
+
+/* rows compared as a multiset of stringified rows unless orderMatters is true */
+function rowsEqual(a, b, orderMatters) {
+  if (a.length !== b.length) return false;
+  const norm = r => JSON.stringify(r.map(v => v === null ? null : (typeof v === "number" ? Math.round(v*100)/100 : v)));
+  if (orderMatters) {
+    return a.every((r,i) => norm(r) === norm(b[i]));
+  }
+  const as = a.map(norm).sort(), bs = b.map(norm).sort();
+  return as.every((v,i) => v === bs[i]);
+}
+
+const exerciseState = {};
+async function checkExercise(id, editorId, resultsId, referenceSql, sectionKey, orderMatters) {
+  const resultsEl = document.getElementById(resultsId);
+  resultsEl.innerHTML = `<div class="feedback wait">Running your query and the reference query against the live database&hellip;</div>`;
+  let db;
+  try { db = await getDb(); } catch (e) {
+    resultsEl.innerHTML = `<div class="feedback bad">Could not load the database: ${CourseProgress.escapeHtml(e.message)}</div>`; return;
+  }
+  const studentSql = document.getElementById(editorId).value;
+  let studentResult;
+  try {
+    studentResult = execToRows(db, studentSql);
+  } catch (e) {
+    resultsEl.innerHTML = `<div class="feedback bad">Your query has an error: ${CourseProgress.escapeHtml(e.message)}</div>`;
+    exerciseState[id] = { passCount: 0, total: 1 };
+    CourseProgress.setExtra("module6_" + id, exerciseState[id]);
+    if (sectionKey) CourseProgress.setSection(MODULE_ID, sectionKey, exerciseState[id]);
+    updateNextButton();
+    return;
+  }
+  const refResult = execToRows(db, referenceSql);
+  const pass = rowsEqual(studentResult.rows, refResult.rows, !!orderMatters);
+  resultsEl.innerHTML = "";
+  renderResultTable(resultsEl, studentResult.columns, studentResult.rows, 20);
+  const verdict = document.createElement("div");
+  verdict.className = "feedback " + (pass ? "ok" : "bad");
+  verdict.innerHTML = pass
+    ? "<b>Correct.</b> Your query's results match the expected answer, checked by running the reference query against the same live database, not by comparing to a fixed number."
+    : `<b>Not quite.</b> Your query ran, but the results don't match. Row count: yours ${studentResult.rows.length}, expected ${refResult.rows.length}. Re-check the pattern described above.`;
+  resultsEl.appendChild(verdict);
+  exerciseState[id] = { passCount: pass ? 1 : 0, total: 1 };
+  CourseProgress.setExtra("module6_" + id, exerciseState[id]);
+  if (sectionKey) CourseProgress.setSection(MODULE_ID, sectionKey, exerciseState[id]);
+  updateNextButton();
+}
+
+document.getElementById("btnRunExplore").addEventListener("click", () => runOnly("exploreEditor", "exploreResults"));
+
+document.getElementById("btnRunOnly1").addEventListener("click", () => runOnly("ex1Editor", "ex1Results"));
+document.getElementById("btnCheck1").addEventListener("click", () => checkExercise("ex1", "ex1Editor", "ex1Results",
+  "SELECT name, signup_date FROM customers ORDER BY signup_date DESC LIMIT 5", null, true));
+
+document.getElementById("btnRunOnly2").addEventListener("click", () => runOnly("ex2Editor", "ex2Results"));
+document.getElementById("btnCheck2").addEventListener("click", () => checkExercise("ex2", "ex2Editor", "ex2Results",
+  "SELECT p.category, SUM(oi.quantity) AS units FROM order_items oi JOIN products p ON p.sku=oi.sku GROUP BY p.category ORDER BY units DESC", null, true));
+
+document.getElementById("btnRunOnly3").addEventListener("click", () => runOnly("ex3Editor", "ex3Results"));
+document.getElementById("btnCheck3").addEventListener("click", () => checkExercise("ex3", "ex3Editor", "ex3Results",
+  "SELECT channel, COUNT(*) AS n FROM orders GROUP BY channel ORDER BY n DESC", null, true));
+
+document.getElementById("btnRunOnly4").addEventListener("click", () => runOnly("ex4Editor", "ex4Results"));
+document.getElementById("btnCheck4").addEventListener("click", () => checkExercise("ex4", "ex4Editor", "ex4Results",
+  "SELECT p.category, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue FROM order_items oi JOIN orders o ON o.order_id=oi.order_id JOIN products p ON p.sku=oi.sku WHERE o.status='completed' GROUP BY p.category ORDER BY revenue DESC", null, true));
+
+document.getElementById("btnRunOnly5").addEventListener("click", () => runOnly("ex5Editor", "ex5Results"));
+document.getElementById("btnCheck5").addEventListener("click", () => checkExercise("ex5", "ex5Editor", "ex5Results",
+  "SELECT customer_id, name FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.customer_id) ORDER BY customer_id", null, true));
+
+document.getElementById("btnRunOnly6").addEventListener("click", () => runOnly("ex6Editor", "ex6Results"));
+document.getElementById("btnCheck6").addEventListener("click", () => checkExercise("ex6", "ex6Editor", "ex6Results",
+  `SELECT c.country, ROUND(SUM(oi.quantity*oi.unit_price),2) AS total_revenue, COUNT(DISTINCT c.customer_id) AS n_customers,
+   ROUND(SUM(oi.quantity*oi.unit_price)/COUNT(DISTINCT c.customer_id),2) AS revenue_per_customer
+   FROM customers c JOIN orders o ON o.customer_id=c.customer_id AND o.status='completed' JOIN order_items oi ON oi.order_id=o.order_id
+   GROUP BY c.country ORDER BY revenue_per_customer DESC`, "sqlQueryExercise", true));
+
+/* ---------------- Checkpoint quiz ---------------- */
+let score = 0;
+const answered = { q1:false,q2:false,q3:false,q4:false,q5:false };
+function allExercisesPassing(){
+  const ids = ["ex1","ex2","ex3","ex4","ex5","ex6"];
+  return ids.every(id => exerciseState[id] && exerciseState[id].passCount === exerciseState[id].total);
+}
+function updateNextButton(){
+  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
+  const btn = document.getElementById("btnNext");
+  const ready = allDone && allExercisesPassing();
+  btn.disabled = !ready;
+  btn.textContent = ready ? "Continue to Module 7 →" : "Complete all 6 exercises and the checkpoint to continue →";
+  if (allDone) CourseProgress.markComplete(MODULE_ID, score, 5);
+  maybeShowRetry();
+}
+function buildQ(id, opts, containerId){
+  const el = document.getElementById(containerId);
+  opts.forEach((opt,i) => {
+    const div = document.createElement("label");
+    div.className = "qopt";
+    div.textContent = opt.text;
+    div.addEventListener("click", () => {
+      if (answered[id]) return;
+      answered[id] = true;
+      CourseProgress.setAnswer(MODULE_ID, id, i);
+      el.querySelectorAll(".qopt").forEach((e,j) => {
+        if (opts[j].correct) e.classList.add("correct");
+        else if (j === i) e.classList.add("incorrect");
+      });
+      const ex = document.getElementById(id + "explain");
+      ex.style.display = "block";
+      if (opt.correct) { score++; ex.textContent = opt.correctText; }
+      else { ex.textContent = "Not quite. " + opt.reason; }
+      document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
+      updateNextButton();
+    });
+    el.appendChild(div);
+  });
+}
+buildQ("q1", [
+  { text: "COUNT(channel) returns 82 (excludes the 11 NULLs), COUNT(*) returns 93 (counts every row)", correct: true, correctText: "Correct. COUNT(col) only counts non-NULL values in that column; COUNT(*) counts rows regardless of NULLs." },
+  { text: "Both return 93, NULL has no effect on COUNT", correct: false, reason: "NULL absolutely affects COUNT(column) — it's specifically excluded, that's the whole trap." },
+  { text: "COUNT(channel) errors out on NULL values", correct: false, reason: "COUNT(column) doesn't error on NULLs, it just quietly skips them, which is exactly what makes this bug easy to miss." },
+], "q1opts");
+buildQ("q2", [
+  { text: "COUNT(*) inflates, since each order can now appear once per line item instead of once total", correct: true, correctText: "Correct. This exact database has 77 completed orders but 155 rows after joining to order_items — nearly double." },
+  { text: "COUNT(*) stays accurate, joins never change row counts", correct: false, reason: "Joins change row counts constantly, especially a one-to-many join like orders to order_items, that's the entire trap this section is about." },
+  { text: "COUNT(*) undercounts instead of overcounting", correct: false, reason: "A one-to-many join multiplies rows, it doesn't lose them — the count goes up, not down." },
+], "q2opts");
+buildQ("q3", [
+  { text: "SQL's NULL comparisons return 'unknown,' not true or false, so a NULL row never satisfies != and gets silently filtered out along with everything else that fails the WHERE", correct: true, correctText: "Correct. NULL represents 'no value recorded,' and no comparison operator (=, !=, <, >) ever evaluates to true against it — only IS NULL / IS NOT NULL do." },
+  { text: "!= treats NULL the same as any other value, like the empty string", correct: false, reason: "NULL isn't a value at all in SQL's model, it's the absence of one — that's exactly why normal comparison operators can't test for it." },
+  { text: "This is a bug in this specific database, not a general SQL behavior", correct: false, reason: "This is standard SQL behavior everywhere (three-valued logic), not specific to this course's database." },
+], "q3opts");
+buildQ("q4", [
+  { text: "Check for the ABSENCE of a matching row in orders for each customer (NOT EXISTS, or LEFT JOIN with IS NULL), since there's no 'never ordered' flag to filter on directly", correct: true, correctText: "Correct. You're looking for customers with zero matches in another table, which needs a subquery or outer join, not a simple WHERE on a column." },
+  { text: "Filter customers WHERE orders = 0", correct: false, reason: "There's no 'orders' column on the customers table to filter on — order history lives in a separate table entirely." },
+  { text: "It can't be done in SQL, this needs to be done in Python", correct: false, reason: "This is a completely standard SQL pattern (NOT EXISTS / anti-join), no external tool needed." },
+], "q4opts");
+buildQ("q5", [
+  { text: "That country likely has many customers making small purchases, its scale comes from customer count, not from how valuable each individual customer is", correct: true, correctText: "Correct. Total revenue can be high purely from volume of customers; revenue per customer is what tells you how valuable each one actually is, a very different, often more useful, business signal." },
+  { text: "The data must be wrong, the top-revenue country should always be the top per-customer country too", correct: false, reason: "There's no reason these have to agree, they're measuring different things, this pattern happens constantly in real business data." },
+  { text: "It means that country's customers churned faster than others", correct: false, reason: "Nothing in this metric measures churn or retention, it purely compares total revenue against average revenue per customer." },
+], "q5opts");
+
+function maybeShowRetry(){
+  const anyAnswered = answered.q1||answered.q2||answered.q3||answered.q4||answered.q5;
+  const allDone = answered.q1&&answered.q2&&answered.q3&&answered.q4&&answered.q5;
+  const btn = document.getElementById("btnRetryCheckpoint");
+  btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
+}
+document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModule(MODULE_ID);
+  window.location.reload();
+});
+document.getElementById("btnNext").addEventListener("click", () => { window.location.href = "module-07.html"; });
+
+(function restore(){
+  const stored = CourseProgress.getModule(MODULE_ID);
+  const a = stored.answers || {};
+  ["q1","q2","q3","q4","q5"].forEach(id => {
+    if (a[id] !== undefined && !answered[id]) {
+      const label = document.querySelectorAll(`#${id}opts .qopt`)[a[id]];
+      if (label) label.click();
+    }
+  });
+  ["ex1","ex2","ex3","ex4","ex5","ex6"].forEach((id) => {
+    const saved = CourseProgress.getExtra("module6_" + id);
+    if (saved && saved.total > 0) {
+      exerciseState[id] = saved;
+      const resultsEl = document.getElementById(id + "Results");
+      const passed = saved.passCount === saved.total;
+      resultsEl.innerHTML = `<div class="feedback ${passed ? "ok" : "bad"}">Restored from your last visit: ${passed ? "passing" : "not yet passing"}. Edit and re-check any time.</div>`;
+    }
+  });
+  updateNextButton();
+})();
+</script>
 <script src="course-rail.js"></script>
 </body>
 </html>

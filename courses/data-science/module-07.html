@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 7: SQL for Analysts</title>
+<title>Module 7: Data Visualization & Storytelling</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -51,15 +51,15 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Module 7 of 9</span>
-    <h1 class="serif">SQL for Analysts</h1>
-    <p class="sub">SELECT, WHERE, GROUP BY, JOIN, and window functions against a small in-browser sandboxed database. The real skill being taught is translating a business question into a query, not SQL trivia.</p>
+    <h1 class="serif">Data Visualization &amp; Storytelling</h1>
+    <p class="sub">Not "here's a bar chart, here's a line chart." Every exercise starts from a real dataset and a question, and asks you to choose and defend the visualization, including a deliberately misleading chart you have to diagnose.</p>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
-        <li>Write a JOIN and a GROUP BY that answer a real business question</li>
-        <li>Use window functions for running totals and rankings</li>
-        <li>Translate "which customers haven't ordered in 90 days" into working SQL</li>
-        <li>Read and fix a broken query on your own</li>
+        <li>Choose the right chart for a given question, and explain why, not just recognize chart types</li>
+        <li>Build real charts from real data with matplotlib and seaborn</li>
+        <li>Spot and explain what makes a chart misleading, not just "off"</li>
+        <li>Distinguish a real pattern from something that only looks like one</li>
       </ul>
     </div>
   </header>
@@ -67,14 +67,14 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
     <div class="soon">
       <span class="badge">In production</span>
       <h2 class="serif">This module's full interactive lesson is being built</h2>
-      <p>An in-browser SQL sandbox (no install), three exercises: two query drills and a translate-the-business-question challenge.</p>
+      <p>Built on the same real-execution pattern as Modules 2&ndash;6: real charts rendered from the real App Analytics dataset, not descriptions of what a good chart looks like.</p>
       <div class="covers">
         <div class="lbl">What this module will cover</div>
         <ul>
-          <li>SELECT, WHERE, and GROUP BY against a real small relational dataset</li>
-          <li>JOIN across multiple tables</li>
-          <li>Window functions: running totals, rankings, period-over-period comparisons</li>
-          <li>Translating an ambiguous business question into a precise query</li>
+          <li>Chart-type selection driven by the question being asked, not the data type alone</li>
+          <li>matplotlib and seaborn, building real charts from the real App Analytics events file</li>
+          <li>A deliberately misleading chart (truncated axis, dual-axis trick) you have to diagnose, not just read about</li>
+          <li>Correlation vs. causation, applied to a chart you're looking at, not just defined in the abstract</li>
         </ul>
       </div>
       <a href="dashboard.html" class="cta">Back to dashboard &rarr;</a>
@@ -82,7 +82,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   </section>
   <footer>Zenith Lab · Data Science &amp; Analysis · Module 7 of 9</footer>
 </div>
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="course-rail.js"></script>
 </body>
 </html>

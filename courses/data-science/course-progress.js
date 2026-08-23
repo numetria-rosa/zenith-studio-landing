@@ -29,8 +29,8 @@
     { id: 3, file: "module-03.html", title: "Pandas & NumPy Fundamentals", minutes: 50 },
     { id: 4, file: "module-04.html", title: "Data Cleaning & Validation", minutes: 55 },
     { id: 5, file: "module-05.html", title: "Exploratory Data Analysis & Statistics", minutes: 50 },
-    { id: 6, file: "module-06.html", title: "Data Visualization & Storytelling", minutes: 45 },
-    { id: 7, file: "module-07.html", title: "SQL for Analysts", minutes: 45 },
+    { id: 6, file: "module-06.html", title: "SQL for Analysts", minutes: 45 },
+    { id: 7, file: "module-07.html", title: "Data Visualization & Storytelling", minutes: 45 },
     { id: 8, file: "module-08.html", title: "Dashboards & Business Communication", minutes: 50 },
     { id: 9, file: "module-09.html", title: "Capstone Analysis Project", minutes: 120 },
   ];
@@ -67,8 +67,8 @@
     3: ["mergeJoinExercise"],
     4: ["cleaningPipelineExercise"],
     5: ["hypothesisTestExercise"],
-    6: ["chartBuildExercise"],
-    7: ["sqlQueryExercise"],
+    6: ["sqlQueryExercise"],
+    7: ["chartBuildExercise"],
     8: ["dashboardBuildExercise"],
     9: [], // capstone's own rubric score gates it, same pattern as the other two courses
   };

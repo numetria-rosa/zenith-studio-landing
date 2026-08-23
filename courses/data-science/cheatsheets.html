@@ -91,7 +91,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <footer>Zenith Lab · Data Science &amp; Analysis · Cheat Sheets</footer>
 </div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script>
 const SHEETS = [
   { id: 1, title: "Excel Formulas & Shortcuts", tag: "Module 1",
@@ -133,13 +133,13 @@ const SHEETS = [
       { label: "Signal vs. noise", items: ["A small sample can easily produce a difference that looks real but isn't.", "A hypothesis test (t-test, chi-square) gives a principled answer to 'is this difference likely real.'"] },
       { label: "Common mistakes", items: ["Reporting a mean without checking whether outliers are distorting it.", "Concluding causation from correlation alone.", "Trusting a small-sample comparison without checking if the gap could just be noise."] },
     ] },
-  { id: 6, title: "Chart-Type Decision Tree", tag: "Module 6",
+  { id: 7, title: "Chart-Type Decision Tree", tag: "Module 7",
     sections: [
       { label: "Pick by question", items: ["Trend over time → <b>line chart</b>.", "Compare categories → <b>bar chart</b>.", "Distribution / shape of one variable → <b>histogram</b>.", "Relationship between two numeric variables → <b>scatter plot</b>.", "Part-to-whole, 2-3 categories only → pie chart, otherwise avoid it."] },
       { label: "Red flags in a chart", items: ["A y-axis that doesn't start at zero for a bar chart (exaggerates differences).", "Dual axes with independently-scaled lines implying a false relationship.", "Too many categories crammed into one pie chart."] },
       { label: "Building the 'so what' visual", checklist: ["One chart, one clear point.", "Title states the finding, not just the metric name.", "Remove gridlines/decoration that don't help the reader.", "Highlight the one data point that matters most."] },
     ] },
-  { id: 7, title: "SQL Query Patterns", tag: "Module 7",
+  { id: 6, title: "SQL Query Patterns", tag: "Module 6",
     sections: [
       { label: "The basic shape", formula: "SELECT col1, SUM(col2)\nFROM table\nWHERE condition\nGROUP BY col1\nHAVING SUM(col2) > 1000\nORDER BY 2 DESC" },
       { label: "JOIN types", items: ["<b>INNER JOIN</b> — only rows matching in both tables.", "<b>LEFT JOIN</b> — all rows from the left table, matched data where it exists.", "Choose LEFT JOIN when you want to keep unmatched rows (e.g. customers with zero orders)."] },
