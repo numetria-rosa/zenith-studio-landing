@@ -632,6 +632,13 @@ const EX4 = () => harnessFor("validate_cleaning", [
   "            else:",
   "                results.append({'name': 'All four counts are correct', 'pass': False, 'hint': 'Fix the keys first.'})",
   "    except Exception as e: results.append({'name': 'validate_cleaning runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        out2 = fn(orders.head(100).copy())",
+  "        exp2 = {'rows_before': 100, 'rows_after': 98, 'duplicates_removed': 0, 'negative_qty_removed': 2}",
+  "        got2 = out2 if isinstance(out2, dict) else {}",
+  "        ok2 = set(got2) == set(exp2) and all(int(got2.get(k, -1)) == v for k, v in exp2.items())",
+  "        results.append({'name': 'Recomputes on a 100-row slice (not hardcoded to the full-file counts)', 'pass': ok2, 'hint': f'On just the first 100 rows, expected {exp2}, got {got2}.'})",
+  "    except Exception as e: results.append({'name': 'Recomputes on a 100-row slice (not hardcoded to the full-file counts)', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 
 const EX5 = () => harnessFor("usd_spend_by_category", [
@@ -651,6 +658,13 @@ const EX5 = () => harnessFor("usd_spend_by_category", [
   "            else:",
   "                results.append({'name': 'USD-only totals are correct (euro rows excluded)', 'pass': False, 'hint': 'Fix the category names first.'})",
   "    except Exception as e: results.append({'name': 'usd_spend_by_category runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        out2 = fn(expenses.head(60).copy())",
+  "        exp2 = {'Meals': 1107.14, 'Office Supplies': 1277.2, 'Software': 482.86, 'Travel': 2018.51}",
+  "        got2 = {str(k): float(v) for k, v in out2.items()} if isinstance(out2, dict) else {}",
+  "        ok2 = set(got2) == set(exp2) and all(abs(got2[k]-v) < 0.1 for k, v in exp2.items())",
+  "        results.append({'name': 'Recomputes on a 60-row slice (not hardcoded to the full-file totals)', 'pass': ok2, 'hint': f'On just the first 60 rows, expected {exp2}, got {got2}.'})",
+  "    except Exception as e: results.append({'name': 'Recomputes on a 60-row slice (not hardcoded to the full-file totals)', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 
 const STARTERS = {

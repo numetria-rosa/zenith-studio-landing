@@ -652,6 +652,12 @@ const EX2 = () => harnessSingle("recompute_revenue", [
   "        results.append({'name': 'Actually adds a line_total column to the DataFrame', 'pass': 'line_total' in d.columns, 'hint': 'The function should assign df[\"line_total\"] = ... so the column exists on the DataFrame afterwards.'})",
   "    except Exception as e:",
   "        results.append({'name': 'Actually adds a line_total column to the DataFrame', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        out3 = fn(retail.head(10).copy())",
+  "        p3 = abs(float(out3) - 279090.5) < 1.0",
+  "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to 1486653.53)', 'pass': p3, 'hint': f'On just the first 10 rows the answer must be about 279090.5, got {out3!r}. Did you hardcode the full-file total?'})",
+  "    except Exception as e:",
+  "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to 1486653.53)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
 ]);
 
 const EX3 = () => harnessSingle("top_region_by_revenue", [
@@ -698,6 +704,14 @@ const EX5 = () => harnessSingle("orders_in_month", [
   "        results.append({'name': 'A month with no orders returns 0, not an error', 'pass': out3 == 0, 'hint': f'Expected 0 for January 1999, got {out3!r}.'})",
   "    except Exception as e:",
   "        results.append({'name': 'A month with no orders returns 0, not an error', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        sub = retail.copy()",
+  "        sub['order_date'] = pd.to_datetime(sub['order_date'])",
+  "        sub = sub[sub['order_date'].dt.month != 1]",
+  "        out4 = fn(sub, 2026, 1)",
+  "        results.append({'name': 'Recomputes on a filtered copy (not hardcoded to 15 for January)', 'pass': out4 == 0, 'hint': f'With every January row removed first, January 2026 must return 0, got {out4!r}. Did you hardcode 15?'})",
+  "    except Exception as e:",
+  "        results.append({'name': 'Recomputes on a filtered copy (not hardcoded to 15 for January)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
 ]);
 
 const EX6 = () => harnessSingle("overtime_by_department", [
@@ -719,6 +733,14 @@ const EX6 = () => harnessSingle("overtime_by_department", [
   "                results.append({'name': 'Overtime totals are correct per department', 'pass': False, 'hint': 'Fix the department names first, then the totals can be checked.'})",
   "    except Exception as e:",
   "        results.append({'name': 'overtime_by_department runs', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        out5 = fn(hc.copy(), ot.head(50).copy())",
+  "        exp5 = {'Engineering': 200.5, 'Operations': 75.7, 'Sales': 65.1, 'Support': 68.2}",
+  "        got5 = {str(k).strip(): float(v) for k, v in out5.items()} if isinstance(out5, dict) else {}",
+  "        ok5 = set(got5) == set(exp5) and all(abs(got5[k]-v) < 0.2 for k, v in exp5.items())",
+  "        results.append({'name': 'Recomputes on a smaller overtime table (not hardcoded to the full-file totals)', 'pass': ok5, 'hint': f'With only the first 50 overtime rows, expected {exp5}, got {got5}. If your totals never move, the department math is hardcoded rather than computed from ot.'})",
+  "    except Exception as e:",
+  "        results.append({'name': 'Recomputes on a smaller overtime table (not hardcoded to the full-file totals)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
 ]);
 
 const STARTERS = {

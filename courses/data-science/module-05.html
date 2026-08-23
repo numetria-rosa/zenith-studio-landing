@@ -471,6 +471,13 @@ const EX1 = () => harnessFor("valid_satisfaction_stats", [
   "                ok = abs(float(out['mean'])-3.0)<0.02 and abs(float(out['median'])-3.0)<0.02 and abs(float(out['std'])-1.42)<0.02",
   "                results.append({'name': 'mean, median and std are correct', 'pass': ok, 'hint': f\"Expected mean 3.0, median 3.0, std 1.42, got mean {out['mean']}, median {out['median']}, std {out['std']}.\"})",
   "    except Exception as e: results.append({'name': 'valid_satisfaction_stats runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        out2 = fn(survey.head(80).copy())",
+  "        exp2 = {'count': 75, 'mean': 3.11, 'median': 3.0, 'std': 1.28}",
+  "        got2 = out2 if isinstance(out2, dict) else {}",
+  "        ok2 = got2.get('count') == exp2['count'] and all(abs(float(got2.get(k, 999))-v) < 0.03 for k, v in exp2.items() if k != 'count')",
+  "        results.append({'name': 'Recomputes on the first 80 rows (not hardcoded to the full-file stats)', 'pass': ok2, 'hint': f'On just the first 80 rows, expected {exp2}, got {got2}.'})",
+  "    except Exception as e: results.append({'name': 'Recomputes on the first 80 rows (not hardcoded to the full-file stats)', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 
 const EX2 = () => harnessFor("tenure_satisfaction_corr", [
@@ -479,6 +486,11 @@ const EX2 = () => harnessFor("tenure_satisfaction_corr", [
   "        p = abs(float(out) - (-0.041)) < 0.01",
   "        results.append({'name': 'Correlation is about -0.041', 'pass': p, 'hint': f'Expected about -0.041, got {out!r}. Filter to valid 1-5 scores first, then .corr().'})",
   "    except Exception as e: results.append({'name': 'tenure_satisfaction_corr runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        out2 = fn(survey.head(80).copy())",
+  "        p2 = abs(float(out2) - (-0.0532)) < 0.01",
+  "        results.append({'name': 'Recomputes on the first 80 rows (not hardcoded to -0.041)', 'pass': p2, 'hint': f'On just the first 80 rows the correlation should be about -0.0532, got {out2!r}.'})",
+  "    except Exception as e: results.append({'name': 'Recomputes on the first 80 rows (not hardcoded to -0.041)', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 
 const EX3 = () => harnessFor("channel_analysis", [
@@ -499,6 +511,13 @@ const EX3 = () => harnessFor("channel_analysis", [
   "            else:",
   "                results.append({'name': 'Conversion rates are correct', 'pass': False, 'hint': 'Fix the channel keys first.'})",
   "    except Exception as e: results.append({'name': 'channel_analysis runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        out2 = fn(mkt.head(20).copy())",
+  "        exp2 = {'Email': (5.23, 31.88), 'Search': (4.79, 28.37), 'Social': (2.37, 51.93)}",
+  "        got2 = out2 if isinstance(out2, dict) else {}",
+  "        ok2 = set(got2) == set(exp2) and all(abs(float(got2[k].get('cvr',0))-v[0])<0.05 and abs(float(got2[k].get('cpa',0))-v[1])<0.05 for k,v in exp2.items())",
+  "        results.append({'name': 'Recomputes on the first 20 rows (not hardcoded to the full-file numbers)', 'pass': ok2, 'hint': f'On just the first 20 rows (Referral does not even appear), expected {exp2}, got {got2}.'})",
+  "    except Exception as e: results.append({'name': 'Recomputes on the first 20 rows (not hardcoded to the full-file numbers)', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 
 const STARTERS = {
