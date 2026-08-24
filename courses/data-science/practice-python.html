@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Practice Library, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;--blue:#5b8cff;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 90px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--blue)}
+.bar .in{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px;flex-wrap:wrap}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--blue)}
+.hero{padding:40px 0 24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:720px;margin-top:10px}
+.scopenote{background:rgba(91,140,255,.08);border:1px solid rgba(91,140,255,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
+.scopenote b{color:var(--blue)}
+.skillbar{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:20px 22px;margin-top:22px}
+.skillrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tierpill{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 12px;border-radius:99px;font-weight:700}
+.tierpill.t-not-started{background:var(--bg2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.12);color:var(--amber)}
+.tierpill.t-competent{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t-mastered{background:rgba(91,140,255,.18);color:var(--blue)}
+.skillbarwrap{flex:1;min-width:180px;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--bd)}
+.skillbarwrap .fill{height:100%;background:var(--blue)}
+.tierladder{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.tierladder span{font-family:'IBM Plex Mono';font-size:10.5px;padding:3px 10px;border-radius:99px;background:var(--bg2);color:var(--mut2);border:1px solid var(--bd2)}
+.tierladder span.reached{background:rgba(91,140,255,.12);color:var(--blue);border-color:rgba(91,140,255,.4)}
+.nextup{margin-top:14px;padding:12px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px}
+.nextup b{color:var(--blue)}
+.tasklist{display:grid;gap:10px;margin-top:22px}
+.taskcard{background:var(--card);border:1px solid var(--bd2);border-radius:12px;overflow:hidden}
+.taskhead{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer}
+.taskhead:hover{background:var(--card2)}
+.taskhead .tid{font-family:'IBM Plex Mono';font-size:11px;color:var(--mut2);width:32px;flex-shrink:0}
+.taskhead .ttitle{font-weight:600;font-size:14.5px;flex:1}
+.levelpill{font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;padding:2px 9px;border-radius:99px;flex-shrink:0}
+.levelpill.guided{background:rgba(74,222,149,.12);color:var(--good)}
+.levelpill.semiguided{background:rgba(240,180,41,.12);color:var(--amber)}
+.levelpill.challenge{background:rgba(255,133,133,.12);color:var(--bad)}
+.statusdot{width:9px;height:9px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+.statusdot.passed{background:var(--good);box-shadow:0 0 6px var(--good)}
+.taskbody{display:none;padding:0 18px 18px}
+.taskbody.open{display:block}
+.objective{font-size:13.5px;color:var(--mut);margin-bottom:12px}
+.objective b{color:var(--tx)}
+textarea{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6;tab-size:4}
+.writtenlbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);font-family:'IBM Plex Mono';margin:12px 0 6px}
+.writtenbox{font-family:'IBM Plex Sans';line-height:1.6}
+textarea:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--blue);color:var(--blue)}
+button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button.primary{background:var(--blue);color:#050a1a;border-color:var(--blue)}
+button.primary:hover{filter:brightness(1.1);color:#050a1a}
+button:disabled{opacity:.5;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px}
+.feedback.ok{background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.feedback.wait{background:var(--bg2);border:1px solid var(--bd2);color:var(--mut)}
+.testsummary{margin-top:8px;font-family:'IBM Plex Mono';font-size:12.5px;font-weight:600}
+.hints{margin-top:12px;display:grid;gap:6px}
+.hints details{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px}
+.hints summary{cursor:pointer;color:var(--blue);font-size:12px;font-weight:600;list-style:none}
+.hints summary::-webkit-details-marker{display:none}
+.hints .hbody{margin-top:7px;font-size:12.5px;color:var(--mut);padding-top:7px;border-top:1px solid var(--bd)}
+.explainbox{margin-top:12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.explainbox .erow .elbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);font-family:'IBM Plex Mono';margin-bottom:3px}
+.explainbox .erow p{font-size:12.5px;color:var(--mut)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 70px} .taskhead{flex-wrap:wrap} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-02.html">Module 2: Python Foundations</a><a href="career.html">Career Path</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Practice Library &middot; Python &middot; Stage 1 of &hellip;</span>
+    <h1 class="serif">Python Practice Library</h1>
+    <p class="sub">Extra repetition beyond Module 2's core lesson, real CPython running in a Web Worker (Pyodide), the same sandbox Module 2 itself uses. Every task pairs a few fixed test cases with one freshly randomized input compared against a hidden reference implementation, so a hardcoded return value can't pass.</p>
+    <div class="scopenote"><b>Honest scope note:</b> this is Stage 1 only (functions over lists and dicts: sums, counts, filters, dict accumulation, basic string parsing), 10 tasks, real, fully built, graded, and tested. Further stages are planned but not yet built, that's future work, not a claim made here.</div>
+  </header>
+
+  <div id="skillBars"></div>
+
+  <div class="tasklist" id="taskList"></div>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Practice Library</footer>
+</div>
+
+<script src="course-progress.js?v=5"></script>
+<script src="practice-progress.js"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+
+/* ================= harness generator =================
+   Every task supplies: functionName, testCases (fixed inputs/expected,
+   as plain JS values), referenceCode (Python source defining _ref, as
+   an array of already-indented lines), randomGenCode (Python source
+   that builds a `rargs` tuple, indented lines). This function stitches
+   those into one harness.run()-compatible Python source string, the
+   same fixed-cases-plus-one-randomized-case pattern Module 2's own
+   exercises already use, just generated instead of hand-written per
+   task. Args/expected values cross the JS->Python boundary via
+   json.loads(<JSON string>), not hand-built Python literals, so any
+   JSON-representable value (numbers, strings, lists, dicts, booleans,
+   null) transfers correctly without a separate literal-syntax path. */
+function pyLit(value) {
+  return `json.loads(${JSON.stringify(JSON.stringify(value))})`;
+}
+function buildHarness(task) {
+  const checkLines = task.testCases.map(tc =>
+    `    check(${JSON.stringify(tc.name)}, ${pyLit(tc.args)}, ${pyLit(tc.expected)})`
+  ).join("\n");
+  const randomLabel = task.randomLabel || "Matches a reference implementation on a freshly randomized input (not hardcoded)";
+  return [
+    "import json, random",
+    "def _close(a, b):",
+    "    if isinstance(a, dict) and isinstance(b, dict):",
+    "        return set(a.keys()) == set(b.keys()) and all(_close(a[k], b[k]) for k in a)",
+    "    if isinstance(a, list) and isinstance(b, list):",
+    "        return len(a) == len(b) and all(_close(x, y) for x, y in zip(a, b))",
+    "    if isinstance(a, (int, float)) and isinstance(b, (int, float)):",
+    "        return abs(a - b) < 0.01",
+    "    return a == b",
+    "def harness(student_code):",
+    "    ns = {}",
+    "    exec(student_code, ns)",
+    `    fn = ns.get(${JSON.stringify(task.functionName)})`,
+    "    results = []",
+    "    def check(name, args, expected):",
+    "        try:",
+    "            out = fn(*args)",
+    "            ok = _close(out, expected)",
+    "            results.append({'name': name, 'pass': ok, 'hint': f'Expected {expected!r}, got {out!r}.'})",
+    "        except Exception as e:",
+    "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised: {e}'})",
+    checkLines,
+    ...task.referenceCode,
+    "    try:",
+    ...task.randomGenCode,
+    "        rexp = _ref(*rargs)",
+    "        rout = fn(*rargs)",
+    "        okr = _close(rout, rexp)",
+    `        results.append({'name': ${JSON.stringify(randomLabel)}, 'pass': okr, 'hint': f'For input {rargs!r} expected {rexp!r}, got {rout!r}. This input changes every run, a fixed/memorized answer cannot pass it.'})`,
+    "    except Exception as e:",
+    `        results.append({'name': ${JSON.stringify(randomLabel)}, 'pass': False, 'hint': f'Your code raised: {e}'})`,
+    `    if fn is None: results = [{'name': ${JSON.stringify(task.functionName + " is defined")}, 'pass': False, 'hint': ${JSON.stringify("Define a function named exactly " + task.functionName + ".")}}]`,
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n");
+}
+
+/* ================= tasks ================= */
+const SKILL_ID_FUND = "python-fundamentals";
+const SKILLS = [
+  { id: SKILL_ID_FUND, label: "Python Fundamentals" },
+];
+
+const TASKS = [
+  { id: "py-f01", skill: SKILL_ID_FUND, tool: "python", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Total revenue from a list of orders",
+    objective: "Sum a field across a list of dicts, the Python equivalent of SUM in a spreadsheet.",
+    functionName: "total_revenue",
+    objectiveNote: "Each order is a dict like {'amount': 128.5}. Return the sum of every order's amount.",
+    starterCode: "def total_revenue(orders):\n    # your code here\n    return 0",
+    testCases: [
+      { name: "two orders sum correctly", args: [[{ amount: 100 }, { amount: 50.5 }]], expected: 150.5 },
+      { name: "empty list sums to 0", args: [[]], expected: 0 },
+      { name: "single order", args: [[{ amount: 19.99 }]], expected: 19.99 },
+    ],
+    referenceCode: ["    def _ref(orders): return sum(o['amount'] for o in orders)"],
+    randomGenCode: [
+      "        n = random.randint(1, 6)",
+      "        orders = [{'amount': round(random.uniform(1, 500), 2)} for _ in range(n)]",
+      "        rargs = (orders,)",
+    ],
+    hints: [
+      "You need to add up one field across every dict in a list, that's a sum over a generator expression or a loop with a running total.",
+      "sum(o['amount'] for o in orders) walks every dict in the list and adds up just the amount field from each.",
+      "Return sum(o['amount'] for o in orders) directly, no loop needed, or write the equivalent with a for loop and a running total variable.",
+      "def total_revenue(orders):\n    return sum(o['amount'] for o in orders)" ],
+    explanation: { why: "A generator expression, o['amount'] for o in orders, produces just the amounts, one per dict, and sum() adds them all up in one pass, no intermediate list needed.", mistake: "Writing sum(orders) directly tries to add the dicts themselves, not a field inside them, Python has no idea how to add two dicts together and raises a TypeError.", tip: "This same shape, sum(field for item in items), covers most spreadsheet-SUM-equivalent questions in Python, once it's comfortable, it becomes a reflex.", business: "This is the exact same total-revenue question the SQL and Excel practice libraries ask, in a shop's real analytics stack, this same number often gets computed in all three tools, and they'd better agree." } },
+
+  { id: "py-f02", skill: SKILL_ID_FUND, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-f01"],
+    title: "Count returned orders",
+    objective: "Count dicts matching a condition, the Python equivalent of COUNTIF.",
+    functionName: "count_returns",
+    objectiveNote: "Each order is a dict like {'status': 'Returned'}. Return how many orders have status exactly 'Returned'.",
+    starterCode: "def count_returns(orders):\n    # your code here\n    return 0",
+    testCases: [
+      { name: "two returned out of four", args: [[{ status: "Completed" }, { status: "Returned" }, { status: "Returned" }, { status: "Completed" }]], expected: 2 },
+      { name: "no returns", args: [[{ status: "Completed" }]], expected: 0 },
+      { name: "empty list", args: [[]], expected: 0 },
+    ],
+    referenceCode: ["    def _ref(orders): return sum(1 for o in orders if o['status'] == 'Returned')"],
+    randomGenCode: [
+      "        n = random.randint(1, 8)",
+      "        statuses = ['Completed', 'Returned', 'Cancelled']",
+      "        orders = [{'status': random.choice(statuses)} for _ in range(n)]",
+      "        rargs = (orders,)",
+    ],
+    hints: [
+      "This needs a count, not a sum, count how many dicts satisfy a condition rather than adding any field up.",
+      "sum(1 for o in orders if o['status']=='Returned') adds 1 for every matching dict, which is exactly a count.",
+      "A for loop with an if check and a running counter works identically, pick whichever reads more clearly to you.",
+      "def count_returns(orders):\n    return sum(1 for o in orders if o['status'] == 'Returned')" ],
+    explanation: { why: "sum(1 for o in orders if condition) is a common idiom, it turns a filtering condition directly into a count, without building an intermediate filtered list first.", mistake: "Using len([o for o in orders if o['status']=='Returned']) works too, but builds a whole extra list just to measure its length, the generator version does the same job without that extra step.", tip: "Whenever you catch yourself about to write 'count how many items match X,' this generator-plus-sum pattern is almost always the most direct way to say it.", business: "A return count is the raw number behind a return rate, exactly the kind of figure an ops team pulls before deciding whether a product listing needs a second look." } },
+
+  { id: "py-f03", skill: SKILL_ID_FUND, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-f02"],
+    title: "The distinct regions that ordered",
+    objective: "Deduplicate values with a set, then return them in a predictable order.",
+    functionName: "unique_regions",
+    objectiveNote: "Each order is a dict like {'region': 'West'}. Return a sorted list of the distinct region values, no duplicates.",
+    starterCode: "def unique_regions(orders):\n    # your code here\n    return []",
+    testCases: [
+      { name: "dedupes and sorts", args: [[{ region: "West" }, { region: "East" }, { region: "West" }]], expected: ["East", "West"] },
+      { name: "empty list gives empty list", args: [[]], expected: [] },
+      { name: "single region", args: [[{ region: "North" }]], expected: ["North"] },
+    ],
+    referenceCode: ["    def _ref(orders): return sorted(set(o['region'] for o in orders))"],
+    randomGenCode: [
+      "        n = random.randint(1, 8)",
+      "        regions = ['West', 'East', 'North', 'South']",
+      "        orders = [{'region': random.choice(regions)} for _ in range(n)]",
+      "        rargs = (orders,)",
+    ],
+    hints: [
+      "\"Distinct\" means duplicates removed, a set is Python's built-in tool for that, it can never contain the same value twice.",
+      "set(o['region'] for o in orders) collects every region into a set, automatically dropping repeats.",
+      "sorted(...) around that set turns it into a predictably ordered list, sets themselves don't guarantee any particular order.",
+      "def unique_regions(orders):\n    return sorted(set(o['region'] for o in orders))" ],
+    explanation: { why: "A set stores each distinct value exactly once, converting a list with duplicates into a set is the standard way to deduplicate in Python, sorted() then gives a consistent, testable order.", mistake: "Returning the set directly instead of wrapping it in sorted() (or list()) usually still \"looks right\" when printed, but two sets with identical contents aren't guaranteed to print or compare in the same order across different runs, sorting removes that ambiguity.", tip: "set() for deduplication, then sorted() for a stable order, is a two-step pattern worth automating in your head, it comes up constantly.", business: "Knowing exactly which regions have ever placed an order, no duplicates, no guesswork, is the kind of basic fact an expansion or logistics team checks before assuming a region is or isn't already served." } },
+
+  { id: "py-f04", skill: SKILL_ID_FUND, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-f01"],
+    title: "Filter orders above a threshold",
+    objective: "Use a list comprehension to keep only the dicts that pass a condition.",
+    functionName: "filter_high_value",
+    objectiveNote: "Each order is a dict like {'amount': 100}. Return a new list containing only the orders whose amount is strictly greater than threshold, in their original order.",
+    starterCode: "def filter_high_value(orders, threshold):\n    # your code here\n    return []",
+    testCases: [
+      { name: "keeps only orders over 50", args: [[{ amount: 100 }, { amount: 20 }, { amount: 300 }], 50], expected: [{ amount: 100 }, { amount: 300 }] },
+      { name: "empty list stays empty", args: [[], 10], expected: [] },
+      { name: "nothing clears the bar", args: [[{ amount: 5 }], 10], expected: [] },
+    ],
+    referenceCode: ["    def _ref(orders, threshold): return [o for o in orders if o['amount'] > threshold]"],
+    randomGenCode: [
+      "        n = random.randint(1, 8)",
+      "        orders = [{'amount': round(random.uniform(1, 500), 2)} for _ in range(n)]",
+      "        threshold = round(random.uniform(1, 500), 2)",
+      "        rargs = (orders, threshold)",
+    ],
+    hints: [
+      "You need a new list containing only some of the original dicts, the ones that pass a test, that's exactly what a list comprehension with an if clause does.",
+      "[o for o in orders if o['amount'] > threshold] builds a new list keeping only dicts whose amount clears the threshold.",
+      "The comparison has to be strictly greater than (>), not >=, an order exactly at the threshold should NOT be included.",
+      "def filter_high_value(orders, threshold):\n    return [o for o in orders if o['amount'] > threshold]" ],
+    explanation: { why: "A list comprehension with an if clause is a filter, it walks the original list and keeps only the items where the condition is true, building a brand new list without touching the original.", mistake: "Using >= instead of > silently includes orders exactly at the threshold, this task specifically requires strictly greater than, matching how a real \"above X\" business question is usually meant.", tip: "This filter-with-a-condition list comprehension is one of the single most common Python patterns in real data work, worth being completely fluent in before moving on to pandas, which does the same filtering with different syntax.", business: "\"Which orders were over $200\" is the kind of question that precedes a specific action, flagging them for review, applying a bulk discount, whatever the actual filtered list is what gets acted on, not just the count." } },
+
+  { id: "py-f05", skill: SKILL_ID_FUND, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-f04"],
+    title: "Revenue broken down by category",
+    objective: "Accumulate into a dict, building up a running total per key as you loop.",
+    functionName: "revenue_by_category",
+    objectiveNote: "Each order is a dict like {'category': 'Outdoor', 'amount': 100}. Return a dict mapping each category to its total amount.",
+    starterCode: "def revenue_by_category(orders):\n    # your code here\n    return {}",
+    testCases: [
+      { name: "two categories accumulate separately", args: [[{ category: "Outdoor", amount: 100 }, { category: "Apparel", amount: 50 }, { category: "Outdoor", amount: 25 }]], expected: { Outdoor: 125, Apparel: 50 } },
+      { name: "empty list gives empty dict", args: [[]], expected: {} },
+      { name: "single order", args: [[{ category: "Home", amount: 10 }]], expected: { Home: 10 } },
+    ],
+    referenceCode: [
+      "    def _ref(orders):",
+      "        totals = {}",
+      "        for o in orders:",
+      "            totals[o['category']] = totals.get(o['category'], 0) + o['amount']",
+      "        return totals",
+    ],
+    randomGenCode: [
+      "        n = random.randint(1, 8)",
+      "        cats = ['Outdoor', 'Apparel', 'Electronics', 'Home']",
+      "        orders = [{'category': random.choice(cats), 'amount': round(random.uniform(1, 500), 2)} for _ in range(n)]",
+      "        rargs = (orders,)",
+    ],
+    hints: [
+      "You need a running total PER category, not one overall total, that means a dict where each key accumulates its own sum as you loop.",
+      "dict.get(key, 0) returns the current total for a category, or 0 if it hasn't been seen yet, that default is what lets the very first order in a category start its total.",
+      "totals[o['category']] = totals.get(o['category'], 0) + o['amount'], repeated for every order in a loop, builds the whole breakdown.",
+      "def revenue_by_category(orders):\n    totals = {}\n    for o in orders:\n        totals[o['category']] = totals.get(o['category'], 0) + o['amount']\n    return totals" ],
+    explanation: { why: "dict.get(key, 0) is what makes the accumulation loop work for a category's very first order, without it, totals[category] on a category that hasn't been added yet would raise a KeyError instead of starting at 0.", mistake: "Assuming every category name will already be a key in totals before the loop runs (and skipping the .get(...,0) default) breaks on the first order of any category, this is one of the most common real dict-accumulation bugs.", tip: "This exact shape, an empty dict plus a loop that does totals[key] = totals.get(key,0) + value, is the general pattern for turning a flat list into a group-by summary in plain Python, the same job GROUP BY does in SQL or a pivot table does in Excel.", business: "This is the same category revenue breakdown the SQL and Excel practice libraries compute, seeing the identical business answer emerge from three different tools is exactly the kind of connection this course is built to make explicit." } },
+
+  { id: "py-f06", skill: SKILL_ID_FUND, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-f05"],
+    title: "Which category earns the most",
+    objective: "Find the key with the largest value in a dict, using max with a key function.",
+    functionName: "best_category",
+    objectiveNote: "Each order is a dict like {'category': 'Outdoor', 'amount': 100}. Return the name of the category with the highest total revenue.",
+    starterCode: "def best_category(orders):\n    # your code here\n    return \"\"",
+    testCases: [
+      { name: "Outdoor beats Apparel", args: [[{ category: "Outdoor", amount: 100 }, { category: "Apparel", amount: 50 }]], expected: "Outdoor" },
+      { name: "accumulated totals decide it, not single orders", args: [[{ category: "Home", amount: 10 }, { category: "Home", amount: 5 }, { category: "Electronics", amount: 8 }]], expected: "Home" },
+      { name: "single category wins by default", args: [[{ category: "Apparel", amount: 1 }]], expected: "Apparel" },
+    ],
+    referenceCode: [
+      "    def _ref(orders):",
+      "        totals = {}",
+      "        for o in orders:",
+      "            totals[o['category']] = totals.get(o['category'], 0) + o['amount']",
+      "        return max(totals, key=totals.get)",
+    ],
+    randomGenCode: [
+      "        n = random.randint(2, 8)",
+      "        cats = ['Outdoor', 'Apparel', 'Electronics', 'Home']",
+      "        orders = [{'category': random.choice(cats), 'amount': round(random.uniform(1, 500), 2)} for _ in range(n)]",
+      "        rargs = (orders,)",
+    ],
+    hints: [
+      "This reuses the category-totals dict from the previous task, the new part is finding which key has the biggest value.",
+      "max() on a dict by itself compares the KEYS, not the values, you need max(dict, key=dict.get) to compare by value instead.",
+      "Build the totals dict exactly like the previous task, then return max(totals, key=totals.get).",
+      "def best_category(orders):\n    totals = {}\n    for o in orders:\n        totals[o['category']] = totals.get(o['category'], 0) + o['amount']\n    return max(totals, key=totals.get)" ],
+    explanation: { why: "max(iterable, key=function) applies the key function to every item to decide what to compare, max(totals, key=totals.get) iterates the dict's keys but ranks them by their looked-up value, exactly \"which key has the biggest value.\"", mistake: "Calling max(totals) alone compares the category NAMES alphabetically (since dict iteration yields keys), returning whichever category name sorts last, not the one with the most revenue, an easy and very common mistake.", tip: "max(..., key=...) and its sibling min(..., key=...) are the general tool for \"find the biggest/smallest BY some criterion,\" not just the biggest raw value, this pattern reappears constantly once you're looking for it.", business: "\"Which category actually makes us the most money\" is a one-line answer with this function, and it's the same question a merchandising lead opens almost every planning meeting with." } },
+
+  { id: "py-f07", skill: SKILL_ID_FUND, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-f01"],
+    title: "Clean a price string into a real number",
+    objective: "Strip formatting characters from a string before converting it to a number, a preview of Module 4's data-cleaning theme.",
+    functionName: "clean_price",
+    objectiveNote: "Given a price written the way it might appear in a spreadsheet, like \"$1,234.56\", return it as a plain float, 1234.56.",
+    starterCode: "def clean_price(text):\n    # your code here\n    return 0.0",
+    testCases: [
+      { name: "dollar sign and comma both stripped", args: ["$1,234.56"], expected: 1234.56 },
+      { name: "no comma needed", args: ["$19.99"], expected: 19.99 },
+      { name: "zero", args: ["$0"], expected: 0 },
+    ],
+    referenceCode: ["    def _ref(text): return float(text.replace('$', '').replace(',', ''))"],
+    randomGenCode: [
+      "        amt = round(random.uniform(1, 99999), 2)",
+      "        text = f'${amt:,.2f}'",
+      "        rargs = (text,)",
+    ],
+    hints: [
+      "float() can't parse a string with a dollar sign or comma in it directly, those characters have to be removed first.",
+      "str.replace(old, new) with new as an empty string removes every occurrence of a character, do this once for '$' and once for ','.",
+      "text.replace('$','').replace(',','') strips both characters, then wrap the result in float(...) to convert it to a number.",
+      "def clean_price(text):\n    return float(text.replace('$', '').replace(',', ''))" ],
+    explanation: { why: "str.replace() removes every occurrence of a substring, chaining two of them strips both formatting characters in sequence, leaving a plain numeric string that float() can parse correctly.", mistake: "Calling float() on the original string with the $ and comma still in it raises a ValueError immediately, Python's float() only understands plain numeric text, not currency formatting.", tip: "Real spreadsheet exports and CSVs are full of exactly this kind of formatted-for-humans text, this two-replace-then-convert pattern is something you'll reach for constantly once you start working with real exported data.", business: "This is precisely the kind of \"looks like a number, isn't actually stored as one\" problem Module 1's tidy-data lesson warned about, and Module 4 will spend an entire module on, this task is a first real taste of it." } },
+
+  { id: "py-f08", skill: SKILL_ID_FUND, tool: "python", level: "challenge", difficulty: "challenge", prerequisite: ["py-f03"],
+    title: "Remove duplicates, keep the first-seen order",
+    objective: "Deduplicate a list without losing its original ordering, something a plain set can't do.",
+    functionName: "dedupe_preserve_order",
+    objectiveNote: "Return a new list with duplicate items removed, keeping only each item's FIRST appearance, in the order they originally appeared. Decide the approach yourself.",
+    starterCode: "def dedupe_preserve_order(items):\n    # your code here\n    return []",
+    testCases: [
+      { name: "keeps first occurrence, drops later repeats", args: [["a", "b", "a", "c", "b"]], expected: ["a", "b", "c"] },
+      { name: "empty list stays empty", args: [[]], expected: [] },
+      { name: "no duplicates, unchanged", args: [["x", "y", "z"]], expected: ["x", "y", "z"] },
+    ],
+    referenceCode: [
+      "    def _ref(items):",
+      "        seen = set()",
+      "        out = []",
+      "        for x in items:",
+      "            if x not in seen:",
+      "                seen.add(x)",
+      "                out.append(x)",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        pool = ['red', 'blue', 'green', 'yellow', 'purple']",
+      "        n = random.randint(1, 10)",
+      "        items = [random.choice(pool) for _ in range(n)]",
+      "        rargs = (items,)",
+    ],
+    hints: [
+      "A plain set() would deduplicate, but sets don't remember insertion order reliably enough to guarantee the original ordering survives, you need to track order yourself.",
+      "Keep two things while looping: a set of values already seen (for a fast duplicate check), and a list of the output in order.",
+      "For each item, only append it to the output list (and add it to the seen set) the first time it's encountered, skip it on every later repeat.",
+      "def dedupe_preserve_order(items):\n    seen = set()\n    out = []\n    for x in items:\n        if x not in seen:\n            seen.add(x)\n            out.append(x)\n    return out" ],
+    explanation: { why: "The set exists purely for a fast 'have I seen this before' check (checking set membership is much faster than checking list membership), the actual output order comes entirely from the separate list, built up only on first sightings.", mistake: "Returning list(set(items)) is tempting and does deduplicate, but a set's iteration order isn't guaranteed to match the original list's order, so the result can come back scrambled relative to the input.", tip: "This two-structures-at-once pattern, a set for fast lookups plus a list for order, is a genuinely common real technique whenever you need both speed AND order preserved.", business: "A deduplicated customer email list that keeps the FIRST address on file (rather than an arbitrary one) is exactly the kind of detail that matters when the first entry might be the one already synced to a billing system." } },
+
+  { id: "py-f09", skill: SKILL_ID_FUND, tool: "python", level: "challenge", difficulty: "challenge", prerequisite: ["py-f07"],
+    title: "Parse a small CSV into a list of order dicts",
+    objective: "Turn raw delimited text into structured data by hand, the manual version of what pandas will later automate.",
+    functionName: "parse_orders_csv",
+    objectiveNote: "csv_text has a header row (order_id,category,amount,status) followed by one row per order. Return a list of dicts, one per data row, with amount converted to a float. Decide the approach yourself.",
+    starterCode: "def parse_orders_csv(csv_text):\n    # your code here\n    return []",
+    testCases: [
+      { name: "two rows parse into two dicts", args: ["order_id,category,amount,status\nA1,Outdoor,100.5,Completed\nA2,Apparel,20,Returned\n"], expected: [{ order_id: "A1", category: "Outdoor", amount: 100.5, status: "Completed" }, { order_id: "A2", category: "Apparel", amount: 20, status: "Returned" }] },
+      { name: "header only gives an empty list", args: ["order_id,category,amount,status\n"], expected: [] },
+      { name: "single data row", args: ["order_id,category,amount,status\nB9,Home,15.25,Completed\n"], expected: [{ order_id: "B9", category: "Home", amount: 15.25, status: "Completed" }] },
+    ],
+    referenceCode: [
+      "    def _ref(csv_text):",
+      "        lines = [l for l in csv_text.strip().split(chr(10)) if l.strip()]",
+      "        rows = lines[1:]",
+      "        out = []",
+      "        for r in rows:",
+      "            parts = r.split(',')",
+      "            out.append({'order_id': parts[0], 'category': parts[1], 'amount': float(parts[2]), 'status': parts[3]})",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        cats = ['Outdoor', 'Apparel', 'Electronics', 'Home']",
+      "        statuses = ['Completed', 'Returned', 'Cancelled']",
+      "        n = random.randint(1, 5)",
+      "        header = 'order_id,category,amount,status'",
+      "        rows = []",
+      "        for i in range(n):",
+      "            amt = round(random.uniform(1, 500), 2)",
+      "            rows.append(f'R{i},{random.choice(cats)},{amt},{random.choice(statuses)}')",
+      "        csv_text = header + chr(10) + chr(10).join(rows) + chr(10)",
+      "        rargs = (csv_text,)",
+    ],
+    hints: [
+      "This is text processing: split the whole text into lines first, then split each line into its comma-separated fields.",
+      "The first line is the header, skip it, every line after that is one order, split on comma gives you the 4 fields in order.",
+      "For each data line, parts = line.split(','), then build a dict {'order_id': parts[0], 'category': parts[1], 'amount': float(parts[2]), 'status': parts[3]}.",
+      "def parse_orders_csv(csv_text):\n    lines = [l for l in csv_text.strip().split(chr(10)) if l.strip()]\n    rows = lines[1:]\n    out = []\n    for r in rows:\n        parts = r.split(',')\n        out.append({'order_id': parts[0], 'category': parts[1], 'amount': float(parts[2]), 'status': parts[3]})\n    return out" ],
+    explanation: { why: "Splitting on the newline character breaks the whole text into individual lines, splitting each line on comma breaks it into fields, that two-level split is the entire mechanism behind CSV parsing, before any library gets involved.", mistake: "Forgetting to skip the header row treats the column names themselves as if they were an order, and forgetting float() on the amount field leaves it as text, which would silently break any later arithmetic on it.", tip: "Real files often have a trailing blank line at the end, filtering out empty lines (as this reference does) before processing is a small habit that avoids a whole category of \"off by one row\" bugs.", business: "pandas' read_csv does this exact job automatically and handles far more edge cases, but understanding what it's actually doing under the hood, split lines, split fields, convert types, is what makes pandas' behavior predictable instead of mysterious once Module 3 introduces it." } },
+
+  { id: "py-f10", skill: SKILL_ID_FUND, tool: "python", level: "mastery", difficulty: "mastery", prerequisite: ["py-f06", "py-f09"],
+    title: "Completed-only revenue by category, parsed from raw text",
+    objective: "Chain parsing, filtering, and dict accumulation into one function, then reason about why status has to be part of it.",
+    functionName: "category_summary",
+    objectiveNote: "csv_text has a header row (order_id,category,amount,status) followed by order rows. Parse it, keep ONLY rows where status is exactly 'Completed', and return a dict mapping each category to its total amount from just those rows.",
+    starterCode: "def category_summary(csv_text):\n    # your code here\n    return {}",
+    testCases: [
+      { name: "excludes a returned row from the total", args: ["order_id,category,amount,status\nA1,Outdoor,100,Completed\nA2,Outdoor,50,Returned\nA3,Apparel,30,Completed\n"], expected: { Outdoor: 100, Apparel: 30 } },
+      { name: "header only gives an empty dict", args: ["order_id,category,amount,status\n"], expected: {} },
+      { name: "all rows excluded gives an empty dict", args: ["order_id,category,amount,status\nA1,Home,10,Cancelled\n"], expected: {} },
+    ],
+    referenceCode: [
+      "    def _ref(csv_text):",
+      "        lines = [l for l in csv_text.strip().split(chr(10)) if l.strip()]",
+      "        rows = lines[1:]",
+      "        totals = {}",
+      "        for r in rows:",
+      "            parts = r.split(',')",
+      "            category, amount, status = parts[1], float(parts[2]), parts[3]",
+      "            if status == 'Completed':",
+      "                totals[category] = totals.get(category, 0) + amount",
+      "        return totals",
+    ],
+    randomGenCode: [
+      "        cats = ['Outdoor', 'Apparel', 'Electronics', 'Home']",
+      "        statuses = ['Completed', 'Returned', 'Cancelled']",
+      "        n = random.randint(2, 8)",
+      "        header = 'order_id,category,amount,status'",
+      "        rows = []",
+      "        for i in range(n):",
+      "            amt = round(random.uniform(1, 500), 2)",
+      "            rows.append(f'R{i},{random.choice(cats)},{amt},{random.choice(statuses)}')",
+      "        csv_text = header + chr(10) + chr(10).join(rows) + chr(10)",
+      "        rargs = (csv_text,)",
+    ],
+    written: {
+      label: "Why must this exclude anything other than 'Completed' orders?",
+      placeholder: "Think about what a returned or cancelled order actually represents in terms of revenue the business keeps...",
+      check: (text) => /(cancel|return|refund|complete)/i.test(text) && text.trim().length > 40,
+      hint: "Mention that a cancelled or returned order doesn't represent revenue the business actually kept, including it in a category's total would overstate real performance." },
+    hints: [
+      "This combines two things you've already built separately, CSV parsing (splitting lines and fields) and dict accumulation by category (a running total per key).",
+      "Parse the text into rows first, exactly like the CSV parsing task, then loop the rows and only accumulate into totals when status=='Completed'.",
+      "Inside the loop: if status=='Completed': totals[category] = totals.get(category,0) + amount, skip the accumulation entirely otherwise.",
+      "def category_summary(csv_text):\n    lines = [l for l in csv_text.strip().split(chr(10)) if l.strip()]\n    rows = lines[1:]\n    totals = {}\n    for r in rows:\n        parts = r.split(',')\n        category, amount, status = parts[1], float(parts[2]), parts[3]\n        if status == 'Completed':\n            totals[category] = totals.get(category, 0) + amount\n    return totals" ],
+    explanation: { why: "Every technique from this stage lands in one function, splitting text into rows and fields, converting a string to a float, filtering by a condition, and accumulating a running total per category, exactly the shape of a real small ETL step.", mistake: "Accumulating every row regardless of status would silently inflate every category's total with orders that were returned or cancelled, revenue the business never actually kept.", tip: "Whenever a summary function touches money, checking which status values should actually count toward it is usually the single most consequential line in the whole function, get that filter wrong and every downstream number built on it is wrong too.", business: "This is the same 'completed orders only' discipline the SQL and Excel practice libraries both enforce in their own mastery tasks, seeing the identical business rule show up in three separate tools is the point, it's not a SQL quirk or an Excel quirk, it's just correct accounting." } },
+];
+
+/* ================= rendering ================= */
+function tierLabel(tier) { return { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" }[tier]; }
+function renderSkillBar() {
+  const order = ["not-started", "introduced", "practicing", "competent", "mastered"];
+  const wrap = document.getElementById("skillBars");
+  wrap.innerHTML = SKILLS.map(s => {
+    const prog = PracticeProgress.skillProgress(TASKS, s.id);
+    const reachedIdx = order.indexOf(prog.tier);
+    const ladder = order.slice(1).map((t, i) => `<span class="${i + 1 <= reachedIdx ? "reached" : ""}">${tierLabel(t)}</span>`).join("");
+    return `<div class="skillbar">
+      <div class="skillrow">
+        <span style="font-weight:700;font-size:14.5px">${esc(s.label)}</span>
+        <span class="tierpill t-${prog.tier}">${tierLabel(prog.tier)}</span>
+        <div class="skillbarwrap"><div class="fill" style="width:${prog.pct}%"></div></div>
+        <span class="mono" style="font-size:12.5px;color:var(--mut2)">${prog.passedCount} / ${prog.totalCount} tasks</span>
+      </div>
+      <div class="tierladder">${ladder}</div>
+    </div>`;
+  }).join("");
+  const next = PracticeProgress.recommendNext(TASKS);
+  if (!document.getElementById("nextUpBlock")) {
+    const block = document.createElement("div");
+    block.className = "skillbar";
+    block.id = "nextUpBlock";
+    block.innerHTML = `<div class="nextup" id="nextUp"></div>`;
+    wrap.after(block);
+  }
+  const target = document.getElementById("nextUp");
+  const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
+  target.innerHTML = next
+    ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
+    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. Further stages aren't built yet.`;
+}
+function buildHintsHtml(hints) {
+  const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
+  return `<div class="hints">${hints.map((h, i) => `<details><summary>${labels[i]}</summary><div class="hbody">${esc(h)}</div></details>`).join("")}</div>`;
+}
+function buildExplainHtml(ex) {
+  if (!ex) return "";
+  const rows = [["Why this works", ex.why], ["Common mistake", ex.mistake], ["Real analyst tip", ex.tip], ["Business interpretation", ex.business]].filter(([, v]) => v);
+  return `<div class="explainbox">${rows.map(([lbl, v]) => `<div class="erow"><div class="elbl">${esc(lbl)}</div><p>${esc(v)}</p></div>`).join("")}</div>`;
+}
+
+const openTasks = new Set();
+const codeDrafts = {};
+const resultsDrafts = {};
+const writtenDrafts = {};
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  TASKS.forEach(t => {
+    const openEl = document.getElementById("body_" + t.id);
+    if (openEl && openEl.classList.contains("open")) openTasks.add(t.id);
+    const ed = document.getElementById("editor_" + t.id);
+    if (ed) codeDrafts[t.id] = ed.value;
+    const res = document.getElementById("results_" + t.id);
+    if (res && res.innerHTML) resultsDrafts[t.id] = res.innerHTML;
+    const wr = document.getElementById("written_" + t.id);
+    if (wr) writtenDrafts[t.id] = wr.value;
+  });
+  list.innerHTML = "";
+  TASKS.forEach((t, idx) => {
+    const state = PracticeProgress.getTaskState(t.id);
+    const prereqsMet = t.prerequisite.every(pid => PracticeProgress.getTaskState(pid).passed);
+    const card = document.createElement("div");
+    card.className = "taskcard";
+    card.innerHTML = `
+      <div class="taskhead" data-id="${t.id}">
+        <span class="statusdot ${state.passed ? "passed" : ""}"></span>
+        <span class="tid">${String(idx + 1).padStart(2, "0")}</span>
+        <span class="ttitle">${esc(t.title)}</span>
+        <span class="levelpill ${t.level}">${t.level.replace("semiguided", "semi-guided")}</span>
+      </div>
+      <div class="taskbody${openTasks.has(t.id) ? " open" : ""}" id="body_${t.id}">
+        <div class="objective"><b>Objective:</b> ${esc(t.objective)}</div>
+        <p style="font-size:13.5px;margin-bottom:10px">${esc(t.objectiveNote)}</p>
+        ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
+        <textarea id="editor_${t.id}" rows="6" spellcheck="false">${esc(codeDrafts[t.id] !== undefined ? codeDrafts[t.id] : t.starterCode)}</textarea>
+        ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
+        <div class="dagctrl">
+          <button class="primary" data-check="${t.id}">&#10003; Check answer</button>
+        </div>
+        <div id="results_${t.id}">${resultsDrafts[t.id] || ""}</div>
+        ${buildHintsHtml(t.hints)}
+        `}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll(".taskhead").forEach(head => {
+    head.addEventListener("click", () => {
+      const body = document.getElementById("body_" + head.dataset.id);
+      body.classList.toggle("open");
+    });
+  });
+  list.querySelectorAll("[data-check]").forEach(btn => {
+    btn.addEventListener("click", () => checkTask(btn.dataset.check));
+  });
+}
+
+async function checkTask(id) {
+  const task = TASKS.find(t => t.id === id);
+  const btn = document.querySelector(`[data-check="${id}"]`);
+  const resultsEl = document.getElementById("results_" + id);
+  const code = document.getElementById("editor_" + id).value;
+  btn.disabled = true;
+  resultsEl.innerHTML = `<div class="feedback wait">Starting the Python sandbox&hellip; first run on this page downloads the interpreter, after that it's a few seconds.</div>`;
+
+  const harness = buildHarness(task);
+  let outcome;
+  try {
+    outcome = await PySandboxRunner.run(harness, "harness", code, 12000, 60000);
+  } finally {
+    btn.disabled = false;
+  }
+
+  if (!outcome.ok) {
+    resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error)}</div>`;
+    PracticeProgress.recordAttempt(id, false);
+    renderSkillBar();
+    return;
+  }
+  const data = outcome.result;
+  if (!data.ranOk) {
+    resultsEl.innerHTML = `<div class="feedback bad">Your code didn't run: ${esc(data.error || "unknown error")}. Check for a syntax error, or that the function name matches exactly.</div>`;
+    PracticeProgress.recordAttempt(id, false);
+    renderSkillBar();
+    return;
+  }
+  const results = data.results;
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${esc(r.name)}` + (r.pass ? "" : `<br>${esc(r.hint || "")}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.className = "testsummary";
+  summary.style.color = passCount === results.length ? "var(--good)" : "var(--mut)";
+  summary.textContent = `${passCount} / ${results.length} tests passing`;
+  resultsEl.appendChild(summary);
+
+  let sqlPass = passCount === results.length;
+  let writtenPass = true;
+  if (task.written) {
+    const writtenText = (document.getElementById("written_" + id) || {}).value || "";
+    writtenPass = task.written.check(writtenText);
+    const wv = document.createElement("div");
+    wv.className = "feedback " + (writtenPass ? "ok" : "bad");
+    wv.innerHTML = writtenPass ? "<b>Interpretation accepted.</b>" : `<b>Interpretation needs more.</b> ${esc(task.written.hint)}`;
+    resultsEl.appendChild(wv);
+  }
+  const pass = sqlPass && writtenPass;
+
+  if (pass && task.explanation) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(task.explanation));
+  PracticeProgress.recordAttempt(id, pass);
+  if (pass) openTasks.add(id);
+  renderTasks();
+  renderSkillBar();
+}
+
+renderSkillBar();
+renderTasks();
+</script>
+<script src="course-rail.js?v=5"></script>
+</body>
+</html>
