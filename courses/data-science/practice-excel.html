@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel Practice Library, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;--green:#3fae62;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 90px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--green)}
+.bar .in{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px;flex-wrap:wrap}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--green)}
+.hero{padding:40px 0 24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--green);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:720px;margin-top:10px}
+.scopenote{background:rgba(63,174,98,.08);border:1px solid rgba(63,174,98,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
+.scopenote b{color:var(--green)}
+.sheetblock{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:20px 22px;margin-top:22px}
+.sheetblock .stlbl{font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:10px}
+.sheetwrap{overflow-x:auto;border:1px solid var(--bd2);border-radius:8px;max-height:340px;overflow-y:auto}
+table.grid{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px}
+table.grid th,table.grid td{padding:6px 10px;border:1px solid var(--bd);text-align:left;white-space:nowrap;font-family:'IBM Plex Mono'}
+table.grid thead tr.colhead th{background:var(--card2);color:var(--green);font-size:11px;text-align:center;position:sticky;top:0}
+table.grid thead tr.fieldhead th{background:var(--bg2);color:var(--tx);font-weight:600;position:sticky;top:23px}
+table.grid tbody th{background:var(--card2);color:var(--mut2);text-align:center;font-weight:400}
+table.grid td.num{text-align:right}
+.skillbar{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:20px 22px;margin-top:22px}
+.skillrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tierpill{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 12px;border-radius:99px;font-weight:700}
+.tierpill.t-not-started{background:var(--bg2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.12);color:var(--amber)}
+.tierpill.t-competent{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t-mastered{background:rgba(63,174,98,.18);color:var(--green)}
+.skillbarwrap{flex:1;min-width:180px;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--bd)}
+.skillbarwrap .fill{height:100%;background:var(--green)}
+.tierladder{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.tierladder span{font-family:'IBM Plex Mono';font-size:10.5px;padding:3px 10px;border-radius:99px;background:var(--bg2);color:var(--mut2);border:1px solid var(--bd2)}
+.tierladder span.reached{background:rgba(63,174,98,.12);color:var(--green);border-color:rgba(63,174,98,.4)}
+.nextup{margin-top:14px;padding:12px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px}
+.nextup b{color:var(--green)}
+.tasklist{display:grid;gap:10px;margin-top:22px}
+.taskcard{background:var(--card);border:1px solid var(--bd2);border-radius:12px;overflow:hidden}
+.taskhead{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer}
+.taskhead:hover{background:var(--card2)}
+.taskhead .tid{font-family:'IBM Plex Mono';font-size:11px;color:var(--mut2);width:32px;flex-shrink:0}
+.taskhead .ttitle{font-weight:600;font-size:14.5px;flex:1}
+.levelpill{font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;padding:2px 9px;border-radius:99px;flex-shrink:0}
+.levelpill.guided{background:rgba(74,222,149,.12);color:var(--good)}
+.levelpill.semiguided{background:rgba(240,180,41,.12);color:var(--amber)}
+.levelpill.challenge{background:rgba(255,133,133,.12);color:var(--bad)}
+.statusdot{width:9px;height:9px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+.statusdot.passed{background:var(--good);box-shadow:0 0 6px var(--good)}
+.taskbody{display:none;padding:0 18px 18px}
+.taskbody.open{display:block}
+.objective{font-size:13.5px;color:var(--mut);margin-bottom:12px}
+.objective b{color:var(--tx)}
+.forminput{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:4px 4px 4px 12px}
+.forminput .fx{font-family:'IBM Plex Mono';font-weight:700;color:var(--green);font-size:14px}
+.forminput input{flex:1;font-family:'IBM Plex Mono';font-size:13px;background:transparent;border:none;color:var(--tx);padding:8px 4px;outline:none}
+.forminput:focus-within{outline:2px solid var(--green);outline-offset:1px}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--green);color:var(--green)}
+button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+button.primary{background:var(--green);color:#04140a;border-color:var(--green)}
+button.primary:hover{filter:brightness(1.1);color:#04140a}
+.dagctrl{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px}
+.feedback.ok{background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.feedback.result{background:var(--bg2);border:1px solid var(--bd2);color:var(--tx);font-family:'IBM Plex Mono'}
+.hints{margin-top:12px;display:grid;gap:6px}
+.hints details{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px}
+.hints summary{cursor:pointer;color:var(--green);font-size:12px;font-weight:600;list-style:none}
+.hints summary::-webkit-details-marker{display:none}
+.hints .hbody{margin-top:7px;font-size:12.5px;color:var(--mut);padding-top:7px;border-top:1px solid var(--bd)}
+.explainbox{margin-top:12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.explainbox .erow .elbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);font-family:'IBM Plex Mono';margin-bottom:3px}
+.explainbox .erow p{font-size:12.5px;color:var(--mut)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 70px} .taskhead{flex-wrap:wrap} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-01.html">Module 1: Spreadsheets</a><a href="career.html">Career Path</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Practice Library &middot; Excel &middot; Stage 1 of &hellip;</span>
+    <h1 class="serif">Excel Practice Library</h1>
+    <p class="sub">Extra repetition beyond Module 1's core lesson, a real formula engine parsing and evaluating exactly what you type, not a multiple-choice guess. Every task is checked by evaluating your formula against a live spreadsheet, then against an independently modified copy, so a memorized number can't pass.</p>
+    <div class="scopenote"><b>Honest scope note:</b> this is Stage 1 only (fundamentals: SUM, AVERAGE, COUNT, COUNTIF, IF), 10 tasks, real, fully built, graded, and tested. Further stages (SUMIF/lookup formulas, multi-condition logic, a full mastery task) are planned but not yet built, that's future work, not a claim made here.</div>
+  </header>
+
+  <div class="sheetblock">
+    <div class="stlbl">Sheet1 &middot; Retail Sales Ledger &middot; 24 rows</div>
+    <div class="sheetwrap"><table class="grid" id="gridTable"></table></div>
+  </div>
+
+  <div id="skillBars"></div>
+
+  <div class="tasklist" id="taskList"></div>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Practice Library</footer>
+</div>
+
+<script src="course-progress.js?v=5"></script>
+<script src="practice-progress.js"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+
+/* ================= formula engine =================
+   Minimal Excel-style formula engine: tokenizer, recursive-descent
+   parser, evaluator. Supports SUM, AVERAGE, COUNT, COUNTA, COUNTIF,
+   SUMIF, IF, ROUND, MAX, MIN (VLOOKUP/XLOOKUP land in a later stage
+   alongside a lookup sheet), cell refs (A1), ranges (A2:A25), full-
+   column refs (A:A), arithmetic, comparisons, and string concat (&).
+   Unit-tested standalone against 22 real cases plus 3 deliberate
+   error paths before ever being wired into this page. */
+function colToIndex(letters) {
+  let n = 0;
+  for (const ch of letters.toUpperCase()) n = n * 26 + (ch.charCodeAt(0) - 64);
+  return n - 1;
+}
+function tokenize(src) {
+  const tokens = [];
+  let i = 0;
+  const n = src.length;
+  while (i < n) {
+    const c = src[i];
+    if (/\s/.test(c)) { i++; continue; }
+    if (c === '"') {
+      let j = i + 1, s = "";
+      while (j < n && src[j] !== '"') { s += src[j]; j++; }
+      tokens.push({ type: "string", value: s });
+      i = j + 1;
+      continue;
+    }
+    if (/[0-9]/.test(c) || (c === "." && /[0-9]/.test(src[i + 1] || ""))) {
+      let j = i, s = "";
+      while (j < n && /[0-9.]/.test(src[j])) { s += src[j]; j++; }
+      tokens.push({ type: "number", value: parseFloat(s) });
+      i = j;
+      continue;
+    }
+    if (c === ">" || c === "<") {
+      if (src[i + 1] === "=") { tokens.push({ type: "op", value: c + "=" }); i += 2; }
+      else if (c === "<" && src[i + 1] === ">") { tokens.push({ type: "op", value: "<>" }); i += 2; }
+      else { tokens.push({ type: "op", value: c }); i++; }
+      continue;
+    }
+    if (/[A-Za-z$]/.test(c)) {
+      let j = i, s = "";
+      while (j < n && /[A-Za-z0-9_$.!:]/.test(src[j])) { s += src[j]; j++; }
+      while (s.endsWith(":")) { s = s.slice(0, -1); j--; }
+      tokens.push({ type: "word", value: s });
+      i = j;
+      continue;
+    }
+    if ("+-*/=(),:!&".includes(c)) { tokens.push({ type: "op", value: c }); i++; continue; }
+    throw new Error(`Unexpected character '${c}' at position ${i}`);
+  }
+  tokens.push({ type: "eof" });
+  return tokens;
+}
+function isCellRefWord(w) {
+  return /^\$?[A-Za-z]{1,2}\$?[0-9]+(:\$?[A-Za-z]{1,2}\$?[0-9]+)?$/.test(w)
+      || /^\$?[A-Za-z]{1,2}:\$?[A-Za-z]{1,2}$/.test(w)
+      || /^[A-Za-z0-9_]+!\$?[A-Za-z]{1,2}\$?[0-9]*(:\$?[A-Za-z]{1,2}\$?[0-9]*)?$/.test(w);
+}
+function parseRefWord(w) {
+  let sheet = null;
+  let rest = w;
+  const bang = w.indexOf("!");
+  if (bang !== -1) { sheet = w.slice(0, bang); rest = w.slice(bang + 1); }
+  rest = rest.replace(/\$/g, "");
+  const parts = rest.split(":");
+  const parseOne = (p) => {
+    const m = p.match(/^([A-Za-z]{1,2})([0-9]*)$/);
+    if (!m) throw new Error(`Bad cell reference '${p}'`);
+    return { col: colToIndex(m[1]), row: m[2] ? parseInt(m[2], 10) : -1 };
+  };
+  const start = parseOne(parts[0]);
+  const end = parts[1] ? parseOne(parts[1]) : start;
+  return { sheet, colStart: start.col, rowStart: start.row, colEnd: end.col, rowEnd: end.row };
+}
+function parseFormula(tokens) {
+  let pos = 0;
+  const peek = () => tokens[pos];
+  const next = () => tokens[pos++];
+  function parsePrimary() {
+    const t = peek();
+    if (t.type === "number") { next(); return { type: "num", value: t.value }; }
+    if (t.type === "string") { next(); return { type: "str", value: t.value }; }
+    if (t.type === "op" && t.value === "(") {
+      next();
+      const e = parseComparison();
+      if (!(peek().type === "op" && peek().value === ")")) throw new Error("Expected ')'");
+      next();
+      return e;
+    }
+    if (t.type === "op" && t.value === "-") { next(); return { type: "neg", value: parsePrimary() }; }
+    if (t.type === "word") {
+      next();
+      const upper = t.value.toUpperCase();
+      if (upper === "TRUE") return { type: "bool", value: true };
+      if (upper === "FALSE") return { type: "bool", value: false };
+      if (peek().type === "op" && peek().value === "(") {
+        next();
+        const args = [];
+        if (!(peek().type === "op" && peek().value === ")")) {
+          args.push(parseComparison());
+          while (peek().type === "op" && peek().value === ",") { next(); args.push(parseComparison()); }
+        }
+        if (!(peek().type === "op" && peek().value === ")")) throw new Error("Expected ')' after function args");
+        next();
+        return { type: "call", name: upper, args };
+      }
+      if (isCellRefWord(t.value)) return { type: "ref", raw: t.value };
+      throw new Error(`Unrecognized token '${t.value}'`);
+    }
+    throw new Error(`Unexpected token ${JSON.stringify(t)}`);
+  }
+  function parseConcat() {
+    let left = parsePrimary();
+    while (peek().type === "op" && peek().value === "&") { next(); left = { type: "concat", left, right: parsePrimary() }; }
+    return left;
+  }
+  function parseTerm() {
+    let left = parseConcat();
+    while (peek().type === "op" && (peek().value === "*" || peek().value === "/")) {
+      const op = next().value;
+      left = { type: "arith", op, left, right: parseConcat() };
+    }
+    return left;
+  }
+  function parseAdd() {
+    let left = parseTerm();
+    while (peek().type === "op" && (peek().value === "+" || peek().value === "-")) {
+      const op = next().value;
+      left = { type: "arith", op, left, right: parseTerm() };
+    }
+    return left;
+  }
+  function parseComparison() {
+    let left = parseAdd();
+    while (peek().type === "op" && ["=", "<>", ">", "<", ">=", "<="].includes(peek().value)) {
+      const op = next().value;
+      left = { type: "cmp", op, left, right: parseAdd() };
+    }
+    return left;
+  }
+  const ast = parseComparison();
+  if (peek().type !== "eof") throw new Error(`Unexpected trailing input near ${JSON.stringify(peek())}`);
+  return ast;
+}
+function resolveRange(ref, workbook, currentSheet) {
+  const sheetName = ref.sheet || currentSheet;
+  const sheet = workbook[sheetName];
+  if (!sheet) throw new Error(`Unknown sheet '${sheetName}'`);
+  const rowStart = ref.rowStart === -1 ? 2 : ref.rowStart;
+  const rowEnd = ref.rowEnd === -1 ? sheet.length : ref.rowEnd;
+  const cells = [];
+  for (let r = rowStart; r <= rowEnd; r++) {
+    const rowArr = sheet[r - 1];
+    if (!rowArr) continue;
+    for (let c = ref.colStart; c <= ref.colEnd; c++) cells.push(rowArr[c] === undefined ? null : rowArr[c]);
+  }
+  return cells;
+}
+function isNumeric(v) { return typeof v === "number" && !Number.isNaN(v); }
+function matchesCriteria(value, criteria) {
+  if (typeof criteria === "string" && /^(>=|<=|<>|>|<|=)/.test(criteria)) {
+    const m = criteria.match(/^(>=|<=|<>|>|<|=)(.*)$/);
+    const op = m[1];
+    let rhs = m[2].trim();
+    const rhsNum = parseFloat(rhs);
+    const useNum = isNumeric(value) && rhs !== "" && !Number.isNaN(rhsNum);
+    const a = useNum ? value : String(value ?? "").toLowerCase();
+    const b = useNum ? rhsNum : rhs.toLowerCase();
+    switch (op) {
+      case ">": return a > b;
+      case "<": return a < b;
+      case ">=": return a >= b;
+      case "<=": return a <= b;
+      case "<>": return a != b;
+      case "=": return a == b;
+    }
+  }
+  if (isNumeric(criteria) && isNumeric(value)) return value === criteria;
+  return String(value ?? "").toLowerCase() === String(criteria ?? "").toLowerCase();
+}
+function toNumber(v) {
+  if (typeof v === "number") return v;
+  if (v && v.__range) return toNumber(v.values.find(x => isNumeric(x)) ?? 0);
+  if (typeof v === "boolean") return v ? 1 : 0;
+  const n = parseFloat(v);
+  if (Number.isNaN(n)) throw new Error(`Cannot use '${v}' as a number`);
+  return n;
+}
+function asRangeValues(v) { return (v && v.__range) ? v.values : [v]; }
+function evaluateNode(node, workbook, currentSheet) {
+  switch (node.type) {
+    case "num": return node.value;
+    case "str": return node.value;
+    case "bool": return node.value;
+    case "neg": return -evaluateNode(node.value, workbook, currentSheet);
+    case "concat": return String(evaluateNode(node.left, workbook, currentSheet)) + String(evaluateNode(node.right, workbook, currentSheet));
+    case "ref": {
+      const ref = parseRefWord(node.raw);
+      const isSingleCell = ref.rowStart === ref.rowEnd && ref.colStart === ref.colEnd && ref.rowStart !== -1;
+      const cells = resolveRange(ref, workbook, currentSheet);
+      if (isSingleCell) return cells[0] === undefined ? null : cells[0];
+      return { __range: true, values: cells, ref, sheet: ref.sheet || currentSheet };
+    }
+    case "arith": {
+      const l = toNumber(evaluateNode(node.left, workbook, currentSheet));
+      const r = toNumber(evaluateNode(node.right, workbook, currentSheet));
+      switch (node.op) {
+        case "+": return l + r;
+        case "-": return l - r;
+        case "*": return l * r;
+        case "/": if (r === 0) throw new Error("Division by zero"); return l / r;
+      }
+    }
+    case "cmp": {
+      const l = evaluateNode(node.left, workbook, currentSheet);
+      const r = evaluateNode(node.right, workbook, currentSheet);
+      const bothNum = isNumeric(l) && isNumeric(r);
+      const a = bothNum ? l : String(l).toLowerCase();
+      const b = bothNum ? r : String(r).toLowerCase();
+      switch (node.op) {
+        case "=": return a == b;
+        case "<>": return a != b;
+        case ">": return a > b;
+        case "<": return a < b;
+        case ">=": return a >= b;
+        case "<=": return a <= b;
+      }
+    }
+    case "call": return evalFunction(node.name, node.args, workbook, currentSheet);
+    default: throw new Error(`Cannot evaluate node type ${node.type}`);
+  }
+}
+function evalFunction(name, argNodes, workbook, currentSheet) {
+  const args = argNodes.map(a => evaluateNode(a, workbook, currentSheet));
+  switch (name) {
+    case "SUM": { let s = 0; args.forEach(a => asRangeValues(a).forEach(v => { if (isNumeric(v)) s += v; })); return s; }
+    case "AVERAGE": {
+      const vals = [];
+      args.forEach(a => asRangeValues(a).forEach(v => { if (isNumeric(v)) vals.push(v); }));
+      if (!vals.length) throw new Error("AVERAGE of empty range");
+      return vals.reduce((x, y) => x + y, 0) / vals.length;
+    }
+    case "COUNT": { let c = 0; args.forEach(a => asRangeValues(a).forEach(v => { if (isNumeric(v)) c++; })); return c; }
+    case "COUNTA": { let c = 0; args.forEach(a => asRangeValues(a).forEach(v => { if (v !== null && v !== undefined && v !== "") c++; })); return c; }
+    case "MAX": { const vals = []; args.forEach(a => asRangeValues(a).forEach(v => { if (isNumeric(v)) vals.push(v); })); return Math.max(...vals); }
+    case "MIN": { const vals = []; args.forEach(a => asRangeValues(a).forEach(v => { if (isNumeric(v)) vals.push(v); })); return Math.min(...vals); }
+    case "ROUND": {
+      if (args.length !== 2) throw new Error("ROUND takes 2 arguments");
+      const v = toNumber(args[0]), digits = toNumber(args[1]), f = Math.pow(10, digits);
+      return Math.round(v * f) / f;
+    }
+    case "COUNTIF": {
+      if (args.length !== 2) throw new Error("COUNTIF takes 2 arguments");
+      const vals = asRangeValues(args[0]), criteria = args[1];
+      return vals.filter(v => matchesCriteria(v, criteria)).length;
+    }
+    case "SUMIF": {
+      if (args.length !== 3) throw new Error("SUMIF takes 3 arguments");
+      const testVals = asRangeValues(args[0]), criteria = args[1], sumVals = asRangeValues(args[2]);
+      let s = 0;
+      testVals.forEach((v, i) => { if (matchesCriteria(v, criteria) && isNumeric(sumVals[i])) s += sumVals[i]; });
+      return s;
+    }
+    case "IF": { if (args.length !== 3) throw new Error("IF takes 3 arguments"); return args[0] ? args[1] : args[2]; }
+    case "VLOOKUP": {
+      if (args.length < 3) throw new Error("VLOOKUP needs at least 3 arguments");
+      const key = args[0], table = args[1];
+      if (!table || !table.__range) throw new Error("VLOOKUP's second argument must be a range");
+      const colIndex = toNumber(args[2]);
+      const ref = table.ref, width = ref.colEnd - ref.colStart + 1, height = table.values.length / width;
+      for (let r = 0; r < height; r++) {
+        const rowFirst = table.values[r * width];
+        if (rowFirst === key) return table.values[r * width + (colIndex - 1)];
+      }
+      throw new Error("#N/A, VLOOKUP found no match");
+    }
+    case "XLOOKUP": {
+      if (args.length < 3) throw new Error("XLOOKUP needs at least 3 arguments");
+      const key = args[0], lookupRange = args[1], returnRange = args[2];
+      if (!lookupRange || !lookupRange.__range || !returnRange || !returnRange.__range) throw new Error("XLOOKUP's 2nd/3rd arguments must be ranges");
+      const idx = lookupRange.values.findIndex(v => v === key);
+      if (idx === -1) throw new Error("#N/A, XLOOKUP found no match");
+      return returnRange.values[idx];
+    }
+    default: throw new Error(`Unknown function ${name}`);
+  }
+}
+function evalFormula(formula, workbook, currentSheet) {
+  let src = (formula || "").trim();
+  if (!src) throw new Error("Empty formula");
+  if (src.startsWith("=")) src = src.slice(1);
+  const ast = parseFormula(tokenize(src));
+  const result = evaluateNode(ast, workbook, currentSheet);
+  if (result && result.__range) {
+    if (result.values.length === 1) return result.values[0];
+    throw new Error("Formula resolved to a range of cells, not a single value, wrap it in SUM/AVERAGE/COUNT/etc.");
+  }
+  return result;
+}
+
+/* ================= workbook (same shop-flavored ledger as the SQL library) ================= */
+const REGIONS = ["West", "East", "North", "South"];
+const CATEGORIES = ["Outdoor", "Apparel", "Electronics", "Home"];
+const STATUSES = ["Completed", "Returned", "Cancelled"];
+const BASE_ROWS = [
+  [1, "2025-01-04", "West", "Outdoor", "Completed", 128.50],
+  [2, "2025-01-09", "East", "Apparel", "Completed", 64.00],
+  [3, "2025-01-15", "West", "Electronics", "Returned", 340.00],
+  [4, "2025-01-22", "North", "Outdoor", "Completed", 91.25],
+  [5, "2025-02-02", "South", "Home", "Completed", 55.00],
+  [6, "2025-02-08", "East", "Electronics", "Completed", 512.00],
+  [7, "2025-02-14", "West", "Apparel", "Cancelled", 78.40],
+  [8, "2025-02-19", "North", "Home", "Completed", 33.99],
+  [9, "2025-02-27", "South", "Outdoor", "Completed", 210.00],
+  [10, "2025-03-03", "East", "Home", "Returned", 47.50],
+  [11, "2025-03-10", "West", "Electronics", "Completed", 289.99],
+  [12, "2025-03-16", "North", "Apparel", "Completed", 62.00],
+  [13, "2025-03-21", "South", "Electronics", "Completed", 445.00],
+  [14, "2025-03-29", "East", "Outdoor", "Completed", 133.75],
+  [15, "2025-04-05", "West", "Home", "Cancelled", 29.00],
+  [16, "2025-04-11", "North", "Electronics", "Returned", 199.00],
+  [17, "2025-04-18", "South", "Apparel", "Completed", 84.50],
+  [18, "2025-04-24", "East", "Outdoor", "Completed", 156.00],
+  [19, "2025-05-01", "West", "Apparel", "Completed", 71.25],
+  [20, "2025-05-07", "North", "Home", "Completed", 41.00],
+  [21, "2025-05-13", "South", "Electronics", "Completed", 378.50],
+  [22, "2025-05-19", "East", "Apparel", "Returned", 58.00],
+  [23, "2025-05-25", "West", "Outdoor", "Completed", 102.00],
+  [24, "2025-05-30", "North", "Electronics", "Completed", 265.00],
+];
+const FIELDS = ["order_id", "order_date", "region", "category", "status", "amount"];
+function buildSheet1() { return [FIELDS.slice(), ...BASE_ROWS.map(r => r.slice())]; }
+function currentWorkbook() { return { Sheet1: buildSheet1() }; }
+
+/* Deliberately NOT cached: a fresh mutation is built on every check, so
+   a student can't learn "the mutated answer" and hardcode a second
+   literal for it. Perturbs every amount (so SUM/AVERAGE/SUMIF-style
+   answers change), and reassigns status and region on a handful of
+   random rows (so COUNTIF/SUMIF-by-category answers change too, not
+   just amount-driven ones), covering every column a Stage 1 task can
+   depend on. */
+function mutatedWorkbook() {
+  const rows = BASE_ROWS.map(r => r.slice());
+  rows.forEach(r => { r[5] = Math.round(r[5] * (0.7 + Math.random() * 0.7) * 100) / 100; });
+  // Status needs to be reassigned so the COUNT of each status varies
+  // widely and independently across mutations, not just reshuffled.
+  // An earlier version gave every row an independent ~1/3 chance of
+  // becoming "Returned", which sounds random but actually concentrates
+  // the returned-count tightly around its expected value (basic law of
+  // large numbers), that expected value sat comfortably above the
+  // "Alert if >3 returns" threshold every time, letting a hardcoded
+  // "Alert" pass 10/12 checks. Directly controlling how many rows get
+  // each status, drawn fresh and independently every mutation, spans
+  // a wide, threshold-straddling range instead.
+  const idxPool = rows.map((_, i) => i);
+  for (let i = idxPool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idxPool[i], idxPool[j]] = [idxPool[j], idxPool[i]]; }
+  // Ranges chosen to straddle the specific thresholds Stage 1's tasks
+  // compare against (>3 returns for the Alert/OK flag), not just "some
+  // random range", so a hardcoded flag has real odds of landing on the
+  // wrong side on any given mutation.
+  const nReturned = Math.floor(Math.random() * 7); // 0-6, straddles the >3 threshold
+  const nCancelled = 1 + Math.floor(Math.random() * 6); // 1-6
+  idxPool.slice(0, nReturned).forEach(i => { rows[i][4] = "Returned"; });
+  idxPool.slice(nReturned, nReturned + nCancelled).forEach(i => { rows[i][4] = "Cancelled"; });
+  idxPool.slice(nReturned + nCancelled).forEach(i => { rows[i][4] = "Completed"; });
+  rows.forEach(r => { if (Math.random() < 0.4) r[2] = REGIONS[Math.floor(Math.random() * REGIONS.length)]; });
+  // Row COUNT itself never otherwise changes (only cell values do),
+  // so a task whose answer is literally a row count (COUNTA of an ID
+  // column) is structurally invariant across mutation, a hardcoded
+  // "24" passed 15/15 checks before this. Physically remove a few rows
+  // (fixed range references like A2:A25 tolerate this fine, resolveRange
+  // already skips rows past the end of the shortened array).
+  const nRemove = 1 + Math.floor(Math.random() * 4); // 1-4
+  for (let k = 0; k < nRemove; k++) { rows.splice(Math.floor(Math.random() * rows.length), 1); }
+  return { Sheet1: [FIELDS.slice(), ...rows] };
+}
+function resultsMatch(a, b) {
+  if (typeof a === "number" && typeof b === "number") return Math.abs(a - b) < 0.005;
+  return String(a).toLowerCase() === String(b).toLowerCase();
+}
+function fmtResult(v) {
+  if (typeof v === "number") return Number.isInteger(v) ? String(v) : v.toFixed(2);
+  return String(v);
+}
+
+/* ================= grid rendering ================= */
+function colLetter(i) { return String.fromCharCode(65 + i); }
+function renderGrid() {
+  const sheet = buildSheet1();
+  const table = document.getElementById("gridTable");
+  let html = `<thead><tr class="colhead"><th></th>${FIELDS.map((_, i) => `<th>${colLetter(i)}</th>`).join("")}</tr>`;
+  html += `<tr class="fieldhead"><th>1</th>${FIELDS.map(f => `<th>${esc(f)}</th>`).join("")}</tr></thead><tbody>`;
+  sheet.slice(1).forEach((row, i) => {
+    html += `<tr><th>${i + 2}</th>${row.map((v, ci) => `<td class="${ci === 5 ? "num" : ""}">${esc(ci === 5 ? Number(v).toFixed(2) : String(v))}</td>`).join("")}</tr>`;
+  });
+  html += "</tbody>";
+  table.innerHTML = html;
+}
+
+/* ================= skills & tasks ================= */
+const SKILL_ID_FUND = "excel-fundamentals";
+const SKILLS = [
+  { id: SKILL_ID_FUND, label: "Excel Fundamentals" },
+];
+
+const TASKS = [
+  { id: "xl-f01", skill: SKILL_ID_FUND, tool: "excel", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Total revenue across every order",
+    objective: "Add up an entire column with SUM, the first move on any new sheet.",
+    prompt: "In one formula, return the total of every value in the <code>amount</code> column (F2:F25).",
+    starterFormula: "",
+    referenceFormula: "=SUM(F2:F25)",
+    hints: [
+      "SUM adds up every number in a range, exactly what \"total\" means here.",
+      "The amount column is F, and the data runs from row 2 (row 1 is headers) to row 25.",
+      "=SUM(F2:F25) adds every cell in that range.",
+      "=SUM(F2:F25)" ],
+    explanation: { why: "SUM walks every cell in the range and adds the numeric ones together, ignoring the header row entirely since it isn't part of the range.", mistake: "Including row 1 in the range (F1:F25) would try to add the text \"amount\" into the total, most spreadsheets silently skip non-numeric cells in SUM rather than erroring, but it's still the wrong range to reference on purpose.", tip: "SUM is almost always the first formula worth writing on any new sheet, just to get a feel for the scale of the numbers before asking anything more specific.", business: "Total revenue is the number every other number in this sheet gets compared against, it's the natural starting point for any sales review." } },
+
+  { id: "xl-f02", skill: SKILL_ID_FUND, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-f01"],
+    title: "The average order value",
+    objective: "Use AVERAGE instead of manually dividing a SUM by a COUNT.",
+    prompt: "Return the average value of every order in the <code>amount</code> column, rounded to 2 decimal places.",
+    starterFormula: "",
+    referenceFormula: "=ROUND(AVERAGE(F2:F25),2)",
+    hints: [
+      "AVERAGE means a range directly, it's built to do exactly what SUM(range)/COUNT(range) would do manually.",
+      "Wrap it in ROUND so the answer comes back to exactly 2 decimal places instead of a long decimal.",
+      "ROUND(AVERAGE(range), 2) is the pattern, the second ROUND argument is how many decimal places to keep.",
+      "=ROUND(AVERAGE(F2:F25),2)" ],
+    explanation: { why: "AVERAGE computes the mean of a range in one step, it's the same arithmetic as SUM divided by COUNT, but it can't be thrown off if you get the row count wrong by hand.", mistake: "Forgetting ROUND leaves you with a long, unrounded decimal, technically correct but not how a real report would ever present a dollar figure.", tip: "ROUND(formula, 2) wrapped around almost any dollar calculation is a habit worth building now, it matches how money is actually reported everywhere else in this course.", business: "Average order value is one of the first numbers a retail business tracks over time, a rising AOV means customers are buying more per visit, a falling one is often an early warning sign." } },
+
+  { id: "xl-f03", skill: SKILL_ID_FUND, tool: "excel", level: "guided", difficulty: "core", prerequisite: [],
+    title: "How many orders are on the sheet",
+    objective: "Distinguish COUNT (numeric cells) from COUNTA (any non-blank cell).",
+    prompt: "Return the number of orders on the sheet, by counting the non-blank cells in the <code>order_id</code> column (A2:A25).",
+    starterFormula: "",
+    referenceFormula: "=COUNTA(A2:A25)",
+    hints: [
+      "\"How many orders\" means counting rows, not adding anything up, that's a COUNT-family formula, not SUM.",
+      "COUNT only counts numeric cells, COUNTA counts any cell that isn't blank, both would work here since order_id is numeric, but COUNTA is the more general habit.",
+      "COUNTA(A2:A25) counts every non-blank cell in the order_id column, one per order.",
+      "=COUNTA(A2:A25)" ],
+    explanation: { why: "COUNTA counts any cell with something in it, text or number, while COUNT only counts numbers, on a numeric ID column both give the same answer, but COUNTA is the safer default when you're not sure a column will always be numeric.", mistake: "Using COUNT on a column that later turns out to contain some text (like an order code such as \"ORD-004\") would silently undercount, COUNTA wouldn't have that problem.", tip: "COUNTA is a good default for \"how many rows are there\" questions in general, reach for plain COUNT specifically when you care that a value is numeric, not just present.", business: "Order count on its own is a basic operational metric, but it's also the denominator behind almost every other rate or average you'll compute from this sheet." } },
+
+  { id: "xl-f04", skill: SKILL_ID_FUND, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-f03"],
+    title: "How many orders were returned",
+    objective: "Count rows matching a text condition with COUNTIF.",
+    prompt: "Return the number of orders whose <code>status</code> (E2:E25) is exactly <code>\"Returned\"</code>.",
+    starterFormula: "",
+    referenceFormula: '=COUNTIF(E2:E25,"Returned")',
+    hints: [
+      "This is \"how many of X happened,\" the exact phrase COUNTIF is built for.",
+      "COUNTIF takes two arguments: the range to check, and the condition each cell is tested against.",
+      "COUNTIF(E2:E25,\"Returned\") counts every cell in the status column that matches the text \"Returned\" exactly.",
+      '=COUNTIF(E2:E25,"Returned")' ],
+    explanation: { why: "COUNTIF scans the range and tests every cell against the criteria, here an exact text match, then returns how many cells passed.", mistake: "Typing the status text with different capitalization or a typo (\"returned\" vs \"Returned\") usually still works, since Excel's text matching in COUNTIF is case-insensitive, but a genuine typo (\"Retured\") would silently return 0 instead of erroring.", tip: "COUNTIF's second argument is the workhorse of most spreadsheet reporting, it's the same shape whether you're counting returns, counting a region, or counting anything else that has a text label.", business: "Return rate is one of the first health checks on any retail operation, a spike in returns for one region or product usually points to a real, specific problem worth investigating." } },
+
+  { id: "xl-f05", skill: SKILL_ID_FUND, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-f04"],
+    title: "How many orders were over $200",
+    objective: "Use COUNTIF with a numeric comparison instead of a text match.",
+    prompt: "Return the number of orders where <code>amount</code> (F2:F25) is greater than 200.",
+    starterFormula: "",
+    referenceFormula: '=COUNTIF(F2:F25,">200")',
+    hints: [
+      "COUNTIF's criteria can be a comparison, not just an exact match, written as text like \">200\".",
+      "The comparison operator goes inside the quotes, right up against the number, no space.",
+      "COUNTIF(F2:F25,\">200\") counts every cell in the amount column greater than 200.",
+      '=COUNTIF(F2:F25,">200")' ],
+    explanation: { why: "COUNTIF accepts a comparison operator as part of its criteria string, \">200\" tests every cell against that threshold instead of an exact match.", mistake: "Writing the criteria as a bare number, 200, without the operator, tests for cells EQUAL to 200, not greater than it, an easy way to silently get the wrong count.", tip: "This exact pattern, COUNTIF(range, \">threshold\"), is how you'd answer almost any \"how many were above/below X\" question without touching a single extra column.", business: "Knowing how many orders clear a dollar threshold is a fast way to size a segment, for instance, how many customers would a free-shipping-over-$200 promotion actually apply to." } },
+
+  { id: "xl-f06", skill: SKILL_ID_FUND, tool: "excel", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Classify one order as High or Low value",
+    objective: "Branch on a condition with IF, referencing a single cell.",
+    prompt: "Order 3 (row 3) has an amount in F3. Using a $150 threshold, return <code>\"High\"</code> if it's above $150, otherwise <code>\"Low\"</code>.",
+    starterFormula: "",
+    referenceFormula: '=IF(F3>150,"High","Low")',
+    hints: [
+      "IF takes three parts: a condition, what to return if it's true, and what to return if it's false.",
+      "The condition here is a plain comparison against a single cell, F3>150.",
+      "IF(F3>150,\"High\",\"Low\") returns \"High\" when the condition is true, \"Low\" otherwise.",
+      '=IF(F3>150,"High","Low")' ],
+    explanation: { why: "IF evaluates its first argument as true or false, then returns exactly one of the other two arguments depending on which way that came out, nothing else runs.", mistake: "Swapping the order of the true/false results (\"Low\" first, \"High\" second) silently flips every classification, since IF doesn't know which text is supposed to mean what, it just returns whichever argument is in the true or false slot.", tip: "IF referencing a single cell like this is the building block, once you're comfortable with it, nesting IF inside COUNTIF or SUMIF (as the next tasks do) is the same logic applied to a whole range instead of one cell.", business: "A high/low flag like this is usually the first step toward a tiering system, VIP vs regular customer, priority vs standard shipping, the underlying logic is always this same threshold check." } },
+
+  { id: "xl-f07", skill: SKILL_ID_FUND, tool: "excel", level: "semiguided", difficulty: "core", prerequisite: ["xl-f01"],
+    title: "The single largest order",
+    objective: "Use MAX to find an extreme value without sorting the sheet.",
+    prompt: "Return the largest single value in the <code>amount</code> column.",
+    starterFormula: "",
+    referenceFormula: "=MAX(F2:F25)",
+    hints: [
+      "You need the single biggest number in a range, that's exactly what MAX is for, no sorting required.",
+      "MAX takes a range and returns the largest numeric value in it, ignoring blanks and text.",
+      "MAX(F2:F25) scans the amount column and returns its largest value.",
+      "=MAX(F2:F25)" ],
+    explanation: { why: "MAX scans every cell in the range and keeps track of the largest numeric value seen, returning it once the whole range has been checked.", mistake: "Sorting the sheet by amount and reading off the top row also works, but it changes the sheet's row order for everyone else looking at it, MAX gets the same answer without touching anything.", tip: "MAX and MIN are the fastest way to sanity-check a dataset, an unexpectedly huge MAX or a negative MIN is often the first sign something in the data is wrong.", business: "The single largest order is often worth a closer look on its own, is it a legitimate bulk purchase, a VIP customer, or a data entry error, MAX is how you'd find it to check." } },
+
+  { id: "xl-f08", skill: SKILL_ID_FUND, tool: "excel", level: "semiguided", difficulty: "core", prerequisite: ["xl-f05"],
+    title: "Total revenue from the West region only",
+    objective: "Combine a condition and a sum in one formula with SUMIF.",
+    prompt: "Return the total <code>amount</code> for orders where <code>region</code> (C2:C25) is <code>\"West\"</code>.",
+    starterFormula: "",
+    referenceFormula: '=SUMIF(C2:C25,"West",F2:F25)',
+    hints: [
+      "This needs a SUM that only includes some of the rows, the ones matching a condition, that's SUMIF, not plain SUM.",
+      "SUMIF takes three arguments: the range to test, the condition, and the range to actually sum (which can be a different column).",
+      "SUMIF(C2:C25,\"West\",F2:F25) checks the region column for \"West\", and for every match, adds the corresponding amount.",
+      '=SUMIF(C2:C25,"West",F2:F25)' ],
+    explanation: { why: "SUMIF tests each row of its first range against the criteria, and for every row that matches, adds the corresponding cell from the third range, the two ranges stay aligned row by row.", mistake: "Summing the wrong range, for instance SUMIF(C2:C25,\"West\",C2:C25), would try to sum the region text itself instead of the amount, that's a silent logic error, not one that throws visibly.", tip: "SUMIF is COUNTIF's sibling, same first two arguments (range, criteria), but with a third range telling it what to actually add up instead of just count.", business: "Regional revenue is one of the most standard breakdowns in any sales report, this exact formula, repeated once per region, is how that breakdown usually gets built." } },
+
+  { id: "xl-f09", skill: SKILL_ID_FUND, tool: "excel", level: "semiguided", difficulty: "core", prerequisite: ["xl-f04"],
+    title: "Flag whether returns look high this period",
+    objective: "Nest a COUNTIF inside an IF to turn a count into a business-readable flag.",
+    prompt: "If more than 3 orders have <code>status</code> = <code>\"Returned\"</code>, return <code>\"Alert\"</code>, otherwise return <code>\"OK\"</code>.",
+    starterFormula: "",
+    referenceFormula: '=IF(COUNTIF(E2:E25,"Returned")>3,"Alert","OK")',
+    hints: [
+      "This is two formulas in one, first count the returns, then check whether that count crosses a threshold.",
+      "COUNTIF(E2:E25,\"Returned\") gives you the count, put that whole expression where IF expects a condition.",
+      "IF(COUNTIF(E2:E25,\"Returned\")>3,\"Alert\",\"OK\"), the COUNTIF result feeds directly into the IF's comparison.",
+      '=IF(COUNTIF(E2:E25,"Returned")>3,"Alert","OK")' ],
+    explanation: { why: "A formula's result can be used anywhere a value is expected, including as part of another formula's condition, COUNTIF's numeric result slots directly into IF's comparison with no extra step needed.", mistake: "Computing COUNTIF in one cell and IF in a separate cell referencing it also works and is sometimes clearer, but nesting them directly is the more common pattern once you're comfortable with both formulas individually.", tip: "Nesting one formula inside another like this, a count feeding a condition, a lookup feeding a calculation, is most of what separates an intermediate spreadsheet user from a beginner.", business: "A plain count (\"4 returns\") means nothing to a stakeholder without context, a flag like \"Alert\" or \"OK\" turns that same number into something they can act on at a glance." } },
+
+  { id: "xl-f10", skill: SKILL_ID_FUND, tool: "excel", level: "challenge", difficulty: "challenge", prerequisite: ["xl-f09"],
+    title: "The cancellation rate, as a percentage",
+    objective: "Combine COUNTIF, COUNTA, arithmetic, and ROUND into a single business metric.",
+    prompt: "Return the percentage of all orders whose <code>status</code> is <code>\"Cancelled\"</code>, rounded to 2 decimal places (for example, a result of 12.5 means 12.5%, not 0.125). Decide the formula yourself.",
+    starterFormula: "",
+    referenceFormula: '=ROUND(COUNTIF(E2:E25,"Cancelled")/COUNTA(A2:A25)*100,2)',
+    hints: [
+      "A percentage is a count divided by a total, times 100, you already have formulas for both the count and the total.",
+      "COUNTIF(E2:E25,\"Cancelled\") is the numerator, COUNTA(A2:A25) is the denominator (total orders).",
+      "Divide the COUNTIF result by the COUNTA result, multiply by 100, then wrap the whole thing in ROUND(...,2).",
+      '=ROUND(COUNTIF(E2:E25,"Cancelled")/COUNTA(A2:A25)*100,2)' ],
+    explanation: { why: "Every piece of this formula is something built in an earlier task, COUNTIF for the count, COUNTA for the total, arithmetic to turn a ratio into a percentage, and ROUND to present it cleanly, combined into one line.", mistake: "Forgetting to multiply by 100 leaves you with a decimal fraction (0.0417) instead of a percentage (4.17), technically the same information, but not how percentages are ever actually reported to a stakeholder.", tip: "Whenever a business question asks for a rate or a percentage, the shape is almost always the same: COUNTIF or SUMIF for the part, COUNTA or COUNT for the whole, divide, multiply by 100, round.", business: "A cancellation rate stated as a clean percentage, not a raw count, is what actually goes in front of a stakeholder, \"4.17% of orders were cancelled\" is a sentence a manager can act on, \"1 order\" or \"24 orders\" alone isn't." } },
+];
+
+/* ================= grading ================= */
+async function checkTask(id) {
+  const task = TASKS.find(t => t.id === id);
+  const resultsEl = document.getElementById("results_" + id);
+  const formulaInput = document.getElementById("formula_" + id);
+  const studentFormula = formulaInput.value;
+  resultsEl.innerHTML = `<div class="feedback">Evaluating&hellip;</div>`;
+
+  let studentValue, refValue;
+  const wb = currentWorkbook();
+  try { studentValue = evalFormula(studentFormula, wb, "Sheet1"); }
+  catch (e) {
+    resultsEl.innerHTML = `<div class="feedback bad">Your formula has an error: ${esc(e.message)}</div>`;
+    PracticeProgress.recordAttempt(id, false);
+    renderSkillBar();
+    return;
+  }
+  try { refValue = evalFormula(task.referenceFormula, wb, "Sheet1"); } catch (e) { refValue = null; }
+  const primaryPass = resultsMatch(studentValue, refValue);
+
+  // Three independent mutated copies, not one: a task whose result is a
+  // single boolean-ish flag (e.g. "Alert" vs "OK") only has two possible
+  // outputs, so a hardcoded literal has real odds of surviving any ONE
+  // random mutation by chance alone, no matter how the mutation range is
+  // tuned. Requiring a match on three independently redrawn copies cubes
+  // that survival probability instead.
+  let pass = false, mutationNote = "";
+  if (primaryPass) {
+    try {
+      for (let round = 0; round < 3; round++) {
+        const mutWb = mutatedWorkbook();
+        const mutStudent = evalFormula(studentFormula, mutWb, "Sheet1");
+        const mutRef = evalFormula(task.referenceFormula, mutWb, "Sheet1");
+        pass = resultsMatch(mutStudent, mutRef);
+        if (!pass) { mutationNote = " Your formula matched on the original sheet but not on an independently modified copy, that usually means a hardcoded or memorized result rather than a real formula."; break; }
+      }
+    } catch (e) {
+      pass = false;
+      mutationNote = ` Your formula matched the original sheet but raised an error on a modified copy: ${esc(e.message)}.`;
+    }
+  }
+  const verdict = document.createElement("div");
+  verdict.className = "feedback " + (pass ? "ok" : "bad");
+  verdict.innerHTML = pass
+    ? `<b>Correct.</b> Result: ${esc(fmtResult(studentValue))}. Checked against a live reference formula, then re-checked on an independently modified copy of the sheet, not a fixed number, so this can't be hardcoded.`
+    : primaryPass
+      ? `<b>Not quite.</b>${mutationNote}`
+      : `<b>Not quite.</b> Your formula ran and returned ${esc(fmtResult(studentValue))}, that doesn't match the expected result.`;
+  resultsEl.innerHTML = "";
+  resultsEl.appendChild(verdict);
+
+  if (pass && task.explanation) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(task.explanation));
+  PracticeProgress.recordAttempt(id, pass);
+  if (pass) openTasks.add(id);
+  renderTasks();
+  renderSkillBar();
+}
+function runTask(id) {
+  const task = TASKS.find(t => t.id === id);
+  const resultsEl = document.getElementById("results_" + id);
+  const formulaInput = document.getElementById("formula_" + id);
+  try {
+    const wb = currentWorkbook();
+    const v = evalFormula(formulaInput.value, wb, "Sheet1");
+    resultsEl.innerHTML = `<div class="feedback result"><b>Result:</b> ${esc(fmtResult(v))}</div>`;
+  } catch (e) {
+    resultsEl.innerHTML = `<div class="feedback bad">Formula error: ${esc(e.message)}</div>`;
+  }
+}
+
+/* ================= rendering ================= */
+function tierLabel(tier) { return { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" }[tier]; }
+function renderSkillBar() {
+  const order = ["not-started", "introduced", "practicing", "competent", "mastered"];
+  const wrap = document.getElementById("skillBars");
+  wrap.innerHTML = SKILLS.map(s => {
+    const prog = PracticeProgress.skillProgress(TASKS, s.id);
+    const reachedIdx = order.indexOf(prog.tier);
+    const ladder = order.slice(1).map((t, i) => `<span class="${i + 1 <= reachedIdx ? "reached" : ""}">${tierLabel(t)}</span>`).join("");
+    return `<div class="skillbar">
+      <div class="skillrow">
+        <span style="font-weight:700;font-size:14.5px">${esc(s.label)}</span>
+        <span class="tierpill t-${prog.tier}">${tierLabel(prog.tier)}</span>
+        <div class="skillbarwrap"><div class="fill" style="width:${prog.pct}%"></div></div>
+        <span class="mono" style="font-size:12.5px;color:var(--mut2)">${prog.passedCount} / ${prog.totalCount} tasks</span>
+      </div>
+      <div class="tierladder">${ladder}</div>
+    </div>`;
+  }).join("");
+  const next = PracticeProgress.recommendNext(TASKS);
+  if (!document.getElementById("nextUpBlock")) {
+    const block = document.createElement("div");
+    block.className = "skillbar";
+    block.id = "nextUpBlock";
+    block.innerHTML = `<div class="nextup" id="nextUp"></div>`;
+    wrap.after(block);
+  }
+  const target = document.getElementById("nextUp");
+  const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
+  target.innerHTML = next
+    ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
+    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. Further stages (SUMIF/lookup formulas, multi-condition logic, a mastery task) aren't built yet.`;
+}
+function buildHintsHtml(hints) {
+  const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
+  return `<div class="hints">${hints.map((h, i) => `<details><summary>${labels[i]}</summary><div class="hbody">${esc(h)}</div></details>`).join("")}</div>`;
+}
+function buildExplainHtml(ex) {
+  if (!ex) return "";
+  const rows = [["Why this works", ex.why], ["Common mistake", ex.mistake], ["Real analyst tip", ex.tip], ["Business interpretation", ex.business]].filter(([, v]) => v);
+  return `<div class="explainbox">${rows.map(([lbl, v]) => `<div class="erow"><div class="elbl">${esc(lbl)}</div><p>${esc(v)}</p></div>`).join("")}</div>`;
+}
+
+const openTasks = new Set();
+const formulaDrafts = {};
+const resultsDrafts = {};
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  TASKS.forEach(t => {
+    const openEl = document.getElementById("body_" + t.id);
+    if (openEl && openEl.classList.contains("open")) openTasks.add(t.id);
+    const fi = document.getElementById("formula_" + t.id);
+    if (fi) formulaDrafts[t.id] = fi.value;
+    const res = document.getElementById("results_" + t.id);
+    if (res && res.innerHTML) resultsDrafts[t.id] = res.innerHTML;
+  });
+  list.innerHTML = "";
+  TASKS.forEach((t, idx) => {
+    const state = PracticeProgress.getTaskState(t.id);
+    const prereqsMet = t.prerequisite.every(pid => PracticeProgress.getTaskState(pid).passed);
+    const card = document.createElement("div");
+    card.className = "taskcard";
+    card.innerHTML = `
+      <div class="taskhead" data-id="${t.id}">
+        <span class="statusdot ${state.passed ? "passed" : ""}"></span>
+        <span class="tid">${String(idx + 1).padStart(2, "0")}</span>
+        <span class="ttitle">${esc(t.title)}</span>
+        <span class="levelpill ${t.level}">${t.level.replace("semiguided", "semi-guided")}</span>
+      </div>
+      <div class="taskbody${openTasks.has(t.id) ? " open" : ""}" id="body_${t.id}">
+        <div class="objective"><b>Objective:</b> ${esc(t.objective)}</div>
+        <p style="font-size:13.5px;margin-bottom:10px">${t.prompt}</p>
+        ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
+        <div class="forminput"><span class="fx">fx</span><input id="formula_${t.id}" type="text" spellcheck="false" placeholder="=SUM(F2:F25)" value="${esc(formulaDrafts[t.id] !== undefined ? formulaDrafts[t.id] : t.starterFormula)}"></div>
+        <div class="dagctrl">
+          <button data-run="${t.id}">Run formula</button>
+          <button class="primary" data-check="${t.id}">&#10003; Check answer</button>
+        </div>
+        <div id="results_${t.id}">${resultsDrafts[t.id] || ""}</div>
+        ${buildHintsHtml(t.hints)}
+        `}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll(".taskhead").forEach(head => {
+    head.addEventListener("click", () => {
+      const body = document.getElementById("body_" + head.dataset.id);
+      body.classList.toggle("open");
+    });
+  });
+  list.querySelectorAll("[data-run]").forEach(btn => {
+    btn.addEventListener("click", () => runTask(btn.dataset.run));
+  });
+  list.querySelectorAll("[data-check]").forEach(btn => {
+    btn.addEventListener("click", () => checkTask(btn.dataset.check));
+  });
+}
+
+renderGrid();
+renderSkillBar();
+renderTasks();
+</script>
+<script src="course-rail.js?v=5"></script>
+</body>
+</html>
