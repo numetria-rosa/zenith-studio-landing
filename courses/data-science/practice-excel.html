@@ -101,10 +101,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Excel &middot; Stages 1-3 of &hellip;</span>
+    <span class="eyebrow">Practice Library &middot; Excel &middot; Complete, Stages 1-4</span>
     <h1 class="serif">Excel Practice Library</h1>
     <p class="sub">Extra repetition beyond Module 1's core lesson, a real formula engine parsing and evaluating exactly what you type, not a multiple-choice guess. Every task is checked by evaluating your formula against a live spreadsheet, then against an independently modified copy, so a memorized number can't pass.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-3 (fundamentals, lookups and multi-condition logic, plus text functions and error handling: LEFT/RIGHT/MID, UPPER/LOWER/TRIM, TEXT, INDEX/MATCH, IFERROR), 30 tasks, real, fully built, graded, and tested. Further stages are planned but not yet built, that's future work, not a claim made here.</div>
+    <div class="scopenote"><b>Honest scope note:</b> all 4 stages are complete, 35 tasks (fundamentals, lookups and multi-condition logic, text functions and error handling, and business analysis: nested IF, date arithmetic, reversing a percentage, data-quality flags, and a fully independent manager's-request task), real, fully built, graded, and tested.</div>
   </header>
 
   <div class="sheetblock">
@@ -478,6 +478,16 @@ function evalFunction(name, argNodes, workbook, currentSheet) {
       if (idx === -1) throw new Error("#N/A, MATCH found no exact match");
       return idx + 1;
     }
+    case "DAYS": {
+      // Simplified date arithmetic: order_date is stored as plain
+      // "YYYY-MM-DD" text (this sheet has no real date type), DAYS
+      // parses two such strings and returns the whole-day difference,
+      // end_date minus start_date, matching Excel's own DAYS(end,start)
+      // argument order.
+      if (args.length !== 2) throw new Error("DAYS takes 2 arguments");
+      const parse = (s) => { const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/); if (!m) throw new Error(`'${s}' is not a valid YYYY-MM-DD date`); return Date.UTC(+m[1], +m[2] - 1, +m[3]); };
+      return Math.round((parse(args[0]) - parse(args[1])) / 86400000);
+    }
     case "VLOOKUP": {
       if (args.length < 3) throw new Error("VLOOKUP needs at least 3 arguments");
       const key = args[0], table = args[1];
@@ -659,10 +669,12 @@ function renderGrid() {
 const SKILL_ID_FUND = "excel-fundamentals";
 const SKILL_ID_LOOKUP = "excel-lookups";
 const SKILL_ID_TEXT = "excel-text-lookup";
+const SKILL_ID_BUSINESS = "excel-business";
 const SKILLS = [
   { id: SKILL_ID_FUND, label: "Excel Fundamentals" },
   { id: SKILL_ID_LOOKUP, label: "Excel Lookups & Logic" },
   { id: SKILL_ID_TEXT, label: "Excel Text & Error Handling" },
+  { id: SKILL_ID_BUSINESS, label: "Excel Business Analysis" },
 ];
 
 const TASKS = [
@@ -1065,6 +1077,76 @@ const TASKS = [
       "SUMIFS(F2:F25,D2:D25,\"Electronics\") appears twice, once for the dollar figure, once as the numerator of the percentage, divided by SUM(F2:F25) for the denominator.",
       '="Electronics revenue: "&TEXT(SUMIFS(F2:F25,D2:D25,"Electronics"),"$0.00")&" ("&TEXT(SUMIFS(F2:F25,D2:D25,"Electronics")/SUM(F2:F25),"0.0%")&" of total)"' ],
     explanation: { why: "Every piece of this stage lands in one line, SUMIFS for the filtered total, TEXT (twice) for two different display formats, and & to assemble literal text and formatted numbers into one readable sentence.", mistake: "Treating the polished sentence as more trustworthy than the numbers behind it is exactly backwards, TEXT() only changes how a number LOOKS, a formatting bug (wrong format code, a rounding surprise) can make an inaccurate number look completely convincing.", tip: "A nicely formatted output is a presentation layer, not a verification step, before a summary sentence like this goes in front of a stakeholder, it's worth checking the raw, unformatted numbers behind it at least once.", business: "A confident-sounding sentence like \"Electronics revenue: $2429.49 (62.7% of total)\" is exactly the kind of output that gets copied straight into a slide deck without a second look, that confidence is earned by the calculation being correct, not by the formatting looking clean, this task's stage closes on that distinction on purpose." } },
+
+  { id: "xl-b01", skill: SKILL_ID_BUSINESS, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-s06"],
+    title: "A three-tier customer classification",
+    objective: "Nest IF inside IF to sort a value into more than two buckets.",
+    prompt: "Classify order 5 (row 5) into a spending tier based on its amount: <code>\"Platinum\"</code> if $300 or more, <code>\"Gold\"</code> if at least $100 but under $300, otherwise <code>\"Standard\"</code>.",
+    starterFormula: "",
+    referenceFormula: '=IF(F5>=300,"Platinum",IF(F5>=100,"Gold","Standard"))',
+    hints: [
+      "Two thresholds means three buckets, a single IF only branches two ways, you need a second IF nested inside the first one's \"false\" slot.",
+      "Check the highest tier first: IF the amount is >=300, it's Platinum, otherwise fall through to a second IF that checks the next threshold.",
+      "IF(F5>=300,\"Platinum\", IF(F5>=100,\"Gold\",\"Standard\")), the second IF only ever runs when the first condition was false.",
+      '=IF(F5>=300,"Platinum",IF(F5>=100,"Gold","Standard"))' ],
+    explanation: { why: "Nesting IF inside IF's false branch chains conditions in order, each nested IF only gets evaluated if every check before it failed, checking the highest threshold first is what makes the chain work correctly.", mistake: "Checking thresholds out of order, for instance testing >=100 before >=300, would misclassify every Platinum order as Gold, since the first true condition wins and the code never gets to check the higher bar.", tip: "For more than two tiers, always check from the most extreme threshold toward the least extreme, one IF per additional tier, nested inside the previous one's false branch.", business: "A tiered classification like this is the basis of almost every loyalty program or account segmentation, Platinum/Gold/Standard customers get different treatment, and it all starts from a threshold rule exactly like this one." } },
+
+  { id: "xl-b02", skill: SKILL_ID_BUSINESS, tool: "excel", level: "semiguided", difficulty: "core", prerequisite: ["xl-t03"],
+    title: "How many days between two orders",
+    objective: "Use DAYS to do real date arithmetic instead of treating dates as plain text.",
+    prompt: "The sheet is sorted chronologically by order_date. Return the number of days between the order in row 2 and the order in row 19.",
+    starterFormula: "",
+    referenceFormula: "=DAYS(B19,B2)",
+    hints: [
+      "This needs a real day count between two dates, not a text extraction like the earlier LEFT/MID tasks, that calls for a proper date function.",
+      "DAYS(end_date, start_date) returns the whole number of days between two dates, later date first.",
+      "Row 2's date goes second (the earlier date), row 19's date goes first, DAYS(B19,B2) gives the span between them.",
+      "=DAYS(B19,B2)" ],
+    explanation: { why: "DAYS parses both dates and returns the difference in whole days, unlike LEFT or MID (which only ever see the date as text), DAYS actually understands calendar arithmetic, crossing month and year boundaries correctly.", mistake: "Subtracting the two date strings directly, or treating them as if LEN or LEFT could measure elapsed time, doesn't work, text functions don't know what a date means, only that it's a string.", tip: "Once dates are genuinely being compared, added to, or measured against each other, reach for a date function, not a text function, text functions are for extracting or reformatting, not calculating.", business: "\"How long has this data been collected\" or \"how many days since the last order\" are both real, common questions, and both are exactly this DAYS calculation applied to different pairs of dates." } },
+
+  { id: "xl-b03", skill: SKILL_ID_BUSINESS, tool: "excel", level: "challenge", difficulty: "challenge", prerequisite: ["xl-f01"],
+    title: "Back out the pre-tax revenue",
+    objective: "Reverse a percentage increase, a common real financial calculation.",
+    prompt: "Finance has just told you that every amount in the amount column already includes a 5% sales tax. Return the TOTAL pre-tax revenue across every order (the amount before that 5% was added), rounded to 2 decimal places. Decide the formula yourself.",
+    starterFormula: "",
+    referenceFormula: "=ROUND(SUM(F2:F25)/1.05,2)",
+    hints: [
+      "The stored total already has 5% added on top of the real pre-tax figure, dividing it back down (not subtracting 5%) is what actually reverses a percentage increase.",
+      "If pre-tax * 1.05 = the tax-inclusive total, then pre-tax = total / 1.05, that's the relationship to use.",
+      "Sum the whole amount column first, then divide that sum by 1.05, then round to 2 decimal places.",
+      "=ROUND(SUM(F2:F25)/1.05,2)" ],
+    explanation: { why: "A value that already has X% added on top is 100%+X% (as a multiplier) of the original, dividing by that multiplier, not subtracting X% from the total, is what correctly reverses the increase back to the original figure.", mistake: "Subtracting 5% of the total from the total (SUM(F2:F25)*0.95) looks similar but answers a different question, that formula finds 95% of the tax-inclusive total, not the true pre-tax amount, the two numbers are close but genuinely different.", tip: "Whenever a stored figure already has a percentage baked in and you need the original, divide by (1 + the percentage as a decimal), this exact pattern, not subtraction, reverses a percentage increase correctly.", business: "Backing out tax, a markup, or a fee from a stored total is routine finance work, getting the direction of the calculation wrong (subtracting instead of dividing) is a genuinely common, genuinely costly real mistake." } },
+
+  { id: "xl-b04", skill: SKILL_ID_BUSINESS, tool: "excel", level: "challenge", difficulty: "challenge", prerequisite: ["xl-s09"],
+    title: "Flag high-value orders that didn't complete",
+    objective: "Combine a numeric threshold with a not-equal condition to surface orders worth a second look.",
+    prompt: "Ops wants a quick data-quality check: how many orders are BOTH over $150 in amount AND did not end up <code>\"Completed\"</code> (cancelled or returned)? A high-value order that fell through is worth investigating. Decide the formula yourself.",
+    starterFormula: "",
+    referenceFormula: '=COUNTIFS(F2:F25,">150",E2:E25,"<>Completed")',
+    hints: [
+      "This needs two conditions true at once again, COUNTIFS, but one of them is a \"not equal to\" condition rather than a match.",
+      "COUNTIF/COUNTIFS criteria accept <> for \"not equal\", exactly like >, <, and = do, written the same way, as text inside the criteria argument.",
+      "COUNTIFS(F2:F25,\">150\",E2:E25,\"<>Completed\") counts rows where amount exceeds 150 AND status isn't Completed.",
+      '=COUNTIFS(F2:F25,">150",E2:E25,"<>Completed")' ],
+    explanation: { why: "<> works in a criteria string exactly like every other comparison operator this stage has used, it just tests inequality instead of equality, matching everything except the specified value.", mistake: "Writing two separate conditions for \"Cancelled\" and \"Returned\" (which would need an OR, not something COUNTIFS can express directly) is more complicated than necessary here, <>Completed already captures both statuses (and any other non-Completed status) in one condition.", tip: "<> is worth remembering as a criteria operator in its own right, not just the 'opposite of =', it's often the simplest way to express 'anything except this one specific value.'", business: "A short, specific review list, high-value orders that didn't complete, is exactly the kind of targeted flag an ops or fraud-review team acts on, far more useful than a blanket cancellation count with no way to prioritize which cases matter most." } },
+
+  { id: "xl-b05", skill: SKILL_ID_BUSINESS, tool: "excel", level: "mastery", difficulty: "mastery", prerequisite: ["xl-b03", "xl-b04"],
+    title: "The manager's workbook: find the number finance actually needs",
+    objective: "Given only a business request, decide which techniques from every earlier stage actually apply, then justify the result.",
+    prompt: "You've been handed this workbook with the following request from your manager: \"I need the real net revenue we can count on, completed orders only, and don't forget the payment processor takes a 5% cut of everything that goes through.\" Produce that single number, rounded to 2 decimal places. There is no formula hint for this task, decide the approach yourself. Then, in the box below, explain in 2-3 sentences what you included and excluded, and why a stakeholder should trust this number over simply summing the whole amount column.",
+    starterFormula: "",
+    referenceFormula: '=ROUND(SUMIF(E2:E25,"Completed",F2:F25)*0.95,2)',
+    written: {
+      label: "What did you include or exclude, and why should this number be trusted over a raw SUM?",
+      placeholder: "Think about which orders represent real, kept revenue, and what the processor's cut means for the final figure...",
+      check: (text) => /(complet|cancel|return|fee|processor|net)/i.test(text) && text.trim().length > 40,
+      hint: "Mention that only completed orders were included (cancelled/returned orders never became real revenue), and that the 5% processor fee was subtracted because that portion never actually reaches the business, a raw SUM of the whole amount column would overstate both of these." },
+    hints: [
+      "This is genuinely open-ended, but every piece has already appeared somewhere in this library: filtering to one status, and applying a percentage cut.",
+      "\"Completed orders only\" is a status filter, SUMIF or SUMIFS, \"the processor takes a 5% cut\" means the real kept revenue is 95% of that filtered total.",
+      "First get completed-only revenue with SUMIF(E2:E25,\"Completed\",F2:F25), then multiply that result by 0.95 (keeping 95%, since 5% was taken), then round.",
+      '=ROUND(SUMIF(E2:E25,"Completed",F2:F25)*0.95,2)' ],
+    explanation: { why: "This is a plain-language business request with no formula names in it at all, translating \"real net revenue, completed only, minus the processor's cut\" into SUMIF plus a 0.95 multiplier is the actual analyst skill this whole library has been building toward.", mistake: "Summing the entire amount column, including cancelled and returned orders, and skipping the processor fee entirely, would overstate the true figure on two separate counts, exactly the kind of overstated number that erodes trust once someone checks it against the bank statement.", tip: "When a business request has no formula names in it, translate the plain-language conditions one at a time, \"completed only\" becomes a filter, \"the processor's cut\" becomes a multiplier, before worrying about which specific function to use.", business: "This is deliberately the least guided task in the whole Excel library, a real manager's request never comes with a function name attached, being able to work backward from a plain-language ask to the right combination of filtering and arithmetic is the actual job, not a bonus skill on top of it." } },
 ];
 
 /* ================= grading ================= */
