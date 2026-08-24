@@ -77,6 +77,9 @@ table.qres th{background:var(--card2);color:var(--mut2);text-transform:uppercase
 .hints summary{cursor:pointer;color:var(--purple);font-size:12px;font-weight:600;list-style:none}
 .hints summary::-webkit-details-marker{display:none}
 .hints .hbody{margin-top:7px;font-size:12.5px;color:var(--mut);padding-top:7px;border-top:1px solid var(--bd)}
+.explainbox{margin-top:12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.explainbox .erow .elbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple);font-family:'IBM Plex Mono';margin-bottom:3px}
+.explainbox .erow p{font-size:12.5px;color:var(--mut)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
 @media (max-width:640px){ .wrap{padding:0 16px 70px} .taskhead{flex-wrap:wrap} }
 </style>
@@ -87,10 +90,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; SQL &middot; Stages 1-2 of 6</span>
+    <span class="eyebrow">Practice Library &middot; SQL &middot; Stages 1-3 of 6</span>
     <h1 class="serif">SQL Practice Library</h1>
     <p class="sub">Extra repetition beyond Module 6's core lesson, same real database, real anti-cheat, on-demand hints. Each skill is tracked independently, aggregation mastery doesn't borrow credit from fundamentals mastery. Guided tasks first, then semi-guided (you get the business question and the data, not the technique), then a challenge task with no scaffolding at all.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-2 of a much larger planned SQL practice library (60 tasks across 6 stages: fundamentals, aggregation, joins, intermediate SQL, window functions, business challenges). These 20 tasks are real, fully built, graded, and tested. Joins, intermediate SQL, window functions, and business-challenge stages, plus the Excel/Python/Tableau/Power BI/Automation libraries, are designed but not yet built, that's future work, not a claim made here.</div>
+    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-3 of a much larger planned SQL practice library (60 tasks across 6 stages: fundamentals, aggregation, joins, intermediate SQL, window functions, business challenges). These 30 tasks are real, fully built, graded, and tested. Intermediate SQL, window functions, and business-challenge stages, plus the Excel/Python/Tableau/Power BI/Automation libraries, are designed but not yet built, that's future work, not a claim made here.</div>
   </header>
 
   <div id="skillBars"></div>
@@ -107,9 +110,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 const esc = CourseProgress.escapeHtml;
 const SKILL_ID = "sql-fundamentals";
 const SKILL_ID_AGG = "sql-aggregation";
+const SKILL_ID_JOINS = "sql-joins";
 const SKILLS = [
   { id: SKILL_ID, label: "SQL Fundamentals" },
   { id: SKILL_ID_AGG, label: "SQL Aggregation" },
+  { id: SKILL_ID_JOINS, label: "SQL Joins" },
 ];
 
 /* ================= TASK_MAP ================= */
@@ -358,11 +363,141 @@ const TASKS = [
       "The denominator matters: it should be the number of distinct orders, not the number of line-item rows, an order with 3 items shouldn't count 3 times.",
       "COUNT(DISTINCT o.order_id) guards against the fan-out trap from Module 6, total revenue divided by that.",
       "SELECT ROUND(SUM(oi.quantity*oi.unit_price)*1.0/COUNT(DISTINCT o.order_id), 2) FROM orders o JOIN order_items oi ON o.order_id=oi.order_id WHERE o.status='completed';" ] },
+
+  /* ---- Stage 3: Joins & Relational Analysis ---- */
+  { id: "sql-j01", skill: SKILL_ID_JOINS, tool: "sql", level: "guided", difficulty: "core", prerequisite: [],
+    title: "INNER JOIN two tables",
+    objective: "Combine matching rows from two related tables into one result.",
+    prompt: "Return <code>order_id</code>, <code>order_date</code>, and the customer's <code>name</code>, for every order.",
+    starter: "SELECT order_id, order_date FROM orders",
+    referenceSql: "SELECT o.order_id, o.order_date, c.name FROM orders o JOIN customers c ON o.customer_id = c.customer_id",
+    hints: [
+      "The order date lives in orders, the customer's name lives in customers, you need both tables at once.",
+      "JOIN them on the column they share: customer_id.",
+      "FROM orders o JOIN customers c ON o.customer_id = c.customer_id, then select the three columns you need.",
+      "SELECT o.order_id, o.order_date, c.name FROM orders o JOIN customers c ON o.customer_id = c.customer_id;" ],
+    explanation: { why: "A plain JOIN (INNER JOIN) only keeps rows that have a match in both tables, exactly what you want when every order genuinely has a real customer.", mistake: "Forgetting the ON condition entirely produces a cross join, every order paired with every customer, a result far larger than either table, and mostly nonsense.", tip: "Always know which column two tables share before you join them, it's rarely optional and it's never guessed.", business: "This is the most common analyst move: revenue data and customer data almost always live in separate tables, and nearly every real business question needs both." } },
+
+  { id: "sql-j02", skill: SKILL_ID_JOINS, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-j01"],
+    title: "LEFT JOIN to keep unmatched rows",
+    objective: "See what INNER JOIN would have silently thrown away.",
+    prompt: "Return every customer's <code>customer_id</code>, <code>name</code>, and <code>order_id</code>, including customers who have never placed a single order (their <code>order_id</code> should show as missing, not disappear).",
+    starter: "SELECT c.customer_id, c.name FROM customers c",
+    referenceSql: "SELECT c.customer_id, c.name, o.order_id FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id",
+    hints: [
+      "An INNER JOIN here would silently drop every customer who never ordered, that's not what's being asked.",
+      "A different join keyword keeps every row from the left-hand table regardless of whether a match exists.",
+      "LEFT JOIN orders o ON c.customer_id = o.customer_id, starting FROM customers, not from orders.",
+      "SELECT c.customer_id, c.name, o.order_id FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id;" ],
+    explanation: { why: "LEFT JOIN keeps every row from the table named first (customers), filling in NULL for columns from the second table when there's no match.", mistake: "Using INNER JOIN here would quietly remove every customer who's never ordered, exactly the customers a re-engagement campaign would want to find.", tip: "If a business question includes any version of \"who hasn't...\", that's almost always a LEFT JOIN plus a NULL check, not an INNER JOIN.", business: "This matters directly for customer activation and retention reporting, an INNER JOIN version of this query would make your customer base look smaller and fully-activated, both wrong." } },
+
+  { id: "sql-j03", skill: SKILL_ID_JOINS, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-j02"],
+    title: "The same join, flipped",
+    objective: "Understand that LEFT JOIN and RIGHT JOIN are the same operation, viewed from opposite sides.",
+    prompt: "Rewrite the previous task using <code>RIGHT JOIN</code> instead of <code>LEFT JOIN</code>, keeping every customer (including those with no orders), but this time write <code>orders</code> first in the FROM clause.",
+    starter: "SELECT c.customer_id, c.name, o.order_id FROM orders o",
+    referenceSql: "SELECT c.customer_id, c.name, o.order_id FROM orders o RIGHT JOIN customers c ON o.customer_id = c.customer_id",
+    hints: [
+      "You want the exact same result as the LEFT JOIN task, just with the FROM table order swapped.",
+      "RIGHT JOIN keeps every row from the table on the right side of the join, the opposite of LEFT JOIN.",
+      "FROM orders o RIGHT JOIN customers c means \"keep every customer,\" even though customers is written second.",
+      "SELECT c.customer_id, c.name, o.order_id FROM orders o RIGHT JOIN customers c ON o.customer_id = c.customer_id;" ],
+    explanation: { why: "RIGHT JOIN and LEFT JOIN are the same idea, mirrored, whichever table is on the \"kept no matter what\" side is the one that behaves like the LEFT JOIN's first table.", mistake: "Assuming RIGHT JOIN is some different, more advanced operation, it isn't, it's purely about which side of the join you don't want to lose rows from.", tip: "Most analysts default to LEFT JOIN and just reorder their FROM clause instead of reaching for RIGHT JOIN, that's a style choice, not a technical requirement, and it's worth recognizing both.", business: "Some tools and teams have house-style conventions here, being able to read either form means you're not blocked by someone else's query style." } },
+
+  { id: "sql-j04", skill: SKILL_ID_JOINS, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-j01"],
+    title: "Join three tables",
+    objective: "Chain two joins together to connect data that spans three tables.",
+    prompt: "Finance wants line-item detail with names attached, not just IDs. Return the customer's <code>name</code>, the <code>order_id</code>, and each line item's <code>line_total</code> (<code>quantity * unit_price</code>), for every order line.",
+    starter: "SELECT oi.order_id, oi.quantity, oi.unit_price FROM order_items oi",
+    referenceSql: "SELECT c.name, o.order_id, oi.quantity * oi.unit_price AS line_total FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id",
+    hints: [
+      "The customer name, the order, and the line item live in three separate tables, none of them touch each other directly except through a shared key.",
+      "Chain two joins: customers to orders, then orders to order_items.",
+      "JOIN orders o ON c.customer_id = o.customer_id, then JOIN order_items oi ON o.order_id = oi.order_id.",
+      "SELECT c.name, o.order_id, oi.quantity * oi.unit_price AS line_total FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id;" ],
+    explanation: { why: "Joins chain: once two tables are joined, the combined result can be joined again to a third table on a different shared key.", mistake: "Trying to join customers directly to order_items, there's no shared column between them, only orders bridges the two.", tip: "Sketch the path between tables before writing the query: customers -> orders -> order_items. If you can't draw the path, you can't write the join.", business: "Real schemas are rarely two tables, most real analyst queries chain three or more, this is the actual day-to-day shape of the job." } },
+
+  { id: "sql-j05", skill: SKILL_ID_JOINS, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-j04"],
+    title: "Which products earn the most revenue?",
+    objective: "Combine a join with GROUP BY to answer a real product-performance question.",
+    prompt: "Merchandising wants a revenue ranking, not a units ranking. Return <code>product_name</code> and total revenue (<code>SUM(quantity*unit_price)</code>, rounded to 2dp), highest revenue first.",
+    starter: "SELECT sku FROM order_items",
+    referenceSql: "SELECT p.product_name, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.sku = p.sku GROUP BY p.product_name ORDER BY revenue DESC",
+    hints: [
+      "Product names live in products, quantity and price live in order_items, and you need a total per product.",
+      "Join on sku, then group by the product name and sum the revenue.",
+      "JOIN products p ON oi.sku = p.sku, GROUP BY p.product_name, SUM(oi.quantity*oi.unit_price).",
+      "SELECT p.product_name, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue FROM order_items oi JOIN products p ON oi.sku=p.sku GROUP BY p.product_name ORDER BY revenue DESC;" ],
+    explanation: { why: "Joining first, then grouping, lets you aggregate a numeric column from one table by a label that only exists in another.", mistake: "Grouping by sku instead of product_name would still work numerically, but produces a report nobody can read at a glance, always group by what a human needs to see.", tip: "\"Highest revenue\" and \"highest units\" often disagree, a cheap product can outsell an expensive one in revenue by sheer volume, or vice versa, always check which metric the stakeholder actually meant.", business: "This is a direct answer to \"which products should we double down on,\" the kind of question merchandising and inventory teams ask constantly." } },
+
+  { id: "sql-j06", skill: SKILL_ID_JOINS, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-j01"],
+    title: "Which customers have a cancelled order?",
+    objective: "Use a join purely to filter, without needing every joined column in the output.",
+    prompt: "Support wants to proactively reach out to anyone affected by a cancellation. Return the distinct <code>name</code> and <code>country</code> of every customer who has at least one order with <code>status = 'cancelled'</code>.",
+    starter: "SELECT name, country FROM customers",
+    referenceSql: "SELECT DISTINCT c.name, c.country FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE o.status = 'cancelled'",
+    hints: [
+      "\"Cancelled\" is a fact about an order, but the output needs to describe a customer, that's a join even though status never appears in the result.",
+      "Join customers to orders, filter on status, but only select the customer columns.",
+      "A customer with 2 cancelled orders would appear twice without something to collapse duplicates.",
+      "SELECT DISTINCT c.name, c.country FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE o.status = 'cancelled';" ],
+    explanation: { why: "A join can filter on one table's column while only selecting another table's columns, the WHERE clause has access to every joined table regardless of what's in SELECT.", mistake: "Skipping DISTINCT here: a customer with multiple cancelled orders would appear once per cancelled order, inflating the outreach list with duplicates.", tip: "Whenever a join's purpose is filtering rather than pulling combined data, double check whether the result needs DISTINCT, it usually does.", business: "A duplicated customer list means someone gets contacted twice, a small thing that looks unprofessional and erodes trust in the data team's output." } },
+
+  { id: "sql-j07", skill: SKILL_ID_JOINS, tool: "sql", level: "challenge", difficulty: "challenge", prerequisite: ["sql-j02"],
+    title: "Build a re-engagement list",
+    objective: "Use a LEFT JOIN's NULL behavior to find an absence, without being told the exact query shape.",
+    prompt: "Sales wants a country-by-country count of customers who have <b>never generated a single order</b>. Return <code>country</code> and the count of never-ordered customers in each. Decide the join yourself.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "SELECT c.country, COUNT(*) AS never_ordered FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id WHERE o.order_id IS NULL GROUP BY c.country",
+    hints: [
+      "\"Never generated an order\" is an absence of a match, which join preserves rows even when nothing matches?",
+      "After a LEFT JOIN, a customer with no orders has NULL in every column that came from orders.",
+      "WHERE o.order_id IS NULL keeps only the customers whose join found nothing, then GROUP BY country to count them.",
+      "SELECT c.country, COUNT(*) FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id WHERE o.order_id IS NULL GROUP BY c.country;" ],
+    explanation: { why: "LEFT JOIN plus a NULL check on the right-hand table's key is the standard SQL pattern for \"rows in A with no match in B.\"", mistake: "Filtering with WHERE o.status IS NULL instead of WHERE o.order_id IS NULL would work by coincidence here, but breaks the moment status has its own legitimate NULLs elsewhere, always check the join key column, not just any column from the right table.", tip: "This exact pattern, LEFT JOIN plus IS NULL on the joined key, is one of the highest-value things to have memorized as an analyst, it comes up constantly.", business: "This is a real, actionable list: marketing can target these specific customers with an activation campaign, a raw \"no orders\" percentage doesn't tell you who to actually contact." } },
+
+  { id: "sql-j08", skill: SKILL_ID_JOINS, tool: "sql", level: "challenge", difficulty: "challenge", prerequisite: ["sql-j05"],
+    title: "Validate a join before trusting it",
+    objective: "Confirm a join hasn't silently duplicated or dropped rows before trusting its output.",
+    prompt: "Before finance trusts the revenue-by-product numbers from a couple of tasks ago, they want proof the <code>order_items</code>-to-<code>products</code> join didn't change the row count. Write a query that returns two numbers side by side: the row count of <code>order_items</code> alone, and the row count after joining it to <code>products</code>. Decide the query structure yourself.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "SELECT (SELECT COUNT(*) FROM order_items) AS items_alone, (SELECT COUNT(*) FROM order_items oi JOIN products p ON oi.sku = p.sku) AS items_joined",
+    hints: [
+      "You need two separate counts in one row: one query has no join, one does.",
+      "A subquery in the SELECT list can compute a value independently, you can use two of them side by side.",
+      "(SELECT COUNT(*) FROM order_items) as one column, (SELECT COUNT(*) FROM order_items JOIN products ...) as another.",
+      "SELECT (SELECT COUNT(*) FROM order_items) AS items_alone, (SELECT COUNT(*) FROM order_items oi JOIN products p ON oi.sku=p.sku) AS items_joined;" ],
+    explanation: { why: "If every sku in order_items matches exactly one row in products, the joined count equals the original count, that equality is the actual proof the join is safe.", mistake: "Trusting a join's output just because it \"ran without an error\", a join can run perfectly and still silently multiply or drop rows, only checking the count catches it.", tip: "This exact two-number comparison is a real pre-flight check professional analysts run before shipping a number built on a join, especially one they didn't write themselves.", business: "A revenue figure built on a silently-inflated join is a wrong number presented with total confidence, exactly the kind of mistake that damages an analyst's credibility." } },
+
+  { id: "sql-j09", skill: SKILL_ID_JOINS, tool: "sql", level: "challenge", difficulty: "challenge", prerequisite: ["sql-j08"],
+    title: "Diagnose a fan-out bug",
+    objective: "Recognize and fix a join that's silently multiplying rows.",
+    prompt: "A colleague wrote this to count completed orders: <code>SELECT COUNT(*) FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'completed'</code>. It returns a number that looks too high. Explain what's gone wrong in one query that proves it, and write a corrected version that returns the true count of distinct completed orders.",
+    starter: "-- decide the approach yourself, then write the corrected query\n",
+    referenceSql: "SELECT COUNT(DISTINCT o.order_id) FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'completed'",
+    hints: [
+      "Joining orders to order_items produces one row per line item, not one row per order, an order with 3 items appears 3 times.",
+      "COUNT(*) after that join counts line items, not orders, that's the bug.",
+      "The fix doesn't remove the join, it changes what's being counted.",
+      "SELECT COUNT(DISTINCT o.order_id) FROM orders o JOIN order_items oi ON o.order_id=oi.order_id WHERE o.status='completed';" ],
+    explanation: { why: "COUNT(DISTINCT o.order_id) counts unique orders regardless of how many line-item rows the join produced for each one.", mistake: "This is the single most common real-world SQL bug in revenue and order reporting, joining to a line-item-level table then counting rows as if they were orders.", tip: "Anytime you join a one-to-many relationship (one order, many items) and then COUNT something, ask yourself: am I counting the thing I actually mean, or a row that got duplicated by the join?", business: "This exact bug, if shipped, would tell leadership completed orders nearly doubled, a number someone might present in a board meeting before anyone catches the mistake." } },
+
+  { id: "sql-j10", skill: SKILL_ID_JOINS, tool: "sql", level: "challenge", difficulty: "mastery", prerequisite: ["sql-j06", "sql-j07", "sql-j09"],
+    title: "Country revenue and reach, combined",
+    objective: "Transfer everything from this stage into one multi-join, multi-metric business answer.",
+    prompt: "Leadership wants to know, for completed orders only: which 3 countries generate the most total revenue, and how many distinct customers contributed to that revenue in each? Return <code>country</code>, total revenue (rounded to 2dp), and distinct customer count, top 3 by revenue. No further instructions, decide the joins and aggregation yourself.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "SELECT c.country, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue, COUNT(DISTINCT c.customer_id) AS customers FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'completed' GROUP BY c.country ORDER BY revenue DESC LIMIT 3",
+    hints: [
+      "This needs all three tables, filtered to completed orders, then grouped by a customer attribute, not an order attribute.",
+      "Country lives on the customer, revenue lives on the line item, completed status lives on the order, chain all three joins together.",
+      "GROUP BY c.country, then two aggregates: SUM for revenue, COUNT(DISTINCT customer_id) for reach, guarding against the same fan-out trap from two tasks ago.",
+      "SELECT c.country, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue, COUNT(DISTINCT c.customer_id) AS customers FROM customers c JOIN orders o ON c.customer_id=o.customer_id JOIN order_items oi ON o.order_id=oi.order_id WHERE o.status='completed' GROUP BY c.country ORDER BY revenue DESC LIMIT 3;" ],
+    explanation: { why: "Every piece from this stage combines here: a three-table join, a status filter, GROUP BY on a dimension from the outermost table, and a fan-out-safe COUNT(DISTINCT).", mistake: "Using COUNT(*) instead of COUNT(DISTINCT c.customer_id) for the customer count would count line items again, not customers, the exact bug from two tasks ago, reappearing in a bigger query.", tip: "Large multi-join queries are just small, well-understood pieces stacked together, if each individual piece is correct, verify the whole is too, that's how experienced analysts avoid getting lost.", business: "This single result could directly inform a regional investment decision, revenue tells you where the money is, customer count tells you whether that revenue is broad or concentrated in a few big accounts, very different strategic implications." } },
 ];
 
 /* ================= sql.js database (same shop.sql as Module 6) ================= */
 let dbPromise = null;
-let mutatedDbPromise = null;
 let sqlModulePromise = null;
 function getSqlModule() {
   if (!sqlModulePromise) sqlModulePromise = initSqlJs({ locateFile: f => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/" + f });
@@ -387,18 +522,33 @@ function getDb() {
    output for. A hardcoded literal answer (e.g. a UNION of the values
    that happen to match the unmutated database) cannot adapt and will
    fail this second comparison, even though it might pass the first. */
-function getMutatedDb() {
-  if (!mutatedDbPromise) {
-    mutatedDbPromise = (async () => {
-      const SQL = await getSqlModule();
-      const sqlText = await (await fetch("datasets/shop.sql")).text();
-      const db = new SQL.Database();
-      db.run(sqlText);
-      db.run("DELETE FROM order_items WHERE order_id = 1002; DELETE FROM orders WHERE order_id = 1002;");
-      return db;
-    })();
-  }
-  return mutatedDbPromise;
+let shopSqlTextPromise = null;
+function getShopSqlText() {
+  if (!shopSqlTextPromise) shopSqlTextPromise = fetch("datasets/shop.sql").then(r => r.text());
+  return shopSqlTextPromise;
+}
+/* Deliberately NOT cached/memoized: a fresh mutation is built on every
+   call, so a student can't learn "the mutated answer" from one check
+   and hardcode a second literal for it. Removes one randomly chosen
+   COMPLETED order and one randomly chosen NON-completed order (with
+   their line items each time), so the mutation actually changes the
+   result for queries filtered to either status, not just one fixed
+   order that might not even belong to the status a given task cares
+   about. */
+async function getMutatedDb() {
+  const SQL = await getSqlModule();
+  const sqlText = await getShopSqlText();
+  const db = new SQL.Database();
+  db.run(sqlText);
+  const completedRow = db.exec("SELECT order_id FROM orders WHERE status = 'completed' ORDER BY RANDOM() LIMIT 1");
+  const otherRow = db.exec("SELECT order_id FROM orders WHERE status != 'completed' ORDER BY RANDOM() LIMIT 1");
+  const ids = [];
+  if (completedRow.length) ids.push(completedRow[0].values[0][0]);
+  if (otherRow.length) ids.push(otherRow[0].values[0][0]);
+  ids.forEach(id => {
+    db.run(`DELETE FROM order_items WHERE order_id = ${id}; DELETE FROM orders WHERE order_id = ${id};`);
+  });
+  return db;
 }
 function execToRows(db, query) {
   const res = db.exec(query);
@@ -455,12 +605,22 @@ function renderSkillBar() {
   const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
   target.innerHTML = next
     ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
-    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. Module 6's Joins section is the natural next step in the core curriculum, the Joins/Intermediate/Window-function/Business-challenge stages of this practice library aren't built yet.`;
+    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. The Intermediate SQL, Window Functions, and Business Analysis stages of this practice library aren't built yet.`;
 }
 
 function buildHintsHtml(hints) {
   const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
   return `<div class="hints">${hints.map((h, i) => `<details><summary>${labels[i]}</summary><div class="hbody">${esc(h)}</div></details>`).join("")}</div>`;
+}
+function buildExplainHtml(ex) {
+  if (!ex) return "";
+  const rows = [
+    ["Why this works", ex.why],
+    ["Common mistake", ex.mistake],
+    ["Real analyst tip", ex.tip],
+    ["Business interpretation", ex.business],
+  ].filter(([, v]) => v);
+  return `<div class="explainbox">${rows.map(([lbl, v]) => `<div class="erow"><div class="elbl">${esc(lbl)}</div><p>${esc(v)}</p></div>`).join("")}</div>`;
 }
 
 const openTasks = new Set();
@@ -572,6 +732,7 @@ function renderTasks() {
           ? `<b>Not quite.</b>${mutationNote}`
           : `<b>Not quite.</b> Your query ran, but the results don't match. Row count: yours ${studentResult.rows.length}, expected ${refResult.rows.length}.`;
       resultsEl.appendChild(verdict);
+      if (pass && task.explanation) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(task.explanation));
       PracticeProgress.recordAttempt(id, pass);
       if (pass) openTasks.add(id);
       renderTasks();
