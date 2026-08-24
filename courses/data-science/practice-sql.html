@@ -90,10 +90,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; SQL &middot; Stages 1-3 of 6</span>
+    <span class="eyebrow">Practice Library &middot; SQL &middot; Stages 1-4 of 6</span>
     <h1 class="serif">SQL Practice Library</h1>
     <p class="sub">Extra repetition beyond Module 6's core lesson, same real database, real anti-cheat, on-demand hints. Each skill is tracked independently, aggregation mastery doesn't borrow credit from fundamentals mastery. Guided tasks first, then semi-guided (you get the business question and the data, not the technique), then a challenge task with no scaffolding at all.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-3 of a much larger planned SQL practice library (60 tasks across 6 stages: fundamentals, aggregation, joins, intermediate SQL, window functions, business challenges). These 30 tasks are real, fully built, graded, and tested. Intermediate SQL, window functions, and business-challenge stages, plus the Excel/Python/Tableau/Power BI/Automation libraries, are designed but not yet built, that's future work, not a claim made here.</div>
+    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-4 of a much larger planned SQL practice library (60 tasks across 6 stages: fundamentals, aggregation, joins, advanced SQL, window functions, business challenges). These 40 tasks are real, fully built, graded, and tested. Window functions and business-challenge stages, plus the Excel/Python/Tableau/Power BI/Automation libraries, are designed but not yet built, that's future work, not a claim made here.</div>
   </header>
 
   <div id="skillBars"></div>
@@ -111,10 +111,12 @@ const esc = CourseProgress.escapeHtml;
 const SKILL_ID = "sql-fundamentals";
 const SKILL_ID_AGG = "sql-aggregation";
 const SKILL_ID_JOINS = "sql-joins";
+const SKILL_ID_ADV = "sql-advanced";
 const SKILLS = [
   { id: SKILL_ID, label: "SQL Fundamentals" },
   { id: SKILL_ID_AGG, label: "SQL Aggregation" },
   { id: SKILL_ID_JOINS, label: "SQL Joins" },
+  { id: SKILL_ID_ADV, label: "SQL Advanced" },
 ];
 
 /* ================= TASK_MAP ================= */
@@ -494,6 +496,137 @@ const TASKS = [
       "GROUP BY c.country, then two aggregates: SUM for revenue, COUNT(DISTINCT customer_id) for reach, guarding against the same fan-out trap from two tasks ago.",
       "SELECT c.country, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue, COUNT(DISTINCT c.customer_id) AS customers FROM customers c JOIN orders o ON c.customer_id=o.customer_id JOIN order_items oi ON o.order_id=oi.order_id WHERE o.status='completed' GROUP BY c.country ORDER BY revenue DESC LIMIT 3;" ],
     explanation: { why: "Every piece from this stage combines here: a three-table join, a status filter, GROUP BY on a dimension from the outermost table, and a fan-out-safe COUNT(DISTINCT).", mistake: "Using COUNT(*) instead of COUNT(DISTINCT c.customer_id) for the customer count would count line items again, not customers, the exact bug from two tasks ago, reappearing in a bigger query.", tip: "Large multi-join queries are just small, well-understood pieces stacked together, if each individual piece is correct, verify the whole is too, that's how experienced analysts avoid getting lost.", business: "This single result could directly inform a regional investment decision, revenue tells you where the money is, customer count tells you whether that revenue is broad or concentrated in a few big accounts, very different strategic implications." } },
+
+  /* ---- Stage 4: Advanced SQL ---- */
+  { id: "sql-d01", skill: SKILL_ID_ADV, tool: "sql", level: "guided", difficulty: "core", prerequisite: [], mutationTarget: "products",
+    title: "Three-way price bands with CASE",
+    objective: "Extend CASE WHEN to three outcomes instead of two.",
+    prompt: "Merchandising wants products classified by cost: <code>'Budget'</code> under $25, <code>'Mid'</code> from $25 up to $60, <code>'Premium'</code> at $60 or above. Return <code>sku</code>, <code>product_name</code>, and the computed <code>band</code>.",
+    starter: "SELECT sku, product_name, unit_cost FROM products",
+    referenceSql: "SELECT sku, product_name, CASE WHEN unit_cost < 25 THEN 'Budget' WHEN unit_cost < 60 THEN 'Mid' ELSE 'Premium' END AS band FROM products",
+    hints: [
+      "Module 6 and an earlier practice task used a two-way CASE (Premium/Standard), this needs a third outcome in between.",
+      "Add a second WHEN before the ELSE: WHEN unit_cost < 25 THEN 'Budget' WHEN unit_cost < 60 THEN 'Mid' ELSE 'Premium'.",
+      "CASE reads top to bottom and stops at the first true condition, so the second WHEN only needs to check the upper bound, the lower bound is implied by having already failed the first check.",
+      "SELECT sku, product_name, CASE WHEN unit_cost < 25 THEN 'Budget' WHEN unit_cost < 60 THEN 'Mid' ELSE 'Premium' END AS band FROM products;" ],
+    explanation: { why: "Each WHEN is only reached if every earlier WHEN failed, so 'Mid''s condition only needs to rule out the upper bound, the lower bound (>=25) is already guaranteed by falling through the first check.", mistake: "Writing the middle condition as unit_cost >= 25 AND unit_cost < 60 isn't wrong, but it's redundant, CASE's fall-through already handles the lower bound for you.", tip: "When you have 3 or more bands, always write boundary conditions from lowest to highest, top to bottom, it's the only order that lets you skip repeating the lower bound each time.", business: "Price-tier labels like this show up constantly in merchandising and pricing dashboards, they turn a raw number into a category a non-technical stakeholder can scan at a glance." } },
+
+  { id: "sql-d02", skill: SKILL_ID_ADV, tool: "sql", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Filter grouped results with HAVING",
+    objective: "Reinforce HAVING from Stage 2, now as a building block for more advanced queries.",
+    prompt: "Ops wants to know which order channels are genuinely high-volume. Return <code>channel</code> and its order count, for channels with more than 20 orders.",
+    starter: "SELECT channel, COUNT(*) FROM orders GROUP BY channel",
+    referenceSql: "SELECT channel, COUNT(*) AS n FROM orders GROUP BY channel HAVING COUNT(*) > 20",
+    hints: [
+      "Group by channel first, exactly like Stage 2, then filter the grouped totals.",
+      "WHERE can't test COUNT(*), that aggregate doesn't exist yet when WHERE runs.",
+      "HAVING COUNT(*) > 20, placed after GROUP BY.",
+      "SELECT channel, COUNT(*) AS n FROM orders GROUP BY channel HAVING COUNT(*) > 20;" ],
+    explanation: { why: "HAVING runs after GROUP BY has produced its aggregates, so it's the only clause that can test a computed value like COUNT(*) or SUM(...).", mistake: "Forgetting that a NULL channel forms its own group, if that group happens to have a high count, it would appear in results with a blank channel name, worth noticing, not silently accepting.", tip: "Any time a business question includes a threshold word, \"more than,\" \"at least,\" \"over,\" on a count or a total, that's a HAVING clause, not a WHERE clause.", business: "This is exactly the kind of check that precedes a channel-investment decision, you wouldn't want to recommend expanding a channel based on a handful of orders." } },
+
+  { id: "sql-d03", skill: SKILL_ID_ADV, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a04"],
+    title: "Compare a row against an aggregate with a subquery",
+    objective: "Use a subquery to compare individual rows against a computed benchmark.",
+    prompt: "Return <code>sku</code> and <code>unit_cost</code> for every product priced above the average <code>unit_cost</code> across all products.",
+    starter: "SELECT sku, unit_cost FROM products",
+    referenceSql: "SELECT sku, unit_cost FROM products WHERE unit_cost > (SELECT AVG(unit_cost) FROM products)",
+    hints: [
+      "You need a benchmark number (the average) to compare every row against, and that number has to be computed first.",
+      "A subquery in parentheses can compute a single value and be used directly inside a WHERE comparison.",
+      "WHERE unit_cost > (SELECT AVG(unit_cost) FROM products), the subquery runs once and produces one number.",
+      "SELECT sku, unit_cost FROM products WHERE unit_cost > (SELECT AVG(unit_cost) FROM products);" ],
+    explanation: { why: "A subquery that returns a single value can be used anywhere a literal number could go, including inside a WHERE comparison, SQL computes it once, then compares every row against it.", mistake: "Trying to compute AVG(unit_cost) in the same SELECT as the row-level filter without a subquery mixes an aggregate and a non-aggregate incorrectly, most databases will reject it outright.", tip: "\"Compared to the average\" or \"above average\" in a business question is almost always a subquery-in-WHERE pattern, it's one of the most common advanced SQL shapes in real analyst work.", business: "This is the literal SQL version of \"who's above average,\" a question that comes up in pricing, performance review, and customer-value analysis alike." } },
+
+  { id: "sql-d04", skill: SKILL_ID_ADV, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-d03"],
+    title: "Customers with no completed order",
+    objective: "Distinguish \"never ordered at all\" from the narrower, more useful \"never had an order that actually succeeded.\"",
+    prompt: "A Stage 3 task found customers who never placed <b>any</b> order. This is different: some customers have placed orders that were all cancelled or refunded, never one that completed. Return the count of distinct customers who have <b>zero completed orders</b> (whether they've never ordered, or every order they placed failed to complete).",
+    starter: "SELECT customer_id FROM customers",
+    referenceSql: "SELECT COUNT(DISTINCT c.customer_id) FROM customers c WHERE c.customer_id NOT IN (SELECT customer_id FROM orders WHERE status = 'completed')",
+    hints: [
+      "This is broader than \"never ordered\", it also includes customers whose only orders were cancelled or refunded.",
+      "Build the list of customers who DO have a completed order first, then find everyone not on that list.",
+      "NOT IN (SELECT customer_id FROM orders WHERE status = 'completed') excludes exactly the customers with at least one success.",
+      "SELECT COUNT(DISTINCT c.customer_id) FROM customers c WHERE c.customer_id NOT IN (SELECT customer_id FROM orders WHERE status = 'completed');" ],
+    explanation: { why: "The subquery computes the set of customer_ids with at least one completed order; NOT IN keeps every customer whose ID isn't in that set, whether they ordered and failed, or never ordered at all.", mistake: "Reusing the Stage 3 \"never ordered\" query here would undercount, that query only catches customers with zero orders total, missing everyone whose orders existed but all fell through.", tip: "\"Never succeeded\" and \"never tried\" are different business questions with different answers, always check which one a stakeholder actually means before writing the query.", business: "This is a materially bigger, more honest list for a win-back campaign than \"never ordered\" alone, it includes customers who tried and had a bad experience, arguably a higher priority to win back." } },
+
+  { id: "sql-d05", skill: SKILL_ID_ADV, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-j09"],
+    title: "Build a reusable result with a CTE",
+    objective: "Use WITH to name and reuse an intermediate result instead of repeating a subquery.",
+    prompt: "Finance keeps needing \"total completed revenue per customer\" as a starting point for other questions. Define it once with a CTE named <code>cust_rev</code> (columns: <code>customer_id</code>, <code>revenue</code>, completed orders only, revenue rounded to 2dp), then select every row from it, highest revenue first.",
+    starter: "-- WITH cust_rev AS (\n--   ...\n-- )\n-- SELECT * FROM cust_rev\n",
+    referenceSql: "WITH cust_rev AS (SELECT c.customer_id, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM customers c JOIN orders o ON c.customer_id = o.customer_id JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'completed' GROUP BY c.customer_id) SELECT * FROM cust_rev ORDER BY revenue DESC",
+    hints: [
+      "WITH name AS (a normal SELECT query) defines a temporary, named result you can query like a table afterward.",
+      "The inside of the CTE is exactly the same 3-table join and GROUP BY you've already written before, just wrapped in WITH ... AS (...).",
+      "WITH cust_rev AS (SELECT c.customer_id, ROUND(SUM(...),2) AS revenue FROM ... WHERE status='completed' GROUP BY c.customer_id), then SELECT * FROM cust_rev ORDER BY revenue DESC.",
+      "WITH cust_rev AS (SELECT c.customer_id, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue FROM customers c JOIN orders o ON c.customer_id=o.customer_id JOIN order_items oi ON o.order_id=oi.order_id WHERE o.status='completed' GROUP BY c.customer_id) SELECT * FROM cust_rev ORDER BY revenue DESC;" ],
+    explanation: { why: "A CTE (Common Table Expression) runs its inner query once and gives the result a name, which the rest of the query can then SELECT from just like a real table.", mistake: "Copy-pasting the same join-and-group logic into two or three different subqueries in one big query, once you need the same intermediate result twice, that's the signal to name it with a CTE instead.", tip: "This exact \"customer revenue base\" CTE is worth remembering, the next several tasks build directly on the same shape.", business: "Naming and reusing a metric like this is how real analytics teams avoid two dashboards quietly disagreeing about what \"customer revenue\" means, one CTE, one definition, reused everywhere." } },
+
+  { id: "sql-d06", skill: SKILL_ID_ADV, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-d01"],
+    title: "Compare each category to the overall average",
+    objective: "Use a subquery inside SELECT to place a per-group value next to a global benchmark.",
+    prompt: "Return each <code>category</code>'s average <code>unit_cost</code> (rounded to 2dp) alongside the overall average across every product (also rounded to 2dp, the same number repeated on every row), so a reader can see each category's position at a glance.",
+    starter: "SELECT category, AVG(unit_cost) FROM products GROUP BY category",
+    referenceSql: "SELECT category, ROUND(AVG(unit_cost), 2) AS category_avg, (SELECT ROUND(AVG(unit_cost), 2) FROM products) AS overall_avg FROM products GROUP BY category",
+    hints: [
+      "The category average needs GROUP BY, the overall average deliberately doesn't, it's the same number on every row.",
+      "A subquery inside the SELECT list (not just WHERE) can compute one value and repeat it across every output row.",
+      "GROUP BY category for the first average, then (SELECT AVG(unit_cost) FROM products) as a second, ungrouped column.",
+      "SELECT category, ROUND(AVG(unit_cost),2) AS category_avg, (SELECT ROUND(AVG(unit_cost),2) FROM products) AS overall_avg FROM products GROUP BY category;" ],
+    explanation: { why: "A subquery in the SELECT list is evaluated independently of the surrounding GROUP BY, so it can return the same, ungrouped benchmark value on every row.", mistake: "Trying to get both numbers from a single AVG() call is impossible, one is grouped, one isn't, they need two separate computations even though they're in the same result.", tip: "Putting a benchmark column next to a grouped metric is a small trick that makes a report dramatically easier to read, the reader doesn't have to hold the overall average in their head while scanning categories.", business: "This is exactly what turns a plain category breakdown into an actual insight: Electronics isn't just $64.75, it's meaningfully above the $35.77 average, that comparison is the finding." } },
+
+  { id: "sql-d07", skill: SKILL_ID_ADV, tool: "sql", level: "challenge", difficulty: "challenge", prerequisite: ["sql-d05"],
+    title: "High-value customers, more than one condition",
+    objective: "Combine a revenue threshold with a frequency threshold using the CTE from a couple of tasks ago.",
+    prompt: "Retention wants a genuinely high-value list, not just big spenders: customers with more than $300 in completed revenue <b>and</b> at least 2 completed orders (a one-time big purchase shouldn't count the same as a loyal repeat buyer). Return <code>customer_id</code>, <code>name</code>, revenue, and order count, highest revenue first. Decide the structure yourself.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "WITH cust_rev AS (SELECT c.customer_id, c.name, COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS revenue, COUNT(DISTINCT o.order_id) AS n_orders FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id AND o.status = 'completed' LEFT JOIN order_items oi ON o.order_id = oi.order_id GROUP BY c.customer_id) SELECT customer_id, name, ROUND(revenue, 2), n_orders FROM cust_rev WHERE revenue > 300 AND n_orders >= 2 ORDER BY revenue DESC",
+    hints: [
+      "You need both a revenue total and a distinct completed-order count per customer, computed together before you can filter on either.",
+      "Build the per-customer summary first (a CTE is a natural fit, like a few tasks ago), then filter it with two ANDed conditions.",
+      "WHERE revenue > 300 AND n_orders >= 2, applied to the CTE's output, not to the raw joined rows.",
+      "WITH cust_rev AS (SELECT c.customer_id, c.name, COALESCE(SUM(oi.quantity*oi.unit_price),0) AS revenue, COUNT(DISTINCT o.order_id) AS n_orders FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.status='completed' LEFT JOIN order_items oi ON o.order_id=oi.order_id GROUP BY c.customer_id) SELECT customer_id, name, ROUND(revenue,2), n_orders FROM cust_rev WHERE revenue > 300 AND n_orders >= 2 ORDER BY revenue DESC;" ],
+    explanation: { why: "Computing both metrics once in a CTE, then filtering the CTE's output with AND, is cleaner and less error-prone than trying to jam both conditions into the original joined query's HAVING clause.", mistake: "Filtering only on revenue would wrongly include a customer who spent $350 in one single order, exactly the one-time-big-spender case retention explicitly didn't want counted as high-value.", tip: "\"High-value\" almost never means just one number in real business use, it's usually a combination of spend and frequency (or spend and recency), always ask which combination before writing the filter.", business: "A retention team has limited outreach capacity, this list is who they should actually spend that capacity on, not the full customer base and not just whoever spent the most once." } },
+
+  { id: "sql-d08", skill: SKILL_ID_ADV, tool: "sql", level: "challenge", difficulty: "challenge", prerequisite: ["sql-d05"],
+    title: "Segment every customer into three tiers",
+    objective: "Combine a CTE and CASE to turn a continuous number into a business-readable segment for the entire customer base.",
+    prompt: "Marketing wants every customer (not just the high spenders) segmented by completed revenue: <code>'High'</code> at $300 or more, <code>'Medium'</code> from $100 up to $300, <code>'Low'</code> below $100 (customers with zero completed revenue count as Low). Return each segment and how many customers fall into it.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "WITH cust_rev AS (SELECT c.customer_id, COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS revenue FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id AND o.status = 'completed' LEFT JOIN order_items oi ON o.order_id = oi.order_id GROUP BY c.customer_id) SELECT CASE WHEN revenue >= 300 THEN 'High' WHEN revenue >= 100 THEN 'Medium' ELSE 'Low' END AS segment, COUNT(*) AS n FROM cust_rev GROUP BY segment",
+    hints: [
+      "Every customer needs a revenue figure first, including the ones with $0, that means LEFT JOIN from customers, not an INNER JOIN that would drop them.",
+      "Build the per-customer revenue CTE, then CASE the revenue into a segment, then GROUP BY that segment to count.",
+      "COALESCE(SUM(...), 0) handles customers with no completed orders at all, otherwise they'd have NULL revenue and CASE would need an explicit NULL branch.",
+      "WITH cust_rev AS (SELECT c.customer_id, COALESCE(SUM(oi.quantity*oi.unit_price),0) AS revenue FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.status='completed' LEFT JOIN order_items oi ON o.order_id=oi.order_id GROUP BY c.customer_id) SELECT CASE WHEN revenue>=300 THEN 'High' WHEN revenue>=100 THEN 'Medium' ELSE 'Low' END AS segment, COUNT(*) FROM cust_rev GROUP BY segment;" ],
+    explanation: { why: "The CTE guarantees every customer gets a row (LEFT JOIN, not INNER JOIN), including a real $0 for customers with no completed purchases, so CASE can segment the entire base, not just the customers who happened to buy something.", mistake: "Using an INNER JOIN (or forgetting COALESCE) would silently drop or NULL-out customers with zero completed revenue, undercounting the Low segment and making the customer base look smaller and more successful than it is.", tip: "Whenever a segmentation needs to cover \"everyone,\" including people with zero activity, that's a strong signal you need LEFT JOIN plus COALESCE, not a plain join.", business: "This exact three-number breakdown is what a marketing team uses to size each campaign, a Low segment that's secretly much bigger than reported (because zero-revenue customers were dropped) means campaigns get sized wrong." } },
+
+  { id: "sql-d09", skill: SKILL_ID_ADV, tool: "sql", level: "challenge", difficulty: "challenge", prerequisite: ["sql-f09"],
+    title: "Diagnose a silently wrong filter",
+    objective: "Recognize the classic NULL-comparison trap and fix it.",
+    prompt: "A colleague wrote this to count every order NOT placed via the web: <code>SELECT COUNT(*) FROM orders WHERE channel != 'web'</code>. It returned 32. That number looks too low. Diagnose what's wrong, then write a corrected query that returns the true count of orders that weren't placed via web, including orders where the channel was never recorded at all.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "SELECT COUNT(*) FROM orders WHERE channel != 'web' OR channel IS NULL",
+    hints: [
+      "channel != 'web' silently drops every row where channel is NULL, NULL never satisfies any = or != comparison, it just evaluates to unknown.",
+      "Think about how many orders have no channel recorded at all (you've filtered on this before), those rows are the ones going missing.",
+      "You need two conditions ORed together: not-web, or missing entirely.",
+      "SELECT COUNT(*) FROM orders WHERE channel != 'web' OR channel IS NULL;" ],
+    explanation: { why: "SQL's three-valued logic means NULL != 'web' evaluates to unknown, not true, so WHERE silently excludes every row with a missing channel, even though \"missing\" is clearly not \"web.\"", mistake: "This is one of the single most common real-world SQL bugs, and it's dangerous specifically because the query runs perfectly and returns a plausible-looking number, nothing about it looks broken.", tip: "Any time a column can be NULL and a query uses = or != on it, stop and ask whether NULL rows should be included, then add OR column IS NULL explicitly if they should.", business: "32 versus the true 43 is an 11-order, 34% undercount, presented confidently as fact, exactly the kind of quietly wrong number that erodes trust in a data team once someone else catches it." } },
+
+  { id: "sql-d10", skill: SKILL_ID_ADV, tool: "sql", level: "mastery", difficulty: "mastery", prerequisite: ["sql-d07", "sql-d09"],
+    title: "Valuable customers experiencing friction",
+    objective: "Transfer the average-comparison, CTE, and multi-condition patterns from this whole stage into one independent business answer.",
+    prompt: "Retention leadership asks: <b>\"Which customers are spending above the average, but have also experienced a cancelled or refunded order?\"</b> These are valuable customers hitting friction, exactly who a retention team should prioritize. Return <code>customer_id</code>, <code>name</code>, and their completed revenue (rounded to 2dp), highest revenue first. No further instructions, decide the structure yourself.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "WITH cust_rev AS (SELECT c.customer_id, c.name, COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS revenue FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id AND o.status = 'completed' LEFT JOIN order_items oi ON o.order_id = oi.order_id GROUP BY c.customer_id) SELECT customer_id, name, ROUND(revenue, 2) FROM cust_rev WHERE revenue > (SELECT AVG(revenue) FROM cust_rev) AND customer_id IN (SELECT customer_id FROM orders WHERE status IN ('cancelled', 'refunded')) ORDER BY revenue DESC",
+    hints: [
+      "This needs two separate facts about each customer: their completed revenue compared to the average, and whether they've ever had a cancelled or refunded order, computed from two different subsets of orders.",
+      "Build the customer-revenue CTE from earlier in this stage, compare it to its own average, and separately check order history for cancelled/refunded status.",
+      "WHERE revenue > (SELECT AVG(revenue) FROM cust_rev) AND customer_id IN (SELECT customer_id FROM orders WHERE status IN ('cancelled','refunded')).",
+      "WITH cust_rev AS (SELECT c.customer_id, c.name, COALESCE(SUM(oi.quantity*oi.unit_price),0) AS revenue FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.status='completed' LEFT JOIN order_items oi ON o.order_id=oi.order_id GROUP BY c.customer_id) SELECT customer_id, name, ROUND(revenue,2) FROM cust_rev WHERE revenue > (SELECT AVG(revenue) FROM cust_rev) AND customer_id IN (SELECT customer_id FROM orders WHERE status IN ('cancelled','refunded')) ORDER BY revenue DESC;" ],
+    explanation: { why: "The CTE computes each customer's real revenue once; comparing it to (SELECT AVG(revenue) FROM cust_rev) reuses that same CTE as its own benchmark, while a separate IN subquery checks a completely different condition (order friction) on the same customer.", mistake: "Filtering only on revenue would surface every big spender, most of whom have never had a problem, this task specifically wants the intersection with customers who've had friction, that second condition is the entire point of the business question.", tip: "When a business question combines two genuinely different conditions (\"valuable\" and \"experiencing friction\"), resist the urge to force them into one clever expression, compute each independently, then AND them together, it's easier to verify and easier to explain later.", business: "This list is directly actionable: not \"our best customers\" (too broad to act on) and not \"everyone with a cancellation\" (too broad in a different way), but the specific overlap where a retention conversation would have the highest expected payoff." } },
 ];
 
 /* ================= sql.js database (same shop.sql as Module 6) ================= */
@@ -535,19 +668,34 @@ function getShopSqlText() {
    result for queries filtered to either status, not just one fixed
    order that might not even belong to the status a given task cares
    about. */
-async function getMutatedDb() {
+/* target: "orders" (default) mutates orders/order_items, the right
+   choice for any task whose answer depends on order or line-item
+   data. target: "products" is for tasks whose answer depends ONLY on
+   the products table (e.g. a CASE band on unit_cost alone), where
+   the orders mutation would change nothing and a hardcoded literal
+   would slip through undetected, exactly the dependency-graph gap
+   this course's own review process is meant to catch. */
+async function getMutatedDb(target) {
   const SQL = await getSqlModule();
   const sqlText = await getShopSqlText();
   const db = new SQL.Database();
   db.run(sqlText);
-  const completedRow = db.exec("SELECT order_id FROM orders WHERE status = 'completed' ORDER BY RANDOM() LIMIT 1");
-  const otherRow = db.exec("SELECT order_id FROM orders WHERE status != 'completed' ORDER BY RANDOM() LIMIT 1");
-  const ids = [];
-  if (completedRow.length) ids.push(completedRow[0].values[0][0]);
-  if (otherRow.length) ids.push(otherRow[0].values[0][0]);
-  ids.forEach(id => {
-    db.run(`DELETE FROM order_items WHERE order_id = ${id}; DELETE FROM orders WHERE order_id = ${id};`);
-  });
+  if (target === "products") {
+    // Nudge every product's cost by a random factor, enough to move
+    // several products across any reasonable band boundary, without
+    // ever producing a negative or zero cost.
+    const factor = 1.4 + Math.random() * 1.2; // 1.4x - 2.6x
+    db.run(`UPDATE products SET unit_cost = ROUND(unit_cost * ${factor}, 2)`);
+  } else {
+    const completedRow = db.exec("SELECT order_id FROM orders WHERE status = 'completed' ORDER BY RANDOM() LIMIT 1");
+    const otherRow = db.exec("SELECT order_id FROM orders WHERE status != 'completed' ORDER BY RANDOM() LIMIT 1");
+    const ids = [];
+    if (completedRow.length) ids.push(completedRow[0].values[0][0]);
+    if (otherRow.length) ids.push(otherRow[0].values[0][0]);
+    ids.forEach(id => {
+      db.run(`DELETE FROM order_items WHERE order_id = ${id}; DELETE FROM orders WHERE order_id = ${id};`);
+    });
+  }
   return db;
 }
 function execToRows(db, query) {
@@ -605,7 +753,7 @@ function renderSkillBar() {
   const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
   target.innerHTML = next
     ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
-    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. The Intermediate SQL, Window Functions, and Business Analysis stages of this practice library aren't built yet.`;
+    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. The Window Functions and Business Analysis stages of this practice library aren't built yet.`;
 }
 
 function buildHintsHtml(hints) {
@@ -712,7 +860,7 @@ function renderTasks() {
         // mutated copy of the database (one order removed). A hardcoded or
         // memorized answer cannot adapt to data it never saw.
         try {
-          const mutDb = await getMutatedDb();
+          const mutDb = await getMutatedDb(task.mutationTarget);
           const mutStudent = execToRows(mutDb, studentSql);
           const mutRef = execToRows(mutDb, task.referenceSql);
           const mutationPass = rowsEqual(mutStudent.rows, mutRef.rows) && mutStudent.columns.length === mutRef.columns.length;
