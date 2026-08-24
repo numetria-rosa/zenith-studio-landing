@@ -50,6 +50,7 @@
     ["quiz-center.html", "Quiz Center"],
     ["cheatsheets.html", "Cheat Sheets"],
     ["python-survival-guide.html", "Python Survival Guide"],
+    ["practice-sql.html", "SQL Practice Library"],
     ["projects.html", "Projects"],
     ["portfolio.html", "My Portfolio"],
     ["career.html", "Career Path"],
