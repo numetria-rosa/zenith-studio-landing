@@ -922,9 +922,10 @@ function buildWarmup(opts, containerId) {
   const el = document.getElementById(containerId);
   let done = false;
   opts.forEach((opt, i) => {
-    const div = document.createElement("label");
-    div.className = "qopt";
-    div.textContent = opt.text;
+    const div = document.createElement("button");
+      div.type = "button";
+      div.className = "qopt";
+      div.textContent = opt.text;
     div.addEventListener("click", () => {
       if (done) return;
       done = true;
@@ -974,9 +975,10 @@ function updateNextButton(){
 function buildQ(id, opts, containerId){
   const el = document.getElementById(containerId);
   opts.forEach((opt,i) => {
-    const div = document.createElement("label");
-    div.className = "qopt";
-    div.textContent = opt.text;
+    const div = document.createElement("button");
+      div.type = "button";
+      div.className = "qopt";
+      div.textContent = opt.text;
     div.addEventListener("click", () => {
       if (answered[id]) return;
       answered[id] = true;

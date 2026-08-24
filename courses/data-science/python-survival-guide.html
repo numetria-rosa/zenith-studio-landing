@@ -291,7 +291,8 @@ function renderTopics(filter) {
     const optsEl = sec.querySelector(`#miniopts_${t.id}`);
     let answered = false;
     t.q.opts.forEach((opt, oi) => {
-      const btn = document.createElement("div");
+      const btn = document.createElement("button");
+      btn.type = "button";
       btn.className = "qopt";
       btn.textContent = opt.t;
       btn.addEventListener("click", () => {

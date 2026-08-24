@@ -122,6 +122,10 @@ table.sheet td.num{font-family:'IBM Plex Mono';text-align:right}
         <li>Build a summary table that answers a real business question from raw rows</li>
       </ul>
     </div>
+    <div class="objectives" style="border-left-color:var(--info,#5fc2e8)">
+      <div class="lbl" style="color:var(--info,#5fc2e8)">Already a strong Excel or spreadsheet user?</div>
+      <p style="font-size:14px">SUM, AVERAGE, COUNTIF, IF, and XLOOKUP will mostly be review, skim 1.1&ndash;1.2 and go straight for the exercises. The part worth slowing down for either way is "tidy data" in 1.1, it's the mental model every later module (pandas, SQL, dashboards) builds on, and it's easy to think you already know it when you don't.</p>
+    </div>
   </header>
 
   <section>
@@ -176,6 +180,7 @@ table.sheet td.num{font-family:'IBM Plex Mono';text-align:right}
       <div id="exerciseArea"></div>
       <div class="dagctrl">
         <span class="mono" id="exerciseScore" style="font-size:13px;color:var(--mut2)">0 / 4 correct</span>
+        <button id="btnRetryExercise" style="display:none">&#8635; Retry this exercise</button>
       </div>
     </div>
 
@@ -335,7 +340,8 @@ function renderExercise(){
     area.appendChild(div);
     const optsEl = div.querySelector(`#ex_${i}`);
     eq.opts.forEach(opt => {
-      const btn = document.createElement("div");
+      const btn = document.createElement("button");
+      btn.type = "button";
       btn.className = "qopt";
       btn.textContent = opt;
       btn.addEventListener("click", () => {
@@ -352,6 +358,8 @@ function renderExercise(){
         document.getElementById("exerciseScore").textContent = `${exCorrect} / ${EXERCISE_Q.length} correct`;
         if (Object.keys(exAnswered).length === EXERCISE_Q.length) {
           CourseProgress.setSection(MODULE_ID, "summaryTableExercise", { passCount: exCorrect, total: EXERCISE_Q.length });
+          document.getElementById("btnRetryExercise").style.display = exCorrect === EXERCISE_Q.length ? "none" : "inline-flex";
+          updateScore();
         }
       });
       optsEl.appendChild(btn);
@@ -359,6 +367,14 @@ function renderExercise(){
   });
 }
 renderExercise();
+document.getElementById("btnRetryExercise").addEventListener("click", () => {
+  for (const k in exAnswered) delete exAnswered[k];
+  exCorrect = 0;
+  document.getElementById("exerciseScore").textContent = `0 / ${EXERCISE_Q.length} correct`;
+  document.getElementById("btnRetryExercise").style.display = "none";
+  renderExercise();
+  updateScore();
+});
 
 /* ---------------- Checkpoint quiz ---------------- */
 let score = 0;
@@ -443,7 +459,9 @@ maybeShowRetry();
   if (savedEx && savedEx.total > 0) {
     for (let i = 0; i < savedEx.total; i++) exAnswered[i] = true;
     exCorrect = savedEx.passCount;
-    document.getElementById("exerciseScore").textContent = `${exCorrect} / ${EXERCISE_Q.length} correct (restored from your last visit, edit is locked, use Retry to redo it)`;
+    const restoredOk = exCorrect === EXERCISE_Q.length;
+    document.getElementById("exerciseScore").textContent = `${exCorrect} / ${EXERCISE_Q.length} correct (restored from your last visit)`;
+    document.getElementById("btnRetryExercise").style.display = restoredOk ? "none" : "inline-flex";
   }
   const a = stored.answers || {};
   ["q1","q2","q3","q4","q5"].forEach(id => {
