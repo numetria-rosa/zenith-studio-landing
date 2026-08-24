@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Survival Guide, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--info)}
+.bar .in{max-width:900px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:900px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--info)}
+.hero{padding:44px 0 24px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--info);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(28px,4.5vw,40px);font-weight:600;letter-spacing:-.02em;margin-top:10px;line-height:1.1}
+.sub{color:var(--mut);font-size:15px;max-width:680px;margin-top:12px}
+.searchrow{margin-top:20px}
+.searchrow input{width:100%;font-family:'IBM Plex Sans';font-size:14px;background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:12px 16px;color:var(--tx)}
+.searchrow input:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.toc a{font-family:'IBM Plex Mono';font-size:11.5px;color:var(--mut);text-decoration:none;background:var(--card2);border:1px solid var(--bd2);padding:5px 11px;border-radius:99px;transition:.15s}
+.toc a:hover{color:var(--info);border-color:var(--info)}
+.topic{padding:36px 0;border-bottom:1px solid var(--bd);scroll-margin-top:70px}
+.topic .thead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.topic h2{font-family:'Fraunces';font-size:22px;font-weight:600}
+.topic .tnum{font-family:'IBM Plex Mono';font-size:11px;color:var(--info);border:1px solid var(--info);border-radius:99px;padding:2px 10px}
+.block{margin-top:16px}
+.block .blbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--mut2);font-family:'IBM Plex Mono';margin-bottom:6px}
+.block p{font-size:14.5px}
+pre.code{font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:14px 16px;overflow-x:auto;line-height:1.7;color:var(--tx);margin-top:6px}
+pre.code .c{color:var(--mut2)}
+pre.code .kw{color:var(--info)}
+pre.code .s{color:var(--good)}
+.mistake{border-left:3px solid var(--bad);background:rgba(255,133,133,.06);border-radius:0 8px 8px 0;padding:10px 14px;font-size:13.5px;color:var(--mut)}
+.mistake b{color:var(--bad)}
+.miniex{background:var(--card);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px}
+.miniex .qtext{font-size:13.5px;font-weight:600;margin-bottom:10px}
+.qopt{display:block;width:100%;text-align:left;font-family:'IBM Plex Mono';font-size:12.5px;padding:8px 10px;border-radius:6px;border:1px solid var(--bd);margin-bottom:6px;cursor:pointer;background:var(--card2);color:var(--tx)}
+.qopt:hover{border-color:var(--bd2)}
+.qopt.correct{border-color:var(--good);background:rgba(74,222,149,.08)}
+.qopt.incorrect{border-color:var(--bad);background:rgba(255,133,133,.08)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-02.html">Module 2</a><a href="cheatsheets.html">Cheat Sheets</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Always-available reference</span>
+    <h1 class="serif">Python Survival Guide</h1>
+    <p class="sub">Not a course, not a module, not graded. A compact reference to check any time Module 2 or 3 moves faster than you'd like. Every example is a data-analysis task, not an abstract programming exercise, because that's the only reason any of this matters here.</p>
+    <div class="searchrow"><input type="search" id="searchBox" placeholder="Search (e.g. &quot;loop&quot;, &quot;dictionary&quot;, &quot;except&quot;)..."></div>
+    <div class="toc" id="tocRow"></div>
+  </header>
+
+  <div id="topicsRoot"></div>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Python Survival Guide</footer>
+</div>
+
+<script src="course-progress.js?v=3"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+const TOPICS = [
+  { id: "variables", name: "Variables",
+    what: "A name that points at a value. Assigning a variable doesn't copy data around, it just labels it so you can use it again.",
+    why: "You'll constantly store an intermediate result, a threshold, a column name, and reuse it later instead of retyping it.",
+    code: `revenue = 1840
+customer_count = 12
+average_order = revenue / customer_count
+print(average_order)`,
+    output: "153.33333333333334",
+    mistake: "Using <code>=</code> when you mean \"is this equal to?\", that's <code>==</code>. A single <code>=</code> always assigns, it never compares.",
+    q: { text: "What does <code>x = 5</code> followed by <code>x = x + 1</code> leave <code>x</code> as?", opts: [
+      { t: "6", correct: true }, { t: "5", correct: false }, { t: "An error", correct: false } ] } },
+
+  { id: "strings", name: "Strings",
+    what: "Text, wrapped in quotes. An analyst's most common string task is building a label or reading one from a file.",
+    why: "Category names, customer names, file paths, every non-numeric column value arrives as a string, even if it looks like a number.",
+    code: `product = "Widget"
+price = 12.5
+label = f"{product}: \${price:.2f}"
+print(label)`,
+    output: "Widget: $12.50",
+    mistake: "Forgetting a value read from a CSV is text even when it looks like a number, <code>\"5\" + \"3\"</code> gives <code>\"53\"</code>, not <code>8</code>, until you convert it with <code>float()</code> or <code>int()</code>.",
+    q: { text: "What does <code>\"5\" + \"3\"</code> evaluate to?", opts: [
+      { t: '"53"', correct: true }, { t: "8", correct: false }, { t: "An error", correct: false } ] } },
+
+  { id: "numbers", name: "Numbers",
+    what: "Whole numbers (<code>int</code>) and decimals (<code>float</code>). Python does the usual arithmetic, plus a couple of analyst-specific operators.",
+    why: "Almost every metric, a rate, a total, a percentage, is a number you compute from other numbers.",
+    code: `conversions = 42
+visitors = 350
+rate = conversions / visitors * 100
+print(round(rate, 1))`,
+    output: "12.0",
+    mistake: "In Python 3, <code>/</code> always gives a float (<code>7 / 2</code> is <code>3.5</code>), even with two whole numbers. Use <code>//</code> only when you deliberately want the whole-number part.",
+    q: { text: "What does <code>7 / 2</code> evaluate to in Python 3?", opts: [
+      { t: "3.5", correct: true }, { t: "3", correct: false }, { t: "3.0 rounded to 4", correct: false } ] } },
+
+  { id: "booleans", name: "Booleans",
+    what: "<code>True</code> or <code>False</code>, the result of any comparison, and the thing an <code>if</code> statement actually checks.",
+    why: "Filtering a dataset is fundamentally asking a boolean question of every row: \"is this order over $1,000?\"",
+    code: `amount = 1250
+is_high_value = amount > 1000
+print(is_high_value)`,
+    output: "True",
+    mistake: "Writing <code>if is_high_value == True:</code> instead of just <code>if is_high_value:</code>, both work, but the second is how real Python code reads.",
+    q: { text: "What is <code>10 > 5</code>?", opts: [
+      { t: "True", correct: true }, { t: "False", correct: false }, { t: "10", correct: false } ] } },
+
+  { id: "lists", name: "Lists",
+    what: "An ordered collection, written in square brackets. A list of numbers, a list of names, a list of anything.",
+    why: "Before pandas, a column of data is just a list. Understanding lists is what makes a DataFrame column make sense later.",
+    code: `daily_sales = [420, 380, 510, 290]
+total = sum(daily_sales)
+highest = max(daily_sales)
+print(total, highest)`,
+    output: "1600 510",
+    mistake: "Off-by-one errors: <code>daily_sales[4]</code> on a 4-item list raises an error, valid positions are <code>0</code> through <code>3</code>, indexing starts at 0.",
+    q: { text: "What is <code>[10, 20, 30][0]</code>?", opts: [
+      { t: "10", correct: true }, { t: "20", correct: false }, { t: "Error, indexing starts at 1", correct: false } ] } },
+
+  { id: "dictionaries", name: "Dictionaries",
+    what: "Key/value pairs, written in curly braces. The natural shape for one row of structured data.",
+    why: "A dataset often contains records represented as structured values, a dictionary is how you represent one customer, one order, one anything with named fields, before pandas turns a whole table of them into a DataFrame.",
+    code: `customer = {
+    "name": "Sarah",
+    "orders": 12,
+    "revenue": 1840
+}
+print(customer["revenue"] / customer["orders"])`,
+    output: "153.33333333333334",
+    mistake: "Using <code>customer[\"loyalty_tier\"]</code> on a key that might not exist raises a <code>KeyError</code> and stops your script. <code>customer.get(\"loyalty_tier\", \"Unknown\")</code> returns a safe default instead.",
+    q: { text: "What does <code>{\"a\": 1}.get(\"b\", 0)</code> return?", opts: [
+      { t: "0", correct: true }, { t: "A KeyError", correct: false }, { t: "None, silently", correct: false } ] } },
+
+  { id: "conditions", name: "if / elif / else",
+    what: "Branch on a condition. Do one thing if it's true, something else if it isn't.",
+    why: "Categorizing a value, \"High\", \"Medium\", \"Low\", is exactly this, one condition after another until one matches.",
+    code: `amount = 450
+if amount >= 1000:
+    tier = "High"
+elif amount >= 200:
+    tier = "Medium"
+else:
+    tier = "Low"
+print(tier)`,
+    output: "Medium",
+    mistake: "Writing several separate <code>if</code> statements instead of <code>if/elif</code> when only one branch should ever run, with separate <code>if</code>s, a value that matches an earlier branch can wrongly fall into a later one too.",
+    q: { text: "With <code>x = 5</code>: <code>if x > 10: y='A'</code> then <code>elif x > 3: y='B'</code> then <code>else: y='C'</code>, what is <code>y</code>?", opts: [
+      { t: "B", correct: true }, { t: "C", correct: false }, { t: "A", correct: false } ] } },
+
+  { id: "forloops", name: "for loops", is_for: true,
+    what: "Repeat an action once per item in a collection, a list, the rows of a file, anything you can iterate over.",
+    why: "Before pandas can vectorize an operation for you, a <code>for</code> loop is how you touch every row of a hand-parsed CSV, one at a time.",
+    code: `revenues = [120, 340, 95, 610]
+total = 0
+for r in revenues:
+    total = total + r
+print(total)`,
+    output: "1165",
+    mistake: "Modifying a list while looping over it directly, this silently skips items. Loop over a copy (<code>list(original)</code>) if you need to change the original.",
+    q: { text: "What does this print?<br><code>total = 0<br>for x in [1, 2, 3]:<br>&nbsp;&nbsp;&nbsp;&nbsp;total += x<br>print(total)</code>", opts: [
+      { t: "6", correct: true }, { t: "3", correct: false }, { t: "[1, 2, 3]", correct: false } ] } },
+
+  { id: "whileloops", name: "while loops",
+    what: "Repeat an action until a condition becomes false. Less common in analyst work than <code>for</code>, but real.",
+    why: "Useful when you don't know in advance how many times you'll need to repeat, retrying a flaky data load, for example.",
+    code: `attempts = 0
+success = False
+while attempts < 3 and not success:
+    attempts += 1
+    success = attempts == 2  # pretend this succeeds on try 2
+print(attempts, success)`,
+    output: "2 True",
+    mistake: "Forgetting to update the loop's condition variable inside the loop, that's an infinite loop, exactly what the timeout in this course's Python sandbox exists to catch.",
+    q: { text: "What's the risk of writing <code>while True:</code> with no <code>break</code> or condition change inside?", opts: [
+      { t: "It never stops on its own, an infinite loop", correct: true }, { t: "It runs exactly once", correct: false }, { t: "Python raises a syntax error", correct: false } ] } },
+
+  { id: "functions", name: "Functions", is_for: true,
+    what: "A named, reusable block of code. Give it inputs (parameters), it can hand back a result (<code>return</code>).",
+    why: "Every graded exercise in this course asks you to write one function. It's the unit of \"here's a piece of logic I can reuse and test.\"",
+    code: `def conversion_rate(visitors, conversions):
+    if visitors == 0:
+        return 0.0
+    return round(conversions / visitors * 100, 1)
+
+print(conversion_rate(350, 42))`,
+    output: "12.0",
+    mistake: "Forgetting <code>return</code> and using <code>print()</code> instead, the function runs and shows output, but hands back <code>None</code> to any code that calls it, which breaks anything downstream expecting a real value.",
+    q: { text: "A function has no <code>return</code> statement. What does calling it produce?", opts: [
+      { t: "None", correct: true }, { t: "An error", correct: false }, { t: "Whatever was last printed", correct: false } ] } },
+
+  { id: "imports", name: "import", is_for: true,
+    what: "Load a library's functionality into your script so you can use it.",
+    why: "<code>pandas</code>, <code>numpy</code>, <code>plotly</code>, none of them exist in a script until you import them, usually at the very top.",
+    code: `import pandas as pd
+
+df = pd.DataFrame({"a": [1, 2, 3]})
+print(df.shape)`,
+    output: "(3, 1)",
+    mistake: "Importing inside a function every time it's called instead of once at the top of the file, it still works, but it's unconventional and slightly slower.",
+    q: { text: "What does <code>import pandas as pd</code> let you do?", opts: [
+      { t: "Use pandas functions with the shorter name pd", correct: true }, { t: "Install pandas", correct: false }, { t: "Nothing until pandas is also imported without \"as pd\"", correct: false } ] } },
+
+  { id: "exceptions", name: "Exceptions", is_for: true,
+    what: "An error Python raises when something goes wrong at runtime, a missing file, dividing by zero, a bad conversion. You can catch it with <code>try/except</code> instead of letting it crash your script.",
+    why: "Real data is never perfectly clean. Converting a column to numbers will hit a blank cell eventually, catching that gracefully is what separates working analysis code from a script that dies on row 4,000.",
+    code: `def to_number(text):
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+print(to_number("42.5"), to_number("N/A"))`,
+    output: "42.5 None",
+    mistake: "Writing a bare <code>except:</code> with no error type, this silently swallows every kind of error, including real bugs, making them much harder to find. Catch the specific error you expect.",
+    q: { text: "What does <code>float(\"N/A\")</code> do, un-caught?", opts: [
+      { t: "Raises a ValueError", correct: true }, { t: "Returns 0.0", correct: false }, { t: "Returns None silently", correct: false } ] } },
+
+  { id: "readingfiles", name: "Reading files", is_for: true,
+    what: "Open a file and read its contents, line by line or all at once, before pandas exists to do it for you.",
+    why: "Module 2 has you hand-parse a CSV specifically so <code>pd.read_csv()</code> stops being a magic black box afterward, you'll know exactly what it's doing for you.",
+    code: `text = "name,revenue\\nWidget,1840\\nGadget,920"
+lines = text.strip().split("\\n")
+header, rows = lines[0], lines[1:]
+for row in rows:
+    fields = row.split(",")
+    print(fields[0], fields[1])`,
+    output: "Widget 1840\nGadget 920",
+    mistake: "Forgetting the header row is data too, if you don't skip it, it gets treated as if it were a real record.",
+    q: { text: "Why does the code above use <code>lines[1:]</code> instead of <code>lines</code>?", opts: [
+      { t: "To skip the header row, which isn't real data", correct: true }, { t: "To reverse the order of the rows", correct: false }, { t: "It's required syntax with no real effect here", correct: false } ] } },
+
+  { id: "dataframe", name: "What a DataFrame actually is",
+    what: "A pandas DataFrame is a table: rows and named columns, like a spreadsheet, backed by fast, whole-column operations instead of loops.",
+    why: "Everything above, lists, dictionaries, loops, is what a DataFrame replaces. A column is a list of values. A row is like a dictionary of named fields. Module 3 builds directly on this.",
+    code: `import pandas as pd
+
+data = [{"name":"Sarah","revenue":1840}, {"name":"Tom","revenue":920}]
+df = pd.DataFrame(data)
+print(df["revenue"].sum())`,
+    output: "2760",
+    mistake: "Reaching for a <code>for</code> loop to process a DataFrame column when a direct column operation (<code>df[\"revenue\"] * 1.1</code>) does the same thing, without a loop, and much faster. Module 3 covers this in depth, this entry just previews it.",
+    q: { text: "What does <code>df[\"revenue\"].sum()</code> compute in the example above?", opts: [
+      { t: "The total of every value in the revenue column", correct: true }, { t: "The number of rows", correct: false }, { t: "The average revenue", correct: false } ] } },
+];
+
+function renderCode(code) {
+  return esc(code);
+}
+
+function renderToc() {
+  const el = document.getElementById("tocRow");
+  el.innerHTML = TOPICS.map(t => `<a href="#${t.id}">${esc(t.name)}</a>`).join("");
+}
+
+function renderTopics(filter) {
+  const root = document.getElementById("topicsRoot");
+  root.innerHTML = "";
+  const f = (filter || "").toLowerCase();
+  TOPICS.forEach((t, i) => {
+    const haystack = (t.name + " " + t.what + " " + t.why).toLowerCase();
+    if (f && !haystack.includes(f)) return;
+    const sec = document.createElement("section");
+    sec.className = "topic";
+    sec.id = t.id;
+    sec.innerHTML = `
+      <div class="thead"><span class="tnum">${i+1}</span><h2 class="serif">${esc(t.name)}</h2></div>
+      <div class="block"><div class="blbl">What it is</div><p>${t.what}</p></div>
+      <div class="block"><div class="blbl">Why analysts use it</div><p>${t.why}</p></div>
+      <div class="block"><div class="blbl">Tiny example</div><pre class="code">${renderCode(t.code)}</pre><pre class="code" style="color:var(--mut2);margin-top:-4px"># output: ${esc(t.output)}</pre></div>
+      <div class="block"><div class="blbl">Common mistake</div><div class="mistake">${t.mistake}</div></div>
+      <div class="block"><div class="blbl">Mini exercise</div><div class="miniex" id="mini_${t.id}"><div class="qtext">${t.q.text}</div><div id="miniopts_${t.id}"></div></div></div>
+    `;
+    root.appendChild(sec);
+    const optsEl = sec.querySelector(`#miniopts_${t.id}`);
+    let answered = false;
+    t.q.opts.forEach((opt, oi) => {
+      const btn = document.createElement("div");
+      btn.className = "qopt";
+      btn.textContent = opt.t;
+      btn.addEventListener("click", () => {
+        if (answered) return;
+        answered = true;
+        Array.from(optsEl.children).forEach((el2, j) => {
+          if (t.q.opts[j].correct) el2.classList.add("correct");
+          else if (j === oi) el2.classList.add("incorrect");
+        });
+      });
+      optsEl.appendChild(btn);
+    });
+  });
+}
+
+renderToc();
+renderTopics("");
+document.getElementById("searchBox").addEventListener("input", (e) => renderTopics(e.target.value));
+</script>
+<script src="course-rail.js?v=4"></script>
+</body>
+</html>
