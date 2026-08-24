@@ -58,6 +58,8 @@ h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-
 .objective{font-size:13.5px;color:var(--mut);margin-bottom:12px}
 .objective b{color:var(--tx)}
 textarea{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
+.writtenlbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple);font-family:'IBM Plex Mono';margin:12px 0 6px}
+.writtenbox{font-family:'IBM Plex Sans';line-height:1.6}
 textarea:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
 button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
 button:hover{border-color:var(--purple);color:var(--purple)}
@@ -90,10 +92,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; SQL &middot; Stages 1-4 of 6</span>
+    <span class="eyebrow">Practice Library &middot; SQL &middot; Stages 1-5 of 6</span>
     <h1 class="serif">SQL Practice Library</h1>
     <p class="sub">Extra repetition beyond Module 6's core lesson, same real database, real anti-cheat, on-demand hints. Each skill is tracked independently, aggregation mastery doesn't borrow credit from fundamentals mastery. Guided tasks first, then semi-guided (you get the business question and the data, not the technique), then a challenge task with no scaffolding at all.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-4 of a much larger planned SQL practice library (60 tasks across 6 stages: fundamentals, aggregation, joins, advanced SQL, window functions, business challenges). These 40 tasks are real, fully built, graded, and tested. Window functions and business-challenge stages, plus the Excel/Python/Tableau/Power BI/Automation libraries, are designed but not yet built, that's future work, not a claim made here.</div>
+    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-5 of a much larger planned SQL practice library (60 tasks across 6 stages: fundamentals, aggregation, joins, advanced SQL, window functions, business challenges). These 50 tasks are real, fully built, graded, and tested. The business-challenge stage, plus the Excel/Python/Tableau/Power BI/Automation libraries, are designed but not yet built, that's future work, not a claim made here.</div>
   </header>
 
   <div id="skillBars"></div>
@@ -112,11 +114,13 @@ const SKILL_ID = "sql-fundamentals";
 const SKILL_ID_AGG = "sql-aggregation";
 const SKILL_ID_JOINS = "sql-joins";
 const SKILL_ID_ADV = "sql-advanced";
+const SKILL_ID_WINDOW = "sql-window";
 const SKILLS = [
   { id: SKILL_ID, label: "SQL Fundamentals" },
   { id: SKILL_ID_AGG, label: "SQL Aggregation" },
   { id: SKILL_ID_JOINS, label: "SQL Joins" },
   { id: SKILL_ID_ADV, label: "SQL Advanced" },
+  { id: SKILL_ID_WINDOW, label: "SQL Analytical / Window Functions" },
 ];
 
 /* ================= TASK_MAP ================= */
@@ -627,6 +631,142 @@ const TASKS = [
       "WHERE revenue > (SELECT AVG(revenue) FROM cust_rev) AND customer_id IN (SELECT customer_id FROM orders WHERE status IN ('cancelled','refunded')).",
       "WITH cust_rev AS (SELECT c.customer_id, c.name, COALESCE(SUM(oi.quantity*oi.unit_price),0) AS revenue FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.status='completed' LEFT JOIN order_items oi ON o.order_id=oi.order_id GROUP BY c.customer_id) SELECT customer_id, name, ROUND(revenue,2) FROM cust_rev WHERE revenue > (SELECT AVG(revenue) FROM cust_rev) AND customer_id IN (SELECT customer_id FROM orders WHERE status IN ('cancelled','refunded')) ORDER BY revenue DESC;" ],
     explanation: { why: "The CTE computes each customer's real revenue once; comparing it to (SELECT AVG(revenue) FROM cust_rev) reuses that same CTE as its own benchmark, while a separate IN subquery checks a completely different condition (order friction) on the same customer.", mistake: "Filtering only on revenue would surface every big spender, most of whom have never had a problem, this task specifically wants the intersection with customers who've had friction, that second condition is the entire point of the business question.", tip: "When a business question combines two genuinely different conditions (\"valuable\" and \"experiencing friction\"), resist the urge to force them into one clever expression, compute each independently, then AND them together, it's easier to verify and easier to explain later.", business: "This list is directly actionable: not \"our best customers\" (too broad to act on) and not \"everyone with a cancellation\" (too broad in a different way), but the specific overlap where a retention conversation would have the highest expected payoff." } },
+
+  /* ---- Stage 5: Analytical SQL / Window Functions ---- */
+  { id: "sql-w01", skill: SKILL_ID_WINDOW, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-d05"],
+    title: "Rank customers by revenue",
+    objective: "Attach a rank to every row without collapsing the table the way GROUP BY does.",
+    prompt: "Using the customer-revenue CTE pattern from Stage 4, return every customer's <code>customer_id</code>, <code>name</code>, revenue (rounded to 2dp), and a <code>rnk</code> column ranking them by revenue, highest first.",
+    starter: "-- reuse the cust_rev CTE pattern from Stage 4, then add a rank\n",
+    referenceSql: "WITH cust_rev AS (SELECT c.customer_id, c.name, COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS revenue FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id AND o.status = 'completed' LEFT JOIN order_items oi ON o.order_id = oi.order_id GROUP BY c.customer_id) SELECT customer_id, name, ROUND(revenue, 2), RANK() OVER (ORDER BY revenue DESC) AS rnk FROM cust_rev",
+    hints: [
+      "GROUP BY collapses rows into one per group, a window function does the opposite, it keeps every row and just attaches a computed value to each.",
+      "RANK() OVER (ORDER BY revenue DESC) ranks every row by revenue without merging any of them together.",
+      "Build the same cust_rev CTE as Stage 4, then add RANK() OVER (ORDER BY revenue DESC) AS rnk to the final SELECT.",
+      "WITH cust_rev AS (SELECT c.customer_id, c.name, COALESCE(SUM(oi.quantity*oi.unit_price),0) AS revenue FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.status='completed' LEFT JOIN order_items oi ON o.order_id=oi.order_id GROUP BY c.customer_id) SELECT customer_id, name, ROUND(revenue,2), RANK() OVER (ORDER BY revenue DESC) AS rnk FROM cust_rev;" ],
+    explanation: { why: "OVER (ORDER BY ...) tells SQL to compute the rank across the whole result set without grouping rows together, every customer keeps their own row, they just gain a rank column.", mistake: "Reaching for GROUP BY to \"get a ranking\" is a common instinct, but GROUP BY answers a different question (one row per group), not \"where does this row sit relative to the others.\"", tip: "GROUP BY answers \"what's the total per category,\" a window function answers \"where does this specific row rank,\" learning to tell those two questions apart is most of what this stage teaches.", business: "A ranked customer list, not just a total, is what a sales team actually works from day to day, they need to know who's #1 through #10, not just the sum of everyone's revenue." } },
+
+  { id: "sql-w02", skill: SKILL_ID_WINDOW, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-w01"],
+    title: "Rank within groups with PARTITION BY",
+    objective: "Reset a ranking separately for each group instead of ranking across the whole table.",
+    prompt: "Return each product's <code>category</code>, <code>product_name</code>, total revenue (rounded to 2dp), and a rank that starts over at 1 within each category (use <code>DENSE_RANK</code>).",
+    starter: "SELECT p.category, p.product_name, SUM(oi.quantity*oi.unit_price) FROM order_items oi JOIN products p ON oi.sku=p.sku GROUP BY p.category, p.product_name",
+    referenceSql: "SELECT p.category, p.product_name, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue, DENSE_RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity * oi.unit_price) DESC) AS rnk FROM order_items oi JOIN products p ON oi.sku = p.sku GROUP BY p.category, p.product_name",
+    hints: [
+      "Without PARTITION BY, task w01's RANK() would rank every product against every other product, mixing categories together.",
+      "PARTITION BY category resets the ranking to 1 at the start of each category, exactly like GROUP BY splits a table into buckets, but without collapsing rows.",
+      "DENSE_RANK() OVER (PARTITION BY p.category ORDER BY SUM(...) DESC), added to the existing group-by-product query.",
+      "SELECT p.category, p.product_name, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue, DENSE_RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity*oi.unit_price) DESC) AS rnk FROM order_items oi JOIN products p ON oi.sku=p.sku GROUP BY p.category, p.product_name;" ],
+    explanation: { why: "PARTITION BY splits the window into independent groups, the ranking restarts at 1 for every new category, exactly the way GROUP BY would split totals, except every row survives.", mistake: "Skipping PARTITION BY here would rank Electronics products against Apparel products directly, meaningless for a \"best in category\" question, and it would hide that every category actually has its own top performer.", tip: "DENSE_RANK never skips a number after a tie (1,1,2,3), plain RANK does (1,1,3), pick DENSE_RANK when you want a clean 1st/2nd/3rd regardless of ties.", business: "Category managers think in terms of \"best seller in my category,\" not \"best seller company-wide,\" PARTITION BY is what makes that framing possible in one query." } },
+
+  { id: "sql-w03", skill: SKILL_ID_WINDOW, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-w02"],
+    title: "Top 3 products per category",
+    objective: "Use a window function's rank as a filter, which requires a CTE or subquery since window functions can't be used directly in WHERE.",
+    prompt: "Return the top 3 products by revenue within each category (columns: <code>category</code>, <code>product_name</code>, revenue rounded to 2dp), ordered by category then rank.",
+    starter: "-- rank products within category first, then keep only the top 3\n",
+    referenceSql: "WITH ranked AS (SELECT p.category, p.product_name, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue, ROW_NUMBER() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity * oi.unit_price) DESC) AS rn FROM order_items oi JOIN products p ON oi.sku = p.sku GROUP BY p.category, p.product_name) SELECT category, product_name, revenue FROM ranked WHERE rn <= 3 ORDER BY category, rn",
+    hints: [
+      "You can't put ROW_NUMBER() OVER (...) directly inside a WHERE clause, window functions are computed after WHERE would run.",
+      "Compute the ranking first inside a CTE, then filter the CTE's output in a second, outer SELECT.",
+      "WITH ranked AS (... ROW_NUMBER() OVER (PARTITION BY category ORDER BY revenue DESC) AS rn ...) SELECT * FROM ranked WHERE rn <= 3.",
+      "WITH ranked AS (SELECT p.category, p.product_name, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue, ROW_NUMBER() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity*oi.unit_price) DESC) AS rn FROM order_items oi JOIN products p ON oi.sku=p.sku GROUP BY p.category, p.product_name) SELECT category, product_name, revenue FROM ranked WHERE rn<=3 ORDER BY category, rn;" ],
+    explanation: { why: "A CTE lets you compute the window function once, give the result a name, then treat rn like any ordinary column in a normal WHERE clause on the outer query.", mistake: "Trying to write WHERE ROW_NUMBER() OVER (...) <= 3 directly, most databases reject this outright, window functions are evaluated in a later stage of query processing than WHERE.", tip: "\"Top N per group\" is one of the single most common real analyst requests, and this CTE-plus-ROW_NUMBER pattern is the standard way to answer it in SQL.", business: "This is exactly what a merchandising review looks like: not the single best product company-wide, but each category's own top 3, so every category gets fair representation in the conversation." } },
+
+  { id: "sql-w04", skill: SKILL_ID_WINDOW, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a10"],
+    title: "A running revenue total",
+    objective: "Accumulate a value across ordered rows instead of collapsing them into one sum.",
+    prompt: "Return each month (<code>strftime('%Y-%m', order_date)</code>) of completed-order revenue, alongside a running total that accumulates month over month. Columns: <code>month</code>, <code>revenue</code> (2dp), <code>running_total</code> (2dp).",
+    starter: "-- compute monthly revenue first, then add a running total over it\n",
+    referenceSql: "WITH monthly AS (SELECT strftime('%Y-%m', o.order_date) AS month, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'completed' GROUP BY month) SELECT month, revenue, ROUND(SUM(revenue) OVER (ORDER BY month), 2) AS running_total FROM monthly ORDER BY month",
+    hints: [
+      "A running total needs the monthly figures computed first, then summed cumulatively in order, that's two steps.",
+      "SUM(revenue) OVER (ORDER BY month), with no PARTITION BY, accumulates every prior row into each row's total.",
+      "Build the monthly-revenue CTE, then SELECT month, revenue, SUM(revenue) OVER (ORDER BY month) AS running_total FROM it.",
+      "WITH monthly AS (SELECT strftime('%Y-%m', o.order_date) AS month, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue FROM orders o JOIN order_items oi ON o.order_id=oi.order_id WHERE o.status='completed' GROUP BY month) SELECT month, revenue, ROUND(SUM(revenue) OVER (ORDER BY month),2) AS running_total FROM monthly ORDER BY month;" ],
+    explanation: { why: "SUM() OVER (ORDER BY ...) without PARTITION BY defaults to a cumulative frame, each row's total includes every row that came before it in the specified order, that's what \"running\" means.", mistake: "Confusing this with a plain SUM(revenue) (which collapses everything into one number) is the most common mistake, the window version deliberately keeps one row per month, each with its own accumulated total.", tip: "A running total is only meaningful with a real ORDER BY, usually time, running totals ordered by something arbitrary (like alphabetically) rarely mean anything to a business.", business: "This is literally what a year-to-date revenue figure is, the exact calculation behind the \"YTD\" number on almost every finance dashboard." } },
+
+  { id: "sql-w05", skill: SKILL_ID_WINDOW, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-w01"],
+    title: "Compare each row to the one ranked above it",
+    objective: "Use LAG to pull a value from an adjacent row in a specific ordering.",
+    prompt: "Ranking customers by revenue (highest first), return each customer's <code>customer_id</code>, <code>name</code>, revenue (2dp), and how much less they earned than the customer ranked directly above them (<code>diff_from_prev</code>, 2dp, NULL for the top customer).",
+    starter: "-- rank by revenue, then look at the previous row in that ordering\n",
+    referenceSql: "WITH cust_rev AS (SELECT c.customer_id, c.name, COALESCE(SUM(oi.quantity * oi.unit_price), 0) AS revenue FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id AND o.status = 'completed' LEFT JOIN order_items oi ON o.order_id = oi.order_id GROUP BY c.customer_id) SELECT customer_id, name, ROUND(revenue, 2), ROUND(revenue - LAG(revenue) OVER (ORDER BY revenue DESC), 2) AS diff_from_prev FROM cust_rev ORDER BY revenue DESC",
+    hints: [
+      "\"The customer ranked directly above\" means the previous row once everything is ordered by revenue descending, that's exactly what LAG reads.",
+      "LAG(revenue) OVER (ORDER BY revenue DESC) pulls the revenue value from the row immediately before the current one in that ordering.",
+      "Subtract: revenue - LAG(revenue) OVER (ORDER BY revenue DESC), the top-ranked customer will get NULL since there's no row above them.",
+      "WITH cust_rev AS (SELECT c.customer_id, c.name, COALESCE(SUM(oi.quantity*oi.unit_price),0) AS revenue FROM customers c LEFT JOIN orders o ON c.customer_id=o.customer_id AND o.status='completed' LEFT JOIN order_items oi ON o.order_id=oi.order_id GROUP BY c.customer_id) SELECT customer_id, name, ROUND(revenue,2), ROUND(revenue - LAG(revenue) OVER (ORDER BY revenue DESC),2) AS diff_from_prev FROM cust_rev ORDER BY revenue DESC;" ],
+    explanation: { why: "LAG(column) OVER (ORDER BY ...) reaches back one row in a specific ordering and pulls its value into the current row, without any join or subquery needed.", mistake: "Trying to solve this by joining the table to itself on some offset condition works but is far more complex than necessary, LAG exists specifically to avoid that.", tip: "LAG always returns NULL for the very first row in its ordering (nothing to look back at), that's expected, not a bug, handle it deliberately rather than filtering it out by accident.", business: "This shows a sales lead exactly how big the gap is between consecutive customers, useful for spotting a cliff (a huge gap) versus a gradual slope in customer value." } },
+
+  { id: "sql-w06", skill: SKILL_ID_WINDOW, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-w02"],
+    title: "Each category's share of total revenue",
+    objective: "Compute a grand total inside the same query as the grouped totals, using an empty OVER().",
+    prompt: "Return each <code>category</code>'s total revenue (2dp) and its percentage of overall revenue across all categories (<code>pct</code>, 2dp), highest revenue first.",
+    starter: "SELECT p.category, SUM(oi.quantity*oi.unit_price) FROM order_items oi JOIN products p ON oi.sku=p.sku GROUP BY p.category",
+    referenceSql: "SELECT p.category, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue, ROUND(100.0 * SUM(oi.quantity * oi.unit_price) / SUM(SUM(oi.quantity * oi.unit_price)) OVER (), 2) AS pct FROM order_items oi JOIN products p ON oi.sku = p.sku GROUP BY p.category ORDER BY revenue DESC",
+    hints: [
+      "You need each category's total AND the grand total across every category, in the same result, without a second query.",
+      "OVER () with nothing inside it, no PARTITION BY, no ORDER BY, treats the entire result as one window, giving you a grand total on every row.",
+      "SUM(SUM(oi.quantity*oi.unit_price)) OVER () takes the already-grouped category sums and sums them again across the whole window.",
+      "SELECT p.category, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue, ROUND(100.0*SUM(oi.quantity*oi.unit_price)/SUM(SUM(oi.quantity*oi.unit_price)) OVER (),2) AS pct FROM order_items oi JOIN products p ON oi.sku=p.sku GROUP BY p.category ORDER BY revenue DESC;" ],
+    explanation: { why: "An empty OVER() doesn't partition anything, so the window covers every row in the result, letting you compute a grand total that appears, unchanged, on every single grouped row.", mistake: "Running a separate query for the grand total and combining the two results in application code works, but it's needless extra complexity, and it risks the two numbers coming from data that's drifted out of sync.", tip: "100.0 * (not just 100 *) forces the division to happen in floating point, using a plain integer 100 in some databases would silently truncate the percentage to a whole number.", business: "\"Electronics is 46.68% of revenue\" is a materially more useful statement to a stakeholder than \"Electronics is $7,957.69,\" the percentage carries the actual business context the raw dollar figure doesn't." } },
+
+  { id: "sql-w07", skill: SKILL_ID_WINDOW, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-w04"],
+    title: "Compare each month to the one before it",
+    objective: "Use LAG across a time series to enable period-over-period comparison.",
+    prompt: "Return each month of completed-order revenue (2dp) alongside the previous month's revenue (<code>prev_revenue</code>, 2dp, NULL for the first month).",
+    starter: "-- compute monthly revenue first, then look one row back\n",
+    referenceSql: "WITH monthly AS (SELECT strftime('%Y-%m', o.order_date) AS month, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'completed' GROUP BY month) SELECT month, revenue, LAG(revenue) OVER (ORDER BY month) AS prev_revenue FROM monthly ORDER BY month",
+    hints: [
+      "This is the same LAG pattern from a couple of tasks ago, applied to months instead of ranked customers.",
+      "Build the monthly-revenue CTE first, exactly like the running-total task, then add LAG instead of a cumulative SUM.",
+      "LAG(revenue) OVER (ORDER BY month) pulls the previous month's revenue into the current month's row.",
+      "WITH monthly AS (SELECT strftime('%Y-%m', o.order_date) AS month, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue FROM orders o JOIN order_items oi ON o.order_id=oi.order_id WHERE o.status='completed' GROUP BY month) SELECT month, revenue, LAG(revenue) OVER (ORDER BY month) AS prev_revenue FROM monthly ORDER BY month;" ],
+    explanation: { why: "Ordering by month and applying LAG turns a flat list of monthly totals into a genuine period-over-period comparison, each row now carries both its own value and its predecessor's.", mistake: "Manually self-joining the monthly table on \"month = previous month\" is possible but fragile, especially with gaps in the data (this dataset has real gaps, some months have no completed orders at all), LAG handles gaps in the ORDER BY sequence correctly without extra logic.", tip: "Once you have current-vs-previous in the same row, computing a change (subtraction) or percent change (division) is a one-line addition, this is the foundation the next two tasks build on.", business: "\"Is this month better or worse than last month\" is one of the single most common questions a stakeholder asks, and this query is the direct SQL answer to it." } },
+
+  { id: "sql-w08", skill: SKILL_ID_WINDOW, tool: "sql", level: "challenge", difficulty: "challenge", prerequisite: ["sql-w07"],
+    title: "Find the single biggest month-over-month decline",
+    objective: "Chain a LAG comparison into a filter and sort to surface the one worst period, not just the full trend.",
+    prompt: "Using the previous task's pattern, find the single month with the largest dollar decline compared to the month before it. Return <code>month</code>, <code>revenue</code>, <code>prev_revenue</code>, and the change (<code>revenue - prev_revenue</code>, 2dp). Decide the structure yourself.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "WITH monthly AS (SELECT strftime('%Y-%m', o.order_date) AS month, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'completed' GROUP BY month), withlag AS (SELECT month, revenue, LAG(revenue) OVER (ORDER BY month) AS prev_revenue FROM monthly) SELECT month, revenue, prev_revenue, ROUND(revenue - prev_revenue, 2) AS change FROM withlag WHERE prev_revenue IS NOT NULL ORDER BY change ASC LIMIT 1",
+    hints: [
+      "Start from the current-vs-previous comparison you already built, then find the worst single row in it.",
+      "Wrap the LAG comparison in its own CTE, then filter and sort the CTE's output to isolate the single largest decline.",
+      "WHERE prev_revenue IS NOT NULL (exclude the first month, which has nothing to compare to), ORDER BY change ASC LIMIT 1 puts the biggest decline first.",
+      "WITH monthly AS (...), withlag AS (SELECT month, revenue, LAG(revenue) OVER (ORDER BY month) AS prev_revenue FROM monthly) SELECT month, revenue, prev_revenue, ROUND(revenue-prev_revenue,2) AS change FROM withlag WHERE prev_revenue IS NOT NULL ORDER BY change ASC LIMIT 1;" ],
+    explanation: { why: "Once every month has a computed change value, finding the worst one is an ordinary ORDER BY ... LIMIT 1, the window function did the hard part, the filtering is standard SQL from Stage 1.", mistake: "Forgetting WHERE prev_revenue IS NOT NULL would let the very first month (with a NULL change) sort unpredictably into the result depending on how the database orders NULLs.", tip: "This two-step shape, compute a metric with a window function in one CTE, then filter/sort it in a second step, is the standard way almost every \"find the extreme case\" analyst question gets solved.", business: "A single number, \"which month crashed hardest,\" is the natural opening question in an incident review, this query answers it directly instead of making a stakeholder scan a full year of numbers by eye." } },
+
+  { id: "sql-w09", skill: SKILL_ID_WINDOW, tool: "sql", level: "challenge", difficulty: "challenge", prerequisite: ["sql-w03"],
+    title: "Identify each category's single top performer",
+    objective: "Transfer the top-N-per-group pattern to the narrower case of top-1-per-group.",
+    prompt: "Return exactly one row per category: the single top-revenue product in each (<code>category</code>, <code>product_name</code>, revenue rounded to 2dp). Decide the structure yourself, don't just copy the top-3 query and add a LIMIT, LIMIT doesn't work per-group.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "WITH ranked AS (SELECT p.category, p.product_name, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue, DENSE_RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity * oi.unit_price) DESC) AS rnk FROM order_items oi JOIN products p ON oi.sku = p.sku GROUP BY p.category, p.product_name) SELECT category, product_name, revenue FROM ranked WHERE rnk = 1 ORDER BY category",
+    hints: [
+      "A plain LIMIT 1 only limits the entire result to one row total, not one row per category, that's the trap in this task's warning.",
+      "This is the exact same shape as the top-3 task, just with a stricter filter on the rank.",
+      "Rank products within each category (like task w02 or w03), then keep only rnk = 1 instead of rnk <= 3.",
+      "WITH ranked AS (SELECT p.category, p.product_name, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue, DENSE_RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity*oi.unit_price) DESC) AS rnk FROM order_items oi JOIN products p ON oi.sku=p.sku GROUP BY p.category, p.product_name) SELECT category, product_name, revenue FROM ranked WHERE rnk=1 ORDER BY category;" ],
+    explanation: { why: "rnk = 1 after a PARTITION BY ranking is the general \"top 1 per group\" pattern, LIMIT operates on the whole result set, it has no concept of \"per group\" at all.", mistake: "Adding LIMIT 1 to a query grouped by category without PARTITION BY-based ranking returns exactly one row, the single best product company-wide, silently discarding every other category entirely.", tip: "Whenever a business question says \"per category,\" \"per region,\" \"per customer,\" or any other \"per X,\" that's a strong signal you need PARTITION BY, not LIMIT.", business: "\"Best seller in each category\" is a report every merchandising team runs regularly, getting this pattern right (rank-then-filter, not LIMIT) is directly reusable well beyond this one query." } },
+
+  { id: "sql-w10", skill: SKILL_ID_WINDOW, tool: "sql", level: "mastery", difficulty: "mastery", prerequisite: ["sql-w08"],
+    title: "The sharpest percentage decline, and why it might be misleading",
+    objective: "Transfer LAG-based comparison to a percentage basis, then reason about what the number does and doesn't prove.",
+    prompt: "Task w08 found the biggest <b>dollar</b> decline. Now find the single month with the biggest <b>percentage</b> decline instead (<code>(revenue - prev_revenue) / prev_revenue * 100</code>, rounded to 2dp), which may be a different month entirely. Return <code>month</code>, <code>revenue</code>, <code>prev_revenue</code>, and <code>pct_change</code>. Then, in the box below, explain in 2-3 sentences why a huge percentage decline in a low-revenue month might be less alarming than it looks, and what you'd check before reporting it to a stakeholder.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "WITH monthly AS (SELECT strftime('%Y-%m', o.order_date) AS month, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'completed' GROUP BY month), withlag AS (SELECT month, revenue, LAG(revenue) OVER (ORDER BY month) AS prev_revenue FROM monthly) SELECT month, revenue, prev_revenue, ROUND((revenue - prev_revenue) * 100.0 / prev_revenue, 2) AS pct_change FROM withlag WHERE prev_revenue IS NOT NULL ORDER BY pct_change ASC LIMIT 1",
+    written: {
+      label: "Why might this percentage decline be misleading?",
+      placeholder: "Think about the small-sample lesson from Module 5's statistics, and what a percentage hides that a dollar figure doesn't...",
+      check: (text) => /(sample|small|base|volume|noise|dollar|absolute)/i.test(text) && text.trim().length > 40,
+      hint: "Mention that a percentage computed from a small revenue base can swing enormously from a tiny dollar change, tying back to the small-sample-size lesson from Module 5, and that you'd check the dollar figure and order count before reporting the percentage alone." },
+    hints: [
+      "This reuses task w08's exact structure, only the metric being sorted on changes, from a dollar difference to a percentage.",
+      "(revenue - prev_revenue) * 100.0 / prev_revenue computes percentage change, the 100.0 (not 100) keeps the division in floating point.",
+      "Same CTE-then-filter-then-sort shape as w08, ORDER BY pct_change ASC LIMIT 1 instead of ORDER BY change ASC LIMIT 1.",
+      "WITH monthly AS (...), withlag AS (SELECT month, revenue, LAG(revenue) OVER (ORDER BY month) AS prev_revenue FROM monthly) SELECT month, revenue, prev_revenue, ROUND((revenue-prev_revenue)*100.0/prev_revenue,2) AS pct_change FROM withlag WHERE prev_revenue IS NOT NULL ORDER BY pct_change ASC LIMIT 1;" ],
+    explanation: { why: "Percentage change and dollar change rank months differently, precisely because percentage is relative to a base that varies month to month, a small base makes small dollar moves look huge in percentage terms.", mistake: "Reporting the percentage decline alone, without also stating the dollar figures and the underlying order volume, is exactly the kind of framing that panics a stakeholder over a statistically unstable number, this is the same small-sample lesson from Module 5's conversion-rate example, applied to a time series instead of a channel comparison.", tip: "Whenever you find an extreme percentage, immediately check the absolute numbers behind it, before you present the percentage to anyone, that habit alone prevents a lot of false alarms.", business: "A CFO who hears \"revenue dropped 96%\" without also hearing \"from $529 to $19, in our smallest month\" will make a very different, probably wrong, decision than one who hears both numbers together." } },
 ];
 
 /* ================= sql.js database (same shop.sql as Module 6) ================= */
@@ -753,7 +893,7 @@ function renderSkillBar() {
   const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
   target.innerHTML = next
     ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
-    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. The Window Functions and Business Analysis stages of this practice library aren't built yet.`;
+    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. The Business Analysis stage of this practice library isn't built yet.`;
 }
 
 function buildHintsHtml(hints) {
@@ -774,6 +914,7 @@ function buildExplainHtml(ex) {
 const openTasks = new Set();
 const editorDrafts = {};
 const resultsDrafts = {};
+const writtenDrafts = {};
 function renderTasks() {
   const list = document.getElementById("taskList");
   TASKS.forEach(t => {
@@ -783,6 +924,8 @@ function renderTasks() {
     if (ed) editorDrafts[t.id] = ed.value;
     const res = document.getElementById("results_" + t.id);
     if (res && res.innerHTML) resultsDrafts[t.id] = res.innerHTML;
+    const wr = document.getElementById("written_" + t.id);
+    if (wr) writtenDrafts[t.id] = wr.value;
   });
   list.innerHTML = "";
   TASKS.forEach((t, idx) => {
@@ -802,6 +945,7 @@ function renderTasks() {
         <p style="font-size:13.5px;margin-bottom:10px">${t.prompt}</p>
         ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
         <textarea id="editor_${t.id}" rows="4" spellcheck="false">${esc(editorDrafts[t.id] !== undefined ? editorDrafts[t.id] : t.starter)}</textarea>
+        ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
         <div class="dagctrl">
           <button data-run="${t.id}">Run query</button>
           <button class="primary" data-check="${t.id}">&#10003; Check answer</button>
@@ -880,6 +1024,20 @@ function renderTasks() {
           ? `<b>Not quite.</b>${mutationNote}`
           : `<b>Not quite.</b> Your query ran, but the results don't match. Row count: yours ${studentResult.rows.length}, expected ${refResult.rows.length}.`;
       resultsEl.appendChild(verdict);
+
+      let writtenPass = true;
+      if (task.written) {
+        const writtenText = (document.getElementById("written_" + id) || {}).value || "";
+        writtenPass = task.written.check(writtenText);
+        const wv = document.createElement("div");
+        wv.className = "feedback " + (writtenPass ? "ok" : "bad");
+        wv.innerHTML = writtenPass
+          ? "<b>Interpretation accepted.</b>"
+          : `<b>Interpretation needs more.</b> ${esc(task.written.hint)}`;
+        resultsEl.appendChild(wv);
+      }
+      pass = pass && writtenPass;
+
       if (pass && task.explanation) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(task.explanation));
       PracticeProgress.recordAttempt(id, pass);
       if (pass) openTasks.add(id);
