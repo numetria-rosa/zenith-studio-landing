@@ -7,200 +7,400 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;}
 body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
 .serif{font-family:'Fraunces',serif}
 .mono{font-family:'IBM Plex Mono',monospace}
-.wrap{max-width:960px;margin:0 auto;padding:0 24px 80px}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px 90px}
 .bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
-.bar .in{max-width:960px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .in{max-width:980px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
 .bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
 .bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
 .coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
-.coursenav .in{max-width:960px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav .in{max-width:980px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px;flex-wrap:wrap}
 .coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
 .coursenav a:hover{color:var(--amber)}
 .hero{padding:40px 0 20px}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
 h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
-.sub{color:var(--mut);font-size:14.5px;max-width:700px;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:720px;margin-top:10px}
 .disclosure{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
 .disclosure b{color:var(--amber)}
-h2.sectitle{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);margin:34px 0 14px;font-family:'IBM Plex Mono'}
-.readywrap{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px 26px;margin-top:22px}
-.readyrow{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd)}
+h2.sectitle{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);margin:40px 0 14px;font-family:'IBM Plex Mono';scroll-margin-top:60px}
+h2.sectitle .n{color:var(--mut2);margin-right:8px}
+.toc{position:sticky;top:57px;z-index:30;background:rgba(13,15,20,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd);margin:0 -24px;padding:10px 24px;overflow-x:auto;white-space:nowrap}
+.toc a{font-family:'IBM Plex Mono';font-size:11.5px;color:var(--mut);text-decoration:none;margin-right:16px;padding:4px 0}
+.toc a:hover{color:var(--amber)}
+p{font-size:14.5px}
+p.mut{color:var(--mut)}
+code{font-family:'IBM Plex Mono';font-size:12.5px;background:rgba(240,180,41,.1);color:var(--amber);padding:1px 6px;border-radius:4px}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,.qopt:focus-visible,.pathtab:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button.primary:hover{filter:brightness(1.08);color:var(--amberd)}
+button:disabled{opacity:.4;cursor:not-allowed}
+textarea,input[type=text]{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
+/* ---- readiness ---- */
+.readywrap{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px 26px;margin-top:8px}
+.readyrow{padding:14px 0;border-bottom:1px solid var(--bd)}
 .readyrow:last-of-type{border-bottom:none}
+.readytop{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .readyrow .rlbl{font-size:14px;font-weight:600}
-.readyrow .rexplain{font-size:12px;color:var(--mut2);margin-top:3px}
-.readybar{width:160px;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--bd)}
+.readyrow .rexplain{font-size:12px;color:var(--mut2);margin-top:3px;max-width:520px}
+.readybar{width:160px;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--bd);flex-shrink:0}
 .readybar .fill{height:100%;background:var(--amber)}
-.readyval{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;width:46px;text-align:right}
-.overallready{margin-top:18px;padding-top:18px;border-top:2px solid var(--bd2);display:flex;justify-content:space-between;align-items:center}
-.overallready .oval{font-family:'IBM Plex Mono';font-size:32px;font-weight:700;color:var(--amber)}
-.improvebox{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 18px;margin-top:16px;font-size:13px;color:var(--mut)}
-.improvebox b{color:var(--tx)}
+.readyval{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;width:46px;text-align:right;flex-shrink:0}
+@media (max-width:640px){ .readybar{width:110px} }
+.methodbox{background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;padding:10px 12px;margin-top:14px;font-size:11.5px;color:var(--mut)}
+/* ---- role cards ---- */
 .pathtabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .pathtab{font-family:'IBM Plex Mono';font-size:12px;padding:8px 14px;border-radius:99px;border:1px solid var(--bd2);background:var(--card2);color:var(--mut);cursor:pointer}
 .pathtab.active{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
-.pathtab:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .pathcard{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:26px 28px;margin-top:18px}
 .pathcard h3{font-size:20px;font-weight:600;font-family:'Fraunces'}
-.pathcard .pdesc{color:var(--mut);font-size:14px;margin-top:8px}
+.alignbadge{display:inline-block;font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;padding:3px 10px;border-radius:99px;margin-top:8px}
+.alignbadge.high{background:rgba(74,222,149,.12);color:var(--good)}
+.alignbadge.medium{background:rgba(240,180,41,.12);color:var(--amber)}
+.alignbadge.low{background:rgba(255,133,133,.12);color:var(--bad)}
 .skillcol{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
 @media (max-width:640px){ .skillcol{grid-template-columns:1fr} }
 .skillcol .slbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-family:'IBM Plex Mono'}
 .skillcol.have .slbl{color:var(--good)}
 .skillcol.need .slbl{color:var(--amber)}
 .skillcol ul{padding-left:18px;font-size:13.5px;line-height:1.9;color:var(--tx)}
-.roadmap{margin-top:22px;display:flex;flex-direction:column;gap:0}
-.rstep{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 18px;position:relative}
-.rstep .rslbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);font-family:'IBM Plex Mono'}
-.rstep .rsval{font-size:13.5px;color:var(--tx);margin-top:6px}
-.rarrow{text-align:center;color:var(--mut2);font-size:13px;padding:4px 0}
-.jobtargets{margin-top:20px}
-.jobtargets .jlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:10px;font-family:'IBM Plex Mono'}
 .jobchip{display:inline-block;background:var(--card2);border:1px solid var(--bd2);border-radius:99px;padding:6px 14px;font-size:12.5px;margin:0 8px 8px 0}
 .nopromise{font-size:12px;color:var(--mut2);margin-top:12px;font-style:italic}
-.playgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-@media (max-width:640px){ .playgrid{grid-template-columns:1fr} }
-.playcard{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px 22px}
-.playcard h4{font-size:14px;font-weight:700;color:var(--amber);margin-bottom:8px}
-.playcard p{font-size:13.5px;color:var(--mut)}
-.playcard code{display:block;margin-top:10px;font-family:'IBM Plex Mono';font-size:12.5px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--amber);white-space:pre-wrap}
+/* ---- skill matrix ---- */
+.matrixwrap{overflow-x:auto;margin-top:8px;border:1px solid var(--bd2);border-radius:12px}
+table.matrix{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+table.matrix th,table.matrix td{padding:10px 14px;border-bottom:1px solid var(--bd);text-align:left}
+table.matrix th{background:var(--card2);color:var(--mut2);text-transform:uppercase;font-size:10.5px;letter-spacing:.05em;font-family:'IBM Plex Mono'}
+table.matrix tr:last-child td{border-bottom:none}
+.tierpill{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.tierpill.t0{background:var(--bg2);color:var(--mut2)}
+.tierpill.t1{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t2{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t3{background:rgba(240,180,41,.15);color:var(--amber)}
+/* ---- CV / claims ---- */
+.claimlist{display:grid;gap:10px;margin-top:14px}
+.claim{background:var(--card2);border-left:3px solid var(--good);border-radius:0 8px 8px 0;padding:12px 16px;font-size:13.5px}
+.claim.locked{border-left-color:var(--bd2);color:var(--mut2)}
+.claim .clbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut2);font-family:'IBM Plex Mono';margin-bottom:4px}
+.formula{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px;font-family:'IBM Plex Mono';font-size:12px}
+.formula span{background:var(--card2);border:1px solid var(--bd2);border-radius:8px;padding:6px 12px}
+.formula .plus{background:none;border:none;color:var(--mut2);padding:0}
+.bulletbox{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;margin-top:10px;font-size:13px;color:var(--amber);font-family:'IBM Plex Mono';white-space:pre-wrap}
+/* ---- generic card grids ---- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media (max-width:700px){ .grid2{grid-template-columns:1fr} }
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px 22px}
+.card h4{font-size:14px;font-weight:700;color:var(--amber);margin-bottom:8px}
+.card p{font-size:13.5px;color:var(--mut)}
+.card code{display:block;margin-top:10px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;white-space:pre-wrap}
+/* ---- github tree ---- */
+.filetree{font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px;line-height:1.9;color:var(--tx);overflow-x:auto}
+.filetree .c{color:var(--mut2)}
+/* ---- gap checker ---- */
+.gapinput{margin-top:14px}
+.gapresults{display:grid;gap:14px;margin-top:16px}
+.gapcol .glbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-family:'IBM Plex Mono'}
+.gapcol.match .glbl{color:var(--good)}
+.gapcol.learn .glbl{color:var(--amber)}
+.gapcol.absent .glbl{color:var(--mut2)}
+.gaptags{display:flex;flex-wrap:wrap;gap:6px}
+.gaptag{font-family:'IBM Plex Mono';font-size:11.5px;padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--bd2)}
+.gapcol.match .gaptag{border-color:rgba(74,222,149,.4);color:var(--good)}
+.gapcol.learn .gaptag{border-color:rgba(240,180,41,.4);color:var(--amber)}
+.safetynote{font-size:11.5px;color:var(--mut2);margin-top:12px;font-style:italic}
+/* ---- interview practice ---- */
+.qpractice{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px 22px;margin-top:14px}
+.qpractice .qtext{font-weight:600;font-size:14.5px}
+.qpractice .qtag{font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;color:var(--mut2);margin-bottom:6px;display:block}
+.modelanswer{margin-top:12px;padding:12px 14px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13px;color:var(--mut);display:none}
+.modelanswer.show{display:block}
+.selfeval{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.selfeval button{font-size:12px;padding:6px 12px}
+.selfeval button.chosen{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+.gradedfeedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;display:none}
+.gradedfeedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.gradedfeedback.bad{display:block;background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+/* ---- case study ---- */
+.casebrief{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px;margin-top:14px;font-size:13.5px}
+.caseq{margin-top:16px}
+.caseq label{font-size:12.5px;font-weight:600;color:var(--info);display:block;margin-bottom:6px}
+.caseq textarea{min-height:60px}
+/* ---- 30/60/90 ---- */
+.phaseblock{margin-top:18px}
+.phaseblock h4{font-family:'Fraunces';font-size:16px;font-weight:600;margin-bottom:10px}
+.tasklist{display:grid;gap:8px}
+.taskrow{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;background:var(--card2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px}
+.taskrow input{margin-top:3px;flex-shrink:0}
+.taskrow.done span{color:var(--mut2);text-decoration:line-through}
+.planprogress{font-family:'IBM Plex Mono';font-size:12.5px;color:var(--mut2);margin-top:14px}
+/* ---- project ideas ---- */
+.ideacard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;margin-top:12px}
+.ideacard h4{font-family:'Fraunces';font-size:16px;font-weight:600}
+.ideameta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ideatag{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--bg2);color:var(--mut2);border:1px solid var(--bd2)}
+.ideafield{margin-top:8px;font-size:13px}
+.ideafield b{color:var(--mut2);font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-family:'IBM Plex Mono';display:inline-block;min-width:110px}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
-@media (max-width:640px){ .wrap{padding:0 16px 60px} .readyrow{flex-wrap:wrap;gap:8px} }
+@media (max-width:640px){ .wrap{padding:0 16px 70px} .readytop{flex-wrap:wrap} .grid2{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="portfolio.html">Portfolio</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="portfolio.html">My Portfolio</a><a href="projects.html">Projects</a></div></div>
 
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Career Path Edition</span>
-    <h1 class="serif">What can I actually do with this?</h1>
-    <p class="sub">Tied directly to what you've built in this course, not generic career advice. Every skill listed below is one you either have evidence for or explicitly still need.</p>
-    <div class="disclosure"><b>This course alone does not guarantee a job or a client.</b> Each path below separates "skills this course develops" from "additional skills required," and the readiness score is a measure of course-skill evidence, not an employment probability. See the playbook below for realistic, typical patterns, not promises.</div>
+    <h1 class="serif">Turning this course into a job search</h1>
+    <p class="sub">Every claim below is tied to something you actually did in this course, not generic advice. Where a number appears, its method is shown next to it. Where a skill isn't taught here, that's stated plainly instead of glossed over.</p>
+    <div class="disclosure"><b>What this course is honest about:</b> finishing it prepares you to apply to junior/entry-level analyst roles with real, demonstrable evidence. It does not make you a data scientist, it does not guarantee an interview or a job, and several tools real job postings ask for (Power BI, Tableau, Git, cloud platforms) aren't taught here. Read on for exactly what you have and exactly what's still missing.</div>
   </header>
 
-  <h2 class="sectitle">Course Skill Readiness</h2>
+  <nav class="toc">
+    <a href="#readiness">Readiness</a>
+    <a href="#roles">Roles</a>
+    <a href="#matrix">Skills matrix</a>
+    <a href="#claims">CV claims</a>
+    <a href="#bullets">CV bullets</a>
+    <a href="#portfolio">Portfolio</a>
+    <a href="#github">GitHub</a>
+    <a href="#jobsearch">Job search</a>
+    <a href="#interview">Interview prep</a>
+    <a href="#case">Case study</a>
+    <a href="#next">What's next</a>
+    <a href="#plan">30/60/90 plan</a>
+    <a href="#ideas">Project ideas</a>
+    <a href="#honest">Can I get a job?</a>
+  </nav>
+
+  <h2 class="sectitle" id="readiness"><span class="n">01</span>Realistic readiness</h2>
+  <p class="mut">Four separate measures, not one fake percentage. Each has its own method, shown below it. "Job tooling" starts empty on purpose, this course doesn't teach those tools, so it can't claim you have them.</p>
   <div class="readywrap" id="readyWrap"></div>
 
-  <h2 class="sectitle">Career pathways</h2>
+  <h2 class="sectitle" id="roles"><span class="n">02</span>Roles this course prepares you to pursue</h2>
+  <p class="mut">Course alignment below is computed from a fixed rule, shown in the methodology note under each card, not a vibe.</p>
   <div class="pathtabs" id="pathTabs"></div>
   <div id="pathDetail"></div>
 
-  <h2 class="sectitle">The job-landing playbook</h2>
-  <div class="playgrid">
-    <div class="playcard">
-      <h4>Where the work actually is</h4>
-      <p>Freelance: Upwork and Fiverr, starting near the low end of the range and building reviews. Entry-level roles: LinkedIn easy-apply plus direct informational outreach. Cold outreach: a free mini-analysis for a local business in exchange for a testimonial, the same tactic small agencies use to land their first clients.</p>
-    </div>
-    <div class="playcard">
-      <h4>Resume bullet formula</h4>
-      <p>Action verb, what you analyzed, the tool, the business result. Worked from a real portfolio project, not a generic template.</p>
-      <code>Analyzed 18 months of e-commerce order data in Python and pandas to identify a 23% cart-abandonment spike at checkout, informing a UX fix.</code>
-    </div>
-    <div class="playcard">
-      <h4>Cold outreach template</h4>
-      <p>Short, no fluff, offering a free mini-analysis in exchange for a testimonial and a review, the fastest path from zero reviews to a first paid gig.</p>
-      <code>Hi [name], I noticed [specific, real observation about their business]. I'm building a portfolio in data analysis and would like to run a free 1-hour analysis of [specific metric] for you, no cost, just a testimonial if it's useful. Interested?</code>
-    </div>
-    <div class="playcard">
-      <h4>Interview prep</h4>
-      <p>Technical screens usually include a live pandas or SQL exercise, not just conceptual questions. Take-home case studies are common, practice explaining your approach out loud. For behavioral questions, use the STAR method (Situation, Task, Action, Result) against a real portfolio project.</p>
-    </div>
-  </div>
-  <p class="nopromise" style="margin-top:14px">Realistic pattern, not a promise: most students who finish the portfolio and send the outreach templates land a first paid analysis or an interview within a few weeks of finishing. That's typical, not guaranteed, and depends heavily on effort, market, and location.</p>
+  <h2 class="sectitle" id="matrix"><span class="n">03</span>Skills gap analyzer: where you actually are</h2>
+  <p class="mut">Pulled live from your real course progress. A module being <i>opened</i> doesn't count, only a passed checkpoint quiz plus its graded exercise does. "Capstone demonstrated" means the specific capstone deliverable that reuses this skill is also passing.</p>
+  <div class="matrixwrap"><table class="matrix" id="matrixTable"></table></div>
 
-  <footer>Zenith Lab · Data Science &amp; Analysis · Career Path</footer>
+  <h2 class="sectitle" id="claims"><span class="n">04</span>What you can honestly put on your CV</h2>
+  <p class="mut">Each statement below only appears once you have real evidence for it. Locked ones show what's still needed to unlock them.</p>
+  <div class="claimlist" id="claimList"></div>
+
+  <h2 class="sectitle" id="bullets"><span class="n">05</span>Turn your capstone into CV bullets</h2>
+  <div class="formula">
+    <span>ACTION</span><span class="plus">+</span><span>TOOL</span><span class="plus">+</span><span>DATA</span><span class="plus">+</span><span>RESULT</span><span class="plus">+</span><span>BUSINESS IMPACT</span>
+  </div>
+  <p class="mut" style="margin-top:12px">Generic and weak: <code>"Analyzed data using Python."</code> Specific and true, generated from your actual Northstar Retail capstone once you've completed it:</p>
+  <div class="bulletbox" id="bulletExample"></div>
+  <p class="mut" id="bulletStatus" style="margin-top:8px"></p>
+
+  <h2 class="sectitle" id="portfolio"><span class="n">06</span>Building your portfolio</h2>
+  <p>A portfolio-worthy write-up of an analysis project demonstrates ten things: the problem, the dataset, the data-quality issues you found, your analytical process, your SQL/Python work, your statistical reasoning, your visualizations, your business findings, your recommendations, and what you'd investigate next. The Northstar capstone from Module 9 already has all ten, it should be your flagship project.</p>
+  <div class="grid2">
+    <div class="card"><h4>Your first portfolio project, step by step</h4><p>Finish the Module 9 capstone &rarr; clean up your code into a single readable notebook or script &rarr; write it up as a case study using the 10 elements above &rarr; publish the code to GitHub &rarr; add your Module 8/9 chart screenshots &rarr; write the CV bullet from section 05 &rarr; link it from <a href="portfolio.html" style="color:var(--amber)">My Portfolio</a>.</p></div>
+    <div class="card"><h4>What "clean it up" actually means</h4><p>Remove dead-end attempts and scratch code. Add comments explaining <i>why</i>, not what. Rename variables so a stranger can follow them. Re-run it top to bottom once, broken code in a portfolio piece is worse than no portfolio piece.</p></div>
+  </div>
+
+  <h2 class="sectitle" id="github"><span class="n">07</span>What goes in a GitHub repository</h2>
+  <p class="mut">The exact folders depend on the project, a one-notebook analysis doesn't need a <code>src/</code> directory. What every professional analytics repo needs is a README that tells the story without anyone having to run your code.</p>
+  <div class="grid2">
+    <div>
+      <div class="filetree">northstar-retail-analysis/<br>
+&nbsp;&nbsp;<span class="c">README.md</span> &larr; the most important file<br>
+&nbsp;&nbsp;data/ &larr; raw + cleaned data, or a link if too large<br>
+&nbsp;&nbsp;notebooks/ or src/ &larr; your actual analysis code<br>
+&nbsp;&nbsp;sql/ &larr; if the project used SQL<br>
+&nbsp;&nbsp;charts/ &larr; exported chart images<br>
+&nbsp;&nbsp;requirements.txt &larr; so it's reproducible</div>
+    </div>
+    <div class="card"><h4>Your README needs</h4><p>Problem statement (one paragraph). Data source and its known issues. Method (what you did, briefly). Key findings (the numbers). Screenshots of your charts/dashboard. Limitations (be honest, e.g. "H1/H2 split, not per-month"). Conclusion and recommendation. A skeleton project without a README reads as unfinished, even if the code is good.</p></div>
+  </div>
+
+  <h2 class="sectitle" id="jobsearch"><span class="n">08</span>Job search: what to look for</h2>
+  <p>Companies use overlapping titles for nearly the same work: <b>Data Analyst</b>, <b>Junior/Entry-Level Data Analyst</b>, <b>Reporting Analyst</b>, <b>Business Analyst</b>, <b>Analytics Analyst</b>, <b>BI Analyst</b>, and <b>Operations Analyst</b> often ask for the same core SQL/Excel/dashboard skillset under different names. Read the actual job description, not just the title.</p>
+  <div class="card" style="margin-top:16px">
+    <h4>Job description gap checker</h4>
+    <p>Paste a real job description below. This runs entirely in your browser: it just scans the text for keywords against what this course teaches, it is not an AI recruiter and does not send your text anywhere.</p>
+    <div class="gapinput">
+      <textarea id="jdInput" rows="8" placeholder="Paste a job description here..."></textarea>
+      <div style="margin-top:10px"><button class="primary" id="btnCheckJd">Check against this course</button> <button id="btnClearJd">Clear</button></div>
+    </div>
+    <div id="jdResults"></div>
+    <p class="safetynote">Simple keyword matching only. It cannot judge seniority, culture fit, or whether you're actually qualified, use it as a starting checklist, not a verdict.</p>
+  </div>
+
+  <h2 class="sectitle" id="interview"><span class="n">09</span>Interview practice</h2>
+  <p class="mut">Write a real answer before revealing the model answer, that's the only way this is useful. A few are graded automatically on key concepts (disclosed, simple keyword checks, same honest approach as this course's written exercises), the rest ask you to self-rate.</p>
+  <div id="interviewList"></div>
+
+  <h2 class="sectitle" id="case"><span class="n">10</span>Case study: "Revenue dropped 12% this month"</h2>
+  <div class="casebrief">Your manager messages you Monday morning: <i>"Revenue was down 12% in June compared to May. Can you find out why before the leadership meeting Thursday?"</i> You have access to the same kind of order-level data as the Module 9 capstone, sourced by product category, channel, and date, with no other context.</div>
+  <div id="caseQuestions"></div>
+  <div style="margin-top:14px"><button class="primary" id="btnCheckCase">Check my thinking</button></div>
+  <div id="caseResults"></div>
+
+  <h2 class="sectitle" id="next"><span class="n">11</span>What to learn next</h2>
+  <p class="mut">These are genuinely useful next steps, not secret prerequisites you were missing. Everything in this course stands on its own.</p>
+  <div class="grid2">
+    <div class="card"><h4>Priority order, regardless of direction</h4><p>1. Power BI or Tableau (pick one, most job posts want one of the two)<br>2. More SQL, window functions, CTEs, query performance<br>3. Git and GitHub, version control is assumed at almost every job<br>4. A second and third portfolio project, in a different industry each time<br>5. Deeper statistics, regression, experiment design</p></div>
+    <div class="card"><h4>If you want Data Science</h4><p>Probability and statistics in depth, machine learning fundamentals, scikit-learn, model evaluation, feature engineering. This course's EDA and hypothesis-testing work (Modules 5 and 9) is real preparation for this, model training itself is not covered here.</p></div>
+    <div class="card"><h4>If you want BI / Analytics</h4><p>Power BI or Tableau specifically, DAX, data modeling, Power Query. Module 8's KPI/chart-choice judgment transfers directly, the tool syntax itself does not.</p></div>
+    <div class="card"><h4>If you want Analytics Engineering</h4><p>Advanced SQL, dbt, data warehouses, dimensional modeling, Git, a cloud data platform (Snowflake/BigQuery). Module 6's SQL and Module 4's cleaning are a real foundation, the production tooling is new.</p></div>
+    <div class="card"><h4>If you want Business Analysis</h4><p>Requirements gathering, stakeholder management, process mapping, business case development. Module 8 and 9's stakeholder-communication work is directly relevant, the rest is a different, more process-focused skill set.</p></div>
+  </div>
+
+  <h2 class="sectitle" id="plan"><span class="n">12</span>Your 30/60/90 day plan</h2>
+  <p class="mut">Check items off as you complete them, this is saved in your browser like the rest of your course progress.</p>
+  <div id="planBody"></div>
+  <div class="planprogress" id="planProgress"></div>
+
+  <h2 class="sectitle" id="ideas"><span class="n">13</span>Portfolio project ideas beyond the capstone</h2>
+  <p class="mut">Each needs real judgment calls, not a recipe to follow. Pick a dataset from a public source (Kaggle, data.gov, or a company's own public reports) and treat it like the capstone: investigate first, don't assume the columns mean what they say.</p>
+  <div id="ideasBody"></div>
+
+  <h2 class="sectitle" id="honest"><span class="n">14</span>Can I get a job after this course?</h2>
+  <div class="disclosure" style="border-color:rgba(95,194,232,.35);background:rgba(95,194,232,.06)">
+    <p><b>Honest answer:</b> this course gives you a practical, demonstrable foundation for applying to junior and entry-level analyst roles: Junior Data Analyst, Entry-Level Data Analyst, Reporting Analyst, Analytics Intern, and Business/Data Analyst trainee positions. It does <b>not</b> guarantee employment. Your actual competitiveness depends on your portfolio quality, communication, interview performance, the job market where you're applying, and whether a given role additionally requires a BI tool this course doesn't teach.</p>
+    <p style="margin-top:10px"><b>What you have:</b> real, verifiable evidence across Python, pandas, SQL, statistics, visualization, and dashboards, plus one complete end-to-end analysis (the Northstar capstone) you can walk an interviewer through in detail.</p>
+    <p style="margin-top:10px"><b>What you still need:</b> at minimum, one more portfolio project in a different domain, a published GitHub with a real README, and (for most postings) at least conversational familiarity with a BI tool.</p>
+    <p style="margin-top:10px"><b>What to do next:</b> section 12's 30/60/90 plan above is the literal next step, not a metaphor. Start it today.</p>
+  </div>
+  <p class="mut" style="margin-top:16px">If you started this course with zero coding experience: finishing it is real, concrete evidence that you can learn Python, pandas, SQL, and analytical thinking from nothing, most people who say they want to do that never finish. That's worth something, distinct from, and less than, professional work experience. Both things are true at once.</p>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Career Path</footer>
 </div>
 
 <script src="course-progress.js?v=5"></script>
 <script>
-const PATHS = [
-  { id: "data-analyst", name: "Data Analyst",
-    have: ["Data cleaning and validation on real messy data (Module 4)", "Descriptive statistics and correlation-vs-causation judgment (Module 5)", "SQL for pulling and shaping data (Module 6)", "Chart selection and avoiding misleading visuals (Module 7)", "Dashboard building and executive communication (Module 8)"],
-    need: ["Company-specific data warehouse/BI tool experience (Looker, Tableau, Power BI)", "Domain expertise in the specific industry you're applying to", "Experience working with much larger, production-scale datasets", "Stakeholder management across a real, ongoing analyst role"],
-    projects: [1, 2, 3, 4],
-    tools: ["Excel/Google Sheets", "Python + pandas", "SQL", "A BI tool (Tableau or Power BI)"],
-    jobs: ["Data Analyst", "Junior Data Analyst", "Business Analyst"] },
-  { id: "bi-analyst", name: "BI Analyst",
-    have: ["Dashboard design and metric selection (Module 8)", "SQL for querying live data sources (Module 6)", "Data cleaning to keep a recurring report trustworthy (Module 4)", "Chart selection for a recurring, at-a-glance report (Module 7)"],
-    need: ["Experience with a dedicated BI platform's specific features (scheduled refreshes, row-level security, embedded dashboards)", "Data warehouse / data modeling experience at a company scale", "Ongoing stakeholder maintenance of a live, evolving dashboard suite"],
-    projects: [1, 2, 4],
-    tools: ["Tableau or Power BI", "SQL", "A data warehouse (Snowflake, BigQuery, Redshift)"],
-    jobs: ["BI Analyst", "Reporting Analyst", "Business Intelligence Developer"] },
-  { id: "junior-ds", name: "Junior Data Scientist",
-    have: ["Statistical judgment: signal vs. noise, correlation vs. causation (Module 5)", "Exploratory data analysis methodology (Module 5)", "pandas/NumPy fluency (Module 3)", "A full analysis pipeline from messy data to a defensible conclusion (Module 9 capstone)"],
-    need: ["Machine learning fundamentals (this course doesn't teach model training)", "Experimental design (A/B testing at depth, more advanced hypothesis testing)", "A programming-heavy production environment (version control at scale, testing, deployment)", "More advanced statistics: regression modeling, Bayesian methods"],
-    projects: [2, 3, 4],
-    tools: ["Python (scikit-learn, statsmodels)", "Jupyter notebooks", "SQL", "Experiment-design frameworks"],
-    jobs: ["Junior Data Scientist", "Data Science Associate", "Insights Analyst"] },
-  { id: "analytics-eng", name: "Analytics Engineer",
-    have: ["pandas/SQL fluency for transforming raw data into clean tables (Modules 3, 6)", "Real experience diagnosing and fixing messy, real-world data (Module 4)", "Multi-source merging and joining (Module 3)"],
-    need: ["A transformation framework in production use (dbt is the standard)", "Data warehouse architecture and modeling patterns (star schema, etc.)", "Pipeline orchestration (Airflow or similar)", "Version control and CI/CD for data pipelines"],
-    projects: [2, 3],
-    tools: ["dbt", "A data warehouse (Snowflake, BigQuery)", "SQL", "Git"],
-    jobs: ["Analytics Engineer", "Data Engineer (junior)", "BI Engineer"] },
-  { id: "freelance", name: "Freelance / Independent Analyst",
-    have: ["A complete, ambiguous-question analysis from raw mess to recommendation (Module 9 capstone)", "Four distinct portfolio pieces across different industries (Projects)", "Dashboard building and client-ready communication (Module 8)", "The specific outreach and pricing playbook above"],
-    need: ["Real client-management experience (scoping, expectations, revisions)", "A track record of reviews/testimonials, which only comes from doing the first few jobs", "Comfort pricing your own time without a salary benchmark to anchor to"],
-    projects: [1, 2, 3, 4],
-    tools: ["Excel/Google Sheets", "Python + pandas", "A simple invoicing/proposal tool", "Upwork or Fiverr profile"],
-    jobs: ["Freelance Data Analyst", "Independent Analytics Consultant"] },
-];
+const esc = CourseProgress.escapeHtml;
 
-function readinessScore(){
-  const ov = CourseProgress.overall();
-  const technical = ov.pct;
+/* ================= Evidence layer: read real course state ================= */
+function moduleDone(id) { return CourseProgress.isModuleComplete(id); }
+function extraPassing(key) {
+  const e = CourseProgress.getExtra(key);
+  return !!(e && e.total > 0 && e.passCount === e.total);
+}
+function anyExtraPassing(keys) { return keys.some(extraPassing); }
+function allExtraPassing(keys) { return keys.length > 0 && keys.every(extraPassing); }
 
-  let practicalSum = 0;
-  CourseProgress.PROJECTS.forEach(p => { const st = CourseProgress.getProject(p.id); practicalSum += st.completed ? (st.score || 0) : 0; });
-  const practical = Math.round(practicalSum / (CourseProgress.PROJECTS.length * 100) * 100);
+const CAPSTONE_KEYS = { A: "module9_exA", B: "module9_exB", C: "module9_exC", D: "module9_exD", G: "module9_exG", write: "module9_write", explain: "module9_explain", portfolio: "module9_portfolio" };
+function capstoneDeliverablesPassing() {
+  return Object.values(CAPSTONE_KEYS).filter(extraPassing).length;
+}
+function capstoneFullyComplete() { return capstoneDeliverablesPassing() === Object.keys(CAPSTONE_KEYS).length; }
 
-  let portfolioSum = 0;
-  CourseProgress.PROJECTS.forEach(p => {
-    const st = CourseProgress.getProject(p.id);
-    if (!st.completed) return;
-    let frac = 0;
-    if (st.description) frac += 1/3;
-    if (st.githubUrl) frac += 1/3;
-    if (st.testsPassed) frac += 1/3;
-    portfolioSum += frac;
-  });
-  const portfolio = Math.round(portfolioSum / CourseProgress.PROJECTS.length * 100);
-
-  const overall = Math.round(technical * 0.40 + practical * 0.35 + portfolio * 0.25);
-  return { technical, practical, portfolio, overall, modulesComplete: ov.completed, projectsComplete: CourseProgress.PROJECTS.filter(p => CourseProgress.getProject(p.id).completed).length };
+function projectsCompletedCount() {
+  return CourseProgress.PROJECTS.filter(p => CourseProgress.getProject(p.id).completed).length;
 }
 
-function renderReadiness(){
-  const r = readinessScore();
-  const wrap = document.getElementById("readyWrap");
+/* ================= 01: Readiness (4 measures, transparent method) ================= */
+const JOB_TOOLING_ITEMS = [
+  { id: "bi", label: "Used Power BI or Tableau to build at least one report" },
+  { id: "git", label: "Comfortable with basic Git commit/push/pull, and have a GitHub account" },
+  { id: "cloud", label: "Explored a cloud data platform (BigQuery, Snowflake, Redshift, or similar)" },
+  { id: "sql2", label: "Practiced SQL beyond this course (window functions, CTEs, or a real database)" },
+];
+function jobToolingState() { return CourseProgress.getExtra("career_job_tooling") || {}; }
+function setJobTooling(id, val) {
+  const cur = jobToolingState();
+  cur[id] = val;
+  CourseProgress.setExtra("career_job_tooling", cur);
+  renderReadiness();
+}
+function jobToolingPct() {
+  const state = jobToolingState();
+  const checked = JOB_TOOLING_ITEMS.filter(i => state[i.id]).length;
+  return Math.round((checked / JOB_TOOLING_ITEMS.length) * 100);
+}
+function interviewReadinessPct() {
+  const practiced = INTERVIEW_QUESTIONS.filter(q => !!CourseProgress.getExtra("career_interview_" + q.id)).length;
+  const caseState = CourseProgress.getExtra("career_case_study");
+  const caseDone = caseState && caseState.checked ? 1 : 0;
+  const totalItems = INTERVIEW_QUESTIONS.length + 1;
+  return Math.round(((practiced + caseDone) / totalItems) * 100);
+}
+function portfolioPct() {
+  const capstoneFrac = capstoneDeliverablesPassing() / Object.keys(CAPSTONE_KEYS).length;
+  const projFrac = projectsCompletedCount() / CourseProgress.PROJECTS.length;
+  return Math.round(((capstoneFrac * 0.6) + (projFrac * 0.4)) * 100);
+}
+function renderReadiness() {
+  const ov = CourseProgress.overall();
   const rows = [
-    { label: "Technical foundation", val: r.technical, explain: `${r.modulesComplete}/9 modules completed under full mastery gating (quiz + hands-on exercise)`,
-      improve: r.technical < 100 ? `Complete the remaining ${9 - r.modulesComplete} module(s), including their hands-on exercises, not just the checkpoint quiz.` : "All 9 modules complete." },
-    { label: "Practical evidence", val: r.practical, explain: `${r.projectsComplete}/4 capstone projects completed, weighted by self-assessed rubric score`,
-      improve: r.practical < 100 ? `Build and submit more of the 4 projects in the Projects library, an unstarted project counts as 0 here, a submitted-but-partial one counts partially.` : "All 4 projects completed at full rubric score." },
-    { label: "Portfolio readiness", val: r.portfolio, explain: "Share of completed projects with a description, a link, and reported deliverables filled in",
-      improve: r.portfolio < 100 ? "For each completed project, add a link, a short description, and your completed deliverables, these are what make a project verifiable to someone reviewing your portfolio." : "Every completed project has full portfolio metadata." },
+    { label: "Course skills", val: ov.pct, explain: `${ov.completed}/9 modules fully complete (checkpoint quiz plus the module's own graded hands-on exercise, not just visited)`,
+      method: "Method: (modules meeting the same completion bar the course itself gates on) / 9." },
+    { label: "Portfolio", val: portfolioPct(), explain: `${capstoneDeliverablesPassing()}/8 Module 9 capstone deliverables passing, ${projectsCompletedCount()}/4 additional projects completed`,
+      method: "Method: 60% weight on capstone deliverables (A-H) passing, 40% weight on completed projects from the Projects library." },
+    { label: "Job tooling", val: jobToolingPct(), explain: "Self-reported only, this course does not teach these tools, so it cannot claim you have them",
+      method: "Method: checked items below / 4. Starts at 0% for everyone, on purpose." },
+    { label: "Interview readiness", val: interviewReadinessPct(), explain: "Based on interview questions you've actually practiced plus the case study below",
+      method: "Method: (practiced questions + case study completed) / (total questions + 1)." },
   ];
   let html = "";
   rows.forEach(row => {
-    html += `<div class="readyrow">
-      <div><div class="rlbl">${row.label}</div><div class="rexplain">${row.explain}</div></div>
+    html += `<div class="readyrow"><div class="readytop">
+      <div><div class="rlbl">${esc(row.label)}</div><div class="rexplain">${esc(row.explain)}</div></div>
       <div style="display:flex;align-items:center;gap:12px"><div class="readybar"><div class="fill" style="width:${row.val}%"></div></div><div class="readyval">${row.val}%</div></div>
-    </div>`;
+    </div><div class="methodbox">${esc(row.method)}</div></div>`;
   });
-  html += `<div class="overallready"><span>Overall course skill readiness</span><span class="oval">${r.overall}%</span></div>`;
-  const improveLines = rows.filter(row => row.val < 100).map(row => `<b>${row.label}:</b> ${row.improve}`).join("<br><br>");
-  html += `<div class="improvebox">${improveLines || "<b>Everything measurable here is at 100%.</b> That reflects course-skill evidence, real-world readiness also depends on experience this course can't measure."}</div>`;
-  wrap.innerHTML = html;
+  html += `<div class="readyrow" style="border-bottom:none"><div class="rlbl" style="margin-bottom:10px">Job tooling checklist (self-reported)</div><div id="toolingChecklist"></div></div>`;
+  document.getElementById("readyWrap").innerHTML = html;
+  const tc = document.getElementById("toolingChecklist");
+  const state = jobToolingState();
+  JOB_TOOLING_ITEMS.forEach(item => {
+    const row = document.createElement("label");
+    row.className = "taskrow" + (state[item.id] ? " done" : "");
+    row.style.cursor = "pointer";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = !!state[item.id];
+    cb.addEventListener("change", () => setJobTooling(item.id, cb.checked));
+    row.appendChild(cb);
+    const span = document.createElement("span");
+    span.textContent = item.label;
+    row.appendChild(span);
+    tc.appendChild(row);
+  });
 }
 
+/* ================= 02: Roles ================= */
+const PATHS = [
+  { id: "data-analyst", name: "Junior Data Analyst", align: "high",
+    have: ["Excel/spreadsheets and the tidy-data idea (Module 1)", "Python fundamentals (Module 2)", "pandas for cleaning, grouping, and merging (Module 3)", "Real messy-data cleaning with a documented audit trail (Module 4)", "Descriptive statistics and correlation-vs-causation judgment (Module 5)", "SQL for pulling and shaping data (Module 6)", "Chart selection and avoiding misleading visuals (Module 7)", "KPI definition, dashboard building, and axis-honesty judgment (Module 8)", "One complete end-to-end analysis with a business recommendation (Module 9 capstone)"],
+    need: ["Power BI or Tableau (most job posts ask for one)", "Git/GitHub, expected at nearly every company", "A second portfolio project in a different industry", "Real workplace stakeholder back-and-forth (this course simulates one client, not a team)"],
+    projects: [1, 2, 3, 4],
+    jobs: ["Data Analyst", "Junior Data Analyst", "Entry-Level Data Analyst", "Business/Data Analyst trainee"],
+    method: "Alignment rule: HIGH when the role's core loop (clean data, query it, visualize it, communicate a finding) matches at least 8 of this course's 9 modules directly." },
+  { id: "reporting", name: "Reporting / BI Analyst", align: "medium",
+    have: ["Dashboard design and KPI selection (Module 8)", "SQL for querying live data sources (Module 6)", "Data cleaning to keep a recurring report trustworthy (Module 4)", "Chart selection for at-a-glance reporting (Module 7)"],
+    need: ["A dedicated BI platform (Tableau or Power BI specifically, this course teaches the underlying judgment, not the tool)", "Scheduled refresh / row-level security concepts, specific to whichever BI tool a job uses", "Data-warehouse-scale data, this course's datasets are realistic but small"],
+    projects: [1, 2, 4],
+    jobs: ["BI Analyst", "Reporting Analyst", "Business Intelligence Developer (junior)"],
+    method: "Alignment rule: MEDIUM when the role's core loop matches, but a specific commercial tool this course doesn't teach is typically required day one." },
+  { id: "junior-ds", name: "Junior Data Scientist / Insights Analyst", align: "medium",
+    have: ["Statistical judgment: signal vs. noise, a real z-test on order-level data (Modules 5, 9)", "Exploratory data analysis methodology (Module 5)", "pandas/NumPy fluency (Module 3)", "A full pipeline from messy data to a defensible, statistically checked conclusion (Module 9 capstone)"],
+    need: ["Machine learning fundamentals, this course does not teach model training", "Deeper experimental design (A/B testing at depth)", "scikit-learn or a similar modeling library", "More advanced statistics: regression, Bayesian methods"],
+    projects: [2, 3, 4],
+    jobs: ["Junior Data Scientist", "Data Science Associate", "Insights Analyst"],
+    method: "Alignment rule: MEDIUM, the statistical-reasoning half of this role is real and demonstrated, the modeling half is a genuine gap, not a light one." },
+  { id: "analytics-eng", name: "Analytics Engineer (junior)", align: "low",
+    have: ["pandas/SQL fluency for transforming raw data into clean tables (Modules 3, 6)", "Real experience diagnosing messy, real-world data (Module 4)", "Multi-source merging and joining (Module 3)"],
+    need: ["dbt, the standard transformation framework in production use", "Data warehouse architecture and modeling patterns (star schema, dimensional modeling)", "Pipeline orchestration (Airflow or similar)", "Git and CI/CD for data pipelines"],
+    projects: [2, 3],
+    jobs: ["Analytics Engineer (junior)", "Data Engineer (junior)", "BI Engineer"],
+    method: "Alignment rule: LOW, the data-transformation instincts transfer, but the actual production tooling this role runs on isn't covered here at all." },
+];
 let activePath = PATHS[0].id;
-function renderPathTabs(){
+function renderPathTabs() {
   const tabs = document.getElementById("pathTabs");
   tabs.innerHTML = "";
   PATHS.forEach(p => {
@@ -211,43 +411,383 @@ function renderPathTabs(){
     tabs.appendChild(btn);
   });
 }
-
-function renderPathDetail(){
+function renderPathDetail() {
   const p = PATHS.find(x => x.id === activePath);
   const projectTitles = p.projects.map(id => CourseProgress.PROJECTS.find(x => x.id === id).title);
   const el = document.getElementById("pathDetail");
   el.innerHTML = `
     <div class="pathcard">
-      <h3 class="serif">${p.name}</h3>
+      <h3 class="serif">${esc(p.name)}</h3>
+      <span class="alignbadge ${esc(p.align)}">Course alignment: ${esc(p.align)}</span>
+      <div class="methodbox">${esc(p.method)}</div>
       <div class="skillcol">
-        <div class="skillcol have"><div class="slbl">✓ Skills this course develops</div><ul>${p.have.map(s => `<li>${s}</li>`).join("")}</ul></div>
-        <div class="skillcol need"><div class="slbl">→ Additional skills required</div><ul>${p.need.map(s => `<li>${s}</li>`).join("")}</ul></div>
+        <div class="skillcol have"><div class="slbl">Skills this course develops</div><ul>${p.have.map(s => `<li>${esc(s)}</li>`).join("")}</ul></div>
+        <div class="skillcol need"><div class="slbl">Still worth learning</div><ul>${p.need.map(s => `<li>${esc(s)}</li>`).join("")}</ul></div>
       </div>
-
-      <div class="roadmap">
-        <div class="rstep"><div class="rslbl">Current skills (this course)</div><div class="rsval">${p.have.join(", ")}</div></div>
-        <div class="rarrow">↓</div>
-        <div class="rstep"><div class="rslbl">Skills to add</div><div class="rsval">${p.need.join(", ")}</div></div>
-        <div class="rarrow">↓</div>
-        <div class="rstep"><div class="rslbl">Portfolio pieces that fit this path</div><div class="rsval">${projectTitles.join(" · ")}</div></div>
-        <div class="rarrow">↓</div>
-        <div class="rstep"><div class="rslbl">Tools to learn</div><div class="rsval">${p.tools.join(", ")}</div></div>
-        <div class="rarrow">↓</div>
-        <div class="rstep"><div class="rslbl">Portfolio</div><div class="rsval">Written case studies for the projects above, with your numbers, method, and recommendation, see <a href="portfolio.html" style="color:var(--amber)">My Portfolio</a></div></div>
-      </div>
-
-      <div class="jobtargets">
-        <div class="jlbl">Potential job titles to research</div>
-        ${p.jobs.map(j => `<span class="jobchip">${j}</span>`).join("")}
-        <div class="nopromise">This course does not promise or guarantee employment or paid work in any of these roles. It develops a specific, verifiable subset of the skills they typically require.</div>
+      <p class="mut" style="margin-top:16px"><b style="color:var(--tx)">Portfolio pieces that fit this path:</b> ${esc(projectTitles.join(" · "))}</p>
+      <div class="jobtargets" style="margin-top:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:10px;font-family:'IBM Plex Mono'">Typical next step: research these titles</div>
+        ${p.jobs.map(j => `<span class="jobchip">${esc(j)}</span>`).join("")}
+        <div class="nopromise">This course does not promise or guarantee employment in any of these roles. It develops a specific, verifiable subset of the skills they typically require.</div>
       </div>
     </div>
   `;
 }
 
+/* ================= 03: Skill matrix ================= */
+const SKILLS = [
+  { label: "Spreadsheets (Excel)", moduleId: 1, capstoneKeys: [], note: "Not re-tested in the capstone, which is pandas/SQL-based." },
+  { label: "Python fundamentals", moduleId: 2, capstoneKeys: [], note: "Superseded, not re-tested directly, by pandas in the capstone." },
+  { label: "pandas / NumPy", moduleId: 3, capstoneKeys: ["A", "C", "D", "G"], note: "" },
+  { label: "Data cleaning", moduleId: 4, capstoneKeys: ["A"], note: "" },
+  { label: "Statistics", moduleId: 5, capstoneKeys: ["G"], note: "" },
+  { label: "SQL", moduleId: 6, capstoneKeys: ["B"], note: "" },
+  { label: "Visualization", moduleId: 7, capstoneKeys: ["D"], note: "" },
+  { label: "Dashboards / KPIs", moduleId: 8, capstoneKeys: [], note: "Capstone builds one chart, not a full multi-chart dashboard, that specific skill caps at \"Demonstrated.\"" },
+  { label: "Business communication", moduleId: 8, capstoneKeys: ["write", "explain", "portfolio"], note: "" },
+];
+function tierFor(skill) {
+  const done = moduleDone(skill.moduleId);
+  if (!done) return 0;
+  if (skill.capstoneKeys.length === 0) return 2;
+  return allExtraPassing(skill.capstoneKeys.map(k => CAPSTONE_KEYS[k])) ? 3 : 2;
+}
+const TIER_LABEL = ["Not started", "Practiced", "Demonstrated", "Capstone demonstrated"];
+function renderMatrix() {
+  let html = `<thead><tr><th>Skill</th><th>Taught in</th><th>Status</th><th>Evidence</th></tr></thead><tbody>`;
+  SKILLS.forEach(s => {
+    const tier = tierFor(s);
+    const evidence = tier === 0 ? "Complete Module " + s.moduleId + " (quiz + hands-on exercise)"
+      : tier === 3 ? "Module " + s.moduleId + " complete, plus the matching capstone deliverable passing"
+      : (s.note || "Module " + s.moduleId + " complete");
+    html += `<tr><td>${esc(s.label)}</td><td class="mono" style="font-size:12px;color:var(--mut2)">Module ${s.moduleId}</td><td><span class="tierpill t${tier}">${esc(TIER_LABEL[tier])}</span></td><td style="font-size:12.5px;color:var(--mut)">${esc(evidence)}</td></tr>`;
+  });
+  html += `</tbody>`;
+  document.getElementById("matrixTable").innerHTML = html;
+}
+
+/* ================= 04: CV claims (evidence-gated) ================= */
+const CLAIMS = [
+  { text: "Used Python and pandas to clean, transform, group, and analyze messy tabular datasets.", requires: () => moduleDone(3) && moduleDone(4), unlockHint: "Complete Modules 3 and 4." },
+  { text: "Built SQL queries against relational data and identified NULL-handling and join-related row-count issues.", requires: () => moduleDone(6) && extraPassing(CAPSTONE_KEYS.B), unlockHint: "Complete Module 6 and pass the capstone's SQL deliverable (Part B)." },
+  { text: "Applied statistical testing (standard error, z-score) to distinguish a real finding from sampling noise, on real order-level data.", requires: () => moduleDone(5) && extraPassing(CAPSTONE_KEYS.G), unlockHint: "Complete Module 5 and pass the capstone's statistical validation (Part G)." },
+  { text: "Built interactive Plotly visualizations directly from live analysis code, including catching a misleading truncated axis.", requires: () => moduleDone(7) && moduleDone(8), unlockHint: "Complete Modules 7 and 8." },
+  { text: "Designed KPIs and an interactive dashboard from a raw dataset, correctly excluding non-completed transactions from a revenue total.", requires: () => moduleDone(8), unlockHint: "Complete Module 8." },
+  { text: "Built an end-to-end analytical project combining data cleaning, SQL, statistical validation, visualization, business-impact quantification, and written recommendations for a non-technical stakeholder.", requires: () => capstoneFullyComplete(), unlockHint: "Pass all 8 Module 9 capstone deliverables (A-H)." },
+];
+function renderClaims() {
+  const el = document.getElementById("claimList");
+  el.innerHTML = "";
+  CLAIMS.forEach(c => {
+    const unlocked = c.requires();
+    const div = document.createElement("div");
+    div.className = "claim" + (unlocked ? "" : " locked");
+    div.innerHTML = `<div class="clbl">${unlocked ? "You can claim this" : "Not yet, locked"}</div>${esc(c.text)}` + (unlocked ? "" : `<div style="margin-top:6px;font-size:12px;color:var(--mut2)">Unlock by: ${esc(c.unlockHint)}</div>`);
+    el.appendChild(div);
+  });
+}
+
+/* ================= 05: CV bullet ================= */
+function renderBullet() {
+  const box = document.getElementById("bulletExample");
+  const status = document.getElementById("bulletStatus");
+  if (capstoneFullyComplete()) {
+    box.textContent = "Investigated a profitability gap for a simulated mid-size retailer (Northstar Retail): cleaned a raw 3,600-row order export in Python/pandas, wrote SQL against a live database to isolate Electronics as the category driving the margin decline, validated the ~13-point margin drop with a two-sample statistical test, quantified the impact at roughly $21,800 in lost H2 gross profit, built an interactive Plotly chart, and delivered a written recommendation and plain-English explanation for non-technical stakeholders.";
+    status.textContent = "Generated from your actual, passing capstone deliverables.";
+    status.style.color = "var(--good)";
+  } else {
+    box.textContent = "Complete all 8 parts of the Module 9 capstone to generate your real bullet here, built from your actual results, not a placeholder.";
+    status.textContent = `${capstoneDeliverablesPassing()}/8 capstone deliverables currently passing.`;
+    status.style.color = "var(--mut2)";
+  }
+}
+
+/* ================= 08: Job description gap checker ================= */
+const COURSE_VOCAB = ["sql","excel","python","pandas","statistics","statistical","visualization","dashboard","data cleaning","data analysis","reporting","kpi","business communication","stakeholder"];
+const LEARN_VOCAB = ["power bi","tableau","git","github","cloud","aws","azure","gcp","machine learning","scikit-learn","dbt","snowflake","bigquery","spark","looker","r programming","airflow","ci/cd"];
+function scanJobDescription(text) {
+  const lower = text.toLowerCase();
+  const matched = COURSE_VOCAB.filter(k => new RegExp("\\b" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i").test(lower));
+  const learn = LEARN_VOCAB.filter(k => new RegExp("\\b" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i").test(lower));
+  const allVocab = COURSE_VOCAB.concat(LEARN_VOCAB);
+  const absent = allVocab.filter(k => !matched.includes(k) && !learn.includes(k));
+  return { matched, learn, absent };
+}
+document.getElementById("btnCheckJd").addEventListener("click", () => {
+  const text = document.getElementById("jdInput").value;
+  const resultsEl = document.getElementById("jdResults");
+  if (!text.trim()) { resultsEl.innerHTML = `<p class="mut" style="margin-top:14px">Paste a job description above first.</p>`; return; }
+  const { matched, learn, absent } = scanJobDescription(text);
+  const tagRow = (arr) => arr.length ? `<div class="gaptags">${arr.map(k => `<span class="gaptag">${esc(k)}</span>`).join("")}</div>` : `<p class="mut" style="font-size:12.5px">None detected.</p>`;
+  resultsEl.innerHTML = `<div class="gapresults">
+    <div class="gapcol match"><div class="glbl">Matches this course</div>${tagRow(matched)}</div>
+    <div class="gapcol learn"><div class="glbl">Needs additional learning</div>${tagRow(learn)}</div>
+    <div class="gapcol absent"><div class="glbl">Not mentioned in this posting</div>${tagRow(absent)}</div>
+  </div>`;
+});
+document.getElementById("btnClearJd").addEventListener("click", () => {
+  document.getElementById("jdInput").value = "";
+  document.getElementById("jdResults").innerHTML = "";
+});
+
+/* ================= 09: Interview practice ================= */
+const INTERVIEW_QUESTIONS = [
+  { id: "wherehaving", tag: "SQL", text: "What is the difference between WHERE and HAVING?", graded: true,
+    check: (a) => /(group|aggregat)/i.test(a) && /(before|after|row)/i.test(a),
+    hint: "Mention that WHERE filters rows before grouping/aggregation, HAVING filters after.",
+    model: "WHERE filters individual rows before any grouping happens. HAVING filters groups after a GROUP BY and aggregation, it's the only way to filter on an aggregate like SUM() or COUNT()." },
+  { id: "joinmultiply", tag: "SQL", text: "How can a join accidentally multiply rows?", graded: true,
+    check: (a) => /(duplicat|many|fan.?out|multiple)/i.test(a),
+    hint: "Mention duplicate keys on one or both sides of the join, a many-to-many relationship.",
+    model: "If the join key isn't unique on one or both sides, every matching pair of rows gets combined, a customer with 3 orders joined to 3 rows in another table produces 9 rows, not 3. This is often called a join fan-out." },
+  { id: "meanmedian", tag: "Statistics", text: "What is the difference between mean and median, and when does it matter?", graded: true,
+    check: (a) => /(outlier|skew)/i.test(a),
+    hint: "Mention outliers or skew, that's the case where they diverge and it matters which one you report.",
+    model: "The mean is the arithmetic average, the median is the middle value. They're close for symmetric data, but an outlier (one huge order, one executive salary) pulls the mean far from what's typical, while the median stays put. Report median when outliers could mislead." },
+  { id: "confidence", tag: "Statistics", text: "What does a confidence interval actually tell you?", graded: true,
+    check: (a) => /(range|plausible|uncertain)/i.test(a),
+    hint: "Mention that it's a range of plausible values, reflecting uncertainty, not a single guaranteed number.",
+    model: "It's the range the true value plausibly sits in, given the data you have. A wide interval means high uncertainty, usually from a small sample. It is not the probability the true value falls in that range, it's a statement about the method's long-run reliability." },
+  { id: "convrate", tag: "Statistics", text: "Why can a high conversion rate still be unreliable?", graded: true,
+    check: (a) => /(sample|small|few)/i.test(a),
+    hint: "Mention sample size, a rate from a tiny number of clicks/conversions is unstable.",
+    model: "A rate computed from a tiny sample (say, 2 conversions out of 21 clicks) can swing wildly with one more or fewer conversion. It's not wrong, it's just not stable enough to compare against a rate built on thousands of data points, exactly the trap in Module 7." },
+  { id: "misleadingkpi", tag: "Dashboards", text: "What makes a KPI misleading?", graded: false,
+    hint: "Think about denominators, time-period mismatches, truncated axes, and unclear definitions.",
+    model: "Common causes: the wrong denominator (counting abandoned carts as sales), comparing mismatched time periods, a truncated axis exaggerating a change, mixing currencies or units, or a KPI with no agreed definition so two people compute it differently." },
+  { id: "revenuedrop", tag: "Analytical thinking", text: "How would you investigate a sudden revenue drop, at a high level?", graded: false,
+    hint: "Think about the order this course actually taught: verify the data first, then slice by dimension, then check for a plausible cause before concluding.",
+    model: "First, verify it's real (not a data pipeline or reporting bug). Then slice by category, channel, region, and time to find where the drop concentrates, a company-wide number hides where the real problem is. Only then look for a plausible cause, and be careful not to claim causation you haven't actually tested." },
+  { id: "datacleaning", tag: "Fundamentals", text: "What is data cleaning, in your own words?", graded: false,
+    hint: "Think about what Module 4 actually covered: duplicates, missing values, inconsistent labels, impossible values.",
+    model: "Finding and deciding how to handle problems in raw data before analyzing it: duplicate rows, missing values, inconsistent category labels (like 'Beauty' vs 'BEAUTY'), and impossible values (negative quantities). Every decision should be documented, not silently applied." },
+];
+function renderInterview() {
+  const wrap = document.getElementById("interviewList");
+  wrap.innerHTML = "";
+  INTERVIEW_QUESTIONS.forEach(q => {
+    const saved = CourseProgress.getExtra("career_interview_" + q.id) || {};
+    const card = document.createElement("div");
+    card.className = "qpractice";
+    card.innerHTML = `<span class="qtag">${esc(q.tag)}${q.graded ? " &middot; auto-checked" : " &middot; self-rated"}</span><div class="qtext">${esc(q.text)}</div>`;
+    const ta = document.createElement("textarea");
+    ta.rows = 3;
+    ta.placeholder = "Write your answer here first...";
+    ta.value = saved.answer || "";
+    card.appendChild(ta);
+    const ctrl = document.createElement("div");
+    ctrl.style.cssText = "margin-top:10px;display:flex;gap:8px;flex-wrap:wrap";
+    const revealBtn = document.createElement("button");
+    revealBtn.textContent = "Reveal model answer";
+    ctrl.appendChild(revealBtn);
+    if (q.graded) {
+      const checkBtn = document.createElement("button");
+      checkBtn.className = "primary";
+      checkBtn.textContent = "Check my answer";
+      ctrl.appendChild(checkBtn);
+      const fb = document.createElement("div");
+      fb.className = "gradedfeedback";
+      checkBtn.addEventListener("click", () => {
+        const pass = q.check(ta.value);
+        fb.className = "gradedfeedback " + (pass ? "ok" : "bad");
+        fb.textContent = pass ? "Good, that covers the key idea." : "Not quite yet. " + q.hint;
+        CourseProgress.setExtra("career_interview_" + q.id, { answer: ta.value, graded: true, pass });
+        renderReadiness();
+      });
+      card.appendChild(ctrl);
+      card.appendChild(fb);
+    } else {
+      card.appendChild(ctrl);
+    }
+    const model = document.createElement("div");
+    model.className = "modelanswer";
+    model.textContent = q.model;
+    card.appendChild(model);
+    revealBtn.addEventListener("click", () => {
+      model.classList.toggle("show");
+      if (!q.graded && model.classList.contains("show")) {
+        const evalRow = document.createElement("div");
+        evalRow.className = "selfeval";
+        evalRow.innerHTML = `<span style="font-size:12px;color:var(--mut2);align-self:center">Self-rate:</span>`;
+        ["Got it", "Partial", "Missed it"].forEach(label => {
+          const b = document.createElement("button");
+          b.textContent = label;
+          if (saved.selfRating === label) b.classList.add("chosen");
+          b.addEventListener("click", () => {
+            evalRow.querySelectorAll("button").forEach(x => x.classList.remove("chosen"));
+            b.classList.add("chosen");
+            CourseProgress.setExtra("career_interview_" + q.id, { answer: ta.value, selfRating: label });
+            renderReadiness();
+          });
+          evalRow.appendChild(b);
+        });
+        if (!card.querySelector(".selfeval")) card.appendChild(evalRow);
+      }
+    });
+    ta.addEventListener("blur", () => {
+      const cur = CourseProgress.getExtra("career_interview_" + q.id) || {};
+      CourseProgress.setExtra("career_interview_" + q.id, Object.assign({}, cur, { answer: ta.value }));
+    });
+    wrap.appendChild(card);
+  });
+}
+
+/* ================= 10: Case study ================= */
+const CASE_QUESTIONS = [
+  { id: "investigate", label: "What would you investigate first?" },
+  { id: "data", label: "What data would you need?" },
+  { id: "analysis", label: "What SQL/pandas analysis would you run?" },
+  { id: "falseconclusion", label: "What could cause a false conclusion here?" },
+  { id: "viz", label: "What visualization would you use to show this?" },
+  { id: "stakeholder", label: "What would you tell the stakeholder, in plain language?" },
+];
+function renderCase() {
+  const wrap = document.getElementById("caseQuestions");
+  const saved = CourseProgress.getExtra("career_case_study") || {};
+  wrap.innerHTML = "";
+  CASE_QUESTIONS.forEach(q => {
+    const div = document.createElement("div");
+    div.className = "caseq";
+    div.innerHTML = `<label>${esc(q.label)}</label>`;
+    const ta = document.createElement("textarea");
+    ta.id = "case_" + q.id;
+    ta.value = (saved.answers && saved.answers[q.id]) || "";
+    div.appendChild(ta);
+    wrap.appendChild(div);
+  });
+  if (saved.checked) renderCaseResults(saved.answers || {});
+}
+function renderCaseResults(answers) {
+  const checks = [
+    { name: "\"What would you investigate first\" mentions slicing by a dimension (category/channel/region/time), not just re-running the same total", pass: /(categor|channel|region|slice|segment|dimension)/i.test(answers.investigate || "") },
+    { name: "\"What data\" names specific fields or tables, not just \"more data\"", pass: (answers.data || "").length > 20 },
+    { name: "\"What analysis\" names a real technique (groupby, join, filter, comparison)", pass: /(group|join|filter|compar|sql|pandas)/i.test(answers.analysis || "") },
+    { name: "\"False conclusion\" identifies a real risk (wrong denominator, mismatched period, small sample, confusing correlation with causation)", pass: /(denominator|period|sample|correlat|caus|assum)/i.test(answers.falseconclusion || "") },
+    { name: "\"Visualization\" names a specific, appropriate chart type", pass: /(bar|line|chart|trend|histogram)/i.test(answers.viz || "") },
+    { name: "\"Stakeholder\" answer avoids raw jargon and states a number", pass: !/(p-value|regression coefficient|standard deviation)/i.test(answers.stakeholder || "") && /\d/.test(answers.stakeholder || "") },
+  ];
+  const resultsEl = document.getElementById("caseResults");
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  checks.forEach(c => {
+    if (c.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "gradedfeedback " + (c.pass ? "ok" : "bad");
+    row.textContent = (c.pass ? "Good: " : "Consider: ") + c.name;
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("p");
+  summary.className = "mut";
+  summary.style.marginTop = "10px";
+  summary.textContent = `${passCount} / ${checks.length} checks. This grades whether your thinking touches the right concepts, not writing quality, there's no single correct answer to a case study.`;
+  resultsEl.appendChild(summary);
+}
+document.getElementById("btnCheckCase").addEventListener("click", () => {
+  const answers = {};
+  CASE_QUESTIONS.forEach(q => { answers[q.id] = document.getElementById("case_" + q.id).value; });
+  CourseProgress.setExtra("career_case_study", { answers, checked: true });
+  renderCaseResults(answers);
+  renderReadiness();
+});
+
+/* ================= 12: 30/60/90 plan ================= */
+const PLAN = [
+  { phase: "First 30 days", tasks: [
+    { id: "p1_1", label: "Finish the Module 9 capstone (all 8 deliverables)" },
+    { id: "p1_2", label: "Clean up the capstone code into one readable notebook or script" },
+    { id: "p1_3", label: "Publish the capstone to GitHub with a real README" },
+    { id: "p1_4", label: "Write the capstone up as your first portfolio case study" },
+  ]},
+  { phase: "Days 31-60", tasks: [
+    { id: "p2_1", label: "Learn the basics of Power BI or Tableau, pick one" },
+    { id: "p2_2", label: "Build a second portfolio project in a different industry (see section 13)" },
+    { id: "p2_3", label: "Practice SQL beyond this course: window functions, CTEs" },
+    { id: "p2_4", label: "Start applying to junior/entry-level roles that match section 08's title list" },
+  ]},
+  { phase: "Days 61-90", tasks: [
+    { id: "p3_1", label: "Build a third portfolio project" },
+    { id: "p3_2", label: "Do at least one mock interview using section 09's questions out loud" },
+    { id: "p3_3", label: "Practice the case-study format in section 10 with a new scenario" },
+    { id: "p3_4", label: "Keep applying consistently, and revise your CV bullets against real job descriptions using section 08's checker" },
+  ]},
+];
+function renderPlan() {
+  const body = document.getElementById("planBody");
+  body.innerHTML = "";
+  const saved = CourseProgress.getExtra("career_plan") || {};
+  PLAN.forEach(block => {
+    const section = document.createElement("div");
+    section.className = "phaseblock";
+    section.innerHTML = `<h4>${esc(block.phase)}</h4>`;
+    const list = document.createElement("div");
+    list.className = "tasklist";
+    block.tasks.forEach(t => {
+      const row = document.createElement("label");
+      row.className = "taskrow" + (saved[t.id] ? " done" : "");
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = !!saved[t.id];
+      cb.addEventListener("change", () => {
+        const cur = CourseProgress.getExtra("career_plan") || {};
+        cur[t.id] = cb.checked;
+        CourseProgress.setExtra("career_plan", cur);
+        row.classList.toggle("done", cb.checked);
+        renderPlanProgress();
+      });
+      row.appendChild(cb);
+      const span = document.createElement("span");
+      span.textContent = t.label;
+      row.appendChild(span);
+      list.appendChild(row);
+    });
+    section.appendChild(list);
+    body.appendChild(section);
+  });
+  renderPlanProgress();
+}
+function renderPlanProgress() {
+  const saved = CourseProgress.getExtra("career_plan") || {};
+  const allTasks = PLAN.flatMap(b => b.tasks);
+  const done = allTasks.filter(t => saved[t.id]).length;
+  document.getElementById("planProgress").textContent = `${done} / ${allTasks.length} tasks complete.`;
+}
+
+/* ================= 13: Project ideas ================= */
+const IDEAS = [
+  { title: "E-commerce revenue analysis", problem: "A store's revenue looks healthy overall, but is it actually growing per customer, or just from more traffic?", dataset: "A public e-commerce order dataset (Kaggle has several), or synthesize one like Module 9's.", question: "Is revenue growth coming from more customers, more orders per customer, or higher prices?", skills: "pandas, SQL-style grouping, cohort thinking, visualization", output: "A short report distinguishing the three growth sources with a chart for each.", difficulty: "Medium" },
+  { title: "Marketing campaign analysis", problem: "Which channel is actually earning conversions, versus just being credited for them?", dataset: "A public ad-spend/conversions dataset, or channel-level data from a marketing platform's sample exports.", question: "Which channel has the best return once you account for sample size and existing customer overlap?", skills: "Statistics (reliable-rate judgment from Module 7), SQL, dashboards", output: "A ranked, reliability-adjusted channel comparison with a recommendation.", difficulty: "Medium" },
+  { title: "Customer retention analysis", problem: "Are customers coming back, and which segment churns fastest?", dataset: "A subscription or repeat-purchase dataset with customer IDs and order dates.", question: "What's the actual repeat-purchase rate by customer segment, and where's the biggest drop-off?", skills: "pandas cohort analysis, SQL, statistical comparison across segments", output: "A cohort retention chart plus a segment-level finding.", difficulty: "Hard, cohort logic is genuinely tricky to get right." },
+  { title: "Operations / logistics analysis", problem: "Are delivery delays concentrated somewhere specific, or spread evenly?", dataset: "A shipping/logistics dataset with order dates, ship dates, and delivery dates.", question: "Which region, carrier, or product category drives most late deliveries, and by how much?", skills: "Data cleaning (date parsing, like Module 4/9), SQL, visualization", output: "A dashboard identifying the highest-impact delay source.", difficulty: "Medium" },
+  { title: "SaaS subscription analysis", problem: "Is monthly recurring revenue actually growing, or is it churn-masked by new signups?", dataset: "A synthetic or public SaaS billing dataset with subscription start/end dates and plan tiers.", question: "What's net revenue retention, and is it above or below 100%?", skills: "pandas, statistics, business-impact quantification (like Module 9 Part C)", output: "A net-retention calculation with a plain-English explanation of what it means.", difficulty: "Hard, requires genuinely understanding what net retention measures." },
+];
+function renderIdeas() {
+  const body = document.getElementById("ideasBody");
+  body.innerHTML = "";
+  IDEAS.forEach(idea => {
+    const card = document.createElement("div");
+    card.className = "ideacard";
+    card.innerHTML = `<h4>${esc(idea.title)}</h4>
+      <div class="ideameta"><span class="ideatag">${esc(idea.difficulty.split(",")[0])}</span></div>
+      <div class="ideafield"><b>Problem</b>${esc(idea.problem)}</div>
+      <div class="ideafield"><b>Dataset idea</b>${esc(idea.dataset)}</div>
+      <div class="ideafield"><b>Business question</b>${esc(idea.question)}</div>
+      <div class="ideafield"><b>Skills practiced</b>${esc(idea.skills)}</div>
+      <div class="ideafield"><b>Expected output</b>${esc(idea.output)}</div>`;
+    body.appendChild(card);
+  });
+}
+
+/* ================= init ================= */
 renderReadiness();
 renderPathTabs();
 renderPathDetail();
+renderMatrix();
+renderClaims();
+renderBullet();
+renderInterview();
+renderCase();
+renderPlan();
+renderIdeas();
 </script>
 <script src="course-rail.js?v=4"></script>
 </body>
