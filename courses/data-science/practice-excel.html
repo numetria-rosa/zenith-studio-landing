@@ -75,6 +75,9 @@ button:hover{border-color:var(--green);color:var(--green)}
 button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
 button.primary{background:var(--green);color:#04140a;border-color:var(--green)}
 button.primary:hover{filter:brightness(1.1);color:#04140a}
+.writtenlbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);font-family:'IBM Plex Mono';margin:12px 0 6px}
+.writtenbox{width:100%;font-family:'IBM Plex Sans';line-height:1.6;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.writtenbox:focus-visible{outline:2px solid var(--green);outline-offset:1px}
 .dagctrl{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
 .feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px}
 .feedback.ok{background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
@@ -98,10 +101,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Excel &middot; Stage 1 of &hellip;</span>
+    <span class="eyebrow">Practice Library &middot; Excel &middot; Stages 1-2 of &hellip;</span>
     <h1 class="serif">Excel Practice Library</h1>
     <p class="sub">Extra repetition beyond Module 1's core lesson, a real formula engine parsing and evaluating exactly what you type, not a multiple-choice guess. Every task is checked by evaluating your formula against a live spreadsheet, then against an independently modified copy, so a memorized number can't pass.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is Stage 1 only (fundamentals: SUM, AVERAGE, COUNT, COUNTIF, IF), 10 tasks, real, fully built, graded, and tested. Further stages (SUMIF/lookup formulas, multi-condition logic, a full mastery task) are planned but not yet built, that's future work, not a claim made here.</div>
+    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-2 (fundamentals: SUM, AVERAGE, COUNT, COUNTIF, IF, plus lookups and multi-condition logic: XLOOKUP, VLOOKUP, COUNTIFS, SUMIFS, AVERAGEIFS, AND/OR), 20 tasks, real, fully built, graded, and tested. Further stages are planned but not yet built, that's future work, not a claim made here.</div>
   </header>
 
   <div class="sheetblock">
@@ -385,7 +388,37 @@ function evalFunction(name, argNodes, workbook, currentSheet) {
       testVals.forEach((v, i) => { if (matchesCriteria(v, criteria) && isNumeric(sumVals[i])) s += sumVals[i]; });
       return s;
     }
+    case "COUNTIFS": {
+      if (args.length < 2 || args.length % 2 !== 0) throw new Error("COUNTIFS takes pairs of (range, criteria)");
+      const pairs = [];
+      for (let i = 0; i < args.length; i += 2) pairs.push({ vals: asRangeValues(args[i]), criteria: args[i + 1] });
+      const n = pairs[0].vals.length;
+      let c = 0;
+      for (let r = 0; r < n; r++) { if (pairs.every(p => matchesCriteria(p.vals[r], p.criteria))) c++; }
+      return c;
+    }
+    case "SUMIFS": {
+      if (args.length < 3 || args.length % 2 !== 1) throw new Error("SUMIFS takes a sum range, then pairs of (range, criteria)");
+      const sumVals = asRangeValues(args[0]);
+      const pairs = [];
+      for (let i = 1; i < args.length; i += 2) pairs.push({ vals: asRangeValues(args[i]), criteria: args[i + 1] });
+      let s = 0;
+      for (let r = 0; r < sumVals.length; r++) { if (pairs.every(p => matchesCriteria(p.vals[r], p.criteria)) && isNumeric(sumVals[r])) s += sumVals[r]; }
+      return s;
+    }
+    case "AVERAGEIFS": {
+      if (args.length < 3 || args.length % 2 !== 1) throw new Error("AVERAGEIFS takes an average range, then pairs of (range, criteria)");
+      const avgVals = asRangeValues(args[0]);
+      const pairs = [];
+      for (let i = 1; i < args.length; i += 2) pairs.push({ vals: asRangeValues(args[i]), criteria: args[i + 1] });
+      const matched = [];
+      for (let r = 0; r < avgVals.length; r++) { if (pairs.every(p => matchesCriteria(p.vals[r], p.criteria)) && isNumeric(avgVals[r])) matched.push(avgVals[r]); }
+      if (!matched.length) throw new Error("AVERAGEIFS of empty range");
+      return matched.reduce((x, y) => x + y, 0) / matched.length;
+    }
     case "IF": { if (args.length !== 3) throw new Error("IF takes 3 arguments"); return args[0] ? args[1] : args[2]; }
+    case "AND": { return args.every(a => !!a); }
+    case "OR": { return args.some(a => !!a); }
     case "VLOOKUP": {
       if (args.length < 3) throw new Error("VLOOKUP needs at least 3 arguments");
       const key = args[0], table = args[1];
@@ -454,7 +487,22 @@ const BASE_ROWS = [
 ];
 const FIELDS = ["order_id", "order_date", "region", "category", "status", "amount"];
 function buildSheet1() { return [FIELDS.slice(), ...BASE_ROWS.map(r => r.slice())]; }
-function currentWorkbook() { return { Sheet1: buildSheet1() }; }
+
+/* Sheet2: a small category lookup table, the "separate customer table"
+   Module 1's own XLOOKUP example describes, here it's a category's
+   commission rate and the manager who owns it. Fixed, never mutated,
+   the same way a reference/lookup table normally stays fixed while the
+   transactional data around it changes. */
+const SHEET2_FIELDS = ["category", "commission_rate", "manager"];
+const SHEET2_ROWS = [
+  ["Outdoor", 0.06, "Priya Shah"],
+  ["Apparel", 0.04, "Marcus Webb"],
+  ["Electronics", 0.08, "Dana Cole"],
+  ["Home", 0.05, "Reo Tanaka"],
+];
+function buildSheet2() { return [SHEET2_FIELDS.slice(), ...SHEET2_ROWS.map(r => r.slice())]; }
+
+function currentWorkbook() { return { Sheet1: buildSheet1(), Sheet2: buildSheet2() }; }
 
 /* Deliberately NOT cached: a fresh mutation is built on every check, so
    a student can't learn "the mutated answer" and hardcode a second
@@ -496,7 +544,19 @@ function mutatedWorkbook() {
   // already skips rows past the end of the shortened array).
   const nRemove = 1 + Math.floor(Math.random() * 4); // 1-4
   for (let k = 0; k < nRemove; k++) { rows.splice(Math.floor(Math.random() * rows.length), 1); }
-  return { Sheet1: [FIELDS.slice(), ...rows] };
+  // Sheet2 (the lookup table) needs to change too, or any task whose
+  // answer comes purely from Sheet2 (a rate, a manager name) is
+  // structurally invariant across every mutation, letting a hardcoded
+  // literal pass 10/10 checks, exactly what happened before this fix.
+  // Perturb every commission rate, and shuffle which manager goes with
+  // which category, so both the numeric and the text lookup answers
+  // genuinely change.
+  const sheet2Rows = SHEET2_ROWS.map(r => r.slice());
+  sheet2Rows.forEach(r => { r[1] = Math.round(r[1] * (0.5 + Math.random()) * 100) / 100; });
+  const managers = sheet2Rows.map(r => r[2]);
+  for (let i = managers.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [managers[i], managers[j]] = [managers[j], managers[i]]; }
+  sheet2Rows.forEach((r, i) => { r[2] = managers[i]; });
+  return { Sheet1: [FIELDS.slice(), ...rows], Sheet2: [SHEET2_FIELDS.slice(), ...sheet2Rows] };
 }
 function resultsMatch(a, b) {
   if (typeof a === "number" && typeof b === "number") return Math.abs(a - b) < 0.005;
@@ -523,8 +583,10 @@ function renderGrid() {
 
 /* ================= skills & tasks ================= */
 const SKILL_ID_FUND = "excel-fundamentals";
+const SKILL_ID_LOOKUP = "excel-lookups";
 const SKILLS = [
   { id: SKILL_ID_FUND, label: "Excel Fundamentals" },
+  { id: SKILL_ID_LOOKUP, label: "Excel Lookups & Logic" },
 ];
 
 const TASKS = [
@@ -657,6 +719,141 @@ const TASKS = [
       "Divide the COUNTIF result by the COUNTA result, multiply by 100, then wrap the whole thing in ROUND(...,2).",
       '=ROUND(COUNTIF(E2:E25,"Cancelled")/COUNTA(A2:A25)*100,2)' ],
     explanation: { why: "Every piece of this formula is something built in an earlier task, COUNTIF for the count, COUNTA for the total, arithmetic to turn a ratio into a percentage, and ROUND to present it cleanly, combined into one line.", mistake: "Forgetting to multiply by 100 leaves you with a decimal fraction (0.0417) instead of a percentage (4.17), technically the same information, but not how percentages are ever actually reported to a stakeholder.", tip: "Whenever a business question asks for a rate or a percentage, the shape is almost always the same: COUNTIF or SUMIF for the part, COUNTA or COUNT for the whole, divide, multiply by 100, round.", business: "A cancellation rate stated as a clean percentage, not a raw count, is what actually goes in front of a stakeholder, \"4.17% of orders were cancelled\" is a sentence a manager can act on, \"1 order\" or \"24 orders\" alone isn't." } },
+
+  { id: "xl-s01", skill: SKILL_ID_LOOKUP, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-f01"],
+    title: "Look up a category's commission rate",
+    objective: "Pull a value from a separate lookup table with XLOOKUP, a spreadsheet's version of a JOIN.",
+    prompt: "Sheet2 holds each category's commission rate and manager. Using XLOOKUP, return the commission rate for the <code>\"Electronics\"</code> category.",
+    starterFormula: "",
+    referenceFormula: '=XLOOKUP("Electronics",Sheet2!A2:A5,Sheet2!B2:B5)',
+    hints: [
+      "The value you want (commission rate) lives on a different sheet than the value you're searching by (category name), that's exactly what XLOOKUP is for.",
+      "XLOOKUP takes three parts: the value to find, the range to search in, and the range to pull the matching value from.",
+      "XLOOKUP(\"Electronics\", Sheet2!A2:A5, Sheet2!B2:B5) searches column A of Sheet2 for \"Electronics\", then returns the matching row's value from column B.",
+      '=XLOOKUP("Electronics",Sheet2!A2:A5,Sheet2!B2:B5)' ],
+    explanation: { why: "XLOOKUP searches one range (the category names) for a match, then returns the corresponding value from a second, aligned range (the commission rates), the two ranges just need to be the same length and in the same row order.", mistake: "Searching and returning from ranges of different lengths, or on different sheets that aren't actually aligned row-for-row, breaks the implicit assumption XLOOKUP relies on, row 2 of the search range has to correspond to row 2 of the return range.", tip: "XLOOKUP is the modern replacement for VLOOKUP, it can look left as easily as right, and it doesn't break if a column gets inserted between the search and return ranges the way VLOOKUP's column-index argument can.", business: "Keeping commission rates in a small reference table, then looking them up, means updating one cell in Sheet2 changes the rate everywhere it's used, instead of hunting down every formula that has the rate typed in directly." } },
+
+  { id: "xl-s02", skill: SKILL_ID_LOOKUP, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-s01"],
+    title: "Look up a category's manager with VLOOKUP",
+    objective: "Use VLOOKUP's column-index argument to pull from a specific column of a lookup table.",
+    prompt: "Using VLOOKUP, return the manager's name for the <code>\"Apparel\"</code> category from Sheet2 (columns: category, commission_rate, manager).",
+    starterFormula: "",
+    referenceFormula: '=VLOOKUP("Apparel",Sheet2!A2:C5,3)',
+    hints: [
+      "VLOOKUP always searches the FIRST column of the range you give it, then returns a value from a column you specify by position.",
+      "The manager name is the 3rd column of Sheet2 (category=1, commission_rate=2, manager=3), that column number is VLOOKUP's third argument.",
+      "VLOOKUP(\"Apparel\", Sheet2!A2:C5, 3) searches column A for \"Apparel\", then returns the value from the 3rd column of that same range.",
+      '=VLOOKUP("Apparel",Sheet2!A2:C5,3)' ],
+    explanation: { why: "VLOOKUP's range has to include every column from the search column through the return column, then a plain column number (counting from 1, starting at that range's first column) says which one to actually return.", mistake: "Passing a column number outside the range you gave it, or forgetting the range has to start at the search column, both are the most common VLOOKUP errors, XLOOKUP's separate search-range and return-range arguments sidestep this specific mistake entirely.", tip: "VLOOKUP is still extremely common in real spreadsheets, even where XLOOKUP is available, recognizing both is worth more than declaring one obsolete.", business: "Knowing which manager owns which category is exactly the kind of fact that belongs in a small reference table rather than memorized or retyped, VLOOKUP is how a formula reaches over and gets it." } },
+
+  { id: "xl-s03", skill: SKILL_ID_LOOKUP, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-f04"],
+    title: "Count orders matching two conditions",
+    objective: "Use COUNTIFS when a single COUNTIF's one condition isn't enough.",
+    prompt: "Return the number of orders where <code>region</code> is <code>\"West\"</code> AND <code>status</code> is <code>\"Completed\"</code>.",
+    starterFormula: "",
+    referenceFormula: '=COUNTIFS(C2:C25,"West",E2:E25,"Completed")',
+    hints: [
+      "COUNTIF only tests one condition, this needs two conditions to both be true at once, that's COUNTIFS (with an S).",
+      "COUNTIFS takes pairs of arguments, a range then its criteria, repeated for each condition, all conditions must be true for a row to count.",
+      "COUNTIFS(C2:C25,\"West\",E2:E25,\"Completed\") checks region=West AND status=Completed together, row by row.",
+      '=COUNTIFS(C2:C25,"West",E2:E25,"Completed")' ],
+    explanation: { why: "COUNTIFS evaluates every condition pair against the same row simultaneously, a row only counts if it passes every single one, not just any one of them.", mistake: "Adding two separate COUNTIF results together (COUNTIF for West, plus COUNTIF for Completed) answers a completely different question, \"West orders OR completed orders,\" with West-and-completed orders counted twice, not the AND question this task asks.", tip: "COUNTIFS's conditions are always an AND, there's no built-in OR, when a real question needs OR logic, you need a different pattern entirely, which the next stretch of tasks gets into.", business: "\"West region AND completed\" is a materially different, more specific number than either condition alone, this is the level of specificity a real regional performance review actually needs." } },
+
+  { id: "xl-s04", skill: SKILL_ID_LOOKUP, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-s03"],
+    title: "Sum revenue matching two conditions",
+    objective: "Use SUMIFS, SUMIF's multi-condition sibling.",
+    prompt: "Return the total <code>amount</code> for orders where <code>region</code> is <code>\"West\"</code> AND <code>status</code> is <code>\"Completed\"</code>.",
+    starterFormula: "",
+    referenceFormula: '=SUMIFS(F2:F25,C2:C25,"West",E2:E25,"Completed")',
+    hints: [
+      "This is the same two-condition idea as the last task, but summing amount instead of counting rows, that's SUMIFS.",
+      "SUMIFS puts the range to sum FIRST, then the condition pairs after it, the opposite order from SUMIF's single condition.",
+      "SUMIFS(F2:F25, C2:C25,\"West\", E2:E25,\"Completed\") sums amount only where both region=West and status=Completed hold.",
+      '=SUMIFS(F2:F25,C2:C25,"West",E2:E25,"Completed")' ],
+    explanation: { why: "SUMIFS sums the first range's values only for rows where every condition pair after it is satisfied, structurally the same idea as COUNTIFS, but adding a value instead of just counting.", mistake: "SUMIFS puts the sum range first, SUMIF puts it last, mixing up the argument order between the two is one of the most common real spreadsheet mistakes, worth double-checking every time you switch between them.", tip: "COUNTIFS and SUMIFS scale to as many condition pairs as you need, the two-condition version here is the same pattern as a five-condition version, just more pairs.", business: "West-region completed revenue, not just West revenue or just completed revenue, is the number a regional sales lead actually needs to evaluate their own performance fairly." } },
+
+  { id: "xl-s05", skill: SKILL_ID_LOOKUP, tool: "excel", level: "semiguided", difficulty: "core", prerequisite: ["xl-s04"],
+    title: "The average order value for one category",
+    objective: "Use AVERAGEIFS to average a range restricted to rows matching a condition.",
+    prompt: "Return the average <code>amount</code> for orders in the <code>\"Electronics\"</code> category, rounded to 2 decimal places.",
+    starterFormula: "",
+    referenceFormula: '=ROUND(AVERAGEIFS(F2:F25,D2:D25,"Electronics"),2)',
+    hints: [
+      "AVERAGE alone can't filter to one category first, AVERAGEIFS combines the averaging and the filtering in one formula.",
+      "AVERAGEIFS follows the same argument order as SUMIFS, the range to average first, then condition pairs.",
+      "AVERAGEIFS(F2:F25, D2:D25,\"Electronics\") averages amount only where category=Electronics, then wrap it in ROUND.",
+      '=ROUND(AVERAGEIFS(F2:F25,D2:D25,"Electronics"),2)' ],
+    explanation: { why: "AVERAGEIFS filters to matching rows first, then averages only those, the same relationship SUMIFS has to SUMIF, and COUNTIFS has to COUNTIF, one consistent family of functions.", mistake: "Computing AVERAGE(F2:F25) and SUMIF/COUNTIF separately, then trying to combine them by hand, works but is more error-prone and more typing than AVERAGEIFS doing it directly.", tip: "Once COUNTIFS and SUMIFS feel natural, AVERAGEIFS is almost free, it's the exact same argument shape applied to a third aggregate.", business: "Average order value broken out by category tells a merchandising team which categories attract bigger single purchases, a number that's invisible in a company-wide average." } },
+
+  { id: "xl-s06", skill: SKILL_ID_LOOKUP, tool: "excel", level: "semiguided", difficulty: "core", prerequisite: ["xl-f06"],
+    title: "Flag a single order against two conditions at once",
+    objective: "Combine AND with IF to branch on multiple conditions in one formula.",
+    prompt: "For order 2 (row 2), return <code>\"Yes\"</code> if its region is <code>\"West\"</code> AND its amount is over $50, otherwise return <code>\"No\"</code>.",
+    starterFormula: "",
+    referenceFormula: '=IF(AND(C2="West",F2>50),"Yes","No")',
+    hints: [
+      "IF only takes one condition directly, AND lets you combine several conditions into a single true/false value that IF can then branch on.",
+      "AND(condition1, condition2) is true only if every condition inside it is true, exactly matching the \"AND\" in the business question.",
+      "AND(C2=\"West\",F2>50) becomes IF's first argument, IF(AND(C2=\"West\",F2>50),\"Yes\",\"No\").",
+      '=IF(AND(C2="West",F2>50),"Yes","No")' ],
+    explanation: { why: "AND evaluates each of its arguments and returns a single TRUE or FALSE, exactly the shape IF's first argument needs, nesting AND inside IF is how you give IF more than one condition to check.", mistake: "Writing IF(C2=\"West\",F2>50,...) instead of nesting with AND doesn't combine the conditions at all, it uses the first as the actual branch condition and tries to use the second as the \"true\" result, which is a different, broken formula.", tip: "OR works exactly like AND but returns TRUE if ANY condition is true rather than requiring all of them, the two are the standard toolkit for multi-condition IF logic.", business: "A real qualification rule (\"free shipping if West region and over $50\") almost always has more than one condition, AND-inside-IF is how that rule becomes a formula instead of a manual judgment call." } },
+
+  { id: "xl-s07", skill: SKILL_ID_LOOKUP, tool: "excel", level: "semiguided", difficulty: "core", prerequisite: ["xl-s01"],
+    title: "Chain a lookup into a calculation",
+    objective: "Use a lookup's result directly inside arithmetic, instead of as the final answer.",
+    prompt: "For order 2 (row 2), return the commission dollar amount earned, its <code>amount</code> multiplied by its category's commission rate (looked up from Sheet2), rounded to 2 decimal places.",
+    starterFormula: "",
+    referenceFormula: '=ROUND(F2*XLOOKUP(D2,Sheet2!A2:A5,Sheet2!B2:B5),2)',
+    hints: [
+      "This needs two things multiplied together, the order's amount, and its commission rate, but the rate has to be looked up first, it isn't sitting in a column already.",
+      "XLOOKUP(D2, Sheet2!A2:A5, Sheet2!B2:B5) looks up the rate for whatever category is in D2, using the order's own category, not a typed-in one.",
+      "Multiply the amount (F2) by that XLOOKUP result, then wrap the whole thing in ROUND(...,2).",
+      '=ROUND(F2*XLOOKUP(D2,Sheet2!A2:A5,Sheet2!B2:B5),2)' ],
+    explanation: { why: "A formula's result is just a value, it can be used directly inside arithmetic exactly like a cell reference or a typed number, XLOOKUP's returned rate slots straight into a multiplication with no extra step.", mistake: "Looking up the rate in one cell, then referencing that cell in a second formula, also works and is sometimes clearer, but chaining the lookup directly into the calculation is the more common pattern once you're comfortable with both pieces separately.", tip: "Referencing D2 (the order's own category) instead of typing a literal category name is what makes this formula reusable, it computes the right commission for whichever category that specific row happens to be, not just one hardcoded category.", business: "This is literally how a commission payout gets calculated in practice, an amount, a rate looked up from a rate table, multiplied together, exactly the calculation a sales-ops team runs every pay period." } },
+
+  { id: "xl-s08", skill: SKILL_ID_LOOKUP, tool: "excel", level: "challenge", difficulty: "challenge", prerequisite: ["xl-s04"],
+    title: "Sum revenue matching three conditions",
+    objective: "Extend SUMIFS to a third condition, the same pattern, just longer.",
+    prompt: "Return the total <code>amount</code> for orders where <code>region</code> is <code>\"West\"</code>, <code>status</code> is <code>\"Completed\"</code>, AND <code>category</code> is <code>\"Outdoor\"</code>. Decide the formula yourself.",
+    starterFormula: "",
+    referenceFormula: '=SUMIFS(F2:F25,C2:C25,"West",E2:E25,"Completed",D2:D25,"Outdoor")',
+    hints: [
+      "This is the exact same SUMIFS shape as the two-condition task, just with one more range/criteria pair added.",
+      "SUMIFS doesn't have a fixed limit on how many condition pairs you add, each one is just another pair of arguments.",
+      "Add a third pair to the existing SUMIFS: D2:D25,\"Outdoor\", after the region and status pairs.",
+      '=SUMIFS(F2:F25,C2:C25,"West",E2:E25,"Completed",D2:D25,"Outdoor")' ],
+    explanation: { why: "SUMIFS treats every condition pair identically regardless of how many there are, adding a third pair doesn't change how the first two work, it just narrows the matching rows further.", mistake: "Assuming SUMIFS caps out at two conditions and switching to a more complicated formula (nested IFs, a helper column) to add a third is unnecessary, SUMIFS was built to scale to many conditions from the start.", tip: "As real business questions get more specific (\"West, completed, AND Outdoor\" instead of just \"West\"), the formula doesn't need to change shape, it just grows, that scalability is exactly why SUMIFS/COUNTIFS are worth learning over one-condition SUMIF/COUNTIF.", business: "A genuinely narrow question, one region, one status, one category, is usually what a specific stakeholder actually wants answered, not the broader two-condition version, being able to add the third condition without restructuring the formula is a real time-saver." } },
+
+  { id: "xl-s09", skill: SKILL_ID_LOOKUP, tool: "excel", level: "challenge", difficulty: "challenge", prerequisite: ["xl-f04"],
+    title: "Count orders matching EITHER of two conditions",
+    objective: "Recognize that COUNTIFS can't express OR, and build the OR pattern from two COUNTIFs instead.",
+    prompt: "Return the number of orders where <code>region</code> is <code>\"West\"</code> OR <code>region</code> is <code>\"East\"</code>. Decide the formula yourself, COUNTIFS won't do this directly.",
+    starterFormula: "",
+    referenceFormula: '=COUNTIF(C2:C25,"West")+COUNTIF(C2:C25,"East")',
+    hints: [
+      "COUNTIFS's multiple conditions are always combined with AND, there's no way to ask it for OR directly, that's a real limitation worth knowing, not a trick.",
+      "Since West and East can never both be true for the same row (a row has exactly one region), counting each separately and adding the counts together gives the same result as a true OR would.",
+      "COUNTIF(C2:C25,\"West\") counts West orders, COUNTIF(C2:C25,\"East\") counts East orders, add the two results together.",
+      '=COUNTIF(C2:C25,"West")+COUNTIF(C2:C25,"East")' ],
+    explanation: { why: "Adding two separate, mutually exclusive COUNTIFs together produces the same count a genuine OR would, since no row can be counted by both COUNTIFs at once, there's no double-counting to worry about.", mistake: "Trying to force this into a single COUNTIFS call, or writing COUNTIFS(C2:C25,\"West\",C2:C25,\"East\"), always returns 0, since COUNTIFS requires a single cell to equal both \"West\" AND \"East\" simultaneously, which is impossible.", tip: "This add-two-COUNTIFs-together pattern only works cleanly when the categories are mutually exclusive, if they could overlap (for instance, counting orders that are either high-value OR from a specific category), adding separate counts would double-count the overlap, and a different approach would be needed.", business: "\"West or East\" (the two regions closest to a new distribution center, say) is a completely reasonable real question that a single COUNTIFS genuinely cannot answer, recognizing that limitation and reaching for a workaround is a real, common spreadsheet skill." } },
+
+  { id: "xl-s10", skill: SKILL_ID_LOOKUP, tool: "excel", level: "mastery", difficulty: "mastery", prerequisite: ["xl-s07", "xl-s08"],
+    title: "Total commission owed for a category, and why status matters",
+    objective: "Chain SUMIFS and XLOOKUP into a single payout calculation, then reason about which orders should count.",
+    prompt: "Finance needs the total commission owed to the Electronics category's manager. Using only completed orders, sum the Electronics revenue, then multiply by the Electronics commission rate (looked up from Sheet2), rounded to 2 decimal places. Then, in the box below, explain in 2-3 sentences why this calculation should only include completed orders, not cancelled or returned ones.",
+    starterFormula: "",
+    referenceFormula: '=ROUND(SUMIFS(F2:F25,D2:D25,"Electronics",E2:E25,"Completed")*XLOOKUP("Electronics",Sheet2!A2:A5,Sheet2!B2:B5),2)',
+    written: {
+      label: "Why should this exclude cancelled and returned orders?",
+      placeholder: "Think about what commission is actually meant to reward, and what a cancelled or returned order tells you about that sale...",
+      check: (text) => /(cancel|return|refund|revers)/i.test(text) && text.trim().length > 40,
+      hint: "Mention that a cancelled or returned order didn't actually result in revenue the business keeps, paying commission on it would reward a sale that didn't really happen, or that later got reversed." },
+    hints: [
+      "This combines two things you've already built separately, a SUMIFS restricted to Electronics AND completed, and an XLOOKUP for the Electronics commission rate.",
+      "Build the SUMIFS first (category=Electronics, status=Completed), then multiply its result by the XLOOKUP'd rate.",
+      "SUMIFS(F2:F25,D2:D25,\"Electronics\",E2:E25,\"Completed\") is the qualifying revenue, XLOOKUP(\"Electronics\",Sheet2!A2:A5,Sheet2!B2:B5) is the rate, multiply them, then ROUND.",
+      '=ROUND(SUMIFS(F2:F25,D2:D25,"Electronics",E2:E25,"Completed")*XLOOKUP("Electronics",Sheet2!A2:A5,Sheet2!B2:B5),2)' ],
+    explanation: { why: "This is every technique from this stage in one formula, SUMIFS restricting to the right rows, XLOOKUP pulling in a rate from a separate table, and arithmetic combining the two into a single payout figure.", mistake: "Summing ALL Electronics orders regardless of status, not just completed ones, would pay commission on sales that were cancelled or refunded, money the business never actually kept.", tip: "Whenever a calculation touches money that gets paid out, commission, bonuses, refunds owed, the status filter isn't optional detail, it's usually the single most important condition in the whole formula.", business: "Paying commission on a cancelled or returned order rewards a salesperson for a transaction that didn't ultimately benefit the business, restricting to completed orders is what keeps the incentive aligned with real, kept revenue." } },
 ];
 
 /* ================= grading ================= */
@@ -710,6 +907,17 @@ async function checkTask(id) {
   resultsEl.innerHTML = "";
   resultsEl.appendChild(verdict);
 
+  let writtenPass = true;
+  if (task.written) {
+    const writtenText = (document.getElementById("written_" + id) || {}).value || "";
+    writtenPass = task.written.check(writtenText);
+    const wv = document.createElement("div");
+    wv.className = "feedback " + (writtenPass ? "ok" : "bad");
+    wv.innerHTML = writtenPass ? "<b>Interpretation accepted.</b>" : `<b>Interpretation needs more.</b> ${esc(task.written.hint)}`;
+    resultsEl.appendChild(wv);
+  }
+  pass = pass && writtenPass;
+
   if (pass && task.explanation) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(task.explanation));
   PracticeProgress.recordAttempt(id, pass);
   if (pass) openTasks.add(id);
@@ -760,7 +968,7 @@ function renderSkillBar() {
   const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
   target.innerHTML = next
     ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
-    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. Further stages (SUMIF/lookup formulas, multi-condition logic, a mastery task) aren't built yet.`;
+    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. Further stages aren't built yet.`;
 }
 function buildHintsHtml(hints) {
   const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
@@ -775,6 +983,7 @@ function buildExplainHtml(ex) {
 const openTasks = new Set();
 const formulaDrafts = {};
 const resultsDrafts = {};
+const writtenDrafts = {};
 function renderTasks() {
   const list = document.getElementById("taskList");
   TASKS.forEach(t => {
@@ -784,6 +993,8 @@ function renderTasks() {
     if (fi) formulaDrafts[t.id] = fi.value;
     const res = document.getElementById("results_" + t.id);
     if (res && res.innerHTML) resultsDrafts[t.id] = res.innerHTML;
+    const wr = document.getElementById("written_" + t.id);
+    if (wr) writtenDrafts[t.id] = wr.value;
   });
   list.innerHTML = "";
   TASKS.forEach((t, idx) => {
@@ -803,6 +1014,7 @@ function renderTasks() {
         <p style="font-size:13.5px;margin-bottom:10px">${t.prompt}</p>
         ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
         <div class="forminput"><span class="fx">fx</span><input id="formula_${t.id}" type="text" spellcheck="false" placeholder="=SUM(F2:F25)" value="${esc(formulaDrafts[t.id] !== undefined ? formulaDrafts[t.id] : t.starterFormula)}"></div>
+        ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
         <div class="dagctrl">
           <button data-run="${t.id}">Run formula</button>
           <button class="primary" data-check="${t.id}">&#10003; Check answer</button>
