@@ -91,10 +91,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Python &middot; Stage 1 of &hellip;</span>
+    <span class="eyebrow">Practice Library &middot; Python &middot; Stages 1-2 of &hellip;</span>
     <h1 class="serif">Python Practice Library</h1>
     <p class="sub">Extra repetition beyond Module 2's core lesson, real CPython running in a Web Worker (Pyodide), the same sandbox Module 2 itself uses. Every task pairs a few fixed test cases with one freshly randomized input compared against a hidden reference implementation, so a hardcoded return value can't pass.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is Stage 1 only (functions over lists and dicts: sums, counts, filters, dict accumulation, basic string parsing), 10 tasks, real, fully built, graded, and tested. Further stages are planned but not yet built, that's future work, not a claim made here.</div>
+    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-2 (functions over lists and dicts, plus real pandas DataFrame work on the same retail_sales_ledger.csv Module 3 uses: filtering, groupby, aggregation, date handling), 20 tasks, real, fully built, graded, and tested. Further stages are planned but not yet built, that's future work, not a claim made here.</div>
   </header>
 
   <div id="skillBars"></div>
@@ -167,10 +167,52 @@ function buildHarness(task) {
   ].join("\n");
 }
 
+/* ================= pandas harness (Stage 2) =================
+   Stage 1's tasks operate on small dicts/lists, synthetic randomized
+   test cases work well there. Stage 2 operates on the real 62-row
+   retail_sales_ledger.csv (the same file Module 2 Exercise 6 and
+   Module 3 both use), so it follows Module 3's own established
+   anti-cheat pattern instead: fixed checks against the real full
+   dataset, plus at least one check against a real SLICE of that same
+   dataset (head(n), a filtered subset) where the correct answer is
+   verifiably different, proving the function actually recomputes
+   rather than returning a memorized constant. Each task supplies its
+   own hand-written Python check blocks (matching Module 3's house
+   style) rather than auto-generated ones, pandas result types (Series,
+   numpy scalars, DataFrames) vary too much for one generic comparator
+   to handle cleanly. */
+const PANDAS_PREAMBLE = "import pandas as pd, io, json\ndef _mk(txt): return pd.read_csv(io.StringIO(txt))";
+let retailCsvPromise = null;
+function getRetailCsv() {
+  if (!retailCsvPromise) retailCsvPromise = fetch("datasets/retail_sales_ledger.csv").then(r => r.text());
+  return retailCsvPromise;
+}
+function buildPandasHarness(task) {
+  return [
+    PANDAS_PREAMBLE,
+    "def harness(payload):",
+    "    code, retail_txt = payload",
+    "    ns = {'pd': pd}",
+    "    try:",
+    "        exec(code, ns)",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': f'{type(e).__name__}: {e}'}",
+    `    fn = ns.get(${JSON.stringify(task.functionName)})`,
+    "    if fn is None:",
+    `        return {'ranOk': True, 'results': [{'name': ${JSON.stringify(task.functionName + " is defined")}, 'pass': False, 'hint': ${JSON.stringify("Define a function named exactly " + task.functionName + ".")}}]}`,
+    "    retail = _mk(retail_txt)",
+    "    results = []",
+    ...task.checks,
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n");
+}
+
 /* ================= tasks ================= */
 const SKILL_ID_FUND = "python-fundamentals";
+const SKILL_ID_PANDAS = "python-pandas";
 const SKILLS = [
   { id: SKILL_ID_FUND, label: "Python Fundamentals" },
+  { id: SKILL_ID_PANDAS, label: "Python pandas" },
 ];
 
 const TASKS = [
@@ -479,6 +521,297 @@ const TASKS = [
       "Inside the loop: if status=='Completed': totals[category] = totals.get(category,0) + amount, skip the accumulation entirely otherwise.",
       "def category_summary(csv_text):\n    lines = [l for l in csv_text.strip().split(chr(10)) if l.strip()]\n    rows = lines[1:]\n    totals = {}\n    for r in rows:\n        parts = r.split(',')\n        category, amount, status = parts[1], float(parts[2]), parts[3]\n        if status == 'Completed':\n            totals[category] = totals.get(category, 0) + amount\n    return totals" ],
     explanation: { why: "Every technique from this stage lands in one function, splitting text into rows and fields, converting a string to a float, filtering by a condition, and accumulating a running total per category, exactly the shape of a real small ETL step.", mistake: "Accumulating every row regardless of status would silently inflate every category's total with orders that were returned or cancelled, revenue the business never actually kept.", tip: "Whenever a summary function touches money, checking which status values should actually count toward it is usually the single most consequential line in the whole function, get that filter wrong and every downstream number built on it is wrong too.", business: "This is the same 'completed orders only' discipline the SQL and Excel practice libraries both enforce in their own mastery tasks, seeing the identical business rule show up in three separate tools is the point, it's not a SQL quirk or an Excel quirk, it's just correct accounting." } },
+
+  { id: "py-p01", skill: SKILL_ID_PANDAS, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-f01"], engine: "pandas",
+    title: "Total revenue from the real sales ledger",
+    objective: "Sum a real DataFrame column, the pandas equivalent of the sum-a-field task from Stage 1.",
+    functionName: "total_revenue_all",
+    objectiveNote: "Given the retail_sales_ledger DataFrame (columns: order_id, order_date, region, product_line, units, unit_price, revenue), return the sum of the revenue column.",
+    starterCode: "def total_revenue_all(df):\n    # your code here\n    return 0",
+    checks: [
+      "    try:",
+      "        out = fn(retail.copy())",
+      "        p = abs(float(out) - 1536699.68) < 1.0",
+      "        results.append({'name': 'Sums to the correct total revenue', 'pass': p, 'hint': f'Expected about 1536699.68, got {out!r}. df[\"revenue\"].sum() is all this needs.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Sums to the correct total revenue', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(retail.head(10).copy())",
+      "        p2 = abs(float(out2) - 279090.5) < 1.0",
+      "        results.append({'name': 'Recomputes on the first 10 rows (not hardcoded to 1536699.68)', 'pass': p2, 'hint': f'On just the first 10 rows the answer must be about 279090.5, got {out2!r}. If your function only works on the full file, it will fail here.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 10 rows (not hardcoded to 1536699.68)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "This is exactly the total_revenue task from Stage 1, but the input is a real pandas DataFrame instead of a list of dicts.",
+      "A DataFrame column is accessed with df['column_name'], and it has its own .sum() method built in.",
+      "df['revenue'].sum() sums the entire revenue column in one call, no loop needed.",
+      "def total_revenue_all(df):\n    return df['revenue'].sum()" ],
+    explanation: { why: "A pandas Series (what df['revenue'] is) has aggregate methods like .sum() built directly onto it, the same job Stage 1's sum(o['amount'] for o in orders) did with a plain Python loop, pandas does in one vectorized call.", mistake: "Writing sum(df['revenue']) instead of df['revenue'].sum() actually still works (Python's built-in sum can iterate a Series), but it's slow on real-sized data since it falls back to row-by-row iteration instead of pandas' vectorized C implementation, worth building the .sum() habit now.", tip: "Once a list of dicts becomes a DataFrame, almost every Stage 1 pattern has a direct pandas equivalent, a loop with a running total becomes a single .sum() call, that's most of what makes pandas fast and concise.", business: "This is the exact same total-revenue number Module 2's own Exercise 6 computes by manually parsing the CSV as text, seeing pandas produce the identical number in one line is the whole point of Module 3, less code, same answer." } },
+
+  { id: "py-p02", skill: SKILL_ID_PANDAS, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-p01"], engine: "pandas",
+    title: "Count orders from one region",
+    objective: "Filter a DataFrame with a boolean mask, then count the matching rows.",
+    functionName: "count_region",
+    objectiveNote: "Given the retail_sales_ledger DataFrame and a region name, return how many orders came from that region.",
+    starterCode: "def count_region(df, region):\n    # your code here\n    return 0",
+    checks: [
+      "    try:",
+      "        out = fn(retail.copy(), 'West')",
+      "        results.append({'name': \"10 orders came from West\", 'pass': out == 10, 'hint': f'Expected 10, got {out!r}. df[df[\"region\"]==region] filters, then len(...) or .shape[0] counts.'})",
+      "    except Exception as e:",
+      "        results.append({'name': \"10 orders came from West\", 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(retail.copy(), 'Nowhere')",
+      "        results.append({'name': 'A region with zero matches returns 0', 'pass': out2 == 0, 'hint': f'Expected 0, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'A region with zero matches returns 0', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out3 = fn(retail.head(10).copy(), 'West')",
+      "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to 10)', 'pass': out3 == 2, 'hint': f'On just the first 10 rows, West should appear 2 times, got {out3!r}. Did you hardcode 10?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to 10)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "df['region']==region produces a boolean mask, one True/False per row, use it inside df[...] to keep only matching rows.",
+      "df[df['region']==region] returns a new, smaller DataFrame containing only that region's orders, len() on it gives a row count.",
+      "return len(df[df['region']==region]) filters and counts in one line.",
+      "def count_region(df, region):\n    return len(df[df['region'] == region])" ],
+    explanation: { why: "df['region']==region compares every row's region against the target in one vectorized operation, producing a Series of True/False, indexing the DataFrame with that boolean Series keeps only the True rows.", mistake: "Using df['region']=region (a single equals sign) is assignment, not comparison, it would overwrite the entire region column instead of testing it, a genuinely dangerous typo worth watching for.", tip: "Boolean masking, df[condition], is the single most-used pandas pattern, it's the direct equivalent of Stage 1's [o for o in orders if condition] list comprehension, just vectorized.", business: "A region order count is a basic operational number, but it's also the exact kind of filter that gets reused constantly, swap the condition and the same pattern answers a dozen different regional questions." } },
+
+  { id: "py-p03", skill: SKILL_ID_PANDAS, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-p01"], engine: "pandas",
+    title: "The average unit price across all orders",
+    objective: "Use a Series's .mean() method, the pandas equivalent of Stage 1's average_order_value.",
+    functionName: "average_unit_price",
+    objectiveNote: "Return the average of the unit_price column, rounded to 2 decimal places.",
+    starterCode: "def average_unit_price(df):\n    # your code here\n    return 0.0",
+    checks: [
+      "    try:",
+      "        out = fn(retail.copy())",
+      "        p = abs(float(out) - 77.41) < 0.01",
+      "        results.append({'name': 'Average unit price is correct', 'pass': p, 'hint': f'Expected about 77.41, got {out!r}. round(df[\"unit_price\"].mean(), 2).'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Average unit price is correct', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(retail.head(10).copy())",
+      "        p2 = abs(float(out2) - 90.99) < 0.01",
+      "        results.append({'name': 'Recomputes on the first 10 rows (not hardcoded to 77.41)', 'pass': p2, 'hint': f'On the first 10 rows the average should be about 90.99, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 10 rows (not hardcoded to 77.41)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "A Series (a single DataFrame column) has a .mean() method, exactly like it has .sum(), no manual division needed.",
+      "df['unit_price'].mean() computes the average directly, wrap it in round(...,2) for a clean 2-decimal result.",
+      "return round(df['unit_price'].mean(), 2)",
+      "def average_unit_price(df):\n    return round(df['unit_price'].mean(), 2)" ],
+    explanation: { why: ".mean() is another built-in aggregate on a pandas Series, computing sum-divided-by-count in one vectorized call instead of the manual sum()/len() Stage 1 needed.", mistake: "Computing df['unit_price'].sum() / len(df) manually gives the same answer but is more typing for no benefit, .mean() exists specifically so you don't have to reconstruct it by hand.", tip: "round() around a pandas aggregate works exactly like it does around a plain Python number, pandas' numeric results are ordinary Python/NumPy floats once you pull a single value out of a Series.", business: "Average unit price, not average order value, is a distinct and useful number, it describes the products themselves rather than how many units a typical order contains, useful for a pricing or catalog review rather than a sales-volume one." } },
+
+  { id: "py-p04", skill: SKILL_ID_PANDAS, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-p02"], engine: "pandas",
+    title: "Count orders above a revenue threshold",
+    objective: "Combine boolean masking with a parameter, instead of a fixed condition.",
+    functionName: "orders_over",
+    objectiveNote: "Given the DataFrame and a revenue threshold, return how many orders have revenue strictly greater than that threshold.",
+    starterCode: "def orders_over(df, threshold):\n    # your code here\n    return 0",
+    checks: [
+      "    try:",
+      "        out = fn(retail.copy(), 20000)",
+      "        results.append({'name': '25 orders exceed 20000 in revenue', 'pass': out == 25, 'hint': f'Expected 25, got {out!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': '25 orders exceed 20000 in revenue', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(retail.copy(), 99999999)",
+      "        results.append({'name': 'An impossibly high threshold returns 0', 'pass': out2 == 0, 'hint': f'Expected 0, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'An impossibly high threshold returns 0', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out3 = fn(retail.head(10).copy(), 20000)",
+      "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to 25)', 'pass': out3 == 4, 'hint': f'On the first 10 rows, 4 orders should exceed 20000, got {out3!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to 25)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "Same boolean-mask-then-count shape as counting a region, the condition is just a numeric comparison against a parameter this time.",
+      "df['revenue'] > threshold produces the boolean mask, df[df['revenue'] > threshold] filters to matching rows.",
+      "len(df[df['revenue'] > threshold]) counts them, using the threshold parameter rather than a hardcoded number.",
+      "def orders_over(df, threshold):\n    return len(df[df['revenue'] > threshold])" ],
+    explanation: { why: "The mask-and-count pattern doesn't care whether the comparison value is a literal or a parameter, threshold slots into the comparison exactly like a hardcoded number would, making the function reusable for any threshold a stakeholder asks about.", mistake: "Hardcoding 20000 inside the function instead of using the threshold parameter would pass the first fixed test by coincidence, but fail the moment a different threshold is requested, exactly what the second check here is built to catch.", tip: "Parameterizing a threshold instead of hardcoding it is a small change that turns a one-off answer into a reusable tool, the same function now answers 'how many over 20000' AND 'how many over 50000' without being rewritten.", business: "A single order count is meaningless without knowing what it's counting, letting the threshold be a parameter is what makes this function useful for more than one specific stakeholder question." } },
+
+  { id: "py-p05", skill: SKILL_ID_PANDAS, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-p02"], engine: "pandas",
+    title: "Which product line sells the most units",
+    objective: "Use groupby to aggregate by category, then find the largest group, the pandas equivalent of Stage 1's best_category.",
+    functionName: "top_product_line_by_units",
+    objectiveNote: "Return the name of the product_line with the highest total units sold.",
+    starterCode: "def top_product_line_by_units(df):\n    # your code here\n    return \"\"",
+    checks: [
+      "    try:",
+      "        out = fn(retail.copy())",
+      "        results.append({'name': \"Electronics has the most units sold overall\", 'pass': out == 'Electronics', 'hint': f'Expected \\'Electronics\\', got {out!r}. df.groupby(\"product_line\")[\"units\"].sum(), then find the largest.'})",
+      "    except Exception as e:",
+      "        results.append({'name': \"Electronics has the most units sold overall\", 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        sub = retail[retail['product_line'] != 'Electronics'].copy()",
+      "        out2 = fn(sub)",
+      "        results.append({'name': 'With Electronics removed, Apparel takes the lead (not hardcoded)', 'pass': out2 == 'Apparel', 'hint': f'With every Electronics row removed the answer must become \\'Apparel\\', got {out2!r}. Did you hardcode the product line name?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'With Electronics removed, Apparel takes the lead (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "You need a total PER product line, not one overall total, that's exactly what groupby is for, it splits the DataFrame into groups before aggregating.",
+      "df.groupby('product_line')['units'].sum() gives a Series indexed by product line, each value the total units for that line.",
+      "That Series has an .idxmax() method, it returns the INDEX (the product line name) of the largest value, not the value itself.",
+      "def top_product_line_by_units(df):\n    return df.groupby('product_line')['units'].sum().idxmax()" ],
+    explanation: { why: "groupby('product_line') splits the DataFrame into one group per distinct product line, ['units'].sum() aggregates each group separately, and .idxmax() returns which group's INDEX (its label) had the largest value, exactly 'which category wins.'", mistake: "Calling .max() instead of .idxmax() returns the largest VALUE (a units number), not the name of the product line that achieved it, a very easy mix-up since both methods exist on the same Series.", tip: "groupby(...).agg().idxmax() is the pandas equivalent of Stage 1's max(totals, key=totals.get), same question, same underlying idea, dramatically less code once the data is already a DataFrame.", business: "This is the exact same 'which category earns the most' question the Excel and SQL practice libraries both ask, in a real analytics workflow you might reach for whichever tool is already open, pandas, SQL, or a spreadsheet, and expect the same answer from all three." } },
+
+  { id: "py-p06", skill: SKILL_ID_PANDAS, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-p05"], engine: "pandas",
+    title: "Revenue broken down by region",
+    objective: "Turn a groupby result into a plain dict, a common last step before returning or serializing a summary.",
+    functionName: "revenue_by_region",
+    objectiveNote: "Return a dict mapping each region to its total revenue.",
+    starterCode: "def revenue_by_region(df):\n    # your code here\n    return {}",
+    checks: [
+      "    try:",
+      "        out = fn(retail.copy())",
+      "        expected = {'East': 630432.14, 'North': 311019.81, 'South': 246002.85, 'West': 349244.88}",
+      "        ok = isinstance(out, dict) and set(out.keys()) == set(expected.keys()) and all(abs(float(out[k]) - expected[k]) < 1.0 for k in expected)",
+      "        results.append({'name': 'Correct total revenue per region', 'pass': ok, 'hint': f'Expected roughly {expected!r}, got {out!r}. df.groupby(\"region\")[\"revenue\"].sum().to_dict().'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Correct total revenue per region', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(retail.head(8).copy())",
+      "        results.append({'name': 'Returns a plain dict, not a Series', 'pass': isinstance(out2, dict), 'hint': f'Expected a plain dict, got {type(out2).__name__}. Call .to_dict() on the grouped Series before returning it.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Returns a plain dict, not a Series', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out3 = fn(retail.head(5).copy())",
+      "        results.append({'name': 'Recomputes on a smaller slice (only the regions actually present)', 'pass': isinstance(out3, dict) and set(out3.keys()) <= {'East','North','South','West'} and len(out3) <= 5, 'hint': f'On just the first 5 rows, only the regions that actually appear should be keys, got {out3!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on a smaller slice (only the regions actually present)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "groupby('region')['revenue'].sum() gives you the totals, but it returns a pandas Series, not a plain dict, and this task asks for a dict specifically.",
+      "A Series has a .to_dict() method that converts it directly into a plain Python dict, keys become the index labels, values stay the same.",
+      "df.groupby('region')['revenue'].sum().to_dict() does the grouping, aggregating, and conversion in one chained line.",
+      "def revenue_by_region(df):\n    return df.groupby('region')['revenue'].sum().to_dict()" ],
+    explanation: { why: ".to_dict() is the standard way to convert a pandas Series into a plain Python dict once you're done aggregating with it, useful whenever the result needs to be returned, serialized to JSON, or handed to code that doesn't know about pandas.", mistake: "Returning the Series itself instead of calling .to_dict() usually still LOOKS like a dict when printed, but it's a different type with different behavior, code expecting a plain dict (or a JSON serializer) can behave unexpectedly on a raw Series.", tip: "groupby(...).sum() (or any aggregate) followed by .to_dict() is a very common closing move in pandas, it's the bridge between pandas' own vectorized world and plain Python data structures.", business: "A dict of region totals is exactly the shape needed to hand off to a templating system, an API response, or a chart library, this conversion step is what makes a pandas analysis usable outside pandas itself." } },
+
+  { id: "py-p07", skill: SKILL_ID_PANDAS, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-p06"], engine: "pandas",
+    title: "One region's share of total revenue",
+    objective: "Combine a groupby aggregate with arithmetic across the whole result, mirroring Stage 1's percentage tasks.",
+    functionName: "region_share_pct",
+    objectiveNote: "Given the DataFrame and a region name, return that region's revenue as a percentage of TOTAL revenue across every region, rounded to 2 decimal places.",
+    starterCode: "def region_share_pct(df, region):\n    # your code here\n    return 0.0",
+    checks: [
+      "    try:",
+      "        out = fn(retail.copy(), 'West')",
+      "        p = abs(float(out) - 22.73) < 0.05",
+      "        results.append({'name': \"West is about 22.73% of total revenue\", 'pass': p, 'hint': f'Expected about 22.73, got {out!r}. This region\\'s total, divided by the grand total, times 100.'})",
+      "    except Exception as e:",
+      "        results.append({'name': \"West is about 22.73% of total revenue\", 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(retail.head(15).copy(), 'West')",
+      "        p2 = abs(float(out2) - 18.45) < 0.05",
+      "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to 22.73)', 'pass': p2, 'hint': f'On just the first 15 rows, West should be about 18.45%, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to 22.73)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "You need two numbers: this specific region's revenue total, and the grand total across every region, then divide and scale to a percentage.",
+      "df.groupby('region')['revenue'].sum() gives every region's total in one Series, that same Series's .sum() gives the grand total across all of them.",
+      "region_total / grand_total * 100, then round(...,2), where region_total comes from the grouped Series indexed by the region parameter.",
+      "def region_share_pct(df, region):\n    totals = df.groupby('region')['revenue'].sum()\n    return round(totals[region] / totals.sum() * 100, 2)" ],
+    explanation: { why: "The grouped Series already has every region's total, indexing it by name (totals[region]) gets one region's figure, and calling .sum() on that SAME Series gets the grand total, both numbers come from one aggregation.", mistake: "Recomputing the grand total separately as df['revenue'].sum() also works and gives the same answer, but reusing the already-grouped totals.sum() is less code and guarantees the two numbers can never drift out of sync with each other.", tip: "This 'one part divided by the whole, from the same aggregation' shape reappears constantly, whenever you've already grouped data, the grand total is usually just one more .sum() away, not a separate calculation.", business: "A percentage share, not just a raw dollar total, is what actually answers 'how reliant are we on this region,' this is the exact same reframe the SQL and Excel practice libraries make in their own percentage-of-total tasks." } },
+
+  { id: "py-p08", skill: SKILL_ID_PANDAS, tool: "python", level: "challenge", difficulty: "challenge", prerequisite: ["py-p05"], engine: "pandas",
+    title: "The best and worst performing regions",
+    objective: "Pull both the max and the min from the same groupby result. Decide the approach yourself.",
+    functionName: "best_and_worst_region",
+    objectiveNote: "Return a list of two region names, [best, worst], ranked by total revenue.",
+    starterCode: "def best_and_worst_region(df):\n    # your code here\n    return [\"\", \"\"]",
+    checks: [
+      "    try:",
+      "        out = fn(retail.copy())",
+      "        results.append({'name': \"East is best, South is worst, overall\", 'pass': list(out) == ['East', 'South'], 'hint': f'Expected [\\'East\\', \\'South\\'], got {out!r}. Group by region, sum revenue, then idxmax and idxmin.'})",
+      "    except Exception as e:",
+      "        results.append({'name': \"East is best, South is worst, overall\", 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(retail.head(8).copy())",
+      "        results.append({'name': 'Recomputes on a smaller slice, North/South instead of East/South (not hardcoded)', 'pass': list(out2) == ['North', 'South'], 'hint': f'On just the first 8 rows the answer should be [\\'North\\', \\'South\\'], got {out2!r}. Did you hardcode East as the winner?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on a smaller slice, North/South instead of East/South (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "This reuses the same groupby-and-sum you've already built, the new part is pulling out both the best AND the worst from the same result.",
+      "A grouped Series has both .idxmax() and .idxmin(), the region names with the highest and lowest totals respectively.",
+      "Compute the grouped totals once, store it in a variable, then return [totals.idxmax(), totals.idxmin()] using that same variable for both.",
+      "def best_and_worst_region(df):\n    totals = df.groupby('region')['revenue'].sum()\n    return [totals.idxmax(), totals.idxmin()]" ],
+    explanation: { why: "Storing the grouped totals in a variable once, then calling both .idxmax() and .idxmin() on it, avoids grouping and summing the data twice for what is really one piece of analysis viewed two ways.", mistake: "Calling df.groupby(...).sum() twice, once for idxmax and again for idxmin, works but repeats the exact same aggregation for no reason, on a larger real dataset that's genuinely wasted computation.", tip: "Whenever you need more than one fact out of the same aggregation, compute the aggregation once, store it, then pull everything you need from that one result.", business: "'Best and worst region' in the same sentence is exactly how this kind of finding gets presented to a stakeholder, not as two separate disconnected numbers, but as a single comparison." } },
+
+  { id: "py-p09", skill: SKILL_ID_PANDAS, tool: "python", level: "challenge", difficulty: "challenge", prerequisite: ["py-p04"], engine: "pandas",
+    title: "Revenue in a specific month",
+    objective: "Convert a text date column to real datetimes, then filter by month. Decide the approach yourself.",
+    functionName: "revenue_in_month",
+    objectiveNote: "Given the DataFrame and a month number (1-12), return the total revenue from orders placed in that month, across any year present in the data.",
+    starterCode: "def revenue_in_month(df, month):\n    # your code here\n    return 0.0",
+    checks: [
+      "    try:",
+      "        out = fn(retail.copy(), 1)",
+      "        p = abs(float(out) - 386569.22) < 1.0",
+      "        results.append({'name': 'January revenue is correct', 'pass': p, 'hint': f'Expected about 386569.22, got {out!r}. pd.to_datetime(df[\"order_date\"]).dt.month == month, then filter and sum revenue.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'January revenue is correct', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(retail.copy(), 2)",
+      "        p2 = abs(float(out2) - 462814.64) < 1.0",
+      "        results.append({'name': 'February revenue is also correct (not hardcoded to January)', 'pass': p2, 'hint': f'Expected about 462814.64, got {out2!r}. Did you hardcode month 1 somewhere?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'February revenue is also correct (not hardcoded to January)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out3 = fn(retail.head(30).copy(), 1)",
+      "        p3 = abs(float(out3) - 371072.32) < 1.0",
+      "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to the full file)', 'pass': p3, 'hint': f'On just the first 30 rows, January revenue should be about 371072.32, got {out3!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to the full file)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "order_date arrives as plain text, not a real date, pandas can't filter it by month until it's converted with pd.to_datetime first.",
+      "pd.to_datetime(df['order_date']).dt.month gives the month number for every row as a Series, compare that Series to the month parameter to build a mask.",
+      "Filter the DataFrame with that mask, then sum the revenue column of just the matching rows.",
+      "def revenue_in_month(df, month):\n    dates = pd.to_datetime(df['order_date'])\n    return df.loc[dates.dt.month == month, 'revenue'].sum()" ],
+    explanation: { why: "pd.to_datetime converts a column of date-like text into genuine datetime objects, only after that conversion does .dt.month (or .dt.year, .dt.day) become available, pandas has no way to know a plain string column represents dates until told.", mistake: "Trying to filter on the raw text column directly, like df[df['order_date'].str.contains('-01-')], happens to sort of work for January specifically but is fragile and breaks the moment the date format changes or a different month is needed.", tip: "pd.to_datetime followed by .dt.month / .dt.year / .dt.day is the standard way to pull date components out in pandas, it's worth doing this conversion as an early step whenever a DataFrame has a date column, rather than working around the text version.", business: "Month-over-month revenue is one of the most commonly requested breakdowns in any business review, this conversion-then-filter pattern is the foundation every one of those reports is built on." } },
+
+  { id: "py-p10", skill: SKILL_ID_PANDAS, tool: "python", level: "mastery", difficulty: "mastery", prerequisite: ["py-p07", "py-p09"], engine: "pandas",
+    title: "Revenue by month across the whole dataset, and which month to double-check",
+    objective: "Chain a date conversion, a groupby, and a dict conversion into one summary, then reason about a real data-quality risk in the result.",
+    functionName: "monthly_revenue_summary",
+    objectiveNote: "Return a dict mapping each month number present in the data to its total revenue. Then, in the box below, name the month whose total you'd want to double-check before reporting it, and explain why.",
+    starterCode: "def monthly_revenue_summary(df):\n    # your code here\n    return {}",
+    checks: [
+      "    try:",
+      "        out = fn(retail.copy())",
+      "        expected = {1: 386569.22, 2: 462814.64, 3: 409036.37, 4: 254053.8, 5: 24225.65}",
+      "        outk = {int(k): v for k, v in out.items()}",
+      "        ok = set(outk.keys()) == set(expected.keys()) and all(abs(float(outk[k]) - expected[k]) < 1.0 for k in expected)",
+      "        results.append({'name': 'Correct revenue total for every month present', 'pass': ok, 'hint': f'Expected roughly {expected!r}, got {out!r}. Convert order_date, group by its month, sum revenue, then .to_dict().'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Correct revenue total for every month present', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(retail.head(30).copy())",
+      "        outk2 = {int(k) for k in out2.keys()}",
+      "        results.append({'name': 'Recomputes on a smaller slice, only 3 months instead of 5 (not hardcoded)', 'pass': outk2 == {1, 2, 3}, 'hint': f'On just the first 30 rows, only months 1, 2, and 3 should appear, got {sorted(outk2)!r}. Did you hardcode all 5 months?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on a smaller slice, only 3 months instead of 5 (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    written: {
+      label: "Which month's total would you double-check before reporting it, and why?",
+      placeholder: "Look at how each month's total compares to the others, is one of them suspiciously small or large...",
+      check: (text) => /(may|month|small|sample|incomplete|partial|low)/i.test(text) && text.trim().length > 40,
+      hint: "Mention month 5 (May) specifically, its total is roughly a tenth the size of the other months, worth checking whether that month's data is simply incomplete (the dataset might just stop partway through May) rather than a genuine collapse in sales." },
+    hints: [
+      "This chains three things you've already built separately, converting order_date with pd.to_datetime, grouping by the resulting month, and converting the grouped result to a plain dict.",
+      "pd.to_datetime(df['order_date']).dt.month gives a Series of month numbers, group the DataFrame by that Series directly, it doesn't need to be its own column first.",
+      "df.groupby(pd.to_datetime(df['order_date']).dt.month)['revenue'].sum().to_dict() does the conversion, grouping, aggregating, and dict conversion in one chained line.",
+      "def monthly_revenue_summary(df):\n    months = pd.to_datetime(df['order_date']).dt.month\n    return df.groupby(months)['revenue'].sum().to_dict()" ],
+    explanation: { why: "groupby can take a Series that isn't even a column on the DataFrame yet, like the month numbers computed on the fly from order_date, pandas just needs something the same length as the DataFrame to group by.", mistake: "Assuming every month's total is equally trustworthy just because the code ran without errors is exactly the mistake this task's written question is built to catch, a small total can mean a real business event, or it can mean the data simply doesn't cover that month completely.", tip: "Whenever a groupby result has one dramatically smaller or larger group than the rest, that's worth a second look before it goes in front of anyone, it's either the most interesting finding in the whole analysis, or a data completeness problem, and those look identical in a bar chart.", business: "Reporting 'May revenue collapsed' without checking whether May's data is actually complete is exactly the kind of premature, wrong conclusion that damages trust in an analyst's numbers, this is the same small-sample-size caution the SQL and Excel practice libraries raise in their own mastery tasks, here it shows up as an incomplete month instead of a low-volume category." } },
 ];
 
 /* ================= rendering ================= */
@@ -582,63 +915,90 @@ function renderTasks() {
 }
 
 async function checkTask(id) {
+  // Pandas checks can take 20-90s (a fresh Pyodide+pandas worker every
+  // time), long enough that a student may open and check a second task
+  // before this one resolves. renderTasks() rebuilds every task card's
+  // DOM from scratch whenever ANY check completes, so a resultsEl/btn
+  // reference captured once at the top of this function, before the
+  // await, can point at an element that's since been replaced, updates
+  // would then silently write into a detached node nobody sees, even
+  // though grading and progress-recording both still succeeded
+  // underneath. Re-querying fresh by id at every write point (never
+  // reusing a pre-await reference) avoids that.
   const task = TASKS.find(t => t.id === id);
-  const btn = document.querySelector(`[data-check="${id}"]`);
-  const resultsEl = document.getElementById("results_" + id);
+  const getBtn = () => document.querySelector(`[data-check="${id}"]`);
+  const getResultsEl = () => document.getElementById("results_" + id);
   const code = document.getElementById("editor_" + id).value;
-  btn.disabled = true;
-  resultsEl.innerHTML = `<div class="feedback wait">Starting the Python sandbox&hellip; first run on this page downloads the interpreter, after that it's a few seconds.</div>`;
+  const initialBtn = getBtn();
+  if (initialBtn) initialBtn.disabled = true;
+  const initialResultsEl = getResultsEl();
+  if (initialResultsEl) initialResultsEl.innerHTML = `<div class="feedback wait">Starting the Python sandbox&hellip; first run on this page downloads the interpreter, after that it's a few seconds.</div>`;
 
-  const harness = buildHarness(task);
   let outcome;
   try {
-    outcome = await PySandboxRunner.run(harness, "harness", code, 12000, 60000);
+    if (task.engine === "pandas") {
+      const waitEl = getResultsEl();
+      if (waitEl) waitEl.innerHTML = `<div class="feedback wait">Loading the real dataset and starting Python&hellip; first run downloads pandas (can take 20-60s), after that it's faster.</div>`;
+      const retailTxt = await getRetailCsv();
+      const harness = buildPandasHarness(task);
+      outcome = await PySandboxRunner.run(harness, "harness", [code, retailTxt], 20000, 90000);
+    } else {
+      const harness = buildHarness(task);
+      outcome = await PySandboxRunner.run(harness, "harness", code, 12000, 60000);
+    }
   } finally {
-    btn.disabled = false;
+    const btn = getBtn();
+    if (btn) btn.disabled = false;
   }
 
+  const resultsEl = getResultsEl();
   if (!outcome.ok) {
-    resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error)}</div>`;
+    if (resultsEl) resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error)}</div>`;
     PracticeProgress.recordAttempt(id, false);
     renderSkillBar();
     return;
   }
   const data = outcome.result;
   if (!data.ranOk) {
-    resultsEl.innerHTML = `<div class="feedback bad">Your code didn't run: ${esc(data.error || "unknown error")}. Check for a syntax error, or that the function name matches exactly.</div>`;
+    if (resultsEl) resultsEl.innerHTML = `<div class="feedback bad">Your code didn't run: ${esc(data.error || "unknown error")}. Check for a syntax error, or that the function name matches exactly.</div>`;
     PracticeProgress.recordAttempt(id, false);
     renderSkillBar();
     return;
   }
   const results = data.results;
-  resultsEl.innerHTML = "";
+  if (resultsEl) resultsEl.innerHTML = "";
   let passCount = 0;
   results.forEach(r => {
     if (r.pass) passCount++;
+    if (!resultsEl) return;
     const row = document.createElement("div");
     row.className = "feedback " + (r.pass ? "ok" : "bad");
     row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${esc(r.name)}` + (r.pass ? "" : `<br>${esc(r.hint || "")}`);
     resultsEl.appendChild(row);
   });
-  const summary = document.createElement("div");
-  summary.className = "testsummary";
-  summary.style.color = passCount === results.length ? "var(--good)" : "var(--mut)";
-  summary.textContent = `${passCount} / ${results.length} tests passing`;
-  resultsEl.appendChild(summary);
+  if (resultsEl) {
+    const summary = document.createElement("div");
+    summary.className = "testsummary";
+    summary.style.color = passCount === results.length ? "var(--good)" : "var(--mut)";
+    summary.textContent = `${passCount} / ${results.length} tests passing`;
+    resultsEl.appendChild(summary);
+  }
 
   let sqlPass = passCount === results.length;
   let writtenPass = true;
   if (task.written) {
     const writtenText = (document.getElementById("written_" + id) || {}).value || "";
     writtenPass = task.written.check(writtenText);
-    const wv = document.createElement("div");
-    wv.className = "feedback " + (writtenPass ? "ok" : "bad");
-    wv.innerHTML = writtenPass ? "<b>Interpretation accepted.</b>" : `<b>Interpretation needs more.</b> ${esc(task.written.hint)}`;
-    resultsEl.appendChild(wv);
+    if (resultsEl) {
+      const wv = document.createElement("div");
+      wv.className = "feedback " + (writtenPass ? "ok" : "bad");
+      wv.innerHTML = writtenPass ? "<b>Interpretation accepted.</b>" : `<b>Interpretation needs more.</b> ${esc(task.written.hint)}`;
+      resultsEl.appendChild(wv);
+    }
   }
   const pass = sqlPass && writtenPass;
 
-  if (pass && task.explanation) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(task.explanation));
+  if (pass && task.explanation && resultsEl) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(task.explanation));
   PracticeProgress.recordAttempt(id, pass);
   if (pass) openTasks.add(id);
   renderTasks();
