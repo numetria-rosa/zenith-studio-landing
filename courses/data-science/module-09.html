@@ -132,7 +132,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
         <li>Written a real SQL query against a live database to answer the client's actual question</li>
         <li>Put a dollar figure on a business problem, with a stated method</li>
         <li>Built a real, honest, interactive chart from your own analysis</li>
-        <li>Written a stakeholder-ready recommendation and explained it in plain English</li>
+        <li>Checked whether a finding is statistically real or just noise, on real order-level data</li>
+        <li>Written a stakeholder-ready recommendation, explained it in plain English, and written it up for your own portfolio</li>
       </ul>
     </div>
   </header>
@@ -161,6 +162,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
       <div class="drow"><span class="dletter">D</span> A real, interactive chart built from your own analysis <span class="dstatus" id="dstatusD">Not started</span></div>
       <div class="drow"><span class="dletter">E</span> A written executive summary with a recommendation <span class="dstatus" id="dstatusE">Not started</span></div>
       <div class="drow"><span class="dletter">F</span> A plain-English explanation for a non-technical stakeholder <span class="dstatus" id="dstatusF">Not started</span></div>
+      <div class="drow"><span class="dletter">G</span> Statistical validation: is the finding real, or noise? <span class="dstatus" id="dstatusG">Not started</span></div>
+      <div class="drow"><span class="dletter">H</span> A portfolio-ready project description <span class="dstatus" id="dstatusH">Not started</span></div>
     </div>
   </section>
 
@@ -276,6 +279,54 @@ fig = px.bar(title="Margin % by category, H1 vs H2")</textarea>
         <button class="primary" id="btnCheckExplain">✓ Check my explanation</button>
       </div>
       <div id="explainResults"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">G</span><h2 class="serif">Is this real, or noise?</h2></div>
+    <p>You explained the finding to a store manager in part F. Before it goes any further, one more check: with only two 6-month windows to compare, could Electronics' margin drop just be normal month-to-month variation, the kind every category has some of?</p>
+    <div class="why"><b>Why this matters:</b> a real analyst doesn't stop at "the number went down." Module 5 taught you to ask whether a difference is big enough, relative to the natural spread in the data, to trust. This capstone has enough individual orders to actually check that here, not just assert it.</div>
+    <div class="interactive">
+      <span class="ilbl">Required · real data, real Python, graded</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>validate_significance(df)</code>. Clean the same way as before (drop duplicates, normalize category casing), isolate Electronics, split into H1/H2 by order date, and compute each half's <b>per-order</b> margin percentage (<code>(revenue-cogs)/revenue*100</code> for each row, not the aggregate). Return <code>{"h1_mean_margin_pct": ..., "h2_mean_margin_pct": ..., "z_score": ..., "is_significant": True or False}</code>, using the standard-error formula from Module 5: <code>se = sqrt(std1**2/n1 + std2**2/n2)</code>, <code>z = (mean1 - mean2) / se</code>, and treat <code>abs(z) > 1.96</code> as significant (the same 95% threshold Module 5 used).</p>
+      <textarea id="exGEditor" class="testin" spellcheck="false" rows="12">import math
+
+def validate_significance(df):
+    d = df.drop_duplicates()
+    d["category"] = d["category"].str.strip().str.title()
+    elec = d[d["category"] == "Electronics"].copy()
+    elec["margin_pct"] = (elec["revenue"] - elec["cogs"]) / elec["revenue"] * 100
+    elec["half"] = elec["order_date"].apply(lambda x: "H1" if x < "2025-10-01" else "H2")
+    h1 = elec[elec.half == "H1"]["margin_pct"]
+    h2 = elec[elec.half == "H2"]["margin_pct"]
+    se = math.sqrt(h1.std()**2 / len(h1) + h2.std()**2 / len(h2))
+    z = (h1.mean() - h2.mean()) / se
+    return {
+        "h1_mean_margin_pct": round(h1.mean(), 2),
+        "h2_mean_margin_pct": round(h2.mean(), 2),
+        "z_score": round(z, 2),
+        "is_significant": abs(z) > 1.96,
+    }</textarea>
+      <details class="hint"><summary>Stuck for a few minutes? One hint</summary><div class="hbody">This is per-order margin, not the aggregate revenue/cogs margin from parts B and C, one <code>margin_pct</code> value per row, so you get a real spread (standard deviation) to compare, not just two single numbers.</div></details>
+      <div class="dagctrl">
+        <button id="btnRunExG">▶ Run tests</button>
+        <button id="btnResetExG">Reset</button>
+      </div>
+      <div id="exGResults"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">H</span><h2 class="serif">Write it up for your portfolio</h2></div>
+    <p>Your executive summary in part E was for Northstar's leadership. This one is for you: the paragraph that goes under this project when a hiring manager looks at your portfolio.</p>
+    <div class="why"><b>Why this is different from part E:</b> a portfolio description isn't a business memo, it's evidence of what you can do. Name the tools, the method, and the result, so someone skimming your portfolio in 20 seconds knows exactly what you're capable of.</div>
+    <div class="interactive">
+      <span class="ilbl">Required · checked for content, not writing quality</span>
+      <textarea id="portfolioBox" class="proseIn" rows="6" placeholder="e.g. Investigated a profitability gap for a mid-size retailer using SQL and Python (pandas). Found that a single product category's margin had compressed sharply while four others held steady, quantified the impact at roughly $22K in lost gross profit, validated the finding statistically, and built an interactive Plotly chart and a stakeholder-ready recommendation."></textarea>
+      <div class="dagctrl">
+        <button class="primary" id="btnCheckPortfolio">✓ Check my description</button>
+      </div>
+      <div id="portfolioResults"></div>
     </div>
   </section>
 
@@ -414,7 +465,7 @@ async function runGraded(id, buildHarness, buttonId) {
   exerciseState[id] = { passCount, total: data.results.length };
   CourseProgress.setExtra("module9_" + id, { passCount, total: data.results.length });
   if (allPass) {
-    const letterMap = { exA: "A", exC: "C", exD: "D" };
+    const letterMap = { exA: "A", exC: "C", exD: "D", exG: "G" };
     if (letterMap[id]) markDeliverable(letterMap[id]);
     if (id === "exD" && data.chartHtmls && data.chartHtmls.exD) {
       const el = document.getElementById("exDChart");
@@ -561,6 +612,94 @@ document.getElementById("btnResetExD").addEventListener("click", () => {
   const el = document.getElementById("exDChart"); el.style.display = "none"; el.srcdoc = "";
 });
 
+/* ================= Part G: statistical validation (Pyodide) ================= */
+const EXG = () => harnessFor(ORDERS_SETUP, [
+  "    fn = ns.get('validate_significance')",
+  "    if fn is None:",
+  "        results.append({'name': 'validate_significance is defined', 'pass': False, 'hint': 'Define a function named exactly validate_significance.'})",
+  "    else:",
+  "        try:",
+  "            import math",
+  "            def _ref(d):",
+  "                dd = d.drop_duplicates()",
+  "                dd = dd.assign(category=dd['category'].str.strip().str.title())",
+  "                elec = dd[dd['category'] == 'Electronics'].copy()",
+  "                elec['margin_pct'] = (elec['revenue'] - elec['cogs']) / elec['revenue'] * 100",
+  "                elec['half'] = elec['order_date'].apply(lambda x: 'H1' if x < '2025-10-01' else 'H2')",
+  "                h1 = elec[elec.half == 'H1']['margin_pct']",
+  "                h2 = elec[elec.half == 'H2']['margin_pct']",
+  "                se = math.sqrt(h1.std()**2 / len(h1) + h2.std()**2 / len(h2))",
+  "                z = (h1.mean() - h2.mean()) / se",
+  "                return {'h1': float(round(h1.mean(), 2)), 'h2': float(round(h2.mean(), 2)), 'z': float(round(z, 2))}",
+  "            out = fn(_extra_ns['df'].copy())",
+  "            got = out if isinstance(out, dict) else {}",
+  "            ref = _ref(_extra_ns['df'])",
+  "            ok_h1 = abs(float(got.get('h1_mean_margin_pct', 0)) - ref['h1']) < 1.0",
+  "            results.append({'name': f\"h1_mean_margin_pct is correct (about {ref['h1']})\", 'pass': ok_h1, 'hint': f\"Got {got.get('h1_mean_margin_pct')!r}.\"})",
+  "            ok_h2 = abs(float(got.get('h2_mean_margin_pct', 0)) - ref['h2']) < 1.0",
+  "            results.append({'name': f\"h2_mean_margin_pct is correct (about {ref['h2']})\", 'pass': ok_h2, 'hint': f\"Got {got.get('h2_mean_margin_pct')!r}.\"})",
+  "            ok_z = abs(float(got.get('z_score', 0)) - ref['z']) < 8.0",
+  "            results.append({'name': f\"z_score is roughly correct (about {ref['z']})\", 'pass': ok_z, 'hint': f\"Got {got.get('z_score')!r}. Check the standard-error formula: sqrt(std1**2/n1 + std2**2/n2).\"})",
+  "            sig_ok = bool(got.get('is_significant')) == (abs(ref['z']) > 1.96)",
+  "            results.append({'name': 'is_significant correctly reflects the 95% threshold (abs(z) > 1.96)', 'pass': sig_ok, 'hint': f\"Got {got.get('is_significant')!r}, expected {abs(ref['z']) > 1.96}.\"})",
+  "            allok = ok_h1 and ok_h2 and ok_z and sig_ok",
+  "            if allok:",
+  "                half = _extra_ns['df'].head(len(_extra_ns['df']) // 2)",
+  "                ref2 = _ref(half)",
+  "                try:",
+  "                    got2 = fn(half)",
+  "                    matches_ref2 = abs(float(got2.get('z_score', -999999)) - ref2['z']) < 8.0",
+  "                    not_hardcoded = matches_ref2 and float(got2.get('z_score', -1)) != float(got['z_score'])",
+  "                except Exception:",
+  "                    not_hardcoded = False",
+  "                results.append({'name': 'Not hardcoded: recalculates correctly on a different slice of the data', 'pass': not_hardcoded, 'hint': 'Your numbers did not change correctly on a smaller slice of the data, that usually means hardcoded values.' if not not_hardcoded else ''})",
+  "        except Exception as e:",
+  "            results.append({'name': 'validate_significance runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+]);
+document.getElementById("btnRunExG").addEventListener("click", () => runGraded("exG", EXG, "btnRunExG"));
+const EXG_STARTER = document.getElementById("exGEditor").value;
+document.getElementById("btnResetExG").addEventListener("click", () => {
+  document.getElementById("exGEditor").value = EXG_STARTER;
+  document.getElementById("exGResults").innerHTML = "";
+});
+
+/* ================= Part H: portfolio-ready description ================= */
+function checkPortfolio() {
+  const text = document.getElementById("portfolioBox").value.trim();
+  const lower = text.toLowerCase();
+  const checks = [];
+  const mentionsCategory = /electronics/.test(lower);
+  checks.push({ name: "Names the specific finding (Electronics)", pass: mentionsCategory, hint: "A portfolio reader should know exactly what you found, not just that you \"did an analysis.\"" });
+  const mentionsTool = /(sql|python|pandas|plotly)/.test(lower);
+  checks.push({ name: "Names at least one real tool you used", pass: mentionsTool, hint: "Mention SQL, Python, pandas, or Plotly, whichever you actually used, tools are what a hiring manager scans for first." });
+  const mentionsImpact = /\$|profit|margin|percent|%/.test(lower);
+  checks.push({ name: "States a quantified result", pass: mentionsImpact, hint: "Include the dollar figure or the margin percentages, a portfolio description without a number is just a claim." });
+  const longEnough = text.length > 100;
+  checks.push({ name: "Long enough to actually describe the project (2-3 sentences)", pass: longEnough, hint: "A single vague sentence won't differentiate you, aim for a real paragraph." });
+
+  const resultsEl = document.getElementById("portfolioResults");
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  checks.forEach(c => {
+    if (c.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (c.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${c.pass ? "PASS" : "FAIL"}</b>, ${esc(c.name)}` + (c.pass ? "" : `<br>${esc(c.hint)}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.className = "testsummary";
+  summary.style.color = passCount === checks.length ? "var(--good)" : "var(--mut)";
+  summary.textContent = `${passCount} / ${checks.length} checks passing`;
+  resultsEl.appendChild(summary);
+  const state = { passCount, total: checks.length };
+  exerciseState["portfolio"] = state;
+  CourseProgress.setExtra("module9_portfolio", { ...state, text });
+  if (passCount === checks.length) markDeliverable("H");
+  updateNextButton();
+}
+document.getElementById("btnCheckPortfolio").addEventListener("click", checkPortfolio);
+
 /* ================= Part E: written executive summary ================= */
 function checkWrite() {
   const vals = {
@@ -663,7 +802,7 @@ document.getElementById("btnCheckExplain").addEventListener("click", checkExplai
 let score = 0;
 const answered = { q1:false,q2:false,q3:false,q4:false,q5:false };
 function requiredPassing(){
-  const ids = ["exA","exB","exC","exD","write","explain"];
+  const ids = ["exA","exB","exC","exD","write","explain","exG","portfolio"];
   return ids.every(id => exerciseState[id] && exerciseState[id].passCount === exerciseState[id].total);
 }
 function updateNextButton(){
@@ -746,14 +885,14 @@ document.getElementById("btnNext").addEventListener("click", () => { window.loca
       if (label) label.click();
     }
   });
-  ["exA","exB","exC","exD"].forEach((id) => {
+  ["exA","exB","exC","exD","exG"].forEach((id) => {
     const saved = CourseProgress.getExtra("module9_" + id);
     if (saved && saved.total > 0) {
       exerciseState[id] = saved;
       const resultsEl = document.getElementById(id + "Results");
       const passed = saved.passCount === saved.total;
       resultsEl.innerHTML = `<div class="feedback ${passed ? "ok" : "bad"}">Restored from your last visit: ${passed ? "passing" : "not yet passing"}. Edit and re-run to update.</div>`;
-      const letterMap = { exA: "A", exB: "B", exC: "C", exD: "D" };
+      const letterMap = { exA: "A", exB: "B", exC: "C", exD: "D", exG: "G" };
       if (passed && letterMap[id]) markDeliverable(letterMap[id]);
     }
   });
@@ -772,6 +911,12 @@ document.getElementById("btnNext").addEventListener("click", () => { window.loca
     exerciseState["explain"] = { passCount: savedExplain.passCount, total: savedExplain.total };
     document.getElementById("explainBox").value = savedExplain.text || "";
     if (savedExplain.passCount === savedExplain.total) markDeliverable("F");
+  }
+  const savedPortfolio = CourseProgress.getExtra("module9_portfolio");
+  if (savedPortfolio && savedPortfolio.text !== undefined) {
+    exerciseState["portfolio"] = { passCount: savedPortfolio.passCount, total: savedPortfolio.total };
+    document.getElementById("portfolioBox").value = savedPortfolio.text || "";
+    if (savedPortfolio.passCount === savedPortfolio.total) markDeliverable("H");
   }
   updateNextButton();
 })();
