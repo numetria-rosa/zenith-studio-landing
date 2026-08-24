@@ -81,7 +81,7 @@
     hypothesisTestExercise: "Mini hypothesis-test exercise (Survey Responses)",
     chartBuildExercise: "Build-a-chart-from-raw-data exercise (App Analytics)",
     sqlQueryExercise: "Translate-a-business-question-into-SQL exercise",
-    dashboardBuildExercise: "Dashboard build (P&L or Inventory file)",
+    dashboardBuildExercise: "Dashboard build (E-commerce Orders funnel data)",
   };
 
   function safeParse(raw) {

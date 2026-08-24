@@ -58,8 +58,6 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
 .testin{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
 .testin:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-.proseIn{width:100%;font-family:'IBM Plex Sans';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
-.proseIn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px;display:none}
 .feedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
 .feedback.bad{display:block;background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
@@ -82,22 +80,41 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .scoreboard .in{max-width:960px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
 .scoreboard .sc{font-family:'IBM Plex Mono';font-weight:700;font-size:15px;color:var(--amber)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
-.chartbox{margin-top:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px 10px}
-.chartbox .clbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut2);font-family:'IBM Plex Mono';margin-bottom:8px}
-.kpirow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
-.kpi{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px}
-.kpi .kv{font-family:'IBM Plex Mono';font-size:22px;font-weight:700;color:var(--amber)}
-.kpi .kl{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
-.pyramid{display:grid;gap:8px;margin-top:14px}
-.pystep{border-radius:8px;padding:12px 16px;font-size:13px}
-.pystep b{display:block;font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
-.pystep.p1{background:rgba(240,180,41,.12);border:1px solid var(--amber)}
-.pystep.p1 b{color:var(--amber)}
-.pystep.p2{background:var(--card2);border:1px solid var(--bd2)}
-.pystep.p2 b{color:var(--mut2)}
-.writecard{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px;margin-top:14px}
-.writecard label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:6px;font-family:'IBM Plex Mono'}
-.writecard+.writecard{margin-top:14px}
+.chartframe{width:100%;height:420px;border:1px solid var(--bd2);border-radius:10px;margin-top:14px;background:#fff}
+.chartframe.small{height:340px}
+.chartrow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){ .chartrow{grid-template-columns:1fr} }
+.hints{margin-top:14px;display:grid;gap:6px}
+.hints details{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px}
+.hints summary{cursor:pointer;color:var(--info);font-size:12.5px;font-weight:600;list-style:none}
+.hints summary::-webkit-details-marker{display:none}
+.hints summary:before{content:"HINT · "}
+.hints .hbody{margin-top:8px;font-size:13px;color:var(--mut);padding-top:8px;border-top:1px solid var(--bd)}
+.qualityrow{margin-top:10px;font-size:12.5px;color:var(--mut2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.qualitybadge{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:99px}
+.qualitybadge.ok{background:rgba(74,222,149,.12);color:var(--good)}
+.qualitybadge.warn{background:rgba(240,180,41,.12);color:var(--amber)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px;font-family:'IBM Plex Mono';font-size:12.5px}
+.flow .step{background:var(--card2);border:1px solid var(--bd2);border-radius:8px;padding:8px 12px;color:var(--tx)}
+.flow .arrow{color:var(--mut2)}
+.kpirow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+@media (max-width:640px){ .kpirow{grid-template-columns:1fr} }
+.kpicard{background:var(--card2);border:1px solid var(--bd2);border-radius:12px;padding:16px 18px}
+.kpicard .klabel{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut2);font-family:'IBM Plex Mono';margin-bottom:6px}
+.kpicard .kval{font-family:'IBM Plex Mono';font-size:24px;font-weight:700;color:var(--amber)}
+.dashgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media (max-width:760px){ .dashgrid{grid-template-columns:1fr} }
+.dashgrid .full{grid-column:1 / -1}
+.toolgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+@media (max-width:640px){ .toolgrid{grid-template-columns:1fr} }
+.toolcard{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px}
+.toolcard .tname{font-family:'IBM Plex Mono';font-weight:700;color:var(--info);font-size:13px;margin-bottom:6px}
+.toolcard p{font-size:13.5px;color:var(--mut)}
+.logbox{width:100%;min-height:120px;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6}
+.logbox:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.checklist{display:grid;gap:8px;margin-top:14px}
+.checkrow{display:flex;align-items:flex-start;gap:10px;font-size:14px;background:var(--card2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px}
+.checkrow input{margin-top:3px}
 @media (max-width:640px){ .wrap{padding:0 16px 60px} h1{font-size:26px} .kh h2{font-size:18px} .interactive{padding:16px} }
 </style>
 </head>
@@ -113,124 +130,269 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <header class="hero">
     <span class="eyebrow">Module 8 of 9</span>
     <h1 class="serif">Dashboards &amp; Business Communication</h1>
-    <p class="sub">A correct analysis that nobody acts on is a wasted analysis. This module is about the last, hardest step: turning a real number into a report a busy stakeholder reads in 30 seconds and knows exactly what to do with.</p>
+    <p class="sub">Every KPI and every chart on this page is computed by your own Python code, running on the real, messy <code>ecommerce_orders.csv</code> funnel data from Module 4. Nothing here is typed in, nothing is a screenshot. A dashboard is not a picture of numbers, it's an argument built out of them, and this module is about learning to build one you'd actually trust.</p>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
-        <li>Build headline KPIs from a real, messily-formatted dataset</li>
-        <li>Catch a dashboard number that's silently wrong before you ship it (the "you can't just sum this" trap)</li>
-        <li>Translate a pattern into a dollar-denominated business impact, with a defensible method</li>
-        <li>Structure a report as DATA &rarr; FINDING &rarr; BUSINESS IMPACT &rarr; RECOMMENDATION &rarr; ACTION, not methodology-first</li>
-        <li>Write a real recommendation, using your own computed numbers, that a stakeholder could act on today</li>
+        <li>Turn a vague stakeholder question into measurable KPIs</li>
+        <li>Calculate KPIs in pandas and catch a wrong denominator before it ships</li>
+        <li>Build real, interactive Plotly charts and combine them into one dashboard view</li>
+        <li>Use a chart's legend as a real, working filter</li>
+        <li>Spot a truncated axis or a misleading aggregation, in your own work and someone else's</li>
+        <li>Write an interpretation and a recommendation a manager could act on</li>
       </ul>
     </div>
   </header>
 
   <section>
-    <div class="kh"><span class="num">8.0</span><h2 class="serif">Lead with the answer, not the method</h2></div>
-    <p>A technical audience wants to see your work first. A business audience wants the answer first, then enough of your work to trust it. Almost every report that gets ignored made this mistake.</p>
-    <div class="pyramid">
-      <div class="pystep p2"><b>What most first drafts look like</b>"I pulled the quarterly P&amp;L data and grouped it by period after standardizing the date formats, then computed a trailing average to establish a baseline for comparison, which showed..."</div>
-      <div class="pystep p1"><b>What a stakeholder actually needs, first</b>"Q3 revenue has dipped below trend three years running, costing roughly $127K total. Recommend: investigate Q3 demand drivers before this year's Q3."</div>
+    <div class="kh"><span class="num">8.0</span><h2 class="serif">What a dashboard actually is</h2></div>
+    <p>A dashboard is not a chart collection. It's the end of a chain, and every link in that chain can break.</p>
+    <div class="flow">
+      <span class="step">Business question</span><span class="arrow">&rarr;</span>
+      <span class="step">Data</span><span class="arrow">&rarr;</span>
+      <span class="step">KPI</span><span class="arrow">&rarr;</span>
+      <span class="step">Analysis</span><span class="arrow">&rarr;</span>
+      <span class="step">Visualization</span><span class="arrow">&rarr;</span>
+      <span class="step">Dashboard</span><span class="arrow">&rarr;</span>
+      <span class="step">Interpretation</span><span class="arrow">&rarr;</span>
+      <span class="step">Decision</span>
     </div>
-    <div class="def"><div class="k">The five parts, in this order</div><p><b>DATA</b> (the number) &rarr; <b>FINDING</b> (the pattern in the number) &rarr; <b>BUSINESS IMPACT</b> (why it matters, in dollars or another concrete unit) &rarr; <b>RECOMMENDATION</b> (what to do) &rarr; <b>ACTION</b> (the specific next step, with an owner or timing if you can name one). Methodology, if anyone asks, goes in an appendix, not the opening line.</p></div>
+    <div class="why"><b>A tiny, made-up example, not the module's real data:</b> a raw table of 5 lemonade-stand sales rows becomes a KPI ("$14 average sale"), becomes a chart (sales by day), becomes a dashboard (that chart plus a second one for weather), becomes a decision ("open Saturdays only, revenue per hour is triple"). Skip any one step, calculate the KPI wrong, or pick a chart that hides the pattern, and the decision at the end is built on nothing.</p>
+    <div class="trap"><b>The failure mode this module is built around:</b> a dashboard that looks completely professional, clean cards, a nice color palette, real interactive charts, and quietly answers the wrong question because a KPI was calculated on the wrong subset of rows. It will not look broken. It will look great. That's what makes it dangerous.</div>
   </section>
 
   <section>
-    <div class="kh"><span class="num">8.1</span><h2 class="serif">Headline KPIs from a messy source</h2></div>
-    <p><b>The dataset:</b> <code>pnl_statement.csv</code>, the same 12-quarter P&amp;L from Module 7, three period-label formats included.</p>
-    <p><b>Business question:</b> "What are this quarter's headline numbers?", the numbers that go at the top of any dashboard, above everything else.</p>
+    <div class="kh"><span class="num">8.1</span><h2 class="serif">Start with the business question</h2></div>
+    <p>Nobody asks for "a bar chart." They ask something like <i>"how much are we actually selling, and is it working?"</i> Your first job is never to open Plotly, it's to turn that into a small number of specific, calculable questions.</p>
+    <div class="def"><div class="k">What is a KPI?</div><p>A Key Performance Indicator is one number, precisely defined, that a business tracks because it answers a real question. "Revenue" isn't precise on its own, revenue <i>of what, over what period, counting which rows</i> is what makes it a usable KPI.</p></div>
+    <div class="def"><div class="k">Why would a business care?</div><p>Because a KPI is what a decision gets made on. If "average order value went up 40%" is wrong, the business might raise prices, cut a promotion, or congratulate a team, based on a number that was never real.</p></div>
+    <p>The scenario for the rest of this module: <b>you're a junior analyst at an online store.</b> Management wants to know how much you're actually selling, where the revenue is coming from, and whether it's growing. You have <code>ecommerce_orders.csv</code>, the same 412-row funnel export you cleaned in Module 4, four stages from <code>cart_created</code> to <code>shipped</code>.</p>
     <div class="interactive">
-      <span class="ilbl">Exercise 1 · real data, real Python, graded</span>
-      <p class="mut" style="margin-bottom:10px">Write <code>headline_kpis(df)</code>: standardize the periods (as in Module 7), find the most recent quarter, and return <code>{"latest_quarter": "2026-Q4", "latest_revenue": 239740.84, "yoy_growth_pct": 6.35, "latest_margin_pct": 29.7}</code>. <code>yoy_growth_pct</code> compares the latest quarter's revenue to the same quarter one year earlier. <code>latest_margin_pct</code> is <code>net_income / revenue * 100</code> for the latest quarter.</p>
-      <textarea id="ex1Editor" class="testin" spellcheck="false" rows="6">def headline_kpis(df):
-    # standardize periods to "YYYY-Q#", find the latest one
-    # yoy_growth_pct: vs the same quarter, prior year
-    # latest_margin_pct: net_income / revenue * 100, for the latest quarter
-    return {"latest_quarter": "", "latest_revenue": 0, "yoy_growth_pct": 0, "latest_margin_pct": 0}</textarea>
-      <div class="dagctrl">
-        <button id="btnRunEx1">Run tests</button>
-        <button id="btnResetEx1">Reset</button>
-      </div>
-      <div id="ex1Results"></div>
-      <div id="ex1Chart"></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">8.2</span><h2 class="serif">The trap: a dashboard number that's silently wrong</h2></div>
-    <p><b>The dataset:</b> <code>inventory_supply.csv</code>, 144 rows of stock across 3 warehouses.</p>
-    <div class="trap"><b>The trap:</b> the same SKU can be stocked in <code>case</code> units at one warehouse and <code>each</code> units at another, 27 of the 77 SKUs here do exactly that. A dashboard tile that does <code>SUM(stock_qty)</code> across all rows silently adds cases to eaches as if they were the same thing, the total it shows is a real number that means nothing.</div>
-    <div class="def"><div class="k">Pattern</div><p>Before any KPI touches a quantity column, check whether the unit is consistent. If it isn't, either convert to one unit first or report per-unit totals separately, never a blended sum.</p></div>
-    <div class="interactive">
-      <span class="ilbl">Exercise 2 · real data, real Python, graded</span>
-      <p class="mut" style="margin-bottom:10px">Write <code>reorder_risk(df)</code>: return <code>{"negative_stock_rows": n, "below_threshold_rows": n, "skus_with_mixed_units": n}</code>. <code>below_threshold_rows</code> counts rows where <code>0 &lt;= stock_qty &lt; reorder_threshold</code> (a real reorder need). <code>negative_stock_rows</code> counts rows where <code>stock_qty &lt; 0</code> (a data error, not a reorder signal, flag separately). <code>skus_with_mixed_units</code> counts distinct SKUs that appear with more than one <code>unit</code> value across warehouses.</p>
-      <textarea id="ex2Editor" class="testin" spellcheck="false" rows="5">def reorder_risk(df):
-    # negative_stock_rows: stock_qty < 0 (data error)
-    # below_threshold_rows: 0 <= stock_qty < reorder_threshold (real reorder need)
-    # skus_with_mixed_units: SKUs whose unit isn't the same everywhere they appear
-    return {"negative_stock_rows": 0, "below_threshold_rows": 0, "skus_with_mixed_units": 0}</textarea>
-      <div class="dagctrl">
-        <button id="btnRunEx2">Run tests</button>
-        <button id="btnResetEx2">Reset</button>
-      </div>
-      <div id="ex2Results"></div>
-    </div>
-    <div class="qcard"><div class="qtext">A colleague's dashboard shows "4,812 units in stock" as a single tile. What's the most important question to ask before trusting that number?</div><div id="w1opts"></div><div class="qexplain" id="w1explain"></div></div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">8.3</span><h2 class="serif">Turning a pattern into a dollar figure</h2></div>
-    <p><b>Business question:</b> "The recurring Q3 dip from Module 7, how much has it actually cost us?"</p>
-    <div class="why"><b>A defensible method, not a precise one:</b> there's no ground truth for "what Q3 would have been." A reasonable, stateable estimate: for each year, average that year's other three quarters as a rough counterfactual for what Q3 "should" have been, then compare. It's an estimate, say so, but it's a real number a stakeholder can reason about, which is more useful than "revenue was lower."</div>
-    <div class="interactive">
-      <span class="ilbl">Exercise 3 · real data, real Python, graded</span>
-      <p class="mut" style="margin-bottom:10px">Write <code>q3_dip_cost(df)</code>: for each year (2024, 2025, 2026), compute the counterfactual as the average of that year's Q1, Q2, and Q4 revenue, subtract actual Q3 revenue to get that year's gap, then return <code>{"gap_2024": ..., "gap_2025": ..., "gap_2026": ..., "total_gap": ...}</code> (all rounded to 2 decimals).</p>
-      <textarea id="ex3Editor" class="testin" spellcheck="false" rows="6">def q3_dip_cost(df):
-    # standardize periods, then per year: counterfactual = avg(Q1,Q2,Q4), gap = counterfactual - actual Q3
-    return {"gap_2024": 0, "gap_2025": 0, "gap_2026": 0, "total_gap": 0}</textarea>
-      <div class="dagctrl">
-        <button id="btnRunEx3">Run tests</button>
-        <button id="btnResetEx3">Reset</button>
-      </div>
-      <div id="ex3Results"></div>
-      <div id="ex3Chart"></div>
+      <span class="ilbl">Quick check · practice, not graded</span>
+      <p class="mut" style="margin-bottom:10px">Match each vague ask to the KPI that actually answers it.</p>
+      <div class="qcard" style="margin-top:0"><div class="qtext">"How much are we selling?"</div><div id="w1opts"></div></div>
+      <div class="qcard"><div class="qtext">"Are customers spending more per purchase than before?"</div><div id="w2opts"></div></div>
+      <div class="qcard"><div class="qtext">"Which product line matters most to revenue?"</div><div id="w3opts"></div></div>
     </div>
   </section>
 
   <section>
-    <div class="kh"><span class="num">8.4</span><h2 class="serif">Critique: spot what's missing</h2></div>
-    <p>Each excerpt below is the opening of a real report. For each one, decide whether it's business-ready, or which part of the DATA &rarr; FINDING &rarr; IMPACT &rarr; RECOMMENDATION &rarr; ACTION structure it's missing.</p>
-    <div class="qcard"><div class="qtext">"We analyzed 12 quarters of P&amp;L data using pandas, applying groupby and standardizing three inconsistent date formats before computing quarterly aggregates."</div><div id="c1opts"></div><div class="qexplain" id="c1explain"></div></div>
-    <div class="qcard"><div class="qtext">"Q3 revenue is down. This has happened before."</div><div id="c2opts"></div><div class="qexplain" id="c2explain"></div></div>
-    <div class="qcard"><div class="qtext">"Q3 revenue has dipped below trend every year for 3 years running, an estimated $127K in lost revenue. We recommend investigating Q3 demand drivers before this pattern repeats again."</div><div id="c3opts"></div><div class="qexplain" id="c3explain"></div></div>
+    <div class="kh"><span class="num">8.2</span><h2 class="serif">Building KPIs in Python, and the trap hiding in the denominator</h2></div>
+    <p>Not every row in <code>ecommerce_orders.csv</code> is a completed sale. <code>status</code> records how far the row got through the funnel: <code>cart_created</code>, <code>checkout_started</code>, <code>payment</code>, <code>shipped</code>. Only the last two mean the customer actually paid.</p>
+    <div class="trap"><b>The trap:</b> if you sum <code>quantity &times; unit_price</code> across every row regardless of status, you are counting abandoned carts and started-but-never-finished checkouts as if they were real revenue. It will produce a real-looking number. It will be wrong.</div>
+    <div class="interactive">
+      <span class="ilbl">Exercise A · real Python, graded, required</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>store_kpis(df)</code>, returning a dict with <code>total_revenue</code>, <code>total_orders</code>, and <code>average_order_value</code>, counting <b>completed sales only</b>. <code>df</code> is already loaded and has a <code>line_total</code> column (<code>quantity &times; unit_price</code>) precomputed for you, the same cleaning from Module 4 (duplicates dropped, negative quantities removed) is already applied.</p>
+      <textarea id="exAEditor" class="testin" spellcheck="false" rows="9">def store_kpis(df):
+    completed = df[df["status"].isin(["payment", "shipped"])]
+    total_revenue = round(completed["line_total"].sum(), 2)
+    total_orders = completed["order_id"].nunique()
+    average_order_value = round(total_revenue / total_orders, 2) if total_orders else 0.0
+    return {
+        "total_revenue": total_revenue,
+        "total_orders": total_orders,
+        "average_order_value": average_order_value,
+    }</textarea>
+      <div class="hints">
+        <details><summary>Hint 1, conceptual</summary><div class="hbody">Think about what one row in this dataset represents. Not every row is a sale, some are carts that were never paid for.</div></details>
+        <details><summary>Hint 2, more specific</summary><div class="hbody">Look at the <code>status</code> column's four values. Which ones mean money actually changed hands?</div></details>
+        <details><summary>Hint 3, technical</summary><div class="hbody">Filter with <code>df[df["status"].isin(["payment", "shipped"])]</code> before summing anything.</div></details>
+      </div>
+      <div class="dagctrl">
+        <button id="btnRunExA">&#9654; Run</button>
+        <button id="btnResetExA">Reset</button>
+      </div>
+      <div id="exAResults"></div>
+      <div class="kpirow" id="exAKpiCards" style="display:none"></div>
+    </div>
   </section>
 
   <section>
-    <div class="kh"><span class="num">8.5</span><h2 class="serif">Required exercise: write the report yourself</h2></div>
-    <p>Use your own numbers from 8.1 and 8.3. Five short fields, in the DATA &rarr; FINDING &rarr; IMPACT &rarr; RECOMMENDATION &rarr; ACTION order. This isn't graded on prose quality, it's checked for the right kind of content in each field, in the right order, using numbers you actually computed.</p>
+    <div class="kh"><span class="num">8.3</span><h2 class="serif">Choosing the right chart for a comparison, and the same trap in chart form</h2></div>
+    <p><b>Business question:</b> "which product category matters most to revenue?" This is a comparison across a small number of categories, so a bar chart is the right default, exactly like Module 7. The trap from 8.2 shows up here too, just harder to notice because a chart looks authoritative even when it's built on the wrong rows.</p>
     <div class="interactive">
-      <span class="ilbl">Required exercise · this module's graded checkpoint work</span>
-      <div class="writecard"><label>Data</label><textarea id="wData" class="proseIn" rows="2" placeholder="The specific number(s). e.g. the total dollar gap from exercise 3."></textarea></div>
-      <div class="writecard"><label>Finding</label><textarea id="wFinding" class="proseIn" rows="2" placeholder="The pattern in the number. Which quarter, how often."></textarea></div>
-      <div class="writecard"><label>Business impact</label><textarea id="wImpact" class="proseIn" rows="2" placeholder="Why it matters, in a concrete unit (dollars)."></textarea></div>
-      <div class="writecard"><label>Recommendation</label><textarea id="wRecommendation" class="proseIn" rows="2" placeholder="What should be done."></textarea></div>
-      <div class="writecard"><label>Action</label><textarea id="wAction" class="proseIn" rows="2" placeholder="The specific next step."></textarea></div>
-      <div class="dagctrl">
-        <button class="primary" id="btnCheckWrite">✓ Check my report</button>
+      <span class="ilbl">Exercise B · real Plotly, real Python, graded, required</span>
+      <p class="mut" style="margin-bottom:10px">Build a bar chart of total revenue by <code>product_category</code>, completed orders only. <code>df</code> is already loaded with <code>line_total</code> precomputed.</p>
+      <textarea id="exBEditor" class="testin" spellcheck="false" rows="7">import plotly.express as px
+
+completed = df[df["status"].isin(["payment", "shipped"])]
+g = completed.groupby("product_category")["line_total"].sum().reset_index()
+g.columns = ["category", "revenue"]
+fig = px.bar(g.sort_values("revenue", ascending=False), x="category", y="revenue", title="Revenue by category (completed orders)")</textarea>
+      <div class="hints">
+        <details><summary>Hint 1, conceptual</summary><div class="hbody">Same filter as 8.2 applies here. A chart doesn't automatically know which rows count as real sales, you still have to tell it.</div></details>
+        <details><summary>Hint 2, more specific</summary><div class="hbody">Filter to completed status first, then group by category and sum <code>line_total</code>.</div></details>
+        <details><summary>Hint 3, technical</summary><div class="hbody"><code>df[df["status"].isin(["payment","shipped"])].groupby("product_category")["line_total"].sum()</code>, then reset the index and chart it with <code>px.bar</code>.</div></details>
       </div>
+      <div class="dagctrl">
+        <button id="btnRunExB">&#9654; Run &amp; build chart</button>
+        <button id="btnResetExB">Reset</button>
+      </div>
+      <div id="exBResults"></div>
+      <iframe id="exBChart" class="chartframe" style="display:none"></iframe>
+      <div id="exBQuality"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8.4</span><h2 class="serif">Trend charts, and the axis trick that lies without changing a single number</h2></div>
+    <p><b>Business question:</b> "is revenue actually growing?" The data spans April, May, and June 2026. Here's a chart someone on the team already built to answer that.</p>
+    <div class="interactive">
+      <span class="ilbl">A chart someone already made · real code, run it yourself</span>
+      <p class="mut" style="margin-bottom:8px">Real, unedited code. Run it and look at what it shows.</p>
+      <textarea id="badEditor" class="testin" spellcheck="false" rows="8">import plotly.express as px
+
+completed = df[df["status"].isin(["payment", "shipped"])].copy()
+completed["month"] = completed["dt"].dt.strftime("%Y-%m")
+m = completed.groupby("month")["line_total"].sum().reset_index()
+m.columns = ["month", "revenue"]
+fig = px.line(m, x="month", y="revenue", title="Monthly revenue", markers=True)
+fig.update_yaxes(range=[10500, 13500])</textarea>
+      <div class="dagctrl"><button id="btnRunBad">&#9654; Run it</button></div>
+      <div id="badResults"></div>
+      <iframe id="badChart" class="chartframe" style="display:none"></iframe>
+      <p class="mut" style="font-size:13px;margin-top:8px" id="badCaption"></p>
+    </div>
+    <div class="trap"><b>The trap:</b> June's revenue is about 17% below May's, a real dip worth investigating. But forcing the y-axis to start at 10,500 instead of 0 stretches that dip across almost the entire chart height, making it look like revenue is collapsing. Not one number in the underlying data changed. Only the axis did.</div>
+    <div class="def"><div class="k">The fix</div><p>Let the y-axis include zero, or at minimum don't hand-pick a narrow range that exaggerates the visual swing. The real dip is still worth flagging, an honest chart lets the reader judge its actual size instead of being told how alarmed to feel.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Exercise C · real Plotly, real Python, graded, required</span>
+      <p class="mut" style="margin-bottom:10px">Rebuild the monthly revenue line chart honestly, same data, no manually restricted y-axis range. <code>df</code> is already loaded, and a real datetime column <code>dt</code> is already parsed for you (the order dates use three different formats, exactly like Module 4).</p>
+      <textarea id="exCEditor" class="testin" spellcheck="false" rows="7">import plotly.express as px
+
+completed = df[df["status"].isin(["payment", "shipped"])].copy()
+completed["month"] = completed["dt"].dt.strftime("%Y-%m")
+m = completed.groupby("month")["line_total"].sum().reset_index()
+m.columns = ["month", "revenue"]
+fig = px.line(m.sort_values("month"), x="month", y="revenue", title="Monthly revenue (completed orders)", markers=True)</textarea>
+      <div class="hints">
+        <details><summary>Hint 1, conceptual</summary><div class="hbody">This is the same analysis as the bad chart above, minus the one line that damaged it.</div></details>
+        <details><summary>Hint 2, more specific</summary><div class="hbody">Don't call <code>fig.update_yaxes(range=[...])</code> at all, let Plotly choose a range that includes zero.</div></details>
+        <details><summary>Hint 3, technical</summary><div class="hbody">Group completed orders by <code>dt.dt.strftime("%Y-%m")</code>, sum <code>line_total</code>, sort by month, then <code>px.line(...)</code>.</div></details>
+      </div>
+      <div class="dagctrl">
+        <button id="btnRunExC">&#9654; Run &amp; build chart</button>
+        <button id="btnResetExC">Reset</button>
+      </div>
+      <div id="exCResults"></div>
+      <iframe id="exCChart" class="chartframe" style="display:none"></iframe>
+      <div id="exCQuality"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8.5</span><h2 class="serif">Filters, without writing a filter</h2></div>
+    <p>A real dashboard tool gives readers a dropdown to filter by category. You don't have a server here, but Plotly's legend already does most of that job for free: give a chart one trace per category with <code>color=</code>, and clicking a category in the legend hides or isolates it, live, in the browser, no extra code.</p>
+    <div class="interactive">
+      <span class="ilbl">Exercise D · real Plotly, real Python, graded, required</span>
+      <p class="mut" style="margin-bottom:10px">Build a grouped bar chart of revenue by month, split by category (<code>color="product_category"</code>), completed orders only. Once it renders, click a category name in the legend, it will toggle in and out of the chart.</p>
+      <textarea id="exDEditor" class="testin" spellcheck="false" rows="8">import plotly.express as px
+
+completed = df[df["status"].isin(["payment", "shipped"])].copy()
+completed["month"] = completed["dt"].dt.strftime("%Y-%m")
+g = completed.groupby(["month", "product_category"])["line_total"].sum().reset_index()
+g.columns = ["month", "category", "revenue"]
+fig = px.bar(g.sort_values("month"), x="month", y="revenue", color="category", barmode="group", title="Revenue by month and category (click the legend to filter)")</textarea>
+      <div class="hints">
+        <details><summary>Hint 1, conceptual</summary><div class="hbody">This is 8.4's grouping, with one more dimension. Group by both month and category instead of month alone.</div></details>
+        <details><summary>Hint 2, more specific</summary><div class="hbody"><code>groupby(["month", "product_category"])</code> gives you one row per month/category pair.</div></details>
+        <details><summary>Hint 3, technical</summary><div class="hbody">Pass <code>color="category"</code> and <code>barmode="group"</code> to <code>px.bar</code>, that's what creates one legend entry, and one clickable trace, per category.</div></details>
+      </div>
+      <div class="dagctrl">
+        <button id="btnRunExD">&#9654; Run &amp; build chart</button>
+        <button id="btnResetExD">Reset</button>
+      </div>
+      <div id="exDResults"></div>
+      <iframe id="exDChart" class="chartframe" style="display:none"></iframe>
+      <div id="exDQuality"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8.6</span><h2 class="serif">Assembling the dashboard</h2></div>
+    <p>This is the moment the pieces above stop being separate exercises. The KPI cards below are the real dict your <code>store_kpis</code> function returned. The charts are the real figures your own code built. Nothing on this page from here down is re-typed or faked, it's assembled straight from what you already passed above.</p>
+    <div class="interactive">
+      <span class="ilbl">Your dashboard</span>
+      <div id="dashboardEmpty" class="feedback wait" style="display:block">Complete exercises A through D above, this section fills in automatically once they pass.</div>
+      <div id="dashboardBody" style="display:none">
+        <div class="kpirow" id="dashKpiCards"></div>
+        <div class="dashgrid">
+          <div><div id="dashChartB" class="chartframe" style="height:360px"></div></div>
+          <div><div id="dashChartC" class="chartframe" style="height:360px"></div></div>
+          <div class="full"><div id="dashChartD" class="chartframe" style="height:380px"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8.7</span><h2 class="serif">Interpretation and recommendation</h2></div>
+    <p>A dashboard that nobody explains is just a picture. Write the short report a manager actually reads.</p>
+    <div class="interactive">
+      <span class="ilbl">Written exercise · graded on content, required</span>
+      <p class="mut" style="margin-bottom:12px">Answer using what your own dashboard above actually shows.</p>
+      <label style="font-size:12.5px;color:var(--mut2);font-family:'IBM Plex Mono'">WHAT IS HAPPENING</label>
+      <textarea id="wWhat" class="logbox" spellcheck="false" placeholder="What does the completed-orders revenue trend show across April, May, and June? Which category actually leads once you filter correctly?" style="min-height:70px;margin-top:6px"></textarea>
+      <label style="font-size:12.5px;color:var(--mut2);font-family:'IBM Plex Mono';display:block;margin-top:14px">WHY IT MATTERS</label>
+      <textarea id="wWhy" class="logbox" spellcheck="false" placeholder="Why would using the all-status total instead of completed-only have misled management?" style="min-height:70px;margin-top:6px"></textarea>
+      <label style="font-size:12.5px;color:var(--mut2);font-family:'IBM Plex Mono';display:block;margin-top:14px">RECOMMENDATION</label>
+      <textarea id="wRec" class="logbox" spellcheck="false" placeholder="What should the team actually do next, given the June dip and the category breakdown?" style="min-height:70px;margin-top:6px"></textarea>
+      <div class="dagctrl"><button id="btnCheckWrite">Check my answer</button></div>
       <div id="writeResults"></div>
     </div>
   </section>
 
   <section>
+    <div class="kh"><span class="num">8.8</span><h2 class="serif">The toolset, and where this course stops</h2></div>
+    <p>You've now touched every tool a junior analyst actually uses. They overlap on purpose, and none of them is "the best one," each fits a different moment in the same chain from 8.0.</p>
+    <div class="toolgrid">
+      <div class="toolcard"><div class="tname">Excel</div><p>Fast, visible, zero setup. Best for quick exploration and small, one-off business workflows. Falls apart at scale and isn't repeatable without real discipline.</p></div>
+      <div class="toolcard"><div class="tname">SQL</div><p>Retrieves and aggregates data that lives in a real database, often before Python ever sees it. The tool for "get me the right rows" at any scale.</p></div>
+      <div class="toolcard"><div class="tname">Python / pandas</div><p>Deeper analysis, automation, and repeatability. The same cleaning and KPI logic runs identically every time, on data Excel would choke on.</p></div>
+      <div class="toolcard"><div class="tname">Plotly</div><p>Interactive visualization for exploration and for embedding in an app or notebook. What you used all module.</p></div>
+      <div class="toolcard"><div class="tname">BI tools (Tableau, Power BI, Looker)</div><p>Production dashboards meant for stakeholders who don't code, refreshed on a schedule, permissioned, shared company-wide. This course doesn't teach a specific one, the KPI-definition and chart-choice judgment you just practiced transfers directly.</p></div>
+      <div class="toolcard"><div class="tname">Honest gap</div><p>This module builds one dashboard's worth of judgment. Production BI tools add scheduled refresh, row-level permissions, and drill-downs, genuinely useful next things to learn, not things this course claims to teach.</p></div>
+    </div>
+    <div class="def"><div class="k">The analyst's actual job, in order</div><p>Stakeholder asks a vague question &rarr; you turn it into measurable questions &rarr; you define KPIs &rarr; you query and clean the data &rarr; you validate the calculation &rarr; you build the dashboard &rarr; you explain what it shows &rarr; the business decides. Building charts is one step out of seven. Most of the job is everything around it.</p></div>
+  </section>
+
+  <section>
     <div class="kh"><span class="num">✓</span><h2 class="serif">Checkpoint</h2></div>
-    <p class="mut">Five questions on judgement. Score 80% or higher (4 of 5) to unlock Module 9.</p>
-    <div class="qcard"><div class="qtext">1. A one-page report should generally open with which part of the pyramid?</div><div id="q1opts"></div><div class="qexplain" id="q1explain"></div></div>
-    <div class="qcard"><div class="qtext">2. A quantity column mixes "case" and "each" units for the same SKU. What must happen before that column feeds a dashboard total?</div><div id="q2opts"></div><div class="qexplain" id="q2explain"></div></div>
-    <div class="qcard"><div class="qtext">3. There's no ground truth for "what revenue would have been" without the Q3 dip. What's the honest way to still report a dollar estimate?</div><div id="q3opts"></div><div class="qexplain" id="q3explain"></div></div>
-    <div class="qcard"><div class="qtext">4. "Revenue is down" is a finding without an impact. What turns it into one?</div><div id="q4opts"></div><div class="qexplain" id="q4explain"></div></div>
-    <div class="qcard"><div class="qtext">5. A negative stock quantity shows up in inventory data. Should it be treated as a reorder signal?</div><div id="q5opts"></div><div class="qexplain" id="q5explain"></div></div>
+    <p class="mut">Score 80% or higher (4 of 5) to unlock Module 9.</p>
+    <div class="qcard"><div class="qtext">1. Management claims "average order value increased 40%." What's the first thing to check before accepting that?</div><div id="q1opts"></div><div class="qexplain" id="q1explain"></div></div>
+    <div class="qcard"><div class="qtext">2. A chart's y-axis runs from 10,500 to 13,500 instead of 0 to 13,500. What does that do to the reader's perception?</div><div id="q2opts"></div><div class="qexplain" id="q2explain"></div></div>
+    <div class="qcard"><div class="qtext">3. You need production dashboards refreshed daily and shared with 40 non-technical stakeholders. Which tool fits best?</div><div id="q3opts"></div><div class="qexplain" id="q3explain"></div></div>
+    <div class="qcard"><div class="qtext">4. In Plotly, what does giving a chart <code>color="category"</code> actually buy you for free?</div><div id="q4opts"></div><div class="qexplain" id="q4explain"></div></div>
+    <div class="qcard"><div class="qtext">5. A stakeholder asks "can you make me a dashboard?" What's the analyst's actual first move?</div><div id="q5opts"></div><div class="qexplain" id="q5explain"></div></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">8.9</span><h2 class="serif">Independent challenge: the leadership dashboard</h2></div>
+    <p>You've joined the analytics team at a growing retailer. Your manager wants a dashboard for the monthly leadership meeting, built from <code>retail_sales_ledger.csv</code>, 62 rows across 4 regions and 3 product lines, January through May 2026. Nobody has told you which KPIs matter or which charts to use. That's your call.</p>
+    <div class="def"><div class="k">retail_sales_ledger.csv &nbsp;·&nbsp; <a href="datasets/retail_sales_ledger.csv" download style="color:var(--info)">download</a></div><p>Columns: <code>order_id, order_date, region, product_line, units, unit_price, revenue</code>. <code>revenue</code> is already provided, unlike the funnel data above. One row has a missing <code>units</code> value, decide how to handle it.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Auto-graded anchor · required</span>
+      <p class="mut" style="margin-bottom:10px">Write <code>dashboard_kpis(df)</code>, returning a dict with at minimum <code>total_revenue</code>. <code>df</code> is the raw file, unfiltered, uncleaned, exactly as downloaded.</p>
+      <textarea id="exFEditor" class="testin" spellcheck="false" rows="6">def dashboard_kpis(df):
+    total_revenue = round(df["revenue"].sum(), 2)
+    return {"total_revenue": total_revenue}</textarea>
+      <div class="hints">
+        <details><summary>Hint 1, conceptual</summary><div class="hbody">Nothing to filter here by status, this file only contains real transactions, so this one is more direct than 8.2.</div></details>
+        <details><summary>Hint 2, technical</summary><div class="hbody"><code>df["revenue"].sum()</code> directly, no groupby needed for the total.</div></details>
+      </div>
+      <div class="dagctrl">
+        <button id="btnRunExF">&#9654; Run</button>
+        <button id="btnResetExF">Reset</button>
+      </div>
+      <div id="exFResults"></div>
+    </div>
+    <div class="trap"><b>Anti-cheat note, shown honestly:</b> this total is a specific real number for this specific file. Typing <code>return {"total_revenue": 1536699.68}</code> will look correct once, then fail the moment the grader recomputes it against a different slice of the same data, which it always does.</div>
+    <div class="interactive">
+      <span class="ilbl">Self-assessed &middot; use the checklist honestly</span>
+      <p class="mut" style="margin-bottom:6px">Build the rest of the dashboard in your own notebook or the module scratch space of your choice: at least 3 meaningful KPIs, at least 3 interactive charts, at least 1 real comparison or filter (region vs. region, product line vs. product line, or a legend filter like 8.5), correct calculations, clear titles, no misleading visualization, a written interpretation, and a business recommendation. There's no single right design, a good one tells a true story from this data. Check off each item only once it's actually true.</p>
+      <div class="checklist" id="finalChecklist"></div>
+      <div id="finalChecklistScore" class="testsummary" style="margin-top:10px"></div>
+    </div>
   </section>
 
   <footer>Zenith Lab · Data Science &amp; Analysis · Module 8 of 9 · Next: Capstone Analysis Project</footer>
@@ -238,81 +400,329 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="scoreboard"><div class="in">
   <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
-  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
-  <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete all exercises and the checkpoint to continue →</button>
+  <button id="btnRetryCheckpoint" style="display:none">&#8635; Retry checkpoint</button>
+  <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete all exercises and the checkpoint to continue &rarr;</button>
 </div></div>
 
-<script src="course-progress.js?v=2"></script>
-<script src="pyodide-sandbox-runner.js"></script>
+<script src="course-progress.js?v=5"></script>
+<script src="plotly-sandbox-runner.js"></script>
 <script>
 const MODULE_ID = 8;
 CourseProgress.touchVisited(MODULE_ID);
 const esc = CourseProgress.escapeHtml;
 
-function barChart(items, opts) {
-  opts = opts || {};
-  const w = 600, barH = 30, gap = 9, padL = opts.padL || 110, padR = 66, padT = 8;
-  const max = Math.max(1, ...items.map(i => Math.abs(i.value)));
-  const h = padT * 2 + items.length * (barH + gap) - gap;
-  let bars = "";
-  items.forEach((it, i) => {
-    const y = padT + i * (barH + gap);
-    const bw = Math.max(2, (Math.abs(it.value) / max) * (w - padL - padR));
-    const color = it.color || "var(--amber)";
-    bars += `<text x="${padL - 10}" y="${y + barH/2 + 4}" text-anchor="end" font-size="12" fill="var(--mut)">${esc(it.label)}</text>`;
-    bars += `<rect x="${padL}" y="${y}" width="${bw}" height="${barH}" rx="4" fill="${color}"></rect>`;
-    bars += `<text x="${padL + bw + 8}" y="${y + barH/2 + 4}" font-size="12" fill="var(--tx)" font-family="IBM Plex Mono">${esc(opts.fmt ? opts.fmt(it.value) : it.value)}</text>`;
-  });
-  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;font-family:'IBM Plex Sans',sans-serif">${bars}</svg>`;
-}
-
+/* ---------------- dataset loading ---------------- */
 const DATASETS = {};
 async function loadDatasets() {
-  if (DATASETS.pnl) return DATASETS;
-  const [pnl, inv] = await Promise.all([
-    fetch("datasets/pnl_statement.csv").then(r => r.text()),
-    fetch("datasets/inventory_supply.csv").then(r => r.text()),
+  if (DATASETS.orders) return DATASETS;
+  const [orders, retail] = await Promise.all([
+    fetch("datasets/ecommerce_orders.csv").then(r => r.text()),
+    fetch("datasets/retail_sales_ledger.csv").then(r => r.text()),
   ]);
-  Object.assign(DATASETS, { pnl, inv });
+  Object.assign(DATASETS, { orders, retail });
   return DATASETS;
 }
-const PREAMBLE = ["import pandas as pd, io, math, json", "def _mk(txt): return pd.read_csv(io.StringIO(txt))"].join("\n");
+const PREAMBLE = "import pandas as pd, io, json";
 const exerciseState = {};
 
-function harnessFor(fnName, checks) {
+function renderChart(target, html) {
+  const el = document.getElementById(target);
+  if (!html) { if (el.tagName === "IFRAME") el.style.display = "none"; else el.innerHTML = ""; return; }
+  if (el.tagName === "IFRAME") { el.srcdoc = html; el.style.display = "block"; }
+  else { el.innerHTML = `<iframe style="width:100%;height:100%;border:0" srcdoc="${esc(html)}"></iframe>`; }
+}
+function qualityBadges(containerId, quality) {
+  const el = document.getElementById(containerId);
+  if (!el || !quality || !quality.length) { if (el) el.innerHTML = ""; return; }
+  let html = `<div class="qualityrow">Chart quality: `;
+  quality.forEach(q => { html += `<span class="qualitybadge ${q.ok ? "ok" : "warn"}">${q.ok ? "&check;" : "!"} ${esc(q.label)}</span>`; });
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+/* ---------------- harness builder ---------------- */
+function harnessFor(setupPy, checksArr) {
   return [
     PREAMBLE,
     "def harness(payload):",
-    "    code, pnl_txt, inv_txt = payload",
-    "    ns = {'pd': pd, 'math': math}",
-    "    try: exec(code, ns)",
-    "    except Exception as e: return {'ranOk': False, 'error': f'{type(e).__name__}: {e}'}",
-    `    fn = ns.get('${fnName}')`,
-    "    if fn is None:",
-    `        return {'ranOk': True, 'results': [{'name': '${fnName} is defined', 'pass': False, 'hint': 'Define a function named exactly ${fnName}.'}], 'chartData': None}`,
-    "    pnl = _mk(pnl_txt); inv = _mk(inv_txt)",
+    "    code, data = payload",
+    "    data = data.to_py() if hasattr(data, 'to_py') else data",
+    setupPy,
+    "    ns = {'pd': pd}",
+    "    ns.update(_extra_ns)",
+    "    try:",
+    "        exec(code, ns)",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': f'{type(e).__name__}: {e}'}",
     "    results = []",
-    "    chartData = None",
-    ...checks,
-    "    return {'ranOk': True, 'results': results, 'chartData': chartData}",
+    "    chartHtmls = {}",
+    "    quality = []",
+    "    extra = {}",
+    ...checksArr,
+    "    return {'ranOk': True, 'results': results, 'chartHtmls': chartHtmls, 'quality': quality, 'extra': extra}",
   ].join("\n");
 }
 
-async function runGraded(id, buildHarness, buttonId, sectionKey, onChart) {
-  const btn = document.getElementById(buttonId), resultsEl = document.getElementById(id + "Results"), chartEl = document.getElementById(id + "Chart");
+/* Shared setup for all ecommerce_orders exercises: same M4 cleaning
+   (dedupe, quantity>0), plus a set of hidden reference functions that
+   are RECOMPUTED LIVE from the dataframe on every grading run, never a
+   fixed expected value, so hardcoding a return value or a chart's
+   numbers cannot pass. */
+const ORDERS_SETUP = `    orders_txt = data['orders']
+    _od = pd.read_csv(io.StringIO(orders_txt))
+    _od = _od.drop_duplicates()
+    _od = _od[_od['quantity'] > 0].copy()
+    _od['line_total'] = _od['quantity'] * _od['unit_price']
+    def _parse_date(s):
+        for fmt in ('%d-%b-%Y', '%m/%d/%Y', '%Y-%m-%d'):
+            try:
+                return pd.to_datetime(s, format=fmt)
+            except Exception:
+                pass
+        return pd.NaT
+    _od['dt'] = _od['order_date'].apply(_parse_date)
+    def _completed(d):
+        return d[d['status'].isin(['payment', 'shipped'])]
+    def _ref_kpis(d):
+        dd = _completed(d)
+        total_revenue = round(float(dd['line_total'].sum()), 2)
+        total_orders = int(dd['order_id'].nunique())
+        aov = round(total_revenue / total_orders, 2) if total_orders else 0.0
+        return {'total_revenue': total_revenue, 'total_orders': total_orders, 'average_order_value': aov}
+    def _ref_by_category(d):
+        dd = _completed(d)
+        g = dd.groupby('product_category')['line_total'].sum().round(2)
+        return {k: float(v) for k, v in g.to_dict().items()}
+    def _ref_by_month(d):
+        dd = _completed(d).copy()
+        dd['month'] = dd['dt'].dt.strftime('%Y-%m')
+        g = dd.groupby('month')['line_total'].sum().round(2)
+        return {k: float(v) for k, v in g.to_dict().items()}
+    def _ref_by_month_category(d):
+        dd = _completed(d).copy()
+        dd['month'] = dd['dt'].dt.strftime('%Y-%m')
+        g = dd.groupby(['month', 'product_category'])['line_total'].sum().round(2)
+        return {f'{m}|{c}': float(v) for (m, c), v in g.to_dict().items()}
+    _extra_ns = {'df': _od}`;
+
+/* ---------------- Exercise A: store_kpis (the denominator trap) ---------------- */
+const EXA_CHECKS = [`    fn = ns.get('store_kpis')
+    if fn is None:
+        results.append({'name': 'store_kpis(df) is defined', 'pass': False, 'hint': 'Define a function named exactly store_kpis that takes df and returns a dict.'})
+    else:
+        try:
+            got = fn(_extra_ns['df'])
+            ref = _ref_kpis(_extra_ns['df'])
+            naive_revenue = round(float(_extra_ns['df']['line_total'].sum()), 2)
+            keys_ok = isinstance(got, dict) and all(k in got for k in ('total_revenue', 'total_orders', 'average_order_value'))
+            results.append({'name': 'Returns a dict with total_revenue, total_orders, average_order_value', 'pass': keys_ok, 'hint': f'Got {got!r}' if not keys_ok else ''})
+            if keys_ok:
+                hit_trap = abs(float(got['total_revenue']) - naive_revenue) < 1.0
+                rev_ok = abs(float(got['total_revenue']) - ref['total_revenue']) < 1.0
+                trap_hint = 'Your total matches summing every row regardless of status. cart_created and checkout_started rows never became a completed sale, exclude them.' if hit_trap else f"Expected about {ref['total_revenue']}, got {got['total_revenue']}."
+                results.append({'name': 'total_revenue counts only completed sales (status payment or shipped)', 'pass': rev_ok, 'hint': trap_hint if not rev_ok else ''})
+                orders_ok = int(got['total_orders']) == ref['total_orders']
+                results.append({'name': 'total_orders matches the number of completed orders', 'pass': orders_ok, 'hint': f"Expected {ref['total_orders']}, got {got['total_orders']}." if not orders_ok else ''})
+                aov_ok = abs(float(got['average_order_value']) - ref['average_order_value']) < 0.5
+                results.append({'name': 'average_order_value is completed revenue divided by completed order count', 'pass': aov_ok, 'hint': f"Expected about {ref['average_order_value']}, got {got['average_order_value']}." if not aov_ok else ''})
+                allok = rev_ok and orders_ok and aov_ok
+                if allok:
+                    half = _extra_ns['df'].head(len(_extra_ns['df']) // 2)
+                    ref2 = _ref_kpis(half)
+                    try:
+                        got2 = fn(half)
+                        matches_ref2 = abs(float(got2.get('total_revenue', -999999)) - ref2['total_revenue']) < 1.0
+                        not_hardcoded = matches_ref2 and float(got2.get('total_revenue', -1)) != float(got['total_revenue'])
+                    except Exception:
+                        not_hardcoded = False
+                    results.append({'name': 'Not hardcoded: recalculates correctly on a different slice of the data', 'pass': not_hardcoded, 'hint': 'Your numbers did not change correctly on a smaller slice of the data. That usually means a hardcoded return value.' if not not_hardcoded else ''})
+                    if not_hardcoded:
+                        extra['kpis'] = got
+                        quality.append({'ok': True, 'label': 'uses the status column correctly'})
+        except Exception as e:
+            results.append({'name': 'store_kpis runs without error', 'pass': False, 'hint': f'{type(e).__name__}: {e}'})
+`];
+const EXA = () => harnessFor(ORDERS_SETUP, EXA_CHECKS);
+
+/* ---------------- Exercise B: revenue by category (comparison + trap) ---------------- */
+const EXB_CHECKS = [`    fig = ns.get('fig')
+    if fig is None:
+        results.append({'name': 'fig is defined', 'pass': False, 'hint': 'Assign your chart to a variable named exactly fig.'})
+    else:
+        try:
+            trace = fig.data[0]
+            names = [str(v) for v in trace.x]
+            got = dict(zip(names, [float(v) for v in trace.y]))
+            ref = _ref_by_category(_extra_ns['df'])
+            keys_ok = set(got) == set(ref)
+            results.append({'name': 'Chart includes all 4 categories', 'pass': keys_ok, 'hint': f'Expected {sorted(ref)}, got {sorted(got)}.' if not keys_ok else ''})
+            vals_ok = keys_ok and all(abs(got[k] - v) < 1.0 for k, v in ref.items())
+            results.append({'name': 'Revenue values use completed orders only', 'pass': vals_ok, 'hint': 'Your bar heights do not match completed-order revenue by category. Filter by status before grouping.' if not vals_ok else ''})
+            top_ref = max(ref, key=ref.get)
+            top_got = max(got, key=got.get) if got else None
+            top_ok = top_got == top_ref
+            results.append({'name': f'Correctly identifies {top_ref} as the top category', 'pass': top_ok, 'hint': f'Your chart ranks {top_got} highest. Once you filter to completed sales only, {top_ref} actually leads, the all-status total is misleading here.' if not top_ok else ''})
+            type_ok = trace.type == 'bar'
+            results.append({'name': 'Uses a bar chart', 'pass': type_ok, 'hint': f'Expected a bar chart, got {trace.type}.' if not type_ok else ''})
+            allok = keys_ok and vals_ok and top_ok and type_ok
+            if allok:
+                half = _extra_ns['df'].head(len(_extra_ns['df']) // 2)
+                ref2 = _ref_by_category(half)
+                ns2 = {'pd': pd, 'df': half}
+                try:
+                    exec(code, ns2)
+                    fig2 = ns2.get('fig')
+                    got2 = dict(zip([str(v) for v in fig2.data[0].x], [float(v) for v in fig2.data[0].y]))
+                    matches_ref2 = set(got2) == set(ref2) and all(abs(got2.get(k, -999999) - v) < 1.0 for k, v in ref2.items())
+                    not_hardcoded = matches_ref2 and got2 != got
+                except Exception:
+                    not_hardcoded = False
+                results.append({'name': 'Not hardcoded: chart changes correctly on a different slice of the data', 'pass': not_hardcoded, 'hint': 'Your chart showed identical or incorrect numbers on a smaller slice of the data, that usually means hardcoded values.' if not not_hardcoded else ''})
+                if not_hardcoded:
+                    chartHtmls['exB'] = fig.to_html(include_plotlyjs='cdn', full_html=False)
+                    quality.append({'ok': bool(fig.layout.title and fig.layout.title.text), 'label': 'has a title'})
+                    quality.append({'ok': type_ok, 'label': 'uses a bar chart'})
+        except Exception as e:
+            results.append({'name': 'Chart data is readable', 'pass': False, 'hint': f'{type(e).__name__}: {e}'})
+`];
+const EXB = () => harnessFor(ORDERS_SETUP, EXB_CHECKS);
+
+/* ---------------- Exercise C: monthly trend, honest y-axis ---------------- */
+const EXC_CHECKS = [`    fig = ns.get('fig')
+    if fig is None:
+        results.append({'name': 'fig is defined', 'pass': False, 'hint': 'Assign your chart to a variable named exactly fig.'})
+    else:
+        try:
+            trace = fig.data[0]
+            got = dict(zip([str(v) for v in trace.x], [float(v) for v in trace.y]))
+            ref = _ref_by_month(_extra_ns['df'])
+            keys_ok = set(got) == set(ref)
+            results.append({'name': 'Chart includes all 3 months', 'pass': keys_ok, 'hint': f'Expected {sorted(ref)}, got {sorted(got)}.' if not keys_ok else ''})
+            vals_ok = keys_ok and all(abs(got[k] - v) < 1.0 for k, v in ref.items())
+            results.append({'name': 'Monthly revenue values use completed orders only', 'pass': vals_ok, 'hint': 'Values do not match completed-order revenue by month.' if not vals_ok else ''})
+            type_ok = trace.type == 'scatter' and trace.mode and 'lines' in trace.mode
+            results.append({'name': 'Uses a line chart', 'pass': type_ok, 'hint': f'Expected a line chart (px.line), got type={trace.type}.' if not type_ok else ''})
+            yr = fig.layout.yaxis.range
+            axis_ok = yr is None or (yr[0] is not None and yr[0] <= 0)
+            results.append({'name': 'Y-axis is not truncated to exaggerate the trend', 'pass': axis_ok, 'hint': f'Your y-axis range is {list(yr) if yr else yr}, which starts well above zero and exaggerates how dramatic the change looks. Do not call update_yaxes with a manually restricted range.' if not axis_ok else ''})
+            allok = keys_ok and vals_ok and type_ok and axis_ok
+            if allok:
+                half = _extra_ns['df'].head(len(_extra_ns['df']) // 2)
+                ref2 = _ref_by_month(half)
+                ns2 = {'pd': pd, 'df': half}
+                try:
+                    exec(code, ns2)
+                    fig2 = ns2.get('fig')
+                    got2 = dict(zip([str(v) for v in fig2.data[0].x], [float(v) for v in fig2.data[0].y]))
+                    matches_ref2 = set(got2) == set(ref2) and all(abs(got2.get(k, -999999) - v) < 1.0 for k, v in ref2.items())
+                    not_hardcoded = matches_ref2 and got2 != got
+                except Exception:
+                    not_hardcoded = False
+                results.append({'name': 'Not hardcoded: chart changes correctly on a different slice of the data', 'pass': not_hardcoded, 'hint': 'The chart did not recompute correctly on a smaller slice of the data.' if not not_hardcoded else ''})
+                if not_hardcoded:
+                    chartHtmls['exC'] = fig.to_html(include_plotlyjs='cdn', full_html=False)
+                    quality.append({'ok': bool(fig.layout.title and fig.layout.title.text), 'label': 'has a title'})
+                    quality.append({'ok': axis_ok, 'label': 'honest y-axis'})
+        except Exception as e:
+            results.append({'name': 'Chart data is readable', 'pass': False, 'hint': f'{type(e).__name__}: {e}'})
+`];
+const EXC = () => harnessFor(ORDERS_SETUP, EXC_CHECKS);
+
+/* ---------------- Exercise D: month x category, legend-filterable ---------------- */
+const EXD_CHECKS = [`    fig = ns.get('fig')
+    if fig is None:
+        results.append({'name': 'fig is defined', 'pass': False, 'hint': 'Assign your chart to a variable named exactly fig.'})
+    else:
+        try:
+            ref = _ref_by_month_category(_extra_ns['df'])
+            multi_trace = len(fig.data) >= 3
+            results.append({'name': 'Chart has one trace per category (needed for legend filtering)', 'pass': multi_trace, 'hint': f'Expected at least 3 separate traces (one per category via color=), got {len(fig.data)}. Use color=\\"product_category\\" (or your renamed column) in px.bar.' if not multi_trace else ''})
+            got = {}
+            if multi_trace:
+                for tr in fig.data:
+                    cat = str(tr.name)
+                    for x, y in zip(tr.x, tr.y):
+                        got[f'{x}|{cat}'] = float(y)
+            vals_ok = multi_trace and set(got) == set(ref) and all(abs(got[k] - v) < 1.0 for k, v in ref.items())
+            results.append({'name': 'Every month/category combination matches completed-order revenue', 'pass': vals_ok, 'hint': 'Values do not match completed-order revenue grouped by month and category.' if not vals_ok else ''})
+            type_ok = multi_trace and fig.data[0].type == 'bar'
+            results.append({'name': 'Uses a bar chart', 'pass': type_ok, 'hint': 'Expected a bar chart.' if not type_ok else ''})
+            allok = multi_trace and vals_ok and type_ok
+            if allok:
+                chartHtmls['exD'] = fig.to_html(include_plotlyjs='cdn', full_html=False)
+                quality.append({'ok': bool(fig.layout.title and fig.layout.title.text), 'label': 'has a title'})
+                quality.append({'ok': True, 'label': 'legend acts as a real filter'})
+        except Exception as e:
+            results.append({'name': 'Chart data is readable', 'pass': False, 'hint': f'{type(e).__name__}: {e}'})
+`];
+const EXD = () => harnessFor(ORDERS_SETUP, EXD_CHECKS);
+
+/* ---------------- 8.4 bad-chart demo (ungraded, real code, real render) ---------------- */
+async function runBad() {
+  const btn = document.getElementById("btnRunBad"), resultsEl = document.getElementById("badResults");
   btn.disabled = true;
-  resultsEl.innerHTML = `<div class="feedback wait">Loading data and starting Python&hellip; (first run downloads pandas, 20&ndash;60s)</div>`;
-  if (chartEl) chartEl.innerHTML = "";
+  resultsEl.innerHTML = `<div class="feedback wait">Running&hellip;</div>`;
+  let ds;
+  try { ds = await loadDatasets(); } catch (e) { resultsEl.innerHTML = `<div class="feedback bad">${esc(String(e))}</div>`; btn.disabled = false; return; }
+  const harness = harnessFor(ORDERS_SETUP, [
+    "    fig = ns.get('fig')",
+    "    if fig is not None:",
+    "        chartHtmls['bad'] = fig.to_html(include_plotlyjs='cdn', full_html=False)",
+    "        results.append({'name': 'ran', 'pass': True, 'hint': ''})",
+  ]);
+  const code = document.getElementById("badEditor").value;
+  const outcome = await PlotlySandboxRunner.run(harness, "harness", [code, ds], 15000, 90000);
+  btn.disabled = false;
+  if (!outcome.ok || !outcome.result.ranOk) { resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error || outcome.result.error)}</div>`; return; }
+  resultsEl.innerHTML = `<div class="feedback ok">Ran. Look closely at where the y-axis starts before you react to how steep that drop looks.</div>`;
+  renderChart("badChart", outcome.result.chartHtmls.bad);
+  document.getElementById("badCaption").textContent = "The underlying dip is real and worth investigating, about 17%. The axis choice made it look far larger than that.";
+}
+document.getElementById("btnRunBad").addEventListener("click", runBad);
+
+/* ---------------- shared graded-exercise runner ---------------- */
+const STARTERS = {
+  exA: document.getElementById("exAEditor").value,
+  exB: document.getElementById("exBEditor").value,
+  exC: document.getElementById("exCEditor").value,
+  exD: document.getElementById("exDEditor").value,
+  exF: document.getElementById("exFEditor").value,
+};
+const EXERCISES = {
+  exA: { build: EXA, chartMap: null },
+  exB: { build: EXB, chartMap: { exB: "exBChart" } },
+  exC: { build: EXC, chartMap: { exC: "exCChart" } },
+  exD: { build: EXD, chartMap: { exD: "exDChart" } },
+};
+
+function renderKpiCards(containerId, kpis) {
+  const el = document.getElementById(containerId);
+  if (!kpis) { el.innerHTML = ""; el.style.display = "none"; return; }
+  el.style.display = "grid";
+  el.innerHTML = `
+    <div class="kpicard"><div class="klabel">Total revenue (completed)</div><div class="kval">$${Number(kpis.total_revenue).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+    <div class="kpicard"><div class="klabel">Total orders (completed)</div><div class="kval">${Number(kpis.total_orders).toLocaleString("en-US")}</div></div>
+    <div class="kpicard"><div class="klabel">Average order value</div><div class="kval">$${Number(kpis.average_order_value).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+  `;
+}
+
+async function runGraded(id) {
+  const cfg = EXERCISES[id];
+  const btn = document.getElementById("btnRun" + id.charAt(0).toUpperCase() + id.slice(1));
+  const resultsEl = document.getElementById(id + "Results");
+  btn.disabled = true;
+  resultsEl.innerHTML = `<div class="feedback wait">Loading data and starting the chart sandbox&hellip; (first run installs plotly, 30&ndash;90s)</div>`;
+  if (cfg.chartMap) Object.keys(cfg.chartMap).forEach(k => renderChart(cfg.chartMap[k], null));
   let ds;
   try { ds = await loadDatasets(); }
   catch (e) { resultsEl.innerHTML = `<div class="feedback bad">Could not load datasets: ${esc(String(e))}</div>`; btn.disabled = false; return; }
   const code = document.getElementById(id + "Editor").value;
   let outcome;
-  try { outcome = await PySandboxRunner.run(buildHarness(), "harness", [code, ds.pnl, ds.inv], 20000, 90000); }
+  try { outcome = await PlotlySandboxRunner.run(cfg.build(), "harness", [code, ds], 15000, 90000); }
   finally { btn.disabled = false; }
   if (!outcome.ok) { resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error)}</div>`; return; }
   const data = outcome.result;
-  if (!data.ranOk) { resultsEl.innerHTML = `<div class="feedback bad">Your code didn't run: ${esc(data.error || "unknown")}</div>`; return; }
+  if (!data.ranOk) { resultsEl.innerHTML = `<div class="feedback bad">Your code did not run: ${esc(data.error || "unknown")}</div>`; return; }
   resultsEl.innerHTML = "";
   let passCount = 0;
   data.results.forEach(r => {
@@ -328,119 +738,187 @@ async function runGraded(id, buildHarness, buttonId, sectionKey, onChart) {
   summary.textContent = `${passCount} / ${data.results.length} tests passing`;
   resultsEl.appendChild(summary);
   const allPass = passCount === data.results.length;
-  if (allPass && data.chartData && chartEl && onChart) onChart(chartEl, data.chartData);
-  exerciseState[id] = { passCount, total: data.results.length };
-  CourseProgress.setExtra("module8_" + id, { passCount, total: data.results.length });
-  if (sectionKey) CourseProgress.setSection(MODULE_ID, sectionKey, { passCount, total: data.results.length });
+  if (allPass && cfg.chartMap) Object.keys(cfg.chartMap).forEach(k => renderChart(cfg.chartMap[k], data.chartHtmls ? data.chartHtmls[k] : null));
+  if (allPass && data.quality) qualityBadges(id + "Quality", data.quality);
+  if (id === "exA") renderKpiCards("exAKpiCards", allPass && data.extra ? data.extra.kpis : null);
+  exerciseState[id] = { passCount, total: data.results.length, extra: allPass ? data.extra : null, chartHtml: allPass && data.chartHtmls ? data.chartHtmls[id] : null };
+  CourseProgress.setExtra("module8_" + id, { passCount, total: data.results.length, extra: allPass ? data.extra : null });
+  updateDashboardAssembly();
   updateNextButton();
 }
+document.getElementById("btnRunExA").addEventListener("click", () => runGraded("exA"));
+document.getElementById("btnRunExB").addEventListener("click", () => runGraded("exB"));
+document.getElementById("btnRunExC").addEventListener("click", () => runGraded("exC"));
+document.getElementById("btnRunExD").addEventListener("click", () => runGraded("exD"));
 
-/* ---------------- Exercise 1: headline KPIs ---------------- */
-const EX1 = () => harnessFor("headline_kpis", [
-  "    try:",
-  "        out = fn(pnl.copy())",
-  "        exp = {'latest_quarter': '2026-Q4', 'latest_revenue': 239740.84, 'yoy_growth_pct': 6.35, 'latest_margin_pct': 29.7}",
-  "        got = out if isinstance(out, dict) else {}",
-  "        results.append({'name': 'latest_quarter is 2026-Q4', 'pass': got.get('latest_quarter')=='2026-Q4', 'hint': f\"Got {got.get('latest_quarter')!r}. Standardize all periods first, then take the max.\"})",
-  "        ok_rev = abs(float(got.get('latest_revenue',0))-exp['latest_revenue'])<0.05",
-  "        results.append({'name': 'latest_revenue is correct', 'pass': ok_rev, 'hint': f\"Got {got.get('latest_revenue')}, expected {exp['latest_revenue']}.\" if not ok_rev else ''})",
-  "        ok_yoy = abs(float(got.get('yoy_growth_pct',999))-exp['yoy_growth_pct'])<0.05",
-  "        results.append({'name': 'yoy_growth_pct is correct', 'pass': ok_yoy, 'hint': f\"Got {got.get('yoy_growth_pct')}, expected {exp['yoy_growth_pct']}. Compare 2026-Q4 to 2025-Q4.\" if not ok_yoy else ''})",
-  "        ok_margin = abs(float(got.get('latest_margin_pct',999))-exp['latest_margin_pct'])<0.05",
-  "        results.append({'name': 'latest_margin_pct is correct', 'pass': ok_margin, 'hint': f\"Got {got.get('latest_margin_pct')}, expected {exp['latest_margin_pct']}.\" if not ok_margin else ''})",
-  "        if got.get('latest_quarter')=='2026-Q4' and ok_rev and ok_yoy and ok_margin:",
-  "            chartData = exp",
-  "            try:",
-  "                mutated = pnl.copy(); mutated['revenue'] = mutated['revenue'] * 1.15",
-  "                out2 = fn(mutated)",
-  "                got2 = out2 if isinstance(out2, dict) else {}",
-  "                not_hardcoded = got2 != got",
-  "            except Exception:",
-  "                not_hardcoded = True",
-  "            results.append({'name': 'Not hardcoded: result changes when revenue is scaled', 'pass': not_hardcoded, 'hint': 'Your function returned the identical result after revenue was scaled up 15%. That almost always means the numbers are hardcoded instead of computed from df.'})",
-  "    except Exception as e: results.append({'name': 'headline_kpis runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
-]);
-function renderEx1Chart(el, data) {
-  el.innerHTML = `<div class="kpirow">
-    <div class="kpi"><div class="kv">${esc(data.latest_quarter)}</div><div class="kl">Latest quarter</div></div>
-    <div class="kpi"><div class="kv">$${data.latest_revenue.toLocaleString('en-US')}</div><div class="kl">Revenue</div></div>
-    <div class="kpi"><div class="kv">+${data.yoy_growth_pct}%</div><div class="kl">YoY growth</div></div>
-    <div class="kpi"><div class="kv">${data.latest_margin_pct}%</div><div class="kl">Net margin</div></div>
-  </div>`;
-}
-
-/* ---------------- Exercise 2: inventory unit trap ---------------- */
-const EX2 = () => harnessFor("reorder_risk", [
-  "    try:",
-  "        out = fn(inv.copy())",
-  "        exp = {'negative_stock_rows': 4, 'below_threshold_rows': 13, 'skus_with_mixed_units': 27}",
-  "        got = out if isinstance(out, dict) else {}",
-  "        allok = True",
-  "        for k in exp:",
-  "            ok = int(got.get(k, -1)) == exp[k]",
-  "            allok = allok and ok",
-  "            results.append({'name': f'{k} is correct', 'pass': ok, 'hint': f\"Got {got.get(k)!r}, expected {exp[k]}.\" if not ok else ''})",
-  "        if allok:",
-  "            try:",
-  "                half = inv.head(len(inv)//2).copy()",
-  "                out2 = fn(half)",
-  "                got2 = out2 if isinstance(out2, dict) else {}",
-  "                not_hardcoded = got2 != got",
-  "            except Exception:",
-  "                not_hardcoded = True",
-  "            results.append({'name': 'Not hardcoded: result changes on a different slice of the data', 'pass': not_hardcoded, 'hint': 'Your function returned the identical result on half the dataset as on the full dataset. That almost always means the numbers are hardcoded instead of computed from df.'})",
-  "    except Exception as e: results.append({'name': 'reorder_risk runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
-]);
-
-/* ---------------- Exercise 3: Q3 dip dollar impact ---------------- */
-const EX3 = () => harnessFor("q3_dip_cost", [
-  "    try:",
-  "        out = fn(pnl.copy())",
-  "        exp = {'gap_2024': 35363.2, 'gap_2025': 43605.55, 'gap_2026': 48231.08, 'total_gap': 127199.83}",
-  "        got = out if isinstance(out, dict) else {}",
-  "        allok = True",
-  "        for k in exp:",
-  "            ok = abs(float(got.get(k, 0)) - exp[k]) < 5",
-  "            allok = allok and ok",
-  "            results.append({'name': f'{k} is correct (within rounding)', 'pass': ok, 'hint': f\"Got {got.get(k)}, expected about {exp[k]}.\" if not ok else ''})",
-  "        if allok:",
-  "            chartData = {'gap_2024': exp['gap_2024'], 'gap_2025': exp['gap_2025'], 'gap_2026': exp['gap_2026']}",
-  "            try:",
-  "                mutated = pnl.copy(); mutated['revenue'] = mutated['revenue'] * 1.15",
-  "                out2 = fn(mutated)",
-  "                got2 = out2 if isinstance(out2, dict) else {}",
-  "                not_hardcoded = got2 != got",
-  "            except Exception:",
-  "                not_hardcoded = True",
-  "            results.append({'name': 'Not hardcoded: result changes when revenue is scaled', 'pass': not_hardcoded, 'hint': 'Your function returned the identical result after revenue was scaled up 15%. That almost always means the numbers are hardcoded instead of computed from df.'})",
-  "    except Exception as e: results.append({'name': 'q3_dip_cost runs', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
-]);
-function renderEx3Chart(el, data) {
-  const items = ["gap_2024","gap_2025","gap_2026"].map(k => ({ label: k.replace("gap_",""), value: data[k], color: "var(--bad)" }));
-  el.innerHTML = `<div class="chartbox"><div class="clbl">Estimated revenue gap vs. trend, by year</div>${barChart(items, { fmt: v => "$" + v.toLocaleString('en-US') })}</div>`;
-}
-
-const STARTERS = {
-  ex1: 'def headline_kpis(df):\n    # standardize periods to "YYYY-Q#", find the latest one\n    # yoy_growth_pct: vs the same quarter, prior year\n    # latest_margin_pct: net_income / revenue * 100, for the latest quarter\n    return {"latest_quarter": "", "latest_revenue": 0, "yoy_growth_pct": 0, "latest_margin_pct": 0}',
-  ex2: 'def reorder_risk(df):\n    # negative_stock_rows: stock_qty < 0 (data error)\n    # below_threshold_rows: 0 <= stock_qty < reorder_threshold (real reorder need)\n    # skus_with_mixed_units: SKUs whose unit isn\'t the same everywhere they appear\n    return {"negative_stock_rows": 0, "below_threshold_rows": 0, "skus_with_mixed_units": 0}',
-  ex3: 'def q3_dip_cost(df):\n    # standardize periods, then per year: counterfactual = avg(Q1,Q2,Q4), gap = counterfactual - actual Q3\n    return {"gap_2024": 0, "gap_2025": 0, "gap_2026": 0, "total_gap": 0}',
-};
-const HARNESSES = { ex1: EX1, ex2: EX2, ex3: EX3 };
-const CHART_RENDERERS = { ex1: renderEx1Chart, ex3: renderEx3Chart };
-const SECTION_KEYS = {};
-
-["ex1","ex2","ex3"].forEach(id => {
+["exA","exB","exC","exD"].forEach(id => {
   const cap = id.charAt(0).toUpperCase() + id.slice(1);
-  document.getElementById("btnRun" + cap).addEventListener("click", () => runGraded(id, HARNESSES[id], "btnRun" + cap, SECTION_KEYS[id] || null, CHART_RENDERERS[id]));
   document.getElementById("btnReset" + cap).addEventListener("click", () => {
     document.getElementById(id + "Editor").value = STARTERS[id];
     document.getElementById(id + "Results").innerHTML = "";
-    if (document.getElementById(id + "Chart")) document.getElementById(id + "Chart").innerHTML = "";
+    if (id === "exA") renderKpiCards("exAKpiCards", null);
+    else renderChart(id + "Chart", null);
   });
 });
 
-/* ---------------- 8.2 inline multiple choice ---------------- */
-function buildWarmup(id, opts, containerId) {
+/* ---------------- 8.6 dashboard assembly ---------------- */
+function updateDashboardAssembly() {
+  const ready = ["exA","exB","exC","exD"].every(id => exerciseState[id] && exerciseState[id].passCount === exerciseState[id].total);
+  document.getElementById("dashboardEmpty").style.display = ready ? "none" : "block";
+  document.getElementById("dashboardBody").style.display = ready ? "block" : "none";
+  if (!ready) return;
+  renderKpiCards("dashKpiCards", exerciseState.exA.extra ? exerciseState.exA.extra.kpis : null);
+  renderChart("dashChartB", exerciseState.exB.chartHtml);
+  renderChart("dashChartC", exerciseState.exC.chartHtml);
+  renderChart("dashChartD", exerciseState.exD.chartHtml);
+  if (!CourseProgress.getModule(MODULE_ID).sections || !CourseProgress.getModule(MODULE_ID).sections.dashboardBuildExercise) {
+    CourseProgress.setSection(MODULE_ID, "dashboardBuildExercise", { passCount: 1, total: 1 });
+  }
+}
+
+/* ---------------- 8.7 written interpretation ---------------- */
+function checkWrite() {
+  const what = document.getElementById("wWhat").value.trim();
+  const why = document.getElementById("wWhy").value.trim();
+  const rec = document.getElementById("wRec").value.trim();
+  const checks = [
+    { name: "What: mentions a category or a month/trend detail", pass: /electronics|apparel|beauty|home|june|may|april|dip|declin/i.test(what) && what.length > 20 },
+    { name: "Why: explains the risk of using the wrong denominator/status filter", pass: /status|complet|cart|checkout|abandon|inflat|overstat|wrong/i.test(why) && why.length > 20 },
+    { name: "Recommendation: distinct from the other two fields, and concrete", pass: rec.length > 20 && rec !== what && rec !== why },
+    { name: "All three fields are filled in", pass: what.length > 0 && why.length > 0 && rec.length > 0 },
+  ];
+  const resultsEl = document.getElementById("writeResults");
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  checks.forEach(c => {
+    if (c.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (c.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${c.pass ? "PASS" : "FAIL"}</b>, ${esc(c.name)}`;
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.className = "testsummary";
+  summary.style.color = passCount === checks.length ? "var(--good)" : "var(--mut)";
+  summary.textContent = `${passCount} / ${checks.length} checks passing`;
+  resultsEl.appendChild(summary);
+  const allPass = passCount === checks.length;
+  exerciseState.write = { passCount, total: checks.length };
+  CourseProgress.setExtra("module8_write", { what, why, rec, passCount, total: checks.length });
+  updateNextButton();
+}
+document.getElementById("btnCheckWrite").addEventListener("click", checkWrite);
+
+/* ---------------- 8.9 final challenge: auto-graded anchor ---------------- */
+const RETAIL_SETUP = `    retail_txt = data['retail']
+    _rd = pd.read_csv(io.StringIO(retail_txt))
+    def _ref_total(d):
+        return round(float(d['revenue'].sum()), 2)
+    _extra_ns = {'df': _rd}`;
+const EXF_CHECKS = [`    fn = ns.get('dashboard_kpis')
+    if fn is None:
+        results.append({'name': 'dashboard_kpis(df) is defined', 'pass': False, 'hint': 'Define a function named exactly dashboard_kpis that takes df and returns a dict.'})
+    else:
+        try:
+            got = fn(_extra_ns['df'])
+            ref = _ref_total(_extra_ns['df'])
+            key_ok = isinstance(got, dict) and 'total_revenue' in got
+            results.append({'name': 'Returns a dict containing total_revenue', 'pass': key_ok, 'hint': f'Got {got!r}' if not key_ok else ''})
+            if key_ok:
+                rev_ok = abs(float(got['total_revenue']) - ref) < 1.0
+                results.append({'name': 'total_revenue is correct', 'pass': rev_ok, 'hint': f'Expected about {ref}, got {got["total_revenue"]}.' if not rev_ok else ''})
+                if rev_ok:
+                    half = _extra_ns['df'].head(len(_extra_ns['df']) // 2)
+                    ref2 = _ref_total(half)
+                    try:
+                        got2 = fn(half)
+                        not_hardcoded = abs(float(got2.get('total_revenue', -999999)) - ref2) < 1.0 and float(got2.get('total_revenue', -1)) != float(got['total_revenue'])
+                    except Exception:
+                        not_hardcoded = False
+                    results.append({'name': 'Not hardcoded: recalculates correctly on a different slice of the data', 'pass': not_hardcoded, 'hint': 'Your total did not change correctly on a smaller slice of the data, that usually means a hardcoded return value like the exact full-dataset total.' if not not_hardcoded else ''})
+        except Exception as e:
+            results.append({'name': 'dashboard_kpis runs without error', 'pass': False, 'hint': f'{type(e).__name__}: {e}'})
+`];
+const EXF = () => harnessFor(RETAIL_SETUP, EXF_CHECKS);
+
+document.getElementById("btnRunExF").addEventListener("click", async () => {
+  const btn = document.getElementById("btnRunExF"), resultsEl = document.getElementById("exFResults");
+  btn.disabled = true;
+  resultsEl.innerHTML = `<div class="feedback wait">Loading data and starting the chart sandbox&hellip;</div>`;
+  let ds;
+  try { ds = await loadDatasets(); } catch (e) { resultsEl.innerHTML = `<div class="feedback bad">${esc(String(e))}</div>`; btn.disabled = false; return; }
+  const code = document.getElementById("exFEditor").value;
+  let outcome;
+  try { outcome = await PlotlySandboxRunner.run(EXF(), "harness", [code, ds], 15000, 90000); }
+  finally { btn.disabled = false; }
+  if (!outcome.ok) { resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error)}</div>`; return; }
+  const data = outcome.result;
+  if (!data.ranOk) { resultsEl.innerHTML = `<div class="feedback bad">Your code did not run: ${esc(data.error || "unknown")}</div>`; return; }
+  resultsEl.innerHTML = "";
+  let passCount = 0;
+  data.results.forEach(r => {
+    if (r.pass) passCount++;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${esc(r.name)}` + (r.pass ? "" : `<br>${esc(r.hint || "")}`);
+    resultsEl.appendChild(row);
+  });
+  const summary = document.createElement("div");
+  summary.className = "testsummary";
+  summary.style.color = passCount === data.results.length ? "var(--good)" : "var(--mut)";
+  summary.textContent = `${passCount} / ${data.results.length} tests passing`;
+  resultsEl.appendChild(summary);
+  exerciseState.exF = { passCount, total: data.results.length };
+  CourseProgress.setExtra("module8_exF", { passCount, total: data.results.length });
+  updateNextButton();
+});
+document.getElementById("btnResetExF").addEventListener("click", () => {
+  document.getElementById("exFEditor").value = STARTERS.exF;
+  document.getElementById("exFResults").innerHTML = "";
+});
+
+/* ---------------- 8.9 self-assessed checklist ---------------- */
+const FINAL_CHECKLIST_ITEMS = [
+  "At least 3 meaningful KPIs, each with a clear definition (not just a number)",
+  "At least 3 interactive Plotly charts, each answering a specific question",
+  "At least 1 real comparison or filter (region vs. region, product line vs. product line, or a legend filter)",
+  "Every calculation is correct against the actual data, not estimated or eyeballed",
+  "Every chart has a clear, honest title",
+  "No misleading visualization (truncated axis, wrong chart type, or wrong denominator)",
+  "A written interpretation of what the dashboard shows",
+  "A specific business recommendation, not a restatement of the data",
+];
+function buildFinalChecklist() {
+  const el = document.getElementById("finalChecklist");
+  const saved = CourseProgress.getExtra("module8_checklist") || {};
+  FINAL_CHECKLIST_ITEMS.forEach((text, i) => {
+    const row = document.createElement("label");
+    row.className = "checkrow";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = !!saved[i];
+    cb.addEventListener("change", saveFinalChecklist);
+    row.appendChild(cb);
+    const span = document.createElement("span");
+    span.textContent = text;
+    row.appendChild(span);
+    el.appendChild(row);
+  });
+  saveFinalChecklist();
+}
+function saveFinalChecklist() {
+  const boxes = document.querySelectorAll("#finalChecklist input[type=checkbox]");
+  const state = {};
+  let checked = 0;
+  boxes.forEach((b, i) => { state[i] = b.checked; if (b.checked) checked++; });
+  CourseProgress.setExtra("module8_checklist", state);
+  document.getElementById("finalChecklistScore").textContent = `${checked} / ${boxes.length} self-assessed items checked`;
+  document.getElementById("finalChecklistScore").style.color = checked === boxes.length ? "var(--good)" : "var(--mut)";
+}
+buildFinalChecklist();
+
+/* ---------------- 8.1 warm-up matching quiz (ungraded) ---------------- */
+function buildWarmup(opts, containerId) {
   const el = document.getElementById(containerId);
   let done = false;
   opts.forEach((opt, i) => {
@@ -454,85 +932,35 @@ function buildWarmup(id, opts, containerId) {
         if (opts[j].correct) e.classList.add("correct");
         else if (j === i) e.classList.add("incorrect");
       });
-      const ex = document.getElementById(id + "explain");
-      ex.style.display = "block";
-      ex.textContent = opt.correct ? opt.correctText : ("Not quite. " + opt.reason);
     });
     el.appendChild(div);
   });
 }
-buildWarmup("w1", [
-  { text: "Is the unit the same for every row being summed? Mixed units (e.g. case vs each) make a summed total meaningless", correct: true, correctText: "Correct. A single-number tile hides this completely, the number could be off by an order of magnitude and look perfectly normal." },
-  { text: "Is 4,812 a round enough number to be believable?", correct: false, reason: "How round a number looks has nothing to do with whether it's correct." },
-  { text: "Was the dashboard built recently?", correct: false, reason: "Recency doesn't catch a unit-mixing bug, the same wrong calculation produces a wrong number regardless of when it ran." },
+buildWarmup([
+  { text: "Total revenue from completed orders over a defined period", correct: true },
+  { text: "Number of website visitors", correct: false },
+  { text: "Number of product categories", correct: false },
 ], "w1opts");
-
-/* ---------------- 8.4 critique questions ---------------- */
-buildWarmup("c1", [
-  { text: "Missing everything except methodology, no data, finding, impact, recommendation, or action, this belongs in an appendix, not the opening", correct: true, correctText: "Correct. This is the single most common failure mode: leading with how the analysis was done instead of what it found." },
-  { text: "This is a strong opening, it establishes credibility first", correct: false, reason: "It establishes nothing a stakeholder needs, and delays the actual finding, credibility comes from being right, not from narrating the method." },
-], "c1opts");
-buildWarmup("c2", [
-  { text: "Has a finding but no data (no number), no impact, no recommendation, and no action, it's a start but not business-ready", correct: true, correctText: "Correct. \"Down\" and \"happened before\" are directionally useful but give no magnitude and no next step." },
-  { text: "This is complete, it states the finding clearly", correct: false, reason: "Stating a finding without a number, an impact, or a recommendation leaves the reader with nothing to act on." },
-], "c2opts");
-buildWarmup("c3", [
-  { text: "This is business-ready: data ($127K), finding (every year, 3 years), impact (lost revenue), and a recommendation, all in one or two sentences", correct: true, correctText: "Correct. This is the target shape, note what's still missing: a specific ACTION (who does what, by when) would make it even stronger." },
-  { text: "This is too short to be useful, it needs more supporting detail before the recommendation", correct: false, reason: "Length isn't the goal, a stakeholder can ask for supporting detail once the headline lands, front-loading it just delays the ask." },
-], "c3opts");
-
-/* ---------------- 8.5 required written exercise ---------------- */
-function checkWrite() {
-  const vals = {
-    data: document.getElementById("wData").value.trim(),
-    finding: document.getElementById("wFinding").value.trim(),
-    impact: document.getElementById("wImpact").value.trim(),
-    recommendation: document.getElementById("wRecommendation").value.trim(),
-    action: document.getElementById("wAction").value.trim(),
-  };
-  const checks = [];
-  const hasNumber = /\d/.test(vals.data);
-  checks.push({ name: "Data section includes an actual number", pass: hasNumber, hint: "Reference a specific figure, e.g. the total gap you computed in exercise 3." });
-  const findingWords = /(q3|quarter)/i.test(vals.finding) && /(recurr|every year|pattern|again|repeat|three years|3 years)/i.test(vals.finding);
-  checks.push({ name: "Finding names the pattern (which quarter, how often)", pass: findingWords, hint: "Mention Q3 specifically, and that it recurs (e.g. \"every year\" or \"three years running\")." });
-  const impactWords = /\$|dollar|revenue|cost/i.test(vals.impact) && vals.impact.length > 10;
-  checks.push({ name: "Business impact is stated in a concrete unit", pass: impactWords, hint: "State the impact in dollars, not just \"significant\" or \"a lot\"." });
-  const recOk = vals.recommendation.length > 12 && vals.recommendation.toLowerCase() !== vals.finding.toLowerCase();
-  checks.push({ name: "Recommendation is present and distinct from the finding", pass: recOk, hint: "Say what should be done about it, not just what happened." });
-  const actionOk = vals.action.length > 8 && vals.action.toLowerCase() !== vals.recommendation.toLowerCase();
-  checks.push({ name: "Action is a concrete next step, distinct from the recommendation", pass: actionOk, hint: "Name a specific next step, ideally who does it or when, not a restatement of the recommendation." });
-  const orderOk = vals.data.length > 0 && vals.finding.length > 0 && vals.impact.length > 0 && vals.recommendation.length > 0 && vals.action.length > 0;
-  checks.push({ name: "All five fields are filled in", pass: orderOk, hint: "Every field needs real content, the structure only works complete." });
-
-  const resultsEl = document.getElementById("writeResults");
-  resultsEl.innerHTML = "";
-  let passCount = 0;
-  checks.forEach(c => {
-    if (c.pass) passCount++;
-    const row = document.createElement("div");
-    row.className = "feedback " + (c.pass ? "ok" : "bad");
-    row.innerHTML = `<b>${c.pass ? "PASS" : "FAIL"}</b>, ${esc(c.name)}` + (c.pass ? "" : `<br>${esc(c.hint)}`);
-    resultsEl.appendChild(row);
-  });
-  const summary = document.createElement("div");
-  summary.className = "testsummary";
-  summary.style.color = passCount === checks.length ? "var(--good)" : "var(--mut)";
-  summary.textContent = `${passCount} / ${checks.length} checks passing`;
-  resultsEl.appendChild(summary);
-  const state = { passCount, total: checks.length };
-  exerciseState["write"] = state;
-  CourseProgress.setExtra("module8_write", { ...state, vals });
-  CourseProgress.setSection(MODULE_ID, "dashboardBuildExercise", state);
-  updateNextButton();
-}
-document.getElementById("btnCheckWrite").addEventListener("click", checkWrite);
+buildWarmup([
+  { text: "Average order value, this month vs. the same calculation last month", correct: true },
+  { text: "Total number of orders", correct: false },
+  { text: "Number of distinct customers", correct: false },
+], "w2opts");
+buildWarmup([
+  { text: "Revenue by product category, completed orders only", correct: true },
+  { text: "Number of SKUs per category", correct: false },
+  { text: "Average unit price per category", correct: false },
+], "w3opts");
 
 /* ---------------- Checkpoint quiz ---------------- */
 let score = 0;
 const answered = { q1:false,q2:false,q3:false,q4:false,q5:false };
 function allExercisesPassing(){
-  const ids = ["ex1","ex2","ex3","write"];
-  return ids.every(id => exerciseState[id] && exerciseState[id].passCount === exerciseState[id].total);
+  const ids = ["exA","exB","exC","exD"];
+  const exOk = ids.every(id => exerciseState[id] && exerciseState[id].passCount === exerciseState[id].total);
+  const writeOk = exerciseState.write && exerciseState.write.passCount === exerciseState.write.total;
+  const exFOk = exerciseState.exF && exerciseState.exF.passCount === exerciseState.exF.total;
+  return exOk && writeOk && exFOk;
 }
 function updateNextButton(){
   const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
@@ -568,29 +996,29 @@ function buildQ(id, opts, containerId){
   });
 }
 buildQ("q1", [
-  { text: "The recommendation or the headline finding, so a reader who stops after one sentence still gets the point", correct: true, correctText: "Correct. Methodology and supporting detail can follow, but the opening line is the one guaranteed read." },
-  { text: "The methodology, so the reader trusts the numbers before seeing them", correct: false, reason: "This is the most common mistake this module covers, it delays the one thing the reader actually needs." },
-  { text: "The raw data table, so the reader can verify everything themselves", correct: false, reason: "Almost no stakeholder wants to re-derive your analysis, they want the conclusion and enough context to trust it." },
+  { text: "What denominator and what row subset the calculation actually used, an inflated or wrong count of qualifying rows can produce a change that never happened", correct: true, correctText: "Correct." },
+  { text: "Whether the chart's colors look professional", correct: false, reason: "Visual polish says nothing about whether the underlying number is real." },
+  { text: "Nothing, a 40% figure from management can be trusted as reported", correct: false, reason: "Any KPI figure, including ones from management, is only as good as the calculation behind it." },
 ], "q1opts");
 buildQ("q2", [
-  { text: "Convert to a consistent unit first, or report totals separately per unit, never sum mixed units directly", correct: true, correctText: "Correct. A blended sum across incompatible units produces a number that looks valid and isn't." },
-  { text: "Nothing, SUM works the same regardless of units", correct: false, reason: "SUM has no concept of units at all, it adds the numbers regardless of what they represent, that's exactly the danger." },
-  { text: "Round the numbers first to reduce the error", correct: false, reason: "Rounding doesn't address a category error, cases and eaches aren't the same quantity no matter how they're rounded." },
+  { text: "It exaggerates the visual size of the change, making a real but modest dip look like a collapse", correct: true, correctText: "Correct." },
+  { text: "Nothing, the axis range doesn't affect what the data shows", correct: false, reason: "The underlying numbers don't change, but the reader's perception of their size does, and perception drives decisions." },
+  { text: "It makes the chart load faster", correct: false, reason: "Axis range has no effect on load performance." },
 ], "q2opts");
 buildQ("q3", [
-  { text: "Use a clearly stated, defensible estimation method (like a same-year average as a counterfactual), and label it as an estimate", correct: true, correctText: "Correct. An honest, disclosed estimate is far more useful to a stakeholder than no number at all, as long as the method is stated." },
-  { text: "Don't report a dollar figure at all, since it can't be proven exactly", correct: false, reason: "Refusing to estimate isn't more honest, it just leaves the stakeholder with less to act on. State the method and the estimate." },
-  { text: "Report the number without mentioning it's an estimate, so it reads as more authoritative", correct: false, reason: "Presenting an estimate as exact fact is the opposite of honest reporting, and it erodes trust once someone checks the method." },
+  { text: "A BI tool like Tableau or Power BI, built for scheduled refresh and non-technical stakeholder consumption at scale", correct: true, correctText: "Correct." },
+  { text: "A single Python script someone runs by hand each morning", correct: false, reason: "That doesn't scale to 40 stakeholders or survive someone forgetting to run it." },
+  { text: "Excel, emailed as an attachment daily", correct: false, reason: "Works briefly, breaks down fast at that scale and refresh cadence." },
 ], "q3opts");
 buildQ("q4", [
-  { text: "Attaching a concrete consequence, ideally in dollars or another unit a stakeholder already tracks", correct: true, correctText: "Correct. \"Revenue is down\" is a fact. \"Revenue is down, costing an estimated $127K\" is a reason to act." },
-  { text: "Adding more charts to the same finding", correct: false, reason: "More visuals restate the same fact, they don't translate it into a consequence the reader cares about." },
-  { text: "Making the finding sound more urgent with stronger language", correct: false, reason: "Tone isn't a substitute for a concrete, quantified consequence, and overstating urgency without one damages credibility." },
+  { text: "One trace per category, which means the legend becomes a real, working filter, click a name to toggle it", correct: true, correctText: "Correct." },
+  { text: "Faster chart rendering", correct: false, reason: "color= has nothing to do with render speed." },
+  { text: "Automatic outlier removal", correct: false, reason: "Plotly doesn't remove or adjust data based on color grouping." },
 ], "q4opts");
 buildQ("q5", [
-  { text: "No, a negative stock quantity is impossible in reality, it's a data error to flag and investigate, not inventory to reorder", correct: true, correctText: "Correct. Treating a negative value as a real signal (e.g. \"reorder urgently\") would act on broken data instead of fixing it." },
-  { text: "Yes, negative stock means the most urgent reorder need of all", correct: false, reason: "Negative physical stock isn't a real state, something upstream (a data entry or sync error) produced it, that's what needs attention." },
-  { text: "It depends on the warehouse", correct: false, reason: "The warehouse doesn't change the underlying fact, a negative quantity of physical stock isn't possible anywhere." },
+  { text: "Ask what business question the dashboard needs to answer, before opening any chart tool", correct: true, correctText: "Correct." },
+  { text: "Open Plotly and start building charts from whatever columns are available", correct: false, reason: "That produces a dashboard that might look complete while answering nothing anyone actually asked." },
+  { text: "Ask which colors the stakeholder prefers", correct: false, reason: "Visual preference is a real but much later concern, after the KPIs and questions are defined." },
 ], "q5opts");
 
 function maybeShowRetry(){
@@ -614,24 +1042,26 @@ document.getElementById("btnNext").addEventListener("click", () => { window.loca
       if (label) label.click();
     }
   });
-  ["ex1","ex2","ex3"].forEach((id) => {
+  ["exA","exB","exC","exD","exF"].forEach((id) => {
     const saved = CourseProgress.getExtra("module8_" + id);
     if (saved && saved.total > 0) {
       exerciseState[id] = saved;
       const resultsEl = document.getElementById(id + "Results");
       const passed = saved.passCount === saved.total;
-      resultsEl.innerHTML = `<div class="feedback ${passed ? "ok" : "bad"}">Restored from your last visit: ${passed ? "passing" : "not yet passing"}. Edit and re-run to update.</div>`;
+      resultsEl.innerHTML = `<div class="feedback ${passed ? "ok" : "bad"}">Restored from your last visit: ${passed ? "passing" : "not yet passing"}. Edit and re-run to rebuild the chart.</div>`;
+      if (id === "exA" && passed && saved.extra) renderKpiCards("exAKpiCards", saved.extra.kpis);
     }
   });
   const savedWrite = CourseProgress.getExtra("module8_write");
-  if (savedWrite && savedWrite.vals) {
-    exerciseState["write"] = { passCount: savedWrite.passCount, total: savedWrite.total };
-    document.getElementById("wData").value = savedWrite.vals.data || "";
-    document.getElementById("wFinding").value = savedWrite.vals.finding || "";
-    document.getElementById("wImpact").value = savedWrite.vals.impact || "";
-    document.getElementById("wRecommendation").value = savedWrite.vals.recommendation || "";
-    document.getElementById("wAction").value = savedWrite.vals.action || "";
+  if (savedWrite) {
+    document.getElementById("wWhat").value = savedWrite.what || "";
+    document.getElementById("wWhy").value = savedWrite.why || "";
+    document.getElementById("wRec").value = savedWrite.rec || "";
+    if (savedWrite.total > 0) {
+      exerciseState.write = { passCount: savedWrite.passCount, total: savedWrite.total };
+    }
   }
+  updateDashboardAssembly();
   updateNextButton();
 })();
 </script>
