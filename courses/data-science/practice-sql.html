@@ -87,22 +87,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; SQL &middot; Stage 1 of 6</span>
-    <h1 class="serif">SQL Fundamentals Practice</h1>
-    <p class="sub">Extra repetition beyond Module 6's core lesson, same real database, real anti-cheat, on-demand hints. Guided tasks first, then semi-guided (you get the business question and the data, not the technique), then one challenge task with no scaffolding at all.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is Stage 1 of a much larger planned SQL practice library (60 tasks across 6 stages: fundamentals, aggregation, joins, intermediate SQL, window functions, business challenges). These 10 fundamentals tasks are real, fully built, graded, and tested. The rest of the SQL library, and the Excel/Python/Tableau/Power BI/Automation libraries, are designed (see the architecture note on the Career Path audit) but not yet built, that's future work, not a claim made here.</div>
+    <span class="eyebrow">Practice Library &middot; SQL &middot; Stages 1-2 of 6</span>
+    <h1 class="serif">SQL Practice Library</h1>
+    <p class="sub">Extra repetition beyond Module 6's core lesson, same real database, real anti-cheat, on-demand hints. Each skill is tracked independently, aggregation mastery doesn't borrow credit from fundamentals mastery. Guided tasks first, then semi-guided (you get the business question and the data, not the technique), then a challenge task with no scaffolding at all.</p>
+    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-2 of a much larger planned SQL practice library (60 tasks across 6 stages: fundamentals, aggregation, joins, intermediate SQL, window functions, business challenges). These 20 tasks are real, fully built, graded, and tested. Joins, intermediate SQL, window functions, and business-challenge stages, plus the Excel/Python/Tableau/Power BI/Automation libraries, are designed but not yet built, that's future work, not a claim made here.</div>
   </header>
 
-  <div class="skillbar">
-    <div class="skillrow">
-      <span style="font-weight:700;font-size:14.5px">SQL Fundamentals</span>
-      <span class="tierpill" id="tierPill">Not started</span>
-      <div class="skillbarwrap"><div class="fill" id="skillFill" style="width:0%"></div></div>
-      <span class="mono" id="skillCount" style="font-size:12.5px;color:var(--mut2)">0 / 10 tasks</span>
-    </div>
-    <div class="tierladder" id="tierLadder"></div>
-    <div class="nextup" id="nextUp"></div>
-  </div>
+  <div id="skillBars"></div>
 
   <div class="tasklist" id="taskList"></div>
 
@@ -115,6 +106,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 <script>
 const esc = CourseProgress.escapeHtml;
 const SKILL_ID = "sql-fundamentals";
+const SKILL_ID_AGG = "sql-aggregation";
+const SKILLS = [
+  { id: SKILL_ID, label: "SQL Fundamentals" },
+  { id: SKILL_ID_AGG, label: "SQL Aggregation" },
+];
 
 /* ================= TASK_MAP ================= */
 /* Each task: id, skill, tool, level (guided|semiguided|challenge),
@@ -241,14 +237,141 @@ const TASKS = [
       "You need two conditions on the same table, joined together, not just one.",
       "channel IS NULL narrows it to unrecorded orders, then a second condition should narrow it to ones that didn't complete.",
       "WHERE channel IS NULL AND status != 'completed', sorted however you find most useful, order_date is a defensible choice." ] },
+
+  /* ---- Stage 2: Aggregation ---- */
+  { id: "sql-a01", skill: SKILL_ID_AGG, tool: "sql", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Count every row",
+    objective: "COUNT(*) counts rows, regardless of what's in them.",
+    prompt: "How many orders are in the database in total, of any status?",
+    starter: "SELECT * FROM orders",
+    referenceSql: "SELECT COUNT(*) FROM orders",
+    hints: [
+      "You want a single number: how many rows exist.",
+      "COUNT(*) counts every row in the result, nulls and all.",
+      "SELECT COUNT(*) FROM a table gives you its row count directly.",
+      "SELECT COUNT(*) FROM orders;" ] },
+
+  { id: "sql-a02", skill: SKILL_ID_AGG, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a01"],
+    title: "COUNT a column vs COUNT(*)",
+    objective: "COUNT(column) skips NULLs, COUNT(*) doesn't, and that difference matters.",
+    prompt: "How many orders actually have a <code>channel</code> recorded (not missing)?",
+    starter: "SELECT COUNT(*) FROM orders",
+    referenceSql: "SELECT COUNT(channel) FROM orders",
+    hints: [
+      "This is different from the last task, some orders have no channel recorded at all.",
+      "COUNT(*) would count those missing rows too, you don't want that here.",
+      "COUNT(column_name) only counts rows where that column isn't NULL.",
+      "SELECT COUNT(channel) FROM orders;" ] },
+
+  { id: "sql-a03", skill: SKILL_ID_AGG, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a01"],
+    title: "SUM a numeric column",
+    objective: "Add up a column across every matching row.",
+    prompt: "What's the total <code>quantity</code> of every line item ever ordered, across all of <code>order_items</code>?",
+    starter: "SELECT quantity FROM order_items",
+    referenceSql: "SELECT SUM(quantity) FROM order_items",
+    hints: [
+      "You want one total, not a list of individual quantities.",
+      "SUM adds up every value in a column across the matching rows.",
+      "SELECT SUM(column) FROM table, no GROUP BY needed when you want one grand total.",
+      "SELECT SUM(quantity) FROM order_items;" ] },
+
+  { id: "sql-a04", skill: SKILL_ID_AGG, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a03"],
+    title: "AVG across a table",
+    objective: "Compute a mean directly in SQL instead of pulling all the rows out first.",
+    prompt: "What's the average <code>unit_cost</code> across every row in <code>products</code>, rounded to 2 decimal places?",
+    starter: "SELECT unit_cost FROM products",
+    referenceSql: "SELECT ROUND(AVG(unit_cost), 2) FROM products",
+    hints: [
+      "You want a single average value, not every product's cost.",
+      "AVG works like SUM, but divides by the row count for you.",
+      "Wrap it in ROUND(..., 2) to get exactly 2 decimal places.",
+      "SELECT ROUND(AVG(unit_cost), 2) FROM products;" ] },
+
+  { id: "sql-a05", skill: SKILL_ID_AGG, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a04"],
+    title: "MIN and MAX together",
+    objective: "Pull two different aggregates in the same query.",
+    prompt: "Return the cheapest and most expensive <code>unit_cost</code> in <code>products</code>, as two columns in one row: <code>MIN(unit_cost)</code> and <code>MAX(unit_cost)</code>.",
+    starter: "SELECT unit_cost FROM products",
+    referenceSql: "SELECT MIN(unit_cost), MAX(unit_cost) FROM products",
+    hints: [
+      "You can compute more than one aggregate in the same SELECT.",
+      "MIN finds the smallest value, MAX the largest, same table, same column.",
+      "Separate them with a comma in the SELECT list, just like selecting two normal columns.",
+      "SELECT MIN(unit_cost), MAX(unit_cost) FROM products;" ] },
+
+  { id: "sql-a06", skill: SKILL_ID_AGG, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-a02"],
+    title: "GROUP BY a status column",
+    objective: "Break a total down by category instead of computing one grand number.",
+    prompt: "Ops wants a breakdown, not a single total: how many orders exist per <code>status</code> value? Return <code>status</code> and the count.",
+    starter: "SELECT status FROM orders",
+    referenceSql: "SELECT status, COUNT(*) FROM orders GROUP BY status",
+    hints: [
+      "\"Per status\" means one row of output per distinct status value, not one grand total.",
+      "GROUP BY splits the table into buckets before the aggregate runs, one bucket per distinct value.",
+      "SELECT status, COUNT(*) FROM orders GROUP BY status, the column you group by usually belongs in the SELECT list too.",
+      "SELECT status, COUNT(*) FROM orders GROUP BY status;" ] },
+
+  { id: "sql-a07", skill: SKILL_ID_AGG, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-a06"],
+    title: "Aggregate after a join",
+    objective: "Combine a join with GROUP BY to answer a question that spans two tables.",
+    prompt: "Merchandising wants total units sold per product <code>category</code>. That number doesn't exist directly, <code>order_items</code> has quantity, <code>products</code> has category. Return <code>category</code> and the summed <code>quantity</code>.",
+    starter: "SELECT oi.quantity FROM order_items oi",
+    referenceSql: "SELECT p.category, SUM(oi.quantity) FROM order_items oi JOIN products p ON oi.sku = p.sku GROUP BY p.category",
+    hints: [
+      "The two pieces of information you need live in two different tables, join them first.",
+      "Join order_items to products on the shared sku column, then group by category.",
+      "JOIN products p ON oi.sku = p.sku, then GROUP BY p.category, SUM(oi.quantity).",
+      "SELECT p.category, SUM(oi.quantity) FROM order_items oi JOIN products p ON oi.sku = p.sku GROUP BY p.category;" ] },
+
+  { id: "sql-a08", skill: SKILL_ID_AGG, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-a07"],
+    title: "Filter groups with HAVING",
+    objective: "Filter on an aggregate result, which WHERE can't do.",
+    prompt: "From the category totals in the last task, keep only categories that sold more than 55 total units. Return <code>category</code> and the summed <code>quantity</code>.",
+    starter: "SELECT p.category, SUM(oi.quantity) FROM order_items oi JOIN products p ON oi.sku = p.sku GROUP BY p.category",
+    referenceSql: "SELECT p.category, SUM(oi.quantity) FROM order_items oi JOIN products p ON oi.sku = p.sku GROUP BY p.category HAVING SUM(oi.quantity) > 55",
+    hints: [
+      "WHERE can't filter on SUM(quantity), that total doesn't exist yet when WHERE runs.",
+      "A different keyword filters groups after the aggregate is computed.",
+      "HAVING goes after GROUP BY: GROUP BY p.category HAVING SUM(oi.quantity) > 55.",
+      "SELECT p.category, SUM(oi.quantity) FROM order_items oi JOIN products p ON oi.sku = p.sku GROUP BY p.category HAVING SUM(oi.quantity) > 55;" ] },
+
+  { id: "sql-a09", skill: SKILL_ID_AGG, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-a06"],
+    title: "Conditional aggregation",
+    objective: "Compute several conditional counts in a single row, instead of three separate queries.",
+    prompt: "Leadership wants completed, cancelled, and refunded order counts side by side in one row, not three separate results. Return three columns: <code>completed</code>, <code>cancelled</code>, <code>refunded</code>, each a count of orders with that status.",
+    starter: "SELECT status FROM orders",
+    referenceSql: "SELECT SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed, SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled, SUM(CASE WHEN status = 'refunded' THEN 1 ELSE 0 END) AS refunded FROM orders",
+    hints: [
+      "You've already met a tool for turning a condition into a value per row, from Module 6.",
+      "CASE WHEN status = 'completed' THEN 1 ELSE 0 END gives you a 1/0 per row, sum it to count.",
+      "Write one CASE-based SUM per status, as three separate aliased columns in the same SELECT.",
+      "SELECT SUM(CASE WHEN status='completed' THEN 1 ELSE 0 END) AS completed, SUM(CASE WHEN status='cancelled' THEN 1 ELSE 0 END) AS cancelled, SUM(CASE WHEN status='refunded' THEN 1 ELSE 0 END) AS refunded FROM orders;" ] },
+
+  { id: "sql-a10", skill: SKILL_ID_AGG, tool: "sql", level: "challenge", difficulty: "challenge", prerequisite: ["sql-a08", "sql-a09"],
+    title: "Compute a real business KPI",
+    objective: "Combine a join, a filter, and two aggregates into one defensible metric, deciding the approach yourself.",
+    prompt: "Finance wants <b>average order value</b> for completed orders only, real revenue per completed order, not per line item. Decide what \"average order value\" should actually mean here (hint: an order can have several line items) and write one query that returns a single number, rounded to 2 decimals. No further instructions.",
+    starter: "-- decide the approach yourself\n",
+    referenceSql: "SELECT ROUND(SUM(oi.quantity * oi.unit_price) * 1.0 / COUNT(DISTINCT o.order_id), 2) FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = 'completed'",
+    hints: [
+      "Revenue lives in order_items (quantity times unit_price), but \"completed\" lives in orders, you need both.",
+      "The denominator matters: it should be the number of distinct orders, not the number of line-item rows, an order with 3 items shouldn't count 3 times.",
+      "COUNT(DISTINCT o.order_id) guards against the fan-out trap from Module 6, total revenue divided by that.",
+      "SELECT ROUND(SUM(oi.quantity*oi.unit_price)*1.0/COUNT(DISTINCT o.order_id), 2) FROM orders o JOIN order_items oi ON o.order_id=oi.order_id WHERE o.status='completed';" ] },
 ];
 
 /* ================= sql.js database (same shop.sql as Module 6) ================= */
 let dbPromise = null;
+let mutatedDbPromise = null;
+let sqlModulePromise = null;
+function getSqlModule() {
+  if (!sqlModulePromise) sqlModulePromise = initSqlJs({ locateFile: f => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/" + f });
+  return sqlModulePromise;
+}
 function getDb() {
   if (!dbPromise) {
     dbPromise = (async () => {
-      const SQL = await initSqlJs({ locateFile: f => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/" + f });
+      const SQL = await getSqlModule();
       const sqlText = await (await fetch("datasets/shop.sql")).text();
       const db = new SQL.Database();
       db.run(sqlText);
@@ -256,6 +379,26 @@ function getDb() {
     })();
   }
   return dbPromise;
+}
+/* A second, independently-mutated copy of the same database (one real
+   order and its line items removed). Used as a live anti-cheat check:
+   a student query is re-run here alongside a freshly-recomputed
+   reference query, both against data neither has seen the "expected"
+   output for. A hardcoded literal answer (e.g. a UNION of the values
+   that happen to match the unmutated database) cannot adapt and will
+   fail this second comparison, even though it might pass the first. */
+function getMutatedDb() {
+  if (!mutatedDbPromise) {
+    mutatedDbPromise = (async () => {
+      const SQL = await getSqlModule();
+      const sqlText = await (await fetch("datasets/shop.sql")).text();
+      const db = new SQL.Database();
+      db.run(sqlText);
+      db.run("DELETE FROM order_items WHERE order_id = 1002; DELETE FROM orders WHERE order_id = 1002;");
+      return db;
+    })();
+  }
+  return mutatedDbPromise;
 }
 function execToRows(db, query) {
   const res = db.exec(query);
@@ -283,21 +426,36 @@ function tierLabel(tier) {
   return { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" }[tier];
 }
 function renderSkillBar() {
-  const prog = PracticeProgress.skillProgress(TASKS, SKILL_ID);
-  const pill = document.getElementById("tierPill");
-  pill.textContent = tierLabel(prog.tier);
-  pill.className = "tierpill t-" + prog.tier;
-  document.getElementById("skillFill").style.width = prog.pct + "%";
-  document.getElementById("skillCount").textContent = `${prog.passedCount} / ${prog.totalCount} tasks`;
-  const ladder = document.getElementById("tierLadder");
   const order = ["not-started", "introduced", "practicing", "competent", "mastered"];
-  const reachedIdx = order.indexOf(prog.tier);
-  ladder.innerHTML = order.slice(1).map((t, i) => `<span class="${i + 1 <= reachedIdx ? "reached" : ""}">${tierLabel(t)}</span>`).join("");
+  const wrap = document.getElementById("skillBars");
+  wrap.innerHTML = SKILLS.map(s => {
+    const prog = PracticeProgress.skillProgress(TASKS, s.id);
+    const reachedIdx = order.indexOf(prog.tier);
+    const ladder = order.slice(1).map((t, i) => `<span class="${i + 1 <= reachedIdx ? "reached" : ""}">${tierLabel(t)}</span>`).join("");
+    return `<div class="skillbar">
+      <div class="skillrow">
+        <span style="font-weight:700;font-size:14.5px">${esc(s.label)}</span>
+        <span class="tierpill t-${prog.tier}">${tierLabel(prog.tier)}</span>
+        <div class="skillbarwrap"><div class="fill" style="width:${prog.pct}%"></div></div>
+        <span class="mono" style="font-size:12.5px;color:var(--mut2)">${prog.passedCount} / ${prog.totalCount} tasks</span>
+      </div>
+      <div class="tierladder">${ladder}</div>
+    </div>`;
+  }).join("");
   const next = PracticeProgress.recommendNext(TASKS);
   const nextEl = document.getElementById("nextUp");
-  nextEl.innerHTML = next
-    ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), task ${TASKS.indexOf(next) + 1} of ${TASKS.length}.`
-    : `<b>What should I do next?</b> All 10 fundamentals tasks passed. Module 6's Aggregation and JOINs sections are the natural next step, the Aggregation/JOINs/Intermediate/Window-function/Business-challenge stages of this practice library aren't built yet.`;
+  if (!document.getElementById("nextUpBlock")) {
+    const block = document.createElement("div");
+    block.className = "skillbar";
+    block.id = "nextUpBlock";
+    block.innerHTML = `<div class="nextup" id="nextUp"></div>`;
+    wrap.after(block);
+  }
+  const target = document.getElementById("nextUp");
+  const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
+  target.innerHTML = next
+    ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
+    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. Module 6's Joins section is the natural next step in the core curriculum, the Joins/Intermediate/Window-function/Business-challenge stages of this practice library aren't built yet.`;
 }
 
 function buildHintsHtml(hints) {
@@ -386,13 +544,33 @@ function renderTasks() {
         return;
       }
       const refResult = execToRows(db, task.referenceSql);
-      const pass = rowsEqual(studentResult.rows, refResult.rows) && studentResult.columns.length === refResult.columns.length;
+      const primaryPass = rowsEqual(studentResult.rows, refResult.rows) && studentResult.columns.length === refResult.columns.length;
+
+      let pass = false, mutationNote = "";
+      if (primaryPass) {
+        // Anti-cheat second pass: re-run both queries against an independently
+        // mutated copy of the database (one order removed). A hardcoded or
+        // memorized answer cannot adapt to data it never saw.
+        try {
+          const mutDb = await getMutatedDb();
+          const mutStudent = execToRows(mutDb, studentSql);
+          const mutRef = execToRows(mutDb, task.referenceSql);
+          const mutationPass = rowsEqual(mutStudent.rows, mutRef.rows) && mutStudent.columns.length === mutRef.columns.length;
+          pass = mutationPass;
+          if (!mutationPass) mutationNote = " Your query matched on the original database but not on a second, independently modified copy, that usually means a hardcoded or memorized result rather than a real computation.";
+        } catch (e) {
+          pass = false;
+          mutationNote = ` Your query matched the original database but raised an error on a modified copy: ${esc(e.message)}.`;
+        }
+      }
       renderResultTable(resultsEl, studentResult.columns, studentResult.rows, 15);
       const verdict = document.createElement("div");
       verdict.className = "feedback " + (pass ? "ok" : "bad");
       verdict.innerHTML = pass
-        ? "<b>Correct.</b> Checked against a live reference query on the same database, not a fixed number, so this can't be hardcoded."
-        : `<b>Not quite.</b> Your query ran, but the results don't match. Row count: yours ${studentResult.rows.length}, expected ${refResult.rows.length}.`;
+        ? "<b>Correct.</b> Checked against a live reference query on the original database, then re-checked against an independently modified copy, not a fixed number, so this can't be hardcoded."
+        : primaryPass
+          ? `<b>Not quite.</b>${mutationNote}`
+          : `<b>Not quite.</b> Your query ran, but the results don't match. Row count: yours ${studentResult.rows.length}, expected ${refResult.rows.length}.`;
       resultsEl.appendChild(verdict);
       PracticeProgress.recordAttempt(id, pass);
       if (pass) openTasks.add(id);
