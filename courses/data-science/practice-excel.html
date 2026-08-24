@@ -101,10 +101,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Excel &middot; Stages 1-2 of &hellip;</span>
+    <span class="eyebrow">Practice Library &middot; Excel &middot; Stages 1-3 of &hellip;</span>
     <h1 class="serif">Excel Practice Library</h1>
     <p class="sub">Extra repetition beyond Module 1's core lesson, a real formula engine parsing and evaluating exactly what you type, not a multiple-choice guess. Every task is checked by evaluating your formula against a live spreadsheet, then against an independently modified copy, so a memorized number can't pass.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-2 (fundamentals: SUM, AVERAGE, COUNT, COUNTIF, IF, plus lookups and multi-condition logic: XLOOKUP, VLOOKUP, COUNTIFS, SUMIFS, AVERAGEIFS, AND/OR), 20 tasks, real, fully built, graded, and tested. Further stages are planned but not yet built, that's future work, not a claim made here.</div>
+    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-3 (fundamentals, lookups and multi-condition logic, plus text functions and error handling: LEFT/RIGHT/MID, UPPER/LOWER/TRIM, TEXT, INDEX/MATCH, IFERROR), 30 tasks, real, fully built, graded, and tested. Further stages are planned but not yet built, that's future work, not a claim made here.</div>
   </header>
 
   <div class="sheetblock">
@@ -353,7 +353,27 @@ function evaluateNode(node, workbook, currentSheet) {
         case "<=": return a <= b;
       }
     }
-    case "call": return evalFunction(node.name, node.args, workbook, currentSheet);
+    case "call": {
+      // IF and IFERROR need LAZY argument evaluation, not the eager
+      // evalFunction() path every other function uses. Both branches of
+      // IF being evaluated eagerly would mean IF(D2=0,"N/A",100/D2)
+      // divides by zero and throws even on the branch that was never
+      // meant to run, IFERROR specifically exists to catch an error
+      // from evaluating its own first argument, which is impossible if
+      // that argument was already evaluated (and already thrown) before
+      // IFERROR's own logic ever runs.
+      if (node.name === "IF") {
+        if (node.args.length !== 3) throw new Error("IF takes 3 arguments");
+        const cond = evaluateNode(node.args[0], workbook, currentSheet);
+        return cond ? evaluateNode(node.args[1], workbook, currentSheet) : evaluateNode(node.args[2], workbook, currentSheet);
+      }
+      if (node.name === "IFERROR") {
+        if (node.args.length !== 2) throw new Error("IFERROR takes 2 arguments");
+        try { return evaluateNode(node.args[0], workbook, currentSheet); }
+        catch (e) { return evaluateNode(node.args[1], workbook, currentSheet); }
+      }
+      return evalFunction(node.name, node.args, workbook, currentSheet);
+    }
     default: throw new Error(`Cannot evaluate node type ${node.type}`);
   }
 }
@@ -416,9 +436,48 @@ function evalFunction(name, argNodes, workbook, currentSheet) {
       if (!matched.length) throw new Error("AVERAGEIFS of empty range");
       return matched.reduce((x, y) => x + y, 0) / matched.length;
     }
-    case "IF": { if (args.length !== 3) throw new Error("IF takes 3 arguments"); return args[0] ? args[1] : args[2]; }
     case "AND": { return args.every(a => !!a); }
     case "OR": { return args.some(a => !!a); }
+    case "LEN": { if (args.length !== 1) throw new Error("LEN takes 1 argument"); return String(args[0]).length; }
+    case "LEFT": { if (args.length !== 2) throw new Error("LEFT takes 2 arguments"); return String(args[0]).slice(0, toNumber(args[1])); }
+    case "RIGHT": { if (args.length !== 2) throw new Error("RIGHT takes 2 arguments"); const n = toNumber(args[1]); return n <= 0 ? "" : String(args[0]).slice(-n); }
+    case "MID": {
+      if (args.length !== 3) throw new Error("MID takes 3 arguments");
+      const s = String(args[0]), start = toNumber(args[1]), n = toNumber(args[2]);
+      return s.slice(start - 1, start - 1 + n);
+    }
+    case "UPPER": { if (args.length !== 1) throw new Error("UPPER takes 1 argument"); return String(args[0]).toUpperCase(); }
+    case "LOWER": { if (args.length !== 1) throw new Error("LOWER takes 1 argument"); return String(args[0]).toLowerCase(); }
+    case "TRIM": { if (args.length !== 1) throw new Error("TRIM takes 1 argument"); return String(args[0]).trim().replace(/\s+/g, " "); }
+    case "CONCATENATE": { return args.map(a => String(a)).join(""); }
+    case "TEXT": {
+      // Deliberately minimal: only the handful of format codes this
+      // stage's tasks actually use, not real Excel TEXT()'s full format
+      // language. Task prompts spell out exactly which codes are valid.
+      if (args.length !== 2) throw new Error("TEXT takes 2 arguments");
+      const v = toNumber(args[0]), fmt = String(args[1]);
+      if (fmt === "0.00") return v.toFixed(2);
+      if (fmt === "0.0%") return (v * 100).toFixed(1) + "%";
+      if (fmt === "0%") return Math.round(v * 100) + "%";
+      if (fmt === "$0.00") return "$" + v.toFixed(2);
+      throw new Error(`Unsupported TEXT format '${fmt}', this sheet only supports "0.00", "0.0%", "0%", "$0.00"`);
+    }
+    case "INDEX": {
+      if (args.length !== 2) throw new Error("INDEX takes 2 arguments");
+      const range = args[0];
+      if (!range || !range.__range) throw new Error("INDEX's first argument must be a range");
+      const n = toNumber(args[1]);
+      if (n < 1 || n > range.values.length) throw new Error("#REF!, INDEX position out of range");
+      return range.values[n - 1];
+    }
+    case "MATCH": {
+      if (args.length < 2) throw new Error("MATCH needs at least 2 arguments");
+      const target = args[0], range = args[1];
+      if (!range || !range.__range) throw new Error("MATCH's second argument must be a range");
+      const idx = range.values.findIndex(v => v === target);
+      if (idx === -1) throw new Error("#N/A, MATCH found no exact match");
+      return idx + 1;
+    }
     case "VLOOKUP": {
       if (args.length < 3) throw new Error("VLOOKUP needs at least 3 arguments");
       const key = args[0], table = args[1];
@@ -536,6 +595,21 @@ function mutatedWorkbook() {
   idxPool.slice(nReturned, nReturned + nCancelled).forEach(i => { rows[i][4] = "Cancelled"; });
   idxPool.slice(nReturned + nCancelled).forEach(i => { rows[i][4] = "Completed"; });
   rows.forEach(r => { if (Math.random() < 0.4) r[2] = REGIONS[Math.floor(Math.random() * REGIONS.length)]; });
+  // Category and order_date were both left untouched through Stage 1
+  // and 2 (no task needed them to vary), but Stage 3's single-cell
+  // text tasks (LEN(D3), LEFT(B2,4), a formatted label built from C3
+  // and D3) read those columns directly, if they never changed, a
+  // hardcoded literal answer would be exactly as invariant as the
+  // pre-fix row-count bug was. Reassign both on a real fraction of rows.
+  rows.forEach(r => { if (Math.random() < 0.85) r[3] = CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)]; });
+  rows.forEach(r => {
+    if (Math.random() < 0.85) {
+      const y = 2023 + Math.floor(Math.random() * 4);
+      const m = String(1 + Math.floor(Math.random() * 12)).padStart(2, "0");
+      const d = String(1 + Math.floor(Math.random() * 28)).padStart(2, "0");
+      r[1] = `${y}-${m}-${d}`;
+    }
+  });
   // Row COUNT itself never otherwise changes (only cell values do),
   // so a task whose answer is literally a row count (COUNTA of an ID
   // column) is structurally invariant across mutation, a hardcoded
@@ -584,9 +658,11 @@ function renderGrid() {
 /* ================= skills & tasks ================= */
 const SKILL_ID_FUND = "excel-fundamentals";
 const SKILL_ID_LOOKUP = "excel-lookups";
+const SKILL_ID_TEXT = "excel-text-lookup";
 const SKILLS = [
   { id: SKILL_ID_FUND, label: "Excel Fundamentals" },
   { id: SKILL_ID_LOOKUP, label: "Excel Lookups & Logic" },
+  { id: SKILL_ID_TEXT, label: "Excel Text & Error Handling" },
 ];
 
 const TASKS = [
@@ -854,6 +930,141 @@ const TASKS = [
       "SUMIFS(F2:F25,D2:D25,\"Electronics\",E2:E25,\"Completed\") is the qualifying revenue, XLOOKUP(\"Electronics\",Sheet2!A2:A5,Sheet2!B2:B5) is the rate, multiply them, then ROUND.",
       '=ROUND(SUMIFS(F2:F25,D2:D25,"Electronics",E2:E25,"Completed")*XLOOKUP("Electronics",Sheet2!A2:A5,Sheet2!B2:B5),2)' ],
     explanation: { why: "This is every technique from this stage in one formula, SUMIFS restricting to the right rows, XLOOKUP pulling in a rate from a separate table, and arithmetic combining the two into a single payout figure.", mistake: "Summing ALL Electronics orders regardless of status, not just completed ones, would pay commission on sales that were cancelled or refunded, money the business never actually kept.", tip: "Whenever a calculation touches money that gets paid out, commission, bonuses, refunds owed, the status filter isn't optional detail, it's usually the single most important condition in the whole formula.", business: "Paying commission on a cancelled or returned order rewards a salesperson for a transaction that didn't ultimately benefit the business, restricting to completed orders is what keeps the incentive aligned with real, kept revenue." } },
+
+  { id: "xl-t01", skill: SKILL_ID_TEXT, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-f01"],
+    title: "How many characters are in a category name",
+    objective: "Measure text length with LEN, the building block every other text function is checked against.",
+    prompt: "Return the number of characters in the category name in D3.",
+    starterFormula: "",
+    referenceFormula: "=LEN(D3)",
+    hints: [
+      "LEN takes a single piece of text and returns how many characters are in it, spaces included.",
+      "It takes exactly one argument, the text (or the cell holding it) to measure.",
+      "LEN(D3) reads whatever text is in D3 and returns its character count.",
+      "=LEN(D3)" ],
+    explanation: { why: "LEN counts every character in a text value, including spaces and punctuation, it's the simplest text function and the one most others get checked against, is a cleaned-up value actually shorter than the original.", mistake: "Assuming LEN works on numbers the way it works on text can be misleading, LEN(100) does return 3, but only because Excel converts the number to text first, it's not measuring the number's magnitude.", tip: "LEN is a small function on its own, but it's the standard way to sanity-check text cleanup, comparing LEN before and after a TRIM or a formula fix is a quick way to confirm something actually changed.", business: "A product catalog or category list with wildly inconsistent name lengths is often a sign of inconsistent data entry, LEN is frequently the very first check run when auditing a text column." } },
+
+  { id: "xl-t02", skill: SKILL_ID_TEXT, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-t01"],
+    title: "Pull the year out of an order date",
+    objective: "Use LEFT to grab a fixed number of characters from the start of a text value.",
+    prompt: "order_date is stored as text in the format \"YYYY-MM-DD\" (for example \"2025-01-09\"). Return just the 4-digit year from B2, as text.",
+    starterFormula: "",
+    referenceFormula: "=LEFT(B2,4)",
+    hints: [
+      "The year is always the first 4 characters of this date format, LEFT grabs a fixed number of characters starting from the beginning of a text value.",
+      "LEFT takes two arguments: the text, and how many characters to take from its left side.",
+      "LEFT(B2,4) takes the first 4 characters of B2, exactly the year portion of \"YYYY-MM-DD\".",
+      "=LEFT(B2,4)" ],
+    explanation: { why: "LEFT(text, n) always returns the first n characters, counting from the start, it doesn't know or care what those characters mean, it's a pure positional slice.", mistake: "This only works because the date format is fixed and consistent (always exactly YYYY-MM-DD), if some rows had a different date format, a fixed LEFT(...,4) would silently grab the wrong characters instead of erroring.", tip: "LEFT, RIGHT, and MID (a later task) are positional text extraction, they're a reasonable tool when a text format is rigid and predictable, real date columns are usually better handled with actual date functions once they're stored as real dates rather than text.", business: "Pulling a year (or month) out of a date-as-text column is a common first step before grouping or filtering by time period, especially in exported data where dates often arrive as plain text rather than a real date type." } },
+
+  { id: "xl-t03", skill: SKILL_ID_TEXT, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-t02"],
+    title: "Pull the month out of an order date",
+    objective: "Use MID to grab characters from the middle of a text value, not just an end.",
+    prompt: "Using the same \"YYYY-MM-DD\" format, return just the 2-digit month from B2, as text.",
+    starterFormula: "",
+    referenceFormula: "=MID(B2,6,2)",
+    hints: [
+      "The month isn't at the start or end of the text, it's in the middle, LEFT and RIGHT can't reach it directly, MID can start anywhere.",
+      "MID takes three arguments: the text, the starting position (counting from 1), and how many characters to take from there.",
+      "In \"2025-01-09\", the month digits start at position 6 (after \"2025-\") and are 2 characters long.",
+      "=MID(B2,6,2)" ],
+    explanation: { why: "MID(text, start, length) is the general-purpose version of LEFT and RIGHT, it can extract from any position, not just the two ends, LEFT(text,n) is actually equivalent to MID(text,1,n).", mistake: "Off-by-one errors are the most common MID mistake, counting the starting position wrong by even one character grabs the wrong slice entirely, it's worth counting characters carefully (or testing on one known example) before trusting a MID formula.", tip: "Whenever LEFT or RIGHT can't reach the part of the text you need because it's sandwiched between other characters, MID is the tool, it subsumes both of the other two.", business: "Month-level date extraction like this is exactly what feeds a month-over-month report when a date column arrives as text instead of a proper date, the same real-world situation Module 1's own tidy-data lesson warns about." } },
+
+  { id: "xl-t04", skill: SKILL_ID_TEXT, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-t01"],
+    title: "Build a formatted region/category label",
+    objective: "Combine UPPER with string concatenation to build a single readable label from two columns.",
+    prompt: "For row 3, build a label combining the region (uppercased) and the category, in the exact form <code>\"WEST / Outdoor\"</code> style, region in capitals, then <code>\" / \"</code>, then the category exactly as stored.",
+    starterFormula: "",
+    referenceFormula: '=UPPER(C3)&" / "&D3',
+    hints: [
+      "UPPER converts text to all capitals, but only the region needs that treatment here, not the category.",
+      "Apply UPPER only to C3 (region), leave D3 (category) exactly as it is, and join both with the literal text \" / \" in between.",
+      "UPPER(C3) & \" / \" & D3 concatenates three pieces: the uppercased region, the separator, and the category.",
+      '=UPPER(C3)&" / "&D3' ],
+    explanation: { why: "The & operator concatenates any number of pieces, text functions, cell references, and literal strings, into one result, UPPER is applied only to the piece that needs it, the rest pass through unchanged.", mistake: "Wrapping the entire concatenated result in UPPER (UPPER(C3&\" / \"&D3)) would uppercase the category too, which this task specifically doesn't want, applying a text function to the whole expression versus just one piece of it makes a real difference.", tip: "Building a formatted label by concatenating several pieces, some transformed, some as-is, is one of the most common real spreadsheet tasks, dashboards and reports are full of labels assembled exactly this way.", business: "A consistent, readable label like this is what actually shows up in a dropdown, a chart legend, or a printed report, raw column values rarely look presentable without some assembly first." } },
+
+  { id: "xl-t05", skill: SKILL_ID_TEXT, tool: "excel", level: "semiguided", difficulty: "core", prerequisite: ["xl-t04"],
+    title: "A formatted revenue summary line",
+    objective: "Use TEXT to control exactly how a number displays inside a larger string.",
+    prompt: "Build the exact text <code>\"Total revenue: $X.XX\"</code>, where X.XX is the total of the amount column (F2:F25), formatted as currency with exactly 2 decimal places.",
+    starterFormula: "",
+    referenceFormula: '="Total revenue: "&TEXT(SUM(F2:F25),"$0.00")',
+    hints: [
+      "Concatenating a raw number into a string with & works, but it won't force 2 decimal places or a dollar sign, that's what TEXT is for.",
+      "TEXT(value, format) converts a number into text using a format code, \"$0.00\" means a dollar sign and exactly 2 decimals.",
+      "Concatenate the literal \"Total revenue: \" with TEXT(SUM(F2:F25),\"$0.00\").",
+      '="Total revenue: "&TEXT(SUM(F2:F25),"$0.00")' ],
+    explanation: { why: "TEXT converts a number into a specifically-formatted string before it gets concatenated, without it, & just converts the number using its default (and often ugly or inconsistent) text representation.", mistake: "Concatenating SUM(F2:F25) directly with & instead of wrapping it in TEXT(...,\"$0.00\") first would produce something like \"Total revenue: 3875.63\" or worse, an unrounded long decimal, no dollar sign, no guaranteed 2 decimal places.", tip: "TEXT is what you reach for whenever a number needs to appear INSIDE a larger sentence or label, ROUND controls the actual stored value, TEXT controls only how it displays as text.", business: "A formatted summary sentence like this is exactly what shows up in an auto-generated report header or an email summary, readable text, not a bare number a reader has to interpret themselves." } },
+
+  { id: "xl-t06", skill: SKILL_ID_TEXT, tool: "excel", level: "semiguided", difficulty: "core", prerequisite: ["xl-s05"],
+    title: "A safe average that won't break on an empty category",
+    objective: "Use IFERROR to provide a fallback instead of letting a formula break.",
+    prompt: "AVERAGEIFS raises an error if a category has zero matching orders, dividing by zero orders is undefined. Return the average amount for category <code>\"Toys\"</code> (which doesn't exist in this data), returning the text <code>\"No orders in this category\"</code> instead of an error.",
+    starterFormula: "",
+    referenceFormula: '=IFERROR(AVERAGEIFS(F2:F25,D2:D25,"Toys"),"No orders in this category")',
+    hints: [
+      "AVERAGEIFS with a category that matches zero rows tries to divide by zero internally and raises an error, IFERROR is what catches that.",
+      "IFERROR takes two arguments: the formula to try, and a fallback value to use only if that formula raises an error.",
+      "IFERROR(AVERAGEIFS(F2:F25,D2:D25,\"Toys\"),\"No orders in this category\") tries the average, falls back to the message if it errors.",
+      '=IFERROR(AVERAGEIFS(F2:F25,D2:D25,"Toys"),"No orders in this category")' ],
+    explanation: { why: "IFERROR evaluates its first argument, and only if that specific evaluation raises an error does it fall back to the second argument, a formula that succeeds never touches the fallback at all.", mistake: "Wrapping the WRONG part of a formula in IFERROR, or wrapping too much of it, can hide a genuine bug rather than handling a genuinely expected empty-category case, IFERROR should catch a specific anticipated failure, not blanket over anything that might go wrong.", tip: "A bare error code like #DIV/0! showing up on a shared spreadsheet looks broken to a stakeholder, even when the underlying cause (no data for this category) is completely expected and not actually a problem, IFERROR is what turns that into a readable message.", business: "\"No orders in this category\" is a genuinely useful, actionable message, a raw error is not, this is the difference between a spreadsheet that looks broken and one that clearly communicates a real, expected situation." } },
+
+  { id: "xl-t07", skill: SKILL_ID_TEXT, tool: "excel", level: "semiguided", difficulty: "core", prerequisite: ["xl-s01"],
+    title: "Look up a commission rate with INDEX and MATCH",
+    objective: "Combine two separate functions to do what XLOOKUP does in one, the classic pre-XLOOKUP pattern.",
+    prompt: "Using INDEX and MATCH together (not XLOOKUP or VLOOKUP), return the commission rate for the <code>\"Electronics\"</code> category from Sheet2.",
+    starterFormula: "",
+    referenceFormula: '=INDEX(Sheet2!B2:B5,MATCH("Electronics",Sheet2!A2:A5,0))',
+    hints: [
+      "MATCH finds WHERE a value is in a range (a position number), INDEX then returns the value at that position in a different range, combined they do a lookup.",
+      "MATCH(\"Electronics\",Sheet2!A2:A5,0) finds Electronics's position within the category column, the 0 means exact match.",
+      "INDEX(Sheet2!B2:B5, ...) then returns the value at that same position, but from the RATE column instead.",
+      '=INDEX(Sheet2!B2:B5,MATCH("Electronics",Sheet2!A2:A5,0))' ],
+    explanation: { why: "MATCH answers \"which row is this in\" as a plain number, INDEX answers \"give me the value at this row number\", chaining them, MATCH's output feeding directly into INDEX's position argument, performs the same lookup XLOOKUP does in one function.", mistake: "Forgetting the third argument to MATCH (0, for exact match) can make MATCH assume the range is sorted and return the wrong position entirely, exact match should almost always be specified explicitly, not left to a default.", tip: "INDEX/MATCH is the classic lookup pattern that predates XLOOKUP, and it's still extremely common in real spreadsheets, especially older ones, recognizing it is just as important as knowing XLOOKUP.", business: "Plenty of real spreadsheets in active use today were built before XLOOKUP existed (it's a relatively recent addition), being able to read and write INDEX/MATCH is often necessary just to work with an existing file, not a matter of preference." } },
+
+  { id: "xl-t08", skill: SKILL_ID_TEXT, tool: "excel", level: "challenge", difficulty: "challenge", prerequisite: ["xl-t06", "xl-t07"],
+    title: "A lookup that won't break on an unknown category",
+    objective: "Combine IFERROR with INDEX/MATCH so a missing lookup value fails gracefully instead of erroring.",
+    prompt: "Using INDEX and MATCH, look up the commission rate for <code>\"Toys\"</code> (which isn't in Sheet2). Instead of letting MATCH's #N/A error surface, return the text <code>\"Unknown category\"</code>. Decide the formula yourself.",
+    starterFormula: "",
+    referenceFormula: '=IFERROR(INDEX(Sheet2!B2:B5,MATCH("Toys",Sheet2!A2:A5,0)),"Unknown category")',
+    hints: [
+      "This combines the previous two tasks, INDEX/MATCH as a lookup, and IFERROR as a safety net, applied to the whole lookup at once.",
+      "When MATCH can't find \"Toys\" anywhere in the category column, it raises an error, which then propagates up through INDEX too, IFERROR needs to wrap the ENTIRE INDEX/MATCH expression, not just one piece of it.",
+      "IFERROR(INDEX(Sheet2!B2:B5,MATCH(\"Toys\",Sheet2!A2:A5,0)),\"Unknown category\") tries the full lookup, falls back to the message if any part of it errors.",
+      '=IFERROR(INDEX(Sheet2!B2:B5,MATCH("Toys",Sheet2!A2:A5,0)),"Unknown category")' ],
+    explanation: { why: "MATCH's #N/A error, when a lookup value genuinely doesn't exist, propagates outward through whatever function called it, INDEX in this case, IFERROR at the outermost layer catches that error no matter which inner step actually raised it.", mistake: "Wrapping only the MATCH part in IFERROR, like INDEX(range, IFERROR(MATCH(...), 0)), technically avoids the error but silently returns INDEX's 0th (often invalid, or the wrong) position instead of a clear message, that's a different, more confusing kind of bug.", tip: "When combining a lookup with error handling, IFERROR almost always belongs on the OUTSIDE of the whole lookup expression, wrapping the entire calculation is what actually catches every way it could fail.", business: "A product catalog constantly changes, and a lookup formula referencing it will eventually hit a category, SKU, or ID that's been removed or renamed, IFERROR is what keeps that eventual mismatch from turning into a spreadsheet full of visible #N/A errors." } },
+
+  { id: "xl-t09", skill: SKILL_ID_TEXT, tool: "excel", level: "challenge", difficulty: "challenge", prerequisite: ["xl-t04"],
+    title: "Match messy text against a clean value",
+    objective: "Normalize text with TRIM and LOWER before comparing it, so formatting differences don't cause a false mismatch.",
+    prompt: "D5 holds a category name. A user has typed a search term with inconsistent capitalization and extra spaces: <code>\"  Outdoor  \"</code>. Return <code>\"Match\"</code> if D5's category matches that search term once both are trimmed and lowercased, otherwise <code>\"No match\"</code>. Decide the formula yourself.",
+    starterFormula: "",
+    referenceFormula: '=IF(LOWER(TRIM(D5))=LOWER(TRIM("  Outdoor  ")),"Match","No match")',
+    hints: [
+      "A direct comparison (D5=\"  Outdoor  \") would fail here even for a genuine match, the extra spaces and any capitalization difference make the two strings literally unequal.",
+      "TRIM removes extra spaces, LOWER removes case differences, applying both to EACH side before comparing neutralizes both kinds of formatting noise.",
+      "Wrap both sides of the comparison the same way: LOWER(TRIM(D5)) = LOWER(TRIM(\"  Outdoor  \")), then feed that comparison into IF for the Match/No match text.",
+      '=IF(LOWER(TRIM(D5))=LOWER(TRIM("  Outdoor  ")),"Match","No match")' ],
+    explanation: { why: "TRIM and LOWER each normalize a different kind of formatting inconsistency, stacking them (LOWER(TRIM(text))) cleans both at once, applying the exact same cleanup to both sides of a comparison is what makes the comparison actually fair.", mistake: "Cleaning only ONE side of the comparison (for instance, trimming D5 but not the search term, or vice versa) still leaves a mismatch whenever the uncleaned side has the exact formatting issue being guarded against.", tip: "Whenever user-typed or externally-sourced text needs to be compared against known values, assume it has inconsistent capitalization and stray whitespace until proven otherwise, TRIM+LOWER on both sides is a cheap, standard defense.", business: "A search box, a data-entry form, or an imported file column will almost always contain \"Outdoor\", \" outdoor\", and \"OUTDOOR \" as if they were three different categories unless something normalizes them first, this exact pattern is what prevents that kind of silent fragmentation." } },
+
+  { id: "xl-t10", skill: SKILL_ID_TEXT, tool: "excel", level: "mastery", difficulty: "mastery", prerequisite: ["xl-t05", "xl-t08"],
+    title: "A full formatted category briefing line, and why formatting isn't the same as accuracy",
+    objective: "Chain SUMIFS, TEXT, and concatenation into one polished summary sentence, then reason about a real risk formatted text introduces.",
+    prompt: "Build one text summary for the Electronics category, in the exact form <code>\"Electronics revenue: $X.XX (Y.Y% of total)\"</code>, where X.XX is Electronics' total revenue (2 decimal places) and Y.Y is Electronics' share of TOTAL revenue across every category, as a percentage with 1 decimal place. Then, in the box below, explain in 2-3 sentences why a nicely formatted summary sentence like this is riskier to blindly trust than the raw numbers behind it.",
+    starterFormula: "",
+    referenceFormula: '="Electronics revenue: "&TEXT(SUMIFS(F2:F25,D2:D25,"Electronics"),"$0.00")&" ("&TEXT(SUMIFS(F2:F25,D2:D25,"Electronics")/SUM(F2:F25),"0.0%")&" of total)"',
+    written: {
+      label: "Why is a formatted summary sentence riskier to blindly trust than the raw numbers?",
+      placeholder: "Think about what TEXT() does to a number, and whether the displayed, rounded value is still exactly what's stored and used in further calculations...",
+      check: (text) => /(round|format|hidden|display|precision|trust|wrong)/i.test(text) && text.trim().length > 40,
+      hint: "Mention that TEXT() only changes how a number DISPLAYS, rounding for readability, it doesn't change the underlying stored value, and a polished sentence can make a reader trust a number without checking whether the formatting itself hid something (a rounding error, a stale calculation) that a raw number would have made more visible." },
+    hints: [
+      "This chains everything from this stage, SUMIFS for the category revenue, TEXT twice (once for a dollar amount, once for a percentage), and concatenation to assemble the final sentence.",
+      "Build it piece by piece: the Electronics revenue as currency, the Electronics share (Electronics revenue divided by SUM of everything) as a percentage, then concatenate both into the literal sentence structure.",
+      "SUMIFS(F2:F25,D2:D25,\"Electronics\") appears twice, once for the dollar figure, once as the numerator of the percentage, divided by SUM(F2:F25) for the denominator.",
+      '="Electronics revenue: "&TEXT(SUMIFS(F2:F25,D2:D25,"Electronics"),"$0.00")&" ("&TEXT(SUMIFS(F2:F25,D2:D25,"Electronics")/SUM(F2:F25),"0.0%")&" of total)"' ],
+    explanation: { why: "Every piece of this stage lands in one line, SUMIFS for the filtered total, TEXT (twice) for two different display formats, and & to assemble literal text and formatted numbers into one readable sentence.", mistake: "Treating the polished sentence as more trustworthy than the numbers behind it is exactly backwards, TEXT() only changes how a number LOOKS, a formatting bug (wrong format code, a rounding surprise) can make an inaccurate number look completely convincing.", tip: "A nicely formatted output is a presentation layer, not a verification step, before a summary sentence like this goes in front of a stakeholder, it's worth checking the raw, unformatted numbers behind it at least once.", business: "A confident-sounding sentence like \"Electronics revenue: $2429.49 (62.7% of total)\" is exactly the kind of output that gets copied straight into a slide deck without a second look, that confidence is earned by the calculation being correct, not by the formatting looking clean, this task's stage closes on that distinction on purpose." } },
 ];
 
 /* ================= grading ================= */
