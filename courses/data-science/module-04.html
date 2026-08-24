@@ -614,6 +614,11 @@ const EX3 = () => harnessFor("clean_revenue", [
   "        out2 = fn(d)",
   "        results.append({'name': 'Excludes negative quantities (all-negative frame totals 0)', 'pass': abs(float(out2)) < 0.001, 'hint': f'If every quantity is negative the total must be 0, got {out2!r}. Are you filtering quantity > 0?'})",
   "    except Exception as e: results.append({'name': 'Excludes negative quantities', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+  "    try:",
+  "        out3 = fn(orders.head(100).copy())",
+  "        p3 = abs(float(out3) - 12280.47) < 1.0",
+  "        results.append({'name': 'Recomputes on the first 100 rows (not hardcoded to 46287.08)', 'pass': p3, 'hint': f'On just the first 100 rows the total must be about 12280.47, got {out3!r}. A function that only works on the full 412-row file is hardcoded to it.'})",
+  "    except Exception as e: results.append({'name': 'Recomputes on the first 100 rows (not hardcoded to 46287.08)', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
 ]);
 
 const EX4 = () => harnessFor("validate_cleaning", [

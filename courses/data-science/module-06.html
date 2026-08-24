@@ -170,6 +170,28 @@ FROM order_items oi
   </section>
 
   <section>
+    <div class="kh"><span class="num">6.2b</span><h2 class="serif">CASE WHEN, and filtering a group with HAVING</h2></div>
+    <p><b>Business question:</b> "How many orders fall into each price tier: under $50, $50 to $200, or over $200?"</p>
+    <div class="def"><div class="k">CASE WHEN: an if/else inside a query</div><p>SQL has no built-in "price tier" column, you build one inline: <code>CASE WHEN unit_price &lt; 50 THEN 'Low' WHEN unit_price &lt; 200 THEN 'Mid' ELSE 'High' END AS tier</code>. It reads top to bottom, like Python's <code>if/elif/else</code>, the first matching condition wins. You can <code>GROUP BY</code> the result of a CASE expression exactly like a real column.</p></div>
+    <div class="def"><div class="k">HAVING: WHERE, but after grouping</div><p><code>WHERE</code> filters individual rows before grouping happens. <code>HAVING</code> filters entire groups, after <code>GROUP BY</code> has collapsed them, usually to test an aggregate like <code>HAVING COUNT(*) &gt; 5</code> or <code>HAVING SUM(revenue) &gt; 1000</code>. You cannot write <code>WHERE SUM(revenue) &gt; 1000</code>, the aggregate doesn't exist yet at the point <code>WHERE</code> runs.</p></div>
+    <div class="interactive">
+      <span class="ilbl">Try it yourself · ungraded, runs against the real database</span>
+      <p class="mut" style="margin-bottom:10px">Run this, then edit the price breakpoints or the HAVING threshold and re-run to see how the groups change.</p>
+      <textarea id="caseEditor" class="testin" spellcheck="false" rows="6">SELECT
+  CASE WHEN unit_price < 50 THEN 'Low'
+       WHEN unit_price < 200 THEN 'Mid'
+       ELSE 'High' END AS tier,
+  COUNT(*) AS n
+FROM order_items
+GROUP BY tier
+HAVING COUNT(*) > 5
+ORDER BY n DESC</textarea>
+      <div class="dagctrl"><button id="btnRunCase">Run query</button></div>
+      <div id="caseResults"></div>
+    </div>
+  </section>
+
+  <section>
     <div class="kh"><span class="num">6.3</span><h2 class="serif">The NULL trap</h2></div>
     <p><b>Business question:</b> "How many orders came through each channel?"</p>
     <div class="trap"><b>The trap:</b> 11 orders have no recorded channel at all, the value is genuinely <code>NULL</code>, not the text "unknown." <code>COUNT(channel)</code> silently skips NULLs; <code>COUNT(*)</code> doesn't. A filter like <code>WHERE channel != 'web'</code> also silently excludes every NULL row, because SQL's three-valued logic treats <code>NULL != anything</code> as unknown, not true.</div>
@@ -372,6 +394,7 @@ async function checkExercise(id, editorId, resultsId, referenceSql, sectionKey, 
 document.getElementById("btnRunExplore").addEventListener("click", () => runOnly("exploreEditor", "exploreResults"));
 
 document.getElementById("btnRunOnly1").addEventListener("click", () => runOnly("ex1Editor", "ex1Results"));
+document.getElementById("btnRunCase").addEventListener("click", () => runOnly("caseEditor", "caseResults"));
 document.getElementById("btnCheck1").addEventListener("click", () => checkExercise("ex1", "ex1Editor", "ex1Results",
   "SELECT name, signup_date FROM customers ORDER BY signup_date DESC LIMIT 5", null, true));
 
