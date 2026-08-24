@@ -91,10 +91,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Python &middot; Stages 1-2 of &hellip;</span>
+    <span class="eyebrow">Practice Library &middot; Python &middot; Stages 1-3 of &hellip;</span>
     <h1 class="serif">Python Practice Library</h1>
     <p class="sub">Extra repetition beyond Module 2's core lesson, real CPython running in a Web Worker (Pyodide), the same sandbox Module 2 itself uses. Every task pairs a few fixed test cases with one freshly randomized input compared against a hidden reference implementation, so a hardcoded return value can't pass.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-2 (functions over lists and dicts, plus real pandas DataFrame work on the same retail_sales_ledger.csv Module 3 uses: filtering, groupby, aggregation, date handling), 20 tasks, real, fully built, graded, and tested. Further stages are planned but not yet built, that's future work, not a claim made here.</div>
+    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-3 (functions over lists and dicts; real pandas DataFrame work on the same retail_sales_ledger.csv Module 3 uses; and real-world data cleaning on the same messy files, ecommerce_orders.csv and expense_reports.csv, Module 4 uses, plus inventory_supply.csv, each task targeting a different sub-problem than Module 4's own graded exercises), 30 tasks, real, fully built, graded, and tested. Further stages are planned but not yet built, that's future work, not a claim made here.</div>
   </header>
 
   <div id="skillBars"></div>
@@ -182,16 +182,32 @@ function buildHarness(task) {
    numpy scalars, DataFrames) vary too much for one generic comparator
    to handle cleanly. */
 const PANDAS_PREAMBLE = "import pandas as pd, io, json\ndef _mk(txt): return pd.read_csv(io.StringIO(txt))";
-let retailCsvPromise = null;
-function getRetailCsv() {
-  if (!retailCsvPromise) retailCsvPromise = fetch("datasets/retail_sales_ledger.csv").then(r => r.text());
-  return retailCsvPromise;
+/* Stage 3+ tasks read from the SAME real, messy files Module 4's own
+   cleaning exercises use (ecommerce_orders.csv, expense_reports.csv),
+   plus inventory_supply.csv (fresh, not used anywhere else in the
+   course), deliberately targeting different sub-problems than Module
+   4's own graded functions (dedupe_count, true_product_count,
+   clean_revenue, validate_cleaning, usd_spend_by_category) so this
+   library adds real practice instead of repeating it. One fetch per
+   file, cached, reused across every task that needs it. */
+const DATASET_FILES = {
+  retail: { path: "datasets/retail_sales_ledger.csv", varName: "retail" },
+  orders: { path: "datasets/ecommerce_orders.csv", varName: "orders" },
+  expenses: { path: "datasets/expense_reports.csv", varName: "exp" },
+  inventory: { path: "datasets/inventory_supply.csv", varName: "inv" },
+};
+const datasetCsvPromises = {};
+function getDatasetCsv(key) {
+  if (!datasetCsvPromises[key]) datasetCsvPromises[key] = fetch(DATASET_FILES[key].path).then(r => r.text());
+  return datasetCsvPromises[key];
 }
 function buildPandasHarness(task) {
+  const dsKey = task.dataset || "retail";
+  const varName = DATASET_FILES[dsKey].varName;
   return [
     PANDAS_PREAMBLE,
     "def harness(payload):",
-    "    code, retail_txt = payload",
+    `    code, ${varName}_txt = payload`,
     "    ns = {'pd': pd}",
     "    try:",
     "        exec(code, ns)",
@@ -200,7 +216,7 @@ function buildPandasHarness(task) {
     `    fn = ns.get(${JSON.stringify(task.functionName)})`,
     "    if fn is None:",
     `        return {'ranOk': True, 'results': [{'name': ${JSON.stringify(task.functionName + " is defined")}, 'pass': False, 'hint': ${JSON.stringify("Define a function named exactly " + task.functionName + ".")}}]}`,
-    "    retail = _mk(retail_txt)",
+    `    ${varName} = _mk(${varName}_txt)`,
     "    results = []",
     ...task.checks,
     "    return {'ranOk': True, 'results': results}",
@@ -210,9 +226,11 @@ function buildPandasHarness(task) {
 /* ================= tasks ================= */
 const SKILL_ID_FUND = "python-fundamentals";
 const SKILL_ID_PANDAS = "python-pandas";
+const SKILL_ID_CLEANING = "python-cleaning";
 const SKILLS = [
   { id: SKILL_ID_FUND, label: "Python Fundamentals" },
   { id: SKILL_ID_PANDAS, label: "Python pandas" },
+  { id: SKILL_ID_CLEANING, label: "Python Data Cleaning" },
 ];
 
 const TASKS = [
@@ -812,6 +830,275 @@ const TASKS = [
       "df.groupby(pd.to_datetime(df['order_date']).dt.month)['revenue'].sum().to_dict() does the conversion, grouping, aggregating, and dict conversion in one chained line.",
       "def monthly_revenue_summary(df):\n    months = pd.to_datetime(df['order_date']).dt.month\n    return df.groupby(months)['revenue'].sum().to_dict()" ],
     explanation: { why: "groupby can take a Series that isn't even a column on the DataFrame yet, like the month numbers computed on the fly from order_date, pandas just needs something the same length as the DataFrame to group by.", mistake: "Assuming every month's total is equally trustworthy just because the code ran without errors is exactly the mistake this task's written question is built to catch, a small total can mean a real business event, or it can mean the data simply doesn't cover that month completely.", tip: "Whenever a groupby result has one dramatically smaller or larger group than the rest, that's worth a second look before it goes in front of anyone, it's either the most interesting finding in the whole analysis, or a data completeness problem, and those look identical in a bar chart.", business: "Reporting 'May revenue collapsed' without checking whether May's data is actually complete is exactly the kind of premature, wrong conclusion that damages trust in an analyst's numbers, this is the same small-sample-size caution the SQL and Excel practice libraries raise in their own mastery tasks, here it shows up as an incomplete month instead of a low-volume category." } },
+
+  { id: "py-c01", skill: SKILL_ID_CLEANING, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-p02"], engine: "pandas", dataset: "orders",
+    title: "How many orders never shipped",
+    objective: "Distinguish a genuinely missing value from data that just hasn't happened yet.",
+    functionName: "count_never_shipped",
+    objectiveNote: "orders is the real ecommerce_orders.csv (412 rows). Return how many rows have a blank (NaN) shipped_date, orders that simply haven't shipped, not a data defect.",
+    starterCode: "def count_never_shipped(orders):\n    # your code here\n    return 0",
+    checks: [
+      "    try:",
+      "        out = fn(orders.copy())",
+      "        results.append({'name': '133 orders have never shipped', 'pass': bool(out == 133), 'hint': f'Expected 133, got {out!r}. orders[\"shipped_date\"].isna().sum() counts genuinely blank cells.'})",
+      "    except Exception as e:",
+      "        results.append({'name': '133 orders have never shipped', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(orders.head(100).copy())",
+      "        results.append({'name': 'Recomputes on the first 100 rows (not hardcoded to 133)', 'pass': bool(out2 == 29), 'hint': f'On just the first 100 rows, 29 should never have shipped, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 100 rows (not hardcoded to 133)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "A blank shipped_date isn't broken data here, some orders genuinely haven't shipped yet, isna() is how pandas represents \"nothing here.\"",
+      "orders['shipped_date'].isna() gives a True/False Series, one per row, True wherever the cell is genuinely blank (NaN).",
+      "orders['shipped_date'].isna().sum() adds up the Trues, giving you the count directly.",
+      "def count_never_shipped(orders):\n    return orders['shipped_date'].isna().sum()" ],
+    explanation: { why: ".isna() specifically detects pandas' NaN representation of \"no value stored here,\" which is exactly what an order that hasn't shipped yet should look like, an absence, not a placeholder.", mistake: "Checking orders['shipped_date']=='' (an empty string) instead of isna() misses genuinely blank cells entirely, pandas represents a missing CSV field as NaN, a float, not an empty string, the two are not the same value.", tip: "isna() (or its opposite, notna()) is the correct tool whenever \"blank\" is a real, expected state, not every missing value is a mistake, some are the data faithfully reporting that something hasn't happened yet.", business: "133 of 412 orders never shipping isn't a data problem to fix, it's a genuine operational fact, maybe those orders are still in the funnel, maybe they were abandoned, either way that number itself is worth reporting, not cleaning away." } },
+
+  { id: "py-c02", skill: SKILL_ID_CLEANING, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-c01"], engine: "pandas", dataset: "orders",
+    title: "Find the one row with a fake date",
+    objective: "Detect a placeholder value hiding among genuine missing values.",
+    functionName: "count_shipping_defects",
+    objectiveNote: "Separately from genuinely blank rows, one row has the literal text \"MISSING\" typed into shipped_date, a real defect, not a legitimate absence. Return how many rows have that exact literal value.",
+    starterCode: "def count_shipping_defects(orders):\n    # your code here\n    return 0",
+    checks: [
+      "    try:",
+      "        out = fn(orders.copy())",
+      "        results.append({'name': 'Exactly 1 row has the literal \"MISSING\" placeholder', 'pass': bool(out == 1), 'hint': f'Expected 1, got {out!r}. orders[\"shipped_date\"]==\"MISSING\" tests for that exact text, not a blank cell.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Exactly 1 row has the literal \"MISSING\" placeholder', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(orders.head(100).copy())",
+      "        results.append({'name': 'Recomputes on the first 100 rows, where it does not appear (not hardcoded to 1)', 'pass': bool(out2 == 0), 'hint': f'The \"MISSING\" row is not among the first 100, this should return 0 there, got {out2!r}. Did you hardcode 1?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 100 rows, where it does not appear (not hardcoded to 1)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "This is a completely different check than the last task, you're testing for one specific piece of TEXT, not for a blank cell, isna() would not catch this at all.",
+      "orders['shipped_date']=='MISSING' tests every row for that exact string, a genuinely blank cell (NaN) would not equal the string \"MISSING\".",
+      "orders['shipped_date']=='MISSING' gives a True/False Series, .sum() adds up the Trues.",
+      "def count_shipping_defects(orders):\n    return (orders['shipped_date']=='MISSING').sum()" ],
+    explanation: { why: "A literal string like \"MISSING\" is a real, present value as far as pandas is concerned, isna() would report False for it, since the cell isn't actually blank, it's testing equality against specific text that catches it instead.", mistake: "Treating every non-parseable shipped_date the same way, lumping the 133 genuinely blank rows together with this 1 placeholder row, throws away a real distinction, one is an expected absence, the other is somebody's data-entry workaround for a broken export.", tip: "Whenever a column has both real blanks and suspicious placeholder text (\"MISSING\", \"N/A\", \"TBD\", \"unknown\"), check for both separately, isna() catches one kind, an equality check catches the other.", business: "This single row is exactly the kind of defect worth flagging to whoever owns the data export, a real blank is expected and fine, a hand-typed placeholder means something upstream broke, and it's the more urgent problem of the two." } },
+
+  { id: "py-c03", skill: SKILL_ID_CLEANING, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-p02"], engine: "pandas", dataset: "expenses",
+    title: "Clean up inconsistent expense categories",
+    objective: "Normalize whitespace and capitalization before trusting a count of distinct values.",
+    functionName: "clean_expense_categories",
+    objectiveNote: "exp is the real expense_reports.csv (154 rows, some fully blank). Drop rows with a missing category, then return a sorted list of the distinct category names after stripping whitespace and title-casing them.",
+    starterCode: "def clean_expense_categories(exp):\n    # your code here\n    return []",
+    checks: [
+      "    try:",
+      "        out = fn(exp.copy())",
+      "        expected = ['Meals', 'Office Supplies', 'Software', 'Travel', 'Trvl']",
+      "        results.append({'name': 'Five distinct categories after cleaning whitespace and case', 'pass': list(out) == expected, 'hint': f'Expected {expected!r}, got {out!r}. strip() and title() the category column, drop NaN categories first, then sort the unique values.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Five distinct categories after cleaning whitespace and case', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(exp.head(50).copy())",
+      "        results.append({'name': 'Recomputes on the first 50 rows (not hardcoded)', 'pass': list(out2) == expected, 'hint': f'The first 50 rows should already contain all 5 category variants, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 50 rows (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "The raw category column has extra whitespace and inconsistent capitalization (\"travel \", \"Travel\", \"TRAVEL\"), those need cleaning up before .unique() means anything.",
+      "exp['category'].str.strip().str.title() removes stray whitespace and normalizes capitalization to Title Case, in one chained call.",
+      "Drop rows with a missing category first (dropna(subset=['category'])), then apply the strip/title cleanup, then .unique(), then sorted(...) for a stable order.",
+      "def clean_expense_categories(exp):\n    clean = exp.dropna(subset=['category'])\n    return sorted(clean['category'].str.strip().str.title().unique().tolist())" ],
+    explanation: { why: "str.strip() removes leading/trailing whitespace, str.title() normalizes casing, chaining both before calling .unique() means formatting differences no longer create phantom extra categories.", mistake: "Calling .unique() before cleaning the text, or forgetting to drop the missing-category rows first, either leaves formatting variants uncollapsed or crashes trying to sort a list containing NaN alongside strings, Python can't compare a missing value to text.", tip: "This library's mastery task deliberately stops short of merging \"Trvl\" into \"Travel\", that's a judgement call (an abbreviation, not a formatting accident), worth handling separately from mechanical whitespace/case cleanup.", business: "Five categories, not four, is the honest answer to this specific cleaning step, collapsing \"Trvl\" into \"Travel\" too is a real business decision (is that abbreviation actually the same account code, or does someone need to ask), not something a generic cleaning function should quietly assume." } },
+
+  { id: "py-c04", skill: SKILL_ID_CLEANING, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-p04"], engine: "pandas", dataset: "orders",
+    title: "Count orders with an impossible quantity",
+    objective: "Detect an invalid value with a simple comparison, before deciding what to do about it.",
+    functionName: "count_bad_quantity",
+    objectiveNote: "Return how many rows have a quantity of zero or less, a real order can't have negative or zero units.",
+    starterCode: "def count_bad_quantity(orders):\n    # your code here\n    return 0",
+    checks: [
+      "    try:",
+      "        out = fn(orders.copy())",
+      "        results.append({'name': '7 rows have quantity <= 0', 'pass': bool(out == 7), 'hint': f'Expected 7, got {out!r}. (orders[\"quantity\"]<=0).sum() counts them directly.'})",
+      "    except Exception as e:",
+      "        results.append({'name': '7 rows have quantity <= 0', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(orders.head(50).copy())",
+      "        results.append({'name': 'Recomputes on the first 50 rows (not hardcoded to 7)', 'pass': bool(out2 == 2), 'hint': f'On just the first 50 rows, 2 should have a bad quantity, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 50 rows (not hardcoded to 7)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "This is a straightforward boolean-mask-then-count, exactly the shape you've used before, just with a different, invalid-value condition.",
+      "orders['quantity']<=0 gives a True/False Series, True wherever the quantity is impossible for a real order.",
+      "(orders['quantity']<=0).sum() counts the True values directly.",
+      "def count_bad_quantity(orders):\n    return (orders['quantity']<=0).sum()" ],
+    explanation: { why: "A boolean comparison against the whole column, then .sum(), is the standard way to count how many rows violate a rule, exactly the same shape whether the rule is about a business threshold or a data-validity check.", mistake: "Only checking for quantity==0 and missing the negative values (or vice versa) undercounts the real problem, both zero and negative quantities are equally impossible for a real order, <=0 catches both in one condition.", tip: "Before deciding whether to drop, fix, or investigate invalid rows, always count them first, exactly what this task does, that number tells you whether you're looking at a handful of edge cases or a systemic problem.", business: "7 orders with an impossible quantity, out of 412, is a small enough number to investigate individually, were they refunds recorded oddly, a scanner glitch, a manual entry error, that's a very different next step than just silently dropping them." } },
+
+  { id: "py-c05", skill: SKILL_ID_CLEANING, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-c03"], engine: "pandas", dataset: "expenses",
+    title: "Count the expenses recorded in a foreign currency",
+    objective: "Detect a currency mismatch before it silently corrupts a total.",
+    functionName: "count_non_usd_expenses",
+    objectiveNote: "Some amounts in the expense file are recorded in euros (a € symbol, comma as the decimal separator) rather than USD. Return how many rows are in a non-USD currency.",
+    starterCode: "def count_non_usd_expenses(exp):\n    # your code here\n    return 0",
+    checks: [
+      "    try:",
+      "        out = fn(exp.copy())",
+      "        results.append({'name': '42 rows are recorded in euros, not USD', 'pass': bool(out == 42), 'hint': f'Expected 42, got {out!r}. Check the amount column (as text) for the euro symbol.'})",
+      "    except Exception as e:",
+      "        results.append({'name': '42 rows are recorded in euros, not USD', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(exp.head(50).copy())",
+      "        results.append({'name': 'Recomputes on the first 50 rows (not hardcoded to 42)', 'pass': bool(out2 == 14), 'hint': f'On just the first 50 rows, 14 should be in euros, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 50 rows (not hardcoded to 42)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "The amount column is stored as text (because it mixes currencies), so this is a text-pattern check, not a numeric one.",
+      "Convert the column to text with .astype(str) to be safe, then use .str.contains() to test for the euro symbol.",
+      "exp['amount'].astype(str).str.contains('€') gives a True/False Series, .sum() counts the matches.",
+      "def count_non_usd_expenses(exp):\n    return exp['amount'].astype(str).str.contains('€').sum()" ],
+    explanation: { why: "Since the amount column mixes formats, it's stored as text, not numbers, so detecting currency is a string pattern match (does this cell contain a € symbol), not a numeric comparison.", mistake: "Trying to convert the whole column to float directly (exp['amount'].astype(float)) crashes immediately, both the $ prefix and the € values (which use a comma as a decimal point) aren't valid numeric text yet, that conversion has to happen after currency is sorted out, not before.", tip: "Before converting a messy numeric-looking text column to real numbers, always check what's actually in it first, mixed currencies, thousands separators, and stray symbols all break a naive astype(float) in different ways.", business: "42 non-USD rows is exactly why Module 4's own version of this file explicitly excludes euro expenses from its USD total rather than guessing an exchange rate, this count is the evidence behind that judgment call." } },
+
+  { id: "py-c06", skill: SKILL_ID_CLEANING, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-c03"], engine: "pandas", dataset: "expenses",
+    title: "Find the completely empty rows",
+    objective: "Detect rows that are missing everything, not just one field.",
+    functionName: "count_blank_expense_rows",
+    objectiveNote: "A handful of rows in the expense file are entirely blank, every single column empty. Return how many rows have no data in ANY column.",
+    starterCode: "def count_blank_expense_rows(exp):\n    # your code here\n    return 0",
+    checks: [
+      "    try:",
+      "        out = fn(exp.copy())",
+      "        results.append({'name': '4 rows are completely blank', 'pass': bool(out == 4), 'hint': f'Expected 4, got {out!r}. exp.isna().all(axis=1) tests each row for being blank in every column.'})",
+      "    except Exception as e:",
+      "        results.append({'name': '4 rows are completely blank', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(exp.head(50).copy())",
+      "        results.append({'name': 'Recomputes on the first 50 rows, where none appear (not hardcoded to 4)', 'pass': bool(out2 == 0), 'hint': f'None of the fully-blank rows are in the first 50, this should return 0 there, got {out2!r}. Did you hardcode 4?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 50 rows, where none appear (not hardcoded to 4)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "This is different from checking one column for missing values, you need a row where EVERY column is blank, not just one.",
+      "exp.isna() applied to the whole DataFrame gives True/False for every individual cell, .all(axis=1) then checks, per row, whether ALL of that row's cells were True.",
+      "exp.isna().all(axis=1) gives one True/False per row, True only when every column in that row is blank, .sum() counts them.",
+      "def count_blank_expense_rows(exp):\n    return exp.isna().all(axis=1).sum()" ],
+    explanation: { why: "isna() on a whole DataFrame produces a same-shaped grid of True/False, one per cell, .all(axis=1) collapses each ROW down to one True/False, True only if literally every cell in that row was missing.", mistake: "Checking only one column (like exp['category'].isna()) for blank rows would also catch rows that have SOME data but happen to be missing just that field, a completely blank row is a stricter, different condition, every column has to be empty.", tip: "A row that's blank across every column usually isn't 'missing data' in the same sense as a blank single field, it's often an export artifact (a trailing blank line, a formatting glitch), worth dropping outright rather than trying to fill in.", business: "4 fully blank rows out of 154 is a small, mechanical cleanup, dropping them is safe and uncontroversial, unlike a blank single field, there's no judgment call about what the row 'really meant', there's no row there at all." } },
+
+  { id: "py-c07", skill: SKILL_ID_CLEANING, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-p05"], engine: "pandas", dataset: "inventory",
+    title: "Find SKUs recorded with inconsistent units",
+    objective: "Detect a unit mismatch that would make summing quantities meaningless.",
+    functionName: "inconsistent_unit_skus",
+    objectiveNote: "inv is the real inventory_supply.csv, a SKU can appear in multiple warehouses, sometimes recorded in \"each\" and sometimes in \"case\", the same SKU should use one consistent unit. Return a sorted list of SKUs that appear with more than one distinct unit value.",
+    starterCode: "def inconsistent_unit_skus(inv):\n    # your code here\n    return []",
+    checks: [
+      "    try:",
+      "        out = fn(inv.copy())",
+      "        results.append({'name': '27 SKUs have inconsistent units across warehouses', 'pass': len(out) == 27, 'hint': f'Expected 27 SKUs, got {len(out) if hasattr(out,\"__len__\") else out!r}. Group by sku, count distinct units per group, keep the ones with more than 1.'})",
+      "    except Exception as e:",
+      "        results.append({'name': '27 SKUs have inconsistent units across warehouses', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(inv.head(50).copy())",
+      "        results.append({'name': 'Recomputes on the first 50 rows (not hardcoded to 27)', 'pass': len(out2) == 8, 'hint': f'On just the first 50 rows, 8 SKUs should be inconsistent, got {len(out2) if hasattr(out2,\"__len__\") else out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 50 rows (not hardcoded to 27)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "You need to know, per SKU, how many DIFFERENT unit values it has across all its warehouse rows, that's a groupby followed by counting distinct values.",
+      "inv.groupby('sku')['unit'].nunique() gives a Series, one row per SKU, the count of distinct units that SKU uses.",
+      "Filter that Series to where the count is greater than 1, those are the inconsistent SKUs, then take .index (the SKU names) as a sorted list.",
+      "def inconsistent_unit_skus(inv):\n    counts = inv.groupby('sku')['unit'].nunique()\n    return sorted(counts[counts>1].index.tolist())" ],
+    explanation: { why: "groupby('sku')['unit'].nunique() answers 'how many distinct units does each SKU use', a SKU that's genuinely consistent will show exactly 1, filtering to counts greater than 1 isolates exactly the inconsistent ones.", mistake: "Just eyeballing a few rows or checking one SKU manually would miss the scale of the problem, 27 out of roughly 80 SKUs (a third of the catalog) is a systemic issue, not a handful of one-off typos, and only a full groupby reveals that.", tip: "nunique() per group is the general tool for 'does this key have more than one value for something that should be fixed', it applies just as well to inconsistent units as it would to inconsistent prices, names, or categories tied to the same key.", business: "Summing stock_qty across warehouses for a SKU that's tracked in \"each\" in one place and \"case\" in another produces a meaningless total, a 24-count case and a single unit are not the same quantity, this detection has to happen before any inventory total can be trusted." } },
+
+  { id: "py-c08", skill: SKILL_ID_CLEANING, tool: "python", level: "challenge", difficulty: "challenge", prerequisite: ["py-c07"], engine: "pandas", dataset: "inventory",
+    title: "Find impossible stock levels",
+    objective: "Detect a value that's structurally invalid, not just unusual. Decide the approach yourself.",
+    functionName: "count_invalid_stock",
+    objectiveNote: "A warehouse can't physically hold a negative quantity of stock. Return how many rows have a negative stock_qty.",
+    starterCode: "def count_invalid_stock(inv):\n    # your code here\n    return 0",
+    checks: [
+      "    try:",
+      "        out = fn(inv.copy())",
+      "        results.append({'name': '4 rows have a negative stock_qty', 'pass': bool(out == 4), 'hint': f'Expected 4, got {out!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': '4 rows have a negative stock_qty', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(inv.head(50).copy())",
+      "        results.append({'name': 'Recomputes on the first 50 rows (not hardcoded to 4)', 'pass': bool(out2 == 2), 'hint': f'On just the first 50 rows, 2 should be negative, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 50 rows (not hardcoded to 4)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "This is the same boolean-mask-and-count shape as the bad-quantity task earlier, applied to a different column and a different, physically impossible condition.",
+      "A stock quantity can be exactly 0 (out of stock) and that's fine, only negative values are structurally impossible.",
+      "inv['stock_qty']<0 gives a True/False Series, only True where the value is negative, .sum() counts them.",
+      "def count_invalid_stock(inv):\n    return (inv['stock_qty']<0).sum()" ],
+    explanation: { why: "A negative stock quantity has no possible real-world meaning, a warehouse can hold zero of something but never a negative amount, this makes it a structural validity check, not a business judgment call.", mistake: "Using <=0 here (copying the bad-quantity task's condition) would incorrectly flag legitimate zero-stock rows, zero is a completely valid, common inventory state, out of stock, only negative crosses into impossible.", tip: "Whether zero counts as 'invalid' depends entirely on what the number represents, a quantity ordered can't be zero (nobody orders nothing), but a quantity in stock absolutely can be, always check which case applies before reusing a condition from an earlier task.", business: "A negative stock count almost always means an inventory system glitch, a return processed twice, a sync error between warehouses, flagging these 4 rows is a concrete, actionable lead for whoever owns the inventory system." } },
+
+  { id: "py-c09", skill: SKILL_ID_CLEANING, tool: "python", level: "challenge", difficulty: "challenge", prerequisite: ["py-c01"], engine: "pandas", dataset: "orders",
+    title: "Count orders placed in a specific month, despite mixed date formats",
+    objective: "Parse genuinely inconsistent date formats correctly before filtering by month. Decide the approach yourself.",
+    functionName: "orders_in_month",
+    objectiveNote: "order_date mixes several formats in the same column (\"03-Apr-2026\", \"05/30/2026\", \"2026-06-19\"). Given a year and a month, return how many orders were placed in that year and month.",
+    starterCode: "def orders_in_month(orders, year, month):\n    # your code here\n    return 0",
+    checks: [
+      "    try:",
+      "        out = fn(orders.copy(), 2026, 5)",
+      "        results.append({'name': 'May 2026 has 140 orders', 'pass': bool(out == 140), 'hint': f'Expected 140, got {out!r}. pd.to_datetime(orders[\"order_date\"], format=\"mixed\") handles multiple formats in one column.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'May 2026 has 140 orders', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(orders.copy(), 2026, 4)",
+      "        results.append({'name': 'April 2026 is different too (not hardcoded to May)', 'pass': bool(out2 != 140), 'hint': f'April 2026 should not have the same count as May, got {out2!r}. Did you hardcode a fixed answer regardless of the month argument?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'April 2026 is different too (not hardcoded to May)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out3 = fn(orders.head(100).copy(), 2026, 5)",
+      "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to 140)', 'pass': bool(out3 == 37), 'hint': f'On just the first 100 rows, May 2026 should have 37 orders, got {out3!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on a smaller slice (not hardcoded to 140)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "A plain pd.to_datetime() call will struggle here, or silently guess wrong, since the column mixes several genuinely different date formats.",
+      "pd.to_datetime(orders['order_date'], format='mixed') tells pandas to figure out each row's format individually rather than assuming they're all the same.",
+      "Once parsed, compare .dt.year and .dt.month against the function's arguments with a boolean mask, then count the matching rows.",
+      "def orders_in_month(orders, year, month):\n    dates = pd.to_datetime(orders['order_date'], format='mixed')\n    return ((dates.dt.year==year) & (dates.dt.month==month)).sum()" ],
+    explanation: { why: "format='mixed' tells pandas to parse each date string according to whatever format IT individually matches, rather than assuming the whole column follows one format, exactly what a real column with several genuine formats needs.", mistake: "Calling pd.to_datetime() without format='mixed' on a column like this either raises an error (in newer pandas, the safer failure) or, in some versions, silently misparses some rows, neither is what you want when you actually need every row parsed correctly.", tip: "Always inspect a handful of raw date values before parsing a date column for real, if they don't all look the same, format='mixed' (or an explicit per-row strategy) is worth reaching for immediately rather than debugging silent misparses later.", business: "This is precisely the situation Module 4 warns about, a genuinely ambiguous, multi-format date column, being able to actually write the parsing code that handles it, not just recognize the problem in a quiz, is the practical skill this task is checking." } },
+
+  { id: "py-c10", skill: SKILL_ID_CLEANING, tool: "python", level: "mastery", difficulty: "mastery", prerequisite: ["py-c01", "py-c02", "py-c09"], engine: "pandas", dataset: "orders",
+    title: "A full shipping-status audit, and why two kinds of \"missing\" aren't the same problem",
+    objective: "Chain every distinction from this stage into one audit report, then argue for why it matters.",
+    functionName: "shipping_data_audit",
+    objectiveNote: "Return a dict with exactly three keys: never_shipped (blank shipped_date, a legitimate absence), shipping_defects (the literal \"MISSING\" placeholder, a real data defect), and successfully_shipped (a genuinely parseable shipped_date). Then, in the box below, explain in 2-3 sentences why treating never_shipped and shipping_defects as the same kind of problem would be a mistake.",
+    starterCode: "def shipping_data_audit(orders):\n    # your code here\n    return {}",
+    checks: [
+      "    try:",
+      "        out = fn(orders.copy())",
+      "        expected = {'never_shipped': 133, 'shipping_defects': 1, 'successfully_shipped': 278}",
+      "        ok = isinstance(out, dict) and all(out.get(k) == v for k, v in expected.items())",
+      "        results.append({'name': 'All three counts are correct and add up to every row', 'pass': ok, 'hint': f'Expected {expected!r}, got {out!r}. never_shipped uses isna(), shipping_defects checks for the literal \"MISSING\" text, successfully_shipped is a real parseable date.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'All three counts are correct and add up to every row', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(orders.copy())",
+      "        total = out2.get('never_shipped',0) + out2.get('shipping_defects',0) + out2.get('successfully_shipped',0)",
+      "        results.append({'name': 'The three counts add up to all 412 rows', 'pass': bool(total == 412), 'hint': f'Expected the three counts to sum to 412 (every row falls into exactly one bucket), got {total!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'The three counts add up to all 412 rows', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out3 = fn(orders.head(100).copy())",
+      "        results.append({'name': 'Recomputes on the first 100 rows (not hardcoded)', 'pass': bool(out3.get('never_shipped')==29 and out3.get('shipping_defects')==0), 'hint': f'On the first 100 rows, never_shipped should be 29 and shipping_defects should be 0 (that row is not among them), got {out3!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 100 rows (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    written: {
+      label: "Why would treating never_shipped and shipping_defects as the same problem be a mistake?",
+      placeholder: "Think about what each one actually represents, and what fixing each would mean for the business...",
+      check: (text) => /(defect|placeholder|blank|missing|legitimate|expect|real)/i.test(text) && text.trim().length > 40,
+      hint: "Mention that never_shipped is an expected, legitimate state (those orders genuinely haven't shipped), while shipping_defects is an actual data problem (someone typed a placeholder into a field that should hold a real date), conflating them would mean either investigating 133 orders that don't need it, or missing the 1 that does." },
+    hints: [
+      "This combines the first two tasks from this stage exactly as they are, plus a third count for genuinely valid dates, into one dict.",
+      "never_shipped is orders['shipped_date'].isna().sum(), shipping_defects is (orders['shipped_date']=='MISSING').sum(), reuse both directly.",
+      "successfully_shipped can be found with pd.to_datetime(orders['shipped_date'], format='mixed', errors='coerce').notna().sum(), errors='coerce' turns anything unparseable (including \"MISSING\") into NaT instead of crashing.",
+      "def shipping_data_audit(orders):\n    never_shipped = orders['shipped_date'].isna().sum()\n    shipping_defects = (orders['shipped_date']=='MISSING').sum()\n    valid = pd.to_datetime(orders['shipped_date'], format='mixed', errors='coerce').notna().sum()\n    return {'never_shipped': never_shipped, 'shipping_defects': shipping_defects, 'successfully_shipped': valid}" ],
+    explanation: { why: "errors='coerce' is what makes the third count possible, it turns any unparseable value (blank, \"MISSING\", or anything else malformed) into pandas' NaT (Not a Time) instead of raising, .notna() then isolates exactly the rows with a genuinely usable date.", mistake: "Reporting a single 'missing shipped_date' number (134, the sum of both problem types) erases the distinction this whole stage has been building, one number can't tell a reader whether they're looking at normal operational variation or an actual defect needing a fix.", tip: "Whenever a column has more than one DIFFERENT reason a value might be unusable, blank because it's genuinely N/A, versus broken because of a data defect, resist the urge to collapse them into one 'bad data' count, keep them as separate, named categories.", business: "This is precisely the distinction Module 4 raises as a concept, here it becomes real, tested code: a report that says '134 orders have shipping problems' would send someone chasing 133 orders that are completely fine and might bury the 1 that genuinely needs attention, separating the counts is what makes the report actually actionable." } },
 ];
 
 /* ================= rendering ================= */
@@ -939,9 +1226,9 @@ async function checkTask(id) {
     if (task.engine === "pandas") {
       const waitEl = getResultsEl();
       if (waitEl) waitEl.innerHTML = `<div class="feedback wait">Loading the real dataset and starting Python&hellip; first run downloads pandas (can take 20-60s), after that it's faster.</div>`;
-      const retailTxt = await getRetailCsv();
+      const csvText = await getDatasetCsv(task.dataset || "retail");
       const harness = buildPandasHarness(task);
-      outcome = await PySandboxRunner.run(harness, "harness", [code, retailTxt], 20000, 90000);
+      outcome = await PySandboxRunner.run(harness, "harness", [code, csvText], 20000, 90000);
     } else {
       const harness = buildHarness(task);
       outcome = await PySandboxRunner.run(harness, "harness", code, 12000, 60000);
