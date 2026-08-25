@@ -69,10 +69,12 @@ export const COURSES: Course[] = [
     // Tableau/Power BI/Automation/Integrated), the diagnostic, adaptive
     // engine, misconception system, learning roadmap, portfolio, career
     // path, and capstone are real and built. Real Whop product/plan created
-    // 2026-08-25 (see whop-created-products.json). Left false pending the
-    // checkout -> webhook -> entitlement -> access chain being verified end
-    // to end; flip to true once that's confirmed, not before.
-    published: false,
+    // 2026-08-25 (see whop-created-products.json). checkout -> webhook ->
+    // entitlement -> access verified end to end live against production on
+    // 2026-08-25 (real signed webhook, real DB writes, duplicate protection,
+    // revocation, and cross-course isolation all confirmed, test data
+    // cleaned up afterward) before flipping this to true.
+    published: true,
   },
 ];
 
