@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistics Practice Library, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;--violet:#a78bfa;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 90px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--violet)}
+.bar .in{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px;flex-wrap:wrap}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--violet)}
+.hero{padding:40px 0 24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--violet);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:720px;margin-top:10px}
+.scopenote{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
+.scopenote b{color:var(--violet)}
+.skillbar{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:20px 22px;margin-top:22px}
+.skillrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tierpill{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 12px;border-radius:99px;font-weight:700}
+.tierpill.t-not-started{background:var(--bg2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.12);color:var(--amber)}
+.tierpill.t-competent{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t-mastered{background:rgba(167,139,250,.18);color:var(--violet)}
+.skillbarwrap{flex:1;min-width:180px;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--bd)}
+.skillbarwrap .fill{height:100%;background:var(--violet)}
+.tierladder{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.tierladder span{font-family:'IBM Plex Mono';font-size:10.5px;padding:3px 10px;border-radius:99px;background:var(--bg2);color:var(--mut2);border:1px solid var(--bd2)}
+.tierladder span.reached{background:rgba(167,139,250,.12);color:var(--violet);border-color:rgba(167,139,250,.4)}
+.nextup{margin-top:14px;padding:12px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px}
+.nextup b{color:var(--violet)}
+.tasklist{display:grid;gap:10px;margin-top:22px}
+.taskcard{background:var(--card);border:1px solid var(--bd2);border-radius:12px;overflow:hidden}
+.taskhead:focus-visible{outline:2px solid var(--violet);outline-offset:-2px}
+.taskhead{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer}
+.taskhead:hover{background:var(--card2)}
+.taskhead .tid{font-family:'IBM Plex Mono';font-size:11px;color:var(--mut2);width:32px;flex-shrink:0}
+.taskhead .ttitle{font-weight:600;font-size:14.5px;flex:1}
+.levelpill{font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;padding:2px 9px;border-radius:99px;flex-shrink:0}
+.levelpill.guided{background:rgba(74,222,149,.12);color:var(--good)}
+.levelpill.semiguided{background:rgba(240,180,41,.12);color:var(--amber)}
+.levelpill.challenge{background:rgba(255,133,133,.12);color:var(--bad)}
+.levelpill.mastery{background:rgba(167,139,250,.16);color:var(--violet)}
+.statusdot{width:9px;height:9px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+.statusdot.passed{background:var(--good);box-shadow:0 0 6px var(--good)}
+.taskbody{display:none;padding:0 18px 18px}
+.taskbody.open{display:block}
+.objective{font-size:13.5px;color:var(--mut);margin-bottom:12px}
+.objective b{color:var(--tx)}
+textarea{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6;tab-size:4}
+.writtenlbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--violet);font-family:'IBM Plex Mono';margin:12px 0 6px}
+.writtenbox{font-family:'IBM Plex Sans';line-height:1.6}
+textarea:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--violet);color:var(--violet)}
+button:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+button.primary{background:var(--violet);color:#1a1030;border-color:var(--violet)}
+button.primary:hover{filter:brightness(1.1);color:#1a1030}
+button:disabled{opacity:.5;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px}
+.feedback.ok{background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.feedback.wait{background:var(--bg2);border:1px solid var(--bd2);color:var(--mut)}
+.testsummary{margin-top:8px;font-family:'IBM Plex Mono';font-size:12.5px;font-weight:600}
+.hints{margin-top:12px;display:grid;gap:6px}
+.hints details{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px}
+.hints summary{cursor:pointer;color:var(--violet);font-size:12px;font-weight:600;list-style:none}
+.hints summary::-webkit-details-marker{display:none}
+.hints .hbody{margin-top:7px;font-size:12.5px;color:var(--mut);padding-top:7px;border-top:1px solid var(--bd)}
+.explainbox{margin-top:12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.explainbox .erow .elbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--violet);font-family:'IBM Plex Mono';margin-bottom:3px}
+.explainbox .erow p{font-size:12.5px;color:var(--mut)}
+.miscopanel{margin-top:10px;background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.35);border-radius:8px;padding:14px 16px}
+.miscopanel .miscohead{font-weight:700;font-size:13.5px;color:var(--violet);margin-bottom:8px}
+.miscopanel .miscoexplain{font-size:13px;color:var(--tx);margin:0 0 10px}
+.miscopanel .mlbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);margin-bottom:4px;font-family:'IBM Plex Mono'}
+.miscopanel .miscoexample{margin-bottom:10px}
+.miscopanel .miscoexample pre{font-family:'IBM Plex Mono';font-size:12px;color:var(--mut);white-space:pre-wrap;background:var(--bg2);border-radius:6px;padding:8px 10px;margin-top:4px}
+.miscopanel .miscoexercise p{font-size:13px;color:var(--tx)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 70px} .taskhead{flex-wrap:wrap} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-05.html">Module 5: EDA &amp; Statistics</a><a href="learning-roadmap.html">Learning Roadmap</a><a href="career.html">Career Path</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Practice Library &middot; Statistics &middot; 40 tasks, Stages 1-5</span>
+    <h1 class="serif">Statistics Practice Library</h1>
+    <p class="sub">Real descriptive statistics, probability, hypothesis testing, correlation/regression, and business statistical judgment, computed by real CPython (Pyodide, the same sandbox the Python library uses) against real, genuinely messy datasets, not scipy, not a formula lookup, not a fixed answer key.</p>
+    <div class="scopenote"><b>Honest scope note:</b> every task is graded by running your function AND a freshly-computed reference calculation on the same real data, twice, once on the full dataset and once on a different slice, so a hardcoded number cannot pass. No scipy is used anywhere, every p-value and confidence interval is computed from the standard normal CDF via Python's built-in math.erf, and every regression is fit with the closed-form least-squares formula, both worth knowing how to derive by hand, not just call a library for.</p></div>
+  </header>
+
+  <div id="skillBars"></div>
+
+  <div class="tasklist" id="taskList"></div>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Practice Library</footer>
+</div>
+
+<script src="course-progress.js?v=6"></script>
+<script src="practice-progress.js"></script>
+<script src="misconception-registry.js?v=2"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+
+/* ================= dataset registry ================= */
+const DATASET_FILES = {
+  survey: { path: "datasets/survey_responses.csv", varName: "survey" },
+  overtime: { path: "datasets/employee_overtime.csv", varName: "ot" },
+  retail: { path: "datasets/retail_sales_ledger.csv", varName: "retail" },
+  marketing: { path: "datasets/marketing_campaign_results.csv", varName: "mkt" },
+  saas: { path: "datasets/saas_subscriptions.csv", varName: "saas" },
+  pnl: { path: "datasets/pnl_statement.csv", varName: "pnl" },
+};
+const datasetCsvPromises = {};
+function getDatasetCsv(key) {
+  if (!datasetCsvPromises[key]) datasetCsvPromises[key] = fetch(DATASET_FILES[key].path).then(r => r.text());
+  return datasetCsvPromises[key];
+}
+
+/* ================= generic reference-comparison harness =================
+   Every task supplies a functionName, a dataset key, and refCode (Python
+   source defining _ref(d), the correct computation, as an array of
+   already-indented lines). Grading runs the student's function AND _ref
+   on the SAME data twice: once on the full real dataset, once on a
+   different real slice/filter (task.mutation), and checks the student's
+   result matches the freshly-computed reference both times. Because _ref
+   is executed fresh against real data on every grading run rather than
+   compared to a stored constant, a hardcoded return value cannot pass
+   twice, the same anti-cheat shape as this course's SQL library (live
+   reference query on original + independently mutated data) and Module
+   9's capstone, applied here to statistics instead of SQL. */
+const STATS_PREAMBLE = "import pandas as pd, numpy as np, io, math, json\ndef _mk(txt): return pd.read_csv(io.StringIO(txt))\ndef _close(a, b):\n    if isinstance(a, dict) and isinstance(b, dict):\n        return set(a.keys()) == set(b.keys()) and all(_close(a[k], b[k]) for k in a)\n    if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):\n        return len(a) == len(b) and all(_close(x, y) for x, y in zip(a, b))\n    if isinstance(a, bool) or isinstance(b, bool):\n        return bool(a) == bool(b)\n    try:\n        fa, fb = float(a), float(b)\n        return abs(fa - fb) <= max(0.015, abs(fb) * 0.01)\n    except (TypeError, ValueError):\n        return a == b";
+
+function buildStatsHarness(task) {
+  const ds = DATASET_FILES[task.dataset];
+  const v = ds.varName;
+  return [
+    STATS_PREAMBLE,
+    "def harness(payload):",
+    `    code, ${v}_txt = payload`,
+    "    ns = {'pd': pd, 'np': np, 'math': math}",
+    "    try:",
+    "        exec(code, ns)",
+    "    except Exception as e:",
+    "        return {'ranOk': False, 'error': f'{type(e).__name__}: {e}'}",
+    `    fn = ns.get(${JSON.stringify(task.functionName)})`,
+    "    if fn is None:",
+    `        return {'ranOk': True, 'results': [{'name': ${JSON.stringify(task.functionName + " is defined")}, 'pass': False, 'hint': ${JSON.stringify("Define a function named exactly " + task.functionName + ".")}}]}`,
+    `    ${v} = _mk(${v}_txt)`,
+    ...task.refCode,
+    "    def _detect_misconception(out, ref):",
+    "        if not isinstance(out, dict) or not isinstance(ref, dict):",
+    "            return None",
+    "        if 'mean' in ref and 'median' in ref and 'mean' in out:",
+    "            try:",
+    "                ov = float(out['mean'])",
+    "                if abs(ov - float(ref['median'])) < 0.02 and abs(ov - float(ref['mean'])) > 0.015 and abs(float(ref['mean']) - float(ref['median'])) > 0.015:",
+    "                    return 'mean-vs-median'",
+    "            except (TypeError, ValueError):",
+    "                pass",
+    "        if 'p_value' in ref and 'p_value' in out:",
+    "            try:",
+    "                pv = float(out['p_value'])",
+    "                if pv > 1.0001 or pv < -0.0001:",
+    "                    return 'p-value-misunderstanding'",
+    "            except (TypeError, ValueError):",
+    "                pass",
+    "        if 'significant' in ref and 'p_value' in ref and 'significant' in out and 'p_value' in out:",
+    "            try:",
+    "                if abs(float(out['p_value']) - float(ref['p_value'])) < 0.01 and bool(out['significant']) != (float(ref['p_value']) < 0.05):",
+    "                    return 'significance-vs-magnitude'",
+    "            except (TypeError, ValueError):",
+    "                pass",
+    "        return None",
+    "    results = []",
+    "    misconceptionTag = None",
+    "    try:",
+    `        out1 = fn(${v}.copy())`,
+    `        ref1 = _ref(${v}.copy())`,
+    "        ok1 = _close(out1, ref1)",
+    "        results.append({'name': 'Matches the correct calculation on the full dataset', 'pass': ok1, 'hint': ('Expected something like ' + repr(ref1) + ', got ' + repr(out1) + '.') if not ok1 else ''})",
+    "        if not ok1:",
+    "            misconceptionTag = _detect_misconception(out1, ref1)",
+    "    except Exception as e:",
+    "        ok1 = False",
+    "        results.append({'name': 'Function runs without error', 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})",
+    "    if ok1:",
+    `        sub = ${task.mutation}`,
+    "        try:",
+    "            out2 = fn(sub.copy())",
+    "            ref2 = _ref(sub.copy())",
+    "            ok2 = _close(out2, ref2)",
+    `            results.append({'name': ${JSON.stringify(task.mutationLabel)}, 'pass': ok2, 'hint': ('On this different slice, expected something like ' + repr(ref2) + ', got ' + repr(out2) + '.') if not ok2 else ''})`,
+    "            if not ok2 and misconceptionTag is None:",
+    "                misconceptionTag = _detect_misconception(out2, ref2)",
+    "        except Exception as e:",
+    `            results.append({'name': ${JSON.stringify(task.mutationLabel)}, 'pass': False, 'hint': f'Raised: {type(e).__name__}: {e}'})`,
+    "    return {'ranOk': True, 'results': results, 'misconceptionTag': misconceptionTag}",
+  ].join("\n");
+}
+
+/* ================= misconception detection (statistics) =================
+   The Python harness itself detects the misconception (comparing the
+   student's actual wrong output to the freshly-computed reference value,
+   real evidence, not fragile text pattern-matching) and returns a tag in
+   the graded result. 3 reliable tags detected here: mean-vs-median,
+   p-value-misunderstanding, significance-vs-magnitude. See
+   misconception-registry.js for the full registry and its honest-scope
+   note on which tags across the whole course have detection wired up. */
+function flagStatsMisconception(tag, resultsEl) {
+  if (!tag || typeof MisconceptionRegistry === "undefined") return;
+  const count = MisconceptionRegistry.record(tag);
+  if (count < MisconceptionRegistry.REPEATED_THRESHOLD) return;
+  const panel = document.createElement("div");
+  MisconceptionRegistry.renderIfRepeated(panel, tag);
+  resultsEl.appendChild(panel);
+}
+
+/* ================= tasks ================= */
+const SKILL_ID_DESCRIPTIVE = "statistics-descriptive";
+const SKILL_ID_PROBABILITY = "statistics-probability";
+const SKILL_ID_HYPOTHESIS = "statistics-hypothesis";
+const SKILL_ID_CORRELATION = "statistics-correlation";
+const SKILL_ID_BUSINESS = "statistics-business";
+const SKILLS = [
+  { id: SKILL_ID_DESCRIPTIVE, label: "Statistics: Descriptive" },
+  { id: SKILL_ID_PROBABILITY, label: "Statistics: Probability & Sampling" },
+  { id: SKILL_ID_HYPOTHESIS, label: "Statistics: Hypothesis Testing" },
+  { id: SKILL_ID_CORRELATION, label: "Statistics: Correlation & Regression" },
+  { id: SKILL_ID_BUSINESS, label: "Statistics: Business Judgment" },
+];
+
+const TASKS = [
+  { id: "st-d01", skill: "statistics-descriptive", tool: "statistics", level: "guided", prerequisite: [],
+    title: "The average satisfaction score",
+    objective: "Compute the mean of a real column, the first move on any new numeric field.",
+    objectiveNote: "survey has a satisfaction_score column (0-6). Return {\"mean\": ...} using the column's real mean, rounded to 4 decimals.",
+    functionName: "mean_satisfaction",
+    dataset: "survey",
+    starterCode: "def mean_satisfaction(survey):\n    # your code here\n    return {\"mean\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        return {\"mean\": round(float(d[\"satisfaction_score\"].mean()), 4)}"
+    ],
+    mutation: "survey.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice of the real survey (not hardcoded)",
+    hints: ["mean() on a pandas Series already skips missing values by default.", "round(float(x), 4) keeps the comparison stable without changing the real computed value."],
+    explanation: { why: "The mean is the sum divided by the count, pandas' .mean() does both in one call and already handles the 6 missing satisfaction scores in this file correctly by skipping them.", business: "A single average satisfaction number is the first thing most stakeholders ask for, but it hides everything about the shape of the responses behind it, which is exactly what the rest of this stage builds toward." },
+  },
+  { id: "st-d02", skill: "statistics-descriptive", tool: "statistics", level: "guided", prerequisite: [],
+    title: "The median satisfaction score",
+    objective: "Compute the median, the value that actually sits in the middle, unlike the mean.",
+    objectiveNote: "Return {\"median\": ...} for satisfaction_score.",
+    functionName: "median_satisfaction",
+    dataset: "survey",
+    starterCode: "def median_satisfaction(survey):\n    # your code here\n    return {\"median\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        return {\"median\": float(d[\"satisfaction_score\"].median())}"
+    ],
+    mutation: "survey.head(20)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["pandas has a .median() method, exactly parallel to .mean()."],
+    explanation: { why: "The median sorts every value and picks the middle one, so a handful of extreme scores can't drag it around the way they can the mean.", mistake: "Assuming mean and median should always be close, a real gap between them is a signal worth investigating, not an error to explain away.", business: "When mean and median disagree noticeably, the median is usually the more honest single number to lead with in a stakeholder summary." },
+  },
+  { id: "st-d03", skill: "statistics-descriptive", tool: "statistics", level: "guided", prerequisite: [],
+    title: "The most common department",
+    objective: "Find the mode, the single most frequent value in a categorical column.",
+    objectiveNote: "Return {\"department\": ..., \"count\": ...} for the most common value in the department column.",
+    functionName: "most_common_department",
+    dataset: "survey",
+    starterCode: "def most_common_department(survey):\n    # your code here\n    return {\"department\": \"\", \"count\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        vc = d[\"department\"].value_counts()",
+      "        return {\"department\": vc.index[0], \"count\": int(vc.iloc[0])}"
+    ],
+    mutation: "survey.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice (a different department may lead)",
+    hints: ["value_counts() returns a Series sorted from most to least frequent, its first index label is the mode."],
+    explanation: { why: "value_counts() tallies every distinct value and sorts by frequency in one call, the mode is just its first row.", business: "Knowing the single most common category is a quick sanity check before any deeper group-by analysis, if one department dominates the response count, every department-level average needs that context." },
+  },
+  { id: "st-d04", skill: "statistics-descriptive", tool: "statistics", level: "guided", prerequisite: [],
+    title: "Min, max, and range of tenure",
+    objective: "Compute the spread of a numeric column using its extremes.",
+    objectiveNote: "Return {\"min\": ..., \"max\": ..., \"range\": ...} for tenure_months, all integers.",
+    functionName: "tenure_range",
+    dataset: "survey",
+    starterCode: "def tenure_range(survey):\n    # your code here\n    return {\"min\": 0, \"max\": 0, \"range\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        t = d[\"tenure_months\"]",
+      "        return {\"min\": int(t.min()), \"max\": int(t.max()), \"range\": int(t.max() - t.min())}"
+    ],
+    mutation: "survey.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice (the min/max genuinely change)",
+    hints: ["Series has .min() and .max() methods, range is just their difference."],
+    explanation: { why: "Range is the crudest measure of spread, just the distance between the extremes, useful as a first check before variance or percentiles.", mistake: "Range is highly sensitive to a single extreme value, one unusually long-tenured employee can make the range look far larger than what's typical for most of the column." },
+  },
+  { id: "st-d05", skill: "statistics-descriptive", tool: "statistics", level: "semiguided", prerequisite: ["st-d04"],
+    title: "Variance and standard deviation of overtime",
+    objective: "Compute real spread measures, not just min/max, on a genuinely skewed column.",
+    objectiveNote: "ot has employee_id, month, overtime_hours. Return {\"variance\": ..., \"std\": ...} using SAMPLE variance/std (ddof=1), rounded to 3 decimals.",
+    functionName: "overtime_spread",
+    dataset: "overtime",
+    starterCode: "def overtime_spread(ot):\n    # your code here, use ddof=1 for sample variance/std\n    return {\"variance\": 0, \"std\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        h = d[\"overtime_hours\"]",
+      "        return {\"variance\": round(float(h.var(ddof=1)), 3), \"std\": round(float(h.std(ddof=1)), 3)}"
+    ],
+    mutation: "ot.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice of the real overtime data (not hardcoded)",
+    hints: ["pandas' .var() and .std() default to ddof=1 (sample) already, but pass it explicitly so the intent is clear.", "std is just the square root of variance, in the same units as the original data, which is why it's usually the more interpretable of the two."],
+    explanation: { why: "Variance averages the squared distance of every value from the mean, standard deviation undoes the squaring so it's back in real hours, not squared hours.", business: "A high standard deviation on overtime hours means the workload is unevenly distributed, some employees are absorbing far more overtime than others, a fact the mean alone would completely hide." },
+  },
+  { id: "st-d06", skill: "statistics-descriptive", tool: "statistics", level: "semiguided", prerequisite: ["st-d04"],
+    title: "Percentiles and the interquartile range",
+    objective: "Break a distribution into quarters instead of relying on one summary number.",
+    objectiveNote: "Return {\"p25\": ..., \"p50\": ..., \"p75\": ..., \"iqr\": ...} for overtime_hours, all rounded to 2 decimals.",
+    functionName: "overtime_percentiles",
+    dataset: "overtime",
+    starterCode: "def overtime_percentiles(ot):\n    import numpy as np\n    # your code here\n    return {\"p25\": 0, \"p50\": 0, \"p75\": 0, \"iqr\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import numpy as np",
+      "        h = d[\"overtime_hours\"]",
+      "        p25, p50, p75 = np.percentile(h, [25, 50, 75])",
+      "        return {\"p25\": round(float(p25), 2), \"p50\": round(float(p50), 2), \"p75\": round(float(p75), 2), \"iqr\": round(float(p75 - p25), 2)}"
+    ],
+    mutation: "ot.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice (percentiles genuinely shift)",
+    hints: ["np.percentile(series, [25, 50, 75]) returns all three cut points in one call.", "IQR is just p75 minus p25, the width of the middle 50% of the data."],
+    explanation: { why: "Percentiles describe the shape of a distribution without being thrown off by one or two extreme values the way mean and range can be.", business: "IQR is the standard, defensible definition of a 'typical' range, it's what most outlier rules (including the next task) are built on top of." },
+  },
+  { id: "st-d07", skill: "statistics-descriptive", tool: "statistics", level: "semiguided", prerequisite: ["st-d06"],
+    title: "Flagging outliers with the IQR rule",
+    objective: "Apply the standard 1.5x IQR rule to actually count how many rows are statistical outliers.",
+    objectiveNote: "Return {\"outlier_count\": ..., \"upper_threshold\": ...} for overtime_hours, using the standard rule: outlier if value > p75 + 1.5*IQR or value < p25 - 1.5*IQR.",
+    functionName: "count_overtime_outliers",
+    dataset: "overtime",
+    starterCode: "def count_overtime_outliers(ot):\n    import numpy as np\n    # your code here\n    return {\"outlier_count\": 0, \"upper_threshold\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import numpy as np",
+      "        h = d[\"overtime_hours\"]",
+      "        p25, p75 = np.percentile(h, [25, 75])",
+      "        iqr = p75 - p25",
+      "        hi = p75 + 1.5 * iqr",
+      "        lo = p25 - 1.5 * iqr",
+      "        outliers = h[(h < lo) | (h > hi)]",
+      "        return {\"outlier_count\": int(len(outliers)), \"upper_threshold\": round(float(hi), 2)}"
+    ],
+    mutation: "ot.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice (fewer or different rows flagged)",
+    hints: ["The 1.5x IQR rule is the same one behind a boxplot's whiskers, anything past them is flagged.", "Build the boolean mask with (h < lo) | (h > hi), a Series comparison, not Python's `or`."],
+    explanation: { why: "The 1.5x multiplier is a widely-used convention, not a law of nature, it flags points far enough from the middle 50% to warrant a second look.", mistake: "Using Python's `and`/`or` instead of `&`/`|` on two Series comparisons raises an error or silently does the wrong thing, pandas needs the bitwise operators for element-wise boolean logic.", business: "An outlier count on overtime hours is a starting point for a conversation with a manager, not an automatic 'something is wrong' alarm, some of those flagged rows might be a single legitimate crunch week." },
+  },
+  { id: "st-d08", skill: "statistics-descriptive", tool: "statistics", level: "semiguided", prerequisite: [],
+    title: "Is retail revenue symmetric or skewed?",
+    objective: "Compare mean and median on real revenue data to detect skew without plotting anything.",
+    objectiveNote: "retail has order_id, order_date, region, product_line, units, unit_price, revenue. Return {\"mean\": ..., \"median\": ..., \"skewed_right\": ...} (mean rounded to 2dp, median to 2dp, skewed_right is a bool, true if mean > median).",
+    functionName: "revenue_skew_direction",
+    dataset: "retail",
+    starterCode: "def revenue_skew_direction(retail):\n    # your code here\n    return {\"mean\": 0, \"median\": 0, \"skewed_right\": False}",
+    refCode: [
+      "    def _ref(d):",
+      "        r = d[\"revenue\"]",
+      "        return {\"mean\": round(float(r.mean()), 2), \"median\": round(float(r.median()), 2), \"skewed_right\": bool(r.mean() > r.median())}"
+    ],
+    mutation: "retail.head(20)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["Compute both mean and median, then just compare them with a plain > operator.", "Wrap the comparison result in bool(...) so it serializes as a real true/false, not a numpy bool type."],
+    explanation: { why: "When the mean sits noticeably above the median, a smaller number of unusually large orders are pulling the average up, that's the textbook signature of right skew.", business: "Revenue data is almost always right-skewed in practice, a handful of big orders inflate the average order value far above what a typical customer actually spends, reporting the mean alone overstates the typical transaction." },
+  },
+  { id: "st-d09", skill: "statistics-descriptive", tool: "statistics", level: "challenge", prerequisite: ["st-d05", "st-d06"],
+    title: "A full distribution summary",
+    objective: "Combine several descriptive statistics into one summary, the kind of function a real analyst writes once and reuses.",
+    objectiveNote: "Return {\"mean\": ..., \"median\": ..., \"std\": ..., \"min\": ..., \"max\": ...} for satisfaction_score (mean/std to 3dp, median/min/max as-is).",
+    functionName: "satisfaction_distribution_summary",
+    dataset: "survey",
+    starterCode: "def satisfaction_distribution_summary(survey):\n    # your code here\n    return {\"mean\": 0, \"median\": 0, \"std\": 0, \"min\": 0, \"max\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        s = d[\"satisfaction_score\"]",
+      "        return {\"mean\": round(float(s.mean()), 3), \"median\": float(s.median()), \"std\": round(float(s.std(ddof=1)), 3), \"min\": int(s.min()), \"max\": int(s.max())}"
+    ],
+    mutation: "survey.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice (every value shifts together)",
+    hints: ["This is exactly the five stats you've already written individually in this stage, combined into one function.", "df.describe() would give you nearly all of this for free, worth knowing it exists, but write it explicitly here so every value is something you computed on purpose."],
+    explanation: { why: "A five-number summary (mean, median, std, min, max) is the fastest way to understand a new numeric column before doing anything else with it.", business: "This is usually the very first code a real analyst runs on any new dataset, before a single chart or query, it's how you catch a column that's broken or miscoded before it wastes an hour of analysis." },
+  },
+  { id: "st-d10", skill: "statistics-descriptive", tool: "statistics", level: "mastery", prerequisite: ["st-d07", "st-d09"],
+    title: "Are these overtime outliers legitimate?",
+    objective: "Flag extreme overtime values, then judge in writing whether they look like real crunch weeks or likely data errors.",
+    objectiveNote: "Return {\"suspect_count\": ..., \"median\": ...} where suspect_count counts rows with overtime_hours more than 5x the median (median rounded to 2dp). Then, in the box below, say whether you'd treat these as legitimate outliers or investigate them as possible data errors, and why.",
+    functionName: "flag_suspect_overtime",
+    dataset: "overtime",
+    starterCode: "def flag_suspect_overtime(ot):\n    # your code here\n    return {\"suspect_count\": 0, \"median\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        h = d[\"overtime_hours\"]",
+      "        med = h.median()",
+      "        suspect = h[h > med * 5]",
+      "        return {\"suspect_count\": int(len(suspect)), \"median\": round(float(med), 2)}"
+    ],
+    mutation: "ot.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["5x the median is a deliberately blunt threshold, different from the IQR rule in the earlier task, on purpose, there's more than one valid way to define 'extreme.'"],
+    explanation: { why: "A 5x-the-median threshold is a simple, explainable rule, useful exactly because it's easy to defend to a non-technical stakeholder, unlike a z-score or IQR multiplier.", mistake: "Treating every flagged value as an error to delete throws away real information, an outlier in overtime hours could be a legitimate one-off crunch, or it could be a data-entry mistake (hours logged in minutes, say), the number alone can't tell you which.", business: "This is the actual judgment call behind every 'should I remove this outlier' decision, the statistics can flag a candidate, but only domain knowledge (was there a product launch that week?) can confirm whether it's real." },
+    written: { label: "Legitimate outlier, or data error? Explain your reasoning.", placeholder: "State whether you'd keep or investigate these rows, and what evidence would change your mind...", check: (t) => t.trim().length > 40 && /invest|check|real|legitima|error|verify|confirm/i.test(t), hint: "Say more, and use specific reasoning tied to the numbers you computed." },
+  },
+  { id: "st-p01", skill: "statistics-probability", tool: "statistics", level: "guided", prerequisite: [],
+    title: "A basic probability from real data",
+    objective: "Compute a simple probability directly from row counts, no formula sheet needed.",
+    objectiveNote: "Return {\"probability\": ...} for P(department == 'Engineering'), rounded to 4dp.",
+    functionName: "prob_engineering",
+    dataset: "survey",
+    starterCode: "def prob_engineering(survey):\n    # your code here\n    return {\"probability\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        return {\"probability\": round(float((d[\"department\"] == \"Engineering\").mean()), 4)}"
+    ],
+    mutation: "survey.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["A boolean Series' .mean() is exactly the proportion of True values, that IS the probability."],
+    explanation: { why: "Probability, here, is just a proportion: how many rows satisfy the condition, divided by how many rows there are. (condition).mean() computes both in one line.", business: "This is the same computation behind every conversion rate, churn rate, and pass rate in this course, they're all just 'proportion of rows meeting a condition.'" },
+  },
+  { id: "st-p02", skill: "statistics-probability", tool: "statistics", level: "guided", prerequisite: ["st-p01"],
+    title: "A conditional probability",
+    objective: "Compute a probability restricted to a subgroup, not the whole dataset.",
+    objectiveNote: "Return {\"probability\": ...} for P(satisfaction_score >= 4 | department == 'Sales'), i.e. among Sales rows only, rounded to 4dp.",
+    functionName: "cond_prob_high_satisfaction_sales",
+    dataset: "survey",
+    starterCode: "def cond_prob_high_satisfaction_sales(survey):\n    # your code here\n    return {\"probability\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        sales = d[d[\"department\"] == \"Sales\"]",
+      "        return {\"probability\": round(float((sales[\"satisfaction_score\"] >= 4).mean()), 4)}"
+    ],
+    mutation: "survey.head(80)",
+    mutationLabel: "Recomputes correctly on a smaller slice (a genuinely different Sales subset)",
+    hints: ["Filter to the condition FIRST (department == 'Sales'), then compute the probability only within that filtered subset."],
+    explanation: { why: "Conditional probability just means: restrict to the rows where the condition is true, THEN compute the proportion, the order of operations is the entire concept.", mistake: "Computing P(satisfaction >= 4) across everyone, then separately checking who's in Sales, answers a different question, conditioning has to happen before the probability is computed, not after.", business: "This is the exact reasoning behind 'what fraction of our enterprise customers churn' versus 'what fraction of all customers churn', the two numbers can tell very different stories." },
+  },
+  { id: "st-p03", skill: "statistics-probability", tool: "statistics", level: "semiguided", prerequisite: ["st-p01"],
+    title: "Sample mean vs population mean",
+    objective: "Compare a small sample's average to the true average of the full dataset it was drawn from.",
+    objectiveNote: "Treat the full survey as the population, and its first 20 rows as a sample. Return {\"sample_mean\": ..., \"population_mean\": ..., \"difference\": ...} for satisfaction_score, all rounded to 3dp.",
+    functionName: "sample_vs_population_mean",
+    dataset: "survey",
+    starterCode: "def sample_vs_population_mean(survey):\n    # your code here\n    return {\"sample_mean\": 0, \"population_mean\": 0, \"difference\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        pop_mean = float(d[\"satisfaction_score\"].mean())",
+      "        sample = d.head(20)",
+      "        sample_mean = float(sample[\"satisfaction_score\"].mean())",
+      "        return {\"sample_mean\": round(sample_mean, 3), \"population_mean\": round(pop_mean, 3), \"difference\": round(sample_mean - pop_mean, 3)}"
+    ],
+    mutation: "survey.tail(150)",
+    mutationLabel: "Recomputes correctly when given a different population to sample from",
+    hints: ["Compute the population mean from the WHOLE dataframe you're given, then take just the first 20 rows of that same dataframe as the sample."],
+    explanation: { why: "Every sample, even a genuinely random one, will differ from the true population value by some amount, that gap is called sampling error, and it's expected, not a mistake.", business: "This is the entire reason a 20-person customer survey can't be reported as 'the truth' about all customers, it's an estimate with a margin of error, not a fact." },
+  },
+  { id: "st-p04", skill: "statistics-probability", tool: "statistics", level: "semiguided", prerequisite: ["st-p03"],
+    title: "Spotting a sampling bias",
+    objective: "Check whether an easy, convenient sample (the first N rows) actually represents the whole dataset.",
+    objectiveNote: "Return {\"first30_mean\": ..., \"full_mean\": ..., \"gap\": ...} comparing the mean satisfaction_score of the first 30 rows against the mean of the whole dataset, all rounded to 3dp.",
+    functionName: "detect_sample_bias",
+    dataset: "survey",
+    starterCode: "def detect_sample_bias(survey):\n    # your code here\n    return {\"first30_mean\": 0, \"full_mean\": 0, \"gap\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        first30 = d.head(30)[\"satisfaction_score\"].mean()",
+      "        full = d[\"satisfaction_score\"].mean()",
+      "        return {\"first30_mean\": round(float(first30), 3), \"full_mean\": round(float(full), 3), \"gap\": round(float(first30 - full), 3)}"
+    ],
+    mutation: "survey.tail(180)",
+    mutationLabel: "Recomputes correctly on a different underlying dataframe (not hardcoded)",
+    hints: ["Same shape as the previous task, a 'convenience sample' (whatever's easiest to grab) instead of a random one."],
+    explanation: { why: "If response order in this file correlates with anything real (which team submitted first, which region, response date), then 'the first 30 rows' is not a random sample, it's a biased one, and its mean can systematically differ from the true average.", business: "This is the same trap as only surveying customers who happen to reply fastest, or only reviewing the tickets that were easiest to find, convenience sampling quietly bakes in bias before any statistics are even computed." },
+  },
+  { id: "st-p05", skill: "statistics-probability", tool: "statistics", level: "semiguided", prerequisite: [],
+    title: "A churn probability from messy subscription data",
+    objective: "Compute a real proportion from a dataset with actual data-quality problems you have to handle.",
+    objectiveNote: "saas has customer_id, plan, mrr, signup_date, cancel_date, seats, industry. It contains an exact duplicate row and a literal \"-\" placeholder in cancel_date meaning 'not cancelled', not a real date. Drop the duplicate first, treat both blank AND \"-\" as 'not cancelled'. Return {\"probability\": ...} for the proportion of customers who HAVE cancelled, rounded to 4dp.",
+    functionName: "churn_probability",
+    dataset: "saas",
+    starterCode: "def churn_probability(saas):\n    # your code here, remember: drop_duplicates(), and \"-\" isn't a real cancel date\n    return {\"probability\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        d = d.drop_duplicates()",
+      "        churned = d[\"cancel_date\"].notna() & (d[\"cancel_date\"] != \"-\")",
+      "        return {\"probability\": round(float(churned.mean()), 4)}"
+    ],
+    mutation: "saas.head(10)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["pandas already reads a blank cancel_date cell as NaN, but the literal string \"-\" survives as real text, you have to filter that out explicitly.", "drop_duplicates() with no arguments removes rows that are exact duplicates across every column."],
+    explanation: { why: "notna() catches the blank cells, but a \"-\" placeholder is a real, non-null string as far as pandas is concerned, missing it would silently overcount churned customers.", mistake: "Skipping drop_duplicates() here double-counts one real customer, inflating both the numerator and denominator, a small dataset like this one is exactly where one duplicate row can meaningfully shift the answer.", business: "This is completely ordinary: real subscription exports have inconsistent null markers and the occasional duplicate sync, the analysis is only as correct as the cleaning that happens before it." },
+  },
+  { id: "st-p06", skill: "statistics-probability", tool: "statistics", level: "challenge", prerequisite: ["st-p05"],
+    title: "Does plan value predict churn?",
+    objective: "Split customers into two groups and compare their churn rates directly.",
+    objectiveNote: "Using the same cleaning as before (drop duplicates, drop rows with missing mrr, treat \"-\" as not-cancelled), split customers into high-value (mrr >= 199) and low-value (mrr < 199). Return {\"churn_rate_high_mrr\": ..., \"churn_rate_low_mrr\": ...}, both rounded to 4dp.",
+    functionName: "high_value_churn_rate",
+    dataset: "saas",
+    starterCode: "def high_value_churn_rate(saas):\n    # your code here\n    return {\"churn_rate_high_mrr\": 0, \"churn_rate_low_mrr\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        d = d.drop_duplicates()",
+      "        d = d[d[\"mrr\"].notna()]",
+      "        churned = d[\"cancel_date\"].notna() & (d[\"cancel_date\"] != \"-\")",
+      "        high = d[\"mrr\"] >= 199",
+      "        rate_high = float(churned[high].mean()) if high.sum() else 0.0",
+      "        rate_low = float(churned[~high].mean()) if (~high).sum() else 0.0",
+      "        return {\"churn_rate_high_mrr\": round(rate_high, 4), \"churn_rate_low_mrr\": round(rate_low, 4)}"
+    ],
+    mutation: "saas.head(12)",
+    mutationLabel: "Recomputes correctly on a smaller slice (the two rates genuinely shift)",
+    hints: ["Build the high/low boolean mask once, then use it to index BOTH the mrr column and the churned Series, they share the same row index so this lines up correctly."],
+    explanation: { why: "Splitting into two groups by a threshold, then comparing the same rate across both, is the basic shape of almost every 'does X predict Y' business question.", business: "A real subscription business asks exactly this question constantly, does an Enterprise customer actually churn less than a Starter customer, and by how much, before deciding where to invest retention effort." },
+  },
+  { id: "st-p07", skill: "statistics-probability", tool: "statistics", level: "challenge", prerequisite: [],
+    title: "The small-sample trap in channel performance",
+    objective: "Find which marketing channel has the fewest conversions, and judge whether that number is even trustworthy.",
+    objectiveNote: "mkt has channel, week, impressions, clicks, conversions, spend, 8 weeks of data per channel. Group by channel and sum conversions. Return {\"channel\": ..., \"n_conversions\": ..., \"reliable\": ...}, for the channel with the FEWEST total conversions, where reliable is True only if n_conversions >= 30.",
+    functionName: "unreliable_conversion_estimates",
+    dataset: "marketing",
+    starterCode: "def unreliable_conversion_estimates(mkt):\n    # your code here\n    return {\"channel\": \"\", \"n_conversions\": 0, \"reliable\": False}",
+    refCode: [
+      "    def _ref(d):",
+      "        g = d.groupby(\"channel\").agg(conversions=(\"conversions\", \"sum\"), impressions=(\"impressions\", \"sum\"))",
+      "        worst = g[\"conversions\"].idxmin()",
+      "        return {\"channel\": worst, \"n_conversions\": int(g.loc[worst, \"conversions\"]), \"reliable\": bool(g.loc[worst, \"conversions\"] >= 30)}"
+    ],
+    mutation: "mkt[mkt['channel'] != 'Referral']",
+    mutationLabel: "Recomputes correctly with a different set of channels available (not hardcoded)",
+    hints: ["groupby(...).agg(name=(\"col\",\"sum\")) sums a column per group and lets you name the result column whatever you like.", "idxmin() on a Series returns the INDEX LABEL of the smallest value, not the value itself, exactly the channel name you need here."],
+    explanation: { why: "idxmin() is the group-by equivalent of 'which row has the smallest value', it returns the label, not the number.", business: "A channel with only a handful of conversions can show a wildly high or low conversion RATE purely by chance, reporting 'Referral converts at 2.6%!' from 2 total conversions is exactly the kind of small-sample overconfidence that misleads a marketing budget decision." },
+  },
+  { id: "st-p08", skill: "statistics-probability", tool: "statistics", level: "mastery", prerequisite: ["st-p07"],
+    title: "A confidence interval by hand",
+    objective: "Compute a real margin of error for a proportion, without any statistics library beyond arithmetic.",
+    objectiveNote: "For the Email channel, compute its overall conversion rate (total conversions / total impressions across all weeks), then a 95% margin of error using the standard-error formula sqrt(p*(1-p)/n). Return {\"rate\": ..., \"margin\": ...}, both rounded to 4dp. Then, in the box below, state the interval in plain English and say whether you'd trust it enough to make a budget decision.",
+    functionName: "email_conversion_confidence",
+    dataset: "marketing",
+    starterCode: "def email_conversion_confidence(mkt):\n    import math\n    # your code here\n    return {\"rate\": 0, \"margin\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        g = d.groupby(\"channel\").agg(conversions=(\"conversions\", \"sum\"), impressions=(\"impressions\", \"sum\"))",
+      "        p = g.loc[\"Email\", \"conversions\"] / g.loc[\"Email\", \"impressions\"]",
+      "        n = g.loc[\"Email\", \"impressions\"]",
+      "        se = math.sqrt(p * (1 - p) / n)",
+      "        return {\"rate\": round(float(p), 4), \"margin\": round(float(1.96 * se), 4)}"
+    ],
+    mutation: "mkt[mkt['week'] != mkt['week'].max()]",
+    mutationLabel: "Recomputes correctly on a different window of weeks (not hardcoded)",
+    hints: ["1.96 is the standard multiplier for a 95% confidence interval on a proportion, the same number Module 5 introduced.", "The margin is added AND subtracted from the rate to get the interval's two ends, this function only needs to return the margin itself."],
+    explanation: { why: "This is the exact formula behind every 'plus or minus X%' figure in a real polling or conversion-rate report, computed here from raw impressions and conversions, not looked up from a table.", mistake: "A tight, confident-looking rate like 0.27% means very little without its margin, a wide margin relative to the rate itself means the true rate could plausibly be much higher or lower.", business: "Whether this interval is 'tight enough to act on' is a judgment call that depends on how much budget is riding on the decision, the statistics inform the decision, they don't make it automatically." },
+    written: { label: "State the interval in plain English. Would you trust it for a budget decision?", placeholder: "e.g. Email converts at about X%, plus or minus Y%, which means...", check: (t) => t.trim().length > 40 && /trust|confiden|reliab|margin|narrow|wide|enough/i.test(t), hint: "Say more, and use specific reasoning tied to the numbers you computed." },
+  },
+  { id: "st-h01", skill: "statistics-hypothesis", tool: "statistics", level: "guided", prerequisite: [],
+    title: "Two channels, one gap: is it real?",
+    objective: "Set up the comparison every hypothesis test starts with, two proportions and the gap between them.",
+    objectiveNote: "mkt has channel, week, impressions, clicks, conversions, spend. Compare Search vs Social's overall conversion rate (total conversions / total impressions, summed across all 8 weeks). Return {\"channel_a_rate\": ..., \"channel_b_rate\": ..., \"gap\": ...}, all rounded to 4dp (a=Search, b=Social).",
+    functionName: "channel_conversion_gap",
+    dataset: "marketing",
+    starterCode: "def channel_conversion_gap(mkt):\n    # your code here\n    return {\"channel_a_rate\": 0, \"channel_b_rate\": 0, \"gap\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        g = d.groupby(\"channel\").agg(conversions=(\"conversions\", \"sum\"), impressions=(\"impressions\", \"sum\"))",
+      "        p1 = g.loc[\"Search\", \"conversions\"] / g.loc[\"Search\", \"impressions\"]",
+      "        p2 = g.loc[\"Social\", \"conversions\"] / g.loc[\"Social\", \"impressions\"]",
+      "        return {\"channel_a_rate\": round(float(p1), 4), \"channel_b_rate\": round(float(p2), 4), \"gap\": round(float(p1 - p2), 4)}"
+    ],
+    mutation: "mkt[mkt['week'] != mkt['week'].max()]",
+    mutationLabel: "Recomputes correctly on a different window of weeks (not hardcoded)",
+    hints: ["Sum conversions and impressions separately per channel first, then divide, don't average the 8 weekly rates directly, weeks with more impressions should count more."],
+    explanation: { why: "This is the null hypothesis setup for every two-group comparison: H0 is 'the two rates are really the same, and this gap is just noise.' Everything in the rest of this stage tests whether that's believable.", business: "A raw percentage-point gap alone can't tell you whether one channel is truly better, or whether you'd see a gap this size purely by chance even if they performed identically, that's exactly what the next several tasks work out." },
+  },
+  { id: "st-h02", skill: "statistics-hypothesis", tool: "statistics", level: "guided", prerequisite: ["st-h01"],
+    title: "The z-score for a two-proportion comparison",
+    objective: "Turn a raw gap into a standardized z-score, the number that actually lets you judge significance.",
+    objectiveNote: "For the same Search vs Social comparison, compute the two-proportion z-score using the pooled standard error formula: pooled_p = (x1+x2)/(n1+n2), se = sqrt(pooled_p*(1-pooled_p)*(1/n1+1/n2)), z = (p1-p2)/se. Return {\"z_score\": ...}, rounded to 3dp.",
+    functionName: "conversion_z_score",
+    dataset: "marketing",
+    starterCode: "def conversion_z_score(mkt):\n    import math\n    # your code here\n    return {\"z_score\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        def _two_prop(x1, n1, x2, n2):",
+      "            p1, p2 = x1 / n1, x2 / n2",
+      "            pooled = (x1 + x2) / (n1 + n2)",
+      "            se = math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))",
+      "            z = (p1 - p2) / se if se > 0 else 0.0",
+      "            return p1, p2, z",
+      "        def _norm_cdf(z):",
+      "            return 0.5 * (1 + math.erf(z / math.sqrt(2)))",
+      "        g = d.groupby(\"channel\").agg(conversions=(\"conversions\", \"sum\"), impressions=(\"impressions\", \"sum\"))",
+      "        p1, p2, z = _two_prop(g.loc[\"Search\", \"conversions\"], g.loc[\"Search\", \"impressions\"], g.loc[\"Social\", \"conversions\"], g.loc[\"Social\", \"impressions\"])",
+      "        return {\"z_score\": round(float(z), 3)}"
+    ],
+    mutation: "mkt[mkt['week'] != mkt['week'].max()]",
+    mutationLabel: "Recomputes correctly on a different window of weeks (not hardcoded)",
+    hints: ["The 'pooled' rate assumes, for the test, that both channels share one true rate, that's the null hypothesis being tested.", "This is the exact formula Module 5 already introduced, applied here to fresh, real data."],
+    explanation: { why: "A z-score measures the gap in units of standard error, how many 'typical amounts of noise' apart the two rates are, which is what makes it comparable across completely different scales of data.", mistake: "Using each channel's OWN rate in the standard-error formula instead of the pooled rate answers a subtly different, less standard question, the pooled version is what assumes the null hypothesis is true, which is the whole point of a significance test." },
+  },
+  { id: "st-h03", skill: "statistics-hypothesis", tool: "statistics", level: "semiguided", prerequisite: ["st-h02"],
+    title: "From z-score to p-value",
+    objective: "Convert a z-score into an actual p-value, using nothing but the math module, no statistics library needed.",
+    objectiveNote: "Using the same Search vs Social z-score, compute the two-sided p-value using the normal CDF: p = 2 * (1 - normal_cdf(abs(z))), where normal_cdf(z) = 0.5*(1+erf(z/sqrt(2))). Return {\"z_score\": ..., \"p_value\": ...}, both rounded (z to 3dp, p to 4dp).",
+    functionName: "conversion_p_value",
+    dataset: "marketing",
+    starterCode: "def conversion_p_value(mkt):\n    import math\n    # your code here\n    return {\"z_score\": 0, \"p_value\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        def _two_prop(x1, n1, x2, n2):",
+      "            p1, p2 = x1 / n1, x2 / n2",
+      "            pooled = (x1 + x2) / (n1 + n2)",
+      "            se = math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))",
+      "            z = (p1 - p2) / se if se > 0 else 0.0",
+      "            return p1, p2, z",
+      "        def _norm_cdf(z):",
+      "            return 0.5 * (1 + math.erf(z / math.sqrt(2)))",
+      "        g = d.groupby(\"channel\").agg(conversions=(\"conversions\", \"sum\"), impressions=(\"impressions\", \"sum\"))",
+      "        p1, p2, z = _two_prop(g.loc[\"Search\", \"conversions\"], g.loc[\"Search\", \"impressions\"], g.loc[\"Social\", \"conversions\"], g.loc[\"Social\", \"impressions\"])",
+      "        p_two = 2 * (1 - _norm_cdf(abs(z)))",
+      "        return {\"z_score\": round(float(z), 3), \"p_value\": round(float(p_two), 4)}"
+    ],
+    mutation: "mkt[mkt['week'] != mkt['week'].max()]",
+    mutationLabel: "Recomputes correctly on a different window of weeks (not hardcoded)",
+    hints: ["Python's math.erf is standard library, no scipy or any external statistics package needed to get a real p-value.", "The p-value answers: 'if the two channels truly performed identically, how likely is a gap this large (or larger) purely by chance?'"],
+    explanation: { why: "math.erf gives you the error function directly, and the normal CDF is a simple, exact transformation of it, this is the real formula behind every 'p-value from a z-score' lookup table, just computed instead of looked up.", mistake: "A small p-value does not mean 'the effect is big', it means 'this gap is unlikely to be pure chance', magnitude and significance are two different questions, which the next few tasks separate out explicitly." },
+  },
+  { id: "st-h04", skill: "statistics-hypothesis", tool: "statistics", level: "semiguided", prerequisite: ["st-h03"],
+    title: "One-sided vs two-sided reasoning",
+    objective: "Compute both versions of the same test and understand why they give different p-values for the same data.",
+    objectiveNote: "Using the same z-score, compute BOTH the one-sided p-value (1 - normal_cdf(abs(z))) and the two-sided p-value (double the one-sided). Return {\"one_sided_p\": ..., \"two_sided_p\": ...}, both rounded to 4dp.",
+    functionName: "one_vs_two_sided",
+    dataset: "marketing",
+    starterCode: "def one_vs_two_sided(mkt):\n    import math\n    # your code here\n    return {\"one_sided_p\": 0, \"two_sided_p\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        def _two_prop(x1, n1, x2, n2):",
+      "            p1, p2 = x1 / n1, x2 / n2",
+      "            pooled = (x1 + x2) / (n1 + n2)",
+      "            se = math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))",
+      "            z = (p1 - p2) / se if se > 0 else 0.0",
+      "            return p1, p2, z",
+      "        def _norm_cdf(z):",
+      "            return 0.5 * (1 + math.erf(z / math.sqrt(2)))",
+      "        g = d.groupby(\"channel\").agg(conversions=(\"conversions\", \"sum\"), impressions=(\"impressions\", \"sum\"))",
+      "        p1, p2, z = _two_prop(g.loc[\"Search\", \"conversions\"], g.loc[\"Search\", \"impressions\"], g.loc[\"Social\", \"conversions\"], g.loc[\"Social\", \"impressions\"])",
+      "        one_p = 1 - _norm_cdf(abs(z))",
+      "        two_p = 2 * one_p",
+      "        return {\"one_sided_p\": round(float(one_p), 4), \"two_sided_p\": round(float(two_p), 4)}"
+    ],
+    mutation: "mkt[mkt['week'] != mkt['week'].max()]",
+    mutationLabel: "Recomputes correctly on a different window of weeks (not hardcoded)",
+    hints: ["The two-sided p-value is always exactly double the one-sided one, for the same z-score."],
+    explanation: { why: "A one-sided test only asks 'is A better than B', a two-sided test asks 'are A and B different at all, in either direction', which one is appropriate depends entirely on the question being asked BEFORE looking at the data.", mistake: "Picking one-sided vs two-sided AFTER seeing which direction the data leans is a form of cheating the test, called p-hacking, the choice has to be made based on the actual business question, not the results.", business: "If the real question is 'should we shift budget toward Search', a one-sided test is defensible, if it's 'are these two channels performing differently at all', two-sided is the honest choice." },
+  },
+  { id: "st-h05", skill: "statistics-hypothesis", tool: "statistics", level: "semiguided", prerequisite: ["st-h03"],
+    title: "Deciding significance at the standard threshold",
+    objective: "Apply the conventional alpha = 0.05 cutoff to an actual computed p-value and make the call.",
+    objectiveNote: "Compare Email vs Referral's conversion rates (same method as before). Return {\"p_value\": ..., \"significant\": ...}, p rounded to 4dp, significant is True only if p_value < 0.05.",
+    functionName: "significance_decision",
+    dataset: "marketing",
+    starterCode: "def significance_decision(mkt):\n    import math\n    # your code here\n    return {\"p_value\": 0, \"significant\": False}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        def _two_prop(x1, n1, x2, n2):",
+      "            p1, p2 = x1 / n1, x2 / n2",
+      "            pooled = (x1 + x2) / (n1 + n2)",
+      "            se = math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))",
+      "            z = (p1 - p2) / se if se > 0 else 0.0",
+      "            return p1, p2, z",
+      "        def _norm_cdf(z):",
+      "            return 0.5 * (1 + math.erf(z / math.sqrt(2)))",
+      "        g = d.groupby(\"channel\").agg(conversions=(\"conversions\", \"sum\"), impressions=(\"impressions\", \"sum\"))",
+      "        p1, p2, z = _two_prop(g.loc[\"Email\", \"conversions\"], g.loc[\"Email\", \"impressions\"], g.loc[\"Referral\", \"conversions\"], g.loc[\"Referral\", \"impressions\"])",
+      "        p = 2 * (1 - _norm_cdf(abs(z)))",
+      "        return {\"p_value\": round(float(p), 4), \"significant\": bool(p < 0.05)}"
+    ],
+    mutation: "mkt[mkt['week'] != mkt['week'].max()]",
+    mutationLabel: "Recomputes correctly on a different window of weeks (not hardcoded)",
+    hints: ["0.05 is a convention, not a law, but it's the one this course (and most of the industry) uses consistently, apply it exactly as stated."],
+    explanation: { why: "Alpha = 0.05 means: we're willing to accept a 5% chance of calling a real difference where there isn't one (a false positive), it's a deliberately chosen risk tolerance, not a mathematical certainty.", business: "Email and Referral both have small sample sizes in this dataset, expect this comparison to often come back NOT significant, which is itself a real, useful finding: there isn't enough evidence yet to say they differ." },
+  },
+  { id: "st-h06", skill: "statistics-hypothesis", tool: "statistics", level: "challenge", prerequisite: ["st-h05"],
+    title: "A stricter threshold and the Type I/II tradeoff",
+    objective: "Re-run the same test at a stricter alpha, and reason about what changes.",
+    objectiveNote: "Using the same Search vs Social p-value as before, return {\"p_value\": ..., \"significant_at_01\": ...} where significant_at_01 uses alpha=0.01 instead of 0.05. Then, in the box below, explain: if you use the stricter 0.01 threshold, are you now more likely to make a Type I error or a Type II error, compared to using 0.05?",
+    functionName: "stricter_alpha_test",
+    dataset: "marketing",
+    starterCode: "def stricter_alpha_test(mkt):\n    import math\n    # your code here\n    return {\"p_value\": 0, \"significant_at_01\": False}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        def _two_prop(x1, n1, x2, n2):",
+      "            p1, p2 = x1 / n1, x2 / n2",
+      "            pooled = (x1 + x2) / (n1 + n2)",
+      "            se = math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))",
+      "            z = (p1 - p2) / se if se > 0 else 0.0",
+      "            return p1, p2, z",
+      "        def _norm_cdf(z):",
+      "            return 0.5 * (1 + math.erf(z / math.sqrt(2)))",
+      "        g = d.groupby(\"channel\").agg(conversions=(\"conversions\", \"sum\"), impressions=(\"impressions\", \"sum\"))",
+      "        p1, p2, z = _two_prop(g.loc[\"Search\", \"conversions\"], g.loc[\"Search\", \"impressions\"], g.loc[\"Social\", \"conversions\"], g.loc[\"Social\", \"impressions\"])",
+      "        p = 2 * (1 - _norm_cdf(abs(z)))",
+      "        return {\"p_value\": round(float(p), 4), \"significant_at_01\": bool(p < 0.01)}"
+    ],
+    mutation: "mkt[mkt['week'] != mkt['week'].max()]",
+    mutationLabel: "Recomputes correctly on a different window of weeks (not hardcoded)",
+    hints: ["Type I error: rejecting a true null hypothesis, calling a difference real when it isn't. Type II: failing to reject a false null, missing a real difference."],
+    explanation: { why: "A stricter alpha (0.01 instead of 0.05) makes it HARDER to call something significant, which lowers your Type I error risk (false positives) but raises your Type II error risk (missing a real effect).", business: "This tradeoff is a real business decision: a stricter threshold for a decision that's expensive to reverse (a pricing change) makes sense, a looser one for a cheap, easily-reversible experiment (an email subject line) is often more practical." },
+    written: { label: "Stricter alpha, more Type I or Type II risk? Explain.", placeholder: "At alpha=0.01 instead of 0.05, you are now more likely to make a Type ... error because...", check: (t) => t.trim().length > 40 && /type\s*i{1,2}|type\s*1|type\s*2/i.test(t), hint: "Say more, and use specific reasoning tied to the numbers you computed." },
+  },
+  { id: "st-h07", skill: "statistics-hypothesis", tool: "statistics", level: "challenge", prerequisite: [],
+    title: "Practical significance, not just statistical",
+    objective: "Compute a real effect size alongside significance, and recognize when a real result still might not matter.",
+    objectiveNote: "ot has employee_id, month, overtime_hours across many months. Split into the earlier half of months and the later half (by sorted unique month value). Return {\"mean_diff_hours\": ..., \"z_score\": ...} comparing the later half's mean overtime to the earlier half's (later minus earlier), using the two-sample z formula se=sqrt(var1/n1+var2/n2), both rounded to 3dp.",
+    functionName: "overtime_trend_check",
+    dataset: "overtime",
+    starterCode: "def overtime_trend_check(ot):\n    import math\n    # your code here\n    return {\"mean_diff_hours\": 0, \"z_score\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        d[\"month\"] = d[\"month\"].astype(str)",
+      "        months = sorted(d[\"month\"].unique())",
+      "        early = d[d[\"month\"].isin(months[:len(months)//2])][\"overtime_hours\"]",
+      "        late = d[d[\"month\"].isin(months[len(months)//2:])][\"overtime_hours\"]",
+      "        diff = float(late.mean() - early.mean())",
+      "        se = math.sqrt(early.var(ddof=1)/len(early) + late.var(ddof=1)/len(late))",
+      "        z = diff / se if se > 0 else 0.0",
+      "        return {\"mean_diff_hours\": round(diff, 3), \"z_score\": round(float(z), 3)}"
+    ],
+    mutation: "ot.head(90)",
+    mutationLabel: "Recomputes correctly on a smaller slice of months (not hardcoded)",
+    hints: ["sorted(d['month'].unique()) gives you the distinct months in order, split that list in half to define 'early' and 'late'.", "This two-sample z-test uses each group's own variance, unlike the pooled proportion test earlier, because these are continuous hours, not yes/no outcomes."],
+    explanation: { why: "This is the same z-test logic as the marketing tasks, adapted for a continuous measurement (hours) instead of a proportion, using each group's own variance instead of a pooled rate.", mistake: "A statistically significant z-score on a mean difference of, say, 0.3 hours is a real, detectable effect that is probably too small to justify a staffing change, that's the gap between 'real' and 'worth acting on.'", business: "This is the core practical-vs-statistical-significance trap: a detectable trend in overtime hours isn't automatically an urgent one, the actual number of hours matters as much as whether the trend is 'real.'" },
+  },
+  { id: "st-h08", skill: "statistics-hypothesis", tool: "statistics", level: "mastery", prerequisite: ["st-h05", "st-p05"],
+    title: "A full hypothesis test on plan churn",
+    objective: "Run a complete two-sample test end to end: clean the data, compute both rates, get a z-score and p-value, and decide.",
+    objectiveNote: "Using the same cleaning as before (drop duplicates, \"-\" is not a real cancel date), normalize plan names with .str.strip().str.capitalize() (handles Starter/starter, Growth/growth). Compare Starter vs Growth churn rates. Return {\"plan_a_churn\": ..., \"plan_b_churn\": ..., \"z_score\": ..., \"p_value\": ..., \"significant\": ...} (a=Starter, b=Growth, rates/z/p rounded appropriately, significant at alpha=0.05). Then, in the box below, state your recommendation: is there enough evidence to say Growth-plan customers churn at a different rate than Starter-plan customers?",
+    functionName: "churn_rate_hypothesis_test",
+    dataset: "saas",
+    starterCode: "def churn_rate_hypothesis_test(saas):\n    import math\n    # your code here\n    return {\"plan_a_churn\": 0, \"plan_b_churn\": 0, \"z_score\": 0, \"p_value\": 0, \"significant\": False}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        def _two_prop(x1, n1, x2, n2):",
+      "            p1, p2 = x1 / n1, x2 / n2",
+      "            pooled = (x1 + x2) / (n1 + n2)",
+      "            se = math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))",
+      "            z = (p1 - p2) / se if se > 0 else 0.0",
+      "            return p1, p2, z",
+      "        def _norm_cdf(z):",
+      "            return 0.5 * (1 + math.erf(z / math.sqrt(2)))",
+      "        d = d.drop_duplicates()",
+      "        d[\"plan_norm\"] = d[\"plan\"].str.strip().str.capitalize()",
+      "        d[\"churned\"] = d[\"cancel_date\"].notna() & (d[\"cancel_date\"] != \"-\")",
+      "        a = d[d[\"plan_norm\"] == \"Starter\"]",
+      "        b = d[d[\"plan_norm\"] == \"Growth\"]",
+      "        p1, p2, z = _two_prop(a[\"churned\"].sum(), len(a), b[\"churned\"].sum(), len(b))",
+      "        p = 2 * (1 - _norm_cdf(abs(z)))",
+      "        return {\"plan_a_churn\": round(float(p1), 4), \"plan_b_churn\": round(float(p2), 4), \"z_score\": round(float(z), 3), \"p_value\": round(float(p), 4), \"significant\": bool(p < 0.05)}"
+    ],
+    mutation: "saas.head(14)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["str.capitalize() turns 'starter'/'STARTER'/'Starter' all into 'Starter', but only if you strip whitespace first.", "This combines every piece from the last 7 tasks: cleaning, grouping, the two-proportion z-test, and a p-value, into one workflow."],
+    explanation: { why: "This is the complete hypothesis-testing workflow used throughout this stage, applied end to end on real, messy subscription data instead of a clean textbook table.", business: "With only 21 raw rows (fewer after cleaning), expect this test to have low power, meaning even a real difference in churn rates might not reach significance, that's an honest, common real-world outcome, not a failure of the method." },
+    written: { label: "Is there enough evidence that Growth churns differently than Starter? Recommend.", placeholder: "Based on the p-value and sample size, I would/would not conclude...", check: (t) => t.trim().length > 40 && /evidence|sample|significan|p.?value|enough|small/i.test(t), hint: "Say more, and use specific reasoning tied to the numbers you computed." },
+  },
+  { id: "st-c01", skill: "statistics-correlation", tool: "statistics", level: "guided", prerequisite: [],
+    title: "A first correlation coefficient",
+    objective: "Compute Pearson correlation between two real numeric columns.",
+    objectiveNote: "survey has tenure_months and satisfaction_score (satisfaction_score has some missing values, drop those rows first). Return {\"correlation\": ...} rounded to 3dp.",
+    functionName: "tenure_satisfaction_correlation",
+    dataset: "survey",
+    starterCode: "def tenure_satisfaction_correlation(survey):\n    import numpy as np\n    # your code here, drop rows with a missing satisfaction_score first\n    return {\"correlation\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import numpy as np",
+      "        d2 = d.dropna(subset=[\"tenure_months\", \"satisfaction_score\"])",
+      "        c = np.corrcoef(d2[\"tenure_months\"].to_numpy(), d2[\"satisfaction_score\"].to_numpy())[0, 1]",
+      "        return {\"correlation\": round(float(c), 3)}"
+    ],
+    mutation: "survey.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["np.corrcoef(x, y) returns a 2x2 matrix, the correlation you want is at [0, 1] (or equivalently [1, 0]).", "np.corrcoef propagates NaN into the whole result if either column has any missing values, dropna first."],
+    explanation: { why: "Pearson correlation ranges from -1 (perfectly opposite) to +1 (perfectly together), with 0 meaning no linear relationship at all.", mistake: "Forgetting to drop the missing satisfaction_score rows silently returns NaN for the whole correlation, a good reminder to always check a new column for missing values before computing anything with it.", business: "A near-zero correlation here is itself a real, useful finding: it means tenure alone doesn't predict satisfaction, so a retention strategy built only around 'newer employees are less happy' wouldn't be supported by this data." },
+  },
+  { id: "st-c02", skill: "statistics-correlation", tool: "statistics", level: "guided", prerequisite: ["st-c01"],
+    title: "Classifying correlation strength",
+    objective: "Compute a correlation and translate the number into a plain-English strength label.",
+    objectiveNote: "Compute the correlation between tenure_months and nps (drop missing rows in either column first). Return {\"correlation\": ..., \"strength\": ...}, correlation rounded to 3dp, strength is 'weak' if abs(correlation) < 0.3, 'moderate' if < 0.5, else 'strong'.",
+    functionName: "classify_correlation_strength",
+    dataset: "survey",
+    starterCode: "def classify_correlation_strength(survey):\n    import numpy as np\n    # your code here\n    return {\"correlation\": 0, \"strength\": \"\"}",
+    refCode: [
+      "    def _ref(d):",
+      "        import numpy as np",
+      "        d2 = d.dropna(subset=[\"tenure_months\", \"nps\"])",
+      "        c = np.corrcoef(d2[\"tenure_months\"].to_numpy(), d2[\"nps\"].to_numpy())[0, 1]",
+      "        ac = abs(c)",
+      "        strength = \"strong\" if ac >= 0.5 else (\"moderate\" if ac >= 0.3 else \"weak\")",
+      "        return {\"correlation\": round(float(c), 3), \"strength\": strength}"
+    ],
+    mutation: "survey.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["Classify on the ABSOLUTE value of correlation, a strong negative relationship (-0.7) is still strong, direction and strength are separate questions."],
+    explanation: { why: "These thresholds (0.3, 0.5) are a common convention, not a universal law, different fields use different cutoffs, but the direction of reasoning is always the same: bigger absolute value means a tighter linear relationship.", business: "Reporting 'weak correlation' honestly, instead of rounding it up to 'a relationship exists', is what keeps a stakeholder from over-investing in a pattern that barely holds." },
+  },
+  { id: "st-c03", skill: "statistics-correlation", tool: "statistics", level: "semiguided", prerequisite: [],
+    title: "A correlation that isn't really about behavior",
+    objective: "Compute a correlation, then recognize when it reflects a definition, not a discovery.",
+    objectiveNote: "retail has units, revenue (revenue = units * unit_price by construction, and units has one missing value, drop it first). Return {\"correlation\": ...} between units and revenue, rounded to 3dp. Then, in the box below, explain why this correlation being high tells you very little that's actually useful.",
+    functionName: "units_revenue_correlation",
+    dataset: "retail",
+    starterCode: "def units_revenue_correlation(retail):\n    import numpy as np\n    # your code here, drop the missing units row first\n    return {\"correlation\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import numpy as np",
+      "        d = d.dropna(subset=[\"units\", \"revenue\"])",
+      "        c = np.corrcoef(d[\"units\"].to_numpy(), d[\"revenue\"].to_numpy())[0, 1]",
+      "        return {\"correlation\": round(float(c), 3)}"
+    ],
+    mutation: "retail.head(20)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["Same corrcoef pattern as the last two tasks, the interesting part of this one is in the written explanation, not the code."],
+    explanation: { why: "revenue is literally computed FROM units (times unit_price), so a high correlation between them isn't a discovery about customer behavior, it's a restatement of how the revenue column was built.", mistake: "Presenting a mechanically-guaranteed correlation like this as an 'insight' in a report is a common, easy-to-make mistake, always ask whether a relationship could be true by definition before treating it as a finding.", business: "A genuinely useful correlation would relate two INDEPENDENTLY measured things, like marketing spend and revenue, not two numbers where one is partly built from the other." },
+    written: { label: "Why does this high correlation tell you very little?", placeholder: "Because revenue is computed from units (times price), this correlation is mostly...", check: (t) => t.trim().length > 30 && /defin|comput|construct|built|formula|mechanic/i.test(t), hint: "Say more, and use specific reasoning tied to the numbers you computed." },
+  },
+  { id: "st-c04", skill: "statistics-correlation", tool: "statistics", level: "semiguided", prerequisite: ["st-c01"],
+    title: "A simple linear regression, by formula",
+    objective: "Fit a line to real data using the closed-form least-squares formula, no library beyond numpy's basic math.",
+    objectiveNote: "Fit revenue = slope * units + intercept using slope = cov(units, revenue) / var(units), intercept = mean(revenue) - slope * mean(units) (drop the missing units row first). Return {\"slope\": ..., \"intercept\": ...}, both rounded to 3dp.",
+    functionName: "regression_units_revenue",
+    dataset: "retail",
+    starterCode: "def regression_units_revenue(retail):\n    import numpy as np\n    # your code here\n    return {\"slope\": 0, \"intercept\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import numpy as np",
+      "        d = d.dropna(subset=[\"units\", \"revenue\"])",
+      "        x, y = d[\"units\"].to_numpy(dtype=float), d[\"revenue\"].to_numpy(dtype=float)",
+      "        slope = float(np.cov(x, y, ddof=1)[0, 1] / np.var(x, ddof=1))",
+      "        intercept = float(y.mean() - slope * x.mean())",
+      "        return {\"slope\": round(slope, 3), \"intercept\": round(intercept, 3)}"
+    ],
+    mutation: "retail.head(20)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["np.cov(x, y, ddof=1) returns a 2x2 covariance matrix, the covariance between x and y is at [0, 1].", "This closed-form formula is the same one behind any 'line of best fit', computed directly instead of via a black-box regression function."],
+    explanation: { why: "This is ordinary least squares in its simplest form: the slope that minimizes the total squared vertical distance between the line and every point, derived directly from covariance and variance.", business: "The slope here answers 'for one more unit sold, how much does revenue typically go up', a number a pricing or inventory conversation could actually use." },
+  },
+  { id: "st-c05", skill: "statistics-correlation", tool: "statistics", level: "challenge", prerequisite: ["st-c04"],
+    title: "Residuals: where the line is wrong",
+    objective: "Use a fitted regression to find the rows the line predicts worst, real residual analysis.",
+    objectiveNote: "Using the same regression as before, compute each row's residual (actual revenue minus predicted revenue), then flag rows whose absolute residual is more than 2 standard deviations above the mean residual. Return {\"outlier_count\": ..., \"max_residual\": ...} (max_residual rounded to 2dp).",
+    functionName: "flag_large_residuals",
+    dataset: "retail",
+    starterCode: "def flag_large_residuals(retail):\n    import numpy as np\n    # your code here\n    return {\"outlier_count\": 0, \"max_residual\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import numpy as np",
+      "        d = d.dropna(subset=[\"units\", \"revenue\"])",
+      "        x, y = d[\"units\"].to_numpy(dtype=float), d[\"revenue\"].to_numpy(dtype=float)",
+      "        slope = float(np.cov(x, y, ddof=1)[0, 1] / np.var(x, ddof=1))",
+      "        intercept = float(y.mean() - slope * x.mean())",
+      "        pred = slope * d[\"units\"] + intercept",
+      "        resid = (d[\"revenue\"] - pred).abs()",
+      "        return {\"outlier_count\": int((resid > resid.mean() + 2 * resid.std(ddof=1)).sum()), \"max_residual\": round(float(resid.max()), 2)}"
+    ],
+    mutation: "retail.head(20)",
+    mutationLabel: "Recomputes correctly on a smaller slice (the flagged rows genuinely change)",
+    hints: ["A residual is just actual minus predicted, compute the predicted value for every row first using the fitted slope/intercept, then subtract."],
+    explanation: { why: "Residuals show exactly where a linear model fits well and where it doesn't, a large residual means that specific row's revenue is far from what units alone would predict, something else is going on for that order.", business: "A row with a huge residual is a real lead worth investigating, maybe a bulk-discount order, a data-entry error, or a special promotion, the regression itself won't tell you which, but it tells you exactly where to look." },
+  },
+  { id: "st-c06", skill: "statistics-correlation", tool: "statistics", level: "challenge", prerequisite: ["st-c01"],
+    title: "A misleading region-specific correlation",
+    objective: "Compare a correlation on the whole dataset to the same correlation restricted to one subgroup, and see how much it can shift.",
+    objectiveNote: "Compute the units-revenue correlation on the full dataset (drop the missing units row), then again restricted to whichever region is most common. Return {\"full_correlation\": ..., \"single_region_correlation\": ..., \"region\": ...}, correlations rounded to 3dp.",
+    functionName: "region_specific_correlation",
+    dataset: "retail",
+    starterCode: "def region_specific_correlation(retail):\n    import numpy as np\n    # your code here\n    return {\"full_correlation\": 0, \"single_region_correlation\": 0, \"region\": \"\"}",
+    refCode: [
+      "    def _ref(d):",
+      "        import numpy as np",
+      "        d = d.dropna(subset=[\"units\", \"revenue\"])",
+      "        full_c = float(np.corrcoef(d[\"units\"].to_numpy(), d[\"revenue\"].to_numpy())[0, 1])",
+      "        region = d[\"region\"].mode().iloc[0]",
+      "        sub = d[d[\"region\"] == region]",
+      "        sub_c = float(np.corrcoef(sub[\"units\"].to_numpy(), sub[\"revenue\"].to_numpy())[0, 1])",
+      "        return {\"full_correlation\": round(full_c, 3), \"single_region_correlation\": round(sub_c, 3), \"region\": region}"
+    ],
+    mutation: "retail.head(30)",
+    mutationLabel: "Recomputes correctly on a smaller slice (the leading region may change)",
+    hints: [".mode().iloc[0] gets the most frequent value in a column, use it to pick which region to zoom into."],
+    explanation: { why: "A relationship computed across a mixed population can look different, sometimes very different, from the same relationship computed within just one subgroup, a version of what's sometimes called Simpson's paradox.", business: "Reporting one company-wide correlation can hide the fact that the relationship is much stronger (or weaker, or even reversed) in a specific region, segment-level analysis before a company-wide claim is what catches this." },
+  },
+  { id: "st-c07", skill: "statistics-correlation", tool: "statistics", level: "mastery", prerequisite: ["st-c04", "st-c06"],
+    title: "Does the correlation justify a recommendation?",
+    objective: "Combine correlation and regression into one analysis, then judge in writing whether it's enough evidence to act on.",
+    objectiveNote: "Compute both the units-revenue correlation and the regression slope (same formulas as before, drop the missing units row first). Return {\"correlation\": ..., \"slope\": ...}, both rounded to 3dp. Then, in the box below: a stakeholder wants to recommend 'sell in bigger unit quantities per order to grow revenue' based on this. Is that justified by a units-revenue correlation alone?",
+    functionName: "revenue_driver_analysis",
+    dataset: "retail",
+    starterCode: "def revenue_driver_analysis(retail):\n    import numpy as np\n    # your code here\n    return {\"correlation\": 0, \"slope\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        import numpy as np",
+      "        d = d.dropna(subset=[\"units\", \"revenue\"])",
+      "        c = float(np.corrcoef(d[\"units\"].to_numpy(), d[\"revenue\"].to_numpy())[0, 1])",
+      "        x, y = d[\"units\"].to_numpy(dtype=float), d[\"revenue\"].to_numpy(dtype=float)",
+      "        slope = float(np.cov(x, y, ddof=1)[0, 1] / np.var(x, ddof=1))",
+      "        return {\"correlation\": round(c, 3), \"slope\": round(slope, 3)}"
+    ],
+    mutation: "retail.head(20)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["This combines st-c01's correlation and st-c04's regression into one function, the written judgment is the actual point of this task."],
+    explanation: { why: "Correlation and regression both describe an association, neither one, on its own, proves that pushing one variable (getting customers to buy MORE units per order) will actually cause the other to rise proportionally in practice.", business: "The recommendation conflates 'units and revenue move together' (true, and partly definitional, per st-c03) with 'increasing units will increase revenue' (a causal claim this data alone can't support), exactly the correlation-versus-causation trap this whole stage has been building toward." },
+    written: { label: "Is 'sell bigger quantities to grow revenue' justified by this alone?", placeholder: "This correlation shows association, not necessarily that pushing units would cause revenue to rise, because...", check: (t) => t.trim().length > 40 && /caus|associat|correlat|justif|enough|alone/i.test(t), hint: "Say more, and use specific reasoning tied to the numbers you computed." },
+  },
+  { id: "st-b01", skill: "statistics-business", tool: "statistics", level: "semiguided", prerequisite: ["st-h05"],
+    title: "Is this conversion increase meaningful?",
+    objective: "Compare the first and last week of a campaign and judge whether an apparent lift is real.",
+    objectiveNote: "mkt has channel, week, impressions, clicks, conversions, spend. Group by week (summed across all channels), compare the earliest week to the latest week's conversion rate. Return {\"week1_rate\": ..., \"week2_rate\": ..., \"p_value\": ..., \"meaningful\": ...} (rates/p rounded to 4dp, meaningful true if p_value < 0.05). Then, in the box below, state whether you'd tell a stakeholder this campaign genuinely improved.",
+    functionName: "conversion_increase_check",
+    dataset: "marketing",
+    starterCode: "def conversion_increase_check(mkt):\n    import math\n    # your code here\n    return {\"week1_rate\": 0, \"week2_rate\": 0, \"p_value\": 0, \"meaningful\": False}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        def _two_prop(x1, n1, x2, n2):",
+      "            p1, p2 = x1 / n1, x2 / n2",
+      "            pooled = (x1 + x2) / (n1 + n2)",
+      "            se = math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))",
+      "            z = (p1 - p2) / se if se > 0 else 0.0",
+      "            return p1, p2, z",
+      "        def _norm_cdf(z):",
+      "            return 0.5 * (1 + math.erf(z / math.sqrt(2)))",
+      "        g = d.groupby(\"week\").agg(conversions=(\"conversions\", \"sum\"), impressions=(\"impressions\", \"sum\")).sort_index()",
+      "        weeks = list(g.index)",
+      "        w1, w2 = weeks[0], weeks[-1]",
+      "        p1, p2, z = _two_prop(g.loc[w1, \"conversions\"], g.loc[w1, \"impressions\"], g.loc[w2, \"conversions\"], g.loc[w2, \"impressions\"])",
+      "        p = 2 * (1 - _norm_cdf(abs(z)))",
+      "        return {\"week1_rate\": round(float(p1), 4), \"week2_rate\": round(float(p2), 4), \"p_value\": round(float(p), 4), \"meaningful\": bool(p < 0.05)}"
+    ],
+    mutation: "mkt.head(16)",
+    mutationLabel: "Recomputes correctly on a smaller slice (fewer weeks/channels contribute)",
+    hints: ["sort_index() on the grouped weeks ensures 'first' and 'last' are chronological, not just however they happened to appear in the file."],
+    explanation: { why: "This is the exact same two-proportion z-test from Stage 3, applied to a real before/after business question instead of a static channel comparison.", business: "A campaign 'improving' from one week to the next is exactly the kind of claim that needs a significance check before it goes in a report, week-to-week noise alone can easily produce a rate that looks higher without anything real having changed." },
+    written: { label: "Would you tell a stakeholder this genuinely improved? Why or why not?", placeholder: "Based on the p-value, I would/would not say this is a genuine improvement because...", check: (t) => t.trim().length > 40 && /signif|p.?value|noise|chance|genuin|real/i.test(t), hint: "Say more, and use specific reasoning tied to the numbers you computed." },
+  },
+  { id: "st-b02", skill: "statistics-business", tool: "statistics", level: "semiguided", prerequisite: [],
+    title: "Revenue grew. Is that actually good news?",
+    objective: "Compute revenue growth AND margin change together, the classic 'growth that isn't as good as it looks' check.",
+    objectiveNote: "pnl has period, revenue, cogs, opex, net_income, 12 quarters. Split into the earlier half and later half of periods (by row order, already chronological). Return {\"revenue_change_pct\": ..., \"margin_change_pct\": ..., \"good_news\": ...} (revenue_change_pct = pct change in TOTAL revenue between halves, margin_change_pct = pct-point change in gross margin ((revenue-cogs)/revenue), both *100, rounded to 2dp, good_news true only if revenue grew AND margin did not fall).",
+    functionName: "revenue_vs_margin_check",
+    dataset: "pnl",
+    starterCode: "def revenue_vs_margin_check(pnl):\n    # your code here\n    return {\"revenue_change_pct\": 0, \"margin_change_pct\": 0, \"good_news\": False}",
+    refCode: [
+      "    def _ref(d):",
+      "        half = len(d) // 2",
+      "        early = d.iloc[:half]",
+      "        late = d.iloc[half:]",
+      "        rev_change = (late[\"revenue\"].sum() - early[\"revenue\"].sum()) / early[\"revenue\"].sum()",
+      "        early_margin = (early[\"revenue\"].sum() - early[\"cogs\"].sum()) / early[\"revenue\"].sum()",
+      "        late_margin = (late[\"revenue\"].sum() - late[\"cogs\"].sum()) / late[\"revenue\"].sum()",
+      "        margin_change = late_margin - early_margin",
+      "        return {\"revenue_change_pct\": round(float(rev_change * 100), 2), \"margin_change_pct\": round(float(margin_change * 100), 2), \"good_news\": bool(rev_change > 0 and margin_change >= 0)}"
+    ],
+    mutation: "pnl.head(8)",
+    mutationLabel: "Recomputes correctly on a smaller slice of periods (not hardcoded)",
+    hints: ["Sum revenue and cogs SEPARATELY across each half first, then compute margin from the totals, don't average the individual quarterly margins."],
+    explanation: { why: "Gross margin is (revenue - cogs) / revenue, computing it from summed totals (not an average of period margins) correctly weights bigger quarters more.", business: "This is precisely the scenario from this course's own capstone: revenue up, margin down, is genuinely common when costs are growing faster than sales, for instance from discounting to win volume, and it means real profit growth is smaller than the headline revenue number suggests, or even negative." },
+  },
+  { id: "st-b03", skill: "statistics-business", tool: "statistics", level: "challenge", prerequisite: ["st-h05"],
+    title: "Is this A/B-style result strong enough to act on?",
+    objective: "Combine significance AND sample size into one 'should we act on this' judgment.",
+    objectiveNote: "Compare Search vs Referral conversion rates (same z-test method as Stage 3). Return {\"z_score\": ..., \"p_value\": ..., \"strong_enough\": ...} (strong_enough true only if p_value < 0.05 AND Referral's total conversions >= 30, since a significant result on a tiny sample is still fragile).",
+    functionName: "ab_test_strength",
+    dataset: "marketing",
+    starterCode: "def ab_test_strength(mkt):\n    import math\n    # your code here\n    return {\"z_score\": 0, \"p_value\": 0, \"strong_enough\": False}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        def _two_prop(x1, n1, x2, n2):",
+      "            p1, p2 = x1 / n1, x2 / n2",
+      "            pooled = (x1 + x2) / (n1 + n2)",
+      "            se = math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))",
+      "            z = (p1 - p2) / se if se > 0 else 0.0",
+      "            return p1, p2, z",
+      "        def _norm_cdf(z):",
+      "            return 0.5 * (1 + math.erf(z / math.sqrt(2)))",
+      "        g = d.groupby(\"channel\").agg(conversions=(\"conversions\", \"sum\"), impressions=(\"impressions\", \"sum\"))",
+      "        p1, p2, z = _two_prop(g.loc[\"Search\", \"conversions\"], g.loc[\"Search\", \"impressions\"], g.loc[\"Referral\", \"conversions\"], g.loc[\"Referral\", \"impressions\"])",
+      "        p = 2 * (1 - _norm_cdf(abs(z)))",
+      "        return {\"z_score\": round(float(z), 3), \"p_value\": round(float(p), 4), \"strong_enough\": bool(p < 0.05 and g.loc[\"Referral\", \"conversions\"] >= 30)}"
+    ],
+    mutation: "mkt[mkt['week'] != mkt['week'].max()]",
+    mutationLabel: "Recomputes correctly on a different window of weeks (not hardcoded)",
+    hints: ["This combines the z-test from Stage 3 with the small-sample judgment from Stage 2's unreliable_conversion_estimates task."],
+    explanation: { why: "A p-value alone doesn't guard against small-sample fragility, a result that happens to clear 0.05 on a tiny sample can flip completely with just one or two more data points, requiring a minimum sample size alongside significance is a real, common safeguard.", business: "Referral has very few total conversions in this dataset, exactly the situation where even a 'statistically significant' result deserves real skepticism before it changes a budget decision." },
+  },
+  { id: "st-b04", skill: "statistics-business", tool: "statistics", level: "challenge", prerequisite: [],
+    title: "Is this survey sample representative?",
+    objective: "Check whether response counts across a categorical column look balanced or badly skewed.",
+    objectiveNote: "Return {\"department_counts\": ..., \"most_underrepresented\": ...}, department_counts is a dict of every department's response count, most_underrepresented is the department with the FEWEST responses.",
+    functionName: "sample_representativeness",
+    dataset: "survey",
+    starterCode: "def sample_representativeness(survey):\n    # your code here\n    return {\"department_counts\": {}, \"most_underrepresented\": \"\"}",
+    refCode: [
+      "    def _ref(d):",
+      "        counts = d[\"department\"].value_counts().to_dict()",
+      "        counts = {k: int(v) for k, v in counts.items()}",
+      "        smallest = min(counts, key=counts.get)",
+      "        return {\"department_counts\": counts, \"most_underrepresented\": smallest}"
+    ],
+    mutation: "survey.head(60)",
+    mutationLabel: "Recomputes correctly on a smaller slice (counts and possibly the smallest department change)",
+    hints: ["value_counts().to_dict() gives you every category's count directly, min(dict, key=dict.get) finds the key with the smallest value."],
+    explanation: { why: "A department with far fewer responses than the others contributes a much less reliable estimate of ITS OWN average, even though it's part of a large overall survey.", business: "Reporting one company-wide satisfaction number treats every department's opinion as equally well-measured, when in reality the smallest department's number might be based on a handful of responses and deserves far less confidence than the largest department's." },
+  },
+  { id: "st-b05", skill: "statistics-business", tool: "statistics", level: "challenge", prerequisite: ["st-p05"],
+    title: "Is this MRR outlier legitimate?",
+    objective: "Flag customers with unusually high MRR, then judge whether they're a data problem or just real enterprise customers.",
+    objectiveNote: "Using the same cleaning as before (drop duplicates, drop missing mrr), flag customers with mrr more than 3x the median. Return {\"outlier_count\": ..., \"median_mrr\": ...} (median rounded to 2dp).",
+    functionName: "mrr_outlier_check",
+    dataset: "saas",
+    starterCode: "def mrr_outlier_check(saas):\n    # your code here\n    return {\"outlier_count\": 0, \"median_mrr\": 0}",
+    refCode: [
+      "    def _ref(d):",
+      "        d = d.drop_duplicates()",
+      "        d = d[d[\"mrr\"].notna()]",
+      "        med = d[\"mrr\"].median()",
+      "        outliers = d[d[\"mrr\"] > med * 3]",
+      "        return {\"outlier_count\": int(len(outliers)), \"median_mrr\": round(float(med), 2)}"
+    ],
+    mutation: "saas.head(12)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["Same '3x (or 5x) the median' pattern used in Stage 1's overtime outlier task, applied here to MRR."],
+    explanation: { why: "Unlike overtime hours, a high-MRR customer isn't inherently suspicious, Enterprise-tier customers are SUPPOSED to pay far more than Starter-tier ones, the plan column (not just the number) is what determines whether an outlier is 'real.'", business: "This is the direct contrast with st-d10's overtime outliers: there, an extreme value was more likely a data problem, here, an extreme MRR value is very likely a legitimate, valuable Enterprise customer, the right response to a flagged outlier depends entirely on domain context, not the statistics alone." },
+  },
+  { id: "st-b06", skill: "statistics-business", tool: "statistics", level: "mastery", prerequisite: ["st-c04"],
+    title: "Does correlation justify a pricing recommendation?",
+    objective: "Compute a real correlation between price and revenue, then push back on a recommendation that oversimplifies it.",
+    objectiveNote: "Compute the correlation between unit_price and revenue in retail (drop rows with missing units first, for consistency with earlier tasks, though unit_price and revenue themselves have no missing values). Return {\"correlation\": ..., \"recommend_price_increase\": ...} (correlation rounded to 3dp, recommend_price_increase true if correlation > 0.5). Then, in the box below, a stakeholder wants to raise prices across the board because 'higher price clearly means higher revenue here.' Push back on that reasoning, using what you know about correlation vs causation.",
+    functionName: "pricing_recommendation_check",
+    dataset: "retail",
+    starterCode: "def pricing_recommendation_check(retail):\n    import numpy as np\n    # your code here\n    return {\"correlation\": 0, \"recommend_price_increase\": False}",
+    refCode: [
+      "    def _ref(d):",
+      "        import numpy as np",
+      "        d = d.dropna(subset=[\"units\", \"revenue\"])",
+      "        c = float(np.corrcoef(d[\"unit_price\"].to_numpy(), d[\"revenue\"].to_numpy())[0, 1])",
+      "        return {\"correlation\": round(c, 3), \"recommend_price_increase\": bool(c > 0.5)}"
+    ],
+    mutation: "retail.head(25)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["Same corrcoef pattern as Stage 4, applied to unit_price instead of units this time."],
+    explanation: { why: "Higher-priced product lines in this data likely also happen to be different products with different demand, correlation between price and revenue doesn't isolate what would happen if you raised the price on the SAME product, that requires a controlled comparison, not a snapshot correlation.", business: "This is the highest-stakes version of the correlation-vs-causation trap in this library: acting on it directly (raising prices broadly) risks cutting demand on the very products this correlation doesn't actually explain, the recommendation needs a real pricing experiment, not a correlation." },
+    written: { label: "Push back on 'higher price clearly means higher revenue here.'", placeholder: "This correlation doesn't isolate the effect of price alone because...", check: (t) => t.trim().length > 40 && /caus|correlat|differen|isolat|control|experiment/i.test(t), hint: "Say more, and use specific reasoning tied to the numbers you computed." },
+  },
+  { id: "st-b07", skill: "statistics-business", tool: "statistics", level: "mastery", prerequisite: ["st-h08", "st-b05"],
+    title: "Should you act on this churn finding?",
+    objective: "The hardest task in this library: synthesize significance, sample size, and business context into one final call.",
+    objectiveNote: "Using the same cleaning and normalization as the earlier plan-churn task, compare Starter vs Enterprise churn rates. Return {\"churn_rate_plan_a\": ..., \"churn_rate_plan_b\": ..., \"p_value\": ..., \"sample_size_plan_b\": ..., \"recommend_action\": ...} (a=Starter, b=Enterprise, rates/p rounded appropriately, recommend_action true only if p_value < 0.05 AND sample_size_plan_b >= 5). Then, in the box below, give your final recommendation: should the business act on this churn comparison right now, or gather more data first, and why?",
+    functionName: "should_act_on_churn_finding",
+    dataset: "saas",
+    starterCode: "def should_act_on_churn_finding(saas):\n    import math\n    # your code here\n    return {\"churn_rate_plan_a\": 0, \"churn_rate_plan_b\": 0, \"p_value\": 0, \"sample_size_plan_b\": 0, \"recommend_action\": False}",
+    refCode: [
+      "    def _ref(d):",
+      "        import math",
+      "        def _two_prop(x1, n1, x2, n2):",
+      "            p1, p2 = x1 / n1, x2 / n2",
+      "            pooled = (x1 + x2) / (n1 + n2)",
+      "            se = math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))",
+      "            z = (p1 - p2) / se if se > 0 else 0.0",
+      "            return p1, p2, z",
+      "        def _norm_cdf(z):",
+      "            return 0.5 * (1 + math.erf(z / math.sqrt(2)))",
+      "        d = d.drop_duplicates()",
+      "        d[\"plan_norm\"] = d[\"plan\"].str.strip().str.capitalize()",
+      "        d[\"churned\"] = d[\"cancel_date\"].notna() & (d[\"cancel_date\"] != \"-\")",
+      "        a = d[d[\"plan_norm\"] == \"Starter\"]",
+      "        b = d[d[\"plan_norm\"] == \"Enterprise\"]",
+      "        p1, p2, z = _two_prop(a[\"churned\"].sum(), len(a), b[\"churned\"].sum(), len(b))",
+      "        p = 2 * (1 - _norm_cdf(abs(z)))",
+      "        return {\"churn_rate_plan_a\": round(float(p1), 4), \"churn_rate_plan_b\": round(float(p2), 4), \"p_value\": round(float(p), 4), \"sample_size_plan_b\": int(len(b)), \"recommend_action\": bool(p < 0.05 and len(b) >= 5)}"
+    ],
+    mutation: "saas.head(15)",
+    mutationLabel: "Recomputes correctly on a smaller slice (not hardcoded)",
+    hints: ["This is the same shape as st-h08, applied to a different plan pair, with an explicit minimum-sample-size gate added on top."],
+    explanation: { why: "This task deliberately combines every judgment skill this library teaches: a real p-value, an explicit sample-size floor, and a written business call, none of the three alone is enough to decide whether to act.", business: "This is the realistic version of a churn analysis a junior analyst would actually be asked to deliver: not just 'is it significant', but 'is it significant on enough data to bet a retention budget on', and if not, what to do instead, usually: keep monitoring, don't ship a change yet." },
+    written: { label: "Act now, or gather more data first? Give your final recommendation.", placeholder: "Given the p-value and the sample size behind it, I would recommend...", check: (t) => t.trim().length > 40 && /sample|more data|monitor|evidence|enough|wait|act/i.test(t), hint: "Say more, and use specific reasoning tied to the numbers you computed." },
+  }
+];
+
+function tierLabel(t) { return { "not-started": "Not started", introduced: "Introduced", practicing: "Practicing", competent: "Competent", mastered: "Mastered" }[t]; }
+
+function renderSkillBar() {
+  const order = ["not-started", "introduced", "practicing", "competent", "mastered"];
+  const wrap = document.getElementById("skillBars");
+  wrap.innerHTML = SKILLS.map(s => {
+    const prog = PracticeProgress.skillProgress(TASKS, s.id);
+    const reachedIdx = order.indexOf(prog.tier);
+    const ladder = order.slice(1).map((t, i) => `<span class="${i + 1 <= reachedIdx ? "reached" : ""}">${tierLabel(t)}</span>`).join("");
+    return `<div class="skillbar">
+      <div class="skillrow">
+        <span style="font-weight:700;font-size:14.5px">${esc(s.label)}</span>
+        <span class="tierpill t-${prog.tier}">${tierLabel(prog.tier)}</span>
+        <div class="skillbarwrap"><div class="fill" style="width:${prog.pct}%"></div></div>
+        <span class="mono" style="font-size:12.5px;color:var(--mut2)">${prog.passedCount} / ${prog.totalCount} tasks</span>
+      </div>
+      <div class="tierladder">${ladder}</div>
+    </div>`;
+  }).join("");
+  const next = PracticeProgress.recommendNext(TASKS);
+  if (!document.getElementById("nextUpBlock")) {
+    const block = document.createElement("div");
+    block.className = "skillbar";
+    block.id = "nextUpBlock";
+    block.innerHTML = `<div class="nextup" id="nextUp"></div>`;
+    wrap.after(block);
+  }
+  const target = document.getElementById("nextUp");
+  const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
+  target.innerHTML = next
+    ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
+    : `<b>What should I do next?</b> All ${TASKS.length} tasks passed, the full Statistics Practice Library is complete.`;
+}
+function buildHintsHtml(hints) {
+  const labels = ["Level 1, conceptual", "Level 2, technical", "Level 3, near-solution"];
+  return `<div class="hints">${hints.map((h, i) => `<details><summary>${labels[i] || "Hint"}</summary><div class="hbody">${esc(h)}</div></details>`).join("")}</div>`;
+}
+function buildExplainHtml(ex) {
+  if (!ex) return "";
+  const rows = [["Why this works", ex.why], ["Common mistake", ex.mistake], ["Real analyst tip", ex.tip], ["Business interpretation", ex.business]].filter(([, v]) => v);
+  return `<div class="explainbox">${rows.map(([lbl, v]) => `<div class="erow"><div class="elbl">${esc(lbl)}</div><p>${esc(v)}</p></div>`).join("")}</div>`;
+}
+
+const openTasks = new Set();
+const codeDrafts = {};
+const resultsDrafts = {};
+const writtenDrafts = {};
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  TASKS.forEach(t => {
+    const openEl = document.getElementById("body_" + t.id);
+    if (openEl && openEl.classList.contains("open")) openTasks.add(t.id);
+    const ed = document.getElementById("editor_" + t.id);
+    if (ed) codeDrafts[t.id] = ed.value;
+    const res = document.getElementById("results_" + t.id);
+    if (res && res.innerHTML) resultsDrafts[t.id] = res.innerHTML;
+    const wr = document.getElementById("written_" + t.id);
+    if (wr) writtenDrafts[t.id] = wr.value;
+  });
+  list.innerHTML = "";
+  TASKS.forEach((t, idx) => {
+    const state = PracticeProgress.getTaskState(t.id);
+    const prereqsMet = t.prerequisite.every(pid => PracticeProgress.getTaskState(pid).passed);
+    const card = document.createElement("div");
+    card.className = "taskcard";
+    card.innerHTML = `
+      <div class="taskhead" data-id="${t.id}" tabindex="0" role="button" aria-expanded="${openTasks.has(t.id) ? 'true' : 'false'}">
+        <span class="statusdot ${state.passed ? "passed" : ""}"></span>
+        <span class="tid">${String(idx + 1).padStart(2, "0")}</span>
+        <span class="ttitle">${esc(t.title)}</span>
+        <span class="levelpill ${t.level}">${t.level.replace("semiguided", "semi-guided")}</span>
+      </div>
+      <div class="taskbody${openTasks.has(t.id) ? " open" : ""}" id="body_${t.id}">
+        <div class="objective"><b>Objective:</b> ${esc(t.objective)}</div>
+        <p style="font-size:13.5px;margin-bottom:10px">${esc(t.objectiveNote)}</p>
+        ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
+        <textarea id="editor_${t.id}" rows="7" spellcheck="false">${esc(codeDrafts[t.id] !== undefined ? codeDrafts[t.id] : t.starterCode)}</textarea>
+        ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
+        <div class="dagctrl">
+          <button class="primary" data-check="${t.id}">&#10003; Check answer</button>
+        </div>
+        <div id="results_${t.id}">${resultsDrafts[t.id] || ""}</div>
+        ${buildHintsHtml(t.hints)}
+        `}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  function toggleTaskBody(head) {
+    const body = document.getElementById("body_" + head.dataset.id);
+    body.classList.toggle("open");
+    head.setAttribute("aria-expanded", body.classList.contains("open") ? "true" : "false");
+  }
+  list.querySelectorAll(".taskhead").forEach(head => {
+    head.addEventListener("click", () => toggleTaskBody(head));
+    head.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        toggleTaskBody(head);
+      }
+    });
+  });
+  list.querySelectorAll("[data-check]").forEach(btn => {
+    btn.addEventListener("click", () => checkTask(btn.dataset.check));
+  });
+}
+
+async function checkTask(id) {
+  const task = TASKS.find(t => t.id === id);
+  const getBtn = () => document.querySelector(`[data-check="${id}"]`);
+  const getResultsEl = () => document.getElementById("results_" + id);
+  const code = document.getElementById("editor_" + id).value;
+  const initialBtn = getBtn();
+  if (initialBtn) initialBtn.disabled = true;
+  const initialResultsEl = getResultsEl();
+  if (initialResultsEl) initialResultsEl.innerHTML = `<div class="feedback wait">Loading the real dataset and starting Python&hellip; first run downloads pandas/NumPy (can take 20-60s), after that it's faster.</div>`;
+
+  let outcome;
+  try {
+    const csvText = await getDatasetCsv(task.dataset);
+    const harness = buildStatsHarness(task);
+    outcome = await PySandboxRunner.run(harness, "harness", [code, csvText], 20000, 90000);
+  } finally {
+    const btn = getBtn();
+    if (btn) btn.disabled = false;
+  }
+
+  const resultsEl = getResultsEl();
+  if (!outcome.ok) {
+    if (resultsEl) resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error)}</div>`;
+    PracticeProgress.recordAttempt(id, false);
+    renderSkillBar();
+    return;
+  }
+  const data = outcome.result;
+  if (!data.ranOk) {
+    if (resultsEl) resultsEl.innerHTML = `<div class="feedback bad">Your code didn't run: ${esc(data.error || "unknown error")}. Check for a syntax error, or that the function name matches exactly.</div>`;
+    PracticeProgress.recordAttempt(id, false);
+    renderSkillBar();
+    return;
+  }
+  const results = data.results;
+  if (resultsEl) resultsEl.innerHTML = "";
+  let passCount = 0;
+  results.forEach(r => {
+    if (r.pass) passCount++;
+    if (!resultsEl) return;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${esc(r.name)}` + (r.pass ? "" : `<br>${esc(r.hint || "")}`);
+    resultsEl.appendChild(row);
+  });
+  if (resultsEl) {
+    const summary = document.createElement("div");
+    summary.className = "testsummary";
+    summary.style.color = passCount === results.length ? "var(--good)" : "var(--mut)";
+    summary.textContent = `${passCount} / ${results.length} tests passing`;
+    resultsEl.appendChild(summary);
+  }
+
+  let gradedPass = passCount === results.length;
+  let writtenPass = true;
+  if (task.written) {
+    const writtenText = (document.getElementById("written_" + id) || {}).value || "";
+    writtenPass = task.written.check(writtenText);
+    if (resultsEl) {
+      const wv = document.createElement("div");
+      wv.className = "feedback " + (writtenPass ? "ok" : "bad");
+      wv.innerHTML = writtenPass ? "<b>Interpretation accepted.</b>" : `<b>Interpretation needs more.</b> ${esc(task.written.hint)}`;
+      resultsEl.appendChild(wv);
+    }
+  }
+  const pass = gradedPass && writtenPass;
+
+  if (pass && task.explanation && resultsEl) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(task.explanation));
+  PracticeProgress.recordAttempt(id, pass);
+  if (!pass && resultsEl && data.misconceptionTag) {
+    flagStatsMisconception(data.misconceptionTag, resultsEl);
+  }
+  if (pass) openTasks.add(id);
+  renderTasks();
+  renderSkillBar();
+}
+
+renderSkillBar();
+renderTasks();
+</script>
+<script src="course-rail.js?v=7"></script>
+</body>
+</html>

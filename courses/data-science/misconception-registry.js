@@ -7,13 +7,19 @@
    to show the panel once a tag has fired twice or more for that learner.
 
    HONEST SCOPE NOTE: every tag below has real explanatory content, but
-   automatic DETECTION (pattern-matching a wrong answer to a tag) is only
-   wired up for SQL so far (practice-sql.html), covering 3 of the 5 SQL
-   tags listed: where-vs-having, null-vs-zero, join-fanout. The other SQL
-   tags and every other tool's tags exist here as content and as a target
-   for future detection wiring, not as claimed-working auto-detection
-   today. Do not read a tag's presence in this file as proof it is
-   actively detected anywhere. */
+   automatic DETECTION (recognizing that a specific wrong answer maps to
+   a specific tag) is wired up for 2 of the 31 tags' worth of tasks so
+   far: SQL (practice-sql.html), covering 3 of its 5 listed tags
+   (where-vs-having, null-vs-zero, join-fanout, via text pattern-matching
+   on the submitted query), and Statistics (practice-statistics.html),
+   covering 3 tags (mean-vs-median, p-value-misunderstanding,
+   significance-vs-magnitude, via comparing the student's actual wrong
+   numeric output to a freshly-computed correct reference value, not
+   text pattern-matching). Every other tag, and every other tool's tasks,
+   exist here as real content and as a target for future detection
+   wiring, not as claimed-working auto-detection today. Do not read a
+   tag's presence in this file as proof it is actively detected
+   anywhere. */
 (function (global) {
   const MISCONCEPTIONS = {
     "where-vs-having": {
@@ -120,6 +126,20 @@
       explain: "df[df.a > 5 and df.b < 10] raises an error, Python's `and` doesn't work element-wise on Series. Use `&` with parentheses around each condition instead.",
       example: "Wrong: df[(df.a > 5) and (df.b < 10)]\nRight: df[(df.a > 5) & (df.b < 10)]",
       microExercise: "Filter a DataFrame on two combined numeric conditions using & with each side parenthesized.",
+    },
+    "mean-vs-median": {
+      label: "Mean vs median",
+      tool: "statistics",
+      explain: "The mean (sum divided by count) and the median (the middle value) can differ noticeably whenever a distribution is skewed, a few unusually large or small values pull the mean toward them without moving the median at all. They answer different questions: mean sums everything into an average, median just finds the midpoint.",
+      example: "Five salaries of 40k, 42k, 45k, 48k, and 400k: the mean is about 115k (dragged up by the one outlier), the median is 45k, a far more typical value for this group.",
+      microExercise: "Given a column with one extreme outlier, compute both the mean and the median, and explain in one sentence which one better represents a 'typical' row.",
+    },
+    "p-value-misunderstanding": {
+      label: "P-value misunderstanding",
+      tool: "statistics",
+      explain: "A p-value is always a probability, between 0 and 1, it answers 'if there were truly no effect, how likely is a result this extreme purely by chance.' It is not the probability the null hypothesis is true, and it is not the probability your finding is 'real' or 'important', those are common but incorrect readings of the same number.",
+      example: "A p-value of 0.03 means: if the two groups truly performed identically, a gap this large would happen about 3% of the time by chance alone, not 'there's a 3% chance this is a fluke' and not 'there's a 97% chance the effect is real.'",
+      microExercise: "Given a p-value of 0.02, write one sentence stating correctly what it does and does not tell you.",
     },
     "sample-vs-population": {
       label: "Sample vs population",
