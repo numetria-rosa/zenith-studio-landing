@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Hammer, Briefcase, Rocket } from "lucide-react";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
 import { CourseCatalog } from "./CourseCatalog";
 import { courses } from "./courses-data";
@@ -185,15 +186,17 @@ export default function ZenithLabPage() {
 
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              ["Build something real", "You ship a working system, not a folder of exercise files. It becomes the thing you demo when someone asks what you can do."],
-              ["Career Path Edition", "Where the work is, how to find it, what to charge, and how to talk about it. The part almost every course leaves out."],
-              ["Taught from live products", "The material comes out of systems that are actually running and actually sold, not from a syllabus written in a vacuum."],
-            ].map(([title, text]) => (
+              { icon: Hammer, title: "Build something real", text: "You ship a working system, not a folder of exercise files. It becomes the thing you demo when someone asks what you can do." },
+              { icon: Briefcase, title: "Career Path Edition", text: "Where the work is, how to find it, what to charge, and how to talk about it. The part almost every course leaves out." },
+              { icon: Rocket, title: "Taught from live products", text: "The material comes out of systems that are actually running and actually sold, not from a syllabus written in a vacuum." },
+            ].map(({ icon: Icon, title, text }) => (
               <div
                 key={title}
                 className="rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white/[0.06]"
               >
-                <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-emerald-300/30 via-teal-500/25 to-cyan-500/30 shadow-[0_0_30px_rgba(52,211,153,0.16)]" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-300/30 via-teal-500/25 to-cyan-500/30 shadow-[0_0_30px_rgba(52,211,153,0.16)]">
+                  <Icon className="h-5 w-5 text-emerald-100" aria-hidden />
+                </div>
                 <h3 className="mt-5 text-lg font-semibold">{title}</h3>
                 <p className="mt-2.5 text-sm leading-7 text-white/60">{text}</p>
               </div>
