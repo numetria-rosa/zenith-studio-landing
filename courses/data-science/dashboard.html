@@ -82,8 +82,45 @@ h1{font-family:'Fraunces';font-size:clamp(28px,4.5vw,40px);font-weight:600;lette
 .completebanner .cbtitle{font-size:22px;font-weight:600;font-family:'Fraunces',serif;display:flex;align-items:center;justify-content:center}
 .completebanner .cbtitle .icon svg{color:var(--amber)}
 .completebanner .cbsub{color:var(--mut);font-size:14px;margin-top:8px}
+.evidencegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+@media (max-width:760px){ .evidencegrid{grid-template-columns:repeat(2,1fr)} }
+.evcard{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px}
+.evcard .evval{font-family:'IBM Plex Mono';font-weight:700;font-size:22px;color:var(--tx)}
+.evcard .evlbl{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.06em;margin-top:4px;font-family:'IBM Plex Mono'}
+.libgrid{display:grid;gap:10px;margin-top:14px}
+.libcard{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:12px 16px;text-decoration:none;color:inherit;transition:.15s}
+.libcard:hover,.libcard:focus-visible{border-color:var(--bd2);background:var(--card2)}
+.libcard:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.libcard .liblbl{font-weight:600;font-size:13.5px;min-width:150px;flex-shrink:0}
+.libcard .libbarwrap{flex:1;height:7px;background:var(--bg);border-radius:99px;overflow:hidden;border:1px solid var(--bd)}
+.libcard .libbarwrap .fill{height:100%;background:var(--info)}
+.libcard .libcount{font-family:'IBM Plex Mono';font-size:12px;color:var(--mut2);flex-shrink:0;min-width:60px;text-align:right}
+.libcard.simlib .libbarwrap .fill{background:var(--amber)}
+.simtag{font-family:'IBM Plex Mono';font-size:9px;text-transform:uppercase;padding:1px 6px;border-radius:99px;background:rgba(240,180,41,.12);color:var(--amber);flex-shrink:0}
+.catlbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);margin-top:22px;margin-bottom:8px;font-family:'IBM Plex Mono'}
+.catlbl:first-child{margin-top:0}
+.mskillrow{display:flex;align-items:center;gap:12px;padding:9px 4px;flex-wrap:wrap}
+.mskillrow .mslbl{font-size:13.5px;font-weight:600;min-width:220px;flex-shrink:0}
+.tierpill{font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:3px 10px;border-radius:99px;font-weight:700;flex-shrink:0}
+.tierpill.t-not-started{background:var(--card2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.12);color:var(--amber)}
+.tierpill.t-competent{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t-mastered{background:rgba(74,222,149,.2);color:var(--good)}
+.mskillrow .msbarwrap{flex:1;min-width:100px;height:6px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--bd)}
+.mskillrow .msbarwrap .fill{height:100%;background:var(--good)}
+.mskillrow .msnote{flex-basis:100%;font-size:11.5px;color:var(--mut2);margin-top:2px}
+.nextpractice{margin-top:16px;padding:14px 16px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.nextpractice .nalbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--info);font-weight:700;font-family:'IBM Plex Mono'}
+.nextpractice .natext{font-size:14px;color:var(--tx);flex:1;min-width:180px}
+.nextpractice a.nabtn{background:var(--info);color:#04202e;font-weight:700;font-size:13px;padding:8px 16px;border-radius:8px;text-decoration:none;white-space:nowrap}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
-@media (max-width:640px){ .modcard{flex-direction:column;align-items:flex-start;gap:10px} .modstatus{align-self:flex-start} }
+@media (max-width:640px){
+  .modcard{flex-direction:column;align-items:flex-start;gap:10px} .modstatus{align-self:flex-start}
+  .libcard{flex-wrap:wrap} .libcard .liblbl{min-width:0;width:100%} .libcard .libbarwrap{min-width:0}
+  .mskillrow .mslbl{min-width:0;width:100%}
+  .evidencegrid{grid-template-columns:repeat(2,1fr)}
+}
 </style>
 </head>
 <body>
@@ -104,7 +141,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
     <a class="syscard" href="syllabus.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span class="systitle">Syllabus</span><span class="sysdesc">Full course outline &amp; tracks</span></a>
     <a class="syscard" href="quiz-center.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 2-2.4 3.7"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/></svg></span><span class="systitle">Quiz Center</span><span class="sysdesc">Module &amp; cumulative quizzes</span></a>
     <a class="syscard" href="cheatsheets.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 14.5h6M9 18h3.5"/></svg></span><span class="systitle">Cheat Sheets</span><span class="sysdesc">Excel, pandas, SQL &amp; more</span></a>
-    <a class="syscard" href="projects.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2z"/></svg></span><span class="systitle">Projects</span><span class="sysdesc">4 portfolio-grade scenarios</span></a>
+    <a class="syscard" href="projects.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2z"/></svg></span><span class="systitle">Projects</span><span class="sysdesc">10 portfolio scenarios</span></a>
     <a class="syscard" href="portfolio.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5"/><path d="M3.5 12.5h17"/></svg></span><span class="systitle">My Portfolio</span><span class="sysdesc">Your completed work</span></a>
     <a class="syscard" href="career.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6z"/></svg></span><span class="systitle">Career Path</span><span class="sysdesc">Readiness &amp; job-landing playbook</span></a>
   </div>
@@ -120,7 +157,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
       <span class="natext" id="naText"></span>
       <a class="nabtn" id="naBtn" href="#">Continue &rarr;</a>
     </div>
-    <div class="storage-note">Progress is stored locally in this browser only, it will not follow you to another device or browser profile. <button id="btnReset">Reset all progress</button></div>
+    <div class="storage-note">Progress is stored locally in this browser only, it will not follow you to another device or browser profile. <button id="btnReset">Reset module progress</button></div>
   </div>
 
   <h2 class="modgrid-lbl">Start here</h2>
@@ -136,14 +173,43 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <div class="modgrid" id="modGrid"></div>
 
   <div class="overallwrap" id="skillsWrap" style="margin-top:28px">
-    <div class="ov-lbl" style="margin-bottom:14px">Skills demonstrated</div>
+    <div class="ov-lbl" style="margin-bottom:14px">Module skills demonstrated</div>
     <div id="skillsList" style="display:grid;gap:10px"></div>
+  </div>
+
+  <h2 class="modgrid-lbl">Practice &amp; portfolio evidence</h2>
+  <p class="sub" style="margin-top:6px;max-width:700px">Course modules and practice-library tasks are tracked separately, on purpose, finishing a module's lesson is not the same evidence as passing a genuinely tested, anti-cheat-protected practice task. Both count toward what you can actually do.</p>
+  <div class="overallwrap" style="margin-top:16px">
+    <div class="evidencegrid">
+      <div class="evcard"><div class="evval" id="evModules">0 / 9</div><div class="evlbl">Course lessons completed</div></div>
+      <div class="evcard"><div class="evval" id="evTasks">0 / 275</div><div class="evlbl">Practice tasks passed</div></div>
+      <div class="evcard"><div class="evval" id="evSkillsMastered">0 / 21</div><div class="evlbl">Skills at Mastered</div></div>
+      <div class="evcard"><div class="evval" id="evProjects">0 / 10</div><div class="evlbl">Portfolio projects completed</div></div>
+    </div>
+    <div class="nextpractice" id="nextPractice" style="display:none">
+      <span class="nalbl">Next practice task</span>
+      <span class="natext" id="npText"></span>
+      <a class="nabtn" id="npBtn" href="#">Open library &rarr;</a>
+    </div>
+  </div>
+
+  <h2 class="modgrid-lbl">Practice library progress</h2>
+  <div class="overallwrap" style="margin-top:14px">
+    <div class="libgrid" id="libGrid"></div>
+  </div>
+
+  <h2 class="modgrid-lbl">Skill map</h2>
+  <p class="sub" style="margin-top:6px;max-width:700px">21 tracked skills, Foundation through Portfolio. A tier only advances on real evidence: Introduced needs a passed guided task, Practicing needs 3+ passed tasks, Competent needs a passed challenge task, Mastered needs a passed independent/mastery-level task, on top of everything below it. See <a href="mastery-profile.html" style="color:var(--info)">the full mastery profile</a> for the evidence behind each tier.</p>
+  <div class="overallwrap" style="margin-top:14px" id="skillMapWrap">
+    <div id="skillMapList"></div>
   </div>
 
   <footer>Zenith Lab · Data Science &amp; Analysis</footer>
 </div>
 
 <script src="course-progress.js?v=5"></script>
+<script src="practice-progress.js"></script>
+<script src="skill-map.js?v=1"></script>
 <script>
 const LOCK_ICON = '<span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>';
 const descriptions = {
@@ -235,7 +301,7 @@ function renderDashboard(){
         <div class="modnum">${faDone ? "✓" : "★"}</div>
         <div class="modbody">
           <div class="modtitle">Final Competency Assessment</div>
-          <div class="moddesc">Novel scenarios spanning Modules 1–8. Not recycled from the lessons.</div>
+          <div class="moddesc">Novel scenarios spanning core analytical concepts, BI, and automation. Not recycled from the lessons.</div>
           <div class="modmeta"><span>${fMeta}</span></div>
         </div>
         <div class="modstatus ${!fUnlocked ? "locked" : fStatus}">${fLabel}</div>
@@ -320,14 +386,94 @@ function renderSkills(){
   });
 }
 
+/* ---------------- Practice-library evidence (separate system from
+   module progress above, backed by SkillMap + PracticeProgress,
+   shared localStorage state with every practice-*.html page) ---------------- */
+const TIER_LABEL = { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" };
+const LIB_LABELS = { sql: "SQL Practice Library", excel: "Excel Practice Library", python: "Python Practice Library", tableau: "Tableau Practice Library", powerbi: "Power BI Practice Library", automation: "Automation Practice Library", integrated: "Integrated Cross-Tool Challenges" };
+const SIM_TOOLS = { tableau: true, powerbi: true };
+
+function renderEvidenceOverview(){
+  if (typeof SkillMap === "undefined") return;
+  const totalTasks = SkillMap.TASKS.length;
+  const passedTasks = SkillMap.totalTasksPassed();
+  document.getElementById("evModules").textContent = `${CourseProgress.overall().completed} / 9`;
+  document.getElementById("evTasks").textContent = `${passedTasks} / ${totalTasks}`;
+  const allSkills = SkillMap.allMasterSkillProgress();
+  const masteredCount = allSkills.filter(s => s.tier === "mastered").length;
+  document.getElementById("evSkillsMastered").textContent = `${masteredCount} / ${allSkills.length}`;
+  const projTier = SkillMap.portfolioTier();
+  document.getElementById("evProjects").textContent = `${projTier.passedCount} / ${projTier.totalCount}`;
+
+  const next = SkillMap.recommendNextAcrossCourse();
+  const box = document.getElementById("nextPractice");
+  if (!next) { box.style.display = "none"; }
+  else {
+    box.style.display = "flex";
+    const libFile = SkillMap.TOOL_LIBRARIES[next.tool] || "#";
+    const libLabel = LIB_LABELS[next.tool] || next.tool;
+    document.getElementById("npText").textContent = `${passedTasks} / ${totalTasks} practice tasks passed so far. Next up: a ${next.level.replace("semiguided","semi-guided")} task in the ${libLabel}.`;
+    document.getElementById("npBtn").href = libFile;
+    document.getElementById("npBtn").textContent = `Open ${libLabel} →`;
+  }
+}
+
+function renderLibraryProgress(){
+  if (typeof SkillMap === "undefined" || typeof PracticeProgress === "undefined") return;
+  const grid = document.getElementById("libGrid");
+  grid.innerHTML = "";
+  Object.keys(SkillMap.TOOL_LIBRARIES).forEach(tool => {
+    const tasks = SkillMap.TASKS.filter(t => t.tool === tool);
+    const passed = tasks.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
+    const pct = tasks.length ? Math.round(passed / tasks.length * 100) : 0;
+    const a = document.createElement("a");
+    a.className = "libcard" + (SIM_TOOLS[tool] ? " simlib" : "");
+    a.href = SkillMap.TOOL_LIBRARIES[tool];
+    a.innerHTML = `<span class="liblbl">${LIB_LABELS[tool] || tool}</span>${SIM_TOOLS[tool] ? '<span class="simtag">Simulation</span>' : ""}<span class="libbarwrap"><span class="fill" style="width:${pct}%"></span></span><span class="libcount">${passed} / ${tasks.length}</span>`;
+    grid.appendChild(a);
+  });
+}
+
+function renderSkillMap(){
+  if (typeof SkillMap === "undefined") return;
+  const all = SkillMap.allMasterSkillProgress();
+  const cats = [];
+  all.forEach(s => { if (cats.indexOf(s.category) === -1) cats.push(s.category); });
+  const list = document.getElementById("skillMapList");
+  list.innerHTML = "";
+  cats.forEach(cat => {
+    const lbl = document.createElement("div");
+    lbl.className = "catlbl";
+    lbl.textContent = cat;
+    list.appendChild(lbl);
+    all.filter(s => s.category === cat).forEach(s => {
+      const row = document.createElement("div");
+      row.className = "mskillrow";
+      const breadthNote = (s.groupsTotal && s.groupsTotal > 1 && s.groupsTouched < s.groupsTotal) ? `<span class="msnote">Evidence from ${s.groupsTouched} of ${s.groupsTotal} sub-skills, Competent/Mastered needs broader coverage, not just depth in one.</span>` : "";
+      row.innerHTML = `<span class="mslbl">${CourseProgress.escapeHtml(s.label)}${s.simulation ? ' <span class="simtag">Simulation</span>' : ""}</span>
+        <span class="tierpill t-${s.tier}">${TIER_LABEL[s.tier]}</span>
+        <span class="msbarwrap"><span class="fill" style="width:${s.pct}%"></span></span>
+        <span class="libcount">${s.passedCount} / ${s.totalCount}</span>
+        ${s.approximate ? `<span class="msnote">${CourseProgress.escapeHtml(s.approximateNote)}</span>` : breadthNote}`;
+      list.appendChild(row);
+    });
+  });
+}
+
 document.getElementById("btnReset").addEventListener("click", () => {
-  if (confirm("Reset all course progress in this browser? This cannot be undone.")){
+  if (confirm("Reset module and quiz progress in this browser? This does not affect practice-library task progress or portfolio projects, those are stored separately. This cannot be undone.")){
     CourseProgress.resetAll();
     renderDashboard();
+    renderEvidenceOverview();
+    renderLibraryProgress();
+    renderSkillMap();
   }
 });
 
 renderDashboard();
+renderEvidenceOverview();
+renderLibraryProgress();
+renderSkillMap();
 </script>
 <script src="course-rail.js?v=5"></script>
 </body>
