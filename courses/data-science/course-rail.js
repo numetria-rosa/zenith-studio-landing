@@ -47,6 +47,7 @@
   const NAV = [
     ["syllabus.html", "Syllabus"],
     ["dashboard.html", "Dashboard"],
+    ["mastery-profile.html", "Mastery Profile"],
     ["quiz-center.html", "Quiz Center"],
     ["cheatsheets.html", "Cheat Sheets"],
     ["python-survival-guide.html", "Python Survival Guide"],
