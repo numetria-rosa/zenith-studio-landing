@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power BI Practice Library, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f2c811;--amberd:#1a1500;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;--gold:#f2c811;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 90px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--gold)}
+.bar .in{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px;flex-wrap:wrap}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--gold)}
+.hero{padding:40px 0 24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:720px;margin-top:10px}
+.scopenote{background:rgba(242,200,17,.08);border:1px solid rgba(242,200,17,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
+.scopenote b{color:var(--gold)}
+.honestnote{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.35);border-radius:10px;padding:14px 18px;margin-top:12px;font-size:13px;color:var(--mut)}
+.honestnote b{color:#f0b429}
+.sheetblock{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:20px 22px;margin-top:22px}
+.sheetblock .stlbl{font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);margin-bottom:10px}
+.fieldgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.fieldcard{border:1px solid var(--bd2);border-radius:8px;padding:9px 12px;font-family:'IBM Plex Mono';font-size:12px}
+.fieldcard .fname{font-weight:700}
+.fieldcard.col .fname{color:var(--info)}
+.fieldcard.col{background:rgba(95,194,232,.06)}
+.fieldcard.mea .fname{color:var(--good)}
+.fieldcard.mea{background:rgba(74,222,149,.06)}
+.fieldcard .fmeta{color:var(--mut2);margin-top:3px;font-size:10.5px}
+.sheetwrap{overflow-x:auto;border:1px solid var(--bd2);border-radius:8px;max-height:280px;overflow-y:auto;margin-top:12px}
+table.grid{width:100%;border-collapse:collapse;font-size:12.5px;min-width:600px}
+table.grid th,table.grid td{padding:6px 10px;border:1px solid var(--bd);text-align:left;white-space:nowrap;font-family:'IBM Plex Mono'}
+table.grid thead th{background:var(--card2);color:var(--gold);position:sticky;top:0}
+table.grid td.num{text-align:right}
+.skillbar{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:20px 22px;margin-top:22px}
+.skillrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tierpill{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 12px;border-radius:99px;font-weight:700}
+.tierpill.t-not-started{background:var(--bg2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.12);color:#f0b429}
+.tierpill.t-competent{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t-mastered{background:rgba(242,200,17,.18);color:var(--gold)}
+.skillbarwrap{flex:1;min-width:180px;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--bd)}
+.skillbarwrap .fill{height:100%;background:var(--gold)}
+.tierladder{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.tierladder span{font-family:'IBM Plex Mono';font-size:10.5px;padding:3px 10px;border-radius:99px;background:var(--bg2);color:var(--mut2);border:1px solid var(--bd2)}
+.tierladder span.reached{background:rgba(242,200,17,.12);color:var(--gold);border-color:rgba(242,200,17,.4)}
+.nextup{margin-top:14px;padding:12px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px}
+.nextup b{color:var(--gold)}
+.tasklist{display:grid;gap:10px;margin-top:22px}
+.taskcard{background:var(--card);border:1px solid var(--bd2);border-radius:12px;overflow:hidden}
+.taskhead{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer}
+.taskhead:hover{background:var(--card2)}
+.taskhead .tid{font-family:'IBM Plex Mono';font-size:11px;color:var(--mut2);width:32px;flex-shrink:0}
+.taskhead .ttitle{font-weight:600;font-size:14.5px;flex:1}
+.levelpill{font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;padding:2px 9px;border-radius:99px;flex-shrink:0}
+.levelpill.guided{background:rgba(74,222,149,.12);color:var(--good)}
+.levelpill.semiguided{background:rgba(240,180,41,.12);color:#f0b429}
+.levelpill.challenge{background:rgba(255,133,133,.12);color:var(--bad)}
+.levelpill.mastery{background:rgba(242,200,17,.12);color:var(--gold)}
+.statusdot{width:9px;height:9px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+.statusdot.passed{background:var(--good);box-shadow:0 0 6px var(--good)}
+.taskbody{display:none;padding:0 18px 18px}
+.taskbody.open{display:block}
+.objective{font-size:13.5px;color:var(--mut);margin-bottom:12px}
+.objective b{color:var(--tx)}
+.scenario{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;font-size:13.5px;margin-bottom:12px}
+.scenario b{color:var(--gold)}
+.streakrow{display:flex;gap:6px;margin-bottom:10px}
+.streakdot{width:10px;height:10px;border-radius:50%;background:var(--bg2);border:1px solid var(--bd2)}
+.streakdot.hit{background:var(--gold);border-color:var(--gold)}
+.slotgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.slotfield{display:flex;flex-direction:column;gap:4px}
+.slotfield label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);font-family:'IBM Plex Mono'}
+select{font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+select:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--gold);color:var(--gold)}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button.primary{background:var(--gold);color:#1a1500;border-color:var(--gold)}
+button.primary:hover{filter:brightness(1.1);color:#1a1500}
+.writtenlbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);font-family:'IBM Plex Mono';margin:12px 0 6px}
+.writtenbox{width:100%;font-family:'IBM Plex Sans';line-height:1.6;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.writtenbox:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.dagctrl{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px}
+.feedback.ok{background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.hints{margin-top:12px;display:grid;gap:6px}
+.hints details{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px}
+.hints summary{cursor:pointer;color:var(--gold);font-size:12px;font-weight:600;list-style:none}
+.hints summary::-webkit-details-marker{display:none}
+.hints .hbody{margin-top:7px;font-size:12.5px;color:var(--mut);padding-top:7px;border-top:1px solid var(--bd)}
+.explainbox{margin-top:12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.explainbox .erow .elbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);font-family:'IBM Plex Mono';margin-bottom:3px}
+.explainbox .erow p{font-size:12.5px;color:var(--mut)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 70px} .taskhead{flex-wrap:wrap} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-08.html">Module 8: Dashboards</a><a href="career.html">Career Path</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Practice Library &middot; Power BI &middot; Stage 1 of 4</span>
+    <h1 class="serif">Power BI Practice Library</h1>
+    <p class="sub">Decision-based practice for Power BI's specific reasoning: Column vs Measure, Calculated Column vs Measure, Row Context vs Filter Context, which visual fits a request, and the Report/Dashboard split unique to Power BI's Desktop-plus-Service workflow.</p>
+    <div class="honestnote"><b>Honest scope note, please read:</b> this is a <b>practice simulation</b>, not real Power BI. Nothing here renders inside actual Power BI Desktop or the Power BI Service, and no click is graded by executing real Microsoft software, this page can't run in a browser the way the Excel formula engine or the Python/SQL sandboxes do. What it genuinely checks is the reasoning: given a real field from a real table, do you know whether it's a Column or a Measure, when a calculation needs Row Context vs Filter Context, and which Power BI feature a business request actually calls for. Every scenario is re-randomized on every attempt specifically so a memorized click sequence can't pass, only the underlying rule can. Treat this as a rehearsal for the concepts, not a substitute for opening Power BI Desktop (free) and building a real report.</div>
+    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals: the Fields pane, Column vs Measure, data types, visual choice, Report vs Dashboard) is complete, 10 tasks. Stages 2-4 (Power Query &amp; Data Prep, Data Modeling &amp; DAX, Dashboards &amp; BI) are not yet built.</div>
+  </header>
+
+  <div class="sheetblock">
+    <div class="stlbl">Data model &middot; Retail Performance table &middot; connect once, reuse in every task below</div>
+    <div id="fieldGrid" class="fieldgrid"></div>
+    <div class="sheetwrap"><table class="grid" id="gridTable"></table></div>
+  </div>
+
+  <div id="skillBars"></div>
+
+  <div class="tasklist" id="taskList"></div>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Practice Library &middot; Practice Simulation, not real Power BI</footer>
+</div>
+
+<script src="course-progress.js?v=5"></script>
+<script src="practice-progress.js"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+
+/* ================= data model ================= */
+const ROWS = [
+  [1, "2025-01-04", "West", "Outdoor", "Consumer", "Completed", 128.50],
+  [2, "2025-01-09", "East", "Apparel", "Corporate", "Completed", 64.00],
+  [3, "2025-01-15", "West", "Electronics", "Home Office", "Returned", 340.00],
+  [4, "2025-01-22", "North", "Outdoor", "Consumer", "Completed", 91.25],
+  [5, "2025-02-02", "South", "Home", "Corporate", "Completed", 55.00],
+  [6, "2025-02-08", "East", "Electronics", "Consumer", "Completed", 512.00],
+  [7, "2025-02-14", "West", "Apparel", "Home Office", "Cancelled", 78.40],
+  [8, "2025-02-19", "North", "Home", "Consumer", "Completed", 33.99],
+  [9, "2025-02-27", "South", "Outdoor", "Corporate", "Completed", 210.00],
+  [10, "2025-03-03", "East", "Home", "Consumer", "Returned", 47.50],
+  [11, "2025-03-10", "West", "Electronics", "Corporate", "Completed", 289.99],
+  [12, "2025-03-16", "North", "Apparel", "Home Office", "Completed", 62.00],
+];
+const FIELDS = ["order_id", "order_date", "region", "category", "customer_segment", "status", "amount"];
+
+const FIELD_META = {
+  order_id: { kind: "column", note: "whole number, unique identifier per order" },
+  order_date: { kind: "column", note: "date, used for time intelligence and slicers" },
+  region: { kind: "column", note: "text category" },
+  category: { kind: "column", note: "text category" },
+  customer_segment: { kind: "column", note: "text category" },
+  status: { kind: "column", note: "text category" },
+  amount: { kind: "column", note: "decimal number, stored per row, needs a Measure to summarize it" },
+};
+const DIMENSION_FIELDS = ["region", "category", "customer_segment", "status"];
+
+function renderFieldGrid() {
+  const grid = document.getElementById("fieldGrid");
+  grid.innerHTML = FIELDS.map(f => {
+    const m = FIELD_META[f];
+    return `<div class="fieldcard col"><div class="fname">${esc(f)}</div><div class="fmeta">Column &middot; ${esc(m.note)}</div></div>`;
+  }).join("") + `<div class="fieldcard mea"><div class="fname">fx Total Revenue</div><div class="fmeta">Measure &middot; = SUM(Orders[amount]), not stored per row, computed on demand</div></div>`;
+}
+function renderGrid() {
+  const table = document.getElementById("gridTable");
+  let html = `<thead><tr>${FIELDS.map(f => `<th>${esc(f)}</th>`).join("")}</tr></thead><tbody>`;
+  ROWS.forEach(row => {
+    html += `<tr>${row.map((v, ci) => `<td class="${ci === 6 ? "num" : ""}">${esc(ci === 6 ? Number(v).toFixed(2) : String(v))}</td>`).join("")}</tr>`;
+  });
+  html += "</tbody>";
+  table.innerHTML = html;
+}
+
+/* ================= random helpers =================
+   Every task redraws its scenario fresh on every render, the same
+   anti-cheat intent as the Excel library's mutatedWorkbook() and the
+   Tableau library's per-attempt redraw: a memorized click sequence
+   only survives if it's actually applying the right RULE, since the
+   specific field or business ask named in the prompt changes every
+   time. */
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function pickN(arr, n) {
+  const copy = arr.slice();
+  for (let i = copy.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; }
+  return copy.slice(0, n);
+}
+
+/* ================= skills & tasks ================= */
+const SKILL_ID_FIELDS = "powerbi-fields";
+const SKILL_ID_VISUALS = "powerbi-visuals";
+const SKILL_ID_REPORTVSDASH = "powerbi-report-dashboard";
+const SKILLS = [
+  { id: SKILL_ID_FIELDS, label: "Power BI Column vs Measure" },
+  { id: SKILL_ID_VISUALS, label: "Power BI Visual Choice" },
+  { id: SKILL_ID_REPORTVSDASH, label: "Power BI Report vs Dashboard" },
+];
+
+/* Each task's build(seed) returns { scenarioHtml, slots, correct },
+   drawn fresh every time renderTasks() paints this task's body, so the
+   correct answer differs attempt to attempt while the RULE it tests
+   stays fixed. */
+const TASKS = [
+  { id: "pb-f01", skill: SKILL_ID_FIELDS, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Column or Measure?",
+    objective: "Recognize Power BI's Fields pane split: Columns (stored per row) vs Measures (computed on demand, marked with fx).",
+    build() {
+      const isMeasure = Math.random() < 0.5;
+      const label = isMeasure ? "Total Revenue" : pick(FIELDS);
+      return {
+        scenarioHtml: `Look at <b class="mono">${esc(label)}</b> in the Fields pane above.`,
+        slots: [{ key: "kind", label: "Is it a Column or a Measure?", options: [{ value: "column", label: "Column" }, { value: "measure", label: "Measure" }] }],
+        correct: { kind: isMeasure ? "measure" : "column" },
+      };
+    },
+    hints: [
+      "A Column holds one value per row, physically stored in the table, region, amount, order_date are all Columns.",
+      "A Measure is a DAX formula, computed on the fly whenever it's used in a visual, never stored per row, marked with a small fx icon in the Fields pane.",
+      "Total Revenue is a Measure (= SUM(Orders[amount])), everything else listed here is a plain stored Column.",
+      "Total Revenue = Measure. order_id, order_date, region, category, customer_segment, status, amount = Column." ],
+    explanation: { why: "Columns and Measures look similar in the Fields pane but behave completely differently, a Column's value exists on disk for every row, a Measure's value is calculated fresh every time it's used, using whatever filters happen to be active at that moment.", mistake: "Treating amount itself as though it were already a total is a common early mix-up, amount is a per-row Column, SUM(amount) (wrapped in a Measure) is what actually produces a summarized total, the raw Column alone doesn't aggregate itself.", tip: "The fx icon next to a field's name in the Fields pane is the fastest visual tell, that icon means Measure, its absence means Column.", business: "Getting Column vs Measure right is foundational to everything else in Power BI, relationships, visuals, and DAX formulas all behave differently depending on which one you're working with." } },
+
+  { id: "pb-f02", skill: SKILL_ID_FIELDS, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-f01"],
+    title: "Recognize the data type",
+    objective: "Match a Power BI field to its correct data type, which determines what operations and visuals it supports.",
+    build() {
+      const f = pick(["order_id", "order_date", "region", "amount"]);
+      const typeMap = { order_id: "whole_number", order_date: "date", region: "text", amount: "decimal_number" };
+      return {
+        scenarioHtml: `What data type should <b class="mono">${esc(f)}</b> have in the data model?`,
+        slots: [{ key: "type", label: "Data type", options: [{ value: "whole_number", label: "Whole Number" }, { value: "decimal_number", label: "Decimal Number" }, { value: "text", label: "Text" }, { value: "date", label: "Date" }] }],
+        correct: { type: typeMap[f] },
+      };
+    },
+    hints: [
+      "order_id is a whole-number identifier, order_date is a calendar date, region is a text category, amount is a decimal dollar figure.",
+      "The correct data type determines what Power BI lets you do with a field, a Text field can't be summed, a Date field unlocks a built-in date hierarchy and time-intelligence functions.",
+      "Match the field named above to what kind of value it actually holds: whole number, decimal, text, or date.",
+      "order_id = Whole Number, order_date = Date, region = Text, amount = Decimal Number." ],
+    explanation: { why: "Power BI uses a field's declared data type to decide what aggregations, visuals, and DAX functions are even available for it, a field typed as Text can never be summed no matter how numeric-looking its values are, and a field typed as Date unlocks Power BI's automatic date hierarchy.", mistake: "A numeric-looking field imported as Text (common with messy source data, like a CSV where a number column has a stray blank or symbol) silently loses the ability to be summed or averaged until its type is explicitly corrected.", tip: "Checking each column's data type is one of the first things worth doing after connecting to a new data source, a wrong type discovered later, after visuals are already built on top of it, is more disruptive to fix.", business: "A revenue field accidentally imported as Text would make every SUM-based Measure return an error or a blank, a data type problem this basic is also one of the most common real Power BI troubleshooting scenarios." } },
+
+  { id: "pb-f03", skill: SKILL_ID_VISUALS, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-f01"],
+    title: "Pick the right visual for one Measure across categories",
+    objective: "Match Power BI's most common visual, the bar/column chart, to a category-comparison request.",
+    build() {
+      const dim = pick(DIMENSION_FIELDS);
+      return {
+        scenarioHtml: `You want to compare <b>Total Revenue across every ${esc(dim)}</b>, one bar per value, easy to compare at a glance.`,
+        slots: [{ key: "visual", label: "Which visual fits?", options: [{ value: "bar", label: "Bar/Column Chart" }, { value: "card", label: "Card (single number)" }, { value: "table", label: "Table" }, { value: "line", label: "Line Chart" }] }],
+        correct: { visual: "bar" },
+      };
+    },
+    hints: [
+      "Comparing one Measure across several categories, at a glance, is exactly what a Bar or Column Chart is built for.",
+      "A Card shows just one single number, no breakdown, that's too little for a \"compare across every value\" request.",
+      "A Line Chart implies a trend over a continuous axis (usually time), region or category isn't a continuous axis.",
+      "Bar/Column Chart." ],
+    explanation: { why: "A Bar or Column Chart maps each category to a bar whose length represents the Measure's value, making relative comparisons across categories immediately visible, exactly what \"compare across every value\" is asking for.", mistake: "A Card only ever shows a single aggregated number with no breakdown at all, using one here would lose the entire category comparison the request specifically asked for.", tip: "Bar/Column charts are Power BI's single most common visual for exactly this shape of request, one Measure, broken out by one categorical field, reaching for it first is usually the right instinct.", business: "\"Revenue by region\" is one of the first visuals almost any retail Power BI report includes, it's the direct visual answer to \"where is our business actually coming from.\"" } },
+
+  { id: "pb-f04", skill: SKILL_ID_VISUALS, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-f03"],
+    title: "Pick the right visual for a trend over time",
+    objective: "Match a Line Chart to a request about change over a continuous time axis.",
+    build() {
+      return {
+        scenarioHtml: `You want to see <b>how Total Revenue has changed over time</b>, month by month, as a continuous trend.`,
+        slots: [{ key: "visual", label: "Which visual fits?", options: [{ value: "bar", label: "Bar/Column Chart" }, { value: "card", label: "Card (single number)" }, { value: "table", label: "Table" }, { value: "line", label: "Line Chart" }] }],
+        correct: { visual: "line" },
+      };
+    },
+    hints: [
+      "\"How something has changed over time, as a continuous trend\" is the exact use case a Line Chart is built for.",
+      "A Bar Chart CAN show revenue by month too, but a Line Chart makes the shape of the TREND (rising, falling, seasonal) far easier to read at a glance.",
+      "A Card or Table would show the numbers but not the visual shape of the trend at all.",
+      "Line Chart." ],
+    explanation: { why: "A Line Chart connects each period's value with the next, making the overall trajectory, rising, falling, seasonal, immediately visible as a shape, which a Bar Chart's separate, disconnected bars don't convey as clearly.", mistake: "Defaulting to a Bar Chart for every request, including a trend-over-time one, isn't wrong exactly (the numbers are all there), but it makes the actual shape of the trend harder to read at a glance than a Line Chart would.", tip: "Whenever a request specifically says \"over time\" or \"trend\", that's usually a strong signal for a Line Chart over a Bar Chart, even though both COULD technically display the same underlying numbers.", business: "A CFO asking \"is revenue trending up or down this year\" is implicitly asking for the shape of a trend, not a list of monthly totals, a Line Chart answers that specific question more directly than a bar-per-month view." } },
+
+  { id: "pb-f05", skill: SKILL_ID_VISUALS, tool: "powerbi", level: "semiguided", difficulty: "core", prerequisite: ["pb-f03"],
+    title: "Pick the right visual for one headline number",
+    objective: "Match a Card visual to a request for a single, prominent KPI figure.",
+    build() {
+      const asks = ["total revenue for the whole period, front and center, as the dashboard's headline number", "the total number of orders, as one big number at the top of the report"];
+      const a = pick(asks);
+      return {
+        scenarioHtml: `A stakeholder wants <b>${esc(a)}</b>, no breakdown, just the one number.`,
+        slots: [{ key: "visual", label: "Which visual fits?", options: [{ value: "bar", label: "Bar/Column Chart" }, { value: "card", label: "Card (single number)" }, { value: "table", label: "Table" }, { value: "line", label: "Line Chart" }] }],
+        correct: { visual: "card" },
+      };
+    },
+    hints: [
+      "\"No breakdown, just the one number\" rules out any chart that shows multiple categories or a trend, that's exactly what a Card is for.",
+      "A Card displays a single Measure as one large, prominent number, nothing else, the standard way to headline a KPI.",
+      "Bar, Line, and Table all imply more than one value being shown, a Card is the one visual built for exactly one.",
+      "Card." ],
+    explanation: { why: "A Card visual displays exactly one aggregated value, large and prominent, with no categorical breakdown at all, it's purpose-built for headline KPIs that need to be immediately visible without any further reading.", mistake: "Using a single-row Table or a single-bar Bar Chart to show one number technically works, but adds visual clutter (axis lines, table borders) that a Card is specifically designed to avoid for a single headline figure.", tip: "Cards are frequently placed at the very top of a Power BI report, a row of 3-4 Cards showing the report's most important headline numbers before any detailed chart appears below.", business: "\"Total revenue\" or \"total orders this month\" as the very first thing an executive sees on a report is exactly the Card visual's job, it answers the single most urgent question before any further detail is needed." } },
+
+  { id: "pb-f06", skill: SKILL_ID_VISUALS, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-f03"],
+    title: "Pick the right visual for exact numbers across two breakdowns",
+    objective: "Match a Table (or Matrix) visual to a request for precise, readable numbers across more than one dimension.",
+    build() {
+      const [d1, d2] = pickN(DIMENSION_FIELDS, 2);
+      return {
+        scenarioHtml: `Finance wants to see <b>exact Total Revenue figures broken down by both ${esc(d1)} and ${esc(d2)}</b>, they need to read precise numbers, not just compare bar heights.`,
+        slots: [{ key: "visual", label: "Which visual fits?", options: [{ value: "bar", label: "Bar/Column Chart" }, { value: "card", label: "Card (single number)" }, { value: "table", label: "Table / Matrix" }, { value: "line", label: "Line Chart" }] }],
+        correct: { visual: "table" },
+      };
+    },
+    hints: [
+      "\"Exact numbers... need to read precise figures, not just compare bar heights\" describes wanting to READ values, not just visually compare them, that's a Table or Matrix.",
+      "A Matrix specifically handles two breakdowns well, one on rows, one on columns, similar to a spreadsheet pivot table, printing an exact number in each cell.",
+      "A Bar or Line Chart is built for visual comparison, not for precisely reading off individual values, especially not across two breakdowns at once.",
+      "Table / Matrix." ],
+    explanation: { why: "A Table or Matrix visual prints exact aggregated numbers in a grid, a Matrix specifically supports two breakdowns at once (rows and columns), exactly like a spreadsheet pivot table, which is what \"exact numbers across two breakdowns\" calls for.", mistake: "A Bar or Line Chart forces a reader to estimate values from bar height or line position, when the actual request is to read precise numbers, that's a mismatch between what the visual is good at and what was actually asked for.", tip: "Whenever a stakeholder specifically emphasizes needing to read exact figures, not just compare visually, that's usually a signal for a Table or Matrix over a chart, even though a chart might look more polished.", business: "A finance team reconciling numbers against another system needs to read exact figures, a Matrix broken out by two dimensions serves that need directly, where a bar chart would force them to guess at precise values." } },
+
+  { id: "pb-f07", skill: SKILL_ID_FIELDS, tool: "powerbi", level: "semiguided", difficulty: "core", prerequisite: ["pb-f01"],
+    title: "Why amount alone can't answer \"what's our total revenue\"",
+    objective: "Recognize that a bare Column doesn't aggregate itself, a Measure is required to summarize it.",
+    build() {
+      return {
+        scenarioHtml: `You drag the <b class="mono">amount</b> Column directly onto a Card visual, with no Measure involved.`,
+        slots: [{ key: "behavior", label: "What happens by default?", options: [{ value: "sums", label: "Power BI automatically sums it for you" }, { value: "error", label: "It shows a meaningless value, like the count of rows or the first value, not a total" }] }],
+        correct: { behavior: "sums" },
+      };
+    },
+    hints: [
+      "This is actually a common point of confusion, Power BI DOES let you drag a numeric Column directly onto a visual and apply a default aggregation (usually Sum) without writing a Measure first.",
+      "That default aggregation is a convenience, not a substitute for a real Measure, it's applying an implicit SUM() to the Column on the fly.",
+      "Once real business logic is needed, a percentage, a ratio, a comparison to another period, a proper Measure becomes necessary, a bare Column's default aggregation can't express that.",
+      "By default, Power BI applies an implicit Sum (or another default aggregation) to a numeric Column dropped directly onto a visual." ],
+    explanation: { why: "Power BI lets a numeric Column be used directly on a visual with an automatic default aggregation (usually Sum for a decimal or whole number field), which is convenient for quick exploration, but it's implicit and limited, a real Measure is needed the moment the calculation needs actual business logic beyond a plain total.", mistake: "Relying on a Column's default aggregation for anything beyond a quick, simple total is a common habit that breaks down fast, a real analyst report almost always needs explicit Measures (for percentages, comparisons, filtered totals) rather than a Column's implicit default.", tip: "Building an explicit Measure (even a simple = SUM(Orders[amount])) instead of relying on a Column's default aggregation is a good habit from the start, it documents the calculation clearly and it's the only path to anything more complex later.", business: "A report built entirely on Columns with default aggregations looks fine at first glance but becomes fragile the moment a stakeholder asks for something slightly more specific, like year-over-year growth, that a bare Column's default aggregation simply can't express." } },
+
+  { id: "pb-f08", skill: SKILL_ID_REPORTVSDASH, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Report or Dashboard?",
+    objective: "Recognize Power BI's specific split: a multi-page interactive Report built in Desktop, vs a single-page pinned-tile Dashboard built in the Service.",
+    build() {
+      const scenarios = [
+        { desc: "a multi-page file you build in Power BI Desktop, with slicers, filters, and drill-down interactions a viewer can use", ans: "report" },
+        { desc: "a single page in the Power BI Service, made of individual tiles PINNED from one or more different reports, viewable at a glance", ans: "dashboard" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You're looking at <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "which", label: "Is this a Report or a Dashboard?", options: [{ value: "report", label: "Report" }, { value: "dashboard", label: "Dashboard" }] }],
+        correct: { which: s.ans },
+      };
+    },
+    hints: [
+      "A Report is the multi-page file built in Power BI Desktop, it has slicers, filters, cross-highlighting, and drill-down, all the interactive functionality.",
+      "A Dashboard exists only in the Power BI Service (the online/cloud side), it's a single page made of tiles pinned from one or more Reports, built for a fast, at-a-glance summary.",
+      "Multi-page, built in Desktop, fully interactive = Report. Single page, tiles pinned from elsewhere, viewed in the Service = Dashboard.",
+      "Match your answer to whether the scenario describes a Desktop-built, multi-page interactive file (Report) or a Service-side, single-page tile summary (Dashboard)." ],
+    explanation: { why: "This is a Power BI-specific distinction that doesn't map directly onto other BI tools' vocabulary, a Report is the primary authoring artifact, built in Desktop, with full interactivity across as many pages as needed, a Dashboard is a Service-only, single-page collection of tiles pinned from one or more Reports (or datasets), meant for a fast, combined overview.", mistake: "Using \"dashboard\" as a generic catch-all term for any Power BI visual, the way many people casually do, actually means something specific and different in Power BI itself, a genuine Dashboard can't contain a slicer or support drill-down the way a Report page can, it's fundamentally a summary view, not an authoring surface.", tip: "If it was built in Power BI Desktop and has multiple pages, it's a Report, if it was assembled in the Power BI Service out of pinned tiles from possibly several different Reports, it's a Dashboard, that's the fastest way to keep the two straight.", business: "An executive who wants \"one screen\" combining a KPI from the sales Report and a different KPI from the operations Report needs a Dashboard specifically, since a single Report page can only show visuals from its own underlying dataset, a Dashboard is what combines tiles across different sources." } },
+
+  { id: "pb-f09", skill: SKILL_ID_REPORTVSDASH, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-f08"],
+    title: "What a Dashboard tile loses compared to its source Report",
+    objective: "Recognize that pinning a visual to a Dashboard freezes its filter state and drops its interactivity.",
+    build() {
+      return {
+        scenarioHtml: `You pin a bar chart from a Report page to a Dashboard. On the Report, that chart could be filtered by a region slicer and drilled down by clicking a bar.`,
+        slots: [{ key: "behavior", label: "What happens to the pinned tile on the Dashboard?", options: [
+          { value: "frozen", label: "It becomes a static snapshot of that filter state, the slicer and drill-down no longer work on the tile itself" },
+          { value: "same", label: "It keeps full interactivity, the slicer and drill-down still work exactly as on the Report" },
+        ] }],
+        correct: { behavior: "frozen" },
+      };
+    },
+    hints: [
+      "Pinning captures a snapshot of the visual AS IT LOOKED at that moment, including whatever filters were applied when you pinned it.",
+      "A Dashboard tile is meant for a fast, glanceable summary, not full interactivity, clicking it typically takes you back to the underlying Report rather than filtering in place.",
+      "The interactive slicer and drill-down behavior live on the Report page, not on the pinned tile itself.",
+      "Frozen: the tile becomes a static snapshot, full interactivity requires going back to the source Report." ],
+    explanation: { why: "A Dashboard tile is a pinned snapshot of a visual's state at the moment it was pinned, it displays that captured view (data still refreshes with the underlying dataset, but the FILTER STATE is fixed), clicking most tiles navigates back to the live, interactive Report rather than letting you re-filter the tile in place.", mistake: "Assuming a Dashboard is just a rearranged, still-fully-interactive version of a Report is a common misunderstanding, it isn't, real interactivity (slicers, cross-highlighting, drill-down) only exists on the Report itself, the Dashboard is deliberately a simpler, glanceable layer on top.", tip: "If a viewer needs to actively filter, slice, or drill into data themselves, send them to the Report, not a Dashboard, the Dashboard is for a fast overview, the Report is for actual exploration.", business: "An executive Dashboard combining KPIs from several different Reports is valuable precisely because it's simple and fast to scan, that simplicity is a deliberate tradeoff against the deeper interactivity a full Report provides." } },
+
+  { id: "pb-f10", skill: SKILL_ID_VISUALS, tool: "powerbi", level: "mastery", difficulty: "mastery", prerequisite: ["pb-f05", "pb-f06"],
+    title: "Independent build: a headline-plus-detail layout",
+    objective: "Combine a Card and a Table/Matrix from a plain-language stakeholder request with no visual names given, then justify the pairing.",
+    build() {
+      return {
+        scenarioHtml: `A regional director asks: <b>"I want to see our total revenue as one big number I can spot immediately, and right below it, I want the exact revenue figures broken down by region and category so I can check specific numbers."</b>`,
+        slots: [
+          { key: "headline", label: "Visual for the headline number", options: [{ value: "card", label: "Card" }, { value: "bar", label: "Bar/Column Chart" }, { value: "table", label: "Table / Matrix" }] },
+          { key: "detail", label: "Visual for the region + category breakdown", options: [{ value: "card", label: "Card" }, { value: "bar", label: "Bar/Column Chart" }, { value: "table", label: "Table / Matrix" }] },
+        ],
+        correct: { headline: "card", detail: "table" },
+      };
+    },
+    written: {
+      label: "Why does this request need BOTH a Card and a Table/Matrix, rather than just one visual?",
+      placeholder: "Think about what each visual is good at on its own, and what the director explicitly asked to see that neither one alone would show...",
+      check: (text) => /\b(card|headline|glance|immediat)\b/i.test(text) && /\b(table|matrix|exact|detail|precise)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that the Card answers the \"spot immediately\" part (one big glanceable number), while the Table/Matrix answers the \"check specific numbers, broken down by two dimensions\" part, the director explicitly asked for both, and neither visual alone delivers both." },
+    hints: [
+      "This combines two separate pieces from this stage: a Card for a single headline number, and a Table/Matrix for exact figures across two breakdowns, no visual names were given, translate the plain-language request yourself.",
+      "\"One big number I can spot immediately\" is the Card pattern from earlier in this stage.",
+      "\"Exact revenue figures broken down by region and category... to check specific numbers\" is the Table/Matrix pattern, precise numbers across two dimensions.",
+      "Headline visual = Card, Detail visual = Table / Matrix." ],
+    explanation: { why: "This combines the Card-for-one-headline-number pattern with the Table/Matrix-for-exact-numbers-across-two-breakdowns pattern, both covered separately earlier in this stage, applied together from a plain-language request with no visual names supplied.", mistake: "Using only a Card would satisfy the \"spot immediately\" part but drop the region-and-category detail entirely, using only a Table would satisfy the detail but lose the fast, glanceable headline number, the director explicitly asked for both.", tip: "A Card-plus-Table (or Card-plus-Matrix) pairing, a headline number up top with supporting detail below, is one of the most common real Power BI report layouts, it serves both a quick glance and a deeper check in the same report.", business: "This is deliberately the least guided task in this stage, a real stakeholder request never comes with visual names attached, translating \"one big number\" and \"exact figures, broken down two ways\" into the right pair of Power BI visuals is the actual skill, not memorizing visual names in isolation." } },
+];
+
+/* ================= grading =================
+   Anti-cheat: a task only records passed=true after 3 CONSECUTIVE
+   correct answers on 3 independently redrawn scenarios (a different
+   random field/value each time), mirroring the Excel library's
+   3-round mutation check and the Tableau library's streak check, but
+   adapted to a discrete-choice UI where there's no formula to
+   silently re-evaluate, the student has to actually resubmit against
+   each fresh draw. */
+const taskState = {}; // id -> { draw, streak }
+function ensureDraw(t) {
+  if (!taskState[t.id]) taskState[t.id] = { draw: t.build(), streak: 0 };
+  return taskState[t.id];
+}
+function checkTask(id) {
+  const t = TASKS.find(x => x.id === id);
+  const st = ensureDraw(t);
+  const resultsEl = document.getElementById("results_" + id);
+  let allCorrect = true;
+  const wrongSlots = [];
+  st.draw.slots.forEach(slot => {
+    const sel = document.getElementById(`slot_${id}_${slot.key}`);
+    const val = sel ? sel.value : null;
+    if (val !== st.draw.correct[slot.key]) { allCorrect = false; wrongSlots.push(slot.label); }
+  });
+
+  let writtenPass = true;
+  if (t.written) {
+    const writtenText = (document.getElementById("written_" + id) || {}).value || "";
+    writtenPass = t.written.check(writtenText);
+  }
+
+  if (allCorrect && writtenPass) {
+    st.streak++;
+  } else {
+    st.streak = 0;
+  }
+
+  const verdict = document.createElement("div");
+  if (st.streak >= 3) {
+    verdict.className = "feedback ok";
+    verdict.innerHTML = `<b>Correct, 3 fresh scenarios in a row.</b> That's real evidence this wasn't a memorized click sequence, since the field and business ask were re-randomized each time.`;
+    PracticeProgress.recordAttempt(id, true);
+    openTasks.add(id);
+  } else if (allCorrect && !writtenPass) {
+    verdict.className = "feedback bad";
+    verdict.innerHTML = `<b>Shelf choices correct, but the written answer needs more.</b> ${esc(t.written.hint)}`;
+    PracticeProgress.recordAttempt(id, false);
+  } else if (!allCorrect) {
+    verdict.className = "feedback bad";
+    verdict.innerHTML = `<b>Not quite.</b> Re-check: ${wrongSlots.map(esc).join(", ")}. Streak reset, a new scenario has been drawn below.`;
+    PracticeProgress.recordAttempt(id, false);
+    st.draw = t.build();
+  } else {
+    const remaining = 3 - st.streak;
+    verdict.className = "feedback ok";
+    verdict.innerHTML = `<b>Correct (${st.streak}/3).</b> ${remaining} more fresh scenario${remaining === 1 ? "" : "s"} to confirm this wasn't luck.`;
+    PracticeProgress.recordAttempt(id, false);
+    st.draw = t.build();
+  }
+  resultsEl.innerHTML = "";
+  resultsEl.appendChild(verdict);
+  if (st.streak >= 3 && t.explanation) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(t.explanation));
+  renderTasks();
+  renderSkillBar();
+}
+
+/* ================= rendering ================= */
+function tierLabel(tier) { return { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" }[tier]; }
+function renderSkillBar() {
+  const order = ["not-started", "introduced", "practicing", "competent", "mastered"];
+  const wrap = document.getElementById("skillBars");
+  wrap.innerHTML = SKILLS.map(s => {
+    const prog = PracticeProgress.skillProgress(TASKS, s.id);
+    const reachedIdx = order.indexOf(prog.tier);
+    const ladder = order.slice(1).map((t, i) => `<span class="${i + 1 <= reachedIdx ? "reached" : ""}">${tierLabel(t)}</span>`).join("");
+    return `<div class="skillbar">
+      <div class="skillrow">
+        <span style="font-weight:700;font-size:14.5px">${esc(s.label)}</span>
+        <span class="tierpill t-${prog.tier}">${tierLabel(prog.tier)}</span>
+        <div class="skillbarwrap"><div class="fill" style="width:${prog.pct}%"></div></div>
+        <span class="mono" style="font-size:12.5px;color:var(--mut2)">${prog.passedCount} / ${prog.totalCount} tasks</span>
+      </div>
+      <div class="tierladder">${ladder}</div>
+    </div>`;
+  }).join("");
+  const next = PracticeProgress.recommendNext(TASKS);
+  if (!document.getElementById("nextUpBlock")) {
+    const block = document.createElement("div");
+    block.className = "skillbar";
+    block.id = "nextUpBlock";
+    block.innerHTML = `<div class="nextup" id="nextUp"></div>`;
+    wrap.after(block);
+  }
+  const target = document.getElementById("nextUp");
+  const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
+  target.innerHTML = next
+    ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
+    : `<b>What should I do next?</b> All ${TASKS.length} Stage 1 tasks passed. Stages 2-4 aren't built yet.`;
+}
+function buildHintsHtml(hints) {
+  const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
+  return `<div class="hints">${hints.map((h, i) => `<details><summary>${labels[i]}</summary><div class="hbody">${esc(h)}</div></details>`).join("")}</div>`;
+}
+function buildExplainHtml(ex) {
+  if (!ex) return "";
+  const rows = [["Why this works", ex.why], ["Common mistake", ex.mistake], ["Real analyst tip", ex.tip], ["Business interpretation", ex.business]].filter(([, v]) => v);
+  return `<div class="explainbox">${rows.map(([lbl, v]) => `<div class="erow"><div class="elbl">${esc(lbl)}</div><p>${esc(v)}</p></div>`).join("")}</div>`;
+}
+
+const openTasks = new Set();
+const resultsDrafts = {};
+const writtenDrafts = {};
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  TASKS.forEach(t => {
+    const openEl = document.getElementById("body_" + t.id);
+    if (openEl && openEl.classList.contains("open")) openTasks.add(t.id);
+    const res = document.getElementById("results_" + t.id);
+    if (res && res.innerHTML) resultsDrafts[t.id] = res.innerHTML;
+    const wr = document.getElementById("written_" + t.id);
+    if (wr) writtenDrafts[t.id] = wr.value;
+  });
+  list.innerHTML = "";
+  TASKS.forEach((t, idx) => {
+    const state = PracticeProgress.getTaskState(t.id);
+    const prereqsMet = t.prerequisite.every(pid => PracticeProgress.getTaskState(pid).passed);
+    const st = prereqsMet ? ensureDraw(t) : null;
+    const card = document.createElement("div");
+    card.className = "taskcard";
+    card.innerHTML = `
+      <div class="taskhead" data-id="${t.id}">
+        <span class="statusdot ${state.passed ? "passed" : ""}"></span>
+        <span class="tid">${String(idx + 1).padStart(2, "0")}</span>
+        <span class="ttitle">${esc(t.title)}</span>
+        <span class="levelpill ${t.level}">${t.level.replace("semiguided", "semi-guided")}</span>
+      </div>
+      <div class="taskbody${openTasks.has(t.id) ? " open" : ""}" id="body_${t.id}">
+        <div class="objective"><b>Objective:</b> ${esc(t.objective)}</div>
+        ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
+        <div class="scenario">${st.draw.scenarioHtml}</div>
+        ${!state.passed ? `<div class="streakrow">${[0,1,2].map(i => `<span class="streakdot ${i < st.streak ? "hit" : ""}"></span>`).join("")}<span class="mono" style="font-size:11px;color:var(--mut2)">3 correct in a row on fresh scenarios required</span></div>` : ""}
+        <div class="slotgrid">
+          ${st.draw.slots.map(slot => `<div class="slotfield"><label>${esc(slot.label)}</label><select id="slot_${t.id}_${slot.key}">${slot.options.map(o => `<option value="${esc(o.value)}">${esc(o.label)}</option>`).join("")}</select></div>`).join("")}
+        </div>
+        ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
+        <div class="dagctrl">
+          <button class="primary" data-check="${t.id}">&#10003; Check answer</button>
+        </div>
+        <div id="results_${t.id}">${resultsDrafts[t.id] || ""}</div>
+        ${buildHintsHtml(t.hints)}
+        `}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll(".taskhead").forEach(head => {
+    head.addEventListener("click", () => {
+      const body = document.getElementById("body_" + head.dataset.id);
+      body.classList.toggle("open");
+    });
+  });
+  list.querySelectorAll("[data-check]").forEach(btn => {
+    btn.addEventListener("click", () => checkTask(btn.dataset.check));
+  });
+}
+
+renderFieldGrid();
+renderGrid();
+renderSkillBar();
+renderTasks();
+</script>
+<script src="course-rail.js?v=5"></script>
+</body>
+</html>
