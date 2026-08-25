@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automation Practice Library, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;--orange:#ff8a3d;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 90px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--orange)}
+.bar .in{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px;flex-wrap:wrap}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--orange)}
+.hero{padding:40px 0 24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:720px;margin-top:10px}
+.scopenote{background:rgba(255,138,61,.08);border:1px solid rgba(255,138,61,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
+.scopenote b{color:var(--orange)}
+.skillbar{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:20px 22px;margin-top:22px}
+.skillrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tierpill{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 12px;border-radius:99px;font-weight:700}
+.tierpill.t-not-started{background:var(--bg2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.12);color:var(--amber)}
+.tierpill.t-competent{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t-mastered{background:rgba(255,138,61,.18);color:var(--orange)}
+.skillbarwrap{flex:1;min-width:180px;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--bd)}
+.skillbarwrap .fill{height:100%;background:var(--orange)}
+.tierladder{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.tierladder span{font-family:'IBM Plex Mono';font-size:10.5px;padding:3px 10px;border-radius:99px;background:var(--bg2);color:var(--mut2);border:1px solid var(--bd2)}
+.tierladder span.reached{background:rgba(255,138,61,.12);color:var(--orange);border-color:rgba(255,138,61,.4)}
+.nextup{margin-top:14px;padding:12px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px}
+.nextup b{color:var(--orange)}
+.tasklist{display:grid;gap:10px;margin-top:22px}
+.taskcard{background:var(--card);border:1px solid var(--bd2);border-radius:12px;overflow:hidden}
+.taskhead{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer}
+.taskhead:hover{background:var(--card2)}
+.taskhead .tid{font-family:'IBM Plex Mono';font-size:11px;color:var(--mut2);width:32px;flex-shrink:0}
+.taskhead .ttitle{font-weight:600;font-size:14.5px;flex:1}
+.levelpill{font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;padding:2px 9px;border-radius:99px;flex-shrink:0}
+.levelpill.guided{background:rgba(74,222,149,.12);color:var(--good)}
+.levelpill.semiguided{background:rgba(240,180,41,.12);color:var(--amber)}
+.levelpill.challenge{background:rgba(255,133,133,.12);color:var(--bad)}
+.levelpill.mastery{background:rgba(255,138,61,.12);color:var(--orange)}
+.statusdot{width:9px;height:9px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+.statusdot.passed{background:var(--good);box-shadow:0 0 6px var(--good)}
+.taskbody{display:none;padding:0 18px 18px}
+.taskbody.open{display:block}
+.objective{font-size:13.5px;color:var(--mut);margin-bottom:12px}
+.objective b{color:var(--tx)}
+textarea{width:100%;font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;line-height:1.6;tab-size:4}
+.writtenlbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--orange);font-family:'IBM Plex Mono';margin:12px 0 6px}
+.writtenbox{font-family:'IBM Plex Sans';line-height:1.6}
+textarea:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--orange);color:var(--orange)}
+button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+button.primary{background:var(--orange);color:#1a0a00;border-color:var(--orange)}
+button.primary:hover{filter:brightness(1.1);color:#1a0a00}
+button:disabled{opacity:.5;cursor:not-allowed}
+.dagctrl{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px}
+.feedback.ok{background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.feedback.wait{background:var(--bg2);border:1px solid var(--bd2);color:var(--mut)}
+.testsummary{margin-top:8px;font-family:'IBM Plex Mono';font-size:12.5px;font-weight:600}
+.hints{margin-top:12px;display:grid;gap:6px}
+.hints details{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px}
+.hints summary{cursor:pointer;color:var(--orange);font-size:12px;font-weight:600;list-style:none}
+.hints summary::-webkit-details-marker{display:none}
+.hints .hbody{margin-top:7px;font-size:12.5px;color:var(--mut);padding-top:7px;border-top:1px solid var(--bd)}
+.explainbox{margin-top:12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.explainbox .erow .elbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--orange);font-family:'IBM Plex Mono';margin-bottom:3px}
+.explainbox .erow p{font-size:12.5px;color:var(--mut)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 70px} .taskhead{flex-wrap:wrap} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-02.html">Module 2: Python Foundations</a><a href="career.html">Career Path</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Practice Library &middot; Automation &middot; Stage 1 of 3</span>
+    <h1 class="serif">Automation Practice Library</h1>
+    <p class="sub">Real CPython running in a Web Worker (Pyodide), the same sandbox the Python Practice Library uses, applied to the specific building blocks of scripted, repeatable analyst work: parsing raw text, batching records, cleaning filenames, merging totals from separate sources, and handling bad rows without crashing the whole run.</p>
+    <div class="scopenote"><b>Honest scope note:</b> this is genuine code execution, not a simulation, every task pairs fixed test cases with one freshly randomized input compared against a hidden reference implementation, so a hardcoded return value can't pass. Stage 1 (Fundamentals) is complete, 10 tasks. Stages 2-3 (Report Automation, Real-World Analyst Workflows) are not yet built.</div>
+  </header>
+
+  <div id="skillBars"></div>
+
+  <div class="tasklist" id="taskList"></div>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Practice Library</footer>
+</div>
+
+<script src="course-progress.js?v=5"></script>
+<script src="practice-progress.js"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+
+/* ================= harness generator =================
+   Same architecture as the Python Practice Library: every task
+   supplies functionName, testCases (fixed inputs/expected, plain JS
+   values), referenceCode (Python source defining _ref, as an array of
+   already-indented lines), and randomGenCode (Python source building
+   an `rargs` tuple). This stitches those into one harness.run()
+   Python source string. Fixed cases catch straightforward bugs, the
+   randomized case, compared against a hidden reference
+   implementation, catches a hardcoded or memorized return value,
+   since the input changes every single check. */
+function pyLit(value) {
+  return `json.loads(${JSON.stringify(JSON.stringify(value))})`;
+}
+function buildHarness(task) {
+  const checkLines = task.testCases.map(tc =>
+    `    check(${JSON.stringify(tc.name)}, ${pyLit(tc.args)}, ${pyLit(tc.expected)})`
+  ).join("\n");
+  const randomLabel = task.randomLabel || "Matches a reference implementation on a freshly randomized input (not hardcoded)";
+  return [
+    "import json, random",
+    "def _close(a, b):",
+    "    if isinstance(a, dict) and isinstance(b, dict):",
+    "        return set(a.keys()) == set(b.keys()) and all(_close(a[k], b[k]) for k in a)",
+    "    if isinstance(a, list) and isinstance(b, list):",
+    "        return len(a) == len(b) and all(_close(x, y) for x, y in zip(a, b))",
+    "    if isinstance(a, (int, float)) and isinstance(b, (int, float)):",
+    "        return abs(a - b) < 0.01",
+    "    return a == b",
+    "def harness(student_code):",
+    "    ns = {}",
+    "    exec(student_code, ns)",
+    `    fn = ns.get(${JSON.stringify(task.functionName)})`,
+    "    results = []",
+    "    def check(name, args, expected):",
+    "        try:",
+    "            out = fn(*args)",
+    "            ok = _close(out, expected)",
+    "            results.append({'name': name, 'pass': ok, 'hint': f'Expected {expected!r}, got {out!r}.'})",
+    "        except Exception as e:",
+    "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised: {e}'})",
+    checkLines,
+    ...task.referenceCode,
+    "    try:",
+    ...task.randomGenCode,
+    "        rexp = _ref(*rargs)",
+    "        rout = fn(*rargs)",
+    "        okr = _close(rout, rexp)",
+    `        results.append({'name': ${JSON.stringify(randomLabel)}, 'pass': okr, 'hint': f'For input {rargs!r} expected {rexp!r}, got {rout!r}. This input changes every run, a fixed/memorized answer cannot pass it.'})`,
+    "    except Exception as e:",
+    `        results.append({'name': ${JSON.stringify(randomLabel)}, 'pass': False, 'hint': f'Your code raised: {e}'})`,
+    `    if fn is None: results = [{'name': ${JSON.stringify(task.functionName + " is defined")}, 'pass': False, 'hint': ${JSON.stringify("Define a function named exactly " + task.functionName + ".")}}]`,
+    "    return {'ranOk': True, 'results': results}",
+  ].join("\n");
+}
+
+/* ================= skills & tasks ================= */
+const SKILL_ID_TEXT = "automation-text-processing";
+const SKILL_ID_BATCH = "automation-batch-records";
+const SKILLS = [
+  { id: SKILL_ID_TEXT, label: "Automation Text & File Processing" },
+  { id: SKILL_ID_BATCH, label: "Automation Batch Records" },
+];
+
+const TASKS = [
+  { id: "au-f01", skill: SKILL_ID_BATCH, tool: "automation", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Deduplicate a list, keeping first-seen order",
+    objective: "Write dedupe_preserve_order(items), removing repeats while keeping each value's first occurrence position.",
+    objectiveNote: "A batch script that pulls IDs from several sources often ends up with repeats, this is the standard first cleanup pass before anything downstream trusts the list.",
+    functionName: "dedupe_preserve_order",
+    starterCode: "def dedupe_preserve_order(items):\n    # return items with duplicates removed, keeping first-occurrence order\n    pass\n",
+    testCases: [
+      { name: "Removes repeats, keeps first-seen order", args: [[1, 2, 2, 3, 1, 4]], expected: [1, 2, 3, 4] },
+      { name: "Works on strings", args: [["a", "b", "a", "c", "b"]], expected: ["a", "b", "c"] },
+      { name: "No duplicates, unchanged", args: [[5, 6, 7]], expected: [5, 6, 7] },
+    ],
+    referenceCode: [
+      "    def _ref(items):",
+      "        seen = set()",
+      "        out = []",
+      "        for x in items:",
+      "            if x not in seen:",
+      "                seen.add(x)",
+      "                out.append(x)",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        rargs = ([random.choice(range(6)) for _ in range(12)],)",
+    ],
+    hints: [
+      "Walk the list once, keeping track of which values you've already seen, in a set.",
+      "For each item, only add it to the output if it hasn't been seen before, then mark it as seen.",
+      "A set gives you fast \"have I seen this?\" lookups, a plain list would work too but would be slower to check against repeatedly.",
+      "def dedupe_preserve_order(items):\n    seen = set()\n    out = []\n    for x in items:\n        if x not in seen:\n            seen.add(x)\n            out.append(x)\n    return out" ],
+    explanation: { why: "Walking the list once while tracking seen values in a set keeps this at O(n) instead of the O(n\u00b2) a naive \"is this already in my output list\" check would cost on a large batch.", mistake: "Converting to a set directly (list(set(items))) does remove duplicates, but sets don't preserve insertion order reliably, that would silently scramble the original order, which matters when order carries meaning (like a processing sequence).", tip: "\"Deduplicate while preserving order\" is one of the most common small utilities in real automation scripts, worth having memorized rather than re-derived each time.", business: "A script pulling customer IDs from three overlapping export files needs exactly this, one clean, ordered list, with no customer processed twice." } },
+
+  { id: "au-f02", skill: SKILL_ID_TEXT, tool: "automation", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Parse a key=value line",
+    objective: "Write parse_kv_line(line), turning \"region=West,status=Completed\" into {\"region\": \"West\", \"status\": \"Completed\"}.",
+    objectiveNote: "Log lines, config files, and simple exports are frequently structured this way, this is the standard first parsing step before anything can be validated or aggregated.",
+    functionName: "parse_kv_line",
+    starterCode: "def parse_kv_line(line):\n    # parse \"key=value,key2=value2\" into a dict\n    pass\n",
+    testCases: [
+      { name: "Parses two pairs", args: ["region=West,status=Completed"], expected: { region: "West", status: "Completed" } },
+      { name: "Parses one pair", args: ["amount=128.5"], expected: { amount: "128.5" } },
+      { name: "Handles a trailing comma", args: ["a=1,b=2,"], expected: { a: "1", b: "2" } },
+    ],
+    referenceCode: [
+      "    def _ref(line):",
+      "        out = {}",
+      "        for part in line.split(','):",
+      "            if not part:",
+      "                continue",
+      "            k, v = part.split('=', 1)",
+      "            out[k.strip()] = v.strip()",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        keys = random.sample(['region', 'status', 'category', 'segment'], k=random.randint(1, 3))",
+      "        vals = [str(random.randint(1, 999)) for _ in keys]",
+      "        rargs = (','.join(f'{k}={v}' for k, v in zip(keys, vals)),)",
+    ],
+    hints: [
+      "Split the whole line on commas first, to get each \"key=value\" piece on its own.",
+      "For each piece, split on the FIRST equals sign only (split('=', 1)), in case a value itself ever contains an equals sign.",
+      "Skip any empty piece, a trailing comma produces one, and it isn't a real key=value pair.",
+      "def parse_kv_line(line):\n    out = {}\n    for part in line.split(','):\n        if not part:\n            continue\n        k, v = part.split('=', 1)\n        out[k.strip()] = v.strip()\n    return out" ],
+    explanation: { why: "Splitting on the first '=' only (not every '=') protects against a value that legitimately contains an equals sign, splitting on every '=' would break on that input, splitting on just the first one doesn't.", mistake: "Not skipping empty pieces means a trailing comma (a common, easy mistake in hand-written log lines) produces a crash trying to split an empty string on '=', a real automation script needs to tolerate small formatting slips like this.", tip: "This exact key=value parsing pattern shows up constantly in real log files, .env config files, and simple structured exports, it's worth having as a reusable utility.", business: "A daily log export in this format is extremely common, being able to reliably parse every line, even slightly messy ones, is the first step before any of that data can be validated or aggregated." } },
+
+  { id: "au-f03", skill: SKILL_ID_BATCH, tool: "automation", level: "guided", difficulty: "core", prerequisite: ["au-f01"],
+    title: "Total a field across a batch of records",
+    objective: "Write batch_total(records, field), summing one named field across a list of dicts.",
+    objectiveNote: "Once several records are parsed (from one or several source files), this is the standard next step, a single aggregated total across the whole batch.",
+    functionName: "batch_total",
+    starterCode: "def batch_total(records, field):\n    # sum the given field across every record (a list of dicts)\n    pass\n",
+    testCases: [
+      { name: "Sums a numeric field", args: [[{ amount: 10 }, { amount: 20 }, { amount: 5 }], "amount"], expected: 35 },
+      { name: "Missing field counts as 0", args: [[{ amount: 10 }, {}], "amount"], expected: 10 },
+      { name: "Empty batch sums to 0", args: [[], "amount"], expected: 0 },
+    ],
+    referenceCode: [
+      "    def _ref(records, field):",
+      "        return sum(r.get(field, 0) for r in records)",
+    ],
+    randomGenCode: [
+      "        n = random.randint(1, 8)",
+      "        recs = [{'amount': random.randint(1, 500)} for _ in range(n)]",
+      "        rargs = (recs, 'amount')",
+    ],
+    hints: [
+      "Loop through every record and pull out the named field's value, using .get so a missing field doesn't crash the whole batch.",
+      ".get(field, 0) returns 0 for any record that's missing the field entirely, instead of raising a KeyError.",
+      "Python's built-in sum() with a generator expression does this in one line.",
+      "def batch_total(records, field):\n    return sum(r.get(field, 0) for r in records)" ],
+    explanation: { why: ".get(field, 0) treats a missing field as zero rather than crashing, that tolerance matters in real batch processing, where one malformed record shouldn't take down an entire run's total.", mistake: "Using r[field] instead of r.get(field, 0) works fine until one record in a real batch is missing that field, at which point the entire script crashes on a KeyError instead of just treating that one record as contributing zero.", tip: "This same total-a-field-across-a-batch pattern generalizes directly to any aggregation, count, average, max, once the sum version is solid.", business: "Combining revenue totals from several regional export files into one company-wide number is exactly this pattern, applied to a batch instead of a single file." } },
+
+  { id: "au-f04", skill: SKILL_ID_TEXT, tool: "automation", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Clean a string into a safe filename",
+    objective: "Write safe_filename(name), replacing whitespace with underscores and stripping any character that isn't a letter, digit, underscore, dash, or dot.",
+    objectiveNote: "A script that generates its own output filenames (from a report title, a date, a customer name) needs to guarantee the result is actually a valid filename on any operating system.",
+    functionName: "safe_filename",
+    starterCode: "def safe_filename(name):\n    # replace whitespace with underscores, strip anything else unsafe\n    pass\n",
+    testCases: [
+      { name: "Replaces spaces, strips punctuation", args: ["Monthly Report Q1!.csv"], expected: "Monthly_Report_Q1.csv" },
+      { name: "Collapses multiple spaces", args: ["a   b"], expected: "a_b" },
+      { name: "Leaves an already-safe name alone", args: ["report_2025-01.csv"], expected: "report_2025-01.csv" },
+    ],
+    referenceCode: [
+      "    def _ref(name):",
+      "        import re",
+      "        s = re.sub(r'\\s+', '_', name)",
+      "        s = re.sub(r'[^A-Za-z0-9_.-]', '', s)",
+      "        return s",
+    ],
+    randomGenCode: [
+      "        import re as _re",
+      "        pieces = random.sample(['Report', 'Summary', 'Q1', 'Data!', 'Export#', '2025'], k=random.randint(2, 4))",
+      "        rargs = (' '.join(pieces),)",
+    ],
+    hints: [
+      "This is two separate cleanup passes: first replace runs of whitespace with a single underscore, then strip any remaining unsafe character.",
+      "Python's re module (re.sub) can do both passes, one regex to collapse whitespace, a second to remove disallowed characters.",
+      "The allowed characters are letters, digits, underscore, dash, and dot, everything else should be removed entirely, not replaced.",
+      "def safe_filename(name):\n    import re\n    s = re.sub(r'\\s+', '_', name)\n    s = re.sub(r'[^A-Za-z0-9_.-]', '', s)\n    return s" ],
+    explanation: { why: "Two separate regex passes keep the logic clear, one specifically handles whitespace (turning it into a single separator), the other strips any character outside the safe set, doing both in one combined pass would be harder to get right and harder to read.", mistake: "Stripping unsafe characters BEFORE replacing whitespace (reversing the two passes) can still work for simple cases, but skipping the whitespace pass entirely and just stripping spaces would produce a filename with words jammed together, a real usability problem for anyone reading the output filename later.", tip: "A small, well-tested safe_filename utility like this is worth reusing across every script that generates its own output files, re-deriving the regex each time risks a subtly different, inconsistent rule.", business: "A script that names its own output files from a report title or a customer name absolutely needs this kind of sanitization, an unsanitized name (with a slash, a colon, or other unsafe characters) can silently fail to save, or worse, save to an unintended location." } },
+
+  { id: "au-f05", skill: SKILL_ID_BATCH, tool: "automation", level: "semiguided", difficulty: "core", prerequisite: ["au-f01"],
+    title: "Split a list into fixed-size chunks",
+    objective: "Write chunk_list(items, size), splitting a list into consecutive sublists of at most size elements each.",
+    objectiveNote: "Processing a huge batch all at once (thousands of API calls, thousands of rows) often needs to happen in smaller, fixed-size chunks instead, to avoid rate limits or memory issues.",
+    functionName: "chunk_list",
+    starterCode: "def chunk_list(items, size):\n    # split items into consecutive chunks of at most `size` elements\n    pass\n",
+    testCases: [
+      { name: "Splits evenly", args: [[1, 2, 3, 4], 2], expected: [[1, 2], [3, 4]] },
+      { name: "Last chunk can be smaller", args: [[1, 2, 3, 4, 5], 2], expected: [[1, 2], [3, 4], [5]] },
+      { name: "Chunk size larger than the list", args: [[1, 2], 10], expected: [[1, 2]] },
+    ],
+    referenceCode: [
+      "    def _ref(items, size):",
+      "        return [items[i:i + size] for i in range(0, len(items), size)]",
+    ],
+    randomGenCode: [
+      "        n = random.randint(3, 15)",
+      "        items = list(range(n))",
+      "        size = random.randint(1, 5)",
+      "        rargs = (items, size)",
+    ],
+    hints: [
+      "Step through the list in strides of `size`, using range(0, len(items), size) to get each chunk's starting index.",
+      "For each starting index i, a Python slice items[i:i+size] grabs that chunk, and slicing past the end of a list is safe, it just returns however many elements are left.",
+      "A list comprehension over those starting indices, taking a slice at each one, builds the whole result in one line.",
+      "def chunk_list(items, size):\n    return [items[i:i + size] for i in range(0, len(items), size)]" ],
+    explanation: { why: "Python slicing is safe past the end of a list, items[i:i+size] on the final chunk just returns whatever's left, even if that's fewer than `size` elements, no special-casing the last chunk is needed.", mistake: "Trying to handle the last, possibly-shorter chunk with a separate if-statement is unnecessary extra code, Python's slicing already handles that case correctly and simply.", tip: "Chunking is one of the most common real automation utilities, sending 10,000 records to an API 100 at a time, or writing a huge report in manageable page-sized batches, both start with exactly this function.", business: "A script that needs to call an external API (which limits requests to, say, 50 records per call) for 10,000 total records needs chunk_list to break that batch into safe, rate-limit-respecting pieces." } },
+
+  { id: "au-f06", skill: SKILL_ID_BATCH, tool: "automation", level: "semiguided", difficulty: "core", prerequisite: ["au-f03"],
+    title: "Find rows missing a required field",
+    objective: "Write validate_rows(rows, required_fields), returning the list of indices of any row missing at least one required field.",
+    objectiveNote: "Before aggregating a batch of records, a real script checks which ones are actually usable, this is that check.",
+    functionName: "validate_rows",
+    starterCode: "def validate_rows(rows, required_fields):\n    # return the indices of rows missing at least one required field\n    pass\n",
+    testCases: [
+      { name: "Flags a row missing a field", args: [[{ a: 1, b: 2 }, { a: 1 }], ["a", "b"]], expected: [1] },
+      { name: "No missing fields, empty result", args: [[{ a: 1, b: 2 }, { a: 3, b: 4 }], ["a", "b"]], expected: [] },
+      { name: "Flags multiple rows", args: [[{}, { a: 1 }, { a: 1, b: 2 }], ["a", "b"]], expected: [0, 1] },
+    ],
+    referenceCode: [
+      "    def _ref(rows, required):",
+      "        out = []",
+      "        for i, r in enumerate(rows):",
+      "            if any(f not in r for f in required):",
+      "                out.append(i)",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        n = random.randint(2, 6)",
+      "        required = ['a', 'b']",
+      "        rows = []",
+      "        for _ in range(n):",
+      "            row = {}",
+      "            if random.random() < 0.7: row['a'] = 1",
+      "            if random.random() < 0.7: row['b'] = 2",
+      "            rows.append(row)",
+      "        rargs = (rows, required)",
+    ],
+    hints: [
+      "Walk the rows with their index (enumerate), checking each one against every required field.",
+      "any(f not in r for f in required) is True the moment a single required field is missing from that row, that's exactly \"missing at least one\".",
+      "Collect the INDEX (not the row itself) of every row that fails the check, in original order.",
+      "def validate_rows(rows, required_fields):\n    out = []\n    for i, r in enumerate(rows):\n        if any(f not in r for f in required_fields):\n            out.append(i)\n    return out" ],
+    explanation: { why: "enumerate() gives both the index and the row in one loop, and any() short-circuits the moment one required field is found missing, no need to check every remaining field once one has already failed.", mistake: "Checking whether a row IS EMPTY, rather than whether it's missing any of the SPECIFIC required fields, would miss a row that has some fields but not all the required ones, which is exactly the case this function needs to catch.", tip: "Validating BEFORE aggregating, rather than letting a bad row crash the aggregation step itself, is the standard shape of a robust batch script, catch and report the problem rows first, then process only the clean ones.", business: "A daily import where a handful of rows are missing a required field (a common, realistic data quality issue) needs to be flagged and excluded, not silently processed with a missing value, or allowed to crash the entire day's run." } },
+
+  { id: "au-f07", skill: SKILL_ID_TEXT, tool: "automation", level: "semiguided", difficulty: "core", prerequisite: ["au-f04"],
+    title: "Format a report line with currency formatting",
+    objective: "Write format_report_line(name, value), producing a string like \"Revenue: $1,234.56\" with thousands separators and 2 decimal places.",
+    objectiveNote: "A script that generates a plain-text report needs consistent, readable formatting on every line, this is that formatting rule.",
+    functionName: "format_report_line",
+    starterCode: "def format_report_line(name, value):\n    # e.g. format_report_line(\"Revenue\", 1234.5) -> \"Revenue: $1,234.50\"\n    pass\n",
+    testCases: [
+      { name: "Formats with thousands separator", args: ["Revenue", 1234.5], expected: "Revenue: $1,234.50" },
+      { name: "Formats a small value", args: ["Fee", 8], expected: "Fee: $8.00" },
+      { name: "Formats a large value", args: ["Total", 1000000], expected: "Total: $1,000,000.00" },
+    ],
+    referenceCode: [
+      "    def _ref(name, value):",
+      "        return f'{name}: ${value:,.2f}'",
+    ],
+    randomGenCode: [
+      "        name = random.choice(['Revenue', 'Fees', 'Total', 'Net'])",
+      "        value = round(random.uniform(1, 999999), 2)",
+      "        rargs = (name, value)",
+    ],
+    hints: [
+      "Python's f-string number formatting supports both a thousands-separator flag and a fixed decimal count in one format spec.",
+      "The format spec ,.2f means: comma as a thousands separator, exactly 2 digits after the decimal point.",
+      "Combine the name, a literal colon and dollar sign, and the formatted value into one f-string.",
+      "def format_report_line(name, value):\n    return f'{name}: ${value:,.2f}'" ],
+    explanation: { why: "Python's built-in format spec mini-language handles both the thousands separator and fixed decimal places in one expression, ,.2f, no manual string manipulation needed.", mistake: "Manually inserting commas with string splitting or regex is unnecessary and error-prone, Python's format spec already does this correctly and simply, reaching for it directly avoids reinventing something the language already provides.", tip: "This exact ,.2f formatting pattern is worth having memorized, it's the standard way to present any dollar figure consistently across an entire generated report.", business: "A generated report with inconsistent number formatting, sometimes with commas, sometimes without, sometimes with a different number of decimal places, looks unpolished and undermines trust in the numbers, one consistent formatting function used everywhere avoids that." } },
+
+  { id: "au-f08", skill: SKILL_ID_BATCH, tool: "automation", level: "challenge", difficulty: "challenge", prerequisite: ["au-f03"],
+    title: "Merge two totals dicts, summing shared keys",
+    objective: "Write merge_totals(d1, d2), combining two dicts of totals, summing the values for any key present in both.",
+    objectiveNote: "Combining this month's category totals with last month's, from two separate source files, needs exactly this merge behavior.",
+    functionName: "merge_totals",
+    starterCode: "def merge_totals(d1, d2):\n    # merge d1 and d2, summing values for keys present in both\n    pass\n",
+    testCases: [
+      { name: "Sums shared keys, keeps unique ones", args: [{ a: 10, b: 5 }, { b: 3, c: 7 }], expected: { a: 10, b: 8, c: 7 } },
+      { name: "No overlap, just combines", args: [{ a: 1 }, { b: 2 }], expected: { a: 1, b: 2 } },
+      { name: "Empty second dict", args: [{ a: 5 }, {}], expected: { a: 5 } },
+    ],
+    referenceCode: [
+      "    def _ref(d1, d2):",
+      "        out = dict(d1)",
+      "        for k, v in d2.items():",
+      "            out[k] = out.get(k, 0) + v",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        keys1 = random.sample(['a', 'b', 'c', 'd'], k=random.randint(1, 3))",
+      "        keys2 = random.sample(['a', 'b', 'c', 'd'], k=random.randint(1, 3))",
+      "        d1 = {k: random.randint(1, 100) for k in keys1}",
+      "        d2 = {k: random.randint(1, 100) for k in keys2}",
+      "        rargs = (d1, d2)",
+    ],
+    hints: [
+      "Start from a COPY of the first dict (dict(d1)), don't mutate the caller's original dict directly.",
+      "Walk the second dict's items, for each key, add its value to whatever's already in the result (or 0 if that key wasn't in the first dict).",
+      ".get(k, 0) handles both cases in one expression, a key that's new gets treated as starting from 0, a key that already exists gets its existing value added to.",
+      "def merge_totals(d1, d2):\n    out = dict(d1)\n    for k, v in d2.items():\n        out[k] = out.get(k, 0) + v\n    return out" ],
+    explanation: { why: "Starting from a copy of d1, then adding d2's values on top (using .get(k, 0) to handle both new and overlapping keys in one line), correctly merges without mutating either of the caller's original dicts, a real, avoidable bug if the merge instead modified d1 in place.", mistake: "Merging with out = {**d1, **d2} (dict unpacking) is a common shortcut, but it OVERWRITES d1's value for any shared key with d2's, rather than summing them, silently producing a smaller, wrong total for every overlapping category.", tip: "Never mutate a function's input arguments in place unless that's explicitly the function's documented job, dict(d1) makes a shallow copy specifically to avoid that, a subtle bug class that's easy to introduce accidentally.", business: "Merging this month's per-category revenue totals with last month's, to build a running two-month total, needs exactly this summing-merge behavior, using dict unpacking instead would silently discard one month's numbers for every category present in both." } },
+
+  { id: "au-f09", skill: SKILL_ID_TEXT, tool: "automation", level: "challenge", difficulty: "challenge", prerequisite: ["au-f04"],
+    title: "Push a weekend date to the next business day",
+    objective: "Write next_weekday(date_str), returning the same \"YYYY-MM-DD\" date if it's a weekday, or the following Monday if it falls on a Saturday or Sunday.",
+    objectiveNote: "A scheduled script that's supposed to run on business days needs to know how to reschedule itself when the naive next date lands on a weekend.",
+    functionName: "next_weekday",
+    starterCode: "def next_weekday(date_str):\n    # if date_str (YYYY-MM-DD) is a Sat/Sun, push forward to the next Monday, else return it unchanged\n    pass\n",
+    testCases: [
+      { name: "A Saturday moves to Monday", args: ["2025-01-04"], expected: "2025-01-06" },
+      { name: "A Sunday moves to Monday", args: ["2025-01-05"], expected: "2025-01-06" },
+      { name: "A weekday is unchanged", args: ["2025-01-08"], expected: "2025-01-08" },
+    ],
+    referenceCode: [
+      "    def _ref(date_str):",
+      "        from datetime import date, timedelta",
+      "        y, m, d = map(int, date_str.split('-'))",
+      "        dt = date(y, m, d)",
+      "        while dt.weekday() >= 5:",
+      "            dt = dt + timedelta(days=1)",
+      "        return dt.isoformat()",
+    ],
+    randomGenCode: [
+      "        from datetime import date, timedelta as _td",
+      "        base = date(2025, 1, 1) + _td(days=random.randint(0, 300))",
+      "        rargs = (base.isoformat(),)",
+    ],
+    hints: [
+      "Python's datetime.date has a .weekday() method, 0 is Monday, 6 is Sunday, so 5 and 6 are Saturday and Sunday.",
+      "Parse the \"YYYY-MM-DD\" string into a real date object first, string manipulation alone can't correctly handle month/year rollovers (like a Saturday on the very last day of the month).",
+      "A while loop that keeps adding one day, as long as the current weekday is 5 or 6, correctly lands on the next Monday even from a Sunday (two steps: Sunday to Monday would actually only take one step, but keeping the loop general handles both Saturday and Sunday cleanly).",
+      "def next_weekday(date_str):\n    from datetime import date, timedelta\n    y, m, d = map(int, date_str.split('-'))\n    dt = date(y, m, d)\n    while dt.weekday() >= 5:\n        dt = dt + timedelta(days=1)\n    return dt.isoformat()" ],
+    explanation: { why: "Using Python's real date type (rather than manipulating the \"YYYY-MM-DD\" string directly) correctly handles every edge case, month boundaries, year boundaries, leap years, that a purely string-based approach would need to reimplement by hand and would likely get wrong.", mistake: "Writing custom logic to add days to a string-parsed date without using a real date object is a common way to introduce a subtle bug at a month or year boundary (a Saturday that happens to be the 31st, for instance), Python's datetime module already handles this correctly.", tip: ".weekday() (Monday=0) and .isoweekday() (Monday=1) are both real Python methods that return slightly different numbering, mixing them up is an easy, common source of an off-by-one bug, .weekday() >= 5 for Saturday/Sunday is the version used here.", business: "A scheduled script meant to run every business day (skipping weekends automatically) is an extremely common real automation requirement, getting the weekend-detection logic wrong means either silently skipping a valid business day or silently running on a day it shouldn't." } },
+
+  { id: "au-f10", skill: SKILL_ID_BATCH, tool: "automation", level: "mastery", difficulty: "mastery", prerequisite: ["au-f06", "au-f08"],
+    title: "Independent build: a small, fault-tolerant pipeline",
+    objective: "Write run_pipeline(raw_lines), combining parsing, validation, and aggregation into one script that never crashes on a single bad line.",
+    objectiveNote: "Given a list of raw \"region=West,status=Completed,amount=128.5\"-style lines, parse each one, skip (don't crash on) any line that's malformed or missing region/status/amount, sum amount only for rows where status is exactly \"Completed\", and return {\"completed_total\": <rounded to 2 decimals>, \"skipped\": <count of bad lines>}.",
+    functionName: "run_pipeline",
+    starterCode: "def run_pipeline(raw_lines):\n    # parse, validate, and aggregate, without crashing on a single bad line\n    # return {\"completed_total\": ..., \"skipped\": ...}\n    pass\n",
+    testCases: [
+      { name: "Sums Completed amounts, ignores other statuses", args: [["region=West,status=Completed,amount=100", "region=East,status=Returned,amount=50", "region=West,status=Completed,amount=25"]], expected: { completed_total: 125, skipped: 0 } },
+      { name: "Skips a line missing a required field", args: [["region=West,status=Completed,amount=100", "region=East,status=Completed"]], expected: { completed_total: 100, skipped: 1 } },
+      { name: "Skips a line with an unparseable amount", args: [["region=West,status=Completed,amount=notanumber"]], expected: { completed_total: 0, skipped: 1 } },
+    ],
+    referenceCode: [
+      "    def _ref(raw_lines):",
+      "        total = 0.0",
+      "        skipped = 0",
+      "        for line in raw_lines:",
+      "            try:",
+      "                parts = {}",
+      "                for p in line.split(','):",
+      "                    if not p:",
+      "                        continue",
+      "                    k, v = p.split('=', 1)",
+      "                    parts[k.strip()] = v.strip()",
+      "            except Exception:",
+      "                skipped += 1",
+      "                continue",
+      "            if 'region' not in parts or 'status' not in parts or 'amount' not in parts:",
+      "                skipped += 1",
+      "                continue",
+      "            try:",
+      "                amt = float(parts['amount'])",
+      "            except Exception:",
+      "                skipped += 1",
+      "                continue",
+      "            if parts['status'] == 'Completed':",
+      "                total += amt",
+      "        return {'completed_total': round(total, 2), 'skipped': skipped}",
+    ],
+    randomGenCode: [
+      "        n = random.randint(3, 8)",
+      "        lines = []",
+      "        for _ in range(n):",
+      "            r = random.choice(['region=West', 'region=East', ''])",
+      "            s = random.choice(['status=Completed', 'status=Returned'])",
+      "            a = random.choice([f'amount={random.randint(1,200)}', 'amount=bad', ''])",
+      "            parts = [p for p in [r, s, a] if p]",
+      "            lines.append(','.join(parts))",
+      "        rargs = (lines,)",
+    ],
+    written: {
+      label: "Why should this pipeline skip and count bad lines instead of raising an exception and stopping the whole run?",
+      placeholder: "Think about what happens to a scheduled overnight script if it crashes on line 4 of a 10,000-line file...",
+      check: (text) => /\b(crash|stop|fail|skip|continue|entire|whole|rest)\b/i.test(text) && /\b(bad|malform|invalid|error|one)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that a script processing a large batch shouldn't let ONE malformed line stop the entire run, if it crashed on line 4 of a 10,000-line overnight file, the other 9,996 valid lines would never get processed at all, skipping and counting bad lines lets the run complete and gives visibility into how many were skipped." },
+    hints: [
+      "This combines parsing (task 2), validation (task 6), and aggregation (task 3) into one function, wrapped in error handling so a single bad line doesn't crash the whole batch.",
+      "Wrap each line's parsing and amount-conversion in a try/except, on any failure, increment skipped and move to the next line with continue, rather than letting the exception propagate.",
+      "After successfully parsing a line, still check that region, status, and amount are all present, a line can parse successfully but still be missing a required field.",
+      "def run_pipeline(raw_lines):\n    total = 0.0\n    skipped = 0\n    for line in raw_lines:\n        try:\n            parts = {}\n            for p in line.split(','):\n                if not p:\n                    continue\n                k, v = p.split('=', 1)\n                parts[k.strip()] = v.strip()\n        except Exception:\n            skipped += 1\n            continue\n        if 'region' not in parts or 'status' not in parts or 'amount' not in parts:\n            skipped += 1\n            continue\n        try:\n            amt = float(parts['amount'])\n        except Exception:\n            skipped += 1\n            continue\n        if parts['status'] == 'Completed':\n            total += amt\n    return {'completed_total': round(total, 2), 'skipped': skipped}" ],
+    explanation: { why: "Wrapping each line's risky operations (parsing, float conversion) in their own try/except, and using continue to move to the next line on failure, means one malformed line only costs that one line, not the entire batch, exactly the fault tolerance a real unattended script needs.", mistake: "Letting a single line's parsing error propagate as an uncaught exception would stop the ENTIRE function immediately, on a large real file, that means every line after the first bad one never gets processed at all, and depending on how the script is invoked, might fail completely silently overnight with no output.", tip: "The general pattern here, isolate risky per-item work in a try/except inside a loop, count and report failures rather than crashing on them, is one of the most valuable, broadly reusable habits in real automation code, it shows up in almost every batch-processing script worth writing.", business: "This is deliberately the least guided, most comprehensive task in this stage, an overnight script that processes a large batch of records and crashes partway through on one bad row is a genuinely common, genuinely costly real automation failure, building in this kind of fault tolerance from the start is what separates a script that's actually safe to leave unattended from one that isn't." } },
+];
+
+/* ================= grading ================= */
+async function checkTask(id) {
+  const task = TASKS.find(t => t.id === id);
+  const getBtn = () => document.querySelector(`[data-check="${id}"]`);
+  const getResultsEl = () => document.getElementById("results_" + id);
+  const code = document.getElementById("editor_" + id).value;
+  const initialBtn = getBtn();
+  if (initialBtn) initialBtn.disabled = true;
+  const initialResultsEl = getResultsEl();
+  if (initialResultsEl) initialResultsEl.innerHTML = `<div class="feedback wait">Starting the Python sandbox&hellip; first run on this page downloads the interpreter, after that it's a few seconds.</div>`;
+
+  let outcome;
+  try {
+    const harness = buildHarness(task);
+    outcome = await PySandboxRunner.run(harness, "harness", code, 12000, 60000);
+  } finally {
+    const btn = getBtn();
+    if (btn) btn.disabled = false;
+  }
+
+  const resultsEl = getResultsEl();
+  if (!outcome.ok) {
+    if (resultsEl) resultsEl.innerHTML = `<div class="feedback bad">${esc(outcome.error)}</div>`;
+    PracticeProgress.recordAttempt(id, false);
+    renderSkillBar();
+    return;
+  }
+  const data = outcome.result;
+  if (!data.ranOk) {
+    if (resultsEl) resultsEl.innerHTML = `<div class="feedback bad">Your code didn't run: ${esc(data.error || "unknown error")}. Check for a syntax error, or that the function name matches exactly.</div>`;
+    PracticeProgress.recordAttempt(id, false);
+    renderSkillBar();
+    return;
+  }
+  const results = data.results;
+  if (resultsEl) resultsEl.innerHTML = "";
+  let passCount = 0;
+  results.forEach(r => {
+    if (r.pass) passCount++;
+    if (!resultsEl) return;
+    const row = document.createElement("div");
+    row.className = "feedback " + (r.pass ? "ok" : "bad");
+    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b>, ${esc(r.name)}` + (r.pass ? "" : `<br>${esc(r.hint || "")}`);
+    resultsEl.appendChild(row);
+  });
+  if (resultsEl) {
+    const summary = document.createElement("div");
+    summary.className = "testsummary";
+    summary.style.color = passCount === results.length ? "var(--good)" : "var(--mut)";
+    summary.textContent = `${passCount} / ${results.length} tests passing`;
+    resultsEl.appendChild(summary);
+  }
+
+  let codePass = passCount === results.length;
+  let writtenPass = true;
+  if (task.written) {
+    const writtenText = (document.getElementById("written_" + id) || {}).value || "";
+    writtenPass = task.written.check(writtenText);
+    if (resultsEl) {
+      const wv = document.createElement("div");
+      wv.className = "feedback " + (writtenPass ? "ok" : "bad");
+      wv.innerHTML = writtenPass ? "<b>Interpretation accepted.</b>" : `<b>Interpretation needs more.</b> ${esc(task.written.hint)}`;
+      resultsEl.appendChild(wv);
+    }
+  }
+  const pass = codePass && writtenPass;
+
+  if (pass && task.explanation && resultsEl) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(task.explanation));
+  PracticeProgress.recordAttempt(id, pass);
+  if (pass) openTasks.add(id);
+  renderTasks();
+  renderSkillBar();
+}
+
+/* ================= rendering ================= */
+function tierLabel(tier) { return { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" }[tier]; }
+function renderSkillBar() {
+  const order = ["not-started", "introduced", "practicing", "competent", "mastered"];
+  const wrap = document.getElementById("skillBars");
+  wrap.innerHTML = SKILLS.map(s => {
+    const prog = PracticeProgress.skillProgress(TASKS, s.id);
+    const reachedIdx = order.indexOf(prog.tier);
+    const ladder = order.slice(1).map((t, i) => `<span class="${i + 1 <= reachedIdx ? "reached" : ""}">${tierLabel(t)}</span>`).join("");
+    return `<div class="skillbar">
+      <div class="skillrow">
+        <span style="font-weight:700;font-size:14.5px">${esc(s.label)}</span>
+        <span class="tierpill t-${prog.tier}">${tierLabel(prog.tier)}</span>
+        <div class="skillbarwrap"><div class="fill" style="width:${prog.pct}%"></div></div>
+        <span class="mono" style="font-size:12.5px;color:var(--mut2)">${prog.passedCount} / ${prog.totalCount} tasks</span>
+      </div>
+      <div class="tierladder">${ladder}</div>
+    </div>`;
+  }).join("");
+  const next = PracticeProgress.recommendNext(TASKS);
+  if (!document.getElementById("nextUpBlock")) {
+    const block = document.createElement("div");
+    block.className = "skillbar";
+    block.id = "nextUpBlock";
+    block.innerHTML = `<div class="nextup" id="nextUp"></div>`;
+    wrap.after(block);
+  }
+  const target = document.getElementById("nextUp");
+  const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
+  target.innerHTML = next
+    ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
+    : `<b>What should I do next?</b> All ${TASKS.length} Stage 1 tasks passed. Stages 2-3 aren't built yet.`;
+}
+function buildHintsHtml(hints) {
+  const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
+  return `<div class="hints">${hints.map((h, i) => `<details><summary>${labels[i]}</summary><div class="hbody">${esc(h)}</div></details>`).join("")}</div>`;
+}
+function buildExplainHtml(ex) {
+  if (!ex) return "";
+  const rows = [["Why this works", ex.why], ["Common mistake", ex.mistake], ["Real analyst tip", ex.tip], ["Business interpretation", ex.business]].filter(([, v]) => v);
+  return `<div class="explainbox">${rows.map(([lbl, v]) => `<div class="erow"><div class="elbl">${esc(lbl)}</div><p>${esc(v)}</p></div>`).join("")}</div>`;
+}
+
+const openTasks = new Set();
+const codeDrafts = {};
+const resultsDrafts = {};
+const writtenDrafts = {};
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  TASKS.forEach(t => {
+    const openEl = document.getElementById("body_" + t.id);
+    if (openEl && openEl.classList.contains("open")) openTasks.add(t.id);
+    const ed = document.getElementById("editor_" + t.id);
+    if (ed) codeDrafts[t.id] = ed.value;
+    const res = document.getElementById("results_" + t.id);
+    if (res && res.innerHTML) resultsDrafts[t.id] = res.innerHTML;
+    const wr = document.getElementById("written_" + t.id);
+    if (wr) writtenDrafts[t.id] = wr.value;
+  });
+  list.innerHTML = "";
+  TASKS.forEach((t, idx) => {
+    const state = PracticeProgress.getTaskState(t.id);
+    const prereqsMet = t.prerequisite.every(pid => PracticeProgress.getTaskState(pid).passed);
+    const card = document.createElement("div");
+    card.className = "taskcard";
+    card.innerHTML = `
+      <div class="taskhead" data-id="${t.id}">
+        <span class="statusdot ${state.passed ? "passed" : ""}"></span>
+        <span class="tid">${String(idx + 1).padStart(2, "0")}</span>
+        <span class="ttitle">${esc(t.title)}</span>
+        <span class="levelpill ${t.level}">${t.level.replace("semiguided", "semi-guided")}</span>
+      </div>
+      <div class="taskbody${openTasks.has(t.id) ? " open" : ""}" id="body_${t.id}">
+        <div class="objective"><b>Objective:</b> ${esc(t.objective)}</div>
+        <p style="font-size:13.5px;margin-bottom:10px">${esc(t.objectiveNote)}</p>
+        ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
+        <textarea id="editor_${t.id}" rows="6" spellcheck="false">${esc(codeDrafts[t.id] !== undefined ? codeDrafts[t.id] : t.starterCode)}</textarea>
+        ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
+        <div class="dagctrl">
+          <button class="primary" data-check="${t.id}">&#10003; Check answer</button>
+        </div>
+        <div id="results_${t.id}">${resultsDrafts[t.id] || ""}</div>
+        ${buildHintsHtml(t.hints)}
+        `}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll(".taskhead").forEach(head => {
+    head.addEventListener("click", () => {
+      const body = document.getElementById("body_" + head.dataset.id);
+      body.classList.toggle("open");
+    });
+  });
+  list.querySelectorAll("[data-check]").forEach(btn => {
+    btn.addEventListener("click", () => checkTask(btn.dataset.check));
+  });
+}
+
+renderSkillBar();
+renderTasks();
+</script>
+<script src="course-rail.js?v=5"></script>
+</body>
+</html>
