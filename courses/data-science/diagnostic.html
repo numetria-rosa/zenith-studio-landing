@@ -36,6 +36,7 @@ section{margin-top:32px}
 .qopt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:7px;cursor:pointer;transition:.15s;font-size:13.5px}
 .qopt:hover{border-color:var(--bd2)}
 .qopt.picked{border-color:var(--info);background:rgba(95,194,232,.06)}
+.qopt:focus-visible{outline:2px solid var(--info);outline-offset:-2px}
 button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
 button:hover{border-color:var(--amber);color:var(--amber)}
 button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
@@ -199,17 +200,31 @@ function renderTestOutAndQuiz() {
       const q = QUESTIONS[area.id];
       const card = document.createElement("div");
       card.className = "qcard";
-      card.innerHTML = `<div class="qtag">${esc(area.label)}, no practice evidence yet</div><div class="qtext">${esc(q.text)}</div><div id="qopts_${area.id}"></div>`;
+      card.innerHTML = `<div class="qtag">${esc(area.label)}, no practice evidence yet</div><div class="qtext">${esc(q.text)}</div><div id="qopts_${area.id}" role="radiogroup" aria-label="${esc(q.text)}"></div>`;
       qBox.appendChild(card);
       const optsEl = card.querySelector(`#qopts_${area.id}`);
+      function pickOpt(oi, opt) {
+        quizAnswers[area.id] = opt;
+        optsEl.querySelectorAll(".qopt").forEach((e, j) => {
+          const picked = j === oi;
+          e.classList.toggle("picked", picked);
+          e.setAttribute("aria-checked", picked ? "true" : "false");
+        });
+        checkQuizDone();
+      }
       q.opts.forEach((opt, oi) => {
         const div = document.createElement("div");
         div.className = "qopt";
         div.textContent = opt.t;
-        div.addEventListener("click", () => {
-          quizAnswers[area.id] = opt;
-          optsEl.querySelectorAll(".qopt").forEach((e, j) => e.classList.toggle("picked", j === oi));
-          checkQuizDone();
+        div.tabIndex = 0;
+        div.setAttribute("role", "radio");
+        div.setAttribute("aria-checked", "false");
+        div.addEventListener("click", () => pickOpt(oi, opt));
+        div.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+            e.preventDefault();
+            pickOpt(oi, opt);
+          }
         });
         optsEl.appendChild(div);
       });
