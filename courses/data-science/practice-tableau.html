@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau Practice Library, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;--teal:#2fb8ac;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 90px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--teal)}
+.bar .in{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px;flex-wrap:wrap}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--teal)}
+.hero{padding:40px 0 24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:720px;margin-top:10px}
+.scopenote{background:rgba(47,184,172,.08);border:1px solid rgba(47,184,172,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
+.scopenote b{color:var(--teal)}
+.honestnote{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.35);border-radius:10px;padding:14px 18px;margin-top:12px;font-size:13px;color:var(--mut)}
+.honestnote b{color:var(--amber)}
+.sheetblock{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:20px 22px;margin-top:22px}
+.sheetblock .stlbl{font-family:'IBM Plex Mono';font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);margin-bottom:10px}
+.fieldgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.fieldcard{border:1px solid var(--bd2);border-radius:8px;padding:9px 12px;font-family:'IBM Plex Mono';font-size:12px}
+.fieldcard .fname{font-weight:700}
+.fieldcard.dim .fname{color:var(--info)}
+.fieldcard.dim{background:rgba(95,194,232,.06)}
+.fieldcard.mea .fname{color:var(--good)}
+.fieldcard.mea{background:rgba(74,222,149,.06)}
+.fieldcard .fmeta{color:var(--mut2);margin-top:3px;font-size:10.5px}
+.sheetwrap{overflow-x:auto;border:1px solid var(--bd2);border-radius:8px;max-height:280px;overflow-y:auto;margin-top:12px}
+table.grid{width:100%;border-collapse:collapse;font-size:12.5px;min-width:600px}
+table.grid th,table.grid td{padding:6px 10px;border:1px solid var(--bd);text-align:left;white-space:nowrap;font-family:'IBM Plex Mono'}
+table.grid thead th{background:var(--card2);color:var(--teal);position:sticky;top:0}
+table.grid td.num{text-align:right}
+.skillbar{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:20px 22px;margin-top:22px}
+.skillrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tierpill{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 12px;border-radius:99px;font-weight:700}
+.tierpill.t-not-started{background:var(--bg2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.12);color:var(--amber)}
+.tierpill.t-competent{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t-mastered{background:rgba(47,184,172,.18);color:var(--teal)}
+.skillbarwrap{flex:1;min-width:180px;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--bd)}
+.skillbarwrap .fill{height:100%;background:var(--teal)}
+.tierladder{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.tierladder span{font-family:'IBM Plex Mono';font-size:10.5px;padding:3px 10px;border-radius:99px;background:var(--bg2);color:var(--mut2);border:1px solid var(--bd2)}
+.tierladder span.reached{background:rgba(47,184,172,.12);color:var(--teal);border-color:rgba(47,184,172,.4)}
+.nextup{margin-top:14px;padding:12px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px}
+.nextup b{color:var(--teal)}
+.tasklist{display:grid;gap:10px;margin-top:22px}
+.taskcard{background:var(--card);border:1px solid var(--bd2);border-radius:12px;overflow:hidden}
+.taskhead{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer}
+.taskhead:hover{background:var(--card2)}
+.taskhead .tid{font-family:'IBM Plex Mono';font-size:11px;color:var(--mut2);width:32px;flex-shrink:0}
+.taskhead .ttitle{font-weight:600;font-size:14.5px;flex:1}
+.levelpill{font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;padding:2px 9px;border-radius:99px;flex-shrink:0}
+.levelpill.guided{background:rgba(74,222,149,.12);color:var(--good)}
+.levelpill.semiguided{background:rgba(240,180,41,.12);color:var(--amber)}
+.levelpill.challenge{background:rgba(255,133,133,.12);color:var(--bad)}
+.levelpill.mastery{background:rgba(47,184,172,.12);color:var(--teal)}
+.statusdot{width:9px;height:9px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+.statusdot.passed{background:var(--good);box-shadow:0 0 6px var(--good)}
+.taskbody{display:none;padding:0 18px 18px}
+.taskbody.open{display:block}
+.objective{font-size:13.5px;color:var(--mut);margin-bottom:12px}
+.objective b{color:var(--tx)}
+.scenario{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;font-size:13.5px;margin-bottom:12px}
+.scenario b{color:var(--teal)}
+.streakrow{display:flex;gap:6px;margin-bottom:10px}
+.streakdot{width:10px;height:10px;border-radius:50%;background:var(--bg2);border:1px solid var(--bd2)}
+.streakdot.hit{background:var(--teal);border-color:var(--teal)}
+.slotgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.slotfield{display:flex;flex-direction:column;gap:4px}
+.slotfield label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);font-family:'IBM Plex Mono'}
+select{font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+select:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--teal);color:var(--teal)}
+button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+button.primary{background:var(--teal);color:#04201d;border-color:var(--teal)}
+button.primary:hover{filter:brightness(1.1);color:#04201d}
+.writtenlbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);font-family:'IBM Plex Mono';margin:12px 0 6px}
+.writtenbox{width:100%;font-family:'IBM Plex Sans';line-height:1.6;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.writtenbox:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.dagctrl{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px}
+.feedback.ok{background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.hints{margin-top:12px;display:grid;gap:6px}
+.hints details{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px}
+.hints summary{cursor:pointer;color:var(--teal);font-size:12px;font-weight:600;list-style:none}
+.hints summary::-webkit-details-marker{display:none}
+.hints .hbody{margin-top:7px;font-size:12.5px;color:var(--mut);padding-top:7px;border-top:1px solid var(--bd)}
+.explainbox{margin-top:12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.explainbox .erow .elbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);font-family:'IBM Plex Mono';margin-bottom:3px}
+.explainbox .erow p{font-size:12.5px;color:var(--mut)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 70px} .taskhead{flex-wrap:wrap} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-08.html">Module 8: Dashboards</a><a href="career.html">Career Path</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Practice Library &middot; Tableau &middot; Stage 1 of 4</span>
+    <h1 class="serif">Tableau Practice Library</h1>
+    <p class="sub">Decision-based practice for the reasoning behind a Tableau view: which field is a Dimension vs a Measure, which shelf it belongs on, discrete vs continuous, and which chart shape a given combination of fields actually calls for.</p>
+    <div class="honestnote"><b>Honest scope note, please read:</b> this is a <b>practice simulation</b>, not real Tableau. Nothing here renders inside an actual Tableau workbook, and no click is graded by executing real Tableau software, this page can't run in a browser the way the Excel formula engine or the Python/SQL sandboxes do. What it genuinely checks is the reasoning: given a real field from a real dataset, do you know whether it's a Dimension or a Measure, which shelf it belongs on, and why. Every scenario is re-randomized on every attempt (a different field, a different business ask) specifically so a memorized click sequence can't pass, only the underlying rule can. Treat this as a rehearsal for the concepts, not a substitute for opening Tableau Public or Tableau Desktop and building a real workbook.</div>
+    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals: Dimensions vs Measures, shelves, discrete vs continuous, chart choice) is complete, 10 tasks. Stages 2-4 (Visual Analytics, Calculated Fields, Dashboards &amp; Storytelling) are not yet built.</div>
+  </header>
+
+  <div class="sheetblock">
+    <div class="stlbl">Data source &middot; Retail Performance &middot; connect once, reuse in every task below</div>
+    <div id="fieldGrid" class="fieldgrid"></div>
+    <div class="sheetwrap"><table class="grid" id="gridTable"></table></div>
+  </div>
+
+  <div id="skillBars"></div>
+
+  <div class="tasklist" id="taskList"></div>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Practice Library &middot; Practice Simulation, not real Tableau</footer>
+</div>
+
+<script src="course-progress.js?v=5"></script>
+<script src="practice-progress.js"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+
+/* ================= data source ================= */
+const ROWS = [
+  [1, "2025-01-04", "West", "Outdoor", "Consumer", "Completed", 128.50],
+  [2, "2025-01-09", "East", "Apparel", "Corporate", "Completed", 64.00],
+  [3, "2025-01-15", "West", "Electronics", "Home Office", "Returned", 340.00],
+  [4, "2025-01-22", "North", "Outdoor", "Consumer", "Completed", 91.25],
+  [5, "2025-02-02", "South", "Home", "Corporate", "Completed", 55.00],
+  [6, "2025-02-08", "East", "Electronics", "Consumer", "Completed", 512.00],
+  [7, "2025-02-14", "West", "Apparel", "Home Office", "Cancelled", 78.40],
+  [8, "2025-02-19", "North", "Home", "Consumer", "Completed", 33.99],
+  [9, "2025-02-27", "South", "Outdoor", "Corporate", "Completed", 210.00],
+  [10, "2025-03-03", "East", "Home", "Consumer", "Returned", 47.50],
+  [11, "2025-03-10", "West", "Electronics", "Corporate", "Completed", 289.99],
+  [12, "2025-03-16", "North", "Apparel", "Home Office", "Completed", 62.00],
+];
+const FIELDS = ["order_id", "order_date", "region", "category", "customer_segment", "status", "amount"];
+
+const FIELD_META = {
+  order_id: { kind: "dimension", note: "unique identifier, usually kept discrete for counting orders, not summed" },
+  order_date: { kind: "dimension", note: "a date; can be dragged as Discrete (blue, individual date labels) or Continuous (green, a timeline for trend lines)" },
+  region: { kind: "dimension", note: "text category" },
+  category: { kind: "dimension", note: "text category" },
+  customer_segment: { kind: "dimension", note: "text category" },
+  status: { kind: "dimension", note: "text category" },
+  amount: { kind: "measure", note: "numeric, aggregated (SUM/AVG/etc.) by default" },
+};
+const DIMENSION_FIELDS = ["region", "category", "customer_segment", "status"];
+
+function renderFieldGrid() {
+  const grid = document.getElementById("fieldGrid");
+  grid.innerHTML = FIELDS.map(f => {
+    const m = FIELD_META[f];
+    return `<div class="fieldcard ${m.kind === "dimension" ? "dim" : "mea"}"><div class="fname">${m.kind === "dimension" ? "Abc" : "#"} ${esc(f)}</div><div class="fmeta">${m.kind === "dimension" ? "Dimension" : "Measure"} &middot; ${esc(m.note)}</div></div>`;
+  }).join("");
+}
+function renderGrid() {
+  const table = document.getElementById("gridTable");
+  let html = `<thead><tr>${FIELDS.map(f => `<th>${esc(f)}</th>`).join("")}</tr></thead><tbody>`;
+  ROWS.forEach(row => {
+    html += `<tr>${row.map((v, ci) => `<td class="${ci === 6 ? "num" : ""}">${esc(ci === 6 ? Number(v).toFixed(2) : String(v))}</td>`).join("")}</tr>`;
+  });
+  html += "</tbody>";
+  table.innerHTML = html;
+}
+
+/* ================= random helpers =================
+   Every task redraws its scenario (which field, which value, which
+   business ask) fresh on every render, the same anti-cheat intent as
+   the Excel library's mutatedWorkbook(): a memorized click sequence
+   only survives if it's actually applying the right RULE, since the
+   specific field named in the prompt changes every time. */
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function pickN(arr, n) {
+  const copy = arr.slice();
+  for (let i = copy.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; }
+  return copy.slice(0, n);
+}
+
+/* ================= skills & tasks ================= */
+const SKILL_ID_FIELDS = "tableau-fields";
+const SKILL_ID_SHELVES = "tableau-shelves";
+const SKILL_ID_CHARTS = "tableau-chart-choice";
+const SKILLS = [
+  { id: SKILL_ID_FIELDS, label: "Tableau Field Types" },
+  { id: SKILL_ID_SHELVES, label: "Tableau Shelves & Filters" },
+  { id: SKILL_ID_CHARTS, label: "Tableau Chart Choice" },
+];
+
+const FIELD_OPTIONS = FIELDS.map(f => ({ value: f, label: f }));
+const SHELF_OPTIONS_DIM = [{ value: "none", label: "(leave off the view)" }, ...FIELDS.map(f => ({ value: f, label: f }))];
+
+/* Each task's build(seed) returns { scenarioHtml, slots, correct },
+   drawn fresh every time renderTasks() paints this task's body, so the
+   correct answer differs attempt to attempt while the RULE it tests
+   stays fixed. */
+const TASKS = [
+  { id: "tb-f01", skill: SKILL_ID_FIELDS, tool: "tableau", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Dimension or Measure?",
+    objective: "Recognize Tableau's most basic split: qualitative fields (Dimensions) vs quantitative, aggregatable fields (Measures).",
+    build() {
+      const f = pick(["region", "category", "customer_segment", "status", "amount"]);
+      const correctKind = FIELD_META[f].kind;
+      return {
+        scenarioHtml: `You've connected the Retail Performance data source. Look at the field <b class="mono">${esc(f)}</b> in the pane above.`,
+        slots: [{ key: "kind", label: "Is it a Dimension or a Measure?", options: [{ value: "dimension", label: "Dimension" }, { value: "measure", label: "Measure" }] }],
+        correct: { kind: correctKind },
+      };
+    },
+    hints: [
+      "Tableau splits every field into two buckets the moment you connect a data source: Dimensions (qualitative, usually text or dates, shown in blue) and Measures (quantitative, numeric, shown in green, meant to be aggregated).",
+      "Ask: does it make sense to SUM or AVERAGE this field? If yes, it's a Measure. If it's a category, label, or ID, it's a Dimension.",
+      "amount is the only numeric, summable field in this data source, everything else (region, category, customer_segment, status) is a category, a Dimension.",
+      "amount = Measure. region, category, customer_segment, status = Dimension." ],
+    explanation: { why: "Tableau infers this split automatically when you connect a source: text and date fields default to Dimensions, numeric fields default to Measures, this classification drives almost everything else about how a field behaves once it's on a shelf.", mistake: "A numeric-looking field isn't automatically a Measure, order_id is a number but it's really an identifier, summing order IDs together produces a meaningless total, which is why Tableau lets you manually convert a field's role when the default guess is wrong.", tip: "The Dimension/Measure split is the single most load-bearing concept in Tableau, almost every other decision (which shelf, which aggregation, which chart type) depends on getting this right first.", business: "Misclassifying a field, treating an ID as a Measure and accidentally summing it, is one of the most common real Tableau mistakes new analysts make, it produces a chart that runs without error but shows a completely meaningless number." } },
+
+  { id: "tb-f02", skill: SKILL_ID_FIELDS, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f01"],
+    title: "Discrete (blue) or Continuous (green)?",
+    objective: "Recognize Tableau's default discrete/continuous coloring, and where dates are a special case.",
+    build() {
+      const f = pick(["region", "category", "customer_segment", "status", "amount", "order_date"]);
+      const correct = f === "amount" ? "continuous" : "discrete";
+      return {
+        scenarioHtml: `You drag <b class="mono">${esc(f)}</b> onto a shelf for the first time, using Tableau's default behavior (no manual conversion).`,
+        slots: [{ key: "colour", label: "Does it appear discrete (blue) or continuous (green)?", options: [{ value: "discrete", label: "Discrete (blue)" }, { value: "continuous", label: "Continuous (green)" }] }],
+        correct: { colour: correct },
+      };
+    },
+    hints: [
+      "Discrete fields (blue) create separate headers, one per distinct value, continuous fields (green) create a smooth axis.",
+      "By default, Dimensions are discrete and Measures are continuous, that covers region, category, customer_segment, status (discrete) and amount (continuous).",
+      "order_date is a Dimension, so like the other Dimensions, its default when first dragged onto a shelf is discrete, even though dates CAN be converted to continuous for trend lines.",
+      "amount = continuous (green). Every other field listed here = discrete (blue), including order_date by default." ],
+    explanation: { why: "Discrete values become distinct headers or axis labels (each region gets its own column), continuous values become a smooth, ordered axis (a range of dollar amounts), Tableau's default coloring, blue for Dimensions, green for Measures, reflects that difference.", mistake: "Assuming date fields always default to continuous because they're often used in trend lines is a common mix-up, a freshly dragged date field is discrete by default, you have to explicitly convert it to continuous to get a smooth timeline.", tip: "You can always right-click any field on a shelf and manually switch it between discrete and continuous, the default isn't a permanent constraint, it's just where Tableau starts you off.", business: "A line chart meant to show a smooth revenue trend over time will instead show a series of disconnected marks if the date field is left discrete, this exact mix-up is one of the first things that trips up someone new to the tool." } },
+
+  { id: "tb-f03", skill: SKILL_ID_SHELVES, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f01"],
+    title: "Build a simple list of categories",
+    objective: "Place a single Dimension on the correct shelf to list its distinct values.",
+    build() {
+      const f = pick(DIMENSION_FIELDS);
+      return {
+        scenarioHtml: `You want a plain list of every distinct <b class="mono">${esc(f)}</b> value, one row per value, nothing else on the view yet.`,
+        slots: [
+          { key: "rows", label: "Rows shelf", options: SHELF_OPTIONS_DIM },
+          { key: "columns", label: "Columns shelf", options: SHELF_OPTIONS_DIM },
+        ],
+        correct: { rows: f, columns: "none" },
+      };
+    },
+    hints: [
+      "A single Dimension placed on Rows creates one row per distinct value, exactly a list.",
+      "Columns should stay empty here, you don't need a second axis for a plain list.",
+      `Put ${"the field named in the scenario"} on Rows, leave Columns as "(leave off the view)".`,
+      "Rows = the field named in the scenario, Columns = none." ],
+    explanation: { why: "Rows and Columns are Tableau's two core layout shelves, a Dimension on Rows alone produces one row per distinct value in that field, the simplest possible view.", mistake: "Putting the field on Columns instead of Rows would still work (it would list the values across the top rather than down the side), but the scenario specifically describes rows, matching the shelf to the described layout is the actual skill.", tip: "Rows and Columns are the two shelves every single Tableau view starts from, everything else (Color, Size, Filters) adds detail on top of a layout those two shelves establish first.", business: "A plain list of distinct values, regions, categories, segments, is often the very first thing an analyst builds when exploring a new data source, before any aggregation or chart type decision happens at all." } },
+
+  { id: "tb-f04", skill: SKILL_ID_SHELVES, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f03"],
+    title: "Build a bar chart: one Dimension, one Measure",
+    objective: "Combine a Dimension and an aggregated Measure to build the most common Tableau chart.",
+    build() {
+      const f = pick(DIMENSION_FIELDS);
+      return {
+        scenarioHtml: `You want a horizontal bar chart showing total <b class="mono">amount</b> for each <b class="mono">${esc(f)}</b>, one bar per value.`,
+        slots: [
+          { key: "rows", label: "Rows shelf", options: SHELF_OPTIONS_DIM },
+          { key: "columns", label: "Columns shelf", options: [{ value: "none", label: "(leave off the view)" }, { value: "amount", label: "amount" }] },
+          { key: "agg", label: "Aggregation on amount", options: [{ value: "SUM", label: "SUM" }, { value: "AVG", label: "AVG" }, { value: "COUNT", label: "COUNT" }] },
+        ],
+        correct: { rows: f, columns: "amount", agg: "SUM" },
+      };
+    },
+    hints: [
+      "Rows gets the Dimension (one bar per category), Columns gets the Measure (bar length), that's the standard horizontal-bar layout.",
+      "The business ask says \"total amount\", that maps directly to the SUM aggregation, not AVG or COUNT.",
+      "Rows = the Dimension named in the scenario, Columns = amount, Aggregation = SUM.",
+      "Rows = <that field>, Columns = amount, Aggregation = SUM." ],
+    explanation: { why: "This is Tableau's default aggregation of amount, SUM, combined with a Dimension on Rows, is what produces exactly the bar-chart-by-category shape almost every business request starts with.", mistake: "Picking AVG or COUNT when the request says \"total\" produces a chart that runs and looks plausible, but answers a different question than the one actually asked, matching the aggregation word to the business language (\"total\" = SUM, \"average\" = AVG, \"number of\" = COUNT) is the real skill.", tip: "\"One bar per category, total of some measure\" is the single most common Tableau view in existence, once this exact Rows-Dimension, Columns-Measure-SUM pattern is automatic, most other charts are small variations on it.", business: "Total revenue by region or category is usually the very first chart a stakeholder asks for, it's the one view virtually every retail dashboard opens with." } },
+
+  { id: "tb-f05", skill: SKILL_ID_SHELVES, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f04"],
+    title: "Match the aggregation to the business ask",
+    objective: "Translate plain-language wording (total / average / number of) into the correct Tableau aggregation.",
+    build() {
+      const asks = [
+        { text: "total revenue", agg: "SUM" },
+        { text: "the average order value", agg: "AVG" },
+        { text: "how many orders", agg: "COUNT" },
+      ];
+      const a = pick(asks);
+      return {
+        scenarioHtml: `A stakeholder asks for <b>${esc(a.text)}</b> per region.`,
+        slots: [{ key: "agg", label: "Which aggregation on amount matches this ask?", options: [{ value: "SUM", label: "SUM" }, { value: "AVG", label: "AVG" }, { value: "COUNT", label: "COUNT" }] }],
+        correct: { agg: a.agg },
+      };
+    },
+    hints: [
+      "\"Total\" always means SUM, \"average\" always means AVG, \"how many\" (a count of rows/orders, not a dollar figure) means COUNT.",
+      "Read the exact wording in the scenario, the aggregation word is usually right there in the business ask.",
+      "Match: total -> SUM, average -> AVG, how many -> COUNT.",
+      "Whichever of SUM / AVG / COUNT matches the wording in the scenario above." ],
+    explanation: { why: "Tableau's default aggregation for a Measure is SUM, but that's only a default, real business requests routinely ask for an average or a count instead, and the aggregation has to be changed to match, not left on SUM by habit.", mistake: "Leaving every Measure on SUM regardless of what was actually asked is one of the most common real analyst mistakes, a chart showing SUM(amount) when a stakeholder asked for average order value isn't wrong technically, it's wrong in a way that silently misinforms whoever reads it.", tip: "Before building any view, translate the request's own words into an aggregation first, \"total\", \"average\", \"how many\" almost always map directly to SUM, AVG, COUNT.", business: "A regional manager comparing \"total revenue\" against \"average order value\" is asking two genuinely different questions, one about overall scale, one about typical transaction size, mixing them up leads to a real, wrong conclusion." } },
+
+  { id: "tb-f06", skill: SKILL_ID_CHARTS, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f04"],
+    title: "Pick the right chart type for the fields on hand",
+    objective: "Recognize which chart shape a given combination of Dimension(s)/Measure(s) actually calls for.",
+    build() {
+      const scenarios = [
+        { desc: "one Dimension (category) and one Measure (total amount)", answer: "bar" },
+        { desc: "order_date used as a continuous field, and one Measure (total amount), to show a trend over time", answer: "line" },
+        { desc: "two Measures at once (amount and a hypothetical profit figure), to see if they're related", answer: "scatter" },
+        { desc: "two Dimensions (region and category) and one Measure, as an exact numeric grid", answer: "crosstab" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You have <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "chart", label: "Which chart type fits?", options: [{ value: "bar", label: "Bar chart" }, { value: "line", label: "Line chart" }, { value: "scatter", label: "Scatter plot" }, { value: "crosstab", label: "Crosstab / table" }] }],
+        correct: { chart: s.answer },
+      };
+    },
+    hints: [
+      "One Dimension + one Measure almost always means a bar chart, comparing a total across categories.",
+      "A continuous date + a Measure means a trend over time, a line chart.",
+      "Two Measures at once, checking whether they're related to each other, is a scatter plot's whole purpose.",
+      "Two Dimensions + a Measure as exact numbers (not a shape) is a crosstab, a table of numbers, not really a \"chart\" at all." ],
+    explanation: { why: "Chart type follows directly from what's actually on the view: category comparison = bar, trend over a continuous axis = line, relationship between two numeric fields = scatter, exact numbers across two categorical breakdowns = crosstab.", mistake: "Defaulting to a bar chart for everything, including a trend-over-time question, technically shows the same numbers but makes the trend far harder to read than a line chart would, the shape of the chart should match the shape of the question.", tip: "Before choosing a chart type, name out loud what the fields actually are, how many Dimensions, how many Measures, is time involved, the right chart type is usually obvious once that's spelled out.", business: "Choosing the wrong chart type doesn't make a report wrong, exactly, but it makes it harder for a stakeholder to see the point quickly, and speed of comprehension is most of what a good chart is actually for." } },
+
+  { id: "tb-f07", skill: SKILL_ID_SHELVES, tool: "tableau", level: "semiguided", difficulty: "core", prerequisite: ["tb-f04"],
+    title: "Filters shelf vs Color shelf",
+    objective: "Distinguish restricting the data shown (Filters) from adding detail without restricting it (Color).",
+    build() {
+      const status = pick(["Completed", "Returned", "Cancelled"]);
+      const restrict = Math.random() < 0.5;
+      const desc = restrict
+        ? `You want the view to show <b>only</b> orders where status = "${status}", every other status should disappear from the view entirely.`
+        : `You want the view to keep showing every order, but color each mark by its status, so "${status}" and the other statuses are all visible at once, just distinguished by color.`;
+      return {
+        scenarioHtml: desc,
+        slots: [{ key: "shelf", label: "Where does status belong?", options: [{ value: "filters", label: "Filters shelf" }, { value: "color", label: "Color shelf" }] }],
+        correct: { shelf: restrict ? "filters" : "color" },
+      };
+    },
+    hints: [
+      "Filters removes data from the view entirely, only matching rows remain, everything else is gone.",
+      "Color adds a visual encoding on top of the existing data, nothing is removed, every status still shows, just in different colors.",
+      "\"Only show X\" is always Filters, \"keep everything, but distinguish by X\" is always Color.",
+      "Read whether the scenario asks to REMOVE other values (Filters) or KEEP all values but distinguish them (Color)." ],
+    explanation: { why: "Filters and Color solve genuinely different problems: Filters restricts which rows of underlying data ever reach the view, Color is a purely visual encoding applied to whatever data already made it onto the view.", mistake: "Putting a field on Color when the actual intent was to restrict the data (or vice versa) is a common early mistake, the view might look reasonable either way, but Color-only leaves every status's data still counted in any total shown, which changes the actual numbers.", tip: "Ask: should this field change which rows are included in totals (Filters), or just change how included rows are displayed (Color)? That question resolves almost every Filters-vs-Color decision.", business: "A regional manager who only wants to see completed sales, not a color-coded mix of completed/returned/cancelled, needs Filters, using Color instead would silently leave returns and cancellations inflating any SUM shown on the view." } },
+
+  { id: "tb-f08", skill: SKILL_ID_SHELVES, tool: "tableau", level: "challenge", difficulty: "challenge", prerequisite: ["tb-f04", "tb-f07"],
+    title: "Build a two-dimension crosstab",
+    objective: "Place two Dimensions on Rows and Columns together to build a numeric grid.",
+    build() {
+      const [d1, d2] = pickN(DIMENSION_FIELDS, 2);
+      return {
+        scenarioHtml: `You want an exact numeric table: <b class="mono">${esc(d1)}</b> down the rows, <b class="mono">${esc(d2)}</b> across the columns, and total <b class="mono">amount</b> in each cell.`,
+        slots: [
+          { key: "rows", label: "Rows shelf", options: SHELF_OPTIONS_DIM },
+          { key: "columns", label: "Columns shelf", options: SHELF_OPTIONS_DIM },
+          { key: "label", label: "Where does SUM(amount) go?", options: [{ value: "label", label: "Label / Text (crosstab cells)" }, { value: "color", label: "Color" }, { value: "size", label: "Size" }] },
+          { key: "agg", label: "Aggregation on amount", options: [{ value: "SUM", label: "SUM" }, { value: "AVG", label: "AVG" }, { value: "COUNT", label: "COUNT" }] },
+        ],
+        correct: { rows: d1, columns: d2, label: "label", agg: "SUM" },
+      };
+    },
+    hints: [
+      "Both Dimensions go on layout shelves, one on Rows and one on Columns, exactly as named in the scenario.",
+      "For exact numbers in a grid (not a visual chart), the Measure goes on Label/Text, not Color or Size, those encode a chart visually rather than printing a number.",
+      "Rows = the first field named, Columns = the second field named, Label = SUM(amount).",
+      "Rows = the Dimension listed first, Columns = the Dimension listed second, Label/Text = SUM(amount), Aggregation = SUM." ],
+    explanation: { why: "Two Dimensions, one on Rows and one on Columns, automatically creates the grid structure of a crosstab, a Measure placed on Label/Text then prints its aggregated value inside each cell of that grid, rather than driving a bar length or a color intensity.", mistake: "Putting the Measure on Color or Size instead of Label produces a heat-map-style visual crosstab, which isn't wrong exactly, but doesn't match a request for \"an exact numeric table\", where the actual number needs to be readable, not just implied by shading.", tip: "Two Dimensions on Rows and Columns together is the standard way to build any crosstab or pivot-table-style view in Tableau, the same shape a spreadsheet PivotTable would produce.", business: "A finance stakeholder reviewing exact dollar figures by region and category needs to read precise numbers off the page, a crosstab with numeric labels serves that need directly, where a purely visual chart would force them to estimate." } },
+
+  { id: "tb-f09", skill: SKILL_ID_CHARTS, tool: "tableau", level: "challenge", difficulty: "challenge", prerequisite: ["tb-f04"],
+    title: "Add a second Dimension by encoding Color",
+    objective: "Extend a one-Dimension bar chart with a second Dimension via Color instead of restructuring the layout.",
+    build() {
+      const [d1, d2] = pickN(DIMENSION_FIELDS, 2);
+      return {
+        scenarioHtml: `You already have a bar chart: <b class="mono">${esc(d1)}</b> on Rows, SUM(amount) on Columns. Now you want each bar broken down by <b class="mono">${esc(d2)}</b> using color, without changing the Rows/Columns layout.`,
+        slots: [
+          { key: "rows", label: "Rows shelf", options: SHELF_OPTIONS_DIM },
+          { key: "columns", label: "Columns shelf", options: [{ value: "none", label: "(leave off the view)" }, { value: "amount", label: "amount" }] },
+          { key: "color", label: "Color shelf", options: SHELF_OPTIONS_DIM },
+        ],
+        correct: { rows: d1, columns: "amount", color: d2 },
+      };
+    },
+    hints: [
+      "The Rows/Columns layout is described as unchanged, keep the same Dimension on Rows and amount on Columns.",
+      "The second Dimension goes on Color, that's what breaks each bar into colored segments without touching the layout shelves.",
+      "Rows = the first Dimension named, Columns = amount, Color = the second Dimension named.",
+      "Rows = <first field>, Columns = amount, Color = <second field>." ],
+    explanation: { why: "Color is an encoding shelf, not a layout shelf, adding a Dimension to Color subdivides each existing bar into colored segments (a stacked bar) without moving anything on Rows or Columns.", mistake: "Adding the second Dimension to Rows or Columns instead of Color would restructure the whole view (creating a grid or a new set of bars) rather than the requested \"break down each existing bar\" behavior, which specifically calls for Color.", tip: "Color, Size, Label, and Detail are all encoding shelves, they add information to an existing layout, Rows and Columns are layout shelves, they define the structure itself, knowing which category a request falls into is most of this decision.", business: "A stacked bar chart, total revenue by region, colored by customer segment, lets a stakeholder see both the regional total and its internal composition in one glance, information a single flat bar can't show." } },
+
+  { id: "tb-f10", skill: SKILL_ID_CHARTS, tool: "tableau", level: "mastery", difficulty: "mastery", prerequisite: ["tb-f08", "tb-f09"],
+    title: "Independent build: revenue by region, colored by status",
+    objective: "Build a complete view from a plain-language stakeholder request with no shelf names given, then justify the design choice.",
+    build() {
+      return {
+        scenarioHtml: `A regional director asks: <b>"Show me total revenue by region, and let me see how much of it is completed vs. returned vs. cancelled, all in one view, don't just filter down to one status."</b>`,
+        slots: [
+          { key: "rows", label: "Rows shelf", options: SHELF_OPTIONS_DIM },
+          { key: "columns", label: "Columns shelf", options: [{ value: "none", label: "(leave off the view)" }, { value: "amount", label: "amount" }] },
+          { key: "agg", label: "Aggregation on amount", options: [{ value: "SUM", label: "SUM" }, { value: "AVG", label: "AVG" }, { value: "COUNT", label: "COUNT" }] },
+          { key: "color", label: "Color shelf", options: SHELF_OPTIONS_DIM },
+        ],
+        correct: { rows: "region", columns: "amount", agg: "SUM", color: "status" },
+      };
+    },
+    written: {
+      label: "Why does coloring by status serve this request better than filtering to one status?",
+      placeholder: "Think about what the director explicitly said they didn't want, and what a stakeholder loses if the view is filtered down to a single status...",
+      check: (text) => /(filter|breakdown|compos|proportion|all statuses|one view|compare)/i.test(text) && text.trim().length > 40,
+      hint: "Mention that the director explicitly asked to see all three statuses together in one view, not filtered to one, Color preserves every status's contribution to the total instead of hiding two-thirds of it." },
+    hints: [
+      "This is every technique from this stage combined: a Dimension on Rows, an aggregated Measure on Columns, and a second Dimension on Color, no shelf names were given, translate the plain-language request yourself.",
+      "\"Total revenue by region\" maps to Rows = region, Columns = SUM(amount), exactly the standard bar-chart pattern from earlier in this stage.",
+      "\"Don't just filter down to one status\" is the request explicitly ruling out Filters, \"let me see how much is each status\" means status belongs on Color instead.",
+      "Rows = region, Columns = amount, Aggregation = SUM, Color = status." ],
+    explanation: { why: "This combines the Rows-Dimension/Columns-Measure bar pattern with a Color-encoded second Dimension, exactly the two building blocks this stage covered, applied together from a plain-language request with no shelf names supplied.", mistake: "Reaching for Filters here, since status is involved, would directly contradict the stated request, the director explicitly wants all three statuses visible at once for comparison, not narrowed down to one.", tip: "When a real request mentions a field but doesn't say \"only show X\" or \"remove X\", that's usually a signal for Color or Detail, not Filters, filtering removes information a stakeholder didn't ask to lose.", business: "This is deliberately the least guided task in this stage, a real stakeholder request never comes with shelf names attached, translating plain business language into the correct Rows/Columns/Color combination is the actual Tableau skill, not memorizing shelf names in isolation." } },
+];
+
+/* ================= grading =================
+   Anti-cheat: a task only records passed=true after 3 CONSECUTIVE
+   correct answers on 3 independently redrawn scenarios (a different
+   random field/value each time), mirroring the Excel library's
+   3-round mutation check but adapted to a discrete-choice UI where
+   there's no formula to silently re-evaluate, the student has to
+   actually resubmit against each fresh draw. */
+const taskState = {}; // id -> { draw, streak }
+function ensureDraw(t) {
+  if (!taskState[t.id]) taskState[t.id] = { draw: t.build(), streak: 0 };
+  return taskState[t.id];
+}
+function checkTask(id) {
+  const t = TASKS.find(x => x.id === id);
+  const st = ensureDraw(t);
+  const resultsEl = document.getElementById("results_" + id);
+  let allCorrect = true;
+  const wrongSlots = [];
+  t.build; // no-op reference to keep build pure/documented
+  st.draw.slots.forEach(slot => {
+    const sel = document.getElementById(`slot_${id}_${slot.key}`);
+    const val = sel ? sel.value : null;
+    if (val !== st.draw.correct[slot.key]) { allCorrect = false; wrongSlots.push(slot.label); }
+  });
+
+  let writtenPass = true;
+  if (t.written) {
+    const writtenText = (document.getElementById("written_" + id) || {}).value || "";
+    writtenPass = t.written.check(writtenText);
+  }
+
+  if (allCorrect && writtenPass) {
+    st.streak++;
+  } else {
+    st.streak = 0;
+  }
+
+  const verdict = document.createElement("div");
+  if (st.streak >= 3) {
+    verdict.className = "feedback ok";
+    verdict.innerHTML = `<b>Correct, 3 fresh scenarios in a row.</b> That's real evidence this wasn't a memorized click sequence, since the field and business ask were re-randomized each time.`;
+    PracticeProgress.recordAttempt(id, true);
+    openTasks.add(id);
+  } else if (allCorrect && !writtenPass) {
+    verdict.className = "feedback bad";
+    verdict.innerHTML = `<b>Shelf choices correct, but the written answer needs more.</b> ${esc(t.written.hint)}`;
+    PracticeProgress.recordAttempt(id, false);
+  } else if (!allCorrect) {
+    verdict.className = "feedback bad";
+    verdict.innerHTML = `<b>Not quite.</b> Re-check: ${wrongSlots.map(esc).join(", ")}. Streak reset, a new scenario has been drawn below.`;
+    PracticeProgress.recordAttempt(id, false);
+    st.draw = t.build();
+  } else {
+    const remaining = 3 - st.streak;
+    verdict.className = "feedback ok";
+    verdict.innerHTML = `<b>Correct (${st.streak}/3).</b> ${remaining} more fresh scenario${remaining === 1 ? "" : "s"} to confirm this wasn't luck.`;
+    PracticeProgress.recordAttempt(id, false);
+    st.draw = t.build();
+  }
+  resultsEl.innerHTML = "";
+  resultsEl.appendChild(verdict);
+  if (st.streak >= 3 && t.explanation) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(t.explanation));
+  renderTasks();
+  renderSkillBar();
+}
+
+/* ================= rendering ================= */
+function tierLabel(tier) { return { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" }[tier]; }
+function renderSkillBar() {
+  const order = ["not-started", "introduced", "practicing", "competent", "mastered"];
+  const wrap = document.getElementById("skillBars");
+  wrap.innerHTML = SKILLS.map(s => {
+    const prog = PracticeProgress.skillProgress(TASKS, s.id);
+    const reachedIdx = order.indexOf(prog.tier);
+    const ladder = order.slice(1).map((t, i) => `<span class="${i + 1 <= reachedIdx ? "reached" : ""}">${tierLabel(t)}</span>`).join("");
+    return `<div class="skillbar">
+      <div class="skillrow">
+        <span style="font-weight:700;font-size:14.5px">${esc(s.label)}</span>
+        <span class="tierpill t-${prog.tier}">${tierLabel(prog.tier)}</span>
+        <div class="skillbarwrap"><div class="fill" style="width:${prog.pct}%"></div></div>
+        <span class="mono" style="font-size:12.5px;color:var(--mut2)">${prog.passedCount} / ${prog.totalCount} tasks</span>
+      </div>
+      <div class="tierladder">${ladder}</div>
+    </div>`;
+  }).join("");
+  const next = PracticeProgress.recommendNext(TASKS);
+  if (!document.getElementById("nextUpBlock")) {
+    const block = document.createElement("div");
+    block.className = "skillbar";
+    block.id = "nextUpBlock";
+    block.innerHTML = `<div class="nextup" id="nextUp"></div>`;
+    wrap.after(block);
+  }
+  const target = document.getElementById("nextUp");
+  const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
+  target.innerHTML = next
+    ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
+    : `<b>What should I do next?</b> All ${TASKS.length} Stage 1 tasks passed. Stages 2-4 aren't built yet.`;
+}
+function buildHintsHtml(hints) {
+  const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
+  return `<div class="hints">${hints.map((h, i) => `<details><summary>${labels[i]}</summary><div class="hbody">${esc(h)}</div></details>`).join("")}</div>`;
+}
+function buildExplainHtml(ex) {
+  if (!ex) return "";
+  const rows = [["Why this works", ex.why], ["Common mistake", ex.mistake], ["Real analyst tip", ex.tip], ["Business interpretation", ex.business]].filter(([, v]) => v);
+  return `<div class="explainbox">${rows.map(([lbl, v]) => `<div class="erow"><div class="elbl">${esc(lbl)}</div><p>${esc(v)}</p></div>`).join("")}</div>`;
+}
+
+const openTasks = new Set();
+const resultsDrafts = {};
+const writtenDrafts = {};
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  TASKS.forEach(t => {
+    const openEl = document.getElementById("body_" + t.id);
+    if (openEl && openEl.classList.contains("open")) openTasks.add(t.id);
+    const res = document.getElementById("results_" + t.id);
+    if (res && res.innerHTML) resultsDrafts[t.id] = res.innerHTML;
+    const wr = document.getElementById("written_" + t.id);
+    if (wr) writtenDrafts[t.id] = wr.value;
+  });
+  list.innerHTML = "";
+  TASKS.forEach((t, idx) => {
+    const state = PracticeProgress.getTaskState(t.id);
+    const prereqsMet = t.prerequisite.every(pid => PracticeProgress.getTaskState(pid).passed);
+    const st = prereqsMet ? ensureDraw(t) : null;
+    const card = document.createElement("div");
+    card.className = "taskcard";
+    card.innerHTML = `
+      <div class="taskhead" data-id="${t.id}">
+        <span class="statusdot ${state.passed ? "passed" : ""}"></span>
+        <span class="tid">${String(idx + 1).padStart(2, "0")}</span>
+        <span class="ttitle">${esc(t.title)}</span>
+        <span class="levelpill ${t.level}">${t.level.replace("semiguided", "semi-guided")}</span>
+      </div>
+      <div class="taskbody${openTasks.has(t.id) ? " open" : ""}" id="body_${t.id}">
+        <div class="objective"><b>Objective:</b> ${esc(t.objective)}</div>
+        ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
+        <div class="scenario">${st.draw.scenarioHtml}</div>
+        ${!state.passed ? `<div class="streakrow">${[0,1,2].map(i => `<span class="streakdot ${i < st.streak ? "hit" : ""}"></span>`).join("")}<span class="mono" style="font-size:11px;color:var(--mut2)">3 correct in a row on fresh scenarios required</span></div>` : ""}
+        <div class="slotgrid">
+          ${st.draw.slots.map(slot => `<div class="slotfield"><label>${esc(slot.label)}</label><select id="slot_${t.id}_${slot.key}">${slot.options.map(o => `<option value="${esc(o.value)}">${esc(o.label)}</option>`).join("")}</select></div>`).join("")}
+        </div>
+        ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
+        <div class="dagctrl">
+          <button class="primary" data-check="${t.id}">&#10003; Check answer</button>
+        </div>
+        <div id="results_${t.id}">${resultsDrafts[t.id] || ""}</div>
+        ${buildHintsHtml(t.hints)}
+        `}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll(".taskhead").forEach(head => {
+    head.addEventListener("click", () => {
+      const body = document.getElementById("body_" + head.dataset.id);
+      body.classList.toggle("open");
+    });
+  });
+  list.querySelectorAll("[data-check]").forEach(btn => {
+    btn.addEventListener("click", () => checkTask(btn.dataset.check));
+  });
+}
+
+renderFieldGrid();
+renderGrid();
+renderSkillBar();
+renderTasks();
+</script>
+<script src="course-rail.js?v=5"></script>
+</body>
+</html>

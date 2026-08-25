@@ -53,6 +53,7 @@
     ["practice-sql.html", "SQL Practice Library"],
     ["practice-excel.html", "Excel Practice Library"],
     ["practice-python.html", "Python Practice Library"],
+    ["practice-tableau.html", "Tableau Practice Library"],
     ["projects.html", "Projects"],
     ["portfolio.html", "My Portfolio"],
     ["career.html", "Career Path"],
