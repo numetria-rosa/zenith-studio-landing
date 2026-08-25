@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Roadmap, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;
+}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:980px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:980px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:14px;font-size:12.5px;flex-wrap:wrap}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--amber)}
+.hero{padding:44px 0 24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(28px,4.5vw,40px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
+.sub{color:var(--mut);font-size:15px;max-width:660px;margin-top:12px}
+.wherebox{background:var(--card);border:1px solid var(--amber);border-radius:12px;padding:18px 22px;margin-top:22px}
+.wherebox .wlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);font-family:'IBM Plex Mono';margin-bottom:8px}
+.wherebox .wtext{font-size:14.5px;color:var(--tx)}
+.wherebox a.wbtn{display:inline-block;margin-top:12px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:13px;padding:8px 16px;border-radius:8px;text-decoration:none}
+.stage{margin-top:40px}
+.stagehead{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+.stagehead .sn{font-family:'IBM Plex Mono';font-weight:700;font-size:11px;color:var(--amber);border:1px solid var(--amber);border-radius:99px;padding:3px 10px}
+.stagehead h2{font-family:'Fraunces';font-size:22px;font-weight:600;letter-spacing:-.01em}
+.stagedesc{font-size:13.5px;color:var(--mut);margin-bottom:16px;max-width:640px}
+.nodegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.node{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:6px;transition:.15s;position:relative}
+.node:hover,.node:focus-visible{border-color:var(--bd2)}
+.node:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+.node.current{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber) inset}
+.node .ntop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.node .ntitle{font-weight:700;font-size:13.5px;color:var(--tx)}
+.node .nmeta{font-size:11.5px;color:var(--mut2);font-family:'IBM Plex Mono'}
+.statuspill{font-family:'IBM Plex Mono';font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:99px;white-space:nowrap;flex-shrink:0}
+.statuspill.done{background:rgba(74,222,149,.14);color:var(--good)}
+.statuspill.current{background:rgba(240,180,41,.16);color:var(--amber)}
+.statuspill.locked{background:var(--card2);color:var(--mut2)}
+.statuspill.available{background:rgba(95,194,232,.14);color:var(--info)}
+.tierpill{font-family:'IBM Plex Mono';font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:2px 7px;border-radius:99px;display:inline-block}
+.tierpill.t-not-started{background:var(--card2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.14);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.14);color:var(--amber)}
+.tierpill.t-competent{background:rgba(74,222,149,.14);color:var(--good)}
+.tierpill.t-mastered{background:var(--good);color:#04210f}
+.simtag{font-size:9.5px;color:var(--mut2);font-family:'IBM Plex Mono'}
+.groupdiv{margin-top:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mut2);font-family:'IBM Plex Mono'}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;font-size:12px;color:var(--mut)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} .nodegrid{grid-template-columns:1fr} h1{font-size:26px} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+  <span class="tag">Data Science &amp; Analysis</span>
+</div></div>
+<div class="coursenav"><div class="in">
+  <a href="dashboard.html">&larr; Dashboard</a>
+  <a href="syllabus.html">Syllabus</a>
+  <a href="mastery-profile.html">Mastery Profile</a>
+  <a href="diagnostic.html">Skill Diagnostic</a>
+  <a href="career.html">Career Path</a>
+</div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Learning Roadmap</span>
+    <h1 class="serif">The whole journey, in one place</h1>
+    <p class="sub">Every module, practice library, and skill in this course, grouped by stage, showing what's done, what's next, and why. Skill status comes from real, persisted practice-task evidence, not a fixed curriculum checklist.</p>
+    <div class="wherebox">
+      <div class="wlbl">Where you are</div>
+      <div class="wtext" id="whereText">Loading your progress&hellip;</div>
+      <a class="wbtn" id="whereBtn" href="dashboard.html">Open Dashboard &rarr;</a>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--good)"></span> Done</span>
+      <span><span class="dot" style="background:var(--amber)"></span> Current / recommended</span>
+      <span><span class="dot" style="background:var(--info)"></span> Available</span>
+      <span><span class="dot" style="background:var(--mut2)"></span> Locked or not started</span>
+    </div>
+  </header>
+
+  <div id="roadmapBody"></div>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Learning Roadmap</footer>
+</div>
+
+<script src="course-progress.js?v=6"></script>
+<script src="practice-progress.js"></script>
+<script src="skill-map.js?v=1"></script>
+<script src="adaptive-engine.js?v=1"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+
+/* Roadmap sections group the 9 skill-map categories (Foundation, Data
+   Handling, Analysis, Visualization, BI, Business Analysis, Automation,
+   Integration, Portfolio) into the 5 stages this page shows, plus which
+   modules and practice libraries belong in each stage. This is a display
+   grouping only, every underlying number still comes straight from
+   CourseProgress/SkillMap, nothing here recomputes evidence itself. */
+const STAGES = [
+  {
+    id: "foundation", num: "01", title: "Foundation", desc: "Where every path starts: what this job is, spreadsheet literacy, and your first real Python.",
+    modules: [0, 1, 2],
+    categories: ["Foundation"],
+  },
+  {
+    id: "analysis", num: "02", title: "Analysis", desc: "Turning raw data into an answer: pandas, cleaning, statistics, and SQL from basics through real business questions.",
+    modules: [3, 4, 5, 6],
+    categories: ["Data Handling", "Analysis"],
+    libraries: ["sql"],
+  },
+  {
+    id: "visualization", num: "03", title: "Visualization & BI", desc: "Showing the finding: charting principles, then Tableau and Power BI judgment (both decision-based simulations, not live tool execution).",
+    modules: [7, 8],
+    categories: ["Visualization", "BI"],
+    libraries: ["tableau", "powerbi"],
+  },
+  {
+    id: "automation", num: "04", title: "Automation", desc: "Making an analysis repeatable instead of one-off: real Python scripts that clean, validate, and report without crashing on bad input.",
+    modules: [],
+    categories: ["Automation"],
+    libraries: ["automation"],
+  },
+  {
+    id: "professional", num: "05", title: "Professional Analysis", desc: "Proving it: cross-tool judgment, a real capstone, a portfolio with evidence behind every claim, and an honest read on career readiness.",
+    modules: [9],
+    categories: ["Business Analysis", "Integration", "Portfolio"],
+    libraries: ["excel", "python", "integrated"],
+  },
+];
+
+const MODULE_TITLES = { 0: "Orientation" };
+CourseProgress.MODULES.forEach(m => { MODULE_TITLES[m.id] = m.title; });
+
+function moduleStatus(id) {
+  if (id === 0) return CourseProgress.getExtra("module0") && CourseProgress.getExtra("module0").visited ? "done" : "available";
+  if (CourseProgress.isModuleComplete(id)) return "done";
+  if (CourseProgress.isUnlocked(id)) return "available";
+  return "locked";
+}
+
+function moduleNode(id) {
+  const status = moduleStatus(id);
+  const href = id === 0 ? "module-00.html" : `module-${String(id).padStart(2, "0")}.html`;
+  const pillLabel = { done: "Done", available: "Available", locked: "Locked", current: "Current" }[status];
+  return `<a class="node ${status === "available" ? "current" : ""}" href="${href}">
+    <div class="ntop"><span class="ntitle">Module ${id}: ${esc(MODULE_TITLES[id] || "")}</span><span class="statuspill ${status}">${pillLabel}</span></div>
+    <span class="nmeta">Course module</span>
+  </a>`;
+}
+
+const LIB_META = {
+  sql: { file: "practice-sql.html", label: "SQL Practice Library" },
+  excel: { file: "practice-excel.html", label: "Excel Practice Library" },
+  python: { file: "practice-python.html", label: "Python Practice Library" },
+  tableau: { file: "practice-tableau.html", label: "Tableau Practice Library" },
+  powerbi: { file: "practice-powerbi.html", label: "Power BI Practice Library" },
+  automation: { file: "practice-automation.html", label: "Automation Practice Library" },
+  integrated: { file: "practice-integrated.html", label: "Integrated Cross-Tool Challenges" },
+};
+
+function libraryNode(tool) {
+  const meta = LIB_META[tool];
+  const tasks = SkillMap.TASKS.filter(t => t.tool === tool);
+  const passed = tasks.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
+  const status = passed === 0 ? "available" : (passed === tasks.length ? "done" : "current");
+  const pillLabel = { done: "Done", available: "Available", current: "In progress" }[status];
+  return `<a class="node ${status === "current" ? "current" : ""}" href="${meta.file}">
+    <div class="ntop"><span class="ntitle">${esc(meta.label)}</span><span class="statuspill ${status}">${pillLabel}</span></div>
+    <span class="nmeta">${passed} / ${tasks.length} tasks passed</span>
+  </a>`;
+}
+
+function skillNode(m) {
+  const prog = SkillMap.masterSkillProgress(m.id);
+  const tierLabel = { "not-started": "Not started", introduced: "Introduced", practicing: "Practicing", competent: "Competent", mastered: "Mastered" }[prog.tier];
+  const href = m.special === "portfolio" ? "projects.html" : "mastery-profile.html";
+  return `<a class="node" href="${href}">
+    <div class="ntop"><span class="ntitle">${esc(m.label)}</span><span class="tierpill t-${prog.tier}">${tierLabel}</span></div>
+    <span class="nmeta">${prog.passedCount} / ${prog.totalCount} evidence items</span>
+    ${m.simulation ? '<span class="simtag">Simulation, judgment-based, not live tool execution</span>' : ""}
+  </a>`;
+}
+
+function renderRoadmap() {
+  const body = document.getElementById("roadmapBody");
+  body.innerHTML = "";
+  STAGES.forEach(stage => {
+    const section = document.createElement("div");
+    section.className = "stage";
+    const modulesHtml = stage.modules.map(moduleNode).join("");
+    const libsHtml = (stage.libraries || []).map(libraryNode).join("");
+    const skills = SkillMap.MASTER_SKILLS.filter(m => stage.categories.indexOf(m.category) !== -1);
+    const skillsHtml = skills.map(skillNode).join("");
+    section.innerHTML = `
+      <div class="stagehead"><span class="sn">${stage.num}</span><h2 class="serif">${esc(stage.title)}</h2></div>
+      <p class="stagedesc">${esc(stage.desc)}</p>
+      ${modulesHtml ? `<div class="groupdiv">Modules</div><div class="nodegrid" style="margin-top:8px">${modulesHtml}</div>` : ""}
+      ${libsHtml ? `<div class="groupdiv">Practice libraries</div><div class="nodegrid" style="margin-top:8px">${libsHtml}</div>` : ""}
+      ${skillsHtml ? `<div class="groupdiv">Skills</div><div class="nodegrid" style="margin-top:8px">${skillsHtml}</div>` : ""}
+    `;
+    body.appendChild(section);
+  });
+
+  const overall = CourseProgress.overall();
+  const totalTasks = SkillMap.TASKS.length;
+  const passedTasks = SkillMap.totalTasksPassed();
+  const rec = (typeof AdaptiveEngine !== "undefined") ? AdaptiveEngine.recommend() : null;
+  const whereText = document.getElementById("whereText");
+  const whereBtn = document.getElementById("whereBtn");
+  if (passedTasks === 0 && overall.completed === 0) {
+    whereText.textContent = "You haven't started yet. Module 0 (Orientation) is the right place to begin, it's a short, honest self-check that routes you to the right starting module.";
+    whereBtn.href = "module-00.html";
+    whereBtn.textContent = "Start Module 0 →";
+  } else if (rec && !rec.done && rec.primary) {
+    const libLabel = LIB_META[rec.primary.tool] ? LIB_META[rec.primary.tool].label : rec.primary.tool;
+    whereText.textContent = `${overall.completed} / ${overall.total} modules complete, ${passedTasks} / ${totalTasks} practice tasks passed. Recommended next: a ${rec.primary.level.replace("semiguided","semi-guided")} task in the ${libLabel}. ${rec.primary.why[0]}`;
+    whereBtn.href = LIB_META[rec.primary.tool] ? LIB_META[rec.primary.tool].file : "dashboard.html";
+    whereBtn.textContent = `Open ${libLabel} →`;
+  } else {
+    whereText.textContent = `${overall.completed} / ${overall.total} modules complete, ${passedTasks} / ${totalTasks} practice tasks passed. Every practice task in the course has been passed at least once, the Integrated Challenges and Portfolio Projects are the strongest next step to build toward something you can show.`;
+    whereBtn.href = "projects.html";
+    whereBtn.textContent = "Open Projects →";
+  }
+}
+
+renderRoadmap();
+</script>
+<script src="course-rail.js?v=6"></script>
+</body>
+</html>
