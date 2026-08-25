@@ -27,6 +27,8 @@ h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-
 .disclosure{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
 .disclosure b{color:var(--amber)}
 .grid{display:grid;gap:14px;margin-top:20px}
+.stagelbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);margin-top:22px;font-family:'IBM Plex Mono'}
+.stagelbl:first-child{margin-top:0}
 .pcard{display:block;width:100%;text-align:left;font-family:'IBM Plex Sans';background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px 22px;cursor:pointer;transition:.15s}
 .pcard:hover,.pcard:focus-visible{border-color:var(--bd2)}
 .pcard:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
@@ -136,7 +138,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <footer>Zenith Lab · Data Science &amp; Analysis · Projects</footer>
 </div>
 
-<script src="course-progress.js?v=5"></script>
+<script src="course-progress.js?v=6"></script>
 <script>
 const DETAILS = {
   1: {
@@ -267,22 +269,32 @@ function rubricTotal(id){
 function renderList(){
   const grid = document.getElementById("projectGrid");
   grid.innerHTML = "";
-  CourseProgress.PROJECTS.forEach(p => {
-    const state = projectState(p.id);
-    const score = rubricTotal(p.id);
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "pcard";
-    let statusBadge = `<span class="badge notstarted">Not started</span>`;
-    if (state.completed) statusBadge = `<span class="badge done">✓ Completed</span>`;
-    else if (score > 0) statusBadge = `<span class="badge progress">In progress</span>`;
-    card.innerHTML = `
-      <div class="ptop"><div class="pt">${p.title}</div><span class="badge capstone">${p.difficulty}</span></div>
-      <div class="pd">${p.summary}</div>
-      <div class="pmeta">${statusBadge}<span class="pscore">${score > 0 ? `Rubric: ${score}%` : (p.modules && p.modules.includes(9) ? "Module 9 capstone option" : "Portfolio project")}</span></div>
-    `;
-    card.addEventListener("click", () => openProject(p.id));
-    grid.appendChild(card);
+  const stages = [];
+  CourseProgress.PROJECTS.forEach(p => { if (stages.indexOf(p.stage) === -1) stages.push(p.stage); });
+  stages.sort((a, b) => a - b);
+  stages.forEach(stageNum => {
+    const stageProjects = CourseProgress.PROJECTS.filter(p => p.stage === stageNum);
+    const stageLbl = document.createElement("div");
+    stageLbl.className = "stagelbl";
+    stageLbl.textContent = `Stage ${stageNum} · ${stageProjects[0].stageLabel}`;
+    grid.appendChild(stageLbl);
+    stageProjects.forEach(p => {
+      const state = projectState(p.id);
+      const score = rubricTotal(p.id);
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "pcard";
+      let statusBadge = `<span class="badge notstarted">Not started</span>`;
+      if (state.completed) statusBadge = `<span class="badge done">✓ Completed</span>`;
+      else if (score > 0) statusBadge = `<span class="badge progress">In progress</span>`;
+      card.innerHTML = `
+        <div class="ptop"><div class="pt">${p.title}</div><span class="badge capstone">${p.difficulty}</span></div>
+        <div class="pd">${p.summary}</div>
+        <div class="pmeta">${statusBadge}<span class="pscore">${score > 0 ? `Rubric: ${score}%` : (p.modules && p.modules.includes(9) ? "Module 9 capstone option" : "Portfolio project")}</span></div>
+      `;
+      card.addEventListener("click", () => openProject(p.id));
+      grid.appendChild(card);
+    });
   });
 }
 
