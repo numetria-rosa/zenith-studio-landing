@@ -115,11 +115,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Tableau &middot; Stages 1-2 of 4</span>
+    <span class="eyebrow">Practice Library &middot; Tableau &middot; Stages 1-3 of 4</span>
     <h1 class="serif">Tableau Practice Library</h1>
     <p class="sub">Decision-based practice for the reasoning behind a Tableau view: which field is a Dimension vs a Measure, which shelf it belongs on, discrete vs continuous, and which chart shape a given combination of fields actually calls for.</p>
     <div class="honestnote"><b>Honest scope note, please read:</b> this is a <b>practice simulation</b>, not real Tableau. Nothing here renders inside an actual Tableau workbook, and no click is graded by executing real Tableau software, this page can't run in a browser the way the Excel formula engine or the Python/SQL sandboxes do. What it genuinely checks is the reasoning: given a real field from a real dataset, do you know whether it's a Dimension or a Measure, which shelf it belongs on, and why. Every scenario is re-randomized on every attempt (a different field, a different business ask) specifically so a memorized click sequence can't pass, only the underlying rule can. Treat this as a rehearsal for the concepts, not a substitute for opening Tableau Public or Tableau Desktop and building a real workbook.</div>
-    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals: Dimensions vs Measures, shelves, discrete vs continuous, chart choice) and Stage 2 (Visual Analytics: quick table calculations, Compute Using, reference lines, sorting, trend lines, Top N filtering) are complete, 20 tasks. Stages 3-4 (Calculated Fields, Dashboards &amp; Storytelling) are not yet built.</div>
+    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals), Stage 2 (Visual Analytics: quick table calculations, Compute Using, reference lines, sorting, trend lines, Top N filtering), and Stage 3 (Calculated Fields: IF/CASE syntax, string concatenation, row-level vs aggregate calculations, and FIXED/INCLUDE/EXCLUDE LOD expressions) are complete, 30 tasks. Stage 4 (Dashboards &amp; Storytelling) is not yet built.</div>
   </header>
 
   <div class="sheetblock">
@@ -204,12 +204,16 @@ const SKILL_ID_SHELVES = "tableau-shelves";
 const SKILL_ID_CHARTS = "tableau-chart-choice";
 const SKILL_ID_TABLECALC = "tableau-table-calcs";
 const SKILL_ID_ANALYTICS = "tableau-analytics-pane";
+const SKILL_ID_CALCFIELDS = "tableau-calc-fields";
+const SKILL_ID_LOD = "tableau-lod";
 const SKILLS = [
   { id: SKILL_ID_FIELDS, label: "Tableau Field Types" },
   { id: SKILL_ID_SHELVES, label: "Tableau Shelves & Filters" },
   { id: SKILL_ID_CHARTS, label: "Tableau Chart Choice" },
   { id: SKILL_ID_TABLECALC, label: "Tableau Table Calculations" },
   { id: SKILL_ID_ANALYTICS, label: "Tableau Analytics Pane" },
+  { id: SKILL_ID_CALCFIELDS, label: "Tableau Calculated Fields" },
+  { id: SKILL_ID_LOD, label: "Tableau LOD Expressions" },
 ];
 
 const FIELD_OPTIONS = FIELDS.map(f => ({ value: f, label: f }));
@@ -637,6 +641,228 @@ const TASKS = [
       "\"A single line showing what the average region brings in\" is a Table-scoped reference line, the same pattern as the very first task in this stage.",
       "Quick table calculation = Rank, Reference line scope = Table." ],
     explanation: { why: "Rank and a reference line answer two genuinely different questions, Rank orders the regions relative to EACH OTHER, the reference line benchmarks each region against the OVERALL average, the VP's request explicitly asked for both, ordering and above/below-average context, in the same view.", mistake: "Providing only Rank without the reference line tells the VP the order but not how close regions are to average, providing only the reference line tells them who's above or below average but not their exact order, either alone leaves half the request unanswered.", tip: "When a stakeholder request bundles two distinct asks in one sentence, \"rank them AND show me the average\", that's usually a signal to combine two separate Tableau features rather than searching for one feature that does both.", business: "This is deliberately the least guided task in this stage, a real VP request never comes pre-labeled with \"use Rank\" or \"use a reference line\", recognizing that a single plain-language sentence sometimes requires two separate techniques stacked together is the actual skill." } },
+
+  /* ---- Stage 3: Calculated Fields ---- */
+  { id: "tb-c01", skill: SKILL_ID_CALCFIELDS, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f04"],
+    title: "Pick the correctly formed IF calculation",
+    objective: "Recognize valid Tableau calculation syntax for a simple threshold flag, and the common ways it breaks.",
+    build() {
+      const threshold = pick([100, 150, 200, 250]);
+      const correct = `IF [amount] > ${threshold} THEN "High Value" ELSE "Standard" END`;
+      const distractors = [
+        `IF [amount] > ${threshold} THEN "High Value" ELSE "Standard"`,
+        `IF amount > ${threshold} THEN "High Value" ELSE "Standard" END`,
+        `IF [amount] > ${threshold} "High Value" ELSE "Standard" END`,
+      ];
+      const options = pickN([correct, ...distractors], 4).map((f, i) => ({ value: f === correct ? "correct" : "wrong" + i, label: f }));
+      return {
+        scenarioHtml: `You want a calculated field flagging orders over $${threshold} as <b>"High Value"</b>, everything else as <b>"Standard"</b>. Which formula is correctly formed Tableau calculation syntax?`,
+        slots: [{ key: "formula", label: "Pick the correct formula", options }],
+        correct: { formula: "correct" },
+      };
+    },
+    hints: [
+      "Every IF calculation in Tableau needs a matching END keyword, missing it is one of the most common syntax errors.",
+      "Field names inside a Tableau calculation are wrapped in square brackets, [amount], not written bare.",
+      "The THEN keyword has to appear between the condition and its result, IF ... THEN result ELSE result END is the full required shape.",
+      "The correct formula has all three: [amount] in brackets, an explicit THEN, and a closing END." ],
+    explanation: { why: "Tableau's calculation language requires IF/THEN/ELSE/END as a complete, matched set, and every field reference needs square brackets, both are non-negotiable syntax rules, not style preferences.", mistake: "Dropping END is probably the single most common Tableau calculation syntax error, the calculation editor will flag it as invalid and won't let you save until it's fixed, a useful signal, but one worth recognizing on sight rather than debugging by trial and error.", tip: "Reading a Tableau calculation by identifying its keywords first, IF, THEN, ELSE, END, before worrying about the condition's logic, is a fast way to catch a structural error before a logical one.", business: "A High Value / Standard flag like this is a common first calculated field a new analyst builds, it's also usually the first place they'll hit a syntax error, recognizing the shape on sight saves real debugging time." } },
+
+  { id: "tb-c02", skill: SKILL_ID_CALCFIELDS, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-c01"],
+    title: "Pick the correct boolean comparison",
+    objective: "Recognize valid syntax for a calculated field that returns True/False.",
+    build() {
+      const status = pick(["Completed", "Returned", "Cancelled"]);
+      const correct = `[status] = "${status}"`;
+      const distractors = [
+        `status = "${status}"`,
+        `[status] == "${status}"`,
+        `[status] = ${status}`,
+      ];
+      const options = pickN([correct, ...distractors], 4).map((f, i) => ({ value: f === correct ? "correct" : "wrong" + i, label: f }));
+      return {
+        scenarioHtml: `You want a calculated field that returns True when a row's status is <b>"${status}"</b>, False otherwise, nothing else, no IF needed. Which formula is correctly formed?`,
+        slots: [{ key: "formula", label: "Pick the correct formula", options }],
+        correct: { formula: "correct" },
+      };
+    },
+    hints: [
+      "A bare comparison (no IF at all) already returns True or False on its own, Tableau doesn't need IF/THEN for a plain boolean.",
+      "Field names need square brackets, [status], and a single equals sign, =, not a double == the way some programming languages use.",
+      "Text values being compared against need quotes around them, a bare word without quotes would be read as a field name, not a literal string.",
+      "[status] = \"<the status value named above>\" is the correctly formed version." ],
+    explanation: { why: "Tableau's calculation language uses a single = for equality (not a programming-language-style ==), and any literal text value needs to be quoted, otherwise Tableau tries to interpret it as another field name and the calculation fails to validate.", mistake: "Forgetting brackets around a field name, or quotes around a literal text value, are both extremely common early mistakes, and both produce a calculation that won't validate at all, rather than a silently wrong one.", tip: "A plain comparison like this, with no IF at all, is already a complete, valid calculated field, wrapping it in an unnecessary IF...THEN True ELSE False END produces the same result with more typing.", business: "Boolean calculated fields like this are frequently used directly on the Filters shelf, or as the basis for a Color or Detail encoding, getting the bare syntax right is foundational to nearly everything built on top of it." } },
+
+  { id: "tb-c03", skill: SKILL_ID_CALCFIELDS, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-c01"],
+    title: "Pick the correct string concatenation",
+    objective: "Recognize Tableau's string concatenation operator, and the mistake of reaching for a spreadsheet habit instead.",
+    build() {
+      const correct = `[region] + " - " + [category]`;
+      const distractors = [
+        `[region] & " - " & [category]`,
+        `CONCAT([region], [category])`,
+        `[region] + " - " + category`,
+      ];
+      const options = pickN([correct, ...distractors], 4).map((f, i) => ({ value: f === correct ? "correct" : "wrong" + i, label: f }));
+      return {
+        scenarioHtml: `You want a calculated field combining region and category into one label, like <b>"West - Electronics"</b>, with a dash and spaces between them. Which formula is correctly formed Tableau syntax?`,
+        slots: [{ key: "formula", label: "Pick the correct formula", options }],
+        correct: { formula: "correct" },
+      };
+    },
+    hints: [
+      "Tableau uses + to concatenate strings, the same symbol as addition, not Excel's & operator, that's a real, common habit-carryover mistake.",
+      "CONCAT() does exist in Tableau, but it needs every literal piece, including the \" - \" separator, spelled out as its own argument, the two-argument version shown here would just glue region and category together with no separator at all.",
+      "Every field reference still needs square brackets, a bare word like category without brackets would break the formula.",
+      `[region] + " - " + [category] is the correctly formed version.` ],
+    explanation: { why: "Tableau overloads + to mean both numeric addition and string concatenation, depending on the type of its operands, this is different from Excel's dedicated & concatenation operator, a common mix-up for anyone coming from spreadsheets.", mistake: "Using & out of spreadsheet habit doesn't just produce a wrong result, in Tableau it isn't a valid operator between strings at all, the calculation fails to validate rather than silently doing the wrong thing.", tip: "CONCAT() is a legitimate alternative to +, but every piece, including literal separators like \" - \", has to be passed as its own argument, CONCAT([region],\" - \",[category]) would be an equally correct third option.", business: "A combined region-category label like this is a common way to create a single, readable Dimension for a crosstab row or a tooltip, exactly the kind of small calculated field a real analyst writes several times a week." } },
+
+  { id: "tb-c04", skill: SKILL_ID_CALCFIELDS, tool: "tableau", level: "semiguided", difficulty: "core", prerequisite: ["tb-c01"],
+    title: "Pick the correct CASE statement for three outcomes",
+    objective: "Recognize CASE syntax as a cleaner alternative to nested IFs for an exact-match, multi-outcome rule.",
+    build() {
+      const correct = `CASE [region]\nWHEN "West" THEN "Region A"\nWHEN "East" THEN "Region B"\nELSE "Other"\nEND`;
+      const distractors = [
+        `CASE [region]\nWHEN "West" THEN "Region A"\nWHEN "East" THEN "Region B"\nELSE "Other"`,
+        `CASE\nWHEN [region] = "West" THEN "Region A"\nWHEN [region] = "East" THEN "Region B"\nEND`,
+        `IF [region] WHEN "West" THEN "Region A" WHEN "East" THEN "Region B" ELSE "Other" END`,
+      ];
+      const options = pickN([correct, ...distractors], 4).map((f, i) => ({ value: f === correct ? "correct" : "wrong" + i, label: f }));
+      return {
+        scenarioHtml: `You want to relabel region values: <b>"West" &rarr; "Region A"</b>, <b>"East" &rarr; "Region B"</b>, and every other region &rarr; <b>"Other"</b>. Which formula is correctly formed Tableau syntax?`,
+        slots: [{ key: "formula", label: "Pick the correct formula", options }],
+        correct: { formula: "correct" },
+      };
+    },
+    hints: [
+      "CASE needs a matching END, exactly like IF does, missing it is the same common mistake as task 1 in this stage.",
+      "CASE [field] WHEN value THEN result is the shape for testing one field against several exact values, it's a cleaner alternative to writing IF [field]=\"West\" THEN ... ELSEIF [field]=\"East\" THEN ... over and over.",
+      "Mixing CASE and IF/WHEN keywords together (IF...WHEN...) isn't valid syntax, each keyword belongs to a different, complete construct.",
+      "CASE [region] WHEN \"West\" THEN \"Region A\" WHEN \"East\" THEN \"Region B\" ELSE \"Other\" END is the correctly formed version." ],
+    explanation: { why: "CASE tests one field against a series of exact values in sequence, stopping at the first match, it needs the same END that closes an IF, and ELSE still covers every value that didn't match any WHEN.", mistake: "CASE only tests for exact equality against a single field, it can't express a range condition (amount > 200) the way IF can, reaching for CASE on a range-based rule instead of an exact-match rule is a common confusion between the two constructs.", tip: "When a business rule is really a lookup table, one field, several specific values, each mapping to a specific result, CASE is usually more readable than an equivalent chain of IF/ELSEIF, even though both would work.", business: "Relabeling raw category codes or region abbreviations into stakeholder-friendly names is one of CASE's most common real uses, turning a data-entry-friendly value into a presentation-friendly one without touching the underlying data." } },
+
+  { id: "tb-c05", skill: SKILL_ID_CALCFIELDS, tool: "tableau", level: "semiguided", difficulty: "core", prerequisite: ["tb-v01"],
+    title: "Row-level calculation or aggregate calculation?",
+    objective: "Distinguish a calculated field that runs once per row from one that only makes sense after aggregation.",
+    build() {
+      const rowLevel = Math.random() < 0.5;
+      const desc = rowLevel
+        ? `[amount] * 0.08 (an 8% tax amount, computed for each individual order)`
+        : `SUM([amount]) / COUNTD([order_id]) (an average order value, computed from a total and a count)`;
+      return {
+        scenarioHtml: `Look at this calculated field: <b class="mono">${esc(desc)}</b>`,
+        slots: [{ key: "kind", label: "Is this a row-level calculation or an aggregate calculation?", options: [{ value: "row", label: "Row-level (computed once per row, before aggregation)" }, { value: "aggregate", label: "Aggregate (only makes sense after aggregating rows together)" }] }],
+        correct: { kind: rowLevel ? "row" : "aggregate" },
+      };
+    },
+    hints: [
+      "A row-level calculation references only fields that already exist on each individual row, and produces one output per row, before any aggregation happens.",
+      "An aggregate calculation contains an aggregation function itself, SUM, AVG, COUNTD, it can only be evaluated after rows have been grouped together, not on a single row in isolation.",
+      "Ask: could this formula be computed for exactly one row, on its own, with no other rows involved? If yes, row-level, if the formula needs a group of rows to mean anything, aggregate.",
+      "[amount] * 0.08 = row-level. SUM([amount]) / COUNTD([order_id]) = aggregate." ],
+    explanation: { why: "Row-level calculations are evaluated independently for every row in the underlying data, before Tableau does any aggregation, aggregate calculations contain an aggregation function and can only be evaluated on a group of rows, they behave completely differently once placed on a view.", mistake: "Assuming every calculated field behaves the same way regardless of whether it contains an aggregation function is a common early misunderstanding, a row-level calc can be used inside a Level of Detail expression or a Filter applied before aggregation, an aggregate calc generally can't.", tip: "The fastest way to tell them apart, look inside the formula for an aggregation function name (SUM, AVG, COUNT, COUNTD, MIN, MAX), its presence is what makes a calculation aggregate rather than row-level.", business: "This distinction matters most once filtering enters the picture, a row-level tax calculation can be safely used in an ordinary data-source filter, an aggregate average-order-value calculation generally needs a different kind of filter (a Context Filter or a Filter placed after the aggregation), using the wrong kind of filter with the wrong kind of calculation is a real, common source of quietly wrong numbers." } },
+
+  { id: "tb-c06", skill: SKILL_ID_LOD, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-c05"],
+    title: "Pick the right LOD keyword: FIXED",
+    objective: "Recognize when a calculation needs to ignore the view entirely and compute at one specific, fixed level of detail.",
+    build() {
+      const dim = pick(["customer_segment", "region", "category"]);
+      return {
+        scenarioHtml: `You want total revenue per <b class="mono">${esc(dim)}</b>, computed <b>independently of whatever other Dimensions or filters end up on the view</b>, it should always mean exactly the same thing no matter what else is added.`,
+        slots: [{ key: "keyword", label: "Which LOD keyword fits?", options: [{ value: "FIXED", label: `{ FIXED [${dim}] : SUM([amount]) }` }, { value: "INCLUDE", label: `{ INCLUDE [${dim}] : SUM([amount]) }` }, { value: "EXCLUDE", label: `{ EXCLUDE [${dim}] : SUM([amount]) }` }] }],
+        correct: { keyword: "FIXED" },
+      };
+    },
+    hints: [
+      "\"Independently of whatever else is on the view\" is exactly what FIXED means, it computes at exactly the Dimension(s) you name, ignoring everything else, always.",
+      "INCLUDE and EXCLUDE both still respond to the view's own Dimensions in some way, FIXED is the only one of the three that's genuinely independent of the view.",
+      "{ FIXED [<the Dimension named above>] : SUM([amount]) } computes total revenue per that Dimension, the same number no matter what else is on the view.",
+      "FIXED." ],
+    explanation: { why: "A FIXED LOD expression computes its aggregation at exactly the Dimension(s) listed inside the braces, completely ignoring any other Dimensions present on the view, that's what makes its result stable and independent regardless of how the view changes around it.", mistake: "Reaching for a plain aggregated Measure instead of a FIXED LOD expression when the view already has other Dimensions on it would compute the total at whatever level of detail the VIEW happens to be at, not the fixed level actually wanted, producing a different, view-dependent number.", tip: "FIXED is the LOD keyword to reach for whenever a business definition needs to stay stable and comparable no matter what else gets added to a dashboard around it, INCLUDE and EXCLUDE are both more entangled with the view's own structure.", business: "A customer segment's total revenue is exactly the kind of number that needs to mean the same thing whether it's shown alone or alongside a dozen other breakdowns on a dashboard, FIXED is what guarantees that consistency." } },
+
+  { id: "tb-c07", skill: SKILL_ID_LOD, tool: "tableau", level: "challenge", difficulty: "challenge", prerequisite: ["tb-c06"],
+    title: "FIXED for a per-row benchmark",
+    objective: "Use a FIXED LOD expression to attach a group-level benchmark to every individual row.",
+    build() {
+      const dim = pick(["region", "customer_segment"]);
+      return {
+        scenarioHtml: `You want each individual order's row to also show <b>the average order amount for its own ${esc(dim)}</b>, computed once per ${esc(dim)}, independent of any filter or other Dimension on the view.`,
+        slots: [{ key: "formula", label: "Which LOD expression fits?", options: [
+          { value: "correct", label: `{ FIXED [${dim}] : AVG([amount]) }` },
+          { value: "wrong1", label: `AVG([amount])` },
+          { value: "wrong2", label: `{ INCLUDE [${dim}] : AVG([amount]) }` },
+          { value: "wrong3", label: `{ FIXED [amount] : AVG([${dim}]) }` },
+        ] }],
+        correct: { formula: "correct" },
+      };
+    },
+    hints: [
+      "The benchmark is scoped to \"its own group\", the Dimension named in the scenario above belongs inside the FIXED braces, not as the Measure being averaged.",
+      "A plain AVG([amount]) with no LOD wrapper would just show the same view-level average on every row, not a per-group benchmark attached to each row individually.",
+      "The Dimension goes inside the braces after FIXED, the Measure being aggregated goes after the colon, mixing them up (averaging the Dimension, fixing on the Measure) produces a formula that doesn't even make sense.",
+      "{ FIXED [<the Dimension named above>] : AVG([amount]) } is correct." ],
+    explanation: { why: "A FIXED LOD expression computes once per distinct value of the Dimension inside its braces, then that same computed value is available on every row belonging to that group, exactly how a per-group benchmark gets attached to individual rows.", mistake: "A plain AVG([amount]) has no independent level of detail, it just aggregates to whatever the current view's granularity is, on a row-level view it would return the same overall average on every row, not a per-region or per-segment figure.", tip: "The classic FIXED LOD pattern, attach a group average or total to every individual row, so each row can be compared against its own group's benchmark, is one of the most common real uses of LOD expressions in analyst work.", business: "Flagging \"orders above their own region's average\" (the next task in this stage) depends entirely on first having this per-row benchmark calculated correctly, LOD expressions are usually a building block for a further comparison, not the final deliverable on their own." } },
+
+  { id: "tb-c08", skill: SKILL_ID_LOD, tool: "tableau", level: "challenge", difficulty: "challenge", prerequisite: ["tb-c06"],
+    title: "Pick the right LOD keyword: INCLUDE",
+    objective: "Recognize when a calculation should add a finer Dimension to whatever's already on the view, not replace it.",
+    build() {
+      return {
+        scenarioHtml: `Your view currently has <b class="mono">region</b> on Rows. You want a calculation showing average order amount <b>per customer_segment WITHIN each region</b>, one level finer than what's already on the view, and it should keep working correctly if someone later adds another Dimension to the view too.`,
+        slots: [{ key: "keyword", label: "Which LOD keyword fits?", options: [{ value: "FIXED", label: "{ FIXED [customer_segment] : AVG([amount]) }" }, { value: "INCLUDE", label: "{ INCLUDE [customer_segment] : AVG([amount]) }" }, { value: "EXCLUDE", label: "{ EXCLUDE [customer_segment] : AVG([amount]) }" }] }],
+        correct: { keyword: "INCLUDE" },
+      };
+    },
+    hints: [
+      "INCLUDE adds a finer Dimension to whatever's already on the view, it computes at (view's Dimensions + the INCLUDEd one) together, not independently of the view the way FIXED does.",
+      "FIXED would ignore region entirely and compute per customer_segment company-wide, that's not \"within each region\", it's a different, broader number.",
+      "The scenario specifically says it should adapt if more Dimensions are added later, that adaptability is exactly what distinguishes INCLUDE from FIXED's rigid independence.",
+      "INCLUDE." ],
+    explanation: { why: "INCLUDE computes at a finer level of detail than the view by adding the named Dimension to whatever Dimensions the view already has, unlike FIXED, it isn't independent of the view, it's the view's own detail plus one more layer.", mistake: "Reaching for FIXED here would ignore region entirely (since FIXED only respects the Dimension named inside its own braces), producing a company-wide per-segment average instead of the within-each-region average actually requested.", tip: "FIXED ignores the view, INCLUDE adds detail to the view, EXCLUDE removes detail from the view, that three-way contrast, ignore / add / remove, is the fastest way to keep all three LOD keywords straight.", business: "\"Within each region\" is a very common real qualifier in business requests, average deal size within each sales territory, conversion rate within each cohort, INCLUDE is the LOD keyword built for exactly that shape of request." } },
+
+  { id: "tb-c09", skill: SKILL_ID_LOD, tool: "tableau", level: "challenge", difficulty: "challenge", prerequisite: ["tb-c08"],
+    title: "Pick the right LOD keyword: EXCLUDE",
+    objective: "Recognize when a calculation should ignore one specific Dimension that's already on the view, not add to or replace it entirely.",
+    build() {
+      return {
+        scenarioHtml: `Your view has both <b class="mono">region</b> and <b class="mono">category</b> on Rows, broken down two levels deep. You want a calculation showing <b>each region's average order amount across all categories combined</b>, ignoring the category breakdown that's otherwise on the view.`,
+        slots: [{ key: "keyword", label: "Which LOD keyword fits?", options: [{ value: "FIXED", label: "{ FIXED [region] : AVG([amount]) }" }, { value: "INCLUDE", label: "{ INCLUDE [category] : AVG([amount]) }" }, { value: "EXCLUDE", label: "{ EXCLUDE [category] : AVG([amount]) }" }] }],
+        correct: { keyword: "EXCLUDE" },
+      };
+    },
+    hints: [
+      "EXCLUDE removes a Dimension that's already on the view from the calculation's grouping, without needing to know or name every OTHER Dimension that's also present.",
+      "You want to keep the region breakdown (it's still on the view) but ignore just the category breakdown, that's removing one specific piece of the view's detail, not ignoring the view entirely.",
+      "FIXED [region] would also happen to produce a similar-looking number here, but only by coincidence, since region is the only other Dimension present, FIXED works by ignoring the view entirely and would break the moment a third Dimension got added, EXCLUDE [category] stays correct regardless.",
+      "EXCLUDE." ],
+    explanation: { why: "EXCLUDE removes one specific, named Dimension from the calculation's level of detail while leaving every other Dimension on the view intact, it's the only one of the three LOD keywords that works relative to whatever else happens to be on the view rather than specifying an absolute level.", mistake: "Using FIXED [region] instead of EXCLUDE [category] can produce the same-looking number today, but for the wrong reason, FIXED ignores the view entirely rather than removing just category, the two calculations would diverge the moment a third Dimension was added to the view, EXCLUDE would keep working correctly, FIXED would not.", tip: "Whenever a request says \"ignore just this one breakdown, but keep everything else that's on the view\", that's EXCLUDE, it's defined relative to the view, not as an absolute, view-independent level the way FIXED is.", business: "A regional manager who's drilled into category-level detail but wants a reminder of their region's overall average, without losing the category breakdown they're currently looking at, needs exactly this EXCLUDE pattern, a benchmark that survives however deep they've drilled in." } },
+
+  { id: "tb-c10", skill: SKILL_ID_LOD, tool: "tableau", level: "mastery", difficulty: "mastery", prerequisite: ["tb-c07", "tb-c09"],
+    title: "Independent build: flag orders above their own segment's average",
+    objective: "Combine a FIXED LOD expression with an IF calculation, from a plain-language business rule with no formula given.",
+    build() {
+      return {
+        scenarioHtml: `A stakeholder asks: <b>"I want a calculated field that flags each order as 'Above Average' or 'Below Average', compared to the average order amount for that order's OWN customer_segment, not the company-wide average."</b>`,
+        slots: [{ key: "formula", label: "Which formula correctly implements this?", options: [
+          { value: "correct", label: `IF [amount] > { FIXED [customer_segment] : AVG([amount]) } THEN "Above Average" ELSE "Below Average" END` },
+          { value: "wrong1", label: `IF [amount] > AVG([amount]) THEN "Above Average" ELSE "Below Average" END` },
+          { value: "wrong2", label: `IF { FIXED [customer_segment] : AVG([amount]) } > [amount] THEN "Above Average" ELSE "Below Average" END` },
+          { value: "wrong3", label: `IF [amount] > { INCLUDE [customer_segment] : AVG([amount]) } THEN "Above Average" ELSE "Below Average" END` },
+        ] }],
+        correct: { formula: "correct" },
+      };
+    },
+    written: {
+      label: "Why does this need a FIXED LOD expression instead of a plain AVG([amount])?",
+      placeholder: "Think about what \"that order's own customer_segment\" means, and what a plain AVG would compute instead...",
+      check: (text) => /\b(fixed|segment|group|own)\b/i.test(text) && /\b(average|avg|compan|overall|view)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that a plain AVG([amount]) would compute one single company-wide (or view-wide) average shared by every row, not a separate benchmark per customer_segment, FIXED is what makes the average recompute per segment while still comparing against each individual order's own row." },
+    hints: [
+      "This combines two pieces from this stage: a FIXED LOD expression (task 6-7) providing the per-segment benchmark, and an IF comparison (task 1) comparing each row's own amount against it.",
+      "The FIXED expression has to be the per-segment AVERAGE, [customer_segment] inside the braces, AVG([amount]) after the colon, exactly the pattern from earlier in this stage.",
+      "The comparison direction matters, [amount] (this row's own value) has to be on the side being compared TO the benchmark, not the other way around, though > and < would just flip Above/Below if reversed consistently, watch the wrong-order distractor carefully.",
+      `IF [amount] > { FIXED [customer_segment] : AVG([amount]) } THEN "Above Average" ELSE "Below Average" END is correct.` ],
+    explanation: { why: "This is the FIXED-LOD-as-per-row-benchmark pattern from earlier in this stage, combined with a row-level IF comparison, each row's own amount is compared against a FIXED average that's recomputed per customer_segment, exactly the two building blocks this stage covered, applied together from a plain-language request.", mistake: "Using a plain AVG([amount]) instead of the FIXED expression would compare every row against one single overall average, shared by every customer_segment, silently ignoring the \"own segment\" qualifier that was the entire point of the request.", tip: "Whenever a business rule says \"compared to its own group's average\" or \"relative to its own category\", that phrase is the signal for a FIXED LOD expression nested inside an IF, not a plain aggregation.", business: "This is deliberately the least guided task in this stage, a real stakeholder request never comes with LOD keywords attached, translating \"relative to its own segment, not the company-wide number\" into a FIXED expression nested inside an IF is the actual analyst skill this whole stage has been building toward." } },
 ];
 
 /* ================= grading =================
