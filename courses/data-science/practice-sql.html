@@ -71,6 +71,13 @@ button.primary:hover{filter:brightness(1.1);color:#1a1030}
 .feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px}
 .feedback.ok{background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
 .feedback.bad{background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.miscopanel{margin-top:10px;background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.35);border-radius:8px;padding:14px 16px}
+.miscopanel .miscohead{font-weight:700;font-size:13.5px;color:var(--purple);margin-bottom:8px}
+.miscopanel .miscoexplain{font-size:13px;color:var(--tx);margin:0 0 10px}
+.miscopanel .mlbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut2);margin-bottom:4px;font-family:'IBM Plex Mono'}
+.miscopanel .miscoexample{margin-bottom:10px}
+.miscopanel .miscoexample pre{font-family:'IBM Plex Mono';font-size:12px;color:var(--mut);white-space:pre-wrap;background:var(--bg2);border-radius:6px;padding:8px 10px;margin-top:4px}
+.miscopanel .miscoexercise p{font-size:13px;color:var(--tx)}
 .resulttable{margin-top:10px;overflow-x:auto;border:1px solid var(--bd2);border-radius:8px;max-height:220px;overflow-y:auto}
 table.qres{width:100%;border-collapse:collapse;font-size:12px}
 table.qres th,table.qres td{padding:6px 9px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap;font-family:'IBM Plex Mono'}
@@ -108,6 +115,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <script src="course-progress.js?v=6"></script>
 <script src="practice-progress.js"></script>
+<script src="misconception-registry.js?v=1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
 <script>
 const esc = CourseProgress.escapeHtml;
@@ -996,6 +1004,26 @@ function execToRows(db, query) {
   if (!res.length) return { columns: [], rows: [] };
   return { columns: res[0].columns, rows: res[0].values };
 }
+/* Real pattern-based misconception detection for the 3 SQL tags this
+   library actively auto-detects (of the 5 in MisconceptionRegistry):
+   where-vs-having, null-vs-zero, join-fanout. See misconception-registry.js
+   for the honest scope note on why only these 3, and only SQL. */
+function detectSqlMisconception(studentSql, studentResult, refResult) {
+  const sql = studentSql.toLowerCase();
+  if (/=\s*null|<>\s*null|!=\s*null/.test(sql)) return "null-vs-zero";
+  const whereMatch = sql.match(/\bwhere\b([\s\S]*?)(\bgroup by\b|\border by\b|\bhaving\b|$)/);
+  if (whereMatch && /(count|sum|avg|min|max)\s*\(/.test(whereMatch[1])) return "where-vs-having";
+  if (studentResult && refResult && /\bjoin\b/.test(sql) && refResult.rows.length > 0 && studentResult.rows.length > refResult.rows.length * 1.5) return "join-fanout";
+  return null;
+}
+function flagMisconception(tag, resultsEl) {
+  if (!tag || typeof MisconceptionRegistry === "undefined") return;
+  const count = MisconceptionRegistry.record(tag);
+  if (count < MisconceptionRegistry.REPEATED_THRESHOLD) return;
+  const panel = document.createElement("div");
+  MisconceptionRegistry.renderIfRepeated(panel, tag);
+  resultsEl.appendChild(panel);
+}
 function rowsEqual(a, b) {
   if (a.length !== b.length) return false;
   const norm = r => JSON.stringify(r.map(v => v === null ? null : (typeof v === "number" ? Math.round(v * 100) / 100 : v)));
@@ -1153,6 +1181,7 @@ function renderTasks() {
       catch (e) {
         resultsEl.innerHTML = `<div class="feedback bad">Your query has an error: ${esc(e.message)}</div>`;
         PracticeProgress.recordAttempt(id, false);
+        flagMisconception(detectSqlMisconception(studentSql, null, null), resultsEl);
         renderSkillBar();
         return;
       }
@@ -1201,6 +1230,7 @@ function renderTasks() {
 
       if (pass && task.explanation) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(task.explanation));
       PracticeProgress.recordAttempt(id, pass);
+      if (!pass) flagMisconception(detectSqlMisconception(studentSql, studentResult, refResult), resultsEl);
       if (pass) openTasks.add(id);
       renderTasks();
       renderSkillBar();
