@@ -101,11 +101,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Integrated Cross-Tool Challenges &middot; Batch 1 of 2</span>
+    <span class="eyebrow">Practice Library &middot; Integrated Cross-Tool Challenges &middot; Complete, Batches 1-2</span>
     <h1 class="serif">Integrated Cross-Tool Challenges</h1>
     <p class="sub">The same business question, answered in two different tools, the specific skill of recognizing that a SUMIF, a GROUP BY, a pandas groupby, a DAX Measure, and a Tableau shelf configuration are frequently the exact same idea wearing a different tool's syntax.</p>
     <div class="honestnote"><b>Honest scope note, please read:</b> this is a <b>decision-based practice simulation</b> testing cross-tool translation judgment, not simultaneous live execution across three engines at once. The individual practice libraries (Excel, SQL, Python, Automation) already give you genuine, real-execution practice in each tool on its own, this library instead drills the judgment call of recognizing the SAME underlying technique across different tools' vocabularies, and knowing which tool a given step of a workflow actually belongs in. Every scenario is re-randomized on every attempt, and a task only counts as passed after 3 consecutive correct answers on 3 independently redrawn scenarios.</div>
-    <div class="scopenote"><b>Progress:</b> Batch 1 (the 10 explicit tool-pair challenges: Excel&harr;SQL, Python&harr;SQL, Python&harr;Excel, SQL&harr;Tableau, SQL&harr;Power BI, Python&harr;Tableau, Python&harr;Power BI, Excel&harr;Power BI, SQL&harr;Automation, Python&harr;Automation) is complete, 10 tasks. Batch 2 (multi-tool investigations, ambiguous stakeholder requests, and a final capstone) is not yet built.</div>
+    <div class="scopenote"><b>Progress:</b> All 20 tasks are complete: Batch 1, the 10 explicit tool-pair challenges (Excel&harr;SQL, Python&harr;SQL, Python&harr;Excel, SQL&harr;Tableau, SQL&harr;Power BI, Python&harr;Tableau, Python&harr;Power BI, Excel&harr;Power BI, SQL&harr;Automation, Python&harr;Automation), and Batch 2, 5 multi-tool investigations, 4 ambiguous stakeholder requests, and a final capstone with no numbered instructions.</div>
   </header>
 
   <div id="skillBars"></div>
@@ -130,9 +130,11 @@ function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 /* ================= skills & tasks ================= */
 const SKILL_ID_TRANSLATE = "integrated-translation";
 const SKILL_ID_SELECT = "integrated-tool-selection";
+const SKILL_ID_STAKEHOLDER = "integrated-stakeholder-translation";
 const SKILLS = [
   { id: SKILL_ID_TRANSLATE, label: "Cross-Tool Technique Translation" },
   { id: SKILL_ID_SELECT, label: "Cross-Tool Selection & Workflow" },
+  { id: SKILL_ID_STAKEHOLDER, label: "Cross-Tool Stakeholder Translation" },
 ];
 
 const REGIONS = ["West", "East", "North", "South"];
@@ -368,6 +370,237 @@ const TASKS = [
       "Fault tolerance means one malformed row (a bad date, a missing field) gets skipped and counted, not left to crash the entire unattended run with nobody watching.",
       "Idempotency, fault tolerance, and a way to report what happened (not just a printed number nobody's there to read)." ],
     explanation: { why: "This combines every major theme from the Automation library's three stages, idempotency (Stage 2's re-run-safety lesson), fault tolerance (Stage 1 and Stage 3's skip-and-count-bad-rows lesson), and reporting (Stage 2's alert-and-summary lesson), into the single judgment call of recognizing what separates working analysis code from a script that's actually safe to leave running unattended every day.", mistake: "Treating \"it works when I run it\" as equivalent to \"it's ready to automate\" is the exact gap this task is built around, a script that works fine when a human is watching and can fix problems as they appear can fail in ways that go completely unnoticed the moment nobody's watching it run.", tip: "Before scheduling any working script to run unattended, ask specifically: what happens if I run this twice by accident, what happens if today's file has one bad row, and how would I even find out if something went wrong, those three questions map directly onto idempotency, fault tolerance, and reporting.", business: "This is deliberately the final, least guided task in this batch, and mirrors the exact judgment a real analyst has to apply before promoting any working script from \"something I run by hand when I remember to\" to \"something that runs itself every day\", getting it wrong doesn't cause an error message, it causes silent, undetected wrong numbers." } },
+
+  /* ---- Multi-tool investigations ---- */
+  { id: "ct-11", skill: SKILL_ID_SELECT, tool: "integrated", level: "guided", difficulty: "core", prerequisite: ["ct-04"],
+    title: "Investigating WHY, not just confirming THAT",
+    objective: "Recognize that a monitoring dashboard and open-ended root-cause exploration call for different tools.",
+    build() {
+      const region = pick(REGIONS);
+      return {
+        scenarioHtml: `Your Power BI dashboard shows that <b>${esc(region)}'s return rate spiked last month</b>, but not why. You need to dig into order-level detail, checking product, day of week, and customer segment, to find the actual cause.`,
+        slots: [{ key: "tool", label: "Which tool fits this open-ended digging?", options: [
+          { value: "correct", label: "Python/pandas, for flexible, iterative exploratory analysis" },
+          { value: "wrong1", label: "Rebuild the same dashboard again in Power BI" },
+          { value: "wrong2", label: "Manually scroll through the raw export in a spreadsheet, row by row" },
+        ] }],
+        correct: { tool: "correct" },
+      };
+    },
+    hints: [
+      "A dashboard is built to MONITOR a known metric at a glance, it's not built for open-ended, iterative digging into why that metric moved.",
+      "Root-cause exploration means trying several different breakdowns and angles quickly, filtering by product, then by day, then by segment, that kind of rapid iteration is exactly what a Python/pandas session is good at.",
+      "Manually scrolling through raw rows doesn't scale to finding a pattern across thousands of orders, and rebuilding the same dashboard just reproduces the same THAT, not the WHY.",
+      "Python/pandas." ],
+    explanation: { why: "A BI dashboard answers a fixed, pre-defined set of questions well, but open-ended root-cause exploration needs to try many different, unplanned angles quickly, filter by this, then that, then check a correlation, pandas in a notebook-style environment is built for exactly that kind of rapid, iterative digging.", mistake: "Treating the dashboard itself as the investigation tool conflates two different jobs, MONITORING a known number (what the dashboard is for) and EXPLORING why that number changed (what it isn't built for), a real investigation usually starts where the dashboard's job ends.", tip: "When a dashboard shows a number moved but not why, that's the signal to drop into a more flexible tool, not to keep staring at the same dashboard hoping the answer appears.", business: "A return-rate spike large enough to show up on an executive dashboard is exactly the kind of finding that needs a real investigation behind it before anyone can act on it, dashboards surface the question, exploratory analysis answers it." } },
+
+  { id: "ct-12", skill: SKILL_ID_SELECT, tool: "integrated", level: "guided", difficulty: "core", prerequisite: ["ct-04"],
+    title: "Clean before you analyze, not after",
+    objective: "Recognize that data cleaning has to happen before analysis or visualization touches the data, not as an afterthought.",
+    build() {
+      const issue = pick(["duplicate rows", "an amount column stored as text", "a handful of malformed dates"]);
+      return {
+        scenarioHtml: `A CSV export you need to analyze has <b>${esc(issue)}</b>. What should happen FIRST, before any analysis or dashboard touches this data?`,
+        slots: [{ key: "step", label: "What should happen first?", options: [
+          { value: "correct", label: "Clean and validate the data (Power Query or pandas) before anything downstream uses it" },
+          { value: "wrong1", label: "Load it straight into a dashboard and fix visual glitches as they appear" },
+          { value: "wrong2", label: "Write DAX Measures designed to work around the bad values without fixing them" },
+        ] }],
+        correct: { step: "correct" },
+      };
+    },
+    hints: [
+      "Every downstream step, a dashboard, a Measure, a report, trusts that the data feeding it is already clean, that trust has to be earned by cleaning FIRST, not assumed.",
+      "Loading messy data straight into a dashboard means every visual built on top of it inherits the same problem, multiplying the cleanup work instead of doing it once, at the source.",
+      "Writing workaround logic (a DAX Measure that tries to handle bad values in place) treats a data problem as a formula problem, more fragile and harder to maintain than just fixing the data once.",
+      "Clean and validate first, before anything downstream depends on it." ],
+    explanation: { why: "Cleaning once, at the source, before any analysis or visualization depends on the data, means every downstream step can simply trust the data is correct, fixing the same problem repeatedly in multiple downstream formulas or visuals is both more work and more fragile.", mistake: "Building workaround logic in a dashboard's calculated fields to handle known-bad data treats a data-quality problem as though it were a formula design problem, that workaround has to be remembered and maintained everywhere the bad data might show up, instead of being fixed once.", tip: "\"Garbage in, garbage out\" isn't just a saying, it's the reason data cleaning belongs at the very start of a workflow, in Power Query or pandas, not scattered as patches throughout the analysis and visualization layers built on top of it.", business: "A duplicate-inflated revenue number that reaches a board-facing dashboard before anyone catches it is far more damaging and embarrassing than the same duplicate caught and fixed during data prep, before a single chart was ever built on top of it." } },
+
+  { id: "ct-13", skill: SKILL_ID_SELECT, tool: "integrated", level: "semiguided", difficulty: "core", prerequisite: ["ct-11"],
+    title: "Matching tool overhead to a one-off question",
+    objective: "Recognize when a quick, disposable tool is the right choice, not an over-engineered one.",
+    build() {
+      const deadline = pick(["by tomorrow morning", "before a call starting in twenty minutes", "by end of day today"]);
+      return {
+        scenarioHtml: `A stakeholder needs ONE specific number, a single ad hoc question, <b>${esc(deadline)}</b>. This isn't a recurring need, just a one-time question.`,
+        slots: [{ key: "approach", label: "What's the right-sized approach?", options: [
+          { value: "correct", label: "A quick Excel formula or SQL query, fast, zero setup, disposable" },
+          { value: "wrong1", label: "Build a full scheduled Python automation pipeline for it" },
+          { value: "wrong2", label: "Design a proper Power BI data model with relationships and Measures" },
+        ] }],
+        correct: { approach: "correct" },
+      };
+    },
+    hints: [
+      "A one-time question doesn't justify the setup cost of a tool built for RECURRING, repeatable work, that investment only pays off if the same question gets asked again and again.",
+      "Excel or a quick SQL query gets a fast, disposable answer with essentially zero setup time, exactly matched to a single, urgent, one-off need.",
+      "Building a full automation pipeline or a proper BI data model for a single question that won't be asked again is over-engineering, time spent on infrastructure nobody will reuse.",
+      "A quick Excel formula or SQL query." ],
+    explanation: { why: "Matching a tool's setup overhead to how many times a question will actually be asked is a real, practical judgment call, a one-off question deserves the fastest path to an answer, a recurring one justifies investing in something more durable.", mistake: "Reaching for a fully engineered solution, a scheduled pipeline, a modeled BI dataset, for a single ad hoc question wastes time that could have gone toward actually answering the question before the deadline, over-engineering is a real, common mistake, not just under-engineering.", tip: "Before building anything, ask: will this exact question get asked again? If the honest answer is no, the fastest, most disposable tool that gets a trustworthy answer is usually the right one.", business: "A stakeholder who needs one number before a call in twenty minutes doesn't care how elegant the underlying infrastructure is, they need an answer, on time, an over-engineered approach that misses the deadline has failed regardless of its long-term merits." } },
+
+  { id: "ct-14", skill: SKILL_ID_SELECT, tool: "integrated", level: "semiguided", difficulty: "core", prerequisite: ["ct-11"],
+    title: "Matching tool scale to a recurring, wide audience",
+    objective: "Recognize when a report's scale and audience specifically call for a BI tool with scheduled refresh, not a manually maintained file.",
+    build() {
+      const n = pick([25, 40, 60]);
+      return {
+        scenarioHtml: `A report needs to refresh with <b>fresh data every day</b> and be viewed by <b>${n} non-technical stakeholders</b>, none of whom should need to open a spreadsheet or run any code themselves.`,
+        slots: [{ key: "approach", label: "What's the right-sized approach?", options: [
+          { value: "correct", label: "A BI tool (Power BI/Tableau) with Scheduled Refresh, published for that audience" },
+          { value: "wrong1", label: "A daily emailed Excel file someone manually updates and re-sends" },
+          { value: "wrong2", label: "A Jupyter notebook each of the 25+ stakeholders runs themselves" },
+        ] }],
+        correct: { approach: "correct" },
+      };
+    },
+    hints: [
+      "\"Daily fresh data\" points toward Scheduled Refresh, a BI-tool feature specifically built for unattended, recurring updates, not a person manually updating and re-sending a file every day.",
+      "\"Non-technical stakeholders, none of whom should run code\" rules out a notebook, that audience needs a viewing experience, not an execution environment.",
+      "A BI tool published to a wide, non-technical audience, with scheduled refresh keeping it current, is exactly the scale and audience this scenario describes.",
+      "A BI tool with Scheduled Refresh, published for that audience." ],
+    explanation: { why: "Scale (dozens of viewers) and audience (non-technical, shouldn't need to run anything themselves) are exactly the conditions a BI tool's publish-and-schedule model was built for, one maintained report, refreshed automatically, viewed by everyone without any technical setup on their end.", mistake: "A manually updated and re-sent Excel file doesn't scale gracefully to dozens of daily recipients, and depends on a person remembering to do it every single day, exactly the fragility a scheduled, automated refresh eliminates.", tip: "Whenever a scenario mentions BOTH a recurring cadence AND a wide, non-technical audience, that combination is close to a textbook case for a published BI report with scheduled refresh, rather than a manually maintained file.", business: "Forty stakeholders each independently trusting a daily-refreshed number is only sustainable if that number updates itself reliably, a manually maintained process depending on one person's daily diligence is a single point of failure a real organization can't depend on at that scale." } },
+
+  { id: "ct-15", skill: SKILL_ID_SELECT, tool: "integrated", level: "challenge", difficulty: "challenge", prerequisite: ["ct-12"],
+    title: "Who orchestrates a multi-tool pipeline?",
+    objective: "Recognize that an unattended, recurring ETL step needs an automation layer to orchestrate it, not the downstream tools themselves.",
+    build() {
+      return {
+        scenarioHtml: `A weekly process needs to extract fresh data, load it into a SQL warehouse table, and refresh a Tableau extract built on top of that table, all unattended, every single week.`,
+        slots: [{ key: "orchestrator", label: "What should orchestrate this weekly process?", options: [
+          { value: "correct", label: "A scheduled Python automation script, with SQL and Tableau as downstream consumers" },
+          { value: "wrong1", label: "A Tableau calculated field, performing the extraction and loading itself" },
+          { value: "wrong2", label: "Manually re-running the SQL queries and re-uploading to Tableau each week" },
+        ] }],
+        correct: { orchestrator: "correct" },
+      };
+    },
+    hints: [
+      "Extracting data and loading it into a warehouse table is fundamentally a scripting/orchestration job, not something a calculated field inside a downstream visualization tool is built to do.",
+      "SQL and Tableau are both downstream CONSUMERS in this pipeline, SQL stores the loaded data, Tableau visualizes it, neither one is positioned to trigger and coordinate the extraction step itself.",
+      "\"Unattended, every single week\" rules out a manual weekly re-run, that's exactly the repeating, forgettable manual task automation is meant to replace.",
+      "A scheduled Python automation script, with SQL and Tableau as downstream consumers." ],
+    explanation: { why: "An ETL pipeline (Extract, Transform, Load) needs something to actually trigger and sequence its steps, a scheduled automation script is built exactly for that orchestration role, while SQL (storage) and Tableau (visualization) are correctly positioned as downstream consumers of the data that pipeline produces, not as the orchestrator itself.", mistake: "Trying to make a downstream visualization tool (Tableau's calculated fields) perform upstream extraction and loading work confuses what each tool in the chain is actually responsible for, a calculated field transforms data ALREADY in Tableau, it can't reach out and load new data from a source system.", tip: "In any multi-tool pipeline, it's worth explicitly naming which tool ORCHESTRATES (triggers and sequences the steps) versus which tools are downstream CONSUMERS of the result, conflating the two roles is a common design mistake.", business: "A weekly refresh that currently depends on someone remembering to manually run several steps in the right order is a fragile, real risk, a scheduled automation script removes that single point of human failure from an otherwise sound multi-tool pipeline." } },
+
+  /* ---- Ambiguous stakeholder requests ---- */
+  { id: "ct-16", skill: SKILL_ID_STAKEHOLDER, tool: "integrated", level: "guided", difficulty: "core", prerequisite: [],
+    title: "\"Just get me the numbers.\"",
+    objective: "Recognize that a vague request is a request for clarification, not a technical problem to silently guess at.",
+    build() {
+      return {
+        scenarioHtml: `Your manager says: <b>"Just get me the numbers."</b> No further detail, no specific metric, no format, no deadline mentioned.`,
+        slots: [{ key: "response", label: "What's the right first move?", options: [
+          { value: "correct", label: "Ask one clarifying question, which numbers, for what audience, in what format, before starting any work" },
+          { value: "wrong1", label: "Silently guess, and build a full, polished dashboard on that guess" },
+          { value: "wrong2", label: "Reply with a raw, unformatted data dump of everything available" },
+        ] }],
+        correct: { response: "correct" },
+      };
+    },
+    hints: [
+      "\"Just get me the numbers\" doesn't specify WHICH numbers, this is genuinely ambiguous, not a technical problem with a single right technical answer.",
+      "Guessing and building something elaborate risks hours of work on entirely the wrong thing, a single clarifying question costs almost nothing by comparison.",
+      "A raw data dump technically \"gets the numbers\" but shifts all the interpretation work onto the manager, usually not what they actually wanted either.",
+      "Ask one clarifying question before starting any work." ],
+    explanation: { why: "A vague request like this is missing information that only the requester has, which specific numbers matter, who's going to see them, in what format, guessing wastes potentially significant effort on a wrong assumption, one clarifying question resolves the ambiguity directly and cheaply.", mistake: "Silently guessing and building something elaborate (a full dashboard, a polished report) on an unclarified assumption risks a large amount of wasted work if the guess turns out wrong, a real, common, and avoidable mistake.", tip: "The instinct to \"just start building\" often feels more productive than asking a question, but for a genuinely ambiguous request, a single well-aimed clarifying question is usually the faster path to the right answer overall.", business: "This same theme shows up as the least-guided task at the end of nearly every practice library in this course, a real stakeholder request never comes with full technical specification attached, translating (or when necessary, clarifying) plain language into the right work is the actual job." } },
+
+  { id: "ct-17", skill: SKILL_ID_STAKEHOLDER, tool: "integrated", level: "semiguided", difficulty: "core", prerequisite: ["ct-16"],
+    title: "\"Make this look better for the board meeting.\"",
+    objective: "Recognize when a vague polish request actually means a shift to a presentation-appropriate visualization tool, not just formatting an existing sheet.",
+    build() {
+      return {
+        scenarioHtml: `Your manager says: <b>"Make this look better for the board meeting."</b>, pointing at a plain spreadsheet full of numbers, meant to be shown to a non-technical executive board.`,
+        slots: [{ key: "response", label: "What does \"look better\" most likely mean here?", options: [
+          { value: "correct", label: "Build a clean, well-labeled chart or dashboard suited to a non-technical board audience" },
+          { value: "wrong1", label: "Apply cell borders, bold text, and colored fills to the existing spreadsheet" },
+          { value: "wrong2", label: "Rewrite the underlying SQL query, the board won't see that layer at all" },
+        ] }],
+        correct: { response: "correct" },
+      };
+    },
+    hints: [
+      "A board audience typically needs to grasp the story at a glance, not read a dense grid of numbers, that's a strong signal the request is really about VISUALIZATION, not just spreadsheet styling.",
+      "Cosmetic formatting (borders, bold, color fills) leaves the fundamental problem, a wall of numbers being hard to read quickly, completely unsolved.",
+      "The underlying query's correctness matters, but it's invisible to the board, \"look better\" is about what they'll actually SEE, not the plumbing behind it.",
+      "Build a clean, well-labeled chart or dashboard suited to a non-technical board audience." ],
+    explanation: { why: "\"Look better\" aimed at a non-technical executive audience is almost always really asking for a shift from raw data to a genuine visualization, a chart or dashboard designed to be understood at a glance, not a cosmetically dressed-up version of the same dense spreadsheet.", mistake: "Treating this as a purely cosmetic request (just prettying up the existing spreadsheet) solves the wrong problem, a nicely formatted wall of numbers is still a wall of numbers, exactly what a board audience typically doesn't have time to parse.", tip: "When a vague polish request is aimed at a specifically non-technical or executive audience, that audience detail is usually the real signal, it's pointing toward a visualization tool, not a formatting pass on the existing artifact.", business: "A board meeting typically allows a few minutes per topic, a chart or dashboard that communicates the finding instantly serves that setting far better than a beautifully formatted spreadsheet the board doesn't have time to actually read." } },
+
+  { id: "ct-18", skill: SKILL_ID_STAKEHOLDER, tool: "integrated", level: "semiguided", difficulty: "core", prerequisite: ["ct-16"],
+    title: "\"This should just work every month without me thinking about it.\"",
+    objective: "Recognize that this specific phrasing is a direct request for automation, not a one-time deliverable no matter how well-built.",
+    build() {
+      return {
+        scenarioHtml: `Your manager says: <b>"This should just work every month without me thinking about it."</b>, about a report you currently build by hand each time.`,
+        slots: [{ key: "response", label: "What does this request actually call for?", options: [
+          { value: "correct", label: "A scheduled, fault-tolerant automation, not a report someone has to remember to rebuild" },
+          { value: "wrong1", label: "A very detailed, thoroughly documented one-time Excel workbook" },
+          { value: "wrong2", label: "A one-off SQL query, saved as a text file for future reference" },
+        ] }],
+        correct: { response: "correct" },
+      };
+    },
+    hints: [
+      "\"Without me thinking about it\" is close to a direct definition of automation, the whole point is removing the need for a person to remember and manually execute the process.",
+      "A more detailed one-time deliverable, no matter how well built, still requires someone to manually rebuild it next month, that doesn't satisfy \"without me thinking about it\" at all.",
+      "A saved query is a starting point, not a solution, it still needs to actually RUN somewhere, on a schedule, to satisfy this request.",
+      "A scheduled, fault-tolerant automation." ],
+    explanation: { why: "This phrasing describes the exact goal automation exists to solve, removing the need for a person to remember, trigger, and manually redo a repeating process every period, a beautifully built but manually-triggered report doesn't satisfy that request no matter its quality.", mistake: "Responding with a more polished but still MANUAL deliverable misses the actual request entirely, the stakeholder isn't asking for better quality, they're asking to be removed from the loop, a fundamentally different kind of solution.", tip: "Phrases like \"every month, automatically\", \"without me having to\", or \"so I don't have to remember\" are direct signals for automation, distinct from a request for a better one-time report.", business: "A manager who has to remember to ask for a report every month, and then wait for someone to manually build it, is exactly the friction real automation is meant to eliminate, recognizing this phrasing as an automation request, not a quality request, is what actually solves their problem." } },
+
+  { id: "ct-19", skill: SKILL_ID_STAKEHOLDER, tool: "integrated", level: "challenge", difficulty: "challenge", prerequisite: ["ct-18"],
+    title: "\"I don't trust this number, check it.\"",
+    objective: "Recognize that verifying a distrusted number means independently reproducing it a different way, not just re-running the same process again.",
+    build() {
+      const tool = pick(["Python", "Excel"]);
+      return {
+        scenarioHtml: `A stakeholder says: <b>"I don't trust this number, check it."</b> about a total that was originally computed in ${esc(tool)}.`,
+        slots: [{ key: "response", label: "What does genuinely \"checking it\" require?", options: [
+          { value: "correct", label: "Independently recompute the figure using a DIFFERENT tool or method, then reconcile the two within a tolerance" },
+          { value: "wrong1", label: `Re-run the exact same ${tool} process again and report the same number` },
+          { value: "wrong2", label: "Round the number differently and hope that satisfies them" },
+        ] }],
+        correct: { response: "correct" },
+      };
+    },
+    hints: [
+      "Re-running the EXACT SAME process a second time will reproduce the exact same number (and the exact same bug, if there is one), that doesn't actually verify anything independently.",
+      "A genuine check means computing the SAME figure a DIFFERENT way, a different tool, a different method, if a bug or a wrong assumption caused the original number to be wrong, an independent method is far more likely to catch it.",
+      "This is the same reconcile_totals idea from the Automation library, comparing two independently computed figures within a reasonable tolerance, not expecting bit-for-bit identical results.",
+      "Independently recompute the figure using a different tool or method, then reconcile the two." ],
+    explanation: { why: "A number computed the exact same way twice will match itself even if the underlying logic is wrong, a genuine check requires an INDEPENDENT computation, a different tool, a different approach, that could plausibly catch a mistake the original method made, then comparing the two results within a sensible tolerance.", mistake: "Re-running the identical process and reporting the same number gives false confidence, it looks like verification but provides none, any systematic error in the original approach would be reproduced exactly, not caught.", tip: "This is the same reconciliation judgment from the Automation library's own reconcile_totals task, applied here as a response to a stakeholder's specific request, verifying a number well means computing it independently, not just repeating the same steps.", business: "A stakeholder who explicitly says they don't trust a number is often right to be cautious, silently re-confirming the same (possibly wrong) process doesn't rebuild that trust, an independently reproduced, reconciled figure genuinely does." } },
+
+  { id: "ct-20", skill: SKILL_ID_STAKEHOLDER, tool: "integrated", level: "mastery", difficulty: "mastery", prerequisite: ["ct-15", "ct-19"],
+    title: "Independent challenge: the full chain, from messy export to trusted board report",
+    objective: "Translate a complete, unstructured business request into the correct sequence of tool roles, with no numbered steps given.",
+    build() {
+      return {
+        scenarioHtml: `Northstar's finance director writes: <b>"Every month I get a CSV export from our order system that's always a little messy, duplicate rows, sometimes a badly formatted date. I need someone to dig into why our return rate has been climbing, put together something the board can actually look at, and make sure I never have to manually redo this every single month again."</b>`,
+        slots: [
+          { key: "prepStep", label: "What has to happen to the raw export first?", options: [
+            { value: "correct", label: "Clean and validate it (duplicates, date formatting) before any analysis touches it" },
+            { value: "wrong1", label: "Load it straight into a board-facing dashboard as-is" },
+          ] },
+          { key: "rootCauseTool", label: "Which tool investigates WHY returns are climbing?", options: [
+            { value: "correct", label: "Python/pandas, for flexible, iterative exploratory digging" },
+            { value: "wrong1", label: "A static, fixed-format spreadsheet report" },
+          ] },
+          { key: "deliveryTool", label: "How does this reach the board, every month, unattended?", options: [
+            { value: "correct", label: "A scheduled, fault-tolerant automated pipeline feeding a recurring BI dashboard" },
+            { value: "wrong1", label: "A manually rebuilt Excel file, redone by hand each month" },
+          ] },
+        ],
+        correct: { prepStep: "correct", rootCauseTool: "correct", deliveryTool: "correct" },
+      };
+    },
+    written: {
+      label: "Walk through why this request genuinely needs at least three different tool roles, not one tool doing everything.",
+      placeholder: "Think about what happens if you tried to do the cleaning, the root-cause digging, AND the automated monthly delivery all in just one tool...",
+      check: (text) => /\b(clean|prep|root.cause|explor|dig)\b/i.test(text) && /\b(automat|schedul|dashboard|deliver|board)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that cleaning messy raw data, open-ended root-cause exploration, and a recurring, unattended board-facing delivery are three genuinely different jobs, each suited to a different tool's strengths, forcing all three into one tool (say, doing everything by hand in a spreadsheet) would fail at least one of them, most likely the \"never manually redo this\" requirement." },
+    hints: [
+      "This combines every theme from this entire library, cleaning before analysis (task 12), exploratory root-cause digging (task 11), and automated, recurring, board-facing delivery (tasks 14-15 and 18), applied together from one real, unstructured request.",
+      "\"Always a little messy, duplicate rows, badly formatted dates\" is the cleaning step, that has to happen before anything else touches the data.",
+      "\"Dig into why our return rate has been climbing\" is open-ended root-cause exploration, not a fixed, known metric, that's Python's job, not a dashboard's.",
+      "\"Something the board can actually look at\" plus \"never manually redo this every month\" together mean a recurring, automated pipeline feeding a BI dashboard, not a one-time deliverable." ],
+    explanation: { why: "This request bundles three genuinely distinct jobs into one plain-language paragraph, data cleaning, open-ended investigation, and automated recurring delivery, each one individually covered by a different practice library in this course, recognizing all three, and which tool each belongs to, from an unstructured request with no tool names or numbered steps is the actual capstone skill this entire library has been building toward.", mistake: "Trying to satisfy this whole request inside a single tool, say, doing the cleaning, the investigation, AND the recurring board delivery entirely by hand in a spreadsheet, would technically produce something for this month, but would completely fail the \"never manually redo this again\" requirement, the request's own words rule that approach out.", tip: "A real, messy stakeholder request like this one is exactly what shows up on the job, no tool names, no numbered steps, just a description of the underlying problem, breaking it into its real component jobs (clean, investigate, automate-and-deliver) before picking any tool is the actual skill.", business: "This is deliberately the final, least guided task in the entire Integrated Cross-Tool Challenges library, a finance director describing a real recurring pain point in their own words, translating that into the right sequence of tool roles, cleaning, exploration, and automated delivery, is exactly the judgment that separates a working analyst from someone who only knows individual tools in isolation." } },
 ];
 
 /* ================= grading =================
@@ -462,7 +695,7 @@ function renderSkillBar() {
   const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
   target.innerHTML = next
     ? `<b>What should I do next?</b> ${esc(next.title.replace(/&rarr;/g, "→"))} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
-    : `<b>What should I do next?</b> All ${TASKS.length} Batch 1 tasks passed. Batch 2 isn't built yet.`;
+    : `<b>What should I do next?</b> All ${TASKS.length} tasks passed, the full Integrated Cross-Tool Challenges library is complete.`;
 }
 function buildHintsHtml(hints) {
   const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
