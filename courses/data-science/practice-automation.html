@@ -92,10 +92,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Automation &middot; Stages 1-2 of 3</span>
+    <span class="eyebrow">Practice Library &middot; Automation &middot; Complete, Stages 1-3</span>
     <h1 class="serif">Automation Practice Library</h1>
     <p class="sub">Real CPython running in a Web Worker (Pyodide), the same sandbox the Python Practice Library uses, applied to the specific building blocks of scripted, repeatable analyst work: parsing raw text, batching records, cleaning filenames, merging totals from separate sources, and handling bad rows without crashing the whole run.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is genuine code execution, not a simulation, every task pairs fixed test cases with one freshly randomized input compared against a hidden reference implementation, so a hardcoded return value can't pass. Stage 1 (Fundamentals) and Stage 2 (Report Automation: CSV generation and parsing, ranked report formatting, period-over-period comparison, threshold alerting, template filling, and idempotent re-run-safe aggregation) are complete, 20 tasks. Stage 3 (Real-World Analyst Workflows) is not yet built.</div>
+    <div class="scopenote"><b>Honest scope note:</b> this is genuine code execution, not a simulation, every task pairs fixed test cases with one freshly randomized input compared against a hidden reference implementation, so a hardcoded return value can't pass. All 3 stages are complete, 30 tasks: Fundamentals, Report Automation (CSV generation/parsing, ranked reports, period comparison, threshold alerting, templating, idempotent aggregation), and Real-World Workflows (missing-column detection, ID-based deduplication, run-to-run diffing, bounded retries, config-driven rules, reconciliation tolerance, workflow-log summarizing, column-name normalization), ending in an independent year-end consolidation task.</div>
   </header>
 
   <div id="skillBars"></div>
@@ -171,11 +171,13 @@ const SKILL_ID_TEXT = "automation-text-processing";
 const SKILL_ID_BATCH = "automation-batch-records";
 const SKILL_ID_REPORTGEN = "automation-report-generation";
 const SKILL_ID_MONITORING = "automation-monitoring-alerts";
+const SKILL_ID_WORKFLOW = "automation-workflows";
 const SKILLS = [
   { id: SKILL_ID_TEXT, label: "Automation Text & File Processing" },
   { id: SKILL_ID_BATCH, label: "Automation Batch Records" },
   { id: SKILL_ID_REPORTGEN, label: "Automation Report Generation" },
   { id: SKILL_ID_MONITORING, label: "Automation Monitoring & Alerts" },
+  { id: SKILL_ID_WORKFLOW, label: "Automation Real-World Workflows" },
 ];
 
 const TASKS = [
@@ -828,6 +830,344 @@ const TASKS = [
       "Once you have the totals dict, this is exactly build_summary_report's ranking-and-formatting logic, applied here after adding the \"Monthly Report\" header line first.",
       "def build_monthly_report(records):\n    totals = {}\n    for r in records:\n        if r.get('status') == 'Completed':\n            totals[r['category']] = totals.get(r['category'], 0) + r.get('amount', 0)\n    lines = ['Monthly Report']\n    for k, v in sorted(totals.items(), key=lambda kv: -kv[1]):\n        lines.append(f'{k}: ${v:,.2f}')\n    return '\\n'.join(lines)" ],
     explanation: { why: "This combines every major piece from this stage, filtering to the right status, accumulating per-category totals, ranking descending, and formatting into a readable report, into one complete, self-contained function that recomputes its entire result fresh from the input records every single time it's called.", mistake: "A script that instead ACCUMULATES onto some persistent state (a running total saved to a file, or a database row incremented each run) would NOT be safe to re-run the same way, running it twice on the same day's data would double-count that day, this function avoids that entirely by depending only on its own input and computing a fresh result every time.", tip: "Whenever possible, structuring an automation function as a pure computation, depending only on its input, causing no side effects, returning a fresh result every time, is what makes it safe to re-run without careful bookkeeping, that property is called idempotency, and it's one of the most valuable design habits in real automation work.", business: "This is deliberately the least guided task in this stage, a real monthly report needs to be regenerable on demand, if someone re-runs it after fixing a data issue, or just to double check a number, it should produce the exact same, correct report both times, not accumulate into something different." } },
+
+  /* ---- Stage 3: Real-World Analyst Workflows ---- */
+  { id: "au-w01", skill: SKILL_ID_WORKFLOW, tool: "automation", level: "guided", difficulty: "core", prerequisite: ["au-f06"],
+    title: "Detect missing columns before processing a file",
+    objective: "Write detect_missing_columns(header_fields, required_fields), returning which required fields are absent from a file's actual header.",
+    objectiveNote: "Twelve monthly export files rarely have perfectly identical columns, checking for missing ones before processing avoids a confusing crash deep inside the script.",
+    functionName: "detect_missing_columns",
+    starterCode: "def detect_missing_columns(header_fields, required_fields):\n    # return the required fields that are NOT present in header_fields\n    pass\n",
+    testCases: [
+      { name: "Finds one missing field", args: [["region", "amount"], ["region", "status", "amount"]], expected: ["status"] },
+      { name: "Finds multiple missing fields", args: [["region"], ["region", "status", "amount"]], expected: ["status", "amount"] },
+      { name: "Nothing missing", args: [["region", "status", "amount"], ["region", "status"]], expected: [] },
+    ],
+    referenceCode: [
+      "    def _ref(header_fields, required_fields):",
+      "        return [f for f in required_fields if f not in header_fields]",
+    ],
+    randomGenCode: [
+      "        all_fields = ['region', 'status', 'amount', 'category']",
+      "        header = random.sample(all_fields, k=random.randint(1, 3))",
+      "        required = ['region', 'status', 'amount']",
+      "        rargs = (header, required)",
+    ],
+    hints: [
+      "Walk the required fields, checking each one against the actual header, this is the same shape as an earlier task, just checking a header list instead of a single row's keys.",
+      "A list comprehension with an `if f not in header_fields` filter builds the missing-fields list directly.",
+      "Keep the required fields in their ORIGINAL order in the output, don't sort or reorder them.",
+      "def detect_missing_columns(header_fields, required_fields):\n    return [f for f in required_fields if f not in header_fields]" ],
+    explanation: { why: "This is a straightforward filter, checking each required field's presence in the actual header, but doing it EXPLICITLY and EARLY, before any row processing begins, turns a potential deep, confusing KeyError later in the script into one clear, actionable message right at the start.", mistake: "Skipping this check and letting the script fail wherever the missing column first gets used produces a much less helpful error, often deep inside a loop, on some arbitrary row, rather than a clear \"this file is missing the status column\" message before any processing even starts.", tip: "Validating a file's STRUCTURE (does it have the columns I need) before validating its individual ROWS is the natural first step in any real file-processing workflow, catching a structural problem early saves debugging a much more confusing symptom later.", business: "A vendor who quietly renames or drops a column in their monthly export is a common, real problem, catching it immediately with a clear message (\"this month's file is missing 'status'\") is far more useful to whoever's running the script than a cryptic crash three functions deep." } },
+
+  { id: "au-w02", skill: SKILL_ID_MONITORING, tool: "automation", level: "guided", difficulty: "core", prerequisite: ["au-f08"],
+    title: "Deduplicate records by ID, keeping the latest data",
+    objective: "Write dedupe_by_id(records, id_field), combining records so each ID appears once, using its LAST-seen data if an ID was corrected or resent.",
+    objectiveNote: "When combining several monthly files, the same record ID sometimes appears more than once, a later file's version is usually a correction and should win.",
+    functionName: "dedupe_by_id",
+    starterCode: "def dedupe_by_id(records, id_field):\n    # one record per ID, using each ID's LAST-seen data\n    pass\n",
+    testCases: [
+      { name: "A repeated ID keeps its last data", args: [[{ id: 1, amount: 10 }, { id: 2, amount: 20 }, { id: 1, amount: 15 }], "id"], expected: [{ id: 1, amount: 15 }, { id: 2, amount: 20 }] },
+      { name: "No repeats, unchanged", args: [[{ id: 1, amount: 5 }, { id: 2, amount: 6 }], "id"], expected: [{ id: 1, amount: 5 }, { id: 2, amount: 6 }] },
+      { name: "Every record shares one ID", args: [[{ id: 9, amount: 1 }, { id: 9, amount: 2 }, { id: 9, amount: 3 }], "id"], expected: [{ id: 9, amount: 3 }] },
+    ],
+    referenceCode: [
+      "    def _ref(records, id_field):",
+      "        out = {}",
+      "        for r in records:",
+      "            out[r[id_field]] = r",
+      "        return list(out.values())",
+    ],
+    randomGenCode: [
+      "        ids = [1, 2, 3]",
+      "        n = random.randint(3, 7)",
+      "        recs = [{'id': random.choice(ids), 'amount': random.randint(1, 99)} for _ in range(n)]",
+      "        rargs = (recs, 'id')",
+    ],
+    hints: [
+      "Build a dict keyed by each record's ID, walking the records in order, a later record for the same ID simply OVERWRITES the dict's value for that key.",
+      "A Python dict remembers each key's ORIGINAL insertion position even when its value is later updated, so the result naturally comes out in first-seen ID order, with each ID's most recent data.",
+      "Return list(out.values()) once every record has been walked, that gives you one entry per distinct ID.",
+      "def dedupe_by_id(records, id_field):\n    out = {}\n    for r in records:\n        out[r[id_field]] = r\n    return list(out.values())" ],
+    explanation: { why: "A dict naturally implements exactly this \"one entry per key, latest value wins\" behavior, walking records in order and assigning into the dict by ID means the final value for each ID is whichever record was seen LAST, while the dict's key order stays fixed at each ID's first appearance.", mistake: "Using a list and manually checking \"is this ID already in my results\" before appending would either keep the FIRST occurrence (wrong, if later data is a correction) or require extra logic to find-and-replace an existing entry, the dict-based approach gets \"latest wins\" for free.", tip: "This is the same underlying idea as combine_monthly_totals from Stage 2 (later data replaces earlier data for the same key), applied here to whole records instead of just numeric totals.", business: "A customer record that gets resent in a later monthly file with a corrected email address needs the corrected version to win, silently keeping the FIRST (wrong) version, or blindly treating the correction as a brand-new duplicate customer, are both real, damaging mistakes this function avoids." } },
+
+  { id: "au-w03", skill: SKILL_ID_MONITORING, tool: "automation", level: "challenge", difficulty: "challenge", prerequisite: ["au-w02"],
+    title: "Diff two runs' totals",
+    objective: "Write diff_totals(old, new), comparing a prior run's category totals against the current run's, reporting which categories were added, removed, or changed.",
+    objectiveNote: "A workflow that runs regularly benefits from reporting what actually CHANGED since last time, not just the current numbers on their own.",
+    functionName: "diff_totals",
+    starterCode: "def diff_totals(old, new):\n    # return {\"added\": [...], \"removed\": [...], \"changed\": {cat: {\"old\":.., \"new\":..}}}\n    pass\n",
+    testCases: [
+      { name: "Finds added, removed, and changed categories", args: [{ A: 100, B: 200 }, { A: 150, C: 50 }], expected: { added: ["C"], removed: ["B"], changed: { A: { old: 100, new: 150 } } } },
+      { name: "No changes at all", args: [{ A: 100 }, { A: 100 }], expected: { added: [], removed: [], changed: {} } },
+      { name: "Only additions", args: [{}, { X: 5, Y: 10 }], expected: { added: ["X", "Y"], removed: [], changed: {} } },
+    ],
+    referenceCode: [
+      "    def _ref(old, new):",
+      "        added = sorted([k for k in new if k not in old])",
+      "        removed = sorted([k for k in old if k not in new])",
+      "        changed = {}",
+      "        for k in old:",
+      "            if k in new and old[k] != new[k]:",
+      "                changed[k] = {'old': old[k], 'new': new[k]}",
+      "        return {'added': added, 'removed': removed, 'changed': changed}",
+    ],
+    randomGenCode: [
+      "        keys = ['A', 'B', 'C', 'D']",
+      "        old_keys = random.sample(keys, k=random.randint(1, 3))",
+      "        new_keys = random.sample(keys, k=random.randint(1, 3))",
+      "        old = {k: random.randint(1, 100) for k in old_keys}",
+      "        new = {k: random.randint(1, 100) for k in new_keys}",
+      "        rargs = (old, new)",
+    ],
+    hints: [
+      "\"Added\" means a key exists in new but not old, \"removed\" means the reverse, present in old but not new.",
+      "\"Changed\" only applies to keys present in BOTH, where the value actually differs, record both the old and new value for each one.",
+      "Sort the added and removed lists so the output is consistent and predictable, not dependent on dict iteration order.",
+      "def diff_totals(old, new):\n    added = sorted([k for k in new if k not in old])\n    removed = sorted([k for k in old if k not in new])\n    changed = {}\n    for k in old:\n        if k in new and old[k] != new[k]:\n            changed[k] = {'old': old[k], 'new': new[k]}\n    return {'added': added, 'removed': removed, 'changed': changed}" ],
+    explanation: { why: "Three separate set-style comparisons, membership in new-but-not-old, old-but-not-new, and present-in-both-but-different, together cover every way two runs' totals can meaningfully differ, that's the complete shape of a real \"what changed\" report.", mistake: "Only reporting the current totals, without comparing against the prior run, forces whoever reads the report to manually spot differences themselves, a diff report does that comparison work automatically and surfaces exactly what's new.", tip: "This diff-two-snapshots pattern generalizes well beyond totals, the same added/removed/changed shape applies to comparing any two versions of structured data, a config file, a customer list, a set of totals.", business: "A stakeholder reviewing a weekly report cares far more about WHAT CHANGED since last week than about re-reading every number from scratch, a diff report surfaces exactly that, in a fraction of the reading time." } },
+
+  { id: "au-w04", skill: SKILL_ID_WORKFLOW, tool: "automation", level: "semiguided", difficulty: "core", prerequisite: ["au-w01"],
+    title: "Simulate a retry budget",
+    objective: "Write simulate_retries(attempt_outcomes, max_attempts), returning the first non-null result within the first max_attempts entries, or None if the budget runs out first.",
+    objectiveNote: "attempt_outcomes represents what each retry attempt WOULD produce (None means that attempt failed), this models a flaky operation (an API call, a file download) without needing to actually call anything.",
+    functionName: "simulate_retries",
+    starterCode: "def simulate_retries(attempt_outcomes, max_attempts):\n    # return the first non-null value within the first max_attempts entries, else None\n    pass\n",
+    testCases: [
+      { name: "Succeeds on the third attempt", args: [[null, null, "success"], 3], expected: "success" },
+      { name: "Budget runs out before success", args: [[null, null, "success"], 2], expected: null },
+      { name: "Succeeds immediately", args: [["ok"], 3], expected: "ok" },
+    ],
+    referenceCode: [
+      "    def _ref(attempt_outcomes, max_attempts):",
+      "        for outcome in attempt_outcomes[:max_attempts]:",
+      "            if outcome is not None:",
+      "                return outcome",
+      "        return None",
+    ],
+    randomGenCode: [
+      "        n_fail = random.randint(0, 3)",
+      "        outcomes = [None] * n_fail + ['done']",
+      "        max_attempts = random.randint(1, 5)",
+      "        rargs = (outcomes, max_attempts)",
+    ],
+    hints: [
+      "Only look at the first max_attempts entries of attempt_outcomes, a slice (attempt_outcomes[:max_attempts]) limits the search to exactly that budget.",
+      "Walk that limited slice, the first entry that ISN'T None is the successful result, return it immediately.",
+      "If every entry within the budget was None (every attempt failed), the retries are exhausted, return None.",
+      "def simulate_retries(attempt_outcomes, max_attempts):\n    for outcome in attempt_outcomes[:max_attempts]:\n        if outcome is not None:\n            return outcome\n    return None" ],
+    explanation: { why: "Slicing to the first max_attempts entries before searching correctly models a retry BUDGET, even if a later entry in attempt_outcomes would have succeeded, it's outside the allowed number of attempts and shouldn't be considered, exactly like a real retry loop that gives up after N tries.", mistake: "Searching the ENTIRE attempt_outcomes list for a non-null value, ignoring max_attempts, would find a success that happened AFTER the retry budget should have been exhausted, that's not how retry logic actually behaves, a real script gives up and moves on once its budget runs out.", tip: "In real code (rather than this simplified simulation), a retry loop actually calls a function fresh on each attempt inside a try/except, catching failures and stopping either on success or once max_attempts is reached, this task models that same budget-and-first-success logic without needing a real flaky operation to call.", business: "A script that calls an external API which occasionally times out needs exactly this kind of bounded retry logic, trying a few times before giving up, rather than either failing immediately on the first hiccup or retrying forever." } },
+
+  { id: "au-w05", skill: SKILL_ID_MONITORING, tool: "automation", level: "guided", difficulty: "core", prerequisite: ["au-r05"],
+    title: "Summarize a list of logged actions",
+    objective: "Write summarize_actions(actions), counting how many times each distinct action string appears in a list.",
+    objectiveNote: "A script that logs one action string per row processed (\"OK\", \"SKIP\", \"ALERT\") needs a quick way to summarize what actually happened across the whole run.",
+    functionName: "summarize_actions",
+    starterCode: "def summarize_actions(actions):\n    # count occurrences of each distinct action string\n    pass\n",
+    testCases: [
+      { name: "Counts repeated actions", args: [["SKIP", "OK", "SKIP", "OK", "OK"]], expected: { SKIP: 2, OK: 3 } },
+      { name: "All the same action", args: [["OK", "OK"]], expected: { OK: 2 } },
+      { name: "Empty list", args: [[]], expected: {} },
+    ],
+    referenceCode: [
+      "    def _ref(actions):",
+      "        out = {}",
+      "        for a in actions:",
+      "            out[a] = out.get(a, 0) + 1",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        pool = ['OK', 'SKIP', 'ALERT']",
+      "        n = random.randint(2, 8)",
+      "        actions = [random.choice(pool) for _ in range(n)]",
+      "        rargs = (actions,)",
+    ],
+    hints: [
+      "Walk the list once, keeping a running count per distinct value in a dict.",
+      ".get(a, 0) + 1 handles both cases in one expression, a new action starts its count at 1, an existing one gets incremented.",
+      "This is the exact same accumulation shape as batch_total from Stage 1, counting occurrences instead of summing a field.",
+      "def summarize_actions(actions):\n    out = {}\n    for a in actions:\n        out[a] = out.get(a, 0) + 1\n    return out" ],
+    explanation: { why: "A single pass, incrementing a per-value counter in a dict, is the standard way to tally occurrences of anything in Python, Python's own collections.Counter does exactly this internally, this hand-written version makes the same logic explicit.", mistake: "Counting occurrences by calling actions.count(a) for each distinct action inside a loop technically works, but re-scans the entire list once per distinct action, the single-pass dict approach does the whole job in one walk through the data.", tip: "This same tally pattern applies to summarizing any repeated categorical value, action logs, status codes, error types, it's one of the most broadly reusable small utilities in real analyst code.", business: "A daily script that processed 500 rows, skipped 12, and alerted on 3, needs exactly this kind of summary to report back \"what happened\" in one glance, rather than someone having to scroll through 500 individual log lines." } },
+
+  { id: "au-w06", skill: SKILL_ID_WORKFLOW, tool: "automation", level: "semiguided", difficulty: "core", prerequisite: ["au-w01"],
+    title: "Apply a config-driven business rule",
+    objective: "Write apply_config_rule(row, config), qualifying a row based on settings from a config dict, rather than hardcoded thresholds.",
+    objectiveNote: "A rule like \"minimum order amount\" changes over time and by business decision, hardcoding it means editing the script's code every time it changes, reading it from config means editing a setting instead.",
+    functionName: "apply_config_rule",
+    starterCode: "def apply_config_rule(row, config):\n    # True if row['amount'] >= config['min_amount'] AND row['region'] not in config['excluded_regions']\n    pass\n",
+    testCases: [
+      { name: "Qualifies", args: [{ amount: 100, region: "West" }, { min_amount: 50, excluded_regions: ["Test"] }], expected: true },
+      { name: "Fails on amount", args: [{ amount: 20, region: "West" }, { min_amount: 50, excluded_regions: ["Test"] }], expected: false },
+      { name: "Fails on excluded region", args: [{ amount: 100, region: "Test" }, { min_amount: 50, excluded_regions: ["Test"] }], expected: false },
+    ],
+    referenceCode: [
+      "    def _ref(row, config):",
+      "        if row.get('amount', 0) < config.get('min_amount', 0):",
+      "            return False",
+      "        if row.get('region') in config.get('excluded_regions', []):",
+      "            return False",
+      "        return True",
+    ],
+    randomGenCode: [
+      "        amount = random.randint(1, 200)",
+      "        region = random.choice(['West', 'East', 'Test'])",
+      "        rargs = ({'amount': amount, 'region': region}, {'min_amount': 100, 'excluded_regions': ['Test']})",
+    ],
+    hints: [
+      "Both conditions read their thresholds FROM the config dict, not from a number typed directly into the function, that's what makes this config-driven rather than hardcoded.",
+      "Check the amount threshold first, if it fails, the row doesn't qualify, no need to check anything else.",
+      "Then check whether the row's region is in the config's excluded list, if it is, the row doesn't qualify either.",
+      "def apply_config_rule(row, config):\n    if row.get('amount', 0) < config.get('min_amount', 0):\n        return False\n    if row.get('region') in config.get('excluded_regions', []):\n        return False\n    return True" ],
+    explanation: { why: "Every threshold this function checks against comes from the config argument, not a literal number written into the function body, that's the entire idea behind config-driven behavior, the RULE'S LOGIC stays fixed in code, while the specific THRESHOLDS can change by editing a settings dict instead of the script itself.", mistake: "Hardcoding `if row['amount'] < 50` directly into the function means every time the business changes its minimum order threshold, someone has to edit and redeploy the actual script, reading it from config means changing one setting instead, without touching the code at all.", tip: "This config-driven pattern scales well, a real script might load its config from a JSON file or environment variables at startup, but the core idea is the same, keep BUSINESS RULES' SPECIFIC VALUES outside the code that implements the rule's LOGIC.", business: "A minimum-order-value promotion threshold that changes every quarter is exactly the kind of value that shouldn't be buried inside a script's code, a config-driven function lets a non-engineer update the threshold by changing a setting, without needing to touch or redeploy the script itself." } },
+
+  { id: "au-w07", skill: SKILL_ID_MONITORING, tool: "automation", level: "semiguided", difficulty: "core", prerequisite: ["au-r04"],
+    title: "Reconcile a computed total against an expected one",
+    objective: "Write reconcile_totals(computed, expected, tolerance), returning True if the two values are close enough (within tolerance) to count as matching.",
+    objectiveNote: "Comparing your script's own computed total against a trusted, independently-produced number (like finance's own figure) is a standard sanity check before trusting a script's output.",
+    functionName: "reconcile_totals",
+    starterCode: "def reconcile_totals(computed, expected, tolerance):\n    # True if computed and expected are within `tolerance` of each other\n    pass\n",
+    testCases: [
+      { name: "Within tolerance, matches", args: [100.0, 100.005, 0.01], expected: true },
+      { name: "Outside tolerance, does not match", args: [100.0, 101.0, 0.01], expected: false },
+      { name: "Exactly equal", args: [50, 50, 0.01], expected: true },
+    ],
+    referenceCode: [
+      "    def _ref(computed, expected, tolerance):",
+      "        return abs(computed - expected) <= tolerance",
+    ],
+    randomGenCode: [
+      "        expected = round(random.uniform(10, 1000), 2)",
+      "        computed = expected + random.choice([-5, -0.001, 0, 0.001, 5])",
+      "        rargs = (computed, expected, 0.01)",
+    ],
+    hints: [
+      "\"Close enough\" is exactly what abs(computed - expected) measures, the absolute difference between the two, regardless of which one is bigger.",
+      "Compare that absolute difference against tolerance, if it's within (less than or equal to) tolerance, the two values count as matching.",
+      "This is deliberately NOT checking for EXACT equality, floating-point arithmetic (and independently-computed real-world totals) can differ by a tiny rounding amount even when they're both correct.",
+      "def reconcile_totals(computed, expected, tolerance):\n    return abs(computed - expected) <= tolerance" ],
+    explanation: { why: "abs(computed - expected) <= tolerance is the standard way to compare two numbers for \"close enough\" rather than bit-for-bit equality, essential for anything involving floating-point arithmetic or independently-computed real-world figures, which rarely match to the exact last decimal even when both are correct.", mistake: "Checking computed == expected directly is a common mistake with financial or computed figures, two genuinely correct numbers computed by different methods (a script's SUM vs. an accountant's spreadsheet) can differ by a fraction of a cent due to rounding, an exact equality check would incorrectly flag that as a mismatch.", tip: "Choosing the right tolerance is itself a real decision, too tight and legitimate rounding differences get flagged as errors, too loose and a genuine discrepancy slips through undetected, it should match the actual precision the two numbers are expected to agree to.", business: "A script's computed total that doesn't reconcile with finance's own trusted number for the same period is one of the most valuable checks a report can run automatically, catching that discrepancy before the wrong number ever reaches a stakeholder is exactly what this function is for." } },
+
+  { id: "au-w08", skill: SKILL_ID_MONITORING, tool: "automation", level: "challenge", difficulty: "challenge", prerequisite: ["au-w05"],
+    title: "Summarize a workflow's step-by-step execution log",
+    objective: "Write build_workflow_summary(steps_log), reducing a list of {\"step\":..., \"status\": \"ok\"/\"error\", \"detail\":...} entries into one summary dict.",
+    objectiveNote: "After a multi-step workflow finishes, a quick summary, how many steps ran, how many failed, what the first failure was, is far more useful than re-reading the entire raw log.",
+    functionName: "build_workflow_summary",
+    starterCode: "def build_workflow_summary(steps_log):\n    # return {\"total_steps\":N, \"ok\":X, \"errors\":Y, \"first_error\": <detail of the first error step, or None>}\n    pass\n",
+    testCases: [
+      { name: "Summarizes a mixed log", args: [[{ step: "load", status: "ok" }, { step: "parse", status: "error", detail: "bad row" }, { step: "save", status: "ok" }]], expected: { total_steps: 3, ok: 2, errors: 1, first_error: "bad row" } },
+      { name: "No errors at all", args: [[{ step: "a", status: "ok" }, { step: "b", status: "ok" }]], expected: { total_steps: 2, ok: 2, errors: 0, first_error: null } },
+      { name: "Reports the FIRST error's detail specifically", args: [[{ step: "a", status: "error", detail: "first" }, { step: "b", status: "error", detail: "second" }]], expected: { total_steps: 2, ok: 0, errors: 2, first_error: "first" } },
+    ],
+    referenceCode: [
+      "    def _ref(steps_log):",
+      "        ok = sum(1 for s in steps_log if s.get('status') == 'ok')",
+      "        errors = sum(1 for s in steps_log if s.get('status') == 'error')",
+      "        first_error = None",
+      "        for s in steps_log:",
+      "            if s.get('status') == 'error':",
+      "                first_error = s.get('detail')",
+      "                break",
+      "        return {'total_steps': len(steps_log), 'ok': ok, 'errors': errors, 'first_error': first_error}",
+    ],
+    randomGenCode: [
+      "        n = random.randint(2, 6)",
+      "        steps = []",
+      "        for i in range(n):",
+      "            status = random.choice(['ok', 'error'])",
+      "            entry = {'step': f'step{i}', 'status': status}",
+      "            if status == 'error':",
+      "                entry['detail'] = f'error at step{i}'",
+      "            steps.append(entry)",
+      "        rargs = (steps,)",
+    ],
+    hints: [
+      "total_steps is just the length of the log, ok and errors are each a count of entries matching that specific status.",
+      "sum(1 for s in steps_log if ...) is a compact way to count matching entries without a separate counter variable.",
+      "For first_error specifically, walk the log IN ORDER and stop at the very first error entry, using break, later errors shouldn't overwrite it.",
+      "def build_workflow_summary(steps_log):\n    ok = sum(1 for s in steps_log if s.get('status') == 'ok')\n    errors = sum(1 for s in steps_log if s.get('status') == 'error')\n    first_error = None\n    for s in steps_log:\n        if s.get('status') == 'error':\n            first_error = s.get('detail')\n            break\n    return {'total_steps': len(steps_log), 'ok': ok, 'errors': errors, 'first_error': first_error}" ],
+    explanation: { why: "Using break the moment the first error is found guarantees first_error stays exactly that, the FIRST one, without a later loop iteration accidentally overwriting it, a loop with no break would keep reassigning first_error all the way to the LAST error instead.", mistake: "Removing the break (or restructuring the loop so it doesn't stop early) would silently change first_error to report the LAST error in the log instead of the first one, exactly the opposite of what the name promises, and often the first error is the more useful one, since later failures are sometimes just downstream consequences of it.", tip: "Reducing a raw, detailed log into a small summary dict like this is a common final step in any workflow script, it's what actually gets read by a human or included in a notification, the raw log itself is usually just for deeper debugging when something needs it.", business: "A workflow that ran 50 steps overnight, with 2 failures, needs a summary that immediately says \"2 errors, first one was X\", not a raw 50-line log someone has to read start to finish to find the same information." } },
+
+  { id: "au-w09", skill: SKILL_ID_WORKFLOW, tool: "automation", level: "challenge", difficulty: "challenge", prerequisite: ["au-w06"],
+    title: "Normalize a row's column names",
+    objective: "Write schema_normalize(row, column_map), renaming a row's keys according to a mapping dict, leaving any unmapped key unchanged.",
+    objectiveNote: "Twelve monthly files from slightly different sources rarely use identical column names for the same field, this reconciles them to one consistent schema before anything downstream depends on a specific key name.",
+    functionName: "schema_normalize",
+    starterCode: "def schema_normalize(row, column_map):\n    # rename row's keys per column_map, leave any key not in column_map unchanged\n    pass\n",
+    testCases: [
+      { name: "Renames two mapped keys", args: [{ Region: "West", Amt: 100 }, { Region: "region", Amt: "amount" }], expected: { region: "West", amount: 100 } },
+      { name: "Leaves an unmapped key alone", args: [{ region: "East", note: "x" }, { Region: "region" }], expected: { region: "East", note: "x" } },
+      { name: "Empty map, nothing renamed", args: [{ a: 1 }, {}], expected: { a: 1 } },
+    ],
+    referenceCode: [
+      "    def _ref(row, column_map):",
+      "        out = {}",
+      "        for k, v in row.items():",
+      "            out[column_map.get(k, k)] = v",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        row = {'Region': random.choice(['West', 'East']), 'Amt': random.randint(1, 500)}",
+      "        col_map = {'Region': 'region', 'Amt': 'amount'}",
+      "        rargs = (row, col_map)",
+    ],
+    hints: [
+      "Walk the row's existing key-value pairs, for each one, look up whether the key has a rename in column_map.",
+      "column_map.get(k, k) is the key move here, it returns the mapped name if one exists, or falls back to the ORIGINAL key k unchanged if it doesn't.",
+      "Build a fresh output dict rather than modifying the row in place, so the caller's original row is left untouched.",
+      "def schema_normalize(row, column_map):\n    out = {}\n    for k, v in row.items():\n        out[column_map.get(k, k)] = v\n    return out" ],
+    explanation: { why: "column_map.get(k, k) elegantly handles both cases in one expression, a key that IS in the map gets renamed to its mapped value, a key that ISN'T falls back to itself (k), passing through unchanged, no separate if/else branch needed.", mistake: "Only copying over the keys that ARE in column_map (and silently dropping everything else) would lose any field the map didn't happen to mention, schema_normalize needs to preserve every field, renaming only the ones that need it.", tip: "This exact rename-with-fallback pattern is the standard way to reconcile inconsistent column naming across multiple source files before combining them, one column_map per known source format, applied through this same function.", business: "A vendor whose export calls the region field \"Region\" instead of \"region\" (a trivial-looking capitalization difference that would otherwise break every downstream function expecting a lowercase key) is exactly the real-world inconsistency this function is built to absorb, in one place, rather than special-casing it throughout the rest of the script." } },
+
+  { id: "au-w10", skill: SKILL_ID_WORKFLOW, tool: "automation", level: "mastery", difficulty: "mastery", prerequisite: ["au-w04", "au-w09"],
+    title: "Independent build: consolidate a year of monthly records",
+    objective: "Write process_annual_batch(monthly_records), combining fault tolerance and aggregation into one year-end consolidation of records pulled from twelve monthly files.",
+    objectiveNote: "Given a combined list of order records pulled from twelve monthly files (each with category, status, and amount, some rows malformed or incomplete, the usual mess of real monthly exports), skip any row missing category, status, or amount, or with an amount that can't be converted to a number, then sum amount by category for Completed rows only, across the WHOLE YEAR. Return {\"annual_totals\": {category: total}, \"skipped\": <count of bad rows>}.",
+    functionName: "process_annual_batch",
+    starterCode: "def process_annual_batch(monthly_records):\n    # skip malformed rows, sum amount by category for Completed rows, across the whole year\n    # return {\"annual_totals\": {...}, \"skipped\": ...}\n    pass\n",
+    testCases: [
+      { name: "Sums Completed amounts by category across records", args: [[{ category: "West", status: "Completed", amount: 100 }, { category: "West", status: "Completed", amount: 50 }, { category: "East", status: "Returned", amount: 999 }]], expected: { annual_totals: { West: 150 }, skipped: 0 } },
+      { name: "Skips a row missing a required field", args: [[{ category: "West", status: "Completed", amount: 100 }, { category: "East", status: "Completed" }]], expected: { annual_totals: { West: 100 }, skipped: 1 } },
+      { name: "Skips a row with an unparseable amount", args: [[{ category: "West", status: "Completed", amount: "N/A" }]], expected: { annual_totals: {}, skipped: 1 } },
+    ],
+    referenceCode: [
+      "    def _ref(monthly_records):",
+      "        totals = {}",
+      "        skipped = 0",
+      "        for r in monthly_records:",
+      "            if 'category' not in r or 'status' not in r or 'amount' not in r:",
+      "                skipped += 1",
+      "                continue",
+      "            try:",
+      "                amt = float(r['amount'])",
+      "            except Exception:",
+      "                skipped += 1",
+      "                continue",
+      "            if r['status'] == 'Completed':",
+      "                totals[r['category']] = totals.get(r['category'], 0) + amt",
+      "        return {'annual_totals': totals, 'skipped': skipped}",
+    ],
+    randomGenCode: [
+      "        cats = ['West', 'East', 'North']",
+      "        n = random.randint(4, 10)",
+      "        recs = []",
+      "        for _ in range(n):",
+      "            bad = random.random() < 0.2",
+      "            if bad:",
+      "                recs.append({'category': random.choice(cats), 'status': 'Completed'})",
+      "            else:",
+      "                recs.append({'category': random.choice(cats), 'status': random.choice(['Completed', 'Returned']), 'amount': random.randint(10, 300)})",
+      "        rargs = (recs,)",
+    ],
+    written: {
+      label: "Why does this function validate and skip each row BEFORE aggregating, rather than aggregating everything first and cleaning up afterward?",
+      placeholder: "Think about what a single bad amount value (like the string \"N/A\") would do to a running total if it were added in before being checked...",
+      check: (text) => /\b(before|first|validat|skip|check)\b/i.test(text) && /\b(crash|error|bad|corrupt|wrong|fail)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that trying to add an unparseable value like \"N/A\" directly into a running numeric total would crash immediately (or silently corrupt the total if not caught), validating and converting each row FIRST, before it ever touches the total, means a bad row is cleanly skipped instead of breaking or corrupting the whole year's aggregation." },
+    hints: [
+      "This combines Stage 1's fault-tolerant validation pattern (skip and count bad rows, don't crash) with Stage 2's per-category aggregation pattern, applied here across a full year's combined records instead of one file.",
+      "Check for the three required fields first, before trying to use any of them, a row can be missing a field entirely, which is a different problem than having a badly-formatted value.",
+      "Convert amount to a float inside its own try/except, a row can have ALL three required fields present, but still have an amount that isn't actually a valid number (like the text \"N/A\").",
+      "def process_annual_batch(monthly_records):\n    totals = {}\n    skipped = 0\n    for r in monthly_records:\n        if 'category' not in r or 'status' not in r or 'amount' not in r:\n            skipped += 1\n            continue\n        try:\n            amt = float(r['amount'])\n        except Exception:\n            skipped += 1\n            continue\n        if r['status'] == 'Completed':\n            totals[r['category']] = totals.get(r['category'], 0) + amt\n    return {'annual_totals': totals, 'skipped': skipped}" ],
+    explanation: { why: "Validating and converting each row BEFORE it's allowed to touch the running totals means a single malformed row is caught and skipped in isolation, exactly like Stage 1's run_pipeline, aggregating everything first and trying to clean up afterward would mean a bad value either crashes the aggregation immediately, or, worse, gets silently included as some default value and quietly corrupts the year's real total.", mistake: "An \"aggregate first, clean later\" approach sounds appealing (write the simple aggregation logic first, worry about bad data after), but for numeric aggregation specifically, a single bad value touching the running total can crash the whole computation or, if caught too late, has already been added in and corrupted the result before anyone noticed.", tip: "This validate-then-aggregate order isn't just a style preference, it's the difference between a script that fails safely on one bad row (skipping it, keeping an accurate total) and one that either crashes entirely or produces a subtly wrong number nobody catches.", business: "This is deliberately the least guided task in this stage, and in the whole Automation library, twelve real monthly files, consolidated into one honest annual total, with a handful of inevitably malformed rows along the way, is exactly the kind of unglamorous, high-stakes automation work a working analyst is actually asked to build and trust." } },
 ];
 
 /* ================= grading ================= */
@@ -935,7 +1275,7 @@ function renderSkillBar() {
   const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
   target.innerHTML = next
     ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
-    : `<b>What should I do next?</b> All ${TASKS.length} Stage 1 tasks passed. Stages 2-3 aren't built yet.`;
+    : `<b>What should I do next?</b> All ${TASKS.length} tasks passed, the full Automation Practice Library is complete.`;
 }
 function buildHintsHtml(hints) {
   const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
