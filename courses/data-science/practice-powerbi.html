@@ -115,11 +115,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Power BI &middot; Stages 1-2 of 4</span>
+    <span class="eyebrow">Practice Library &middot; Power BI &middot; Stages 1-3 of 4</span>
     <h1 class="serif">Power BI Practice Library</h1>
     <p class="sub">Decision-based practice for Power BI's specific reasoning: Column vs Measure, Calculated Column vs Measure, Row Context vs Filter Context, which visual fits a request, and the Report/Dashboard split unique to Power BI's Desktop-plus-Service workflow.</p>
     <div class="honestnote"><b>Honest scope note, please read:</b> this is a <b>practice simulation</b>, not real Power BI. Nothing here renders inside actual Power BI Desktop or the Power BI Service, and no click is graded by executing real Microsoft software, this page can't run in a browser the way the Excel formula engine or the Python/SQL sandboxes do. What it genuinely checks is the reasoning: given a real field from a real table, do you know whether it's a Column or a Measure, when a calculation needs Row Context vs Filter Context, and which Power BI feature a business request actually calls for. Every scenario is re-randomized on every attempt specifically so a memorized click sequence can't pass, only the underlying rule can. Treat this as a rehearsal for the concepts, not a substitute for opening Power BI Desktop (free) and building a real report.</div>
-    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals) and Stage 2 (Power Query &amp; Data Prep: Change Type, Remove Duplicates, Remove vs Replace Errors, Append vs Merge, Split Column, Unpivot, Applied Steps order, Group By vs a Measure, Choose vs Remove Columns) are complete, 20 tasks. Stages 3-4 (Data Modeling &amp; DAX, Dashboards &amp; BI) are not yet built.</div>
+    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals), Stage 2 (Power Query &amp; Data Prep), and Stage 3 (Data Modeling &amp; DAX: Calculated Column vs Measure, One-to-Many relationships and cross-filter direction, Row Context vs Filter Context, CALCULATE, SUM vs SUMX, and CALCULATE + ALL() for percent-of-total patterns) are complete, 30 tasks. Stage 4 (Dashboards &amp; BI) is not yet built.</div>
   </header>
 
   <div class="sheetblock">
@@ -205,12 +205,16 @@ const SKILL_ID_VISUALS = "powerbi-visuals";
 const SKILL_ID_REPORTVSDASH = "powerbi-report-dashboard";
 const SKILL_ID_CLEANING = "powerbi-data-cleaning";
 const SKILL_ID_COMBINE = "powerbi-combine-reshape";
+const SKILL_ID_MODELING = "powerbi-data-modeling";
+const SKILL_ID_DAX = "powerbi-dax";
 const SKILLS = [
   { id: SKILL_ID_FIELDS, label: "Power BI Column vs Measure" },
   { id: SKILL_ID_VISUALS, label: "Power BI Visual Choice" },
   { id: SKILL_ID_REPORTVSDASH, label: "Power BI Report vs Dashboard" },
   { id: SKILL_ID_CLEANING, label: "Power BI Data Cleaning" },
   { id: SKILL_ID_COMBINE, label: "Power BI Combining & Reshaping Data" },
+  { id: SKILL_ID_MODELING, label: "Power BI Data Modeling" },
+  { id: SKILL_ID_DAX, label: "Power BI DAX" },
 ];
 
 /* Each task's build(seed) returns { scenarioHtml, slots, correct },
@@ -619,6 +623,209 @@ const TASKS = [
       "\"The amount column came in as text\" needs Change Type, and doing this per-file before combining (or right after, consistently) keeps both files' amounts genuinely numeric before anything downstream depends on them.",
       "First fix = Change Type, Combine method = Append." ],
     explanation: { why: "This combines the Change Type and Append patterns from earlier in this stage, applied together from a plain-language brief, \"same columns, some duplicates, wrong data type\" translates directly into Change Type, Remove Duplicates, and Append, in some sensible order, without ever naming a single Power Query feature.", mistake: "Reaching for Merge because two separate files are being combined, without noticing they share the exact same columns (not a shared key to join on), would misapply the wrong combine operation entirely, Merge answers a different question than \"stack these two same-shaped files together\".", tip: "A real data prep brief almost never uses the words \"Append\", \"Merge\", or \"Change Type\", it describes files, columns, and problems in plain language, translating that into the right sequence of Power Query steps, in the right order, is the actual skill this whole stage has been building toward.", business: "This is deliberately the least guided task in this stage, monthly exports with matching columns, some duplicate rows, and an occasional wrong data type are an extremely common real starting point for an analyst's data prep work, recognizing the right combination of steps without being told which ones to use is the real job." } },
+
+  /* ---- Stage 3: Data Modeling & DAX ---- */
+  { id: "pb-m01", skill: SKILL_ID_DAX, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-f01"],
+    title: "Calculated Column or Measure?",
+    objective: "Recognize when a DAX formula needs to be stored per row (Calculated Column) vs computed on demand (Measure).",
+    build() {
+      const columnCase = Math.random() < 0.5;
+      const desc = columnCase
+        ? "an 8% tax amount for EACH individual order, that value should live in the table itself, one value per row, so it can be filtered on and shown in a detail table alongside the order"
+        : "a total revenue figure that should always reflect whatever filters are currently active in the report, recalculating live as a stakeholder slices by region or date";
+      return {
+        scenarioHtml: `You need a DAX formula for <b>${esc(desc)}</b>.`,
+        slots: [{ key: "kind", label: "Calculated Column or Measure?", options: [{ value: "column", label: "Calculated Column" }, { value: "measure", label: "Measure" }] }],
+        correct: { kind: columnCase ? "column" : "measure" },
+      };
+    },
+    hints: [
+      "A value that needs to exist PER ROW, stored in the table, filterable and visible in a detail view, is a Calculated Column, exactly like a per-order tax amount.",
+      "A value that needs to recompute LIVE, responding to whatever filters are currently active, is a Measure, that's not something a static per-row value can do.",
+      "\"One value per row, stored, filterable\" = Calculated Column. \"Always reflects current filters, recalculates live\" = Measure.",
+      "Match your answer to whether the value needs to be stored per row (Calculated Column) or recomputed live per current filter (Measure)." ],
+    explanation: { why: "A Calculated Column is computed once, when the data refreshes, and stored physically in the table, one fixed value per row, a Measure is instead computed fresh every time it's used in a visual, using whatever filters currently apply, the two solve genuinely different problems and aren't interchangeable.", mistake: "Building every calculation as a Calculated Column (a common early habit, since it's conceptually simpler, one formula, one row) works for row-level values but produces a stale, non-responsive number for anything that should react to report filters, that's specifically what a Measure is for.", tip: "Ask: does this value need to exist on every individual row (Calculated Column), or does it only make sense as a summary that should update with whatever's currently filtered (Measure)? That question resolves the choice almost every time.", business: "A per-order tax amount genuinely belongs on each row, useful in a detail table or as a filterable value, a company-wide total revenue figure needs to update every time a stakeholder changes a filter, using the wrong one for the wrong job either bloats the model with a frozen number or fails to provide the per-row detail actually needed." } },
+
+  { id: "pb-m02", skill: SKILL_ID_MODELING, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Which side of a relationship is \"one\", which is \"many\"?",
+    objective: "Recognize the One and Many sides of a standard Power BI relationship.",
+    build() {
+      return {
+        scenarioHtml: `Your model has a small <b class="mono">Category</b> table (one row per category, 4 rows total: Outdoor, Apparel, Electronics, Home) related to the <b class="mono">Orders</b> table (many rows, each with a category value that must match a row in the Category table).`,
+        slots: [{ key: "one", label: "Which table is the \"One\" side?", options: [{ value: "category", label: "Category table" }, { value: "orders", label: "Orders table" }] }],
+        correct: { one: "category" },
+      };
+    },
+    hints: [
+      "The \"One\" side of a relationship is the table where each key value appears exactly once, here, each category name appears exactly once in the Category table.",
+      "The \"Many\" side is the table where that same key value can repeat many times, here, many orders can share the same category.",
+      "A small reference/lookup table (one row per category) is almost always the \"One\" side, a large transactional table (many orders) is almost always the \"Many\" side.",
+      "Category table = One side, Orders table = Many side." ],
+    explanation: { why: "A relationship's cardinality describes how many times a key value can appear on each side, the Category table has each category exactly once (the \"One\" side), the Orders table can have the same category on many different order rows (the \"Many\" side), that's a standard one-to-many relationship.", mistake: "Mixing up which side is \"One\" and which is \"Many\" doesn't just matter conceptually, it determines the DEFAULT direction filters flow (from One to Many), getting it backwards can mean a slicer on the Category table appears to do nothing to the Orders table, or vice versa.", tip: "A fast rule of thumb, the small reference/lookup table (categories, regions, a calendar table) is almost always the \"One\" side, the large transactional/fact table (orders, sales, events) is almost always the \"Many\" side.", business: "This one-to-many shape, a small category or region lookup table related to a large orders table, is the standard, most common structure in almost every real Power BI data model, recognizing it on sight is foundational to everything else in this stage." } },
+
+  { id: "pb-m03", skill: SKILL_ID_MODELING, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-m02"],
+    title: "Which direction do filters normally flow?",
+    objective: "Recognize the default, Single direction cross-filter behavior of a one-to-many relationship.",
+    build() {
+      return {
+        scenarioHtml: `Using the standard Category (One) to Orders (Many) relationship, with the DEFAULT cross-filter direction (Single), a slicer is placed on the <b class="mono">category</b> field from the Category table.`,
+        slots: [{ key: "behavior", label: "What happens when a category is selected in the slicer?", options: [
+          { value: "filters_orders", label: "It filters the Orders table down to just that category's orders" },
+          { value: "no_effect", label: "It has no effect on the Orders table at all" },
+        ] }],
+        correct: { behavior: "filters_orders" },
+      };
+    },
+    hints: [
+      "By default (Single direction), filters flow from the \"One\" side to the \"Many\" side, exactly the direction that makes a category filter narrow down matching orders.",
+      "This is the standard, expected behavior for the vast majority of real Power BI models, filtering a lookup table narrows the larger table related to it.",
+      "The default Single direction is specifically One-to-Many (Category to Orders here), not the other way around.",
+      "It filters the Orders table down to just that category's orders." ],
+    explanation: { why: "In Power BI's default Single cross-filter direction, a filter applied on the \"One\" side of a relationship (here, Category) automatically propagates to the \"Many\" side (Orders), narrowing it down, that's the direction that makes intuitive sense for the vast majority of real models.", mistake: "Assuming a slicer's filtering direction is automatic and always symmetric is a common misunderstanding, by default it flows in exactly one direction (One to Many), a slicer placed on a field from the Orders table would NOT automatically filter the Category table back, without switching the relationship to Both.", tip: "Single direction is Power BI's default for good reason, it matches how most real questions work, \"show me orders for this category\", not the reverse, only switch to Both when a genuine, specific need for bidirectional filtering arises.", business: "This is exactly the behavior that makes a Category slicer on a Power BI report narrow down every visual built from the Orders table, the single most common interaction pattern in a real Power BI report depends on this default direction working correctly." } },
+
+  { id: "pb-m04", skill: SKILL_ID_DAX, tool: "powerbi", level: "semiguided", difficulty: "core", prerequisite: ["pb-m01"],
+    title: "Row Context: a Calculated Column already knows its own row",
+    objective: "Recognize that a Calculated Column's formula automatically has row context, no explicit filter needed.",
+    build() {
+      return {
+        scenarioHtml: `You write a Calculated Column: <b class="mono">Tax Amount = Orders[amount] * 0.08</b>. For a row where amount is $100, Tax Amount correctly shows $8, for a row where amount is $340, it correctly shows $27.20, with no filter or CALCULATE written anywhere in the formula.`,
+        slots: [{ key: "why", label: "Why does the formula automatically use each row's OWN amount?", options: [
+          { value: "rowcontext", label: "Row context: a Calculated Column's formula evaluates once per row, with that row's own values already available" },
+          { value: "filtercontext", label: "Filter context: the formula is being filtered down to one row at a time by an implicit filter" },
+        ] }],
+        correct: { why: "rowcontext" },
+      };
+    },
+    hints: [
+      "A Calculated Column's formula runs once for EVERY row in the table, and on each run, it automatically has access to that specific row's own column values, no filter needed.",
+      "This automatic per-row evaluation, where the formula just knows \"this row's amount\", is called Row Context, it's fundamentally different from filtering a set of rows down.",
+      "Filter Context (a different concept, covered next) is about which rows are currently visible or selected, Row Context is about a formula having direct access to one row's own values as it evaluates.",
+      "Row context." ],
+    explanation: { why: "Row context is DAX's term for a Calculated Column formula's automatic, built-in awareness of \"the current row\", when Orders[amount] is referenced inside a Calculated Column, it means THIS row's amount, without needing any filter, because the formula is inherently evaluated one row at a time.", mistake: "Assuming Orders[amount] inside a Measure would behave the same way, automatically meaning \"the current row's amount\", is a common and genuinely confusing DAX mistake, Measures don't have row context by default, that's exactly the distinction the next few tasks in this stage build on.", tip: "Row context is specific to Calculated Columns (and to iterator functions like SUMX, covered later in this stage), it's the reason a Calculated Column formula can reference its own row's fields directly, with no CALCULATE or filter logic required.", business: "This automatic row-by-row evaluation is what makes Calculated Columns straightforward for row-level business logic, a tax amount, a High/Low flag, a concatenated label, each simply refers to \"this row's\" fields directly, no extra filtering language required." } },
+
+  { id: "pb-m05", skill: SKILL_ID_DAX, tool: "powerbi", level: "semiguided", difficulty: "core", prerequisite: ["pb-m01"],
+    title: "Filter Context: a Measure responds to whatever's currently filtered",
+    objective: "Recognize that a Measure's formula evaluates within the filter context of wherever it's placed, not a single fixed row.",
+    build() {
+      const dim = pick(DIMENSION_FIELDS);
+      return {
+        scenarioHtml: `You write a Measure: <b class="mono">Total Revenue = SUM(Orders[amount])</b>, and place it in a Table visual with <b class="mono">${esc(dim)}</b> on rows. Each row of that table shows a DIFFERENT Total Revenue number, matching just that row's ${esc(dim)} value, even though the Measure's formula never mentions ${esc(dim)} at all.`,
+        slots: [{ key: "why", label: "Why does the same Measure formula produce a different number per row?", options: [
+          { value: "filtercontext", label: "Filter context: the visual applies an implicit filter for each row, and the Measure recalculates within it" },
+          { value: "rowcontext", label: "Row context: the Measure automatically knows each row's own values, the same as a Calculated Column" },
+        ] }],
+        correct: { why: "filtercontext" },
+      };
+    },
+    hints: [
+      "The Measure's formula, SUM(Orders[amount]), never changes, but the SET OF ROWS it sums over changes, because the visual itself is applying an implicit filter for each table row.",
+      "This implicit, surrounding filter, coming from the visual, a slicer, or anything else currently narrowing the data, is called Filter Context, it's what a Measure always evaluates within.",
+      "Row Context (a different concept, covered in the previous task) belongs to Calculated Columns, a Measure does NOT automatically get row context the same way.",
+      "Filter context." ],
+    explanation: { why: "Filter context is the set of filters currently in effect wherever a Measure is being evaluated, coming from slicers, visual rows/columns, and any other active filters, a Measure's formula stays exactly the same, but it recalculates fresh within whatever filter context surrounds it, that's why the same SUM(Orders[amount]) produces a different number in each row of a table broken out by a Dimension.", mistake: "Expecting a Measure to behave like a Calculated Column, automatically \"knowing\" one row's own value, is a common and genuinely important DAX misunderstanding, a Measure has no row context of its own, it only responds to filter context, an entirely different mechanism.", tip: "Filter context is the single most important concept for understanding how Measures actually work, everything a Measure does, in every visual, every slicer interaction, is really just \"evaluate this formula within whatever filter context currently surrounds it\".", business: "This is exactly why the SAME Total Revenue Measure can be dropped into any visual, any breakdown, any slicer combination, and always show the CORRECT number for that specific context, without writing a separate formula for every possible breakdown, that reusability is one of DAX's biggest practical advantages." } },
+
+  { id: "pb-m06", skill: SKILL_ID_DAX, tool: "powerbi", level: "semiguided", difficulty: "core", prerequisite: ["pb-m05"],
+    title: "CALCULATE: overriding filter context",
+    objective: "Recognize CALCULATE as the DAX function that modifies the filter context a Measure evaluates within.",
+    build() {
+      const status = pick(["Completed", "Returned", "Cancelled"]);
+      return {
+        scenarioHtml: `You need a Measure that always returns total revenue for <b>"${esc(status)}"</b> orders specifically, REGARDLESS of whatever status filter (if any) is currently active elsewhere on the report.`,
+        slots: [{ key: "func", label: "Which DAX function makes this possible?", options: [{ value: "calculate", label: "CALCULATE" }, { value: "sum", label: "SUM (alone, with no other function)" }, { value: "sumx", label: "SUMX" }] }],
+        correct: { func: "calculate" },
+      };
+    },
+    hints: [
+      "A plain SUM(Orders[amount]) just respects whatever filter context already surrounds it, it can't override or replace part of that context on its own.",
+      "CALCULATE is the DAX function specifically built to modify filter context, adding, replacing, or removing filters within a Measure's formula.",
+      "CALCULATE(SUM(Orders[amount]), Orders[status] = \"<the status value named above>\") would force the status filter to always be exactly that value, overriding whatever else is active.",
+      "CALCULATE." ],
+    explanation: { why: "CALCULATE takes a base expression (often a simple SUM or another Measure) and one or more filter arguments, it evaluates that expression within a MODIFIED filter context, here forcing status to one specific value regardless of whatever filter context already existed, that's the core mechanism behind almost every advanced DAX pattern.", mistake: "Trying to force a fixed status filter using only plain SUM, with no CALCULATE, isn't possible, SUM has no mechanism to override the filter context it's placed in, CALCULATE is specifically what makes that override possible.", tip: "CALCULATE is arguably the single most important function in all of DAX, nearly every advanced pattern, year-over-year comparisons, percent of total, ignoring a specific filter, is CALCULATE modifying filter context in some way.", business: "A \"completed revenue only\" Measure that stays fixed on Completed status regardless of whatever else a stakeholder filters by is exactly the kind of reliable, override-proof metric a finance team needs for a metric that must never accidentally include the wrong status." } },
+
+  { id: "pb-m07", skill: SKILL_ID_DAX, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-m06"],
+    title: "SUM or SUMX?",
+    objective: "Recognize when a calculation needs row-by-row iteration (SUMX) rather than a plain aggregation over one existing column (SUM).",
+    build() {
+      const plainCase = Math.random() < 0.5;
+      const desc = plainCase
+        ? "total revenue, which is just adding up the existing amount column, no per-row calculation needed first"
+        : "total revenue where each row's contribution first needs its own tax subtracted (amount minus 8% of amount), calculated per row, THEN summed together";
+      return {
+        scenarioHtml: `You need a Measure for: <b>${esc(desc)}</b>.`,
+        slots: [{ key: "func", label: "Which function fits?", options: [{ value: "sum", label: "SUM(Orders[amount])" }, { value: "sumx", label: "SUMX(Orders, Orders[amount] * 0.92)" }] }],
+        correct: { func: plainCase ? "sum" : "sumx" },
+      };
+    },
+    hints: [
+      "SUM adds up an EXISTING column directly, no per-row formula needed first, just \"add up this column\".",
+      "SUMX is an iterator, it walks the table row by row, evaluates a formula for EACH row (introducing row context, just like a Calculated Column would), and THEN sums those per-row results together.",
+      "\"Just adding up the existing column\" is plain SUM, \"each row needs its own calculation first, THEN summed\" is SUMX.",
+      "Match your answer to whether the value being summed already exists as-is (SUM) or needs a per-row formula computed first (SUMX)." ],
+    explanation: { why: "SUM aggregates an existing column directly, with no per-row logic, SUMX is an iterator function, it evaluates a given expression once per row (temporarily introducing row context, the same mechanism a Calculated Column has), THEN sums up those individual per-row results, SUMX is required whenever the value being summed isn't already sitting in a single column as-is.", mistake: "Trying to write SUM(Orders[amount] * 0.92) directly (without SUMX) isn't valid DAX, SUM only accepts a single column reference, it has no way to apply a per-row formula before aggregating, that's specifically what makes SUMX necessary.", tip: "Whenever a total requires a calculation to happen PER ROW first, quantity times price, amount minus a per-row discount, before being added together, that's a signal for an iterator function like SUMX, not plain SUM.", business: "A margin calculation (revenue minus a per-row cost that varies by product) genuinely needs to be computed per transaction before being totaled, SUMX is the DAX tool built for exactly that shape of real business calculation, plain SUM can't express it at all." } },
+
+  { id: "pb-m08", skill: SKILL_ID_DAX, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-m04", "pb-m05"],
+    title: "A Measure has no row context by default",
+    objective: "Recognize the classic DAX gotcha: referencing a Column inside a plain Measure does NOT automatically mean \"this row\", the way it does in a Calculated Column.",
+    build() {
+      return {
+        scenarioHtml: `You write <b class="mono">Orders[amount] * 1.08</b> as a MEASURE (not a Calculated Column) and place it on a Card visual, hoping to see one specific row's amount, marked up by 8%.`,
+        slots: [{ key: "result", label: "What actually happens?", options: [
+          { value: "error", label: "It errors or behaves unexpectedly, a bare column reference like this isn't meaningful without row or filter context to resolve it to a single value" },
+          { value: "onerow", label: "It correctly shows that one row's amount, marked up by 8%, the same as a Calculated Column would" },
+        ] }],
+        correct: { result: "error" },
+      };
+    },
+    hints: [
+      "A Measure has NO automatic row context, referencing a Column directly inside a Measure doesn't mean \"this row\" the way the exact same reference would inside a Calculated Column.",
+      "Without row context AND without an aggregation function telling DAX how to reduce many rows down to one value, a bare column reference inside a Measure is ambiguous, which row's amount would it even mean?",
+      "This is exactly why Measures almost always wrap a Column reference in an aggregation (SUM, AVERAGE) or an iterator (SUMX), those tell DAX how to go from many rows to one number, a bare reference alone can't.",
+      "It errors or behaves unexpectedly, without row or filter context to resolve to a single value, the bare Column reference is ambiguous." ],
+    explanation: { why: "This is one of the most common real DAX gotchas, the exact same-looking expression, Orders[amount] * 1.08, behaves completely differently depending on whether it's written inside a Calculated Column (where row context makes it unambiguous, \"this row's amount\") or a Measure (where there's no row context, so DAX has no way to know which row's amount is meant).", mistake: "Assuming any DAX expression means the same thing regardless of whether it's a Calculated Column or a Measure is exactly the mistake this gotcha is built to correct, the SAME formula text can be perfectly valid in one context and meaningless in the other.", tip: "As a rule, a Measure should almost always wrap any Column reference in an aggregation function (SUM, AVERAGE, MIN, MAX) or an iterator (SUMX, AVERAGEX), a bare Column reference with no aggregation, inside a Measure, is a signal something is probably wrong.", business: "This exact confusion, writing a Measure formula that would have worked fine as a Calculated Column, and getting a confusing error or unexpected blank instead, is one of the most common real stumbling blocks for anyone newly learning DAX, recognizing it on sight saves real debugging time." } },
+
+  { id: "pb-m09", skill: SKILL_ID_DAX, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-m06"],
+    title: "ALL(): removing a filter inside CALCULATE",
+    objective: "Recognize ALL() as the way to strip filters from a table or column, the building block of a percent-of-total DAX pattern.",
+    build() {
+      return {
+        scenarioHtml: `You're building a "% of Total Revenue" Measure. The numerator is the currently-filtered Total Revenue, the denominator needs to be the GRAND TOTAL revenue, completely ignoring whatever region or category filter is currently active, the company-wide total no matter what's selected.`,
+        slots: [{ key: "func", label: "Which function belongs in the denominator's CALCULATE?", options: [{ value: "all", label: "CALCULATE(SUM(Orders[amount]), ALL(Orders))" }, { value: "sum", label: "Just SUM(Orders[amount]), no CALCULATE needed" }, { value: "sumx", label: "SUMX(Orders, Orders[amount])" }] }],
+        correct: { func: "all" },
+      };
+    },
+    hints: [
+      "The denominator needs to IGNORE whatever filters are currently active, that's removing filter context, not just aggregating.",
+      "ALL(Orders) inside CALCULATE strips away any filters currently applied to the Orders table, so the SUM inside computes over the entire, unfiltered table.",
+      "Plain SUM (no CALCULATE) would still respect whatever filter context surrounds it, that's the opposite of what a grand-total denominator needs.",
+      "CALCULATE(SUM(Orders[amount]), ALL(Orders))." ],
+    explanation: { why: "ALL() removes any filters currently applied to the table (or column) named inside it, wrapped inside CALCULATE, this forces the SUM to compute over the complete, unfiltered dataset, a company-wide grand total, regardless of whatever region, category, or other filter is currently narrowing the rest of the report.", mistake: "Using plain SUM(Orders[amount]) for the denominator, without CALCULATE and ALL(), would just respect the SAME filter context as the numerator, making the percentage always compute to 100%, since numerator and denominator would always be identical, that's a common, subtle DAX bug.", tip: "CALCULATE combined with ALL() is the standard DAX pattern behind \"percent of total\", \"percent of grand total\", and similar ignore-this-filter calculations, the same underlying idea as Tableau's Percent of Total Table scope, expressed through DAX's own filter-context mechanism instead.", business: "A \"this region is X% of total company revenue\" figure is a genuinely common real business ask, and it specifically requires the denominator to ignore the region filter the numerator is respecting, CALCULATE plus ALL() is exactly the DAX mechanism that makes that possible." } },
+
+  { id: "pb-m10", skill: SKILL_ID_DAX, tool: "powerbi", level: "mastery", difficulty: "mastery", prerequisite: ["pb-m08", "pb-m09"],
+    title: "Independent build: percent of category total, per region",
+    objective: "Combine CALCULATE and ALL() into a within-group percent-of-total Measure, from a plain-language brief with no DAX given.",
+    build() {
+      return {
+        scenarioHtml: `A stakeholder asks: <b>"I want to see, for each region, what percentage of ITS OWN CATEGORY's total revenue it represents, not a percentage of the whole company, just within that one category."</b> Your view has category on Rows and region on Columns.`,
+        slots: [{ key: "formula", label: "Which Measure formula correctly implements this?", options: [
+          { value: "correct", label: "DIVIDE(SUM(Orders[amount]), CALCULATE(SUM(Orders[amount]), ALL(Orders[region])))" },
+          { value: "wrong1", label: "DIVIDE(SUM(Orders[amount]), CALCULATE(SUM(Orders[amount]), ALL(Orders)))" },
+          { value: "wrong2", label: "DIVIDE(SUM(Orders[amount]), SUM(Orders[amount]))" },
+          { value: "wrong3", label: "CALCULATE(DIVIDE(SUM(Orders[amount]), SUM(Orders[amount])), ALL(Orders[category]))" },
+        ] }],
+        correct: { formula: "correct" },
+      };
+    },
+    written: {
+      label: "Why does the denominator use ALL(Orders[region]) specifically, rather than ALL(Orders) or no ALL() at all?",
+      placeholder: "Think about which filter needs to be removed (region) and which one needs to STAY in place (category) for a within-category percentage...",
+      check: (text) => /\b(region)\b/i.test(text) && /\b(category|stay|keep|remain)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that only the region filter should be removed for the denominator (so it sums across every region), while the category filter needs to STAY in place (so the denominator is that category's total, not the whole company's), ALL(Orders[region]) removes exactly one filter and leaves the rest, ALL(Orders) would remove both, including category, which isn't what \"within its own category\" means." },
+    hints: [
+      "This combines CALCULATE and ALL() from earlier in this stage, but the ALL() needs to be scoped to just ONE column, region, not the whole table.",
+      "\"Within its own category\" means the category filter should STAY in place for the denominator, only the region filter should be removed.",
+      "ALL(Orders[region]) removes just the region filter, leaving category's filter intact, ALL(Orders) (the whole table) would remove BOTH filters, producing a company-wide percentage instead of a within-category one.",
+      "DIVIDE(SUM(Orders[amount]), CALCULATE(SUM(Orders[amount]), ALL(Orders[region])))." ],
+    explanation: { why: "This is the Pane-scope Percent of Total pattern from Tableau's own Stage 2 and 3 (this library's Tableau LOD tasks cover the same underlying idea), expressed here in DAX, ALL() can be scoped to a SINGLE column rather than an entire table, removing just the region filter while deliberately leaving the category filter in place for the denominator, exactly what \"within its own category\" requires.", mistake: "Using ALL(Orders) (the whole table) instead of ALL(Orders[region]) removes every filter, including category, producing a percentage of the WHOLE COMPANY's revenue instead of the requested within-category percentage, a subtle but completely different, and wrong, number.", tip: "ALL() can target a table (remove every filter on it) or a specific column (remove just that one filter), scoping it to exactly the column that needs to be ignored, while leaving everything else intact, is the key skill this task is built around.", business: "This is deliberately the least guided task in this stage, and mirrors the exact same within-group percentage judgment call from the Tableau library's own LOD stage, applied here through DAX's CALCULATE and ALL() instead of Tableau's FIXED/INCLUDE/EXCLUDE, the underlying analytical reasoning is the same skill, expressed in two different tools' languages." } },
 ];
 
 /* ================= grading =================
