@@ -69,6 +69,16 @@ textarea,input[type=text]{width:100%;font-family:'IBM Plex Mono';font-size:13px;
 .skillcol.have .slbl{color:var(--good)}
 .skillcol.need .slbl{color:var(--amber)}
 .skillcol ul{padding-left:18px;font-size:13.5px;line-height:1.9;color:var(--tx)}
+.evidencebox{margin-top:20px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:16px 18px}
+.evidencebox .elbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);margin-bottom:10px;font-family:'IBM Plex Mono'}
+.evrow{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+.evrow .evskill{flex:1;color:var(--tx)}
+.tierpill{font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:3px 10px;border-radius:99px;font-weight:700;flex-shrink:0}
+.tierpill.t-not-started{background:var(--card2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.12);color:var(--amber)}
+.tierpill.t-competent{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t-mastered{background:rgba(74,222,149,.2);color:var(--good)}
 .jobchip{display:inline-block;background:var(--card2);border:1px solid var(--bd2);border-radius:99px;padding:6px 14px;font-size:12.5px;margin:0 8px 8px 0}
 .nopromise{font-size:12px;color:var(--mut2);margin-top:12px;font-style:italic}
 /* ---- skill matrix ---- */
@@ -158,7 +168,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
     <span class="eyebrow">Career Path Edition</span>
     <h1 class="serif">Turning this course into a job search</h1>
     <p class="sub">Every claim below is tied to something you actually did in this course, not generic advice. Where a number appears, its method is shown next to it. Where a skill isn't taught here, that's stated plainly instead of glossed over.</p>
-    <div class="disclosure"><b>What this course is honest about:</b> finishing it prepares you to apply to junior/entry-level analyst roles with real, demonstrable evidence. It does not make you a data scientist, it does not guarantee an interview or a job, and several tools real job postings ask for (Power BI, Tableau, Git, cloud platforms) aren't taught here. Read on for exactly what you have and exactly what's still missing.</div>
+    <div class="disclosure"><b>What this course is honest about:</b> finishing it prepares you to apply to junior/entry-level analyst roles with real, demonstrable evidence. It does not make you a data scientist, it does not guarantee an interview or a job. Tableau and Power BI ARE covered, but as honest, clearly-labeled decision-based practice simulations, not real execution against the actual desktop or cloud tools, that's a genuine, disclosed gap, not a hidden one. Git and cloud platforms still aren't taught here at all. Read on for exactly what you have and exactly what's still missing.</div>
   </header>
 
   <nav class="toc">
@@ -280,6 +290,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 </div>
 
 <script src="course-progress.js?v=5"></script>
+<script src="practice-progress.js"></script>
+<script src="skill-map.js?v=1"></script>
 <script>
 const esc = CourseProgress.escapeHtml;
 
@@ -379,25 +391,36 @@ const PATHS = [
     need: ["Power BI or Tableau (most job posts ask for one)", "Git/GitHub, expected at nearly every company", "A second portfolio project in a different industry", "Real workplace stakeholder back-and-forth (this course simulates one client, not a team)"],
     projects: [1, 2, 3, 4],
     jobs: ["Data Analyst", "Junior Data Analyst", "Entry-Level Data Analyst", "Business/Data Analyst trainee"],
-    method: "Alignment rule: HIGH when the role's core loop (clean data, query it, visualize it, communicate a finding) matches at least 8 of this course's 9 modules directly." },
+    method: "Alignment rule: HIGH when the role's core loop (clean data, query it, visualize it, communicate a finding) matches at least 8 of this course's 9 modules directly.",
+    evidenceSkills: ["spreadsheet-analysis", "sql-fundamentals-master", "python-data-analysis", "data-cleaning", "business-analysis"] },
   { id: "reporting", name: "Reporting / BI Analyst", align: "medium",
-    have: ["Dashboard design and KPI selection (Module 8)", "SQL for querying live data sources (Module 6)", "Data cleaning to keep a recurring report trustworthy (Module 4)", "Chart selection for at-a-glance reporting (Module 7)"],
-    need: ["A dedicated BI platform (Tableau or Power BI specifically, this course teaches the underlying judgment, not the tool)", "Scheduled refresh / row-level security concepts, specific to whichever BI tool a job uses", "Data-warehouse-scale data, this course's datasets are realistic but small"],
-    projects: [1, 2, 4],
+    have: ["Dashboard design and KPI selection (Module 8)", "SQL for querying live data sources (Module 6)", "Data cleaning to keep a recurring report trustworthy (Module 4)", "Chart selection for at-a-glance reporting (Module 7)", "Tableau and Power BI reasoning, Dimension vs. Measure, Calculated Column vs. Measure, DAX, Row-Level Security concepts (Tableau and Power BI Practice Libraries, 80 tasks, decision-based simulation, not real desktop execution)"],
+    need: ["Hands-on time in the ACTUAL Tableau Desktop or Power BI Desktop application, this course teaches the reasoning behind both tools honestly, but never runs the real software, that's a genuine, disclosed gap worth closing with a few real hours in either tool's free version before interviewing", "Scheduled refresh / row-level security configured in a real workspace, not just the concept", "Data-warehouse-scale data, this course's datasets are realistic but small"],
+    projects: [1, 2, 4, 9, 10],
     jobs: ["BI Analyst", "Reporting Analyst", "Business Intelligence Developer (junior)"],
-    method: "Alignment rule: MEDIUM when the role's core loop matches, but a specific commercial tool this course doesn't teach is typically required day one." },
+    method: "Alignment rule: MEDIUM when the role's core loop matches and the underlying tool reasoning is genuinely covered, but real hands-on time in the actual commercial software (not a simulation) is typically required day one.",
+    evidenceSkills: ["dashboard-design", "tableau", "powerbi", "sql-fundamentals-master"] },
+  { id: "automation-analyst", name: "Data Automation Analyst", align: "medium",
+    have: ["Real, genuinely-executed Python automation: parsing, batching, report generation, monitoring/alerting (Automation Practice Library, 30 tasks, real execution, not simulated)", "Idempotent, fault-tolerant script design, the specific judgment that separates a working script from one safe to leave running unattended", "SQL and pandas fluency to feed an automated pipeline (Modules 3, 6)", "Cross-tool workflow judgment, knowing which tool orchestrates a multi-step pipeline (Integrated Cross-Tool Challenges)"],
+    need: ["A real task scheduler (cron, a workflow orchestration tool like Airflow or Prefect), this course teaches the scripting and the design judgment, not a specific production scheduler", "Cloud deployment (a script running on someone's laptop vs. a scheduled cloud job are different skills)", "Logging/monitoring infrastructure beyond what a script prints to its own output"],
+    projects: [1, 2, 4],
+    jobs: ["Data Automation Analyst", "Reporting Automation Specialist", "Junior Analytics Engineer (automation-focused)"],
+    method: "Alignment rule: MEDIUM, the scripting, fault-tolerance, and design judgment are real and demonstrated, the production deployment layer (a real scheduler, cloud infrastructure) is a genuine gap.",
+    evidenceSkills: ["automation", "python-programming", "python-data-analysis"] },
   { id: "junior-ds", name: "Junior Data Scientist / Insights Analyst", align: "medium",
     have: ["Statistical judgment: signal vs. noise, a real z-test on order-level data (Modules 5, 9)", "Exploratory data analysis methodology (Module 5)", "pandas/NumPy fluency (Module 3)", "A full pipeline from messy data to a defensible, statistically checked conclusion (Module 9 capstone)"],
     need: ["Machine learning fundamentals, this course does not teach model training", "Deeper experimental design (A/B testing at depth)", "scikit-learn or a similar modeling library", "More advanced statistics: regression, Bayesian methods"],
     projects: [2, 3, 4],
     jobs: ["Junior Data Scientist", "Data Science Associate", "Insights Analyst"],
-    method: "Alignment rule: MEDIUM, the statistical-reasoning half of this role is real and demonstrated, the modeling half is a genuine gap, not a light one." },
+    method: "Alignment rule: MEDIUM, the statistical-reasoning half of this role is real and demonstrated, the modeling half is a genuine gap, not a light one.",
+    evidenceSkills: ["statistics", "python-data-analysis", "sql-window-master"] },
   { id: "analytics-eng", name: "Analytics Engineer (junior)", align: "low",
     have: ["pandas/SQL fluency for transforming raw data into clean tables (Modules 3, 6)", "Real experience diagnosing messy, real-world data (Module 4)", "Multi-source merging and joining (Module 3)"],
     need: ["dbt, the standard transformation framework in production use", "Data warehouse architecture and modeling patterns (star schema, dimensional modeling)", "Pipeline orchestration (Airflow or similar)", "Git and CI/CD for data pipelines"],
     projects: [2, 3],
     jobs: ["Analytics Engineer (junior)", "Data Engineer (junior)", "BI Engineer"],
-    method: "Alignment rule: LOW, the data-transformation instincts transfer, but the actual production tooling this role runs on isn't covered here at all." },
+    method: "Alignment rule: LOW, the data-transformation instincts transfer, but the actual production tooling this role runs on isn't covered here at all.",
+    evidenceSkills: ["sql-joins-master", "sql-advanced-master", "python-data-analysis"] },
 ];
 let activePath = PATHS[0].id;
 function renderPathTabs() {
@@ -410,6 +433,17 @@ function renderPathTabs() {
     btn.addEventListener("click", () => { activePath = p.id; renderPathTabs(); renderPathDetail(); });
     tabs.appendChild(btn);
   });
+}
+const PRACTICE_TIER_LABEL = { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" };
+function renderEvidenceBox(p) {
+  if (!p.evidenceSkills || typeof SkillMap === "undefined") return "";
+  const rows = p.evidenceSkills.map(id => {
+    const meta = SkillMap.MASTER_SKILLS.find(m => m.id === id);
+    if (!meta) return "";
+    const prog = SkillMap.masterSkillProgress(id);
+    return `<div class="evrow"><span class="evskill">${esc(meta.label)}</span><span class="tierpill t-${prog.tier}">${esc(PRACTICE_TIER_LABEL[prog.tier])}</span></div>`;
+  }).join("");
+  return `<div class="evidencebox"><div class="elbl">Your actual evidence for this role's core skills</div>${rows}<p style="margin-top:10px;font-size:12px;color:var(--mut2)">Pulled directly from your real, already-tested practice-library progress (see the full <a href="mastery-profile.html" style="color:var(--info)">Mastery Profile</a>), not a self-reported estimate.</p></div>`;
 }
 function renderPathDetail() {
   const p = PATHS.find(x => x.id === activePath);
@@ -424,6 +458,7 @@ function renderPathDetail() {
         <div class="skillcol have"><div class="slbl">Skills this course develops</div><ul>${p.have.map(s => `<li>${esc(s)}</li>`).join("")}</ul></div>
         <div class="skillcol need"><div class="slbl">Still worth learning</div><ul>${p.need.map(s => `<li>${esc(s)}</li>`).join("")}</ul></div>
       </div>
+      ${renderEvidenceBox(p)}
       <p class="mut" style="margin-top:16px"><b style="color:var(--tx)">Portfolio pieces that fit this path:</b> ${esc(projectTitles.join(" · "))}</p>
       <div class="jobtargets" style="margin-top:14px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:10px;font-family:'IBM Plex Mono'">Typical next step: research these titles</div>
