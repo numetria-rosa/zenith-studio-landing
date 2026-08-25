@@ -115,11 +115,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Tableau &middot; Stage 1 of 4</span>
+    <span class="eyebrow">Practice Library &middot; Tableau &middot; Stages 1-2 of 4</span>
     <h1 class="serif">Tableau Practice Library</h1>
     <p class="sub">Decision-based practice for the reasoning behind a Tableau view: which field is a Dimension vs a Measure, which shelf it belongs on, discrete vs continuous, and which chart shape a given combination of fields actually calls for.</p>
     <div class="honestnote"><b>Honest scope note, please read:</b> this is a <b>practice simulation</b>, not real Tableau. Nothing here renders inside an actual Tableau workbook, and no click is graded by executing real Tableau software, this page can't run in a browser the way the Excel formula engine or the Python/SQL sandboxes do. What it genuinely checks is the reasoning: given a real field from a real dataset, do you know whether it's a Dimension or a Measure, which shelf it belongs on, and why. Every scenario is re-randomized on every attempt (a different field, a different business ask) specifically so a memorized click sequence can't pass, only the underlying rule can. Treat this as a rehearsal for the concepts, not a substitute for opening Tableau Public or Tableau Desktop and building a real workbook.</div>
-    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals: Dimensions vs Measures, shelves, discrete vs continuous, chart choice) is complete, 10 tasks. Stages 2-4 (Visual Analytics, Calculated Fields, Dashboards &amp; Storytelling) are not yet built.</div>
+    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals: Dimensions vs Measures, shelves, discrete vs continuous, chart choice) and Stage 2 (Visual Analytics: quick table calculations, Compute Using, reference lines, sorting, trend lines, Top N filtering) are complete, 20 tasks. Stages 3-4 (Calculated Fields, Dashboards &amp; Storytelling) are not yet built.</div>
   </header>
 
   <div class="sheetblock">
@@ -202,10 +202,14 @@ function pickN(arr, n) {
 const SKILL_ID_FIELDS = "tableau-fields";
 const SKILL_ID_SHELVES = "tableau-shelves";
 const SKILL_ID_CHARTS = "tableau-chart-choice";
+const SKILL_ID_TABLECALC = "tableau-table-calcs";
+const SKILL_ID_ANALYTICS = "tableau-analytics-pane";
 const SKILLS = [
   { id: SKILL_ID_FIELDS, label: "Tableau Field Types" },
   { id: SKILL_ID_SHELVES, label: "Tableau Shelves & Filters" },
   { id: SKILL_ID_CHARTS, label: "Tableau Chart Choice" },
+  { id: SKILL_ID_TABLECALC, label: "Tableau Table Calculations" },
+  { id: SKILL_ID_ANALYTICS, label: "Tableau Analytics Pane" },
 ];
 
 const FIELD_OPTIONS = FIELDS.map(f => ({ value: f, label: f }));
@@ -437,6 +441,202 @@ const TASKS = [
       "\"Don't just filter down to one status\" is the request explicitly ruling out Filters, \"let me see how much is each status\" means status belongs on Color instead.",
       "Rows = region, Columns = amount, Aggregation = SUM, Color = status." ],
     explanation: { why: "This combines the Rows-Dimension/Columns-Measure bar pattern with a Color-encoded second Dimension, exactly the two building blocks this stage covered, applied together from a plain-language request with no shelf names supplied.", mistake: "Reaching for Filters here, since status is involved, would directly contradict the stated request, the director explicitly wants all three statuses visible at once for comparison, not narrowed down to one.", tip: "When a real request mentions a field but doesn't say \"only show X\" or \"remove X\", that's usually a signal for Color or Detail, not Filters, filtering removes information a stakeholder didn't ask to lose.", business: "This is deliberately the least guided task in this stage, a real stakeholder request never comes with shelf names attached, translating plain business language into the correct Rows/Columns/Color combination is the actual Tableau skill, not memorizing shelf names in isolation." } },
+
+  /* ---- Stage 2: Visual Analytics ---- */
+  { id: "tb-v01", skill: SKILL_ID_TABLECALC, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f04"],
+    title: "Pick the quick table calculation for a cumulative total",
+    objective: "Recognize when a business ask describes Running Total, not a plain SUM.",
+    build() {
+      const wording = pick(["a cumulative total that keeps climbing month over month", "a running total of revenue building up over the year", "how revenue accumulates as the year progresses"]);
+      return {
+        scenarioHtml: `You already have order_date (continuous) on Columns and SUM(amount) on Rows, a line chart. A stakeholder now wants <b>${esc(wording)}</b>, not the value at each point on its own.`,
+        slots: [{ key: "calc", label: "Which quick table calculation fits?", options: [{ value: "running_total", label: "Running Total" }, { value: "percent_of_total", label: "Percent of Total" }, { value: "rank", label: "Rank" }, { value: "none", label: "None, leave as plain SUM" }] }],
+        correct: { calc: "running_total" },
+      };
+    },
+    hints: [
+      "\"Cumulative\", \"running\", \"builds up over time\" are all the same request: each point should include everything before it, not just its own value.",
+      "That's exactly what Tableau's Running Total quick table calculation does, it adds each value to the sum of everything before it.",
+      "Percent of Total and Rank answer different questions (share of a whole, and ordering), neither shows accumulation over time.",
+      "Running Total." ],
+    explanation: { why: "Running Total is one of Tableau's built-in quick table calculations, applied to a Measure already on the view, it replaces each point's own value with that value plus every prior point's value, producing the classic accumulating line.", mistake: "Leaving the Measure as a plain SUM shows each period's own total, which looks similar at a glance but answers a different question, \"how much revenue in March\" instead of \"how much revenue so far, through March\".", tip: "Quick table calculations are applied on top of an existing aggregation, you right-click the Measure pill already on the view and add the calculation, you don't need a separate calculated field for any of Tableau's built-in quick calcs.", business: "A cumulative revenue-to-date view is one of the most common asks in a monthly business review, it tells a stakeholder how the year is tracking toward a target, information a single month's total can't show on its own." } },
+
+  { id: "tb-v02", skill: SKILL_ID_TABLECALC, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f04"],
+    title: "Pick the quick table calculation for a share of the whole",
+    objective: "Recognize when a business ask describes Percent of Total, not a raw dollar figure.",
+    build() {
+      const dim = pick(DIMENSION_FIELDS);
+      return {
+        scenarioHtml: `You have ${esc(dim)} on Rows and SUM(amount) on Columns, a bar chart. A stakeholder wants to see <b>what share of total revenue each ${esc(dim)} represents</b>, as a percentage, not a dollar amount.`,
+        slots: [{ key: "calc", label: "Which quick table calculation fits?", options: [{ value: "running_total", label: "Running Total" }, { value: "percent_of_total", label: "Percent of Total" }, { value: "rank", label: "Rank" }, { value: "none", label: "None, leave as plain SUM" }] }],
+        correct: { calc: "percent_of_total" },
+      };
+    },
+    hints: [
+      "\"Share of\", \"percentage of the whole\", \"what portion\" are all Percent of Total requests.",
+      "Percent of Total recomputes each bar's value as a fraction of the sum across every bar on the view, expressed as a percentage.",
+      "Running Total accumulates over an ordered axis, Rank orders values, neither expresses a bar's value as a percentage of the whole.",
+      "Percent of Total." ],
+    explanation: { why: "Percent of Total divides each mark's value by the total across all marks on the view (or within a specified scope), turning a dollar figure into a share, exactly what \"what portion of the whole\" is asking for.", mistake: "Leaving the Measure as a plain SUM shows the dollar amount, a stakeholder would have to mentally divide by the grand total themselves to get the percentage they actually asked for.", tip: "Percent of Total's scope (whether it's a percentage of the whole table, or just within a pane) matters a lot once a second Dimension is added, that's exactly what a later task in this stage covers.", business: "\"What percent of revenue comes from each region\" is a more actionable question for resource allocation than the raw dollar figures alone, especially when comparing regions of very different absolute sizes." } },
+
+  { id: "tb-v03", skill: SKILL_ID_TABLECALC, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f04"],
+    title: "Pick the quick table calculation for ordering",
+    objective: "Recognize when a business ask describes Rank, not a plain sort.",
+    build() {
+      const dim = pick(DIMENSION_FIELDS);
+      return {
+        scenarioHtml: `You have ${esc(dim)} on Rows and SUM(amount) on Columns. A stakeholder wants each ${esc(dim)} labeled with <b>its numeric rank, 1st, 2nd, 3rd, by revenue</b>, not just the dollar figures sorted visually.`,
+        slots: [{ key: "calc", label: "Which quick table calculation fits?", options: [{ value: "running_total", label: "Running Total" }, { value: "percent_of_total", label: "Percent of Total" }, { value: "rank", label: "Rank" }, { value: "none", label: "None, leave as plain SUM" }] }],
+        correct: { calc: "rank" },
+      };
+    },
+    hints: [
+      "Sorting a chart changes the visual ORDER of the bars, it doesn't print a number saying \"this is #1\", that's a distinct request.",
+      "Rank is the quick table calculation that assigns each mark an actual numbered position, 1, 2, 3, based on its value.",
+      "A plain sort would put the bars in the right order but wouldn't label any of them with a rank number, Rank does both implicitly.",
+      "Rank." ],
+    explanation: { why: "Rank is a quick table calculation that replaces each mark's value with its ordinal position among all the marks on the view, sorted by that same value, producing an actual \"1st, 2nd, 3rd\" label rather than just a visual order.", mistake: "Sorting the view (right-click sort, or the sort icon) achieves the visual ordering but doesn't add a printed rank number to each bar, if a stakeholder specifically asked to see \"1st, 2nd, 3rd\" as labels, sorting alone doesn't deliver that.", tip: "Sort and Rank solve related but different problems, sort changes the view's order, Rank adds a number, a request can call for one, the other, or both together.", business: "A monthly \"top region\" or \"bottom-performing category\" report often specifically wants the rank number printed, not just implied by position, especially once the view gets filtered or the story needs to reference \"our #2 region\" by name." } },
+
+  { id: "tb-v04", skill: SKILL_ID_ANALYTICS, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f04"],
+    title: "A reference line for the overall average",
+    objective: "Add a reference line scoped to the whole table, not per-cell.",
+    build() {
+      const dim = pick(DIMENSION_FIELDS);
+      return {
+        scenarioHtml: `You have ${esc(dim)} on Rows and SUM(amount) on Columns, several bars. You want <b>one single reference line, the overall average across all bars</b>, drawn once, the same position behind every bar, not a separate average recalculated per bar.`,
+        slots: [{ key: "scope", label: "What scope should the reference line use?", options: [{ value: "table", label: "Table (one line for the whole view)" }, { value: "pane", label: "Pane (one line per pane)" }, { value: "cell", label: "Cell (one line per mark)" }] }],
+        correct: { scope: "table" },
+      };
+    },
+    hints: [
+      "\"One single line, the same position behind every bar\" means the line's average is computed across the ENTIRE view, not recalculated separately for each bar.",
+      "Reference lines can be scoped to the whole Table, to each Pane, or to each Cell, each scope changes what the average is computed over.",
+      "Table scope computes one value from every mark on the view and draws it once, exactly \"one single reference line\".",
+      "Table." ],
+    explanation: { why: "A Table-scoped reference line computes its value (here, the average) from every mark on the entire view, and draws exactly one line, shared across every bar, that's what makes it a single, consistent benchmark.", mistake: "Cell scope would draw a separate reference line recalculated for each individual mark, which for a single-measure bar chart would just redraw the same bar's own value as its own \"average\", not a useful benchmark at all.", tip: "Table, Pane, and Cell scope matter most once the view has more structure, multiple panes from a second Dimension, or multiple marks per cell, on a simple single-dimension bar chart, Table scope is almost always what \"one overall line\" means.", business: "An \"average revenue per region\" reference line drawn once across a regional bar chart is a fast visual way for a stakeholder to see which regions are above or below the company-wide average, without reading the dollar figures at all." } },
+
+  { id: "tb-v05", skill: SKILL_ID_ANALYTICS, tool: "tableau", level: "semiguided", difficulty: "core", prerequisite: ["tb-f04"],
+    title: "Sort a bar chart to match a business ask",
+    objective: "Translate \"show the top performer first\" into the correct sort direction.",
+    build() {
+      const dim = pick(DIMENSION_FIELDS);
+      const wantsTopFirst = Math.random() < 0.5;
+      const wording = wantsTopFirst
+        ? `wants the <b>best-performing ${esc(dim)} shown first</b>, at the top of the list`
+        : `wants to <b>see which ${esc(dim)} is struggling most, right at the top</b> of the list`;
+      return {
+        scenarioHtml: `You have ${esc(dim)} on Rows and SUM(amount) on Columns. A stakeholder ${wording}.`,
+        slots: [{ key: "dir", label: "Which sort direction?", options: [{ value: "desc", label: "Descending (highest value first)" }, { value: "asc", label: "Ascending (lowest value first)" }] }],
+        correct: { dir: wantsTopFirst ? "desc" : "asc" },
+      };
+    },
+    hints: [
+      "\"Best performer first\" means the highest value should be at the top, that's a descending sort by the measure.",
+      "\"Struggling most, right at the top\" means the LOWEST value should be at the top, that's an ascending sort, the opposite direction.",
+      "Read carefully whether the stakeholder wants the highest or the lowest value surfaced first, the sort direction has to match that specific intent.",
+      "Descending shows highest-first, ascending shows lowest-first, pick the one matching the scenario above." ],
+    explanation: { why: "Sorting a Tableau view reorders the marks by a chosen field's value, descending order puts the largest value first (top or left), ascending puts the smallest value first, the direction has to be chosen deliberately to match what the stakeholder actually wants surfaced.", mistake: "Defaulting to descending sort out of habit, even when the actual ask was to surface the worst performer, silently buries the exact row the stakeholder most wanted to see immediately.", tip: "Before sorting, restate the request as \"highest first\" or \"lowest first\" in your own words, that translation makes the descending-vs-ascending choice unambiguous.", business: "A stakeholder auditing underperformance specifically wants the weakest region or category surfaced immediately, not buried at the bottom of a descending-sorted list they'd have to scroll to find." } },
+
+  { id: "tb-v06", skill: SKILL_ID_TABLECALC, tool: "tableau", level: "semiguided", difficulty: "core", prerequisite: ["tb-v01"],
+    title: "Compute Using: which field should a Running Total run along?",
+    objective: "Recognize that a table calculation needs a direction, and that direction has to match the field that actually represents progression.",
+    build() {
+      const dim = pick(DIMENSION_FIELDS);
+      return {
+        scenarioHtml: `Your view has ${esc(dim)} on Rows AND order_date (discrete) on Rows nested below it, with SUM(amount) on Columns as a Running Total. You want the running total to accumulate <b>as time passes within each ${esc(dim)}</b>, not across ${esc(dim)} values.`,
+        slots: [{ key: "computeUsing", label: "Compute Using should be set to:", options: [{ value: "order_date", label: "order_date" }, { value: dim, label: dim }] }],
+        correct: { computeUsing: "order_date" },
+      };
+    },
+    hints: [
+      "\"Compute Using\" tells a table calculation which field defines the order it accumulates along, it has to be the field that represents progression, here that's time.",
+      "The request specifically says \"as time passes\", not \"across\" the other Dimension's values, so the calculation should run along order_date.",
+      "If Compute Using were set to the other Dimension instead, the running total would accumulate in the wrong direction entirely, across categories rather than across time.",
+      "order_date." ],
+    explanation: { why: "Every table calculation needs to know which field defines its direction of accumulation or comparison, Compute Using is exactly that setting, get it wrong and the calculation runs along the wrong axis even though the calculation TYPE (Running Total) is correct.", mistake: "Leaving Compute Using on its default (often the first Dimension on the view) instead of explicitly setting it to the time field is one of the single most common real table-calculation mistakes, the numbers it produces look plausible but accumulate in the wrong direction.", tip: "Whenever a table calculation's result looks wrong despite picking the right calculation TYPE, Compute Using is the first thing worth checking, it's a separate setting from the calculation itself.", business: "A running total that's silently computing across categories instead of across time would show a stakeholder a cumulative-looking number that doesn't actually represent progress through the year at all, a wrong number confidently displayed is worse than an obviously broken chart." } },
+
+  { id: "tb-v07", skill: SKILL_ID_ANALYTICS, tool: "tableau", level: "semiguided", difficulty: "core", prerequisite: ["tb-f06"],
+    title: "Trend lines need a continuous axis",
+    objective: "Recognize a hard prerequisite: a trend line can't be added to a discrete axis.",
+    build() {
+      const continuousFirst = Math.random() < 0.5;
+      const desc = continuousFirst
+        ? "order_date is on Columns as a CONTINUOUS field (green pill), and SUM(amount) is on Rows"
+        : "order_date is on Columns as a DISCRETE field (blue pill), and SUM(amount) is on Rows";
+      return {
+        scenarioHtml: `Your view has ${esc(desc)}. You try to add a trend line from the Analytics pane.`,
+        slots: [{ key: "works", label: "Does the trend line work as expected?", options: [{ value: "yes", label: "Yes, it draws a smooth trend line" }, { value: "no", label: "No, trend lines require a continuous axis" }] }],
+        correct: { works: continuousFirst ? "yes" : "no" },
+      };
+    },
+    hints: [
+      "A trend line is a statistical fit drawn along a continuous, numeric axis, it needs an unbroken range to fit a line through.",
+      "A discrete (blue) date field produces separate headers, not a continuous axis, there's no continuous range for a trend line to fit against.",
+      "Continuous (green) date field = trend line available. Discrete (blue) date field = trend line option is unavailable or meaningless.",
+      "Match your answer to whether the pill in the scenario is described as continuous or discrete." ],
+    explanation: { why: "Trend lines fit a statistical model (usually linear) along a continuous axis, a discrete field produces categorical headers rather than a continuous range, so there's no numeric axis for the model to fit against.", mistake: "Trying to add a trend line to a view with a discrete date field is a common early mistake, the option may be visible in the menu but won't produce a meaningful fit, since discrete headers aren't a continuous domain.", tip: "This is exactly why the discrete-vs-continuous distinction from Stage 1 keeps mattering, it's not just a coloring convention, it directly determines which analytics features (trend lines, forecasting) are even available.", business: "A stakeholder asking \"is revenue trending up or down\" is implicitly asking for a continuous-time analysis, if the underlying view has a discrete date field, that analysis literally can't be produced until the field is converted to continuous first." } },
+
+  { id: "tb-v08", skill: SKILL_ID_ANALYTICS, tool: "tableau", level: "challenge", difficulty: "challenge", prerequisite: ["tb-v03"],
+    title: "Top N filtering vs a plain value filter",
+    objective: "Recognize when a request needs a computed Top N filter, not a plain Filters-shelf value match.",
+    build() {
+      const dim = pick(DIMENSION_FIELDS);
+      const n = pick([2, 3]);
+      return {
+        scenarioHtml: `A stakeholder wants to see only the <b>top ${n} ${esc(dim)} values by total revenue</b>, whichever those happen to be, this should keep working automatically if the data changes next month and the ranking shifts.`,
+        slots: [{ key: "approach", label: "Which filtering approach fits?", options: [{ value: "value", label: `Plain Filters shelf, manually pick ${n} specific ${dim} values` }, { value: "topn", label: `Top N filter (by SUM(amount), limited to ${n})` }] }],
+        correct: { approach: "topn" },
+      };
+    },
+    hints: [
+      "The request explicitly says the filter should keep working automatically if the ranking shifts next month, that rules out manually picking specific values.",
+      "A plain value filter hardcodes which values pass, a Top N filter is computed dynamically off a Measure, it re-evaluates which values qualify every time the data changes.",
+      "\"Top N by revenue, should keep working even if the answer changes\" is exactly what a Top N (computed) filter is built for.",
+      "Top N filter." ],
+    explanation: { why: "A Top N filter is computed dynamically against a Measure (here, SUM(amount)), re-evaluating which Dimension values currently qualify every time the underlying data changes, a plain value filter instead hardcodes a fixed list of values that never re-evaluates on its own.", mistake: "Manually selecting today's top performers into a plain value filter works today, but silently goes stale the moment the ranking changes, next month's true top performers wouldn't automatically appear, last month's would still be shown.", tip: "Whenever a filtering request includes words like \"top N\", \"best-performing\", or \"whichever currently ranks highest\", that's a signal for a computed Top N filter, not a fixed value filter, even if today's answer happens to look the same either way.", business: "A live sales dashboard meant to always show this month's top-performing regions needs a filter that recomputes on its own, a stale, manually-picked filter would keep showing last quarter's top performers even after performance has genuinely shifted." } },
+
+  { id: "tb-v09", skill: SKILL_ID_TABLECALC, tool: "tableau", level: "challenge", difficulty: "challenge", prerequisite: ["tb-v02"],
+    title: "Percent of Total, scoped within a group",
+    objective: "Recognize when Percent of Total needs Pane scope, not Table scope, to answer a within-group question.",
+    build() {
+      const [d1, d2] = pickN(DIMENSION_FIELDS, 2);
+      return {
+        scenarioHtml: `Your view has ${esc(d1)} on Rows and ${esc(d2)} on Columns (a grid), with SUM(amount) as Percent of Total. A stakeholder wants each ${esc(d2)}'s share <b>WITHIN its own ${esc(d1)}</b> (each row should add up to 100% on its own), not each cell's share of the grand total across the whole grid.`,
+        slots: [{ key: "scope", label: "What scope should Percent of Total use?", options: [{ value: "table", label: "Table (percent of the whole grid)" }, { value: "pane", label: "Pane (percent within each row/column group)" }] }],
+        correct: { scope: "pane" },
+      };
+    },
+    hints: [
+      "\"Within its own group, each row adds up to 100% on its own\" is describing a scope narrower than the whole grid, that rules out Table scope.",
+      "Pane scope computes the percentage within each pane (here, within each row group) separately, so each group's percentages sum to 100% on their own.",
+      "Table scope would instead compute every cell's share of the ENTIRE grid's grand total, meaning the percentages across all cells everywhere sum to 100%, not each row individually.",
+      "Pane." ],
+    explanation: { why: "Percent of Total's scope determines the denominator: Table scope divides by the grand total across the entire view, Pane scope divides by the total within each pane (each row or column group) separately, producing percentages that sum to 100% within that group instead of across everything.", mistake: "Leaving Percent of Total on its default Table scope when the actual request was a within-group percentage produces numbers that are individually much smaller than expected and don't sum to 100% within any single row, a subtle, easy-to-miss error.", tip: "Whenever a request says \"within its own X\" or \"as a share of that group\", that's Pane scope, whenever it says \"of the overall total\" or \"across everything\", that's Table scope, the wording almost always signals which one is meant.", business: "A merchandising stakeholder asking what share of EACH region's revenue comes from each category needs Pane scope, region-by-region shares that each sum to 100%, Table scope would instead answer a subtly different question, share of company-wide revenue, which most categories would report as a tiny, hard-to-interpret percentage." } },
+
+  { id: "tb-v10", skill: SKILL_ID_ANALYTICS, tool: "tableau", level: "mastery", difficulty: "mastery", prerequisite: ["tb-v06", "tb-v09"],
+    title: "Independent build: a ranked, cumulative regional view",
+    objective: "Combine Rank, Compute Using, and a reference line from a plain-language request with no technical terms given.",
+    build() {
+      return {
+        scenarioHtml: `A VP asks: <b>"For each region, show me its revenue rank, best to worst, and draw a single line showing what the average region brings in, so I can see who's above and below average at a glance."</b> Your view already has region on Rows and SUM(amount) on Columns.`,
+        slots: [
+          { key: "calc", label: "Quick table calculation on amount", options: [{ value: "running_total", label: "Running Total" }, { value: "percent_of_total", label: "Percent of Total" }, { value: "rank", label: "Rank" }, { value: "none", label: "None" }] },
+          { key: "refscope", label: "Reference line scope", options: [{ value: "table", label: "Table (one line for the whole view)" }, { value: "pane", label: "Pane (one line per pane)" }, { value: "cell", label: "Cell (one line per mark)" }] },
+        ],
+        correct: { calc: "rank", refscope: "table" },
+      };
+    },
+    written: {
+      label: "Why does this need BOTH a Rank calculation AND a reference line, rather than just one or the other?",
+      placeholder: "Think about what each piece answers on its own, and what the VP asked to see that neither one alone would show...",
+      check: (text) => /\b(rank|order|position)\b/i.test(text) && /\b(average|reference line|benchmark)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that Rank answers \"best to worst\" (an ordering), while the reference line answers \"above or below average\" (a benchmark), the VP asked for both pieces of information at once, and neither calculation alone provides the other." },
+    hints: [
+      "This combines two separate pieces of Stage 2: an ordering (Rank) and a benchmark (a Table-scoped reference line), both requested in the same sentence.",
+      "\"Revenue rank, best to worst\" is the Rank quick table calculation, applied to the existing SUM(amount).",
+      "\"A single line showing what the average region brings in\" is a Table-scoped reference line, the same pattern as the very first task in this stage.",
+      "Quick table calculation = Rank, Reference line scope = Table." ],
+    explanation: { why: "Rank and a reference line answer two genuinely different questions, Rank orders the regions relative to EACH OTHER, the reference line benchmarks each region against the OVERALL average, the VP's request explicitly asked for both, ordering and above/below-average context, in the same view.", mistake: "Providing only Rank without the reference line tells the VP the order but not how close regions are to average, providing only the reference line tells them who's above or below average but not their exact order, either alone leaves half the request unanswered.", tip: "When a stakeholder request bundles two distinct asks in one sentence, \"rank them AND show me the average\", that's usually a signal to combine two separate Tableau features rather than searching for one feature that does both.", business: "This is deliberately the least guided task in this stage, a real VP request never comes pre-labeled with \"use Rank\" or \"use a reference line\", recognizing that a single plain-language sentence sometimes requires two separate techniques stacked together is the actual skill." } },
 ];
 
 /* ================= grading =================
