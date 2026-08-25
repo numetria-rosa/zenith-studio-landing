@@ -91,10 +91,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Python &middot; Stages 1-4 of &hellip;</span>
+    <span class="eyebrow">Practice Library &middot; Python &middot; Complete, Stages 1-5</span>
     <h1 class="serif">Python Practice Library</h1>
     <p class="sub">Extra repetition beyond Module 2's core lesson, real CPython running in a Web Worker (Pyodide), the same sandbox Module 2 itself uses. Every task pairs a few fixed test cases with one freshly randomized input compared against a hidden reference implementation, so a hardcoded return value can't pass.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is Stages 1-4 (functions over lists and dicts; real pandas DataFrame work on retail_sales_ledger.csv; real-world data cleaning on the same messy files Module 4 uses, each task targeting a different sub-problem than Module 4's own exercises; and exploratory funnel analysis on a real 11,635-event product-analytics file, set-based conversion rates, drop-off analysis, and a prioritization judgment call), 40 tasks, real, fully built, graded, and tested. Further stages are planned but not yet built, that's future work, not a claim made here.</div>
+    <div class="scopenote"><b>Honest scope note:</b> all 5 stages are complete, 50 tasks (functions over lists and dicts; real pandas DataFrame work; real-world data cleaning on Module 4's own messy files, each task targeting a different sub-problem than Module 4's exercises; exploratory funnel analysis on a real 11,635-event file; and business analytics, NPS, weighted rates, financial margins, on real survey, marketing, and P&amp;L data), real, fully built, graded, and tested.</div>
   </header>
 
   <div id="skillBars"></div>
@@ -196,6 +196,9 @@ const DATASET_FILES = {
   expenses: { path: "datasets/expense_reports.csv", varName: "exp" },
   inventory: { path: "datasets/inventory_supply.csv", varName: "inv" },
   events: { path: "datasets/app_analytics_events.csv", varName: "events" },
+  survey: { path: "datasets/survey_responses.csv", varName: "survey" },
+  marketing: { path: "datasets/marketing_campaign_results.csv", varName: "mkt" },
+  pnl: { path: "datasets/pnl_statement.csv", varName: "pnl" },
 };
 const datasetCsvPromises = {};
 function getDatasetCsv(key) {
@@ -229,11 +232,13 @@ const SKILL_ID_FUND = "python-fundamentals";
 const SKILL_ID_PANDAS = "python-pandas";
 const SKILL_ID_CLEANING = "python-cleaning";
 const SKILL_ID_EDA = "python-eda";
+const SKILL_ID_BUSINESS = "python-business";
 const SKILLS = [
   { id: SKILL_ID_FUND, label: "Python Fundamentals" },
   { id: SKILL_ID_PANDAS, label: "Python pandas" },
   { id: SKILL_ID_CLEANING, label: "Python Data Cleaning" },
   { id: SKILL_ID_EDA, label: "Python Exploratory Analysis" },
+  { id: SKILL_ID_BUSINESS, label: "Python Business Analytics" },
 ];
 
 const TASKS = [
@@ -1378,6 +1383,272 @@ const TASKS = [
       "max(dropoffs.items(), key=lambda x: x[1]) on the dict of three drop-off percentages gives you the (stage_name, percentage) pair with the highest drop-off.",
       "def funnel_bottleneck(events):\n    stages = ['view_item', 'add_to_cart', 'start_checkout', 'purchase']\n    keys = ['view_to_cart', 'cart_to_checkout', 'checkout_to_purchase']\n    sets = [set(events[events['event_name']==s]['user_id']) for s in stages]\n    dropoffs = {}\n    for i in range(3):\n        conv = len(sets[i] & sets[i+1]) / len(sets[i]) * 100\n        dropoffs[keys[i]] = round(100 - conv, 2)\n    worst_stage, worst_pct = max(dropoffs.items(), key=lambda x: x[1])\n    return {'stage': worst_stage, 'dropoff_pct': worst_pct}" ],
     explanation: { why: "max(dict.items(), key=lambda x: x[1]) is the general pattern for 'which key has the largest value', applied here to the three drop-off percentages computed exactly as the previous task already worked out.", mistake: "Treating all three drop-off percentages as equally worth fixing, or picking one to focus on based on intuition rather than the actual computed numbers, defeats the entire purpose of measuring the funnel in the first place.", tip: "Once a funnel has more than two stages, always compute every adjacent drop-off before deciding where to focus, the biggest-sounding problem isn't always the biggest number, and the biggest number isn't always obvious without actually calculating all of them side by side.", business: "A 58% drop from view to cart, nearly six in ten people who look at a product never even add it to their cart, dwarfs the other two stages in absolute impact, fixing checkout (a 40% drop, but on a much smaller remaining group of users) would help fewer total people than fixing the product page itself, this is exactly the kind of prioritization call a real product analytics role makes constantly." } },
+
+  { id: "py-b01", skill: SKILL_ID_BUSINESS, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-e02"], engine: "pandas", dataset: "survey",
+    title: "Calculate a real Net Promoter Score",
+    objective: "Compute a genuine business metric from raw survey data, not just a mean.",
+    functionName: "nps_score",
+    objectiveNote: "survey is the real survey_responses.csv (220 responses). NPS is 0-10. A score of 9-10 is a promoter, 0-6 is a detractor, 7-8 is passive. Return the Net Promoter Score: (% promoters) minus (% detractors), rounded to 2 decimal places.",
+    starterCode: "def nps_score(survey):\n    # your code here\n    return 0.0",
+    checks: [
+      "    try:",
+      "        out = fn(survey.copy())",
+      "        results.append({'name': 'Overall NPS is about -50.45', 'pass': bool(abs(out-(-50.45))<0.1), 'hint': f'Expected about -50.45, got {out!r}. promoters = nps>=9, detractors = nps<=6, (promoters%% - detractors%%)*100 essentially, using counts over the total.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Overall NPS is about -50.45', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(survey.head(100).copy())",
+      "        results.append({'name': 'Recomputes on the first 100 rows (not hardcoded to -50.45)', 'pass': bool(abs(out2-(-50))<0.1), 'hint': f'On just the first 100 rows, NPS should be exactly -50, not the full-dataset -50.45, got {out2!r}. Did you hardcode the full-dataset value?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 100 rows (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "NPS is not an average of the scores, it's built from three CATEGORIES (promoter, passive, detractor), each response falls into exactly one.",
+      "promoters = (survey['nps']>=9).sum(), detractors = (survey['nps']<=6).sum(), both as counts, then divide each by the total response count.",
+      "NPS = (promoter_count/total - detractor_count/total) * 100, passive responses (7-8) don't appear in the formula at all, they're neither added nor subtracted.",
+      "def nps_score(survey):\n    n = len(survey)\n    promoters = (survey['nps']>=9).sum()\n    detractors = (survey['nps']<=6).sum()\n    return round((promoters/n - detractors/n)*100, 2)" ],
+    explanation: { why: "NPS deliberately ignores passive responses (7-8) in its formula, it's a measure of the GAP between enthusiastic and unhappy customers, not an average sentiment score, that's what makes it a genuinely different statistic from a mean.", mistake: "Averaging the raw nps column (survey['nps'].mean()) computes a completely different number, a mean score, not a Net Promoter Score, the two are easy to confuse but measure different things and are not interchangeable.", tip: "NPS can be, and often is, negative, that's not a bug, it means detractors outnumber promoters, a real and meaningful (if unwelcome) finding, not a sign the formula was implemented wrong.", business: "A -50.45 NPS is a genuinely alarming number, far more detractors than promoters, this is exactly the kind of metric that would trigger a customer-experience investigation, and it's a real finding in this dataset, not a manufactured example." } },
+
+  { id: "py-b02", skill: SKILL_ID_BUSINESS, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-e07"], engine: "pandas", dataset: "marketing",
+    title: "Calculate the overall click-through rate",
+    objective: "Compute a rate from summed totals, not an average of per-row rates.",
+    functionName: "overall_click_through_rate",
+    objectiveNote: "mkt is the real marketing_campaign_results.csv (32 rows, 4 channels over 8 weeks). Return the overall click-through rate (total clicks divided by total impressions) as a percentage, rounded to 2 decimal places.",
+    starterCode: "def overall_click_through_rate(mkt):\n    # your code here\n    return 0.0",
+    checks: [
+      "    try:",
+      "        out = fn(mkt.copy())",
+      "        results.append({'name': 'Overall CTR is about 4.33%', 'pass': bool(abs(out-4.33)<0.05), 'hint': f'Expected about 4.33, got {out!r}. Sum clicks, sum impressions, divide, times 100.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Overall CTR is about 4.33%', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(mkt.head(10).copy())",
+      "        results.append({'name': 'Recomputes on the first 10 rows (not hardcoded to 4.33)', 'pass': bool(abs(out2-4.4)<0.02), 'hint': f'On just the first 10 rows CTR should be about 4.40%, not the full-dataset 4.33%, got {out2!r}. Did you hardcode the full-dataset value?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 10 rows (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "The correct overall rate sums BOTH columns first, then divides, it does not average each row's individual rate.",
+      "mkt['clicks'].sum() and mkt['impressions'].sum() give the two totals you need.",
+      "Divide the click total by the impression total, multiply by 100, round to 2 decimals.",
+      "def overall_click_through_rate(mkt):\n    return round(mkt['clicks'].sum()/mkt['impressions'].sum()*100, 2)" ],
+    explanation: { why: "Summing both columns before dividing weights every impression equally, a week with huge impression volume correctly counts more than a slow week, this is sometimes called a 'weighted average' and it's the mathematically correct way to combine a rate across unequal-sized groups.", mistake: "Computing each row's CTR individually, then averaging THOSE rates (mkt['clicks']/mkt['impressions']).mean(), gives every week equal weight regardless of its actual volume, a slow week with 50 impressions would count exactly as much as a huge week with 5000, distorting the true overall rate.", tip: "Whenever combining a rate across multiple groups of different sizes, sum the numerator and denominator separately first, then divide once, averaging pre-computed per-group rates is a subtle, common mistake.", business: "An overall CTR built from summed totals is the number that actually reflects total ad performance, an average-of-rates number can be quietly wrong in a way that misleads a budget decision, especially when spend isn't evenly spread across weeks." } },
+
+  { id: "py-b03", skill: SKILL_ID_BUSINESS, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-c09"], engine: "pandas", dataset: "pnl",
+    title: "Gross margin percentage for every period",
+    objective: "Compute a standard financial ratio across a real (if inconsistently labeled) P&L statement.",
+    functionName: "gross_margin_by_period",
+    objectiveNote: "pnl is the real pnl_statement.csv (12 quarterly periods, columns: period, revenue, cogs, opex, net_income). Note the period labels are inconsistently formatted (\"Jan-Mar-2024\", \"Q1 2025\", \"2025-Q2\"), treat them as opaque labels, don't try to parse them as dates. Return a dict mapping each period label to its gross margin percentage ((revenue - cogs) / revenue * 100), rounded to 2 decimal places.",
+    starterCode: "def gross_margin_by_period(pnl):\n    # your code here\n    return {}",
+    checks: [
+      "    try:",
+      "        out = fn(pnl.copy())",
+      "        ok = abs(out.get('Jan-Mar-2024',0)-58.32)<0.05 and abs(out.get('Q3 2025',0)-61.97)<0.05 and len(out)==12",
+      "        results.append({'name': 'Gross margin is correct for all 12 periods (spot-checked)', 'pass': bool(ok), 'hint': f'Expected 12 keys including Jan-Mar-2024=58.32 and Q3 2025=61.97, got {out!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Gross margin is correct for all 12 periods (spot-checked)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(pnl.head(6).copy())",
+      "        results.append({'name': 'Recomputes on the first 6 periods (not hardcoded)', 'pass': bool(len(out2)==6), 'hint': f'On just the first 6 periods, the dict should have 6 keys, got {len(out2) if hasattr(out2,\"__len__\") else out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 6 periods (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "Gross margin is a per-row calculation (each period's own revenue and cogs), the period column just becomes the dict's keys once you're done.",
+      "(pnl['revenue']-pnl['cogs'])/pnl['revenue']*100 computes the margin for every period at once, as a Series aligned with the original rows.",
+      "Set the period column as the index first (pnl.set_index('period')), then that margin Series naturally carries the right labels when converted to a dict.",
+      "def gross_margin_by_period(pnl):\n    margin = (pnl['revenue']-pnl['cogs'])/pnl['revenue']*100\n    return pnl.set_index('period')[[]].assign(margin=margin.values)['margin'].round(2).to_dict()" ],
+    explanation: { why: "Vectorized arithmetic on whole columns computes every period's margin in one operation, keeping the result aligned to the original row order, setting the period column as the index is what lets that result convert cleanly into a dict keyed by the real period labels.", mistake: "The inconsistent period label formatting (some quarters, some month-ranges, some with a leading year, some trailing) is exactly the kind of real-world labeling mess worth noticing, but for THIS task it doesn't need fixing, the labels just need to survive unchanged as dict keys, not be parsed or standardized.", tip: "Not every messy-looking column needs cleaning, sometimes (like here) a label just needs to be preserved as an opaque identifier, recognizing when cleaning is actually necessary versus when it's unnecessary extra work is itself part of the judgment call.", business: "Gross margin percentage, not just raw profit dollars, is the number that lets a finance team compare periods of very different sizes fairly, a $10,000 profit on $20,000 revenue and a $10,000 profit on $200,000 revenue are wildly different stories that raw dollars alone don't tell." } },
+
+  { id: "py-b04", skill: SKILL_ID_BUSINESS, tool: "python", level: "guided", difficulty: "core", prerequisite: ["py-b01"], engine: "pandas", dataset: "survey",
+    title: "NPS broken down by department",
+    objective: "Apply a business metric per group, not just once for the whole dataset.",
+    functionName: "nps_by_department",
+    objectiveNote: "Return a dict mapping each department to its own Net Promoter Score, computed the same way as the overall NPS task, but separately within each department.",
+    starterCode: "def nps_by_department(survey):\n    # your code here\n    return {}",
+    checks: [
+      "    try:",
+      "        out = fn(survey.copy())",
+      "        expected = {'Engineering': -55.77, 'Operations': -45.28, 'Sales': -45.45, 'Support': -53.52}",
+      "        ok = isinstance(out, dict) and all(abs(out.get(k, -999) - v) < 0.5 for k, v in expected.items())",
+      "        results.append({'name': 'NPS is correct for all four departments', 'pass': bool(ok), 'hint': f'Expected roughly {expected!r}, got {out!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'NPS is correct for all four departments', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(survey.head(100).copy())",
+      "        expected2 = {'Engineering': -64, 'Operations': -32, 'Sales': -63.16, 'Support': -45.16}",
+      "        ok2 = isinstance(out2, dict) and all(abs(out2.get(k, -999) - v) < 1 for k, v in expected2.items())",
+      "        results.append({'name': 'Recomputes on the first 100 rows (not hardcoded)', 'pass': bool(ok2), 'hint': f'On just the first 100 rows, expected roughly {expected2!r}, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 100 rows (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "This is the overall NPS formula from the earlier task, applied once per department instead of once for the whole file, that's a groupby with a custom calculation per group.",
+      "survey.groupby('department').apply(...) runs a function once per department group, each call receiving just that department's rows.",
+      "Inside the grouped function, compute (promoters%% - detractors%%)*100 exactly like the single-department NPS formula, using that group's own nps values.",
+      "def nps_by_department(survey):\n    def _nps(g):\n        return round((g['nps']>=9).mean()*100 - (g['nps']<=6).mean()*100, 2)\n    return survey.groupby('department').apply(_nps).to_dict()" ],
+    explanation: { why: "groupby('department').apply(custom_function) runs the SAME calculation independently on each department's subset of rows, exactly the general pattern for 'compute this metric, but separately per group' rather than once for everything.", mistake: "Computing the overall NPS once and assuming it's representative of every department hides real, meaningful variation, Operations (-45.28) and Engineering (-55.77) are genuinely different situations, a single company-wide number averages that difference away.", tip: ".mean() on a boolean Series (like nps>=9) directly gives the PROPORTION of True values, a shortcut for count/total that reads more naturally once you're comfortable with it.", business: "A department-level breakdown is what actually lets a company target an intervention, Engineering's NPS is the worst of the four, that's a specific, actionable finding a single overall number completely conceals." } },
+
+  { id: "py-b05", skill: SKILL_ID_BUSINESS, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-b02"], engine: "pandas", dataset: "marketing",
+    title: "Which single week converted best",
+    objective: "Find the row with the best per-row rate, not the best raw count.",
+    functionName: "best_converting_week",
+    objectiveNote: "Each row is one channel's results for one week. Return the week label (the 'week' column's value) of the single row with the highest conversion rate (conversions divided by clicks).",
+    starterCode: "def best_converting_week(mkt):\n    # your code here\n    return \"\"",
+    checks: [
+      "    try:",
+      "        out = fn(mkt.copy())",
+      "        results.append({'name': \"2026-W15 has the best conversion rate\", 'pass': str(out)=='2026-W15', 'hint': f'Expected 2026-W15, got {out!r}. Compute conversions/clicks per row, then find the row with the max.'})",
+      "    except Exception as e:",
+      "        results.append({'name': \"2026-W15 has the best conversion rate\", 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(mkt.head(16).copy())",
+      "        results.append({'name': 'Recomputes on the first 16 rows (not hardcoded)', 'pass': str(out2)=='2026-W14', 'hint': f'On just the first 16 rows the best week should be 2026-W14, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 16 rows (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "You need a per-ROW rate (this specific channel-week's conversions divided by its own clicks), then find which row has the largest one.",
+      "mkt['conversions']/mkt['clicks'] computes the rate for every row at once, as a new Series aligned to the original rows.",
+      "That Series has an .idxmax() giving the ROW LABEL of the largest value, use it with .loc[...] to pull that row, then read its 'week' value.",
+      "def best_converting_week(mkt):\n    cvr = mkt['conversions']/mkt['clicks']\n    return mkt.loc[cvr.idxmax(), 'week']" ],
+    explanation: { why: "cvr.idxmax() returns the INDEX of the row where the rate is highest, not the rate itself, .loc[] then uses that index to pull the full row (or a specific column of it), the two-step 'compute a Series, then idxmax to find which row' pattern reappears constantly.", mistake: "Sorting by conversions alone (the raw count, not the rate) would find the highest-VOLUME week, not the best-converting one, a channel with huge traffic and a mediocre rate can easily out-count a smaller channel having an excellent week.", tip: "'Best' almost always means a RATE in a business context (best conversion, best margin, best return), not a raw total, always check which one a question is actually asking for before reaching for idxmax or sort_values.", business: "Knowing exactly which week (and by extension, which conditions) produced the best conversion rate is the natural starting point for figuring out what to repeat, was there a promotion that week, a change in targeting, a seasonal effect worth planning around next year." } },
+
+  { id: "py-b06", skill: SKILL_ID_BUSINESS, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-b02"], engine: "pandas", dataset: "marketing",
+    title: "Rank the channels by conversion rate",
+    objective: "Compute a rate per group, then order the groups by it.",
+    functionName: "channel_ranking_by_cvr",
+    objectiveNote: "Return a list of channel names, ordered from the highest overall conversion rate (total conversions / total clicks, across all weeks for that channel) to the lowest.",
+    starterCode: "def channel_ranking_by_cvr(mkt):\n    # your code here\n    return []",
+    checks: [
+      "    try:",
+      "        out = fn(mkt.copy())",
+      "        results.append({'name': 'Referral ranks highest, Social ranks lowest', 'pass': list(out)==['Referral','Email','Search','Social'], 'hint': f'Expected [\\'Referral\\',\\'Email\\',\\'Search\\',\\'Social\\'], got {out!r}. Group by channel, sum conversions and clicks separately, compute the rate, then sort descending.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Referral ranks highest, Social ranks lowest', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(mkt.head(16).copy())",
+      "        results.append({'name': 'Recomputes on the first 16 rows, where only 2 channels appear (not hardcoded)', 'pass': list(out2)==['Search','Social'], 'hint': f'On just the first 16 rows only Search and Social should appear, ranked in that order, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 16 rows, where only 2 channels appear (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "Each channel's TRUE rate needs both its total conversions and total clicks summed across every week first, not an average of weekly rates (the same weighting issue the overall CTR task raised).",
+      "mkt.groupby('channel').apply(lambda g: g['conversions'].sum()/g['clicks'].sum()) gives one correctly-weighted rate per channel.",
+      "sort_values(ascending=False) on that per-channel rate orders channels from best to worst, .index.tolist() then gives you the plain list of names the task asks for.",
+      "def channel_ranking_by_cvr(mkt):\n    rates = mkt.groupby('channel').apply(lambda g: g['conversions'].sum()/g['clicks'].sum())\n    return rates.sort_values(ascending=False).index.tolist()" ],
+    explanation: { why: "Summing conversions and clicks within each channel group before dividing (rather than averaging each week's individual rate) is the same weighted-rate correctness this stage's CTR task already established, now applied per group instead of overall.", mistake: "mkt.groupby('channel')['cvr'].mean(), where cvr was pre-computed per row, would average unweighted weekly rates within each channel, distorting the true channel-level rate exactly the way an unweighted overall CTR would.", tip: "Whenever grouping and computing a rate, sum the numerator and denominator columns separately within each group first, then divide once per group, this pattern generalizes cleanly no matter how many groups there are.", business: "A clean best-to-worst channel ranking, built on a correctly-weighted rate, is exactly the input a media budget conversation needs, reallocating spend toward Referral and away from Social is a defensible recommendation only if the ranking itself is computed correctly." } },
+
+  { id: "py-b07", skill: SKILL_ID_BUSINESS, tool: "python", level: "semiguided", difficulty: "core", prerequisite: ["py-b03"], engine: "pandas", dataset: "pnl",
+    title: "Revenue growth from the first period to the last",
+    objective: "Compute a growth rate between two specific rows, using row position, not a groupby.",
+    functionName: "revenue_growth_pct",
+    objectiveNote: "Assume the file is already in chronological order (it is). Return the percentage growth in revenue from the very first period to the very last, rounded to 2 decimal places.",
+    starterCode: "def revenue_growth_pct(pnl):\n    # your code here\n    return 0.0",
+    checks: [
+      "    try:",
+      "        out = fn(pnl.copy())",
+      "        results.append({'name': 'Revenue grew about 32.84% from first period to last', 'pass': bool(abs(out-32.84)<0.1), 'hint': f'Expected about 32.84, got {out!r}. (last-first)/first*100, using .iloc[0] and .iloc[-1].'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Revenue grew about 32.84% from first period to last', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(pnl.head(6).copy())",
+      "        results.append({'name': 'Recomputes on the first 6 periods (not hardcoded)', 'pass': bool(abs(out2-19.61)<0.5), 'hint': f'On just the first 6 periods, growth should be about 19.61%, got {out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 6 periods (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "This needs exactly two values out of the whole revenue column, the very first and the very last, by POSITION, not by any condition.",
+      ".iloc[0] gets the first row's value, .iloc[-1] gets the last row's value, regardless of how many rows are in between.",
+      "Growth percentage is (last - first) / first * 100, the standard percentage-change formula.",
+      "def revenue_growth_pct(pnl):\n    first, last = pnl['revenue'].iloc[0], pnl['revenue'].iloc[-1]\n    return round((last-first)/first*100, 2)" ],
+    explanation: { why: ".iloc[0] and .iloc[-1] select by POSITION in the DataFrame, first row and last row respectively, exactly what's needed once you can assume the data is already in the right chronological order.", mistake: "This calculation is only valid because the file is genuinely pre-sorted chronologically, on a file that ISN'T guaranteed sorted, using .iloc[0]/.iloc[-1] would silently compute growth between two essentially random periods instead of first-to-last.", tip: "Always confirm (or be told, as this task states outright) that row order actually means something before relying on positional selection like .iloc[0]/.iloc[-1], row order is not guaranteed by default in every dataset.", business: "32.84% revenue growth over roughly 3 years is the single number that opens almost every board deck or annual report, everything else in a P&L exists to explain what drove that headline growth figure." } },
+
+  { id: "py-b08", skill: SKILL_ID_BUSINESS, tool: "python", level: "challenge", difficulty: "challenge", prerequisite: ["py-b03"], engine: "pandas", dataset: "pnl",
+    title: "Operating expenses as a share of revenue, every period",
+    objective: "Compute a per-row financial ratio across the whole statement. Decide the approach yourself.",
+    functionName: "opex_ratio_trend",
+    objectiveNote: "Return a list of opex-as-a-percentage-of-revenue values (opex / revenue * 100), one per period, rounded to 2 decimal places, in the same order as the original rows.",
+    starterCode: "def opex_ratio_trend(pnl):\n    # your code here\n    return []",
+    checks: [
+      "    try:",
+      "        out = fn(pnl.copy())",
+      "        expected = [33.52, 30.97, 32.48, 32.54, 35.57, 34.62, 30.44, 34.13, 33.68, 31.98, 33.66, 31.55]",
+      "        ok = len(out)==12 and all(abs(a-b)<0.05 for a, b in zip(out, expected))",
+      "        results.append({'name': 'All 12 opex ratios are correct, in order', 'pass': bool(ok), 'hint': f'Expected {expected!r}, got {out!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'All 12 opex ratios are correct, in order', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(pnl.head(6).copy())",
+      "        results.append({'name': 'Recomputes on the first 6 rows (not hardcoded)', 'pass': bool(len(out2)==6), 'hint': f'On just the first 6 periods the list should have 6 values, got {len(out2) if hasattr(out2,\"__len__\") else out2!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 6 rows (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "This is a per-row calculation across the whole column, opex divided by that same row's revenue, for every row, keeping the original order.",
+      "pnl['opex']/pnl['revenue']*100 computes the ratio for every row at once as a Series, in the original row order automatically.",
+      "Round the whole Series with .round(2), then .tolist() converts it to a plain list.",
+      "def opex_ratio_trend(pnl):\n    return (pnl['opex']/pnl['revenue']*100).round(2).tolist()" ],
+    explanation: { why: "Vectorized division across two columns computes every row's ratio in one operation, the result stays in the same row order as the input, exactly what a 'list, one per period' answer needs, no explicit loop required.", mistake: "Looping over rows manually with iterrows() and appending to a list also works but is slower and more code for the exact same result, pandas' vectorized column arithmetic is almost always both faster and more concise than a manual row-by-row loop.", tip: "Once a calculation is 'do the same arithmetic to every row', reach for vectorized column operations first, a manual loop is rarely the right tool unless the per-row logic genuinely can't be expressed as column arithmetic.", business: "An opex ratio that swings between roughly 30% and 36% of revenue quarter to quarter is worth flagging on its own, a finance team watches this ratio specifically to catch cost creep before it erodes margin, a single average would hide exactly which periods ran hot." } },
+
+  { id: "py-b09", skill: SKILL_ID_BUSINESS, tool: "python", level: "challenge", difficulty: "challenge", prerequisite: ["py-b04"], engine: "pandas", dataset: "survey",
+    title: "Which department has the healthiest NPS, and by how much",
+    objective: "Find the best-performing group AND report its actual value, not just its name. Decide the approach yourself.",
+    functionName: "best_nps_department",
+    objectiveNote: "Return a dict with exactly two keys: department (the name of the department with the highest, i.e. least negative or most positive, NPS) and nps (that department's NPS value, 2 decimal places).",
+    starterCode: "def best_nps_department(survey):\n    # your code here\n    return {}",
+    checks: [
+      "    try:",
+      "        out = fn(survey.copy())",
+      "        ok = out.get('department')=='Operations' and abs(out.get('nps',0)-(-45.28))<0.5",
+      "        results.append({'name': 'Operations has the healthiest NPS, at about -45.28', 'pass': bool(ok), 'hint': f'Expected department=\\'Operations\\', nps near -45.28, got {out!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Operations has the healthiest NPS, at about -45.28', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(survey.head(100).copy())",
+      "        ok2 = out2.get('department')=='Operations' and abs(out2.get('nps',0)-(-32))<1",
+      "        results.append({'name': 'Recomputes the NPS value on the first 100 rows (not hardcoded to -45.28)', 'pass': bool(ok2), 'hint': f'On just the first 100 rows, Operations is still highest, but its NPS should be about -32, not -45.28, got {out2!r}. Did you hardcode the full-dataset value?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes the NPS value on the first 100 rows (not hardcoded to -45.28)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    hints: [
+      "Operations turns out to be the best department in both the full dataset AND a smaller slice of it, so the department NAME alone won't prove your code actually recomputes, the NPS VALUE has to be right too.",
+      "Build the same per-department NPS breakdown as the earlier task, then find the entry with the maximum value, keeping both its name and its value.",
+      "max(dept_nps.items(), key=lambda x: x[1]) on a dict of department->NPS gives you the (name, value) pair for the best one.",
+      "def best_nps_department(survey):\n    def _nps(g):\n        return round((g['nps']>=9).mean()*100 - (g['nps']<=6).mean()*100, 2)\n    by_dept = survey.groupby('department').apply(_nps).to_dict()\n    best_dept, best_val = max(by_dept.items(), key=lambda x: x[1])\n    return {'department': best_dept, 'nps': best_val}" ],
+    explanation: { why: "Returning both the winning department's name AND its actual score is what makes this a complete, verifiable finding, the name alone can't be checked for whether it was actually recomputed versus remembered, once the underlying data changes even slightly.", mistake: "Reporting just the department name might feel sufficient, but a stakeholder asking 'how healthy, exactly' needs the number too, 'Operations is best' and 'Operations is best, at -45.28' are different amounts of useful information.", tip: "Whenever a 'best' or 'worst' finding is reported, include the actual value alongside the name or label, not just which one won, the margin matters as much as the winner.", business: "Knowing Operations has the healthiest NPS is useful, knowing it's STILL negative at -45.28 changes the conversation entirely, every department here has a real problem, some are just less severe than others, that nuance is lost if only the 'winner' gets reported." } },
+
+  { id: "py-b10", skill: SKILL_ID_BUSINESS, tool: "python", level: "mastery", difficulty: "mastery", prerequisite: ["py-b07", "py-b08"], engine: "pandas", dataset: "pnl",
+    title: "Did the business get more or less efficient, and what would you tell the board",
+    objective: "Combine a margin calculation across two specific periods into one judgment, then defend it in writing.",
+    functionName: "margin_trend_summary",
+    objectiveNote: "Return a dict with exactly three keys: first_net_margin (net_income/revenue*100 for the first period, 2dp), last_net_margin (the same for the last period, 2dp), and improved (True if the last period's net margin is higher than the first's, else False). Then, in the box below, state whether margin improved or worsened and explain in 2-3 sentences whether revenue growth alone would have told the same story.",
+    starterCode: "def margin_trend_summary(pnl):\n    # your code here\n    return {}",
+    checks: [
+      "    try:",
+      "        out = fn(pnl.copy())",
+      "        ok = abs(out.get('first_net_margin',0)-24.8)<0.1 and abs(out.get('last_net_margin',0)-29.7)<0.1 and out.get('improved')==True",
+      "        results.append({'name': 'Correctly computes both margins and the improved flag', 'pass': bool(ok), 'hint': f'Expected first_net_margin about 24.8, last_net_margin about 29.7, improved=True, got {out!r}.'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Correctly computes both margins and the improved flag', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+      "    try:",
+      "        out2 = fn(pnl.head(6).copy())",
+      "        ok2 = abs(out2.get('last_net_margin',0)-24.37)<0.1 and out2.get('improved')==False",
+      "        results.append({'name': 'Recomputes on the first 6 periods, where the trend actually reverses (not hardcoded)', 'pass': bool(ok2), 'hint': f'On just the first 6 periods, last_net_margin should be about 24.37 (LOWER than first, so improved should be False), got {out2!r}. Did you hardcode the full-dataset answer?'})",
+      "    except Exception as e:",
+      "        results.append({'name': 'Recomputes on the first 6 periods (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {type(e).__name__}: {e}'})",
+    ],
+    written: {
+      label: "Did net margin improve or worsen, and would revenue growth alone have told the same story?",
+      placeholder: "State the direction clearly, then think about whether a business can grow revenue while still becoming less profitable, or vice versa...",
+      check: (text) => /(margin|improv|worsen|profit|revenue|effic)/i.test(text) && text.trim().length > 40,
+      hint: "State that net margin improved (from about 24.8% to about 29.7%), and note that revenue growth (32.84%) and margin improvement are two DIFFERENT findings, a business can grow revenue while margin shrinks (costs growing even faster), so growth alone wouldn't have proven profitability actually improved too." },
+    hints: [
+      "This combines the gross-margin idea from earlier in this stage, but using NET income (after opex too, not just after cogs), for exactly two specific periods, the first and the last.",
+      "Net margin for a period is net_income/revenue*100, compute it for .iloc[0] and .iloc[-1] separately, exactly like the revenue-growth task selected those same two rows.",
+      "Compare the two margins with a simple > to get the improved boolean, then assemble all three values into the result dict.",
+      "def margin_trend_summary(pnl):\n    first = pnl.iloc[0]\n    last = pnl.iloc[-1]\n    first_margin = round(first['net_income']/first['revenue']*100, 2)\n    last_margin = round(last['net_income']/last['revenue']*100, 2)\n    return {'first_net_margin': first_margin, 'last_net_margin': last_margin, 'improved': last_margin > first_margin}" ],
+    explanation: { why: "Selecting the first and last row with .iloc[0]/.iloc[-1] and computing net_income/revenue for each, exactly the same positional-selection idea the revenue-growth task used, just applied to a different, more complete ratio (net margin includes BOTH cogs and opex, gross margin only cogs).", mistake: "Assuming revenue growth automatically means the business got more profitable conflates two genuinely different questions, a company can grow revenue substantially while its margin shrinks, if costs are growing even faster than revenue, this dataset happens to show BOTH improving together, but that's a finding, not a guarantee.", tip: "Revenue growth and margin trend are two separate, equally important axes for judging business health, always check both before concluding a business is doing well, growth without margin discipline is a common way companies quietly become less profitable while looking successful.", business: "This is the exact distinction that closes out the entire Python Practice Library, growth (32.84%) is the headline number, but margin improvement (24.8% to 29.7%) is what proves that growth was actually profitable growth, not just bigger, unprofitable growth, that's the kind of judgment call a board actually needs, not just a chart of revenue going up." } },
 ];
 
 /* ================= rendering ================= */
@@ -1411,7 +1682,7 @@ function renderSkillBar() {
   const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
   target.innerHTML = next
     ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
-    : `<b>What should I do next?</b> All ${TASKS.length} built tasks passed. Further stages aren't built yet.`;
+    : `<b>What should I do next?</b> All ${TASKS.length} tasks passed, the full Python Practice Library is complete.`;
 }
 function buildHintsHtml(hints) {
   const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
