@@ -92,10 +92,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Automation &middot; Stage 1 of 3</span>
+    <span class="eyebrow">Practice Library &middot; Automation &middot; Stages 1-2 of 3</span>
     <h1 class="serif">Automation Practice Library</h1>
     <p class="sub">Real CPython running in a Web Worker (Pyodide), the same sandbox the Python Practice Library uses, applied to the specific building blocks of scripted, repeatable analyst work: parsing raw text, batching records, cleaning filenames, merging totals from separate sources, and handling bad rows without crashing the whole run.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this is genuine code execution, not a simulation, every task pairs fixed test cases with one freshly randomized input compared against a hidden reference implementation, so a hardcoded return value can't pass. Stage 1 (Fundamentals) is complete, 10 tasks. Stages 2-3 (Report Automation, Real-World Analyst Workflows) are not yet built.</div>
+    <div class="scopenote"><b>Honest scope note:</b> this is genuine code execution, not a simulation, every task pairs fixed test cases with one freshly randomized input compared against a hidden reference implementation, so a hardcoded return value can't pass. Stage 1 (Fundamentals) and Stage 2 (Report Automation: CSV generation and parsing, ranked report formatting, period-over-period comparison, threshold alerting, template filling, and idempotent re-run-safe aggregation) are complete, 20 tasks. Stage 3 (Real-World Analyst Workflows) is not yet built.</div>
   </header>
 
   <div id="skillBars"></div>
@@ -169,9 +169,13 @@ function buildHarness(task) {
 /* ================= skills & tasks ================= */
 const SKILL_ID_TEXT = "automation-text-processing";
 const SKILL_ID_BATCH = "automation-batch-records";
+const SKILL_ID_REPORTGEN = "automation-report-generation";
+const SKILL_ID_MONITORING = "automation-monitoring-alerts";
 const SKILLS = [
   { id: SKILL_ID_TEXT, label: "Automation Text & File Processing" },
   { id: SKILL_ID_BATCH, label: "Automation Batch Records" },
+  { id: SKILL_ID_REPORTGEN, label: "Automation Report Generation" },
+  { id: SKILL_ID_MONITORING, label: "Automation Monitoring & Alerts" },
 ];
 
 const TASKS = [
@@ -512,6 +516,318 @@ const TASKS = [
       "After successfully parsing a line, still check that region, status, and amount are all present, a line can parse successfully but still be missing a required field.",
       "def run_pipeline(raw_lines):\n    total = 0.0\n    skipped = 0\n    for line in raw_lines:\n        try:\n            parts = {}\n            for p in line.split(','):\n                if not p:\n                    continue\n                k, v = p.split('=', 1)\n                parts[k.strip()] = v.strip()\n        except Exception:\n            skipped += 1\n            continue\n        if 'region' not in parts or 'status' not in parts or 'amount' not in parts:\n            skipped += 1\n            continue\n        try:\n            amt = float(parts['amount'])\n        except Exception:\n            skipped += 1\n            continue\n        if parts['status'] == 'Completed':\n            total += amt\n    return {'completed_total': round(total, 2), 'skipped': skipped}" ],
     explanation: { why: "Wrapping each line's risky operations (parsing, float conversion) in their own try/except, and using continue to move to the next line on failure, means one malformed line only costs that one line, not the entire batch, exactly the fault tolerance a real unattended script needs.", mistake: "Letting a single line's parsing error propagate as an uncaught exception would stop the ENTIRE function immediately, on a large real file, that means every line after the first bad one never gets processed at all, and depending on how the script is invoked, might fail completely silently overnight with no output.", tip: "The general pattern here, isolate risky per-item work in a try/except inside a loop, count and report failures rather than crashing on them, is one of the most valuable, broadly reusable habits in real automation code, it shows up in almost every batch-processing script worth writing.", business: "This is deliberately the least guided, most comprehensive task in this stage, an overnight script that processes a large batch of records and crashes partway through on one bad row is a genuinely common, genuinely costly real automation failure, building in this kind of fault tolerance from the start is what separates a script that's actually safe to leave unattended from one that isn't." } },
+
+  /* ---- Stage 2: Report Automation ---- */
+  { id: "au-r01", skill: SKILL_ID_REPORTGEN, tool: "automation", level: "guided", difficulty: "core", prerequisite: ["au-f03"],
+    title: "Generate CSV text from a batch of records",
+    objective: "Write generate_csv_string(records, fields), building a CSV-formatted string (header row plus one row per record) in a fixed field order.",
+    objectiveNote: "A script that needs to hand off its results to another tool, or save a report file, needs to build correctly-formatted CSV text itself.",
+    functionName: "generate_csv_string",
+    starterCode: "def generate_csv_string(records, fields):\n    # build CSV text: a header row, then one row per record, in `fields` order\n    pass\n",
+    testCases: [
+      { name: "Builds a header plus one data row", args: [[{ a: 1, b: 2 }], ["a", "b"]], expected: "a,b\n1,2" },
+      { name: "Builds multiple data rows", args: [[{ a: 1, b: 2 }, { a: 3, b: 4 }], ["a", "b"]], expected: "a,b\n1,2\n3,4" },
+      { name: "Missing field becomes blank", args: [[{ a: 1 }], ["a", "b"]], expected: "a,b\n1," },
+    ],
+    referenceCode: [
+      "    def _ref(records, fields):",
+      "        lines = [','.join(fields)]",
+      "        for r in records:",
+      "            lines.append(','.join(str(r.get(f, '')) for f in fields))",
+      "        return '\\n'.join(lines)",
+    ],
+    randomGenCode: [
+      "        fields = ['a', 'b']",
+      "        n = random.randint(1, 4)",
+      "        recs = [{'a': random.randint(1, 99), 'b': random.randint(1, 99)} for _ in range(n)]",
+      "        rargs = (recs, fields)",
+    ],
+    hints: [
+      "The first line is always just the field names themselves, joined by commas, that's the header row.",
+      "For each record, build one line by pulling each named field's value (in the given order) and joining them with commas, using .get(f, '') so a missing field becomes blank instead of crashing.",
+      "Join the header line and every data line together with newline characters to get the full CSV text.",
+      "def generate_csv_string(records, fields):\n    lines = [','.join(fields)]\n    for r in records:\n        lines.append(','.join(str(r.get(f, '')) for f in fields))\n    return '\\n'.join(lines)" ],
+    explanation: { why: "CSV is fundamentally just text with a specific structure, a header line of column names, then one line per record with matching values in the same order, building it as plain strings (for this simple case, with no embedded commas) is straightforward once that structure is clear.", mistake: "Forgetting to convert each value to a string before joining (str(r.get(f, ''))) would crash on any non-string value like a number, since Python's ','.join() requires every piece to already be a string.", tip: "Python's built-in csv module handles more complex real-world cases (values that themselves contain commas or quotes) that this simplified version doesn't, worth knowing about for real production code, even though this task keeps things simple.", business: "A script that needs to hand its results to a stakeholder, or feed them into another tool that expects CSV, needs to reliably produce correctly-structured CSV text, this is the core logic behind that." } },
+
+  { id: "au-r02", skill: SKILL_ID_REPORTGEN, tool: "automation", level: "guided", difficulty: "core", prerequisite: ["au-r01"],
+    title: "Parse CSV text back into records",
+    objective: "Write parse_csv_string(csv_text), the inverse of the previous task, turning CSV text back into a list of dicts using the header row's names as keys.",
+    objectiveNote: "A script that reads in a CSV export (from another system, or a previous run of itself) needs to reliably parse it back into usable records.",
+    functionName: "parse_csv_string",
+    starterCode: "def parse_csv_string(csv_text):\n    # parse CSV text (header row + data rows) into a list of dicts\n    pass\n",
+    testCases: [
+      { name: "Parses a header and one row", args: ["a,b\n1,2"], expected: [{ a: "1", b: "2" }] },
+      { name: "Parses multiple rows", args: ["a,b\n1,2\n3,4"], expected: [{ a: "1", b: "2" }, { a: "3", b: "4" }] },
+      { name: "Header only, no data rows", args: ["a,b"], expected: [] },
+    ],
+    referenceCode: [
+      "    def _ref(csv_text):",
+      "        lines = csv_text.strip().split('\\n')",
+      "        header = lines[0].split(',')",
+      "        out = []",
+      "        for line in lines[1:]:",
+      "            vals = line.split(',')",
+      "            out.append(dict(zip(header, vals)))",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        n = random.randint(0, 4)",
+      "        rows = [f'{random.randint(1,99)},{random.randint(1,99)}' for _ in range(n)]",
+      "        rargs = ('a,b\\n' + '\\n'.join(rows) if rows else 'a,b',)",
+    ],
+    hints: [
+      "Split the whole text on newlines first, the first line is the header, every line after it is a data row.",
+      "Split the header line on commas to get the field names, in order.",
+      "For each data row, split it on commas too, then zip it together with the header names to build one dict per row.",
+      "def parse_csv_string(csv_text):\n    lines = csv_text.strip().split('\\n')\n    header = lines[0].split(',')\n    out = []\n    for line in lines[1:]:\n        vals = line.split(',')\n        out.append(dict(zip(header, vals)))\n    return out" ],
+    explanation: { why: "zip(header, vals) pairs each field name with its corresponding value from the same row, positionally, dict() then turns those pairs directly into a dictionary, that's the whole parsing logic in one line, once the text is split into header and data lines.", mistake: "Forgetting .strip() on the input text can leave a trailing blank line after splitting, which would then try to parse an empty string as a data row, producing an unwanted empty or malformed record at the end.", tip: "generate_csv_string and parse_csv_string are exact inverses of each other, a good way to sanity-check either one is confirming that parse_csv_string(generate_csv_string(records, fields)) round-trips back to equivalent data.", business: "A script that reads yesterday's exported CSV back in, to compare against today's numbers or resume a previous run, needs exactly this parsing logic to turn that file's text back into usable records." } },
+
+  { id: "au-r03", skill: SKILL_ID_REPORTGEN, tool: "automation", level: "guided", difficulty: "core", prerequisite: ["au-f07"],
+    title: "Build a ranked, formatted summary report",
+    objective: "Write build_summary_report(totals), turning a dict of category totals into a multi-line report string, ranked highest revenue first.",
+    objectiveNote: "This is the standard shape of a generated text report, ranked, currency-formatted, one line per category.",
+    functionName: "build_summary_report",
+    starterCode: "def build_summary_report(totals):\n    # one line per category, \"Category: $X.XX\", ranked highest first\n    pass\n",
+    testCases: [
+      { name: "Ranks highest first", args: [{ West: 100, East: 250 }], expected: "East: $250.00\nWest: $100.00" },
+      { name: "Formats a single category", args: [{ Only: 42.5 }], expected: "Only: $42.50" },
+      { name: "Ranks three categories", args: [{ A: 10, B: 30, C: 20 }], expected: "B: $30.00\nC: $20.00\nA: $10.00" },
+    ],
+    referenceCode: [
+      "    def _ref(totals):",
+      "        lines = []",
+      "        for k, v in sorted(totals.items(), key=lambda kv: -kv[1]):",
+      "            lines.append(f'{k}: ${v:,.2f}')",
+      "        return '\\n'.join(lines)",
+    ],
+    randomGenCode: [
+      "        keys = random.sample(['A', 'B', 'C', 'D'], k=random.randint(2, 4))",
+      "        totals = {k: random.randint(1, 999) for k in keys}",
+      "        rargs = (totals,)",
+    ],
+    hints: [
+      "Sort the dict's items by value, DESCENDING, sorted(..., key=lambda kv: -kv[1]) negates the value so the largest sorts first.",
+      "For each (category, value) pair in that sorted order, format one line using the same ,.2f currency pattern from an earlier task.",
+      "Join all the formatted lines together with newlines to build the final multi-line report string.",
+      "def build_summary_report(totals):\n    lines = []\n    for k, v in sorted(totals.items(), key=lambda kv: -kv[1]):\n        lines.append(f'{k}: ${v:,.2f}')\n    return '\\n'.join(lines)" ],
+    explanation: { why: "sorted() with a key function that negates the value produces a descending sort in one line, without needing Python's separate reverse=True argument, either approach works, this is just one common way to write it.", mistake: "Sorting by the dict's KEYS (alphabetically) instead of its VALUES would produce a report in category-name order, not ranked by revenue, technically valid output, but not what \"ranked highest revenue first\" actually asked for.", tip: "This exact combine-sort-then-format pattern, rank by value, format each line, join with newlines, is the standard shape behind most simple generated text reports.", business: "A ranked revenue-by-category report, highest performer listed first, is one of the most common outputs a business stakeholder actually wants to read, matching a script's output order to what a human would naturally want to see first is a real, practical detail." } },
+
+  { id: "au-r04", skill: SKILL_ID_MONITORING, tool: "automation", level: "guided", difficulty: "core", prerequisite: ["au-f03"],
+    title: "Compare this period to the last",
+    objective: "Write compare_periods(current, previous), returning the absolute change, percent change, and a direction (\"up\"/\"down\"/\"flat\").",
+    objectiveNote: "Almost every automated report includes a period-over-period comparison, this is the calculation behind it.",
+    functionName: "compare_periods",
+    starterCode: "def compare_periods(current, previous):\n    # return {\"change\": ..., \"pct_change\": ..., \"direction\": \"up\"/\"down\"/\"flat\"}\n    pass\n",
+    testCases: [
+      { name: "An increase", args: [150, 100], expected: { change: 50, pct_change: 50.0, direction: "up" } },
+      { name: "A decrease", args: [80, 100], expected: { change: -20, pct_change: -20.0, direction: "down" } },
+      { name: "No change", args: [100, 100], expected: { change: 0, pct_change: 0.0, direction: "flat" } },
+    ],
+    referenceCode: [
+      "    def _ref(current, previous):",
+      "        change = round(current - previous, 2)",
+      "        pct = round((current - previous) / previous * 100, 2) if previous else 0.0",
+      "        direction = 'up' if change > 0 else ('down' if change < 0 else 'flat')",
+      "        return {'change': change, 'pct_change': pct, 'direction': direction}",
+    ],
+    randomGenCode: [
+      "        previous = random.randint(50, 500)",
+      "        current = previous + random.choice([-40, -10, 0, 10, 40])",
+      "        rargs = (current, previous)",
+    ],
+    hints: [
+      "The absolute change is just current minus previous, a positive number means an increase, negative means a decrease.",
+      "The percent change divides that same difference by the PREVIOUS value, then multiplies by 100, guard against previous being 0 (which would divide by zero).",
+      "The direction is a simple three-way check on the change value: greater than 0 is \"up\", less than 0 is \"down\", exactly 0 is \"flat\".",
+      "def compare_periods(current, previous):\n    change = round(current - previous, 2)\n    pct = round((current - previous) / previous * 100, 2) if previous else 0.0\n    direction = 'up' if change > 0 else ('down' if change < 0 else 'flat')\n    return {'change': change, 'pct_change': pct, 'direction': direction}" ],
+    explanation: { why: "Guarding the percent-change division with `if previous else 0.0` avoids a ZeroDivisionError when the previous period happened to be exactly zero, a real edge case (a brand-new category with no prior period) that a naive division would crash on.", mistake: "Computing percent change as a fraction of the CURRENT value instead of the PREVIOUS value is a common, subtle formula mistake, \"percent change\" is conventionally relative to where you started (the previous period), not where you ended up.", tip: "This exact change/pct_change/direction shape is worth having as a reusable utility, it's the calculation behind almost every \"vs last period\" line in a real business report.", business: "A weekly automated report comparing this week's revenue to last week's needs exactly this calculation, and needs to not crash on the first week a brand-new product category has zero prior revenue to compare against." } },
+
+  { id: "au-r05", skill: SKILL_ID_MONITORING, tool: "automation", level: "semiguided", difficulty: "core", prerequisite: ["au-f06"],
+    title: "Flag records that breach a threshold",
+    objective: "Write flag_threshold_breaches(records, field, threshold), returning the indices of every record whose field value is below the given threshold.",
+    objectiveNote: "A monitoring script needs to identify exactly which records are a problem, not just whether a problem exists somewhere in the batch.",
+    functionName: "flag_threshold_breaches",
+    starterCode: "def flag_threshold_breaches(records, field, threshold):\n    # return the indices of records where record[field] < threshold\n    pass\n",
+    testCases: [
+      { name: "Flags one breach", args: [[{ amount: 50 }, { amount: 150 }], "amount", 100], expected: [0] },
+      { name: "Flags multiple breaches", args: [[{ amount: 10 }, { amount: 200 }, { amount: 5 }], "amount", 100], expected: [0, 2] },
+      { name: "No breaches", args: [[{ amount: 200 }, { amount: 300 }], "amount", 100], expected: [] },
+    ],
+    referenceCode: [
+      "    def _ref(records, field, threshold):",
+      "        out = []",
+      "        for i, r in enumerate(records):",
+      "            if r.get(field, 0) < threshold:",
+      "                out.append(i)",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        n = random.randint(2, 6)",
+      "        recs = [{'amount': random.randint(1, 300)} for _ in range(n)]",
+      "        rargs = (recs, 'amount', 150)",
+    ],
+    hints: [
+      "Walk the records with their index (enumerate), checking each one's named field against the threshold.",
+      "\"Breach\" here specifically means BELOW the threshold, use .get(field, 0) so a record missing the field is treated as 0 (which would itself count as a breach against any positive threshold).",
+      "Collect the index of every record that fails the check, in original order, exactly the same shape as the earlier validate_rows function.",
+      "def flag_threshold_breaches(records, field, threshold):\n    out = []\n    for i, r in enumerate(records):\n        if r.get(field, 0) < threshold:\n            out.append(i)\n    return out" ],
+    explanation: { why: "Returning indices (not the records themselves) lets a caller trace each flagged breach back to its exact position in the original batch, useful for logging or looking up the full original record afterward.", mistake: "Returning the records themselves instead of their indices loses the ability to say WHERE in the original batch each breach occurred, and if two records happen to be identical, returning objects instead of positions could even be ambiguous about which one was flagged.", tip: "This index-returning pattern (rather than returning the matching items directly) is a small but genuinely useful habit for any monitoring or validation function, it keeps the door open for the caller to do more with the flagged position, like remove it or annotate it in place.", business: "A monitoring script flagging orders with unusually low amounts (a possible data entry error, or a processing bug upstream) needs to identify exactly WHICH orders, so someone can go look at them, not just report that \"some\" orders looked wrong." } },
+
+  { id: "au-r06", skill: SKILL_ID_REPORTGEN, tool: "automation", level: "semiguided", difficulty: "core", prerequisite: ["au-r01"],
+    title: "Fill a report template with values",
+    objective: "Write fill_template(template, values), substituting {placeholder} spots in a template string with values from a dict.",
+    objectiveNote: "A script that generates the same kind of report every day needs one reusable template, filled in with that day's specific numbers.",
+    functionName: "fill_template",
+    starterCode: "def fill_template(template, values):\n    # e.g. fill_template(\"Report for {month}: total ${total}\", {\"month\": \"January\", \"total\": 1000})\n    pass\n",
+    testCases: [
+      { name: "Fills two placeholders", args: ["Report for {month}: total ${total}", { month: "January", total: 1000 }], expected: "Report for January: total $1000" },
+      { name: "Fills one placeholder", args: ["Hello {name}!", { name: "Dana" }], expected: "Hello Dana!" },
+      { name: "No placeholders, unchanged", args: ["Static text", {}], expected: "Static text" },
+    ],
+    referenceCode: [
+      "    def _ref(template, values):",
+      "        return template.format(**values)",
+    ],
+    randomGenCode: [
+      "        month = random.choice(['January', 'February', 'March'])",
+      "        total = random.randint(100, 9999)",
+      "        rargs = ('Report for {month}: total ${total}', {'month': month, 'total': total})",
+    ],
+    hints: [
+      "Python strings have a built-in .format() method that fills in {name}-style placeholders from keyword arguments.",
+      "The values dict's keys need to match the template's placeholder names exactly, ** unpacks a dict into keyword arguments for .format().",
+      "template.format(**values) is the entire function, Python's string formatting already does the substitution.",
+      "def fill_template(template, values):\n    return template.format(**values)" ],
+    explanation: { why: "Python's str.format() method already implements exactly this placeholder-substitution behavior, {name} spots in the template get replaced by the matching keyword argument, ** unpacks a dict directly into keyword arguments, no manual search-and-replace needed.", mistake: "Manually looping through values and using string.replace() for each one works but is more code, more error-prone (a placeholder name that's also a substring of another word could get partially replaced), and reinvents something Python's format() already does correctly.", tip: "A template string kept as one reusable constant, filled in fresh with each day's specific values, is a common, clean way to keep a report's WORDING consistent day to day while only the NUMBERS change.", business: "A daily automated email or report that always says the same thing, structurally, just with that day's specific numbers filled in, is exactly what a template plus fill_template produces, consistent wording, fresh data, every single day." } },
+
+  { id: "au-r07", skill: SKILL_ID_MONITORING, tool: "automation", level: "semiguided", difficulty: "core", prerequisite: ["au-f08"],
+    title: "Combine monthly totals safely, even if re-run",
+    objective: "Write combine_monthly_totals(monthly_list), combining a list of {\"month\": ..., \"total\": ...} entries into one dict keyed by month, where a REPEATED month REPLACES the earlier value rather than adding to it.",
+    objectiveNote: "If a scheduled script fails partway through and gets re-run, it might reprocess the same month twice, this function needs to handle that safely, without double-counting.",
+    functionName: "combine_monthly_totals",
+    starterCode: "def combine_monthly_totals(monthly_list):\n    # combine into {month: total}, a repeated month REPLACES (does not add to) the earlier value\n    pass\n",
+    testCases: [
+      { name: "Combines distinct months", args: [[{ month: "Jan", total: 100 }, { month: "Feb", total: 200 }]], expected: { Jan: 100, Feb: 200 } },
+      { name: "A repeated month replaces, does not sum", args: [[{ month: "Jan", total: 100 }, { month: "Jan", total: 150 }]], expected: { Jan: 150 } },
+      { name: "Later entries win on repeats", args: [[{ month: "Mar", total: 10 }, { month: "Mar", total: 20 }, { month: "Mar", total: 30 }]], expected: { Mar: 30 } },
+    ],
+    referenceCode: [
+      "    def _ref(monthly_list):",
+      "        out = {}",
+      "        for m in monthly_list:",
+      "            out[m['month']] = m['total']",
+      "        return out",
+    ],
+    randomGenCode: [
+      "        months = ['Jan', 'Feb', 'Mar']",
+      "        n = random.randint(2, 5)",
+      "        entries = [{'month': random.choice(months), 'total': random.randint(1, 500)} for _ in range(n)]",
+      "        rargs = (entries,)",
+    ],
+    hints: [
+      "Walk the list in order, for each entry, just SET the dict's value for that month, don't add to whatever's already there.",
+      "This is deliberately different from the earlier merge_totals task, that one summed shared keys together, this one intentionally OVERWRITES on a repeat, because these entries represent a re-run producing a corrected value, not two genuinely separate contributions to add up.",
+      "Since a plain assignment (out[m['month']] = m['total']) always overwrites, the LAST entry for any given month in the list naturally \"wins\", which is exactly the intended behavior if a later entry represents a corrected re-run.",
+      "def combine_monthly_totals(monthly_list):\n    out = {}\n    for m in monthly_list:\n        out[m['month']] = m['total']\n    return out" ],
+    explanation: { why: "A plain dictionary assignment always overwrites any existing value for that key, walking the list in order and just assigning means the LAST entry for any given month ends up as the final value, exactly the intended \"a re-run's corrected value replaces the earlier one\" behavior.", mistake: "Reaching for the earlier merge_totals-style summing pattern here would be a genuine, costly bug, if a script re-processes January's data because its first run failed partway through, SUMMING both attempts would double-count January's real total, not correct it.", tip: "Whether repeated data should be SUMMED or OVERWRITTEN is a real, case-by-case design decision, two genuinely separate contributions (two different regions' revenue) should sum, two attempts to produce the SAME month's corrected number should overwrite, confusing the two is a common, serious automation bug.", business: "A script that recomputes and re-saves January's revenue because a data source was corrected needs its LATEST run to simply REPLACE the earlier, wrong number, not add to it and silently double or triple January's reported revenue." } },
+
+  { id: "au-r08", skill: SKILL_ID_MONITORING, tool: "automation", level: "challenge", difficulty: "challenge", prerequisite: ["au-r03"],
+    title: "Rank categories by total, names only",
+    objective: "Write rank_categories(totals), returning just the category NAMES (not values), sorted from highest total to lowest.",
+    objectiveNote: "Sometimes a report needs just the ranked ORDER of categories, for example to decide which order to loop through them in elsewhere in a script.",
+    functionName: "rank_categories",
+    starterCode: "def rank_categories(totals):\n    # return category names only, sorted highest total to lowest\n    pass\n",
+    testCases: [
+      { name: "Ranks three categories", args: [{ West: 100, East: 300, North: 200 }], expected: ["East", "North", "West"] },
+      { name: "Ranks two categories", args: [{ A: 5, B: 50 }], expected: ["B", "A"] },
+      { name: "Single category", args: [{ Only: 10 }], expected: ["Only"] },
+    ],
+    referenceCode: [
+      "    def _ref(totals):",
+      "        return sorted(totals.keys(), key=lambda k: -totals[k])",
+    ],
+    randomGenCode: [
+      "        keys = random.sample(['A', 'B', 'C', 'D'], k=random.randint(2, 4))",
+      "        totals = {k: random.randint(1, 999) for k in keys}",
+      "        rargs = (totals,)",
+    ],
+    hints: [
+      "sorted() can take any iterable, including a dict's .keys(), plus a key function deciding what to sort by.",
+      "The key function here needs to look up EACH key's corresponding value in the totals dict, then negate it for descending order, key=lambda k: -totals[k].",
+      "The result should be just the names (a list of strings), not the values or the pairs, sorted() on .keys() with that key function returns exactly that.",
+      "def rank_categories(totals):\n    return sorted(totals.keys(), key=lambda k: -totals[k])" ],
+    explanation: { why: "sorted()'s key function doesn't have to operate on the items being sorted directly, here it looks each key up in the totals dict to decide the sort order, while the actual items being sorted and returned are just the keys themselves.", mistake: "Sorting totals.items() (key-value pairs) and then extracting just the keys afterward works too, but is an unnecessary extra step compared to sorting .keys() directly with a key function that looks up each one's value.", tip: "This same \"sort A by a value looked up from somewhere else\" pattern generalizes well beyond dicts, sorting a list of names by a separately-stored score, for instance, the same key=lambda x: -lookup[x] shape applies.", business: "A script that needs to process categories in priority order (perhaps sending an alert about the highest-revenue category first) needs just this ranked name list, not the full totals, to drive that processing order." } },
+
+  { id: "au-r09", skill: SKILL_ID_MONITORING, tool: "automation", level: "challenge", difficulty: "challenge", prerequisite: ["au-r04"],
+    title: "Build an alert message, or nothing at all",
+    objective: "Write build_alert_message(current_total, threshold), returning a formatted alert string if current_total is below threshold, or None if everything's fine.",
+    objectiveNote: "A monitoring script shouldn't send a notification every single time it runs, only when there's actually something to say.",
+    functionName: "build_alert_message",
+    starterCode: "def build_alert_message(current_total, threshold):\n    # return an alert string if current_total < threshold, else return None\n    pass\n",
+    testCases: [
+      { name: "Below threshold produces an alert", args: [50, 100], expected: "ALERT: total $50.00 is below threshold $100.00" },
+      { name: "At or above threshold produces nothing", args: [150, 100], expected: null },
+      { name: "Exactly at threshold produces nothing", args: [100, 100], expected: null },
+    ],
+    referenceCode: [
+      "    def _ref(current_total, threshold):",
+      "        if current_total < threshold:",
+      "            return f'ALERT: total ${current_total:,.2f} is below threshold ${threshold:,.2f}'",
+      "        return None",
+    ],
+    randomGenCode: [
+      "        threshold = 200",
+      "        current = random.choice([50, 100, 150, 200, 250, 300])",
+      "        rargs = (current, threshold)",
+    ],
+    hints: [
+      "Only the below-threshold case should produce a message, at or above the threshold, the function should return None, meaning \"nothing to report\".",
+      "Format the alert string using the same ,.2f currency pattern from earlier tasks, for both the current total and the threshold.",
+      "Returning None (rather than an empty string) makes it easy for calling code to check \"if message:\" to decide whether there's actually anything worth sending.",
+      "def build_alert_message(current_total, threshold):\n    if current_total < threshold:\n        return f'ALERT: total ${current_total:,.2f} is below threshold ${threshold:,.2f}'\n    return None" ],
+    explanation: { why: "Returning None specifically (rather than an empty string, or a fixed \"all good\" message) gives calling code a clean, idiomatic way to check whether there's anything to actually send, `if message:` is False for both None and an empty string, but None more clearly communicates \"there is genuinely nothing here\" as a concept.", mistake: "Always returning SOME string, even when everything's fine (like \"Status: OK\"), would mean a notification system built on top of this function has to separately parse the message to figure out whether it's actually an alert, versus letting the function itself signal \"nothing to report\" via None.", tip: "This return-None-when-there's-nothing-to-report pattern is common across real monitoring code, it cleanly separates \"did a problem occur\" from \"what does the problem look like\", letting calling code make that decision with a simple truthiness check.", business: "A daily monitoring script that emails a report every single day, even on days when revenue is completely normal, quickly gets ignored, alert fatigue is a real, well-documented problem, only sending a message when build_alert_message actually returns one avoids it." } },
+
+  { id: "au-r10", skill: SKILL_ID_REPORTGEN, tool: "automation", level: "mastery", difficulty: "mastery", prerequisite: ["au-r03", "au-r07"],
+    title: "Independent build: a full monthly report from raw records",
+    objective: "Write build_monthly_report(records), combining status filtering, per-category aggregation, ranking, and formatting into one complete report string, starting with a \"Monthly Report\" header line.",
+    objectiveNote: "Given raw order records (each with category, status, and amount), sum amount per category for Completed orders only, then produce \"Monthly Report\" followed by one ranked, currency-formatted line per category, highest first.",
+    functionName: "build_monthly_report",
+    starterCode: "def build_monthly_report(records):\n    # \"Monthly Report\" header, then ranked \"Category: $X.XX\" lines, Completed orders only\n    pass\n",
+    testCases: [
+      { name: "Sums Completed only, ranks descending", args: [[{ category: "West", status: "Completed", amount: 100 }, { category: "East", status: "Completed", amount: 300 }, { category: "West", status: "Returned", amount: 999 }]], expected: "Monthly Report\nEast: $300.00\nWest: $100.00" },
+      { name: "A single category", args: [[{ category: "Only", status: "Completed", amount: 42.5 }]], expected: "Monthly Report\nOnly: $42.50" },
+      { name: "No Completed orders, header only", args: [[{ category: "West", status: "Cancelled", amount: 100 }]], expected: "Monthly Report" },
+    ],
+    referenceCode: [
+      "    def _ref(records):",
+      "        totals = {}",
+      "        for r in records:",
+      "            if r.get('status') == 'Completed':",
+      "                totals[r['category']] = totals.get(r['category'], 0) + r.get('amount', 0)",
+      "        lines = ['Monthly Report']",
+      "        for k, v in sorted(totals.items(), key=lambda kv: -kv[1]):",
+      "            lines.append(f'{k}: ${v:,.2f}')",
+      "        return '\\n'.join(lines)",
+    ],
+    randomGenCode: [
+      "        cats = ['West', 'East', 'North']",
+      "        n = random.randint(3, 8)",
+      "        recs = []",
+      "        for _ in range(n):",
+      "            recs.append({'category': random.choice(cats), 'status': random.choice(['Completed', 'Returned', 'Cancelled']), 'amount': random.randint(10, 300)})",
+      "        rargs = (recs,)",
+    ],
+    written: {
+      label: "Why is it safe to re-run build_monthly_report on the exact same records twice in a row, and what would make a script UNSAFE to re-run that way?",
+      placeholder: "Think about what this function actually depends on, and compare it to a script that appends to a running total file or sends an email as a side effect...",
+      check: (text) => /\b(pure|no side effect|deterministic|same (input|records|result)|recomput)\b/i.test(text) && /\b(unsafe|append|side effect|email|mutat|double|state)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that build_monthly_report only reads its input and returns a new string, it has no side effects and depends on nothing but its own argument, so running it twice on the same records always produces the exact same report. A script becomes UNSAFE to re-run when it has side effects, like appending to a running total file, sending an email, or incrementing a counter, since re-running it would double those effects instead of just recomputing the same answer." },
+    hints: [
+      "This combines status filtering, per-category summing (task 3's SUMIFS-like idea, but in code), ranking, and formatting, all from earlier in this stage and Stage 1, into one function.",
+      "Filter to Completed orders first, accumulating a running total dict keyed by category as you go, using .get(key, 0) so a new category starts from zero.",
+      "Once you have the totals dict, this is exactly build_summary_report's ranking-and-formatting logic, applied here after adding the \"Monthly Report\" header line first.",
+      "def build_monthly_report(records):\n    totals = {}\n    for r in records:\n        if r.get('status') == 'Completed':\n            totals[r['category']] = totals.get(r['category'], 0) + r.get('amount', 0)\n    lines = ['Monthly Report']\n    for k, v in sorted(totals.items(), key=lambda kv: -kv[1]):\n        lines.append(f'{k}: ${v:,.2f}')\n    return '\\n'.join(lines)" ],
+    explanation: { why: "This combines every major piece from this stage, filtering to the right status, accumulating per-category totals, ranking descending, and formatting into a readable report, into one complete, self-contained function that recomputes its entire result fresh from the input records every single time it's called.", mistake: "A script that instead ACCUMULATES onto some persistent state (a running total saved to a file, or a database row incremented each run) would NOT be safe to re-run the same way, running it twice on the same day's data would double-count that day, this function avoids that entirely by depending only on its own input and computing a fresh result every time.", tip: "Whenever possible, structuring an automation function as a pure computation, depending only on its input, causing no side effects, returning a fresh result every time, is what makes it safe to re-run without careful bookkeeping, that property is called idempotency, and it's one of the most valuable design habits in real automation work.", business: "This is deliberately the least guided task in this stage, a real monthly report needs to be regenerable on demand, if someone re-runs it after fixing a data issue, or just to double check a number, it should produce the exact same, correct report both times, not accumulate into something different." } },
 ];
 
 /* ================= grading ================= */
