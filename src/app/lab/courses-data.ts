@@ -31,6 +31,10 @@ export type CourseCard = {
   portfolioProjects?: number;
   hasCapstone?: boolean;
   price?: string;
+  /** Real, permanent (not a limited-time offer) list price this course discounts from, when it has one. */
+  originalPrice?: string;
+  /** Real percent-off, computed from price/originalPrice, not a marketing round-number. */
+  discountPercent?: number;
   summary: string;
   whatYoullDo: string[];
   topics: string[];
@@ -51,6 +55,8 @@ export const courses: CourseCard[] = [
     portfolioProjects: 10,
     hasCapstone: true,
     price: "$30",
+    originalPrice: "$120",
+    discountPercent: 75,
     summary:
       "Spreadsheets through a full capstone analysis: clean real messy data, query it, analyze it in Python, validate it statistically, and ship a dashboard that answers an actual business question.",
     whatYoullDo: [
