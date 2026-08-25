@@ -115,11 +115,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Power BI &middot; Stages 1-3 of 4</span>
+    <span class="eyebrow">Practice Library &middot; Power BI &middot; Complete, Stages 1-4</span>
     <h1 class="serif">Power BI Practice Library</h1>
     <p class="sub">Decision-based practice for Power BI's specific reasoning: Column vs Measure, Calculated Column vs Measure, Row Context vs Filter Context, which visual fits a request, and the Report/Dashboard split unique to Power BI's Desktop-plus-Service workflow.</p>
     <div class="honestnote"><b>Honest scope note, please read:</b> this is a <b>practice simulation</b>, not real Power BI. Nothing here renders inside actual Power BI Desktop or the Power BI Service, and no click is graded by executing real Microsoft software, this page can't run in a browser the way the Excel formula engine or the Python/SQL sandboxes do. What it genuinely checks is the reasoning: given a real field from a real table, do you know whether it's a Column or a Measure, when a calculation needs Row Context vs Filter Context, and which Power BI feature a business request actually calls for. Every scenario is re-randomized on every attempt specifically so a memorized click sequence can't pass, only the underlying rule can. Treat this as a rehearsal for the concepts, not a substitute for opening Power BI Desktop (free) and building a real report.</div>
-    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals), Stage 2 (Power Query &amp; Data Prep), and Stage 3 (Data Modeling &amp; DAX: Calculated Column vs Measure, One-to-Many relationships and cross-filter direction, Row Context vs Filter Context, CALCULATE, SUM vs SUMX, and CALCULATE + ALL() for percent-of-total patterns) are complete, 30 tasks. Stage 4 (Dashboards &amp; BI) is not yet built.</div>
+    <div class="scopenote"><b>Progress:</b> All 4 stages are complete, 40 tasks: Fundamentals, Power Query &amp; Data Prep, Data Modeling &amp; DAX (Calculated Column vs Measure, Row Context vs Filter Context, CALCULATE, SUM vs SUMX, ALL()), and Dashboards &amp; BI (filter scope, Slicers vs the Filters pane, Drillthrough vs drill-down, Bookmarks, Data Alerts, Row-Level Security, Scheduled Refresh, publishing), ending in an independent secure-and-automated management dashboard task.</div>
   </header>
 
   <div class="sheetblock">
@@ -207,6 +207,8 @@ const SKILL_ID_CLEANING = "powerbi-data-cleaning";
 const SKILL_ID_COMBINE = "powerbi-combine-reshape";
 const SKILL_ID_MODELING = "powerbi-data-modeling";
 const SKILL_ID_DAX = "powerbi-dax";
+const SKILL_ID_INTERACTIVITY = "powerbi-report-interactivity";
+const SKILL_ID_SERVICE = "powerbi-service-governance";
 const SKILLS = [
   { id: SKILL_ID_FIELDS, label: "Power BI Column vs Measure" },
   { id: SKILL_ID_VISUALS, label: "Power BI Visual Choice" },
@@ -215,6 +217,8 @@ const SKILLS = [
   { id: SKILL_ID_COMBINE, label: "Power BI Combining & Reshaping Data" },
   { id: SKILL_ID_MODELING, label: "Power BI Data Modeling" },
   { id: SKILL_ID_DAX, label: "Power BI DAX" },
+  { id: SKILL_ID_INTERACTIVITY, label: "Power BI Report Interactivity" },
+  { id: SKILL_ID_SERVICE, label: "Power BI Service & Governance" },
 ];
 
 /* Each task's build(seed) returns { scenarioHtml, slots, correct },
@@ -826,6 +830,217 @@ const TASKS = [
       "ALL(Orders[region]) removes just the region filter, leaving category's filter intact, ALL(Orders) (the whole table) would remove BOTH filters, producing a company-wide percentage instead of a within-category one.",
       "DIVIDE(SUM(Orders[amount]), CALCULATE(SUM(Orders[amount]), ALL(Orders[region])))." ],
     explanation: { why: "This is the Pane-scope Percent of Total pattern from Tableau's own Stage 2 and 3 (this library's Tableau LOD tasks cover the same underlying idea), expressed here in DAX, ALL() can be scoped to a SINGLE column rather than an entire table, removing just the region filter while deliberately leaving the category filter in place for the denominator, exactly what \"within its own category\" requires.", mistake: "Using ALL(Orders) (the whole table) instead of ALL(Orders[region]) removes every filter, including category, producing a percentage of the WHOLE COMPANY's revenue instead of the requested within-category percentage, a subtle but completely different, and wrong, number.", tip: "ALL() can target a table (remove every filter on it) or a specific column (remove just that one filter), scoping it to exactly the column that needs to be ignored, while leaving everything else intact, is the key skill this task is built around.", business: "This is deliberately the least guided task in this stage, and mirrors the exact same within-group percentage judgment call from the Tableau library's own LOD stage, applied here through DAX's CALCULATE and ALL() instead of Tableau's FIXED/INCLUDE/EXCLUDE, the underlying analytical reasoning is the same skill, expressed in two different tools' languages." } },
+
+  /* ---- Stage 4: Dashboards & BI ---- */
+  { id: "pb-d01", skill: SKILL_ID_INTERACTIVITY, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-f03"],
+    title: "Visual, Page, or Report-level filter?",
+    objective: "Match a filter's intended scope to Power BI's three filter levels within a Report.",
+    build() {
+      const scenarios = [
+        { desc: "should only affect ONE specific chart, every other visual on the page should keep showing unfiltered data", ans: "visual" },
+        { desc: "should affect every visual on THIS ONE page, but other pages in the report should be unaffected", ans: "page" },
+        { desc: "should affect EVERY visual on EVERY page of the entire report, with no exceptions", ans: "report" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You're setting a filter's scope. It <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "scope", label: "Which filter level fits?", options: [{ value: "visual", label: "Visual-level filter" }, { value: "page", label: "Page-level filter" }, { value: "report", label: "Report-level filter" }] }],
+        correct: { scope: s.ans },
+      };
+    },
+    hints: [
+      "A Visual-level filter affects exactly one chart or table, nothing else on the page is touched.",
+      "A Page-level filter affects every visual on the current page, but other pages of the report are untouched.",
+      "A Report-level filter affects every visual on every page, the broadest of the three.",
+      "Match your answer to how far the filter's effect should reach: one visual, one page, or the whole report." ],
+    explanation: { why: "Power BI's Filters pane offers three nested scopes, Visual, Page, and Report, each restricting a different breadth of the report, choosing the right one prevents a filter from either under-reaching (missing visuals that should be filtered) or over-reaching (filtering visuals that should stay untouched).", mistake: "Applying a Report-level filter when only one specific visual needed it would silently affect every other page too, potentially hiding data a stakeholder expected to see elsewhere in the report, matching the filter's scope to its actual intended reach avoids that.", tip: "When building a filter, always ask first: does this need to affect one chart, one page, or the whole report? Answering that before applying the filter avoids having to debug an unexpectedly over- or under-filtered visual later.", business: "A \"show only Electronics\" filter meant for a single deep-dive chart, but accidentally applied at Report level, would silently filter every other page too, including ones meant to show the full, unfiltered picture, a real, easy-to-make mistake with real consequences for anyone relying on those other pages." } },
+
+  { id: "pb-d02", skill: SKILL_ID_INTERACTIVITY, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-d01"],
+    title: "Slicer or a Filters-pane filter?",
+    objective: "Distinguish a visible, viewer-controlled Slicer from an author-set filter in the Filters pane.",
+    build() {
+      const scenarios = [
+        { desc: "a viewer needs to be able to change it themselves, picking a different region while exploring the report, right there on the canvas", ans: "slicer" },
+        { desc: "you, the report author, need to permanently restrict a page to Completed orders only, viewers shouldn't need to think about it or be able to change it", ans: "filterspane" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You need a filter where: <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "which", label: "Which fits?", options: [{ value: "slicer", label: "Slicer (a visible, on-canvas control)" }, { value: "filterspane", label: "Filters pane (an author-set, not directly on-canvas filter)" }] }],
+        correct: { which: s.ans },
+      };
+    },
+    hints: [
+      "A Slicer is a visible, interactive control sitting directly on the report canvas, a viewer clicks or selects values in it themselves, that's for filters a VIEWER should control.",
+      "A Filters-pane filter is set by the report author and isn't a visible on-canvas control by default, that's for filters that should just apply, without asking the viewer to interact with anything.",
+      "\"A viewer needs to change it themselves\" is a Slicer, \"permanently restrict... viewers shouldn't need to think about it\" is a Filters-pane filter.",
+      "Match your answer to whether a viewer needs to actively control the filter (Slicer) or it should just silently apply (Filters pane)." ],
+    explanation: { why: "A Slicer is a visual control, placed directly on the report canvas, that a viewer interacts with to change what's filtered, a Filters-pane filter is set once by the report's author and applies automatically without needing any visible, on-canvas control at all.", mistake: "Using a Slicer for a filter that should always be fixed (like restricting a page to Completed orders only) invites a viewer to accidentally change it, when the actual intent was a permanent, invisible restriction, a Filters-pane filter would have enforced that without exposing a control to fiddle with.", tip: "The general rule: if a viewer should be able to change the filter while exploring, use a Slicer, if the filter should just always be true and isn't meant to be visibly adjustable, use the Filters pane instead.", business: "A regional Slicer on a sales report lets each viewer explore their own region interactively, a permanent \"Completed orders only\" Filters-pane restriction on a revenue page ensures nobody accidentally includes cancelled orders in a revenue figure, both are filters, but solving genuinely different problems." } },
+
+  { id: "pb-d03", skill: SKILL_ID_REPORTVSDASH, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-f09"],
+    title: "Which visual is worth pinning to a Dashboard?",
+    objective: "Apply the Report-vs-Dashboard distinction from Stage 1 to a real pinning decision.",
+    build() {
+      const scenarios = [
+        { desc: "a single Card showing this month's total revenue, a number an executive wants to check at a glance every morning", ans: "pin" },
+        { desc: "a fully interactive Table with 8 slicers a stakeholder actively filters and re-filters every time they use it", ans: "dontpin" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You're deciding whether to pin a visual to a Dashboard: <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "decision", label: "Should this be pinned to a Dashboard?", options: [{ value: "pin", label: "Yes, pin it" }, { value: "dontpin", label: "No, keep it on the Report only" }] }],
+        correct: { decision: s.ans },
+      };
+    },
+    hints: [
+      "A pinned Dashboard tile becomes a static snapshot, its slicers and interactivity stop working, so a simple, glanceable number (like a headline Card) loses nothing by being pinned.",
+      "A heavily-interactive visual, one a stakeholder actively re-filters every time, would lose its entire reason for existing if pinned, since pinning freezes its filter state and drops interactivity.",
+      "A quick, glanceable, rarely-re-filtered visual is a good pin candidate, a deeply interactive, frequently-re-filtered one is not.",
+      "Match your answer to whether the visual's value comes from a glanceable number (pin it) or from active interactivity (keep it on the Report)." ],
+    explanation: { why: "Since pinning a visual to a Dashboard freezes its filter state and drops its interactivity (the exact behavior covered in Stage 1), the best pin candidates are visuals whose entire value is in a single, glanceable snapshot, not ones whose value comes from active, ongoing interaction.", mistake: "Pinning a heavily-interactive, slicer-driven visual to a Dashboard strips away the exact interactivity that made it useful in the first place, turning a powerful exploration tool into a static, frozen image of whatever filter state happened to be active at pin time.", tip: "Before pinning anything, ask: would this visual still be useful as a frozen, non-interactive snapshot? If the honest answer is no, it belongs on the Report, not pinned to a Dashboard.", business: "An executive's morning Dashboard benefits from a handful of frozen, glanceable KPI tiles, but a regional manager's deep-dive exploration tool needs its full interactivity intact, that's exactly why the choice of what to pin, not just whether Dashboards exist at all, matters." } },
+
+  { id: "pb-d04", skill: SKILL_ID_INTERACTIVITY, tool: "powerbi", level: "semiguided", difficulty: "core", prerequisite: ["pb-d01"],
+    title: "Drillthrough page or a plain drill-down?",
+    objective: "Distinguish navigating to a dedicated detail PAGE (Drillthrough) from expanding a hierarchy within the SAME visual (drill-down).",
+    build() {
+      const scenarios = [
+        { desc: "right-click a region on a summary chart and jump to an ENTIRELY SEPARATE page built specifically for that region's full detail, with several different visuals", ans: "drillthrough" },
+        { desc: "click the drill-down arrow on a single bar chart to expand from Year down to Quarter, staying on the exact same chart, no page navigation involved", ans: "drilldown" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `A stakeholder wants to: <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "which", label: "Which feature fits?", options: [{ value: "drillthrough", label: "Drillthrough (navigate to a dedicated detail page)" }, { value: "drilldown", label: "Drill-down (expand a hierarchy within the same visual)" }] }],
+        correct: { which: s.ans },
+      };
+    },
+    hints: [
+      "Navigating to an ENTIRELY SEPARATE page, built specifically for detail, is Drillthrough, it's a page-to-page navigation feature.",
+      "Expanding a hierarchy (Year to Quarter to Month) while staying on the exact same visual is drill-down, no page navigation involved at all.",
+      "\"Jump to a separate page\" = Drillthrough. \"Stay on the same chart, expand a level deeper\" = drill-down.",
+      "Match your answer to whether the interaction navigates to a different page (Drillthrough) or stays within the same visual (drill-down)." ],
+    explanation: { why: "Drillthrough is a page-to-page navigation feature, right-clicking a data point carries its context (like which region was clicked) to a separate, dedicated detail page built to receive it, drill-down instead expands or collapses a hierarchy WITHIN the same visual, without ever leaving the current page.", mistake: "Building an elaborate multi-visual detail page and expecting a plain drill-down arrow to reach it is a category mistake, drill-down only ever expands within its own visual, reaching a separate page specifically requires setting up Drillthrough.", tip: "If the destination is \"more detail on the SAME chart\", that's drill-down, if the destination is \"an entirely different page with its own layout\", that's Drillthrough, the two solve genuinely different navigation needs.", business: "A regional summary chart with Drillthrough set up to a dedicated \"Region Detail\" page (complete with its own tables, trends, and breakdowns specific to whichever region was clicked) is a common, powerful real Power BI pattern for letting a stakeholder go from overview to deep-dive without cluttering the summary page itself." } },
+
+  { id: "pb-d05", skill: SKILL_ID_INTERACTIVITY, tool: "powerbi", level: "semiguided", difficulty: "core", prerequisite: ["pb-d01"],
+    title: "Bookmarks for toggling between two saved states",
+    objective: "Recognize Bookmarks as the feature for capturing and returning to a specific combination of filters and visibility.",
+    build() {
+      return {
+        scenarioHtml: `You want a button that toggles a report page between two specific saved states: <b>"Summary View"</b> (certain visuals visible, certain filters applied) and <b>"Detail View"</b> (different visuals visible, different filters applied), each state exactly reproducible with one click.`,
+        slots: [{ key: "feature", label: "Which feature fits?", options: [{ value: "bookmarks", label: "Bookmarks" }, { value: "drillthrough", label: "Drillthrough" }, { value: "rls", label: "Row-Level Security" }] }],
+        correct: { feature: "bookmarks" },
+      };
+    },
+    hints: [
+      "A Bookmark captures a snapshot of a report page's current state, which filters are applied, which visuals are visible or hidden, exactly what \"exactly reproducible with one click\" describes.",
+      "A button can be wired to jump directly to a specific Bookmark, letting a viewer toggle between two saved states (like Summary vs Detail) with one click each.",
+      "Drillthrough navigates to a different PAGE, Row-Level Security controls WHO can see what data, neither one is about toggling between two saved visual states on the same page.",
+      "Bookmarks." ],
+    explanation: { why: "A Bookmark saves the exact current state of a report page, filter selections, which visuals are shown or hidden, even slicer selections, and can be recalled instantly, wiring two Bookmarks to two buttons is the standard way to build a toggle between two distinct, pre-designed views of the same underlying page.", mistake: "Trying to build a Summary/Detail toggle using Drillthrough would navigate to a separate PAGE rather than toggling states on the SAME page, a fundamentally different (and here, unwanted) behavior, Bookmarks is the feature actually built for same-page state toggling.", tip: "Bookmarks are frequently combined with the Selection pane (to control visual visibility) and Buttons, to build a small set of toggle-able \"views\" within a single report page, a common, polished real Power BI pattern.", business: "A Summary/Detail toggle lets one report page serve both a fast executive glance and a deeper analyst dive, without needing two separate pages or duplicated visuals, Bookmarks is what makes that single, adaptable page possible." } },
+
+  { id: "pb-d06", skill: SKILL_ID_SERVICE, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-f09"],
+    title: "Data Alerts on a Dashboard tile",
+    objective: "Recognize Data Alerts as a Dashboard-only feature for automatic threshold notifications.",
+    build() {
+      const threshold = pick([50000, 100000, 150000]);
+      return {
+        scenarioHtml: `An executive wants to be <b>automatically notified, without checking the report manually, whenever total revenue drops below $${threshold.toLocaleString()}</b>.`,
+        slots: [{ key: "feature", label: "Which feature fits?", options: [{ value: "alert", label: "A Data Alert on a pinned Dashboard tile" }, { value: "slicer", label: "A Slicer on the Report" }, { value: "bookmark", label: "A Bookmark" }] }],
+        correct: { feature: "alert" },
+      };
+    },
+    hints: [
+      "\"Automatically notified, without checking manually\" describes a push notification triggered by a threshold, that's specifically a Data Alert.",
+      "Data Alerts are set on a numeric Dashboard TILE (a Card or gauge, pinned from a Report) in the Power BI Service, not on a Report page directly, this is a Dashboard-specific feature.",
+      "A Slicer requires someone to actively look at the report, a Bookmark just saves a view state, neither one pushes a proactive notification on its own.",
+      "A Data Alert on a pinned Dashboard tile." ],
+    explanation: { why: "Data Alerts are configured directly on a numeric Dashboard tile (typically a Card or KPI visual pinned from a Report) in the Power BI Service, once set, Power BI monitors that tile's value and automatically sends a notification (email or in-app) the moment it crosses the configured threshold, with no manual checking required.", mistake: "Looking for an alerting feature on a Report page itself is a common early search in the wrong place, Data Alerts specifically live on Dashboard tiles in the Service, this is one of the concrete, practical reasons a Dashboard tile (not just the underlying Report) is sometimes genuinely necessary.", tip: "Data Alerts only work on tiles showing a single number (a Card, gauge, or KPI visual), not on a full chart or table, if proactive threshold notification is needed, that requirement should shape which visual gets pinned to the Dashboard in the first place.", business: "An executive who wants to know the moment revenue drops below a critical threshold, without having to remember to check a report, needs exactly this Data Alert, it turns a passive dashboard into an active, proactive monitoring tool." } },
+
+  { id: "pb-d07", skill: SKILL_ID_SERVICE, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-d02"],
+    title: "Row-Level Security: the same report, different data per viewer",
+    objective: "Recognize Row-Level Security (RLS) as the feature for restricting WHICH ROWS each specific viewer sees, without building separate reports.",
+    build() {
+      return {
+        scenarioHtml: `Your company has one Power BI report used by every regional manager. Each manager should <b>only ever see their OWN region's data when they open the report, automatically, with no filter for them to set themselves</b>, and they should never be able to see other regions' data even if they tried.`,
+        slots: [{ key: "feature", label: "Which feature fits?", options: [{ value: "rls", label: "Row-Level Security (RLS) roles" }, { value: "slicer", label: "A Slicer on the region field" }, { value: "separatereports", label: "Build a completely separate report per region" }] }],
+        correct: { feature: "rls" },
+      };
+    },
+    hints: [
+      "A Slicer would let a manager see every region, they'd just need to manually select their own, and nothing would stop them from selecting a different one, that's not real security, just a convenience filter.",
+      "Building a separate report per region works but is a maintenance nightmare, every future change would need to be repeated across every regional copy.",
+      "Row-Level Security defines roles that automatically restrict which ROWS of data a given user can see, enforced by Power BI itself, at the data level, not something a viewer can bypass by changing a filter.",
+      "Row-Level Security (RLS) roles." ],
+    explanation: { why: "Row-Level Security defines roles (like \"Region Manager\") with a DAX filter expression tied to each user's identity, Power BI automatically restricts every visual in the SAME single report to only that user's permitted rows, enforced at the data level, a viewer has no way to see or select past it, unlike a Slicer, which is just a convenience filter anyone can change.", mistake: "Relying on a Slicer to \"restrict\" access is a common, genuinely risky mistake, a Slicer is a viewer convenience, not a security boundary, anyone with access to the report can select a different value and see data they weren't meant to.", tip: "Whenever a request includes real security language, \"should never be able to see\", \"only ever\", \"even if they tried\", that's a strong signal for RLS, not a Slicer, a Slicer only helps a well-intentioned viewer, it does nothing against a curious or malicious one.", business: "A single report maintained once, but showing each regional manager only their own region's data automatically and unbypassable, is exactly what RLS is built for, it avoids both the security risk of a Slicer-only approach and the maintenance burden of separate per-region reports." } },
+
+  { id: "pb-d08", skill: SKILL_ID_SERVICE, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-d06"],
+    title: "Scheduled Refresh vs a manual Desktop refresh",
+    objective: "Recognize when a report needs the Power BI Service's Scheduled Refresh, not just a one-time manual refresh in Desktop.",
+    build() {
+      const scenarios = [
+        { desc: "a one-time report built for a single meeting tomorrow, the data just needs to be current as of right now, no ongoing updates needed after that", ans: "manual" },
+        { desc: "a live operations report that stakeholders check every day, it needs to automatically pull fresh data every morning without anyone manually opening Desktop", ans: "scheduled" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You need this report's data to stay current: <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "approach", label: "Which approach fits?", options: [{ value: "manual", label: "A one-time manual Refresh in Power BI Desktop" }, { value: "scheduled", label: "Scheduled Refresh, configured in the Power BI Service" }] }],
+        correct: { approach: s.ans },
+      };
+    },
+    hints: [
+      "A one-time need (\"current as of right now, for tomorrow's meeting\") is satisfied by a single manual refresh in Desktop before publishing, no ongoing automation needed.",
+      "An ongoing, recurring need (\"every morning, without anyone manually opening Desktop\") requires Scheduled Refresh, configured once in the Power BI Service, so the dataset refreshes automatically on a recurring schedule.",
+      "One-time, immediate need = manual Desktop refresh. Ongoing, automatic, recurring need = Scheduled Refresh in the Service.",
+      "Match your answer to whether the data needs to be current just once (manual) or continuously, automatically, going forward (Scheduled Refresh)." ],
+    explanation: { why: "A manual refresh in Power BI Desktop updates the data once, at the moment you click it, useful for a one-time need, Scheduled Refresh is configured in the Power BI Service against a published dataset and runs automatically on a recurring schedule, keeping a live report continuously current without anyone needing to manually intervene.", mistake: "Publishing a report meant for daily ongoing use without ever configuring Scheduled Refresh means the data silently goes stale after the initial publish, viewers would keep seeing the same frozen numbers from whenever it was last manually refreshed, with no indication anything was wrong.", tip: "Scheduled Refresh has to be configured in the Power BI Service, against the published dataset, not in Desktop, and its frequency is limited by the workspace's license tier, that's a real, practical constraint worth knowing before promising a stakeholder \"real-time\" data.", business: "An operations report stakeholders rely on every morning absolutely needs Scheduled Refresh configured, a one-off report for a single meeting doesn't, correctly identifying which situation applies avoids both wasted setup effort and, more importantly, a report silently going stale in production." } },
+
+  { id: "pb-d09", skill: SKILL_ID_SERVICE, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-d08"],
+    title: "What changes when you Publish to the Service",
+    objective: "Recognize the Desktop-to-Service publish step, and that a Report and its underlying Dataset become separate, shareable objects.",
+    build() {
+      return {
+        scenarioHtml: `You finish building a report in Power BI Desktop (a local .pbix file) and click Publish, sending it to the Power BI Service.`,
+        slots: [{ key: "result", label: "What happens as a result?", options: [
+          { value: "shareable", label: "The Report AND its underlying Dataset become separate, shareable, live objects in the Service, others can be given access without needing the original .pbix file" },
+          { value: "nothing", label: "Nothing changes for other people, only you can ever see it, exactly as if it stayed a local file" },
+        ] }],
+        correct: { result: "shareable" },
+      };
+    },
+    hints: [
+      "Publishing uploads BOTH the Report (the visual layout) and its underlying Dataset (the data model, including all Measures and relationships) to the Service as separate, live objects.",
+      "Once published, other people with appropriate access in the organization can open the Report directly in a browser, without ever needing the original .pbix file at all.",
+      "The Dataset published to the Service can also be reused as a source for OTHER reports built by other people, separately from the Report that originally published it.",
+      "The Report and Dataset become separate, shareable, live objects in the Service." ],
+    explanation: { why: "Publishing sends both the Report (visuals and layout) and the Dataset (the underlying data model, including every Measure and relationship built in Stage 3) to the Power BI Service as two separate objects, both become shareable there, and the Dataset in particular can be reused as a source for entirely different reports built later by other people.", mistake: "Assuming a published report still requires the original .pbix file for anyone else to view it is a common misunderstanding, once published, the Report lives in the Service as its own object, viewable in a browser by anyone with appropriate access, entirely independent of the original local file.", tip: "The Dataset-Report split matters most once an organization has several reports, a single well-built Dataset (with its Measures and relationships already modeled) can become the shared foundation for multiple different Reports, without duplicating the modeling work each time.", business: "A well-modeled Dataset, once published, becoming a reusable foundation for several different Reports built by different teams, is one of Power BI's real practical advantages at an organizational scale, understanding that Report and Dataset are separate, shareable Service objects is what unlocks that reuse." } },
+
+  { id: "pb-d10", skill: SKILL_ID_SERVICE, tool: "powerbi", level: "mastery", difficulty: "mastery", prerequisite: ["pb-d07", "pb-d05"],
+    title: "Independent build: a secure, automatically-refreshing management dashboard",
+    objective: "Combine RLS, Scheduled Refresh, and a Dashboard tile with a Data Alert, from a plain-language executive brief with no Power BI terms given.",
+    build() {
+      return {
+        scenarioHtml: `The VP of Sales asks: <b>"I want ONE report that every regional manager opens, but each of them should automatically only see their own region, no manual filtering, and nobody should be able to peek at another region's numbers. The data should refresh on its own every morning before anyone gets in. And I personally want to get a notification the moment total company revenue drops below $100,000 in a month."</b>`,
+        slots: [
+          { key: "security", label: "How to restrict each manager to their own region", options: [{ value: "rls", label: "Row-Level Security (RLS) roles" }, { value: "slicer", label: "A Slicer on the region field" }] },
+          { key: "refresh", label: "How to keep the data current every morning automatically", options: [{ value: "scheduled", label: "Scheduled Refresh in the Power BI Service" }, { value: "manual", label: "A manual Refresh in Desktop" }] },
+          { key: "alert", label: "How to get notified about the revenue threshold", options: [{ value: "alert", label: "A Data Alert on a pinned Dashboard tile" }, { value: "bookmark", label: "A Bookmark" }] },
+        ],
+        correct: { security: "rls", refresh: "scheduled", alert: "alert" },
+      };
+    },
+    written: {
+      label: "Why is a Slicer not good enough for the \"nobody should be able to peek at another region's numbers\" requirement?",
+      placeholder: "Think about what a Slicer actually is, a convenience or a security boundary, and what the VP explicitly said about peeking at other data...",
+      check: (text) => /\b(slicer)\b/i.test(text) && /\b(security|rls|bypass|change|select|peek)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that a Slicer is just a viewer convenience, anyone with report access could manually change it to see another region's data, the VP specifically said nobody should be ABLE to peek, that's a real security requirement, which only RLS actually enforces at the data level." },
+    hints: [
+      "This combines three separate pieces from this stage, RLS (task 7), Scheduled Refresh (task 8), and a Data Alert (task 6), no Power BI terms were given, translate the plain-language brief yourself.",
+      "\"Each of them should automatically only see their own region... nobody should be able to peek\" is real security language, that's RLS, not a Slicer.",
+      "\"Refresh on its own every morning\" is Scheduled Refresh, configured in the Service.",
+      "\"I personally want to get a notification the moment...\" is a Data Alert on a pinned Dashboard tile.",
+      "Security = RLS, Refresh = Scheduled Refresh, Alert = Data Alert on a Dashboard tile." ],
+    explanation: { why: "This combines every major Stage 4 concept, RLS for genuine per-viewer data security, Scheduled Refresh for unattended daily currency, and a Data Alert on a pinned Dashboard tile for proactive threshold notification, applied together from a single plain-language executive brief with no Power BI feature names supplied.", mistake: "Using a Slicer instead of RLS would satisfy the CONVENIENCE half of the request (each manager could filter to their own region) but completely fail the SECURITY half (nobody should be ABLE to peek), those are two different requirements that sound similar but need genuinely different features.", tip: "A real executive brief bundles several distinct needs into one paragraph, security, automation, and notification, in this case, recognizing that it needs THREE different Power BI features, not one, and picking the right one for each distinct need, is the actual skill.", business: "This is deliberately the least guided, most comprehensive task in the entire Power BI library, a single report serving every regional manager securely, staying automatically current, and proactively alerting an executive, is exactly the kind of real, multi-requirement management dashboard a working BI analyst is actually asked to build." } },
 ];
 
 /* ================= grading =================
@@ -925,7 +1140,7 @@ function renderSkillBar() {
   const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
   target.innerHTML = next
     ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
-    : `<b>What should I do next?</b> All ${TASKS.length} Stage 1 tasks passed. Stages 2-4 aren't built yet.`;
+    : `<b>What should I do next?</b> All ${TASKS.length} tasks passed, the full Power BI Practice Library is complete.`;
 }
 function buildHintsHtml(hints) {
   const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
