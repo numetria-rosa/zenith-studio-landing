@@ -115,11 +115,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Power BI &middot; Stage 1 of 4</span>
+    <span class="eyebrow">Practice Library &middot; Power BI &middot; Stages 1-2 of 4</span>
     <h1 class="serif">Power BI Practice Library</h1>
     <p class="sub">Decision-based practice for Power BI's specific reasoning: Column vs Measure, Calculated Column vs Measure, Row Context vs Filter Context, which visual fits a request, and the Report/Dashboard split unique to Power BI's Desktop-plus-Service workflow.</p>
     <div class="honestnote"><b>Honest scope note, please read:</b> this is a <b>practice simulation</b>, not real Power BI. Nothing here renders inside actual Power BI Desktop or the Power BI Service, and no click is graded by executing real Microsoft software, this page can't run in a browser the way the Excel formula engine or the Python/SQL sandboxes do. What it genuinely checks is the reasoning: given a real field from a real table, do you know whether it's a Column or a Measure, when a calculation needs Row Context vs Filter Context, and which Power BI feature a business request actually calls for. Every scenario is re-randomized on every attempt specifically so a memorized click sequence can't pass, only the underlying rule can. Treat this as a rehearsal for the concepts, not a substitute for opening Power BI Desktop (free) and building a real report.</div>
-    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals: the Fields pane, Column vs Measure, data types, visual choice, Report vs Dashboard) is complete, 10 tasks. Stages 2-4 (Power Query &amp; Data Prep, Data Modeling &amp; DAX, Dashboards &amp; BI) are not yet built.</div>
+    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals) and Stage 2 (Power Query &amp; Data Prep: Change Type, Remove Duplicates, Remove vs Replace Errors, Append vs Merge, Split Column, Unpivot, Applied Steps order, Group By vs a Measure, Choose vs Remove Columns) are complete, 20 tasks. Stages 3-4 (Data Modeling &amp; DAX, Dashboards &amp; BI) are not yet built.</div>
   </header>
 
   <div class="sheetblock">
@@ -203,10 +203,14 @@ function pickN(arr, n) {
 const SKILL_ID_FIELDS = "powerbi-fields";
 const SKILL_ID_VISUALS = "powerbi-visuals";
 const SKILL_ID_REPORTVSDASH = "powerbi-report-dashboard";
+const SKILL_ID_CLEANING = "powerbi-data-cleaning";
+const SKILL_ID_COMBINE = "powerbi-combine-reshape";
 const SKILLS = [
   { id: SKILL_ID_FIELDS, label: "Power BI Column vs Measure" },
   { id: SKILL_ID_VISUALS, label: "Power BI Visual Choice" },
   { id: SKILL_ID_REPORTVSDASH, label: "Power BI Report vs Dashboard" },
+  { id: SKILL_ID_CLEANING, label: "Power BI Data Cleaning" },
+  { id: SKILL_ID_COMBINE, label: "Power BI Combining & Reshaping Data" },
 ];
 
 /* Each task's build(seed) returns { scenarioHtml, slots, correct },
@@ -407,6 +411,214 @@ const TASKS = [
       "\"Exact revenue figures broken down by region and category... to check specific numbers\" is the Table/Matrix pattern, precise numbers across two dimensions.",
       "Headline visual = Card, Detail visual = Table / Matrix." ],
     explanation: { why: "This combines the Card-for-one-headline-number pattern with the Table/Matrix-for-exact-numbers-across-two-breakdowns pattern, both covered separately earlier in this stage, applied together from a plain-language request with no visual names supplied.", mistake: "Using only a Card would satisfy the \"spot immediately\" part but drop the region-and-category detail entirely, using only a Table would satisfy the detail but lose the fast, glanceable headline number, the director explicitly asked for both.", tip: "A Card-plus-Table (or Card-plus-Matrix) pairing, a headline number up top with supporting detail below, is one of the most common real Power BI report layouts, it serves both a quick glance and a deeper check in the same report.", business: "This is deliberately the least guided task in this stage, a real stakeholder request never comes with visual names attached, translating \"one big number\" and \"exact figures, broken down two ways\" into the right pair of Power BI visuals is the actual skill, not memorizing visual names in isolation." } },
+
+  /* ---- Stage 2: Power Query & Data Prep ---- */
+  { id: "pb-q01", skill: SKILL_ID_CLEANING, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-f02"],
+    title: "Fix a wrongly-imported data type",
+    objective: "Recognize Change Type as the Power Query fix for a column imported with the wrong data type.",
+    build() {
+      const scenarios = [
+        { desc: "amount was imported as Text instead of Decimal Number, because a few rows had a stray currency symbol, so it can't be summed", ans: "changetype" },
+        { desc: "order_date was imported as Text instead of Date, so it can't use Power BI's automatic date hierarchy", ans: "changetype" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `In Power Query, <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "step", label: "Which Power Query step fixes this?", options: [{ value: "changetype", label: "Change Type" }, { value: "removeduplicates", label: "Remove Duplicates" }, { value: "unpivot", label: "Unpivot Columns" }, { value: "merge", label: "Merge Queries" }] }],
+        correct: { step: "changetype" },
+      };
+    },
+    hints: [
+      "A column holding the wrong kind of value (numbers read as Text, dates read as Text) needs its declared data type corrected, that's exactly what Change Type does.",
+      "Change Type is usually one of the very first steps applied to a newly-connected data source, before any further cleaning.",
+      "Remove Duplicates, Unpivot, and Merge all solve different problems, none of them fix a column's data type.",
+      "Change Type." ],
+    explanation: { why: "Change Type explicitly re-declares what kind of value a column holds, converting its stored representation (and unlocking type-appropriate operations, summing, date hierarchies) rather than just relabeling how it displays.", mistake: "Leaving a numeric-looking column as Text and hoping visuals will \"figure it out\" doesn't work, Power BI respects the declared type strictly, a Text column can't be summed by a Measure no matter how numeric its values look.", tip: "Checking every column's type right after connecting to a new source, before building anything on top of it, catches this class of problem early, when it's cheapest to fix.", business: "A revenue column silently imported as Text would make every downstream Measure built on it fail or return blank, catching this with Change Type at the data-prep stage avoids a much more confusing debugging session later, once visuals are already built." } },
+
+  { id: "pb-q02", skill: SKILL_ID_CLEANING, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-q01"],
+    title: "Remove exact duplicate rows",
+    objective: "Recognize Remove Duplicates as the fix for a table with repeated identical rows.",
+    build() {
+      return {
+        scenarioHtml: `A data export accidentally included <b>the same order rows twice, byte-for-byte identical duplicates</b>, inflating any total built on top of the table.`,
+        slots: [{ key: "step", label: "Which Power Query step fixes this?", options: [{ value: "changetype", label: "Change Type" }, { value: "removeduplicates", label: "Remove Duplicates" }, { value: "unpivot", label: "Unpivot Columns" }, { value: "merge", label: "Merge Queries" }] }],
+        correct: { step: "removeduplicates" },
+      };
+    },
+    hints: [
+      "\"The same rows twice, byte-for-byte identical\" is exactly what Remove Duplicates is built to clean up, it keeps one copy of each distinct row and drops the rest.",
+      "Remove Duplicates can be applied across all columns (an exact full-row match) or a chosen subset of columns, depending on what \"duplicate\" means for the data at hand.",
+      "None of Change Type, Unpivot, or Merge address repeated rows, they solve unrelated problems.",
+      "Remove Duplicates." ],
+    explanation: { why: "Remove Duplicates compares rows (across either every column or a chosen subset) and keeps only the first occurrence of each distinct combination, removing exact repeats before they can silently inflate any SUM or COUNT built on top of the table.", mistake: "Skipping this step when a source system occasionally re-exports the same rows (a common real occurrence with scheduled data exports) means every total downstream is silently overstated, with no error or warning to flag it.", tip: "Running Remove Duplicates early, right after Change Type, is a common, sensible default in a Power Query cleaning sequence, catching row-level duplication before any further transformation compounds the problem.", business: "A revenue total quietly doubled by duplicate rows from a glitchy data export is exactly the kind of error that looks completely plausible until someone reconciles it against a known total, catching it at the data-prep stage is far cheaper than catching it after a stakeholder has already acted on the wrong number." } },
+
+  { id: "pb-q03", skill: SKILL_ID_CLEANING, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-q01"],
+    title: "Remove Errors or Replace Errors?",
+    objective: "Distinguish deleting error rows entirely from substituting a fallback value in their place.",
+    build() {
+      const removeCase = Math.random() < 0.5;
+      const desc = removeCase
+        ? "a handful of rows failed to convert to Decimal Number entirely (a text value like \"N/A\" where amount should be), and those specific rows should be dropped from the table completely"
+        : "a handful of rows failed to convert to Decimal Number, but every row needs to stay in the table, those error cells should just become 0 instead of being lost";
+      return {
+        scenarioHtml: `After a Change Type step, ${esc(desc)}.`,
+        slots: [{ key: "step", label: "Which step fits?", options: [{ value: "removeerrors", label: "Remove Errors" }, { value: "replaceerrors", label: "Replace Errors" }] }],
+        correct: { step: removeCase ? "removeerrors" : "replaceerrors" },
+      };
+    },
+    hints: [
+      "\"Dropped from the table completely\" means the whole row disappears, that's Remove Errors.",
+      "\"Every row needs to stay... those error cells should just become 0\" means the row survives but the bad value is substituted, that's Replace Errors.",
+      "Remove Errors deletes the entire row wherever an error exists, Replace Errors keeps the row and swaps in a fallback value for just the errored cell.",
+      "Match your answer to whether the whole row should disappear (Remove Errors) or just the bad value should be substituted while the row stays (Replace Errors)." ],
+    explanation: { why: "Remove Errors and Replace Errors both handle the same underlying problem, a value that failed a prior transformation, but with opposite consequences for the rest of that row, Remove Errors discards the entire row, Replace Errors keeps the row intact and substitutes a chosen fallback value only in the errored cell.", mistake: "Using Remove Errors when other columns in that same row hold perfectly good data (order_id, region, status) throws away all of that good data along with the one bad value, Replace Errors would have preserved it.", tip: "Before choosing between the two, check what else is in the row, if the rest of the row is genuinely useful, Replace Errors preserves it, if the row is essentially unusable without the errored value, Remove Errors is the cleaner choice.", business: "An order row that failed to convert its amount but still has valid region, category, and date data is still useful for a \"how many orders\" or \"which regions are active\" question, dropping the whole row with Remove Errors would lose that value unnecessarily." } },
+
+  { id: "pb-q04", skill: SKILL_ID_COMBINE, tool: "powerbi", level: "guided", difficulty: "core", prerequisite: ["pb-q02"],
+    title: "Append or Merge?",
+    objective: "Recognize Power Query's two combine operations: stacking same-structure tables (Append) vs joining related tables by a key (Merge).",
+    build() {
+      const scenarios = [
+        { desc: "January's orders table and February's orders table, both with the exact same columns, need to become one single, longer table of all orders", ans: "append" },
+        { desc: "the orders table needs a new commission_rate column pulled in from a separate category-rates table, matched by the shared category column", ans: "merge" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You need to combine data: <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "op", label: "Which combine operation fits?", options: [{ value: "append", label: "Append Queries" }, { value: "merge", label: "Merge Queries" }] }],
+        correct: { op: s.ans },
+      };
+    },
+    hints: [
+      "Stacking rows from two tables that already share the exact same columns (like two months of the same export) is Append, it makes a longer table, not a wider one.",
+      "Pulling in NEW columns from a different table, matched by a shared key column, is Merge, it's Power Query's version of a SQL JOIN, it makes a wider table, not a longer one.",
+      "Append = more rows, same columns. Merge = more columns, matched by a key, like a SQL join.",
+      "Match your answer to whether the goal is more ROWS of the same shape (Append) or more COLUMNS joined by a key (Merge)." ],
+    explanation: { why: "Append stacks two or more tables with matching columns on top of each other, producing a longer table, the same shape, more rows, Merge instead joins two tables on a shared key column, pulling columns from one table across onto matching rows of another, producing a wider table, the same operation SQL calls a JOIN.", mistake: "Reaching for Merge when the real goal was to combine two months of the same export (a same-structure stacking problem) tries to join on a key that doesn't meaningfully relate the two tables the way a JOIN needs, Append is the operation actually built for that shape of problem.", tip: "Ask: do the two tables already have the same columns, and I just want more ROWS (Append), or do they have DIFFERENT columns that share a key I want to join on (Merge)? That question resolves the choice every time.", business: "Combining twelve months of the same monthly export into one full-year table is a textbook Append, pulling a category's commission rate from a separate reference table into the orders table is a textbook Merge, both are extremely common real Power Query operations, and are not interchangeable." } },
+
+  { id: "pb-q05", skill: SKILL_ID_COMBINE, tool: "powerbi", level: "semiguided", difficulty: "core", prerequisite: ["pb-q04"],
+    title: "Split Column: by delimiter or by number of characters?",
+    objective: "Match Power Query's two Split Column modes to the shape of the value being split.",
+    build() {
+      const scenarios = [
+        { desc: "a combined field like \"West-Electronics\" needs to become two columns, region and category, split at the dash", ans: "delimiter" },
+        { desc: "an order code like \"ORD00123\" needs to become two columns, a fixed 3-letter prefix and the number after it, always exactly 3 characters in", ans: "characters" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You need to split a column: <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "mode", label: "Which Split Column mode fits?", options: [{ value: "delimiter", label: "By Delimiter" }, { value: "characters", label: "By Number of Characters" }] }],
+        correct: { mode: s.ans },
+      };
+    },
+    hints: [
+      "A value split at a consistent punctuation character (a dash, a comma, a space) is split By Delimiter, using that character as the boundary.",
+      "A value split at a fixed, always-the-same POSITION (always after exactly 3 characters, regardless of what those characters are) is split By Number of Characters.",
+      "\"Split at the dash\" is a delimiter, \"always exactly 3 characters in\" is a fixed position.",
+      "Match your answer to whether the split point is a punctuation character (By Delimiter) or a fixed character count (By Number of Characters)." ],
+    explanation: { why: "By Delimiter splits wherever a chosen character or string appears, wherever the dash (or comma, or space) happens to fall, By Number of Characters instead splits at a fixed position counted from the start (or end), regardless of what characters are actually there.", mistake: "Using By Delimiter on a fixed-width code that happens to contain no punctuation at all, or using By Number of Characters on a value whose pieces vary in length, both produce a broken split, matching the mode to the actual shape of the value is what makes the split reliable.", tip: "If the value's structure is described by a punctuation character, that's a delimiter split, if it's described by a fixed count (\"always the first 3 characters\"), that's a character-count split, the value's own description usually signals which mode fits.", business: "A combined \"region-category\" field imported from a legacy system is a common real Power Query cleanup task, splitting it back into two proper columns by delimiter makes both fields usable independently for filtering and visuals, something the combined text field alone couldn't support." } },
+
+  { id: "pb-q06", skill: SKILL_ID_COMBINE, tool: "powerbi", level: "semiguided", difficulty: "core", prerequisite: ["pb-q04"],
+    title: "Unpivot wide columns into long rows",
+    objective: "Recognize Unpivot Columns as the fix for data spread across separate columns per category, rather than one row per observation.",
+    build() {
+      return {
+        scenarioHtml: `A source spreadsheet has separate columns named <b class="mono">West, East, North, South</b>, each holding that region's monthly revenue. You need one tidy table instead: a single <b class="mono">region</b> column and a single <b class="mono">revenue</b> column, one row per region per month.`,
+        slots: [{ key: "step", label: "Which Power Query step fixes this?", options: [{ value: "unpivot", label: "Unpivot Columns" }, { value: "merge", label: "Merge Queries" }, { value: "removeduplicates", label: "Remove Duplicates" }, { value: "changetype", label: "Change Type" }] }],
+        correct: { step: "unpivot" },
+      };
+    },
+    hints: [
+      "Data spread across several columns, one column per category, is \"wide\" data, turning it into one row per observation with a category column and a value column is exactly what Unpivot Columns does.",
+      "Unpivot takes the selected columns' HEADERS (West, East, North, South) and turns them into values in a new \"Attribute\" column, with their original cell values moving into a matching \"Value\" column.",
+      "None of Merge, Remove Duplicates, or Change Type reshape a table from wide to long, that's specifically what Unpivot solves.",
+      "Unpivot Columns." ],
+    explanation: { why: "Unpivot Columns takes a set of columns whose HEADERS are actually category values (West, East, North, South are regions, not different kinds of measurement) and reshapes them into two columns, one holding the category (the former headers) and one holding the corresponding values, producing tidy, one-row-per-observation data.", mistake: "Leaving wide, one-column-per-category data as-is makes it far harder to build a single Measure or a single bar chart broken out by region, a Power BI visual generally wants one column identifying the category and one column holding the value, not four separate value columns.", tip: "Whenever a source spreadsheet has a separate column for each value of what should really be a single categorical field (one column per region, one column per month, one column per product), that's a strong signal for Unpivot Columns before any further modeling happens.", business: "Data exported from Excel-style pivot reports (a common real source for Power BI) very often arrives in this wide shape, Unpivot is usually one of the first, most necessary steps before that data is usable for real Power BI visuals or Measures at all." } },
+
+  { id: "pb-q07", skill: SKILL_ID_CLEANING, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-q02", "pb-q03"],
+    title: "Applied Steps order matters",
+    objective: "Recognize that Power Query's Applied Steps run in sequence, top to bottom, and reordering them can change the result.",
+    build() {
+      return {
+        scenarioHtml: `You have two steps: <b>Step A, Remove Duplicates (on order_id)</b>, and <b>Step B, Filter (keep only status = "Completed")</b>. You want the FINAL result to be: every distinct order_id that EVER appeared as Completed, even if a duplicate row for that same order_id had a different status.`,
+        slots: [{ key: "order", label: "Which order produces that result?", options: [{ value: "filter_then_dedupe", label: "Filter first, then Remove Duplicates" }, { value: "dedupe_then_filter", label: "Remove Duplicates first, then Filter" }] }],
+        correct: { order: "filter_then_dedupe" },
+      };
+    },
+    hints: [
+      "Power Query's Applied Steps run strictly in order, top to bottom, each step operates on the RESULT of the step before it, not on the original raw data.",
+      "If Remove Duplicates runs FIRST, it might keep an arbitrary row for a given order_id (possibly not the \"Completed\" one), and the later Filter would then just check whichever status survived, not necessarily \"was it ever Completed\".",
+      "Filtering to Completed FIRST guarantees every remaining row genuinely was Completed, THEN removing duplicates on order_id gives one row per order_id that was ever Completed, exactly the request.",
+      "Filter first, then Remove Duplicates." ],
+    explanation: { why: "Each Applied Step operates on whatever the previous step produced, not on the original source data, so the two orderings here produce genuinely different results, Remove-Duplicates-then-Filter risks keeping an arbitrary (possibly non-Completed) row per order_id and then filtering on THAT status, while Filter-then-Remove-Duplicates guarantees every surviving row actually was Completed before deduplication even happens.", mistake: "Assuming step order in Power Query is just a matter of style or performance is a common and costly misunderstanding, for many real transformations (this one included) the ORDER genuinely changes the final result, not just how fast it runs.", tip: "Whenever two steps both touch the same rows, especially a filter and a deduplication, working through a small example by hand, in both orders, is worth the extra minute, the two results are often not the same.", business: "An order_id that shows up twice, once Completed and once Cancelled (say, cancelled and later successfully re-run), is exactly the kind of real-world duplicate where step order determines whether that order correctly counts as ever having been Completed, or is silently lost depending on which row Remove Duplicates happened to keep." } },
+
+  { id: "pb-q08", skill: SKILL_ID_COMBINE, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-q06"],
+    title: "Aggregate now in Power Query, or later with a Measure?",
+    objective: "Recognize when Group By in Power Query is appropriate, and when aggregation should be left to a DAX Measure instead.",
+    build() {
+      const scenarios = [
+        { desc: "you need a small reference table of each region's total historical revenue as of last year-end, a fixed number that will never need to respond to report filters", ans: "groupby" },
+        { desc: "you need total revenue that updates live as a stakeholder applies filters and slicers on the report, always reflecting whatever's currently selected", ans: "measure" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You need an aggregated revenue figure: <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "approach", label: "Which approach fits?", options: [{ value: "groupby", label: "Group By in Power Query (aggregate once, during data prep)" }, { value: "measure", label: "A DAX Measure (aggregate live, in the report)" }] }],
+        correct: { approach: s.ans },
+      };
+    },
+    hints: [
+      "Group By in Power Query aggregates the data ONCE, permanently, during data prep, before the report ever sees individual rows, the result is a fixed, unfiltered number baked into the table.",
+      "A Measure aggregates LIVE, every time it's used in a visual, responding to whatever filters and slicers are currently active on the report.",
+      "A fixed, never-needs-to-respond-to-filters figure fits Group By, a figure that must update as a stakeholder filters the report needs a Measure.",
+      "Match your answer to whether the number should stay fixed regardless of report filters (Group By) or update live with them (Measure)." ],
+    explanation: { why: "Group By in Power Query bakes an aggregation into the table itself during data prep, before the report ever applies a filter, that result is permanent and won't respond to anything a viewer does in the report, a Measure instead computes its aggregation fresh every time, using whatever filters happen to be active at that moment.", mistake: "Using Group By in Power Query for a number that actually needs to respond to report filters and slicers permanently locks in one fixed aggregation, a viewer's filters would have no effect on it at all, which usually isn't what an interactive report needs.", tip: "The general default for anything a report viewer should be able to filter or slice is a Measure, Group By in Power Query is the right, deliberate exception for genuinely fixed, historical, or reference aggregations that should NOT move when the report is filtered.", business: "A frozen \"revenue as of last year-end\" benchmark is exactly the kind of number that SHOULD stay fixed no matter how a viewer filters the live report around it, Group By is the right tool there, using a Measure instead would make that benchmark drift whenever a filter was applied, breaking its purpose as a fixed comparison point." } },
+
+  { id: "pb-q09", skill: SKILL_ID_CLEANING, tool: "powerbi", level: "challenge", difficulty: "challenge", prerequisite: ["pb-q01"],
+    title: "Choose Columns or Remove Columns?",
+    objective: "Pick the more robust, clearer step depending on how many columns are being kept vs discarded.",
+    build() {
+      const scenarios = [
+        { desc: "a source table has 40 columns, and you only need 3 of them for this report", ans: "choose" },
+        { desc: "a source table has 7 columns, and you just need to drop 2 sensitive ones (an internal note field and a raw IP address field), keeping everything else", ans: "remove" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You're trimming a table's columns: <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "step", label: "Which step is the clearer choice?", options: [{ value: "choose", label: "Choose Columns (explicitly list the ones to KEEP)" }, { value: "remove", label: "Remove Columns (explicitly list the ones to DROP)" }] }],
+        correct: { step: s.ans },
+      };
+    },
+    hints: [
+      "Choose Columns and Remove Columns are functionally opposite, but which one is CLEARER depends on whether you're keeping fewer columns or dropping fewer.",
+      "Keeping only 3 out of 40 columns is much easier to read and maintain as a short \"keep these 3\" list (Choose Columns) than a long \"drop these other 37\" list.",
+      "Dropping just 2 out of 7 columns is clearer as a short \"drop these 2\" list (Remove Columns) than listing out the 5 to keep.",
+      "Match your answer to whichever list (kept columns, or dropped columns) is SHORTER and clearer to read." ],
+    explanation: { why: "Choose Columns and Remove Columns both filter down to the same possible end result, but the more robust choice is whichever produces the shorter, clearer list, Choose Columns when you're keeping a small subset, Remove Columns when you're dropping a small subset, and it also affects how the step behaves if the source ever gains new columns.", mistake: "Using Remove Columns to individually list out 37 unwanted columns out of 40, when Choose Columns and a 3-item keep-list would say the same thing far more clearly, is a common real Power Query readability mistake, both steps work, but one is much easier for a future reader (including yourself) to understand at a glance.", tip: "There's a second, subtler difference worth knowing: Choose Columns will also silently EXCLUDE any new column the source gains later (since it only keeps what's explicitly listed), Remove Columns will silently INCLUDE any new column (since it only drops what's explicitly listed), that behavior difference sometimes matters as much as the readability one.", business: "A wide source table with 40 raw export columns, where a report only needs 3, is extremely common in real analyst work, choosing Choose Columns over Remove Columns there isn't just a style preference, it keeps the query genuinely easier for the next person (or future you) to understand." } },
+
+  { id: "pb-q10", skill: SKILL_ID_COMBINE, tool: "powerbi", level: "mastery", difficulty: "mastery", prerequisite: ["pb-q07", "pb-q08"],
+    title: "Independent build: prep a messy multi-month export",
+    objective: "Combine Change Type, Remove Duplicates, and Append from a plain-language data prep brief with no Power Query terms given.",
+    build() {
+      return {
+        scenarioHtml: `An analyst says: <b>"I have two files, January orders and February orders, same columns in both. Each file has some duplicate rows I need gone, and the amount column came in as text in both files. I need it all combined into one clean table."</b>`,
+        slots: [
+          { key: "typefix", label: "First fix needed", options: [{ value: "changetype", label: "Change Type (amount to Decimal Number)" }, { value: "unpivot", label: "Unpivot Columns" }] },
+          { key: "combine", label: "How to combine the two files", options: [{ value: "append", label: "Append Queries" }, { value: "merge", label: "Merge Queries" }] },
+        ],
+        correct: { typefix: "changetype", combine: "append" },
+      };
+    },
+    written: {
+      label: "Why is this an Append, not a Merge, and why fix the data type before combining rather than after?",
+      placeholder: "Think about whether the two files have the same or different columns, and what could go wrong fixing the type after combining instead of before...",
+      check: (text) => /\b(append|same columns|stack|rows)\b/i.test(text) && /\b(type|text|decimal|before|after)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that Append is correct because both files share the exact same columns, just more rows of the same shape, that's the definition of Append, not Merge. Fixing the data type before combining (or independently in each query before Append) ensures both files' amount columns are genuinely comparable numbers before they're stacked together." },
+    hints: [
+      "This combines three separate pieces from this stage: Change Type (task 1), Remove Duplicates (task 2), and Append (task 4), no Power Query terms were given, translate the plain-language brief yourself.",
+      "\"Same columns in both\" files, needing to become one combined table, is the Append pattern, not Merge (Merge is for different columns joined by a key).",
+      "\"The amount column came in as text\" needs Change Type, and doing this per-file before combining (or right after, consistently) keeps both files' amounts genuinely numeric before anything downstream depends on them.",
+      "First fix = Change Type, Combine method = Append." ],
+    explanation: { why: "This combines the Change Type and Append patterns from earlier in this stage, applied together from a plain-language brief, \"same columns, some duplicates, wrong data type\" translates directly into Change Type, Remove Duplicates, and Append, in some sensible order, without ever naming a single Power Query feature.", mistake: "Reaching for Merge because two separate files are being combined, without noticing they share the exact same columns (not a shared key to join on), would misapply the wrong combine operation entirely, Merge answers a different question than \"stack these two same-shaped files together\".", tip: "A real data prep brief almost never uses the words \"Append\", \"Merge\", or \"Change Type\", it describes files, columns, and problems in plain language, translating that into the right sequence of Power Query steps, in the right order, is the actual skill this whole stage has been building toward.", business: "This is deliberately the least guided task in this stage, monthly exports with matching columns, some duplicate rows, and an occasional wrong data type are an extremely common real starting point for an analyst's data prep work, recognizing the right combination of steps without being told which ones to use is the real job." } },
 ];
 
 /* ================= grading =================
