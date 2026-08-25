@@ -13,6 +13,7 @@
     "@prisma/client": "^6.19.3",
     "@whop/sdk": "^0.0.42",
     "framer-motion": "^12.36.0",
+    "lucide-react": "^1.34.0",
     "next": "16.1.6",
     "next-auth": "^5.0.0-beta.32",
     "prisma": "^6.19.3",
