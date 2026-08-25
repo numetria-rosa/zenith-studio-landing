@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Diagnostic, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:820px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:820px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:820px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--amber)}
+.hero{padding:44px 0 24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:640px;margin-top:10px}
+.honestnote{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.35);border-radius:10px;padding:14px 18px;margin-top:16px;font-size:13px;color:var(--mut)}
+.honestnote b{color:var(--amber)}
+section{margin-top:32px}
+.sectlbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);margin-bottom:12px;font-family:'IBM Plex Mono'}
+.testoutcard{background:rgba(74,222,149,.06);border:1px solid rgba(74,222,149,.3);border-radius:10px;padding:14px 18px;margin-bottom:10px;font-size:13.5px}
+.testoutcard b{color:var(--good)}
+.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:14px}
+.qcard .qtag{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-family:'IBM Plex Mono'}
+.qcard .qtext{font-weight:600;font-size:14.5px;margin-bottom:12px}
+.qopt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:7px;cursor:pointer;transition:.15s;font-size:13.5px}
+.qopt:hover{border-color:var(--bd2)}
+.qopt.picked{border-color:var(--info);background:rgba(95,194,232,.06)}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--amber);color:var(--amber)}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.resultwrap{display:none}
+.resultwrap.show{display:block}
+.profilerow{display:flex;align-items:center;gap:12px;padding:10px 4px;flex-wrap:wrap}
+.profilerow .plbl{font-size:13.5px;font-weight:600;min-width:220px;flex-shrink:0}
+.tierpill{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:3px 10px;border-radius:99px;font-weight:700}
+.tierpill.t-not-started{background:var(--card2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.12);color:var(--amber)}
+.tierpill.t-competent{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t-mastered{background:rgba(74,222,149,.2);color:var(--good)}
+.tierpill.t-estimate{background:rgba(95,194,232,.08);color:var(--mut)}
+.evtag{font-size:10.5px;color:var(--mut2);font-family:'IBM Plex Mono'}
+.startbox{margin-top:24px;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:22px 24px}
+.startbox h3{font-family:'Fraunces';font-size:19px;font-weight:600}
+.startbox p{color:var(--mut);font-size:13.5px;margin-top:8px}
+.startbox a.startlink{display:inline-block;margin-top:12px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:13.5px;padding:9px 18px;border-radius:8px;text-decoration:none}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} .profilerow .plbl{min-width:0;width:100%} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-00.html">Orientation</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Skill Diagnostic</span>
+    <h1 class="serif">What do you already know?</h1>
+    <p class="sub">Not a single score. A per-area profile, so you can skip what you've already demonstrated and start exactly where you actually need to.</p>
+    <div class="honestnote"><b>How this actually works:</b> if you've already passed real practice-library tasks in an area, that genuine, anti-cheat-tested evidence is used directly, no quiz needed, you've already proven it. For any area with no practice evidence yet, a handful of scenario questions below produce a rough estimate, clearly labeled as an ESTIMATE, not equivalent to a passed practice task. A diagnostic estimate can suggest where to start, it never counts as demonstrated mastery on its own, and it never claims you're "job ready."</div>
+  </header>
+
+  <section>
+    <div class="sectlbl">Already demonstrated (real evidence, no quiz needed)</div>
+    <div id="testoutList"></div>
+  </section>
+
+  <section id="quizSection">
+    <div class="sectlbl">Quick estimate for everything else</div>
+    <div id="qList"></div>
+    <div style="margin-top:8px"><button class="primary" id="btnSeeProfile" disabled>See my skill profile &rarr;</button></div>
+  </section>
+
+  <section class="resultwrap" id="resultSection">
+    <div class="sectlbl">Your skill profile</div>
+    <div id="profileList"></div>
+    <div class="startbox" id="startBox"></div>
+  </section>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Skill Diagnostic</footer>
+</div>
+
+<script src="course-progress.js?v=5"></script>
+<script src="practice-progress.js"></script>
+<script src="skill-map.js?v=1"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+const TIER_LABEL = { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" };
+
+/* Diagnostic areas map to real master skills where one exists (SQL is
+   split into its 6 real tracked skills, so this diagnostic groups them
+   back into one "SQL" area for a simpler first-pass estimate, the full
+   6-way breakdown is what the Mastery Profile page is for). */
+const AREAS = [
+  { id: "excel", label: "Excel", masterIds: ["spreadsheet-analysis"] },
+  { id: "sql", label: "SQL", masterIds: ["sql-fundamentals-master", "sql-aggregation-master", "sql-joins-master", "sql-advanced-master", "sql-window-master", "sql-realworld-master"] },
+  { id: "python", label: "Python", masterIds: ["python-programming", "python-data-analysis"] },
+  { id: "statistics", label: "Statistics", masterIds: ["statistics"] },
+  { id: "cleaning", label: "Data Cleaning", masterIds: ["data-cleaning"] },
+  { id: "viz", label: "Visualization", masterIds: ["data-visualization"] },
+  { id: "tableau", label: "Tableau", masterIds: ["tableau"] },
+  { id: "powerbi", label: "Power BI", masterIds: ["powerbi"] },
+  { id: "business", label: "Business Analysis", masterIds: ["business-analysis"] },
+  { id: "automation", label: "Automation", masterIds: ["automation"] },
+];
+
+/* An area "tests out" (real evidence, no quiz needed) once ANY of its
+   underlying master skills has reached at least Practicing, the same
+   "3+ passed, including a guided task" bar the mastery ladder itself
+   uses, never a single easy exercise. */
+function areaRealTier(area) {
+  const tiers = area.masterIds.map(id => SkillMap.masterSkillProgress(id).tier);
+  const order = ["not-started", "introduced", "practicing", "competent", "mastered"];
+  let best = "not-started";
+  tiers.forEach(t => { if (order.indexOf(t) > order.indexOf(best)) best = t; });
+  return best;
+}
+function testsOut(area) {
+  const order = ["not-started", "introduced", "practicing", "competent", "mastered"];
+  return order.indexOf(areaRealTier(area)) >= order.indexOf("practicing");
+}
+
+/* One representative scenario per area still needing an estimate,
+   deliberately not recycled verbatim from final-assessment.html or
+   any module quiz, correctness maps to a BEGINNER/FOUNDATION/
+   INTERMEDIATE/ADVANCED estimate for that one area, not a pass/fail. */
+const QUESTIONS = {
+  excel: { text: "You need the total of column F, but only for rows where column C says \"West\". Which single formula does this?", opts: [
+    { t: "SUMIF(C:C,\"West\",F:F)", correct: true, level: "intermediate" },
+    { t: "SUM(F:F)", correct: false, level: "beginner" },
+    { t: "VLOOKUP(\"West\",C:F,6,FALSE)", correct: false, level: "foundation" } ] },
+  sql: { text: "You want each customer's total order count, but ONLY customers with more than 5 orders. Where does \"> 5\" belong?", opts: [
+    { t: "In a HAVING clause, after GROUP BY", correct: true, level: "intermediate" },
+    { t: "In the WHERE clause", correct: false, level: "foundation" },
+    { t: "I'm not sure what GROUP BY does yet", correct: false, level: "beginner" } ] },
+  python: { text: "You have a list of dicts, each with an 'amount' key. What's the most direct way to sum every amount?", opts: [
+    { t: "sum(row['amount'] for row in records)", correct: true, level: "intermediate" },
+    { t: "records['amount'].sum()", correct: false, level: "foundation" },
+    { t: "I haven't written a for loop over a list of dicts before", correct: false, level: "beginner" } ] },
+  statistics: { text: "Average customer age is 42, median is 29. What does that gap most likely mean?", opts: [
+    { t: "The distribution is skewed, probably by a smaller number of much older customers", correct: true, level: "intermediate" },
+    { t: "One of the two numbers must be a calculation error", correct: false, level: "foundation" },
+    { t: "I don't know the difference between mean and median", correct: false, level: "beginner" } ] },
+  cleaning: { text: "A 'discount' column has some rows as \"15%\" (text) and others as 0.15 (a number). A SUM on it silently skips the text rows. What's the real problem?", opts: [
+    { t: "The column mixes two representations of the same value, breaking any formula expecting one consistent type", correct: true, level: "intermediate" },
+    { t: "The formula is broken and needs to be rewritten", correct: false, level: "foundation" },
+    { t: "I wouldn't know where to start diagnosing this", correct: false, level: "beginner" } ] },
+  viz: { text: "A bar chart's y-axis starts at 8,000 instead of 0, making five similar values look wildly different. What's the fix?", opts: [
+    { t: "Start the axis at 0, so bar height honestly reflects the real (small) differences", correct: true, level: "intermediate" },
+    { t: "Nothing, a zoomed-in axis just shows more detail", correct: false, level: "foundation" },
+    { t: "I wouldn't have noticed this was misleading", correct: false, level: "beginner" } ] },
+  tableau: { text: "In Tableau, region and category are both text columns, amount is a dollar figure. Which is the Measure?", opts: [
+    { t: "amount, it's the one that gets aggregated (summed, averaged)", correct: true, level: "intermediate" },
+    { t: "region, because it's listed first", correct: false, level: "foundation" },
+    { t: "I haven't used Tableau or a BI tool before", correct: false, level: "beginner" } ] },
+  powerbi: { text: "In Power BI, you write Orders[amount]*1.08 as a Measure hoping to see one row's marked-up amount on a Card. It errors instead. Why?", opts: [
+    { t: "A Measure has no row context by default, that reference is ambiguous without an aggregation or a Calculated Column", correct: true, level: "advanced" },
+    { t: "The syntax has a typo", correct: false, level: "foundation" },
+    { t: "I don't know what a Measure is yet", correct: false, level: "beginner" } ] },
+  business: { text: "A dashboard reports 12 metrics. A stakeholder asks \"okay, but what should I actually do?\" What does that feedback mean?", opts: [
+    { t: "The dashboard reports numbers but doesn't lead with a clear recommendation or highlight what matters most", correct: true, level: "intermediate" },
+    { t: "The dashboard has a data bug", correct: false, level: "foundation" },
+    { t: "It needs more metrics, not fewer", correct: false, level: "beginner" } ] },
+  automation: { text: "A daily script crashes on day 47 because one row had a malformed date, and every day since has silently sent nothing. What's missing?", opts: [
+    { t: "Fault tolerance (skip and count the bad row, don't crash) and a way to report that something went wrong", correct: true, level: "intermediate" },
+    { t: "A faster script", correct: false, level: "foundation" },
+    { t: "I haven't written a script meant to run unattended before", correct: false, level: "beginner" } ] },
+};
+
+let quizAnswers = {};
+
+function renderTestOutAndQuiz() {
+  const testOutBox = document.getElementById("testoutList");
+  const qBox = document.getElementById("qList");
+  testOutBox.innerHTML = "";
+  qBox.innerHTML = "";
+  let anyTestedOut = false;
+  AREAS.forEach(area => {
+    if (testsOut(area)) {
+      anyTestedOut = true;
+      const tier = areaRealTier(area);
+      const div = document.createElement("div");
+      div.className = "testoutcard";
+      div.innerHTML = `<b>${esc(area.label)}: ${esc(TIER_LABEL[tier])}</b>, already demonstrated through real, tested practice-library evidence. No quiz needed for this area.`;
+      testOutBox.appendChild(div);
+    } else {
+      const q = QUESTIONS[area.id];
+      const card = document.createElement("div");
+      card.className = "qcard";
+      card.innerHTML = `<div class="qtag">${esc(area.label)}, no practice evidence yet</div><div class="qtext">${esc(q.text)}</div><div id="qopts_${area.id}"></div>`;
+      qBox.appendChild(card);
+      const optsEl = card.querySelector(`#qopts_${area.id}`);
+      q.opts.forEach((opt, oi) => {
+        const div = document.createElement("div");
+        div.className = "qopt";
+        div.textContent = opt.t;
+        div.addEventListener("click", () => {
+          quizAnswers[area.id] = opt;
+          optsEl.querySelectorAll(".qopt").forEach((e, j) => e.classList.toggle("picked", j === oi));
+          checkQuizDone();
+        });
+        optsEl.appendChild(div);
+      });
+    }
+  });
+  if (!anyTestedOut) testOutBox.innerHTML = `<p style="color:var(--mut);font-size:13.5px">No practice-library evidence found yet, that's completely normal if this is your first time here. The quick estimate below covers all 10 areas.</p>`;
+  if (qBox.children.length === 0) {
+    document.getElementById("quizSection").style.display = "none";
+    showProfile();
+  }
+  checkQuizDone();
+}
+
+function checkQuizDone() {
+  const needed = AREAS.filter(a => !testsOut(a)).length;
+  document.getElementById("btnSeeProfile").disabled = Object.keys(quizAnswers).length < needed;
+}
+
+function showProfile() {
+  const list = document.getElementById("profileList");
+  list.innerHTML = "";
+  AREAS.forEach(area => {
+    const row = document.createElement("div");
+    row.className = "profilerow";
+    if (testsOut(area)) {
+      const tier = areaRealTier(area);
+      row.innerHTML = `<span class="plbl">${esc(area.label)}</span><span class="tierpill t-${tier}">${esc(TIER_LABEL[tier])}</span><span class="evtag">Real evidence</span>`;
+    } else {
+      const ans = quizAnswers[area.id];
+      const levelLabel = ans ? ({ beginner: "Beginner", foundation: "Foundation", intermediate: "Intermediate", advanced: "Advanced" }[ans.level]) : "Not answered";
+      row.innerHTML = `<span class="plbl">${esc(area.label)}</span><span class="tierpill t-estimate">${esc(levelLabel)} (estimate)</span><span class="evtag">1-question estimate, not demonstrated evidence</span>`;
+    }
+    list.appendChild(row);
+  });
+
+  const weakAreas = AREAS.filter(a => {
+    if (testsOut(a)) return false;
+    const ans = quizAnswers[a.id];
+    return !ans || ans.level === "beginner" || ans.level === "foundation";
+  });
+  const startBox = document.getElementById("startBox");
+  let rec;
+  if (weakAreas.some(a => a.id === "excel" || a.id === "python")) {
+    rec = { title: "Start at the beginning", text: "Excel and/or Python fundamentals still look early-stage. Module 1 (Spreadsheets) is the right starting point, everything else in this course builds on it.", href: "module-01.html", label: "Start Module 1 &rarr;" };
+  } else if (weakAreas.some(a => a.id === "sql")) {
+    rec = { title: "SQL is your priority", text: "Excel and Python look solid, SQL is where the real gap is. Module 6 (SQL for Analysts) or the SQL Practice Library directly are both good next steps.", href: "module-06.html", label: "Start Module 6 &rarr;" };
+  } else if (weakAreas.some(a => a.id === "tableau" || a.id === "powerbi")) {
+    rec = { title: "BI tools are your priority", text: "Core analysis skills look solid, the Tableau and/or Power BI Practice Libraries are the natural next step.", href: "practice-tableau.html", label: "Start the Tableau Practice Library &rarr;" };
+  } else if (weakAreas.length > 0) {
+    rec = { title: `${weakAreas[0].label} is your priority`, text: `Most areas look solid, ${weakAreas.map(a => a.label).join(", ")} could use focused practice next.`, href: "dashboard.html", label: "See the full skill map &rarr;" };
+  } else {
+    rec = { title: "You're already well-covered", text: "Every area shows real, demonstrated evidence or a strong estimate. The Integrated Cross-Tool Challenges or a Portfolio Project are good next steps to build toward something you can show, rather than more fundamentals.", href: "practice-integrated.html", label: "Try the Integrated Cross-Tool Challenges &rarr;" };
+  }
+  startBox.innerHTML = `<h3 class="serif">${esc(rec.title)}</h3><p>${esc(rec.text)}</p><a class="startlink" href="${esc(rec.href)}">${rec.label}</a>`;
+
+  document.getElementById("resultSection").className = "resultwrap show";
+  document.getElementById("resultSection").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+document.getElementById("btnSeeProfile").addEventListener("click", showProfile);
+renderTestOutAndQuiz();
+</script>
+<script src="course-rail.js?v=5"></script>
+</body>
+</html>

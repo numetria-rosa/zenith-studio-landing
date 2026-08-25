@@ -48,6 +48,7 @@
     ["syllabus.html", "Syllabus"],
     ["dashboard.html", "Dashboard"],
     ["mastery-profile.html", "Mastery Profile"],
+    ["diagnostic.html", "Skill Diagnostic"],
     ["quiz-center.html", "Quiz Center"],
     ["cheatsheets.html", "Cheat Sheets"],
     ["python-survival-guide.html", "Python Survival Guide"],
