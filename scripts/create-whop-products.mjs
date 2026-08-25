@@ -59,6 +59,27 @@ const PRODUCTS = [
     ],
   },
   {
+    envPrefix: "WHOP_DATA_SCIENCE",
+    title: "Data Science & Analysis",
+    headline: "Spreadsheets through a full capstone analysis",
+    description:
+      "Twelve weeks, three entry tracks, spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards, and a Career Path Edition built around actually getting paid. No prior coding required.",
+    plans: [
+      {
+        // Regular price is $120; launched at 75% off ($30) through 2026-08-31.
+        // NOT automated — after the deadline, update this plan's price via
+        // scripts/update-data-science-price.mjs (or client.plans.update in the
+        // Whop dashboard) rather than re-running this file, which would create
+        // a second, duplicate product.
+        key: "",
+        title: "Founding Access, 75% off through Aug 31",
+        description: "Regular price $120. Founding-cohort launch price through August 31, then reverts to $120. Lifetime access and updates.",
+        plan_type: "one_time",
+        initial_price: 30,
+      },
+    ],
+  },
+  {
     envPrefix: "WHOP_AI_INBOX_MANAGER",
     title: "AI Inbox Manager",
     headline: "Wake up to an inbox that is already handled",

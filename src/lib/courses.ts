@@ -58,17 +58,20 @@ export const COURSES: Course[] = [
     description:
       "Twelve weeks, three entry tracks, spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards, and a Career Path Edition built around actually getting paid. No prior coding required.",
     thumbnail: "/lab/data-science.webp",
-    whopAccessPassId: "",
-    whopPlanId: "",
-    checkoutUrl: "",
+    whopAccessPassId: "prod_9eVAjfMpwcaX8",
+    whopPlanId: "plan_ysRjmrPzOn9j1",
+    checkoutUrl: "https://whop.com/checkout/plan_ysRjmrPzOn9j1",
     contentDir: "courses/data-science",
     firstLessonPath: "dashboard.html",
     waitlistUrl:
       "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20Data%20Science%20%26%20Analysis%0A",
-    // Module 0 and Module 1 are built and live; Modules 2-9 and the Career Path
-    // Edition pages exist as real, on-brand shells with placeholder lesson
-    // content. Flip to true once a real Whop product exists and enough of the
-    // module content is filled in to actually sell.
+    // All 9 modules, all 315 practice tasks (SQL/Excel/Python/Statistics/
+    // Tableau/Power BI/Automation/Integrated), the diagnostic, adaptive
+    // engine, misconception system, learning roadmap, portfolio, career
+    // path, and capstone are real and built. Real Whop product/plan created
+    // 2026-08-25 (see whop-created-products.json). Left false pending the
+    // checkout -> webhook -> entitlement -> access chain being verified end
+    // to end; flip to true once that's confirmed, not before.
     published: false,
   },
 ];
