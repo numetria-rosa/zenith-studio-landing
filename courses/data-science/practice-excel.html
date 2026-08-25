@@ -52,6 +52,7 @@ table.grid td.num{text-align:right}
 .nextup b{color:var(--green)}
 .tasklist{display:grid;gap:10px;margin-top:22px}
 .taskcard{background:var(--card);border:1px solid var(--bd2);border-radius:12px;overflow:hidden}
+.taskhead:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
 .taskhead{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer}
 .taskhead:hover{background:var(--card2)}
 .taskhead .tid{font-family:'IBM Plex Mono';font-size:11px;color:var(--mut2);width:32px;flex-shrink:0}
@@ -1296,7 +1297,7 @@ function renderTasks() {
     const card = document.createElement("div");
     card.className = "taskcard";
     card.innerHTML = `
-      <div class="taskhead" data-id="${t.id}">
+      <div class="taskhead" data-id="${t.id}" tabindex="0" role="button" aria-expanded="${openTasks.has(t.id) ? 'true' : 'false'}">
         <span class="statusdot ${state.passed ? "passed" : ""}"></span>
         <span class="tid">${String(idx + 1).padStart(2, "0")}</span>
         <span class="ttitle">${esc(t.title)}</span>
@@ -1320,10 +1321,18 @@ function renderTasks() {
     list.appendChild(card);
   });
 
+  function toggleTaskBody(head) {
+    const body = document.getElementById("body_" + head.dataset.id);
+    body.classList.toggle("open");
+    head.setAttribute("aria-expanded", body.classList.contains("open") ? "true" : "false");
+  }
   list.querySelectorAll(".taskhead").forEach(head => {
-    head.addEventListener("click", () => {
-      const body = document.getElementById("body_" + head.dataset.id);
-      body.classList.toggle("open");
+    head.addEventListener("click", () => toggleTaskBody(head));
+    head.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        toggleTaskBody(head);
+      }
     });
   });
   list.querySelectorAll("[data-run]").forEach(btn => {
