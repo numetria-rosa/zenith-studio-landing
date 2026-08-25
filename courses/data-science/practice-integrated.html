@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integrated Cross-Tool Challenges, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;--pink:#ff5fa8;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 90px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--pink)}
+.bar .in{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px;flex-wrap:wrap}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--pink)}
+.hero{padding:40px 0 24px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--pink);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:720px;margin-top:10px}
+.scopenote{background:rgba(255,95,168,.08);border:1px solid rgba(255,95,168,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
+.scopenote b{color:var(--pink)}
+.honestnote{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.35);border-radius:10px;padding:14px 18px;margin-top:12px;font-size:13px;color:var(--mut)}
+.honestnote b{color:#f0b429}
+.skillbar{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:20px 22px;margin-top:22px}
+.skillrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tierpill{font-family:'IBM Plex Mono';font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 12px;border-radius:99px;font-weight:700}
+.tierpill.t-not-started{background:var(--bg2);color:var(--mut2)}
+.tierpill.t-introduced{background:rgba(95,194,232,.12);color:var(--info)}
+.tierpill.t-practicing{background:rgba(240,180,41,.12);color:var(--amber)}
+.tierpill.t-competent{background:rgba(74,222,149,.12);color:var(--good)}
+.tierpill.t-mastered{background:rgba(255,95,168,.18);color:var(--pink)}
+.skillbarwrap{flex:1;min-width:180px;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;border:1px solid var(--bd)}
+.skillbarwrap .fill{height:100%;background:var(--pink)}
+.tierladder{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.tierladder span{font-family:'IBM Plex Mono';font-size:10.5px;padding:3px 10px;border-radius:99px;background:var(--bg2);color:var(--mut2);border:1px solid var(--bd2)}
+.tierladder span.reached{background:rgba(255,95,168,.12);color:var(--pink);border-color:rgba(255,95,168,.4)}
+.nextup{margin-top:14px;padding:12px 16px;background:var(--bg2);border:1px dashed var(--bd2);border-radius:8px;font-size:13.5px}
+.nextup b{color:var(--pink)}
+.tasklist{display:grid;gap:10px;margin-top:22px}
+.taskcard{background:var(--card);border:1px solid var(--bd2);border-radius:12px;overflow:hidden}
+.taskhead{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer}
+.taskhead:hover{background:var(--card2)}
+.taskhead .tid{font-family:'IBM Plex Mono';font-size:11px;color:var(--mut2);width:32px;flex-shrink:0}
+.taskhead .ttitle{font-weight:600;font-size:14.5px;flex:1}
+.tagpill{font-family:'IBM Plex Mono';font-size:9.5px;text-transform:uppercase;padding:2px 8px;border-radius:99px;flex-shrink:0;background:var(--bg2);color:var(--mut2);border:1px solid var(--bd2)}
+.levelpill{font-family:'IBM Plex Mono';font-size:10px;text-transform:uppercase;padding:2px 9px;border-radius:99px;flex-shrink:0}
+.levelpill.guided{background:rgba(74,222,149,.12);color:var(--good)}
+.levelpill.semiguided{background:rgba(240,180,41,.12);color:var(--amber)}
+.levelpill.challenge{background:rgba(255,133,133,.12);color:var(--bad)}
+.levelpill.mastery{background:rgba(255,95,168,.12);color:var(--pink)}
+.statusdot{width:9px;height:9px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+.statusdot.passed{background:var(--good);box-shadow:0 0 6px var(--good)}
+.taskbody{display:none;padding:0 18px 18px}
+.taskbody.open{display:block}
+.objective{font-size:13.5px;color:var(--mut);margin-bottom:12px}
+.objective b{color:var(--tx)}
+.scenario{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;font-size:13.5px;margin-bottom:12px}
+.scenario b{color:var(--pink)}
+.streakrow{display:flex;gap:6px;margin-bottom:10px}
+.streakdot{width:10px;height:10px;border-radius:50%;background:var(--bg2);border:1px solid var(--bd2)}
+.streakdot.hit{background:var(--pink);border-color:var(--pink)}
+.slotgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.slotfield{display:flex;flex-direction:column;gap:4px}
+.slotfield label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--pink);font-family:'IBM Plex Mono'}
+select{font-family:'IBM Plex Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
+select:focus-visible{outline:2px solid var(--pink);outline-offset:1px}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
+button:hover{border-color:var(--pink);color:var(--pink)}
+button:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+button.primary{background:var(--pink);color:#2a0016;border-color:var(--pink)}
+button.primary:hover{filter:brightness(1.1);color:#2a0016}
+.writtenlbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--pink);font-family:'IBM Plex Mono';margin:12px 0 6px}
+.writtenbox{width:100%;font-family:'IBM Plex Sans';line-height:1.6;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
+.writtenbox:focus-visible{outline:2px solid var(--pink);outline-offset:1px}
+.dagctrl{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.feedback{margin-top:8px;padding:10px 14px;border-radius:8px;font-size:13.5px}
+.feedback.ok{background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+.hints{margin-top:12px;display:grid;gap:6px}
+.hints details{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px}
+.hints summary{cursor:pointer;color:var(--pink);font-size:12px;font-weight:600;list-style:none}
+.hints summary::-webkit-details-marker{display:none}
+.hints .hbody{margin-top:7px;font-size:12.5px;color:var(--mut);padding-top:7px;border-top:1px solid var(--bd)}
+.explainbox{margin-top:12px;background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 16px;display:grid;gap:10px}
+.explainbox .erow .elbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--pink);font-family:'IBM Plex Mono';margin-bottom:3px}
+.explainbox .erow p{font-size:12.5px;color:var(--mut)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 70px} .taskhead{flex-wrap:wrap} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-09.html">Module 9: Capstone</a><a href="career.html">Career Path</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Practice Library &middot; Integrated Cross-Tool Challenges &middot; Batch 1 of 2</span>
+    <h1 class="serif">Integrated Cross-Tool Challenges</h1>
+    <p class="sub">The same business question, answered in two different tools, the specific skill of recognizing that a SUMIF, a GROUP BY, a pandas groupby, a DAX Measure, and a Tableau shelf configuration are frequently the exact same idea wearing a different tool's syntax.</p>
+    <div class="honestnote"><b>Honest scope note, please read:</b> this is a <b>decision-based practice simulation</b> testing cross-tool translation judgment, not simultaneous live execution across three engines at once. The individual practice libraries (Excel, SQL, Python, Automation) already give you genuine, real-execution practice in each tool on its own, this library instead drills the judgment call of recognizing the SAME underlying technique across different tools' vocabularies, and knowing which tool a given step of a workflow actually belongs in. Every scenario is re-randomized on every attempt, and a task only counts as passed after 3 consecutive correct answers on 3 independently redrawn scenarios.</div>
+    <div class="scopenote"><b>Progress:</b> Batch 1 (the 10 explicit tool-pair challenges: Excel&harr;SQL, Python&harr;SQL, Python&harr;Excel, SQL&harr;Tableau, SQL&harr;Power BI, Python&harr;Tableau, Python&harr;Power BI, Excel&harr;Power BI, SQL&harr;Automation, Python&harr;Automation) is complete, 10 tasks. Batch 2 (multi-tool investigations, ambiguous stakeholder requests, and a final capstone) is not yet built.</div>
+  </header>
+
+  <div id="skillBars"></div>
+
+  <div class="tasklist" id="taskList"></div>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Practice Library &middot; Practice Simulation</footer>
+</div>
+
+<script src="course-progress.js?v=5"></script>
+<script src="practice-progress.js"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+
+/* ================= random helpers =================
+   Same anti-cheat intent as the Tableau/Power BI libraries: every
+   task redraws its scenario fresh on every render, so a memorized
+   click sequence only survives if it's actually applying the right
+   RULE, since the specific field/business ask changes every time. */
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+/* ================= skills & tasks ================= */
+const SKILL_ID_TRANSLATE = "integrated-translation";
+const SKILL_ID_SELECT = "integrated-tool-selection";
+const SKILLS = [
+  { id: SKILL_ID_TRANSLATE, label: "Cross-Tool Technique Translation" },
+  { id: SKILL_ID_SELECT, label: "Cross-Tool Selection & Workflow" },
+];
+
+const REGIONS = ["West", "East", "North", "South"];
+const CATEGORIES = ["Outdoor", "Apparel", "Electronics", "Home"];
+
+const TASKS = [
+  { id: "ct-01", skill: SKILL_ID_TRANSLATE, tool: "integrated", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Excel &rarr; SQL: the same conditional total",
+    objective: "Recognize that Excel's SUMIF and SQL's WHERE-plus-SUM express the exact same idea.",
+    build() {
+      const status = pick(["Completed", "Returned", "Cancelled"]);
+      return {
+        scenarioHtml: `In Excel, you found total revenue using <b class="mono">=SUMIF(status,"${esc(status)}",amount)</b>. Which SQL query computes the exact same value from an <b class="mono">orders</b> table?`,
+        slots: [{ key: "sql", label: "Which SQL query is equivalent?", options: [
+          { value: "correct", label: `SELECT SUM(amount) FROM orders WHERE status = '${status}'` },
+          { value: "wrong1", label: `SELECT amount FROM orders WHERE status = '${status}'` },
+          { value: "wrong2", label: `SELECT SUM(amount) FROM orders GROUP BY status` },
+          { value: "wrong3", label: `SELECT SUM(amount) FROM orders WHERE status != '${status}'` },
+        ] }],
+        correct: { sql: "correct" },
+      };
+    },
+    hints: [
+      "SUMIF's two jobs, filtering to matching rows and summing a column, map directly onto SQL's WHERE clause and SUM() aggregate function.",
+      "The condition inside SUMIF (\"status = that value\") becomes the WHERE clause's condition, the range being summed becomes SUM()'s argument.",
+      "GROUP BY status would return a total for EVERY status, not filter down to just the one SUMIF specified, that's a different question.",
+      "SELECT SUM(amount) FROM orders WHERE status = '<the status named above>'." ],
+    explanation: { why: "SUMIF(range, criteria, sum_range) and SELECT SUM(sum_col) FROM table WHERE criteria are structurally the same operation, filter rows by a condition, then total one column across the surviving rows, expressed in each tool's own syntax.", mistake: "Reaching for GROUP BY when the actual need is a single filtered total (not a total broken out by every status) returns a whole result set instead of the one number SUMIF was computing, a common overcomplication when translating a simple filtered total into SQL.", tip: "Whenever an Excel formula's shape is \"filter, then aggregate\", SUMIF/SUMIFS on the Excel side almost always maps to WHERE plus an aggregate function on the SQL side, that mapping holds across almost every filtered-total question.", business: "A finance stakeholder who trusts a number from an Excel sheet often wants that SAME number reproduced from the live database as a sanity check, being able to translate the Excel logic into an equivalent SQL query directly is exactly how that reconciliation gets done." } },
+
+  { id: "ct-02", skill: SKILL_ID_TRANSLATE, tool: "integrated", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Python &rarr; SQL: the same filtered sum",
+    objective: "Recognize that a pandas boolean-filter-then-sum and a SQL WHERE-then-SUM are the same operation.",
+    build() {
+      const status = pick(["Completed", "Returned", "Cancelled"]);
+      return {
+        scenarioHtml: `In pandas, you computed <b class="mono">df[df.status == "${esc(status)}"]["amount"].sum()</b>. Which SQL query computes the exact same value?`,
+        slots: [{ key: "sql", label: "Which SQL query is equivalent?", options: [
+          { value: "correct", label: `SELECT SUM(amount) FROM orders WHERE status = '${status}'` },
+          { value: "wrong1", label: `SELECT AVG(amount) FROM orders WHERE status = '${status}'` },
+          { value: "wrong2", label: `SELECT SUM(amount) FROM orders WHERE status <> '${status}'` },
+          { value: "wrong3", label: `SELECT COUNT(amount) FROM orders WHERE status = '${status}'` },
+        ] }],
+        correct: { sql: "correct" },
+      };
+    },
+    hints: [
+      "df[df.status == X] is pandas' boolean-mask filtering, the direct equivalent of SQL's WHERE clause, both keep only the matching rows.",
+      "Chaining .sum() onto the filtered result is the same as wrapping SUM() around the filtered SQL query's column.",
+      "AVG and COUNT are different aggregations entirely, the pandas code specifically calls .sum(), not .mean() or .count().",
+      "SELECT SUM(amount) FROM orders WHERE status = '<the status named above>'." ],
+    explanation: { why: "pandas' boolean mask filtering (df[condition]) and SQL's WHERE clause both narrow a table down to matching rows before anything else happens, chaining an aggregation afterward, .sum() or SUM(), completes the same two-step filter-then-aggregate operation in each tool's own syntax.", mistake: "Swapping .sum() for a different aggregation when translating (reaching for AVG or COUNT out of habit) changes the actual question being answered, the translation has to preserve which SPECIFIC aggregation was used, not just the general shape.", tip: "pandas' df[condition]['col'].agg() shape maps almost mechanically onto SQL's SELECT AGG(col) FROM table WHERE condition, recognizing that shared shape makes translating between the two fast and reliable.", business: "A data engineer migrating a pandas-based report to run as a scheduled SQL query in a data warehouse needs exactly this translation skill, preserving the exact same filter and aggregation logic, just expressed in SQL instead of Python." } },
+
+  { id: "ct-03", skill: SKILL_ID_TRANSLATE, tool: "integrated", level: "guided", difficulty: "core", prerequisite: [],
+    title: "Python &rarr; Excel: the same group total",
+    objective: "Recognize that a pandas groupby-sum and Excel's SUMIF compute the same per-group total.",
+    build() {
+      const region = pick(REGIONS);
+      return {
+        scenarioHtml: `In pandas, you ran <b class="mono">df.groupby("region")["amount"].sum()</b> and read off the <b class="mono">${esc(region)}</b> region's total from the result. Which single Excel formula reproduces just that one region's total directly?`,
+        slots: [{ key: "formula", label: "Which Excel formula is equivalent?", options: [
+          { value: "correct", label: `=SUMIF(region,"${region}",amount)` },
+          { value: "wrong1", label: `=SUM(amount)` },
+          { value: "wrong2", label: `=AVERAGEIF(region,"${region}",amount)` },
+          { value: "wrong3", label: `=COUNTIF(region,"${region}")` },
+        ] }],
+        correct: { formula: "correct" },
+      };
+    },
+    hints: [
+      "groupby(\"region\")[\"amount\"].sum() computes a total PER region, reading off just one region's value from that result is the same as filtering to that one region and summing, which is exactly SUMIF's job.",
+      "SUM(amount) alone would total EVERY region combined, not the one specific region groupby's result was read from.",
+      "AVERAGEIF and COUNTIF are different aggregations, groupby's result here used .sum(), so the Excel equivalent needs to sum too, not average or count.",
+      "=SUMIF(region,\"<the region named above>\",amount)." ],
+    explanation: { why: "A pandas groupby-then-aggregate followed by reading off one specific group's value is equivalent to directly filtering to that one group and aggregating, which is exactly what SUMIF does in a single step, without needing to compute every other group's total along the way.", mistake: "Reaching for a plain SUM(amount) loses the region filter entirely, that would total every region combined, not the one specific region's figure that was actually being reproduced.", tip: "When only ONE group's value is actually needed (not a full breakdown of every group), a direct filtered aggregate, SUMIF in Excel, a boolean-filtered .sum() in pandas, is more direct than computing a full groupby and then picking one row out of it.", business: "A stakeholder who wants to double-check just the West region's number from a Python-generated report, without re-running the whole script, can get that exact figure from a single SUMIF formula in Excel, a fast, independent cross-check." } },
+
+  { id: "ct-04", skill: SKILL_ID_SELECT, tool: "integrated", level: "guided", difficulty: "core", prerequisite: ["ct-01"],
+    title: "SQL &rarr; Tableau: reproducing a GROUP BY view",
+    objective: "Recognize which Tableau shelf configuration reproduces a specific SQL GROUP BY query's result.",
+    build() {
+      const status = pick(["Completed", "Returned"]);
+      return {
+        scenarioHtml: `You ran <b class="mono">SELECT region, SUM(amount) FROM orders WHERE status = '${esc(status)}' GROUP BY region</b> in SQL. Which Tableau setup reproduces this exact view?`,
+        slots: [{ key: "setup", label: "Which Tableau shelf configuration matches?", options: [
+          { value: "correct", label: `Rows = region, Columns = SUM(amount), Filter: status = "${status}"` },
+          { value: "wrong1", label: `Rows = region, Columns = SUM(amount), Color = status` },
+          { value: "wrong2", label: `Rows = status, Columns = SUM(amount), Filter: region = "West"` },
+          { value: "wrong3", label: `Rows = region, Columns = COUNT(amount), Filter: status = "${status}"` },
+        ] }],
+        correct: { setup: "correct" },
+      };
+    },
+    hints: [
+      "GROUP BY region means region is the Dimension driving the breakdown, that's Rows (or Columns) in Tableau, SUM(amount) is the aggregated Measure.",
+      "The SQL query's WHERE clause RESTRICTS the data before grouping, that's a Filter in Tableau, not Color, Color would keep every status visible, WHERE removes the other statuses entirely.",
+      "SUM(amount), not COUNT(amount), matches the SQL query's own SUM() aggregate function exactly.",
+      "Rows = region, Columns = SUM(amount), Filter: status = \"<the status named above>\"." ],
+    explanation: { why: "SQL's GROUP BY column maps to a Dimension on a layout shelf, the SELECT list's aggregate function maps to that same aggregation applied to a Measure, and WHERE maps to a Filter, restricting the underlying data before any aggregation happens, in both tools.", mistake: "Using Color instead of a Filter for the WHERE clause's condition would keep every status visible (just color-coded) rather than restricting the view to just the one status the SQL query actually filtered to, producing a view with more data than the original query.", tip: "Reading a SQL query's clauses in order, SELECT (which columns/aggregates), FROM (the table), WHERE (restrict rows), GROUP BY (the breakdown), maps almost mechanically onto Measures, the data source, Filters, and layout Dimensions in Tableau.", business: "A SQL-first analyst handing off a query to a Tableau-based teammate needs this exact translation, so the resulting Tableau view genuinely reproduces the same, already-validated number, not an approximation of it." } },
+
+  { id: "ct-05", skill: SKILL_ID_SELECT, tool: "integrated", level: "semiguided", difficulty: "core", prerequisite: ["ct-01"],
+    title: "SQL &rarr; Power BI: reproducing a GROUP BY as a Measure",
+    objective: "Recognize which Power BI Measure and visual setup reproduces a specific SQL GROUP BY query's result.",
+    build() {
+      const status = pick(["Completed", "Returned"]);
+      return {
+        scenarioHtml: `You ran <b class="mono">SELECT region, SUM(amount) FROM orders WHERE status = '${esc(status)}' GROUP BY region</b> in SQL. Which Power BI setup reproduces this exact view?`,
+        slots: [{ key: "setup", label: "Which Power BI setup matches?", options: [
+          { value: "correct", label: `Measure: CALCULATE(SUM(Orders[amount]), Orders[status] = "${status}"), region on the axis` },
+          { value: "wrong1", label: `Measure: SUM(Orders[amount]), region on the axis, no filter` },
+          { value: "wrong2", label: `Measure: CALCULATE(SUM(Orders[amount]), Orders[status] = "${status}"), status on the axis` },
+          { value: "wrong3", label: `Measure: COUNT(Orders[amount]), region on the axis` },
+        ] }],
+        correct: { setup: "correct" },
+      };
+    },
+    hints: [
+      "The SQL query's WHERE clause forces a fixed condition regardless of anything else, that's exactly CALCULATE's job in DAX, wrapping a base aggregation with a forced filter.",
+      "GROUP BY region means region is the breakdown Dimension, that has to be what's on the visual's axis, not status.",
+      "A plain SUM(Orders[amount]) with no CALCULATE wrapper would just respect whatever filters happen to already be on the report, not force the specific status filter the SQL query hardcoded.",
+      "CALCULATE(SUM(Orders[amount]), Orders[status] = \"<the status named above>\"), with region on the axis." ],
+    explanation: { why: "SQL's WHERE clause hardcodes a condition regardless of anything else in the query, DAX's CALCULATE does the same thing inside a Measure, forcing a filter that doesn't depend on whatever else is happening in the report, GROUP BY's column becomes the Dimension driving the visual's breakdown.", mistake: "Using a plain SUM(Orders[amount]) with no CALCULATE wrapper would respond to whatever filter context the report happens to be in, rather than reproducing the SQL query's own fixed, hardcoded WHERE condition, those are two different, only-sometimes-equal behaviors.", tip: "SQL's WHERE (a fixed condition on a specific query) is closer to CALCULATE's forced filter override than to a report-level Slicer, a Slicer is closer to a parameter the SQL query's caller could adjust, not a condition baked into the query itself.", business: "A Power BI report meant to always show completed-orders revenue by region, matching a known, already-validated SQL report exactly, needs the CALCULATE-forced filter, not a Slicer a viewer could accidentally change away from that fixed condition." } },
+
+  { id: "ct-06", skill: SKILL_ID_TRANSLATE, tool: "integrated", level: "semiguided", difficulty: "core", prerequisite: ["ct-03"],
+    title: "Python &rarr; Tableau: reproducing a percent-of-total column",
+    objective: "Recognize which Tableau feature reproduces a pandas percent-of-total calculation.",
+    build() {
+      return {
+        scenarioHtml: `In pandas, you added a column: <b class="mono">df['pct'] = df['amount'] / df['amount'].sum() * 100</b>, each row's share of the grand total. Which Tableau feature reproduces this on a view broken out by category?`,
+        slots: [{ key: "feature", label: "Which Tableau feature matches?", options: [
+          { value: "correct", label: "The Percent of Total quick table calculation" },
+          { value: "wrong1", label: "The Running Total quick table calculation" },
+          { value: "wrong2", label: "A Rank quick table calculation" },
+          { value: "wrong3", label: "A reference line" },
+        ] }],
+        correct: { feature: "correct" },
+      };
+    },
+    hints: [
+      "\"Each row's (or category's) share of the grand total, as a percentage\" is precisely what Percent of Total computes, dividing each mark's value by the sum across the whole view.",
+      "Running Total accumulates over an ordered axis (like time), Rank orders values, neither one expresses \"share of the whole as a percentage\".",
+      "A reference line draws a benchmark value, it doesn't recompute each mark's own value as a share of anything.",
+      "Percent of Total." ],
+    explanation: { why: "Percent of Total's calculation, each mark's value divided by the total across the view, expressed as a percentage, is exactly the arithmetic the pandas line performs manually, Tableau just applies it as a quick table calculation on top of an existing aggregated Measure.", mistake: "Reaching for Running Total or Rank confuses three genuinely different quick table calculations, each answers a different question (accumulation over an axis, ordinal position, share of a whole), matching the pandas operation's actual arithmetic to the matching Tableau feature is the real translation skill.", tip: "A manual pandas calculation dividing by a fixed total (df['amount'].sum(), a single number, not a per-group total) usually maps to Percent of Total at Table scope in Tableau, the same LOD-scope reasoning covered in the Tableau library's own Stage 2.", business: "A stakeholder who's used to seeing a pandas-generated report with a percent-of-total column expects a Tableau version of the same report to show the identical percentages, recognizing Percent of Total as the equivalent feature is what makes that migration faithful." } },
+
+  { id: "ct-07", skill: SKILL_ID_TRANSLATE, tool: "integrated", level: "challenge", difficulty: "challenge", prerequisite: ["ct-05"],
+    title: "Python &rarr; Power BI: reproducing a cumulative sum",
+    objective: "Recognize which DAX pattern reproduces a pandas .cumsum() running total.",
+    build() {
+      return {
+        scenarioHtml: `In pandas, sorted by date, you computed <b class="mono">df['running_total'] = df['amount'].cumsum()</b>, each row showing the total of itself plus every prior row. Which DAX Measure pattern reproduces this same running total, broken out by date?`,
+        slots: [{ key: "dax", label: "Which DAX pattern matches?", options: [
+          { value: "correct", label: `CALCULATE(SUM(Orders[amount]), FILTER(ALL(Orders[order_date]), Orders[order_date] <= MAX(Orders[order_date])))` },
+          { value: "wrong1", label: `SUM(Orders[amount])` },
+          { value: "wrong2", label: `CALCULATE(SUM(Orders[amount]), ALL(Orders))` },
+          { value: "wrong3", label: `AVERAGE(Orders[amount])` },
+        ] }],
+        correct: { dax: "correct" },
+      };
+    },
+    hints: [
+      "A running total needs to sum every row UP TO AND INCLUDING the current one, that means removing the normal date filter (ALL) and replacing it with a custom one, only dates less than or equal to the current row's date.",
+      "MAX(Orders[order_date]) inside the FILTER, evaluated within the current row's own filter context, gives \"this row's date\", the FILTER then keeps only dates at or before that point.",
+      "A plain SUM(Orders[amount]) would only total the current date's own rows, not accumulate everything before it, that's not a running total at all.",
+      "CALCULATE(SUM(Orders[amount]), FILTER(ALL(Orders[order_date]), Orders[order_date] <= MAX(Orders[order_date])))." ],
+    explanation: { why: "This is DAX's standard running-total pattern, ALL() strips away the normal date filter, then FILTER rebuilds a custom one keeping only dates at or before the current row's own date (found via MAX() evaluated in the current context), CALCULATE ties it together, the DAX equivalent of pandas' built-in cumsum().", mistake: "A plain SUM(Orders[amount]) has no awareness of accumulation at all, it just totals whatever's in the current filter context, cumsum()'s entire point, accumulating everything up to and including the current row, requires this more involved CALCULATE-FILTER-ALL pattern in DAX.", tip: "pandas has cumsum() as a single built-in method, DAX has no equally short built-in for the general case, this CALCULATE-FILTER-ALL shape is the standard, reusable pattern worth recognizing on sight rather than re-deriving each time.", business: "A cumulative-revenue-through-the-year Measure, migrated from a pandas prototype into a live Power BI report, needs this exact DAX pattern to keep updating correctly as new data arrives, a plain SUM would silently show the wrong, non-accumulating number instead." } },
+
+  { id: "ct-08", skill: SKILL_ID_TRANSLATE, tool: "integrated", level: "challenge", difficulty: "challenge", prerequisite: ["ct-03"],
+    title: "Excel &rarr; Power BI: reproducing an XLOOKUP",
+    objective: "Recognize which DAX approach reproduces an Excel XLOOKUP pulling a value from a related table.",
+    build() {
+      return {
+        scenarioHtml: `In Excel, you used <b class="mono">=XLOOKUP(category, Sheet2!A:A, Sheet2!B:B)</b> to pull each order's category commission rate from a separate lookup table. In Power BI, the Orders table has a proper relationship to a Category table on the category field. Which approach reproduces this same per-row lookup?`,
+        slots: [{ key: "approach", label: "Which Power BI approach matches?", options: [
+          { value: "correct", label: "A calculated column using RELATED(Category[commission_rate])" },
+          { value: "wrong1", label: "A Measure using SUM(Category[commission_rate])" },
+          { value: "wrong2", label: "A Slicer on Category[commission_rate]" },
+          { value: "wrong3", label: "Merge Queries in Power Query, joining Orders to itself" },
+        ] }],
+        correct: { approach: "correct" },
+      };
+    },
+    hints: [
+      "XLOOKUP pulls one value PER ROW from a related table, that's a row-level operation, needing row context, exactly what a calculated column has (a Measure does not).",
+      "RELATED() is DAX's specific function for reaching across an existing relationship to pull a value from the \"one\" side of a one-to-many relationship, into a row on the \"many\" side, precisely XLOOKUP's job.",
+      "A Slicer is a viewer-facing filter control, not a way to pull a value into a row, and SUM would try to aggregate the rate rather than just look it up.",
+      "A calculated column using RELATED(Category[commission_rate])." ],
+    explanation: { why: "RELATED() is DAX's purpose-built function for exactly this situation, a one-to-many relationship already exists, and each row on the many side needs to pull in a value from its related row on the one side, the same job XLOOKUP does by manually searching a lookup table, but using the relationship Power BI already has, rather than searching from scratch.", mistake: "Reaching for a Measure (SUM or otherwise) instead of a calculated column misses that this is fundamentally a row-level operation, needing row context to know \"this row's own category\", a Measure has no row context of its own, exactly the gotcha covered in the Power BI library's own DAX stage.", tip: "Whenever an existing relationship already connects two tables on the exact field a lookup would search by, RELATED() is almost always simpler and more reliable than manually rebuilding an XLOOKUP-style search with LOOKUPVALUE(), which ignores the modeled relationship entirely.", business: "A commission-rate lookup migrated from an Excel workbook into a proper Power BI data model is exactly the moment a manually-maintained lookup table (and formula) gets replaced by a real, validated relationship, RELATED() is what lets the data model do this work instead of a formula having to." } },
+
+  { id: "ct-09", skill: SKILL_ID_SELECT, tool: "integrated", level: "challenge", difficulty: "challenge", prerequisite: ["ct-01"],
+    title: "SQL &rarr; Automation: turning a query into a recurring job",
+    objective: "Recognize what a one-off SQL query needs in order to become a genuine scheduled automation, not just correct logic.",
+    build() {
+      return {
+        scenarioHtml: `You wrote a SQL query with <b class="mono">GROUP BY</b> that correctly computes monthly totals per category. A stakeholder now wants this to run AUTOMATICALLY every month, unattended, and produce a report file without anyone manually running the query.`,
+        slots: [{ key: "missing", label: "What does the SQL query alone still lack for this to be a real automation?", options: [
+          { value: "correct", label: "A scheduled trigger, and fault-tolerant handling of a month where the data might be incomplete or malformed" },
+          { value: "wrong1", label: "Nothing, a correct GROUP BY query is already a complete automation" },
+          { value: "wrong2", label: "A more complex SQL query with more JOINs" },
+          { value: "wrong3", label: "Converting the GROUP BY into a Tableau calculated field instead" },
+        ] }],
+        correct: { missing: "correct" },
+      };
+    },
+    hints: [
+      "Correct LOGIC (what the query computes) and a genuine AUTOMATION (a query that runs unattended, on a schedule, reliably) are two different concerns, a correct query on its own doesn't run itself.",
+      "\"Every month, unattended\" needs something outside the query itself, a scheduler (cron, a workflow tool, a scheduled Power BI/database job) to actually trigger it.",
+      "\"Unattended\" also means nobody's watching for a bad month's data, the automation layer needs to handle a malformed or incomplete month without crashing silently, the exact fault-tolerance theme from the Automation library's own Stage 1 and Stage 3.",
+      "A scheduled trigger, plus fault-tolerant handling of bad or incomplete data." ],
+    explanation: { why: "A SQL query only computes an answer when something runs it, turning that into a genuine automation needs a scheduling mechanism (something that triggers the query on a recurring basis, unattended) AND fault tolerance (so one bad or incomplete month doesn't silently break or corrupt the whole recurring process), neither of which the query's own GROUP BY logic provides.", mistake: "Assuming a correct query is already \"automated\" just because it computes the right answer conflates correctness with automation, a script or query that requires someone to manually run it every month isn't automated at all, no matter how correct its logic is.", tip: "This exact distinction, correct LOGIC vs genuine AUTOMATION, is the central theme of the entire Automation library, a scheduler and fault tolerance are the two pieces that turn a one-off correct answer into something safe to leave running unattended.", business: "A monthly report that a stakeholder currently has to remember to manually run is a common, real automation opportunity, but automating it means more than copy-pasting the query into a script, it means adding a schedule and handling the inevitable month where the data isn't quite right." } },
+
+  { id: "ct-10", skill: SKILL_ID_SELECT, tool: "integrated", level: "mastery", difficulty: "mastery", prerequisite: ["ct-02", "ct-09"],
+    title: "Python &rarr; Automation: what makes a script a real automation",
+    objective: "Recognize the specific properties that separate a one-off analysis script from a genuine, safe-to-schedule automation, and justify the distinction.",
+    build() {
+      return {
+        scenarioHtml: `You have a working pandas script: it reads a CSV, filters to Completed orders, and prints a total. A stakeholder wants to run this EVERY DAY, unattended, without anyone watching it or manually fixing anything if a file looks different one day.`,
+        slots: [{ key: "properties", label: "Which combination of properties does this script need to become a real, safe-to-schedule automation?", options: [
+          { value: "correct", label: "Idempotency (safe to re-run), fault tolerance (skips bad rows instead of crashing), and a way to report what happened (a summary or alert), not just a printed total" },
+          { value: "wrong1", label: "Just a faster pandas implementation, using more vectorized operations" },
+          { value: "wrong2", label: "Converting the script to use SQL instead of pandas" },
+          { value: "wrong3", label: "Adding more print() statements throughout the script" },
+        ] }],
+        correct: { properties: "correct" },
+      };
+    },
+    written: {
+      label: "Pick ONE of the three properties above, and explain with a concrete scenario what goes wrong if this script is missing it.",
+      placeholder: "Pick idempotency, fault tolerance, or reporting, then describe a specific day where the script runs unattended and something goes wrong because that property is missing...",
+      check: (text) => /\b(idempot|fault.toleran|crash|re-run|rerun|report|alert|summary)\b/i.test(text) && /\b(fail|wrong|crash|break|silent|unattended|error)\b/i.test(text) && text.trim().length > 40,
+      hint: "Pick one property and walk through a concrete failure: without idempotency, re-running the script after a failure could double-count a day's total, without fault tolerance, one malformed row crashes the entire unattended run with nobody there to notice or fix it, without reporting, the script could be silently producing wrong numbers for days before anyone happens to check." },
+    hints: [
+      "This combines the exact themes of the Automation library's own three stages, a script that only prints a number is missing everything that makes it safe to run unattended, every day, without supervision.",
+      "Idempotency means running it twice on the same day's data doesn't double-count anything, essential if the schedule ever has to re-run after a failure.",
+      "Fault tolerance means one malformed row (a bad date, a missing field) gets skipped and counted, not left to crash the entire unattended run with nobody watching.",
+      "Idempotency, fault tolerance, and a way to report what happened (not just a printed number nobody's there to read)." ],
+    explanation: { why: "This combines every major theme from the Automation library's three stages, idempotency (Stage 2's re-run-safety lesson), fault tolerance (Stage 1 and Stage 3's skip-and-count-bad-rows lesson), and reporting (Stage 2's alert-and-summary lesson), into the single judgment call of recognizing what separates working analysis code from a script that's actually safe to leave running unattended every day.", mistake: "Treating \"it works when I run it\" as equivalent to \"it's ready to automate\" is the exact gap this task is built around, a script that works fine when a human is watching and can fix problems as they appear can fail in ways that go completely unnoticed the moment nobody's watching it run.", tip: "Before scheduling any working script to run unattended, ask specifically: what happens if I run this twice by accident, what happens if today's file has one bad row, and how would I even find out if something went wrong, those three questions map directly onto idempotency, fault tolerance, and reporting.", business: "This is deliberately the final, least guided task in this batch, and mirrors the exact judgment a real analyst has to apply before promoting any working script from \"something I run by hand when I remember to\" to \"something that runs itself every day\", getting it wrong doesn't cause an error message, it causes silent, undetected wrong numbers." } },
+];
+
+/* ================= grading =================
+   Anti-cheat: identical 3-consecutive-fresh-scenarios streak
+   mechanism as the Tableau and Power BI libraries. */
+const taskState = {};
+function ensureDraw(t) {
+  if (!taskState[t.id]) taskState[t.id] = { draw: t.build(), streak: 0 };
+  return taskState[t.id];
+}
+function checkTask(id) {
+  const t = TASKS.find(x => x.id === id);
+  const st = ensureDraw(t);
+  const resultsEl = document.getElementById("results_" + id);
+  let allCorrect = true;
+  const wrongSlots = [];
+  st.draw.slots.forEach(slot => {
+    const sel = document.getElementById(`slot_${id}_${slot.key}`);
+    const val = sel ? sel.value : null;
+    if (val !== st.draw.correct[slot.key]) { allCorrect = false; wrongSlots.push(slot.label); }
+  });
+
+  let writtenPass = true;
+  if (t.written) {
+    const writtenText = (document.getElementById("written_" + id) || {}).value || "";
+    writtenPass = t.written.check(writtenText);
+  }
+
+  if (allCorrect && writtenPass) {
+    st.streak++;
+  } else {
+    st.streak = 0;
+  }
+
+  const verdict = document.createElement("div");
+  if (st.streak >= 3) {
+    verdict.className = "feedback ok";
+    verdict.innerHTML = `<b>Correct, 3 fresh scenarios in a row.</b> That's real evidence this wasn't a memorized click sequence, since the field and business ask were re-randomized each time.`;
+    PracticeProgress.recordAttempt(id, true);
+    openTasks.add(id);
+  } else if (allCorrect && !writtenPass) {
+    verdict.className = "feedback bad";
+    verdict.innerHTML = `<b>Choice correct, but the written answer needs more.</b> ${esc(t.written.hint)}`;
+    PracticeProgress.recordAttempt(id, false);
+  } else if (!allCorrect) {
+    verdict.className = "feedback bad";
+    verdict.innerHTML = `<b>Not quite.</b> Re-check: ${wrongSlots.map(esc).join(", ")}. Streak reset, a new scenario has been drawn below.`;
+    PracticeProgress.recordAttempt(id, false);
+    st.draw = t.build();
+  } else {
+    const remaining = 3 - st.streak;
+    verdict.className = "feedback ok";
+    verdict.innerHTML = `<b>Correct (${st.streak}/3).</b> ${remaining} more fresh scenario${remaining === 1 ? "" : "s"} to confirm this wasn't luck.`;
+    PracticeProgress.recordAttempt(id, false);
+    st.draw = t.build();
+  }
+  resultsEl.innerHTML = "";
+  resultsEl.appendChild(verdict);
+  if (st.streak >= 3 && t.explanation) resultsEl.insertAdjacentHTML("beforeend", buildExplainHtml(t.explanation));
+  renderTasks();
+  renderSkillBar();
+}
+
+/* ================= rendering ================= */
+function tierLabel(tier) { return { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" }[tier]; }
+function renderSkillBar() {
+  const order = ["not-started", "introduced", "practicing", "competent", "mastered"];
+  const wrap = document.getElementById("skillBars");
+  wrap.innerHTML = SKILLS.map(s => {
+    const prog = PracticeProgress.skillProgress(TASKS, s.id);
+    const reachedIdx = order.indexOf(prog.tier);
+    const ladder = order.slice(1).map((t, i) => `<span class="${i + 1 <= reachedIdx ? "reached" : ""}">${tierLabel(t)}</span>`).join("");
+    return `<div class="skillbar">
+      <div class="skillrow">
+        <span style="font-weight:700;font-size:14.5px">${esc(s.label)}</span>
+        <span class="tierpill t-${prog.tier}">${tierLabel(prog.tier)}</span>
+        <div class="skillbarwrap"><div class="fill" style="width:${prog.pct}%"></div></div>
+        <span class="mono" style="font-size:12.5px;color:var(--mut2)">${prog.passedCount} / ${prog.totalCount} tasks</span>
+      </div>
+      <div class="tierladder">${ladder}</div>
+    </div>`;
+  }).join("");
+  const next = PracticeProgress.recommendNext(TASKS);
+  if (!document.getElementById("nextUpBlock")) {
+    const block = document.createElement("div");
+    block.className = "skillbar";
+    block.id = "nextUpBlock";
+    block.innerHTML = `<div class="nextup" id="nextUp"></div>`;
+    wrap.after(block);
+  }
+  const target = document.getElementById("nextUp");
+  const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
+  target.innerHTML = next
+    ? `<b>What should I do next?</b> ${esc(next.title.replace(/&rarr;/g, "→"))} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
+    : `<b>What should I do next?</b> All ${TASKS.length} Batch 1 tasks passed. Batch 2 isn't built yet.`;
+}
+function buildHintsHtml(hints) {
+  const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
+  return `<div class="hints">${hints.map((h, i) => `<details><summary>${labels[i]}</summary><div class="hbody">${esc(h)}</div></details>`).join("")}</div>`;
+}
+function buildExplainHtml(ex) {
+  if (!ex) return "";
+  const rows = [["Why this works", ex.why], ["Common mistake", ex.mistake], ["Real analyst tip", ex.tip], ["Business interpretation", ex.business]].filter(([, v]) => v);
+  return `<div class="explainbox">${rows.map(([lbl, v]) => `<div class="erow"><div class="elbl">${esc(lbl)}</div><p>${esc(v)}</p></div>`).join("")}</div>`;
+}
+
+const openTasks = new Set();
+const resultsDrafts = {};
+const writtenDrafts = {};
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  TASKS.forEach(t => {
+    const openEl = document.getElementById("body_" + t.id);
+    if (openEl && openEl.classList.contains("open")) openTasks.add(t.id);
+    const res = document.getElementById("results_" + t.id);
+    if (res && res.innerHTML) resultsDrafts[t.id] = res.innerHTML;
+    const wr = document.getElementById("written_" + t.id);
+    if (wr) writtenDrafts[t.id] = wr.value;
+  });
+  list.innerHTML = "";
+  TASKS.forEach((t, idx) => {
+    const state = PracticeProgress.getTaskState(t.id);
+    const prereqsMet = t.prerequisite.every(pid => PracticeProgress.getTaskState(pid).passed);
+    const st = prereqsMet ? ensureDraw(t) : null;
+    const card = document.createElement("div");
+    card.className = "taskcard";
+    card.innerHTML = `
+      <div class="taskhead" data-id="${t.id}">
+        <span class="statusdot ${state.passed ? "passed" : ""}"></span>
+        <span class="tid">${String(idx + 1).padStart(2, "0")}</span>
+        <span class="ttitle">${t.title}</span>
+        <span class="levelpill ${t.level}">${t.level.replace("semiguided", "semi-guided")}</span>
+      </div>
+      <div class="taskbody${openTasks.has(t.id) ? " open" : ""}" id="body_${t.id}">
+        <div class="objective"><b>Objective:</b> ${esc(t.objective)}</div>
+        ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
+        <div class="scenario">${st.draw.scenarioHtml}</div>
+        ${!state.passed ? `<div class="streakrow">${[0,1,2].map(i => `<span class="streakdot ${i < st.streak ? "hit" : ""}"></span>`).join("")}<span class="mono" style="font-size:11px;color:var(--mut2)">3 correct in a row on fresh scenarios required</span></div>` : ""}
+        <div class="slotgrid">
+          ${st.draw.slots.map(slot => `<div class="slotfield"><label>${esc(slot.label)}</label><select id="slot_${t.id}_${slot.key}">${slot.options.map(o => `<option value="${esc(o.value)}">${esc(o.label)}</option>`).join("")}</select></div>`).join("")}
+        </div>
+        ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
+        <div class="dagctrl">
+          <button class="primary" data-check="${t.id}">&#10003; Check answer</button>
+        </div>
+        <div id="results_${t.id}">${resultsDrafts[t.id] || ""}</div>
+        ${buildHintsHtml(t.hints)}
+        `}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll(".taskhead").forEach(head => {
+    head.addEventListener("click", () => {
+      const body = document.getElementById("body_" + head.dataset.id);
+      body.classList.toggle("open");
+    });
+  });
+  list.querySelectorAll("[data-check]").forEach(btn => {
+    btn.addEventListener("click", () => checkTask(btn.dataset.check));
+  });
+}
+
+renderSkillBar();
+renderTasks();
+</script>
+<script src="course-rail.js?v=5"></script>
+</body>
+</html>
