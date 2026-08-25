@@ -1,0 +1,22 @@
+appointment_id,patient_id,department,scheduled_date,status,wait_time_minutes,provider
+A-4001,P-501,Cardiology,2025-03-03,Completed,22,Dr. Nkemelu
+A-4002,P-502,cardiology,2025-03-03,No-Show,,Dr. Nkemelu
+A-4003,P-503,Orthopedics,2025-03-04,Completed,14,Dr. Salas
+A-4004,P-504,Orthopedics,2025-03-04,Cancelled,,Dr. Salas
+A-4005,P-505,General Practice,2025-03-04,Completed,9,Dr. Chen
+A-4006,P-506,General Practice,2025-03-05,Completed,41,Dr. Chen
+A-4007,P-507,Cardiology,2025-03-05,Completed,18,Dr. Nkemelu
+A-4008,P-508,Dermatology,2025-03-05,Completed,7,Dr. Osei
+A-4009,P-509,General Practice,2025-03-06,No-Show,,Dr. Chen
+A-4003,P-503,Orthopedics,2025-03-04,Completed,14,Dr. Salas
+A-4010,P-510,orthopedics,2025-03-06,Completed,35,Dr. Salas
+A-4011,P-511,Dermatology,2025-03-06,Completed,11,Dr. Osei
+A-4012,P-512,Cardiology,2025-03-07,Cancelled,,Dr. Nkemelu
+A-4013,P-513,General Practice,2025-03-07,Completed,52,Dr. Chen
+A-4014,P-514,Dermatology,2025-03-07,Completed,6,Dr. Osei
+A-4015,P-515,Orthopedics,2025-03-10,Completed,19,Dr. Salas
+A-4016,P-516,Cardiology,2025-03-10,Completed,25,Dr. Nkemelu
+A-4017,P-517,General Practice,2025-03-10,No-Show,,Dr. Chen
+A-4018,P-518,Dermatology,2025-03-11,Completed,8,Dr. Osei
+A-4019,P-519,Orthopedics,2025-03-11,Completed,44,Dr. Salas
+A-4020,P-520,General Practice,2025-03-11,Completed,13,Dr. Chen

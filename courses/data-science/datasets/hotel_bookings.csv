@@ -1,0 +1,17 @@
+booking_id,guest_name,room_type,check_in,check_out,nights,rate_per_night,total_amount,status,channel
+B-5001,J. Alvarez,Standard,2025-06-02,2025-06-05,3,129,387,Confirmed,Direct
+B-5002,M. Kowalski,Deluxe,2025-06-03,2025-06-04,1,189,189,Confirmed,OTA
+B-5003,S. Nakamura,Suite,2025-06-04,2025-06-09,5,299,1495,confirmed,Corporate
+B-5004,R. Osei,Standard,2025-06-05,2025-06-06,1,129,,Cancelled,OTA
+B-5005,T. Nguyen,Deluxe,06/06/2025,06/09/2025,3,189,567,Confirmed,Direct
+B-5006,L. Fischer,Standard,2025-06-07,2025-06-08,1,129,129,No-Show,OTA
+B-5007,A. Haddad,Suite,2025-06-08,2025-06-10,2,299,598,Confirmed,Corporate
+B-5008,K. Johansson,Deluxe,2025-06-09,2025-06-11,2,189,,Confirmed,Direct
+B-5009,P. Kovacs,Standard,2025-06-10,2025-06-12,2,129,258,confirmed,OTA
+B-5003,S. Nakamura,Suite,2025-06-04,2025-06-09,5,299,1495,Confirmed,Corporate
+B-5010,D. Mensah,Suite,2025-06-11,2025-06-13,2,299,598,Cancelled,Corporate
+B-5011,E. Petrova,Standard,2025-06-12,2025-06-13,1,129,129,Confirmed,Direct
+B-5012,W. Tan,Deluxe,2025-06-13,2025-06-16,3,189,567,Confirmed,OTA
+B-5013,C. Dubois,Suite,2025-06-14,2025-06-15,1,299,299,No-Show,Corporate
+B-5014,H. Ibrahim,Standard,2025-06-15,2025-06-18,3,129,,Confirmed,OTA
+B-5015,N. Larsen,Deluxe,2025-06-16,2025-06-17,1,189,189,Confirmed,Direct

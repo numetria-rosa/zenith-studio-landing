@@ -1,0 +1,21 @@
+sku,product_name,category,store_location,unit_cost,unit_price,units_in_stock,units_sold_mtd,last_restock_date
+RS-1001,Trail Runner Backpack,Outdoor,Downtown,32.50,79.99,14,22,2025-05-02
+RS-1002,Insulated Water Bottle,outdoor,Downtown,6.20,18.99,41,35,2025-05-10
+RS-1003,Men's Fleece Jacket,Apparel,Downtown,24.00,,8,19,2025-04-28
+RS-1004,Women's Fleece Jacket,Apparel,Downtown,24.00,59.99,3,27,2025-04-28
+RS-1005,Wireless Earbuds,Electronics,Downtown,18.75,49.99,0,31,2025-05-15
+RS-1006,Bluetooth Speaker,Electronics,Downtown,22.00,54.99,12,14,2025-05-01
+RS-1007,Ceramic Dinner Set,Home,Downtown,15.40,,17,9,2025-04-15
+RS-1001,Trail Runner Backpack,Outdoor,Westside,32.50,79.99,6,18,2025-05-03
+RS-1002,Insulated Water Bottle,Outdoor,Westside,6.20,18.99,29,20,2025-05-11
+RS-1003,Men's Fleece Jacket,apparel,Westside,24.00,59.99,11,12,2025-04-27
+RS-1008,Kids' Rain Boots,Apparel,Westside,9.10,24.99,22,8,2025-04-20
+RS-1009,Camping Lantern,Outdoor,Westside,11.30,29.99,15,17,2025-05-06
+RS-1010,Cast Iron Skillet,Home,Westside,13.80,34.99,9,,2025-04-18
+RS-1006,Bluetooth Speaker,Electronics,Northgate,22.00,54.99,4,26,2025-05-02
+RS-1011,Standing Desk Mat,Home,Northgate,10.50,27.99,19,11,2025-04-30
+RS-1012,Yoga Mat,Outdoor,Northgate,7.90,,33,24,2025-05-08
+RS-1005,Wireless Earbuds,Electronics,Northgate,18.75,49.99,2,29,2025-05-14
+RS-1013,Running Shorts,Apparel,Northgate,8.40,21.99,26,16,2025-04-22
+RS-1014,Throw Blanket,Home,Northgate,9.75,24.99,0,33,2025-04-10
+RS-1001,Trail Runner Backpack,Outdoor,Downtown,32.50,79.99,14,22,2025-05-02

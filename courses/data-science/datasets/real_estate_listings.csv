@@ -1,0 +1,18 @@
+listing_id,address,city,bedrooms,bathrooms,sqft,list_price,days_on_market,status,sold_price
+L-3001,142 Birch St,Rivertown,3,2,1450,389000,18,Sold,382000
+L-3002,88 Harbor Ave,Rivertown,2,1,980,265000,42,Active,
+L-3003,27 Maple Ct,Lakeside,4,3,2200,545000,9,Sold,551000
+L-3004,510 Elm Dr,Rivertown,3,2,1600,,31,active,
+L-3005,19 Cedar Ln,Lakeside,2,2,1100,299000,64,Active,
+L-3006,73 Pinecrest Rd,Hillview,5,4,3100,725000,12,sold,712000
+L-3007,4 Willow Way,Hillview,3,2,1520,410000,,Pending,
+L-3008,220 Ocean Blvd,Lakeside,1,1,720,215000,50,Active,
+L-3009,66 Ridge Ter,Hillview,4,3,2400,,7,Sold,618000
+L-3003,27 Maple Ct,Lakeside,4,3,2200,545000,9,Sold,551000
+L-3010,15 Brookside Dr,Rivertown,2,1,950,240000,88,Active,
+L-3011,301 Summit Ave,Hillview,3,2,1680,435000,22,Sold,428000
+L-3012,58 Meadow Ln,Lakeside,3,2,1580,,15,Pending,
+L-3013,9 Fairway Ct,Hillview,4,3,2350,589000,,Active,
+L-3014,412 Bayview Rd,Lakeside,2,2,1200,315000,29,sold,309000
+L-3015,77 Chestnut St,Rivertown,3,2,1490,,5,Sold,395000
+L-3016,140 Grandview Dr,Hillview,5,4,3300,,11,Active,
