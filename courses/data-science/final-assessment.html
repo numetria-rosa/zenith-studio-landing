@@ -59,8 +59,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Final competency assessment</span>
-    <h1 class="serif" id="pageTitle">Eight scenarios you haven't seen</h1>
-    <p class="sub">Novel scenarios, different numbers and framing than anything in the 9 modules or the Quiz Center. Answer order is randomized. If you can only pass by recognizing a memorized pattern, you'll get these wrong, on purpose. Passing score: 80% (7/8, rounded). Unlimited attempts, each with a fresh shuffle.</p>
+    <h1 class="serif" id="pageTitle">Scenarios you haven't seen, plus a written recommendation</h1>
+    <p class="sub">Novel scenarios, different numbers and framing than anything in the 9 modules or the Quiz Center, now spanning SQL, Excel, Python, statistics, visualization, dashboards, Tableau, Power BI, automation, and cross-tool reasoning. Answer order is randomized. If you can only pass by recognizing a memorized pattern, you'll get these wrong, on purpose. Passing requires 80%+ on the scenarios AND an accepted written recommendation for the final case. Unlimited attempts, each with a fresh shuffle.</p>
   </header>
 
   <section id="introSection">
@@ -70,6 +70,12 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
   <section id="qSection" style="display:none">
     <div class="qgrid" id="qgrid"></div>
+    <div class="qcard" id="writtenCard" style="margin-top:16px">
+      <div class="qn">Written business recommendation</div>
+      <div class="qtext">A company's Q3 revenue grew 20% versus Q2, but gross margin fell from 42% to 31% over the same period. In 2-3 sentences, what do you recommend leadership actually do next?</div>
+      <textarea id="writtenBox" rows="4" style="width:100%;font-family:'IBM Plex Sans';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical" placeholder="Think about what a falling margin alongside rising revenue could mean, and what should actually be investigated before anyone celebrates the growth number..."></textarea>
+      <div class="feedback" id="writtenFb" style="margin-top:10px"></div>
+    </div>
     <div class="feedback" id="overallFb" style="margin-top:20px"></div>
   </section>
 
@@ -77,7 +83,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 </div>
 
 <div class="scoreboard" id="scoreboard" style="display:none"><div class="in">
-  <span class="mono sc" id="scoreDisplay">0 / 8 answered</span>
+  <span class="mono sc" id="scoreDisplay">0 / 15 answered</span>
   <button id="btnRetake" style="display:none">↺ Retake with new scenarios</button>
   <button class="primary nextbtn" id="btnFinish" disabled>Finish assessment</button>
 </div></div>
@@ -141,6 +147,48 @@ const POOL = [
       { t: "Nothing, a clear correlation like this is enough to justify the conclusion", correct: false, why: "Correlation alone doesn't establish which way the causation runs, or whether a third factor explains both, this is exactly the trap correlation-vs-causation reasoning exists to catch." },
       { t: "The company needs a bigger dataset before any interpretation is possible", correct: false, why: "Sample size isn't the core issue here, the issue is the DIRECTION of causation is unclear, more of the same kind of data wouldn't resolve that on its own." },
     ]},
+  { id: "fa_tableau", tag: "Tableau (novel scenario)",
+    text: "A Tableau view already has region on Rows and SUM(amount) on Columns, a bar chart. You want to break each existing bar down by category with color, WITHOUT changing the Rows/Columns layout. Where does category go?",
+    opts: [
+      { t: "The Color shelf, it adds a visual breakdown to the existing layout without restructuring it", correct: true },
+      { t: "Add it to Rows alongside region", correct: false, why: "Adding a second Dimension to Rows restructures the layout into a grid, exactly what the question said NOT to do, Color adds detail without touching layout." },
+      { t: "The Filters shelf", correct: false, why: "Filters restricts which data appears at all, it doesn't add a color-coded breakdown, that's a fundamentally different operation." },
+    ]},
+  { id: "fa_powerbi", tag: "Power BI (novel scenario)",
+    text: "A Power BI Measure, Total Revenue = SUM(Orders[amount]), shows a DIFFERENT number in every row of a table visual broken out by region, even though the formula never mentions region at all. Why?",
+    opts: [
+      { t: "Filter context, the visual applies an implicit per-row filter, and the Measure recalculates fresh within whatever filter context surrounds it", correct: true },
+      { t: "The Measure's formula must have a hidden bug", correct: false, why: "This is completely normal, expected Power BI behavior, not a bug, a Measure is supposed to recompute within whatever filter context it's placed in." },
+      { t: "Power BI is caching a different value for each row randomly", correct: false, why: "This isn't random caching, it's deterministic, the same Measure always produces the same number for a given filter context, that's the whole point of filter context." },
+    ]},
+  { id: "fa_automation", tag: "Automation (novel scenario)",
+    text: "A scheduled script recomputes an ENTIRE month's revenue from scratch every night (it doesn't add to any running total, it just recalculates the full figure fresh each time). A teammate warns this could 'double-count' if it accidentally runs twice in one night. Are they right?",
+    opts: [
+      { t: "No, a script that recomputes fresh from scratch each run (rather than accumulating onto saved state) is idempotent, running it twice produces the same correct number, not a doubled one", correct: true },
+      { t: "Yes, any automated script risks double-counting if it runs more than once", correct: false, why: "That's true for a script that ACCUMULATES onto saved state (adding to a running total), but this script recomputes fresh from scratch every time, a fundamentally different, safer design, the teammate is overgeneralizing." },
+      { t: "It depends on which day of the month it runs", correct: false, why: "The day of the month is irrelevant here, what matters is whether the script accumulates onto prior state or recomputes fresh, this script does the latter, which is safe to re-run regardless of timing." },
+    ]},
+  { id: "fa_crosstool", tag: "Cross-tool reasoning (novel scenario)",
+    text: "A stakeholder says \"I don't trust this revenue number, it was computed in Python.\" Which response genuinely verifies it, rather than just repeating the same risk?",
+    opts: [
+      { t: "Independently recompute the same figure a different way, e.g. a SQL query against the same underlying data, then reconcile the two within a reasonable tolerance", correct: true },
+      { t: "Re-run the exact same Python script again and report the same result", correct: false, why: "Running the identical process a second time reproduces the exact same number, and the exact same bug if there is one, it looks like verification but provides none." },
+      { t: "Round the number to fewer decimal places", correct: false, why: "Changing the number's precision doesn't verify its correctness at all, it just changes how it's displayed." },
+    ]},
+  { id: "fa_definition", tag: "Terminology (novel scenario)",
+    text: "A colleague says \"Data Analytics and Data Analysis are basically two completely different, unrelated fields.\" What's the accurate relationship?",
+    opts: [
+      { t: "Data Analysis is the process of examining data to understand what happened and why, Data Analytics is the broader discipline that includes data analysis plus collection, preparation, modeling, visualization, and decision support, analysis is a core part of analytics, not a separate field", correct: true },
+      { t: "They're identical in every sense, completely interchangeable words with zero distinction of any kind", correct: false, why: "There is a real distinction, Data Analysis specifically refers to the examining-data process itself, Data Analytics is the broader umbrella discipline, but that distinction doesn't make them unrelated fields, one is part of the other." },
+      { t: "Data Analytics only refers to machine learning and predictive modeling", correct: false, why: "Machine learning is one possible piece of a broader analytics practice, but Data Analytics as a discipline covers far more than that, including the core descriptive analysis, cleaning, visualization, and reporting work this course teaches." },
+    ]},
+  { id: "fa_margin", tag: "Business judgment (novel scenario)",
+    text: "A report shows revenue grew 20% this quarter, and a stakeholder is celebrating. You also notice gross margin fell from 42% to 31% in the same period. What should you check before agreeing this is good news?",
+    opts: [
+      { t: "Whether costs grew even faster than revenue, a revenue increase paired with a falling margin can mean the business is making LESS actual profit per dollar sold, not more", correct: true },
+      { t: "Nothing else, revenue growth is always the number that matters most", correct: false, why: "Revenue growing while margin falls can mean the company is selling more but keeping less of each dollar, sometimes even losing more money overall, the margin drop is a real, material fact worth investigating before celebrating." },
+      { t: "Whether the 20% figure was calculated correctly, margin isn't relevant to a revenue claim", correct: false, why: "Margin is directly relevant, revenue and margin together determine actual profit, looking at revenue growth alone while ignoring a falling margin can miss the more important story entirely." },
+    ]},
 ];
 
 let ASSESSMENT = [];
@@ -196,19 +244,34 @@ function renderQuestions(){
   });
 }
 
+function checkWritten(text) {
+  const t = (text || "").trim();
+  return t.length > 40 && /\b(margin|cost|profit|investigate|expense)\b/i.test(t) && /\b(before|check|why|driv|understand|reason)\b/i.test(t);
+}
+
 function checkDone(){
-  const allDone = Object.keys(answered).length === ASSESSMENT.length;
-  document.getElementById("scoreDisplay").textContent = `${Object.keys(answered).length} / ${ASSESSMENT.length} answered`;
+  const allMcDone = Object.keys(answered).length === ASSESSMENT.length;
+  const writtenText = document.getElementById("writtenBox").value;
+  const writtenOk = checkWritten(writtenText);
+  const totalItems = ASSESSMENT.length + 1;
+  const answeredCount = Object.keys(answered).length + (writtenText.trim().length > 0 ? 1 : 0);
+  document.getElementById("scoreDisplay").textContent = `${answeredCount} / ${totalItems} answered`;
+  const allDone = allMcDone && writtenText.trim().length > 0;
   document.getElementById("btnFinish").disabled = !allDone;
   if (allDone) {
-    const passed = score / ASSESSMENT.length >= 0.8;
+    const mcPassed = score / ASSESSMENT.length >= 0.8;
+    const passed = mcPassed && writtenOk;
     const fb = document.getElementById("overallFb");
     fb.className = "feedback " + (passed ? "ok" : "bad");
-    fb.textContent = `Score: ${score} / ${ASSESSMENT.length} (${Math.round(score/ASSESSMENT.length*100)}%). ${passed ? "Passed." : "Not yet at 80%, retake with a fresh shuffle any time."}`;
-    CourseProgress.setExtra("finalAssessment", { passCount: score, total: ASSESSMENT.length, passed, lastAt: new Date().toISOString() });
+    fb.textContent = `Scenario score: ${score} / ${ASSESSMENT.length} (${Math.round(score/ASSESSMENT.length*100)}%). Written recommendation: ${writtenOk ? "accepted" : "needs more, see note above"}. ${passed ? "Passed." : "Not yet passing, retake with a fresh shuffle any time."}`;
+    const wfb = document.getElementById("writtenFb");
+    wfb.className = "feedback " + (writtenOk ? "ok" : "bad");
+    wfb.textContent = writtenOk ? "Accepted, you named the margin/cost concern and that it needs investigating before treating the revenue growth as unambiguous good news." : "Needs more, mention that a falling margin alongside rising revenue needs investigating (what's driving costs up) before treating 20% growth as straightforwardly good news.";
+    CourseProgress.setExtra("finalAssessment", { passCount: score, total: ASSESSMENT.length, writtenOk, passed, lastAt: new Date().toISOString() });
     document.getElementById("btnRetake").style.display = "inline-flex";
   }
 }
+document.getElementById("writtenBox").addEventListener("input", checkDone);
 
 document.getElementById("btnStart").addEventListener("click", () => {
   document.getElementById("introSection").style.display = "none";
@@ -221,8 +284,10 @@ document.getElementById("btnRetake").addEventListener("click", () => {
   buildAssessment();
   renderQuestions();
   document.getElementById("overallFb").className = "feedback";
+  document.getElementById("writtenFb").className = "feedback";
+  document.getElementById("writtenBox").value = "";
   document.getElementById("btnRetake").style.display = "none";
-  document.getElementById("scoreDisplay").textContent = `0 / ${ASSESSMENT.length} answered`;
+  document.getElementById("scoreDisplay").textContent = `0 / ${ASSESSMENT.length + 1} answered`;
   document.getElementById("btnFinish").disabled = true;
 });
 document.getElementById("btnFinish").addEventListener("click", () => { window.location.href = "dashboard.html"; });
