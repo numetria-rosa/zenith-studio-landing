@@ -105,8 +105,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <script src="course-progress.js?v=6"></script>
 <script src="practice-progress.js"></script>
-<script src="skill-map.js?v=1"></script>
-<script src="adaptive-engine.js?v=1"></script>
+<script src="skill-map.js?v=2"></script>
+<script src="adaptive-engine.js?v=2"></script>
 <script>
 const esc = CourseProgress.escapeHtml;
 
@@ -126,7 +126,7 @@ const STAGES = [
     id: "analysis", num: "02", title: "Analysis", desc: "Turning raw data into an answer: pandas, cleaning, statistics, and SQL from basics through real business questions.",
     modules: [3, 4, 5, 6],
     categories: ["Data Handling", "Analysis"],
-    libraries: ["sql"],
+    libraries: ["sql", "statistics"],
   },
   {
     id: "visualization", num: "03", title: "Visualization & BI", desc: "Showing the finding: charting principles, then Tableau and Power BI judgment (both decision-based simulations, not live tool execution).",
@@ -170,6 +170,7 @@ function moduleNode(id) {
 
 const LIB_META = {
   sql: { file: "practice-sql.html", label: "SQL Practice Library" },
+  statistics: { file: "practice-statistics.html", label: "Statistics Practice Library" },
   excel: { file: "practice-excel.html", label: "Excel Practice Library" },
   python: { file: "practice-python.html", label: "Python Practice Library" },
   tableau: { file: "practice-tableau.html", label: "Tableau Practice Library" },
@@ -245,6 +246,6 @@ function renderRoadmap() {
 
 renderRoadmap();
 </script>
-<script src="course-rail.js?v=6"></script>
+<script src="course-rail.js?v=7"></script>
 </body>
 </html>

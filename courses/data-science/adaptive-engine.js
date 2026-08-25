@@ -21,7 +21,7 @@
   }
 
   function toolLabel(toolId) {
-    const LABELS = { sql: "SQL", excel: "Excel", python: "Python", tableau: "Tableau", powerbi: "Power BI", automation: "Automation", integrated: "Integrated Challenges" };
+    const LABELS = { sql: "SQL", excel: "Excel", python: "Python", statistics: "Statistics", tableau: "Tableau", powerbi: "Power BI", automation: "Automation", integrated: "Integrated Challenges" };
     return LABELS[toolId] || toolId;
   }
 

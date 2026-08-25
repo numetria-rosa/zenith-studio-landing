@@ -18,13 +18,14 @@
   "tableau": "practice-tableau.html",
   "powerbi": "practice-powerbi.html",
   "automation": "practice-automation.html",
-  "integrated": "practice-integrated.html"
+  "integrated": "practice-integrated.html",
+  "statistics": "practice-statistics.html"
   };
 
-  /* Every practice task in the course, id/skill/tool/level only. 275
-     entries, one per task across the 7 practice-*.html libraries (Excel
-     35, SQL 60, Python 50, Tableau 40, Power BI 40, Automation 30,
-     Integrated Cross-Tool Challenges 20). Portfolio Projects (10) are
+  /* Every practice task in the course, id/skill/tool/level only. 315
+     entries, one per task across the 8 practice-*.html libraries (Excel
+     35, SQL 60, Python 50, Statistics 40, Tableau 40, Power BI 40,
+     Automation 30, Integrated Cross-Tool Challenges 20). Portfolio Projects (10) are
      tracked separately via CourseProgress.PROJECTS, a different evidence
      system (self-assessed rubric, not auto-graded task passes), rolled
      up into the "Portfolio / Project Delivery" master skill below. */
@@ -303,7 +304,47 @@
   { id: "ct-17", skill: "integrated-stakeholder-translation", tool: "integrated", level: "semiguided" },
   { id: "ct-18", skill: "integrated-stakeholder-translation", tool: "integrated", level: "semiguided" },
   { id: "ct-19", skill: "integrated-stakeholder-translation", tool: "integrated", level: "challenge" },
-  { id: "ct-20", skill: "integrated-stakeholder-translation", tool: "integrated", level: "mastery" }
+  { id: "ct-20", skill: "integrated-stakeholder-translation", tool: "integrated", level: "mastery" },
+  { id: "st-d01", skill: "statistics-descriptive", tool: "statistics", level: "guided" },
+  { id: "st-d02", skill: "statistics-descriptive", tool: "statistics", level: "guided" },
+  { id: "st-d03", skill: "statistics-descriptive", tool: "statistics", level: "guided" },
+  { id: "st-d04", skill: "statistics-descriptive", tool: "statistics", level: "guided" },
+  { id: "st-d05", skill: "statistics-descriptive", tool: "statistics", level: "semiguided" },
+  { id: "st-d06", skill: "statistics-descriptive", tool: "statistics", level: "semiguided" },
+  { id: "st-d07", skill: "statistics-descriptive", tool: "statistics", level: "semiguided" },
+  { id: "st-d08", skill: "statistics-descriptive", tool: "statistics", level: "semiguided" },
+  { id: "st-d09", skill: "statistics-descriptive", tool: "statistics", level: "challenge" },
+  { id: "st-d10", skill: "statistics-descriptive", tool: "statistics", level: "mastery" },
+  { id: "st-p01", skill: "statistics-probability", tool: "statistics", level: "guided" },
+  { id: "st-p02", skill: "statistics-probability", tool: "statistics", level: "guided" },
+  { id: "st-p03", skill: "statistics-probability", tool: "statistics", level: "semiguided" },
+  { id: "st-p04", skill: "statistics-probability", tool: "statistics", level: "semiguided" },
+  { id: "st-p05", skill: "statistics-probability", tool: "statistics", level: "semiguided" },
+  { id: "st-p06", skill: "statistics-probability", tool: "statistics", level: "challenge" },
+  { id: "st-p07", skill: "statistics-probability", tool: "statistics", level: "challenge" },
+  { id: "st-p08", skill: "statistics-probability", tool: "statistics", level: "mastery" },
+  { id: "st-h01", skill: "statistics-hypothesis", tool: "statistics", level: "guided" },
+  { id: "st-h02", skill: "statistics-hypothesis", tool: "statistics", level: "guided" },
+  { id: "st-h03", skill: "statistics-hypothesis", tool: "statistics", level: "semiguided" },
+  { id: "st-h04", skill: "statistics-hypothesis", tool: "statistics", level: "semiguided" },
+  { id: "st-h05", skill: "statistics-hypothesis", tool: "statistics", level: "semiguided" },
+  { id: "st-h06", skill: "statistics-hypothesis", tool: "statistics", level: "challenge" },
+  { id: "st-h07", skill: "statistics-hypothesis", tool: "statistics", level: "challenge" },
+  { id: "st-h08", skill: "statistics-hypothesis", tool: "statistics", level: "mastery" },
+  { id: "st-c01", skill: "statistics-correlation", tool: "statistics", level: "guided" },
+  { id: "st-c02", skill: "statistics-correlation", tool: "statistics", level: "guided" },
+  { id: "st-c03", skill: "statistics-correlation", tool: "statistics", level: "semiguided" },
+  { id: "st-c04", skill: "statistics-correlation", tool: "statistics", level: "semiguided" },
+  { id: "st-c05", skill: "statistics-correlation", tool: "statistics", level: "challenge" },
+  { id: "st-c06", skill: "statistics-correlation", tool: "statistics", level: "challenge" },
+  { id: "st-c07", skill: "statistics-correlation", tool: "statistics", level: "mastery" },
+  { id: "st-b01", skill: "statistics-business", tool: "statistics", level: "semiguided" },
+  { id: "st-b02", skill: "statistics-business", tool: "statistics", level: "semiguided" },
+  { id: "st-b03", skill: "statistics-business", tool: "statistics", level: "challenge" },
+  { id: "st-b04", skill: "statistics-business", tool: "statistics", level: "challenge" },
+  { id: "st-b05", skill: "statistics-business", tool: "statistics", level: "challenge" },
+  { id: "st-b06", skill: "statistics-business", tool: "statistics", level: "mastery" },
+  { id: "st-b07", skill: "statistics-business", tool: "statistics", level: "mastery" }
   ];
 
   /* The 41 granular skills each library already tracks (its own
@@ -323,6 +364,11 @@
   "python-pandas": { label: "Python pandas", tool: "python" },
   "python-cleaning": { label: "Python Data Cleaning", tool: "python" },
   "python-eda": { label: "Python Exploratory Analysis", tool: "python" },
+  "statistics-descriptive": { label: "Statistics: Descriptive", tool: "statistics" },
+  "statistics-probability": { label: "Statistics: Probability & Sampling", tool: "statistics" },
+  "statistics-hypothesis": { label: "Statistics: Hypothesis Testing", tool: "statistics" },
+  "statistics-correlation": { label: "Statistics: Correlation & Regression", tool: "statistics" },
+  "statistics-business": { label: "Statistics: Business Judgment", tool: "statistics" },
   "python-business": { label: "Python Business Analytics", tool: "python" },
   "tableau-fields": { label: "Tableau Field Types", tool: "tableau" },
   "tableau-shelves": { label: "Tableau Shelves & Filters", tool: "tableau" },
@@ -378,7 +424,7 @@
   { id: "sql-window-master", label: "Analytical SQL / Window Functions", category: "Analysis", members: ["sql-window"] },
   { id: "sql-realworld-master", label: "Real-World SQL Analysis", category: "Analysis", members: ["sql-business"] },
   { id: "data-cleaning", label: "Data Cleaning", category: "Data Handling", members: ["python-cleaning", "powerbi-data-cleaning"] },
-  { id: "statistics", label: "Statistics", category: "Analysis", members: ["python-eda"], approximate: true, approximateNote: "No dedicated statistics practice library exists yet, this rolls up the closest evidence available, Python's exploratory-analysis stage (distributions, correlation vs. causation, signal-vs-noise tasks). Treat this tier as a lower-confidence signal than the other skills until a dedicated statistics library is built." },
+  { id: "statistics", label: "Statistics", category: "Analysis", members: ["statistics-descriptive", "statistics-probability", "statistics-hypothesis", "statistics-correlation", "statistics-business"] },
   { id: "data-visualization", label: "Data Visualization", category: "Visualization", members: ["tableau-chart-choice", "powerbi-visuals"] },
   { id: "tableau", label: "Tableau", category: "BI", members: ["tableau-fields", "tableau-shelves", "tableau-chart-choice", "tableau-table-calcs", "tableau-analytics-pane", "tableau-calc-fields", "tableau-lod"], simulation: true },
   { id: "powerbi", label: "Power BI", category: "BI", members: ["powerbi-fields", "powerbi-visuals", "powerbi-data-cleaning", "powerbi-combine-reshape", "powerbi-data-modeling", "powerbi-dax"], simulation: true },
@@ -492,7 +538,7 @@
     return MASTER_SKILLS.map((m) => Object.assign({ id: m.id, label: m.label, category: m.category, simulation: !!m.simulation, approximate: !!m.approximate, approximateNote: m.approximateNote || "" }, masterSkillProgress(m.id)));
   }
 
-  /* "What should I do next?" across ALL 275 tasks (every library at
+  /* "What should I do next?" across ALL 315 tasks (every library at
      once): the first task, in course-progression order (SQL, Excel,
      Python, Tableau, Power BI, Automation, Integrated), that hasn't
      been passed yet. Prerequisite chains are enforced within each

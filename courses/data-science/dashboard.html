@@ -194,7 +194,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <div class="overallwrap" style="margin-top:16px">
     <div class="evidencegrid">
       <div class="evcard"><div class="evval" id="evModules">0 / 9</div><div class="evlbl">Course lessons completed</div></div>
-      <div class="evcard"><div class="evval" id="evTasks">0 / 275</div><div class="evlbl">Practice tasks passed</div></div>
+      <div class="evcard"><div class="evval" id="evTasks">0 / 315</div><div class="evlbl">Practice tasks passed</div></div>
       <div class="evcard"><div class="evval" id="evSkillsMastered">0 / 21</div><div class="evlbl">Skills at Mastered</div></div>
       <div class="evcard"><div class="evval" id="evProjects">0 / 10</div><div class="evlbl">Portfolio projects completed</div></div>
     </div>
@@ -227,8 +227,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <script src="course-progress.js?v=6"></script>
 <script src="practice-progress.js"></script>
-<script src="skill-map.js?v=1"></script>
-<script src="adaptive-engine.js?v=1"></script>
+<script src="skill-map.js?v=2"></script>
+<script src="adaptive-engine.js?v=2"></script>
 <script>
 const LOCK_ICON = '<span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>';
 const descriptions = {
@@ -409,7 +409,7 @@ function renderSkills(){
    module progress above, backed by SkillMap + PracticeProgress,
    shared localStorage state with every practice-*.html page) ---------------- */
 const TIER_LABEL = { "not-started": "Not started", "introduced": "Introduced", "practicing": "Practicing", "competent": "Competent", "mastered": "Mastered" };
-const LIB_LABELS = { sql: "SQL Practice Library", excel: "Excel Practice Library", python: "Python Practice Library", tableau: "Tableau Practice Library", powerbi: "Power BI Practice Library", automation: "Automation Practice Library", integrated: "Integrated Cross-Tool Challenges" };
+const LIB_LABELS = { sql: "SQL Practice Library", excel: "Excel Practice Library", python: "Python Practice Library", statistics: "Statistics Practice Library", tableau: "Tableau Practice Library", powerbi: "Power BI Practice Library", automation: "Automation Practice Library", integrated: "Integrated Cross-Tool Challenges" };
 const SIM_TOOLS = { tableau: true, powerbi: true };
 
 function renderEvidenceOverview(){
@@ -510,6 +510,6 @@ renderEvidenceOverview();
 renderLibraryProgress();
 renderSkillMap();
 </script>
-<script src="course-rail.js?v=6"></script>
+<script src="course-rail.js?v=7"></script>
 </body>
 </html>
