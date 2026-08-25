@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Clock,
@@ -22,8 +22,58 @@ import {
   Brain,
   Wrench,
   Palette,
+  Timer,
 } from "lucide-react";
 import type { CourseCard, CourseCategory } from "./courses-data";
+
+/** Whether a time-limited discount is still active, and its live countdown
+    label. /lab is statically prerendered, so this deliberately never uses
+    Date.now() during the server render or the client's first hydration
+    pass, only inside useEffect (client-only, real wall-clock time): using
+    it in the initial render would bake a stale "Xd Xh left" string into
+    the static HTML (correct only at build time, wrong for every visitor
+    after that) and cause a hydration mismatch the moment the real
+    client-side time differs from the frozen build-time value, which it
+    always does. "active" is the safe default before mount (matches the
+    server-rendered markup exactly), self-correcting to "expired" within
+    one tick if a visitor genuinely loads the page after the deadline. */
+function useCountdown(deadline: string | undefined): { active: boolean; label: string | null } {
+  const target = deadline ? new Date(deadline).getTime() : null;
+  const [state, setState] = useState<{ mounted: boolean; msLeft: number | null }>({
+    mounted: false,
+    msLeft: null,
+  });
+  const { mounted, msLeft } = state;
+
+  // The lint rule's own suggested fixes (derive state during render, or
+  // only setState from an external-system callback) don't apply here:
+  // Date.now() can't be called during render without reintroducing the
+  // exact server/client hydration mismatch this hook exists to avoid. The
+  // "flip a mounted flag on mount, then read real time client-only" idiom
+  // is the standard, correct fix for this class of problem.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    if (!target) {
+      setState({ mounted: true, msLeft: null });
+      return;
+    }
+    const tick = () => setState({ mounted: true, msLeft: target - Date.now() });
+    tick();
+    const id = setInterval(tick, 30_000);
+    return () => clearInterval(id);
+  }, [target]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  if (!target || !mounted || msLeft === null) return { active: true, label: null };
+  if (msLeft <= 0) return { active: false, label: null };
+
+  const days = Math.floor(msLeft / 86_400_000);
+  const hours = Math.floor((msLeft % 86_400_000) / 3_600_000);
+  const minutes = Math.floor((msLeft % 3_600_000) / 60_000);
+  const label =
+    days > 0 ? `${days}d ${hours}h left` : hours > 0 ? `${hours}h ${minutes}m left` : `${Math.max(minutes, 1)}m left`;
+  return { active: true, label };
+}
 
 const TOPIC_ICONS: Record<string, typeof Database> = {
   SQL: Database,
@@ -258,21 +308,7 @@ export function CourseCatalog({
               </div>
 
               <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-                {course.price ? (
-                  <div className="flex flex-wrap items-baseline gap-2.5">
-                    <span className="text-3xl font-semibold tracking-[-0.04em]">{course.price}</span>
-                    {course.originalPrice && (
-                      <span className="text-base text-white/40 line-through">{course.originalPrice}</span>
-                    )}
-                    {typeof course.discountPercent === "number" && (
-                      <span className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-200">
-                        {course.discountPercent}% off
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <span className="text-sm text-white/45">Price to be announced</span>
-                )}
+                <PriceRow course={course} />
 
                 <a
                   href={url}
@@ -291,6 +327,51 @@ export function CourseCatalog({
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function PriceRow({ course }: { course: CourseCard }) {
+  const { active: deadlineActive, label: countdown } = useCountdown(course.discountDeadline);
+  const discountLive = Boolean(course.discountPercent) && deadlineActive;
+
+  if (!course.price) {
+    return <span className="text-sm text-white/45">Price to be announced</span>;
+  }
+
+  // Once the deadline passes, the sale is over: show the real list price
+  // plain, no strikethrough, no badge, matching what was actually promised.
+  const displayPrice = discountLive ? course.price : course.originalPrice ?? course.price;
+
+  // timeZone: "UTC" is required here, not cosmetic: discountDeadline is
+  // written in UTC, and formatting it in the viewer's local zone can roll
+  // the displayed calendar date forward or back a day depending on their
+  // offset (confirmed live: showed "September 1" for a UTC deadline of
+  // August 31 23:59:59 in a timezone ahead of UTC). Fixing the displayed
+  // date to UTC keeps it exactly what was promised, for every viewer.
+  const deadlineLabel = course.discountDeadline
+    ? new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" }).format(
+        new Date(course.discountDeadline)
+      )
+    : null;
+
+  return (
+    <div className="flex flex-wrap items-baseline gap-2.5">
+      <span className="text-3xl font-semibold tracking-[-0.04em]">{displayPrice}</span>
+      {discountLive && course.originalPrice && (
+        <span className="text-base text-white/40 line-through">{course.originalPrice}</span>
+      )}
+      {discountLive && typeof course.discountPercent === "number" && (
+        <span className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-200">
+          {course.discountPercent}% off{deadlineLabel ? ` until ${deadlineLabel}` : ""}
+        </span>
+      )}
+      {discountLive && countdown && (
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-200/80">
+          <Timer className="h-3.5 w-3.5" aria-hidden />
+          {countdown}
+        </span>
+      )}
     </div>
   );
 }

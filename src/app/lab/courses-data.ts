@@ -31,10 +31,16 @@ export type CourseCard = {
   portfolioProjects?: number;
   hasCapstone?: boolean;
   price?: string;
-  /** Real, permanent (not a limited-time offer) list price this course discounts from, when it has one. */
+  /** List price this course discounts from, when it has one. Shown once discountDeadline passes, if set. */
   originalPrice?: string;
   /** Real percent-off, computed from price/originalPrice, not a marketing round-number. */
   discountPercent?: number;
+  /** ISO timestamp the discount actually ends at. The real Whop plan price has to be
+      raised back to originalPrice by hand on this date too (Whop's API has no
+      scheduled-price-change field), see scripts/update-data-science-price.mjs. The
+      countdown and the displayed price both switch automatically once this passes,
+      whether or not that manual step has happened yet, so do it on time. */
+  discountDeadline?: string;
   summary: string;
   whatYoullDo: string[];
   topics: string[];
@@ -57,6 +63,7 @@ export const courses: CourseCard[] = [
     price: "$30",
     originalPrice: "$120",
     discountPercent: 75,
+    discountDeadline: "2026-08-31T23:59:59-00:00",
     summary:
       "Spreadsheets through a full capstone analysis: clean real messy data, query it, analyze it in Python, validate it statistically, and ship a dashboard that answers an actual business question.",
     whatYoullDo: [
