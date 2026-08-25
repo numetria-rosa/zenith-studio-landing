@@ -115,11 +115,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Practice Library &middot; Tableau &middot; Stages 1-3 of 4</span>
+    <span class="eyebrow">Practice Library &middot; Tableau &middot; Complete, Stages 1-4</span>
     <h1 class="serif">Tableau Practice Library</h1>
     <p class="sub">Decision-based practice for the reasoning behind a Tableau view: which field is a Dimension vs a Measure, which shelf it belongs on, discrete vs continuous, and which chart shape a given combination of fields actually calls for.</p>
     <div class="honestnote"><b>Honest scope note, please read:</b> this is a <b>practice simulation</b>, not real Tableau. Nothing here renders inside an actual Tableau workbook, and no click is graded by executing real Tableau software, this page can't run in a browser the way the Excel formula engine or the Python/SQL sandboxes do. What it genuinely checks is the reasoning: given a real field from a real dataset, do you know whether it's a Dimension or a Measure, which shelf it belongs on, and why. Every scenario is re-randomized on every attempt (a different field, a different business ask) specifically so a memorized click sequence can't pass, only the underlying rule can. Treat this as a rehearsal for the concepts, not a substitute for opening Tableau Public or Tableau Desktop and building a real workbook.</div>
-    <div class="scopenote"><b>Progress:</b> Stage 1 (Fundamentals), Stage 2 (Visual Analytics: quick table calculations, Compute Using, reference lines, sorting, trend lines, Top N filtering), and Stage 3 (Calculated Fields: IF/CASE syntax, string concatenation, row-level vs aggregate calculations, and FIXED/INCLUDE/EXCLUDE LOD expressions) are complete, 30 tasks. Stage 4 (Dashboards &amp; Storytelling) is not yet built.</div>
+    <div class="scopenote"><b>Progress:</b> All 4 stages are complete, 40 tasks: Fundamentals, Visual Analytics (quick table calculations, Compute Using, reference lines, sorting, trend lines, Top N filtering), Calculated Fields (IF/CASE syntax, string concatenation, row-level vs aggregate calculations, FIXED/INCLUDE/EXCLUDE LOD expressions), and Dashboards &amp; Storytelling (Tiled vs Floating, sizing, Filter/Highlight/URL actions, action triggers, device layouts, Story vs Dashboard), ending in an independent executive-dashboard-brief task.</div>
   </header>
 
   <div class="sheetblock">
@@ -206,6 +206,8 @@ const SKILL_ID_TABLECALC = "tableau-table-calcs";
 const SKILL_ID_ANALYTICS = "tableau-analytics-pane";
 const SKILL_ID_CALCFIELDS = "tableau-calc-fields";
 const SKILL_ID_LOD = "tableau-lod";
+const SKILL_ID_DASHBOARD = "tableau-dashboard-design";
+const SKILL_ID_ACTIONS = "tableau-dashboard-actions";
 const SKILLS = [
   { id: SKILL_ID_FIELDS, label: "Tableau Field Types" },
   { id: SKILL_ID_SHELVES, label: "Tableau Shelves & Filters" },
@@ -214,6 +216,8 @@ const SKILLS = [
   { id: SKILL_ID_ANALYTICS, label: "Tableau Analytics Pane" },
   { id: SKILL_ID_CALCFIELDS, label: "Tableau Calculated Fields" },
   { id: SKILL_ID_LOD, label: "Tableau LOD Expressions" },
+  { id: SKILL_ID_DASHBOARD, label: "Tableau Dashboard Design" },
+  { id: SKILL_ID_ACTIONS, label: "Tableau Dashboard Actions" },
 ];
 
 const FIELD_OPTIONS = FIELDS.map(f => ({ value: f, label: f }));
@@ -863,6 +867,216 @@ const TASKS = [
       "The comparison direction matters, [amount] (this row's own value) has to be on the side being compared TO the benchmark, not the other way around, though > and < would just flip Above/Below if reversed consistently, watch the wrong-order distractor carefully.",
       `IF [amount] > { FIXED [customer_segment] : AVG([amount]) } THEN "Above Average" ELSE "Below Average" END is correct.` ],
     explanation: { why: "This is the FIXED-LOD-as-per-row-benchmark pattern from earlier in this stage, combined with a row-level IF comparison, each row's own amount is compared against a FIXED average that's recomputed per customer_segment, exactly the two building blocks this stage covered, applied together from a plain-language request.", mistake: "Using a plain AVG([amount]) instead of the FIXED expression would compare every row against one single overall average, shared by every customer_segment, silently ignoring the \"own segment\" qualifier that was the entire point of the request.", tip: "Whenever a business rule says \"compared to its own group's average\" or \"relative to its own category\", that phrase is the signal for a FIXED LOD expression nested inside an IF, not a plain aggregation.", business: "This is deliberately the least guided task in this stage, a real stakeholder request never comes with LOD keywords attached, translating \"relative to its own segment, not the company-wide number\" into a FIXED expression nested inside an IF is the actual analyst skill this whole stage has been building toward." } },
+
+  /* ---- Stage 4: Dashboards & Storytelling ---- */
+  { id: "tb-d01", skill: SKILL_ID_DASHBOARD, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f04"],
+    title: "Tiled or Floating layout?",
+    objective: "Recognize when a dashboard needs Tableau's default auto-arranging layout vs precise, overlapping placement.",
+    build() {
+      const scenarios = [
+        { desc: "three charts that should automatically resize and rearrange to fill the dashboard as objects are added or removed", ans: "tiled" },
+        { desc: "a small KPI summary card that needs to sit in a fixed spot, overlapping the corner of a map behind it, exactly where you drag it", ans: "floating" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You're laying out a dashboard with <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "layout", label: "Which layout container fits?", options: [{ value: "tiled", label: "Tiled" }, { value: "floating", label: "Floating" }] }],
+        correct: { layout: s.ans },
+      };
+    },
+    hints: [
+      "Tiled is Tableau's default, objects snap into a grid and automatically resize as you add, remove, or resize other objects around them.",
+      "Floating lets an object sit at an exact position and size, including overlapping other objects, but it does NOT automatically resize when other objects change.",
+      "\"Automatically resize and rearrange\" describes Tiled, \"a fixed spot, overlapping\" describes Floating, that wording is the signal each time.",
+      "Match your answer to whether the scenario describes automatic rearrangement (Tiled) or a fixed, overlapping position (Floating)." ],
+    explanation: { why: "Tiled objects live in an automatically-managed grid, adding or resizing one tiled object reflows everything else around it, Floating objects instead sit at an exact, independent position and size, which is what makes overlapping possible but also means they don't reflow automatically.", mistake: "Building an entire dashboard out of floating objects because it feels more precise is a common early over-correction, it trades away the automatic resizing that makes a dashboard hold together cleanly across different numbers of visible objects or filter states.", tip: "A common real pattern is mostly Tiled, for the main charts, with one or two Floating objects layered on top for a logo, a KPI card, or a legend positioned in an unused corner.", business: "A KPI summary card meant to always sit in the same corner regardless of what else is on the dashboard is exactly the kind of element that needs Floating, an automatically-reflowing Tiled layout would push it around as other content changes." } },
+
+  { id: "tb-d02", skill: SKILL_ID_DASHBOARD, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-d01"],
+    title: "Fixed size or a responsive range?",
+    objective: "Match dashboard sizing to how and where it will actually be viewed.",
+    build() {
+      const scenarios = [
+        { desc: "displayed full-screen on a single wall-mounted TV in an office, always the exact same screen resolution", ans: "fixed" },
+        { desc: "opened by different stakeholders on laptops, tablets, and wide desktop monitors, all different screen sizes", ans: "range" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `This dashboard will be <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "sizing", label: "Which sizing approach fits?", options: [{ value: "fixed", label: "Fixed size (exact pixel dimensions)" }, { value: "range", label: "Range / Automatic (resizes within limits)" }] }],
+        correct: { sizing: s.ans },
+      };
+    },
+    hints: [
+      "A single, known, unchanging screen (like one wall-mounted TV) is exactly the case Fixed sizing is built for, an exact pixel size that never needs to adapt.",
+      "Multiple different devices and window sizes need a Range or Automatic size instead, so the dashboard can adapt rather than being cropped or leaving empty space on some screens.",
+      "\"Always the exact same resolution\" signals Fixed, \"different devices, all different screen sizes\" signals Range/Automatic.",
+      "Match your answer to whether the scenario describes one known screen (Fixed) or several different ones (Range/Automatic)." ],
+    explanation: { why: "Fixed sizing locks the dashboard to exact pixel dimensions, guaranteeing it looks identical every time on a known display, Range sizing instead lets the dashboard resize within minimum and maximum bounds, adapting to whatever screen it's actually opened on.", mistake: "Using Fixed sizing for a dashboard that stakeholders open on a mix of laptops and external monitors often results in the dashboard being cropped, showing scrollbars, or surrounded by wasted empty space on screens that don't match the fixed dimensions exactly.", tip: "A single, known, permanent display (an office TV, a kiosk) is the one case where Fixed sizing is usually the RIGHT choice, not a limitation, everywhere else, Range or Automatic tends to serve the actual audience better.", business: "A dashboard built for a wall-mounted office display genuinely benefits from Fixed sizing, since it removes any risk of an unexpected reflow disrupting a screen nobody is actively adjusting, that's a real, deliberate exception to \"always design responsively\"." } },
+
+  { id: "tb-d03", skill: SKILL_ID_ACTIONS, tool: "tableau", level: "guided", difficulty: "core", prerequisite: ["tb-f07"],
+    title: "A Filter action between two sheets",
+    objective: "Recognize when cross-filtering between dashboard sheets calls for a Filter action.",
+    build() {
+      const dim = pick(DIMENSION_FIELDS);
+      return {
+        scenarioHtml: `Your dashboard has a ${esc(dim)} bar chart and a detail table below it. You want clicking a bar to <b>restrict the detail table to only that ${esc(dim)}'s rows</b>, hiding everything else.`,
+        slots: [{ key: "action", label: "Which dashboard action fits?", options: [{ value: "filter", label: "Filter action" }, { value: "highlight", label: "Highlight action" }, { value: "url", label: "URL action" }] }],
+        correct: { action: "filter" },
+      };
+    },
+    hints: [
+      "\"Restrict to only that value, hiding everything else\" describes removing data from view, that's exactly what a Filter action does between sheets, the same restrict-vs-keep-everything distinction from Stage 1's Filters-vs-Color task, now at the dashboard level.",
+      "A Highlight action would keep every row visible but visually emphasize the matching ones, that's a different behavior than hiding non-matching rows.",
+      "A URL action opens an external link, it has nothing to do with filtering one sheet based on a selection in another.",
+      "Filter action." ],
+    explanation: { why: "A Filter action passes the selected value(s) from a source sheet as a filter onto one or more target sheets, restricting those target sheets to only matching rows, exactly like a Filters-shelf filter, but driven interactively by a click instead of a fixed value.", mistake: "Reaching for a Highlight action when the actual goal is to REMOVE non-matching rows from a target sheet produces a subtly wrong dashboard, the detail table would still show every row, just with the matching ones visually emphasized, not restricted.", tip: "Filter actions are the backbone of most interactive dashboards, click a summary chart, drill into filtered detail elsewhere on the same dashboard, that's the single most common dashboard interaction pattern in real BI tools.", business: "A sales manager clicking their region on a summary chart to immediately see only that region's detailed order list is a filter action doing exactly the job a static, non-interactive report never could." } },
+
+  { id: "tb-d04", skill: SKILL_ID_ACTIONS, tool: "tableau", level: "semiguided", difficulty: "core", prerequisite: ["tb-d03"],
+    title: "A Highlight action, not a Filter action",
+    objective: "Recognize when a dashboard interaction should emphasize a selection while keeping full context visible, not remove data.",
+    build() {
+      const dim = pick(DIMENSION_FIELDS);
+      return {
+        scenarioHtml: `Your dashboard has a ${esc(dim)} chart and a second chart broken out by month. You want clicking a ${esc(dim)} to <b>visually emphasize its related marks on the month chart, while still keeping every other ${esc(dim)}'s data visible for comparison</b>, nothing should disappear.`,
+        slots: [{ key: "action", label: "Which dashboard action fits?", options: [{ value: "filter", label: "Filter action" }, { value: "highlight", label: "Highlight action" }, { value: "url", label: "URL action" }] }],
+        correct: { action: "highlight" },
+      };
+    },
+    hints: [
+      "\"Keeping every other value's data visible, nothing should disappear\" rules out Filter action, that specifically removes non-matching data.",
+      "A Highlight action visually emphasizes matching marks (usually by dimming everything else) without removing any data from the view, exactly \"keep everything visible, just emphasize the selection\".",
+      "A URL action is unrelated, it opens an external link rather than affecting another sheet's marks.",
+      "Highlight action." ],
+    explanation: { why: "A Highlight action dims all non-matching marks on target sheets while keeping them present and visible, preserving full context for comparison, unlike a Filter action, no data is actually removed from any target sheet.", mistake: "Reaching for a Filter action when the goal is emphasis-with-context, rather than exclusion, would remove the very comparison data the request specifically wanted kept visible, a genuinely different (and here, wrong) interactive behavior.", tip: "The same restrict-vs-preserve distinction from Filters-vs-Color in Stage 1 reappears here as Filter-action-vs-Highlight-action, recognizing the same underlying question, remove or just emphasize, resolves both.", business: "A stakeholder comparing one region's monthly trend against every other region's for context needs Highlight, not Filter, filtering away the other regions would remove the exact comparison they're trying to make." } },
+
+  { id: "tb-d05", skill: SKILL_ID_ACTIONS, tool: "tableau", level: "semiguided", difficulty: "core", prerequisite: ["tb-d03"],
+    title: "A URL action for an external link",
+    objective: "Recognize when a dashboard interaction should leave Tableau entirely, not affect another sheet.",
+    build() {
+      return {
+        scenarioHtml: `Your dashboard shows individual orders. You want clicking an order to <b>open that customer's page in the company's external CRM system, in a new browser tab</b>, entirely outside Tableau.`,
+        slots: [{ key: "action", label: "Which dashboard action fits?", options: [{ value: "filter", label: "Filter action" }, { value: "highlight", label: "Highlight action" }, { value: "url", label: "URL action" }] }],
+        correct: { action: "url" },
+      };
+    },
+    hints: [
+      "Filter and Highlight actions both affect OTHER SHEETS inside the same Tableau dashboard, this request wants to leave Tableau entirely.",
+      "A URL action opens a web address, built dynamically from field values in the clicked mark, exactly what's needed to jump to an external system.",
+      "Neither Filter nor Highlight can open an external website, that's specifically what URL actions exist for.",
+      "URL action." ],
+    explanation: { why: "A URL action constructs a web address (often dynamically, using field values from the clicked mark, like a customer ID) and opens it, typically in a new browser tab, entirely outside the Tableau dashboard itself.", mistake: "There's no way to make a Filter or Highlight action open an external page, reaching for either here would mean the requested behavior, jumping out to the CRM, simply isn't possible with that action type, a URL action is a functionally different tool, not just a stylistic choice.", tip: "URL actions commonly embed field values directly into the URL, something like a company CRM's own URL pattern plus the clicked order's customer ID, letting one dashboard click deep-link into a completely separate system.", business: "Linking a Tableau order dashboard directly to the same customer's record in a CRM saves a support or sales rep from manually searching for that customer in a second system, a small interaction that removes real friction from a daily workflow." } },
+
+  { id: "tb-d06", skill: SKILL_ID_DASHBOARD, tool: "tableau", level: "semiguided", difficulty: "core", prerequisite: ["tb-d01"],
+    title: "How far should a dashboard filter apply?",
+    objective: "Recognize the difference between a filter scoped to one worksheet and one applied across an entire data source.",
+    build() {
+      const scenarios = [
+        { desc: "every single sheet on the dashboard, all of which use the same Retail Performance data source, should respond to this filter, with no exceptions", ans: "all" },
+        { desc: "only two specific sheets should respond to this filter, a third sheet on the same dashboard needs to keep showing unfiltered, company-wide data for comparison", ans: "selected" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You're setting a filter's scope. The requirement is: <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "scope", label: "Which \"Apply to Worksheets\" setting fits?", options: [{ value: "all", label: "All Using This Data Source" }, { value: "selected", label: "Selected Worksheets" }] }],
+        correct: { scope: s.ans },
+      };
+    },
+    hints: [
+      "\"Every single sheet, no exceptions\" describes the broadest available scope, applying to every worksheet built on the same data source.",
+      "\"Only two specific sheets... a third should keep showing unfiltered data\" describes a deliberately narrower, hand-picked scope.",
+      "All Using This Data Source = broadest, automatic scope. Selected Worksheets = a hand-picked, deliberately narrower scope.",
+      "Match your answer to whether every sheet should respond (All Using This Data Source) or only some, by design (Selected Worksheets)." ],
+    explanation: { why: "\"All Using This Data Source\" automatically applies a filter to every worksheet built on the same data source, including ones added later, \"Selected Worksheets\" instead applies it only to a specific, hand-picked set, leaving everything else, including sheets meant to stay unfiltered, untouched.", mistake: "Leaving a filter on its default scope without checking whether it's actually the intended one is a common real dashboard bug, a filter meant to apply everywhere might quietly miss a sheet, or a filter meant to spare one comparison sheet might accidentally filter it too.", tip: "Whenever a dashboard has a sheet deliberately meant to show unfiltered, company-wide context alongside filtered detail, that's a clear signal the filter's scope needs to be Selected Worksheets, not the broader default.", business: "A dashboard showing \"your region's performance\" next to \"company-wide average for context\" needs the region filter to skip that comparison sheet entirely, getting the filter scope wrong would silently filter away the exact benchmark the comparison depends on." } },
+
+  { id: "tb-d07", skill: SKILL_ID_ACTIONS, tool: "tableau", level: "challenge", difficulty: "challenge", prerequisite: ["tb-d04"],
+    title: "Choosing the right trigger: Hover, Select, or Menu",
+    objective: "Match a dashboard action's trigger to how deliberate the interaction should be.",
+    build() {
+      const scenarios = [
+        { desc: "a quick preview tooltip-like effect that should appear the instant the mouse passes over a mark, no click required", ans: "hover" },
+        { desc: "a deliberate drill-down the user only wants to trigger with an actual click, since it replaces the whole detail table below", ans: "select" },
+        { desc: "an occasional action (like a URL link out) that shouldn't be one accidental click away, the user should have to deliberately choose it from a menu", ans: "menu" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You're configuring a dashboard action's trigger. The requirement is: <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "trigger", label: "Which \"Run on\" trigger fits?", options: [{ value: "hover", label: "Hover" }, { value: "select", label: "Select" }, { value: "menu", label: "Menu" }] }],
+        correct: { trigger: s.ans },
+      };
+    },
+    hints: [
+      "Hover fires the instant the mouse passes over a mark, no click needed, that matches an instant, no-commitment preview effect.",
+      "Select requires an actual click, that matches a deliberate action the user should choose to trigger, not something that fires accidentally while just moving the mouse.",
+      "Menu requires the user to right-click (or use the tooltip menu) and explicitly choose the action from a list, the most deliberate, hardest-to-trigger-by-accident option of the three.",
+      "Match your answer to how deliberate the described interaction needs to be, instant (Hover), a click (Select), or an explicit menu choice (Menu)." ],
+    explanation: { why: "Hover, Select, and Menu triggers offer increasingly deliberate levels of commitment, Hover fires with zero commitment (just moving the mouse), Select requires an actual click, Menu requires explicitly choosing the action from a list, matching the trigger to how disruptive or hard-to-undo the resulting action is prevents both accidental firing and unnecessary friction.", mistake: "Setting a disruptive action (like replacing an entire detail table, or navigating to a URL) to fire on Hover means it can trigger accidentally just from the mouse passing over a chart while scrolling, a frustrating, hard-to-avoid experience for anyone using the dashboard.", tip: "As a rule of thumb, the more disruptive or harder-to-undo an action's effect, the more deliberate its trigger should be, quick previews suit Hover, real drill-downs suit Select, rare or destination-changing actions suit Menu.", business: "A dashboard where simply moving the mouse across a chart unexpectedly replaces an entire detail table below (because the action was set to Hover instead of Select) is a common, genuinely frustrating real Tableau dashboard mistake." } },
+
+  { id: "tb-d08", skill: SKILL_ID_DASHBOARD, tool: "tableau", level: "challenge", difficulty: "challenge", prerequisite: ["tb-d02"],
+    title: "Designing for a phone-sized screen",
+    objective: "Recognize what a device-specific dashboard layout is actually for, simplification, not just shrinking.",
+    build() {
+      return {
+        scenarioHtml: `Your desktop dashboard has 6 charts and 3 filters, carefully arranged. A stakeholder will also open it on their phone. Tableau's Device Designer lets you create a separate phone layout.`,
+        slots: [{ key: "approach", label: "What should the phone layout do?", options: [
+          { value: "shrink", label: "Show all 6 charts and 3 filters, just scaled down to fit" },
+          { value: "simplify", label: "Show a reduced subset, the 1-2 most important charts, sized to be usable on a small touch screen" },
+        ] }],
+        correct: { approach: "simplify" },
+      };
+    },
+    hints: [
+      "Shrinking every element to fit a phone screen usually makes each individual chart too small to read or interact with on a touch screen, technically visible, practically unusable.",
+      "A device-specific layout is meant to genuinely rethink the dashboard for that screen, showing fewer, more important elements at a usable size, not just scaling everything down.",
+      "Ask: would a shrunk version of all 6 charts actually be readable and tappable on a phone? If not, simplification, not scaling, is the right approach.",
+      "Simplify: show a reduced, prioritized subset sized to be usable on a small screen." ],
+    explanation: { why: "Tableau's Device Designer lets a dashboard have entirely separate layouts per device class (Desktop, Tablet, Phone), reusing the same underlying sheets but arranging (and often omitting) them differently, phone layouts typically keep only the highest-priority content at a genuinely usable size.", mistake: "Assuming \"responsive\" just means \"the same content, smaller\" is a common misconception, on a phone-sized touch screen, six shrunk charts are usually all technically visible but none of them are actually usable, tapping a specific mark or reading fine text becomes impractical.", tip: "When designing a phone layout, start by asking which 1-2 charts a stakeholder actually needs while away from their desk, that's usually a much smaller set than the full desktop dashboard, not a shrunk copy of everything.", business: "A regional manager checking today's revenue number from their phone between meetings needs one clear, tappable KPI, not a shrunk, illegible copy of a six-chart desktop dashboard, device-specific design is what makes that possible." } },
+
+  { id: "tb-d09", skill: SKILL_ID_DASHBOARD, tool: "tableau", level: "challenge", difficulty: "challenge", prerequisite: ["tb-d01"],
+    title: "Story or Dashboard?",
+    objective: "Distinguish a linear, sequential narrative (a Story) from a single, all-at-once interactive view (a Dashboard).",
+    build() {
+      const scenarios = [
+        { desc: "walk the executive team through 4 specific insights, in a fixed order, one screen at a time, building toward a conclusion", ans: "story" },
+        { desc: "let a regional manager freely explore performance data, filtering and drilling into whatever they're curious about, in any order they like", ans: "dashboard" },
+      ];
+      const s = pick(scenarios);
+      return {
+        scenarioHtml: `You need to <b>${esc(s.desc)}</b>.`,
+        slots: [{ key: "container", label: "Which container fits?", options: [{ value: "story", label: "Story" }, { value: "dashboard", label: "Dashboard" }] }],
+        correct: { container: s.ans },
+      };
+    },
+    hints: [
+      "A Story is a sequence of Story Points, each a snapshot of a sheet or dashboard, presented in a fixed order, built specifically for walking an audience through a narrative.",
+      "A Dashboard is a single, all-at-once interactive view, built for free exploration in whatever order the viewer chooses, not a fixed sequence.",
+      "\"In a fixed order, one screen at a time, building toward a conclusion\" is a Story, \"freely explore, in any order\" is a Dashboard.",
+      "Match your answer to whether the need is a fixed narrative sequence (Story) or free exploration (Dashboard)." ],
+    explanation: { why: "A Story is purpose-built for sequential narrative, presenting a fixed series of snapshots in order, a Dashboard is purpose-built for open-ended, non-linear exploration, the same underlying sheets can support either, but the two containers are designed for genuinely different use cases.", mistake: "Building a walkthrough presentation as a single, all-at-once Dashboard leaves the audience free to click anywhere, out of the intended order, which works against the specific goal of building toward a conclusion step by step.", tip: "If the honest answer to \"in what order should someone view this\" is \"any order they want\", build a Dashboard, if the honest answer is \"this specific order, on purpose\", build a Story instead.", business: "An executive readout meant to build toward a specific recommendation benefits from a Story's fixed sequence, a self-serve regional performance tool benefits from a Dashboard's free exploration, picking the wrong container for the actual use case undermines the goal either way." } },
+
+  { id: "tb-d10", skill: SKILL_ID_DASHBOARD, tool: "tableau", level: "mastery", difficulty: "mastery", prerequisite: ["tb-d06", "tb-d07"],
+    title: "Independent build: an executive dashboard brief",
+    objective: "Combine layout, sizing, and a dashboard action from a plain-language executive brief with no technical terms given.",
+    build() {
+      return {
+        scenarioHtml: `A VP asks: <b>"I want one dashboard that always looks the same on the boardroom TV. When someone clicks a region on the summary chart, the detail table below should immediately narrow down to just that region, nothing else on screen should need to change size or move around."</b>`,
+        slots: [
+          { key: "sizing", label: "Dashboard sizing", options: [{ value: "fixed", label: "Fixed size (exact pixel dimensions)" }, { value: "range", label: "Range / Automatic" }] },
+          { key: "action", label: "Dashboard action, region chart to detail table", options: [{ value: "filter", label: "Filter action" }, { value: "highlight", label: "Highlight action" }, { value: "url", label: "URL action" }] },
+        ],
+        correct: { sizing: "fixed", action: "filter" },
+      };
+    },
+    written: {
+      label: "Why does this brief call for Fixed sizing specifically, rather than a responsive Range?",
+      placeholder: "Think about what the VP said about the boardroom TV, and what a responsive dashboard is actually solving for that isn't needed here...",
+      check: (text) => /\b(fixed|same|consisten|tv|screen|display)\b/i.test(text) && /\b(respons|range|adapt|device|resize)\b/i.test(text) && text.trim().length > 40,
+      hint: "Mention that the VP specifically wants it to always look identical on one known, unchanging screen (the boardroom TV), Fixed sizing guarantees that, a responsive Range is solving a different problem, adapting to multiple different, unpredictable screens, which isn't the situation described here." },
+    hints: [
+      "This combines two separate pieces from this stage: a sizing decision (task 2) and an action-type decision (task 3), both translated from the same plain-language brief with no technical terms given.",
+      "\"Always looks the same on the boardroom TV\" is the exact scenario Fixed sizing was built for, one known, unchanging screen.",
+      "\"Narrow down to just that region, nothing else needs to change\" is restricting data, not just emphasizing it, that's a Filter action, not Highlight.",
+      "Sizing = Fixed, Action = Filter action." ],
+    explanation: { why: "This combines the two Dashboard-and-Actions building blocks from this stage, Fixed sizing for a single known display, and a Filter action for a click-to-restrict interaction, applied together from a plain-language VP brief with no shelf, sizing, or action names supplied.", mistake: "Choosing Range sizing here would be solving a problem the VP didn't have, adapting to multiple unknown screens, when the actual requirement was the opposite, guaranteed consistency on one specific, known screen.", tip: "A real executive brief never says \"use Fixed sizing\" or \"add a Filter action\", it describes the desired OUTCOME, always the same on this TV, click to narrow down, translating that outcome into the right technical choices is the actual skill this whole library has been building toward.", business: "This is deliberately the least guided task in this stage, and in the whole Tableau library, a real stakeholder brief comes as plain business language, translating it correctly into sizing, layout, and action choices without being told which Tableau feature to use is what separates a working dashboard from a broken one." } },
 ];
 
 /* ================= grading =================
@@ -962,7 +1176,7 @@ function renderSkillBar() {
   const totalPassed = TASKS.filter(t => PracticeProgress.getTaskState(t.id).passed).length;
   target.innerHTML = next
     ? `<b>What should I do next?</b> ${esc(next.title)} (${next.level}), skill: ${esc(SKILLS.find(s => s.id === next.skill).label)}. ${totalPassed} / ${TASKS.length} practice tasks passed so far.`
-    : `<b>What should I do next?</b> All ${TASKS.length} Stage 1 tasks passed. Stages 2-4 aren't built yet.`;
+    : `<b>What should I do next?</b> All ${TASKS.length} tasks passed, the full Tableau Practice Library is complete.`;
 }
 function buildHintsHtml(hints) {
   const labels = ["Level 1, conceptual", "Level 2, strategic", "Level 3, technical", "Level 4, near-solution"];
