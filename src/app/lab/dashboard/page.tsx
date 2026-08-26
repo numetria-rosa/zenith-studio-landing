@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
+import { GraduationCap, Briefcase, LogOut } from "lucide-react";
 import Link from "next/link";
-import { GraduationCap, Briefcase, CircleUser, LogOut, Trophy } from "lucide-react";
-import { GlowBackdrop } from "@/components/GlowBackdrop";
+import { CourseBar } from "@/components/CourseBar";
+import { courseFontVars } from "@/lib/fonts";
 import { auth, signOut } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { COURSES } from "@/lib/courses";
@@ -12,9 +13,10 @@ import { getService, SERVICE_STATUSES, SERVICE_STATUS_LABELS } from "@/lib/servi
 /* The Next.js Server Component entry point after sign-in — the role
    courses/ai-engineering/dashboard.html can't safely fill, since a static
    file can't read an HttpOnly session cookie or query Postgres. "Continue"
-   drops the student into the guarded in-course dashboard, which keeps
-   working exactly as it always has. Styling matches /lab's card/pill/glow
-   language so this reads as the same product, not a bolted-on admin page. */
+   drops the student into the guarded in-course dashboard. Styling matches
+   the static course pages (Fraunces/IBM Plex, amber accent, card language)
+   rather than /lab's own marketing-page look — this is the page a paying
+   student actually lands on, so it should feel like the course product. */
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/sign-in?callbackUrl=%2Flab%2Fdashboard");
@@ -38,93 +40,83 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#05060a] text-white overflow-x-hidden">
-      <GlowBackdrop />
-
-      <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 pt-4">
-        <div className="mx-auto max-w-6xl rounded-full border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(52,211,153,0.10)]">
-          <div className="flex items-center justify-between px-5 sm:px-7 py-4">
-            <Link href="/" className="flex items-center gap-3">
-              <img
-                src="/icon.webp"
-                alt="Zenith Studio"
-                className="h-9 w-9 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)]"
-              />
-              <div>
-                <div className="text-sm tracking-[0.35em] text-white/60 uppercase">Zenith</div>
-                <div className="text-base font-semibold -mt-0.5">Lab</div>
-              </div>
+    <div
+      className={`${courseFontVars} min-h-screen bg-[#0d0f14] font-[family-name:var(--font-course-sans)] text-[#eeeee7]`}
+    >
+      <CourseBar
+        tag="Dashboard"
+        right={
+          <>
+            <Link
+              href="/profile"
+              className="hidden font-[family-name:var(--font-course-mono)] text-xs uppercase tracking-[0.08em] text-[#9aa0ae] transition hover:text-[#eeeee7] sm:inline"
+            >
+              Profile
             </Link>
-
-            <div className="flex items-center gap-6">
-              <Link
-                href="/profile"
-                className="hidden items-center gap-1.5 text-sm text-white/70 transition hover:text-white sm:flex"
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/" });
+              }}
+            >
+              <button
+                type="submit"
+                className="flex items-center gap-1.5 rounded-lg border border-[#333a4c] bg-[#191d26] px-3 py-1.5 font-[family-name:var(--font-course-sans)] text-xs font-semibold text-[#eeeee7] transition hover:border-[#f0b429] hover:text-[#f0b429]"
               >
-                <CircleUser className="h-4 w-4" aria-hidden />
-                Profile
-              </Link>
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut({ redirectTo: "/" });
-                }}
-              >
-                <button
-                  type="submit"
-                  className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-                >
-                  <LogOut className="h-3.5 w-3.5" aria-hidden />
-                  Sign out
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </header>
+                <LogOut className="h-3.5 w-3.5" aria-hidden />
+                Sign out
+              </button>
+            </form>
+          </>
+        }
+      />
 
-      <main className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-10">
-        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-xs uppercase tracking-[0.28em] text-emerald-200/90 backdrop-blur-xl">
+      <main className="mx-auto max-w-[980px] px-6 pb-20 pt-12">
+        <div className="font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.14em] text-[#f0b429]">
           Zenith Lab · Dashboard
         </div>
-        <h1 className="mt-6 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">
+        <h1 className="mt-3 font-[family-name:var(--font-course-serif)] text-[clamp(28px,4.5vw,40px)] font-semibold leading-[1.1] tracking-[-0.02em]">
           Welcome back{session.user.name ? `, ${session.user.name}` : ""}
         </h1>
-        {session.user.email && <p className="mt-2 text-sm text-white/50">{session.user.email}</p>}
+        {session.user.email && <p className="mt-3 max-w-[640px] text-[15.5px] text-[#9aa0ae]">{session.user.email}</p>}
 
-        <section className="mt-12">
-          <div className="mb-5 text-xs uppercase tracking-[0.3em] text-emerald-200/70">My courses</div>
+        <section className="mt-9">
+          <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
+            My courses
+          </div>
           {owned.length === 0 ? (
-            <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl">
-              <p className="text-sm text-white/60">
+            <div className="mt-3 rounded-xl border border-[#232838] bg-[#151920] p-5">
+              <p className="text-sm text-[#9aa0ae]">
                 You don&apos;t own any courses yet. Browse what&apos;s available below.
               </p>
             </div>
           ) : (
-            <div className="grid gap-5 md:grid-cols-2">
+            <div className="mt-3 grid gap-3.5">
               {owned.map((course) => {
                 const progress = progressByCourse.get(course.id) ?? { completed: 0, total: 8, pct: 0 };
                 return (
                   <div
                     key={course.id}
-                    className="rounded-[28px] border border-emerald-300/30 bg-emerald-400/[0.05] p-7 backdrop-blur-xl shadow-[0_0_50px_rgba(52,211,153,0.08)]"
+                    className="flex flex-wrap items-center gap-4 rounded-xl border border-[#232838] bg-[#151920] p-5 transition hover:border-[#333a4c] sm:flex-nowrap"
                   >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-300/30 via-teal-500/25 to-cyan-500/30 shadow-[0_0_30px_rgba(52,211,153,0.16)]">
-                      <GraduationCap className="h-5 w-5 text-emerald-100" aria-hidden />
+                    <div className="flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-[10px] border border-[#333a4c] bg-[#191d26]">
+                      <GraduationCap className="h-5 w-5 text-[#f0b429]" aria-hidden />
                     </div>
-                    <h3 className="mt-5 text-xl font-semibold tracking-[-0.02em]">{course.title}</h3>
-                    <p className="mt-2 text-sm text-white/60">
-                      {progress.completed}/{progress.total} modules · {progress.pct}% complete
-                    </p>
-                    <div className="mt-3 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300"
-                        style={{ width: `${progress.pct}%` }}
-                      />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[15.5px] font-bold">{course.title}</div>
+                      <div className="mt-1 text-[13px] text-[#9aa0ae]">
+                        {progress.completed}/{progress.total} modules · {progress.pct}% complete
+                      </div>
+                      <div className="mt-2.5 h-1.5 overflow-hidden rounded-full border border-[#232838] bg-[#0a0c10]">
+                        <div
+                          className={`h-full rounded-full ${progress.pct >= 100 ? "bg-[#4ade95]" : "bg-[#f0b429]"}`}
+                          style={{ width: `${progress.pct}%` }}
+                        />
+                      </div>
                     </div>
                     <a
                       href={`/courses/${course.id}/${course.firstLessonPath}`}
-                      className="mt-6 inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-[1.02]"
+                      className="inline-flex flex-shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg bg-[#f0b429] px-4 py-2 text-[13px] font-bold text-[#1a1200] transition hover:brightness-110"
                     >
                       Continue course →
                     </a>
@@ -136,23 +128,25 @@ export default async function DashboardPage() {
         </section>
 
         {available.length > 0 && (
-          <section className="mt-14">
-            <div className="mb-5 text-xs uppercase tracking-[0.3em] text-emerald-200/70">Available courses</div>
-            <div className="grid gap-5 md:grid-cols-2">
+          <section className="mt-11">
+            <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
+              Available courses
+            </div>
+            <div className="mt-3 grid gap-3.5 md:grid-cols-2">
               {available.map((course) => {
                 const { url } = getCheckoutUrl(course);
                 return (
                   <div
                     key={course.id}
-                    className="rounded-[28px] border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl transition hover:-translate-y-1 hover:bg-white/[0.06]"
+                    className="rounded-xl border border-[#232838] bg-[#151920] p-5 transition hover:border-[#333a4c]"
                   >
-                    <h3 className="text-xl font-semibold tracking-[-0.02em]">{course.title}</h3>
-                    <p className="mt-2.5 text-sm leading-7 text-white/60">{course.description}</p>
+                    <div className="text-[15.5px] font-bold">{course.title}</div>
+                    <p className="mt-2 text-[13px] leading-6 text-[#9aa0ae]">{course.description}</p>
                     <a
                       href={url}
                       target={url.startsWith("mailto:") ? undefined : "_blank"}
                       rel={url.startsWith("mailto:") ? undefined : "noopener noreferrer"}
-                      className="mt-6 inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-xl transition hover:bg-white/10"
+                      className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-[#333a4c] bg-[#191d26] px-4 py-2 text-[13px] font-semibold text-[#eeeee7] transition hover:border-[#f0b429] hover:text-[#f0b429]"
                     >
                       Get access →
                     </a>
@@ -164,9 +158,11 @@ export default async function DashboardPage() {
         )}
 
         {serviceRequests.length > 0 && (
-          <section className="mt-14">
-            <div className="mb-5 text-xs uppercase tracking-[0.3em] text-emerald-200/70">My service requests</div>
-            <div className="flex flex-col gap-5">
+          <section className="mt-11">
+            <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
+              My service requests
+            </div>
+            <div className="mt-3 flex flex-col gap-3.5">
               {serviceRequests.map((r) => {
                 const service = getService(r.serviceId);
                 const stageIndex = SERVICE_STATUSES.indexOf(r.status as (typeof SERVICE_STATUSES)[number]);
@@ -177,38 +173,29 @@ export default async function DashboardPage() {
                       ? "Payment lapsed"
                       : "Not subscribed yet";
                 return (
-                  <div
-                    key={r.id}
-                    className="rounded-[28px] border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl"
-                  >
+                  <div key={r.id} className="rounded-xl border border-[#232838] bg-[#151920] p-5">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5">
-                          <Briefcase className="h-4 w-4 text-white/70" aria-hidden />
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#333a4c] bg-[#191d26]">
+                          <Briefcase className="h-4 w-4 text-[#9aa0ae]" aria-hidden />
                         </div>
-                        <h3 className="text-lg font-semibold tracking-[-0.02em]">{service?.title ?? r.serviceId}</h3>
+                        <span className="text-[15.5px] font-bold">{service?.title ?? r.serviceId}</span>
                       </div>
-                      <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-white/55">
+                      <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
                         Monthly: {monthlyLabel}
                       </span>
                     </div>
-                    <div className="mt-5 flex items-center gap-1.5">
+                    <div className="mt-4 flex items-center gap-1.5">
                       {SERVICE_STATUSES.map((s, i) => (
-                        <div key={s} className="flex flex-1 items-center gap-1.5">
-                          <div
-                            className={`h-1.5 flex-1 rounded-full ${
-                              i <= stageIndex
-                                ? "bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300"
-                                : "bg-white/10"
-                            }`}
-                          />
-                        </div>
+                        <div
+                          key={s}
+                          className={`h-1.5 flex-1 rounded-full ${i <= stageIndex ? "bg-[#f0b429]" : "border border-[#232838] bg-[#0a0c10]"}`}
+                        />
                       ))}
                     </div>
-                    <p className="mt-3 flex items-center gap-1.5 text-sm text-white/70">
-                      <Trophy className="h-3.5 w-3.5 text-emerald-300" aria-hidden />
+                    <p className="mt-3 text-[13px] text-[#9aa0ae]">
                       Current stage:{" "}
-                      <span className="font-semibold text-white">
+                      <span className="font-semibold text-[#eeeee7]">
                         {SERVICE_STATUS_LABELS[r.status as (typeof SERVICE_STATUSES)[number]] ?? r.status}
                       </span>
                     </p>

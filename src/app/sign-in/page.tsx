@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { decryptPassword } from "@/lib/password";
 import { createSessionForUser } from "@/lib/session";
-import { GlowBackdrop } from "@/components/GlowBackdrop";
+import { courseFontVars } from "@/lib/fonts";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -22,40 +22,37 @@ export default async function SignInPage({
   const redirectTo = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/lab/dashboard";
 
   return (
-    <div className="relative min-h-screen bg-[#05060a] text-white flex items-center justify-center overflow-x-hidden px-4">
-      <GlowBackdrop />
-
-      <div className="relative z-10 w-full max-w-sm">
-        <Link href="/" className="flex items-center gap-3 justify-center mb-10">
-          <img
-            src="/icon.webp"
-            alt="Zenith Studio"
-            className="h-9 w-9 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)]"
-          />
-          <div className="text-left">
-            <div className="text-xs tracking-[0.35em] text-white/60 uppercase">Zenith</div>
-            <div className="text-base font-semibold -mt-0.5">Lab</div>
-          </div>
+    <div
+      className={`${courseFontVars} min-h-screen bg-[#0d0f14] font-[family-name:var(--font-course-sans)] text-[#eeeee7] flex items-center justify-center px-4`}
+    >
+      <div className="w-full max-w-sm">
+        <Link href="/" className="mb-10 flex items-center justify-center gap-2">
+          <span className="font-[family-name:var(--font-course-serif)] text-lg font-extrabold tracking-[-0.02em]">
+            ZENITH
+            <span className="ml-0.5 rounded-[2px] bg-[#f0b429] px-1.5 py-px text-[#1a1200]">LAB</span>
+          </span>
         </Link>
 
-        <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl">
-          <h1 className="text-xl font-semibold">Sign in to Zenith Lab</h1>
-          <p className="mt-2 text-sm text-white/60">
+        <div className="rounded-xl border border-[#232838] bg-[#151920] p-8">
+          <h1 className="font-[family-name:var(--font-course-serif)] text-xl font-semibold tracking-[-0.01em]">
+            Sign in to Zenith Lab
+          </h1>
+          <p className="mt-2 text-sm text-[#9aa0ae]">
             Use the password from your welcome page — it&apos;s also always on your profile.
           </p>
 
           {error === "invalid_password" && (
-            <p className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
+            <p className="mt-4 rounded-lg border border-[#ff8585]/30 bg-[#ff8585]/10 px-4 py-3 text-sm text-[#ff8585]">
               That email/password combination didn&apos;t match.
             </p>
           )}
           {error === "claim_expired" && (
-            <p className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
+            <p className="mt-4 rounded-lg border border-[#ff8585]/30 bg-[#ff8585]/10 px-4 py-3 text-sm text-[#ff8585]">
               That sign-in link expired. Use your password below instead.
             </p>
           )}
           {error === "payment" && (
-            <p className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
+            <p className="mt-4 rounded-lg border border-[#ff8585]/30 bg-[#ff8585]/10 px-4 py-3 text-sm text-[#ff8585]">
               We couldn&apos;t confirm that payment. If you were charged, sign in below and it&apos;ll be there shortly.
             </p>
           )}
@@ -95,18 +92,18 @@ function PasswordSignInForm({ redirectTo }: { redirectTo: string }) {
         name="email"
         required
         placeholder="you@example.com"
-        className="rounded-full border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-emerald-300/50"
+        className="rounded-lg border border-[#333a4c] bg-[#0a0c10] px-4 py-2.5 text-sm text-[#eeeee7] placeholder:text-[#676e7d] focus:outline-none focus:border-[#f0b429]"
       />
       <input
         type="password"
         name="password"
         required
         placeholder="Password"
-        className="rounded-full border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-emerald-300/50"
+        className="rounded-lg border border-[#333a4c] bg-[#0a0c10] px-4 py-2.5 text-sm text-[#eeeee7] placeholder:text-[#676e7d] focus:outline-none focus:border-[#f0b429]"
       />
       <button
         type="submit"
-        className="rounded-full bg-white px-4 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
+        className="rounded-lg bg-[#f0b429] px-4 py-2.5 text-sm font-bold text-[#1a1200] transition hover:brightness-110"
       >
         Sign in
       </button>
