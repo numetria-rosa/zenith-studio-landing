@@ -1,30 +1,24 @@
 import NextAuth from "next-auth";
-import Resend from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 
-/* Zenith Lab auth — email magic link, plus password sign-in and the
-   post-checkout auto-claim redirect (both in src/lib/session.ts, since
-   Auth.js's Credentials provider requires JWT sessions and this app is
-   database-session throughout for the Resend provider). All three land the
-   same Session row shape, so auth() treats them identically everywhere
-   else in the app. The Prisma adapter stores the session server-side
-   (Session table); Auth.js issues an HttpOnly, Secure-in-production,
-   SameSite=Lax cookie that references it. No session secret or DB
-   credential is ever sent to the browser — the client only ever holds an
-   opaque session token. */
-export const { handlers, auth, signIn, signOut } = NextAuth({
+/* Zenith Lab auth — no NextAuth provider at all. Every sign-in path
+   (password, and the post-checkout auto-claim redirect) creates its
+   Session row manually via src/lib/session.ts, because there's no email
+   sending set up for this project and Auth.js's Credentials provider
+   requires JWT sessions anyway. NextAuth here exists only for auth()/
+   signOut() and the Prisma adapter's Session table shape — every session
+   this app ever creates, regardless of how, lands the same row shape, so
+   auth() reads them identically everywhere. Auth.js issues an HttpOnly,
+   Secure-in-production, SameSite=Lax cookie that references it. No
+   session secret or DB credential is ever sent to the browser — the
+   client only ever holds an opaque session token. */
+export const { handlers, auth, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
-  session: { strategy: "database" }, // required for the Email/magic-link provider
-  providers: [
-    Resend({
-      apiKey: process.env.RESEND_API_KEY,
-      from: process.env.EMAIL_FROM || "Zenith Lab <onboarding@resend.dev>",
-    }),
-  ],
+  session: { strategy: "database" },
+  providers: [],
   pages: {
     signIn: "/sign-in",
-    verifyRequest: "/sign-in/check-email",
   },
   callbacks: {
     // Database session strategy hands back the DB `user` row (not a JWT

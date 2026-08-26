@@ -3,33 +3,23 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { decryptPassword } from "@/lib/password";
 
 export const metadata: Metadata = {
   title: "Welcome",
   robots: { index: false, follow: false },
 };
 
-/* Landing spot right after /api/auth/claim signs the buyer in. Shows the
-   auto-generated password exactly once — the claim row's tempPassword is
-   nulled out in the same request that reads it, so a refresh, a shared
-   link, or a second visit never shows it again. That one-time read is a
-   deliberate trade against storing it in the DB long-term: readable-forever
-   in "profile details" would mean anyone with DB access (or a future SQL
-   injection) gets every buyer's real login password, exactly what hashing
-   exists to prevent. From here on the hash is the only copy that exists. */
+/* Landing spot right after /api/auth/claim signs the buyer in. The password
+   itself lives encrypted on User.passwordEnc (see src/lib/password.ts) and
+   is also always viewable later from /profile — this page just surfaces it
+   the first time, right when it's most useful. */
 export default async function WelcomePage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/sign-in");
 
-  const claim = await db.purchaseClaim.findFirst({
-    where: { userId: session.user.id, tempPassword: { not: null } },
-    orderBy: { createdAt: "desc" },
-  });
-
-  const password = claim?.tempPassword ?? null;
-  if (claim && password) {
-    await db.purchaseClaim.update({ where: { id: claim.id }, data: { tempPassword: null } });
-  }
+  const user = await db.user.findUniqueOrThrow({ where: { id: session.user.id } });
+  const password = user.passwordEnc ? decryptPassword(user.passwordEnc) : null;
 
   return (
     <div className="min-h-screen bg-[#05060a] text-white flex items-center justify-center px-4">
@@ -45,8 +35,8 @@ export default async function WelcomePage() {
               <p className="text-xs uppercase tracking-[0.2em] text-emerald-200/70">Your password</p>
               <p className="mt-2 font-mono text-lg tracking-wide text-emerald-100 select-all">{password}</p>
               <p className="mt-3 text-xs text-white/50">
-                Shown once — it won&apos;t appear again. Use it with {session.user.email} to sign in next time, or
-                set your own from your profile.
+                Use it with {session.user.email} to sign in next time. You can view or change it anytime from your
+                profile.
               </p>
             </div>
           )}

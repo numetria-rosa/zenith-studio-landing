@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { hashPassword, verifyPassword } from "@/lib/password";
+import { decryptPassword, encryptPassword } from "@/lib/password";
 
 export const metadata: Metadata = {
   title: "Profile",
@@ -20,21 +20,17 @@ export default async function ProfilePage({
 
   const { error, saved } = await searchParams;
   const user = await db.user.findUniqueOrThrow({ where: { id: session.user.id } });
+  const currentPassword = user.passwordEnc ? decryptPassword(user.passwordEnc) : null;
 
   async function handleChangePassword(formData: FormData) {
     "use server";
     const s = await auth();
     if (!s?.user?.id) redirect("/sign-in");
 
-    const current = String(formData.get("current") || "");
     const next = String(formData.get("next") || "");
-
-    const u = await db.user.findUniqueOrThrow({ where: { id: s.user.id } });
-    const currentOk = u.passwordHash ? await verifyPassword(current, u.passwordHash) : current === "";
-    if (!currentOk) redirect("/profile?error=current_password");
     if (next.length < 8) redirect("/profile?error=too_short");
 
-    await db.user.update({ where: { id: s.user.id }, data: { passwordHash: await hashPassword(next) } });
+    await db.user.update({ where: { id: s.user.id }, data: { passwordEnc: encryptPassword(next) } });
     redirect("/profile?saved=1");
   }
 
@@ -60,16 +56,21 @@ export default async function ProfilePage({
         </div>
 
         <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+          <p className="text-xs uppercase tracking-[0.2em] text-white/50">Your password</p>
+          {currentPassword ? (
+            <p className="mt-2 font-mono text-lg tracking-wide text-white select-all">{currentPassword}</p>
+          ) : (
+            <p className="mt-2 text-sm text-white/50">No password set yet — set one below.</p>
+          )}
+          <p className="mt-2 text-xs text-white/40">Use this with {user.email} to sign in.</p>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-6">
           <p className="text-xs uppercase tracking-[0.2em] text-white/50">Change password</p>
 
           {saved && (
             <p className="mt-3 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs text-emerald-200">
               Password updated.
-            </p>
-          )}
-          {error === "current_password" && (
-            <p className="mt-3 rounded-xl border border-red-400/20 bg-red-400/10 px-3 py-2 text-xs text-red-200">
-              Your current password didn&apos;t match.
             </p>
           )}
           {error === "too_short" && (
@@ -80,13 +81,7 @@ export default async function ProfilePage({
 
           <form action={handleChangePassword} className="mt-4 flex flex-col gap-3">
             <input
-              type="password"
-              name="current"
-              placeholder={user.passwordHash ? "Current password" : "Leave blank — no password set yet"}
-              className="rounded-full border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-emerald-300/50"
-            />
-            <input
-              type="password"
+              type="text"
               name="next"
               required
               minLength={8}

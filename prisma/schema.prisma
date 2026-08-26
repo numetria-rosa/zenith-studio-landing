@@ -24,11 +24,12 @@ model User {
   // matching once known, since email can be legitimately reused/changed.
   whopUserId String? @unique
 
-  // scrypt "salt:hash", never the plaintext. Set automatically by the
-  // webhook the moment a purchase completes, so sign-in never depends on
-  // an email round-trip. Nullable — accounts created before this existed,
-  // or via magic link only, may still have none.
-  passwordHash String?
+  // AES-256-GCM ciphertext (see src/lib/password.ts), decryptable only with
+  // PASSWORD_ENCRYPTION_KEY — a server-only secret never stored in this
+  // database. Set automatically by the webhook the moment a purchase
+  // completes, and shown back on /profile any time. Nullable — accounts
+  // created before this existed may still have none.
+  passwordEnc String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -103,18 +104,13 @@ model CourseEntitlement {
 // with this id succeeded", via Whop's own status=success&payment_id=...
 // query params) back to a specific local User, so the buyer's browser can
 // land signed in on /dashboard with zero typing. One row per payment.
-// tempPassword holds the plaintext generated password for exactly one read
-// (the /welcome page nulls it out immediately after showing it) — this is
-// the only place a plaintext password ever touches the database, and only
-// for the few minutes between purchase and the buyer seeing /welcome.
 model PurchaseClaim {
-  id           String    @id @default(cuid())
-  paymentId    String    @unique
-  userId       String
-  tempPassword String?
-  claimedAt    DateTime?
-  expiresAt    DateTime
-  createdAt    DateTime  @default(now())
+  id        String    @id @default(cuid())
+  paymentId String    @unique
+  userId    String
+  claimedAt DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

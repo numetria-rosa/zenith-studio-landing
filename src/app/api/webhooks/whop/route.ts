@@ -5,7 +5,7 @@ import { getWhopClient } from "@/lib/whop";
 import { db } from "@/lib/db";
 import { courseIdForWhopProductId } from "@/lib/courses";
 import { serviceKindForWhopPlanId } from "@/lib/services";
-import { generateStrongPassword, hashPassword } from "@/lib/password";
+import { generateStrongPassword, encryptPassword } from "@/lib/password";
 
 /* Zenith Lab — Whop webhook handler.
    Implements whop-checkout-links-and-webhooks.md §3.3/§3.7 exactly:
@@ -194,27 +194,21 @@ async function findOrCreateUser(
 }
 
 /* Gives every buyer a real password the moment they pay (first purchase
-   only — later repeat purchases reuse the existing one) and drops a claim
-   row keyed by this exact payment id. /api/auth/claim reads that row when
-   the buyer's browser bounces back from Whop's checkout redirect, so they
-   land on /dashboard already signed in with no email round-trip required. */
+   only — later repeat purchases reuse the existing one, and a self-chosen
+   change on /profile is never overwritten) and drops a claim row keyed by
+   this exact payment id. /api/auth/claim reads that row when the buyer's
+   browser bounces back from Whop's checkout redirect, so they land on
+   /dashboard already signed in with no email round-trip required. */
 async function createPurchaseClaim(tx: Tx, userId: string, paymentId: string) {
   const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
 
-  let plaintextPassword: string | null = null;
-  if (!user.passwordHash) {
-    plaintextPassword = generateStrongPassword();
-    await tx.user.update({ where: { id: userId }, data: { passwordHash: await hashPassword(plaintextPassword) } });
+  if (!user.passwordEnc) {
+    await tx.user.update({ where: { id: userId }, data: { passwordEnc: encryptPassword(generateStrongPassword()) } });
   }
 
   await tx.purchaseClaim.upsert({
     where: { paymentId },
-    create: {
-      paymentId,
-      userId,
-      tempPassword: plaintextPassword,
-      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
-    },
+    create: { paymentId, userId, expiresAt: new Date(Date.now() + 30 * 60 * 1000) },
     update: {}, // a retried webhook delivery must never regenerate/overwrite an already-issued claim
   });
 }
