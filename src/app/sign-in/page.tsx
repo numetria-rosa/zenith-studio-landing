@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { decryptPassword } from "@/lib/password";
 import { createSessionForUser } from "@/lib/session";
+import { GlowBackdrop } from "@/components/GlowBackdrop";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -18,13 +19,19 @@ export default async function SignInPage({
   const { callbackUrl, error } = await searchParams;
   // Only ever redirect within this site — an absolute or protocol-relative
   // callbackUrl (e.g. "https://evil.example") must never be honored here.
-  const redirectTo = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/dashboard";
+  const redirectTo = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/lab/dashboard";
 
   return (
-    <div className="min-h-screen bg-[#05060a] text-white flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
+    <div className="relative min-h-screen bg-[#05060a] text-white flex items-center justify-center overflow-x-hidden px-4">
+      <GlowBackdrop />
+
+      <div className="relative z-10 w-full max-w-sm">
         <Link href="/" className="flex items-center gap-3 justify-center mb-10">
-          <img src="/icon.webp" alt="Zenith Studio" className="h-9 w-9 rounded-2xl" />
+          <img
+            src="/icon.webp"
+            alt="Zenith Studio"
+            className="h-9 w-9 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)]"
+          />
           <div className="text-left">
             <div className="text-xs tracking-[0.35em] text-white/60 uppercase">Zenith</div>
             <div className="text-base font-semibold -mt-0.5">Lab</div>
@@ -67,8 +74,8 @@ function PasswordSignInForm({ redirectTo }: { redirectTo: string }) {
       .trim()
       .toLowerCase();
     const password = String(formData.get("password") || "");
-    const rawDest = String(formData.get("redirectTo") || "/dashboard");
-    const dest = rawDest.startsWith("/") ? rawDest : "/dashboard";
+    const rawDest = String(formData.get("redirectTo") || "/lab/dashboard");
+    const dest = rawDest.startsWith("/") ? rawDest : "/lab/dashboard";
 
     const user = email ? await db.user.findUnique({ where: { email } }) : null;
     const ok = user?.passwordEnc ? decryptPassword(user.passwordEnc) === password : false;
