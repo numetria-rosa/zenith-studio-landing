@@ -22,12 +22,21 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
 .bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
 .bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
 .hero{padding:50px 0 30px}
-.welcomecard{display:none;align-items:center;gap:16px;background:var(--card);border:1px solid var(--good);border-radius:16px;padding:18px 22px;margin-bottom:22px}
-.welcomecard.show{display:flex}
-.welcomecard .wcavatar{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:rgba(74,222,149,.14);color:var(--good);display:grid;place-items:center;font-family:'Fraunces';font-weight:700;font-size:18px}
+.welcomecard{display:none;position:fixed;top:20px;right:20px;z-index:200;align-items:flex-start;gap:14px;width:min(360px,calc(100vw - 40px));background:var(--card2);border:1px solid var(--bd2);border-radius:16px;padding:18px 20px;box-shadow:0 20px 50px rgba(0,0,0,.45),0 0 0 1px rgba(74,222,149,.12);opacity:0;transform:translateY(-12px) scale(.97)}
+.welcomecard.show{display:flex;animation:wc-in .38s cubic-bezier(.2,.9,.25,1) forwards}
+.welcomecard.hide{display:flex;animation:wc-out .22s ease-in forwards}
+@keyframes wc-in{to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes wc-out{to{opacity:0;transform:translateY(-8px) scale(.97)}}
+.welcomecard .wcavatar{flex-shrink:0;width:40px;height:40px;border-radius:11px;background:rgba(74,222,149,.14);color:var(--good);display:grid;place-items:center;font-family:'Fraunces';font-weight:700;font-size:16px}
 .welcomecard .wctext{flex:1;min-width:0}
-.welcomecard .wctitle{font-weight:700;font-size:15px;color:var(--tx)}
-.welcomecard .wcsub{font-size:13px;color:var(--mut);margin-top:2px}
+.welcomecard .wctitle{font-weight:700;font-size:14.5px;color:var(--tx)}
+.welcomecard .wcsub{font-size:12.5px;color:var(--mut);margin-top:3px;line-height:1.5}
+.welcomecard .wcclose{flex-shrink:0;width:24px;height:24px;border-radius:8px;border:none;background:transparent;color:var(--mut2);font-size:16px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:.15s}
+.welcomecard .wcclose:hover{background:var(--bd);color:var(--tx)}
+.welcomecard .wcclose:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+@media (max-width:640px){
+  .welcomecard{top:auto;bottom:16px;left:16px;right:16px;width:auto;transform:translateY(16px) scale(.98)}
+}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
 h1{font-family:'Fraunces';font-size:clamp(28px,4.5vw,40px);font-weight:600;letter-spacing:-.02em;margin-top:12px;line-height:1.1;font-optical-sizing:none;font-variation-settings:"opsz" 144}
 .sub{color:var(--mut);font-size:15.5px;max-width:640px;margin-top:12px}
@@ -148,12 +157,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 </div></div>
 
 <div class="wrap">
-  <div class="welcomecard" id="welcomeCard">
+  <div class="welcomecard" id="welcomeCard" role="status">
     <div class="wcavatar" id="wcAvatar">?</div>
     <div class="wctext">
       <div class="wctitle" id="wcTitle">Welcome</div>
       <div class="wcsub" id="wcSub">Loading your progress&hellip;</div>
     </div>
+    <button type="button" class="wcclose" id="wcClose" aria-label="Dismiss">&times;</button>
   </div>
 
   <header class="hero">
@@ -314,12 +324,31 @@ async function renderWelcome() {
   document.getElementById("wcSub").textContent = isFirstVisit
     ? "Your account is ready. Jump in below whenever you're set."
     : `${ov.completed} / ${ov.total} modules complete, ${passedTasks} / ${totalTasks} practice tasks passed.`;
-  document.getElementById("welcomeCard").classList.add("show");
+  showWelcomeCard();
 
   const note = document.getElementById("storageNote");
   if (note) {
     note.childNodes[0].textContent = "Signed in, your progress syncs to your account and follows you to any device. ";
   }
+}
+
+// A floating toast, not an inline banner: shows once per page load, closes
+// on click, and auto-dismisses so it never sits there demanding attention.
+let wcDismissTimer = null;
+function dismissWelcomeCard() {
+  const card = document.getElementById("welcomeCard");
+  clearTimeout(wcDismissTimer);
+  card.classList.remove("show");
+  card.classList.add("hide");
+  card.addEventListener("animationend", () => card.classList.remove("hide"), { once: true });
+}
+function showWelcomeCard() {
+  const card = document.getElementById("welcomeCard");
+  card.classList.add("show");
+  document.getElementById("wcClose").addEventListener("click", dismissWelcomeCard);
+  wcDismissTimer = setTimeout(dismissWelcomeCard, 9000);
+  card.addEventListener("mouseenter", () => clearTimeout(wcDismissTimer));
+  card.addEventListener("mouseleave", () => { wcDismissTimer = setTimeout(dismissWelcomeCard, 9000); });
 }
 
 function renderDashboard(){
