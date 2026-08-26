@@ -10,7 +10,12 @@
     .courseshell{display:flex;align-items:stretch;min-height:100vh}
     .courserail{width:228px;flex-shrink:0;box-sizing:border-box;padding:20px 14px 24px;
       border-right:1px solid var(--bd,#232838);position:sticky;top:0;align-self:flex-start;
-      height:100vh;overflow-y:auto;background:var(--bg,#0d0f14)}
+      height:100vh;overflow-y:auto;background:var(--bg,#0d0f14);
+      scrollbar-width:thin;scrollbar-color:var(--bd2,#333a4c) transparent}
+    .courserail::-webkit-scrollbar{width:6px}
+    .courserail::-webkit-scrollbar-track{background:transparent}
+    .courserail::-webkit-scrollbar-thumb{background:var(--bd2,#333a4c);border-radius:99px}
+    .courserail::-webkit-scrollbar-thumb:hover{background:var(--amber,#f0b429)}
     .coursemain{flex:1;min-width:0}
     .courseshell .coursenav{display:none}
     .rail-brand{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;
