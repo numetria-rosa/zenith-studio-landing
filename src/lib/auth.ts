@@ -3,11 +3,16 @@ import Resend from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 
-/* Zenith Lab auth — email magic link only (Phase 7). The Prisma adapter
-   stores the session server-side (Session table); Auth.js issues an
-   HttpOnly, Secure-in-production, SameSite=Lax cookie that references it.
-   No session secret or DB credential is ever sent to the browser — the
-   client only ever holds an opaque session token. */
+/* Zenith Lab auth — email magic link, plus password sign-in and the
+   post-checkout auto-claim redirect (both in src/lib/session.ts, since
+   Auth.js's Credentials provider requires JWT sessions and this app is
+   database-session throughout for the Resend provider). All three land the
+   same Session row shape, so auth() treats them identically everywhere
+   else in the app. The Prisma adapter stores the session server-side
+   (Session table); Auth.js issues an HttpOnly, Secure-in-production,
+   SameSite=Lax cookie that references it. No session secret or DB
+   credential is ever sent to the browser — the client only ever holds an
+   opaque session token. */
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
   session: { strategy: "database" }, // required for the Email/magic-link provider

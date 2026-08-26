@@ -41,16 +41,21 @@ export default async function DashboardPage() {
           <img src="/icon.webp" alt="Zenith Studio" className="h-8 w-8 rounded-xl" />
           <span className="text-sm font-semibold tracking-wide">ZENITH LAB</span>
         </Link>
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/" });
-          }}
-        >
-          <button type="submit" className="text-sm text-white/60 hover:text-white transition">
-            Sign out
-          </button>
-        </form>
+        <div className="flex items-center gap-5">
+          <Link href="/profile" className="text-sm text-white/60 hover:text-white transition">
+            Profile
+          </Link>
+          <form
+            action={async () => {
+              "use server";
+              await signOut({ redirectTo: "/" });
+            }}
+          >
+            <button type="submit" className="text-sm text-white/60 hover:text-white transition">
+              Sign out
+            </button>
+          </form>
+        </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-6 py-12">

@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { signIn } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { verifyPassword } from "@/lib/password";
+import { createSessionForUser } from "@/lib/session";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -31,19 +35,89 @@ export default async function SignInPage({
         <div className="rounded-[30px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl">
           <h1 className="text-xl font-semibold">Sign in to Zenith Lab</h1>
           <p className="mt-2 text-sm text-white/60">
-            We&apos;ll email you a one-time link. No password to remember.
+            Use the password from your welcome page, or get a one-time email link instead.
           </p>
 
-          {error && (
+          {error === "invalid_password" && (
+            <p className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
+              That email/password combination didn&apos;t match. Try again, or use a one-time email link below.
+            </p>
+          )}
+          {error === "claim_expired" && (
+            <p className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
+              That sign-in link expired. Use your password below, or get a one-time email link.
+            </p>
+          )}
+          {error === "payment" && (
+            <p className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
+              We couldn&apos;t confirm that payment. If you were charged, sign in below and it&apos;ll be there shortly.
+            </p>
+          )}
+          {error && !["invalid_password", "claim_expired", "payment"].includes(error) && (
             <p className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
               That sign-in link didn&apos;t work — it may have expired. Enter your email to get a new one.
             </p>
           )}
 
+          <PasswordSignInForm redirectTo={redirectTo} />
+
+          <div className="my-5 flex items-center gap-3 text-xs text-white/40">
+            <div className="h-px flex-1 bg-white/10" />
+            or
+            <div className="h-px flex-1 bg-white/10" />
+          </div>
+
           <SignInForm redirectTo={redirectTo} />
         </div>
       </div>
     </div>
+  );
+}
+
+function PasswordSignInForm({ redirectTo }: { redirectTo: string }) {
+  async function handlePasswordSignIn(formData: FormData) {
+    "use server";
+    const email = String(formData.get("email") || "")
+      .trim()
+      .toLowerCase();
+    const password = String(formData.get("password") || "");
+    const rawDest = String(formData.get("redirectTo") || "/dashboard");
+    const dest = rawDest.startsWith("/") ? rawDest : "/dashboard";
+
+    const user = email ? await db.user.findUnique({ where: { email } }) : null;
+    const ok = user?.passwordHash ? await verifyPassword(password, user.passwordHash) : false;
+    if (!ok || !user) {
+      redirect(`/sign-in?error=invalid_password&callbackUrl=${encodeURIComponent(dest)}`);
+    }
+
+    await createSessionForUser(user.id);
+    redirect(dest);
+  }
+
+  return (
+    <form action={handlePasswordSignIn} className="flex flex-col gap-3">
+      <input type="hidden" name="redirectTo" value={redirectTo} />
+      <input
+        type="email"
+        name="email"
+        required
+        placeholder="you@example.com"
+        className="rounded-full border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-emerald-300/50"
+      />
+      <input
+        type="password"
+        name="password"
+        required
+        placeholder="Password"
+        className="rounded-full border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-emerald-300/50"
+      />
+      <button
+        type="submit"
+        className="rounded-full bg-white px-4 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
+      >
+        Sign in
+      </button>
+    </form>
   );
 }
 
