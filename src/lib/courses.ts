@@ -46,7 +46,7 @@ export const COURSES: Course[] = [
     whopPlanId: "plan_VSU3hyAITNsNk",
     checkoutUrl: "https://whop.com/checkout/plan_VSU3hyAITNsNk",
     contentDir: "courses/ai-engineering",
-    firstLessonPath: "dashboard.html",
+    firstLessonPath: "dashboard",
     waitlistUrl:
       "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20AI%20Engineering%0A",
     published: true,
@@ -62,7 +62,7 @@ export const COURSES: Course[] = [
     whopPlanId: "plan_ysRjmrPzOn9j1",
     checkoutUrl: "https://whop.com/checkout/plan_ysRjmrPzOn9j1",
     contentDir: "courses/data-science",
-    firstLessonPath: "dashboard.html",
+    firstLessonPath: "dashboard",
     waitlistUrl:
       "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20Data%20Science%20%26%20Analysis%0A",
     // All 9 modules, all 315 practice tasks (SQL/Excel/Python/Statistics/

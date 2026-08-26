@@ -44,12 +44,32 @@ export async function GET(
     return NextResponse.redirect(new URL(`/courses/${courseId}`, request.url));
   }
 
+  // Clean URLs: every course page is addressed without ".html" (e.g.
+  // /courses/data-science/syllabus, not /syllabus.html). A request that
+  // still spells out ".html" — an old link, a bookmark — gets redirected
+  // to the canonical form rather than served directly, so the address bar
+  // only ever shows the clean version.
+  const lastSegment = pathSegments[pathSegments.length - 1] ?? "";
+  if (lastSegment.toLowerCase().endsWith(".html")) {
+    const canonicalSegments = [...pathSegments.slice(0, -1), lastSegment.slice(0, -".html".length)];
+    const canonicalUrl = new URL(`/courses/${courseId}/${canonicalSegments.join("/")}`, request.url);
+    canonicalUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(canonicalUrl, 308);
+  }
+
   // Path-traversal guard: the resolved path must stay inside contentDir no
   // matter what the URL segments say (e.g. "..", encoded separators).
   const baseDir = path.resolve(process.cwd(), course.contentDir);
-  const resolved = path.resolve(baseDir, ...pathSegments);
+  let resolved = path.resolve(baseDir, ...pathSegments);
   if (resolved !== baseDir && !resolved.startsWith(baseDir + path.sep)) {
     return new NextResponse("Not found", { status: 404 });
+  }
+
+  // A page request has no extension on disk — every actual asset (.js,
+  // .css, .json, images, datasets) is already requested with its real
+  // extension and skips this.
+  if (!path.extname(resolved)) {
+    resolved = `${resolved}.html`;
   }
 
   let fileBuffer: Buffer;
