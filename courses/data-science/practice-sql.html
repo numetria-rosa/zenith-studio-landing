@@ -103,7 +103,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
     <span class="eyebrow">Practice Library &middot; SQL &middot; Stages 1-6 of 6</span>
     <h1 class="serif">SQL Practice Library</h1>
     <p class="sub">Extra repetition beyond Module 6's core lesson, same real database, real anti-cheat, on-demand hints. Each skill is tracked independently, aggregation mastery doesn't borrow credit from fundamentals mastery. Guided tasks first, then semi-guided (you get the business question and the data, not the technique), then a challenge task with no scaffolding at all.</p>
-    <div class="scopenote"><b>Honest scope note:</b> this SQL practice library is complete, all 6 planned stages (fundamentals, aggregation, joins, advanced SQL, window functions, business analysis), 60 tasks total, are real, fully built, graded, and tested. The separate Excel/Python/Tableau/Power BI/Automation practice libraries are designed but not yet built, that's future work, not a claim made here.</div>
+    <div class="scopenote"><b>Honest scope note:</b> this SQL practice library is complete, all 6 planned stages (fundamentals, aggregation, joins, advanced SQL, window functions, business analysis), 60 tasks total, are real, fully built, graded, and tested. Excel (35), Python (50), Statistics (40), Tableau (40), Power BI (40), and Automation (30) are also complete, plus 20 Integrated Cross-Tool Challenges and 10 portfolio projects, see the dashboard for the full library list.</div>
   </header>
 
   <div id="skillBars"></div>
@@ -140,7 +140,7 @@ const SKILLS = [
    (array of task ids), objective, dataset, taskType, gradingMethod,
    referenceSql (hidden, recomputed live, never hardcoded values). */
 const TASKS = [
-  { id: "sql-f01", skill: SKILL_ID, tool: "sql", level: "guided", difficulty: "core", prerequisite: [],
+  { id: "sql-f01", skill: SKILL_ID, tool: "sql", level: "guided", difficulty: "core", prerequisite: [], mutationTarget: "products",
     title: "Select specific columns",
     objective: "Return exactly the columns asked for, not every column with SELECT *.",
     prompt: "Return <code>product_name</code> and <code>category</code> for every product.",
@@ -152,7 +152,7 @@ const TASKS = [
       "SELECT product_name, category FROM products, no WHERE needed here.",
       "SELECT product_name, category FROM products;" ] },
 
-  { id: "sql-f02", skill: SKILL_ID, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-f01"],
+  { id: "sql-f02", skill: SKILL_ID, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-f01"], mutationTarget: "customers",
     title: "Filter with WHERE",
     objective: "Narrow rows down to the ones that match a condition.",
     prompt: "Return every column for customers whose <code>country</code> is <code>'France'</code>.",
@@ -188,7 +188,7 @@ const TASKS = [
       "LIMIT 5 keeps only the first 5 rows of the sorted result.",
       "SELECT order_id, order_date FROM orders ORDER BY order_date DESC LIMIT 5;" ] },
 
-  { id: "sql-f05", skill: SKILL_ID, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-f01"],
+  { id: "sql-f05", skill: SKILL_ID, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-f01"], mutationTarget: "customers",
     title: "Remove duplicates with DISTINCT",
     objective: "Get a unique list of values from a column with repeats.",
     prompt: "Return the distinct list of <code>country</code> values that appear in <code>customers</code>.",
@@ -212,7 +212,7 @@ const TASKS = [
       "Name the result with AS: expression AS line_total.",
       "SELECT sku, quantity * unit_price AS line_total FROM order_items;" ] },
 
-  { id: "sql-f07", skill: SKILL_ID, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-f06"],
+  { id: "sql-f07", skill: SKILL_ID, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-f06"], mutationTarget: "products",
     title: "Branch on a condition with CASE",
     objective: "Build a category inline that doesn't exist as a real column.",
     prompt: "Merchandising wants products labeled by price tier, which isn't a column in the data. Return <code>sku</code>, <code>product_name</code>, and a computed column named <code>tier</code>: <code>'Premium'</code> when <code>unit_cost</code> is 40 or more, otherwise <code>'Standard'</code>.",
@@ -297,7 +297,7 @@ const TASKS = [
       "SELECT SUM(column) FROM table, no GROUP BY needed when you want one grand total.",
       "SELECT SUM(quantity) FROM order_items;" ] },
 
-  { id: "sql-a04", skill: SKILL_ID_AGG, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a03"],
+  { id: "sql-a04", skill: SKILL_ID_AGG, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a03"], mutationTarget: "products",
     title: "AVG across a table",
     objective: "Compute a mean directly in SQL instead of pulling all the rows out first.",
     prompt: "What's the average <code>unit_cost</code> across every row in <code>products</code>, rounded to 2 decimal places?",
@@ -309,7 +309,7 @@ const TASKS = [
       "Wrap it in ROUND(..., 2) to get exactly 2 decimal places.",
       "SELECT ROUND(AVG(unit_cost), 2) FROM products;" ] },
 
-  { id: "sql-a05", skill: SKILL_ID_AGG, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a04"],
+  { id: "sql-a05", skill: SKILL_ID_AGG, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a04"], mutationTarget: "products",
     title: "MIN and MAX together",
     objective: "Pull two different aggregates in the same query.",
     prompt: "Return the cheapest and most expensive <code>unit_cost</code> in <code>products</code>, as two columns in one row: <code>MIN(unit_cost)</code> and <code>MAX(unit_cost)</code>.",
@@ -539,7 +539,7 @@ const TASKS = [
       "SELECT channel, COUNT(*) AS n FROM orders GROUP BY channel HAVING COUNT(*) > 20;" ],
     explanation: { why: "HAVING runs after GROUP BY has produced its aggregates, so it's the only clause that can test a computed value like COUNT(*) or SUM(...).", mistake: "Forgetting that a NULL channel forms its own group, if that group happens to have a high count, it would appear in results with a blank channel name, worth noticing, not silently accepting.", tip: "Any time a business question includes a threshold word, \"more than,\" \"at least,\" \"over,\" on a count or a total, that's a HAVING clause, not a WHERE clause.", business: "This is exactly the kind of check that precedes a channel-investment decision, you wouldn't want to recommend expanding a channel based on a handful of orders." } },
 
-  { id: "sql-d03", skill: SKILL_ID_ADV, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a04"],
+  { id: "sql-d03", skill: SKILL_ID_ADV, tool: "sql", level: "guided", difficulty: "core", prerequisite: ["sql-a04"], mutationTarget: "products",
     title: "Compare a row against an aggregate with a subquery",
     objective: "Use a subquery to compare individual rows against a computed benchmark.",
     prompt: "Return <code>sku</code> and <code>unit_cost</code> for every product priced above the average <code>unit_cost</code> across all products.",
@@ -578,7 +578,7 @@ const TASKS = [
       "WITH cust_rev AS (SELECT c.customer_id, ROUND(SUM(oi.quantity*oi.unit_price),2) AS revenue FROM customers c JOIN orders o ON c.customer_id=o.customer_id JOIN order_items oi ON o.order_id=oi.order_id WHERE o.status='completed' GROUP BY c.customer_id) SELECT * FROM cust_rev ORDER BY revenue DESC;" ],
     explanation: { why: "A CTE (Common Table Expression) runs its inner query once and gives the result a name, which the rest of the query can then SELECT from just like a real table.", mistake: "Copy-pasting the same join-and-group logic into two or three different subqueries in one big query, once you need the same intermediate result twice, that's the signal to name it with a CTE instead.", tip: "This exact \"customer revenue base\" CTE is worth remembering, the next several tasks build directly on the same shape.", business: "Naming and reusing a metric like this is how real analytics teams avoid two dashboards quietly disagreeing about what \"customer revenue\" means, one CTE, one definition, reused everywhere." } },
 
-  { id: "sql-d06", skill: SKILL_ID_ADV, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-d01"],
+  { id: "sql-d06", skill: SKILL_ID_ADV, tool: "sql", level: "semiguided", difficulty: "core", prerequisite: ["sql-d01"], mutationTarget: "products",
     title: "Compare each category to the overall average",
     objective: "Use a subquery inside SELECT to place a per-group value next to a global benchmark.",
     prompt: "Return each <code>category</code>'s average <code>unit_cost</code> (rounded to 2dp) alongside the overall average across every product (also rounded to 2dp, the same number repeated on every row), so a reader can see each category's position at a glance.",
@@ -972,6 +972,25 @@ async function getMutatedDb(target) {
     // ever producing a negative or zero cost.
     const factor = 1.4 + Math.random() * 1.2; // 1.4x - 2.6x
     db.run(`UPDATE products SET unit_cost = ROUND(unit_cost * ${factor}, 2)`);
+    // Also drop one random row: a cost-only mutation can't touch a task
+    // whose answer is just "every product's name and category" (no
+    // computation on cost at all), a hardcoded row-enumeration would
+    // still pass that check untouched otherwise.
+    const dropRows = db.exec("SELECT sku FROM products ORDER BY RANDOM() LIMIT 1");
+    if (dropRows.length) db.run(`DELETE FROM products WHERE sku = '${dropRows[0].values[0][0]}'`);
+  } else if (target === "customers") {
+    // A handful of fundamentals tasks (filter/DISTINCT on customers alone,
+    // no join to orders) have an answer the "orders" mutation can never
+    // touch, letting a hardcoded literal slip through undetected, the
+    // same dependency-graph gap the products case above exists to close.
+    // Removing customers who have no orders keeps order_items/orders
+    // referentially sane while still changing the row set and the
+    // distinct-country list these tasks are actually graded against.
+    const rows = db.exec(
+      "SELECT customer_id FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders) ORDER BY RANDOM() LIMIT 4"
+    );
+    const ids = rows.length ? rows[0].values.map((v) => v[0]) : [];
+    ids.forEach((id) => db.run(`DELETE FROM customers WHERE customer_id = ${id}`));
   } else if (target === "orders-heavy") {
     // A handful of tasks (the "find this specific short list of
     // customers/products" business tasks) only surface a narrow slice
