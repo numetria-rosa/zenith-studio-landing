@@ -46,6 +46,8 @@ export type CourseCard = {
   topics: string[];
   facts: string[];
   careerPath: string;
+  /** Real module list, in order, straight from the course's own course-progress.js MODULES array. Only set for courses that are actually built and published — never invent a curriculum for a "Coming soon" course. */
+  curriculum?: string[];
 };
 
 export const courses: CourseCard[] = [
@@ -98,6 +100,18 @@ export const courses: CourseCard[] = [
     ],
     careerPath:
       "A portfolio of real analyses, built from messy data through a defended recommendation, the kind of evidence that gets interviews instead of another tutorial notebook.",
+    curriculum: [
+      "Orientation",
+      "Spreadsheet & Data Literacy Foundations",
+      "Python Foundations for Data",
+      "Pandas & NumPy Fundamentals",
+      "Data Cleaning & Validation",
+      "Exploratory Data Analysis & Statistics",
+      "SQL for Analysts",
+      "Data Visualization & Storytelling",
+      "Dashboards & Business Communication",
+      "Capstone Analysis Project",
+    ],
   },
   {
     id: "ai-engineering",
@@ -137,6 +151,17 @@ export const courses: CourseCard[] = [
     ],
     careerPath:
       "A shipped AI product with evals you can point to in an interview, whether you're moving into AI engineering freelance or hired.",
+    curriculum: [
+      "Orientation",
+      "Prompting & Structured Outputs",
+      "Context Windows & Token Economics",
+      "Retrieval-Augmented Generation",
+      "Tool Use & Function Calling",
+      "Agent Architectures & Control Flow",
+      "Reliability for LLM Systems",
+      "Evaluation, Testing & Observability",
+      "Capstone: A Production AI Agent",
+    ],
   },
   {
     id: "automation-engineering",

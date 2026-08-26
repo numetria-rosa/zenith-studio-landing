@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Clock,
@@ -11,6 +12,7 @@ import {
   Briefcase,
   Sparkles,
   ChevronDown,
+  ArrowUpRight,
   Check,
   Database,
   Terminal,
@@ -239,20 +241,30 @@ export function CourseCatalog({
                 </ul>
               </div>
 
-              {/* Expandable detail */}
-              <button
-                type="button"
-                onClick={() => setExpandedId(expanded ? null : course.id)}
-                aria-expanded={expanded}
-                aria-controls={`detail-${course.id}`}
-                className="mt-4 inline-flex items-center gap-1.5 self-start text-xs font-semibold text-emerald-200/80 transition hover:text-emerald-100"
-              >
-                {expanded ? "Show less" : "Explore course"}
-                <ChevronDown
-                  className={`h-3.5 w-3.5 transition-transform ${expanded ? "rotate-180" : ""}`}
-                  aria-hidden
-                />
-              </button>
+              {/* Expandable detail + full details page link */}
+              <div className="mt-4 flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => setExpandedId(expanded ? null : course.id)}
+                  aria-expanded={expanded}
+                  aria-controls={`detail-${course.id}`}
+                  className="inline-flex items-center gap-1.5 self-start text-xs font-semibold text-emerald-200/80 transition hover:text-emerald-100"
+                >
+                  {expanded ? "Show less" : "Explore course"}
+                  <ChevronDown
+                    className={`h-3.5 w-3.5 transition-transform ${expanded ? "rotate-180" : ""}`}
+                    aria-hidden
+                  />
+                </button>
+
+                <Link
+                  href={`/lab/${course.id}`}
+                  className="inline-flex items-center gap-1.5 self-start text-xs font-semibold text-white/50 transition hover:text-white/85"
+                >
+                  Course details
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+                </Link>
+              </div>
 
               <AnimatePresence initial={false}>
                 {expanded && (
