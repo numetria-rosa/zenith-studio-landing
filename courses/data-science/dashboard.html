@@ -151,7 +151,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <div class="welcomecard" id="welcomeCard">
     <div class="wcavatar" id="wcAvatar">?</div>
     <div class="wctext">
-      <div class="wctitle" id="wcTitle">Welcome back</div>
+      <div class="wctitle" id="wcTitle">Welcome</div>
       <div class="wcsub" id="wcSub">Loading your progress&hellip;</div>
     </div>
   </div>
@@ -304,15 +304,16 @@ async function renderWelcome() {
   const name = (me && me.name) || (me && me.email) || "there";
   const initial = name.trim().charAt(0).toUpperCase() || "?";
   document.getElementById("wcAvatar").textContent = initial;
-  document.getElementById("wcTitle").textContent = `Welcome back, ${name}`;
 
   const ov = CourseProgress.overall();
   const passedTasks = (typeof SkillMap !== "undefined") ? SkillMap.totalTasksPassed() : 0;
   const totalTasks = (typeof SkillMap !== "undefined") ? SkillMap.TASKS.length : 0;
-  document.getElementById("wcSub").textContent =
-    ov.completed === 0 && passedTasks === 0
-      ? "You're just getting started, jump back in below."
-      : `${ov.completed} / ${ov.total} modules complete, ${passedTasks} / ${totalTasks} practice tasks passed.`;
+  const isFirstVisit = ov.completed === 0 && passedTasks === 0;
+
+  document.getElementById("wcTitle").textContent = isFirstVisit ? `Welcome, ${name}` : `Welcome back, ${name}`;
+  document.getElementById("wcSub").textContent = isFirstVisit
+    ? "Your account is ready. Jump in below whenever you're set."
+    : `${ov.completed} / ${ov.total} modules complete, ${passedTasks} / ${totalTasks} practice tasks passed.`;
   document.getElementById("welcomeCard").classList.add("show");
 
   const note = document.getElementById("storageNote");
