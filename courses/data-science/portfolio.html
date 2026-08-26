@@ -56,7 +56,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <header class="hero">
     <span class="eyebrow">My Portfolio</span>
     <h1 class="serif">What you've actually built</h1>
-    <p class="sub">Every completed project from the Projects library, with the skills it demonstrates, your self-assessed score, and a generated summary you can paste into a resume or the static portfolio template.</p>
+    <p class="sub">Every completed project from the Projects library, with the skills it demonstrates, your self-assessed score, and a generated summary you can paste into a resume or the portfolio template below.</p>
+    <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+      <a href="portfolio-template.zip" download style="display:inline-flex;align-items:center;gap:8px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:14px;padding:12px 20px;border-radius:8px;text-decoration:none">&darr; Download the portfolio template</a>
+      <a href="deploy-guide.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--card);color:var(--tx);border:1px solid var(--bd2);font-weight:700;font-size:14px;padding:12px 20px;border-radius:8px;text-decoration:none">How to deploy it &rarr;</a>
+    </div>
   </header>
 
   <div id="content"></div>
@@ -77,6 +81,12 @@ const SKILL_PHRASES = {
   2: "HR/people analytics: multi-source data merging and distinguishing a real headcount gap from a scheduling problem",
   3: "marketing attribution analysis: channel performance comparison that accounts for sample-size noise, not just raw percentages",
   4: "financial variance analysis: seasonality-aware P&L review and a simple, assumption-stated cash-flow forecast",
+  5: "retail inventory analysis: multi-location pricing and stock-level analysis on a messy store-by-store export",
+  6: "SaaS churn analysis: SQL-heavy billing data cleaning and MRR/churn computation by plan and industry segment",
+  7: "real estate pricing analysis: days-on-market and comparable-pricing analysis on a messy listings export",
+  8: "healthcare operations analysis: Python-heavy appointment and wait-time analysis across departments and providers",
+  9: "hospitality revenue analysis: booking and channel profitability analysis accounting for cancellations and no-shows",
+  10: "integrated executive reporting: a cross-tool scorecard pulling SQL, Python/Excel, and a Tableau or Power BI dashboard into one KPI view",
 };
 
 function render(){
@@ -139,6 +149,6 @@ document.getElementById("btnCopySummary").addEventListener("click", () => {
 
 render();
 </script>
-<script src="course-rail.js?v=7"></script>
+<script src="course-rail.js?v=8"></script>
 </body>
 </html>

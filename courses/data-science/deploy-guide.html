@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deploy Your Portfolio, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--bd:#232838;--bd2:#333a4c;
+  --tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;
+  --amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;
+}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:820px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:820px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:820px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--amber)}
+.hero{padding:40px 0 20px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(28px,4.5vw,40px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:15px;max-width:640px;margin-top:12px}
+.download{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap}
+a.dlbtn{display:inline-flex;align-items:center;gap:8px;background:var(--amber);color:var(--amberd);font-weight:700;font-size:14px;padding:12px 20px;border-radius:8px;text-decoration:none}
+a.dlbtn.secondary{background:var(--card);color:var(--tx);border:1px solid var(--bd2)}
+section{padding:36px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.kh .num{font-family:'IBM Plex Mono';font-weight:700;font-size:13px;color:var(--amber);border:1px solid var(--amber);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-family:'Fraunces';font-size:21px;font-weight:600;letter-spacing:-.01em}
+p.lead{color:var(--mut);max-width:640px;margin-bottom:14px}
+ol.steps{list-style:none;display:grid;gap:14px}
+ol.steps li{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px 18px;display:flex;gap:14px}
+ol.steps li .n{font-family:'IBM Plex Mono';font-weight:700;color:var(--amber);flex-shrink:0}
+ol.steps li .t{font-size:14px}
+ol.steps li .t b{display:block;margin-bottom:3px}
+code{font-family:'IBM Plex Mono';background:var(--bg2);border:1px solid var(--bd2);border-radius:4px;padding:2px 6px;font-size:12.5px}
+.note{background:rgba(240,180,41,.06);border-left:3px solid var(--amber);padding:14px 18px;border-radius:0 8px 8px 0;margin-top:16px;font-size:13.5px;color:var(--mut)}
+.note b{color:var(--amber)}
+.cost-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+.cost-table th,.cost-table td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--bd)}
+.cost-table th{color:var(--mut2);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.08em;font-family:'IBM Plex Mono'}
+footer{padding:30px 0 60px;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} ol.steps li{flex-direction:column;gap:4px} }
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="portfolio.html">Portfolio</a></div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Portfolio &middot; Deployment</span>
+    <h1 class="serif">Put your portfolio on the real internet</h1>
+    <p class="sub">A finished portfolio sitting only on your laptop doesn't get you a job. This is the exact path to a real, live URL you can put on a resume: free hosting on Vercel, and an optional custom domain if you want one.</p>
+    <div class="download">
+      <a class="dlbtn" href="portfolio-template.zip" download>&darr; Download the portfolio template</a>
+      <a class="dlbtn secondary" href="portfolio.html">Back to My Portfolio</a>
+    </div>
+    <div class="note"><b>Honest scope:</b> this page covers the deployment workflow itself, GitHub, Vercel, and DNS. It doesn't teach Git from scratch, if you've never used Git before, GitHub's own <a href="https://docs.github.com/en/get-started/quickstart/hello-world" target="_blank" rel="noopener noreferrer" style="color:var(--info)">Hello World guide</a> takes about 10 minutes and covers everything you need first.</div>
+  </header>
+
+  <section>
+    <div class="kh"><span class="num">1</span><h2>Get your template onto GitHub</h2></div>
+    <p class="lead">Vercel deploys directly from a GitHub repository, so that's the first stop, not optional.</p>
+    <ol class="steps">
+      <li><span class="n">1</span><span class="t"><b>Unzip the template</b>you downloaded above into its own folder, then edit <code>index.html</code>, replace every "EDIT ME" comment with your real name, links, and project write-ups.</span></li>
+      <li><span class="n">2</span><span class="t"><b>Create a new repository on GitHub</b>(github.com &rarr; New repository). Name it something like <code>my-portfolio</code>. Leave it empty, no README, no .gitignore.</span></li>
+      <li><span class="n">3</span><span class="t"><b>Push your folder to it</b>from a terminal inside the folder:<br><code>git init</code><br><code>git add .</code><br><code>git commit -m "portfolio"</code><br><code>git branch -M main</code><br><code>git remote add origin https://github.com/yourusername/my-portfolio.git</code><br><code>git push -u origin main</code></span></li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">2</span><h2>Deploy it on Vercel</h2></div>
+    <p class="lead">Vercel's free tier is enough for a static portfolio site, no credit card required for this.</p>
+    <ol class="steps">
+      <li><span class="n">1</span><span class="t"><b>Sign up at vercel.com</b>using your GitHub account, this lets Vercel see your repositories directly.</span></li>
+      <li><span class="n">2</span><span class="t"><b>Click "Add New" &rarr; "Project"</b>, then select the <code>my-portfolio</code> repository you just pushed.</span></li>
+      <li><span class="n">3</span><span class="t"><b>Leave every setting at its default</b>(this is a plain static site, no framework, no build command needed) and click Deploy.</span></li>
+      <li><span class="n">4</span><span class="t"><b>You now have a live URL</b>like <code>my-portfolio.vercel.app</code>. Every future <code>git push</code> to <code>main</code> automatically redeploys it, no manual re-upload ever again.</span></li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">3</span><h2>Optional: buy and connect a real domain</h2></div>
+    <p class="lead">A <code>.vercel.app</code> URL is genuinely fine to put on a resume. A custom domain (like <code>yourname.com</code>) is a nice-to-have, not a requirement, and it costs real money every year.</p>
+    <ol class="steps">
+      <li><span class="n">1</span><span class="t"><b>Buy a domain</b>from any registrar, Namecheap, Cloudflare Registrar, or directly inside Vercel's own dashboard under "Domains". Search your name or a variation of it.</span></li>
+      <li><span class="n">2</span><span class="t"><b>In your Vercel project, go to Settings &rarr; Domains</b>and add the domain you bought.</span></li>
+      <li><span class="n">3</span><span class="t"><b>Point the domain at Vercel</b>. If you bought it directly through Vercel this is automatic. If you bought it elsewhere, Vercel shows you exactly which DNS records to add (usually one A record and one CNAME), you add those in your registrar's DNS settings.</span></li>
+      <li><span class="n">4</span><span class="t"><b>Wait for DNS to propagate</b>, usually minutes, occasionally up to 24 hours, then your domain serves the same site as your <code>.vercel.app</code> URL, automatically over HTTPS.</span></li>
+    </ol>
+    <table class="cost-table">
+      <tr><th>Item</th><th>Typical cost</th><th>Required?</th></tr>
+      <tr><td>GitHub account</td><td>Free</td><td>Yes</td></tr>
+      <tr><td>Vercel hosting (static site)</td><td>Free</td><td>Yes</td></tr>
+      <tr><td>Custom domain</td><td>~$10&ndash;20/year, renews annually</td><td>No, optional</td></tr>
+    </table>
+  </section>
+
+  <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Deploy Guide</footer>
+</div>
+
+<script src="course-progress.js?v=6"></script>
+<script src="course-rail.js?v=8"></script>
+</body>
+</html>

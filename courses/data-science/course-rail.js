@@ -68,6 +68,7 @@
     ["practice-integrated.html", "Integrated Cross-Tool Challenges"],
     ["projects.html", "Projects"],
     ["portfolio.html", "My Portfolio"],
+    ["deploy-guide.html", "Deploy Guide"],
     ["career.html", "Career Path"],
   ];
 
