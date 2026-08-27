@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Hammer, Briefcase, Rocket } from "lucide-react";
 import { GlowBackdrop } from "@/components/GlowBackdrop";
+import { fraunces } from "@/lib/fonts";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
 import { CourseCatalog } from "./CourseCatalog";
 import { courses } from "./courses-data";
@@ -95,10 +96,12 @@ export default function ZenithLabPage() {
                 alt="Zenith Studio"
                 className="h-9 w-9 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)]"
               />
-              <div>
-                <div className="text-sm tracking-[0.35em] text-white/60 uppercase">Zenith</div>
-                <div className="text-base font-semibold -mt-0.5">Lab</div>
-              </div>
+              <span className={`${fraunces.className} inline-flex items-baseline text-lg font-bold tracking-tight`}>
+                ZENITH
+                <span className="ml-1 rounded-[4px] bg-gradient-to-r from-violet-500 to-blue-400 px-1.5 py-0.5 text-sm text-white">
+                  LAB
+                </span>
+              </span>
             </Link>
 
             <nav className="hidden items-center gap-8 text-sm text-white/70 md:flex">
