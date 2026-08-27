@@ -158,7 +158,7 @@ export default function ZenithLabPage() {
 
             <dl className="mt-10 grid max-w-2xl grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-4">
               {[
-                ["4", "courses"],
+                ["8", "courses"],
                 ["315", "practice tasks in Data Science"],
                 ["10", "portfolio projects"],
                 ["100%", "career path in every course"],
@@ -243,12 +243,14 @@ export default function ZenithLabPage() {
           <div className="mb-10 max-w-3xl">
             <div className="text-xs uppercase tracking-[0.3em] text-emerald-200/70">The catalog</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-              Four courses, built in order
+              Eight courses, built in order
             </h2>
             <p className="mt-4 leading-7 text-white/62">
               Data Science &amp; Analysis and AI Engineering are open now, self-paced,
-              start whenever you&apos;re ready. Automation Engineering and Web3 Engineering
-              are in development, join the waitlist to hear when they open.
+              start whenever you&apos;re ready. AI-Assisted Software Engineering,
+              Cybersecurity &amp; Ethical Hacking, AI Agents &amp; Agentic AI, MCP Servers
+              &amp; AI Tool Integration, Automation Engineering, and Web3 Engineering are
+              in development, join the waitlist to hear when they open.
             </p>
           </div>
 
@@ -264,8 +266,8 @@ export default function ZenithLabPage() {
               </h2>
               <p className="mt-4 leading-7 text-white/62">
                 Data Science &amp; Analysis and AI Engineering are open for enrollment now.
-                For Automation Engineering or Web3 Engineering, join the waitlist and
-                we&apos;ll let you know the moment they open.
+                For everything else in the catalog, join the waitlist and we&apos;ll let
+                you know the moment it opens.
               </p>
               <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
                 <a

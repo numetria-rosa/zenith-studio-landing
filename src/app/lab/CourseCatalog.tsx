@@ -26,6 +26,15 @@ import {
   Wrench,
   Palette,
   Timer,
+  Shield,
+  Bug,
+  Cloud,
+  Bot,
+  Network,
+  GitBranch,
+  Server,
+  KeyRound,
+  FileText,
 } from "lucide-react";
 import { fraunces } from "@/lib/fonts";
 import type { CourseCard, CourseCategory } from "./courses-data";
@@ -129,6 +138,28 @@ const TOPIC_ICONS: Record<string, typeof Database> = {
   Wallets: Briefcase,
   Testing: ListChecks,
   dApps: Palette,
+  "AI Orchestration": Bot,
+  "AI Pair Programming": Bot,
+  "Code Review": ListChecks,
+  Debugging: Bug,
+  Refactoring: Wrench,
+  "Prompt Engineering": Brain,
+  "Penetration Testing": Shield,
+  "Network Security": Network,
+  "Web App Security": Shield,
+  "Cloud Security": Cloud,
+  "AI/LLM Security": Bot,
+  Reporting: FileText,
+  "Agent Architectures": Bot,
+  Planning: GitBranch,
+  "Multi-Agent Systems": Network,
+  "Tool Design": Wrench,
+  Guardrails: Shield,
+  "MCP Protocol": Server,
+  "Tool Integration": Blocks,
+  "API Design": Blocks,
+  "Auth & Scoping": KeyRound,
+  Deployment: Server,
 };
 
 function TopicIcon({ topic }: { topic: string }) {
@@ -141,6 +172,7 @@ const FILTERS: { id: CourseCategory | "all"; label: string }[] = [
   { id: "data", label: "Data" },
   { id: "ai", label: "AI" },
   { id: "automation", label: "Automation" },
+  { id: "security", label: "Security" },
   { id: "blockchain", label: "Blockchain" },
 ];
 

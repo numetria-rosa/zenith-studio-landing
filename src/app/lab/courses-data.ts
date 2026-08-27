@@ -15,7 +15,7 @@
 // no price and no task/project counts here, inventing either would
 // violate the one rule this file can't bend on.
 
-export type CourseCategory = "data" | "ai" | "automation" | "blockchain";
+export type CourseCategory = "data" | "ai" | "automation" | "blockchain" | "security";
 
 export type CourseCard = {
   id: string;
@@ -282,6 +282,123 @@ export const courses: CourseCard[] = [
     labBadgeColor: { bg: "#c6f432", text: "#0f1405" },
   },
   {
+    id: "ai-assisted-software-engineering",
+    name: "AI-Assisted Software Engineering",
+    category: "ai",
+    categoryLabel: "AI and LLMs",
+    available: false,
+    level: "Intermediate, some coding experience",
+    duration: "Coming soon",
+    summary:
+      "Ship production code with an AI coding agent without letting it quietly wreck your codebase: prompting for code, reviewing AI output like a skeptic, and knowing exactly what to hand off versus do yourself.",
+    whatYoullDo: [
+      "Scaffold real code from a spec with a coding agent",
+      "Read AI-generated code like a reviewer, not a customer",
+      "Debug with an AI agent without losing the actual root cause",
+      "Verify AI-written tests actually test something",
+      "Run a multi-file refactor with an agent and check its work",
+      "Review an AI-authored pull request for security and logic regressions",
+    ],
+    topics: ["AI Pair Programming", "Code Review", "Debugging", "Testing", "Refactoring", "Prompt Engineering"],
+    facts: [
+      "AI-generated code that compiles and looks plausible can still call an API that doesn't exist.",
+      "The bottleneck in AI-assisted development is review discipline, not how fast the agent writes code.",
+      "A test an AI agent writes for its own code can pass while testing nothing real.",
+    ],
+    careerPath:
+      "A real shipped feature built and reviewed with an AI coding agent, plus the review habits that keep you accountable for code you didn't type yourself.",
+    labBadgeColor: { bg: "#60a5fa", text: "#0b1220" },
+  },
+  {
+    id: "cybersecurity-ethical-hacking",
+    name: "Cybersecurity & Ethical Hacking",
+    category: "security",
+    categoryLabel: "Cybersecurity",
+    available: false,
+    level: "Beginner-friendly foundations, advanced cloud/AI security track after",
+    duration: "Coming soon",
+    summary:
+      "Authorized, hands-on offensive security: network and web app penetration testing against real vulnerable lab environments, then the advanced track into cloud misconfigurations and AI/LLM-specific attacks.",
+    whatYoullDo: [
+      "Run reconnaissance and enumeration against a lab target",
+      "Exploit real vulnerabilities in a deliberately vulnerable web app",
+      "Escalate privileges and move through a compromised host",
+      "Write a pentest report a client can actually act on",
+      "Break and harden cloud IAM and container configurations",
+      "Attack and defend an LLM agent against prompt injection",
+    ],
+    topics: [
+      "Penetration Testing",
+      "Network Security",
+      "Web App Security",
+      "Cloud Security",
+      "AI/LLM Security",
+      "Reporting",
+    ],
+    facts: [
+      "A pentest report nobody can act on is worth less than the engagement that produced it.",
+      "Most real breaches start with a misconfiguration, not a zero-day.",
+      "Prompt injection can hijack an AI agent's tool access, not just its output.",
+    ],
+    careerPath:
+      "A documented pentest engagement plus a cloud/AI security lab writeup, evidence that maps directly to Security+/OSCP-track roles.",
+    labBadgeColor: { bg: "#f87171", text: "#2a0a0a" },
+  },
+  {
+    id: "agentic-ai",
+    name: "AI Agents & Agentic AI",
+    category: "ai",
+    categoryLabel: "AI and LLMs",
+    available: false,
+    level: "Intermediate, comfortable with core AI/LLM fundamentals",
+    duration: "Coming soon",
+    summary:
+      "Beyond a single prompt and response: planning loops, multi-agent orchestration, memory, and the guardrails that keep an autonomous agent from running away with your production system.",
+    whatYoullDo: [
+      "Build a planning loop that reasons over multiple steps",
+      "Manage state and memory across an agent's turns",
+      "Orchestrate multiple agents that delegate to each other",
+      "Design tool schemas an agent can't misuse",
+      "Add guardrails and human-in-the-loop checkpoints",
+      "Evaluate an agentic system, not just a single response",
+    ],
+    topics: ["Agent Architectures", "Planning", "Multi-Agent Systems", "Tool Design", "Guardrails", "Evaluation"],
+    facts: [
+      "An agent loop without a hard stop condition doesn't stop on its own.",
+      "Multi-agent systems fail in ways a single-agent system never does: agents can loop, contradict each other, or delegate forever.",
+      "Giving an agent a tool is also giving it a way to misuse that tool.",
+    ],
+    careerPath:
+      "A working multi-step autonomous agent with real guardrails, tested against failure cases, not just the happy path demo.",
+    labBadgeColor: { bg: "#34d399", text: "#04231a" },
+  },
+  {
+    id: "mcp-servers",
+    name: "MCP Servers & AI Tool Integration",
+    category: "ai",
+    categoryLabel: "AI and LLMs",
+    available: false,
+    level: "Intermediate, basic programming required",
+    duration: "Coming soon",
+    summary:
+      "Build and ship real Model Context Protocol servers: the actual integration layer connecting AI agents to tools, data, and systems in production right now.",
+    whatYoullDo: [
+      "Build a real, runnable MCP server from scratch",
+      "Expose resources, tools, and prompts through the protocol",
+      "Scope tool permissions so an agent can't overreach",
+      "Connect an agent client to your own MCP server",
+      "Debug, version, and deploy an MCP server",
+    ],
+    topics: ["MCP Protocol", "Tool Integration", "API Design", "Auth & Scoping", "Deployment"],
+    facts: [
+      "MCP standardizes how an AI agent discovers and calls tools, instead of every integration inventing its own function-calling format.",
+      "A tool with over-broad permissions is the most common way an agent ends up doing something it shouldn't.",
+    ],
+    careerPath:
+      "A real MCP server solving an actual integration problem, connected to a live agent, the kind of concrete build employers are asking for right now.",
+    labBadgeColor: { bg: "#fb923c", text: "#271200" },
+  },
+  {
     id: "automation-engineering",
     name: "Automation Engineering",
     category: "automation",
@@ -290,21 +407,24 @@ export const courses: CourseCard[] = [
     level: "Intermediate",
     duration: "8 modules",
     summary:
-      "Design production-grade workflows the way agencies actually ship them: API integrations, error handling, queues, retries, and self-hosting.",
+      "Design production-grade workflows the way agencies actually ship them: API integrations, error handling, queues, retries, self-hosting, and where an AI agent belongs (and doesn't) inside an automated pipeline.",
     whatYoullDo: [
       "Design workflow architecture for a real integration",
       "Authenticate against and call real third-party APIs",
       "Handle errors, timeouts, and unexpected data",
       "Build retry logic that doesn't create duplicate actions",
       "Self-host and monitor a running workflow",
+      "Add an AI decision step to a workflow without losing determinism where it matters",
+      "Put guardrails around an agentic automation step so it can't run away",
     ],
-    topics: ["APIs", "Error Handling", "Queues", "Retries", "Self-Hosting", "Monitoring"],
+    topics: ["APIs", "Error Handling", "Queues", "Retries", "Self-Hosting", "Monitoring", "AI Orchestration"],
     facts: [
       "A good workflow needs failure handling, not just a happy path.",
       "APIs often return errors, timeouts, or unexpected data.",
       "Retries without limits can create duplicate actions.",
       "Queues help separate incoming work from processing.",
       "Automation is often about eliminating repetitive decisions, not just clicking faster.",
+      "An AI step in a workflow still needs the same retry and idempotency discipline as any API call.",
     ],
     careerPath:
       "A portfolio automation system you can demo on a sales call, and the pricing/positioning to land clients paying for it.",
