@@ -181,3 +181,29 @@ model ServiceRequest {
   @@unique([userId, serviceId])
   @@index([whopMonthlyMembershipId])
 }
+
+// DB-backed mirror of src/lib/services.ts's static SERVICES array (Slice 2 of
+// the service-platform build, 2026-08-27). Read-through only for now: this
+// table is seeded from SERVICES (scripts/seed-service-catalog.mjs) so its
+// shape can be proven before anything depends on it, but services.ts stays
+// the real source of truth for checkout URLs, webhook plan resolution, and
+// all current UI. slug matches the free-string service ids already in use
+// (SERVICES[].id / ServiceRequest.serviceId), e.g. "ai-inbox-manager".
+model ServiceCatalog {
+  id          String @id @default(cuid())
+  slug        String @unique
+  title       String
+  pitch       String
+  description String @db.Text
+
+  setupPriceCents   Int?
+  monthlyPriceCents Int?
+
+  whopSetupPlanId   String?
+  whopMonthlyPlanId String?
+
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
