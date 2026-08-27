@@ -437,9 +437,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
             </h1>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <BookButton className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]">
-                Book a free automation audit
-              </BookButton>
+              <Link
+                href="/audit"
+                className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
+              >
+                Get Your Free Automation Audit
+              </Link>
               <a
                 href="#systems"
                 className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-xl transition hover:bg-white/10"
@@ -447,6 +450,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 See pricing
               </a>
             </div>
+            <p className="mt-3 text-xs text-white/40">
+              Prefer to talk it through?{" "}
+              <BookButton className="underline decoration-white/30 underline-offset-2 hover:text-white">
+                Book a free call instead
+              </BookButton>
+            </p>
 
             <div className="mt-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
               {[

@@ -207,3 +207,33 @@ model ServiceCatalog {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+enum AuditStatus {
+  SUBMITTED
+  IN_REVIEW
+  PROPOSAL_SENT
+  ACCEPTED
+  DECLINED
+}
+
+// Free audit intake (Slice 3 of the service-platform build, 2026-08-28).
+// Stands alone for now, keyed by email only — no ClientProfile model exists
+// yet (a later slice), so clientProfileId is deliberately omitted here.
+// formAnswers holds the entire structured multi-step form submission as one
+// JSON blob rather than a column per field, since the form has ~20 fields
+// across 4 sections and the schema shouldn't need a migration every time a
+// form question changes.
+model AuditRequest {
+  id          String      @id @default(cuid())
+  email       String
+  name        String?
+  companyName String?
+  formAnswers Json
+  status      AuditStatus @default(SUBMITTED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+}
