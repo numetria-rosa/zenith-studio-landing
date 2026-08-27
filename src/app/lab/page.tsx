@@ -87,7 +87,7 @@ export default function ZenithLabPage() {
       <GlowBackdrop />
 
       <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 pt-4">
-        <div className="mx-auto max-w-6xl rounded-full border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(52,211,153,0.10)]">
+        <div className="mx-auto max-w-7xl rounded-full border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(52,211,153,0.10)]">
           <div className="flex items-center justify-between px-5 sm:px-7 py-4">
             <Link href="/" className="flex items-center gap-3">
               <img
@@ -118,13 +118,13 @@ export default function ZenithLabPage() {
       </header>
 
       <main className="relative z-10 px-4 sm:px-6 lg:px-10">
-        <section className="mx-auto max-w-6xl pb-14 pt-16 sm:pt-24">
-          <div className="max-w-3xl">
+        <section className="mx-auto grid max-w-7xl items-center gap-12 pb-20 pt-14 lg:grid-cols-[1.1fr_0.9fr] lg:pt-20 min-h-[calc(100vh-110px)]">
+          <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-xs uppercase tracking-[0.28em] text-emerald-200/90 backdrop-blur-xl">
               Zenith Lab · Courses
             </div>
 
-            <h1 className="mt-7 text-5xl font-semibold leading-[0.98] tracking-[-0.05em] sm:text-6xl lg:text-7xl">
+            <h1 className="mt-7 max-w-4xl text-5xl font-semibold leading-[0.95] tracking-[-0.05em] sm:text-6xl lg:text-8xl">
               Learn by building.
               <br />
               <span className="bg-gradient-to-r from-emerald-200 via-teal-200 to-cyan-300 bg-clip-text text-transparent">
@@ -138,7 +138,7 @@ export default function ZenithLabPage() {
               you do not just learn the skill, you know exactly where to apply it.
             </p>
 
-            <div className="mt-9 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <a
                 href="#catalog"
                 className="rounded-full bg-white px-6 py-3 text-center text-sm font-semibold text-black transition hover:scale-[1.02]"
@@ -153,7 +153,7 @@ export default function ZenithLabPage() {
               </a>
             </div>
 
-            <dl className="mt-10 grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-4">
+            <dl className="mt-10 grid max-w-2xl grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-4">
               {[
                 ["4", "courses"],
                 ["315", "practice tasks in Data Science"],
@@ -168,9 +168,43 @@ export default function ZenithLabPage() {
               ))}
             </dl>
           </div>
+
+          <div className="relative min-h-[520px] lg:min-h-[680px]">
+            <div className="absolute inset-x-10 top-10 h-56 rounded-full bg-teal-500/20 blur-[110px]" />
+            <div className="absolute right-6 top-6 h-56 w-56 rounded-full bg-emerald-400/20 blur-[95px]" />
+            <div className="absolute left-8 bottom-16 h-52 w-52 rounded-full bg-cyan-500/20 blur-[100px]" />
+
+            <div className="absolute inset-0 flex items-center justify-center -translate-y-14 lg:-translate-y-24">
+              <img
+                src="/lab-capsule.webp"
+                alt="Zenith Lab"
+                className="pointer-events-none select-none drop-shadow-[0_40px_120px_rgba(0,0,0,0.7)] w-[420px] lg:w-[520px]"
+                style={{ animation: "zenithFloat 3.2s ease-in-out infinite" }}
+              />
+            </div>
+
+            <div className="absolute bottom-[30%] left-[0%] rounded-[28px] border border-white/12 bg-white/[0.04] px-4 py-4 backdrop-blur-2xl shadow-[0_0_40px_rgba(52,211,153,0.12)]">
+              <div className="text-xs uppercase tracking-[0.2em] text-white/45">Built for</div>
+              <div className="mt-2 text-sm font-medium text-white/85">No prior experience needed</div>
+            </div>
+
+            <div className="absolute right-[2%] bottom-[30%] rounded-[26px] border border-white/12 bg-white/[0.05] px-4 py-4 backdrop-blur-2xl shadow-[0_0_30px_rgba(94,234,212,0.12)]">
+              <div className="text-xs uppercase tracking-[0.2em] text-white/45">Core outcome</div>
+              <div className="mt-2 text-2xl font-semibold tracking-[-0.04em]">A real portfolio</div>
+              <div className="text-sm text-white/55">Not another certificate.</div>
+            </div>
+
+            <style>{`
+              @keyframes zenithFloat {
+                0% { transform: translateY(0px); }
+                50% { transform: translateY(-14px); }
+                100% { transform: translateY(0px); }
+              }
+            `}</style>
+          </div>
         </section>
 
-        <section id="career-path" className="mx-auto max-w-6xl border-t border-white/10 py-14">
+        <section id="career-path" className="mx-auto max-w-7xl border-t border-white/10 py-14">
           <div className="mb-10 max-w-3xl">
             <div className="text-xs uppercase tracking-[0.3em] text-emerald-200/70">The difference</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
@@ -202,7 +236,7 @@ export default function ZenithLabPage() {
           </div>
         </section>
 
-        <section id="catalog" className="mx-auto max-w-6xl border-t border-white/10 py-14">
+        <section id="catalog" className="mx-auto max-w-7xl border-t border-white/10 py-14">
           <div className="mb-10 max-w-3xl">
             <div className="text-xs uppercase tracking-[0.3em] text-emerald-200/70">The catalog</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
@@ -218,7 +252,7 @@ export default function ZenithLabPage() {
           <CourseCatalog courses={courses} checkoutInfo={checkoutInfo} waitlistLink={WAITLIST_LINK} />
         </section>
 
-        <section className="mx-auto max-w-6xl border-t border-white/10 py-14 pb-24">
+        <section className="mx-auto max-w-7xl border-t border-white/10 py-14 pb-24">
           <div className="overflow-hidden rounded-[38px] border border-white/10 bg-white/[0.05] p-8 backdrop-blur-2xl sm:p-12">
             <div className="mx-auto max-w-2xl text-center">
               <div className="text-xs uppercase tracking-[0.3em] text-emerald-200/70">Get started</div>
@@ -250,7 +284,7 @@ export default function ZenithLabPage() {
       </main>
 
       <footer className="relative z-10 border-t border-white/8 px-4 py-8 text-sm text-white/42 sm:px-6 lg:px-10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>© 2026 Zenith Studio. Zenith Lab is the learning division.</div>
           <div className="flex gap-5">
             <Link href="/" className="hover:text-white/70">Studio</Link>
