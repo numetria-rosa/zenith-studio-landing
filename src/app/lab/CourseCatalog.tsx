@@ -30,15 +30,23 @@ import {
 import { fraunces } from "@/lib/fonts";
 import type { CourseCard, CourseCategory } from "./courses-data";
 
-/** The exact wordmark used on the static course pages' topbar (each course's
-    own course-rail.js): Fraunces "ZENITH" + an amber-badged "LAB". Placed on
-    each catalog card so it visually matches the product the buyer is about
-    to land in, not just the /lab marketplace's own emerald theme. */
-function ZenithLabWordmark() {
+/** The exact wordmark used on each course's own static pages' topbar
+    (course-rail.js): Fraunces "ZENITH" + a "LAB" badge in that course's own
+    accent color (amber for Data Science, neon lime for AI Engineering, and
+    so on — straight from each course's real `.logo b` CSS). Placed on each
+    catalog card so it visually matches the product the buyer is about to
+    land in, not just the /lab marketplace's own emerald theme. */
+function ZenithLabWordmark({ color }: { color?: { bg: string; text: string } }) {
+  const { bg, text } = color ?? { bg: "#f0b429", text: "#1a1200" };
   return (
     <span className={`${fraunces.className} inline-flex items-baseline text-xs font-bold tracking-tight text-white/75`}>
       ZENITH
-      <span className="ml-1 rounded-[3px] bg-[#f0b429] px-1.5 py-0.5 text-[10px] text-[#1a1200]">LAB</span>
+      <span
+        className="ml-1 rounded-[3px] px-1.5 py-0.5 text-[10px]"
+        style={{ background: bg, color: text }}
+      >
+        LAB
+      </span>
     </span>
   );
 }
@@ -206,7 +214,7 @@ export function CourseCatalog({
                   >
                     {course.available ? "Self-paced course" : "Coming soon"}
                   </span>
-                  <ZenithLabWordmark />
+                  <ZenithLabWordmark color={course.labBadgeColor} />
                 </div>
               </div>
 

@@ -48,6 +48,8 @@ export type CourseCard = {
   careerPath: string;
   /** Real module list, in order, straight from the course's own course-progress.js MODULES array. Only set for courses that are actually built and published — never invent a curriculum for a "Coming soon" course. */
   curriculum?: string[];
+  /** The course's real accent color, straight from its own static pages' `.logo b` badge (background + text). Only set once a course has its own distinct, built accent — a course still sharing the template's default doesn't get one invented for it. */
+  labBadgeColor?: { bg: string; text: string };
 };
 
 export const courses: CourseCard[] = [
@@ -112,6 +114,7 @@ export const courses: CourseCard[] = [
       "Dashboards & Business Communication",
       "Capstone Analysis Project",
     ],
+    labBadgeColor: { bg: "#f0b429", text: "#1a1200" },
   },
   {
     id: "ai-engineering",
@@ -162,6 +165,7 @@ export const courses: CourseCard[] = [
       "Evaluation, Testing & Observability",
       "Capstone: A Production AI Agent",
     ],
+    labBadgeColor: { bg: "#c6f432", text: "#0f1405" },
   },
   {
     id: "automation-engineering",
