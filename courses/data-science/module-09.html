@@ -292,21 +292,14 @@ fig = px.bar(title="Margin % by category, H1 vs H2")</textarea>
       <textarea id="exGEditor" class="testin" spellcheck="false" rows="12">import math
 
 def validate_significance(df):
-    d = df.drop_duplicates()
-    d["category"] = d["category"].str.strip().str.title()
-    elec = d[d["category"] == "Electronics"].copy()
-    elec["margin_pct"] = (elec["revenue"] - elec["cogs"]) / elec["revenue"] * 100
-    elec["half"] = elec["order_date"].apply(lambda x: "H1" if x < "2025-10-01" else "H2")
-    h1 = elec[elec.half == "H1"]["margin_pct"]
-    h2 = elec[elec.half == "H2"]["margin_pct"]
-    se = math.sqrt(h1.std()**2 / len(h1) + h2.std()**2 / len(h2))
-    z = (h1.mean() - h2.mean()) / se
-    return {
-        "h1_mean_margin_pct": round(h1.mean(), 2),
-        "h2_mean_margin_pct": round(h2.mean(), 2),
-        "z_score": round(z, 2),
-        "is_significant": abs(z) > 1.96,
-    }</textarea>
+    # clean the same way as parts A/C: drop exact duplicates, normalize category casing
+    # isolate Electronics, split into H1/H2 by order_date (H1 is before 2025-10-01)
+    # compute each half's PER-ORDER margin_pct: (revenue-cogs)/revenue*100 for each row
+    # (not the aggregate margin from parts B/C, you need the row-level spread here)
+    # then apply the standard-error formula from Module 5:
+    #   se = sqrt(std1**2/n1 + std2**2/n2), z = (mean1 - mean2) / se
+    # abs(z) > 1.96 is the 95% significance threshold
+    return {"h1_mean_margin_pct": 0, "h2_mean_margin_pct": 0, "z_score": 0, "is_significant": False}</textarea>
       <details class="hint"><summary>Stuck for a few minutes? One hint</summary><div class="hbody">This is per-order margin, not the aggregate revenue/cogs margin from parts B and C, one <code>margin_pct</code> value per row, so you get a real spread (standard deviation) to compare, not just two single numbers.</div></details>
       <div class="dagctrl">
         <button id="btnRunExG">▶ Run tests</button>
@@ -600,7 +593,27 @@ const EXD = () => harnessFor(ORDERS_SETUP, [
   "            results.append({'name': 'Shows both H1 and H2 (two series or two groups)', 'pass': two_series, 'hint': f'Expected at least 2 traces (H1 and H2), got {len(fig.data)}.'})",
   "            type_ok = fig.data[0].type=='bar'",
   "            results.append({'name': 'Uses a bar chart (comparison across categories)', 'pass': type_ok, 'hint': f'Expected a bar chart, got {fig.data[0].type}.'})",
-  "            allok = has_electronics and two_series and type_ok",
+  "            dd = _extra_ns['df'].drop_duplicates()",
+  "            dd = dd[dd['quantity'] >= 0]",
+  "            dd = dd.dropna(subset=['channel'])",
+  "            dd = dd.assign(category=dd['category'].str.strip().str.title())",
+  "            dd['half'] = dd['order_date'].apply(lambda x: 'H1' if x < '2025-10-01' else 'H2')",
+  "            elec = dd[dd['category']=='Electronics']",
+  "            ref = {}",
+  "            for h in ['H1','H2']:",
+  "                sub = elec[elec.half==h]",
+  "                ref[h] = float((sub.revenue.sum()-sub.cogs.sum())/sub.revenue.sum()*100)",
+  "            def find_val(half_name):",
+  "                for tr in fig.data:",
+  "                    trname = str(getattr(tr, 'name', '') or '')",
+  "                    xs = [str(v).strip().title() for v in tr.x]",
+  "                    if half_name == trname and 'Electronics' in xs:",
+  "                        return float(tr.y[xs.index('Electronics')])",
+  "                return None",
+  "            v1, v2 = find_val('H1'), find_val('H2')",
+  "            values_ok = v1 is not None and v2 is not None and abs(v1-ref['H1']) < 3 and abs(v2-ref['H2']) < 3",
+  "            results.append({'name': f\"Electronics bars reflect the real H1 (~{round(ref['H1'],1)}%) and H2 (~{round(ref['H2'],1)}%) margin, not fabricated numbers\", 'pass': values_ok, 'hint': (f'Got H1={v1}, H2={v2}. ' if v1 is not None or v2 is not None else 'Could not find an Electronics bar in an H1-named and an H2-named trace. ') + 'Your chart must be built by actually cleaning and aggregating df, matching the real margin percentages, not typed-in or approximate values.'})",
+  "            allok = has_electronics and two_series and type_ok and values_ok",
   "            if allok: chartHtmls['exD'] = fig.to_html(include_plotlyjs='cdn', full_html=False)",
   "        except Exception as e:",
   "            results.append({'name': 'Chart data is readable', 'pass': False, 'hint': f'Could not read chart data: {type(e).__name__}: {e}'})",
@@ -664,6 +677,26 @@ document.getElementById("btnResetExG").addEventListener("click", () => {
   document.getElementById("exGResults").innerHTML = "";
 });
 
+/* ================= Shared free-text quality guards (parts E, F, H) =================
+   Client-side prose grading can't judge real writing quality, but it can catch the
+   cheapest ways to fake it: keyboard-mash/padding used only to hit a length minimum,
+   and a "quantified result" that's really just a trivial placeholder digit ($1, 2%). */
+function hasPaddingOrPlaceholder(text) {
+  if (/(.)\1{6,}/.test(text)) return true; // e.g. "aaaaaaa" run used to pad length
+  const words = text.toLowerCase().match(/[a-z']+/g) || [];
+  if (words.length >= 8) {
+    const uniq = new Set(words);
+    if (uniq.size / words.length < 0.45) return true; // heavily repeated words
+  }
+  return false;
+}
+function hasRealMagnitudeNumber(text) {
+  // requires a number with at least 2 digits (rules out "$1" / "5%" style placeholders
+  // while still accepting genuine small-but-real figures like a 12% margin change)
+  const nums = text.match(/[\d][\d,]*(\.\d+)?/g) || [];
+  return nums.some(n => n.replace(/[^0-9]/g, "").length >= 2);
+}
+
 /* ================= Part H: portfolio-ready description ================= */
 function checkPortfolio() {
   const text = document.getElementById("portfolioBox").value.trim();
@@ -673,10 +706,10 @@ function checkPortfolio() {
   checks.push({ name: "Names the specific finding (Electronics)", pass: mentionsCategory, hint: "A portfolio reader should know exactly what you found, not just that you \"did an analysis.\"" });
   const mentionsTool = /(sql|python|pandas|plotly)/.test(lower);
   checks.push({ name: "Names at least one real tool you used", pass: mentionsTool, hint: "Mention SQL, Python, pandas, or Plotly, whichever you actually used, tools are what a hiring manager scans for first." });
-  const mentionsImpact = /\$|profit|margin|percent|%/.test(lower);
-  checks.push({ name: "States a quantified result", pass: mentionsImpact, hint: "Include the dollar figure or the margin percentages, a portfolio description without a number is just a claim." });
-  const longEnough = text.length > 100;
-  checks.push({ name: "Long enough to actually describe the project (2-3 sentences)", pass: longEnough, hint: "A single vague sentence won't differentiate you, aim for a real paragraph." });
+  const mentionsImpact = /\$|profit|margin|percent|%/.test(lower) && hasRealMagnitudeNumber(text);
+  checks.push({ name: "States a quantified result", pass: mentionsImpact, hint: "Include the actual dollar figure or margin percentage you computed, not a placeholder digit, a portfolio description without a real number is just a claim." });
+  const longEnough = text.length > 100 && !hasPaddingOrPlaceholder(text);
+  checks.push({ name: "Long enough to actually describe the project (2-3 sentences)", pass: longEnough, hint: "A single vague sentence, or padding out the length with repeated words or characters, won't differentiate you, aim for a real paragraph." });
 
   const resultsEl = document.getElementById("portfolioResults");
   resultsEl.innerHTML = "";
@@ -715,12 +748,13 @@ function checkWrite() {
   checks.push({ name: "Data section names the category and includes a number", pass: dataOk, hint: "Name Electronics specifically, and include a real figure (the margin % or the dollar impact from part C)." });
   const findingOk = /electronics/i.test(vals.finding) && /(margin|profit|cost)/i.test(vals.finding);
   checks.push({ name: "Finding names the pattern (which category, what changed)", pass: findingOk, hint: "Mention Electronics and describe what happened to its margin or cost." });
-  const impactOk = /\$|dollar/i.test(vals.impact) && vals.impact.length > 10;
-  checks.push({ name: "Business impact is stated in dollars", pass: impactOk, hint: "State the impact in dollars, using your part C figure, not just \"significant\"." });
-  const recOk = vals.recommendation.length > 12 && vals.recommendation.toLowerCase() !== vals.finding.toLowerCase();
-  checks.push({ name: "Recommendation is present and distinct from the finding", pass: recOk, hint: "Say what Northstar should do about it." });
-  const actionOk = vals.action.length > 8 && vals.action.toLowerCase() !== vals.recommendation.toLowerCase();
-  checks.push({ name: "Action is a concrete next step, distinct from the recommendation", pass: actionOk, hint: "Name a specific next step." });
+  const impactOk = /\$|dollar/i.test(vals.impact) && vals.impact.length > 10 && hasRealMagnitudeNumber(vals.impact);
+  checks.push({ name: "Business impact is stated in dollars", pass: impactOk, hint: "State the impact in dollars, using your actual part C figure (not a placeholder like \"$1\"), not just \"significant\"." });
+  const vagueWords = /\b(maybe|perhaps|possibly|somehow|soon|something|figure out|look into|do something|at some point)\b/i;
+  const recOk = vals.recommendation.length > 20 && !vagueWords.test(vals.recommendation) && vals.recommendation.toLowerCase() !== vals.finding.toLowerCase();
+  checks.push({ name: "Recommendation is present and distinct from the finding", pass: recOk, hint: "Say specifically what Northstar should do about it, not a vague hedge like \"look into it\" or \"do something.\"" });
+  const actionOk = vals.action.length > 15 && !vagueWords.test(vals.action) && vals.action.toLowerCase() !== vals.recommendation.toLowerCase();
+  checks.push({ name: "Action is a concrete next step, distinct from the recommendation", pass: actionOk, hint: "Name a specific, concrete next step, not a vague hedge like \"soon\" or \"look into it.\"" });
   const allFilled = Object.values(vals).every(v => v.length > 0);
   checks.push({ name: "All five fields are filled in", pass: allFilled, hint: "Every field needs real content." });
 
@@ -756,12 +790,12 @@ function checkExplain() {
   checks.push({ name: "Names Electronics specifically, not just \"a category\"", pass: mentionsCategory, hint: "A store manager needs to know which category, be specific." });
   const noJargonDump = !/(p-value|confidence interval|regression|standard deviation)/.test(lower);
   checks.push({ name: "Avoids unexplained statistical jargon", pass: noJargonDump, hint: "This is for someone with no data background, terms like p-value or confidence interval will lose them, explain the idea in plain words instead." });
-  const hasNumber = /\d/.test(text);
-  checks.push({ name: "Includes at least one concrete number", pass: hasNumber, hint: "A vague \"it's a problem\" is weaker than a real figure." });
+  const hasNumber = hasRealMagnitudeNumber(text);
+  checks.push({ name: "Includes at least one concrete number", pass: hasNumber, hint: "A vague \"it's a problem\" is weaker than a real figure, and a placeholder digit like \"$1\" doesn't count either." });
   const noOverclaim = !/(prove[sd]?|guarantee[sd]?|definitely caused)/.test(lower);
   checks.push({ name: "Doesn't overclaim certainty (\"proves\", \"guarantees\")", pass: noOverclaim, hint: "You found a real pattern in the data, that's not the same as absolute proof, avoid words like \"proves\" or \"guarantees\"." });
-  const longEnough = text.length > 60;
-  checks.push({ name: "A real explanation, not a one-liner", pass: longEnough, hint: "Give it at least a couple of sentences, enough to actually explain the finding and what it means." });
+  const longEnough = text.length > 60 && !hasPaddingOrPlaceholder(text);
+  checks.push({ name: "A real explanation, not a one-liner", pass: longEnough, hint: "Give it at least a couple of real sentences that actually explain the finding, padding out the length with repeated words won't pass this." });
 
   const resultsEl = document.getElementById("explainResults");
   resultsEl.innerHTML = "";
