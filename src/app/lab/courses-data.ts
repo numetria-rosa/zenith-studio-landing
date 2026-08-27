@@ -48,7 +48,7 @@ export type CourseCard = {
   careerPath: string;
   /** Real module list, in order, straight from the course's own course-progress.js MODULES array. Only set for courses that are actually built and published — never invent a curriculum for a "Coming soon" course. */
   curriculum?: string[];
-  /** The course's real accent color, straight from its own static pages' `.logo b` badge (background + text). Only set once a course has its own distinct, built accent — a course still sharing the template's default doesn't get one invented for it. */
+  /** The LAB badge's accent color for this course. Data Science and AI Engineering pull the real color straight from their own static pages' `.logo b` badge; Automation Engineering and Web3 Engineering don't have a built, distinct accent yet, so these are a deliberate choice made for the catalog rather than lifted from existing course pages. */
   labBadgeColor?: { bg: string; text: string };
 };
 
@@ -194,6 +194,7 @@ export const courses: CourseCard[] = [
     ],
     careerPath:
       "A portfolio automation system you can demo on a sales call, and the pricing/positioning to land clients paying for it.",
+    labBadgeColor: { bg: "#22d3ee", text: "#04272b" },
   },
   {
     id: "web3-engineering",
@@ -215,5 +216,6 @@ export const courses: CourseCard[] = [
     facts: [],
     careerPath:
       "A deployed, working contract to show for it, and a clearer read on where paid on-chain work actually is.",
+    labBadgeColor: { bg: "#a78bfa", text: "#1c1533" },
   },
 ];
