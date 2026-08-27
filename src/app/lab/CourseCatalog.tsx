@@ -259,7 +259,7 @@ export function CourseCatalog({
 
                 <Link
                   href={`/lab/${course.id}`}
-                  className="inline-flex items-center gap-1.5 self-start text-xs font-semibold text-white/50 transition hover:text-white/85"
+                  className="inline-flex items-center gap-1.5 self-start rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-white/80 transition hover:border-white/30 hover:bg-white/10 hover:text-white"
                 >
                   Course details
                   <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
