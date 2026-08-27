@@ -266,6 +266,40 @@ export default async function CourseDetailsPage({
           </Section>
         )}
 
+        {/* Practice task breakdown */}
+        {course.practiceBreakdown && course.practiceBreakdown.length > 0 && (
+          <Section eyebrow="Practice tasks by tool" title={`${course.practiceTasks} tasks, broken down`}>
+            <div className="grid gap-2.5 sm:grid-cols-2">
+              {course.practiceBreakdown.map(({ tool, tasks }) => {
+                const max = Math.max(...course.practiceBreakdown!.map((t) => t.tasks));
+                return (
+                  <div
+                    key={tool}
+                    className="rounded-xl border px-4 py-3"
+                    style={{ borderColor: "var(--bd)", background: "var(--card)" }}
+                  >
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="text-sm font-semibold">{tool}</span>
+                      <span
+                        className="text-xs"
+                        style={{ color: "var(--accent)", fontFamily: "var(--font-course-mono), monospace" }}
+                      >
+                        {tasks} tasks
+                      </span>
+                    </div>
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full" style={{ background: "var(--bg2)" }}>
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${(tasks / max) * 100}%`, background: "var(--accent)" }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Section>
+        )}
+
         {/* What you'll do */}
         <Section eyebrow="What you'll actually do">
           <ul className="grid gap-3 sm:grid-cols-2">
@@ -292,6 +326,42 @@ export default async function CourseDetailsPage({
                 </span>
               ))}
             </div>
+          </Section>
+        )}
+
+        {/* Project samples */}
+        {course.projectSamples && course.projectSamples.length > 0 && (
+          <Section eyebrow="Portfolio projects you'll build" title={`${course.projectSamples.length} real projects`}>
+            <div className="grid gap-2.5 sm:grid-cols-2">
+              {course.projectSamples.map(({ title, tag }) => (
+                <div
+                  key={title}
+                  className="rounded-xl border px-4 py-3"
+                  style={{ borderColor: "var(--bd)", background: "var(--card)" }}
+                >
+                  <div className={`${fraunces.className} text-[15px] font-semibold`} style={{ fontFamily: "var(--font-course-serif), serif" }}>
+                    {title}
+                  </div>
+                  <div className="mt-1 text-xs" style={{ color: "var(--mut2)", fontFamily: "var(--font-course-mono), monospace" }}>
+                    {tag}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+        )}
+
+        {/* What's included */}
+        {course.includes && course.includes.length > 0 && (
+          <Section eyebrow="What's actually included">
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {course.includes.map((item) => (
+                <li key={item} className="flex items-start gap-2.5 text-sm leading-6" style={{ color: "var(--tx)" }}>
+                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: "var(--accent)" }} aria-hidden />
+                  {item}
+                </li>
+              ))}
+            </ul>
           </Section>
         )}
 

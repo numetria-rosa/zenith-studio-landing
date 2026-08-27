@@ -1,4 +1,4 @@
-// Run this on or after August 31, 2026 to end the Data Science & Analysis
+// Run this on or after September 1, 2026 to end the Data Science & Analysis
 // launch discount: raises the real Whop plan price from $30 back to $120,
 // and updates the plan's title/description to drop the "75% off" framing.
 //

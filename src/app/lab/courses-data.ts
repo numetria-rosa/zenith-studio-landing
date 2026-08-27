@@ -50,6 +50,12 @@ export type CourseCard = {
   curriculum?: string[];
   /** The LAB badge's accent color for this course. Data Science and AI Engineering pull the real color straight from their own static pages' `.logo b` badge; Automation Engineering and Web3 Engineering don't have a built, distinct accent yet, so these are a deliberate choice made for the catalog rather than lifted from existing course pages. */
   labBadgeColor?: { bg: string; text: string };
+  /** Real per-tool practice task counts, straight from each practice library's real task count (confirmed against course-progress.js/skill-map.js). Should sum to practiceTasks. */
+  practiceBreakdown?: { tool: string; tasks: number }[];
+  /** A sample of the real portfolio projects (title + one-line context), straight from course-progress.js's PROJECTS array — never invented placeholder project names. */
+  projectSamples?: { title: string; tag: string }[];
+  /** What's actually built into the course beyond modules and practice tasks — real page names, not marketing fluff. */
+  includes?: string[];
 };
 
 export const courses: CourseCard[] = [
@@ -67,7 +73,7 @@ export const courses: CourseCard[] = [
     price: "$30",
     originalPrice: "$120",
     discountPercent: 75,
-    discountDeadline: "2026-08-31T23:59:59-00:00",
+    discountDeadline: "2026-09-01T23:59:59-00:00",
     summary:
       "Spreadsheets through a full capstone analysis: clean real messy data, query it, analyze it in Python, validate it statistically, and ship a dashboard that answers an actual business question.",
     whatYoullDo: [
@@ -115,6 +121,38 @@ export const courses: CourseCard[] = [
       "Capstone Analysis Project",
     ],
     labBadgeColor: { bg: "#f0b429", text: "#1a1200" },
+    practiceBreakdown: [
+      { tool: "Excel", tasks: 35 },
+      { tool: "Python", tasks: 50 },
+      { tool: "SQL", tasks: 60 },
+      { tool: "Statistics", tasks: 40 },
+      { tool: "Tableau", tasks: 40 },
+      { tool: "Power BI", tasks: 40 },
+      { tool: "Automation", tasks: 30 },
+      { tool: "Integrated Cross-Tool Challenges", tasks: 20 },
+    ],
+    projectSamples: [
+      { title: '"The Leaky Funnel"', tag: "E-commerce & Retail" },
+      { title: '"The Understaffed Quarter"', tag: "People & HR" },
+      { title: '"The Campaign That Didn’t Work"', tag: "Marketing & Agency" },
+      { title: '"The Slow Season"', tag: "Finance & Small Business" },
+      { title: '"The Churn Cliff"', tag: "SaaS" },
+      { title: '"The Overpriced Listing"', tag: "Real Estate" },
+      { title: '"The Wait Time Problem"', tag: "Healthcare Operations" },
+      { title: '"The Empty Rooms"', tag: "Travel & Hospitality" },
+      { title: '"The Phantom Stock"', tag: "Retail" },
+      { title: '"The Monthly Scorecard"', tag: "Executive & BI, multi-tool capstone" },
+    ],
+    includes: [
+      "Diagnostic assessment with an adaptive learning roadmap",
+      "Mastery profile tracking your real skill level per tool",
+      "Quiz Center covering every module",
+      "Printable cheat sheets for every tool",
+      "10 real portfolio projects, auto-summarized for your resume",
+      "A downloadable portfolio site template",
+      "Step-by-step guide to deploying it live on Vercel",
+      "Career Path Edition: pricing, job boards, and interview framing",
+    ],
   },
   {
     id: "ai-engineering",
