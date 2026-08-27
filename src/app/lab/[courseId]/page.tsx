@@ -72,6 +72,22 @@ export default async function CourseDetailsPage({
 
   const accent = course.labBadgeColor ?? DEFAULT_ACCENT;
 
+  // Bug found and fixed during the final public-launch audit (2026-08-27):
+  // the catalog page (/lab, CourseCatalog.tsx) already stops showing an
+  // expired discount once its countdown passes, but this details page was
+  // rendering course.price/originalPrice/discountPercent unconditionally,
+  // with no deadline check at all. A visitor landing directly on this page
+  // after discountDeadline passed would see a stale "$30, 75% off" even
+  // though the catalog (and, once the maintainer runs
+  // scripts/update-data-science-price.mjs, the real Whop charge) had moved
+  // on to $120. This mirrors CourseCatalog.tsx's discountLive logic
+  // server-side so both pages agree once the deadline passes.
+  const deadlinePassed = course.discountDeadline
+    ? Date.now() > new Date(course.discountDeadline).getTime()
+    : false;
+  const discountLive = Boolean(course.discountPercent) && !deadlinePassed;
+  const displayPrice = discountLive ? course.price : (course.originalPrice ?? course.price);
+
   const deadlineLabel = course.discountDeadline
     ? new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" }).format(
         new Date(course.discountDeadline)
@@ -202,9 +218,9 @@ export default async function CourseDetailsPage({
                     className={`${fraunces.className} text-3xl font-bold`}
                     style={{ fontFamily: "var(--font-course-serif), serif", color: "var(--accent)" }}
                   >
-                    {course.price}
+                    {displayPrice}
                   </span>
-                  {course.originalPrice && (
+                  {discountLive && course.originalPrice && (
                     <span
                       className="text-sm line-through"
                       style={{ color: "var(--mut2)", fontFamily: "var(--font-course-mono), monospace" }}
@@ -213,7 +229,7 @@ export default async function CourseDetailsPage({
                     </span>
                   )}
                 </div>
-                {course.discountPercent && (
+                {discountLive && typeof course.discountPercent === "number" && (
                   <div
                     className="mt-2 inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
                     style={{

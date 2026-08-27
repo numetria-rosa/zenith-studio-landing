@@ -1321,7 +1321,7 @@ function renderTasks() {
         <div class="objective"><b>Objective:</b> ${esc(t.objective)}</div>
         <p style="font-size:13.5px;margin-bottom:10px">${esc(t.objectiveNote)}</p>
         ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
-        <textarea id="editor_${t.id}" rows="6" spellcheck="false">${esc(codeDrafts[t.id] !== undefined ? codeDrafts[t.id] : t.starterCode)}</textarea>
+        <textarea id="editor_${t.id}" rows="6" spellcheck="false" aria-label="Python editor for: ${esc(t.title)}">${esc(codeDrafts[t.id] !== undefined ? codeDrafts[t.id] : t.starterCode)}</textarea>
         ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
         <div class="dagctrl">
           <button class="primary" data-check="${t.id}">&#10003; Check answer</button>

@@ -1144,7 +1144,7 @@ function renderTasks() {
         <div class="objective"><b>Objective:</b> ${esc(t.objective)}</div>
         <p style="font-size:13.5px;margin-bottom:10px">${t.prompt}</p>
         ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
-        <textarea id="editor_${t.id}" rows="4" spellcheck="false">${esc(editorDrafts[t.id] !== undefined ? editorDrafts[t.id] : t.starter)}</textarea>
+        <textarea id="editor_${t.id}" rows="4" spellcheck="false" aria-label="SQL editor for: ${esc(t.title)}">${esc(editorDrafts[t.id] !== undefined ? editorDrafts[t.id] : t.starter)}</textarea>
         ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
         <div class="dagctrl">
           <button data-run="${t.id}">Run query</button>

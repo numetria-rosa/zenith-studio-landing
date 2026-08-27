@@ -169,7 +169,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <header class="hero">
     <span class="eyebrow">Course Dashboard</span>
     <h1 class="serif">Data Science &amp; Analysis</h1>
-    <p class="sub">Nine modules, spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards, and a Career Path Edition built around getting paid. Signed-in progress syncs to your account automatically; if you're not signed in, it's saved in this browser only.</p>
+    <p class="sub">Nine modules, spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards, and a Career Path Edition built around getting paid. Signed-in, your module and quiz progress syncs to your account automatically and follows you to any device; the 315 practice-task and skill-mastery progress below is saved in this browser only, on every device, signed in or not.</p>
   </header>
 
   <div class="sysgrid">
@@ -328,7 +328,7 @@ async function renderWelcome() {
 
   const note = document.getElementById("storageNote");
   if (note) {
-    note.childNodes[0].textContent = "Signed in, your progress syncs to your account and follows you to any device. ";
+    note.childNodes[0].textContent = "Signed in, your module and quiz progress syncs to your account and follows you to any device. Practice-task and skill-mastery progress (the 315 SQL/Excel/Python/etc. tasks) is stored per-browser only and does not follow you to another device yet. ";
   }
 }
 
