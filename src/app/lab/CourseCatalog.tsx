@@ -27,7 +27,21 @@ import {
   Palette,
   Timer,
 } from "lucide-react";
+import { fraunces } from "@/lib/fonts";
 import type { CourseCard, CourseCategory } from "./courses-data";
+
+/** The exact wordmark used on the static course pages' topbar (each course's
+    own course-rail.js): Fraunces "ZENITH" + an amber-badged "LAB". Placed on
+    each catalog card so it visually matches the product the buyer is about
+    to land in, not just the /lab marketplace's own emerald theme. */
+function ZenithLabWordmark() {
+  return (
+    <span className={`${fraunces.className} inline-flex items-baseline text-xs font-bold tracking-tight text-white/75`}>
+      ZENITH
+      <span className="ml-1 rounded-[3px] bg-[#f0b429] px-1.5 py-0.5 text-[10px] text-[#1a1200]">LAB</span>
+    </span>
+  );
+}
 
 /** Whether a time-limited discount is still active, and its live countdown
     label. /lab is statically prerendered, so this deliberately never uses
@@ -184,13 +198,16 @@ export function CourseCatalog({
                 <span className="rounded-full border border-white/12 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/55">
                   {course.categoryLabel}
                 </span>
-                <span
-                  className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${
-                    course.available ? "text-emerald-200" : "text-white/40"
-                  }`}
-                >
-                  {course.available ? "Self-paced course" : "Coming soon"}
-                </span>
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${
+                      course.available ? "text-emerald-200" : "text-white/40"
+                    }`}
+                  >
+                    {course.available ? "Self-paced course" : "Coming soon"}
+                  </span>
+                  <ZenithLabWordmark />
+                </div>
               </div>
 
               <h3 className="mt-5 text-2xl font-semibold tracking-[-0.03em]">{course.name}</h3>
