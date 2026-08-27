@@ -206,6 +206,8 @@ model ServiceCatalog {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  auditRecommendations AuditRecommendation[]
 }
 
 enum AuditStatus {
@@ -234,6 +236,62 @@ model AuditRequest {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  findings        AuditFinding[]
+  recommendations AuditRecommendation[]
+
   @@index([email])
   @@index([status])
+}
+
+enum FindingSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// A single diagnosed issue surfaced during an admin's review of an
+// AuditRequest submission (Slice 4 of the service-platform build,
+// 2026-08-28). Purely additive — new table, FK to AuditRequest with cascade
+// delete so deleting an audit cleans up its findings.
+model AuditFinding {
+  id                  String          @id @default(cuid())
+  auditId             String
+  title               String
+  severity            FindingSeverity
+  description         String          @db.Text
+  currentImpact       String          @db.Text
+  recommendedSolution String          @db.Text
+  createdAt           DateTime        @default(now())
+
+  audit AuditRequest @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@index([auditId])
+}
+
+enum RecommendationPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// A recommended next step tied to an audit review, optionally linking a real
+// ServiceCatalog offering — nullable since not every recommendation maps to
+// an existing catalog service (e.g. a bespoke build not yet cataloged).
+model AuditRecommendation {
+  id               String                  @id @default(cuid())
+  auditId          String
+  catalogServiceId String?
+  title            String
+  priority         RecommendationPriority
+  rationale        String                  @db.Text
+  expectedOutcome  String                  @db.Text
+  estimatedEffort  String
+  createdAt        DateTime                @default(now())
+
+  audit          AuditRequest    @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  catalogService ServiceCatalog? @relation(fields: [catalogServiceId], references: [id])
+
+  @@index([auditId])
+  @@index([catalogServiceId])
 }
