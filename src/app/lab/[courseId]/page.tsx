@@ -12,6 +12,7 @@ import {
   Trophy,
   ArrowLeft,
   ShoppingCart,
+  Lock,
 } from "lucide-react";
 import { fraunces, courseFontVars } from "@/lib/fonts";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
@@ -353,20 +354,40 @@ export default async function CourseDetailsPage({
           {course.projectSamples && course.projectSamples.length > 0 && (
             <Section id="projects" eyebrow="Portfolio projects you'll build" title={`${course.projectSamples.length} real projects`}>
               <div className="grid gap-2.5 sm:grid-cols-2">
-                {course.projectSamples.map(({ title, tag }) => (
-                  <div
-                    key={title}
-                    className="rounded-xl border px-4 py-3"
-                    style={{ borderColor: "var(--bd)", background: "var(--card)" }}
-                  >
-                    <div className={`${fraunces.className} text-[15px] font-semibold`} style={{ fontFamily: "var(--font-course-serif), serif" }}>
-                      {title}
+                {course.projectSamples.map(({ title, tag }, i) => {
+                  const locked = i >= Math.ceil(course.projectSamples!.length / 2);
+                  return (
+                    <div
+                      key={title}
+                      className="relative overflow-hidden rounded-xl border px-4 py-3"
+                      style={{ borderColor: "var(--bd)", background: "var(--card)" }}
+                    >
+                      <div style={locked ? { filter: "blur(6px)", userSelect: "none" } : undefined}>
+                        <div
+                          className={`${fraunces.className} text-[15px] font-semibold`}
+                          style={{ fontFamily: "var(--font-course-serif), serif" }}
+                        >
+                          {title}
+                        </div>
+                        <div
+                          className="mt-1 text-xs"
+                          style={{ color: "var(--mut2)", fontFamily: "var(--font-course-mono), monospace" }}
+                        >
+                          {tag}
+                        </div>
+                      </div>
+                      {locked && (
+                        <div
+                          className="absolute inset-0 flex items-center justify-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em]"
+                          style={{ background: "color-mix(in srgb, var(--card) 55%, transparent)", color: "var(--accent)" }}
+                        >
+                          <Lock className="h-3.5 w-3.5" aria-hidden />
+                          Unlock in the course
+                        </div>
+                      )}
                     </div>
-                    <div className="mt-1 text-xs" style={{ color: "var(--mut2)", fontFamily: "var(--font-course-mono), monospace" }}>
-                      {tag}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </Section>
           )}
