@@ -34,7 +34,7 @@ export const SERVICES: Service[] = [
     pitch: "Wake up to an inbox that is already handled.",
     description:
       "Sorts and prioritizes email, then drafts replies to the routine ones so your day starts with decisions, not admin.",
-    setupPriceDisplay: "$800",
+    setupPriceDisplay: "$190",
     monthlyPriceDisplay: "$150/mo",
     whopSetupPlanId: "plan_AUhS9tvz8KrJC",
     whopMonthlyPlanId: "plan_Qvl24MqIyHNfQ",
@@ -47,7 +47,7 @@ export const SERVICES: Service[] = [
     pitch: "Never lose a lead to a slow reply again.",
     description:
       "Captures every enquiry, qualifies it, and follows up by email and SMS until they book. The business that answers first wins the job.",
-    setupPriceDisplay: "$1,000",
+    setupPriceDisplay: "$270",
     monthlyPriceDisplay: "$200/mo",
     whopSetupPlanId: "plan_l6f3sCRsCR2Em",
     whopMonthlyPlanId: "plan_EKCkv5lP6CSPP",
@@ -60,12 +60,49 @@ export const SERVICES: Service[] = [
     pitch: "Answers and books while you are on the job.",
     description:
       "Handles enquiries around the clock, books straight into your calendar, and sends the reminders that cut no-shows.",
-    setupPriceDisplay: "$1,500",
+    setupPriceDisplay: "$360",
     monthlyPriceDisplay: "$300/mo",
     whopSetupPlanId: "plan_ts3JwXpFBKKMp",
     whopMonthlyPlanId: "plan_CJyNkObEaPquA",
     setupCheckoutUrl: "https://whop.com/checkout/plan_ts3JwXpFBKKMp",
     monthlyCheckoutUrl: "https://whop.com/checkout/plan_CJyNkObEaPquA",
+  },
+  // The two vertical/role offers from src/app/page.tsx's own `verticalSystems`
+  // array — monthly-only (no separate setup plan), which is why
+  // setupPriceDisplay/whopSetupPlanId/setupCheckoutUrl are empty, matching
+  // this file's own "empty string until created" convention. Added here so
+  // serviceKindForWhopPlanId can actually resolve their plan ids: before this,
+  // a real purchase of either produced no CourseEntitlement/ServiceRequest at
+  // all — the webhook's handlePaymentSucceeded hit its unmapped-product branch
+  // and silently dropped the purchase (found during the 2026-08-27 service-
+  // platform architecture audit). No webhook code changes were needed to fix
+  // this — handlePaymentSucceeded's existing `kind === "monthly"` branch
+  // already creates a fresh ServiceRequest on first purchase.
+  {
+    id: "law-firms",
+    title: "Law Firm AI Team",
+    pitch: "Your firm works 49 hours a week and bills 37.",
+    description:
+      "An AI Intake Coordinator, Follow-Up Clerk, and Billing Clerk as one team: answers and qualifies every enquiry, works the leads that didn't retain, and reconstructs billable time before the write-down window closes.",
+    setupPriceDisplay: "",
+    monthlyPriceDisplay: "$2,000/mo",
+    whopSetupPlanId: "",
+    whopMonthlyPlanId: "plan_kTlL5gBlJTsqy",
+    setupCheckoutUrl: "",
+    monthlyCheckoutUrl: "https://whop.com/checkout/plan_kTlL5gBlJTsqy",
+  },
+  {
+    id: "brokerages",
+    title: "Brokerage AI Team",
+    pitch: "Your agents are not leaving for a better split.",
+    description:
+      "An AI Inside Sales Agent, Transaction Coordinator, and Database Manager as one team: answers new leads in seconds, tracks every file to close, and wakes up the dormant contacts already sitting in your CRM.",
+    setupPriceDisplay: "",
+    monthlyPriceDisplay: "$1,200/mo",
+    whopSetupPlanId: "",
+    whopMonthlyPlanId: "plan_m3i6RwMYvMATE",
+    setupCheckoutUrl: "",
+    monthlyCheckoutUrl: "https://whop.com/checkout/plan_m3i6RwMYvMATE",
   },
 ];
 

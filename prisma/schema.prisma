@@ -12,12 +12,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  CLIENT
+  ADMIN
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
   emailVerified DateTime?
   name          String?
   image         String?
+
+  // Real, DB-backed admin role — additive alongside the existing ADMIN_EMAILS
+  // env-var allowlist in src/lib/admin.ts (kept as a fallback during
+  // transition, not removed). Defaults every existing and new row to CLIENT,
+  // so this migration needs no backfill logic.
+  role UserRole @default(CLIENT)
 
   // The stronger, stable Whop identity (Phase 5) — populated the first time a
   // webhook resolves this email to a Whop user. Preferred over email for

@@ -5,19 +5,12 @@ import { getService, getSetupCheckoutUrl } from "@/lib/services";
 
 const SITE_URL = "https://zenith-studio.site";
 
-// Founding client offer. Set FOUNDING_SPOTS to 0 to switch the whole page back
-// to list pricing: the badges, struck-through prices, and banner all key off it.
-// Founding prices are set directly per system (see aiSystems' `founding` field)
-// rather than derived from one flat discount — they don't share a clean ratio
-// to the list price.
-const FOUNDING_SPOTS = 5;
-
 // Written to match how people actually phrase these in search. Each one is
 // eligible for a Google rich snippet via the FAQPage schema below.
 const faqs = [
   {
     q: "How much does AI automation cost for a small business?",
-    a: "Our systems start at $800 setup plus $150 per month. The AI Lead Capture system is $1,000 setup plus $200 per month, and the AI Receptionist is $1,500 setup plus $300 per month. Founding clients pay a reduced setup fee instead, $190, $270, and $360. The monthly covers hosting, monitoring, and ongoing improvements, and there is no lock-in contract.",
+    a: "The AI Inbox Manager is $190 setup plus $150 per month. The AI Lead Capture system is $270 setup plus $200 per month, and the AI Receptionist is $360 setup plus $300 per month. The monthly covers hosting, monitoring, and ongoing improvements, and there is no lock-in contract.",
   },
   {
     q: "How long does it take to set up an AI automation system?",
@@ -49,8 +42,7 @@ export default function ZenithStudioLandingPage() {
       pitch: "Wake up to an inbox that is already handled.",
       description:
         "Sorts and prioritizes email, then drafts replies to the routine ones so your day starts with decisions, not admin.",
-      setup: "$800",
-      founding: "$190",
+      setup: "$190",
       monthly: "$150/mo",
       live: "Live in 2 to 4 days",
       features: [
@@ -66,8 +58,7 @@ export default function ZenithStudioLandingPage() {
       pitch: "Never lose a lead to a slow reply again.",
       description:
         "Captures every enquiry, qualifies it, and follows up by email and SMS until they book. The business that answers first wins the job.",
-      setup: "$1,000",
-      founding: "$270",
+      setup: "$270",
       monthly: "$200/mo",
       live: "Live in 3 to 5 days",
       features: [
@@ -84,8 +75,7 @@ export default function ZenithStudioLandingPage() {
       pitch: "Answers and books while you are on the job.",
       description:
         "Handles enquiries around the clock, books straight into your calendar, and sends the reminders that cut no-shows.",
-      setup: "$1,500",
-      founding: "$360",
+      setup: "$360",
       monthly: "$300/mo",
       live: "Live in 5 to 7 days",
       features: [
@@ -209,7 +199,7 @@ export default function ZenithStudioLandingPage() {
     {
       title: "Zenith Lab",
       description:
-        "Career-path courses in automation, AI, data, and Web3: the skills that won't be replaced by AI in 2026/2027. Each course includes a Career Path Edition, so you don't just learn, you know exactly where to apply it and how to get paid. Founding cohort pricing is open now.",
+        "Career-path courses in automation, AI, data, and Web3: the skills that won't be replaced by AI in 2026/2027. Each course includes a Career Path Edition, so you don't just learn, you know exactly where to apply it and how to get paid.",
       tag: "Core Service",
       href: "/lab",
       icon: (
@@ -329,7 +319,7 @@ export default function ZenithStudioLandingPage() {
         description:
           "AI automation agency building done-for-you systems that capture leads, book appointments, and clear the inbox. AI receptionists, lead follow-up, and custom integrations.",
         email: "zenith.studio.s@outlook.com",
-        priceRange: "$800 - $5000",
+        priceRange: "$190 - $5000",
         areaServed: { "@type": "Place", name: "Worldwide" },
         sameAs: ["https://www.youtube.com/@ZenithStudio-26", "https://whop.com/zenithstudio"],
         knowsAbout: [
@@ -343,20 +333,9 @@ export default function ZenithStudioLandingPage() {
           "@type": "Offer",
           name: system.name,
           description: system.description,
-          // Advertise the price a buyer can actually get today.
-          price: (FOUNDING_SPOTS > 0 ? system.founding : system.setup).replace(/[$,]/g, ""),
+          price: system.setup.replace(/[$,]/g, ""),
           priceCurrency: "USD",
           category: "AI automation system",
-          ...(FOUNDING_SPOTS > 0
-            ? {
-                availability: "https://schema.org/LimitedAvailability",
-                eligibleQuantity: {
-                  "@type": "QuantitativeValue",
-                  value: FOUNDING_SPOTS,
-                  unitText: "founding client spots",
-                },
-              }
-            : {}),
         })),
       },
       {
@@ -675,26 +654,6 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
             </p>
           </div>
 
-          {FOUNDING_SPOTS > 0 && (
-            <div className="mb-8 flex flex-col gap-4 rounded-[28px] border border-emerald-300/30 bg-gradient-to-r from-emerald-400/[0.10] via-teal-400/[0.06] to-transparent p-6 backdrop-blur-xl sm:flex-row sm:items-center sm:gap-6">
-              <span className="inline-flex w-fit items-center gap-2 rounded-full bg-gradient-to-r from-emerald-300 to-teal-200 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-950">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-900 opacity-70" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-900" />
-                </span>
-                Founding client pricing
-              </span>
-              <p className="flex-1 text-sm leading-7 text-white/72">
-                <span className="font-semibold text-white">
-                  Up to 76% off setup for the first {FOUNDING_SPOTS} businesses.
-                </span>{" "}
-                I am taking on {FOUNDING_SPOTS} founding clients to build case studies. You get the
-                reduced setup fee and lifetime founding rates, I get to point at the results. Monthly
-                stays the same either way.
-              </p>
-            </div>
-          )}
-
           <div className="grid gap-5 lg:grid-cols-3">
             {aiSystems.map((system) => (
               <div
@@ -715,30 +674,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 <p className="mt-2 text-sm font-medium text-white/80">{system.pitch}</p>
 
                 <div className="mt-5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  {FOUNDING_SPOTS > 0 ? (
-                    <>
-                      <span className="text-3xl font-semibold tracking-[-0.04em] text-emerald-200">
-                        {system.founding}
-                      </span>
-                      <span className="text-lg font-medium text-white/35 line-through">{system.setup}</span>
-                      <span className="text-sm text-white/55">setup</span>
-                      <span className="text-sm font-medium text-white/80">+ {system.monthly}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-3xl font-semibold tracking-[-0.04em]">{system.setup}</span>
-                      <span className="text-sm text-white/55">setup</span>
-                      <span className="text-sm font-medium text-emerald-200">+ {system.monthly}</span>
-                    </>
-                  )}
+                  <span className="text-3xl font-semibold tracking-[-0.04em]">{system.setup}</span>
+                  <span className="text-sm text-white/55">setup</span>
+                  <span className="text-sm font-medium text-emerald-200">+ {system.monthly}</span>
                 </div>
                 <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs uppercase tracking-[0.18em] text-white/40">
                   <span>{system.live}</span>
-                  {FOUNDING_SPOTS > 0 && (
-                    <span className="text-emerald-200/80">
-                      Founding price · {FOUNDING_SPOTS} spots
-                    </span>
-                  )}
                 </div>
 
                 <p className="mt-5 text-sm leading-7 text-white/60">{system.description}</p>
