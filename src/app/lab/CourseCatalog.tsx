@@ -13,6 +13,7 @@ import {
   Sparkles,
   ChevronDown,
   ArrowUpRight,
+  ShoppingCart,
   Check,
   Database,
   Terminal,
@@ -326,13 +327,20 @@ export function CourseCatalog({
                   href={url}
                   target={isRealCheckout ? "_blank" : undefined}
                   rel={isRealCheckout ? "noopener noreferrer" : undefined}
-                  className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
+                  className={`inline-flex items-center justify-center gap-1.5 rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
                     course.available
                       ? "bg-white text-black"
                       : "border border-white/15 bg-white/5 text-white hover:bg-white/10"
                   }`}
                 >
-                  {isRealCheckout ? "Get access →" : "Join the waitlist"}
+                  {isRealCheckout ? (
+                    <>
+                      <ShoppingCart className="h-4 w-4" aria-hidden />
+                      Get access
+                    </>
+                  ) : (
+                    "Join the waitlist"
+                  )}
                 </a>
               </div>
             </div>

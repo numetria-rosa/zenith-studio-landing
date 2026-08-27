@@ -11,6 +11,7 @@ import {
   FolderKanban,
   Trophy,
   ArrowLeft,
+  ShoppingCart,
 } from "lucide-react";
 import { GlowBackdrop } from "@/components/GlowBackdrop";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
@@ -86,9 +87,16 @@ export default async function CourseDetailsPage({
               href={checkoutUrl}
               target={isRealCheckout ? "_blank" : undefined}
               rel={isRealCheckout ? "noopener noreferrer" : undefined}
-              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
             >
-              {isRealCheckout ? "Get access →" : "Join the waitlist"}
+              {isRealCheckout ? (
+                <>
+                  <ShoppingCart className="h-4 w-4" aria-hidden />
+                  Get access
+                </>
+              ) : (
+                "Join the waitlist"
+              )}
             </a>
           </div>
         </div>
@@ -238,9 +246,16 @@ export default async function CourseDetailsPage({
             href={checkoutUrl}
             target={isRealCheckout ? "_blank" : undefined}
             rel={isRealCheckout ? "noopener noreferrer" : undefined}
-            className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition hover:scale-[1.02]"
+            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition hover:scale-[1.02]"
           >
-            {isRealCheckout ? "Get access →" : "Join the waitlist"}
+            {isRealCheckout ? (
+              <>
+                <ShoppingCart className="h-4 w-4" aria-hidden />
+                Get access
+              </>
+            ) : (
+              "Join the waitlist"
+            )}
           </a>
         </div>
       </main>

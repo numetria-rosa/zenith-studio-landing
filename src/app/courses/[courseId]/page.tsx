@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { ShoppingCart } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
 import { hasCourseAccess } from "@/lib/entitlements";
@@ -76,9 +77,10 @@ export default async function CourseLandingPage({
             href={checkoutUrl}
             target={checkoutUrl.startsWith("mailto:") ? undefined : "_blank"}
             rel={checkoutUrl.startsWith("mailto:") ? undefined : "noopener noreferrer"}
-            className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
+            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
           >
-            Get access →
+            <ShoppingCart className="h-4 w-4" aria-hidden />
+            Get access
           </a>
           {!session?.user && (
             <Link

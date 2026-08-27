@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { GraduationCap, Briefcase, LogOut } from "lucide-react";
+import { GraduationCap, Briefcase, LogOut, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { CourseBar } from "@/components/CourseBar";
 import { courseFontVars } from "@/lib/fonts";
@@ -148,7 +148,8 @@ export default async function DashboardPage() {
                       rel={url.startsWith("mailto:") ? undefined : "noopener noreferrer"}
                       className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-[#333a4c] bg-[#191d26] px-4 py-2 text-[13px] font-semibold text-[#eeeee7] transition hover:border-[#f0b429] hover:text-[#f0b429]"
                     >
-                      Get access →
+                      <ShoppingCart className="h-3.5 w-3.5" aria-hidden />
+                      Get access
                     </a>
                   </div>
                 );
