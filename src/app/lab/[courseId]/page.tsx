@@ -16,6 +16,7 @@ import {
 import { fraunces, courseFontVars } from "@/lib/fonts";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
 import { courses } from "../courses-data";
+import { CurriculumAccordion } from "./CurriculumAccordion";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -298,27 +299,7 @@ export default async function CourseDetailsPage({
           {/* Full curriculum */}
           {course.curriculum && course.curriculum.length > 0 && (
             <Section id="curriculum" eyebrow="Full curriculum" title={`${course.curriculum.length} modules, in order`}>
-              <ol className="grid gap-2.5 sm:grid-cols-2">
-                {course.curriculum.map((title, i) => (
-                  <li
-                    key={title}
-                    className="flex items-center gap-3 rounded-xl border px-4 py-3"
-                    style={{ borderColor: "var(--bd)", background: "var(--card)" }}
-                  >
-                    <span
-                      className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-xs font-bold"
-                      style={{
-                        background: "color-mix(in srgb, var(--accent) 16%, transparent)",
-                        color: "var(--accent)",
-                        fontFamily: "var(--font-course-mono), monospace",
-                      }}
-                    >
-                      {i}
-                    </span>
-                    <span className="text-sm">{title}</span>
-                  </li>
-                ))}
-              </ol>
+              <CurriculumAccordion modules={course.curriculum} />
             </Section>
           )}
 

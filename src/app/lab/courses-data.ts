@@ -46,8 +46,8 @@ export type CourseCard = {
   topics: string[];
   facts: string[];
   careerPath: string;
-  /** Real module list, in order, straight from the course's own course-progress.js MODULES array. Only set for courses that are actually built and published — never invent a curriculum for a "Coming soon" course. */
-  curriculum?: string[];
+  /** Real module list, in order, straight from the course's own course-progress.js MODULES array. `description` is the real module page's own "sub" copy, not invented. Only set for courses that are actually built and published — never invent a curriculum for a "Coming soon" course. */
+  curriculum?: { title: string; description: string }[];
   /** The LAB badge's accent color for this course. Data Science and AI Engineering pull the real color straight from their own static pages' `.logo b` badge; Automation Engineering and Web3 Engineering don't have a built, distinct accent yet, so these are a deliberate choice made for the catalog rather than lifted from existing course pages. */
   labBadgeColor?: { bg: string; text: string };
   /** Real per-tool practice task counts, straight from each practice library's real task count (confirmed against course-progress.js/skill-map.js). Should sum to practiceTasks. */
@@ -109,16 +109,56 @@ export const courses: CourseCard[] = [
     careerPath:
       "A portfolio of real analyses, built from messy data through a defended recommendation, the kind of evidence that gets interviews instead of another tutorial notebook.",
     curriculum: [
-      "Orientation",
-      "Spreadsheet & Data Literacy Foundations",
-      "Python Foundations for Data",
-      "Pandas & NumPy Fundamentals",
-      "Data Cleaning & Validation",
-      "Exploratory Data Analysis & Statistics",
-      "SQL for Analysts",
-      "Data Visualization & Storytelling",
-      "Dashboards & Business Communication",
-      "Capstone Analysis Project",
+      {
+        title: "Orientation",
+        description:
+          "A short, honest self-check that routes you to Module 1, 3, or 5, plus what data analysts and data scientists actually do and exactly what Modules 1-9 will (and won't) teach you.",
+      },
+      {
+        title: "Spreadsheet & Data Literacy Foundations",
+        description:
+          "Rows, columns, and cells as the mental model for what a \"dataset\" is, the five formulas that cover most real spreadsheet work, sorting and filtering, and why \"tidy data\" is the idea everything after this module depends on.",
+      },
+      {
+        title: "Python Foundations for Data",
+        description:
+          "Six ideas, each taught through a real analyst task, with code you actually write and run in a real Python interpreter in the browser. Every concept exists here because Module 3 onward needs it.",
+      },
+      {
+        title: "Pandas & NumPy Fundamentals",
+        description:
+          "What you parsed by hand with a loop in Module 2, pandas does in one line, then gives you filtering, grouping, and joining on top. Runs against the same real datasets you'll use for the rest of the course.",
+      },
+      {
+        title: "Data Cleaning & Validation",
+        description:
+          "Where most analyst time actually goes. You get raw data and an audit to perform, not a checklist to follow, because finding the problems is the skill, not something anyone can hand you a list of.",
+      },
+      {
+        title: "Exploratory Data Analysis & Statistics",
+        description:
+          "Not a maths course. Every concept exists to answer one question a stakeholder will actually ask: is this difference real, or did we just get lucky? You compute the numbers, and learn when not to trust them.",
+      },
+      {
+        title: "SQL for Analysts",
+        description:
+          "A real SQLite database running entirely in the page, with a messy shop's worth of customers, orders, and products, NULLs, cancelled orders, and duplicate-row traps included. Every exercise starts from a business question and is checked against the live database.",
+      },
+      {
+        title: "Data Visualization & Storytelling",
+        description:
+          "Every chart is real: you write actual Plotly code that runs in a real Python interpreter in your browser. The hard part was never the charting syntax, it's choosing the right chart and knowing when one is honest or quietly lying.",
+      },
+      {
+        title: "Dashboards & Business Communication",
+        description:
+          "Every KPI and chart is computed by your own Python code running on real, messy funnel data from Module 4. A dashboard is not a picture of numbers, it's an argument built out of them.",
+      },
+      {
+        title: "Capstone Analysis Project",
+        description:
+          "One real client, one real ambiguous problem, every skill from Modules 1-8 in service of answering it. No numbered steps: you decide what to clean, what to query, what to chart, and what to recommend.",
+      },
     ],
     labBadgeColor: { bg: "#f0b429", text: "#1a1200" },
     practiceBreakdown: [
@@ -193,15 +233,51 @@ export const courses: CourseCard[] = [
     careerPath:
       "A shipped AI product with evals you can point to in an interview, whether you're moving into AI engineering freelance or hired.",
     curriculum: [
-      "Orientation",
-      "Prompting & Structured Outputs",
-      "Context Windows & Token Economics",
-      "Retrieval-Augmented Generation",
-      "Tool Use & Function Calling",
-      "Agent Architectures & Control Flow",
-      "Reliability for LLM Systems",
-      "Evaluation, Testing & Observability",
-      "Capstone: A Production AI Agent",
+      {
+        title: "Orientation",
+        description:
+          "What this field actually is, what people in it actually build, where you might fit, and exactly what the next 8 modules will (and won't) teach you.",
+      },
+      {
+        title: "Prompting & Structured Outputs",
+        description:
+          "A language model produces text. Your program needs data. This module closes that gap reliably, not with a nicer-sounding prompt, but with validation and repair logic that doesn't trust the model to behave.",
+      },
+      {
+        title: "Context Windows & Token Economics",
+        description:
+          "Every prompt has a budget, measured in tokens, not characters or \"how much text feels reasonable.\" The actual arithmetic for what fits, what it costs, and what to do when your content doesn't fit.",
+      },
+      {
+        title: "Retrieval-Augmented Generation",
+        description:
+          "A model only knows what's in its prompt. Retrieval decides, out of everything you could put there, which pieces actually get in, by searching, not by hoping the right chunk made the cut.",
+      },
+      {
+        title: "Tool Use & Function Calling",
+        description:
+          "A model can only produce text. Everything it does beyond that, looking something up, sending an email, charging a card, happens because a tool call it generated got executed by your code. That execution step is where correctness and safety actually live.",
+      },
+      {
+        title: "Agent Architectures & Control Flow",
+        description:
+          "An agent is what happens when a model chains steps together, reasoning about each result before deciding the next action, in a loop it controls. That loop needs boundaries, or it doesn't stop on its own.",
+      },
+      {
+        title: "Reliability for LLM Systems",
+        description:
+          "Model APIs fail: rate limits, timeouts, transient server errors. Some failures are worth retrying, some never will succeed no matter how many times you try, and treating them the same wastes time, money, and your users' patience.",
+      },
+      {
+        title: "Evaluation, Testing & Observability",
+        description:
+          "\"I tried a few prompts and it looked good\" isn't evaluation, it's a vibe check on a handful of lucky examples. A systematic way to measure whether a system is actually working, and whether a change made it better or worse.",
+      },
+      {
+        title: "Capstone: A Production AI Agent",
+        description:
+          "A client brief: a support bot that must answer from a knowledge base, act on tools safely, run inside a bounded loop, and survive a flaky model API, graded against a rubric, not vibes.",
+      },
     ],
     labBadgeColor: { bg: "#c6f432", text: "#0f1405" },
   },
