@@ -39,10 +39,10 @@ import type { CourseCard, CourseCategory } from "./courses-data";
 function ZenithLabWordmark({ color }: { color?: { bg: string; text: string } }) {
   const { bg, text } = color ?? { bg: "#f0b429", text: "#1a1200" };
   return (
-    <span className={`${fraunces.className} inline-flex items-baseline text-xs font-bold tracking-tight text-white/75`}>
+    <span className={`${fraunces.className} inline-flex items-center text-xs font-bold tracking-tight text-white/75`}>
       ZENITH
       <span
-        className="ml-1 rounded-[3px] px-1.5 py-0.5 text-[10px]"
+        className="ml-1 inline-flex items-center rounded-[3px] px-1.5 py-0.5 text-[10px] leading-none"
         style={{ background: bg, color: text }}
       >
         LAB

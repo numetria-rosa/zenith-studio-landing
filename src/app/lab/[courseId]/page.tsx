@@ -109,12 +109,12 @@ export default async function CourseDetailsPage({
       >
         <div className="mx-auto flex max-w-4xl items-center justify-between px-5 py-4 sm:px-7">
           <span
-            className={`${fraunces.className} text-base font-extrabold tracking-tight`}
+            className={`${fraunces.className} inline-flex items-center text-base font-extrabold tracking-tight`}
             style={{ fontFamily: "var(--font-course-serif), serif" }}
           >
             ZENITH
             <span
-              className="ml-1 rounded-[3px] px-1.5 py-0.5 text-[11px]"
+              className="ml-1 inline-flex items-center rounded-[3px] px-1.5 py-0.5 text-[11px] leading-none"
               style={{ background: "var(--accent)", color: "var(--accentd)" }}
             >
               LAB

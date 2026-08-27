@@ -96,9 +96,9 @@ export default function ZenithLabPage() {
                 alt="Zenith Studio"
                 className="h-9 w-9 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)]"
               />
-              <span className={`${fraunces.className} inline-flex items-baseline text-lg font-bold tracking-tight`}>
+              <span className={`${fraunces.className} inline-flex items-center text-lg font-bold tracking-tight`}>
                 ZENITH
-                <span className="ml-1 rounded-[4px] bg-gradient-to-r from-violet-500 to-blue-400 px-1.5 py-0.5 text-sm text-white">
+                <span className="ml-1 inline-flex items-center rounded-[4px] bg-gradient-to-r from-violet-500 to-blue-400 px-1.5 py-0.5 text-sm leading-none text-white">
                   LAB
                 </span>
               </span>
