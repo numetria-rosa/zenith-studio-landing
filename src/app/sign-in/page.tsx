@@ -28,17 +28,16 @@ export default async function SignInPage({
       <div className="w-full max-w-sm">
         <Link href="/" className="mb-10 flex items-center justify-center gap-2">
           <span className="font-[family-name:var(--font-course-serif)] text-lg font-extrabold tracking-[-0.02em]">
-            ZENITH
-            <span className="ml-0.5 rounded-[2px] bg-[#f0b429] px-1.5 py-px text-[#1a1200]">LAB</span>
+            ZENITH STUDIO
           </span>
         </Link>
 
         <div className="rounded-xl border border-[#232838] bg-[#151920] p-8">
           <h1 className="font-[family-name:var(--font-course-serif)] text-xl font-semibold tracking-[-0.01em]">
-            Sign in to Zenith Lab
+            Sign in to your account
           </h1>
           <p className="mt-2 text-sm text-[#9aa0ae]">
-            Use the password from your welcome page — it&apos;s also always on your profile.
+            For Zenith Lab courses and AI Systems service requests. Use the password from your welcome page — it&apos;s also always on your profile.
           </p>
 
           {error === "invalid_password" && (

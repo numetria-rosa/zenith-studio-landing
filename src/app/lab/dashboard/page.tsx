@@ -39,12 +39,18 @@ export default async function DashboardPage() {
     orderBy: { updatedAt: "desc" },
   });
 
+  // A signed-in user who owns no course but has bought an AI Systems service
+  // shouldn't land on a page that brands itself "Zenith Lab" — see CourseBar's
+  // own comment. Course owners (with or without services too) keep the Lab brand.
+  const brand = owned.length > 0 ? "lab" : "studio";
+
   return (
     <div
       className={`${courseFontVars} min-h-screen bg-[#0d0f14] font-[family-name:var(--font-course-sans)] text-[#eeeee7]`}
     >
       <CourseBar
         tag="Dashboard"
+        brand={brand}
         right={
           <>
             <Link
@@ -73,12 +79,61 @@ export default async function DashboardPage() {
 
       <main className="mx-auto max-w-[980px] px-6 pb-20 pt-12">
         <div className="font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.14em] text-[#f0b429]">
-          Zenith Lab · Dashboard
+          {brand === "lab" ? "Zenith Lab · Dashboard" : "Zenith Studio · Dashboard"}
         </div>
         <h1 className="mt-3 font-[family-name:var(--font-course-serif)] text-[clamp(28px,4.5vw,40px)] font-semibold leading-[1.1] tracking-[-0.02em]">
           Welcome back{session.user.name ? `, ${session.user.name}` : ""}
         </h1>
         {session.user.email && <p className="mt-3 max-w-[640px] text-[15.5px] text-[#9aa0ae]">{session.user.email}</p>}
+
+        {serviceRequests.length > 0 && brand === "studio" && (
+          <section className="mt-9">
+            <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
+              My service requests
+            </div>
+            <div className="mt-3 flex flex-col gap-3.5">
+              {serviceRequests.map((r) => {
+                const service = getService(r.serviceId);
+                const stageIndex = SERVICE_STATUSES.indexOf(r.status as (typeof SERVICE_STATUSES)[number]);
+                const monthlyLabel =
+                  r.monthlyStatus === "active"
+                    ? "Active"
+                    : r.monthlyStatus === "canceled"
+                      ? "Payment lapsed"
+                      : "Not subscribed yet";
+                return (
+                  <div key={r.id} className="rounded-xl border border-[#232838] bg-[#151920] p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#333a4c] bg-[#191d26]">
+                          <Briefcase className="h-4 w-4 text-[#9aa0ae]" aria-hidden />
+                        </div>
+                        <span className="text-[15.5px] font-bold">{service?.title ?? r.serviceId}</span>
+                      </div>
+                      <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
+                        Monthly: {monthlyLabel}
+                      </span>
+                    </div>
+                    <div className="mt-4 flex items-center gap-1.5">
+                      {SERVICE_STATUSES.map((s, i) => (
+                        <div
+                          key={s}
+                          className={`h-1.5 flex-1 rounded-full ${i <= stageIndex ? "bg-[#f0b429]" : "border border-[#232838] bg-[#0a0c10]"}`}
+                        />
+                      ))}
+                    </div>
+                    <p className="mt-3 text-[13px] text-[#9aa0ae]">
+                      Current stage:{" "}
+                      <span className="font-semibold text-[#eeeee7]">
+                        {SERVICE_STATUS_LABELS[r.status as (typeof SERVICE_STATUSES)[number]] ?? r.status}
+                      </span>
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         <section className="mt-9">
           <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
@@ -158,7 +213,7 @@ export default async function DashboardPage() {
           </section>
         )}
 
-        {serviceRequests.length > 0 && (
+        {serviceRequests.length > 0 && brand === "lab" && (
           <section className="mt-11">
             <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
               My service requests

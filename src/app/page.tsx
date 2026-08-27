@@ -425,9 +425,17 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               <a href="#contact" className="hover:text-white transition-colors">Contact</a>
             </nav>
 
-            <BookButton className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]">
-              Book a free audit
-            </BookButton>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/sign-in"
+                className="hidden text-sm text-white/60 transition-colors hover:text-white sm:inline"
+              >
+                Sign in
+              </Link>
+              <BookButton className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]">
+                Book a free audit
+              </BookButton>
+            </div>
           </div>
         </div>
       </header>
