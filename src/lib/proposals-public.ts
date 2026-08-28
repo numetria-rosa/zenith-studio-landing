@@ -1,5 +1,7 @@
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { findOrCreateUserByEmail } from "@/lib/users";
+import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 
 /* Token-secured client-facing proposal lookup (Slice 5 of the
    service-platform build, 2026-08-28). Modeled on PurchaseClaim's pattern
@@ -91,19 +93,47 @@ export async function recordClientResponse(
     return { ok: false, error: "a note is required when requesting changes" };
   }
 
-  await db.$transaction([
-    db.clientApproval.create({
+  await db.$transaction(async (tx) => {
+    await tx.clientApproval.create({
       data: {
         proposalId: proposal.id,
         action,
         note: note?.trim() || null,
         ipAddress,
       },
-    }),
-    db.proposal.update({
+    });
+    await tx.proposal.update({
       where: { id: proposal.id },
       data: { status: ACTION_TO_STATUS[action] },
-    }),
-  ]);
+    });
+
+    // Trigger 1 (Slice 6, 2026-08-28): an approved proposal automatically
+    // creates the client's ServiceProject workspace, in the same
+    // transaction as the approval itself. This does NOT require a real
+    // Whop payment to have occurred — today, the actual payment for a
+    // proposal-driven engagement still happens by some other means (bank
+    // transfer, invoice, a manually-shared Whop link); this only makes
+    // approval create the workspace, not payment.
+    if (action === "APPROVED") {
+      const user = await findOrCreateUserByEmail(tx, proposal.clientEmail, proposal.clientName);
+
+      // Backfill Proposal.userId the first time a real account is tied to
+      // it, mirroring the webhook's own "backfill the stronger identity
+      // the first time we see it" convention.
+      if (!proposal.userId) {
+        await tx.proposal.update({ where: { id: proposal.id }, data: { userId: user.id } });
+      }
+
+      const primaryItem = proposal.items.find((i) => i.catalogServiceId) ?? proposal.items[0];
+      const title = primaryItem?.label || proposal.companyName || proposal.clientName || "Service Engagement";
+
+      await createServiceProjectWithDefaults(tx, {
+        userId: user.id,
+        title,
+        catalogServiceId: primaryItem?.catalogServiceId ?? null,
+        proposalId: proposal.id,
+      });
+    }
+  });
   return { ok: true };
 }

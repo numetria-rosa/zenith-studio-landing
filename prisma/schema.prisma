@@ -52,6 +52,7 @@ model User {
   serviceRequests ServiceRequest[]
   purchaseClaims  PurchaseClaim[]
   proposals       Proposal[]
+  serviceProjects ServiceProject[]
 }
 
 model Account {
@@ -210,6 +211,7 @@ model ServiceCatalog {
 
   auditRecommendations AuditRecommendation[]
   proposalItems        ProposalItem[]
+  serviceProjects      ServiceProject[]
 }
 
 enum AuditStatus {
@@ -357,6 +359,7 @@ model Proposal {
   items    ProposalItem[]
   versions ProposalVersion[]
   approvals ClientApproval[]
+  serviceProjects ServiceProject[]
 
   @@index([auditId])
   @@index([userId])
@@ -429,4 +432,103 @@ model ClientApproval {
   proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
 
   @@index([proposalId])
+}
+
+enum ProjectStage {
+  NEW
+  SCOPING
+  ONBOARDING
+  BUILDING
+  QA
+  LIVE
+  MAINTENANCE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+// The actual delivery workspace for a service engagement (Slice 6 of the
+// service-platform build, 2026-08-28). Purely additive and lives alongside
+// ServiceRequest — it does NOT replace it in this slice. ServiceRequest
+// keeps being the only thing the webhook writes for the 3 generic AI
+// Systems services; ServiceProject is created by two new triggers only:
+// (1) a client approving a Proposal via the token-secured public view, and
+// (2) a Whop purchase of the "law-firms"/"brokerages" vertical offers
+// specifically. catalogServiceId and sourceServiceId are both nullable and
+// independent: a proposal-driven project may set catalogServiceId (from a
+// ProposalItem's linked ServiceCatalog row) with no sourceServiceId, while
+// a webhook-driven project sets sourceServiceId (the free-string
+// src/lib/services.ts id, e.g. "law-firms") with no catalogServiceId, since
+// those two vertical offers don't yet have ServiceCatalog rows of their
+// own. No @@unique([userId, ...]) constraint on purpose — unlike
+// ServiceRequest, a client can have more than one project over time (e.g.
+// a second, later engagement); the webhook branch enforces its own
+// re-buy idempotency via a findFirst check instead of a DB constraint.
+model ServiceProject {
+  id               String  @id @default(cuid())
+  userId           String
+  catalogServiceId String?
+  proposalId       String?
+  sourceServiceId  String?
+
+  stage ProjectStage @default(NEW)
+  title String
+
+  adminNote String? @db.Text // internal only — never shown to the client, matches ServiceRequest.adminNote's convention
+
+  whopMonthlyMembershipId String? // only set for webhook-sourced projects
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  catalogService ServiceCatalog? @relation(fields: [catalogServiceId], references: [id])
+  proposal       Proposal?       @relation(fields: [proposalId], references: [id])
+
+  milestones   ProjectMilestone[]
+  requirements ClientRequirement[]
+
+  @@index([userId])
+  @@index([proposalId])
+  @@index([sourceServiceId])
+}
+
+model ProjectMilestone {
+  id          String    @id @default(cuid())
+  projectId   String
+  title       String
+  dueAt       DateTime?
+  completedAt DateTime?
+  order       Int       @default(0)
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+enum RequirementStatus {
+  MISSING
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+// Doubles as both "what we need from the client" and the onboarding
+// checklist — same underlying concept (things the client needs to
+// provide/confirm before/during build), deliberately not split into two
+// models.
+model ClientRequirement {
+  id        String             @id @default(cuid())
+  projectId String
+  label     String
+  detail    String?            @db.Text
+  status    RequirementStatus  @default(MISSING)
+  order     Int                @default(0)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
 }

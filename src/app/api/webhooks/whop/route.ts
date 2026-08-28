@@ -4,8 +4,9 @@ import type { Payment, Membership } from "@whop/sdk/resources.js";
 import { getWhopClient } from "@/lib/whop";
 import { db } from "@/lib/db";
 import { courseIdForWhopProductId } from "@/lib/courses";
-import { serviceKindForWhopPlanId } from "@/lib/services";
+import { serviceKindForWhopPlanId, getService } from "@/lib/services";
 import { generateStrongPassword, encryptPassword } from "@/lib/password";
+import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 
 /* Zenith Lab — Whop webhook handler.
    Implements whop-checkout-links-and-webhooks.md §3.3/§3.7 exactly:
@@ -148,6 +149,30 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
         whopMonthlyMembershipId: payment.membership?.id ?? undefined,
       },
     });
+  }
+
+  // ---- Slice 6 addition (2026-08-28), purely additive, nothing above this
+  // line changed. The two vertical-offer services ("law-firms",
+  // "brokerages" — NOT the 3 generic AI Systems services, which keep
+  // writing to ServiceRequest only, unmodified) also get a ServiceProject
+  // delivery workspace alongside the ServiceRequest row just upserted
+  // above. findFirst-then-create instead of a DB-level upsert, since
+  // ServiceProject has no @@unique([userId, sourceServiceId]) constraint —
+  // this keeps a re-buy idempotent in spirit, matching the existing
+  // ServiceRequest upsert pattern above.
+  if (serviceId === "law-firms" || serviceId === "brokerages") {
+    const existingProject = await tx.serviceProject.findFirst({
+      where: { userId: user.id, sourceServiceId: serviceId },
+    });
+    if (!existingProject) {
+      const catalogEntry = getService(serviceId);
+      await createServiceProjectWithDefaults(tx, {
+        userId: user.id,
+        title: catalogEntry?.title ?? serviceId,
+        sourceServiceId: serviceId,
+        whopMonthlyMembershipId: payment.membership?.id ?? null,
+      });
+    }
   }
 }
 

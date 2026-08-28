@@ -9,6 +9,7 @@ import { COURSES } from "@/lib/courses";
 import { getCheckoutUrl } from "@/lib/courses";
 import { summarizeProgress } from "@/lib/course-progress-math";
 import { getService, SERVICE_STATUSES, SERVICE_STATUS_LABELS } from "@/lib/services";
+import { FolderKanban } from "lucide-react";
 
 /* The Next.js Server Component entry point after sign-in — the role
    courses/ai-engineering/dashboard.html can't safely fill, since a static
@@ -37,6 +38,19 @@ export default async function DashboardPage() {
   const serviceRequests = await db.serviceRequest.findMany({
     where: { userId: session.user.id },
     orderBy: { updatedAt: "desc" },
+  });
+
+  // Slice 6 (2026-08-28) — minimal client-facing visibility for
+  // ServiceProject. Scoped to the signed-in user only, never a
+  // client-supplied id. A full per-project detail page (tabs, requirements
+  // detail, messages, etc.) is Slice 7 — this just proves the project is
+  // visible to the client who now owns it.
+  const serviceProjects = await db.serviceProject.findMany({
+    where: { userId: session.user.id },
+    orderBy: { updatedAt: "desc" },
+    include: {
+      _count: { select: { requirements: { where: { status: "MISSING" } } } },
+    },
   });
 
   // A signed-in user who owns no course but has bought an AI Systems service
@@ -206,6 +220,40 @@ export default async function DashboardPage() {
                       <ShoppingCart className="h-3.5 w-3.5" aria-hidden />
                       Get access
                     </a>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {serviceProjects.length > 0 && (
+          <section className="mt-11">
+            <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
+              My projects
+            </div>
+            <div className="mt-3 flex flex-col gap-3.5">
+              {serviceProjects.map((p) => {
+                const missingCount = p._count.requirements;
+                return (
+                  <div key={p.id} className="rounded-xl border border-[#232838] bg-[#151920] p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#333a4c] bg-[#191d26]">
+                          <FolderKanban className="h-4 w-4 text-[#9aa0ae]" aria-hidden />
+                        </div>
+                        <span className="text-[15.5px] font-bold">{p.title}</span>
+                      </div>
+                      <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
+                        Stage: {p.stage.replace(/_/g, " ")}
+                      </span>
+                    </div>
+                    {missingCount > 0 && (
+                      <p className="mt-3 text-[13px] text-[#9aa0ae]">
+                        <span className="font-semibold text-[#f0b429]">{missingCount}</span>{" "}
+                        {missingCount === 1 ? "item" : "items"} still needed from you
+                      </p>
+                    )}
                   </div>
                 );
               })}
