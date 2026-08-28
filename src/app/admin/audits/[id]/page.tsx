@@ -110,8 +110,7 @@ export default async function AdminAuditDetailPage({ params }: { params: Promise
   }
 
   return (
-    <div className="min-h-screen bg-[#05060a] px-6 py-12 text-white">
-      <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-4xl">
         <Link href="/admin/audits" className="text-sm text-white/50 hover:text-white/80">
           &larr; All audit requests
         </Link>
@@ -444,6 +443,5 @@ export default async function AdminAuditDetailPage({ params }: { params: Promise
           </form>
         </section>
       </div>
-    </div>
   );
 }

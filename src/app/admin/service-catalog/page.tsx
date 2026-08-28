@@ -24,8 +24,7 @@ export default async function AdminServiceCatalogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#05060a] text-white px-6 py-12">
-      <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-5xl">
         <h1 className="text-2xl font-semibold">Service catalog</h1>
         <p className="mt-1 text-sm text-white/50">
           {services.length} total. Read-only — src/lib/services.ts is still the source of truth for checkout and
@@ -60,6 +59,5 @@ export default async function AdminServiceCatalogPage() {
           ))}
         </div>
       </div>
-    </div>
   );
 }

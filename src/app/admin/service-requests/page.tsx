@@ -44,8 +44,7 @@ export default async function AdminServiceRequestsPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#05060a] text-white px-6 py-12">
-      <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-5xl">
         <h1 className="text-2xl font-semibold">Service requests</h1>
         <p className="mt-1 text-sm text-white/50">
           {requests.length} {serviceFilter ? "matching filter" : "total"}, newest activity first.
@@ -121,6 +120,5 @@ export default async function AdminServiceRequestsPage({
           })}
         </div>
       </div>
-    </div>
   );
 }

@@ -345,6 +345,15 @@ export async function reopenTask(id: string): Promise<WriteResult> {
   return setTaskStatus(id, "TODO");
 }
 
+/** Overdue-task count for the admin nav's Tasks badge (Slice 7,
+    2026-08-28) — same exact criteria (status not DONE, dueAt in the past)
+    as listTasksForAdmin's overdueOnly filter and getNeedsAttention's
+    overdueTasks query in dashboard-metrics.ts, so the badge, the "Overdue
+    only" filter, and the dashboard's Needs Attention list never disagree. */
+export async function getOverdueTaskCount(): Promise<number> {
+  return db.task.count({ where: { status: { not: "DONE" }, dueAt: { lt: new Date() } } });
+}
+
 export async function deleteTask(id: string): Promise<WriteResult> {
   const existing = await db.task.findUnique({ where: { id }, select: { id: true } });
   if (!existing) return { ok: false, error: "not_found" };

@@ -89,8 +89,7 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#05060a] px-6 py-12 text-white">
-      <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h1 className="text-2xl font-semibold">Business dashboard</h1>
           <nav className="flex flex-wrap gap-4 text-sm text-white/50">
@@ -271,6 +270,5 @@ export default async function AdminDashboardPage() {
           </div>
         </section>
       </div>
-    </div>
   );
 }

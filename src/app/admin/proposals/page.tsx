@@ -118,8 +118,7 @@ export default async function AdminProposalsPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#05060a] px-6 py-12 text-white">
-      <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl">
         <h1 className="text-2xl font-semibold">Proposals</h1>
         <p className="mt-1 text-sm text-white/50">
           {rows.length} {statusList.length || search ? "matching" : "total"}
@@ -249,6 +248,5 @@ export default async function AdminProposalsPage({
           ))}
         </div>
       </div>
-    </div>
   );
 }

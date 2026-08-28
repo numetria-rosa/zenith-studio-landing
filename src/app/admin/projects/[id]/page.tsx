@@ -179,8 +179,7 @@ export default async function AdminProjectDetailPage({
   ).length;
 
   return (
-    <div className="min-h-screen bg-[#05060a] px-6 py-12 text-white">
-      <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-4xl">
         <Link href="/admin/projects" className="text-sm text-white/50 hover:text-white/80">
           &larr; All projects
         </Link>
@@ -566,6 +565,5 @@ export default async function AdminProjectDetailPage({
           ))}
         </SectionCard>
       </div>
-    </div>
   );
 }

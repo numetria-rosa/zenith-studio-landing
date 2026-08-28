@@ -54,8 +54,7 @@ export default async function AdminClientsPage({
   for (const c of allClients) stageCounts.set(c.stage, (stageCounts.get(c.stage) ?? 0) + 1);
 
   return (
-    <div className="min-h-screen bg-[#05060a] px-6 py-12 text-white">
-      <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h1 className="text-2xl font-semibold">Clients</h1>
           <nav className="flex flex-wrap gap-4 text-sm text-white/50">
@@ -181,6 +180,5 @@ export default async function AdminClientsPage({
           ))}
         </div>
       </div>
-    </div>
   );
 }

@@ -161,8 +161,7 @@ export default async function AdminTasksPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#05060a] px-6 py-12 text-white">
-      <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div>
             <Link href="/admin" className="text-sm text-white/50 hover:text-white/80">
@@ -536,6 +535,5 @@ export default async function AdminTasksPage({
           </div>
         </section>
       </div>
-    </div>
   );
 }

@@ -131,8 +131,7 @@ export default async function AdminProposalDetailPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#05060a] px-6 py-12 text-white">
-      <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-4xl">
         <Link href="/admin/proposals" className="text-sm text-white/50 hover:text-white/80">
           &larr; All proposals
         </Link>
@@ -430,6 +429,5 @@ export default async function AdminProposalDetailPage({
           </form>
         </section>
       </div>
-    </div>
   );
 }
