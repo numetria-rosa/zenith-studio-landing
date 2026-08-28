@@ -236,7 +236,11 @@ export default async function DashboardPage() {
               {serviceProjects.map((p) => {
                 const missingCount = p._count.requirements;
                 return (
-                  <div key={p.id} className="rounded-xl border border-[#232838] bg-[#151920] p-5">
+                  <Link
+                    key={p.id}
+                    href={`/lab/dashboard/services/${p.id}`}
+                    className="rounded-xl border border-[#232838] bg-[#151920] p-5 transition hover:border-[#333a4c]"
+                  >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#333a4c] bg-[#191d26]">
@@ -254,7 +258,7 @@ export default async function DashboardPage() {
                         {missingCount === 1 ? "item" : "items"} still needed from you
                       </p>
                     )}
-                  </div>
+                  </Link>
                 );
               })}
             </div>

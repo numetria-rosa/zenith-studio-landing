@@ -53,6 +53,9 @@ model User {
   purchaseClaims  PurchaseClaim[]
   proposals       Proposal[]
   serviceProjects ServiceProject[]
+  clientDocuments ClientDocument[]
+  serviceMessages ServiceMessage[]
+  supportRequests SupportRequest[]
 }
 
 model Account {
@@ -485,8 +488,13 @@ model ServiceProject {
   catalogService ServiceCatalog? @relation(fields: [catalogServiceId], references: [id])
   proposal       Proposal?       @relation(fields: [proposalId], references: [id])
 
-  milestones   ProjectMilestone[]
-  requirements ClientRequirement[]
+  milestones      ProjectMilestone[]
+  requirements    ClientRequirement[]
+  integrations    Integration[]
+  metrics         ServiceMetric[]
+  documents       ClientDocument[]
+  messages        ServiceMessage[]
+  supportRequests SupportRequest[]
 
   @@index([userId])
   @@index([proposalId])
@@ -531,4 +539,144 @@ model ClientRequirement {
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
+}
+
+enum IntegrationStatus {
+  NOT_CONNECTED
+  REQUESTED
+  CONNECTED
+  ERROR
+  DISCONNECTED
+}
+
+// Client-facing rendering of this model must NEVER show anything beyond
+// `provider` and a coarse status label (see the business brief's client-safe
+// label set: "Connected" / "Action required" / "Connection issue" /
+// "Not connected" / "Disconnected"). `externalRef` is an opaque
+// reference/id ONLY — e.g. a CRM object id or a webhook subscription id —
+// and must NEVER hold a raw secret, credential, API key, or OAuth token.
+// There is no secrets-storage infrastructure in this codebase; if a real
+// integration ever needs to persist a credential, that is its own dedicated
+// slice with a real secrets manager, not a field on this table.
+model Integration {
+  id          String             @id @default(cuid())
+  projectId   String
+  provider    String // e.g. "gmail", "twilio", "crm"
+  status      IntegrationStatus  @default(NOT_CONNECTED)
+  externalRef String? // opaque reference/id ONLY — never a raw secret, credential, API key, or token
+  connectedAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// Free-string `key` per the business brief's Phase 9 service-specific metric
+// list (e.g. "leads_received", "response_time_minutes"). No metrics-producing
+// integration is wired up anywhere in this codebase yet (Slice 7,
+// 2026-08-28) — every project's Performance tab is expected to show
+// "Awaiting live data" today. That is correct, not a bug.
+model ServiceMetric {
+  id         String   @id @default(cuid())
+  projectId  String
+  key        String
+  value      Float
+  recordedAt DateTime @default(now())
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, key, recordedAt])
+}
+
+enum DocumentKind {
+  PROPOSAL
+  AGREEMENT
+  ONBOARDING
+  REPORT
+  DELIVERABLE
+  OTHER
+}
+
+// File uploads are explicitly OUT OF SCOPE for Slice 7 — no storage provider
+// (S3/Vercel Blob/Uploadthing/etc.) exists anywhere in this codebase, and
+// standing one up is real infrastructure work deserving its own slice with
+// the business owner's input on provider/cost. This table exists so the
+// Files tab UI has a real (currently empty) list to render and is ready the
+// moment storage is wired up; `storageKey`/`sizeBytes` are nullable because
+// no row can be created with real values yet. `storageKey` NEVER holds file
+// bytes — only a future key into whatever blob store is eventually chosen.
+model ClientDocument {
+  id         String       @id @default(cuid())
+  projectId  String
+  userId     String // uploader
+  filename   String
+  storageKey String? // key into a future blob store — always null today, see model comment
+  sizeBytes  Int?
+  kind       DocumentKind @default(OTHER)
+  createdAt  DateTime     @default(now())
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+enum MessageSenderRole {
+  CLIENT
+  ADMIN
+}
+
+// senderRole is stored explicitly at write time (rather than derived from
+// senderUserId + a role lookup on every render) since it drives who a
+// message is attributed to in the UI and is cheap to set correctly once,
+// at the point where the sender's own role is unambiguous.
+model ServiceMessage {
+  id           String            @id @default(cuid())
+  projectId    String
+  senderUserId String
+  senderRole   MessageSenderRole
+  body         String            @db.Text
+  createdAt    DateTime          @default(now())
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sender  User           @relation(fields: [senderUserId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+enum SupportPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum SupportStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_CLIENT
+  RESOLVED
+  CLOSED
+}
+
+// projectId is nullable — a support request may not always be tied to a
+// specific project (e.g. a general account question).
+model SupportRequest {
+  id        String          @id @default(cuid())
+  projectId String?
+  userId    String
+  subject   String
+  body      String          @db.Text
+  priority  SupportPriority @default(MEDIUM)
+  status    SupportStatus   @default(OPEN)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  project ServiceProject? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([userId])
 }
