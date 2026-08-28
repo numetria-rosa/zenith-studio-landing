@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { findOrCreateUserByEmail } from "@/lib/users";
 import { createServiceProjectWithDefaults } from "@/lib/service-projects";
+import { computeApprovedTotals, createProposalCheckout, isProposalPaymentMode } from "@/lib/proposal-payments";
 
 /* Token-secured client-facing proposal lookup (Slice 5 of the
    service-platform build, 2026-08-28). Modeled on PurchaseClaim's pattern
@@ -75,13 +76,24 @@ const ACTION_TO_STATUS: Record<ClientResponseAction, Prisma.ProposalUpdateInput[
 /** Re-validates the token itself — never trusts that the caller already
     validated it via a prior page render. Refuses to record a second
     decision once one of APPROVED/CHANGES_REQUESTED/DECLINED is already
-    live on the proposal record. */
+    live on the proposal record.
+
+    selectedAddOnItemIds/paymentMode only matter for action === "APPROVED"
+    — CHANGES_REQUESTED/REJECTED ignore them entirely. When the approved
+    total has a recurring (MONTHLY-kind) component, paymentMode is
+    required: the client is choosing, at the moment they approve, whether
+    to pay setup now and the monthly plan later (SPLIT, surfaced once an
+    admin marks the project LIVE) or both right now (BUNDLED, one Whop
+    checkout). See src/lib/proposal-payments.ts for what each mode actually
+    creates. */
 export async function recordClientResponse(
   token: string,
   action: ClientResponseAction,
   note: string | null,
-  ipAddress: string | null
-): Promise<{ ok: true } | { ok: false; error: string }> {
+  ipAddress: string | null,
+  selectedAddOnItemIds: string[] = [],
+  paymentMode: string | null = null
+): Promise<{ ok: true; setupCheckoutUrl: string | null } | { ok: false; error: string }> {
   const proposal = await resolveProposalByToken(token);
   if (!proposal) return { ok: false, error: "invalid or expired link" };
 
@@ -92,6 +104,24 @@ export async function recordClientResponse(
   if (action === "CHANGES_REQUESTED" && !note?.trim()) {
     return { ok: false, error: "a note is required when requesting changes" };
   }
+
+  // Only real, real add-on item ids on THIS proposal can be selected — a
+  // tampered form submission naming another proposal's item id (or
+  // anything else) is silently dropped rather than trusted.
+  const realAddOnIds = new Set(proposal.items.filter((i) => i.isOptionalAddOn).map((i) => i.id));
+  const validSelectedAddOnIds = selectedAddOnItemIds.filter((id) => realAddOnIds.has(id));
+
+  let setupCents = 0;
+  let monthlyCents = 0;
+  if (action === "APPROVED") {
+    const totals = computeApprovedTotals(proposal.items, validSelectedAddOnIds);
+    setupCents = totals.setupCents;
+    monthlyCents = totals.monthlyCents;
+    if (monthlyCents > 0 && !(paymentMode && isProposalPaymentMode(paymentMode))) {
+      return { ok: false, error: "choose how you'd like to pay before approving" };
+    }
+  }
+  const resolvedPaymentMode = monthlyCents > 0 && paymentMode && isProposalPaymentMode(paymentMode) ? paymentMode : null;
 
   await db.$transaction(async (tx) => {
     await tx.clientApproval.create({
@@ -104,7 +134,12 @@ export async function recordClientResponse(
     });
     await tx.proposal.update({
       where: { id: proposal.id },
-      data: { status: ACTION_TO_STATUS[action] },
+      data: {
+        status: ACTION_TO_STATUS[action],
+        ...(action === "APPROVED"
+          ? { selectedAddOnItemIds: validSelectedAddOnIds, paymentMode: resolvedPaymentMode }
+          : {}),
+      },
     });
 
     // Trigger 1 (Slice 6, 2026-08-28): an approved proposal automatically
@@ -135,5 +170,21 @@ export async function recordClientResponse(
       });
     }
   });
-  return { ok: true };
+
+  // Whop plan creation is a real network call — deliberately outside the
+  // DB transaction above so a slow/flaky Whop API response never holds a
+  // Postgres transaction open. If it throws, the approval itself has
+  // already committed; the client just won't see a checkout link on this
+  // exact render (the page's own fallback — deriving a URL from a stored
+  // plan id — simply has nothing to derive yet). Not retried automatically
+  // here; an admin can be asked to re-trigger if this ever actually fails.
+  let setupCheckoutUrl: string | null = null;
+  if (action === "APPROVED" && setupCents > 0) {
+    const reference = proposal.id.slice(-8).toUpperCase();
+    const mode = resolvedPaymentMode ?? "SPLIT"; // monthlyCents === 0 here means mode is irrelevant to createProposalCheckout
+    const result = await createProposalCheckout(proposal.id, reference, setupCents, monthlyCents, mode);
+    setupCheckoutUrl = result.setupCheckoutUrl;
+  }
+
+  return { ok: true, setupCheckoutUrl };
 }

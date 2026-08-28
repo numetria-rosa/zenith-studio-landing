@@ -318,6 +318,22 @@ enum ProposalStatus {
   EXPIRED
 }
 
+// SPLIT: setup is paid immediately (whopSetupPlanId, a one_time plan); the
+// monthly plan (whopMonthlyPlanId, a renewal plan) is created later, only
+// once an admin moves the resulting ServiceProject to stage LIVE — see
+// updateProjectStage in service-projects-admin.ts. BUNDLED: a single Whop
+// "renewal" plan covers both — initial_price charges the setup amount at
+// checkout, renewal_price then bills the monthly amount every
+// billing_period days starting from that same checkout, so whopSetupPlanId
+// alone is used for both charges and whopMonthlyPlanId stays null. Chosen
+// by the client alongside their approval (see recordClientResponse in
+// proposals-public.ts) — nullable because a proposal with no MONTHLY-kind
+// items never asks the question, it just gets a plain one_time plan.
+enum ProposalPaymentMode {
+  SPLIT
+  BUNDLED
+}
+
 // Proposal document (Slice 5 of the service-platform build, 2026-08-28).
 // Created from an admin's review of an AuditRequest (auditId always set in
 // practice for this slice's UI entry point), but modeled nullable so a
@@ -357,6 +373,22 @@ model Proposal {
   notIncluded         String? @db.Text
   nextSteps           String? @db.Text
   terms               String? @db.Text
+
+  // Payment (2026-08-28 addition). selectedAddOnItemIds is a JSON array of
+  // ProposalItem ids — which optional add-ons the client actually ticked in
+  // the cart UI before approving; recorded at approval time since add-on
+  // selection has no meaning before then (a DRAFT/SENT proposal has no
+  // "chosen" add-ons yet). See src/lib/proposal-payments.ts for the plan-
+  // creation logic and the ProposalPaymentMode enum's own comment for the
+  // SPLIT vs BUNDLED distinction.
+  selectedAddOnItemIds Json?
+  paymentMode          ProposalPaymentMode?
+  whopSetupPlanId      String?
+  whopMonthlyPlanId    String?
+  setupPaidAt          DateTime?
+  monthlyPaidAt        DateTime?
+  setupWhopPaymentId   String?
+  monthlyWhopPaymentId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

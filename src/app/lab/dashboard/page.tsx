@@ -11,6 +11,7 @@ import { summarizeProgress } from "@/lib/course-progress-math";
 import { getService, SERVICE_STATUSES, SERVICE_STATUS_LABELS } from "@/lib/services";
 import { FolderKanban, PhoneCall } from "lucide-react";
 import { listPaidAuditsForUser, PAID_AUDIT_STATUS_LABELS } from "@/lib/paid-audit";
+import { computeApprovedTotals, whopCheckoutUrl } from "@/lib/proposal-payments";
 
 /* The Next.js Server Component entry point after sign-in — the role
    courses/ai-engineering/dashboard.html can't safely fill, since a static
@@ -51,6 +52,20 @@ export default async function DashboardPage() {
     orderBy: { updatedAt: "desc" },
     include: {
       _count: { select: { requirements: { where: { status: "MISSING" } } } },
+      // Payment surfacing (2026-08-28 addition) — same fields
+      // /proposals/view/[accessToken] uses to show "Complete your
+      // payment", so a client sees the exact same deferred-monthly
+      // checkout here without having to dig up their original proposal
+      // link once an admin has marked the project LIVE.
+      proposal: {
+        select: {
+          whopMonthlyPlanId: true,
+          monthlyPaidAt: true,
+          paymentMode: true,
+          selectedAddOnItemIds: true,
+          items: { select: { id: true, amountCents: true, isOptionalAddOn: true, kind: true } },
+        },
+      },
     },
   });
 
@@ -274,30 +289,52 @@ export default async function DashboardPage() {
             <div className="mt-3 flex flex-col gap-3.5">
               {serviceProjects.map((p) => {
                 const missingCount = p._count.requirements;
+
+                // SPLIT-mode deferred monthly checkout: only ever exists
+                // once an admin has moved this project to LIVE (see
+                // updateProjectStage in service-projects-admin.ts). Same
+                // computeApprovedTotals call the proposal page itself
+                // uses, so the amount shown here can't drift from what
+                // was actually quoted and approved.
+                const proposal = p.proposal;
+                const selectedAddOnIds = Array.isArray(proposal?.selectedAddOnItemIds)
+                  ? (proposal.selectedAddOnItemIds as string[])
+                  : [];
+                const monthlyCents = proposal ? computeApprovedTotals(proposal.items, selectedAddOnIds).monthlyCents : 0;
+                const showMonthlyPay = !!(proposal?.whopMonthlyPlanId && !proposal.monthlyPaidAt && monthlyCents > 0);
+
                 return (
-                  <Link
-                    key={p.id}
-                    href={`/lab/dashboard/services/${p.id}`}
-                    className="rounded-xl border border-[#232838] bg-[#151920] p-5 transition hover:border-[#333a4c]"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#333a4c] bg-[#191d26]">
-                          <FolderKanban className="h-4 w-4 text-[#9aa0ae]" aria-hidden />
+                  <div key={p.id} className="rounded-xl border border-[#232838] bg-[#151920] p-5 transition hover:border-[#333a4c]">
+                    <Link href={`/lab/dashboard/services/${p.id}`} className="block">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#333a4c] bg-[#191d26]">
+                            <FolderKanban className="h-4 w-4 text-[#9aa0ae]" aria-hidden />
+                          </div>
+                          <span className="text-[15.5px] font-bold">{p.title}</span>
                         </div>
-                        <span className="text-[15.5px] font-bold">{p.title}</span>
+                        <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
+                          Stage: {p.stage.replace(/_/g, " ")}
+                        </span>
                       </div>
-                      <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
-                        Stage: {p.stage.replace(/_/g, " ")}
-                      </span>
-                    </div>
-                    {missingCount > 0 && (
-                      <p className="mt-3 text-[13px] text-[#9aa0ae]">
-                        <span className="font-semibold text-[#f0b429]">{missingCount}</span>{" "}
-                        {missingCount === 1 ? "item" : "items"} still needed from you
-                      </p>
+                      {missingCount > 0 && (
+                        <p className="mt-3 text-[13px] text-[#9aa0ae]">
+                          <span className="font-semibold text-[#f0b429]">{missingCount}</span>{" "}
+                          {missingCount === 1 ? "item" : "items"} still needed from you
+                        </p>
+                      )}
+                    </Link>
+                    {showMonthlyPay && (
+                      <a
+                        href={whopCheckoutUrl(proposal!.whopMonthlyPlanId!)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg border border-[#f0b429]/40 bg-[#f0b429]/10 px-4 py-2 text-xs font-semibold text-[#f0b429] transition hover:bg-[#f0b429]/20"
+                      >
+                        Pay ${(monthlyCents / 100).toFixed(0)}/mo — your build is live
+                      </a>
                     )}
-                  </Link>
+                  </div>
                 );
               })}
             </div>

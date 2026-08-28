@@ -7,6 +7,7 @@ import { courseIdForWhopProductId } from "@/lib/courses";
 import { serviceKindForWhopPlanId, getService } from "@/lib/services";
 import { generateStrongPassword, encryptPassword } from "@/lib/password";
 import { createServiceProjectWithDefaults } from "@/lib/service-projects";
+import { resolveProposalByWhopPlanId, classifyProposalPaymentLeg } from "@/lib/proposal-payments";
 
 /* Zenith Lab — Whop webhook handler.
    Implements whop-checkout-links-and-webhooks.md §3.3/§3.7 exactly:
@@ -70,14 +71,40 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
   const productId = payment.product?.id;
   const courseId = productId ? courseIdForWhopProductId(productId) : null;
   const serviceMatch = courseId ? null : serviceKindForWhopPlanId(payment.plan?.id);
+  // Proposal plans are created dynamically per-approval (src/lib/
+  // proposal-payments.ts), never hardcoded like courses.ts/services.ts —
+  // so they can only be resolved with a DB lookup, and only need to be
+  // attempted once the two static maps above have both already missed.
+  const proposalMatch = !courseId && !serviceMatch ? await resolveProposalByWhopPlanId(payment.plan?.id) : null;
 
-  if (!courseId && !serviceMatch) {
+  if (!courseId && !serviceMatch && !proposalMatch) {
     // Doc's "safely rejected/logged rather than granting random access"
     // (Phase 14) — an unrecognized product/plan must never grant anything.
     console.warn(
       `[whop webhook] payment.succeeded for unmapped product "${productId ?? "unknown"}" / plan "${payment.plan?.id ?? "unknown"}" ` +
         `— no entitlement or service request created. Check the WHOP_*_ID env vars against courses.ts / services.ts.`
     );
+    return;
+  }
+
+  if (proposalMatch) {
+    // A proposal's client already has a real account (created at approval
+    // time in recordClientResponse) and never needs a PurchaseClaim — the
+    // approval flow, not a payment redirect, is how they got signed in —
+    // so this branch skips findOrCreateUser/createPurchaseClaim entirely
+    // and just records which leg (setup vs monthly) got paid.
+    const leg = classifyProposalPaymentLeg(proposalMatch.leg, payment.billing_reason ?? null);
+    if (leg === "setup") {
+      await tx.proposal.update({
+        where: { id: proposalMatch.proposal.id },
+        data: { setupPaidAt: new Date(), setupWhopPaymentId: payment.id },
+      });
+    } else {
+      await tx.proposal.update({
+        where: { id: proposalMatch.proposal.id },
+        data: { monthlyPaidAt: new Date(), monthlyWhopPaymentId: payment.id },
+      });
+    }
     return;
   }
 

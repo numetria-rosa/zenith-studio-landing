@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { getService } from "@/lib/services";
+import { computeApprovedTotals, createDeferredMonthlyCheckout } from "@/lib/proposal-payments";
 import type { ProjectStage, SupportStatus } from "@prisma/client";
 
 /* Admin-side ServiceProject operations (Slice 4 of the business command
@@ -175,12 +176,59 @@ type WriteResult = { ok: true } | { ok: false; error: string };
 
 /** Validates the new stage against the real ProjectStage enum before
     writing — never trusts a raw client-submitted string. Caller must have
-    already re-checked requireAdmin(). */
+    already re-checked requireAdmin().
+
+    Also the trigger point for a SPLIT-mode proposal's deferred monthly
+    checkout: per the client's explicit choice at approval time ("pay setup
+    now, monthly once the work is finished"), the monthly Whop plan doesn't
+    exist at all until an admin marks the project LIVE — see the
+    ProposalPaymentMode enum's doc comment in prisma/schema.prisma. Fires
+    at most once per project (guarded by whopMonthlyPlanId already being
+    set) and only on the actual transition INTO LIVE, not on every save
+    while already LIVE. A slow/flaky Whop API call here fails the whole
+    stage update (the two are done together deliberately — an admin
+    retrying "mark LIVE" is the natural retry path, better than silently
+    leaving a LIVE project with no monthly checkout ever created). */
 export async function updateProjectStage(id: string, stage: string): Promise<WriteResult> {
   if (!isProjectStage(stage)) return { ok: false, error: `invalid stage "${stage}"` };
-  const existing = await db.serviceProject.findUnique({ where: { id }, select: { id: true } });
+  const existing = await db.serviceProject.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      stage: true,
+      proposal: {
+        select: {
+          id: true,
+          paymentMode: true,
+          whopMonthlyPlanId: true,
+          selectedAddOnItemIds: true,
+          items: { select: { id: true, amountCents: true, isOptionalAddOn: true, kind: true } },
+        },
+      },
+    },
+  });
   if (!existing) return { ok: false, error: "not_found" };
+
   await db.serviceProject.update({ where: { id }, data: { stage } });
+
+  const proposal = existing.proposal;
+  if (
+    stage === "LIVE" &&
+    existing.stage !== "LIVE" &&
+    proposal &&
+    proposal.paymentMode === "SPLIT" &&
+    !proposal.whopMonthlyPlanId
+  ) {
+    const selectedAddOnIds = Array.isArray(proposal.selectedAddOnItemIds)
+      ? (proposal.selectedAddOnItemIds as string[])
+      : [];
+    const { monthlyCents } = computeApprovedTotals(proposal.items, selectedAddOnIds);
+    if (monthlyCents > 0) {
+      const reference = proposal.id.slice(-8).toUpperCase();
+      await createDeferredMonthlyCheckout(proposal.id, reference, monthlyCents);
+    }
+  }
+
   return { ok: true };
 }
 

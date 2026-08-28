@@ -15,6 +15,7 @@ import {
   sendProposalAsAdmin,
   updateProposalSectionsAsAdmin,
 } from "@/lib/proposals-admin";
+import { computeApprovedTotals, whopCheckoutUrl } from "@/lib/proposal-payments";
 
 /* Proposal builder (Slice 5 of the service-platform build, 2026-08-28).
    Every section is an editable textarea/input saved via a server action;
@@ -229,6 +230,61 @@ export default async function AdminProposalDetailPage({
             <p className="mt-1 break-all text-sm text-cyan-300">{publicUrl}</p>
           </div>
         )}
+
+        {proposal.status === "APPROVED" && (() => {
+          const selectedAddOnIds = Array.isArray(proposal.selectedAddOnItemIds)
+            ? (proposal.selectedAddOnItemIds as string[])
+            : [];
+          const approvedTotals = computeApprovedTotals(proposal.items, selectedAddOnIds);
+          if (approvedTotals.setupCents === 0 && approvedTotals.monthlyCents === 0) return null;
+          return (
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="text-sm font-semibold text-white/80">
+                Payment {proposal.paymentMode ? `— ${proposal.paymentMode === "BUNDLED" ? "pay both now" : "setup now, monthly later"}` : ""}
+              </p>
+              <div className="mt-2 flex flex-col gap-1.5 text-sm">
+                {approvedTotals.setupCents > 0 && (
+                  <p className={proposal.setupPaidAt ? "text-emerald-300" : "text-white/60"}>
+                    Setup ${(approvedTotals.setupCents / 100).toFixed(2)}:{" "}
+                    {proposal.setupPaidAt
+                      ? `paid ${proposal.setupPaidAt.toISOString().slice(0, 16).replace("T", " ")}`
+                      : proposal.whopSetupPlanId
+                        ? "awaiting payment"
+                        : "checkout not created"}
+                    {proposal.whopSetupPlanId && !proposal.setupPaidAt && (
+                      <>
+                        {" — "}
+                        <a href={whopCheckoutUrl(proposal.whopSetupPlanId)} target="_blank" rel="noopener noreferrer" className="underline decoration-white/30 hover:text-white">
+                          checkout link
+                        </a>
+                      </>
+                    )}
+                  </p>
+                )}
+                {approvedTotals.monthlyCents > 0 && (
+                  <p className={proposal.monthlyPaidAt ? "text-emerald-300" : "text-white/60"}>
+                    Monthly ${(approvedTotals.monthlyCents / 100).toFixed(2)}/mo:{" "}
+                    {proposal.monthlyPaidAt
+                      ? `paid ${proposal.monthlyPaidAt.toISOString().slice(0, 16).replace("T", " ")}`
+                      : proposal.whopMonthlyPlanId
+                        ? "awaiting payment"
+                        : proposal.paymentMode === "SPLIT"
+                          ? "checkout created once the project is marked LIVE"
+                          : "checkout not created"}
+                    {proposal.whopMonthlyPlanId && !proposal.monthlyPaidAt && (
+                      <>
+                        {" — "}
+                        <a href={whopCheckoutUrl(proposal.whopMonthlyPlanId)} target="_blank" rel="noopener noreferrer" className="underline decoration-white/30 hover:text-white">
+                          checkout link
+                        </a>
+                      </>
+                    )}
+                  </p>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {proposal.approvals.length > 0 && (
           <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
