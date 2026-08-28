@@ -58,6 +58,7 @@ model User {
   serviceMessages ServiceMessage[]
   supportRequests SupportRequest[]
   assignedTasks   Task[]            @relation("TaskAssignee")
+  paidAudits      PaidAudit[]
 }
 
 model Account {
@@ -248,6 +249,7 @@ model AuditRequest {
   findings        AuditFinding[]
   recommendations AuditRecommendation[]
   proposals       Proposal[]
+  paidAudits      PaidAudit[]
 
   @@index([email])
   @@index([status])
@@ -365,6 +367,7 @@ model Proposal {
   versions ProposalVersion[]
   approvals ClientApproval[]
   serviceProjects ServiceProject[]
+  paidAudits PaidAudit[]
 
   @@index([auditId])
   @@index([userId])
@@ -741,4 +744,69 @@ model Task {
   @@index([assigneeUserId])
   @@index([status])
   @@index([dueAt])
+}
+
+enum PaidAuditStatus {
+  PAYMENT_PENDING
+  PAID
+  BOOKING_PENDING
+  BOOKED
+  COMPLETED
+  FOLLOW_UP
+  CANCELLED
+  REFUNDED
+}
+
+// The $35, 20-minute paid automation audit call, sold alongside (not
+// replacing) the existing free AuditRequest form. Purely additive — new
+// enum, new table, FKs to existing User/AuditRequest/Proposal only.
+// Deliberately NOT a "service" in the ServiceRequest/ServiceProject sense
+// (see src/lib/paid-audit.ts) — a one-off paid call, not an ongoing
+// engagement, so it gets its own small model instead of being folded into
+// either of those.
+//
+// Payment + booking is handled entirely by Cal.com's own "Cal Pay" paid-
+// booking flow (a real, live Cal.com event, id 6851441, slug
+// zenith-studio-ai/paid-automation-audit, $35 USD, ON_BOOKING payment) —
+// Cal.com will not create a booking at all unless payment succeeds first,
+// so the payment security boundary is enforced natively by Cal.com, not by
+// this app. There is no Cal.com <-> this app webhook integration (a
+// deliberate choice, not a gap — see src/lib/paid-audit.ts) — an admin
+// manually creates/updates this row after seeing a real booking land in
+// their Cal.com calendar, which is why every field below is admin-editable
+// rather than webhook-populated.
+//
+// status is intentionally one linear enum rather than separate payment/
+// booking/call fields — the lifecycle is one progression, not independent
+// axes, so a single enum avoids redundant/contradictory state.
+model PaidAudit {
+  id          String          @id @default(cuid())
+  userId      String
+  email       String
+  companyName String?
+  status      PaidAuditStatus @default(BOOKED)
+
+  amountCents Int    @default(3500) // always the real $35 in cents — not derived from anywhere else
+  currency    String @default("usd")
+
+  calBookingUid String? // Cal.com's own booking reference, pasted in by an admin when known — never auto-populated, no webhook exists
+
+  scheduledAt  DateTime?
+  adminNote    String?   @db.Text // internal only — matches ServiceRequest.adminNote's convention
+  followUpNote String?   @db.Text
+
+  relatedAuditRequestId String?
+  relatedProposalId     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relatedAuditRequest AuditRequest? @relation(fields: [relatedAuditRequestId], references: [id])
+  relatedProposal     Proposal?     @relation(fields: [relatedProposalId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([relatedAuditRequestId])
+  @@index([relatedProposalId])
 }

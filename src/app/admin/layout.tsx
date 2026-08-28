@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import { getTopMetrics } from "@/lib/dashboard-metrics";
 import { getOverdueTaskCount } from "@/lib/tasks-admin";
+import { listPaidAuditsForAdmin } from "@/lib/paid-audit";
 import AdminNav, { type NavItem } from "./AdminNav";
 
 /* Shared /admin/** layout (Slice 7 of the business command center,
@@ -28,7 +29,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // Badge counts reuse the exact same queries dashboard-metrics.ts and
   // tasks-admin.ts already established, rather than writing new counting
   // logic that could quietly drift from the numbers shown elsewhere.
-  const [topMetrics, overdueTaskCount] = await Promise.all([getTopMetrics(), getOverdueTaskCount()]);
+  const [topMetrics, overdueTaskCount, paidAudits] = await Promise.all([
+    getTopMetrics(),
+    getOverdueTaskCount(),
+    listPaidAuditsForAdmin(),
+  ]);
+  // Needs-action badge: rows still waiting on an admin to confirm payment or
+  // booking. BOOKED/COMPLETED/FOLLOW_UP/CANCELLED/REFUNDED don't need
+  // action right now, so they're excluded — same "in-memory filter at low
+  // volume" shortcut as getOverdueTaskCount's sibling queries.
+  const paidAuditsNeedingAttention = paidAudits.filter(
+    (a) => a.status === "PAYMENT_PENDING" || a.status === "PAID" || a.status === "BOOKING_PENDING",
+  ).length;
 
   const items: NavItem[] = [
     { href: "/admin", label: "Dashboard", icon: "LayoutDashboard" },
@@ -37,6 +49,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/proposals", label: "Proposals", icon: "FileText", badge: topMetrics.pendingProposals },
     { href: "/admin/projects", label: "Projects", icon: "FolderKanban" },
     { href: "/admin/tasks", label: "Tasks", icon: "CheckSquare", badge: overdueTaskCount },
+    { href: "/admin/paid-audits", label: "Paid audit calls", icon: "PhoneCall", badge: paidAuditsNeedingAttention },
     { href: "/admin/service-catalog", label: "Service catalog", icon: "LayoutGrid" },
     { href: "/admin/service-requests", label: "Service requests", icon: "Inbox", badge: topMetrics.openSupportRequests },
   ];

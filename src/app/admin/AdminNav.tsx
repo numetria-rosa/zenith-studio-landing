@@ -15,6 +15,7 @@ import {
   CheckSquare,
   LayoutGrid,
   Inbox,
+  PhoneCall,
 } from "lucide-react";
 import type { SearchResult, SearchResultGroup } from "@/lib/admin-search";
 import { SEARCH_GROUP_LABELS } from "@/lib/admin-search";
@@ -33,6 +34,7 @@ const ICONS = {
   CheckSquare,
   LayoutGrid,
   Inbox,
+  PhoneCall,
 } as const;
 
 export type NavIconName = keyof typeof ICONS;

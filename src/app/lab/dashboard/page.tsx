@@ -9,7 +9,8 @@ import { COURSES } from "@/lib/courses";
 import { getCheckoutUrl } from "@/lib/courses";
 import { summarizeProgress } from "@/lib/course-progress-math";
 import { getService, SERVICE_STATUSES, SERVICE_STATUS_LABELS } from "@/lib/services";
-import { FolderKanban } from "lucide-react";
+import { FolderKanban, PhoneCall } from "lucide-react";
+import { listPaidAuditsForUser, PAID_AUDIT_STATUS_LABELS } from "@/lib/paid-audit";
 
 /* The Next.js Server Component entry point after sign-in — the role
    courses/ai-engineering/dashboard.html can't safely fill, since a static
@@ -52,6 +53,11 @@ export default async function DashboardPage() {
       _count: { select: { requirements: { where: { status: "MISSING" } } } },
     },
   });
+
+  // Client-facing visibility for their own $35 paid audit call bookings
+  // (manually tracked by an admin — see src/lib/paid-audit.ts). Scoped to
+  // the signed-in user only, never a client-supplied id.
+  const paidAudits = await listPaidAuditsForUser(session.user.id);
 
   // A signed-in user who owns no course but has bought an AI Systems service
   // shouldn't land on a page that brands itself "Zenith Lab" — see CourseBar's
@@ -145,6 +151,39 @@ export default async function DashboardPage() {
                   </div>
                 );
               })}
+            </div>
+          </section>
+        )}
+
+        {paidAudits.length > 0 && (
+          <section className="mt-9">
+            <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
+              My paid audit calls
+            </div>
+            <div className="mt-3 flex flex-col gap-3.5">
+              {paidAudits.map((a) => (
+                <div key={a.id} className="rounded-xl border border-[#232838] bg-[#151920] p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#333a4c] bg-[#191d26]">
+                        <PhoneCall className="h-4 w-4 text-[#9aa0ae]" aria-hidden />
+                      </div>
+                      <span className="text-[15.5px] font-bold">20-Minute Automation Audit Call</span>
+                    </div>
+                    <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
+                      {PAID_AUDIT_STATUS_LABELS[a.status]}
+                    </span>
+                  </div>
+                  {a.scheduledAt && (
+                    <p className="mt-3 text-[13px] text-[#9aa0ae]">
+                      Scheduled for{" "}
+                      <span className="font-semibold text-[#eeeee7]">
+                        {a.scheduledAt.toISOString().slice(0, 16).replace("T", " ")}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
           </section>
         )}

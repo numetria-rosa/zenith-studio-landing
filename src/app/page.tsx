@@ -32,6 +32,10 @@ const faqs = [
     q: "Can I cancel the monthly plan?",
     a: "Yes, anytime. There is no lock-in. The monthly fee covers hosting, monitoring, and improvements, and you keep everything that was built for you.",
   },
+  {
+    q: "What is the difference between the free audit and the $35 audit call?",
+    a: "The free audit is a written assessment: you fill out a form, we review it, and send back findings and a proposal by email, at no cost. The $35 audit call is a separate, live 20-minute call with us, booked and paid for upfront through Cal.com. Neither is a discount or a preview of the other, they are two different ways to get an audit.",
+  },
 ];
 
 export default function ZenithStudioLandingPage() {
@@ -507,6 +511,118 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 100% { transform: translateY(0px); }
               }
             `}</style>
+          </div>
+        </section>
+
+        {/* ── Two ways to start: free written audit vs. paid live call.
+            These are genuinely different products (async report vs. a real
+            20-minute call), not a discount ladder, so the copy and layout
+            keep them visually equal rather than pushing one as an upsell. ── */}
+        <section id="audit-options" className="mx-auto max-w-7xl py-10 sm:py-16">
+          <div className="mb-10 max-w-3xl">
+            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Start here</div>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
+              Two ways to get an audit
+            </h2>
+            <p className="mt-4 text-white/62 leading-7">
+              Pick whichever fits how you like to work. Both tell you exactly where automation would
+              help and what it would cost, they just get you there differently.
+            </p>
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div className="flex flex-col rounded-[30px] border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+                Free Automation Audit
+              </div>
+              <div className="mt-4 flex items-baseline gap-2">
+                <span className="text-4xl font-semibold tracking-[-0.04em]">$0</span>
+                <span className="text-sm text-white/55">written assessment</span>
+              </div>
+              <p className="mt-5 text-sm leading-7 text-white/60">
+                Fill out a short form about your business. We review it and send back a written
+                assessment: where your hours and leads are leaking, whether automation is worth it
+                for you, and a rough timeline and cost if it is. No call required.
+              </p>
+              <ul className="mt-5 flex-1 space-y-2.5">
+                {[
+                  "Async, done over email",
+                  "Written findings and a proposal",
+                  "No payment, no time commitment",
+                ].map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5 text-sm text-white/65">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2.2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden
+                      className="mt-1 h-3.5 w-3.5 flex-shrink-0 text-cyan-300"
+                    >
+                      <path d="M5 12l5 5L20 7" />
+                    </svg>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/audit"
+                className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10"
+              >
+                Get your free audit
+              </Link>
+            </div>
+
+            <div className="relative flex flex-col rounded-[30px] border border-emerald-300/40 bg-emerald-400/[0.06] p-7 backdrop-blur-xl shadow-[0_0_50px_rgba(52,211,153,0.10)]">
+              <span className="absolute -top-3 left-7 rounded-full bg-gradient-to-r from-emerald-300 to-teal-200 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-950">
+                Live call
+              </span>
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+                20-Minute Automation Audit Call
+              </div>
+              <div className="mt-4 flex items-baseline gap-2">
+                <span className="text-4xl font-semibold tracking-[-0.04em]">$35</span>
+                <span className="text-sm text-white/55">one-time, paid at booking</span>
+              </div>
+              <p className="mt-5 text-sm leading-7 text-white/60">
+                Skip the form. Book a real 20-minute call with us, we look at your business live,
+                talk through what is worth automating, and you leave with a plan. Payment is
+                collected when you book, and the call is confirmed straight away.
+              </p>
+              <ul className="mt-5 flex-1 space-y-2.5">
+                {[
+                  "Live, on a call with us",
+                  "Instant booking, no waiting on a written reply",
+                  "Priced separately from the free audit, not a discount on it",
+                ].map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5 text-sm text-white/65">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2.2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden
+                      className="mt-1 h-3.5 w-3.5 flex-shrink-0 text-emerald-300"
+                    >
+                      <path d="M5 12l5 5L20 7" />
+                    </svg>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="https://cal.com/zenith-studio-ai/paid-automation-audit"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
+              >
+                Book the $35 audit call
+              </a>
+            </div>
           </div>
         </section>
 
