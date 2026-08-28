@@ -88,6 +88,13 @@ export type ProposalSectionsInput = Partial<Record<ProposalTextSectionKey, strin
   clientEmail?: string;
   clientName?: string;
   companyName?: string;
+  /** Date-only string (yyyy-mm-dd, from an <input type="date">) or "" to
+      clear. Added in Slice 5 of the admin command center (2026-08-28) —
+      expiresAt existed on the schema and was already enforced by
+      resolveProposalByToken in proposals-public.ts, but nothing in the
+      admin UI could ever set it. This is the smallest addition that closes
+      that gap without touching the token-resolution logic itself. */
+  expiresAt?: string;
 };
 
 export async function updateProposalSectionsAsAdmin(
@@ -107,6 +114,15 @@ export async function updateProposalSectionsAsAdmin(
   if (input.companyName !== undefined) data.companyName = input.companyName.trim() || null;
   for (const key of PROPOSAL_TEXT_SECTION_KEYS) {
     if (input[key] !== undefined) data[key] = input[key] ?? "";
+  }
+  if (input.expiresAt !== undefined) {
+    if (!input.expiresAt.trim()) {
+      data.expiresAt = null;
+    } else {
+      const parsed = new Date(`${input.expiresAt.trim()}T23:59:59.000Z`);
+      if (Number.isNaN(parsed.getTime())) return { ok: false, error: "invalid expiry date" };
+      data.expiresAt = parsed;
+    }
   }
 
   await db.proposal.update({ where: { id }, data });
@@ -243,4 +259,25 @@ export function computeProposalTotals(items: { amountCents: number; isOptionalAd
     else coreCents += item.amountCents;
   }
   return { coreCents, addOnCents, totalCents: coreCents + addOnCents };
+}
+
+/** One-time/setup vs. recurring breakdown for the proposals list (Slice 5
+    of the admin command center, 2026-08-28). Reuses computeProposalTotals's
+    exact sign convention (DISCOUNT is stored already-negative, so summing
+    amountCents directly subtracts it correctly) rather than computing
+    totals a second, different way. Scoped to non-add-on items only, same
+    as coreCents above — optional add-ons are never counted here either.
+    DISCOUNT is folded into the one-time/setup bucket, per this slice's
+    brief, since it's most often applied against a setup fee. */
+export function computeProposalAmountBreakdown(
+  items: { amountCents: number; isOptionalAddOn: boolean; kind: ProposalItemKind }[]
+) {
+  let oneTimeCents = 0;
+  let recurringCents = 0;
+  for (const item of items) {
+    if (item.isOptionalAddOn) continue;
+    if (item.kind === "MONTHLY") recurringCents += item.amountCents;
+    else oneTimeCents += item.amountCents; // SETUP, CUSTOM, PER_UNIT, DISCOUNT
+  }
+  return { oneTimeCents, recurringCents };
 }

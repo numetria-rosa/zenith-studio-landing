@@ -86,6 +86,7 @@ export default async function AdminProposalDetailPage({
       notIncluded: String(formData.get("notIncluded") || ""),
       nextSteps: String(formData.get("nextSteps") || ""),
       terms: String(formData.get("terms") || ""),
+      expiresAt: String(formData.get("expiresAt") || ""),
     });
     revalidatePath(`/admin/proposals/${proposalId}`);
   }
@@ -228,6 +229,18 @@ export default async function AdminProposalDetailPage({
                   name="companyName"
                   defaultValue={proposal.companyName ?? ""}
                   className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-white/50 mb-1" htmlFor="expiresAt">
+                  Expires on (optional — the client link stops working after this date)
+                </label>
+                <input
+                  id="expiresAt"
+                  name="expiresAt"
+                  type="date"
+                  defaultValue={proposal.expiresAt ? proposal.expiresAt.toISOString().slice(0, 10) : ""}
+                  className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm [color-scheme:dark]"
                 />
               </div>
             </div>
