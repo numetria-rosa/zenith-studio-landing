@@ -7,11 +7,27 @@ import { computeProposalTotals } from "@/lib/proposals-admin";
 /* Owner-facing list of proposals (Slice 5 of the service-platform build,
    2026-08-28), matching admin/audits and admin/service-requests' own
    pattern exactly: requireAdmin() -> 404 (not a redirect) for non-admins. */
-export default async function AdminProposalsPage() {
+export default async function AdminProposalsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   const admin = await requireAdmin();
   if (!admin) notFound();
 
+  const { status } = await searchParams;
+  // Comma-separated status filter, e.g. ?status=SENT,VIEWED — added
+  // additively for the /admin dashboard's pipeline links (Slice 2). No
+  // param at all keeps the original unfiltered list.
+  const statusList = status
+    ? status
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
+
   const proposals = await db.proposal.findMany({
+    where: statusList.length ? { status: { in: statusList as never[] } } : undefined,
     orderBy: { updatedAt: "desc" },
     include: { items: { select: { amountCents: true, isOptionalAddOn: true } } },
   });
@@ -30,7 +46,17 @@ export default async function AdminProposalsPage() {
     <div className="min-h-screen bg-[#05060a] px-6 py-12 text-white">
       <div className="mx-auto max-w-5xl">
         <h1 className="text-2xl font-semibold">Proposals</h1>
-        <p className="mt-1 text-sm text-white/50">{proposals.length} total, most recently updated first.</p>
+        <p className="mt-1 text-sm text-white/50">
+          {proposals.length} {statusList.length ? "matching filter" : "total"}, most recently updated first.
+          {statusList.length > 0 && (
+            <>
+              {" "}
+              <Link href="/admin/proposals" className="underline hover:text-white">
+                Clear filter
+              </Link>
+            </>
+          )}
+        </p>
 
         <div className="mt-8 flex flex-col gap-4">
           {proposals.length === 0 && <p className="text-sm text-white/50">No proposals yet.</p>}

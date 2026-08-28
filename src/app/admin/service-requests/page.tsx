@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/admin";
@@ -8,11 +9,20 @@ import { updateServiceRequestAsAdmin } from "@/lib/service-requests-admin";
 /* Owner-facing view of every AI Systems purchase. 404s (not a redirect) for
    non-admins — the route's existence isn't something to confirm to a
    logged-in-but-not-you visitor. */
-export default async function AdminServiceRequestsPage() {
+export default async function AdminServiceRequestsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ service?: string }>;
+}) {
   const admin = await requireAdmin();
   if (!admin) notFound();
 
+  const { service: serviceFilter } = await searchParams;
+  // ?service=<serviceId> filter — added additively for the /admin dashboard's
+  // service-performance rows (Slice 2). No param at all keeps the original
+  // unfiltered list.
   const requests = await db.serviceRequest.findMany({
+    where: serviceFilter ? { serviceId: serviceFilter } : undefined,
     include: { user: { select: { email: true, name: true } } },
     orderBy: { updatedAt: "desc" },
   });
@@ -37,7 +47,17 @@ export default async function AdminServiceRequestsPage() {
     <div className="min-h-screen bg-[#05060a] text-white px-6 py-12">
       <div className="mx-auto max-w-5xl">
         <h1 className="text-2xl font-semibold">Service requests</h1>
-        <p className="mt-1 text-sm text-white/50">{requests.length} total, newest activity first.</p>
+        <p className="mt-1 text-sm text-white/50">
+          {requests.length} {serviceFilter ? "matching filter" : "total"}, newest activity first.
+          {serviceFilter && (
+            <>
+              {" "}
+              <Link href="/admin/service-requests" className="underline hover:text-white">
+                Clear filter
+              </Link>
+            </>
+          )}
+        </p>
 
         <div className="mt-8 flex flex-col gap-4">
           {requests.length === 0 && <p className="text-white/50 text-sm">No purchases yet.</p>}

@@ -9,11 +9,27 @@ import { db } from "@/lib/db";
    exactly: requireAdmin() -> 404 (not a redirect) for non-admins, since the
    route's existence isn't something to confirm to a logged-in-but-not-you
    visitor. */
-export default async function AdminAuditsPage() {
+export default async function AdminAuditsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   const admin = await requireAdmin();
   if (!admin) notFound();
 
+  const { status } = await searchParams;
+  // Comma-separated status filter, e.g. ?status=SUBMITTED,IN_REVIEW — added
+  // additively for the /admin dashboard's pipeline links (Slice 2). No
+  // param at all keeps the original unfiltered list.
+  const statusList = status
+    ? status
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
+
   const audits = await db.auditRequest.findMany({
+    where: statusList.length ? { status: { in: statusList as never[] } } : undefined,
     orderBy: { createdAt: "desc" },
   });
 
@@ -29,7 +45,17 @@ export default async function AdminAuditsPage() {
     <div className="min-h-screen bg-[#05060a] px-6 py-12 text-white">
       <div className="mx-auto max-w-5xl">
         <h1 className="text-2xl font-semibold">Audit requests</h1>
-        <p className="mt-1 text-sm text-white/50">{audits.length} total, newest first.</p>
+        <p className="mt-1 text-sm text-white/50">
+          {audits.length} {statusList.length ? "matching filter" : "total"}, newest first.
+          {statusList.length > 0 && (
+            <>
+              {" "}
+              <Link href="/admin/audits" className="underline hover:text-white">
+                Clear filter
+              </Link>
+            </>
+          )}
+        </p>
 
         <div className="mt-8 flex flex-col gap-4">
           {audits.length === 0 && <p className="text-sm text-white/50">No audit requests yet.</p>}
