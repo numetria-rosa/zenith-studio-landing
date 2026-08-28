@@ -77,6 +77,13 @@ export const STEPS: StepDef[] = [
         required: true,
         placeholder: "e.g. website form, phone calls, referrals, Instagram DMs",
       },
+      {
+        key: "leadVolume",
+        label: "Roughly how many leads/enquiries do you get per month?",
+        type: "select",
+        required: true,
+        options: ["Under 20", "20-50", "50-150", "150-500", "500+"],
+      },
       { key: "crm", label: "What CRM do you use, if any?", type: "text", required: true, placeholder: "e.g. HubSpot, Salesforce, spreadsheet, none" },
       { key: "emailTools", label: "What email / inbox tools do you use?", type: "text", required: true, placeholder: "e.g. Gmail, Outlook" },
       { key: "bookingSystem", label: "How do people book with you today?", type: "text", required: true, placeholder: "e.g. Calendly, phone, walk-in" },
