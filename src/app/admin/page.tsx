@@ -94,6 +94,7 @@ export default async function AdminDashboardPage() {
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h1 className="text-2xl font-semibold">Business dashboard</h1>
           <nav className="flex flex-wrap gap-4 text-sm text-white/50">
+            <Link href="/admin/clients" className="hover:text-white">Clients</Link>
             <Link href="/admin/audits" className="hover:text-white">Audits</Link>
             <Link href="/admin/proposals" className="hover:text-white">Proposals</Link>
             <Link href="/admin/service-requests" className="hover:text-white">Service requests</Link>
