@@ -57,6 +57,7 @@ model User {
   clientDocuments ClientDocument[]
   serviceMessages ServiceMessage[]
   supportRequests SupportRequest[]
+  assignedTasks   Task[]            @relation("TaskAssignee")
 }
 
 model Account {
@@ -506,6 +507,7 @@ model ServiceProject {
   documents       ClientDocument[]
   messages        ServiceMessage[]
   supportRequests SupportRequest[]
+  tasks           Task[]
 
   @@index([userId])
   @@index([proposalId])
@@ -691,4 +693,52 @@ model SupportRequest {
 
   @@index([projectId])
   @@index([userId])
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  BLOCKED
+  DONE
+}
+
+// Internal admin task/to-do (Slice 6 of the business command center,
+// 2026-08-28: /admin/tasks). Purely additive — new enums, new table, FKs to
+// existing ServiceProject/User only. projectId is nullable on purpose: most
+// tasks are tied to a delivery workspace, but some (e.g. "follow up with a
+// lead who hasn't become a client yet") only relate to an AuditRequest or an
+// email thread, not a project — kept simple as a single nullable FK rather
+// than a polymorphic relation to every possible entity. assigneeUserId
+// mirrors ServiceProject.assigneeUserId's exact pattern (Slice 4): nullable,
+// ON DELETE SET NULL, FK not constrained to role:ADMIN at the DB level — the
+// admin UI's picker filters to admins instead. completedAt is set
+// automatically by tasks-admin.ts whenever status transitions to DONE, and
+// cleared whenever it transitions away from DONE — never set directly by a
+// caller.
+model Task {
+  id             String       @id @default(cuid())
+  title          String
+  description    String?      @db.Text
+  projectId      String?
+  assigneeUserId String?
+  priority       TaskPriority @default(MEDIUM)
+  status         TaskStatus   @default(TODO)
+  dueAt          DateTime?
+  createdAt      DateTime     @default(now())
+  completedAt    DateTime?
+
+  project  ServiceProject? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignee User?           @relation("TaskAssignee", fields: [assigneeUserId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([assigneeUserId])
+  @@index([status])
+  @@index([dueAt])
 }

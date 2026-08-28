@@ -198,7 +198,14 @@ export async function getPipelineCounts(): Promise<PipelineCounts> {
 
 export type AttentionItem = {
   id: string;
-  kind: "new_audit" | "stale_proposal" | "unstarted_approval" | "missing_requirement" | "open_support";
+  kind:
+    | "new_audit"
+    | "stale_proposal"
+    | "unstarted_approval"
+    | "missing_requirement"
+    | "open_support"
+    | "overdue_task"
+    | "urgent_task";
   label: string; // human-readable issue
   clientLabel: string; // name/email/company, best available
   service: string | null;
@@ -209,14 +216,23 @@ export type AttentionItem = {
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
 /** Real, bounded, ordered queries only — no fabricated urgency. Each item
-    traces to a real row. Deliberately skips "overdue internal tasks" and
-    "client messages needing a reply" since neither a Task model nor a
-    "last admin reply" concept exists yet (see Slice 2 brief). */
+    traces to a real row. Also surfaces overdue internal tasks and open
+    HIGH/URGENT-priority tasks (Slice 6, 2026-08-28 — previously deferred
+    since no Task model existed). Still deliberately skips "client messages
+    needing a reply" since no "last admin reply" concept exists yet. */
 export async function getNeedsAttention(): Promise<AttentionItem[]> {
   const now = Date.now();
   const staleThreshold = new Date(now - THREE_DAYS_MS);
 
-  const [newAudits, staleProposals, unstartedApprovals, projectsMissingReqs, openSupport] = await Promise.all([
+  const [
+    newAudits,
+    staleProposals,
+    unstartedApprovals,
+    projectsMissingReqs,
+    openSupport,
+    overdueTasks,
+    urgentTasks,
+  ] = await Promise.all([
     db.auditRequest.findMany({
       where: { status: "SUBMITTED" },
       orderBy: { createdAt: "desc" },
@@ -248,6 +264,18 @@ export async function getNeedsAttention(): Promise<AttentionItem[]> {
     db.supportRequest.findMany({
       where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_CLIENT"] } },
       include: { user: { select: { name: true, email: true } } },
+      orderBy: { createdAt: "asc" },
+      take: 10,
+    }),
+    db.task.findMany({
+      where: { status: { not: "DONE" }, dueAt: { lt: new Date(now) } },
+      include: { project: { select: { id: true, user: { select: { name: true, email: true } } } }, assignee: { select: { name: true, email: true } } },
+      orderBy: { dueAt: "asc" },
+      take: 10,
+    }),
+    db.task.findMany({
+      where: { status: { not: "DONE" }, priority: { in: ["HIGH", "URGENT"] } },
+      include: { project: { select: { id: true, user: { select: { name: true, email: true } } } }, assignee: { select: { name: true, email: true } } },
       orderBy: { createdAt: "asc" },
       take: 10,
     }),
@@ -312,6 +340,35 @@ export async function getNeedsAttention(): Promise<AttentionItem[]> {
       service: null,
       ageMs: now - s.createdAt.getTime(),
       href: `/admin/service-requests`,
+    });
+  }
+
+  const taskClientLabel = (t: { project: { user: { name: string | null; email: string } } | null; assignee: { name: string | null; email: string } | null }) =>
+    t.project?.user.name || t.project?.user.email || (t.assignee ? `Assigned: ${t.assignee.name || t.assignee.email}` : "Internal task");
+
+  for (const t of overdueTasks) {
+    items.push({
+      id: `task-overdue-${t.id}`,
+      kind: "overdue_task",
+      label: `Overdue task: ${t.title}`,
+      clientLabel: taskClientLabel(t),
+      service: null,
+      ageMs: t.dueAt ? now - t.dueAt.getTime() : 0,
+      href: t.project ? `/admin/projects/${t.project.id}` : "/admin/tasks",
+    });
+  }
+
+  const overdueTaskIds = new Set(overdueTasks.map((t) => t.id));
+  for (const t of urgentTasks) {
+    if (overdueTaskIds.has(t.id)) continue; // already shown as overdue above
+    items.push({
+      id: `task-urgent-${t.id}`,
+      kind: "urgent_task",
+      label: `${t.priority === "URGENT" ? "Urgent" : "High-priority"} task: ${t.title}`,
+      clientLabel: taskClientLabel(t),
+      service: null,
+      ageMs: now - t.createdAt.getTime(),
+      href: t.project ? `/admin/projects/${t.project.id}` : "/admin/tasks",
     });
   }
 

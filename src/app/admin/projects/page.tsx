@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import { listServiceProjectsForAdmin, PROJECT_STAGES, PROJECT_STAGE_LABELS, isProjectStage } from "@/lib/service-projects-admin";
+import { getOutstandingTaskCountsByProject } from "@/lib/tasks-admin";
 import type { ProjectStage } from "@prisma/client";
 
 /* Every ServiceProject, operationally (Slice 4 of the business command
@@ -33,6 +34,7 @@ export default async function AdminProjectsPage({
   const stageFilter: ProjectStage | undefined = stageParam && isProjectStage(stageParam) ? stageParam : undefined;
 
   const projects = await listServiceProjectsForAdmin(stageFilter);
+  const outstandingTaskCounts = await getOutstandingTaskCountsByProject(projects.map((p) => p.id));
 
   return (
     <div className="min-h-screen bg-[#05060a] px-6 py-12 text-white">
@@ -110,7 +112,7 @@ export default async function AdminProjectsPage({
                 </span>
               </div>
 
-              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
                 <div>
                   <p className="text-[10px] uppercase tracking-wide text-white/30">Created</p>
                   <p className="mt-0.5 text-sm">{formatDate(p.createdAt)}</p>
@@ -134,6 +136,10 @@ export default async function AdminProjectsPage({
                 <div>
                   <p className="text-[10px] uppercase tracking-wide text-white/30">Open support</p>
                   <p className="mt-0.5 text-sm">{p.openSupportCount}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-white/30">Outstanding tasks</p>
+                  <p className="mt-0.5 text-sm">{outstandingTaskCounts.get(p.id) ?? 0}</p>
                 </div>
               </div>
 

@@ -17,6 +17,14 @@ import {
   SUPPORT_STATUS_LABELS,
 } from "@/lib/service-projects-admin";
 import { INTEGRATION_STATUS_LABELS } from "@/lib/service-workspace";
+import {
+  listTasksForProject,
+  createTask,
+  quickCompleteTask,
+  reopenTask,
+  TASK_PRIORITIES,
+  TASK_PRIORITY_LABELS,
+} from "@/lib/tasks-admin";
 
 /* Admin operations view for a single ServiceProject (Slice 4 of the
    business command center, 2026-08-28: /admin/projects/[id]). Every write
@@ -61,9 +69,10 @@ export default async function AdminProjectDetailPage({
   if (!admin) notFound();
 
   const { id } = await params;
-  const [project, assignableAdmins] = await Promise.all([
+  const [project, assignableAdmins, projectTasks] = await Promise.all([
     getServiceProjectForAdmin(id),
     listAssignableAdmins(),
+    listTasksForProject(id),
   ]);
   if (!project) notFound();
 
@@ -117,6 +126,48 @@ export default async function AdminProjectDetailPage({
     const status = String(formData.get("status") || "");
     await updateSupportRequestStatusForAdmin(id, supportRequestId, status);
     revalidatePath(path);
+  }
+
+  async function createProjectTask(formData: FormData) {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    await createTask({
+      title: String(formData.get("title") || ""),
+      description: String(formData.get("description") || ""),
+      projectId: id,
+      assigneeUserId: String(formData.get("assigneeUserId") || ""),
+      priority: String(formData.get("priority") || ""),
+      dueAt: String(formData.get("dueAt") || ""),
+    });
+    revalidatePath(path);
+    revalidatePath("/admin/tasks");
+    revalidatePath("/admin/projects");
+    revalidatePath("/admin");
+  }
+
+  async function completeProjectTask(formData: FormData) {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    const taskId = String(formData.get("taskId") || "");
+    await quickCompleteTask(taskId);
+    revalidatePath(path);
+    revalidatePath("/admin/tasks");
+    revalidatePath("/admin/projects");
+    revalidatePath("/admin");
+  }
+
+  async function reopenProjectTask(formData: FormData) {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    const taskId = String(formData.get("taskId") || "");
+    await reopenTask(taskId);
+    revalidatePath(path);
+    revalidatePath("/admin/tasks");
+    revalidatePath("/admin/projects");
+    revalidatePath("/admin");
   }
 
   const serviceLabel = projectServiceLabel(project);
@@ -350,6 +401,126 @@ export default async function AdminProjectDetailPage({
             >
               Send reply
             </button>
+          </form>
+        </SectionCard>
+
+        {/* Internal tasks */}
+        <SectionCard title={`Internal tasks (${projectTasks.filter((t) => t.status !== "DONE").length} open)`}>
+          {projectTasks.length === 0 && <p className="text-sm text-white/50">No internal tasks yet.</p>}
+          {projectTasks.map((t) => (
+            <div
+              key={t.id}
+              className={`rounded-2xl border p-4 ${
+                t.isOverdue ? "border-red-400/30 bg-red-400/[0.04]" : "border-white/10 bg-white/[0.04]"
+              }`}
+            >
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <p className={`text-sm font-semibold ${t.status === "DONE" ? "text-white/50 line-through" : ""}`}>
+                  {t.title}
+                </p>
+                <span className="text-xs text-white/40">
+                  {TASK_PRIORITY_LABELS[t.priority]} · {t.status}
+                  {t.isOverdue && " · Overdue"}
+                </span>
+              </div>
+              {t.description && <p className="mt-2 text-sm text-white/70">{t.description}</p>}
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-white/40">
+                <span>
+                  {t.dueAt ? `Due ${formatDate(t.dueAt)}` : "No due date"} · {t.assigneeName ?? "Unassigned"}
+                </span>
+                {t.status !== "DONE" ? (
+                  <form action={completeProjectTask}>
+                    <input type="hidden" name="taskId" value={t.id} />
+                    <button
+                      type="submit"
+                      className="rounded-full border border-emerald-400/30 bg-emerald-400/[0.06] px-3 py-1 text-[11px] font-semibold text-emerald-300 transition hover:bg-emerald-400/[0.12]"
+                    >
+                      Complete
+                    </button>
+                  </form>
+                ) : (
+                  <form action={reopenProjectTask}>
+                    <input type="hidden" name="taskId" value={t.id} />
+                    <button
+                      type="submit"
+                      className="rounded-full border border-white/20 px-3 py-1 text-[11px] font-semibold text-white transition hover:bg-white/10"
+                    >
+                      Reopen
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
+          ))}
+          <form action={createProjectTask} className="flex flex-col gap-2 border-t border-white/10 pt-4">
+            <input
+              name="title"
+              required
+              placeholder="New internal task..."
+              className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm"
+            />
+            <textarea
+              name="description"
+              rows={2}
+              placeholder="Description (optional)..."
+              className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm"
+            />
+            <div className="flex flex-wrap items-end gap-3">
+              <div>
+                <label className="mb-1 block text-xs text-white/50" htmlFor="task-assigneeUserId">
+                  Assignee
+                </label>
+                <select
+                  id="task-assigneeUserId"
+                  name="assigneeUserId"
+                  defaultValue=""
+                  className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm"
+                >
+                  <option value="" className="bg-[#05060a]">
+                    Unassigned
+                  </option>
+                  {assignableAdmins.map((a) => (
+                    <option key={a.id} value={a.id} className="bg-[#05060a]">
+                      {a.name || a.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-white/50" htmlFor="task-priority">
+                  Priority
+                </label>
+                <select
+                  id="task-priority"
+                  name="priority"
+                  defaultValue="MEDIUM"
+                  className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm"
+                >
+                  {TASK_PRIORITIES.map((p) => (
+                    <option key={p} value={p} className="bg-[#05060a]">
+                      {TASK_PRIORITY_LABELS[p]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-white/50" htmlFor="task-dueAt">
+                  Due date
+                </label>
+                <input
+                  id="task-dueAt"
+                  name="dueAt"
+                  type="date"
+                  className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm"
+                />
+              </div>
+              <button
+                type="submit"
+                className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
+              >
+                Add task
+              </button>
+            </div>
           </form>
         </SectionCard>
 

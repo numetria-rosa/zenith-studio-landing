@@ -95,6 +95,8 @@ export default async function AdminDashboardPage() {
           <h1 className="text-2xl font-semibold">Business dashboard</h1>
           <nav className="flex flex-wrap gap-4 text-sm text-white/50">
             <Link href="/admin/clients" className="hover:text-white">Clients</Link>
+            <Link href="/admin/projects" className="hover:text-white">Projects</Link>
+            <Link href="/admin/tasks" className="hover:text-white">Tasks</Link>
             <Link href="/admin/audits" className="hover:text-white">Audits</Link>
             <Link href="/admin/proposals" className="hover:text-white">Proposals</Link>
             <Link href="/admin/service-requests" className="hover:text-white">Service requests</Link>
@@ -150,9 +152,9 @@ export default async function AdminDashboardPage() {
           <h2 className="text-lg font-semibold">Needs attention</h2>
           <p className="mt-1 text-xs text-white/40">
             New audit submissions, proposals sent 3+ days ago with no response, approved proposals with no
-            workspace yet, projects with missing client requirements, and open support requests. Does not include
-            overdue internal tasks or unanswered client messages — neither a Task model nor a &quot;last admin
-            reply&quot; concept exists yet.
+            workspace yet, projects with missing client requirements, open support requests, overdue internal
+            tasks, and open high/urgent-priority tasks. Does not include unanswered client messages — no
+            &quot;last admin reply&quot; concept exists yet.
           </p>
           <div className="mt-4 flex flex-col gap-3">
             {needsAttention.length === 0 && (
