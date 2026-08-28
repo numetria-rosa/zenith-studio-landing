@@ -53,6 +53,7 @@ model User {
   purchaseClaims  PurchaseClaim[]
   proposals       Proposal[]
   serviceProjects ServiceProject[]
+  assignedProjects ServiceProject[] @relation("ServiceProjectAssignee")
   clientDocuments ClientDocument[]
   serviceMessages ServiceMessage[]
   supportRequests SupportRequest[]
@@ -479,6 +480,15 @@ model ServiceProject {
 
   adminNote String? @db.Text // internal only — never shown to the client, matches ServiceRequest.adminNote's convention
 
+  // Operational fields added in Slice 4 (/admin/projects, 2026-08-28) —
+  // purely additive, nullable, no default assignee/date implied for
+  // existing rows. assigneeUserId points at any User row (no separate
+  // "Team" concept); in practice only role:ADMIN users are sensibly
+  // assignable, but the FK itself is not constrained to that — the admin
+  // UI's picker filters to admins instead.
+  assigneeUserId String?
+  targetLaunchAt DateTime?
+
   whopMonthlyMembershipId String? // only set for webhook-sourced projects
 
   createdAt DateTime @default(now())
@@ -487,6 +497,7 @@ model ServiceProject {
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   catalogService ServiceCatalog? @relation(fields: [catalogServiceId], references: [id])
   proposal       Proposal?       @relation(fields: [proposalId], references: [id])
+  assignee       User?           @relation("ServiceProjectAssignee", fields: [assigneeUserId], references: [id])
 
   milestones      ProjectMilestone[]
   requirements    ClientRequirement[]
@@ -499,6 +510,7 @@ model ServiceProject {
   @@index([userId])
   @@index([proposalId])
   @@index([sourceServiceId])
+  @@index([assigneeUserId])
 }
 
 model ProjectMilestone {

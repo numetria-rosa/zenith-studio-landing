@@ -83,9 +83,9 @@ export default async function AdminDashboardPage() {
     { label: "Audit (open)", count: pipeline.openAudits, href: "/admin/audits?status=SUBMITTED,IN_REVIEW" },
     { label: "Proposal (sent/viewed)", count: pipeline.sentOrViewedProposals, href: "/admin/proposals?status=SENT,VIEWED" },
     { label: "Approved", count: pipeline.approvedProposals, href: "/admin/proposals?status=APPROVED" },
-    { label: "Building", count: pipeline.building, href: null },
-    { label: "Live", count: pipeline.live, href: null },
-    { label: "Maintenance", count: pipeline.maintenance, href: null },
+    { label: "Building", count: pipeline.building, href: "/admin/projects?stage=BUILDING" },
+    { label: "Live", count: pipeline.live, href: "/admin/projects?stage=LIVE" },
+    { label: "Maintenance", count: pipeline.maintenance, href: "/admin/projects?stage=MAINTENANCE" },
   ];
 
   return (
@@ -140,9 +140,8 @@ export default async function AdminDashboardPage() {
             })}
           </div>
           <p className="mt-3 text-xs text-white/40">
-            Building/Live/Maintenance counts are not yet clickable — there is no <code>/admin/projects</code> list
-            page yet (a later slice); linking them to service-requests would be misleading since that page shows
-            ServiceRequest status, not ServiceProject stage.
+            Every pipeline stage links to a filtered view — Audit/Proposal/Approved to their own admin pages,
+            Building/Live/Maintenance to <code>/admin/projects</code> filtered by that ServiceProject stage.
           </p>
         </section>
 

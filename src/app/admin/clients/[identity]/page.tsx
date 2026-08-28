@@ -230,7 +230,11 @@ export default async function AdminClientProfilePage({
             </div>
           ))}
           {profile.serviceProjects.map((sp) => (
-            <div key={sp.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <Link
+              key={sp.id}
+              href={`/admin/projects/${sp.id}`}
+              className="block rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition hover:border-white/25 hover:bg-white/[0.06]"
+            >
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <p className="text-sm font-semibold">{sp.title}</p>
                 <span className="text-xs text-white/40">
@@ -244,10 +248,8 @@ export default async function AdminClientProfilePage({
                   {sp.adminNote}
                 </p>
               )}
-              <p className="mt-2 text-[10px] uppercase tracking-wide text-white/30">
-                No admin project detail page exists yet (a later slice) — nothing to link to.
-              </p>
-            </div>
+              <p className="mt-2 text-[10px] uppercase tracking-wide text-white/30">View project &rarr;</p>
+            </Link>
           ))}
         </SectionCard>
 
