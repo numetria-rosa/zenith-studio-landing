@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { requireAdmin } from "@/lib/admin";
@@ -11,6 +11,7 @@ import {
   addProposalItemAsAdmin,
   computeProposalTotals,
   deleteProposalItemAsAdmin,
+  emailProposalPdfAsAdmin,
   sendProposalAsAdmin,
   updateProposalSectionsAsAdmin,
 } from "@/lib/proposals-admin";
@@ -33,13 +34,16 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default async function AdminProposalDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ emailSent?: string; emailError?: string }>;
 }) {
   const admin = await requireAdmin();
   if (!admin) notFound();
 
   const { id } = await params;
+  const sp = await searchParams;
 
   const proposal = await db.proposal.findUnique({
     where: { id },
@@ -130,6 +134,22 @@ export default async function AdminProposalDetailPage({
     revalidatePath(`/admin/proposals/${proposalId}`);
   }
 
+  async function emailPdf(formData: FormData) {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+
+    const proposalId = String(formData.get("proposalId") || "");
+    const publicUrl = String(formData.get("publicUrl") || "");
+    const result = await emailProposalPdfAsAdmin(proposalId, publicUrl);
+    revalidatePath(`/admin/proposals/${proposalId}`);
+    if (result.ok) {
+      redirect(`/admin/proposals/${proposalId}?emailSent=1`);
+    } else {
+      redirect(`/admin/proposals/${proposalId}?emailError=${encodeURIComponent(result.error)}`);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-4xl">
         <Link href="/admin/proposals" className="text-sm text-white/50 hover:text-white/80">
@@ -153,16 +173,53 @@ export default async function AdminProposalDetailPage({
             </p>
           </div>
 
-          <form action={sendProposal}>
-            <input type="hidden" name="proposalId" value={proposal.id} />
-            <button
-              type="submit"
-              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href={`/api/admin/proposals/${proposal.id}/pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
             >
-              {proposal.status === "DRAFT" ? "Send to client" : "Re-send (new version)"}
-            </button>
-          </form>
+              Preview PDF
+            </a>
+            <a
+              href={`/api/admin/proposals/${proposal.id}/pdf?download=1`}
+              className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Download PDF
+            </a>
+            <form action={emailPdf}>
+              <input type="hidden" name="proposalId" value={proposal.id} />
+              <input type="hidden" name="publicUrl" value={publicUrl} />
+              <button
+                type="submit"
+                className="rounded-full border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-400/20"
+              >
+                Email PDF to client
+              </button>
+            </form>
+            <form action={sendProposal}>
+              <input type="hidden" name="proposalId" value={proposal.id} />
+              <button
+                type="submit"
+                className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
+              >
+                {proposal.status === "DRAFT" ? "Send to client" : "Re-send (new version)"}
+              </button>
+            </form>
+          </div>
         </div>
+
+        {sp.emailSent && (
+          <div className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-400/[0.06] p-4">
+            <p className="text-sm text-emerald-200">PDF emailed to {proposal.clientEmail}.</p>
+          </div>
+        )}
+        {sp.emailError && (
+          <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/[0.06] p-4">
+            <p className="text-sm text-red-200">Couldn&apos;t email the PDF: {sp.emailError}</p>
+          </div>
+        )}
 
         {proposal.sentAt && (
           <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.06] p-4">

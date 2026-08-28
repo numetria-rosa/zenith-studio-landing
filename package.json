@@ -12,6 +12,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
     "@prisma/client": "^6.19.3",
+    "@react-pdf/renderer": "^4.9.0",
     "@whop/sdk": "^0.0.42",
     "framer-motion": "^12.36.0",
     "lucide-react": "^1.34.0",

@@ -1,6 +1,8 @@
 import { randomBytes } from "node:crypto";
 import { db } from "@/lib/db";
 import { Prisma, ProposalItemKind } from "@prisma/client";
+import { renderProposalPdfBuffer, proposalPdfFilename } from "@/lib/proposal-pdf";
+import { sendProposalEmail } from "@/lib/mail";
 
 /* Shared by /admin/audits/[id]'s "Create Proposal" action and
    /admin/proposals/[id]'s builder server actions (Slice 5 of the
@@ -249,6 +251,45 @@ export async function sendProposalAsAdmin(
     }),
   ]);
   return { ok: true };
+}
+
+/** Renders the current proposal to a PDF and emails it to the client via
+    Resend, alongside the same client link the "Send to client" button
+    already surfaces. Deliberately independent of sendProposalAsAdmin's
+    status transition — emailing the PDF doesn't itself change
+    DRAFT/SENT/etc., since an admin may want to re-send the PDF (e.g. after
+    a client asks for another copy) without creating a new proposal
+    version. Same emptiness guard as sendProposalAsAdmin so a blank
+    proposal can't go out either way. */
+export async function emailProposalPdfAsAdmin(
+  id: string,
+  publicUrl: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const proposal = await db.proposal.findUnique({
+    where: { id },
+    include: { items: true },
+  });
+  if (!proposal) return { ok: false, error: "proposal not found" };
+  if (!proposal.executiveSummary?.trim()) {
+    return { ok: false, error: "an executive summary is required before emailing" };
+  }
+  if (proposal.items.length === 0) {
+    return { ok: false, error: "at least one line item is required before emailing" };
+  }
+
+  const buffer = await renderProposalPdfBuffer(id);
+  if (!buffer) return { ok: false, error: "could not render PDF" };
+
+  const filename = proposalPdfFilename(proposal.companyName, proposal.clientName);
+
+  return sendProposalEmail({
+    to: proposal.clientEmail,
+    clientName: proposal.clientName,
+    companyName: proposal.companyName,
+    publicUrl,
+    pdfBuffer: buffer,
+    pdfFilename: filename,
+  });
 }
 
 export function computeProposalTotals(items: { amountCents: number; isOptionalAddOn: boolean }[]) {
