@@ -51,6 +51,7 @@ model User {
   progress        CourseProgress[]
   serviceRequests ServiceRequest[]
   purchaseClaims  PurchaseClaim[]
+  proposals       Proposal[]
 }
 
 model Account {
@@ -208,6 +209,7 @@ model ServiceCatalog {
   updatedAt DateTime @updatedAt
 
   auditRecommendations AuditRecommendation[]
+  proposalItems        ProposalItem[]
 }
 
 enum AuditStatus {
@@ -238,6 +240,7 @@ model AuditRequest {
 
   findings        AuditFinding[]
   recommendations AuditRecommendation[]
+  proposals       Proposal[]
 
   @@index([email])
   @@index([status])
@@ -294,4 +297,136 @@ model AuditRecommendation {
 
   @@index([auditId])
   @@index([catalogServiceId])
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  VIEWED
+  CHANGES_REQUESTED
+  APPROVED
+  DECLINED
+  EXPIRED
+}
+
+// Proposal document (Slice 5 of the service-platform build, 2026-08-28).
+// Created from an admin's review of an AuditRequest (auditId always set in
+// practice for this slice's UI entry point), but modeled nullable so a
+// future proposal could exist without one. clientEmail is always known even
+// before any User account exists — backfilled from AuditRequest.email on
+// creation. accessToken is the entire security mechanism for the
+// client-facing view: a long random unguessable string, modeled directly on
+// PurchaseClaim's token-based, no-signin-required pattern (see
+// src/app/api/auth/claim/route.ts) rather than requiring a client session.
+// Every Text section below is nullable at the DB level so an admin can save
+// a draft with some sections still blank; the builder UI defaults them to
+// empty strings.
+model Proposal {
+  id      String  @id @default(cuid())
+  auditId String?
+  userId  String?
+
+  clientEmail String
+  clientName  String?
+  companyName String?
+
+  status      ProposalStatus @default(DRAFT)
+  accessToken String         @unique
+
+  sentAt    DateTime?
+  viewedAt  DateTime?
+  expiresAt DateTime?
+
+  executiveSummary    String? @db.Text
+  currentChallenges   String? @db.Text
+  recommendedSolution String? @db.Text
+  scopeOfWork         String? @db.Text
+  deliverables        String? @db.Text
+  implementationPlan  String? @db.Text
+  timeline            String? @db.Text
+  assumptions         String? @db.Text
+  notIncluded         String? @db.Text
+  nextSteps           String? @db.Text
+  terms               String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  audit    AuditRequest?     @relation(fields: [auditId], references: [id])
+  user     User?             @relation(fields: [userId], references: [id])
+  items    ProposalItem[]
+  versions ProposalVersion[]
+  approvals ClientApproval[]
+
+  @@index([auditId])
+  @@index([userId])
+}
+
+enum ProposalItemKind {
+  SETUP
+  MONTHLY
+  PER_UNIT
+  CUSTOM
+  DISCOUNT
+}
+
+// Line item covering the brief's PRICING and OPTIONAL ADD-ONS sections.
+// amountCents is negative for a DISCOUNT kind so totals sum correctly
+// without special-casing subtraction anywhere that reads these rows.
+model ProposalItem {
+  id         String @id @default(cuid())
+  proposalId String
+
+  label            String
+  kind             ProposalItemKind
+  amountCents      Int
+  unitLabel        String?
+  isOptionalAddOn  Boolean @default(false)
+  order            Int     @default(0)
+  catalogServiceId String?
+
+  proposal       Proposal        @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  catalogService ServiceCatalog? @relation(fields: [catalogServiceId], references: [id])
+
+  @@index([proposalId])
+}
+
+// Immutable history: every time an admin sends (or re-sends after edits) a
+// proposal, the current Proposal + ProposalItem state is snapshotted here
+// before/alongside updating the live Proposal row, so a client-visible
+// proposal is never silently overwritten out from under a client who's
+// already responded to a prior version.
+model ProposalVersion {
+  id            String   @id @default(cuid())
+  proposalId    String
+  versionNumber Int
+  snapshot      Json
+  createdAt     DateTime @default(now())
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@index([proposalId])
+}
+
+enum ClientApprovalAction {
+  APPROVED
+  CHANGES_REQUESTED
+  REJECTED
+}
+
+// One row per client response via the token-secured public link — no
+// userId requirement, since the client responding may have no account at
+// all. ipAddress is best-effort (request.headers.get("x-forwarded-for")),
+// never blocking on failure to obtain one.
+model ClientApproval {
+  id         String                @id @default(cuid())
+  proposalId String
+  action     ClientApprovalAction
+  note       String?               @db.Text
+  respondedAt DateTime             @default(now())
+  ipAddress  String?
+
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@index([proposalId])
 }

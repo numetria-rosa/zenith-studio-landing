@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/admin";
 import { db } from "@/lib/db";
@@ -15,6 +15,7 @@ import {
   addFindingAsAdmin,
   addRecommendationAsAdmin,
 } from "@/lib/audits-admin";
+import { createProposalFromAudit } from "@/lib/proposals-admin";
 
 /* Per-audit review workspace (Slice 4 of the service-platform build,
    2026-08-28). Turns the read-only Slice 3 list into a real page an admin
@@ -39,6 +40,7 @@ export default async function AdminAuditDetailPage({ params }: { params: Promise
     include: {
       findings: { orderBy: { createdAt: "desc" } },
       recommendations: { orderBy: { createdAt: "desc" }, include: { catalogService: { select: { title: true } } } },
+      proposals: { orderBy: { createdAt: "desc" }, select: { id: true, status: true, createdAt: true } },
     },
   });
   if (!audit) notFound();
@@ -77,6 +79,16 @@ export default async function AdminAuditDetailPage({ params }: { params: Promise
       recommendedSolution: String(formData.get("recommendedSolution") || ""),
     });
     revalidatePath(`/admin/audits/${auditId}`);
+  }
+
+  const auditId = audit.id;
+  async function createProposal() {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+
+    const result = await createProposalFromAudit(auditId);
+    if (result.ok) redirect(`/admin/proposals/${result.id}`);
   }
 
   async function addRecommendation(formData: FormData) {
@@ -143,17 +155,28 @@ export default async function AdminAuditDetailPage({ params }: { params: Promise
               </button>
             </form>
 
-            {/* Proposal doesn't exist as a model yet — Slice 5. Visible as
-                where this flow is heading, per the brief's own spec, but
-                inert for this slice. */}
-            <button
-              type="button"
-              disabled
-              title="Coming in the next phase"
-              className="cursor-not-allowed rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white/40"
-            >
-              Create Proposal
-            </button>
+            {audit.proposals.length > 0 && (
+              <div className="flex flex-col items-end gap-1">
+                {audit.proposals.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/admin/proposals/${p.id}`}
+                    className="text-xs text-white/50 hover:text-white/80"
+                  >
+                    Proposal ({p.status}) &middot; {p.createdAt.toISOString().slice(0, 10)}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <form action={createProposal}>
+              <button
+                type="submit"
+                className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:border-white/35"
+              >
+                Create Proposal
+              </button>
+            </form>
           </div>
         </div>
 
