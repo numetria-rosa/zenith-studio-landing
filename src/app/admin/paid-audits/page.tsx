@@ -12,11 +12,9 @@ import {
 } from "@/lib/paid-audit";
 import type { PaidAuditStatus } from "@prisma/client";
 
-/* Manual admin tracking for the $35 paid audit call. There is no webhook
-   from Cal.com (its own Cal Pay flow enforces payment before it will even
-   create a booking, so the security boundary lives there, not here) — an
-   admin creates/updates a row by hand after seeing a real booking land in
-   their Cal.com calendar. Matches every other admin route's pattern:
+/* Paid audit call tracking ($35 Cal Pay). Rows auto-arrive via
+   /api/webhooks/cal; this page is for review, status updates, and manual
+   fallback entries. Matches every other admin route's pattern:
    requireAdmin() -> notFound(), dark Studio card language, every write
    action independently re-checks requireAdmin(). */
 
@@ -89,7 +87,7 @@ export default async function AdminPaidAuditsPage() {
             <a href={PAID_AUDIT_BOOKING_URL} target="_blank" rel="noopener noreferrer" className="underline decoration-white/30">
               Cal.com
             </a>
-            . No webhook — add a row here after you see a real booking land in your calendar.
+            . New bookings sync automatically via webhook — use the form below only for corrections or fallback.
           </p>
         </div>
       </div>

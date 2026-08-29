@@ -94,15 +94,28 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
     // so this branch skips findOrCreateUser/createPurchaseClaim entirely
     // and just records which leg (setup vs monthly) got paid.
     const leg = classifyProposalPaymentLeg(proposalMatch.leg, payment.billing_reason ?? null);
+    const now = new Date();
     if (leg === "setup") {
+      // BUNDLED: one checkout charges initial_price (setup) + first
+      // renewal_price (month 1) together. Mark both legs paid on this
+      // first webhook so admin/client UI don't wait ~30 days for
+      // subscription_cycle before showing monthly as active.
+      const alsoFirstMonth =
+        proposalMatch.proposal.paymentMode === "BUNDLED" && !proposalMatch.proposal.monthlyPaidAt;
       await tx.proposal.update({
         where: { id: proposalMatch.proposal.id },
-        data: { setupPaidAt: new Date(), setupWhopPaymentId: payment.id },
+        data: {
+          setupPaidAt: now,
+          setupWhopPaymentId: payment.id,
+          ...(alsoFirstMonth
+            ? { monthlyPaidAt: now, monthlyWhopPaymentId: payment.id }
+            : {}),
+        },
       });
     } else {
       await tx.proposal.update({
         where: { id: proposalMatch.proposal.id },
-        data: { monthlyPaidAt: new Date(), monthlyWhopPaymentId: payment.id },
+        data: { monthlyPaidAt: now, monthlyWhopPaymentId: payment.id },
       });
     }
     return;

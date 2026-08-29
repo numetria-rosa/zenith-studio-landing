@@ -145,18 +145,33 @@ export async function createDeferredMonthlyCheckout(
     payment.billing_reason, not via which field matched here. */
 export async function resolveProposalByWhopPlanId(
   planId: string | null | undefined
-): Promise<{ proposal: { id: string; setupPaidAt: Date | null; monthlyPaidAt: Date | null }; leg: "setup" | "monthly" } | null> {
+): Promise<{
+  proposal: {
+    id: string;
+    setupPaidAt: Date | null;
+    monthlyPaidAt: Date | null;
+    paymentMode: "SPLIT" | "BUNDLED" | null;
+  };
+  leg: "setup" | "monthly";
+} | null> {
   if (!planId) return null;
+
+  const select = {
+    id: true,
+    setupPaidAt: true,
+    monthlyPaidAt: true,
+    paymentMode: true,
+  } as const;
 
   const bySetup = await db.proposal.findFirst({
     where: { whopSetupPlanId: planId },
-    select: { id: true, setupPaidAt: true, monthlyPaidAt: true },
+    select,
   });
   if (bySetup) return { proposal: bySetup, leg: "setup" };
 
   const byMonthly = await db.proposal.findFirst({
     where: { whopMonthlyPlanId: planId },
-    select: { id: true, setupPaidAt: true, monthlyPaidAt: true },
+    select,
   });
   if (byMonthly) return { proposal: byMonthly, leg: "monthly" };
 
@@ -173,11 +188,11 @@ export function isProposalPaymentMode(v: string): v is "SPLIT" | "BUNDLED" {
     whopMonthlyPlanId match is always the monthly leg — that field only
     ever holds SPLIT mode's deferred monthly-only plan. A whopSetupPlanId
     match needs billing_reason to disambiguate: for a BUNDLED plan, the
-    SAME plan id is used for both the initial setup charge
-    (billing_reason "one_time" or "subscription_create") and every later
-    recurring charge ("subscription_cycle") — the latter is the monthly
-    leg even though it hit the "setup" field, since BUNDLED never
-    populates whopMonthlyPlanId at all. */
+    SAME plan id is used for both the initial charge (billing_reason
+    "one_time" or "subscription_create" — setup + first month together)
+    and every later recurring charge ("subscription_cycle"). The webhook
+    handler marks both setupPaidAt and monthlyPaidAt on that first BUNDLED
+    charge; later cycles only refresh monthlyPaidAt. */
 export function classifyProposalPaymentLeg(
   leg: "setup" | "monthly",
   billingReason: string | null

@@ -1,17 +1,22 @@
 import { db } from "@/lib/db";
-import type { PaidAuditStatus } from "@prisma/client";
+import type { PaidAuditStatus, Prisma } from "@prisma/client";
 
-/* Manual admin tracking for the $35, 20-minute paid audit call — see the
-   doc comment on the PaidAudit model in prisma/schema.prisma for the full
-   rationale. Payment and booking both happen inside Cal.com's own "Cal
-   Pay" flow (cal.com/zenith-studio-ai/paid-automation-audit); there is no
-   webhook back to this app, so every row here is created and updated by an
-   admin after they see a real booking land in their Cal.com calendar.
-   Every write here re-checks requireAdmin() independently in its own
-   caller, matching tasks-admin.ts's convention — this file does not call
-   requireAdmin itself. */
+/* $35, 20-minute paid audit call tracking.
+   Payment + booking happen inside Cal.com Cal Pay
+   (cal.com/zenith-studio-ai/paid-automation-audit). Rows are created:
+     1. Automatically by /api/webhooks/cal (BOOKING_CREATED / BOOKING_PAID /
+        BOOKING_RESCHEDULED / BOOKING_CANCELLED), and/or
+     2. Manually by an admin at /admin/paid-audits (fallback / corrections).
+   Admin write helpers do not call requireAdmin themselves — every caller
+   re-checks independently, matching tasks-admin.ts. */
 
 export const PAID_AUDIT_BOOKING_URL = "https://cal.com/zenith-studio-ai/paid-automation-audit";
+
+/** Cal.com event type id for the paid audit (live event, Cal Pay ON_BOOKING). */
+export const PAID_AUDIT_CAL_EVENT_TYPE_ID = 6851441;
+
+/** Event-type slug fragment used when eventTypeId is absent from a payload. */
+export const PAID_AUDIT_CAL_EVENT_SLUG = "paid-automation-audit";
 
 export const PAID_AUDIT_STATUSES: PaidAuditStatus[] = [
   "PAYMENT_PENDING",
@@ -37,6 +42,20 @@ export const PAID_AUDIT_STATUS_LABELS: Record<PaidAuditStatus, string> = {
 
 export function isPaidAuditStatus(value: string): value is PaidAuditStatus {
   return (PAID_AUDIT_STATUSES as string[]).includes(value);
+}
+
+/** True when this Cal.com payload is for the paid audit event specifically —
+    user-level webhooks fire for every event type on the account, so free
+    audit bookings and anything else must be filtered out here. */
+export function isPaidAuditCalEvent(payload: {
+  eventTypeId?: number | null;
+  type?: string | null;
+}): boolean {
+  if (payload.eventTypeId === PAID_AUDIT_CAL_EVENT_TYPE_ID) return true;
+  if (typeof payload.type === "string" && payload.type.includes(PAID_AUDIT_CAL_EVENT_SLUG)) {
+    return true;
+  }
+  return false;
 }
 
 export async function listPaidAuditsForAdmin() {
@@ -67,9 +86,10 @@ export type PaidAuditInput = {
   followUpNote?: string;
 };
 
-/** Resolves the email to a real User — a PaidAudit always belongs to a real
-    account, it is never created for an email with no User row, matching
-    how every other admin-facing model here is anchored to a real FK. */
+/** Resolves the email to a real User — admin manual create still requires an
+    existing account so staff don't accidentally invent users. The Cal.com
+    webhook path uses find-or-create instead (attendees may never have signed
+    in). */
 async function resolveUser(email: string): Promise<{ ok: true; userId: string } | { ok: false; error: string }> {
   const trimmed = email.trim().toLowerCase();
   if (!trimmed) return { ok: false, error: "email is required" };
@@ -137,4 +157,109 @@ export async function updatePaidAudit(id: string, input: PaidAuditInput): Promis
     },
   });
   return { ok: true };
+}
+
+export type CalBookingWebhookPayload = {
+  uid?: string | null;
+  eventTypeId?: number | null;
+  type?: string | null;
+  startTime?: string | null;
+  attendees?: Array<{ email?: string | null; name?: string | null }> | null;
+  responses?: {
+    email?: { value?: unknown };
+    name?: { value?: unknown };
+  } | null;
+};
+
+type UpsertFromCalResult =
+  | { ok: true; id: string; action: "created" | "updated" | "ignored" }
+  | { ok: false; error: string };
+
+/** Upsert a PaidAudit from a verified Cal.com booking webhook. Idempotent on
+    calBookingUid. Ignores non-paid-audit event types. Called from
+    /api/webhooks/cal after signature verification. */
+export async function upsertPaidAuditFromCalWebhook(
+  triggerEvent: string,
+  payload: CalBookingWebhookPayload,
+  tx: Prisma.TransactionClient = db
+): Promise<UpsertFromCalResult> {
+  if (!isPaidAuditCalEvent(payload)) {
+    return { ok: true, id: "", action: "ignored" };
+  }
+
+  let status: PaidAuditStatus;
+  if (triggerEvent === "BOOKING_CANCELLED" || triggerEvent === "BOOKING_REJECTED") {
+    status = "CANCELLED";
+  } else if (
+    triggerEvent === "BOOKING_CREATED" ||
+    triggerEvent === "BOOKING_PAID" ||
+    triggerEvent === "BOOKING_RESCHEDULED"
+  ) {
+    // Cal Pay ON_BOOKING: a booking only exists after payment succeeds, so
+    // CREATED and PAID both mean a real paid booking.
+    status = "BOOKED";
+  } else {
+    return { ok: true, id: "", action: "ignored" };
+  }
+
+  const uid = typeof payload.uid === "string" ? payload.uid.trim() : "";
+  if (!uid) return { ok: false, error: "missing booking uid" };
+
+  const emailFromAttendee = payload.attendees?.[0]?.email?.trim().toLowerCase() ?? "";
+  const emailFromResponses =
+    typeof payload.responses?.email?.value === "string"
+      ? payload.responses.email.value.trim().toLowerCase()
+      : "";
+  const email = emailFromAttendee || emailFromResponses;
+  if (!email) return { ok: false, error: "missing attendee email" };
+
+  const nameFromAttendee = payload.attendees?.[0]?.name?.trim() || null;
+  const nameFromResponses =
+    typeof payload.responses?.name?.value === "string" ? payload.responses.name.value.trim() : null;
+  const name = nameFromAttendee || nameFromResponses;
+
+  let scheduledAt: Date | null = null;
+  if (payload.startTime) {
+    const parsed = new Date(payload.startTime);
+    if (!Number.isNaN(parsed.getTime())) scheduledAt = parsed;
+  }
+
+  let user = await tx.user.findUnique({ where: { email } });
+  if (!user) {
+    user = await tx.user.create({ data: { email, name: name ?? undefined } });
+  } else if (name && !user.name) {
+    user = await tx.user.update({ where: { id: user.id }, data: { name } });
+  }
+
+  const existing = await tx.paidAudit.findFirst({ where: { calBookingUid: uid } });
+  if (existing) {
+    // Don't clobber an admin's later lifecycle status with a late BOOKED
+    // retry (e.g. BOOKING_PAID after staff already marked COMPLETED).
+    const preserveStatus =
+      status === "BOOKED" && ["COMPLETED", "FOLLOW_UP", "REFUNDED"].includes(existing.status);
+
+    await tx.paidAudit.update({
+      where: { id: existing.id },
+      data: {
+        userId: user.id,
+        email,
+        ...(preserveStatus ? {} : { status }),
+        ...(scheduledAt ? { scheduledAt } : {}),
+      },
+    });
+    return { ok: true, id: existing.id, action: "updated" };
+  }
+
+  const created = await tx.paidAudit.create({
+    data: {
+      userId: user.id,
+      email,
+      status,
+      scheduledAt,
+      calBookingUid: uid,
+      amountCents: 3500,
+      currency: "usd",
+    },
+  });
+  return { ok: true, id: created.id, action: "created" };
 }

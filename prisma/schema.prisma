@@ -802,11 +802,9 @@ enum PaidAuditStatus {
 // zenith-studio-ai/paid-automation-audit, $35 USD, ON_BOOKING payment) —
 // Cal.com will not create a booking at all unless payment succeeds first,
 // so the payment security boundary is enforced natively by Cal.com, not by
-// this app. There is no Cal.com <-> this app webhook integration (a
-// deliberate choice, not a gap — see src/lib/paid-audit.ts) — an admin
-// manually creates/updates this row after seeing a real booking land in
-// their Cal.com calendar, which is why every field below is admin-editable
-// rather than webhook-populated.
+// this app. Rows are auto-created/updated by /api/webhooks/cal (verified
+// with CAL_WEBHOOK_SECRET) and remain admin-editable at /admin/paid-audits
+// for corrections and post-call status (COMPLETED / FOLLOW_UP / etc.).
 //
 // status is intentionally one linear enum rather than separate payment/
 // booking/call fields — the lifecycle is one progression, not independent
@@ -821,7 +819,7 @@ model PaidAudit {
   amountCents Int    @default(3500) // always the real $35 in cents — not derived from anywhere else
   currency    String @default("usd")
 
-  calBookingUid String? // Cal.com's own booking reference, pasted in by an admin when known — never auto-populated, no webhook exists
+  calBookingUid String? // Cal.com booking uid — auto-set by /api/webhooks/cal, editable by admin as fallback
 
   scheduledAt  DateTime?
   adminNote    String?   @db.Text // internal only — matches ServiceRequest.adminNote's convention

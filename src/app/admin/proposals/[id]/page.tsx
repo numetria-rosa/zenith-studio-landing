@@ -270,7 +270,9 @@ export default async function AdminProposalDetailPage({
                         ? "awaiting payment"
                         : proposal.paymentMode === "SPLIT"
                           ? "checkout created once the project is marked LIVE"
-                          : "checkout not created"}
+                          : proposal.paymentMode === "BUNDLED"
+                            ? "included in the setup checkout (first month + setup together)"
+                            : "checkout not created"}
                     {proposal.whopMonthlyPlanId && !proposal.monthlyPaidAt && (
                       <>
                         {" — "}
