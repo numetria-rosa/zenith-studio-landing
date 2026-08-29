@@ -18,8 +18,9 @@ export const metadata: Metadata = {
     "Practice-driven courses in data analysis, AI engineering, and automation. Every course includes a Career Path Edition, so you learn the skill and know exactly how to apply it.",
   keywords: [
     "AI engineering course",
-    "automation engineering course",
+    "AI automation course",
     "learn AI automation",
+    "n8n AI workflows",
     "AI engineer career path",
     "data science course with portfolio",
     "web3 engineering course",

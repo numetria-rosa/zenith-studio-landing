@@ -43,6 +43,26 @@ const accountId = companyId;
 
 const PRODUCTS = [
   {
+    // Do not flip readyToCreate until the course verifier and live gate
+    // tests pass and you intend to sell it. Running this file creates a
+    // real purchasable Whop product.
+    envPrefix: "WHOP_AI_ASSISTED_SWE",
+    title: "AI-Assisted Software Engineering",
+    headline: "Zero coding to a live URL, with Cursor and GitHub",
+    description:
+      "Twelve weeks for people who have never shipped code: HTML, CSS, and JavaScript by hand, then Cursor, GitHub, tests, and a live URL. Not AI Engineering (that course builds LLM products). No job guarantee.",
+    readyToCreate: false,
+    plans: [
+      {
+        key: "",
+        title: "Lifetime Access",
+        description: "Lifetime access and updates. Do not create until the course is student-ready.",
+        plan_type: "one_time",
+        initial_price: 99,
+      },
+    ],
+  },
+  {
     envPrefix: "WHOP_AI_ENGINEERING",
     title: "AI Engineering",
     headline: "Build real products with language models",
@@ -76,6 +96,22 @@ const PRODUCTS = [
         description: "Regular price $120. Founding-cohort launch price through August 31, then reverts to $120. Lifetime access and updates.",
         plan_type: "one_time",
         initial_price: 30,
+      },
+    ],
+  },
+  {
+    envPrefix: "WHOP_AI_AUTOMATION",
+    title: "AI Automation",
+    headline: "Build client-ready workflows and agents",
+    description:
+      "Build client-ready workflows and agents: process mapping, APIs, webhooks, retries, idempotency, and bounded AI steps. No programming required. n8n is the example, not the product. Does not promise clients or a job.",
+    plans: [
+      {
+        key: "",
+        title: "Lifetime Access",
+        description: "Lifetime access and updates. Standard price.",
+        plan_type: "one_time",
+        initial_price: 149,
       },
     ],
   },
@@ -201,6 +237,10 @@ async function main() {
   const envLines = [];
 
   for (const p of PRODUCTS) {
+    if (p.readyToCreate !== true) {
+      console.log(`\n=== ${p.title} === SKIPPED (set readyToCreate: true on this entry only — re-running creates duplicate live products)`);
+      continue;
+    }
     console.log(`\n=== ${p.title} ===`);
     const product = await client.products.create({
       account_id: accountId,

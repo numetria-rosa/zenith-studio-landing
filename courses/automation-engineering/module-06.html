@@ -3,1047 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 6: API Contract Design</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
-  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
-  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
-.serif{font-family:'Source Serif 4',serif}
-.mono{font-family:'JetBrains Mono',monospace}
-.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
-.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
-.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
-.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
-.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
-.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
-.progress{height:3px;background:var(--bd)}
-.progress i{display:block;height:100%;background:var(--lime);width:75%}
-.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
-.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
-h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
-.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
-.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
-.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
-.objectives ul{list-style:none;display:grid;gap:6px}
-.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
-.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
-section{padding:40px 0;border-bottom:1px solid var(--bd)}
-.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
-.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
-.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
-p{color:var(--tx);font-size:15.5px}
-p.mut{color:var(--mut)}
-p+p{margin-top:14px}
-.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
-.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
-.def p{font-size:14.5px}
-code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
-.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
-.callout b{color:var(--amber)}
-.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
-.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
-.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
-
-button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
-button:hover{border-color:var(--lime);color:var(--lime)}
-button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
-button.primary:hover{filter:brightness(1.08);color:var(--limed)}
-button:disabled{opacity:.4;cursor:not-allowed}
-.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
-select.stratsel{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 12px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx)}
-.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
-.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
-.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
-
-/* method table */
-.mtable{margin-top:16px;border:1px solid var(--bd);border-radius:10px;overflow:hidden}
-.mtable .row{display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:0}
-.mtable .row > div{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--bd);border-right:1px solid var(--bd)}
-.mtable .row > div:last-child{border-right:none}
-.mtable .row.head > div{background:var(--card2);font-weight:700;color:var(--violet);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
-.mtable .row:last-child > div{border-bottom:none}
-.mtable .yes{color:var(--emerald);font-weight:700}
-.mtable .no{color:var(--red);font-weight:700}
-@media (max-width:640px){ .mtable .row{grid-template-columns:1fr 1fr 1fr; font-size:12px} .mtable .row > div:nth-child(4){display:none} }
-
-/* diff results */
-.diffcard{margin-top:14px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px}
-.diffcard.breaking{border-left:3px solid var(--red)}
-.diffcard.safe{border-left:3px solid var(--emerald)}
-.diffcard .dtag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:6px}
-.diffcard.breaking .dtag{background:rgba(255,107,107,.15);color:var(--red)}
-.diffcard.safe .dtag{background:rgba(52,229,160,.15);color:var(--emerald)}
-.diffcard .dfield{font-family:'JetBrains Mono';font-size:13px;color:var(--tx)}
-.diffcard .dreason{font-size:12.5px;color:var(--mut);margin-top:4px}
-.schemapanel{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
-.schemabox{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px}
-.schemabox .slbl{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
-.schemabox .sfield{font-family:'JetBrains Mono';font-size:12.5px;color:var(--mut);padding:2px 0}
-.schemabox .sfield b{color:var(--tx)}
-@media (max-width:640px){ .schemapanel{grid-template-columns:1fr} }
-
-/* quiz */
-.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
-.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
-.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
-.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
-.qopt:hover{border-color:var(--bd2)}
-.qopt input{margin-top:3px}
-.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
-.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
-.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
-.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
-.numinput input{width:80px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
-.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
-.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
-.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
-.nextbtn{margin-left:auto}
-footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
-
-/* orientation panel */
-.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
-.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
-.orient p{font-size:14.5px;color:var(--mut)}
-.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
-.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
-.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
-
-/* practice */
-.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
-.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
-.practice p{font-size:14px}
-.practice details{margin-top:12px}
-.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
-.practice summary::-webkit-details-marker{display:none}
-.practice summary:before{content:"▸ "}
-.practice details[open] summary:before{content:"▾ "}
-.practice details:not([open]) .ans{display:none}
-.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
-
-@media (max-width:640px){
-  .wrap{padding:0 16px 60px}
-  h1{font-size:26px}
-  .kh h2{font-size:18px}
-  .interactive{padding:16px}
-  .orient{padding:20px 18px}
-}
-
-/* course navigation bar */
-.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
-.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
-.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
-.coursenav a:hover{color:var(--lime)}
-.coursenav .navsep{flex:1}
-.coursenav .navdim{color:var(--mut2);cursor:default;pointer-events:none}
-@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
-</style>
+<title>Module 6: AI as a Step, Not a Brain</title>
+<link rel="stylesheet" href="course.css">
 </head>
 <body>
-
-<div class="bar"><div class="in">
-  <span class="logo">ZENITH<b>LAB</b></span>
-  <span class="tag">Automation Engineering · Module 6 of 8</span>
-</div></div>
-<div class="progress"><i></i></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-05.html">&larr; <span class="navlabel">Module 5</span></a><span class="navsep"></span><a href="module-07.html" id="navNextTop">Module 7 <span class="navlabel">&rarr;</span></a></div></div>
-
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 6</span></div></div>
+<div class="progress"><i style="width:75%"></i></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 06</span>
-    <h1 class="serif">API Contract Design</h1>
-    <p class="sub">A workflow is only as reliable as the contracts between its steps. This module covers idempotent HTTP method semantics, webhook delivery guarantees, and schema versioning strategy so an upstream change doesn't silently break every client running your system.</p>
-
-    <div class="objectives">
-      <div class="lbl">Learning objectives</div>
+    <span class="eyebrow">Module 6 · ~50 minutes</span>
+    <h1 class="serif">AI as a step, not a brain</h1>
+    <p class="sub">The model is a flaky function that returns text. Your workflow needs data. If you cannot name the JSON you will accept, you are not ready to add an AI node.</p>
+    <div class="objectives"><div class="lbl">You will be able to</div>
       <ul>
-        <li>Design REST endpoints whose idempotency matches their HTTP method semantics</li>
-        <li>Specify a webhook contract with delivery, ordering, and replay guarantees stated explicitly</li>
-        <li>Version an API schema without breaking existing integrations</li>
+        <li>Demand a schema from an AI step</li>
+        <li>Reject conversational prose even when it "sounds right"</li>
+        <li>Keep billing, refunds, and emails out of the model's hands</li>
       </ul>
     </div>
   </header>
 
-  <div class="orient">
-    <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module assumes</h3>
-    <p>This module is where Modules 2 and 5 combine into a design discipline. Module 2 gave you idempotency, Module 5 gave you webhook authenticity. This module asks: how do you write those guarantees down as an explicit contract, and how do you change an API later without silently breaking everyone already depending on it?</p>
-    <h3 class="serif">What's new</h3>
-    <p>The interactive in Section 5 runs a real schema-diff algorithm, not a set of canned answers. You'll pick a before/after API schema pair and the tool will compute, field by field, which changes are breaking and which aren't, using the same reasoning a real compatibility checker applies.</p>
-    <h3 class="serif">What's assumed</h3>
-    <div class="assume">Modules 1–5 completed, especially Module 2's idempotency vocabulary and Module 5's webhook/HMAC material.</div>
-    <div class="assume">Basic familiarity with JSON and REST endpoint concepts (GET/POST/etc.), no formal API-design background required.</div>
-    <h3 class="serif">How to work through it</h3>
-    <ol>
-      <li>Read each definition, then run the matching interactive.</li>
-      <li>Answer the practice check before revealing the answer.</li>
-      <li>Finish with the graded checkpoint.</li>
-    </ol>
-  </div>
-
   <section>
-    <div class="kh"><span class="num">1</span><h2 class="serif">What a contract actually is</h2></div>
-    <p>An API contract is every promise a consumer can reasonably rely on: the shape of a request, the shape of a response, what happens if you call something twice, whether an event will arrive more than once, in what order, and whether it can be resent later. Most of that is never written down explicitly, it's just however the API happens to behave today. That's the problem this module addresses: undocumented behavior that consumers depend on anyway is still part of the contract, whether you intended it to be or not.</p>
-    <div class="def">
-      <div class="k">Definition: breaking change</div>
-      <p>Any change to an API that causes a client which was working correctly against the previous version to stop working correctly, without that client changing anything. Note this is defined from the <i>consumer's</i> perspective, not the provider's, a change the provider considers a minor cleanup can still be breaking if any real consumer depended on the old behavior.</p>
-    </div>
-    <div class="callout"><b>Why this matters for automation specifically:</b> a workflow automation is exactly the kind of consumer most likely to break silently. It has no human watching a UI notice something looks wrong, it just keeps calling the API the same way it always has, and either gets errors it doesn't know how to handle or, worse, gets a response it misinterprets without erroring at all.</div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>A provider removes a field from an API response that they consider "internal debug data nobody should be using." Is this necessarily safe to remove without a version bump? Why or why not, based on the definition above?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Not necessarily. The definition of breaking change is about what consumers actually depend on, not what the provider intended for them to depend on. If even one real integration happens to read that "internal" field, removing it is a breaking change for that consumer, regardless of the provider's intent. The only way to know for sure is usage data or an explicit deprecation period, intent alone doesn't make a removal safe.</div>
-      </details>
-    </div>
+    <div class="kh"><span class="num">1</span><h2>Prose is not a ticket label</h2></div>
+    <p>You asked for <code>{"priority":"high","topic":"billing","needs_human":true}</code>. The model said "Sure! This looks urgent." That is not a bug in the API. That is the default. A repair pass can strip a markdown fence. It cannot invent a topic you can route on.</p>
+    <div class="callout"><b>Rule:</b> AI labels, extracts, and drafts. Deterministic code writes to the CRM, charges cards, and sends mail.</div>
   </section>
 
   <section>
-    <div class="kh"><span class="num">2</span><h2 class="serif">HTTP method semantics: safe vs. idempotent</h2></div>
-    <p>Module 2 defined idempotency in general. HTTP methods have a second, related but distinct property worth separating out clearly.</p>
-    <div class="def">
-      <div class="k">Definition: safe method</div>
-      <p>A method that causes no side effects at all, it only retrieves data. A safe method can be called any number of times, including zero, with no effect on server state whatsoever.</p>
-    </div>
-    <div class="def">
-      <div class="k">Definition: idempotent method</div>
-      <p>From Module 1: repeating it produces the same end state as doing it once. Every safe method is automatically idempotent (no side effects to accumulate), but not every idempotent method is safe, <span class="mono-inline">DELETE</span> has a real side effect (something gets deleted) yet is still idempotent (deleting an already-deleted resource leaves the same end state).</p>
-    </div>
-    <div class="mtable">
-      <div class="row head"><div>Method</div><div>Safe?</div><div>Idempotent?</div><div>Typical use</div></div>
-      <div class="row"><div class="mono-inline">GET</div><div class="yes">Yes</div><div class="yes">Yes</div><div>Retrieve a resource</div></div>
-      <div class="row"><div class="mono-inline">HEAD</div><div class="yes">Yes</div><div class="yes">Yes</div><div>Retrieve headers only</div></div>
-      <div class="row"><div class="mono-inline">PUT</div><div class="no">No</div><div class="yes">Yes</div><div>Replace a resource entirely</div></div>
-      <div class="row"><div class="mono-inline">DELETE</div><div class="no">No</div><div class="yes">Yes</div><div>Remove a resource</div></div>
-      <div class="row"><div class="mono-inline">POST</div><div class="no">No</div><div class="no">No, by default</div><div>Create a new resource / trigger an action</div></div>
-      <div class="row"><div class="mono-inline">PATCH</div><div class="no">No</div><div class="no">Not guaranteed</div><div>Partially modify a resource</div></div>
-    </div>
-    <div class="callout"><b>PATCH is the trap:</b> whether PATCH is idempotent depends entirely on what the patch document says. <span class="mono-inline">PATCH {"status": "active"}</span> (set a value) is idempotent, running it five times leaves the same end state. <span class="mono-inline">PATCH {"op": "increment", "field": "credits"}</span> (a relative change) is not, running it five times adds five times as much. The HTTP spec doesn't save you here, the endpoint's own design does.</div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Is every safe method idempotent? Is every idempotent method safe? Give the reasoning, not just yes/no.</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Every safe method is idempotent: with zero side effects, there's nothing to accumulate no matter how many times you call it, so the end state is trivially the same every time. But not every idempotent method is safe: DELETE changes server state (a real side effect) yet is still idempotent, because that one side effect, once applied, doesn't compound on repetition. Safety is the stronger property; idempotency is the weaker, more general one.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">3</span><h2 class="serif">Interactive: calling each method twice</h2></div>
-    <p class="mut">Pick a method and endpoint, then run the same call twice in a row against a simulated resource. Watch the resulting state, not just the response.</p>
+    <div class="kh"><span class="num">2</span><h2>Lab: only structured output passes</h2></div>
+    <p class="mut">The same ticket hits two AI configurations. One accepts any string. One requires priority, topic, and needs_human.</p>
     <div class="interactive">
-      <span class="ilbl">Live simulation</span>
-      <div class="dagctrl">
-        <select class="stratsel" id="methodSelect">
-          <option value="GET">GET /leads/8841</option>
-          <option value="PUT">PUT /leads/8841 {"status":"qualified"}</option>
-          <option value="DELETE">DELETE /leads/8841</option>
-          <option value="POST">POST /leads (create new lead)</option>
-          <option value="PATCH_SET">PATCH /leads/8841 {"status":"qualified"} (a "set" patch)</option>
-          <option value="PATCH_INC">PATCH /leads/8841 {"op":"increment","field":"contact_attempts"} (a relative patch)</option>
-        </select>
-        <button class="primary" id="btnRunMethod">▶ Call it twice</button>
-        <button id="btnResetMethod">Reset resource state</button>
-      </div>
-      <div class="feedback" id="methodFeedback"></div>
-      <div class="schemapanel">
-        <div class="schemabox">
-          <div class="slbl">Resource state, after call #1</div>
-          <div id="stateAfter1" class="sfield">–</div>
-        </div>
-        <div class="schemabox">
-          <div class="slbl">Resource state, after call #2</div>
-          <div id="stateAfter2" class="sfield">–</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Run both PATCH variants. Both are "PATCH," the same HTTP method, same idempotency guarantee on paper. Do they behave the same after two calls?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">No, the "set" patch ends in the same state after one or two calls (idempotent), the "increment" patch ends in a different state after two calls than after one (not idempotent), even though both are PATCH requests. This is exactly the Section 2 warning: PATCH's idempotency isn't guaranteed by the method name, it depends entirely on what the specific patch operation does.</div>
-      </details>
+      <div class="ilbl">Interactive · schema gate</div>
+      <div class="wf-row" id="picks"></div>
+      <div class="logconsole" id="labLog"></div>
+      <button class="primary" id="btnRun" style="margin-top:12px">Run the prose response</button>
+      <div class="feedback" id="labFb"></div>
     </div>
   </section>
 
   <section>
-    <div class="kh"><span class="num">4</span><h2 class="serif">Specifying a webhook contract</h2></div>
-    <p>A webhook contract needs to state three things explicitly, because a consumer that assumes the wrong default for any of them will eventually break, usually silently.</p>
-    <div class="def">
-      <div class="k">Delivery guarantee</div>
-      <p>State it plainly: at-least-once (the honest default per Module 2's proof that exactly-once transport is impossible), or best-effort (may be silently dropped). If you say "at-least-once," every consumer must be built idempotently, exactly the Module 2 lesson, applied here as a contract obligation rather than a suggestion.</p>
-    </div>
-    <div class="def">
-      <div class="k">Ordering guarantee</div>
-      <p>Webhooks sent over independent HTTP requests can arrive out of order, a retry of an earlier event can land after a later event that succeeded on the first try. If you don't guarantee order, say so, and consumers must include a sequence number or timestamp in the payload and use it to detect and discard stale updates, rather than trusting arrival order.</p>
-    </div>
-    <div class="def">
-      <div class="k">Replay policy</div>
-      <p>Many providers let a customer manually replay old webhook events (for recovery after an outage). If replay is supported, state how far back, and remind consumers, again, this is why idempotent handling isn't optional: a replayed event from three days ago must be as safe to process as a live one.</p>
-    </div>
-    <div class="callout"><b>A concrete contract statement, the kind worth actually writing down:</b> "Events are delivered at-least-once. Ordering between events for the same resource is not guaranteed; consumers must use the <span class="mono-inline">sequence</span> field to detect stale updates. Events can be replayed by the customer for up to 7 days after original delivery; consumers must handle replayed events idempotently using the <span class="mono-inline">event_id</span> field." That's short, explicit, and tells every consumer exactly what defensive code they need to write.</div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>A consumer's webhook handler updates a "lead score" field directly from whatever value is in the incoming event, with no check against what it already has stored. Given the ordering guarantee above, what can go wrong?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">A retried, earlier event can arrive after a later event that already succeeded, overwriting the correct, newer score with a stale, older one. Since ordering isn't guaranteed, "whatever arrived most recently" is not the same as "whatever happened most recently." The fix is exactly what the contract statement recommends: check the event's sequence number against what's already stored, and discard the update if it's older than what's already applied.</div>
-      </details>
-    </div>
+    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+    <div id="quizRoot"></div>
+    <div id="reqList" style="margin-top:16px"></div>
   </section>
-
-  <section>
-    <div class="kh"><span class="num">5</span><h2 class="serif">Interactive: contract-breaking-change detector</h2></div>
-    <p class="mut">Pick a before/after schema pair. The analysis below is computed live, field by field, using the same rules explained in Section 6, not a canned answer per scenario.</p>
-    <div class="interactive">
-      <span class="ilbl">Live simulation</span>
-      <div class="dagctrl">
-        <select class="stratsel" id="diffScenario">
-          <option value="addOptional">Adding an optional response field</option>
-          <option value="rename">Renaming a field</option>
-          <option value="tighten">Making an optional request field required</option>
-          <option value="typeChange">Changing a field's type</option>
-          <option value="relax">Making a required request field optional</option>
-          <option value="removeDeprecated">Removing a field after deprecation</option>
-          <option value="mixed">New scenario: two changes shipped in one release</option>
-        </select>
-        <button class="primary" id="btnAnalyze">▶ Analyze</button>
-      </div>
-      <div class="schemapanel">
-        <div class="schemabox">
-          <div class="slbl">Schema v1</div>
-          <div id="schemaV1"></div>
-        </div>
-        <div class="schemabox">
-          <div class="slbl">Schema v2</div>
-          <div id="schemaV2"></div>
-        </div>
-      </div>
-      <div id="diffResults"></div>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Run "Making a required request field optional" (relax). The detector should mark it non-breaking. Why does loosening a constraint never break existing clients, while tightening one (the scenario above it) does?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Every existing client was already satisfying the old, stricter requirement (they were sending the field, since it was required), so they automatically satisfy the new, looser requirement too, nothing they were already doing stops working. Tightening does the opposite: clients that were valid under the old, looser rule (not sending an optional field) are now invalid under the new, stricter rule. Relaxing a constraint can only ever keep old behavior valid or make more things valid, never less.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">6</span><h2 class="serif">Versioning without breaking anyone</h2></div>
-    <p>The detector in Section 5 runs on a simple, defensible rule set worth stating explicitly, since it's the actual test to run mentally before shipping any API change.</p>
-    <div class="def">
-      <div class="k">The compatibility rules</div>
-      <p><b>Safe (non-breaking):</b> adding an optional field (request or response), relaxing a required field to optional, adding a new endpoint entirely.</p>
-      <p style="margin-top:8px"><b>Breaking:</b> removing any field, renaming a field (equivalent to remove + add), changing a field's type, tightening an optional field to required, changing a field's meaning without changing its name or type.</p>
-    </div>
-    <div class="callout"><b>Versioning strategy, in order of preference:</b> (1) prefer additive-only changes within the same version whenever possible, new optional fields cost nothing and break nothing. (2) When a breaking change is unavoidable, introduce it behind a new version (URL path <span class="mono-inline">/v2/</span>, or a version header) while keeping the old version fully functional. (3) Deprecate the old version with a stated sunset date, giving consumers a real window to migrate, rather than breaking them with no notice. Removing a field "after deprecation," as in the last scenario in Section 5, is still technically a breaking change by the rules, deprecation doesn't make it non-breaking, it makes the breakage <i>planned and communicated</i> instead of silent.</div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>A team wants to change a response field's type from a string date ("2026-01-15") to a Unix timestamp integer, to make it easier to work with. Using the rules above, is this safe to ship as an in-place change? What's the non-breaking way to make this improvement available?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Not safe in place, changing a field's type is on the breaking list, every consumer currently parsing a string date will fail or silently misbehave when it suddenly receives an integer. The non-breaking approach: add a NEW field (e.g., a separate timestamp field) alongside the existing string field, which is purely additive, then deprecate the old string field on its own timeline once consumers have had a chance to migrate to the new one.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">7</span><h2 class="serif">Before the checkpoint: what you should now be able to do</h2></div>
-    <p class="mut">A short consolidation before you're graded on it.</p>
-    <ul style="margin-top:10px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:2">
-      <li>Classify any HTTP method as safe, idempotent, both, or neither, and explain why PATCH requires special care.</li>
-      <li>Write an explicit webhook contract statement covering delivery, ordering, and replay.</li>
-      <li>Explain why an unordered, at-least-once, replayable webhook stream requires idempotent, sequence-aware consumers.</li>
-      <li>Classify a schema change as breaking or non-breaking using the compatibility rules, and justify it from the consumer's perspective.</li>
-      <li>Describe the non-breaking path for shipping a change that would otherwise be breaking.</li>
-    </ul>
-
-    <div class="practice">
-      <div class="lbl">Cross-module check</div>
-      <p>Suppose a future API version wants to change how idempotency keys work, from a client-supplied header to a server-generated key. Using this module's compatibility rules, is that a safe in-place change, or does it need a new version?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">It needs a new version. Existing clients built their whole idempotent-retry strategy (Module 2) around supplying their own key and expecting the server to honor it, silently switching to a server-generated key changes the meaning of that field without changing its name, which is exactly the "breaking" case from Section 6, even though no field was removed or renamed. This is a good example of why the compatibility rules need to be applied to BEHAVIOR, not just to field names and types, a contract can break by changing what a field means while it keeps looking identical on paper.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">8</span><h2 class="serif">Build it: design an endpoint contract</h2></div>
-    <p class="mut">Design a real contract for a real endpoint, then validate your own design and defend a schema change against it.</p>
-
-    <div class="interactive">
-      <span class="ilbl">Scenario</span>
-      <p style="margin-top:2px">Design the contract for an endpoint that lets an external client <b>cancel a scheduled automation run</b>, given its run ID. It must be safe to retry (the client's network is unreliable) and must not silently succeed twice with different side effects.</p>
-
-      <div style="display:grid;gap:14px;margin-top:16px">
-        <div>
-          <label style="font-size:13px;color:var(--mut);display:block;margin-bottom:6px">HTTP method</label>
-          <select id="acMethod" style="font-family:'Space Grotesk';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx);width:100%;max-width:300px">
-            <option value="">Choose…</option>
-            <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:13px;color:var(--mut);display:block;margin-bottom:6px">Endpoint path</label>
-          <input type="text" id="acPath" placeholder="/v1/runs/{run_id}/cancel" style="width:100%;max-width:420px;font-family:'JetBrains Mono';font-size:13.5px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)">
-        </div>
-        <div>
-          <label style="font-size:13px;color:var(--mut);display:block;margin-bottom:6px">Authentication</label>
-          <input type="text" id="acAuth" placeholder="e.g. Bearer token, per-client API key, HMAC-signed request..." style="width:100%;font-family:'Space Grotesk';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)">
-        </div>
-        <div>
-          <label style="font-size:13px;color:var(--mut);display:block;margin-bottom:6px">Request schema (what the client sends)</label>
-          <textarea id="acReqSchema" placeholder='{ "reason": "string, optional" }' style="width:100%;min-height:70px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px;color:var(--tx);resize:vertical"></textarea>
-        </div>
-        <div>
-          <label style="font-size:13px;color:var(--mut);display:block;margin-bottom:6px">Success response (status + body)</label>
-          <textarea id="acSuccess" placeholder='200 { "run_id": "...", "status": "cancelled" }' style="width:100%;min-height:60px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px;color:var(--tx);resize:vertical"></textarea>
-        </div>
-        <div>
-          <label style="font-size:13px;color:var(--mut);display:block;margin-bottom:6px">Error responses (status codes + when each fires)</label>
-          <textarea id="acErrors" placeholder="404 if run_id unknown, 409 if run already completed, 401 if auth fails..." style="width:100%;min-height:70px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px;color:var(--tx);resize:vertical"></textarea>
-        </div>
-        <div>
-          <label style="font-size:13px;color:var(--mut);display:block;margin-bottom:6px">Idempotency behavior (what happens if the client retries this exact call)</label>
-          <textarea id="acIdem" placeholder="Describe what happens on a duplicate call..." style="width:100%;min-height:70px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px;color:var(--tx);resize:vertical"></textarea>
-        </div>
-        <div>
-          <label style="font-size:13px;color:var(--mut);display:block;margin-bottom:6px">Validation rules (what makes a request invalid)</label>
-          <textarea id="acValidation" placeholder="run_id must be a valid UUID that exists, reason must be under 500 chars..." style="width:100%;min-height:70px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px;color:var(--tx);resize:vertical"></textarea>
-        </div>
-      </div>
-
-      <button id="btnValidateContract" style="margin-top:16px">Validate my contract</button>
-      <div id="acChecklist" style="margin-top:14px;display:grid;gap:6px;font-size:14px"></div>
-    </div>
-
-    <p style="margin-top:20px">Now a schema-evolution challenge, unrelated to what you just designed. This tests whether you can apply the compatibility rules from Sections 5–6 to an unfamiliar diff, not just recall the rule names.</p>
-
-    <div class="qcard">
-      <div class="qn">Evolution question 1 of 5</div>
-      <div class="qtext">V1 response: <code class="mono-inline">{ "id": 123, "name": "Alice" }</code>. Proposed V2: rename <code class="mono-inline">"name"</code> to <code class="mono-inline">"full_name"</code>. Breaking or non-breaking?</div>
-      <div id="acQ1opts"></div>
-      <div class="qexplain" id="acQ1explain"></div>
-    </div>
-    <div class="qcard">
-      <div class="qn">Evolution question 2 of 5</div>
-      <div class="qtext">V2 adds a new optional field: <code class="mono-inline">{ "id": 123, "name": "Alice", "created_at": "2026-01-01" }</code>, existing fields unchanged. Breaking or non-breaking?</div>
-      <div id="acQ2opts"></div>
-      <div class="qexplain" id="acQ2explain"></div>
-    </div>
-    <div class="qcard">
-      <div class="qn">Evolution question 3 of 5</div>
-      <div class="qtext">V2 changes <code class="mono-inline">"id"</code> from a number (<code class="mono-inline">123</code>) to a string (<code class="mono-inline">"123"</code>), same value, different JSON type. Breaking or non-breaking?</div>
-      <div id="acQ3opts"></div>
-      <div class="qexplain" id="acQ3explain"></div>
-    </div>
-    <div class="qcard">
-      <div class="qn">Evolution question 4 of 5</div>
-      <div class="qtext">V2 makes a previously-optional request field <code class="mono-inline">"email"</code> required on write. Breaking or non-breaking?</div>
-      <div id="acQ4opts"></div>
-      <div class="qexplain" id="acQ4explain"></div>
-    </div>
-    <div class="qcard">
-      <div class="qn">Evolution question 5 of 5</div>
-      <div class="qtext">V2 changes a webhook's delivery guarantee from "at-least-once" to "exactly-once" (strictly stronger, never weaker, for the same field name). Breaking or non-breaking?</div>
-      <div id="acQ5opts"></div>
-      <div class="qexplain" id="acQ5explain"></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">9</span><h2 class="serif">Checkpoint</h2></div>
-    <p class="mut">Graded. Feedback is immediate and attempts are unlimited, the goal is understanding, not a single pass/fail moment.</p>
-
-    <div class="qcard">
-      <div class="qn">Question 1 of 6</div>
-      <div class="qtext">Which HTTP method is idempotent but NOT safe?</div>
-      <div id="q1opts"></div>
-      <div class="qexplain" id="q1explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 2 of 6</div>
-      <div class="qtext">True or false: because PATCH and PUT are both used to modify a resource, PATCH is guaranteed idempotent by the HTTP specification, the same as PUT.</div>
-      <div id="q2opts"></div>
-      <div class="qexplain" id="q2explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 3 of 6</div>
-      <div class="qtext">Run the "Renaming a field" scenario in Section 5's detector. How many breaking changes does it detect (a rename is modeled as one field disappearing and a different one appearing)?</div>
-      <div class="numinput">
-        <input type="number" id="q3input" min="0" max="10" placeholder="?">
-        <button id="q3check">Check</button>
-      </div>
-      <div class="qexplain" id="q3explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 4 of 6</div>
-      <div class="qtext">A webhook provider states "delivery is exactly-once." Per Module 2's proof about transport guarantees, why should a consumer still be built idempotently, just in case?</div>
-      <div id="q4opts"></div>
-      <div class="qexplain" id="q4explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 5 of 6 · new scenario</div>
-      <div class="qtext">Run the new "two changes shipped in one release" scenario in Section 5's detector (an optional request field became required, and a new optional response field was added, both in the same release). How many of the two detected changes are breaking?</div>
-      <div class="numinput">
-        <input type="number" id="q5input" min="0" max="5" placeholder="?">
-        <button id="q5check">Check</button>
-      </div>
-      <div class="qexplain" id="q5explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 6 of 6 · design (self-check, not auto-graded)</div>
-      <div class="qtext">An API currently has an optional <span class="mono-inline">phone</span> field on its "create contact" request. The team wants to make phone verification mandatory going forward. Design a non-breaking rollout path that eventually gets there. Write your answer before revealing the model answer.</div>
-      <textarea id="q6input" placeholder="Versioning approach, timeline, what old and new clients each experience..." style="width:100%;min-height:110px;margin-top:12px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px;color:var(--tx);resize:vertical"></textarea>
-      <details style="margin-top:12px">
-        <summary style="cursor:pointer;color:var(--violet);font-size:13px;font-weight:600;list-style:none">▸ Compare against a model answer</summary>
-        <div class="qexplain" style="display:block;color:var(--mut2);margin-top:10px">A reasonable answer: keep the current version's <span class="mono-inline">phone</span> field optional indefinitely, existing clients are never broken. Introduce the mandatory requirement only in a new API version (e.g., <span class="mono-inline">/v2/contacts</span>), which new integrations are pointed to going forward. Communicate a deprecation timeline for v1 with a real sunset date, giving existing integrations a migration window rather than an instant break. This matches the Section 6 rule: tightening a requirement is breaking, so it can only ship inside a new version, never as an in-place change to the version everyone's already using.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">10</span><h2 class="serif">Further reading</h2></div>
-    <p class="mut">If you want to go deeper than the browser can take you:</p>
-    <ul style="margin-top:10px;padding-left:20px;color:var(--mut2);line-height:1.9">
-      <li>RFC 7231, "HTTP/1.1 Semantics and Content," Section 4.2, the specification defining safe and idempotent methods.</li>
-      <li>RFC 5789, "PATCH Method for HTTP," which explicitly does not guarantee PATCH idempotency, the source of Section 2's warning.</li>
-      <li>Stripe's API versioning documentation, a widely-cited real-world example of header-based versioning with a long deprecation runway.</li>
-      <li>In production, this shows up as OpenAPI/JSON Schema diff tools used in CI pipelines to catch breaking changes before they ship, exactly the algorithm Section 5's detector runs by hand.</li>
-    </ul>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">11</span><h2 class="serif">Glossary</h2></div>
-    <div style="margin-top:14px;display:grid;gap:12px">
-      <div><b class="mono-inline">API contract</b><span style="color:var(--mut);font-size:14px"> — every promise a consumer can reasonably rely on, documented or not.</span></div>
-      <div><b class="mono-inline">breaking change</b><span style="color:var(--mut);font-size:14px"> — any change that stops a previously-working, unmodified client from working correctly.</span></div>
-      <div><b class="mono-inline">safe method</b><span style="color:var(--mut);font-size:14px"> — an HTTP method with no side effects at all.</span></div>
-      <div><b class="mono-inline">idempotent method</b><span style="color:var(--mut);font-size:14px"> — repeating it leaves the same end state as doing it once; weaker than safety.</span></div>
-      <div><b class="mono-inline">webhook contract</b><span style="color:var(--mut);font-size:14px"> — explicit statement of a webhook's delivery, ordering, and replay guarantees.</span></div>
-      <div><b class="mono-inline">additive-only change</b><span style="color:var(--mut);font-size:14px"> — a schema change that only adds optional fields or relaxes constraints; always non-breaking.</span></div>
-      <div><b class="mono-inline">deprecation / sunset date</b><span style="color:var(--mut);font-size:14px"> — a communicated, scheduled breaking change, versus an unannounced one.</span></div>
-    </div>
-  </section>
-
-  <footer>Zenith Lab · Automation Engineering · Module 6 of 8 · Next: Observability &amp; SLOs</footer>
 </div>
-
 <div class="scoreboard"><div class="in">
-  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 5</span>
-  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
-  <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
+  <span class="sc" id="scoreLabel">0 / 5</span>
+  <a id="btnNext" href="module-07.html" class="primary nextbtn" style="text-decoration:none">Complete the lab and quiz (80%+) to continue</a>
 </div></div>
-
-<script src="course-progress.js?v=5"></script>
+<script src="course-progress.js"></script>
+<script src="workflow-runtime.js"></script>
+<script src="module-kit.js"></script>
+<script src="course-rail.js"></script>
 <script>
-/* ---------------- Interactive 1: call each method twice ---------------- */
-let resourceState = { status: "new", contact_attempts: 0, exists: true };
+CourseProgress.touchVisited(6);
+const CHOICES = [
+  { id: "schema", label: "Require {priority, topic, needs_human}" },
+  { id: "any", label: "Accept whatever the model says" },
+];
+let pick = null;
+const box = document.getElementById("picks");
+ModuleKit.shuffle(CHOICES).forEach(function (c) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "wf-chip";
+  b.textContent = c.label;
+  b.onclick = function () {
+    pick = c.id;
+    box.querySelectorAll(".wf-chip").forEach(function (el) { el.classList.remove("on"); });
+    b.classList.add("on");
+  };
+  box.appendChild(b);
+});
 
-function renderState(el, state){
-  if (state === null){
-    el.innerHTML = '<i style="color:var(--red)">resource deleted (404 on subsequent GET)</i>';
-    return;
-  }
-  el.innerHTML = Object.entries(state).map(([k,v]) => `<div><b>${k}</b>: ${JSON.stringify(v)}</div>`).join("");
-}
-
-function resetMethodDemo(){
-  resourceState = { status: "new", contact_attempts: 0, exists: true };
-  document.getElementById("stateAfter1").textContent = "–";
-  document.getElementById("stateAfter2").textContent = "–";
-  document.getElementById("methodFeedback").className = "feedback";
-}
-
-let postCounter = 0;
-
-function applyMethod(method, state){
-  if (state === null && method !== "POST") return null; // deleted resource stays deleted except POST creates new
-  switch(method){
-    case "GET": return state; // no change
-    case "PUT": return { ...state, status: "qualified" };
-    case "DELETE": return null;
-    case "POST": postCounter++; return { new_resource_id: "lead_" + (9000 + postCounter), status: "new", contact_attempts: 0 };
-    case "PATCH_SET": return { ...state, status: "qualified" };
-    case "PATCH_INC": return { ...state, contact_attempts: (state.contact_attempts||0) + 1 };
-  }
-  return state;
-}
-
-document.getElementById("btnRunMethod").addEventListener("click", () => {
-  resourceState = { status: "new", contact_attempts: 0, exists: true };
-  postCounter = 0;
-  const method = document.getElementById("methodSelect").value;
-  const after1 = applyMethod(method, resourceState);
-  const after2 = applyMethod(method, after1);
-  renderState(document.getElementById("stateAfter1"), after1);
-  renderState(document.getElementById("stateAfter2"), after2);
-
-  const same = JSON.stringify(after1) === JSON.stringify(after2);
-  const fb = document.getElementById("methodFeedback");
-  fb.style.display = "block";
-  if (same){
+document.getElementById("btnRun").onclick = function () {
+  const fb = document.getElementById("labFb");
+  if (!pick) { fb.className = "feedback bad"; fb.textContent = "Pick a policy."; return; }
+  const schema = pick === "schema" ? ["priority", "topic", "needs_human"] : null;
+  const graph = {
+    nodes: [
+      { id: "t", type: "trigger" },
+      { id: "ai", type: "ai", config: { schema: schema } },
+      { id: "n", type: "notify" },
+    ],
+    edges: [{ from: "t", to: "ai" }, { from: "ai", to: "n" }],
+  };
+  const r = WorkflowRuntime.run(graph, { id: "tix_1", body: "I was charged twice" }, { aiOutput: "Sure! This looks urgent, probably billing." });
+  ModuleKit.renderLogs(document.getElementById("labLog"), r.logs);
+  if (pick === "schema" && !r.ok && r.error === "not_json") {
     fb.className = "feedback ok";
-    fb.textContent = "Same end state after 1 call and after 2 calls — idempotent.";
+    fb.textContent = "Prose died at the schema gate. Notify never ran. Lab passed.";
+    ModuleKit.passSection(6, "aiStepLab");
+  } else if (pick === "any" && r.ok) {
+    fb.className = "feedback bad";
+    fb.textContent = "You forwarded a sentence to the next system. That is not a label.";
   } else {
     fb.className = "feedback bad";
-    fb.textContent = "Different end state after 2 calls than after 1 — NOT idempotent.";
-  }
-});
-document.getElementById("btnResetMethod").addEventListener("click", resetMethodDemo);
-resetMethodDemo();
-
-/* ---------------- Interactive 2: schema breaking-change detector ---------------- */
-// Each scenario: { v1: [{name, type, required, side}], v2: [...] }
-const scenarios = {
-  addOptional: {
-    v1: [ {name:"id", type:"string", required:true, side:"response"}, {name:"email", type:"string", required:true, side:"response"} ],
-    v2: [ {name:"id", type:"string", required:true, side:"response"}, {name:"email", type:"string", required:true, side:"response"}, {name:"phone", type:"string", required:false, side:"response"} ]
-  },
-  rename: {
-    v1: [ {name:"id", type:"string", required:true, side:"response"}, {name:"full_name", type:"string", required:true, side:"response"} ],
-    v2: [ {name:"id", type:"string", required:true, side:"response"}, {name:"display_name", type:"string", required:true, side:"response"} ]
-  },
-  tighten: {
-    v1: [ {name:"email", type:"string", required:true, side:"request"}, {name:"phone", type:"string", required:false, side:"request"} ],
-    v2: [ {name:"email", type:"string", required:true, side:"request"}, {name:"phone", type:"string", required:true, side:"request"} ]
-  },
-  typeChange: {
-    v1: [ {name:"id", type:"string", required:true, side:"response"}, {name:"created_at", type:"string (ISO date)", required:true, side:"response"} ],
-    v2: [ {name:"id", type:"string", required:true, side:"response"}, {name:"created_at", type:"integer (unix timestamp)", required:true, side:"response"} ]
-  },
-  relax: {
-    v1: [ {name:"email", type:"string", required:true, side:"request"}, {name:"phone", type:"string", required:true, side:"request"} ],
-    v2: [ {name:"email", type:"string", required:true, side:"request"}, {name:"phone", type:"string", required:false, side:"request"} ]
-  },
-  removeDeprecated: {
-    v1: [ {name:"id", type:"string", required:true, side:"response"}, {name:"legacy_score", type:"number", required:false, side:"response"} ],
-    v2: [ {name:"id", type:"string", required:true, side:"response"} ]
-  },
-  mixed: {
-    v1: [ {name:"id", type:"string", required:true, side:"response"}, {name:"email", type:"string", required:true, side:"request"}, {name:"phone", type:"string", required:false, side:"request"} ],
-    v2: [ {name:"id", type:"string", required:true, side:"response"}, {name:"email", type:"string", required:true, side:"request"}, {name:"phone", type:"string", required:true, side:"request"}, {name:"avatar_url", type:"string", required:false, side:"response"} ]
+    fb.textContent = "The passing design rejects unstructured output.";
   }
 };
 
-function diffSchemas(v1, v2){
-  const key = f => f.side + ":" + f.name;
-  const v1map = new Map(v1.map(f => [key(f), f]));
-  const v2map = new Map(v2.map(f => [key(f), f]));
-  const results = [];
-
-  v1map.forEach((f, k) => {
-    if (!v2map.has(k)){
-      results.push({ field: f.name, side: f.side, breaking: true,
-        reason: `Field "${f.name}" (${f.side}) was removed. Any consumer that reads/sends it will be affected.` });
-    }
-  });
-
-  v2map.forEach((f, k) => {
-    if (!v1map.has(k)){
-      if (f.side === "request" && f.required){
-        results.push({ field: f.name, side: f.side, breaking: true,
-          reason: `New required request field "${f.name}" added. Existing clients that don't send it will now be rejected.` });
-      } else {
-        results.push({ field: f.name, side: f.side, breaking: false,
-          reason: `New ${f.required ? "required" : "optional"} ${f.side} field "${f.name}" added${f.side==="response" ? "" : ", but optional"}. Existing clients that don't know about it are unaffected.` });
-      }
-    }
-  });
-
-  v1map.forEach((f1, k) => {
-    if (!v2map.has(k)) return;
-    const f2 = v2map.get(k);
-    if (f1.type !== f2.type){
-      results.push({ field: f1.name, side: f1.side, breaking: true,
-        reason: `Type changed from "${f1.type}" to "${f2.type}". Consumers parsing the old type will break.` });
-    }
-    if (f1.side === "request" && f1.required !== f2.required){
-      if (!f1.required && f2.required){
-        results.push({ field: f1.name, side: f1.side, breaking: true,
-          reason: `Field became required (was optional). Existing clients that don't send it are now invalid.` });
-      } else if (f1.required && !f2.required){
-        results.push({ field: f1.name, side: f1.side, breaking: false,
-          reason: `Field became optional (was required). Existing clients, which were already sending it, are unaffected.` });
-      }
-    }
-  });
-
-  return results;
-}
-
-function renderSchema(el, fields){
-  el.innerHTML = fields.map(f =>
-    `<div class="sfield"><b>${f.name}</b>: ${f.type}${f.required ? "" : "?"} <span style="color:var(--mut2)">(${f.side})</span></div>`
-  ).join("");
-}
-
-function runDiff(){
-  const scenario = scenarios[document.getElementById("diffScenario").value];
-  renderSchema(document.getElementById("schemaV1"), scenario.v1);
-  renderSchema(document.getElementById("schemaV2"), scenario.v2);
-  const results = diffSchemas(scenario.v1, scenario.v2);
-  const el = document.getElementById("diffResults");
-  if (results.length === 0){
-    el.innerHTML = '<div class="diffcard safe"><div class="dtag">no changes detected</div></div>';
-    return;
-  }
-  el.innerHTML = results.map(r => `
-    <div class="diffcard ${r.breaking ? "breaking" : "safe"}">
-      <div class="dtag">${r.breaking ? "breaking" : "safe"}</div>
-      <div class="dfield">${r.field} (${r.side})</div>
-      <div class="dreason">${r.reason}</div>
-    </div>
-  `).join("");
-}
-document.getElementById("btnAnalyze").addEventListener("click", runDiff);
-runDiff();
-
-/* ---------------- Section 8: API contract builder (hands-on exercise) ---------------- */
-const MODULE_ID = 6;
-
-const ACFIELDS = ["acMethod","acPath","acAuth","acReqSchema","acSuccess","acErrors","acIdem","acValidation"];
-function saveContractDraft(){
-  const draft = {};
-  ACFIELDS.forEach(id => { draft[id] = document.getElementById(id).value; });
-  CourseProgress.setSection(MODULE_ID, "apiContractDraft", draft);
-}
-ACFIELDS.forEach(id => document.getElementById(id).addEventListener("input", saveContractDraft));
-
-function validateContract(){
-  const method = document.getElementById("acMethod").value;
-  const path = document.getElementById("acPath").value.trim();
-  const auth = document.getElementById("acAuth").value.trim();
-  const req = document.getElementById("acReqSchema").value.trim();
-  const success = document.getElementById("acSuccess").value.trim();
-  const errors = document.getElementById("acErrors").value.trim();
-  const idem = document.getElementById("acIdem").value.trim();
-  const validation = document.getElementById("acValidation").value.trim();
-
-  const checks = [
-    { label: "Method defined", pass: !!method },
-    { label: "Endpoint path defined", pass: path.length > 3 && path.includes("/") },
-    { label: "Authentication defined", pass: auth.length >= 5 },
-    { label: "Request schema defined", pass: req.length >= 3 },
-    { label: "Success response defined (status + body)", pass: /\d{3}/.test(success) && success.length > 5 },
-    { label: "Error handling defined (status codes + when each fires)", pass: /\d{3}/.test(errors) && errors.length > 10 },
-    { label: "Idempotency behavior defined", pass: idem.length >= 15 },
-    { label: "Validation rules defined", pass: validation.length >= 10 },
-  ];
-  const methodSensible = method === "POST" || method === "DELETE";
-  checks.push({ label: "Method choice is defensible for a cancel action (POST or DELETE, not GET)", pass: methodSensible });
-
-  const el = document.getElementById("acChecklist");
-  el.innerHTML = "";
-  checks.forEach(c => {
-    const row = document.createElement("div");
-    row.style.color = c.pass ? "var(--emerald)" : "var(--red)";
-    row.textContent = (c.pass ? "✓ " : "✗ ") + c.label;
-    el.appendChild(row);
-  });
-  const passCount = checks.filter(c => c.pass).length;
-  const summary = document.createElement("div");
-  summary.style.cssText = "margin-top:8px;font-family:'JetBrains Mono';font-size:13px;color:var(--mut2)";
-  summary.textContent = `${passCount} / ${checks.length} checks passing`;
-  el.appendChild(summary);
-
-  saveContractDraft();
-  CourseProgress.setSection(MODULE_ID, "apiContractBuilderChecklist", { passCount, total: checks.length });
-  checkContractExerciseComplete();
-}
-document.getElementById("btnValidateContract").addEventListener("click", validateContract);
-
-const acAnswerKey = [
-  { id: "acQ1", correct: "breaking", reason: "Renaming a field is breaking, any client reading \"name\" gets undefined once the field disappears, even though the value itself didn't change. Adding \"full_name\" alongside \"name\" (not instead of it) would have been the non-breaking path." },
-  { id: "acQ2", correct: "nonbreaking", reason: "Adding a new optional field that existing clients simply ignore is the textbook non-breaking change, nothing that already worked stops working." },
-  { id: "acQ3", correct: "breaking", reason: "A JSON type change is breaking even when the represented value is identical. Strictly-typed clients (e.g. code expecting a number) will fail to parse or compare \"123\" the string against 123 the number." },
-  { id: "acQ4", correct: "breaking", reason: "Making a previously-optional field required breaks every existing client that wasn't sending it, their requests now get rejected where they used to succeed." },
-  { id: "acQ5", correct: "nonbreaking", reason: "Strengthening a guarantee (fewer duplicates, not more) is safe for consumers that were already built to tolerate the weaker guarantee. This is the mirror image of Section 6's rule: weakening a guarantee is breaking, strengthening it generally isn't." },
-];
-let acScore = 0;
-const acAnswered = {};
-acAnswerKey.forEach((q, idx) => {
-  const el = document.getElementById(q.id + "opts");
-  const opts = [
-    { text: "Breaking", value: "breaking" },
-    { text: "Non-breaking", value: "nonbreaking" },
-  ];
-  opts.forEach((opt) => {
-    const div = document.createElement("label");
-    div.className = "qopt";
-    div.innerHTML = `<input type="radio" name="${q.id}" value="${opt.value}"><span>${opt.text}</span>`;
-    div.addEventListener("click", () => {
-      if (acAnswered[q.id]) return;
-      acAnswered[q.id] = true;
-      const correct = opt.value === q.correct;
-      document.querySelectorAll(`#${q.id}opts .qopt`).forEach((e2, j) => {
-        if (opts[j].value === q.correct) e2.classList.add("correct");
-        else if (opts[j].value === opt.value) e2.classList.add("incorrect");
-      });
-      const ex = document.getElementById(q.id + "explain");
-      ex.style.display = "block";
-      ex.textContent = (correct ? "Correct. " : "Not quite. ") + q.reason;
-      if (correct) acScore++;
-      CourseProgress.setAnswer(MODULE_ID, q.id, opt.value);
-      checkContractExerciseComplete();
-    });
-    el.appendChild(div);
-  });
-});
-
-function checkContractExerciseComplete(){
-  const allAnswered = acAnswerKey.every(q => acAnswered[q.id]);
-  const checklistData = CourseProgress.getModule(MODULE_ID).sections.apiContractBuilderChecklist;
-  const checklistOk = checklistData && checklistData.passCount === checklistData.total;
-  if (allAnswered && checklistOk) {
-    CourseProgress.setSection(MODULE_ID, "apiContractBuilder", { passCount: acScore + (checklistOk ? 1 : 0), total: acAnswerKey.length + 1 });
-  } else if (allAnswered) {
-    CourseProgress.setSection(MODULE_ID, "apiContractBuilder", { passCount: acScore, total: acAnswerKey.length + 1 });
-  }
-}
-
-/* ---------------- Quiz ---------------- */
-let score = 0;
-const answered = { q1:false, q2:false, q3:false, q4:false, q5:false };
-
-function updateScore(){
-  document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
-  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
-  const btn = document.getElementById("btnNext");
-  btn.disabled = !allDone;
-  btn.textContent = allDone ? "Continue to Module 7 →" : "Complete all questions to continue →";
-  if (allDone) {
-    CourseProgress.markComplete(MODULE_ID, score, 5);
-    const navNext = document.getElementById("navNextTop");
-    if (navNext) navNext.classList.add("navnext-ready");
-  }
-}
-
-// Q1
-const q1Options = [
-  { text: "DELETE", correct: true },
-  { text: "GET", correct: false, reason: "GET is both safe AND idempotent, it has no side effects at all, which is a stronger property than what the question asks for." },
-  { text: "POST", correct: false, reason: "POST is neither safe nor idempotent by default, it typically creates a new resource on every call." },
-];
-const q1el = document.getElementById("q1opts");
-q1Options.forEach((opt, i) => {
-  const div = document.createElement("label");
-  div.className = "qopt";
-  div.innerHTML = `<input type="radio" name="q1" value="${i}"><span>${opt.text}</span>`;
-  div.addEventListener("click", () => {
-    if (answered.q1) return;
-    answered.q1 = true;
-    CourseProgress.setAnswer(MODULE_ID, "q1", i);
-    document.querySelectorAll('#q1opts .qopt').forEach((el,j) => {
-      if (q1Options[j].correct) el.classList.add("correct");
-      else if (j === i) el.classList.add("incorrect");
-    });
-    const ex = document.getElementById("q1explain");
-    ex.style.display = "block";
-    if (opt.correct) {
-      score++;
-      ex.textContent = "Correct. DELETE has a real side effect (something is removed), so it's not safe, but deleting an already-deleted resource leaves the same end state, so it's idempotent.";
-    } else {
-      ex.textContent = "Not quite. " + opt.reason;
-    }
-    updateScore();
-  });
-  q1el.appendChild(div);
-});
-
-// Q2
-const q2Options = [
-  { text: "True", correct: false },
-  { text: "False", correct: true },
-];
-const q2el = document.getElementById("q2opts");
-q2Options.forEach((opt, i) => {
-  const div = document.createElement("label");
-  div.className = "qopt";
-  div.innerHTML = `<input type="radio" name="q2" value="${i}"><span>${opt.text}</span>`;
-  div.addEventListener("click", () => {
-    if (answered.q2) return;
-    answered.q2 = true;
-    CourseProgress.setAnswer(MODULE_ID, "q2", i);
-    document.querySelectorAll('#q2opts .qopt').forEach((el,j) => {
-      if (q2Options[j].correct) el.classList.add("correct");
-      else if (j === i) el.classList.add("incorrect");
-    });
-    const ex = document.getElementById("q2explain");
-    ex.style.display = "block";
-    if (opt.correct) {
-      score++;
-      ex.textContent = "Correct. RFC 5789 explicitly does not guarantee PATCH idempotency, unlike PUT. A relative-update patch (like an increment) is a valid PATCH that is not idempotent.";
-    } else {
-      ex.textContent = "Not quite. PUT's idempotency is guaranteed by spec because it always REPLACES a resource wholesale. PATCH's effect depends entirely on the patch document, an increment-style PATCH is not idempotent, exactly what the Section 3 interactive demonstrated.";
-    }
-    updateScore();
-  });
-  q2el.appendChild(div);
-});
-
-// Q3
-function checkQ3(){
-  if (answered.q3) return;
-  const val = Number(document.getElementById("q3input").value);
-  const ex = document.getElementById("q3explain");
-  ex.style.display = "block";
-  answered.q3 = true;
-  CourseProgress.setAnswer(MODULE_ID, "q3", val);
-  if (val === 1) {
-    score++;
-    ex.style.color = "var(--emerald)";
-    ex.textContent = "Correct. Only 1: full_name being removed is flagged breaking. display_name being added is flagged safe, the same rule that makes any new response field safe (well-behaved old clients ignore fields they don't recognize). That's the important nuance: the detector doesn't need to flag the addition too for the rename to count as an overall breaking change, the single removal is already enough to break every client reading the old field name.";
-  } else {
-    ex.style.color = "var(--red)";
-    ex.textContent = "Not quite. Run the scenario in Section 5 and count the diffcard results: only full_name being removed is tagged breaking. display_name being added is tagged safe, new response fields are always safe under the additive rule, even when they're conceptually 'replacing' something. That's 1 breaking tag, not 2, but 1 is still enough to make the overall rename breaking.";
-  }
-  updateScore();
-}
-document.getElementById("q3check").addEventListener("click", checkQ3);
-document.getElementById("q3input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") checkQ3();
-});
-
-// Q4
-const q4Options = [
-  { text: "Because Module 2 proved no transport can guarantee true exactly-once delivery, so 'exactly-once' almost certainly means the provider does at-least-once delivery plus their own deduplication, and any gap in that dedup layer will surface as a duplicate on your end", correct: true },
-  { text: "Because providers who say 'exactly-once' are always lying and never actually attempt deduplication", correct: false, reason: "That's too strong, most providers making this claim do real deduplication work. The point isn't distrust, it's that the underlying transport-level guarantee they're built on is provably imperfect, so defense in depth is still worth it." },
-  { text: "Because idempotent handlers are required by the HTTP specification for all webhook consumers", correct: false, reason: "There's no such HTTP specification requirement, idempotent handling is a design recommendation driven by the realities of distributed delivery, not a protocol rule." },
-];
-const q4el = document.getElementById("q4opts");
-q4Options.forEach((opt, i) => {
-  const div = document.createElement("label");
-  div.className = "qopt";
-  div.innerHTML = `<input type="radio" name="q4" value="${i}"><span>${opt.text}</span>`;
-  div.addEventListener("click", () => {
-    if (answered.q4) return;
-    answered.q4 = true;
-    CourseProgress.setAnswer(MODULE_ID, "q4", i);
-    document.querySelectorAll('#q4opts .qopt').forEach((el,j) => {
-      if (q4Options[j].correct) el.classList.add("correct");
-      else if (j === i) el.classList.add("incorrect");
-    });
-    const ex = document.getElementById("q4explain");
-    ex.style.display = "block";
-    if (opt.correct) {
-      score++;
-      ex.textContent = "Correct. This is the Module 2 'effectively-once' argument applied directly to a vendor's claim: trust the effect, but build for the possibility that their dedup layer, like any system, can have a gap.";
-    } else {
-      ex.textContent = "Not quite. " + opt.reason;
-    }
-    updateScore();
-  });
-  q4el.appendChild(div);
-});
-
-// Q5 — new scenario: mixed breaking + safe changes
-function checkQ5(){
-  if (answered.q5) return;
-  const val = Number(document.getElementById("q5input").value);
-  const ex = document.getElementById("q5explain");
-  ex.style.display = "block";
-  answered.q5 = true;
-  CourseProgress.setAnswer(MODULE_ID, "q5", val);
-  if (val === 1) {
-    score++;
-    ex.style.color = "var(--emerald)";
-    ex.textContent = "Correct. Only 1 of the 2 detected changes is breaking: phone becoming required is breaking (tightening a request field). avatar_url being added is safe (a new optional response field). A single release can bundle a breaking and a non-breaking change together, that doesn't make the breaking one any less breaking, it just means you have to read every change individually rather than judging the release as a whole.";
-  } else {
-    ex.style.color = "var(--red)";
-    ex.textContent = "Not quite. Run the scenario and read both diffcards: phone (request) becoming required is breaking, avatar_url (response) being added is safe. That's 1 breaking change out of 2 total.";
-  }
-  updateScore();
-}
-document.getElementById("q5check").addEventListener("click", checkQ5);
-document.getElementById("q5input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") checkQ5();
-});
-
-document.getElementById("btnNext").addEventListener("click", () => {
-  window.location.href = "module-07.html";
-});
-
-/* ---------------- Retry checkpoint ---------------- */
-function maybeShowRetry(){
-  const anyAnswered = answered.q1 || answered.q2 || answered.q3 || answered.q4 || answered.q5;
-  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
-  const btn = document.getElementById("btnRetryCheckpoint");
-  btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
-}
-document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
-  CourseProgress.resetModule(MODULE_ID);
-  window.location.reload();
-});
-const _origUpdateScore = updateScore;
-updateScore = function(){
-  _origUpdateScore();
-  maybeShowRetry();
-};
-maybeShowRetry();
-
-/* ---------------- Progress persistence: restore on load ---------------- */
-CourseProgress.touchVisited(MODULE_ID);
-(function restoreQuizState(){
-  const stored = CourseProgress.getModule(MODULE_ID);
-  const a = stored.answers || {};
-  if (a.q1 !== undefined && !answered.q1) {
-    const label = document.querySelectorAll('#q1opts .qopt')[a.q1];
-    if (label) label.click();
-  }
-  if (a.q2 !== undefined && !answered.q2) {
-    const label = document.querySelectorAll('#q2opts .qopt')[a.q2];
-    if (label) label.click();
-  }
-  if (a.q3 !== undefined && !answered.q3) {
-    const inputEl = document.getElementById('q3input');
-    if (inputEl) { inputEl.value = a.q3; checkQ3(); }
-  }
-  if (a.q4 !== undefined && !answered.q4) {
-    const label = document.querySelectorAll('#q4opts .qopt')[a.q4];
-    if (label) label.click();
-  }
-  if (a.q5 !== undefined && !answered.q5) {
-    const inputEl = document.getElementById('q5input');
-    if (inputEl) { inputEl.value = a.q5; checkQ5(); }
-  }
-  const draft = stored.sections && stored.sections.apiContractDraft;
-  if (draft) {
-    ACFIELDS.forEach(id => { if (draft[id] !== undefined) document.getElementById(id).value = draft[id]; });
-    if (document.getElementById('acMethod').value) validateContract();
-  }
-  acAnswerKey.forEach(q => {
-    if (a[q.id] !== undefined && !acAnswered[q.id]) {
-      const el = document.querySelector(`input[name="${q.id}"][value="${a[q.id]}"]`);
-      if (el) el.click();
-    }
-  });
-})();
+ModuleKit.renderQuiz("quizRoot", [
+  { text: "Why isn't a confident paragraph a ticket classification?",
+    whyOk: "Code branches on fields. A sentence is not priority or topic.",
+    opts: [
+      { t: "Downstream code needs fields it can branch on, not vibes", correct: true },
+      { t: "Models are not allowed to write English", why: "They write English constantly. That is the failure mode." },
+      { t: "Paragraphs cannot be stored", why: "They can. They still cannot be routed." }
+    ] },
+  { text: "The model wrapped valid JSON in a markdown fence. What should happen?",
+    whyOk: "Fences are mechanical. Strip them, then run the same schema check.",
+    opts: [
+      { t: "A cheap repair can strip the fence, then you validate the object", correct: true },
+      { t: "Reject forever — fences mean the model is broken", why: "Fences are common and mechanical." },
+      { t: "Accept the raw string including the backticks", why: "Your CRM does not want backticks." }
+    ] },
+  { text: "Which job belongs to the AI node?",
+    whyOk: "Extract fields. Charges and list email stay in code with keys.",
+    opts: [
+      { t: "Extract topic and priority from the ticket text", correct: true },
+      { t: "Charge the card", why: "Deterministic code with an idempotency key does that." },
+      { t: "Decide whether to email every contact in the CRM", why: "That is an unbounded side effect. Module 7." }
+    ] },
+  { text: "Schema says amount must be a number. The model returns \"about $2400\". You should:",
+    whyOk: "about $2400 is not 2400. Coercing invents precision the text did not have.",
+    opts: [
+      { t: "Fail validation and ask for a clarify — do not silently coerce", correct: true },
+      { t: "Guess 2400 and continue", why: "You invented precision the text did not have." },
+      { t: "Store the string; numbers are a suggestion", why: "Then every report breaks." }
+    ] },
+  { text: "40% of calls need repair and half of those still fail. What is actually wrong?",
+    whyOk: "A stable high fail rate is a prompt or schema problem, not a regex career.",
+    opts: [
+      { t: "The prompt or schema, not 'need more regex'", correct: true },
+      { t: "The internet", why: "A stable high fail rate is a design smell." },
+      { t: "JSON itself", why: "JSON is fine. Your instructions are not landing." }
+    ] },
+], 6);
 </script>
 </body>
 </html>

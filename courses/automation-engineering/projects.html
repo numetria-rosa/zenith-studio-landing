@@ -3,325 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Projects — Automation Engineering</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
-  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
-  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
-}
-body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
-.serif{font-family:'Source Serif 4',serif}
-.mono{font-family:'JetBrains Mono',monospace}
-.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
-.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
-.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
-.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
-.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
-.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
-.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
-.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono'}
-.coursenav a:hover{color:var(--lime)}
-.hero{padding:40px 0 20px}
-.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
-h1{font-size:clamp(26px,4vw,36px);font-weight:700;letter-spacing:-.02em;margin-top:10px}
-.sub{color:var(--mut);font-size:14.5px;max-width:680px;margin-top:10px}
-.disclosure{background:rgba(255,207,77,.08);border:1px solid rgba(255,207,77,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
-.disclosure b{color:var(--amber)}
-.grid{display:grid;gap:14px;margin-top:20px}
-.pcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px 22px;cursor:pointer;transition:.15s}
-.pcard:hover{border-color:var(--bd2)}
-.pcard .ptop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.pcard .pt{font-weight:700;font-size:16px}
-.pcard .pd{font-size:13px;color:var(--mut);margin-top:6px}
-.pcard .pmeta{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center}
-.badge{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 9px;border-radius:99px}
-.badge.beginner{background:rgba(52,229,160,.15);color:var(--emerald)}
-.badge.intermediate{background:rgba(198,244,50,.12);color:var(--lime)}
-.badge.capstone{background:rgba(167,139,250,.15);color:var(--violet)}
-.badge.done{background:rgba(52,229,160,.15);color:var(--emerald)}
-.badge.progress{background:rgba(255,207,77,.14);color:var(--amber)}
-.badge.notstarted{background:var(--card2);color:var(--mut2);border:1px solid var(--bd2)}
-.pscore{font-family:'JetBrains Mono';font-size:12px;color:var(--mut)}
-
-#detailView{display:none}
-button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
-button:hover{border-color:var(--lime);color:var(--lime)}
-button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
-button:disabled{opacity:.4;cursor:not-allowed}
-.section{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px 24px;margin-top:16px}
-.section h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--violet);margin-bottom:12px}
-.section ul{padding-left:18px;font-size:14px;line-height:1.85}
-.section ol{padding-left:18px;font-size:14px;line-height:1.85}
-.checklist label{display:flex;gap:8px;align-items:flex-start;font-size:14px;padding:6px 0;cursor:pointer}
-.checklist input{margin-top:3px}
-details{margin-top:8px}
-summary{cursor:pointer;color:var(--violet);font-size:13.5px;font-weight:600;list-style:none}
-summary::-webkit-details-marker{display:none}
-summary:before{content:"▸ "}
-details[open] summary:before{content:"▾ "}
-.hinttier{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:12px 16px;margin-top:8px;font-size:13.5px;color:var(--mut)}
-.rubricrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)}
-.rubricrow:last-child{border-bottom:none}
-.rubricrow .rlabel{font-size:14px}
-.rubricrow .rweight{font-size:11px;color:var(--mut2);font-family:'JetBrains Mono'}
-.rubricrow select{font-family:'Space Grotesk';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:6px;padding:5px 8px;color:var(--tx)}
-.rubrictotal{margin-top:14px;padding-top:14px;border-top:2px solid var(--bd2);display:flex;justify-content:space-between;align-items:baseline}
-.rubrictotal b{font-family:'JetBrains Mono';font-size:24px;color:var(--tx)}
-.formrow{margin-top:12px}
-.formrow label{font-size:12.5px;color:var(--mut2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
-.formrow input, .formrow textarea{width:100%;font-family:'Space Grotesk';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px;color:var(--tx)}
-.formrow textarea{min-height:70px;resize:vertical}
-.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
-.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
-footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
-@media (max-width:640px){ .wrap{padding:0 16px 60px} }
-</style>
+<title>Projects — AI Automation</title>
+<link rel="stylesheet" href="course.css">
 </head>
 <body>
-<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
-
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Projects</span></div></div>
 <div class="wrap">
-  <div id="listView">
-    <header class="hero">
-      <span class="eyebrow">Projects</span>
-      <h1 class="serif">Combine concepts. Build something real.</h1>
-      <p class="sub">Exercises teach one concept at a time. Projects require you to build something that stands on its own, outside the browser, in your own editor and repo.</p>
-      <div class="disclosure"><b>How grading works here:</b> this is a static, client-side course with no backend, it cannot execute or grade code you write in your own environment. Each project gives you a real rubric, real test cases to verify against, and a self-assessment checklist, honest self-scoring, not an automated grader pretending to run your code.</div>
-    </header>
-    <div class="grid" id="projectGrid"></div>
-  </div>
-
-  <div id="detailView">
-    <header class="hero">
-      <button id="btnBack">&larr; All projects</button>
-      <div class="eyebrow" id="detailTag" style="margin-top:16px"></div>
-      <h1 class="serif" id="detailTitle"></h1>
-      <p class="sub" id="detailSummary"></p>
-    </header>
-
-    <div class="section"><h3>Requirements</h3><ul id="detailRequirements"></ul></div>
-    <div class="section"><h3>Starting point</h3><p id="detailStart" style="font-size:14px;color:var(--tx)"></p></div>
-    <div class="section"><h3>Acceptance criteria (self-check)</h3><div class="checklist" id="detailAcceptance"></div></div>
-    <div class="section"><h3>Test cases to verify against</h3><ul id="detailTests"></ul></div>
-    <div class="section"><h3>Hints</h3><div id="detailHints"></div></div>
-    <div class="section"><h3>Common mistakes</h3><ul id="detailMistakes"></ul></div>
-    <div class="section"><details><summary>Suggested solution outline</summary><div id="detailSolution" style="margin-top:12px;font-size:14px;color:var(--mut)"></div></details></div>
-
-    <div class="section">
-      <h3>Rubric self-assessment</h3>
-      <div id="rubricRows"></div>
-      <div class="rubrictotal"><span>Estimated score</span><b id="rubricTotalVal">0%</b></div>
-    </div>
-
-    <div class="section">
-      <h3>Submission</h3>
-      <div class="formrow"><label>GitHub URL (optional)</label><input type="url" id="ghUrl" placeholder="https://github.com/you/project-name"></div>
-      <div class="formrow"><label>Short description</label><textarea id="projDesc" placeholder="One or two sentences describing what you built..."></textarea></div>
-      <div class="formrow"><label>Technologies used</label><input type="text" id="projTech" placeholder="e.g. Node.js, Express, Jest"></div>
-      <div class="formrow"><label>Tests passed (self-reported, e.g. 18/20)</label><input type="text" id="projTests" placeholder="18/20"></div>
-      <button class="primary" id="btnSaveProject" style="margin-top:16px">Save project</button>
-      <div class="feedback" id="saveFb"></div>
-    </div>
-  </div>
-
-  <footer>Zenith Lab · Automation Engineering · Projects</footer>
+  <header class="hero">
+    <span class="eyebrow">Client briefs</span>
+    <h1 class="serif">Eight projects</h1>
+    <p class="sub">These are client briefs, not in-browser builders. Rebuild each one in n8n, Make, or Zapier if you want a demo you can show. Mark complete on the Portfolio page only after you score the rubric and write the failure modes.</p>
+  </header>
+  <div id="list"></div>
+  <footer>Zenith Lab · AI Automation</footer>
 </div>
-
-<script src="course-progress.js?v=5"></script>
+<script src="course-progress.js"></script>
+<script src="course-rail.js"></script>
 <script>
-const DETAILS = {
-  1: {
-    requirements: ["Represent tasks and their dependencies as a graph structure.", "Validate that every referenced dependency actually exists.", "Detect cycles before allowing execution.", "Compute at least one valid topological execution order."],
-    start: "Start with a plain object or adjacency-list representation: tasks as keys, each mapping to an array of dependency task names. Kahn's algorithm (repeatedly removing zero-in-degree nodes) is the standard approach covered in Module 1.",
-    acceptance: ["Rejects a graph with an undeclared dependency (referencing a task that doesn't exist).", "Detects a 3+ node cycle and reports which tasks are involved.", "Produces a valid topological order for a 6+ node DAG with at least one diamond (fan-in) shape.", "Running the same valid DAG twice produces a deterministic, valid order (doesn't need to be identical, just valid both times)."],
-    tests: ["Empty graph → valid, empty order.", "Single task, no dependencies → order is just that task.", "Linear chain A→B→C → order must be A,B,C.", "Diamond (A,B→C→D) → order must place C after both A and B.", "Cycle (A→B→C→A) → must be rejected with the cycle identified, not silently return a partial order.", "Reference to a non-existent dependency → must be rejected, not ignored."],
-    mistakes: ["Returning a partial order instead of rejecting when a cycle exists.", "Not distinguishing 'missing dependency' from 'cycle', they need different error messages.", "Off-by-one in in-degree counting causing valid DAGs to be falsely flagged as cyclic."],
-    solution: "1. Build an adjacency list and in-degree count for every node.<br>2. Initialize a queue with all zero-in-degree nodes.<br>3. Repeatedly pop a node, append to the order, decrement in-degree of its dependents, push any that reach zero.<br>4. If the final order's length is less than the total node count, a cycle exists among the unprocessed nodes, report those specifically.",
-  },
-  2: {
-    requirements: ["Accept an idempotency key on write operations.", "Return the original result for a repeated key with an identical body.", "Reject (409) a repeated key with a different body.", "Validate request input before processing.", "Document the contract per Module 6's checklist."],
-    start: "A simple in-memory map from idempotency key to { requestHash, result } is enough to demonstrate the pattern. In a real system this would be a database table with a unique constraint on the key.",
-    acceptance: ["A first request with a new key creates a resource and stores the result.", "A retry with the same key and same body returns the original result, doesn't create a second resource.", "A retry with the same key but a different body is rejected with a conflict, not silently processed.", "Two concurrent requests with the same new key don't both succeed in creating separate resources (test with a real concurrent call, e.g. Promise.all)."],
-    tests: ["POST with new key → 201, resource created.", "POST again, same key, same body → 200, same resource returned, no duplicate.", "POST again, same key, different body → 409 conflict.", "Two concurrent POSTs, same new key → exactly one resource created.", "POST with invalid body (missing required field) → 400, no resource created."],
-    mistakes: ["Non-atomic check-then-create allowing the concurrent-duplicate test to fail.", "No expiry policy on stored keys.", "Returning 500 instead of 409 for a body mismatch, or silently accepting the new body."],
-    solution: "1. Hash the request body.<br>2. Atomically check-and-reserve the idempotency key (a DB unique constraint or an atomic map operation both work for a demo).<br>3. If key exists with matching body hash, return the stored result.<br>4. If key exists with a different body hash, return 409.<br>5. If key is new, process the request, store the result keyed by (key, bodyHash).",
-  },
-  3: {
-    requirements: ["Implement retry with exponential backoff and a delay cap.", "Add jitter to prevent synchronized retries.", "Implement a circuit breaker with Closed/Open/Half-Open states.", "Write automated tests using an injected fake clock/sleep, not real timers."],
-    start: "Inject `sleep` and `clock` as parameters/dependencies rather than calling real timers directly, this is what makes your tests fast and deterministic instead of actually waiting seconds per test, the same pattern used in this course's own Module 3 exercises.",
-    acceptance: ["Retry delay grows exponentially and respects a configured cap.", "Jitter changes the delay across repeated calls with the same attempt number (not identical every time).", "Circuit breaker opens after N consecutive failures and fails fast without calling the underlying function while Open.", "Circuit breaker transitions to Half-Open after a cooldown and closes again on a successful trial call."],
-    tests: ["3 consecutive failures then success → succeeds on the retry, correct number of calls made.", "Delay for attempt N never exceeds the configured cap.", "Two calls at the same attempt number produce different (jittered) delays.", "After the failure threshold, breaker is Open and the wrapped function is NOT called on the next attempt.", "After the cooldown window, breaker allows exactly one trial call (Half-Open), and closes on success."],
-    mistakes: ["Testing with real `setTimeout`/`sleep`, making the suite slow and flaky instead of using an injected fake.", "Circuit breaker's Half-Open state allowing unlimited calls instead of one trial call.", "Retry logic calling through an Open breaker instead of failing fast."],
-    solution: "1. Write `retryWithBackoff(fn, options, sleep)` computing `min(cap, base*mult^attempt) + jitter` between attempts.<br>2. Write `createCircuitBreaker(options, clock)` tracking failure count and state, exposing `call(fn)` that throws immediately when Open.<br>3. Test both with injected fakes so time never actually passes during the test run.",
-  },
-  4: {
-    requirements: ["Accept arrival rate (λ), service rate per worker (μ), and worker count as input.", "Compute utilization (ρ), expected wait time, and average jobs in system.", "Predict whether the system can sustain a given traffic level under a target ρ.", "Support a 'what if traffic increases by X%' recalculation."],
-    start: "This can be a small CLI script or a simple web form, the core logic is just the M/M/1 formulas from Module 4's cheat sheet: ρ=λ/μ_total, Wq=λ/(μ(μ−λ)), L=ρ/(1−ρ).",
-    acceptance: ["Correctly computes ρ for a given λ, μ, and worker count.", "Correctly flags when ρ ≥ 1 (unstable) versus a specific target threshold (e.g. 0.8).", "Given a traffic increase percentage, recomputes ρ and clearly states whether the target is still met.", "Recommends a minimum worker count to satisfy a given target ρ, rounding UP."],
-    tests: ["λ=40, μ=15/worker, 3 workers → ρ≈0.89, correctly flagged as exceeding a 0.8 target.", "Same inputs, 4 workers → ρ≈0.67, correctly flagged as meeting the target.", "λ=40 +30% → λ=52, recompute against the same worker count, correct new ρ.", "Minimum-workers calculation rounds up, not down, for a fractional result."],
-    mistakes: ["Rounding worker recommendations down instead of up.", "Treating 'capacity > traffic' as sufficient without checking the actual target ρ.", "Forgetting μ is PER WORKER, and needs to be multiplied by worker count for total capacity."],
-    solution: "1. total_capacity = workers × μ.<br>2. ρ = λ / total_capacity.<br>3. Wq = λ / (total_capacity × (total_capacity − λ)) when λ < total_capacity, else undefined/unstable.<br>4. min_workers = ceil(λ / (target_ρ × μ)).",
-  },
-  5: {
-    requirements: ["Implement HMAC signature generation and verification.", "Verify signatures using a constant-time comparison.", "Implement replay protection via timestamp freshness and seen-ID tracking.", "Defend against at least 3 named attack scenarios."],
-    start: "Use your language's real crypto library (e.g. Node's `crypto.createHmac` / `crypto.timingSafeEqual`, or the Web Crypto API), never hand-roll HMAC or a comparison function yourself.",
-    acceptance: ["A correctly-signed, fresh request is accepted.", "A request with a tampered body (signature no longer matches) is rejected.", "A correctly-signed but stale (old timestamp) request is rejected.", "An exact replay of a previously-seen valid request is rejected on the second attempt.", "Comparison is demonstrably constant-time (not vulnerable to a naive string-equality timing attack)."],
-    tests: ["Attack scenario 1 — tampered body: modify one byte of a validly-signed payload, must be rejected.", "Attack scenario 2 — replay: resend an identical, validly-signed, previously-accepted payload, must be rejected the second time.", "Attack scenario 3 — stale timestamp: a validly-signed payload with a timestamp from an hour ago, must be rejected.", "Attack scenario 4 (bonus) — wrong secret: a payload signed with a different secret, must be rejected."],
-    mistakes: ["Verifying against the parsed/re-serialized body instead of the original raw bytes.", "Using `===` for signature comparison instead of a constant-time function.", "Checking timestamp OR seen-ID but not both, both are needed for full replay protection."],
-    solution: "1. On send: compute HMAC over raw body + timestamp, attach both as headers.<br>2. On receive: read raw bytes, recompute HMAC, compare constant-time.<br>3. Reject if timestamp is older than an allowed window.<br>4. Track seen (ID, timestamp) pairs for the replay window, reject exact repeats.",
-  },
-  6: {
-    requirements: ["Design an initial API contract (V1) with a documented schema.", "Evolve it to V2 with at least one added capability.", "Ensure the evolution introduces zero unnecessary breaking changes.", "Document versioning strategy and error model."],
-    start: "Pick a small real domain (e.g. a 'notes' or 'tasks' API) so the contract decisions are concrete rather than abstract. Write the contract as an OpenAPI-style spec or even a clear markdown table, the format matters less than the completeness.",
-    acceptance: ["V1 contract documents method, path, auth, request/response schema, and error responses for every endpoint.", "V2 adds real capability (e.g. a new field or endpoint) without breaking any V1 client.", "Every mutating endpoint's idempotency behavior is explicitly documented.", "A breaking change (if any exists between versions) is isolated to a clearly versioned path, not silently applied in place."],
-    tests: ["A V1 client's exact request against V2 still succeeds with the same meaning.", "Newly-added V2 fields are optional or additive, never required on existing endpoints.", "Every documented error response states the specific condition that triggers it."],
-    mistakes: ["Renaming a field 'for clarity' between versions without a migration path.", "Leaving idempotency behavior undocumented for a POST/PUT endpoint.", "Treating 'not technically removed' as the same as 'non-breaking' when a field's meaning quietly changed."],
-    solution: "1. Write the V1 contract fully, including error responses.<br>2. List every capability V2 needs to add.<br>3. For each, classify breaking vs non-breaking using Module 6's rules.<br>4. Anything breaking goes behind a new version path or a new optional field, never an in-place mutation of V1 behavior.",
-  },
-  7: {
-    requirements: ["Emit structured logs with a correlation ID on every request.", "Expose at least one metric (e.g. request count, error rate, or latency).", "Track errors distinctly from successful requests.", "Define at least one SLI/SLO pair with a stated time window.", "Diagnose a deliberately-injected failure using only your own telemetry."],
-    start: "You don't need a full observability stack, structured JSON logs to stdout plus a simple in-memory counter for metrics is enough to demonstrate the concepts genuinely.",
-    acceptance: ["Every log line for one request shares the same correlation ID, across every function/service boundary it passes through.", "At least one metric can answer 'what's my current error rate' without manually grepping raw logs.", "The SLO includes a specific target percentage AND a specific time window, not just a bare number.", "A deliberately-broken request can be traced end-to-end using only the logs and metrics you built, no external debugger."],
-    tests: ["Trigger a deliberate failure, confirm you can find every related log line via the correlation ID alone.", "Confirm the error-rate metric changes when you inject failures, and recovers when you stop.", "State the error budget in minutes for your chosen SLO and window, and verify the arithmetic."],
-    mistakes: ["Logging without a correlation ID, making multi-step requests untraceable.", "An SLO with a percentage but no time window (incomplete, per Module 7).", "Metrics that only show current instantaneous state with no way to see a trend over time."],
-    solution: "1. Generate one correlation ID per incoming request, thread it through every function call and log line.<br>2. Log structured JSON: {correlation_id, service, event, timestamp, ...}.<br>3. Track counters for total requests and errors, compute error rate on demand.<br>4. Define SLO explicitly: e.g. '99% success over a rolling 24h window'.",
-  },
-  8: {
-    requirements: ["Combine DAG execution, idempotency, retry+circuit breaker, capacity awareness, HMAC-secured input, a documented API contract, and structured observability into one system.", "Provide an architecture diagram.", "Provide a README explaining design decisions.", "Document at least 3 concrete failure scenarios and how the system handles each.", "Provide automated tests.", "State an SLO for the system."],
-    start: "Pick one coherent scenario, e.g. a lead-processing or notification pipeline, don't try to demo every module's concept as an unrelated add-on, they should work together as one system the way they do in Module 8's capstone.",
-    acceptance: ["A DAG defines the pipeline's stages with real dependency ordering.", "At least one mutating step is idempotency-key protected.", "At least one external call has retry+backoff+jitter AND a circuit breaker.", "At least one endpoint is HMAC-secured with replay protection.", "The API contract is documented, including idempotency and error behavior.", "Structured logs with correlation IDs make at least one injected failure traceable end-to-end.", "An SLO is stated with a specific target and window.", "Automated tests cover the DAG, the idempotency logic, and the retry/circuit-breaker logic at minimum."],
-    tests: ["End-to-end happy path succeeds and produces the expected final state.", "A duplicate request (same idempotency key) doesn't double-process.", "An injected downstream failure triggers retries, then the circuit breaker, without cascading.", "A forged/unsigned request to the secured endpoint is rejected.", "A deliberately broken run can be diagnosed using only the system's own logs."],
-    mistakes: ["Building each module's feature as an isolated demo instead of one integrated pipeline.", "Skipping tests for the 'boring' parts (DAG validation, idempotency) in favor of only testing the interesting failure injection.", "An architecture diagram that doesn't match what the code actually does."],
-    solution: "This is intentionally the least prescriptive project, the previous 7 projects and the Module 8 capstone exercise are your reference implementations for each individual piece, the work here is INTEGRATING them into one coherent, documented system, not inventing new techniques.",
-  },
-};
-
-function projectState(id){ return CourseProgress.getProject(id); }
-function rubricTotal(id){
-  const rubric = CourseProgress.rubricForProject(id);
-  const state = projectState(id);
-  let total = 0;
-  rubric.forEach(r => {
-    const raw = Number(state.rubricScores[r.key]);
-    const clamped = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
-    total += clamped / 100 * r.weight;
-  });
-  return Math.max(0, Math.min(100, Math.round(total)));
-}
-
-function renderList(){
-  const grid = document.getElementById("projectGrid");
-  grid.innerHTML = "";
-  CourseProgress.PROJECTS.forEach(p => {
-    const state = projectState(p.id);
-    const score = rubricTotal(p.id);
-    const card = document.createElement("div");
-    card.className = "pcard";
-    const diffCls = p.difficulty === "Beginner" ? "beginner" : p.difficulty === "Capstone-level" ? "capstone" : "intermediate";
-    let statusBadge = `<span class="badge notstarted">Not started</span>`;
-    if (state.completed) statusBadge = `<span class="badge done">✓ Completed</span>`;
-    else if (score > 0) statusBadge = `<span class="badge progress">In progress</span>`;
-    card.innerHTML = `
-      <div class="ptop"><div class="pt">Project ${p.id} — ${p.title}</div><span class="badge ${diffCls}">${p.difficulty}</span></div>
-      <div class="pd">${p.summary}</div>
-      <div class="pmeta">${statusBadge}<span class="pscore">Modules ${p.modules.join(", ")}${score > 0 ? ` · Rubric: ${score}%` : ""}</span></div>
-    `;
-    card.addEventListener("click", () => openProject(p.id));
-    grid.appendChild(card);
-  });
-}
-
-let currentProjectId = null;
-function openProject(id){
-  currentProjectId = id;
-  const p = CourseProgress.PROJECTS.find(x => x.id === id);
-  const d = DETAILS[id];
-  const state = projectState(id);
-  document.getElementById("listView").style.display = "none";
-  document.getElementById("detailView").style.display = "block";
-  document.getElementById("detailTag").textContent = `Project ${id} · ${p.difficulty} · Modules ${p.modules.join(", ")}`;
-  document.getElementById("detailTitle").textContent = p.title;
-  document.getElementById("detailSummary").textContent = p.summary;
-  document.getElementById("detailRequirements").innerHTML = d.requirements.map(r => `<li>${r}</li>`).join("");
-  document.getElementById("detailStart").textContent = d.start;
-  document.getElementById("detailAcceptance").innerHTML = d.acceptance.map((a, i) => `<label><input type="checkbox" data-key="acc_${i}" ${state.checklist["acc_"+i] ? "checked" : ""}>${a}</label>`).join("");
-  document.getElementById("detailTests").innerHTML = d.tests.map(t => `<li>${t}</li>`).join("");
-  document.getElementById("detailMistakes").innerHTML = d.mistakes.map(m => `<li>${m}</li>`).join("");
-  document.getElementById("detailSolution").innerHTML = d.solution;
-  document.getElementById("detailHints").innerHTML = `
-    <details><summary>Hint 1 — conceptual</summary><div class="hinttier">Re-read the relevant module's cheat sheet section before diving into code, the requirements above map directly onto concepts already covered.</div></details>
-    <details><summary>Hint 2 — specific</summary><div class="hinttier">Look at the "Common mistakes" list above first, most students hit exactly one of those, identify which one applies to your current approach before writing more code.</div></details>
-    <details><summary>Hint 3 — near-solution</summary><div class="hinttier">${d.solution.replace(/<br>/g, " ")}</div></details>
-  `;
-  document.querySelectorAll('#detailAcceptance input').forEach(cb => {
-    cb.addEventListener("change", () => {
-      const cur = projectState(id);
-      cur.checklist[cb.dataset.key] = cb.checked;
-      CourseProgress.setProject(id, { checklist: cur.checklist });
-    });
-  });
-
-  const rubric = CourseProgress.rubricForProject(id);
-  const rows = document.getElementById("rubricRows");
-  rows.innerHTML = "";
-  rubric.forEach(r => {
-    const row = document.createElement("div");
-    row.className = "rubricrow";
-    const val = state.rubricScores[r.key] || 0;
-    row.innerHTML = `<div><span class="rlabel">${r.label}</span> <span class="rweight">${r.weight}%</span></div>
-      <select data-key="${r.key}">
-        <option value="0" ${val==0?"selected":""}>Not attempted</option>
-        <option value="50" ${val==50?"selected":""}>Partial</option>
-        <option value="80" ${val==80?"selected":""}>Good</option>
-        <option value="100" ${val==100?"selected":""}>Excellent</option>
-      </select>`;
-    rows.appendChild(row);
-  });
-  rows.querySelectorAll("select").forEach(sel => {
-    sel.addEventListener("change", () => {
-      const cur = projectState(id);
-      cur.rubricScores[sel.dataset.key] = Number(sel.value);
-      CourseProgress.setProject(id, { rubricScores: cur.rubricScores });
-      document.getElementById("rubricTotalVal").textContent = rubricTotal(id) + "%";
-    });
-  });
-  document.getElementById("rubricTotalVal").textContent = rubricTotal(id) + "%";
-
-  document.getElementById("ghUrl").value = state.githubUrl || "";
-  document.getElementById("projDesc").value = state.description || "";
-  document.getElementById("projTech").value = state.technologies || "";
-  document.getElementById("projTests").value = state.testsPassed || "";
-  document.getElementById("saveFb").className = "feedback";
-}
-
-document.getElementById("btnSaveProject").addEventListener("click", () => {
-  const id = currentProjectId;
-  CourseProgress.setProject(id, {
-    githubUrl: document.getElementById("ghUrl").value.trim(),
-    description: document.getElementById("projDesc").value.trim(),
-    technologies: document.getElementById("projTech").value.trim(),
-    testsPassed: document.getElementById("projTests").value.trim(),
-    completed: true,
-    completedAt: new Date().toISOString(),
-    score: rubricTotal(id),
-  });
-  const fb = document.getElementById("saveFb");
-  fb.className = "feedback ok";
-  fb.textContent = "Saved. This project now appears in My Portfolio.";
-  renderList();
+const list = document.getElementById("list");
+CourseProgress.PROJECTS.forEach(function (p) {
+  const rub = CourseProgress.rubricForProject(p.id).map(function (r) { return r.label + " " + r.weight + "%"; }).join(" · ");
+  const box = document.createElement("div");
+  box.className = "box";
+  box.style.marginTop = "14px";
+  box.innerHTML = "<h4>" + CourseProgress.escapeHtml(p.title) + " · " + CourseProgress.escapeHtml(p.difficulty) + "</h4><p>" +
+    CourseProgress.escapeHtml(p.summary) + "</p><p class='assume'>" + CourseProgress.escapeHtml(rub) + "</p>";
+  list.appendChild(box);
 });
-
-document.getElementById("btnBack").addEventListener("click", () => {
-  document.getElementById("detailView").style.display = "none";
-  document.getElementById("listView").style.display = "block";
-  renderList();
-});
-
-renderList();
+const hw = document.createElement("div");
+hw.className = "callout";
+hw.style.marginTop = "28px";
+hw.innerHTML = "<b>Off-platform homework.</b> The labs here train judgment on a simulated runtime. They do not log into HubSpot or Stripe. For each brief: draw trigger → transform → side effect on paper, then rebuild it in the tool your client can open. Leave keys, retry budget, and who approves money in the write-up.";
+list.appendChild(hw);
 </script>
 </body>
 </html>

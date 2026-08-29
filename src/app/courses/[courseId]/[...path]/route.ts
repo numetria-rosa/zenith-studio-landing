@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { auth } from "@/lib/auth";
+import { decideCourseAccess } from "@/lib/course-access";
 import { getCourse } from "@/lib/courses";
 import { hasCourseAccess } from "@/lib/entitlements";
 
@@ -34,27 +35,33 @@ export async function GET(
     return new NextResponse("Not found", { status: 404 });
   }
 
-  const session = await auth();
-  if (!session?.user?.id) {
-    const callbackUrl = encodeURIComponent(request.nextUrl.pathname);
-    return NextResponse.redirect(new URL(`/sign-in?callbackUrl=${callbackUrl}`, request.url));
-  }
-
-  if (!(await hasCourseAccess(session.user.id, courseId))) {
-    return NextResponse.redirect(new URL(`/courses/${courseId}`, request.url));
-  }
-
-  // Clean URLs: every course page is addressed without ".html" (e.g.
-  // /courses/data-science/syllabus, not /syllabus.html). A request that
-  // still spells out ".html" — an old link, a bookmark — gets redirected
-  // to the canonical form rather than served directly, so the address bar
-  // only ever shows the clean version.
+  // Strip .html before auth so a bookmark like /dashboard.html signs the
+  // student back into /dashboard, not a callback that still carries .html.
   const lastSegment = pathSegments[pathSegments.length - 1] ?? "";
   if (lastSegment.toLowerCase().endsWith(".html")) {
     const canonicalSegments = [...pathSegments.slice(0, -1), lastSegment.slice(0, -".html".length)];
     const canonicalUrl = new URL(`/courses/${courseId}/${canonicalSegments.join("/")}`, request.url);
     canonicalUrl.search = request.nextUrl.search;
     return NextResponse.redirect(canonicalUrl, 308);
+  }
+
+  const session = await auth();
+  const userId = session?.user?.id ?? null;
+  const entitled = userId ? await hasCourseAccess(userId, courseId) : false;
+  const decision = decideCourseAccess({
+    coursePublished: true,
+    userId,
+    entitled,
+  });
+  if (decision.action === "redirect-sign-in") {
+    const callbackUrl = encodeURIComponent(request.nextUrl.pathname);
+    return NextResponse.redirect(new URL(`/sign-in?callbackUrl=${callbackUrl}`, request.url));
+  }
+  if (decision.action === "redirect-landing") {
+    return NextResponse.redirect(new URL(`/courses/${courseId}`, request.url));
+  }
+  if (decision.action !== "serve") {
+    return new NextResponse("Not found", { status: 404 });
   }
 
   // Path-traversal guard: the resolved path must stay inside contentDir no

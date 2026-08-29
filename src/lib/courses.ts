@@ -9,7 +9,7 @@
    one file to update instead of keeping .env and Vercel's env vars in sync.
    Created via scripts/create-whop-products.mjs on 2026-08-21.
 
-   Adding a fifth course later means adding one entry here, not touching the
+   Adding another course later means adding one entry here, not touching the
    access-control system. */
 
 export type Course = {
@@ -56,13 +56,13 @@ export const COURSES: Course[] = [
     slug: "data-science",
     title: "Data Science & Analysis",
     description:
-      "Twelve weeks, three entry tracks, spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards, and a Career Path Edition built around actually getting paid. No prior coding required.",
+      "Twelve weeks, spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards built in Python, and Tableau/Power BI judgment practiced as labeled simulations. Career Path Edition is honest about junior roles. No prior coding required.",
     thumbnail: "/lab/data-science.webp",
     whopAccessPassId: "prod_9eVAjfMpwcaX8",
     whopPlanId: "plan_ysRjmrPzOn9j1",
     checkoutUrl: "https://whop.com/checkout/plan_ysRjmrPzOn9j1",
     contentDir: "courses/data-science",
-    firstLessonPath: "dashboard",
+    firstLessonPath: "module-00",
     waitlistUrl:
       "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20Data%20Science%20%26%20Analysis%0A",
     // All 9 modules, all 315 practice tasks (SQL/Excel/Python/Statistics/
@@ -75,6 +75,46 @@ export const COURSES: Course[] = [
     // revocation, and cross-course isolation all confirmed, test data
     // cleaned up afterward) before flipping this to true.
     published: true,
+  },
+  {
+    id: "ai-automation",
+    slug: "ai-automation",
+    title: "AI Automation",
+    description:
+      "Build client-ready workflow judgment: process mapping, simulated API and webhook labs, retries, idempotency, and bounded AI steps. No programming required. n8n is the example, not the product. Does not promise clients or a job.",
+    thumbnail: "/lab/ai-engineering.webp",
+    whopAccessPassId: "",
+    whopPlanId: "",
+    checkoutUrl: "",
+    contentDir: "courses/automation-engineering",
+    firstLessonPath: "dashboard",
+    waitlistUrl:
+      "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20AI%20Automation%0A",
+    // Content is built (8 modules, 80 practice tasks, 8 projects). Whop
+    // product/plan not created yet — checkout falls back to the waitlist.
+    // Create the $149 product via scripts/create-whop-products.mjs, then
+    // fill the three Whop fields and set the catalog card available: true.
+    published: true,
+  },
+  {
+    id: "ai-assisted-software-engineering",
+    slug: "ai-assisted-software-engineering",
+    title: "AI-Assisted Software Engineering",
+    description:
+      "Twelve weeks for people who have never shipped code: HTML, CSS, and JavaScript by hand, then Cursor, GitHub, tests, and a live URL. Not AI Engineering (that course builds LLM products). No job guarantee.",
+    thumbnail: "/lab/data-science.webp",
+    whopAccessPassId: "",
+    whopPlanId: "",
+    checkoutUrl: "",
+    contentDir: "courses/ai-assisted-software-engineering",
+    firstLessonPath: "module-00",
+    waitlistUrl:
+      "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20AI-Assisted%20Software%20Engineering%0A",
+    // Content is on disk (modules, practice libraries, desktop labs). Keep
+    // unpublished until the structural verifier, live gate tests, and a real
+    // Whop product exist. Flipping this to true would start serving files
+    // through the guarded course route.
+    published: false,
   },
 ];
 

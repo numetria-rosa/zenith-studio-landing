@@ -3,1061 +3,154 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 2: Idempotency &amp; Exactly-Once Semantics</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
-  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
-  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
-.serif{font-family:'Source Serif 4',serif}
-.mono{font-family:'JetBrains Mono',monospace}
-.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
-.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
-.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
-.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
-.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
-.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
-.progress{height:3px;background:var(--bd)}
-.progress i{display:block;height:100%;background:var(--lime);width:25%}
-.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
-.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
-h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
-.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
-.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
-.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
-.objectives ul{list-style:none;display:grid;gap:6px}
-.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
-.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
-section{padding:40px 0;border-bottom:1px solid var(--bd)}
-.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
-.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
-.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
-p{color:var(--tx);font-size:15.5px}
-p.mut{color:var(--mut)}
-p+p{margin-top:14px}
-.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
-.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
-.def p{font-size:14.5px}
-code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
-.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
-.callout b{color:var(--amber)}
-.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
-.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
-.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
-
-button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
-button:hover{border-color:var(--lime);color:var(--lime)}
-button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
-button.primary:hover{filter:brightness(1.08);color:var(--limed)}
-button:disabled{opacity:.4;cursor:not-allowed}
-.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
-.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
-.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
-.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
-
-/* toggle switch */
-.toggle{display:inline-flex;align-items:center;gap:10px;font-size:13px;color:var(--mut);cursor:pointer;user-select:none}
-.toggle .track{width:42px;height:24px;border-radius:99px;background:var(--card2);border:1px solid var(--bd2);position:relative;transition:.15s}
-.toggle .track:after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--mut2);transition:.15s}
-.toggle.on .track{background:rgba(198,244,50,.18);border-color:var(--lime)}
-.toggle.on .track:after{background:var(--lime);left:20px}
-.toggle.on .lbltext{color:var(--lime)}
-
-/* timeline log (retry sim + race sim) */
-.simlog{margin-top:16px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;min-height:60px;max-height:260px;overflow-y:auto}
-.simlog .row{font-family:'JetBrains Mono';font-size:12.5px;color:var(--mut);padding:4px 0;display:flex;gap:8px;align-items:flex-start}
-.simlog .row .tag{flex-shrink:0;font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;text-transform:uppercase}
-.simlog .row.client .tag{background:rgba(167,139,250,.15);color:var(--violet)}
-.simlog .row.server .tag{background:rgba(198,244,50,.12);color:var(--lime)}
-.simlog .row.warn{color:var(--amber)}
-.simlog .row.warn .tag{background:rgba(255,207,77,.15);color:var(--amber)}
-.simlog .row.bad{color:var(--red)}
-.counter{margin-top:16px;display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:10px;background:var(--bg2);border:1px solid var(--bd)}
-.counter .n{font-family:'JetBrains Mono';font-size:26px;font-weight:700;color:var(--tx)}
-.counter.warn .n{color:var(--red)}
-.counter.ok .n{color:var(--emerald)}
-.counter .lbl2{font-size:13px;color:var(--mut)}
-
-/* race lanes */
-.lanes{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
-.lane{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;min-height:180px}
-.lane .lname{font-family:'JetBrains Mono';font-size:11px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
-.lane .row{font-family:'JetBrains Mono';font-size:12px;color:var(--mut);padding:3px 0}
-.lane .row.win{color:var(--emerald)}
-.lane .row.lose{color:var(--red)}
-@media (max-width:640px){ .lanes{grid-template-columns:1fr} }
-
-/* quiz */
-.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
-.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
-.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
-.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
-.qopt:hover{border-color:var(--bd2)}
-.qopt input{margin-top:3px}
-.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
-.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
-.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
-.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
-.numinput input{width:80px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
-.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
-.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
-.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
-.nextbtn{margin-left:auto}
-footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
-
-/* orientation panel */
-.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
-.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
-.orient p{font-size:14.5px;color:var(--mut)}
-.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
-.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
-.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
-
-/* practice (ungraded, self-check) */
-.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
-.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
-.practice p{font-size:14px}
-.practice details{margin-top:12px}
-.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
-.practice summary::-webkit-details-marker{display:none}
-.practice summary:before{content:"▸ "}
-.practice details[open] summary:before{content:"▾ "}
-.practice details:not([open]) .ans{display:none}
-.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
-
-/* tiered hints for code exercises */
-.hintbox{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 20px;margin-top:14px}
-.hintbox .hlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.hintbox .husage{font-size:11px;color:var(--mut2);font-weight:400;text-transform:none;letter-spacing:0}
-.hintbox details{margin-top:8px;border-top:1px solid var(--bd);padding-top:8px}
-.hintbox details:first-of-type{border-top:none;padding-top:0}
-.hintbox summary{cursor:pointer;color:var(--amber);font-size:13px;list-style:none;font-weight:600}
-.hintbox summary::-webkit-details-marker{display:none}
-.hintbox summary:before{content:"▸ "}
-.hintbox details[open] summary:before{content:"▾ "}
-.hintbox .hbody{margin-top:8px;color:var(--tx);font-size:13.5px;line-height:1.7}
-.hintbox details.locked summary{color:var(--mut2);cursor:not-allowed}
-.hintbox .lockmsg{margin-top:8px;color:var(--mut2);font-size:12.5px;font-style:italic}
-
-@media (max-width:640px){
-  .wrap{padding:0 16px 60px}
-  h1{font-size:26px}
-  .kh h2{font-size:18px}
-  .interactive{padding:16px}
-  .orient{padding:20px 18px}
-}
-
-/* course navigation bar */
-.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
-.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
-.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
-.coursenav a:hover{color:var(--lime)}
-.coursenav .navsep{flex:1}
-.coursenav .navdim{color:var(--mut2);cursor:default;pointer-events:none}
-@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
-</style>
+<title>Module 2: Data That Moves</title>
+<link rel="stylesheet" href="course.css">
 </head>
 <body>
-
-<div class="bar"><div class="in">
-  <span class="logo">ZENITH<b>LAB</b></span>
-  <span class="tag">Automation Engineering · Module 2 of 8</span>
-</div></div>
-<div class="progress"><i></i></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-01.html">&larr; <span class="navlabel">Module 1</span></a><span class="navsep"></span><a href="module-03.html" id="navNextTop">Module 3 <span class="navlabel">&rarr;</span></a></div></div>
-
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 2</span></div></div>
+<div class="progress"><i style="width:25%"></i></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 02</span>
-    <h1 class="serif">Idempotency &amp; Exactly-Once Semantics</h1>
-    <p class="sub">Networks fail mid-request. Clients retry. Without idempotency, a retried "charge the card" becomes two charges. This module derives idempotency-key design from first principles and distinguishes at-most-once, at-least-once, and exactly-once delivery, and why the third one is usually a lie your tooling tells you.</p>
-
-    <div class="objectives">
-      <div class="lbl">Learning objectives</div>
+    <span class="eyebrow">Module 2 · ~45 minutes</span>
+    <h1 class="serif">Data that moves</h1>
+    <p class="sub">Every integration is a translation job. The form says Full Name. The CRM says first_name and last_name. If you map it wrong, you still "built an automation" — you just built a wrong one.</p>
+    <div class="objectives"><div class="lbl">You will be able to</div>
       <ul>
-        <li>Design an idempotency-key scheme that survives concurrent duplicate requests</li>
-        <li>Explain why "exactly-once" is achieved via at-least-once delivery plus idempotent handling, not a magic transport guarantee</li>
-        <li>Identify non-idempotent operations in an existing workflow and fix them</li>
+        <li>Read a nested JSON payload and pull a field out by path</li>
+        <li>Refuse to create a contact when the email is missing</li>
+        <li>Explain why a successful HTTP 200 can still store garbage</li>
       </ul>
     </div>
   </header>
 
-  <div class="orient">
-    <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module assumes</h3>
-    <p>Module 1 gave you the DAG and the FSM, the two shapes workflows come in. This module assumes you're comfortable with both, because the bug this module is about hides inside individual <i>steps</i> of a DAG or individual <i>transitions</i> of an FSM: a step that looks correct in isolation but silently breaks when the network does something a demo environment never does, delivers the same request twice.</p>
-
-    <h3 class="serif">What this module does</h3>
-    <p>It answers one question in full rigor: when a client doesn't get a response, was the request never processed, or was it processed and only the response lost? The client cannot tell the difference. That single fact is the root of almost every duplicate-charge, duplicate-email, duplicate-order bug you will ever debug in production automation. This module derives, from that fact, why retries are unavoidable, why "exactly-once" as a network guarantee is impossible, and what you build instead.</p>
-
-    <h3 class="serif">What's assumed</h3>
-    <div class="assume">Module 1 completed, specifically comfort with reading a definition, then a proof, then testing it against a live interactive.</div>
-    <div class="assume">No networking background required. "Request," "response," and "timeout" are used in their everyday sense and nothing more technical is assumed.</div>
-
-    <h3 class="serif">How to work through it</h3>
-    <ol>
-      <li>Read the definition and the proof under it, the proof in Section 3 is a genuinely famous result in distributed systems, not filler.</li>
-      <li>Run the live interactive, both of them simulate real timing and real race conditions, they are not canned animations.</li>
-      <li>Answer the practice check before revealing the answer.</li>
-      <li>Finish with the graded checkpoint.</li>
-    </ol>
-  </div>
-
   <section>
-    <div class="kh"><span class="num">1</span><h2 class="serif">The problem retries create</h2></div>
-    <p>A client sends a request: "charge this card $50." The server receives it, charges the card, and sends back a response: "done." But the response is lost, a dropped packet, a proxy timeout, a server restart mid-response, doesn't matter which. The client, having sent a request and received nothing back, has exactly one fact available to it: <i>no response arrived</i>. It does not know whether the server never received the request, or received it, processed it, and only the acknowledgment was lost.</p>
-    <p style="margin-top:12px">Those two situations look <i>identical</i> from the client's side. And a client that wants to be reliable has to do something about a request that appears to have failed, the only reasonable option is to retry. So it does: it sends "charge this card $50" again. If the first charge actually went through, the card is now charged twice, for one purchase.</p>
-
-    <div class="def">
-      <div class="k">Definition: idempotent operation</div>
-      <p>An operation <span class="mono-inline">f</span> is idempotent if applying it more than once produces the same effect as applying it exactly once: <span class="mono-inline">f(f(x)) = f(x)</span>. "Set the account balance to $500" is idempotent, running it five times leaves the balance at $500. "Add $500 to the account balance" is not, running it five times adds $2,500.</p>
-    </div>
-
-    <p style="margin-top:12px">Idempotency doesn't stop the duplicate request from arriving, nothing can, as Section 3 proves. What it does is make the duplicate <i>harmless</i>: if "charge the card" is handled idempotently, the second, retried request either does nothing or safely returns the same result as the first, instead of charging the card again.</p>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Without looking back: what two facts are indistinguishable to a client that sent a request and received no response? And why does that ambiguity force the client toward retrying rather than giving up?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">The client can't tell whether the request was never received, or was received and processed but the response was lost. If it assumes "never received" and does nothing, it risks silently dropping a request that actually succeeded on the surface but that the client never confirmed, and it risks a request that genuinely failed being lost forever with no retry. Since giving up risks silently losing real work, a client that cares about reliability has to retry, which is exactly what creates the duplicate-request problem this module is about.</div>
-      </details>
-    </div>
+    <div class="kh"><span class="num">1</span><h2>JSON is just labeled boxes</h2></div>
+    <p>You do not need to "learn JSON" as a language. You need to walk a path: <code>contact.email</code> means "inside contact, the email field." If the form used <code>Email Address</code> with a space, that path is wrong. Most client bugs are a renamed field, not a broken API.</p>
+    <pre class="logconsole" style="white-space:pre-wrap">{
+  "id": "sub_88",
+  "contact": { "Full Name": "Jordan Lee", "Email Address": "" },
+  "source": "google-ads"
+}</pre>
+    <div class="callout"><b>Rule:</b> a missing email is not "we'll fill it in later." It is a reject. Empty string and missing key are both missing.</div>
   </section>
 
   <section>
-    <div class="kh"><span class="num">2</span><h2 class="serif">Interactive: watching a retry create a duplicate</h2></div>
-    <p class="mut">This runs a real timed simulation of a client, a dropped response, and a retry. Toggle idempotency off first and watch what happens, then turn it on and run it again.</p>
-
+    <div class="kh"><span class="num">2</span><h2>Lab: map the form or refuse it</h2></div>
+    <p class="mut">Two events will run. The first has an email. The second has an empty email. Your mapping must accept the first and reject the second.</p>
     <div class="interactive">
-      <span class="ilbl">Live simulation</span>
-      <div class="dagctrl">
-        <div class="toggle" id="idemToggle"><span class="track"></span><span class="lbltext">Idempotency key: OFF</span></div>
-        <button class="primary" id="btnRunRetry">▶ Simulate network timeout + retry</button>
-        <button id="btnResetRetry">Reset</button>
-      </div>
-      <div class="simlog" id="retryLog"></div>
-      <div class="counter" id="chargeCounter"><span class="n" id="chargeN">0</span><span class="lbl2">times the card has been charged</span></div>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Run the simulation with idempotency OFF, then ON. In the ON run, the server still receives the request twice, the network problem isn't fixed. So what specifically changed to prevent the double charge?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Nothing about the network changed, the response is still lost and the client still retries, that part is unavoidable (see Section 3). What changed is that the server now remembers it already processed this exact request (by its idempotency key) and, on the second arrival, skips the charge and returns the stored result instead of executing it again. The fix is entirely on the processing side, not the transport side.</div>
-      </details>
+      <div class="ilbl">Interactive · mapping</div>
+      <p>Which source field should become <code>email</code> on the CRM contact?</p>
+      <div class="wf-row" id="mapPicks"></div>
+      <div class="logconsole" id="labLog"></div>
+      <button class="primary" id="btnRun" style="margin-top:12px">Run both events</button>
+      <div class="feedback" id="labFb"></div>
     </div>
   </section>
 
   <section>
-    <div class="kh"><span class="num">3</span><h2 class="serif">Why "exactly-once" delivery is impossible</h2></div>
-    <p>It's tempting to think a good enough network protocol could just solve this: have the server wait for the client to confirm receipt of the response, and not consider the request complete until then. But watch what happens to that confirmation.</p>
-
-    <div class="def">
-      <div class="k">Claim: no protocol over an unreliable network can guarantee a message is delivered exactly once</div>
-      <p><b>Proof sketch (this is the classical Two Generals Problem, Akkoyunlu, Ekanadham &amp; Huber, 1975).</b></p>
-      <ol style="margin-top:8px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:1.9">
-        <li>Suppose client C sends request R to server S. S processes R and sends acknowledgment A back to C.</li>
-        <li>The network can drop any message, including A. If A is dropped, C is in exactly the same state as if R itself had been dropped: no response arrived.</li>
-        <li>Suppose C, to be sure S got the acknowledgment that C got A, sends a confirmation back to S. That confirmation can also be dropped, and now S doesn't know whether C received A.</li>
-        <li>This chain has no end. Whatever the <i>last</i> message in any proposed protocol is, it can be dropped, and its sender can never have proof it arrived. There is no finite exchange of messages that gives both sides simultaneous certainty.</li>
-        <li>Therefore, C can never be <i>certain</i> whether R was processed exactly once, zero times, or more than once, using network information alone. C's only defensible choice under uncertainty is to retry, which means duplicate delivery is always possible. <span class="mono-inline">∎</span></li>
-      </ol>
-      <p style="margin-top:10px">This isn't a limitation of current technology, it's a property of any communication over a channel that can lose messages, TCP included. TCP guarantees your bytes arrive in order <i>within one connection</i>; it says nothing about whether the application on the other end had already processed your logical request from a connection that TCP itself gave up on.</p>
-    </div>
-
-    <div class="def">
-      <div class="k">Formal definitions: delivery guarantees</div>
-      <p><b>At-most-once:</b> for a given logical message, the number of times it is processed is 0 or 1, it is never duplicated, but it may be silently lost.</p>
-      <p style="margin-top:8px"><b>At-least-once:</b> the number of times it is processed is 1 or more, it is never silently lost, but it may be duplicated.</p>
-      <p style="margin-top:8px"><b>Exactly-once (as a transport guarantee):</b> the number of times it is processed is exactly 1. The proof above shows this cannot be achieved by the transport alone.</p>
-      <p style="margin-top:8px"><b>Effectively-once (what you actually build):</b> at-least-once <i>delivery</i>, combined with an idempotent handler, so that even though the message may arrive more than once, its <i>effect</i> happens exactly once. This is what every system that advertises "exactly-once" is actually doing.</p>
-    </div>
-
-    <div class="callout"><b>Why this matters:</b> if a vendor's documentation says their queue provides "exactly-once delivery," read that as a claim about their idempotency handling, not their network. The proof above applies to them too. The honest version of that claim is "at-least-once delivery, with deduplication we've already done for you." That's still valuable, it means you don't have to build the dedup yourself, but it's a different claim than the marketing copy, and knowing the difference is what lets you ask the right question when it doesn't seem to be working: "what's the dedup window?"</div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>A payment provider's docs say their webhook system delivers "exactly once." Based on the proof above, what is almost certainly actually true, and what's the one follow-up question worth asking their support team?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Almost certainly true: they deliver at-least-once and deduplicate on their end using some kind of event ID, so you experience it as exactly-once. The proof means they cannot literally guarantee single delivery over the network, so "exactly once" is describing the net effect after their deduplication layer, not the transport. Worth asking: what's the deduplication window, and is the event ID they dedupe on stable and available to you, so you can also dedupe defensively on your side in case their window is shorter than you assumed.</div>
-      </details>
-    </div>
+    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+    <div id="quizRoot"></div>
+    <div id="reqList" style="margin-top:16px"></div>
   </section>
-
-  <section>
-    <div class="kh"><span class="num">4</span><h2 class="serif">Idempotency keys, and the race condition that breaks naive ones</h2></div>
-    <p>The standard fix is an <b>idempotency key</b>: the client generates a unique identifier for a logical operation (not per network attempt, per <i>operation</i>, "charge this specific cart," not "this specific HTTP call") and sends it with every attempt, including retries. The server stores results keyed by that identifier. On any request carrying a key it's seen before, it skips the operation and returns the stored result.</p>
-
-    <div class="def">
-      <div class="k">Definition: idempotency key</div>
-      <p>A client-generated identifier, unique per logical operation, attached to every request (and every retry) representing that operation. It lets the server distinguish "this is a retry of something I already handled" from "this is a genuinely new request."</p>
-    </div>
-
-    <p style="margin-top:12px">That sounds like it fully solves the problem. It doesn't, not in the naive implementation, because the check and the write are two separate steps:</p>
-    <div class="callout"><b>The naive (broken) version:</b> <span class="mono-inline">1. SELECT WHERE key = ?</span> — if a row exists, return its stored result. <span class="mono-inline">2. Otherwise, process the operation and INSERT a row with this key and its result.</span> This works perfectly for sequential retries. It fails for <i>concurrent</i> duplicate requests, two attempts arriving close enough together that both run step 1 before either has finished step 2. Both find nothing, both conclude "this is new," both proceed, both charge the card.</div>
-
-    <div class="def">
-      <div class="k">Claim: check-then-insert is not safe under concurrent execution; an atomic unique constraint is</div>
-      <p><b>Counterexample trace for check-then-insert.</b> Two requests, A and B, both carrying key <span class="mono-inline">K</span>, arrive close together:</p>
-      <ol style="margin-top:8px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:1.9">
-        <li>A: SELECT WHERE key = K → no rows.</li>
-        <li>B: SELECT WHERE key = K → no rows (A hasn't inserted yet).</li>
-        <li>A: processes the charge, INSERT key = K.</li>
-        <li>B: processes the charge (it already decided this was new), INSERT key = K.</li>
-        <li>Result: two charges, despite an idempotency key being present and checked correctly on both requests. The bug isn't a missing check, it's the <i>gap</i> between checking and writing.</li>
-      </ol>
-      <p style="margin-top:10px"><b>Why a unique constraint closes the gap.</b> A database-enforced <span class="mono-inline">UNIQUE</span> constraint on the key column makes the insert itself the check, there is no separate read step to race against. If A's insert lands first, the column now holds K. B's insert, attempting to write the same K, is rejected by the database as a constraint violation, atomically, as part of the single insert operation, not as a separate step B could race around. B's handler catches that specific error and returns A's stored result instead of treating it as a real failure. <span class="mono-inline">∎</span></p>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Why does adding a unique constraint fix the race, when the idempotency key check was already present in the broken version too?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">The key wasn't the missing piece, atomicity was. In the broken version, "check" and "write" are two separate operations with a gap between them where another request can slip through. A unique constraint collapses check-and-write into one atomic operation performed by the database, there is no window during which two requests can both believe they're first, because only one insert can ever actually succeed for a given key. The fix isn't "add a key," it's "make the key's enforcement atomic."</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">5</span><h2 class="serif">Interactive: reproducing the race condition</h2></div>
-    <p class="mut">Two requests carrying the <i>same</i> idempotency key fire at nearly the same instant. Switch between the naive and atomic modes and run it, this is a real simulated interleaving, not a scripted outcome.</p>
-
-    <div class="interactive">
-      <span class="ilbl">Live simulation</span>
-      <div class="dagctrl">
-        <div class="toggle on" id="raceModeToggle"><span class="track"></span><span class="lbltext">Mode: Atomic (unique constraint)</span></div>
-        <button class="primary" id="btnRunRace">▶ Fire two concurrent requests</button>
-        <button id="btnResetRace">Reset</button>
-      </div>
-      <div class="lanes">
-        <div class="lane"><div class="lname">Request A</div><div id="laneA"></div></div>
-        <div class="lane"><div class="lname">Request B</div><div id="laneB"></div></div>
-      </div>
-      <div class="counter" id="raceCounter"><span class="n" id="raceN">0</span><span class="lbl2">successful charges from 2 concurrent requests, same key</span></div>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Run the race simulation in naive mode several times in a row. Does the outcome vary, or does it reliably double-charge every single time these two requests genuinely overlap? What does that imply about why this bug survives testing?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">It reliably double-charges every time, once two requests are genuinely concurrent, both starting their check before either finishes its write, the bad interleaving isn't a coin flip, it's guaranteed by the timing. What actually varies in a real system isn't whether the bug fires when two requests truly overlap, it's how often true millisecond-level overlap happens at all. Most manual testing never produces that, you click a button once, wait, look at the result, so the code can pass a hundred manual tests and still fail the first time a real retry happens to fire while the original request is still mid-flight. The bug was never probabilistic, your testing process was just never fast enough to trigger it.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">6</span><h2 class="serif">Implement it: an idempotent request handler</h2></div>
-    <p>You've watched the race condition happen and watched it get fixed. Now you write the fix yourself, and five real tests run against your actual code, including the exact concurrent-duplicate race from Section 5.</p>
-    <div class="interactive">
-      <span class="ilbl">Code exercise · runs in your browser</span>
-      <p class="mut" style="margin-bottom:8px">Complete <span class="mono-inline">processRequest(request, store)</span>. <span class="mono-inline">request</span> is <span class="mono-inline">{ key, payload }</span>. <span class="mono-inline">store</span> gives you: <span class="mono-inline">store.insertKey(key)</span> (atomic, returns <span class="mono-inline">{inserted:true}</span> the first time a key is used, or <span class="mono-inline">{inserted:false, cached}</span> after), <span class="mono-inline">store.releaseKey(key)</span> (call this if processing fails, so a retry can actually try again instead of being stuck), <span class="mono-inline">store.setResult(key, result)</span> (store the result once processing succeeds), and <span class="mono-inline">await store.process(payload)</span> (does the actual work, may throw).</p>
-      <textarea id="idemCodeEditor" class="textin" spellcheck="false" style="min-height:180px;font-size:13px" rows="10"></textarea>
-      <div class="dagctrl">
-        <button class="primary" id="btnRunIdemTests">▶ Run tests</button>
-        <button id="btnResetIdemCode">Reset to starter code</button>
-      </div>
-      <div id="idemTestResults" style="margin-top:14px"></div>
-
-      <div class="hintbox" id="idemHintbox">
-        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="idemHintUsage"></span></div>
-        <details data-hint="1"><summary>Hint 1 — conceptual</summary><div class="hbody">Think about the lifecycle in three parts: reserve the key, do the work, record the result. Which of those three steps has to happen atomically before you touch anything else, and what should happen to the reservation if the work itself fails partway through?</div></details>
-        <details data-hint="2"><summary>Hint 2 — specific</summary><div class="hbody">Call <span class="mono-inline">store.insertKey(key)</span> first, always, before doing any work. If <span class="mono-inline">inserted</span> comes back <span class="mono-inline">false</span>, someone already owns this key, in that case you return the cached result and stop, you never call <span class="mono-inline">store.process</span> again.</div></details>
-        <details data-hint="3"><summary>Hint 3 — near-solution</summary><div class="hbody">Once <span class="mono-inline">insertKey</span> confirms you own the key, wrap <span class="mono-inline">await store.process(payload)</span> in a try/catch. On success, call <span class="mono-inline">store.setResult(key, result)</span> and return the result. On failure, call <span class="mono-inline">store.releaseKey(key)</span> before re-throwing, otherwise the key stays permanently reserved and a legitimate retry can never actually try again.</div></details>
-        <details data-hint="solution" class="locked" id="idemSolutionDetails"><summary id="idemSolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">async function processRequest(request, store) {
-  const { key, payload } = request;
-  const { inserted, cached } = store.insertKey(key);
-  if (!inserted) return cached;
-  try {
-    const result = await store.process(payload);
-    store.setResult(key, result);
-    return result;
-  } catch (err) {
-    store.releaseKey(key);
-    throw err;
-  }
-}</pre></div></details>
-      </div>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Test 5 checks that a failed request can be successfully retried with the same key. If you forget to call <span class="mono-inline">store.releaseKey(key)</span> in your catch block, what specifically will Test 5 observe go wrong?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">The retry will come back with <span class="mono-inline">undefined</span> instead of actually reprocessing, because the key is still marked as "reserved" from the failed attempt (insertKey sees it already exists and returns the cached, empty result rather than allowing a fresh attempt). The failure is permanent even though the underlying cause might have been transient. This is exactly why the naive check-then-insert story from Section 4 isn't the only place atomicity-adjacent bugs hide, forgetting to release a reservation on failure is a different bug with the same flavor: state that should be temporary becomes permanent by accident.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">7</span><h2 class="serif">Which operations need this, and which don't</h2></div>
-    <p>Not every operation needs idempotency-key machinery, some are already naturally idempotent, and forcing keys onto them is wasted complexity. The useful skill is fast classification.</p>
-
-    <div class="def">
-      <div class="k">Reference: HTTP method idempotency</div>
-      <p><span class="mono-inline">GET</span>, <span class="mono-inline">PUT</span>, and <span class="mono-inline">DELETE</span> are defined by the HTTP specification to be idempotent: <span class="mono-inline">PUT /user/5 {email: "a@b.com"}</span> run five times leaves the same end state as running it once, it <i>sets</i> a value. <span class="mono-inline">DELETE /order/9</span> run five times leaves order 9 deleted, same as once. <span class="mono-inline">POST</span> and <span class="mono-inline">PATCH</span> are <i>not</i> guaranteed idempotent by spec, <span class="mono-inline">POST /charges</span> conventionally <i>creates</i> a new resource each time, which is exactly the double-charge failure mode. This is precisely why idempotency keys are a standard, explicit feature on payment-provider POST endpoints, the spec's default behavior is the dangerous one.</p>
-    </div>
-
-    <div class="callout"><b>Quick test:</b> ask "if I run this exact operation twice in a row with no other changes to the system, is the end state different from running it once?" Setting a value, deleting a specific record, or upserting by a stable key all pass. Incrementing a counter, appending to a log, sending an email, or creating a new row with no uniqueness constraint all fail, those need either a redesign (e.g., "set counter to N" instead of "increment") or an idempotency key.</div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>A workflow step does <span class="mono-inline">INSERT INTO notifications_sent (lead_id, channel)</span> every time a follow-up email is sent, with no uniqueness constraint on <span class="mono-inline">(lead_id, channel)</span>. Is this operation idempotent? If a retry hits it, what happens, and what's the one-line fix?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Not idempotent, a retry inserts a second row and, if this table drives whether an email actually gets sent, a second email. The one-line fix: add a unique constraint on (lead_id, channel) and use an upsert (insert-or-do-nothing-on-conflict) instead of a plain insert, exactly the pattern from Section 4, turning the check-then-act race into a single atomic operation the database enforces.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">8</span><h2 class="serif">Before the checkpoint: what you should now be able to do</h2></div>
-    <p class="mut">A short consolidation before you're graded on it.</p>
-    <ul style="margin-top:10px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:2">
-      <li>Explain why a client that receives no response cannot distinguish "never processed" from "processed, response lost," and why that forces retries.</li>
-      <li>State the Two Generals argument for why exactly-once transport delivery is impossible, without looking it up.</li>
-      <li>Define at-most-once, at-least-once, and effectively-once, and identify which one any given real system is actually providing.</li>
-      <li>Explain why check-then-insert idempotency checks fail under concurrency, and why a unique constraint fixes it.</li>
-      <li>Classify a given operation as idempotent or not, and fix a non-idempotent one.</li>
-    </ul>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">9</span><h2 class="serif">Checkpoint</h2></div>
-    <p class="mut">Graded. Feedback is immediate and attempts are unlimited, the goal is understanding, not a single pass/fail moment.</p>
-
-    <div class="qcard">
-      <div class="qn">Question 1 of 5</div>
-      <div class="qtext">A client sends "charge $50," the server charges the card and its response is lost. The client retries the identical request. The server has <b>no</b> idempotency handling. What happens?</div>
-      <div id="q1opts"></div>
-      <div class="qexplain" id="q1explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 2 of 5</div>
-      <div class="qtext">True or false: using TCP instead of UDP is sufficient to guarantee exactly-once processing of a request at the application level.</div>
-      <div id="q2opts"></div>
-      <div class="qexplain" id="q2explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 3 of 5</div>
-      <div class="qtext">Of the following five operations, how many are idempotent: (1) <span class="mono-inline">SET balance = 500</span>, (2) <span class="mono-inline">INCREMENT balance BY 10</span>, (3) <span class="mono-inline">DELETE WHERE id = 7</span>, (4) <span class="mono-inline">APPEND "sent" TO log</span>, (5) <span class="mono-inline">PUT /user/5 {email: "a@b.com"}</span>?</div>
-      <div class="numinput">
-        <input type="number" id="q3input" min="0" max="5" placeholder="?">
-        <button id="q3check">Check</button>
-      </div>
-      <div class="qexplain" id="q3explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 4 of 5</div>
-      <div class="qtext">In the naive check-then-insert idempotency scheme, why can two concurrent requests carrying the same key both succeed in charging the card?</div>
-      <div id="q4opts"></div>
-      <div class="qexplain" id="q4explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 5 of 5 · design (self-check, not auto-graded)</div>
-      <div class="qtext">A new scenario, distinct from anything else in this module: a payment request is sent to your <span class="mono-inline">POST /orders</span> endpoint. The network times out before the client sees a response. The client retries. Your server may or may not have already fully processed the original payment when the retry arrives, possibly even at the exact same instant. Design a complete scheme by specifying all six of the following: (1) the <b>idempotency key</b>, what it's derived from and who generates it; (2) the <b>storage strategy</b>, where and how the key and its result are persisted; (3) the <b>request lifecycle</b>, the order of operations from request received to response sent; (4) <b>duplicate handling</b>, what happens on a sequential retry; (5) <b>concurrency behavior</b>, what happens if two copies of the same request arrive at nearly the same instant; (6) <b>response behavior</b>, exactly what the losing request gets back. Write your answer before revealing the model answer.</div>
-      <textarea id="q5input" placeholder="1. Idempotency key... 2. Storage strategy... 3. Request lifecycle... 4. Duplicate handling... 5. Concurrency behavior... 6. Response behavior..." style="width:100%;min-height:150px;margin-top:12px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px;color:var(--tx);resize:vertical"></textarea>
-      <details style="margin-top:12px">
-        <summary style="cursor:pointer;color:var(--violet);font-size:13px;font-weight:600;list-style:none">▸ Compare against a model answer</summary>
-        <div class="qexplain" style="display:block;color:var(--mut2);margin-top:10px">A complete answer, one dimension at a time: <b>(1) Idempotency key</b>, the client generates a UUID per checkout attempt (not per HTTP call, so a retry reuses the same key) and sends it as an <span class="mono-inline">Idempotency-Key</span> header. <b>(2) Storage strategy</b>, an <span class="mono-inline">idempotency_keys</span> table with a <span class="mono-inline">UNIQUE</span> constraint on the key column, storing the key, the resulting order ID, and the response payload to return on replay. <b>(3) Request lifecycle</b>, attempt <span class="mono-inline">INSERT ... ON CONFLICT DO NOTHING</span> on the key as the very first action, before touching payment logic at all; only on insert success does the handler proceed to actually charge and create the order. <b>(4) Duplicate handling</b>, a sequential retry's insert fails the constraint, the handler looks up the existing row and returns the stored result, no reprocessing. <b>(5) Concurrency behavior</b>, two simultaneous copies both attempt the insert, the database's constraint enforcement (not application code) guarantees only one can succeed, exactly the atomic mechanism from Section 4, the other's insert fails immediately and it falls into the same duplicate-handling path as a sequential retry. <b>(6) Response behavior</b>, the losing request gets back a 200 with the <i>original</i> order ID and payment result, not an error, since from the client's perspective this is the same logical request succeeding once, not failing twice.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">10</span><h2 class="serif">Further reading</h2></div>
-    <p class="mut">If you want to go deeper than the browser can take you:</p>
-    <ul style="margin-top:10px;padding-left:20px;color:var(--mut2);line-height:1.9">
-      <li>E. A. Akkoyunlu, K. Ekanadham &amp; R. V. Huber, "Some constraints and tradeoffs in the design of network communications," 1975, the original statement of what became known as the Two Generals Problem.</li>
-      <li>Jim Gray, "Notes on Data Base Operating Systems," 1978, popularized the Two Generals framing in the context of distributed transactions.</li>
-      <li>Martin Kleppmann, <i>Designing Data-Intensive Applications</i>, Chapter 8 (The Trouble with Distributed Systems) and Chapter 11 (Stream Processing), for delivery-semantics treatment in full production depth.</li>
-      <li>In production, this shows up directly as the "Idempotency-Key" header pattern used by Stripe, and as deduplication windows in Kafka, SQS, and most webhook-delivering SaaS platforms.</li>
-    </ul>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">11</span><h2 class="serif">Glossary</h2></div>
-    <div style="margin-top:14px;display:grid;gap:12px">
-      <div><b class="mono-inline">idempotent operation</b><span style="color:var(--mut);font-size:14px"> — f(f(x)) = f(x); repeating it changes nothing further.</span></div>
-      <div><b class="mono-inline">idempotency key</b><span style="color:var(--mut);font-size:14px"> — a client-generated identifier, stable across retries, that lets a server recognize a duplicate of an operation it already handled.</span></div>
-      <div><b class="mono-inline">at-most-once</b><span style="color:var(--mut);font-size:14px"> — processed 0 or 1 times; never duplicated, may be lost.</span></div>
-      <div><b class="mono-inline">at-least-once</b><span style="color:var(--mut);font-size:14px"> — processed 1 or more times; never lost, may be duplicated.</span></div>
-      <div><b class="mono-inline">effectively-once</b><span style="color:var(--mut);font-size:14px"> — at-least-once delivery combined with idempotent handling, so the observable effect happens exactly once even though delivery may not.</span></div>
-      <div><b class="mono-inline">Two Generals Problem</b><span style="color:var(--mut);font-size:14px"> — the classical proof that no finite message exchange over an unreliable channel gives both parties simultaneous certainty of receipt.</span></div>
-      <div><b class="mono-inline">race condition</b><span style="color:var(--mut);font-size:14px"> — a bug where the outcome depends on the relative timing of concurrent operations; here, the gap between checking and writing.</span></div>
-      <div><b class="mono-inline">unique constraint</b><span style="color:var(--mut);font-size:14px"> — a database-enforced rule that makes a column's insert-or-reject decision atomic, closing the check-then-insert race.</span></div>
-    </div>
-  </section>
-
-  <footer>Zenith Lab · Automation Engineering · Module 2 of 8 · Next: Failure Handling &amp; Retry Theory</footer>
 </div>
-
 <div class="scoreboard"><div class="in">
-  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 4</span>
-  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
-  <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
+  <span class="sc" id="scoreLabel">0 / 5</span>
+  <a id="btnNext" href="module-03.html" class="primary nextbtn" style="text-decoration:none">Complete the lab and quiz (80%+) to continue</a>
 </div></div>
-
-<script src="course-progress.js?v=5"></script>
-<script src="sandbox-runner.js"></script>
+<script src="course-progress.js"></script>
+<script src="workflow-runtime.js"></script>
+<script src="module-kit.js"></script>
+<script src="course-rail.js"></script>
 <script>
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-/* ---------------- Interactive 1: retry / duplicate simulator ---------------- */
-let idemOn = false;
-let chargeCount = 0;
-let seenKeys = new Set();
-let retryRunning = false;
-const RETRY_KEY = "op_9f3a";
-
-const idemToggleEl = document.getElementById("idemToggle");
-idemToggleEl.addEventListener("click", () => {
-  if (retryRunning) return;
-  idemOn = !idemOn;
-  idemToggleEl.classList.toggle("on", idemOn);
-  idemToggleEl.querySelector(".lbltext").textContent = "Idempotency key: " + (idemOn ? "ON" : "OFF");
+CourseProgress.touchVisited(2);
+const OPTIONS = [
+  { id: "good", path: "contact.Email Address", label: "contact.Email Address" },
+  { id: "name", path: "contact.Full Name", label: "contact.Full Name (wrong box)" },
+  { id: "src", path: "source", label: "source (campaign, not a person)" },
+];
+let chosen = null;
+const box = document.getElementById("mapPicks");
+ModuleKit.shuffle(OPTIONS).forEach(function (o) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "wf-chip";
+  b.textContent = o.label;
+  b.onclick = function () {
+    chosen = o;
+    box.querySelectorAll(".wf-chip").forEach(function (el) { el.classList.remove("on"); });
+    b.classList.add("on");
+  };
+  box.appendChild(b);
 });
 
-function logRetry(tag, text, cls){
-  const log = document.getElementById("retryLog");
-  const row = document.createElement("div");
-  row.className = "row " + (cls || "");
-  row.innerHTML = `<span class="tag">${tag}</span><span>${text}</span>`;
-  log.appendChild(row);
-  log.scrollTop = log.scrollHeight;
-}
-
-function updateChargeCounter(){
-  const el = document.getElementById("chargeCounter");
-  const n = document.getElementById("chargeN");
-  n.textContent = chargeCount;
-  el.className = "counter" + (chargeCount > 1 ? " warn" : chargeCount === 1 ? " ok" : "");
-}
-
-function resetRetry(){
-  chargeCount = 0;
-  seenKeys = new Set();
-  document.getElementById("retryLog").innerHTML = "";
-  updateChargeCounter();
-  document.getElementById("btnRunRetry").disabled = false;
-}
-
-async function processCharge(){
-  if (idemOn && seenKeys.has(RETRY_KEY)) {
-    logRetry("SERVER", "key " + RETRY_KEY + " already processed, returning cached result, no charge.", "warn");
+document.getElementById("btnRun").onclick = function () {
+  const fb = document.getElementById("labFb");
+  if (!chosen) { fb.className = "feedback bad"; fb.textContent = "Pick a source field first."; return; }
+  const graph = {
+    nodes: [
+      { id: "t", type: "trigger" },
+      { id: "m", type: "map", config: { mapping: { email: chosen.path, name: "contact.Full Name" }, require: ["email"] } },
+      { id: "n", type: "notify" },
+    ],
+    edges: [{ from: "t", to: "m" }, { from: "m", to: "n" }],
+  };
+  const okEvent = { id: "a", contact: { "Full Name": "Jordan Lee", "Email Address": "jordan@clinic.test" }, source: "google-ads" };
+  const badEvent = { id: "b", contact: { "Full Name": "Sam", "Email Address": "" }, source: "google-ads" };
+  const r1 = WorkflowRuntime.run(graph, okEvent);
+  const r2 = WorkflowRuntime.run(graph, badEvent);
+  ModuleKit.renderLogs(document.getElementById("labLog"), (r1.logs || []).concat([{ level: "info", text: "--- second event ---" }]).concat(r2.logs || []));
+  if (chosen.id !== "good") {
+    fb.className = "feedback bad";
+    fb.textContent = "That path is not the email. The CRM would store a name or a campaign string.";
     return;
   }
-  chargeCount++;
-  seenKeys.add(RETRY_KEY);
-  updateChargeCounter();
-  logRetry("SERVER", "processing charge... done. Card charged (total so far: " + chargeCount + ").");
-}
-
-async function runRetry(){
-  resetRetry();
-  retryRunning = true;
-  document.getElementById("btnRunRetry").disabled = true;
-
-  logRetry("CLIENT", "POST /charge (attempt 1)" + (idemOn ? ", Idempotency-Key: " + RETRY_KEY : ""), "client");
-  await sleep(500);
-  await processCharge();
-  await sleep(400);
-  logRetry("SERVER", "sending 200 OK back to client...", "server");
-  await sleep(400);
-  logRetry("NETWORK", "⚠ response dropped in transit, client never receives it.", "warn");
-  await sleep(700);
-  logRetry("CLIENT", "no response within timeout, retrying...", "client");
-  await sleep(600);
-  logRetry("CLIENT", "POST /charge (attempt 2, identical request)" + (idemOn ? ", Idempotency-Key: " + RETRY_KEY : ""), "client");
-  await sleep(500);
-  await processCharge();
-  await sleep(300);
-
-  if (chargeCount > 1) {
-    logRetry("RESULT", "Card charged " + chargeCount + " times for one purchase. This is the bug.", "bad");
+  if (r1.ok && !r2.ok && r2.error === "missing_fields") {
+    fb.className = "feedback ok";
+    fb.textContent = "First event mapped. Second event rejected on empty email. Lab passed.";
+    ModuleKit.passSection(2, "mappingLab");
   } else {
-    logRetry("RESULT", "Card charged exactly once, despite the request arriving twice.", "");
+    fb.className = "feedback bad";
+    fb.textContent = "Expected accept-then-reject. Check the require list and the path.";
   }
-  retryRunning = false;
-  document.getElementById("btnRunRetry").disabled = false;
-}
-
-document.getElementById("btnRunRetry").addEventListener("click", runRetry);
-document.getElementById("btnResetRetry").addEventListener("click", resetRetry);
-resetRetry();
-
-/* ---------------- Interactive 2: race condition simulator ---------------- */
-let raceAtomic = true;
-let raceRunning = false;
-
-const raceToggleEl = document.getElementById("raceModeToggle");
-raceToggleEl.addEventListener("click", () => {
-  if (raceRunning) return;
-  raceAtomic = !raceAtomic;
-  raceToggleEl.classList.toggle("on", raceAtomic);
-  raceToggleEl.querySelector(".lbltext").textContent = "Mode: " + (raceAtomic ? "Atomic (unique constraint)" : "Naive (check-then-insert)");
-});
-
-function logLane(lane, text, cls){
-  const el = document.getElementById(lane);
-  const row = document.createElement("div");
-  row.className = "row " + (cls || "");
-  row.textContent = text;
-  el.appendChild(row);
-}
-
-function resetRace(){
-  document.getElementById("laneA").innerHTML = "";
-  document.getElementById("laneB").innerHTML = "";
-  document.getElementById("raceN").textContent = "0";
-  document.getElementById("raceCounter").className = "counter";
-  document.getElementById("btnRunRace").disabled = false;
-}
-
-const raceStore = { committed: false };
-
-async function naiveHandle(lane, jitter){
-  logLane(lane, "checking if key exists...");
-  await sleep(300 + jitter);
-  const existedAtCheck = raceStore.committed;
-  await sleep(250);
-  if (!existedAtCheck) {
-    logLane(lane, "not found at check time, proceeding to charge...");
-    await sleep(250);
-    raceStore.committed = true;
-    raceStore.count = (raceStore.count || 0) + 1;
-    logLane(lane, "charge processed ✓", "win");
-  } else {
-    logLane(lane, "duplicate detected, skipping.", "lose");
-  }
-}
-
-async function atomicHandle(lane, jitter){
-  logLane(lane, "attempting INSERT with UNIQUE constraint...");
-  await sleep(300 + jitter);
-  if (!raceStore.committed) {
-    raceStore.committed = true;
-    raceStore.count = (raceStore.count || 0) + 1;
-    logLane(lane, "insert succeeded ✓, charge processed.", "win");
-  } else {
-    logLane(lane, "insert REJECTED: unique constraint violation. Returning original result.", "lose");
-  }
-}
-
-async function runRace(){
-  resetRace();
-  raceRunning = true;
-  document.getElementById("btnRunRace").disabled = true;
-  raceStore.committed = false;
-  raceStore.count = 0;
-
-  logLane("laneA", "POST /orders, Idempotency-Key: K", "");
-  logLane("laneB", "POST /orders, Idempotency-Key: K", "");
-  await sleep(200);
-
-  const jitterA = Math.random() * 40;
-  const jitterB = Math.random() * 40;
-  if (raceAtomic) {
-    await Promise.all([ atomicHandle("laneA", jitterA), atomicHandle("laneB", jitterB) ]);
-  } else {
-    await Promise.all([ naiveHandle("laneA", jitterA), naiveHandle("laneB", jitterB) ]);
-  }
-
-  const n = raceStore.count;
-  document.getElementById("raceN").textContent = n;
-  const counterEl = document.getElementById("raceCounter");
-  counterEl.className = "counter " + (n > 1 ? "warn" : "ok");
-
-  raceRunning = false;
-  document.getElementById("btnRunRace").disabled = false;
-}
-
-document.getElementById("btnRunRace").addEventListener("click", runRace);
-document.getElementById("btnResetRace").addEventListener("click", resetRace);
-resetRace();
-
-/* ---------------- Section 6: idempotency implementation exercise ---------------- */
-const IDEM_STARTER = `async function processRequest(request, store) {
-  // request = { key, payload }
-  // Use store.insertKey(key), store.releaseKey(key), store.setResult(key, result),
-  // and await store.process(payload).
-
-  // YOUR CODE HERE
-
-}`;
-
-function loadIdemStarter(){
-  document.getElementById("idemCodeEditor").value = IDEM_STARTER;
-  document.getElementById("idemTestResults").innerHTML = "";
-}
-loadIdemStarter();
-document.getElementById("btnResetIdemCode").addEventListener("click", loadIdemStarter);
-
-/* ---------------- Tiered hints ---------------- */
-let idemHasAttempted = false;
-function idemHintUsageText(){
-  const used = (CourseProgress.getModule(2).sections || {}).idemHintsUsed || 0;
-  return used > 0 ? `(${used} hint${used===1?"":"s"} used)` : "";
-}
-function refreshIdemHintUsage(){
-  document.getElementById("idemHintUsage").textContent = idemHintUsageText();
-}
-document.querySelectorAll('#idemHintbox details[data-hint]:not([data-hint="solution"])').forEach(d => {
-  d.addEventListener("toggle", () => {
-    if (!d.open) return;
-    const cur = CourseProgress.getModule(2).sections || {};
-    const used = new Set(cur.idemHintsOpened || []);
-    used.add(d.dataset.hint);
-    CourseProgress.setSection(2, "idemHintsOpened", Array.from(used));
-    CourseProgress.setSection(2, "idemHintsUsed", used.size);
-    refreshIdemHintUsage();
-  });
-});
-const idemSolutionDetails = document.getElementById("idemSolutionDetails");
-idemSolutionDetails.addEventListener("toggle", (e) => {
-  if (idemSolutionDetails.open && !idemHasAttempted) {
-    idemSolutionDetails.open = false;
-  }
-});
-function unlockIdemSolution(){
-  idemHasAttempted = true;
-  idemSolutionDetails.classList.remove("locked");
-  document.getElementById("idemSolutionSummary").textContent = "Solution";
-}
-(function restoreIdemHints(){
-  refreshIdemHintUsage();
-  const stored = (CourseProgress.getModule(2).sections || {});
-  if (stored.idemCodeExercise) unlockIdemSolution();
-})();
-
-// This entire function's SOURCE (via .toString()) is shipped to a Web Worker
-// and executed there, never on the main thread, see sandbox-runner.js for why:
-// a synchronous infinite loop in student code can only be stopped by
-// terminating a separate thread, a main-thread timeout cannot interrupt it.
-async function idemHarness(code){
-  function makeIdemStore(){
-    const keys = new Map();
-    let callCount = 0;
-    return {
-      insertKey(key){
-        if (keys.has(key)) return { inserted: false, cached: keys.get(key) };
-        keys.set(key, undefined);
-        return { inserted: true };
-      },
-      releaseKey(key){ keys.delete(key); },
-      setResult(key, result){ keys.set(key, result); },
-      async process(payload){
-        callCount++;
-        if (payload && payload.shouldFail) throw new Error("processing failed");
-        return { status: "ok", id: payload ? payload.id : undefined };
-      },
-      _callCount(){ return callCount; },
-    };
-  }
-
-  let studentFn;
-  try {
-    const factory = new Function(code + "\nreturn processRequest;");
-    studentFn = factory();
-    if (typeof studentFn !== "function") throw new Error("processRequest is not defined as a function.");
-  } catch (e) {
-    return { ranOk: false, error: e.message };
-  }
-
-  const results = [];
-
-  // Test 1: first request processed
-  {
-    const store = makeIdemStore();
-    let out, err;
-    try { out = await studentFn({ key:"a", payload:{id:1} }, store); } catch(e){ err = e; }
-    const pass = !err && out && out.status === "ok" && store._callCount() === 1;
-    results.push({ name:"First request is processed", pass, hint:"A new key should call store.process once and return its result." });
-  }
-  // Test 2: same key returns previous result
-  {
-    const store = makeIdemStore();
-    let out1, out2, err;
-    try {
-      out1 = await studentFn({ key:"b", payload:{id:2} }, store);
-      out2 = await studentFn({ key:"b", payload:{id:2} }, store);
-    } catch(e){ err = e; }
-    const pass = !err && store._callCount() === 1 && JSON.stringify(out1) === JSON.stringify(out2);
-    results.push({ name:"Same key on retry returns the previous result, not a reprocess", pass, hint:"The second call with the same key should return the cached result from insertKey, not call store.process again." });
-  }
-  // Test 3: different key is a new request
-  {
-    const store = makeIdemStore();
-    let err;
-    try {
-      await studentFn({ key:"c1", payload:{id:3} }, store);
-      await studentFn({ key:"c2", payload:{id:4} }, store);
-    } catch(e){ err = e; }
-    const pass = !err && store._callCount() === 2;
-    results.push({ name:"A different key is processed as a genuinely new request", pass, hint:"Don't over-block, only requests sharing the same key should be deduplicated." });
-  }
-  // Test 4: concurrent duplicate, only one side effect
-  {
-    const store = makeIdemStore();
-    let err;
-    try {
-      await Promise.all([
-        studentFn({ key:"d", payload:{id:5} }, store),
-        studentFn({ key:"d", payload:{id:5} }, store),
-      ]);
-    } catch(e){ err = e; }
-    const pass = !err && store._callCount() === 1;
-    results.push({ name:"Concurrent duplicate requests still cause only one side effect", pass, hint:"Two requests fired at once with the same key must still only trigger one store.process call, the atomic-insert pattern from Section 4." });
-  }
-  // Test 5: failed request can be retried
-  {
-    const store = makeIdemStore();
-    let firstErr = null;
-    try { await studentFn({ key:"e", payload:{id:6, shouldFail:true} }, store); }
-    catch(e){ firstErr = e; }
-    let secondOut, secondErr;
-    try { secondOut = await studentFn({ key:"e", payload:{id:6, shouldFail:false} }, store); }
-    catch(e){ secondErr = e; }
-    const pass = !!firstErr && !secondErr && secondOut && secondOut.status === "ok" && store._callCount() === 2;
-    results.push({ name:"A failed request can be successfully retried with the same key", pass, hint:"On failure, call store.releaseKey(key) so a retry isn't stuck returning a stale, empty cached result forever." });
-  }
-
-  return { ranOk: true, results };
-}
-
-async function runIdemTests(){
-  unlockIdemSolution();
-  const resultsEl = document.getElementById("idemTestResults");
-  resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Running in a sandboxed worker…</div>`;
-  const code = document.getElementById("idemCodeEditor").value;
-
-  const outcome = await SandboxRunner.run(idemHarness.toString(), "idemHarness", [code]);
-  resultsEl.innerHTML = "";
-
-  if (!outcome.ok) {
-    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">${CourseProgress.escapeHtml(outcome.error)}</div>`;
-    return;
-  }
-  const data = outcome.result;
-  if (!data.ranOk) {
-    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">Your code didn't run: ${CourseProgress.escapeHtml(data.error)}. Check for a syntax error, or that the function is named exactly processRequest.</div>`;
-    return;
-  }
-
-  const results = data.results;
-  let passCount = 0;
-  results.forEach(r => {
-    if (r.pass) passCount++;
-    const row = document.createElement("div");
-    row.className = "feedback " + (r.pass ? "ok" : "bad");
-    row.style.display = "block"; row.style.marginTop = "8px";
-    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${r.name}` + (r.pass ? "" : `<br>${r.hint}`);
-    resultsEl.appendChild(row);
-  });
-  const summary = document.createElement("div");
-  summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
-  summary.textContent = `${passCount} / ${results.length} tests passing`;
-  resultsEl.appendChild(summary);
-  CourseProgress.setSection(2, "idemCodeExercise", { passCount, total: results.length });
-}
-document.getElementById("btnRunIdemTests").addEventListener("click", runIdemTests);
-
-/* ---------------- Quiz ---------------- */
-let score = 0;
-const answered = { q1:false, q2:false, q3:false, q4:false };
-
-const MODULE_ID = 2;
-function updateScore(){
-  document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 4`;
-  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4;
-  const btn = document.getElementById("btnNext");
-  btn.disabled = !allDone;
-  btn.textContent = allDone ? "Continue to Module 3 →" : "Complete all questions to continue →";
-  if (allDone) {
-    CourseProgress.markComplete(MODULE_ID, score, 4);
-    const navNext = document.getElementById("navNextTop");
-    if (navNext) navNext.classList.add("navnext-ready");
-  }
-}
-
-// Q1
-const q1Options = [
-  { text: "The card is charged twice, once per request the server actually received", correct: true },
-  { text: "The card is charged once, the server automatically recognizes the retry", correct: false, reason: "With no idempotency handling, the server has no way to recognize the second request as a retry, it processes it as a brand-new charge." },
-  { text: "The request fails the second time because the card was already charged", correct: false, reason: "Nothing about a repeated identical request causes it to fail on its own, the server just processes it again unless it's specifically checking for duplicates." },
-];
-const q1el = document.getElementById("q1opts");
-q1Options.forEach((opt, i) => {
-  const div = document.createElement("label");
-  div.className = "qopt";
-  div.innerHTML = `<input type="radio" name="q1" value="${i}"><span>${opt.text}</span>`;
-  div.addEventListener("click", () => {
-    if (answered.q1) return;
-    answered.q1 = true;
-    CourseProgress.setAnswer(MODULE_ID, "q1", i);
-    document.querySelectorAll('#q1opts .qopt').forEach((el,j) => {
-      if (q1Options[j].correct) el.classList.add("correct");
-      else if (j === i) el.classList.add("incorrect");
-    });
-    const ex = document.getElementById("q1explain");
-    ex.style.display = "block";
-    if (opt.correct) {
-      score++;
-      ex.textContent = "Correct. The server has no memory of the first request, so it treats the retry as new work and charges the card again.";
-    } else {
-      ex.textContent = "Not quite. " + opt.reason;
-    }
-    updateScore();
-  });
-  q1el.appendChild(div);
-});
-
-// Q2
-const q2Options = [
-  { text: "True", correct: false },
-  { text: "False", correct: true },
-];
-const q2el = document.getElementById("q2opts");
-q2Options.forEach((opt, i) => {
-  const div = document.createElement("label");
-  div.className = "qopt";
-  div.innerHTML = `<input type="radio" name="q2" value="${i}"><span>${opt.text}</span>`;
-  div.addEventListener("click", () => {
-    if (answered.q2) return;
-    answered.q2 = true;
-    CourseProgress.setAnswer(MODULE_ID, "q2", i);
-    document.querySelectorAll('#q2opts .qopt').forEach((el,j) => {
-      if (q2Options[j].correct) el.classList.add("correct");
-      else if (j === i) el.classList.add("incorrect");
-    });
-    const ex = document.getElementById("q2explain");
-    ex.style.display = "block";
-    if (opt.correct) {
-      score++;
-      ex.textContent = "Correct. TCP guarantees reliable, ordered delivery of bytes within one connection, it says nothing about whether the application already processed a logical request whose connection was abandoned and retried. The Two Generals argument applies above the transport layer.";
-    } else {
-      ex.textContent = "Not quite. TCP solves reliable byte delivery within a connection, but it can't tell the client whether the server's application logic already ran before a connection was lost. The client still can't distinguish 'never processed' from 'processed, ack lost,' which is exactly the Two Generals argument from Section 3.";
-    }
-    updateScore();
-  });
-  q2el.appendChild(div);
-});
-
-// Q3
-function checkQ3(){
-  if (answered.q3) return;
-  const val = Number(document.getElementById("q3input").value);
-  const ex = document.getElementById("q3explain");
-  ex.style.display = "block";
-  answered.q3 = true;
-  CourseProgress.setAnswer(MODULE_ID, "q3", val);
-  if (val === 3) {
-    score++;
-    ex.style.color = "var(--emerald)";
-    ex.textContent = "Correct. SET, DELETE, and PUT are idempotent (3). INCREMENT and APPEND are not, each repeated call changes the result further.";
-  } else {
-    ex.style.color = "var(--red)";
-    ex.textContent = "Not quite. SET balance=500, DELETE id=7, and PUT /user/5 are idempotent (3 of them). INCREMENT and APPEND keep changing the result every time they run, so they're not.";
-  }
-  updateScore();
-}
-document.getElementById("q3check").addEventListener("click", checkQ3);
-document.getElementById("q3input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") checkQ3();
-});
-
-// Q4
-const q4Options = [
-  { text: "Because there's a gap between the read (check) and the write (insert) during which both requests can see 'not found'", correct: true },
-  { text: "Because idempotency keys only work for GET requests", correct: false, reason: "Idempotency keys are specifically used for non-idempotent methods like POST, that's the entire point of the pattern, this isn't a method-type restriction." },
-  { text: "Because the database silently ignores unique constraints under high load", correct: false, reason: "A correctly configured unique constraint is enforced by the database regardless of load, that's what makes the atomic version safe. The naive version's bug isn't about the database failing, it's about there being no constraint at all to enforce." },
-];
-const q4el = document.getElementById("q4opts");
-q4Options.forEach((opt, i) => {
-  const div = document.createElement("label");
-  div.className = "qopt";
-  div.innerHTML = `<input type="radio" name="q4" value="${i}"><span>${opt.text}</span>`;
-  div.addEventListener("click", () => {
-    if (answered.q4) return;
-    answered.q4 = true;
-    CourseProgress.setAnswer(MODULE_ID, "q4", i);
-    document.querySelectorAll('#q4opts .qopt').forEach((el,j) => {
-      if (q4Options[j].correct) el.classList.add("correct");
-      else if (j === i) el.classList.add("incorrect");
-    });
-    const ex = document.getElementById("q4explain");
-    ex.style.display = "block";
-    if (opt.correct) {
-      score++;
-      ex.textContent = "Correct. Both requests can complete their 'check' step before either completes its 'write' step, so both conclude they're first. Closing that gap, not adding more checks, is what fixes it.";
-    } else {
-      ex.textContent = "Not quite. " + opt.reason;
-    }
-    updateScore();
-  });
-  q4el.appendChild(div);
-});
-
-document.getElementById("btnNext").addEventListener("click", () => {
-  window.location.href = "module-03.html";
-});
-
-/* ---------------- Retry checkpoint ---------------- */
-function maybeShowRetry(){
-  const anyAnswered = answered.q1 || answered.q2 || answered.q3 || answered.q4;
-  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4;
-  const btn = document.getElementById("btnRetryCheckpoint");
-  btn.style.display = (anyAnswered && (allDone ? score < 4 : true)) ? "inline-flex" : "none";
-}
-document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
-  CourseProgress.resetModule(MODULE_ID);
-  window.location.reload();
-});
-const _origUpdateScore = updateScore;
-updateScore = function(){
-  _origUpdateScore();
-  maybeShowRetry();
 };
-maybeShowRetry();
 
-/* ---------------- Progress persistence: restore on load ---------------- */
-CourseProgress.touchVisited(MODULE_ID);
-(function restoreQuizState(){
-  const stored = CourseProgress.getModule(MODULE_ID);
-  const a = stored.answers || {};
-  if (a.q1 !== undefined && !answered.q1) {
-    const label = document.querySelectorAll('#q1opts .qopt')[a.q1];
-    if (label) label.click();
-  }
-  if (a.q2 !== undefined && !answered.q2) {
-    const label = document.querySelectorAll('#q2opts .qopt')[a.q2];
-    if (label) label.click();
-  }
-  if (a.q3 !== undefined && !answered.q3) {
-    const inputEl = document.getElementById('q3input');
-    if (inputEl) { inputEl.value = a.q3; checkQ3(); }
-  }
-  if (a.q4 !== undefined && !answered.q4) {
-    const label = document.querySelectorAll('#q4opts .qopt')[a.q4];
-    if (label) label.click();
-  }
-})();
+ModuleKit.renderQuiz("quizRoot", [
+  { text: "A form posts { user: { mail: \"a@b.com\" } }. The CRM wants email. What path do you map?",
+    whyOk: "Walk inward: user, then mail. A top-level email field is not on this payload.",
+    opts: [
+      { t: "user.mail", correct: true },
+      { t: "email", why: "That field does not exist on the incoming payload." },
+      { t: "user", why: "That is an object, not an email string." }
+    ] },
+  { text: "Why must an empty string email be treated as missing?",
+    whyOk: "\"\" is valid JSON and many CRMs will store it. Then nobody can email that contact.",
+    opts: [
+      { t: "The CRM will accept it and you will have a contact nobody can email", correct: true },
+      { t: "Empty strings crash JSON parsers", why: "\"\" is valid JSON. The business rule is the problem." },
+      { t: "HTTP forbids empty strings", why: "HTTP does not care. Your contract with the client does." }
+    ] },
+  { text: "The API returned 200 and the CRM row has first_name = \"google-ads\". What happened?",
+    whyOk: "200 means the CRM stored the body you sent. It did not check that first_name is a person.",
+    opts: [
+      { t: "You mapped the campaign field onto a person field. 200 only means the CRM accepted the body you sent", correct: true },
+      { t: "200 means the mapping was validated by the network", why: "Status codes do not check your field names." },
+      { t: "The CRM renamed it automatically", why: "Most CRMs store what you send." }
+    ] },
+  { text: "Nested JSON `a.b.c` means:",
+    whyOk: "Dots walk inward, not across siblings, and not across a disk.",
+    opts: [
+      { t: "Inside a, inside b, the field c", correct: true },
+      { t: "Three separate top-level keys", why: "Dots walk inward, they do not list siblings." },
+      { t: "A file path on disk", why: "It is a path through an object, not a filesystem." }
+    ] },
+  { text: "A client says 'just dump the whole webhook into the sheet.' Why is that a bad default?",
+    whyOk: "Raw webhooks carry secrets and junk. Map the fields you will report on.",
+    opts: [
+      { t: "You store secrets, unused fields, and a shape nobody can report on", correct: true },
+      { t: "Spreadsheets cannot hold text", why: "They can. The issue is junk and leakage, not capacity." },
+      { t: "Webhooks are illegal to store", why: "They are not. Careless storage is still a product defect." }
+    ] },
+], 2);
 </script>
 </body>
 </html>

@@ -3,1112 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 5: Authentication &amp; Secure Integration</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0b0d11;--bg2:#11141a;--card:#151921;--card2:#1a1f29;--bd:#252c38;--bd2:#39414f;
-  --tx:#eef1f6;--mut:#9aa3b2;--mut2:#5f6877;
-  --lime:#c6f432;--limed:#0f1405;--violet:#a78bfa;--emerald:#34e5a0;--amber:#ffcf4d;--red:#ff6b6b;
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--tx);font-family:'Space Grotesk',sans-serif;line-height:1.65}
-.serif{font-family:'Source Serif 4',serif}
-.mono{font-family:'JetBrains Mono',monospace}
-.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
-.bar{position:sticky;top:0;z-index:40;background:rgba(11,13,17,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--lime)}
-.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
-.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px}
-.bar .logo b{background:var(--lime);color:var(--limed);padding:1px 7px;margin-left:2px}
-.bar .tag{margin-left:auto;font-size:12px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em}
-.progress{height:3px;background:var(--bd)}
-.progress i{display:block;height:100%;background:var(--lime);width:62.5%}
-.hero{padding:50px 0 30px;border-bottom:1px solid var(--bd)}
-.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lime)}
-h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin-top:12px;line-height:1.1}
-.sub{color:var(--mut);font-size:16px;max-width:680px;margin-top:14px}
-.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--emerald);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
-.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:10px;font-weight:700}
-.objectives ul{list-style:none;display:grid;gap:6px}
-.objectives li{padding-left:20px;position:relative;font-size:14.5px;color:var(--tx)}
-.objectives li:before{content:"→";position:absolute;left:0;color:var(--lime)}
-section{padding:40px 0;border-bottom:1px solid var(--bd)}
-.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
-.kh .num{font-weight:700;font-size:13px;color:var(--lime);border:1px solid var(--lime);border-radius:99px;width:26px;height:26px;display:grid;place-items:center;flex-shrink:0}
-.kh h2{font-size:21px;font-weight:700;letter-spacing:-.01em}
-p{color:var(--tx);font-size:15.5px}
-p.mut{color:var(--mut)}
-p+p{margin-top:14px}
-.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:18px 22px;margin-top:18px}
-.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:6px}
-.def p{font-size:14.5px}
-code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
-.callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
-.callout b{color:var(--amber)}
-.interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
-.interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
-.interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
-
-button{font-family:'Space Grotesk';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;transition:.15s}
-button:hover{border-color:var(--lime);color:var(--lime)}
-button.primary{background:var(--lime);color:var(--limed);border-color:var(--lime)}
-button.primary:hover{filter:brightness(1.08);color:var(--limed)}
-button:disabled{opacity:.4;cursor:not-allowed}
-.dagctrl{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
-.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
-.feedback.ok{display:block;background:rgba(52,229,160,.1);border:1px solid rgba(52,229,160,.35);color:var(--emerald)}
-.feedback.bad{display:block;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.35);color:var(--red)}
-
-/* code blocks / mono panels */
-.codeblock{margin-top:14px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;font-family:'JetBrains Mono';font-size:12px;color:var(--mut);word-break:break-all;white-space:pre-wrap;line-height:1.7}
-.codeblock .h{color:var(--violet)}
-.codeblock .p{color:var(--lime)}
-.codeblock .s{color:var(--amber)}
-.textin{width:100%;font-family:'JetBrains Mono';font-size:12.5px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical}
-.fieldlbl{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.08em;margin-top:14px;margin-bottom:6px;display:block}
-
-/* auth flow steps */
-.flowsteps{margin-top:16px;display:grid;gap:10px}
-.flowstep{display:flex;gap:14px;align-items:flex-start;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px}
-.flowstep .fn{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--card2);border:1px solid var(--bd2);color:var(--lime);font-family:'JetBrains Mono';font-size:12px;font-weight:700;display:grid;place-items:center}
-.flowstep .ft{font-size:13.5px;color:var(--tx)}
-.flowstep .ft b{color:var(--lime)}
-
-/* quiz */
-.qcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:22px;margin-top:18px}
-.qcard .qn{font-size:11px;color:var(--mut2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
-.qcard .qtext{font-weight:600;font-size:15px;margin-bottom:14px}
-.qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
-.qopt:hover{border-color:var(--bd2)}
-.qopt input{margin-top:3px}
-.qopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
-.qopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
-.qexplain{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd)}
-.numinput{display:flex;gap:10px;align-items:center;margin-top:6px}
-.numinput input{width:80px;font-family:'JetBrains Mono';font-size:15px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:8px 10px;color:var(--tx)}
-.scoreboard{position:sticky;bottom:0;background:rgba(11,13,17,.95);backdrop-filter:blur(10px);border-top:1px solid var(--bd);padding:14px 0;margin-top:0}
-.scoreboard .in{max-width:920px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
-.scoreboard .sc{font-family:'JetBrains Mono';font-weight:700;font-size:15px;color:var(--lime)}
-.nextbtn{margin-left:auto}
-footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
-
-/* orientation panel */
-.orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
-.orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
-.orient p{font-size:14.5px;color:var(--mut)}
-.orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
-.orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
-.orient .assume:before{content:"✓";color:var(--emerald);font-weight:700;flex-shrink:0}
-
-/* practice */
-.practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
-.practice .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
-.practice p{font-size:14px}
-.practice details{margin-top:12px}
-.practice summary{cursor:pointer;color:var(--violet);font-size:13px;list-style:none;font-weight:600}
-.practice summary::-webkit-details-marker{display:none}
-.practice summary:before{content:"▸ "}
-.practice details[open] summary:before{content:"▾ "}
-.practice details:not([open]) .ans{display:none}
-.practice .ans{margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);color:var(--mut);font-size:13.5px}
-
-/* tiered hints for code exercises */
-.hintbox{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 20px;margin-top:14px}
-.hintbox .hlbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.hintbox .husage{font-size:11px;color:var(--mut2);font-weight:400;text-transform:none;letter-spacing:0}
-.hintbox details{margin-top:8px;border-top:1px solid var(--bd);padding-top:8px}
-.hintbox details:first-of-type{border-top:none;padding-top:0}
-.hintbox summary{cursor:pointer;color:var(--amber);font-size:13px;list-style:none;font-weight:600}
-.hintbox summary::-webkit-details-marker{display:none}
-.hintbox summary:before{content:"▸ "}
-.hintbox details[open] summary:before{content:"▾ "}
-.hintbox .hbody{margin-top:8px;color:var(--tx);font-size:13.5px;line-height:1.7}
-.hintbox details.locked summary{color:var(--mut2);cursor:not-allowed}
-
-@media (max-width:640px){
-  .wrap{padding:0 16px 60px}
-  h1{font-size:26px}
-  .kh h2{font-size:18px}
-  .interactive{padding:16px}
-  .orient{padding:20px 18px}
-}
-
-/* course navigation bar */
-.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
-.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
-.coursenav a{color:var(--mut);text-decoration:none;font-family:'JetBrains Mono';transition:.15s;display:inline-flex;align-items:center;gap:4px}
-.coursenav a:hover{color:var(--lime)}
-.coursenav .navsep{flex:1}
-.coursenav .navdim{color:var(--mut2);cursor:default;pointer-events:none}
-@media (max-width:640px){ .coursenav .in{padding:9px 16px;font-size:11.5px;gap:10px} .coursenav .navlabel{display:none} }
-</style>
+<title>Module 5: Do It Once</title>
+<link rel="stylesheet" href="course.css">
 </head>
 <body>
-
-<div class="bar"><div class="in">
-  <span class="logo">ZENITH<b>LAB</b></span>
-  <span class="tag">Automation Engineering · Module 5 of 8</span>
-</div></div>
-<div class="progress"><i></i></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; <span class="navlabel">Dashboard</span></a><a href="module-04.html">&larr; <span class="navlabel">Module 4</span></a><span class="navsep"></span><a href="module-06.html" id="navNextTop">Module 6 <span class="navlabel">&rarr;</span></a></div></div>
-
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 5</span></div></div>
+<div class="progress"><i style="width:62.5%"></i></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 05</span>
-    <h1 class="serif">Authentication &amp; Secure Integration</h1>
-    <p class="sub">OAuth2 is not one protocol, it is a family of flows for different trust models, and most integration bugs come from choosing the wrong one. This module covers the authorization-code and client-credentials flows in full, JWT structure and verification, and HMAC request signing for webhook authenticity.</p>
-
-    <div class="objectives">
-      <div class="lbl">Learning objectives</div>
+    <span class="eyebrow">Module 5 · ~45 minutes</span>
+    <h1 class="serif">Do it once</h1>
+    <p class="sub">Stripe will send the same event twice. Your client will click Submit twice. If your workflow is not idempotent, you will charge twice and then write a very expensive apology.</p>
+    <div class="objectives"><div class="lbl">You will be able to</div>
       <ul>
-        <li>Choose the correct OAuth2 flow for a given integration (user-delegated vs. service-to-service)</li>
-        <li>Decode and verify a JWT's signature manually, understanding what each claim protects against</li>
-        <li>Implement and verify HMAC-signed webhook payloads, and explain the timing-attack risk in naive comparison</li>
+        <li>Define idempotent: same key, same result, one side effect</li>
+        <li>Store a result for an event id and return it on replay</li>
+        <li>Refuse a design that keys on "whatever timestamp we feel like"</li>
       </ul>
     </div>
   </header>
 
-  <div class="orient">
-    <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module assumes</h3>
-    <p>Modules 1–4 covered how workflows behave, correctly, resiliently, and at scale. This module asks a question those don't touch at all: who is allowed to trigger any of it, and how do you prove a request is genuinely from who it claims to be? Get this wrong and the rest of the course doesn't matter, an attacker who can forge requests doesn't need your queue to be well-behaved.</p>
-    <h3 class="serif">What's new</h3>
-    <p>Both interactives in this module run real cryptography in your browser, using the Web Crypto API, not a simulation dressed up to look like one. When you verify a JWT signature or compute an HMAC, that's an actual SHA-256 computation happening locally, the same primitive production systems use.</p>
-    <h3 class="serif">What's assumed</h3>
-    <div class="assume">Modules 1–4 completed. No prior cryptography background, HMAC and signatures are defined from scratch.</div>
-    <div class="assume">Comfort with the idea of a "secret" shared between two parties and nothing more advanced than that.</div>
-    <h3 class="serif">How to work through it</h3>
-    <ol>
-      <li>Read each definition, then run the matching interactive.</li>
-      <li>Answer the practice check before revealing the answer.</li>
-      <li>Finish with the graded checkpoint.</li>
-    </ol>
-  </div>
-
   <section>
-    <div class="kh"><span class="num">1</span><h2 class="serif">OAuth2 is a family, not a protocol</h2></div>
-    <p>"We use OAuth2" doesn't fully specify how an integration authenticates, any more than "we use HTTP" specifies what a website does. OAuth2 defines several distinct <b>grant types</b> (flows), each suited to a different trust model. Picking the wrong one is the single most common integration security bug, not because the wrong flow is insecure in the abstract, but because it's insecure <i>for the situation it's used in</i>.</p>
-    <div class="def">
-      <div class="k">The one question that determines the flow</div>
-      <p>Is there a human user, present in the moment, delegating access to <i>their own</i> account or data? If yes, you need a flow that involves that human authenticating and consenting, the <b>authorization code</b> flow. If the integration is purely service-to-service, your backend calling a partner's API with no user in the loop, you need the <b>client credentials</b> flow. Using client credentials when a human should be consenting means your system can silently act as any user without their knowledge. Using authorization code for a pure service integration means building unnecessary user-facing consent screens for something that isn't the user's action at all.</p>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>A workflow automation needs to read a specific customer's calendar to schedule a meeting, with that customer's explicit permission granted once during setup. Which trust model does this fit: user-delegated, or service-to-service?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">User-delegated. The calendar belongs to a specific human, and access is only legitimate because that human consented to it. Even though the actual meeting-scheduling call later happens automatically with no human present in the moment, the authorization itself was delegated by a real user, so it needs the authorization code flow, most likely with a stored refresh token for the ongoing automated calls after the initial consent.</div>
-      </details>
-    </div>
+    <div class="kh"><span class="num">1</span><h2>The replay is not a bug in Stripe</h2></div>
+    <p>At-least-once delivery means you will see duplicates. That is normal. Your job is to treat <code>event.id</code> as a lock: first time, charge and remember; second time, return the remembered result and do not charge.</p>
+    <div class="def"><div class="k">Bad keys</div><p>"now", the email address alone, or "customer + today" — two legitimate charges the same day collide, or two retries miss each other.</p></div>
   </section>
 
   <section>
-    <div class="kh"><span class="num">2</span><h2 class="serif">Authorization code flow (user-delegated)</h2></div>
-    <p>This is the flow behind every "Sign in with Google" or "Connect your CRM" button. Its defining feature is an indirection step, a short-lived <b>code</b>, that exists specifically so the long-lived access token never has to pass through the user's browser.</p>
-    <div class="flowsteps">
-      <div class="flowstep"><div class="fn">1</div><div class="ft">The client redirects the user's browser to the authorization server's login page, with the client's identity and requested scopes in the URL.</div></div>
-      <div class="flowstep"><div class="fn">2</div><div class="ft">The user authenticates with the authorization server directly (the client never sees their password) and approves the requested access.</div></div>
-      <div class="flowstep"><div class="fn">3</div><div class="ft">The authorization server redirects back to the client with a short-lived, single-use <b>authorization code</b> in the URL.</div></div>
-      <div class="flowstep"><div class="fn">4</div><div class="ft">The client's <i>backend</i> (not the browser) exchanges that code, plus its own client secret, for an access token, this exchange happens server-to-server, never exposed to the browser.</div></div>
-      <div class="flowstep"><div class="fn">5</div><div class="ft">The client uses the access token to call the resource server (the actual API) on the user's behalf.</div></div>
-    </div>
-    <div class="def">
-      <div class="k">Why the code exists at all, instead of returning the token directly at step 3</div>
-      <p>Step 3's redirect happens through the user's browser, browser history, referrer headers, and server logs can all potentially expose whatever's in that URL. A short-lived, single-use code minimizes the damage if it leaks, it can only be exchanged once, and only by a client that also knows the client secret, which never travels through the browser at all. If the actual access token were put in that URL instead, anyone who captured it could use it directly, for as long as it remained valid.</p>
-    </div>
-    <div class="callout"><b>PKCE (Proof Key for Code Exchange):</b> for clients that can't safely hold a secret, mobile apps, single-page apps, the client secret in step 4 isn't available. PKCE replaces it: the client generates a random secret locally before step 1, sends a hash of it, then presents the original secret at step 4. Even if the authorization code is intercepted, an attacker without that original locally-generated secret can't complete the exchange.</div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Why is exchanging the authorization code for an access token done from the client's backend rather than directly from the user's browser via JavaScript?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Because that exchange requires the client secret, and a client secret embedded in browser-side JavaScript isn't secret at all, anyone can view it. Keeping the exchange server-side means the one piece of information that proves "I am the legitimate client, not an impersonator" never leaves a system the client actually controls.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">3</span><h2 class="serif">Client credentials flow (service-to-service)</h2></div>
-    <p>When there's no user to delegate anything, a backend job that syncs data with a partner API on a schedule, the flow collapses to something much simpler: the client authenticates directly with its own credentials and gets a token back.</p>
-    <div class="flowsteps">
-      <div class="flowstep"><div class="fn">1</div><div class="ft">The client sends its <b>client ID</b> and <b>client secret</b> directly to the authorization server's token endpoint, no redirect, no browser, no user involved.</div></div>
-      <div class="flowstep"><div class="fn">2</div><div class="ft">The authorization server validates the credentials and returns an access token scoped to the client itself, not to any user.</div></div>
-      <div class="flowstep"><div class="fn">3</div><div class="ft">The client uses the token to call the resource server, acting as itself, with whatever permissions its own account was granted.</div></div>
-    </div>
-    <div class="callout"><b>The security implication of skipping steps, not adding them:</b> client credentials is simpler precisely because there's no user consent to obtain, which is exactly why it's wrong to use it as a shortcut around building proper user consent when a real user's data is actually at stake. The flow being easier to implement is not a reason to use it for something that needs delegation.</div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>A nightly job pulls aggregate, non-user-specific analytics from a partner platform using the automation agency's own registered API account. Which flow, and why?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Client credentials. There's no user delegating anything, the agency's own account is what's authorized, and the call happens on a schedule with no human present. Building an authorization-code consent flow here would be solving a problem that doesn't exist, there's no user whose permission is being represented.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">4</span><h2 class="serif">JWT structure and what each claim protects against</h2></div>
-    <p>Access tokens from either flow are often issued as a <b>JWT</b> (JSON Web Token), a compact, self-contained format that lets a resource server verify a token's authenticity without calling back to the authorization server for every request.</p>
-    <div class="def">
-      <div class="k">Structure: header.payload.signature</div>
-      <p>Three base64url-encoded segments joined by dots. The <b>header</b> states the algorithm used (e.g., <span class="mono-inline">HS256</span>). The <b>payload</b> holds claims, statements about the token, like who it's for and when it expires. The <b>signature</b> is a cryptographic proof, computed over the header and payload, that only someone holding the signing secret could have produced.</p>
-    </div>
-    <div class="def">
-      <div class="k">What the standard claims protect against</div>
-      <p><span class="mono-inline">exp</span> (expiration): without it, a stolen token would be valid forever. Short expiration limits the damage window of a leaked token.</p>
-      <p style="margin-top:8px"><span class="mono-inline">aud</span> (audience): without it, a token legitimately issued for Service A could be replayed against Service B, if B doesn't check that the token was actually meant for it, it might accept it anyway.</p>
-      <p style="margin-top:8px"><span class="mono-inline">iss</span> (issuer): without it, or without verifying it, a resource server has no way to confirm the token came from an authorization server it actually trusts.</p>
-    </div>
-    <div class="callout"><b>The single most important fact about JWTs:</b> the payload is encoded, not encrypted. Base64url is not a secret transformation, anyone can decode a JWT's header and payload with no key at all. The signature proves the claims weren't <i>tampered with</i> after issuance, it does nothing to keep them <i>confidential</i>. Never put a secret value in a JWT payload expecting it to stay hidden.</div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>A developer puts a user's raw password hash in a JWT payload, reasoning "it's signed, so it's secure." What's wrong with that reasoning?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Signing provides integrity (proof it wasn't altered), not confidentiality (proof it can't be read). Anyone who intercepts the token, or anyone the token is ever shown to, can base64url-decode the payload and read the password hash directly, no key required. "Signed" and "secret" are unrelated properties, and this is exactly the mistake the callout above warns about.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">5</span><h2 class="serif">Interactive: decode and verify a real JWT</h2></div>
-    <p class="mut">This token was generated in your browser just now using the Web Crypto API, a genuine HMAC-SHA256 signature, not a hardcoded string. Decode it, verify it, then tamper with it and watch verification fail.</p>
+    <div class="kh"><span class="num">2</span><h2>Lab: one event, delivered twice</h2></div>
+    <p class="mut">The same payment event hits your workflow twice in a row. Enable idempotency on the HTTP node or watch the charge count go to 2.</p>
     <div class="interactive">
-      <span class="ilbl">Live simulation</span>
-      <span class="fieldlbl">Sample JWT (generated on load)</span>
-      <div class="codeblock" id="jwtDisplay">generating…</div>
-      <div class="dagctrl">
-        <button class="primary" id="btnDecodeJwt">▶ Decode</button>
-        <button id="btnTamperJwt">Tamper with payload</button>
-        <button id="btnResetJwt">Reset</button>
-      </div>
-      <div id="jwtDecoded" style="display:none">
-        <span class="fieldlbl">Decoded header</span>
-        <div class="codeblock" id="jwtHeaderOut"></div>
-        <span class="fieldlbl">Decoded payload</span>
-        <div class="codeblock" id="jwtPayloadOut"></div>
-        <span class="fieldlbl">Verify with secret</span>
-        <input class="textin" id="jwtSecretInput" value="zenith-lab-secret">
-        <div class="dagctrl"><button class="primary" id="btnVerifyJwt">Verify signature</button></div>
-        <div class="feedback" id="jwtFeedback"></div>
-      </div>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Decode the token, verify it (should succeed), then click "Tamper with payload" and verify again. The header and most of the payload look completely normal both times, so what specifically causes verification to fail after tampering?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">The signature was computed over the ORIGINAL header and payload bytes. Tampering changes the payload's bytes but the signature attached to the token is still the old one, computed for the old content. Verification recomputes what the signature <i>should</i> be for the current content and compares it to the attached signature, since the content changed but the signature didn't, they no longer match. This is the entire point of a signature: it's not that tampering is prevented, it's that tampering is detected.</div>
-      </details>
+      <div class="ilbl">Interactive · replay</div>
+      <div class="wf-row" id="picks"></div>
+      <div class="logconsole" id="labLog"></div>
+      <button class="primary" id="btnRun" style="margin-top:12px">Deliver the event twice</button>
+      <div class="feedback" id="labFb"></div>
     </div>
   </section>
 
   <section>
-    <div class="kh"><span class="num">6</span><h2 class="serif">HMAC-signed webhooks</h2></div>
-    <p>A webhook is a request from someone else's server to yours, an inbound flow, not one you control end to end the way an outbound API call is. Anyone who knows or guesses your webhook URL can send you a POST request that looks exactly like a real event. HMAC signing solves this: it proves a payload really came from the party who holds the shared secret, and wasn't altered in transit.</p>
-    <div class="def">
-      <div class="k">Definition: HMAC (Hash-based Message Authentication Code)</div>
-      <p>A cryptographic function that takes a secret key and a message, and produces a fixed-length signature. The sender computes <span class="mono-inline">HMAC(secret, payload)</span> and includes it as a header. The receiver, who also holds the secret, recomputes the same HMAC over the payload it received and checks whether the two match. Changing even one byte of the payload produces a completely different signature, there's no way to predict how a change will affect it without knowing the secret.</p>
-    </div>
-
-    <div class="interactive">
-      <span class="ilbl">Live simulation</span>
-      <p class="mut" style="margin-bottom:4px">Real HMAC-SHA256, computed live via the Web Crypto API.</p>
-      <span class="fieldlbl">Webhook payload</span>
-      <textarea class="textin" id="hmacMsg" rows="3">{"event":"lead.created","lead_id":"8841","amount":50}</textarea>
-      <span class="fieldlbl">Shared secret</span>
-      <input class="textin" id="hmacSecret" value="whsec_a1b2c3">
-      <div class="dagctrl">
-        <button class="primary" id="btnComputeHmac">▶ Compute signature</button>
-        <button id="btnTamperHmac">Flip one byte in payload</button>
-      </div>
-      <span class="fieldlbl">HMAC-SHA256 signature (hex)</span>
-      <div class="codeblock" id="hmacOut">–</div>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Compute the signature, note it down, then flip one byte and compute again. How different is the new signature from the old one, roughly half the characters changed, or nearly all of them? What property of HMAC does that demonstrate?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">Nearly all of them change, a single-bit difference in the input typically flips roughly half the output bits, which at the character level looks like an almost entirely different string. This is the avalanche effect: a secure hash function is designed so that small input changes cause large, unpredictable output changes, which is exactly why a receiver can trust that a matching signature means the payload truly wasn't altered, even by one byte.</div>
-      </details>
-    </div>
+    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+    <div id="quizRoot"></div>
+    <div id="reqList" style="margin-top:16px"></div>
   </section>
-
-  <section>
-    <div class="kh"><span class="num">7</span><h2 class="serif">The timing-attack risk in naive comparison</h2></div>
-    <p>Computing the HMAC correctly isn't the whole job, comparing it to the received signature safely matters just as much. The obvious way to compare two strings, <span class="mono-inline">signature === received</span> in most languages, is a security bug when either value is secret-derived.</p>
-    <div class="def">
-      <div class="k">Claim: naive equality comparison leaks information via timing</div>
-      <p><b>Argument.</b> A standard string-equality check compares characters left to right and returns <span class="mono-inline">false</span> the instant it finds a mismatch, it does not keep checking the rest of the string. That means a comparison against a signature that's correct for the first 3 characters takes measurably longer than one that's wrong at character 1, because the correct-prefix case does more work before bailing out. An attacker who can send many forged signatures and precisely measure response time can, in principle, guess the signature one byte at a time: try all 256 possibilities for byte 1, keep whichever took longest, move to byte 2, repeat. This turns a brute-force problem that's computationally infeasible (guessing a whole 32-byte signature at once) into a linear one (guessing 32 bytes one at a time), each with only 256 possibilities.</p>
-    </div>
-    <div class="callout"><b>The fix:</b> a constant-time comparison function, one that always compares every byte regardless of where the first mismatch occurs, so the time taken reveals nothing about how many bytes matched. Every mainstream language's crypto library provides one (e.g., <span class="mono-inline">crypto.timingSafeEqual</span> in Node.js, <span class="mono-inline">hmac.compare_digest</span> in Python). The fix is one function call, the vulnerability is invisible until someone specifically looks for it, which is exactly why it's worth knowing to look.</div>
-    <div class="callout"><b>Honesty about this demo:</b> a real timing attack requires statistical measurement over many requests to filter out network jitter and noise, it is not something you can reliably observe from a single comparison in a browser tab, and browsers deliberately reduce JavaScript timer precision for exactly this security reason. The interactive above uses ordinary comparison for simplicity since nothing secret is actually at stake in a learning demo. The vulnerability described here is real and well-documented in production systems, verifying it live isn't something this page can responsibly claim to do.</div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Why does a constant-time comparison function need to check every byte even after it's already found a mismatch, isn't that wasted work?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">It's wasted computation but necessary security, the entire vulnerability comes from the amount of work varying based on secret-dependent information (how many leading bytes matched). A constant-time function deliberately does the "wasteful" full comparison every single time, correct or not, so its execution time carries no signal about the input at all. Trading a small, fixed amount of extra computation for eliminating an information leak is the right tradeoff whenever you're comparing anything secret-derived.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">8</span><h2 class="serif">Implement it: write the verification function</h2></div>
-    <p>Everything so far has been you watching this page compute HMACs and comparisons. This section reverses that: you write the verification logic yourself, and real test cases run against your actual code, not a canned answer.</p>
-    <div class="interactive">
-      <span class="ilbl">Code exercise · runs in your browser</span>
-      <p class="mut" style="margin-bottom:8px">Two helpers are already available to your code: <span class="mono-inline">await computeHmacHex(secret, message)</span> returns the real HMAC-SHA256 hex digest (Web Crypto, same as Section 6), and <span class="mono-inline">constantTimeEqual(hexA, hexB)</span> is a real constant-time comparison (Section 7's fix, already implemented for you). Complete <span class="mono-inline">verifyWebhook</span> so it returns <span class="mono-inline">true</span> only when <span class="mono-inline">receivedSignatureHex</span> is the correct signature for <span class="mono-inline">payload</span> under <span class="mono-inline">secret</span>.</p>
-      <textarea id="codeEditor" class="textin" spellcheck="false" style="min-height:180px;font-size:13px" rows="10"></textarea>
-      <div class="dagctrl">
-        <button class="primary" id="btnRunTests">▶ Run tests</button>
-        <button id="btnResetCode">Reset to starter code</button>
-      </div>
-      <div id="testResults" style="margin-top:14px"></div>
-
-      <div class="hintbox" id="verifyHintbox">
-        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="verifyHintUsage"></span></div>
-        <details data-hint="1"><summary>Hint 1 — conceptual</summary><div class="hbody">Verification means: compute what the signature SHOULD be from the payload and secret, then compare that to what was actually sent. Both helper functions you need already exist, you're wiring them together, not implementing crypto yourself.</div></details>
-        <details data-hint="2"><summary>Hint 2 — specific</summary><div class="hbody">Call <span class="mono-inline">await computeHmacHex(secret, payload)</span> to get the expected signature. Then compare it to <span class="mono-inline">receivedSignatureHex</span>, but not with <span class="mono-inline">===</span>.</div></details>
-        <details data-hint="3"><summary>Hint 3 — near-solution</summary><div class="hbody">Use <span class="mono-inline">constantTimeEqual(expectedHex, receivedSignatureHex)</span> for the comparison, that's exactly what it's there for, and return its result directly.</div></details>
-        <details data-hint="solution" class="locked" id="verifySolutionDetails"><summary id="verifySolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">async function verifyWebhook(payload, receivedSignatureHex, secret) {
-  const expectedHex = await computeHmacHex(secret, payload);
-  return constantTimeEqual(expectedHex, receivedSignatureHex);
-}</pre></div></details>
-      </div>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>Before running your code: if you wrote <span class="mono-inline">return receivedSignatureHex === await computeHmacHex(secret, payload);</span> instead of using <span class="mono-inline">constantTimeEqual</span>, would the test suite below catch that mistake?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">No, and this is worth sitting with. All four tests only check whether the function returns the *correct boolean*, valid signatures pass, invalid ones fail, both versions produce identical results on every test case here. The timing vulnerability from Section 7 is about how *long* the comparison takes depending on the input, not what it returns, so a correctness-only test suite is structurally blind to it. This is a real limitation of automated testing in general, not just this exercise: passing tests proves the code does the right thing on the cases you thought to test, it doesn't prove the code is secure. That's exactly why Section 7's reasoning, not just a green checkmark, is the part you actually need to retain.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">9</span><h2 class="serif">Secure the webhook handler</h2></div>
-    <p>The code below shipped to production. It looks reasonable at a glance, it even checks the signature. It has three real vulnerabilities. Find and fix all three, then run the tests, each vulnerability has its own test specifically designed to catch it.</p>
-    <div class="interactive">
-      <span class="ilbl">Code exercise · runs in your browser</span>
-      <p class="mut" style="margin-bottom:8px">Fix <span class="mono-inline">handleWebhookSecure(rawBody, receivedSignatureHex, secret, timestamp, now, seenIds)</span>. Available: <span class="mono-inline">computeHmacHex</span>, <span class="mono-inline">constantTimeEqual</span>. <span class="mono-inline">timestamp</span> is the claimed send time (ms), <span class="mono-inline">now</span> is the current time (ms), reject anything older than 5 minutes (300000ms). <span class="mono-inline">seenIds</span> is a <span class="mono-inline">Set</span> you should check and update using the payload's <span class="mono-inline">event_id</span>.</p>
-      <textarea id="vulnCodeEditor" class="textin" spellcheck="false" style="min-height:220px;font-size:13px" rows="14"></textarea>
-      <div class="dagctrl">
-        <button class="primary" id="btnRunVulnTests">▶ Run tests</button>
-        <button id="btnResetVulnCode">Reset to starter code</button>
-      </div>
-      <div id="vulnTestResults" style="margin-top:14px"></div>
-
-      <div class="hintbox" id="vulnHintbox">
-        <div class="hlbl"><span>Stuck? Hints</span><span class="husage" id="vulnHintUsage"></span></div>
-        <details data-hint="1"><summary>Hint 1 — conceptual</summary><div class="hbody">There are exactly three separate bugs, matching the three checklist items from Section 5's cheat sheet: something happens in the wrong ORDER, something is compared the wrong WAY, and something isn't checked for FRESHNESS/uniqueness at all. Find each independently, don't assume fixing one fixes another.</div></details>
-        <details data-hint="2"><summary>Hint 2 — specific</summary><div class="hbody">Bug 1: the code reads and acts on fields from the parsed body before the signature has been verified, move verification to the very first thing that happens, before <span class="mono-inline">JSON.parse</span>. Bug 2: find the signature comparison and check whether it's using <span class="mono-inline">constantTimeEqual</span> or plain <span class="mono-inline">===</span>. Bug 3: nothing currently checks <span class="mono-inline">timestamp</span> against <span class="mono-inline">now</span>, or checks <span class="mono-inline">seenIds</span> for the payload's <span class="mono-inline">event_id</span>.</div></details>
-        <details data-hint="3"><summary>Hint 3 — near-solution</summary><div class="hbody">Order your function as: (1) verify the signature over the raw body with <span class="mono-inline">constantTimeEqual</span>, reject immediately if it fails, (2) only then attempt <span class="mono-inline">JSON.parse(rawBody)</span>, inside a try/catch, a malformed body must be rejected gracefully, not thrown, (3) reject if <span class="mono-inline">now - timestamp > 300000</span>, (4) reject if <span class="mono-inline">seenIds.has(payload.event_id)</span>, otherwise add it to <span class="mono-inline">seenIds</span> and proceed.</div></details>
-        <details data-hint="solution" class="locked" id="vulnSolutionDetails"><summary id="vulnSolutionSummary">Solution — run your code at least once first</summary><div class="hbody"><pre style="white-space:pre-wrap;font-family:'JetBrains Mono';font-size:12.5px;margin:0">async function handleWebhookSecure(rawBody, receivedSignatureHex, secret, timestamp, now, seenIds) {
-  const expectedHex = await computeHmacHex(secret, rawBody);
-  if (!constantTimeEqual(expectedHex, receivedSignatureHex)) {
-    return { ok: false, reason: "invalid signature" };
-  }
-  let payload;
-  try {
-    payload = JSON.parse(rawBody);
-  } catch (e) {
-    return { ok: false, reason: "malformed payload" };
-  }
-  if (now - timestamp > 300000) {
-    return { ok: false, reason: "stale timestamp" };
-  }
-  if (seenIds.has(payload.event_id)) {
-    return { ok: false, reason: "replay detected" };
-  }
-  seenIds.add(payload.event_id);
-  return { ok: true, payload };
-}</pre></div></details>
-      </div>
-    </div>
-
-    <div class="practice">
-      <div class="lbl">Practice check</div>
-      <p>The starter code calls <span class="mono-inline">JSON.parse(rawBody)</span> before checking the signature at all. Even if the signature check afterward is written perfectly, what's already gone wrong by the time it runs?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">The parser has already run on completely untrusted, unverified bytes, and whatever the parsed object triggers downstream (logging it, passing fields to other code, even just the parser's own behavior on adversarial input) has already happened before you know whether the sender was legitimate. Verification needs to be the first thing that happens to untrusted input, not a check you run after you've already acted on it. This is the same ordering lesson as the Module 8 capstone's critical path: verify, then parse, then process, never the reverse.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">10</span><h2 class="serif">Before the checkpoint: what you should now be able to do</h2></div>
-    <p class="mut">A short consolidation before you're graded on it.</p>
-    <ul style="margin-top:10px;padding-left:20px;color:var(--tx);font-size:14.5px;line-height:2">
-      <li>Determine whether an integration needs user-delegated (authorization code) or service-to-service (client credentials) authentication, and explain why the wrong choice is a security problem, not just a style choice.</li>
-      <li>Explain why the authorization code flow uses a short-lived code instead of returning the access token directly.</li>
-      <li>Decode a JWT's header and payload without a key, and explain why that's expected behavior, not a bug.</li>
-      <li>Explain what exp, aud, and iss each protect against.</li>
-      <li>Explain how HMAC verification works and why naive string comparison of signatures is a timing-attack vulnerability.</li>
-    </ul>
-
-    <div class="practice">
-      <div class="lbl">Cross-module check</div>
-      <p>A webhook arrives with a valid HMAC signature, but it's a genuine duplicate delivery (the platform retried after not getting a fast 200). Does signature verification (this module) do anything to prevent double-processing that duplicate? What module actually handles that?</p>
-      <details>
-        <summary>Check your answer</summary>
-        <div class="ans">No, and this is a common confusion. HMAC verification only answers "is this really from who it claims to be," a genuinely duplicate delivery from the real sender has a perfectly valid signature every time, since it's the same authentic payload resent. Preventing double-processing of that valid duplicate is Module 2's job, idempotency keys, not this module's. The two are complementary and both necessary: verify authenticity first (this module), then deduplicate (Module 2), exactly the order used in the Module 8 capstone's critical path.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">11</span><h2 class="serif">Checkpoint</h2></div>
-    <p class="mut">Graded. Feedback is immediate and attempts are unlimited, the goal is understanding, not a single pass/fail moment.</p>
-
-    <div class="qcard">
-      <div class="qn">Question 1 of 5</div>
-      <div class="qtext">A backend cron job pulls its own account's usage data from a billing API every night, with no human user involved anywhere in the request. Which OAuth2 grant type fits?</div>
-      <div id="q1opts"></div>
-      <div class="qexplain" id="q1explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 2 of 5</div>
-      <div class="qtext">True or false: a JWT's payload is encrypted, so intercepting a JWT without the signing secret does not reveal its claims.</div>
-      <div id="q2opts"></div>
-      <div class="qexplain" id="q2explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 3 of 5</div>
-      <div class="qtext">A JWT has how many dot-separated, base64url-encoded segments?</div>
-      <div class="numinput">
-        <input type="number" id="q3input" min="0" max="10" placeholder="?">
-        <button id="q3check">Check</button>
-      </div>
-      <div class="qexplain" id="q3explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 4 of 5</div>
-      <div class="qtext">Why does comparing two signatures with a naive <span class="mono-inline">===</span> check create a timing-attack vulnerability?</div>
-      <div id="q4opts"></div>
-      <div class="qexplain" id="q4explain"></div>
-    </div>
-
-    <div class="qcard">
-      <div class="qn">Question 5 of 5 · design (self-check, not auto-graded)</div>
-      <div class="qtext">Design a webhook verification scheme for an endpoint that must resist both payload tampering and replay attacks (an old, legitimately-signed request being resent later by an attacker who captured it). Specify what gets signed, what the receiver checks, and how comparison should be implemented. Write your answer before revealing the model answer.</div>
-      <textarea id="q5input" placeholder="What's included in the signed message, what the receiver validates, and how..." style="width:100%;min-height:110px;margin-top:12px;font-family:'JetBrains Mono';font-size:13px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px;color:var(--tx);resize:vertical"></textarea>
-      <details style="margin-top:12px">
-        <summary style="cursor:pointer;color:var(--violet);font-size:13px;font-weight:600;list-style:none">▸ Compare against a model answer</summary>
-        <div class="qexplain" style="display:block;color:var(--mut2);margin-top:10px">A reasonable answer: sign the concatenation of a timestamp and the raw request body (not just the body alone), using HMAC-SHA256 with the shared secret, sent as a header alongside the timestamp. The receiver recomputes the HMAC over the received timestamp and body and compares it using a constant-time comparison function (protects against tampering and forgery). Separately, the receiver rejects any request whose timestamp is more than a few minutes old, even if the signature is valid (protects against replay, since a captured old request's signature is still technically correct, only the freshness check catches it). Both checks are necessary, the signature alone can't detect replay, and the timestamp alone, unsigned, could be forged.</div>
-      </details>
-    </div>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">12</span><h2 class="serif">Further reading</h2></div>
-    <p class="mut">If you want to go deeper than the browser can take you:</p>
-    <ul style="margin-top:10px;padding-left:20px;color:var(--mut2);line-height:1.9">
-      <li>RFC 6749, "The OAuth 2.0 Authorization Framework," the specification defining every grant type covered here.</li>
-      <li>RFC 7519, "JSON Web Token (JWT)," the specification for JWT structure and standard claims.</li>
-      <li>RFC 2104, "HMAC: Keyed-Hashing for Message Authentication," the original HMAC specification.</li>
-      <li>Kocher, "Timing Attacks on Implementations of Diffie-Hellman, RSA, DSS, and Other Systems," 1996, the foundational paper on timing side-channel attacks.</li>
-      <li>In production, this shows up as Stripe's, GitHub's, and virtually every major platform's webhook signature verification, and as the <span class="mono-inline">Authorization: Bearer</span> header pattern for JWT-based APIs.</li>
-    </ul>
-  </section>
-
-  <section>
-    <div class="kh"><span class="num">13</span><h2 class="serif">Glossary</h2></div>
-    <div style="margin-top:14px;display:grid;gap:12px">
-      <div><b class="mono-inline">authorization code flow</b><span style="color:var(--mut);font-size:14px"> — OAuth2 flow for user-delegated access; a short-lived code stands in for the access token during the browser redirect.</span></div>
-      <div><b class="mono-inline">client credentials flow</b><span style="color:var(--mut);font-size:14px"> — OAuth2 flow for service-to-service access; no user, direct exchange of client ID and secret for a token.</span></div>
-      <div><b class="mono-inline">PKCE</b><span style="color:var(--mut);font-size:14px"> — Proof Key for Code Exchange; lets public clients (that can't hold a secret) safely use the authorization code flow.</span></div>
-      <div><b class="mono-inline">JWT</b><span style="color:var(--mut);font-size:14px"> — JSON Web Token; header.payload.signature, base64url-encoded, self-contained and verifiable without a callback.</span></div>
-      <div><b class="mono-inline">exp / aud / iss</b><span style="color:var(--mut);font-size:14px"> — expiration / intended audience / issuer claims; each closes a specific forgery or replay gap.</span></div>
-      <div><b class="mono-inline">HMAC</b><span style="color:var(--mut);font-size:14px"> — Hash-based Message Authentication Code; proves a message came from a holder of the shared secret and wasn't altered.</span></div>
-      <div><b class="mono-inline">timing attack</b><span style="color:var(--mut);font-size:14px"> — extracting secret information from how long an operation takes, not from its output.</span></div>
-      <div><b class="mono-inline">constant-time comparison</b><span style="color:var(--mut);font-size:14px"> — a comparison whose execution time doesn't depend on how much of the input matches, closing the timing-attack channel.</span></div>
-    </div>
-  </section>
-
-  <footer>Zenith Lab · Automation Engineering · Module 5 of 8 · Next: API Contract Design</footer>
 </div>
-
 <div class="scoreboard"><div class="in">
-  <span class="mono sc" id="scoreDisplay">Checkpoint score: 0 / 4</span>
-  <button id="btnRetryCheckpoint" style="display:none">↺ Retry checkpoint</button>
-  <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
+  <span class="sc" id="scoreLabel">0 / 5</span>
+  <a id="btnNext" href="module-06.html" class="primary nextbtn" style="text-decoration:none">Complete the lab and quiz (80%+) to continue</a>
 </div></div>
-
-<script src="course-progress.js?v=5"></script>
-<script src="sandbox-runner.js"></script>
+<script src="course-progress.js"></script>
+<script src="workflow-runtime.js"></script>
+<script src="module-kit.js"></script>
+<script src="course-rail.js"></script>
 <script>
-/* ---------------- Crypto helpers (real Web Crypto API) ---------------- */
-function b64urlEncode(bytes){
-  let binary = "";
-  bytes.forEach(b => binary += String.fromCharCode(b));
-  return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-}
-function b64urlDecodeToString(str){
-  str = str.replace(/-/g,"+").replace(/_/g,"/");
-  while (str.length % 4) str += "=";
-  return atob(str);
-}
-function strToBytes(str){ return new TextEncoder().encode(str); }
-function bytesToHex(buf){
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
-}
-async function hmacSha256Raw(secret, message){
-  const key = await crypto.subtle.importKey("raw", strToBytes(secret), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
-  return crypto.subtle.sign("HMAC", key, strToBytes(message));
-}
-async function computeHmacHex(secret, message){
-  return bytesToHex(await hmacSha256Raw(secret, message));
-}
-function constantTimeEqual(a, b){
-  if (typeof a !== "string" || typeof b !== "string") return false;
-  if (a.length !== b.length) {
-    let dummy = 0;
-    for (let i = 0; i < a.length; i++) dummy |= a.charCodeAt(i) ^ (b.charCodeAt(i % b.length) || 0);
-    return false;
-  }
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
-}
-
-/* ---------------- Interactive 1: JWT decode/verify ---------------- */
-let jwtParts = { headerB64:"", payloadB64:"", sigB64:"", originalPayloadB64:"" };
-const JWT_SECRET = "zenith-lab-secret";
-
-async function generateSampleJwt(){
-  const header = { alg:"HS256", typ:"JWT" };
-  const now = Math.floor(Date.now()/1000);
-  const payload = { sub:"lead_8841", iss:"zenith-crm", aud:"zenith-workflow-engine", iat: now, exp: now + 3600 };
-  const headerB64 = b64urlEncode(strToBytes(JSON.stringify(header)));
-  const payloadB64 = b64urlEncode(strToBytes(JSON.stringify(payload)));
-  const signingInput = headerB64 + "." + payloadB64;
-  const sig = await hmacSha256Raw(JWT_SECRET, signingInput);
-  const sigB64 = b64urlEncode(new Uint8Array(sig));
-  jwtParts = { headerB64, payloadB64, sigB64, originalPayloadB64: payloadB64 };
-  document.getElementById("jwtDisplay").textContent = headerB64 + "." + payloadB64 + "." + sigB64;
-}
-generateSampleJwt();
-
-document.getElementById("btnDecodeJwt").addEventListener("click", () => {
-  document.getElementById("jwtDecoded").style.display = "block";
-  const header = b64urlDecodeToString(jwtParts.headerB64);
-  const payload = b64urlDecodeToString(jwtParts.payloadB64);
-  document.getElementById("jwtHeaderOut").textContent = JSON.stringify(JSON.parse(header), null, 2);
-  document.getElementById("jwtPayloadOut").textContent = JSON.stringify(JSON.parse(payload), null, 2);
+CourseProgress.touchVisited(5);
+const CHOICES = [
+  { id: "on", label: "Idempotent HTTP keyed on event.id" },
+  { id: "off", label: "No key — treat every delivery as new" },
+];
+let pick = null;
+const box = document.getElementById("picks");
+ModuleKit.shuffle(CHOICES).forEach(function (c) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "wf-chip";
+  b.textContent = c.label;
+  b.onclick = function () {
+    pick = c.id;
+    box.querySelectorAll(".wf-chip").forEach(function (el) { el.classList.remove("on"); });
+    b.classList.add("on");
+  };
+  box.appendChild(b);
 });
 
-document.getElementById("btnTamperJwt").addEventListener("click", () => {
-  const payloadObj = JSON.parse(b64urlDecodeToString(jwtParts.payloadB64));
-  payloadObj.sub = "lead_9999"; // tamper the subject claim
-  const tamperedPayloadB64 = b64urlEncode(strToBytes(JSON.stringify(payloadObj)));
-  jwtParts.payloadB64 = tamperedPayloadB64; // signature (sigB64) is NOT recomputed — this is the point
-  document.getElementById("jwtDisplay").textContent = jwtParts.headerB64 + "." + jwtParts.payloadB64 + "." + jwtParts.sigB64 + "  (tampered)";
-  if (document.getElementById("jwtDecoded").style.display === "block"){
-    document.getElementById("jwtPayloadOut").textContent = JSON.stringify(payloadObj, null, 2);
-  }
-  document.getElementById("jwtFeedback").className = "feedback";
-});
-
-document.getElementById("btnResetJwt").addEventListener("click", async () => {
-  document.getElementById("jwtDecoded").style.display = "none";
-  document.getElementById("jwtFeedback").className = "feedback";
-  await generateSampleJwt();
-});
-
-document.getElementById("btnVerifyJwt").addEventListener("click", async () => {
-  const secret = document.getElementById("jwtSecretInput").value;
-  const signingInput = jwtParts.headerB64 + "." + jwtParts.payloadB64;
-  const recomputed = await hmacSha256Raw(secret, signingInput);
-  const recomputedB64 = b64urlEncode(new Uint8Array(recomputed));
-  const fb = document.getElementById("jwtFeedback");
-  fb.style.display = "block";
-  if (recomputedB64 === jwtParts.sigB64){
+document.getElementById("btnRun").onclick = function () {
+  const fb = document.getElementById("labFb");
+  if (!pick) { fb.className = "feedback bad"; fb.textContent = "Pick a policy."; return; }
+  const store = {};
+  const graph = {
+    nodes: [
+      { id: "t", type: "trigger" },
+      { id: "h", type: "http", config: { maxRetries: 0, sideEffect: "charge", idempotent: pick === "on" } },
+      { id: "n", type: "notify" },
+    ],
+    edges: [{ from: "t", to: "h" }, { from: "h", to: "n" }],
+  };
+  const event = { id: "evt_same" };
+  const r1 = WorkflowRuntime.run(graph, event, { idempotencyStore: store, idempotencyKey: "evt_same" });
+  const r2 = WorkflowRuntime.run(graph, event, { idempotencyStore: store, idempotencyKey: "evt_same" });
+  const charges = WorkflowRuntime.countEffect(r1.ctx, "charge") + WorkflowRuntime.countEffect(r2.ctx, "charge");
+  ModuleKit.renderLogs(document.getElementById("labLog"), (r1.logs || []).concat([{ level: "info", text: "--- replay ---" }]).concat(r2.logs || []));
+  if (pick === "on" && r2.replayed && charges === 1) {
     fb.className = "feedback ok";
-    fb.textContent = "Signature valid. The recomputed HMAC over the current header.payload matches the token's signature exactly.";
+    fb.textContent = "Second delivery replayed the stored result. One charge. Lab passed.";
+    ModuleKit.passSection(5, "idemLab");
   } else {
     fb.className = "feedback bad";
-    fb.textContent = "Signature INVALID. The recomputed HMAC does not match, either the secret is wrong, or the content has been tampered with since it was signed.";
+    fb.textContent = "Charges recorded: " + charges + ". Enable the idempotent node so the replay does not charge again.";
   }
-});
-
-/* ---------------- Interactive 2: HMAC webhook workbench ---------------- */
-async function computeHmac(){
-  const msg = document.getElementById("hmacMsg").value;
-  const secret = document.getElementById("hmacSecret").value;
-  const sig = await hmacSha256Raw(secret, msg);
-  document.getElementById("hmacOut").textContent = bytesToHex(sig);
-}
-document.getElementById("btnComputeHmac").addEventListener("click", computeHmac);
-document.getElementById("btnTamperHmac").addEventListener("click", async () => {
-  const el = document.getElementById("hmacMsg");
-  const msg = el.value;
-  if (msg.length === 0) return;
-  const idx = Math.floor(Math.random() * msg.length);
-  const ch = msg[idx];
-  const replacement = ch === "0" ? "1" : "0";
-  el.value = msg.slice(0, idx) + replacement + msg.slice(idx+1);
-  await computeHmac();
-});
-computeHmac();
-
-/* ---------------- Interactive 3: code exercise ---------------- */
-const STARTER_CODE = `async function verifyWebhook(payload, receivedSignatureHex, secret) {
-  // Compute the expected signature for this payload, then compare it
-  // safely against receivedSignatureHex. Return true or false.
-
-  // YOUR CODE HERE
-
-}`;
-
-function loadStarterCode(){
-  document.getElementById("codeEditor").value = STARTER_CODE;
-  document.getElementById("testResults").innerHTML = "";
-}
-loadStarterCode();
-document.getElementById("btnResetCode").addEventListener("click", loadStarterCode);
-
-// Runs entirely inside a Web Worker via SandboxRunner, see sandbox-runner.js.
-// crypto.subtle and TextEncoder are both available inside a Worker's global
-// scope, so the real HMAC helpers work unmodified, no mocking needed.
-async function verifyHarness(code){
-  function strToBytes(str){ return new TextEncoder().encode(str); }
-  function bytesToHex(buf){ return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join(""); }
-  async function hmacSha256Raw(secret, message){
-    const key = await crypto.subtle.importKey("raw", strToBytes(secret), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
-    return crypto.subtle.sign("HMAC", key, strToBytes(message));
-  }
-  async function computeHmacHex(secret, message){ return bytesToHex(await hmacSha256Raw(secret, message)); }
-  function constantTimeEqual(a, b){
-    if (typeof a !== "string" || typeof b !== "string") return false;
-    if (a.length !== b.length) {
-      let dummy = 0;
-      for (let i = 0; i < a.length; i++) dummy |= a.charCodeAt(i) ^ (b.charCodeAt(i % b.length) || 0);
-      return false;
-    }
-    let diff = 0;
-    for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-    return diff === 0;
-  }
-
-  let studentFn;
-  try {
-    const factory = new Function("computeHmacHex", "constantTimeEqual", code + "\nreturn verifyWebhook;");
-    studentFn = factory(computeHmacHex, constantTimeEqual);
-    if (typeof studentFn !== "function") throw new Error("verifyWebhook is not defined as a function.");
-  } catch (e) {
-    return { ranOk: false, error: e.message };
-  }
-
-  const secret = "whsec_test123";
-  const payload = '{"event":"lead.created","id":"42"}';
-  const validSig = await computeHmacHex(secret, payload);
-  const flippedLast = validSig.slice(0, -1) + (validSig.slice(-1) === "0" ? "1" : "0");
-
-  const tests = [
-    { name: "Valid payload, correct signature, correct secret", payload, sig: validSig, secret, expect: true,
-      hint: "A genuinely valid request was rejected. Check that you're returning the result of the comparison, not something else." },
-    { name: "Modified payload (tampered after signing)", payload: payload.replace("42", "99"), sig: validSig, secret, expect: false,
-      hint: "A tampered payload was accepted. Make sure you're recomputing the HMAC over the payload you actually received, not trusting it blindly." },
-    { name: "Wrong secret", payload, sig: validSig, secret: "wrong-secret", expect: false,
-      hint: "A signature computed with the wrong secret was accepted. The comparison should be failing here." },
-    { name: "Modified signature (one character flipped)", payload, sig: flippedLast, secret, expect: false,
-      hint: "A corrupted signature was accepted. Double check the comparison logic itself." },
-  ];
-
-  const results = [];
-  for (const t of tests) {
-    let actual, errored = false, errMsg = "";
-    try {
-      actual = await studentFn(t.payload, t.sig, t.secret);
-    } catch (e) {
-      errored = true; errMsg = e.message;
-    }
-    const pass = !errored && actual === t.expect;
-    results.push({ name: t.name, pass, hint: t.hint, errored, errorMessage: errored ? errMsg : undefined });
-  }
-  return { ranOk: true, results };
-}
-
-async function runStudentTests(){
-  const resultsEl = document.getElementById("testResults");
-  resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Running in a sandboxed worker…</div>`;
-  const code = document.getElementById("codeEditor").value;
-
-  const outcome = await SandboxRunner.run(verifyHarness.toString(), "verifyHarness", [code]);
-  resultsEl.innerHTML = "";
-  if (!outcome.ok) {
-    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">${CourseProgress.escapeHtml(outcome.error)}</div>`;
-    return;
-  }
-  const data = outcome.result;
-  if (!data.ranOk) {
-    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">Your code didn't run: ${CourseProgress.escapeHtml(data.error)}. Check for a syntax error, or that the function is named exactly verifyWebhook.</div>`;
-    return;
-  }
-
-  const results = data.results;
-  let passCount = 0;
-  results.forEach(t => {
-    if (t.pass) passCount++;
-    const row = document.createElement("div");
-    row.className = "feedback " + (t.pass ? "ok" : "bad");
-    row.style.display = "block";
-    row.style.marginTop = "8px";
-    row.innerHTML = `<b>${t.pass ? "PASS" : "FAIL"}</b> — ${t.name}` +
-      (t.errored ? `<br>Your code threw an error: ${CourseProgress.escapeHtml(t.errorMessage)}` : (t.pass ? "" : `<br>${t.hint}`));
-    resultsEl.appendChild(row);
-  });
-  const summary = document.createElement("div");
-  summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
-  summary.textContent = `${passCount} / ${results.length} tests passing`;
-  resultsEl.appendChild(summary);
-  CourseProgress.setSection(5, "webhookCodeExercise", { passCount, total: results.length, attemptedAt: new Date().toISOString() });
-}
-document.getElementById("btnRunTests").addEventListener("click", runStudentTests);
-
-/* ---------------- Section 9: fix the vulnerable webhook handler ---------------- */
-const VULN_STARTER = `async function handleWebhookSecure(rawBody, receivedSignatureHex, secret, timestamp, now, seenIds) {
-  // This code has THREE real vulnerabilities. Find and fix all of them:
-  //  1. It parses untrusted data before verifying the signature.
-  //  2. It compares the signature unsafely (not constant-time).
-  //  3. It has no replay protection (no timestamp freshness check,
-  //     no duplicate event_id tracking via seenIds).
-
-  const payload = JSON.parse(rawBody);
-
-  const expected = await computeHmacHex(secret, rawBody);
-  if (expected !== receivedSignatureHex) {
-    return { ok: false, reason: "invalid signature" };
-  }
-
-  return { ok: true, payload };
-}`;
-function loadVulnStarter(){
-  document.getElementById("vulnCodeEditor").value = VULN_STARTER;
-  document.getElementById("vulnTestResults").innerHTML = "";
-}
-loadVulnStarter();
-document.getElementById("btnResetVulnCode").addEventListener("click", loadVulnStarter);
-
-// Runs entirely inside a Web Worker via SandboxRunner, see sandbox-runner.js.
-async function vulnHarness(code){
-  function strToBytes(str){ return new TextEncoder().encode(str); }
-  function bytesToHex(buf){ return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join(""); }
-  async function hmacSha256Raw(secret, message){
-    const key = await crypto.subtle.importKey("raw", strToBytes(secret), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
-    return crypto.subtle.sign("HMAC", key, strToBytes(message));
-  }
-  async function computeHmacHex(secret, message){ return bytesToHex(await hmacSha256Raw(secret, message)); }
-  function constantTimeEqual(a, b){
-    if (typeof a !== "string" || typeof b !== "string") return false;
-    if (a.length !== b.length) {
-      let dummy = 0;
-      for (let i = 0; i < a.length; i++) dummy |= a.charCodeAt(i) ^ (b.charCodeAt(i % b.length) || 0);
-      return false;
-    }
-    let diff = 0;
-    for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-    return diff === 0;
-  }
-
-  let studentFn;
-  try {
-    const factory = new Function("computeHmacHex", "constantTimeEqual", code + "\nreturn handleWebhookSecure;");
-    studentFn = factory(computeHmacHex, constantTimeEqual);
-    if (typeof studentFn !== "function") throw new Error("handleWebhookSecure is not defined as a function.");
-  } catch (e) {
-    return { ranOk: false, error: e.message };
-  }
-
-  const secret = "wh_secure_secret";
-  const NOW = 1700000000000;
-  const results = [];
-  async function safeTest(name, hint, body){
-    try { results.push({ name, pass: await body(), hint }); }
-    catch (e) { results.push({ name, pass: false, hint, errorMessage: e.message }); }
-  }
-
-  // Test 1: valid, fresh, unseen -> accepted
-  await safeTest("Valid signature, fresh timestamp, new event: accepted", "A genuinely valid, fresh, new request should be accepted.", async () => {
-    const payload = JSON.stringify({ event_id: "evt_1", data: "x" });
-    const sig = await computeHmacHex(secret, payload);
-    const out = await studentFn(payload, sig, secret, NOW - 1000, NOW, new Set());
-    return out && out.ok === true;
-  });
-
-  // Test 2: invalid signature -> rejected
-  await safeTest("Invalid signature: rejected", "Basic signature verification must still work.", async () => {
-    const payload = JSON.stringify({ event_id: "evt_2", data: "x" });
-    const out = await studentFn(payload, "0000bad0000", secret, NOW - 1000, NOW, new Set());
-    return out && out.ok === false;
-  });
-
-  // Test 3: valid signature, but stale timestamp (replay) -> rejected
-  await safeTest("Valid signature but stale timestamp (older than 5 min): rejected", "Add a freshness check: reject if (now - timestamp) exceeds 300000ms, even when the signature is genuinely valid.", async () => {
-    const payload = JSON.stringify({ event_id: "evt_3", data: "x" });
-    const sig = await computeHmacHex(secret, payload);
-    const out = await studentFn(payload, sig, secret, NOW - 400000, NOW, new Set());
-    return out && out.ok === false;
-  });
-
-  // Test 4: valid signature, fresh, but duplicate event_id (replay) -> rejected
-  await safeTest("Valid signature, fresh timestamp, but a duplicate event_id: rejected", "Check seenIds before accepting, and add the event_id once accepted, so the exact same event can't be replayed even with a technically-valid signature.", async () => {
-    const payload = JSON.stringify({ event_id: "evt_4", data: "x" });
-    const sig = await computeHmacHex(secret, payload);
-    const seenIds = new Set(["evt_4"]);
-    const out = await studentFn(payload, sig, secret, NOW - 1000, NOW, seenIds);
-    return out && out.ok === false;
-  });
-
-  // Test 5: malformed payload with a valid signature over the raw bytes -> rejected gracefully
-  await safeTest("Malformed JSON with a valid signature: rejected, not crashed", "Verify the signature over the raw bytes first (which will pass here), then handle a JSON.parse failure gracefully rather than letting it throw uncaught.", async () => {
-    const badPayload = "{not valid json";
-    const sig = await computeHmacHex(secret, badPayload);
-    let out, threw = false;
-    try { out = await studentFn(badPayload, sig, secret, NOW - 1000, NOW, new Set()); }
-    catch (e) { threw = true; }
-    return !threw && out && out.ok === false;
-  });
-
-  return { ranOk: true, results };
-}
-
-async function runVulnTests(){
-  const resultsEl = document.getElementById("vulnTestResults");
-  resultsEl.innerHTML = `<div class="feedback" style="display:block;color:var(--mut2)">Running in a sandboxed worker…</div>`;
-  const code = document.getElementById("vulnCodeEditor").value;
-
-  const outcome = await SandboxRunner.run(vulnHarness.toString(), "vulnHarness", [code]);
-  resultsEl.innerHTML = "";
-  if (!outcome.ok) {
-    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">${CourseProgress.escapeHtml(outcome.error)}</div>`;
-    return;
-  }
-  const data = outcome.result;
-  if (!data.ranOk) {
-    resultsEl.innerHTML = `<div class="feedback bad" style="display:block">Your code didn't run: ${CourseProgress.escapeHtml(data.error)}.</div>`;
-    return;
-  }
-
-  const results = data.results;
-  let passCount = 0;
-  results.forEach(r => {
-    if (r.pass) passCount++;
-    const row = document.createElement("div");
-    row.className = "feedback " + (r.pass ? "ok" : "bad");
-    row.style.display = "block"; row.style.marginTop = "8px";
-    const hintHtml = r.errorMessage
-      ? `Threw an unexpected error: ${CourseProgress.escapeHtml(r.errorMessage)}. ${r.hint}`
-      : r.hint;
-    row.innerHTML = `<b>${r.pass ? "PASS" : "FAIL"}</b> — ${r.name}` + (r.pass ? "" : `<br>${hintHtml}`);
-    resultsEl.appendChild(row);
-  });
-  const summary = document.createElement("div");
-  summary.style.cssText = "margin-top:10px;font-family:'JetBrains Mono';font-size:13px;color:" + (passCount === results.length ? "var(--emerald)" : "var(--mut)");
-  summary.textContent = `${passCount} / ${results.length} tests passing`;
-  resultsEl.appendChild(summary);
-  CourseProgress.setSection(5, "vulnCodeExercise", { passCount, total: results.length });
-}
-document.getElementById("btnRunVulnTests").addEventListener("click", runVulnTests);
-
-/* ---------------- Quiz ---------------- */
-let score = 0;
-const answered = { q1:false, q2:false, q3:false, q4:false };
-
-const MODULE_ID = 5;
-function updateScore(){
-  document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 4`;
-  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4;
-  const btn = document.getElementById("btnNext");
-  btn.disabled = !allDone;
-  btn.textContent = allDone ? "Continue to Module 6 →" : "Complete all questions to continue →";
-  if (allDone) {
-    CourseProgress.markComplete(MODULE_ID, score, 4);
-    const navNext = document.getElementById("navNextTop");
-    if (navNext) navNext.classList.add("navnext-ready");
-  }
-}
-
-// Q1
-const q1Options = [
-  { text: "Client credentials", correct: true },
-  { text: "Authorization code", correct: false, reason: "Authorization code is for when a human user is delegating access to their own account. There's no user here at all." },
-  { text: "Neither, OAuth2 doesn't apply to backend-only integrations", correct: false, reason: "OAuth2 explicitly includes a grant type for exactly this situation, client credentials, it just isn't the user-facing one people usually picture." },
-];
-const q1el = document.getElementById("q1opts");
-q1Options.forEach((opt, i) => {
-  const div = document.createElement("label");
-  div.className = "qopt";
-  div.innerHTML = `<input type="radio" name="q1" value="${i}"><span>${opt.text}</span>`;
-  div.addEventListener("click", () => {
-    if (answered.q1) return;
-    answered.q1 = true;
-    CourseProgress.setAnswer(MODULE_ID, "q1", i);
-    document.querySelectorAll('#q1opts .qopt').forEach((el,j) => {
-      if (q1Options[j].correct) el.classList.add("correct");
-      else if (j === i) el.classList.add("incorrect");
-    });
-    const ex = document.getElementById("q1explain");
-    ex.style.display = "block";
-    if (opt.correct) {
-      score++;
-      ex.textContent = "Correct. No human delegation is happening, the service is acting as itself, which is exactly what client credentials is for.";
-    } else {
-      ex.textContent = "Not quite. " + opt.reason;
-    }
-    updateScore();
-  });
-  q1el.appendChild(div);
-});
-
-// Q2
-const q2Options = [
-  { text: "True", correct: false },
-  { text: "False", correct: true },
-];
-const q2el = document.getElementById("q2opts");
-q2Options.forEach((opt, i) => {
-  const div = document.createElement("label");
-  div.className = "qopt";
-  div.innerHTML = `<input type="radio" name="q2" value="${i}"><span>${opt.text}</span>`;
-  div.addEventListener("click", () => {
-    if (answered.q2) return;
-    answered.q2 = true;
-    CourseProgress.setAnswer(MODULE_ID, "q2", i);
-    document.querySelectorAll('#q2opts .qopt').forEach((el,j) => {
-      if (q2Options[j].correct) el.classList.add("correct");
-      else if (j === i) el.classList.add("incorrect");
-    });
-    const ex = document.getElementById("q2explain");
-    ex.style.display = "block";
-    if (opt.correct) {
-      score++;
-      ex.textContent = "Correct. JWT payloads are base64url ENCODED, not encrypted. Anyone can decode them with no key at all, the signature only proves integrity, not confidentiality.";
-    } else {
-      ex.textContent = "Not quite. Encoding and encryption are different things. Base64url is reversible by anyone, with no secret required, try decoding the sample JWT above with the 'Decode' button before verifying it, no secret was needed for that step.";
-    }
-    updateScore();
-  });
-  q2el.appendChild(div);
-});
-
-// Q3
-function checkQ3(){
-  if (answered.q3) return;
-  const val = Number(document.getElementById("q3input").value);
-  const ex = document.getElementById("q3explain");
-  ex.style.display = "block";
-  answered.q3 = true;
-  CourseProgress.setAnswer(MODULE_ID, "q3", val);
-  if (val === 3) {
-    score++;
-    ex.style.color = "var(--emerald)";
-    ex.textContent = "Correct. header.payload.signature, three segments.";
-  } else {
-    ex.style.color = "var(--red)";
-    ex.textContent = "Not quite. Look at the sample token in Section 5, count the dots: header.payload.signature is 3 segments.";
-  }
-  updateScore();
-}
-document.getElementById("q3check").addEventListener("click", checkQ3);
-document.getElementById("q3input").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") checkQ3();
-});
-
-// Q4
-const q4Options = [
-  { text: "Because it returns as soon as it finds a mismatched byte, so comparison time correlates with how many leading bytes were correct, information an attacker can measure and exploit", correct: true },
-  { text: "Because === always takes the same amount of time no matter what, which is itself the vulnerability", correct: false, reason: "That's backwards, constant time is the FIX, not the problem. The vulnerability is that naive comparison is NOT constant time, its duration varies based on secret-dependent information." },
-  { text: "Because HMAC signatures are too short to compare securely", correct: false, reason: "Length isn't the issue, SHA-256 HMACs are plenty long to resist brute force as a whole. The vulnerability is specifically about the comparison algorithm's early-exit behavior, not the signature's size." },
-];
-const q4el = document.getElementById("q4opts");
-q4Options.forEach((opt, i) => {
-  const div = document.createElement("label");
-  div.className = "qopt";
-  div.innerHTML = `<input type="radio" name="q4" value="${i}"><span>${opt.text}</span>`;
-  div.addEventListener("click", () => {
-    if (answered.q4) return;
-    answered.q4 = true;
-    CourseProgress.setAnswer(MODULE_ID, "q4", i);
-    document.querySelectorAll('#q4opts .qopt').forEach((el,j) => {
-      if (q4Options[j].correct) el.classList.add("correct");
-      else if (j === i) el.classList.add("incorrect");
-    });
-    const ex = document.getElementById("q4explain");
-    ex.style.display = "block";
-    if (opt.correct) {
-      score++;
-      ex.textContent = "Correct. Early-exit comparison leaks a timing signal proportional to prefix-match length, this is exactly the Section 7 argument.";
-    } else {
-      ex.textContent = "Not quite. " + opt.reason;
-    }
-    updateScore();
-  });
-  q4el.appendChild(div);
-});
-
-document.getElementById("btnNext").addEventListener("click", () => {
-  window.location.href = "module-06.html";
-});
-
-/* ---------------- Retry checkpoint ---------------- */
-function maybeShowRetry(){
-  const anyAnswered = answered.q1 || answered.q2 || answered.q3 || answered.q4;
-  const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4;
-  const btn = document.getElementById("btnRetryCheckpoint");
-  btn.style.display = (anyAnswered && (allDone ? score < 4 : true)) ? "inline-flex" : "none";
-}
-document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
-  CourseProgress.resetModule(MODULE_ID);
-  window.location.reload();
-});
-const _origUpdateScore = updateScore;
-updateScore = function(){
-  _origUpdateScore();
-  maybeShowRetry();
 };
-maybeShowRetry();
 
-/* ---------------- Progress persistence: restore on load ---------------- */
-CourseProgress.touchVisited(MODULE_ID);
-(function restoreQuizState(){
-  const stored = CourseProgress.getModule(MODULE_ID);
-  const a = stored.answers || {};
-  if (a.q1 !== undefined && !answered.q1) {
-    const label = document.querySelectorAll('#q1opts .qopt')[a.q1];
-    if (label) label.click();
-  }
-  if (a.q2 !== undefined && !answered.q2) {
-    const label = document.querySelectorAll('#q2opts .qopt')[a.q2];
-    if (label) label.click();
-  }
-  if (a.q3 !== undefined && !answered.q3) {
-    const inputEl = document.getElementById('q3input');
-    if (inputEl) { inputEl.value = a.q3; checkQ3(); }
-  }
-  if (a.q4 !== undefined && !answered.q4) {
-    const label = document.querySelectorAll('#q4opts .qopt')[a.q4];
-    if (label) label.click();
-  }
-})();
+ModuleKit.renderQuiz("quizRoot", [
+  { text: "Idempotent means:",
+    whyOk: "Same key, stored result, one side effect. Failure is still allowed.",
+    opts: [
+      { t: "Doing the same request again does not create a second side effect", correct: true },
+      { t: "The request can never fail", why: "It can fail. It just must not double-apply." },
+      { t: "You never retry", why: "Retries are why you need the key." }
+    ] },
+  { text: "Best idempotency key for a Stripe webhook?",
+    whyOk: "Stripe already sent a unique event id. Date.now() and email collide or miss.",
+    opts: [
+      { t: "The event id Stripe already sent", correct: true },
+      { t: "Date.now()", why: "Every retry is a new key, so you double-charge." },
+      { t: "The customer email", why: "Two real payments from the same person collide." }
+    ] },
+  { text: "The client timed out and retried with the same key. The first charge actually succeeded. You should:",
+    whyOk: "Return the stored charge. The client is retrying, not buying twice.",
+    opts: [
+      { t: "Return the stored original result and not charge again", correct: true },
+      { t: "Charge again because the client asked twice", why: "The client is retrying, not buying twice." },
+      { t: "Delete the key so the slate is clean", why: "That invites the duplicate you just prevented." }
+    ] },
+  { text: "Why not keep every key forever with no expiry?",
+    whyOk: "Storage grows without bound. A day or two covers real vendor retries.",
+    opts: [
+      { t: "Storage grows without bound; a day or two covers real retries", correct: true },
+      { t: "Keys become invalid JSON after midnight", why: "They do not." },
+      { t: "Stripe forbids stored ids", why: "They expect you to store them." }
+    ] },
+  { text: "You used 'customer + today' as the key. What goes wrong?",
+    whyOk: "A second legitimate purchase the same day looks like a replay.",
+    opts: [
+      { t: "A legitimate second purchase the same day is treated as a replay", correct: true },
+      { t: "Time zones stop existing", why: "The collision is the bug, not time zones." },
+      { t: "Webhooks cannot include dates", why: "They can." }
+    ] },
+], 5);
 </script>
 </body>
 </html>

@@ -10,10 +10,10 @@
 // Science come from its real skill-map.js/course-progress.js (315 tasks,
 // 10 projects, confirmed this engagement); price for AI Engineering and
 // Data Science comes from src/lib/courses.ts's real Whop checkoutUrl.
-// Automation Engineering and Web3 Engineering have no entry in
-// src/lib/courses.ts yet (no real product/checkout exists), so they carry
-// no price and no task/project counts here, inventing either would
-// violate the one rule this file can't bend on.
+// AI Automation is in src/lib/courses.ts (content is real) but has no
+// Whop checkout yet, so this card stays available:false and carries no
+// price. practiceTasks/portfolioProjects are counted from practice-tasks.js
+// and course-progress.js. Web3 Engineering still has no COURSES entry.
 
 export type CourseCategory = "data" | "ai" | "automation" | "blockchain" | "security";
 
@@ -48,7 +48,7 @@ export type CourseCard = {
   careerPath: string;
   /** Real module list, in order, straight from the course's own course-progress.js MODULES array. `description` is the real module page's own "sub" copy, not invented. Only set for courses that are actually built and published — never invent a curriculum for a "Coming soon" course. */
   curriculum?: { title: string; description: string }[];
-  /** The LAB badge's accent color for this course. Data Science and AI Engineering pull the real color straight from their own static pages' `.logo b` badge; Automation Engineering and Web3 Engineering don't have a built, distinct accent yet, so these are a deliberate choice made for the catalog rather than lifted from existing course pages. */
+  /** The LAB badge's accent color for this course. Data Science and AI Engineering pull the real color straight from their own static pages' `.logo b` badge. AI Automation uses the cyan from courses/automation-engineering/course.css. Web3 is a catalog-only choice. */
   labBadgeColor?: { bg: string; text: string };
   /** Real per-tool practice task counts, straight from each practice library's real task count (confirmed against course-progress.js/skill-map.js). Should sum to practiceTasks. */
   practiceBreakdown?: { tool: string; tasks: number }[];
@@ -82,7 +82,7 @@ export const courses: CourseCard[] = [
       "Analyze data in Excel and Python (pandas)",
       "Run statistical tests, correlation, and regression",
       "Choose the right chart and spot a misleading one",
-      "Build dashboard-style analyses in Tableau and Power BI",
+      "Practice Tableau and Power BI judgment in honest in-browser simulations, then submit one real Desktop Lab",
       "Automate a repetitive analytical workflow",
       "Complete an end-to-end capstone and portfolio projects",
     ],
@@ -112,7 +112,7 @@ export const courses: CourseCard[] = [
       {
         title: "Orientation",
         description:
-          "A short, honest self-check that routes you to Module 1, 3, or 5, plus what data analysts and data scientists actually do and exactly what Modules 1-9 will (and won't) teach you.",
+          "A short, honest self-check. Beginners start at Module 1. Later tracks are optional only if you already write code or pandas, plus what analysts actually do and what Modules 1-9 will (and will not) teach you.",
       },
       {
         title: "Spreadsheet & Data Literacy Foundations",
@@ -192,6 +192,7 @@ export const courses: CourseCard[] = [
       "A downloadable portfolio site template",
       "Step-by-step guide to deploying it live on Vercel",
       "Career Path Edition: pricing, job boards, and interview framing",
+      "Required Tableau Public or Power BI Desktop lab (not the in-browser simulations)",
     ],
   },
   {
@@ -287,27 +288,61 @@ export const courses: CourseCard[] = [
     category: "ai",
     categoryLabel: "AI and LLMs",
     available: false,
-    level: "Intermediate, some coding experience",
-    duration: "Coming soon",
+    level: "Beginner, no prior coding required",
+    duration: "12 weeks, self-paced",
+    weeklyTime: "~8–10 hrs/week",
+    practiceTasks: 200,
+    portfolioProjects: 8,
+    hasCapstone: true,
     summary:
-      "Ship production code with an AI coding agent without letting it quietly wreck your codebase: prompting for code, reviewing AI output like a skeptic, and knowing exactly what to hand off versus do yourself.",
+      "Zero to a live web app: write HTML, CSS, and JavaScript yourself, then drive Cursor, review the diff, open a GitHub PR, and deploy. This is not AI Engineering — that course builds LLM products (RAG, tools, eval) and assumes programming logic already.",
     whatYoullDo: [
-      "Scaffold real code from a spec with a coding agent",
-      "Read AI-generated code like a reviewer, not a customer",
-      "Debug with an AI agent without losing the actual root cause",
-      "Verify AI-written tests actually test something",
-      "Run a multi-file refactor with an agent and check its work",
-      "Review an AI-authored pull request for security and logic regressions",
+      "Build a real page from a brief in HTML, by hand",
+      "Match a layout spec in CSS, including one responsive rule",
+      "Write JavaScript functions in the browser before any coding agent",
+      "Write acceptance criteria a stranger could implement",
+      "Install Cursor, change a starter repo, and submit a real GitHub commit URL",
+      "Own a public repo with a README, at least three commits, and a PR or documented branch",
+      "Write a test that fails on a planted bug",
+      "Ship a small web app with tests, a GitHub repo, and a live https URL",
     ],
-    topics: ["AI Pair Programming", "Code Review", "Debugging", "Testing", "Refactoring", "Prompt Engineering"],
+    topics: [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Specs",
+      "Cursor",
+      "GitHub",
+      "Testing",
+      "Python scripts",
+    ],
     facts: [
-      "AI-generated code that compiles and looks plausible can still call an API that doesn't exist.",
-      "The bottleneck in AI-assisted development is review discipline, not how fast the agent writes code.",
-      "A test an AI agent writes for its own code can pass while testing nothing real.",
+      "AI will write most of the characters. You are paid to specify, reject, test, and ship.",
+      "In-browser spec and diff practice is a labeled simulation. It never unlocks the capstone.",
+      "Both Desktop Labs are required: Cursor evidence and a GitHub repo you own. Pick-one is not enough.",
+      "This course does not teach RAG, tool-calling agents, or model eval — that is AI Engineering.",
     ],
     careerPath:
-      "A real shipped feature built and reviewed with an AI coding agent, plus the review habits that keep you accountable for code you didn't type yourself.",
+      "A junior who can specify a small web feature, drive a coding agent, read the diff, write tests, open a PR, and deploy a live URL. Not a senior engineer. No job guarantee.",
+    practiceBreakdown: [
+      { tool: "HTML", tasks: 20 },
+      { tool: "CSS", tasks: 20 },
+      { tool: "JavaScript", tasks: 40 },
+      { tool: "Specs (simulation)", tasks: 20 },
+      { tool: "Git (simulation)", tasks: 20 },
+      { tool: "Review (simulation)", tasks: 20 },
+      { tool: "Testing", tasks: 20 },
+      { tool: "Python", tasks: 25 },
+      { tool: "Integrated", tasks: 15 },
+    ],
     labBadgeColor: { bg: "#60a5fa", text: "#0b1220" },
+    includes: [
+      "Module 0 orientation plus nine sequential modules",
+      "Hard locks from Module 2 (quiz ≥80% and the graded exercise)",
+      "Desktop Labs for Cursor and GitHub (both required)",
+      "Quiz Center, diagnostic, mastery profile, learning roadmap",
+      "Projects, portfolio, deploy guide, career path with explicit gaps",
+    ],
   },
   {
     id: "cybersecurity-ethical-hacking",
@@ -399,36 +434,118 @@ export const courses: CourseCard[] = [
     labBadgeColor: { bg: "#fb923c", text: "#271200" },
   },
   {
-    id: "automation-engineering",
-    name: "Automation Engineering",
+    id: "ai-automation",
+    name: "AI Automation",
     category: "automation",
     categoryLabel: "Automation",
     available: false,
-    level: "Intermediate",
-    duration: "8 modules",
+    level: "Beginner, no programming required",
+    duration: "3–5 weeks if you also rebuild briefs in a real tool",
+    weeklyTime: "~4–6 hrs/week",
+    practiceTasks: 80,
+    portfolioProjects: 8,
+    hasCapstone: true,
     summary:
-      "Design production-grade workflows the way agencies actually ship them: API integrations, error handling, queues, retries, self-hosting, and where an AI agent belongs (and doesn't) inside an automated pipeline.",
+      "Build client-ready workflow judgment: map a real process, survive retries and replayed events in a simulated runtime, and put AI behind a schema and a human gate. n8n is the example, not the product.",
     whatYoullDo: [
-      "Design workflow architecture for a real integration",
-      "Authenticate against and call real third-party APIs",
-      "Handle errors, timeouts, and unexpected data",
-      "Build retry logic that doesn't create duplicate actions",
-      "Self-host and monitor a running workflow",
-      "Add an AI decision step to a workflow without losing determinism where it matters",
-      "Put guardrails around an agentic automation step so it can't run away",
+      "Map a client request into trigger, transform, and side effect",
+      "Read messy JSON and refuse a contact with no email",
+      "Drop a webhook whose teaching-signature does not match (simulated, not Stripe HMAC)",
+      "Retry a simulated flaky HTTP node without sending three invoices",
+      "Charge once when the same event arrives twice",
+      "Reject unstructured model output",
+      "Stop an agent from executing a refund without approval",
     ],
-    topics: ["APIs", "Error Handling", "Queues", "Retries", "Self-Hosting", "Monitoring", "AI Orchestration"],
+    topics: [
+      "Workflows",
+      "APIs",
+      "Webhooks",
+      "Retries",
+      "Idempotency",
+      "AI Steps",
+      "Guardrails",
+      "Client Delivery",
+    ],
     facts: [
-      "A good workflow needs failure handling, not just a happy path.",
-      "APIs often return errors, timeouts, or unexpected data.",
-      "Retries without limits can create duplicate actions.",
-      "Queues help separate incoming work from processing.",
-      "Automation is often about eliminating repetitive decisions, not just clicking faster.",
-      "An AI step in a workflow still needs the same retry and idempotency discipline as any API call.",
+      "A retry can charge a card twice if the write is not keyed.",
+      "A webhook URL without a signature check is a public write API.",
+      "A 200 from the CRM does not mean you mapped the right field.",
+      "Prose from a model is not a ticket label.",
+      "The tool list is the permission list.",
     ],
     careerPath:
-      "A portfolio automation system you can demo on a sales call, and the pricing/positioning to land clients paying for it.",
+      "A portfolio of workflows you can demo, plus an honest map of freelance integration work versus W-2 ops roles. No job guarantee.",
+    curriculum: [
+      {
+        title: "Orientation",
+        description:
+          "Who this is for, how grading works, and what we will not promise. n8n is an example platform, not a certificate.",
+      },
+      {
+        title: "Your First Client Workflow",
+        description:
+          "Trigger, transform, side effect. Assemble a booking pipeline that can actually finish, and reject a graph that loops.",
+      },
+      {
+        title: "Data That Moves",
+        description:
+          "JSON paths, empty emails, and why a 200 can still store garbage in the CRM.",
+      },
+      {
+        title: "APIs, Webhooks & Auth",
+        description:
+          "They call you or you call them. Reject a bad signature. Never mail the secret.",
+      },
+      {
+        title: "When Things Fail",
+        description:
+          "Bounded retries on a flaky API. Do not send three invoices.",
+      },
+      {
+        title: "Do It Once",
+        description:
+          "The same payment event, twice. One charge. Key on event id, not the clock.",
+      },
+      {
+        title: "AI as a Step, Not a Brain",
+        description:
+          "Demand a schema. Reject conversational prose. Models label and draft; code writes and charges.",
+      },
+      {
+        title: "Agents That Can't Run Away",
+        description:
+          "Draft versus execute. Approval before money moves. Ticket text is untrusted.",
+      },
+      {
+        title: "Capstone: A Client-Ready Lead Pipeline",
+        description:
+          "Enrich, extract, CRM, Slack. Survive two CRM failures, a replay, and a model that returns a sentence.",
+      },
+    ],
     labBadgeColor: { bg: "#22d3ee", text: "#04272b" },
+    practiceBreakdown: [
+      { tool: "Workflow design", tasks: 20 },
+      { tool: "APIs & webhooks", tasks: 20 },
+      { tool: "Retries & idempotency", tasks: 20 },
+      { tool: "AI steps & guardrails", tasks: 20 },
+    ],
+    projectSamples: [
+      { title: "Welcome Sequence for a New Lead", tag: "Beginner" },
+      { title: "Lead Form to CRM", tag: "Beginner" },
+      { title: "Invoice Follow-Up That Survives Timeouts", tag: "Reliability" },
+      { title: "Webhook That Must Not Double-Charge", tag: "Reliability" },
+      { title: "Support Ticket Classifier", tag: "AI step" },
+      { title: "Refund Agent With a Human Gate", tag: "Guardrails" },
+      { title: "Broken Production Run", tag: "Debug" },
+      { title: "Client-Ready Lead Pipeline", tag: "Capstone" },
+    ],
+    includes: [
+      "In-browser workflow runtime with flaky APIs, replays, and messy AI output",
+      "80 graded practice scenarios across four libraries",
+      "Quiz Center plus a 10-question transfer final",
+      "8 client-style briefs you rebuild in a real tool and score on the Portfolio page",
+      "Career Path Edition: freelance vs W-2, no job promise",
+    ],
   },
   {
     id: "web3-engineering",

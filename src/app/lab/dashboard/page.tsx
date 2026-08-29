@@ -35,7 +35,10 @@ export default async function DashboardPage() {
   const progressByCourse = new Map(progressRows.map((r) => [r.courseId, summarizeProgress(r.data)]));
 
   const owned = COURSES.filter((c) => ownedIds.has(c.id));
-  const available = COURSES.filter((c) => c.published && !ownedIds.has(c.id));
+  const available = COURSES.filter((c) => {
+    if (!c.published || ownedIds.has(c.id)) return false;
+    return getCheckoutUrl(c).isRealCheckout;
+  });
 
   const serviceRequests = await db.serviceRequest.findMany({
     where: { userId: session.user.id },
