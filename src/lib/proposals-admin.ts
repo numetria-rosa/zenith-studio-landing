@@ -108,7 +108,7 @@ export async function createProposalFromAudit(
 
     if (catalog.setupPriceCents != null && catalog.setupPriceCents !== 0) {
       itemsData.push({
-        label: `${catalog.title} — setup`,
+        label: `${catalog.title} setup`,
         kind: "SETUP",
         amountCents: catalog.setupPriceCents,
         catalogService: { connect: { id: catalog.id } },
@@ -117,7 +117,7 @@ export async function createProposalFromAudit(
     }
     if (catalog.monthlyPriceCents != null && catalog.monthlyPriceCents !== 0) {
       itemsData.push({
-        label: `${catalog.title} — monthly`,
+        label: `${catalog.title} monthly`,
         kind: "MONTHLY",
         amountCents: catalog.monthlyPriceCents,
         catalogService: { connect: { id: catalog.id } },
@@ -194,7 +194,7 @@ export function buildProposalSectionsFromAudit(input: {
 
   const deliverables =
     recommendations.length > 0
-      ? recommendations.map((r) => `• ${r.title} — live and documented`).join("\n")
+      ? recommendations.map((r) => `• ${r.title}: live and documented`).join("\n")
       : `• Working automation live in your stack\n• Short handoff doc / loom of how it works\n• Access to your project workspace for ongoing requests`;
 
   return {

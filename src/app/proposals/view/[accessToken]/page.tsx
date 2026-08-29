@@ -205,7 +205,7 @@ export default async function ProposalViewPage({
                     {proposal.approvals.map((a) => (
                       <li key={a.id} className="text-sm text-white/70">
                         <span className="font-semibold text-white/90">{a.action.replace("_", " ")}</span>
-                        {" — "}
+                        {" - "}
                         {a.respondedAt.toISOString().slice(0, 16).replace("T", " ")}
                         {a.note && <span className="mt-1 block whitespace-pre-wrap text-white/60">{a.note}</span>}
                       </li>
@@ -237,7 +237,7 @@ export default async function ProposalViewPage({
 
                   {proposal.setupPaidAt && (
                     <p className="mt-3 text-sm text-emerald-300">
-                      Setup paid{proposal.paymentMode === "BUNDLED" ? " — your monthly plan is now active." : "."}
+                      Setup paid{proposal.paymentMode === "BUNDLED" ? ". Your monthly plan is now active." : "."}
                     </p>
                   )}
 

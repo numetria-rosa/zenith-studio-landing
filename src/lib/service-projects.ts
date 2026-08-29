@@ -29,7 +29,7 @@ export const DEFAULT_REQUIREMENTS: { label: string; detail: string }[] = [
   { label: "Kickoff call", detail: "A short call to confirm scope and timeline before build starts." },
 ];
 
-export const KICKOFF_MESSAGE_BODY = `Welcome — your project workspace is ready.
+export const KICKOFF_MESSAGE_BODY = `Welcome. Your project workspace is ready.
 
 Please work through the Requirements checklist on this page (upload or confirm each item). Once those are in, we'll move into build.
 

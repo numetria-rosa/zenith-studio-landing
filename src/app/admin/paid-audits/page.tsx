@@ -19,7 +19,7 @@ import type { PaidAuditStatus } from "@prisma/client";
    action independently re-checks requireAdmin(). */
 
 function formatDateTime(d: Date | null): string {
-  if (!d) return "—";
+  if (!d) return "-";
   return d.toISOString().slice(0, 16).replace("T", " ");
 }
 
@@ -87,7 +87,7 @@ export default async function AdminPaidAuditsPage() {
             <a href={PAID_AUDIT_BOOKING_URL} target="_blank" rel="noopener noreferrer" className="underline decoration-white/30">
               Cal.com
             </a>
-            . New bookings sync automatically via webhook — use the form below only for corrections or fallback.
+            . New bookings sync automatically via webhook. Use the form below only for corrections or fallback.
           </p>
         </div>
       </div>

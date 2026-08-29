@@ -159,7 +159,7 @@ export default async function AdminClientProfilePage({
             </div>
           </div>
           <p className="text-xs text-white/40">
-            Uses the same methodology as the main dashboard — never derived from Proposal or ServiceProject data,
+            Uses the same methodology as the main dashboard. Never derived from Proposal or ServiceProject data,
             since approval isn&apos;t payment.
           </p>
         </SectionCard>

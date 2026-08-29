@@ -9,7 +9,7 @@ import { getService, SERVICES } from "@/lib/services";
 
 const ACTIVE_PROJECT_STAGES_EXCLUDED = ["COMPLETED", "CANCELLED"] as const;
 
-/** "$150/mo" / "$2,000/mo" / "$190" / "" -> cents. Empty string (a
+/** "$150/mo" / "$1,200/mo" / "$190" / "" -> cents. Empty string (a
     monthly-only vertical's setupPriceDisplay) parses to 0, which is
     correct — those services never contribute setup revenue. */
 export function parsePriceDisplayToCents(display: string | undefined): number {
@@ -311,7 +311,7 @@ export async function getNeedsAttention(): Promise<AttentionItem[]> {
     items.push({
       id: `proposal-noproject-${p.id}`,
       kind: "unstarted_approval",
-      label: "Approved proposal has no workspace yet — needs manual follow-up",
+      label: "Approved proposal has no workspace yet. Needs manual follow-up",
       clientLabel: p.companyName || p.clientName || p.clientEmail,
       service: null,
       ageMs: now - p.updatedAt.getTime(),
@@ -472,7 +472,7 @@ export async function getRecentActivity(limit = 20): Promise<ActivityEvent[]> {
     events.push({
       id: `project-${proj.id}`,
       label: "New service project created",
-      detail: `${proj.title} — ${proj.user.name || proj.user.email}`,
+      detail: `${proj.title} · ${proj.user.name || proj.user.email}`,
       at: proj.createdAt,
       href: `/admin/service-requests`,
     });
@@ -492,7 +492,7 @@ export async function getRecentActivity(limit = 20): Promise<ActivityEvent[]> {
     events.push({
       id: `support-${s.id}`,
       label: "New support request",
-      detail: `${s.subject} — ${s.user.name || s.user.email}`,
+      detail: `${s.subject} · ${s.user.name || s.user.email}`,
       at: s.createdAt,
       href: `/admin/service-requests`,
     });

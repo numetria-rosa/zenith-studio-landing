@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
       // The dashboard moved under /lab; keep the old URL alive for anyone
       // with it bookmarked or cached from before the move.
       { source: "/dashboard", destination: "/lab/dashboard", permanent: true },
+      { source: "/proposal/:token", destination: "/proposals/view/:token", permanent: false },
     ];
   },
 };

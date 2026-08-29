@@ -96,7 +96,7 @@ export default function ResponseForm({
         {addOnItems.length > 0 && (
           <>
             <h3 className="mt-6 text-xs font-bold uppercase tracking-[0.1em] text-fuchsia-300">
-              Optional add-ons — add any you want
+              Optional add-ons. Add any you want
             </h3>
             <div className="mt-2 flex flex-col gap-2">
               {addOnItems.map((item) => {
@@ -151,8 +151,8 @@ export default function ResponseForm({
       <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
         <h2 className="text-lg font-semibold">Your response</h2>
         <p className="mt-2 text-sm text-white/50">
-          Approve to move forward, request changes with a note, or decline. This records your response —
-          we&apos;ll follow up either way.
+          Approve to move forward, request changes with a note, or decline. This records your response.
+          We&apos;ll follow up either way.
         </p>
 
         {totals.monthlyCents > 0 && (

@@ -40,14 +40,14 @@ import {
 
 const REQUIREMENT_STATUS_LABELS: Record<string, string> = {
   MISSING: "Needed from client",
-  SUBMITTED: "Submitted — awaiting review",
+  SUBMITTED: "Submitted, awaiting review",
   UNDER_REVIEW: "Under review",
   APPROVED: "Approved",
   REJECTED: "Needs revision",
 };
 
 function formatDate(d: Date | null): string {
-  if (!d) return "—";
+  if (!d) return "-";
   return d.toISOString().slice(0, 10);
 }
 
@@ -263,7 +263,7 @@ export default async function AdminProjectDetailPage({
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
             <p className="text-[10px] uppercase tracking-wide text-white/30">Completion</p>
-            <p className="mt-1 text-lg font-semibold">{completionPct === null ? "—" : `${completionPct}%`}</p>
+            <p className="mt-1 text-lg font-semibold">{completionPct === null ? "-" : `${completionPct}%`}</p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
             <p className="text-[10px] uppercase tracking-wide text-white/30">Outstanding reqs</p>
@@ -290,7 +290,7 @@ export default async function AdminProjectDetailPage({
           )}
           {sp.monthlyCreated && (
             <div className="mb-3 rounded-2xl border border-emerald-400/25 bg-emerald-400/[0.06] p-4">
-              <p className="text-sm text-emerald-200">Monthly Whop checkout created — client can pay from their proposal / dashboard.</p>
+              <p className="text-sm text-emerald-200">Monthly Whop checkout created. The client can pay from their proposal / dashboard.</p>
             </div>
           )}
           {sp.monthlyError && (
@@ -317,7 +317,7 @@ export default async function AdminProjectDetailPage({
           )}
           {proposal?.whopMonthlyPlanId && !proposal.monthlyPaidAt && (
             <p className="mb-3 text-sm text-white/60">
-              Monthly checkout ready —{" "}
+              Monthly checkout ready:{" "}
               <a
                 href={whopCheckoutUrl(proposal.whopMonthlyPlanId)}
                 target="_blank"
@@ -433,7 +433,7 @@ export default async function AdminProjectDetailPage({
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-white/40">
-                  {m.completedAt ? `Completed ${formatDate(m.completedAt)}` : m.dueAt ? `Due ${formatDate(m.dueAt)}` : "—"}
+                  {m.completedAt ? `Completed ${formatDate(m.completedAt)}` : m.dueAt ? `Due ${formatDate(m.dueAt)}` : "-"}
                 </span>
                 <form action={toggleMilestone}>
                   <input type="hidden" name="milestoneId" value={m.id} />

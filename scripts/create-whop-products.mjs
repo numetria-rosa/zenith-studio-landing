@@ -171,7 +171,7 @@ const PRODUCTS = [
         description: "AI Intake Coordinator + AI Follow-Up Clerk, billed monthly.",
         plan_type: "renewal",
         initial_price: 0, // see the note on the Inbox Manager monthly plan above
-        renewal_price: 2000,
+        renewal_price: 1200,
         billing_period: 30,
       },
     ],

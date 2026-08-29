@@ -331,7 +331,7 @@ export default async function DashboardPage() {
                         rel="noopener noreferrer"
                         className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg border border-[#f0b429]/40 bg-[#f0b429]/10 px-4 py-2 text-xs font-semibold text-[#f0b429] transition hover:bg-[#f0b429]/20"
                       >
-                        Pay ${(monthlyCents / 100).toFixed(0)}/mo — your build is live
+                        Pay ${(monthlyCents / 100).toFixed(0)}/mo. Your build is live
                       </a>
                     )}
                   </div>

@@ -30,7 +30,7 @@ import { ProjectTabs } from "./Tabs";
 
 const REQUIREMENT_STATUS_LABELS: Record<string, string> = {
   MISSING: "Needed from you",
-  SUBMITTED: "Submitted — awaiting review",
+  SUBMITTED: "Submitted, awaiting review",
   UNDER_REVIEW: "Under review",
   APPROVED: "Approved",
   REJECTED: "Needs revision",

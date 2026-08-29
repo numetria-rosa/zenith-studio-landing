@@ -459,7 +459,7 @@ export async function getClientProfileByEmail(emailRaw: string): Promise<ClientP
     });
   }
   for (const sp of serviceProjects) {
-    activity.push({ id: `sp-${sp.id}`, label: `Project created — ${sp.title}`, at: sp.createdAt, href: "/admin/service-requests" });
+    activity.push({ id: `sp-${sp.id}`, label: `Project created: ${sp.title}`, at: sp.createdAt, href: "/admin/service-requests" });
   }
   for (const m of messages) {
     activity.push({

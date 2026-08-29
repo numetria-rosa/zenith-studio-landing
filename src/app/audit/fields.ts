@@ -134,7 +134,7 @@ export const STEPS: StepDef[] = [
       },
       {
         key: "anythingElse",
-        label: "Anything else — links to docs, workflows, or examples you can describe",
+        label: "Anything else: links to docs, workflows, or examples you can describe",
         type: "textarea",
       },
     ],

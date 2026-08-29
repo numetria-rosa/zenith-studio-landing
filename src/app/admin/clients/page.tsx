@@ -21,7 +21,7 @@ function formatCents(cents: number): string {
 }
 
 function formatDate(d: Date | null): string {
-  if (!d) return "—";
+  if (!d) return "-";
   return d.toISOString().slice(0, 10);
 }
 

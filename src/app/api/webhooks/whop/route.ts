@@ -112,6 +112,10 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
             : {}),
         },
       });
+      await tx.prospect.updateMany({
+        where: { proposalId: proposalMatch.proposal.id },
+        data: { status: "CUSTOMER", sequenceStoppedAt: now, sequenceStopReason: "paid" },
+      });
     } else {
       await tx.proposal.update({
         where: { id: proposalMatch.proposal.id },

@@ -32,7 +32,7 @@ export async function sendProposalEmail(
   const { error } = await client.emails.send({
     from: FROM_ADDRESS,
     to: input.to,
-    subject: `Your Zenith Studio proposal${input.companyName ? ` — ${input.companyName}` : ""}`,
+    subject: `Your Zenith Studio proposal${input.companyName ? `: ${input.companyName}` : ""}`,
     text: `Hi ${greetingName},
 
 Here's your automation proposal${forWhat}. It's attached as a PDF, and you can also view and respond to it online:
@@ -75,7 +75,7 @@ export async function sendProjectKickoffEmail(
   const { error } = await client.emails.send({
     from: FROM_ADDRESS,
     to: input.to,
-    subject: `Your project is ready — ${input.projectTitle}`,
+    subject: `Your project is ready: ${input.projectTitle}`,
     text: `Hi ${greetingName},
 
 Your Zenith Studio project "${input.projectTitle}" is set up.

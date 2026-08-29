@@ -141,7 +141,7 @@ export default async function AdminDashboardPage() {
             })}
           </div>
           <p className="mt-3 text-xs text-white/40">
-            Every pipeline stage links to a filtered view — Audit/Proposal/Approved to their own admin pages,
+            Every pipeline stage links to a filtered view. Audit/Proposal/Approved go to their own admin pages,
             Building/Live/Maintenance to <code>/admin/projects</code> filtered by that ServiceProject stage.
           </p>
         </section>
@@ -152,7 +152,7 @@ export default async function AdminDashboardPage() {
           <p className="mt-1 text-xs text-white/40">
             New audit submissions, proposals sent 3+ days ago with no response, approved proposals with no
             workspace yet, projects with missing client requirements, open support requests, overdue internal
-            tasks, and open high/urgent-priority tasks. Does not include unanswered client messages — no
+            tasks, and open high/urgent-priority tasks. Does not include unanswered client messages. No
             &quot;last admin reply&quot; concept exists yet.
           </p>
           <div className="mt-4 flex flex-col gap-3">
@@ -184,7 +184,7 @@ export default async function AdminDashboardPage() {
           <h2 className="text-lg font-semibold">Revenue overview</h2>
           {!hasAnyRevenue ? (
             <p className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-sm text-white/50">
-              Not much revenue data yet — this is a very new system. MRR and one-time revenue will populate as real
+              Not much revenue data yet. This is a very new system. MRR and one-time revenue will populate as real
               Whop payments come in.
             </p>
           ) : (
@@ -196,7 +196,7 @@ export default async function AdminDashboardPage() {
             </div>
           )}
           <p className="mt-3 text-xs text-white/40">
-            MRR and one-time revenue are shown separately and are never multiplied together or by a time period —
+            MRR and one-time revenue are shown separately and are never multiplied together or by a time period.
             doing so would imply revenue that hasn&apos;t actually been collected. Proposal-driven service projects
             with no matching ServiceRequest have genuinely unknown revenue (approval is not payment) and are
             excluded from these totals.
@@ -240,7 +240,7 @@ export default async function AdminDashboardPage() {
             <p className="mt-3 text-xs text-white/40">
               Pending-proposal counts only include proposal line items explicitly linked to a service catalog
               entry. Some sent/viewed proposals have unlinked line items, so this table may undercount pending
-              proposals for a given service — a real traceability gap, not a bug.
+              proposals for a given service. That is a real traceability gap, not a bug.
             </p>
           )}
         </section>
@@ -262,7 +262,7 @@ export default async function AdminDashboardPage() {
               >
                 <span>
                   <span className="text-white/90">{ev.label}</span>
-                  <span className="text-white/40"> — {ev.detail}</span>
+                  <span className="text-white/40"> · {ev.detail}</span>
                 </span>
                 <span className="shrink-0 text-xs text-white/40">{ev.at.toISOString().slice(0, 16).replace("T", " ")}</span>
               </Link>

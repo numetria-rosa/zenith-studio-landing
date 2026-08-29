@@ -37,7 +37,7 @@ export default async function SignInPage({
             Sign in to your account
           </h1>
           <p className="mt-2 text-sm text-[#9aa0ae]">
-            For Zenith Lab courses and AI Systems service requests. Use the password from your welcome page — it&apos;s also always on your profile.
+            For Zenith Lab courses and AI Systems service requests. Use the password from your welcome page. It&apos;s also always on your profile.
           </p>
 
           {error === "invalid_password" && (

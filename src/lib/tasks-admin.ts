@@ -63,7 +63,7 @@ export async function listProjectsForTaskPicker() {
   });
   return projects.map((p) => ({
     id: p.id,
-    label: `${projectServiceLabel(p)} — ${p.user.name || p.user.email}`,
+    label: `${projectServiceLabel(p)} · ${p.user.name || p.user.email}`,
   }));
 }
 

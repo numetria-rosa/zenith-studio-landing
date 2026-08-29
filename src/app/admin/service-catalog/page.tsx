@@ -19,7 +19,7 @@ export default async function AdminServiceCatalogPage() {
   });
 
   function formatCents(cents: number | null): string {
-    if (cents === null) return "—";
+    if (cents === null) return "-";
     return `$${(cents / 100).toLocaleString()}`;
   }
 
@@ -27,7 +27,7 @@ export default async function AdminServiceCatalogPage() {
     <div className="mx-auto max-w-5xl">
         <h1 className="text-2xl font-semibold">Service catalog</h1>
         <p className="mt-1 text-sm text-white/50">
-          {services.length} total. Read-only — src/lib/services.ts is still the source of truth for checkout and
+          {services.length} total. Read-only. src/lib/services.ts is still the source of truth for checkout and
           fulfillment.
         </p>
 
@@ -52,8 +52,8 @@ export default async function AdminServiceCatalogPage() {
               <div className="mt-4 flex flex-wrap gap-6 text-xs text-white/40">
                 <span>Setup: {formatCents(s.setupPriceCents)}</span>
                 <span>Monthly: {formatCents(s.monthlyPriceCents)}</span>
-                <span>Setup plan: {s.whopSetupPlanId ?? "—"}</span>
-                <span>Monthly plan: {s.whopMonthlyPlanId ?? "—"}</span>
+                <span>Setup plan: {s.whopSetupPlanId ?? "-"}</span>
+                <span>Monthly plan: {s.whopMonthlyPlanId ?? "-"}</span>
               </div>
             </div>
           ))}

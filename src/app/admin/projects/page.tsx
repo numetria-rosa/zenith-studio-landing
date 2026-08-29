@@ -13,12 +13,12 @@ import type { ProjectStage } from "@prisma/client";
    the real enum before it drives any query. */
 
 function formatDate(d: Date | null): string {
-  if (!d) return "—";
+  if (!d) return "-";
   return d.toISOString().slice(0, 10);
 }
 
 function formatDateTime(d: Date | null): string {
-  if (!d) return "—";
+  if (!d) return "-";
   return d.toISOString().slice(0, 16).replace("T", " ");
 }
 
@@ -126,7 +126,7 @@ export default async function AdminProjectsPage({
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wide text-white/30">Completion</p>
-                  <p className="mt-0.5 text-sm">{p.completionPct === null ? "—" : `${p.completionPct}%`}</p>
+                  <p className="mt-0.5 text-sm">{p.completionPct === null ? "-" : `${p.completionPct}%`}</p>
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wide text-white/30">Outstanding reqs</p>

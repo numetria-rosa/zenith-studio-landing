@@ -400,6 +400,7 @@ model Proposal {
   approvals ClientApproval[]
   serviceProjects ServiceProject[]
   paidAudits PaidAudit[]
+  prospect   Prospect?
 
   @@index([auditId])
   @@index([userId])
@@ -839,4 +840,188 @@ model PaidAudit {
   @@index([status])
   @@index([relatedAuditRequestId])
   @@index([relatedProposalId])
+}
+
+enum ProspectStatus {
+  RESEARCHED
+  REJECTED
+  NEEDS_REVIEW
+  READY_TO_SEND
+  SEQUENCE_ACTIVE
+  REPLIED
+  HOT
+  AUDIT_REQUESTED
+  CUSTOMER
+  UNSUBSCRIBED
+  NOT_INTERESTED
+  BOUNCED
+  WRONG_CONTACT
+}
+
+enum OutreachPriority {
+  A
+  B
+  C
+  SKIP
+}
+
+enum OutreachPath {
+  PROPOSAL
+  FREE_AUDIT
+  PAID_AUDIT_CALL
+}
+
+enum OutreachEmailType {
+  INITIAL
+  FOLLOW_UP_1
+  FOLLOW_UP_2
+  FOLLOW_UP_3
+}
+
+enum OutreachMessageStatus {
+  DRAFT
+  NEEDS_REVIEW
+  READY_TO_SEND
+  QUEUED
+  SENT
+  DELIVERED
+  BOUNCED
+  FAILED
+  CANCELLED
+}
+
+enum ReplyClass {
+  INTERESTED
+  WANTS_INFO
+  WANTS_AUDIT
+  WANTS_PRICING
+  WANTS_CALL
+  NOT_INTERESTED
+  UNSUBSCRIBE
+  WRONG_CONTACT
+  OUT_OF_OFFICE
+  OTHER
+}
+
+// Cold-outreach CRM. Separate from AuditRequest (inbound form) and
+// Proposal (the existing token-secured quote). A Prospect may later
+// generate one Proposal via the existing Proposal table — we do not
+// duplicate proposal/payment models.
+model Prospect {
+  id String @id @default(cuid())
+
+  businessName String
+  website      String?
+  city         String
+  country      String
+  niche        String
+  area         String?
+  email        String?
+  phone        String?
+  contactName  String?
+
+  prospectScore Int
+  outreachScore Int
+  priority      OutreachPriority
+  tier          String
+
+  recommendedServiceId String
+  recommendedOffer     String
+  outreachPath         OutreachPath
+
+  personalizationSignal String @db.Text
+  opportunity           String @db.Text
+  buyingSignal          String?
+  researchData          Json
+
+  status             ProspectStatus @default(RESEARCHED)
+  rejectionReasons   Json?
+  unsubscribeToken   String         @unique
+  sequenceStep       Int            @default(0)
+  sequenceStoppedAt  DateTime?
+  sequenceStopReason String?
+  lastOutreachAt     DateTime?
+
+  proposalId String?   @unique
+  proposal   Proposal? @relation(fields: [proposalId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages OutreachMessage[]
+  events   OutreachEvent[]
+
+  @@index([email])
+  @@index([status])
+  @@index([priority])
+  @@index([niche, city])
+}
+
+model OutreachMessage {
+  id         String @id @default(cuid())
+  prospectId String
+
+  emailType    OutreachEmailType
+  subject      String
+  bodyText     String            @db.Text
+  bodyHtml     String            @db.Text
+  qualityScore Int
+  status       OutreachMessageStatus @default(DRAFT)
+
+  factsUsed        Json
+  factCheckPassed  Boolean @default(false)
+  factCheckNotes   Json?
+  servicePagePath  String
+  proposalPath     String?
+  auditCta         String
+
+  resendEmailId String? @unique
+  scheduledFor  DateTime?
+  sentAt        DateTime?
+  deliveredAt   DateTime?
+  openedAt      DateTime?
+  clickedAt     DateTime?
+  bouncedAt     DateTime?
+  repliedAt     DateTime?
+  replyClass    ReplyClass?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+
+  @@index([prospectId])
+  @@index([status])
+  @@index([scheduledFor])
+}
+
+model OutreachEvent {
+  id         String   @id @default(cuid())
+  prospectId String
+  type       String
+  payload    Json?
+  createdAt  DateTime @default(now())
+
+  prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+
+  @@index([prospectId, createdAt])
+  @@index([type])
+}
+
+model EmailSuppression {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+model OutreachSettings {
+  id               String   @id @default("default")
+  autoSendEnabled  Boolean  @default(false)
+  maxEmailsPerHour Int      @default(8)
+  maxEmailsPerDay  Int      @default(30)
+  followUp1Hours   Int      @default(72)
+  followUp2Hours   Int      @default(168)
+  followUp3Hours   Int      @default(336)
+  updatedAt        DateTime @updatedAt
 }

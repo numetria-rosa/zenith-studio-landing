@@ -4,7 +4,7 @@ import BookButton from "../BookButton";
 import AuditForm from "./AuditForm";
 
 export const metadata: Metadata = {
-  title: "Get Your Free Automation Audit — Zenith Studio",
+  title: "Get Your Free Automation Audit | Zenith Studio",
   description:
     "Tell us how your business runs today and we'll map exactly where automation would save the most time and money. Free, no obligation.",
 };

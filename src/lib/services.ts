@@ -85,7 +85,7 @@ export const SERVICES: Service[] = [
     description:
       "An AI Intake Coordinator, Follow-Up Clerk, and Billing Clerk as one team: answers and qualifies every enquiry, works the leads that didn't retain, and reconstructs billable time before the write-down window closes.",
     setupPriceDisplay: "",
-    monthlyPriceDisplay: "$2,000/mo",
+    monthlyPriceDisplay: "$1,200/mo",
     whopSetupPlanId: "",
     whopMonthlyPlanId: "plan_kTlL5gBlJTsqy",
     setupCheckoutUrl: "",
@@ -123,6 +123,27 @@ export function isServiceStatus(v: string): v is ServiceStatus {
 
 export function getService(id: string): Service | undefined {
   return SERVICES.find((s) => s.id === id);
+}
+
+/** Public marketing URLs used in outbound email. Catalog `id` stays the
+    webhook/checkout key; these slugs are what a cold-email visitor hits. */
+export const SERVICE_PAGE_BY_ID: Record<string, { slug: string; path: string }> = {
+  "ai-inbox-manager": { slug: "ai-inbox-manager", path: "/services/ai-inbox-manager" },
+  "ai-lead-capture": { slug: "ai-lead-capture-follow-up", path: "/services/ai-lead-capture-follow-up" },
+  "ai-receptionist": { slug: "ai-receptionist-booking", path: "/services/ai-receptionist-booking" },
+  "law-firms": { slug: "law-firm-ai-team", path: "/services/law-firm-ai-team" },
+  brokerages: { slug: "brokerage-ai-team", path: "/services/brokerage-ai-team" },
+};
+
+export function servicePagePath(serviceId: string): string | null {
+  return SERVICE_PAGE_BY_ID[serviceId]?.path ?? null;
+}
+
+export function serviceIdForPageSlug(slug: string): string | null {
+  for (const [id, page] of Object.entries(SERVICE_PAGE_BY_ID)) {
+    if (page.slug === slug) return id;
+  }
+  return null;
 }
 
 /** null (not a fallback URL) — the page's job is to keep showing the

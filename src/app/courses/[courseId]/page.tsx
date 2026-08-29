@@ -67,7 +67,7 @@ export default async function CourseLandingPage({
           </p>
           {!isRealCheckout && (
             <p className="mt-2 text-xs text-amber-300/80">
-              Checkout isn&apos;t live yet — this links to the waitlist instead.
+              Checkout isn&apos;t live yet. This links to the waitlist instead.
             </p>
           )}
         </div>
@@ -87,7 +87,7 @@ export default async function CourseLandingPage({
               href={`/sign-in?callbackUrl=${encodeURIComponent(`/courses/${course.id}`)}`}
               className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
             >
-              I already purchased — sign in
+              I already purchased. Sign in
             </Link>
           )}
         </div>

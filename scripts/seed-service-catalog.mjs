@@ -62,7 +62,7 @@ const SERVICES = [
     description:
       "An AI Intake Coordinator, Follow-Up Clerk, and Billing Clerk as one team: answers and qualifies every enquiry, works the leads that didn't retain, and reconstructs billable time before the write-down window closes.",
     setupPriceCents: null,
-    monthlyPriceCents: 200000,
+    monthlyPriceCents: 120000,
     whopSetupPlanId: null,
     whopMonthlyPlanId: "plan_kTlL5gBlJTsqy",
   },

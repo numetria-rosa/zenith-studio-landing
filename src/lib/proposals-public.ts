@@ -4,6 +4,7 @@ import { findOrCreateUserByEmail } from "@/lib/users";
 import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 import { computeApprovedTotals, createProposalCheckout, isProposalPaymentMode } from "@/lib/proposal-payments";
 import { sendProjectKickoffEmail } from "@/lib/mail";
+import { syncProspectFromProposal } from "@/lib/outreach-admin";
 
 /* Token-secured client-facing proposal lookup (Slice 5 of the
    service-platform build, 2026-08-28). Modeled on PurchaseClaim's pattern
@@ -52,6 +53,9 @@ export async function markProposalViewed(id: string) {
       status: proposal.status === "SENT" ? "VIEWED" : undefined,
     },
   });
+  if (proposal.status === "SENT") {
+    await syncProspectFromProposal(id, "viewed");
+  }
 }
 
 /** Best-effort — never throws, never blocks the caller on failing to
@@ -171,6 +175,12 @@ export async function recordClientResponse(
       });
     }
   });
+
+  if (action === "APPROVED") {
+    await syncProspectFromProposal(proposal.id, "accepted");
+  } else if (action === "REJECTED") {
+    await syncProspectFromProposal(proposal.id, "declined");
+  }
 
   // Kickoff email after the DB transaction commits — in-app message is
   // already seeded inside createServiceProjectWithDefaults. Best-effort:

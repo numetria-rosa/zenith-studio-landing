@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Script from "next/script";
 import BookButton from "./BookButton";
-import { getService, getSetupCheckoutUrl } from "@/lib/services";
+import { getService, getSetupCheckoutUrl, servicePagePath } from "@/lib/services";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -106,7 +106,7 @@ export default function ZenithStudioLandingPage() {
       accentSoft: "text-amber-200/70",
       accentBtn: "border-amber-300/30 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20",
       glow: "from-amber-300/[0.07] via-orange-400/[0.04] to-transparent",
-      monthly: "$2,000/mo",
+      monthly: "$1,200/mo",
       monthlyNote: "For the Intake Coordinator + Follow-Up Clerk, as one team. The Billing Clerk is priced on what it recovers, not a flat fee.",
       stats: [
         ["38%", "average attorney utilization"],
@@ -830,6 +830,14 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 </ul>
 
                 <div className="mt-7 flex flex-col gap-3">
+                  {servicePagePath(system.id) ? (
+                    <Link
+                      href={servicePagePath(system.id)!}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10"
+                    >
+                      See how it works
+                    </Link>
+                  ) : null}
                   <BookButton
                     className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
                       system.featured
@@ -959,6 +967,14 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                     </div>
 
                     <div className="mt-6 flex flex-col gap-3">
+                      {servicePagePath(v.id) ? (
+                        <Link
+                          href={servicePagePath(v.id)!}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10"
+                        >
+                          See how the AI team works
+                        </Link>
+                      ) : null}
                       <BookButton className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10">
                         Book a free audit
                       </BookButton>

@@ -299,7 +299,7 @@ function ProposalPdfDocument({ data }: { data: ProposalPdfData }) {
   const reference = data.id.slice(-8).toUpperCase();
 
   return (
-    <Document title={`Zenith Studio Proposal — ${data.companyName || data.clientName || data.clientEmail}`}>
+    <Document title={`Zenith Studio Proposal: ${data.companyName || data.clientName || data.clientEmail}`}>
       <Page size="A4" style={styles.page}>
         <View style={styles.brandRow}>
           <View style={styles.brandRowLeft}>

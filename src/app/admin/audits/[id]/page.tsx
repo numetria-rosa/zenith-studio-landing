@@ -193,7 +193,7 @@ export default async function AdminAuditDetailPage({ params }: { params: Promise
                     const value = answers[f.key];
                     const display =
                       value === undefined || value === null || value === ""
-                        ? "—"
+                        ? "-"
                         : String(value);
                     return (
                       <div key={f.key}>

@@ -236,7 +236,7 @@ export default async function AdminProposalDetailPage({
         )}
         {sp.checkoutCreated && (
           <div className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-400/[0.06] p-4">
-            <p className="text-sm text-emerald-200">Whop checkout created — client can pay from their proposal link.</p>
+            <p className="text-sm text-emerald-200">Whop checkout created. The client can pay from their proposal link.</p>
           </div>
         )}
         {sp.checkoutError && (
@@ -248,7 +248,7 @@ export default async function AdminProposalDetailPage({
         {proposal.sentAt && (
           <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.06] p-4">
             <p className="text-sm text-white/80">
-              Client link (no email is sent automatically — copy this and share it with the client yourself):
+              Client link (no email is sent automatically. Copy this and share it with the client yourself):
             </p>
             <p className="mt-1 break-all text-sm text-cyan-300">{publicUrl}</p>
           </div>
@@ -263,7 +263,7 @@ export default async function AdminProposalDetailPage({
           return (
             <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
               <p className="text-sm font-semibold text-white/80">
-                Payment {proposal.paymentMode ? `— ${proposal.paymentMode === "BUNDLED" ? "pay both now" : "setup now, monthly later"}` : ""}
+                Payment {proposal.paymentMode ? `: ${proposal.paymentMode === "BUNDLED" ? "pay both now" : "setup now, monthly later"}` : ""}
               </p>
               <div className="mt-2 flex flex-col gap-1.5 text-sm">
                 {approvedTotals.setupCents > 0 && (
@@ -276,7 +276,7 @@ export default async function AdminProposalDetailPage({
                         : "checkout not created"}
                     {proposal.whopSetupPlanId && !proposal.setupPaidAt && (
                       <>
-                        {" — "}
+                        {" · "}
                         <a href={whopCheckoutUrl(proposal.whopSetupPlanId)} target="_blank" rel="noopener noreferrer" className="underline decoration-white/30 hover:text-white">
                           checkout link
                         </a>
@@ -293,7 +293,7 @@ export default async function AdminProposalDetailPage({
                       Recreate Whop checkout
                     </button>
                     <p className="mt-1 text-xs text-white/40">
-                      Approval saved but no checkout link yet — usually a transient Whop API failure. Safe to retry.
+                      Approval saved but no checkout link yet. Usually a transient Whop API failure. Safe to retry.
                     </p>
                   </form>
                 )}
@@ -311,7 +311,7 @@ export default async function AdminProposalDetailPage({
                             : "checkout not created"}
                     {proposal.whopMonthlyPlanId && !proposal.monthlyPaidAt && (
                       <>
-                        {" — "}
+                        {" · "}
                         <a href={whopCheckoutUrl(proposal.whopMonthlyPlanId)} target="_blank" rel="noopener noreferrer" className="underline decoration-white/30 hover:text-white">
                           checkout link
                         </a>
@@ -331,7 +331,7 @@ export default async function AdminProposalDetailPage({
               {proposal.approvals.map((a) => (
                 <li key={a.id} className="text-sm text-white/70">
                   <span className="font-semibold">{a.action.replace("_", " ")}</span>
-                  {" — "}
+                  {" · "}
                   {a.respondedAt.toISOString().slice(0, 16).replace("T", " ")}
                   {a.note && <span className="block text-xs text-white/50">{a.note}</span>}
                 </li>
@@ -383,7 +383,7 @@ export default async function AdminProposalDetailPage({
               </div>
               <div>
                 <label className="block text-xs text-white/50 mb-1" htmlFor="expiresAt">
-                  Expires on (optional — the client link stops working after this date)
+                  Expires on (optional. The client link stops working after this date)
                 </label>
                 <input
                   id="expiresAt"
@@ -523,7 +523,7 @@ export default async function AdminProposalDetailPage({
               </div>
               <div>
                 <label className="block text-xs text-white/50 mb-1" htmlFor="item-amount">
-                  Amount ($ — enter positive; discounts are stored negative automatically)
+                  Amount ($: enter positive; discounts are stored negative automatically)
                 </label>
                 <input
                   id="item-amount"

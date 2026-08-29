@@ -68,7 +68,7 @@ export default async function ProfilePage({
           <p className="mt-4 font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.1em] text-[#676e7d]">
             Account
           </p>
-          <p className="mt-2 text-sm text-[#eeeee7]">{user.name || "—"}</p>
+          <p className="mt-2 text-sm text-[#eeeee7]">{user.name || "-"}</p>
           <p className="text-sm text-[#9aa0ae]">{user.email}</p>
         </div>
 
@@ -84,7 +84,7 @@ export default async function ProfilePage({
               {currentPassword}
             </p>
           ) : (
-            <p className="mt-2 text-sm text-[#9aa0ae]">No password set yet — set one below.</p>
+            <p className="mt-2 text-sm text-[#9aa0ae]">No password set yet. Set one below.</p>
           )}
           <p className="mt-2 text-xs text-[#676e7d]">Use this with {user.email} to sign in.</p>
         </div>

@@ -44,7 +44,7 @@ export async function generateMetadata({
   if (!course) return {};
 
   return {
-    title: `${course.name} — Course Details | Zenith Lab`,
+    title: `${course.name} | Course Details | Zenith Lab`,
     description: course.summary,
     alternates: { canonical: `${SITE_URL}/lab/${course.id}` },
     openGraph: {
@@ -486,7 +486,7 @@ export default async function CourseDetailsPage({
             <p className="text-sm" style={{ color: "var(--mut)" }}>
               {isRealCheckout
                 ? "Ready to start? Self-paced, start whenever you are."
-                : "Not open for enrollment yet — join the waitlist."}
+                : "Not open for enrollment yet. Join the waitlist."}
             </p>
             <a
               href={checkoutUrl}

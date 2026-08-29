@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/admin";
 import { getTopMetrics } from "@/lib/dashboard-metrics";
 import { getOverdueTaskCount } from "@/lib/tasks-admin";
 import { listPaidAuditsForAdmin } from "@/lib/paid-audit";
+import { db } from "@/lib/db";
 import AdminNav, { type NavItem } from "./AdminNav";
 
 /* Shared /admin/** layout (Slice 7 of the business command center,
@@ -29,10 +30,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // Badge counts reuse the exact same queries dashboard-metrics.ts and
   // tasks-admin.ts already established, rather than writing new counting
   // logic that could quietly drift from the numbers shown elsewhere.
-  const [topMetrics, overdueTaskCount, paidAudits] = await Promise.all([
+  const [topMetrics, overdueTaskCount, paidAudits, outreachReady] = await Promise.all([
     getTopMetrics(),
     getOverdueTaskCount(),
     listPaidAuditsForAdmin(),
+    db.prospect.count({ where: { status: { in: ["READY_TO_SEND", "NEEDS_REVIEW"] } } }),
   ]);
   // Needs-action badge: rows still waiting on an admin to confirm payment or
   // booking. BOOKED/COMPLETED/FOLLOW_UP/CANCELLED/REFUNDED don't need
@@ -46,6 +48,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin", label: "Dashboard", icon: "LayoutDashboard" },
     { href: "/admin/clients", label: "Clients", icon: "Users" },
     { href: "/admin/audits", label: "Audits", icon: "ClipboardList", badge: topMetrics.openAudits },
+    { href: "/admin/outreach", label: "Outreach", icon: "Send", badge: outreachReady },
     { href: "/admin/proposals", label: "Proposals", icon: "FileText", badge: topMetrics.pendingProposals },
     { href: "/admin/projects", label: "Projects", icon: "FolderKanban" },
     { href: "/admin/tasks", label: "Tasks", icon: "CheckSquare", badge: overdueTaskCount },

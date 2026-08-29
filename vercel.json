@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/cron/outreach",
+      "schedule": "0 * * * *"
+    }
+  ],
   "rewrites": [
     {
       "source": "/n8n_course/:chapter",
