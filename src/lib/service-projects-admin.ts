@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { getService } from "@/lib/services";
 import { computeApprovedTotals, createDeferredMonthlyCheckout } from "@/lib/proposal-payments";
-import type { ProjectStage, SupportStatus } from "@prisma/client";
+import type { ProjectStage, ProposalItemKind, SupportStatus } from "@prisma/client";
 
 /* Admin-side ServiceProject operations (Slice 4 of the business command
    center, 2026-08-28: /admin/projects). Every write here re-checks
@@ -150,7 +150,16 @@ export async function getServiceProjectForAdmin(id: string) {
     include: {
       user: { select: { id: true, name: true, email: true } },
       catalogService: { select: { title: true, slug: true } },
-      proposal: { select: { id: true } },
+      proposal: {
+        select: {
+          id: true,
+          paymentMode: true,
+          whopMonthlyPlanId: true,
+          monthlyPaidAt: true,
+          selectedAddOnItemIds: true,
+          items: { select: { id: true, amountCents: true, isOptionalAddOn: true, kind: true } },
+        },
+      },
       assignee: { select: { id: true, name: true, email: true } },
       milestones: { orderBy: { order: "asc" } },
       requirements: { orderBy: { order: "asc" } },
@@ -179,16 +188,11 @@ type WriteResult = { ok: true } | { ok: false; error: string };
     already re-checked requireAdmin().
 
     Also the trigger point for a SPLIT-mode proposal's deferred monthly
-    checkout: per the client's explicit choice at approval time ("pay setup
-    now, monthly once the work is finished"), the monthly Whop plan doesn't
-    exist at all until an admin marks the project LIVE — see the
-    ProposalPaymentMode enum's doc comment in prisma/schema.prisma. Fires
-    at most once per project (guarded by whopMonthlyPlanId already being
-    set) and only on the actual transition INTO LIVE, not on every save
-    while already LIVE. A slow/flaky Whop API call here fails the whole
-    stage update (the two are done together deliberately — an admin
-    retrying "mark LIVE" is the natural retry path, better than silently
-    leaving a LIVE project with no monthly checkout ever created). */
+    checkout: the monthly Whop plan is created when an admin marks the
+    project LIVE. Whop runs BEFORE the stage write so a flaky API leaves
+    the project not-yet-LIVE and "Update stage → LIVE" is a clean retry.
+    Also heals the prior partial-failure case (already LIVE,
+    whopMonthlyPlanId still null) when LIVE is submitted again. */
 export async function updateProjectStage(id: string, stage: string): Promise<WriteResult> {
   if (!isProjectStage(stage)) return { ok: false, error: `invalid stage "${stage}"` };
   const existing = await db.serviceProject.findUnique({
@@ -209,27 +213,72 @@ export async function updateProjectStage(id: string, stage: string): Promise<Wri
   });
   if (!existing) return { ok: false, error: "not_found" };
 
-  await db.serviceProject.update({ where: { id }, data: { stage } });
-
-  const proposal = existing.proposal;
-  if (
-    stage === "LIVE" &&
-    existing.stage !== "LIVE" &&
-    proposal &&
-    proposal.paymentMode === "SPLIT" &&
-    !proposal.whopMonthlyPlanId
-  ) {
-    const selectedAddOnIds = Array.isArray(proposal.selectedAddOnItemIds)
-      ? (proposal.selectedAddOnItemIds as string[])
-      : [];
-    const { monthlyCents } = computeApprovedTotals(proposal.items, selectedAddOnIds);
-    if (monthlyCents > 0) {
-      const reference = proposal.id.slice(-8).toUpperCase();
-      await createDeferredMonthlyCheckout(proposal.id, reference, monthlyCents);
-    }
+  if (stage === "LIVE") {
+    const monthlyResult = await ensureSplitMonthlyCheckoutForProject(id, existing.proposal);
+    if (!monthlyResult.ok) return monthlyResult;
   }
 
+  await db.serviceProject.update({ where: { id }, data: { stage } });
   return { ok: true };
+}
+
+type ProposalForDeferredMonthly = {
+  id: string;
+  paymentMode: "SPLIT" | "BUNDLED" | null;
+  whopMonthlyPlanId: string | null;
+  selectedAddOnItemIds: unknown;
+  items: { id: string; amountCents: number; isOptionalAddOn: boolean; kind: ProposalItemKind }[];
+} | null;
+
+/** Creates the SPLIT deferred monthly Whop plan when missing. No-op when
+    not SPLIT, already has a plan, or monthly total is $0. Exported so the
+    project admin page can retry without bouncing stage. */
+export async function ensureSplitMonthlyCheckoutForProject(
+  projectId: string,
+  proposalHint?: ProposalForDeferredMonthly
+): Promise<WriteResult> {
+  let proposal = proposalHint;
+  if (proposal === undefined) {
+    const row = await db.serviceProject.findUnique({
+      where: { id: projectId },
+      select: {
+        proposal: {
+          select: {
+            id: true,
+            paymentMode: true,
+            whopMonthlyPlanId: true,
+            selectedAddOnItemIds: true,
+            items: { select: { id: true, amountCents: true, isOptionalAddOn: true, kind: true } },
+          },
+        },
+      },
+    });
+    if (!row) return { ok: false, error: "not_found" };
+    proposal = row.proposal;
+  }
+
+  if (!proposal) return { ok: true };
+  if (proposal.paymentMode !== "SPLIT") return { ok: true };
+  if (proposal.whopMonthlyPlanId) return { ok: true };
+
+  const selectedAddOnIds = Array.isArray(proposal.selectedAddOnItemIds)
+    ? (proposal.selectedAddOnItemIds as string[])
+    : [];
+  const { monthlyCents } = computeApprovedTotals(proposal.items, selectedAddOnIds);
+  if (monthlyCents <= 0) return { ok: true };
+
+  const reference = proposal.id.slice(-8).toUpperCase();
+  try {
+    await createDeferredMonthlyCheckout(proposal.id, reference, monthlyCents);
+    return { ok: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Whop monthly plan creation failed";
+    console.error(
+      `[service-projects-admin] ensureSplitMonthlyCheckout failed for project ${projectId}:`,
+      err
+    );
+    return { ok: false, error: `Whop monthly checkout failed: ${message}` };
+  }
 }
 
 export async function updateProjectAdminNote(id: string, adminNote: string): Promise<WriteResult> {

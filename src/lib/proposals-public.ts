@@ -174,16 +174,21 @@ export async function recordClientResponse(
   // Whop plan creation is a real network call — deliberately outside the
   // DB transaction above so a slow/flaky Whop API response never holds a
   // Postgres transaction open. If it throws, the approval itself has
-  // already committed; the client just won't see a checkout link on this
-  // exact render (the page's own fallback — deriving a URL from a stored
-  // plan id — simply has nothing to derive yet). Not retried automatically
-  // here; an admin can be asked to re-trigger if this ever actually fails.
+  // already committed; the client won't see a checkout link until an
+  // admin hits "Recreate Whop checkout" on /admin/proposals/[id].
   let setupCheckoutUrl: string | null = null;
   if (action === "APPROVED" && setupCents > 0) {
     const reference = proposal.id.slice(-8).toUpperCase();
     const mode = resolvedPaymentMode ?? "SPLIT"; // monthlyCents === 0 here means mode is irrelevant to createProposalCheckout
-    const result = await createProposalCheckout(proposal.id, reference, setupCents, monthlyCents, mode);
-    setupCheckoutUrl = result.setupCheckoutUrl;
+    try {
+      const result = await createProposalCheckout(proposal.id, reference, setupCents, monthlyCents, mode);
+      setupCheckoutUrl = result.setupCheckoutUrl;
+    } catch (err) {
+      console.error(
+        `[proposals-public] createProposalCheckout failed after approval for ${proposal.id} — admin can retry:`,
+        err
+      );
+    }
   }
 
   return { ok: true, setupCheckoutUrl };

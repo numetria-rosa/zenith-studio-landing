@@ -15,7 +15,7 @@ import {
   sendProposalAsAdmin,
   updateProposalSectionsAsAdmin,
 } from "@/lib/proposals-admin";
-import { computeApprovedTotals, whopCheckoutUrl } from "@/lib/proposal-payments";
+import { computeApprovedTotals, whopCheckoutUrl, ensureProposalSetupCheckout } from "@/lib/proposal-payments";
 
 /* Proposal builder (Slice 5 of the service-platform build, 2026-08-28).
    Every section is an editable textarea/input saved via a server action;
@@ -38,7 +38,7 @@ export default async function AdminProposalDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ emailSent?: string; emailError?: string }>;
+  searchParams: Promise<{ emailSent?: string; emailError?: string; checkoutError?: string; checkoutCreated?: string }>;
 }) {
   const admin = await requireAdmin();
   if (!admin) notFound();
@@ -151,6 +151,19 @@ export default async function AdminProposalDetailPage({
     }
   }
 
+  async function recreateCheckout() {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    const result = await ensureProposalSetupCheckout(id);
+    revalidatePath(`/admin/proposals/${id}`);
+    if (result.ok) {
+      redirect(`/admin/proposals/${id}?checkoutCreated=1`);
+    } else {
+      redirect(`/admin/proposals/${id}?checkoutError=${encodeURIComponent(result.error)}`);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-4xl">
         <Link href="/admin/proposals" className="text-sm text-white/50 hover:text-white/80">
@@ -221,6 +234,16 @@ export default async function AdminProposalDetailPage({
             <p className="text-sm text-red-200">Couldn&apos;t email the PDF: {sp.emailError}</p>
           </div>
         )}
+        {sp.checkoutCreated && (
+          <div className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-400/[0.06] p-4">
+            <p className="text-sm text-emerald-200">Whop checkout created — client can pay from their proposal link.</p>
+          </div>
+        )}
+        {sp.checkoutError && (
+          <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/[0.06] p-4">
+            <p className="text-sm text-red-200">Couldn&apos;t create checkout: {sp.checkoutError}</p>
+          </div>
+        )}
 
         {proposal.sentAt && (
           <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.06] p-4">
@@ -260,6 +283,19 @@ export default async function AdminProposalDetailPage({
                       </>
                     )}
                   </p>
+                )}
+                {!proposal.whopSetupPlanId && !proposal.setupPaidAt && approvedTotals.setupCents > 0 && (
+                  <form action={recreateCheckout} className="mt-2">
+                    <button
+                      type="submit"
+                      className="rounded-full border border-amber-300/40 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold text-amber-200 transition hover:bg-amber-400/20"
+                    >
+                      Recreate Whop checkout
+                    </button>
+                    <p className="mt-1 text-xs text-white/40">
+                      Approval saved but no checkout link yet — usually a transient Whop API failure. Safe to retry.
+                    </p>
+                  </form>
                 )}
                 {approvedTotals.monthlyCents > 0 && (
                   <p className={proposal.monthlyPaidAt ? "text-emerald-300" : "text-white/60"}>

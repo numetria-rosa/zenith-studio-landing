@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/admin";
 import {
@@ -7,6 +7,7 @@ import {
   listAssignableAdmins,
   projectServiceLabel,
   updateProjectStage,
+  ensureSplitMonthlyCheckoutForProject,
   updateProjectAdminNote,
   updateProjectOps,
   postAdminMessage,
@@ -16,6 +17,7 @@ import {
   SUPPORT_STATUSES,
   SUPPORT_STATUS_LABELS,
 } from "@/lib/service-projects-admin";
+import { computeApprovedTotals, whopCheckoutUrl } from "@/lib/proposal-payments";
 import { INTEGRATION_STATUS_LABELS } from "@/lib/service-workspace";
 import {
   listTasksForProject,
@@ -62,13 +64,16 @@ function SectionCard({ title, children }: { title: string; children: React.React
 
 export default async function AdminProjectDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ stageError?: string; monthlyCreated?: string; monthlyError?: string }>;
 }) {
   const admin = await requireAdmin();
   if (!admin) notFound();
 
   const { id } = await params;
+  const sp = await searchParams;
   const [project, assignableAdmins, projectTasks] = await Promise.all([
     getServiceProjectForAdmin(id),
     listAssignableAdmins(),
@@ -78,14 +83,41 @@ export default async function AdminProjectDetailPage({
 
   const path = `/admin/projects/${id}`;
 
+  const proposal = project.proposal;
+  const selectedAddOnIds = Array.isArray(proposal?.selectedAddOnItemIds)
+    ? (proposal.selectedAddOnItemIds as string[])
+    : [];
+  const monthlyCents = proposal ? computeApprovedTotals(proposal.items, selectedAddOnIds).monthlyCents : 0;
+  const needsDeferredMonthly =
+    !!proposal &&
+    proposal.paymentMode === "SPLIT" &&
+    !proposal.whopMonthlyPlanId &&
+    monthlyCents > 0;
+
   async function changeStage(formData: FormData) {
     "use server";
     const session = await requireAdmin();
     if (!session) return;
     const stage = String(formData.get("stage") || "");
-    await updateProjectStage(id, stage);
+    const result = await updateProjectStage(id, stage);
     revalidatePath(path);
     revalidatePath("/admin/projects");
+    if (!result.ok) {
+      redirect(`${path}?stageError=${encodeURIComponent(result.error)}`);
+    }
+  }
+
+  async function createMonthlyCheckout() {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    const result = await ensureSplitMonthlyCheckoutForProject(id);
+    revalidatePath(path);
+    if (result.ok) {
+      redirect(`${path}?monthlyCreated=1`);
+    } else {
+      redirect(`${path}?monthlyError=${encodeURIComponent(result.error)}`);
+    }
   }
 
   async function saveNote(formData: FormData) {
@@ -227,6 +259,51 @@ export default async function AdminProjectDetailPage({
 
         {/* Stage change control */}
         <SectionCard title="Stage">
+          {sp.stageError && (
+            <div className="mb-3 rounded-2xl border border-red-400/30 bg-red-400/[0.06] p-4">
+              <p className="text-sm text-red-200">Stage update failed: {sp.stageError}</p>
+            </div>
+          )}
+          {sp.monthlyCreated && (
+            <div className="mb-3 rounded-2xl border border-emerald-400/25 bg-emerald-400/[0.06] p-4">
+              <p className="text-sm text-emerald-200">Monthly Whop checkout created — client can pay from their proposal / dashboard.</p>
+            </div>
+          )}
+          {sp.monthlyError && (
+            <div className="mb-3 rounded-2xl border border-red-400/30 bg-red-400/[0.06] p-4">
+              <p className="text-sm text-red-200">Couldn&apos;t create monthly checkout: {sp.monthlyError}</p>
+            </div>
+          )}
+          {needsDeferredMonthly && (
+            <div className="mb-3 rounded-2xl border border-amber-400/30 bg-amber-400/[0.06] p-4">
+              <p className="text-sm text-amber-100">
+                SPLIT monthly checkout (${(monthlyCents / 100).toFixed(2)}/mo) is missing
+                {project.stage === "LIVE" ? " while this project is already LIVE" : ""}.
+                Marking LIVE creates it automatically; you can also create it here.
+              </p>
+              <form action={createMonthlyCheckout} className="mt-3">
+                <button
+                  type="submit"
+                  className="rounded-full border border-amber-300/40 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/20"
+                >
+                  Create monthly Whop checkout
+                </button>
+              </form>
+            </div>
+          )}
+          {proposal?.whopMonthlyPlanId && !proposal.monthlyPaidAt && (
+            <p className="mb-3 text-sm text-white/60">
+              Monthly checkout ready —{" "}
+              <a
+                href={whopCheckoutUrl(proposal.whopMonthlyPlanId)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-white/30 hover:text-white"
+              >
+                open link
+              </a>
+            </p>
+          )}
           <form action={changeStage} className="flex flex-wrap items-end gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
             <div>
               <label className="mb-1 block text-xs text-white/50" htmlFor="stage">

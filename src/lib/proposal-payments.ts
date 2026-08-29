@@ -51,12 +51,12 @@ type CheckoutResult = {
   monthlyCheckoutUrl: string | null;
 };
 
-/** Creates the Whop plan(s) for a just-approved proposal and persists their
-    ids on the Proposal row. Called once, from recordClientResponse's
-    APPROVED branch — never re-run for an already-approved proposal (the
-    caller checks whopSetupPlanId is still null first). setupCents === 0 is
-    not handled here — a proposal that approves at $0 has nothing to
-    charge, so the caller skips calling this entirely in that case. */
+/** Creates the Whop plan(s) for an approved proposal and persists their
+    ids on the Proposal row. Called from recordClientResponse's APPROVED
+    branch, and again from ensureProposalSetupCheckout when Whop failed
+    after approval left whopSetupPlanId null. Callers must check
+    whopSetupPlanId is still null first — never create a second plan for
+    the same proposal. setupCents === 0 is not handled here. */
 export async function createProposalCheckout(
   proposalId: string,
   reference: string,
@@ -180,6 +180,43 @@ export async function resolveProposalByWhopPlanId(
 
 export function isProposalPaymentMode(v: string): v is "SPLIT" | "BUNDLED" {
   return v === "SPLIT" || v === "BUNDLED";
+}
+
+type EnsureCheckoutResult =
+  | { ok: true; setupCheckoutUrl: string | null }
+  | { ok: false; error: string };
+
+/** Admin retry when approval succeeded but Whop plan creation failed
+    (recordClientResponse commits the DB first, then calls Whop outside
+    the transaction). Safe to call only while whopSetupPlanId is still
+    null — refuses otherwise so we never mint duplicate plans. */
+export async function ensureProposalSetupCheckout(proposalId: string): Promise<EnsureCheckoutResult> {
+  const proposal = await db.proposal.findUnique({
+    where: { id: proposalId },
+    include: { items: { select: { id: true, amountCents: true, isOptionalAddOn: true, kind: true } } },
+  });
+  if (!proposal) return { ok: false, error: "proposal not found" };
+  if (proposal.status !== "APPROVED") return { ok: false, error: "proposal must be APPROVED" };
+  if (proposal.whopSetupPlanId) return { ok: false, error: "checkout already exists" };
+  if (proposal.setupPaidAt) return { ok: false, error: "setup already paid" };
+
+  const selectedAddOnIds = Array.isArray(proposal.selectedAddOnItemIds)
+    ? (proposal.selectedAddOnItemIds as string[])
+    : [];
+  const { setupCents, monthlyCents } = computeApprovedTotals(proposal.items, selectedAddOnIds);
+  if (setupCents <= 0) return { ok: false, error: "nothing to charge for setup" };
+
+  const mode = proposal.paymentMode === "BUNDLED" ? "BUNDLED" : "SPLIT";
+  const reference = proposal.id.slice(-8).toUpperCase();
+
+  try {
+    const result = await createProposalCheckout(proposal.id, reference, setupCents, monthlyCents, mode);
+    return { ok: true, setupCheckoutUrl: result.setupCheckoutUrl };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Whop plan creation failed";
+    console.error(`[proposal-payments] ensureProposalSetupCheckout failed for ${proposalId}:`, err);
+    return { ok: false, error: message };
+  }
 }
 
 /** Which of a Proposal's two amounts a real incoming Whop payment actually
