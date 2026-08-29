@@ -8,6 +8,8 @@ import {
   projectServiceLabel,
   updateProjectStage,
   ensureSplitMonthlyCheckoutForProject,
+  setMilestoneCompleted,
+  updateRequirementStatusAsAdmin,
   updateProjectAdminNote,
   updateProjectOps,
   postAdminMessage,
@@ -118,6 +120,28 @@ export default async function AdminProjectDetailPage({
     } else {
       redirect(`${path}?monthlyError=${encodeURIComponent(result.error)}`);
     }
+  }
+
+  async function toggleMilestone(formData: FormData) {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    const milestoneId = String(formData.get("milestoneId") || "");
+    const completed = String(formData.get("completed") || "") === "1";
+    await setMilestoneCompleted(id, milestoneId, completed);
+    revalidatePath(path);
+    revalidatePath(`/lab/dashboard/services/${id}`);
+  }
+
+  async function setRequirementStatus(formData: FormData) {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    const requirementId = String(formData.get("requirementId") || "");
+    const status = String(formData.get("status") || "");
+    await updateRequirementStatusAsAdmin(id, requirementId, status);
+    revalidatePath(path);
+    revalidatePath(`/lab/dashboard/services/${id}`);
   }
 
   async function saveNote(formData: FormData) {
@@ -398,7 +422,7 @@ export default async function AdminProjectDetailPage({
         <SectionCard title={`Milestones (${completedMilestones}/${totalMilestones})`}>
           {project.milestones.length === 0 && <p className="text-sm text-white/50">No milestones.</p>}
           {project.milestones.map((m) => (
-            <div key={m.id} className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <div key={m.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
               <div className="flex items-center gap-3">
                 <span
                   className={`inline-block h-2 w-2 flex-shrink-0 rounded-full ${
@@ -407,9 +431,21 @@ export default async function AdminProjectDetailPage({
                 />
                 <span className={m.completedAt ? "text-white/50 line-through" : "text-white"}>{m.title}</span>
               </div>
-              <span className="text-xs text-white/40">
-                {m.completedAt ? `Completed ${formatDate(m.completedAt)}` : m.dueAt ? `Due ${formatDate(m.dueAt)}` : "—"}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-white/40">
+                  {m.completedAt ? `Completed ${formatDate(m.completedAt)}` : m.dueAt ? `Due ${formatDate(m.dueAt)}` : "—"}
+                </span>
+                <form action={toggleMilestone}>
+                  <input type="hidden" name="milestoneId" value={m.id} />
+                  <input type="hidden" name="completed" value={m.completedAt ? "0" : "1"} />
+                  <button
+                    type="submit"
+                    className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/80 transition hover:bg-white/10"
+                  >
+                    {m.completedAt ? "Reopen" : "Complete"}
+                  </button>
+                </form>
+              </div>
             </div>
           ))}
         </SectionCard>
@@ -424,6 +460,35 @@ export default async function AdminProjectDetailPage({
                 <span className="text-xs text-white/40">{REQUIREMENT_STATUS_LABELS[r.status] ?? r.status}</span>
               </div>
               {r.detail && <p className="mt-2 text-sm text-white/70">{r.detail}</p>}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {r.status === "SUBMITTED" || r.status === "MISSING" || r.status === "REJECTED" ? (
+                  <form action={setRequirementStatus}>
+                    <input type="hidden" name="requirementId" value={r.id} />
+                    <input type="hidden" name="status" value="UNDER_REVIEW" />
+                    <button type="submit" className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/80 transition hover:bg-white/10">
+                      Mark under review
+                    </button>
+                  </form>
+                ) : null}
+                {r.status !== "APPROVED" && (
+                  <form action={setRequirementStatus}>
+                    <input type="hidden" name="requirementId" value={r.id} />
+                    <input type="hidden" name="status" value="APPROVED" />
+                    <button type="submit" className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-400/20">
+                      Approve
+                    </button>
+                  </form>
+                )}
+                {r.status !== "REJECTED" && r.status !== "MISSING" && (
+                  <form action={setRequirementStatus}>
+                    <input type="hidden" name="requirementId" value={r.id} />
+                    <input type="hidden" name="status" value="REJECTED" />
+                    <button type="submit" className="rounded-full border border-red-400/30 bg-red-400/10 px-3 py-1 text-xs font-semibold text-red-200 transition hover:bg-red-400/20">
+                      Request revision
+                    </button>
+                  </form>
+                )}
+              </div>
             </div>
           ))}
         </SectionCard>

@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { findOrCreateUserByEmail } from "@/lib/users";
 import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 import { computeApprovedTotals, createProposalCheckout, isProposalPaymentMode } from "@/lib/proposal-payments";
+import { sendProjectKickoffEmail } from "@/lib/mail";
 
 /* Token-secured client-facing proposal lookup (Slice 5 of the
    service-platform build, 2026-08-28). Modeled on PurchaseClaim's pattern
@@ -170,6 +171,30 @@ export async function recordClientResponse(
       });
     }
   });
+
+  // Kickoff email after the DB transaction commits — in-app message is
+  // already seeded inside createServiceProjectWithDefaults. Best-effort:
+  // missing RESEND_API_KEY or a send failure must not undo approval.
+  if (action === "APPROVED") {
+    const project = await db.serviceProject.findFirst({
+      where: { proposalId: proposal.id },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, title: true, user: { select: { email: true, name: true } } },
+    });
+    if (project?.user.email) {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://zenith-studio.site";
+      void sendProjectKickoffEmail({
+        to: project.user.email,
+        clientName: project.user.name,
+        projectTitle: project.title,
+        dashboardUrl: `${siteUrl}/lab/dashboard/services/${project.id}`,
+      }).then((result) => {
+        if (!result.ok) {
+          console.warn(`[proposals-public] kickoff email skipped/failed for ${project.id}:`, result.error);
+        }
+      });
+    }
+  }
 
   // Whop plan creation is a real network call — deliberately outside the
   // DB transaction above so a slow/flaky Whop API response never holds a

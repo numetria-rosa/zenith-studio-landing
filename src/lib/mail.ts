@@ -1,11 +1,7 @@
 import { Resend } from "resend";
 
-/* Thin Resend wrapper. `resend` was already a package.json dependency
-   before this — installed but never wired up anywhere (no RESEND_API_KEY,
-   no call site). This is the first real usage: emailing a proposal PDF to
-   a client from /admin/proposals/[id]. Kept to a single function rather
-   than a generic "sendEmail" — every call site here is proposal-specific,
-   so there's no abstraction to share yet. */
+/* Thin Resend wrapper. First usage was proposal PDF email from
+   /admin/proposals/[id]; kickoff email on project create is the second. */
 
 const FROM_ADDRESS = "Zenith Studio <hello@zenith-studio.site>";
 
@@ -52,6 +48,45 @@ Zenith Studio`,
         content: input.pdfBuffer,
       },
     ],
+  });
+
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
+export type SendProjectKickoffEmailInput = {
+  to: string;
+  clientName: string | null;
+  projectTitle: string;
+  dashboardUrl: string;
+};
+
+/** Best-effort kickoff email after a ServiceProject is created. Skips
+    cleanly when RESEND_API_KEY is unset — the in-app kickoff message still
+    lands either way. */
+export async function sendProjectKickoffEmail(
+  input: SendProjectKickoffEmailInput
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const client = getResendClient();
+  if (!client) return { ok: false, error: "RESEND_API_KEY is not configured" };
+
+  const greetingName = input.clientName?.trim() || "there";
+
+  const { error } = await client.emails.send({
+    from: FROM_ADDRESS,
+    to: input.to,
+    subject: `Your project is ready — ${input.projectTitle}`,
+    text: `Hi ${greetingName},
+
+Your Zenith Studio project "${input.projectTitle}" is set up.
+
+Open your workspace to complete the short requirements checklist so we can start build:
+
+${input.dashboardUrl}
+
+Questions? Reply to this email or message us inside the workspace.
+
+Zenith Studio`,
   });
 
   if (error) return { ok: false, error: error.message };

@@ -63,15 +63,68 @@ export const PROPOSAL_SECTION_LABELS: Record<ProposalTextSectionKey, string> = {
 
 /** Creates a new DRAFT Proposal from an existing AuditRequest — the only
     entry point this slice's UI has. Backfills clientEmail/clientName/
-    companyName from the audit. */
+    companyName from the audit, seeds narrative sections from findings/
+    recommendations when present, and creates SETUP/MONTHLY line items
+    from any recommendation linked to a ServiceCatalog row with prices. */
 export async function createProposalFromAudit(
   auditId: string
 ): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   const audit = await db.auditRequest.findUnique({
     where: { id: auditId },
-    select: { id: true, email: true, name: true, companyName: true },
+    include: {
+      findings: { orderBy: { createdAt: "asc" } },
+      recommendations: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          catalogService: {
+            select: {
+              id: true,
+              title: true,
+              setupPriceCents: true,
+              monthlyPriceCents: true,
+            },
+          },
+        },
+      },
+    },
   });
   if (!audit) return { ok: false, error: "audit not found" };
+
+  const company = audit.companyName?.trim() || audit.name?.trim() || "your business";
+  const sections = buildProposalSectionsFromAudit({
+    company,
+    findings: audit.findings,
+    recommendations: audit.recommendations,
+  });
+
+  const itemsData: Prisma.ProposalItemCreateWithoutProposalInput[] = [];
+  let order = 0;
+  const seenCatalogIds = new Set<string>();
+
+  for (const rec of audit.recommendations) {
+    const catalog = rec.catalogService;
+    if (!catalog || seenCatalogIds.has(catalog.id)) continue;
+    seenCatalogIds.add(catalog.id);
+
+    if (catalog.setupPriceCents != null && catalog.setupPriceCents !== 0) {
+      itemsData.push({
+        label: `${catalog.title} — setup`,
+        kind: "SETUP",
+        amountCents: catalog.setupPriceCents,
+        catalogService: { connect: { id: catalog.id } },
+        order: order++,
+      });
+    }
+    if (catalog.monthlyPriceCents != null && catalog.monthlyPriceCents !== 0) {
+      itemsData.push({
+        label: `${catalog.title} — monthly`,
+        kind: "MONTHLY",
+        amountCents: catalog.monthlyPriceCents,
+        catalogService: { connect: { id: catalog.id } },
+        order: order++,
+      });
+    }
+  }
 
   const proposal = await db.proposal.create({
     data: {
@@ -80,10 +133,83 @@ export async function createProposalFromAudit(
       clientName: audit.name,
       companyName: audit.companyName,
       accessToken: generateAccessToken(),
+      ...sections,
+      items: itemsData.length > 0 ? { create: itemsData } : undefined,
     },
     select: { id: true },
   });
   return { ok: true, id: proposal.id };
+}
+
+type AuditFindingLike = {
+  title: string;
+  severity: string;
+  description: string;
+  currentImpact: string;
+  recommendedSolution: string;
+};
+
+type AuditRecommendationLike = {
+  title: string;
+  priority: string;
+  rationale: string;
+  expectedOutcome: string;
+  estimatedEffort: string;
+  catalogService: { title: string } | null;
+};
+
+/** Builds editable starting copy for a proposal from audit review data.
+    Admin can rewrite every field afterward — this only kills the blank page. */
+export function buildProposalSectionsFromAudit(input: {
+  company: string;
+  findings: AuditFindingLike[];
+  recommendations: AuditRecommendationLike[];
+}): Record<ProposalTextSectionKey, string> {
+  const { company, findings, recommendations } = input;
+
+  const currentChallenges =
+    findings.length > 0
+      ? findings
+          .map(
+            (f) =>
+              `• ${f.title} (${f.severity})\n${f.description.trim()}\nImpact: ${f.currentImpact.trim()}`
+          )
+          .join("\n\n")
+      : `• Manual / slow processes that cost ${company} time every week\n• Leads and enquiries that go unanswered outside business hours\n• No reliable system of record for follow-up`;
+
+  const recommendedSolution =
+    recommendations.length > 0
+      ? recommendations
+          .map((r) => {
+            const catalog = r.catalogService ? ` (via ${r.catalogService.title})` : "";
+            return `• ${r.title}${catalog}\n${r.rationale.trim()}\nExpected outcome: ${r.expectedOutcome.trim()}\nEffort: ${r.estimatedEffort.trim()}`;
+          })
+          .join("\n\n")
+      : `We recommend a done-for-you automation build tailored to ${company}'s current tools and workflow, with hosting and ongoing improvements included in the monthly plan.`;
+
+  const scopeLines =
+    recommendations.length > 0
+      ? recommendations.map((r) => `• ${r.title}`).join("\n")
+      : `• Discovery and workflow mapping\n• Build and connect the automation to your existing tools\n• Test, handoff, and first-week support`;
+
+  const deliverables =
+    recommendations.length > 0
+      ? recommendations.map((r) => `• ${r.title} — live and documented`).join("\n")
+      : `• Working automation live in your stack\n• Short handoff doc / loom of how it works\n• Access to your project workspace for ongoing requests`;
+
+  return {
+    executiveSummary: `Based on our review of ${company}, we've identified ${findings.length || "several"} operational bottleneck${findings.length === 1 ? "" : "s"} and recommend a focused automation build so the team spends less time on repetitive work and more time on revenue.`,
+    currentChallenges,
+    recommendedSolution,
+    scopeOfWork: `In scope for this engagement:\n${scopeLines}`,
+    deliverables,
+    implementationPlan: `1. Kickoff and collect access / brand / workflow details\n2. Build and connect integrations\n3. Internal QA against your real scenarios\n4. Go-live and handoff\n5. Monthly monitoring and improvements`,
+    timeline: `Typically 2–7 days from kickoff to live, depending on access turnaround and how many systems we need to connect.`,
+    assumptions: `• You can provide timely access to the tools we need to connect\n• A single point of contact is available for questions during build\n• Scope matches the line items in this proposal; out-of-scope work is quoted separately`,
+    notIncluded: `• Custom software products unrelated to the automations listed\n• Ongoing content creation or human VA work\n• Third-party SaaS subscription fees (billed by those vendors directly)`,
+    nextSteps: `1. Approve this proposal (and choose payment mode if there is a monthly component)\n2. Complete payment for the setup fee\n3. Fill in the project requirements checklist so we can start build`,
+    terms: `Setup is due on approval. Monthly covers hosting, monitoring, and ongoing improvements and can be cancelled anytime. Work already delivered remains yours.`,
+  };
 }
 
 export type ProposalSectionsInput = Partial<Record<ProposalTextSectionKey, string>> & {

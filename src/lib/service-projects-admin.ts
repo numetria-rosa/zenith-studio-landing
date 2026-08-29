@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { getService } from "@/lib/services";
 import { computeApprovedTotals, createDeferredMonthlyCheckout } from "@/lib/proposal-payments";
-import type { ProjectStage, ProposalItemKind, SupportStatus } from "@prisma/client";
+import type { ProjectStage, ProposalItemKind, RequirementStatus, SupportStatus } from "@prisma/client";
 
 /* Admin-side ServiceProject operations (Slice 4 of the business command
    center, 2026-08-28: /admin/projects). Every write here re-checks
@@ -343,6 +343,54 @@ export async function postAdminMessage(projectId: string, senderUserId: string, 
   await db.serviceMessage.create({
     data: { projectId, senderUserId, senderRole: "ADMIN", body: trimmed },
   });
+  return { ok: true };
+}
+
+export const REQUIREMENT_STATUSES: RequirementStatus[] = [
+  "MISSING",
+  "SUBMITTED",
+  "UNDER_REVIEW",
+  "APPROVED",
+  "REJECTED",
+];
+
+export function isRequirementStatus(value: string): value is RequirementStatus {
+  return (REQUIREMENT_STATUSES as string[]).includes(value);
+}
+
+/** Toggle a milestone complete / incomplete. Verifies the milestone belongs
+    to the given project before writing. */
+export async function setMilestoneCompleted(
+  projectId: string,
+  milestoneId: string,
+  completed: boolean
+): Promise<WriteResult> {
+  const existing = await db.projectMilestone.findFirst({
+    where: { id: milestoneId, projectId },
+    select: { id: true },
+  });
+  if (!existing) return { ok: false, error: "not_found" };
+  await db.projectMilestone.update({
+    where: { id: milestoneId },
+    data: { completedAt: completed ? new Date() : null },
+  });
+  return { ok: true };
+}
+
+/** Admin review of a client requirement. Only statuses an admin sets
+    intentionally — clients still use service-workspace for SUBMITTED. */
+export async function updateRequirementStatusAsAdmin(
+  projectId: string,
+  requirementId: string,
+  status: string
+): Promise<WriteResult> {
+  if (!isRequirementStatus(status)) return { ok: false, error: `invalid status "${status}"` };
+  const existing = await db.clientRequirement.findFirst({
+    where: { id: requirementId, projectId },
+    select: { id: true },
+  });
+  if (!existing) return { ok: false, error: "not_found" };
+  await db.clientRequirement.update({ where: { id: requirementId }, data: { status } });
   return { ok: true };
 }
 

@@ -13,10 +13,6 @@ import type { Prisma } from "@prisma/client";
 
 type Tx = Prisma.TransactionClient;
 
-// Generic defaults — not tied to any specific ServiceCatalog template
-// system in this slice. Per-service default requirement templates would be
-// real additional scope (see the Slice 6 report for this noted as a
-// reasonable future improvement).
 export const DEFAULT_MILESTONE_TITLES = [
   "Onboarding",
   "Requirements gathered",
@@ -33,6 +29,12 @@ export const DEFAULT_REQUIREMENTS: { label: string; detail: string }[] = [
   { label: "Kickoff call", detail: "A short call to confirm scope and timeline before build starts." },
 ];
 
+export const KICKOFF_MESSAGE_BODY = `Welcome — your project workspace is ready.
+
+Please work through the Requirements checklist on this page (upload or confirm each item). Once those are in, we'll move into build.
+
+Questions? Reply here anytime and we'll get back to you.`;
+
 export type CreateServiceProjectParams = {
   userId: string;
   title: string;
@@ -43,8 +45,8 @@ export type CreateServiceProjectParams = {
 };
 
 /** Creates a ServiceProject at stage NEW plus the standard default
-    milestones/requirements. Caller is responsible for wrapping this in
-    whatever transaction the triggering write already lives in. */
+    milestones/requirements and an in-app kickoff message (from the oldest
+    ADMIN user, if one exists). Caller wraps this in their transaction. */
 export async function createServiceProjectWithDefaults(tx: Tx, params: CreateServiceProjectParams) {
   const project = await tx.serviceProject.create({
     data: {
@@ -73,6 +75,22 @@ export async function createServiceProjectWithDefaults(tx: Tx, params: CreateSer
       order: i,
     })),
   });
+
+  const adminSender = await tx.user.findFirst({
+    where: { role: "ADMIN" },
+    orderBy: { createdAt: "asc" },
+    select: { id: true },
+  });
+  if (adminSender) {
+    await tx.serviceMessage.create({
+      data: {
+        projectId: project.id,
+        senderUserId: adminSender.id,
+        senderRole: "ADMIN",
+        body: KICKOFF_MESSAGE_BODY,
+      },
+    });
+  }
 
   return project;
 }
