@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/outreach",
-      "schedule": "0 * * * *"
+      "schedule": "0 14 * * *"
     }
   ],
   "rewrites": [
