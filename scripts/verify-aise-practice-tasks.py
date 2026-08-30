@@ -11,7 +11,7 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "courses" / "ai-assisted-software-engineering"
-EXPECTED = 200
+EXPECTED = 187
 
 KIND_HOOKS = {
     "html": ("checks",),
@@ -20,6 +20,10 @@ KIND_HOOKS = {
     "python": ("functionName", "testCases"),
     "testing": ("functionName", "goodImpl", "badImpl"),
     "choice": ("correct",),
+    "spec": ("checks",),
+    "command": ("checks",),
+    "review": ("hunks",),
+    "detective": ("case",),
 }
 
 
@@ -30,6 +34,14 @@ def extract_array(text: str, marker: str) -> str:
     i = text.find("[", start)
     if i < 0:
         raise SystemExit(f"{marker} is not an array")
+    # Prefer a unique closer so regex literals like /["']/ cannot
+    # fool a quote-and-bracket walk. Accept CRLF from Windows checkouts.
+    norm = text.replace("\r\n", "\n")
+    i_norm = norm.find("[", norm.find(marker))
+    for closer in ("];\nglobal.AISE_TASKS", "];\n  function", "];\n  const SKILL", "];\n  global.", "];\n})(window)"):
+        end = norm.find(closer, i_norm)
+        if end > i_norm:
+            return norm[i_norm : end + 1]
     depth = 0
     in_str = None
     escape = False
@@ -105,8 +117,19 @@ def field_present(block: str, name: str) -> bool:
 def main() -> int:
     tasks_text = (ROOT / "practice-tasks.js").read_text(encoding="utf-8")
     sm_text = (ROOT / "skill-map.js").read_text(encoding="utf-8")
-    blocks = split_objects(extract_array(tasks_text, "const TASKS = "))
-    sm_ids = [i for i in (parse_id(b) for b in split_objects(extract_array(sm_text, "const TASKS = "))) if i]
+    # Slice by `{ id: "` so regex literals in graders cannot confuse a
+    # quote-and-brace walk. Each slice runs to the next task id.
+    id_pat = re.compile(r'\{ id: "([^"]+)"')
+    id_hits = list(id_pat.finditer(tasks_text))
+    blocks = []
+    for n, m in enumerate(id_hits):
+        end = id_hits[n + 1].start() if n + 1 < len(id_hits) else len(tasks_text)
+        blocks.append(tasks_text[m.start() : end])
+    sm_start = sm_text.find("const TASKS = ")
+    sm_end = sm_text.find("  const SKILL_META", sm_start)
+    if sm_end < 0:
+        sm_end = sm_text.find("  function ", sm_start)
+    sm_ids = [m.group(1) for m in id_pat.finditer(sm_text[sm_start:sm_end] if sm_end > sm_start else sm_text)]
 
     all_ids: list[str] = []
     failures: list[str] = []

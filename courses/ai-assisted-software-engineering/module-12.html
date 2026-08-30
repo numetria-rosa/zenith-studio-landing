@@ -258,7 +258,7 @@ document.getElementById("m12run").onclick = function () {
     ModuleKit.showResults(fb, out);
     if (out.passed) {
       fb.innerHTML = "<b>That is a tool Dan can run on the real export.</b> It survives the blank row, treats <code>A@X.CO </code> and <code>a@x.co</code> as one person, and keeps the first occurrence rather than the last \u2014 which is the difference between the original record and whatever got typed second.<br><br>" +
-        out.results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+        out.results.map(function (r) { return '<span class="i i-check"></span> ' + r.name; }).join("<br>");
       CourseProgress.setSection(12, "pythonToolExercise", { passed: true, at: new Date().toISOString() });
       Northline.showLearned(fb.parentNode,
         "You just shipped a tool Dan can run on the real export.",

@@ -118,7 +118,7 @@ document.getElementById("btnRun").onclick = function () {
   const result = WorkflowRuntime.run(graph, { id: "bk_1001", name: "Amina", phone: "555-0142" });
   ModuleKit.renderLogs(document.getElementById("labLog"), result.logs);
   if (result.ok && WorkflowRuntime.endsWithNotify(graph)) {
-    fb.className = "feedback ok";
+  fb.className = "feedback ok";
     fb.textContent = "Valid pipeline: trigger, map, CRM write, notify. Lab passed.";
     ModuleKit.passSection(1, "firstWorkflow");
   } else {

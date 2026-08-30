@@ -225,7 +225,7 @@ document.getElementById("m10check").onclick = function () {
   if (ok) {
     document.getElementById("m10fb").innerHTML =
       "<b>That is a review Dan can act on.</b> You cleared the two hunks that were genuinely fine, and you caught the deleted booking guard \u2014 which was hiding behind a comment claiming the validation had moved. That one is the regression Dan said he would have to phone the client about.<br><br>" +
-      results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+      results.map(function (r) { return '<span class="i i-check"></span> ' + r.name; }).join("<br>");
     CourseProgress.setSection(10, "reviewExercise", { passed: true, at: new Date().toISOString() });
     Northline.showLearned(document.getElementById("m10fb").parentNode,
       "You just wrote a review someone can act on.",

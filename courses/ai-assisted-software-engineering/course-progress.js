@@ -57,31 +57,44 @@
      Every module is one ticket from their tracker. */
   const TICKETS = {
     1: { id: "NL-001", from: "Priya (office manager, Northline Clinic)", title: "The hours on the site are wrong",
-         quote: "We changed our Saturday hours three weeks ago and the website still says we're closed. People are showing up to a locked door." },
+         quote: "We changed our Saturday hours three weeks ago and the website still says we're closed. People are showing up to a locked door.",
+         priority: "Medium", kind: "HTML", org: "Northline Clinic" },
     2: { id: "NL-002", from: "Dan (Northline Digital, account lead)", title: "Make the booking system better",
-         quote: "Client says booking is confusing. Can you just make it better? I told them we'd scope it this week." },
+         quote: "Client says booking is confusing. Can you just make it better? I told them we'd scope it this week.",
+         priority: "High", kind: "Spec", org: "Northline Digital" },
     3: { id: "NL-003", from: "Priya (Northline Clinic)", title: "We need a real page for the clinic",
-         quote: "Right now there's one paragraph. We need hours, services, how to reach us, and a way to ask for an appointment." },
+         quote: "Right now there's one paragraph. We need hours, services, how to reach us, and a way to ask for an appointment.",
+         priority: "High", kind: "HTML", org: "Northline Clinic" },
     4: { id: "NL-004", from: "Support inbox", title: "It looks broken on my phone",
-         quote: "Everything is squashed into a column on the left and I have to pinch to read the hours. Fine on my laptop." },
+         quote: "Everything is squashed into a column on the left and I have to pinch to read the hours. Fine on my laptop.",
+         priority: "High", kind: "CSS", org: "Northline Clinic" },
     5: { id: "NL-005", from: "Priya (Northline Clinic)", title: "Let the front desk filter appointments",
-         quote: "We get 40 a day. I need to see just the ones that are still open, and just the ones for a given clinician." },
+         quote: "We get 40 a day. I need to see just the ones that are still open, and just the ones for a given clinician.",
+         priority: "Medium", kind: "JavaScript", org: "Northline Clinic" },
     6: { id: "NL-006", from: "Dan (Northline Digital)", title: "Load the appointments from the data file",
-         quote: "Stop hard-coding the list. It should read appointments.json and still work if the file is slow or empty." },
+         quote: "Stop hard-coding the list. It should read appointments.json and still work if the file is slow or empty.",
+         priority: "Medium", kind: "JavaScript", org: "Northline Digital" },
     7: { id: "NL-007", from: "Priya (Northline Clinic)", title: "A dashboard for the morning huddle",
-         quote: "Three numbers on one screen: appointments today, still open, and no-shows this week. We read it out at 8am." },
+         quote: "Three numbers on one screen: appointments today, still open, and no-shows this week. We read it out at 8am.",
+         priority: "High", kind: "JavaScript", org: "Northline Clinic" },
     8: { id: "NL-008", from: "Dan (Northline Digital)", title: "Review this AI-generated pull request",
-         quote: "Contractor pushed a big AI-written PR before going on leave. It runs. I still do not want to merge it blind. You are the reviewer." },
+         quote: "Contractor pushed a big AI-written PR before going on leave. It runs. I still do not want to merge it blind. You are the reviewer.",
+         priority: "High", kind: "Review", org: "Northline Digital" },
     9: { id: "NL-009", from: "Priya (Northline Clinic)", title: "The booking form is broken for some people",
-         quote: "Two patients said they hit Request and nothing happened. It works when I try it. I do not know what is different." },
+         quote: "Two patients said they hit Request and nothing happened. It works when I try it. I do not know what is different.",
+         priority: "High", kind: "Testing", org: "Northline Clinic" },
     10: { id: "NL-010", from: "Dan (Northline Digital)", title: "Add clinician notes without breaking booking",
-         quote: "New feature, same release. If booking regresses I have to call the client myself, so prove it still works." },
+         quote: "New feature, same release. If booking regresses I have to call the client myself, so prove it still works.",
+         priority: "High", kind: "Feature", org: "Northline Digital" },
     11: { id: "NL-011", from: "Dan (Northline Digital)", title: "Clean this up before the release",
-         quote: "There are three copies of the same date function and a console.log with a patient email in it. Tidy it without changing behaviour." },
+         quote: "There are three copies of the same date function and a console.log with a patient email in it. Tidy it without changing behaviour.",
+         priority: "Medium", kind: "Maintenance", org: "Northline Digital" },
     12: { id: "NL-012", from: "Priya (Northline Clinic)", title: "The exported patient list is a mess",
-         quote: "Our old system exports a file full of duplicates and blank rows. Somebody cleans it by hand every Monday. Please stop that." },
+         quote: "Our old system exports a file full of duplicates and blank rows. Somebody cleans it by hand every Monday. Please stop that.",
+         priority: "Medium", kind: "Python", org: "Northline Clinic" },
     13: { id: "NL-013", from: "Dan (Northline Digital)", title: "Prepare the release and ship it",
-         quote: "Client demo is Friday. I need a live URL, tests that actually catch a break, and a note explaining what you decided and why." },
+         quote: "Client demo is Friday. I need a live URL, tests that actually catch a break, and a note explaining what you decided and why.",
+         priority: "High", kind: "Release", org: "Northline Digital" },
   };
 
   const MODULES = [
@@ -564,12 +577,19 @@
       var wrap = document.querySelector(".wrap");
       if (!wrap) return;
       var prev = MODULES.find(function (x) { return x.id === m.id - 1; });
+      var prevTicket = prev ? ticketFor(prev.id) : null;
       var box = document.createElement("div");
-      box.className = "objectives";
+      box.className = "lockedgate";
       box.setAttribute("role", "alert");
-      box.style.borderLeftColor = "var(--amber)";
-      box.style.marginTop = "18px";
-      box.innerHTML = "<div class=\"lbl\" style=\"color:var(--amber)\">Locked</div><p style=\"font-size:14px\">This module opens once Module " + (m.id - 1) + (prev ? " (" + escapeHtml(prev.title) + ")" : "") + " is complete \u2014 checkpoint quiz at 80% plus its graded exercise.</p><p style=\"margin-top:10px\"><a href=\"" + (prev ? prev.file : "dashboard.html") + "\">Go to Module " + (m.id - 1) + "</a> \u00b7 <a href=\"dashboard.html\">Dashboard</a></p>";
+      box.innerHTML = "<div class=\"lbl\">Module locked</div>" +
+        "<h2>Complete " + (prevTicket ? escapeHtml(prevTicket.id) : "the previous ticket") + " first</h2>" +
+        "<p>This module opens once Module " + (m.id - 1) +
+        (prev ? " (" + escapeHtml(prev.title) + ")" : "") +
+        " is complete \u2014 checkpoint quiz at 80% plus its graded exercise.</p>" +
+        "<div class=\"actions\">" +
+          "<a class=\"primary\" href=\"" + (prev ? prev.file : "dashboard.html") + "\">View previous ticket</a>" +
+          "<a href=\"dashboard.html\">Dashboard</a>" +
+        "</div>";
       var header = wrap.querySelector("header");
       if (header && header.nextSibling) wrap.insertBefore(box, header.nextSibling);
       else wrap.insertBefore(box, wrap.firstChild);

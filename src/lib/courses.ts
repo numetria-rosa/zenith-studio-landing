@@ -99,7 +99,7 @@ export const COURSES: Course[] = [
     slug: "ai-assisted-software-engineering",
     title: "AI-Assisted Software Engineering",
     description:
-      "Twelve weeks for people who have never shipped code: HTML, CSS, and JavaScript by hand, then Cursor, GitHub, tests, and a live URL. Not AI Engineering (that course builds LLM products). No job guarantee.",
+      "Software engineering with AI as your pair programmer, for people who have never shipped code. Ten Northline Digital tickets: you write the spec, inspect what an agent produced, run it, test it, review it, and ship it. Graded practice across HTML, CSS, JavaScript, specs, Git, review, testing, Python, and AI Code Detective — plus a real Cursor session, a real GitHub repo, and a live URL. Not AI Engineering (that course builds LLM products). No job guarantee.",
     thumbnail: "/lab/data-science.webp",
     whopAccessPassId: "prod_rW17sq9hKeXYN",
     whopPlanId: "plan_ximKlnIKYO7Bx",
@@ -108,8 +108,11 @@ export const COURSES: Course[] = [
     firstLessonPath: "module-00",
     waitlistUrl:
       "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20AI-Assisted%20Software%20Engineering%0A",
-    // Content + verifier 200/200 + live gates checked locally. Real Whop
-    // product/plan created 2026-08-30 (prod_rW17sq9hKeXYN / plan_ximKlnIKYO7Bx).
+    // Live 9-module path (ids 1–9, storage v1) plus orientation. Ten Northline
+    // Digital tickets, the 11-step loop, AI Code Detective, Desktop Labs.
+    // Practice-task count is whatever verify-aise-practice-tasks.py reports.
+    // Real Whop product/plan created 2026-08-30
+    // (prod_rW17sq9hKeXYN / plan_ximKlnIKYO7Bx).
     published: true,
   },
 ];

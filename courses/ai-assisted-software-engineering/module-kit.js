@@ -27,13 +27,40 @@
     if (!host) return;
     const t = CourseProgress.ticketFor(moduleId);
     if (!t) { host.remove(); return; }
-    host.className = "ticket";
+    const m = CourseProgress.MODULES.find(function (x) { return x.id === moduleId; });
+    const pri = (t.priority || "Medium").toLowerCase();
+    const done = CourseProgress.isModuleComplete(moduleId);
+    host.className = "ticket pri-" + pri;
     host.innerHTML =
-      '<div class="tkhead"><span class="tkid">' + esc(t.id) + '</span>' +
-        '<span class="tkorg">Northline Digital \u00b7 ticket board</span></div>' +
+      '<div class="tkhead">' +
+        '<span class="tkorg"><span class="tkdot" aria-hidden="true"></span>' + esc(t.org || "Northline Digital") + "</span>" +
+        '<span class="tkstatus ' + (done ? "done" : "open") + '">' + (done ? "Done" : "Open") + "</span>" +
+      "</div>" +
+      '<div class="tkid">' + esc(t.id) + "</div>" +
       '<div class="tktitle">' + esc(t.title) + "</div>" +
+      '<div class="tkmeta">' +
+        '<div><span>Priority</span><b class="pri-' + esc(pri) + '">' + esc(t.priority || "Medium") + "</b></div>" +
+        "<div><span>Type</span><b>" + esc(t.kind || "Engineering") + "</b></div>" +
+        "<div><span>Estimate</span><b>~" + ((m && m.minutes) || 45) + " min</b></div>" +
+      "</div>" +
       '<div class="tkquote">\u201c' + esc(t.quote) + '\u201d</div>' +
-      '<div class="tkfrom">\u2014 ' + esc(t.from) + "</div>";
+      '<div class="tkfrom">\u2014 ' + esc(t.from) + "</div>" +
+      '<div class="tkactions">' +
+        (done
+          ? '<a class="primary" href="#quizRoot">Review checkpoint</a>'
+          : '<button type="button" class="primary" data-ticket-start>Start ticket</button>') +
+      "</div>";
+    const start = host.querySelector("[data-ticket-start]");
+    if (start) {
+      start.addEventListener("click", function () {
+        const target = document.getElementById("beforeAi") ||
+          document.querySelector(".wrap > section") ||
+          document.getElementById("whyGrid");
+        if (!target) return;
+        const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      });
+    }
   }
 
   /* `active` is the list of loop step ids this module drills; pass "all" to
@@ -138,7 +165,9 @@
       const box = document.getElementById("reqList");
       if (box) {
         box.innerHTML = CourseProgress.completionRequirements(moduleId).map(function (r) {
-          return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "\u2713 " : "\u25cb ") + esc(r.label) + "</div>";
+          return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' +
+            '<span class="i ' + (r.satisfied ? "i-check" : "i-circle") + '" aria-hidden="true"></span>' +
+            esc(r.label) + "</div>";
         }).join("");
       }
     }
@@ -200,7 +229,8 @@
     if (!el) return;
     el.className = "feedback " + (out.passed ? "ok" : "bad");
     el.innerHTML = out.results.map(function (r) {
-      return (r.pass ? "\u2713 " : "\u2717 ") + esc(r.name) + (r.pass || !r.hint ? "" : '<span class="fbhint"> \u2014 ' + esc(r.hint) + "</span>");
+      return '<span class="i ' + (r.pass ? "i-check" : "i-x") + '" aria-hidden="true"></span>' +
+        esc(r.name) + (r.pass || !r.hint ? "" : '<span class="fbhint"> \u2014 ' + esc(r.hint) + "</span>");
     }).join("<br>");
   }
 

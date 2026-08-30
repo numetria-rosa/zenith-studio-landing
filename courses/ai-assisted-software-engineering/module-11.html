@@ -212,7 +212,7 @@ document.getElementById("m11check").onclick = function () {
   if (ok) {
     document.getElementById("m11fb").innerHTML =
       "<b>Same behaviour, one third of the code, and no patient data in the log.</b> Every window the three originals handled still returns what it returned before \u2014 which is the only thing that entitles you to call this a refactor rather than a rewrite.<br><br>" +
-      results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+      results.map(function (r) { return '<span class="i i-check"></span> ' + r.name; }).join("<br>");
     CourseProgress.setSection(11, "refactorExercise", { passed: true, at: new Date().toISOString() });
     Northline.showLearned(document.getElementById("m11fb").parentNode,
       "You just changed the shape and left the behaviour where it was.",

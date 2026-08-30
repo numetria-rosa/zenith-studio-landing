@@ -7,16 +7,33 @@
 <link rel="stylesheet" href="course.css">
 </head>
 <body>
-<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Roadmap</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a></div></div>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">AI-Assisted Software Engineering</span></div></div>
+<div class="coursenav"><div class="in">
+  <a href="dashboard.html">&larr; Dashboard</a>
+  <a href="syllabus.html">Syllabus</a>
+  <a href="tickets.html">Ticket board</a>
+  <a href="mastery-profile.html">Mastery Profile</a>
+  <a href="career.html">Career Path</a>
+</div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Rule-based · not an AI tutor</span>
-    <h1 class="serif">Learning roadmap</h1>
-    <p class="sub">The next task is whichever unfinished practice item scores highest on retries and uncovered tools. No model is choosing this.</p>
-    <div class="projcard" id="rec"></div>
+    <span class="eyebrow">Learning Roadmap</span>
+    <h1 class="serif">The whole journey, in one place</h1>
+    <p class="sub">Every Northline ticket, practice library, and skill in this course, grouped by stage, showing what is done, what is next, and why. Skill status comes from real, persisted practice-task evidence, not a fixed curriculum checklist. The next-task pick is rule-based, not an AI tutor.</p>
+    <div class="wherebox">
+      <div class="wlbl">Where you are</div>
+      <div class="wtext" id="whereText">Loading your progress&hellip;</div>
+      <a class="wbtn" id="whereBtn" href="dashboard.html">Open Dashboard &rarr;</a>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--good)"></span> Done</span>
+      <span><span class="dot" style="background:var(--accent)"></span> Current / recommended</span>
+      <span><span class="dot" style="background:var(--info)"></span> Available</span>
+      <span><span class="dot" style="background:var(--mut2)"></span> Locked or not started</span>
+    </div>
   </header>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+  <div id="roadmapBody"></div>
+  <footer>Zenith Lab &middot; AI-Assisted Software Engineering &middot; Learning Roadmap</footer>
 </div>
 <script src="course-progress.js"></script>
 <script src="practice-progress.js"></script>
@@ -24,14 +41,187 @@
 <script src="skill-map.js"></script>
 <script src="adaptive-engine.js"></script>
 <script>
-const r = AdaptiveEngine.recommend();
-const el = document.getElementById("rec");
-if (r.done) el.innerHTML = "<p>No unfinished practice tasks in the map, or SkillMap failed to load.</p>";
-else {
-  const p = r.primary;
-  el.innerHTML = "<div class='modtitle'>" + (p.title || p.id) + "</div><p class='moddesc'>" + (p.why || []).join(" ") +
-    '</p><p style="margin-top:10px"><a href="' + p.file + '">Open ' + p.tool + " practice</a></p>";
+const esc = CourseProgress.escapeHtml;
+
+const STAGES = [
+  {
+    id: "welcome", num: "00", title: "Welcome to AI-assisted development",
+    desc: "Orientation plus your first shipped change. Read a real ticket, change one line, prove it, and ship it.",
+    modules: [0, 1],
+  },
+  {
+    id: "think", num: "01", title: "Think like a software engineer",
+    desc: "Turn a vague request into a spec an agent can be supervised against.",
+    modules: [2],
+    libraries: ["specs"],
+    skills: ["m-specs"],
+  },
+  {
+    id: "web", num: "02", title: "Understand the web",
+    desc: "HTML, CSS, JavaScript, and late-arriving data. The skeleton AI keeps getting subtly wrong.",
+    modules: [3, 4, 5, 6],
+    libraries: ["html", "css", "js"],
+    skills: ["m-html", "m-css", "m-js"],
+  },
+  {
+    id: "pair", num: "03", title: "AI as your pair programmer",
+    desc: "The full loop in Cursor, then detective work on plausible AI code. Required Desktop Labs are the real tool time.",
+    modules: [7, 8],
+    libraries: ["review"],
+    extras: ["detective", "desktop"],
+    skills: ["m-review"],
+  },
+  {
+    id: "discipline", num: "04", title: "Engineering discipline",
+    desc: "Tests that can fail, Git and review judgment, then refactoring and security.",
+    modules: [9, 10, 11],
+    libraries: ["testing", "git"],
+    skills: ["m-test", "m-git"],
+  },
+  {
+    id: "ship", num: "05", title: "Release and ship",
+    desc: "Enough Python for a recurring chore, then one live product with tests, a repo, and a URL someone else can open.",
+    modules: [12, 13],
+    libraries: ["python", "integrated"],
+    skills: ["m-py", "m-int", "m-port"],
+  },
+];
+
+const LIB_META = {
+  html: { file: "practice-html.html", label: "HTML Practice Library" },
+  css: { file: "practice-css.html", label: "CSS Practice Library" },
+  js: { file: "practice-js.html", label: "JavaScript Practice Library" },
+  specs: { file: "practice-specs.html", label: "Specs Practice (simulation)" },
+  git: { file: "practice-git.html", label: "Git Practice (simulation)" },
+  testing: { file: "practice-testing.html", label: "Testing Practice Library" },
+  review: { file: "practice-review.html", label: "Review Practice (simulation)" },
+  python: { file: "practice-python.html", label: "Python Practice Library" },
+  integrated: { file: "practice-integrated.html", label: "Integrated Challenges" },
+};
+
+function moduleStatus(id) {
+  if (id === 0) {
+    const m0 = CourseProgress.getExtra("module0") || {};
+    if (m0.completed) return "done";
+    return "available";
+  }
+  if (CourseProgress.isModuleComplete(id)) return "done";
+  if (CourseProgress.isUnlocked(id)) return CourseProgress.statusOf(id) === "in-progress" ? "current" : "available";
+  return "locked";
 }
+
+function moduleNode(id) {
+  const status = moduleStatus(id);
+  const href = id === 0 ? "module-00.html" : ("module-" + String(id).padStart(2, "0") + ".html");
+  const titles = { 0: "Orientation" };
+  CourseProgress.MODULES.forEach(function (m) { titles[m.id] = m.title; });
+  const ticket = id ? CourseProgress.ticketFor(id) : null;
+  const pillLabel = { done: "Done", available: "Available", locked: "Locked", current: "Current" }[status];
+  const tag = status === "locked" ? "div" : "a";
+  const hrefAttr = status === "locked" ? ' aria-disabled="true"' : ' href="' + href + '"';
+  const meta = ticket
+    ? (ticket.id + " · " + (status === "locked" ? "Unlocks after the previous ticket" : ticket.kind))
+    : (status === "locked" ? "Unlocks after the previous module" : "Course orientation");
+  return "<" + tag + ' class="node ' + (status === "available" || status === "current" ? "current" : "") + (status === "locked" ? " locked" : "") + '"' + hrefAttr + ">" +
+    '<div class="ntop"><span class="ntitle">Module ' + id + ": " + esc(titles[id] || "") + '</span><span class="statuspill ' + (status === "current" ? "current" : status) + '">' + pillLabel + "</span></div>" +
+    '<span class="nmeta">' + esc(meta) + "</span></" + tag + ">";
+}
+
+function libraryNode(tool) {
+  const meta = LIB_META[tool];
+  const tasks = (SkillMap.TASKS || []).filter(function (t) { return t.tool === tool; });
+  const passed = tasks.filter(function (t) { return PracticeProgress.getTaskState(t.id).passed; }).length;
+  const status = passed === 0 ? "available" : (passed === tasks.length && tasks.length ? "done" : "current");
+  const pillLabel = { done: "Done", available: "Available", current: "In progress" }[status];
+  return '<a class="node ' + (status === "current" ? "current" : "") + '" href="' + meta.file + '">' +
+    '<div class="ntop"><span class="ntitle">' + esc(meta.label) + '</span><span class="statuspill ' + status + '">' + pillLabel + "</span></div>" +
+    '<span class="nmeta">' + passed + " / " + tasks.length + " tasks passed</span></a>";
+}
+
+function detectiveNode() {
+  const passed = CourseProgress.countPassedPractice("det-");
+  const status = passed === 0 ? "available" : (passed >= 3 ? "done" : "current");
+  const pill = status === "done" ? "Done" : (status === "current" ? "In progress" : "Available");
+  return '<a class="node ' + (status === "current" ? "current" : "") + '" href="practice-detective.html">' +
+    '<div class="ntop"><span class="ntitle">AI Code Detective</span><span class="statuspill ' + status + '">' + pill + "</span></div>" +
+    '<span class="nmeta">' + passed + " detective tasks passed · capstone needs 3+</span></a>";
+}
+
+function desktopLabNode() {
+  const done = CourseProgress.desktopLabReady();
+  const cursor = CourseProgress.desktopLabRecord("cursor").completed;
+  const github = CourseProgress.desktopLabRecord("github").completed;
+  const status = done ? "done" : "available";
+  return '<a class="node ' + (done ? "" : "current") + '" href="desktop-labs.html">' +
+    '<div class="ntop"><span class="ntitle">Desktop Labs: Cursor + GitHub</span><span class="statuspill ' + status + '">' + (done ? "Done" : "Required") + "</span></div>" +
+    '<span class="nmeta">' + (cursor ? "Cursor done" : "Cursor open") + " · " + (github ? "GitHub done" : "GitHub open") + "</span></a>";
+}
+
+function skillNode(m) {
+  const prog = SkillMap.masterSkillProgress(m.id);
+  const tierLabel = { "not-started": "Not started", introduced: "Introduced", practicing: "Practicing", competent: "Competent", mastered: "Mastered" }[prog.tier];
+  const href = m.special === "portfolio" ? "projects.html" : "mastery-profile.html";
+  return '<a class="node" href="' + href + '">' +
+    '<div class="ntop"><span class="ntitle">' + esc(m.label) + '</span><span class="tierpill t-' + prog.tier + '">' + tierLabel + "</span></div>" +
+    '<span class="nmeta">' + prog.passedCount + " / " + prog.totalCount + " evidence items</span>" +
+    (m.simulation ? '<span class="simtag">Simulation, judgment-based, not live tool execution</span>' : "") +
+    "</a>";
+}
+
+function renderRoadmap() {
+  const body = document.getElementById("roadmapBody");
+  body.innerHTML = "";
+  STAGES.forEach(function (stage) {
+    const section = document.createElement("div");
+    section.className = "rmstage";
+    const modulesHtml = stage.modules.map(moduleNode).join("");
+    const libsHtml = (stage.libraries || []).map(libraryNode).join("");
+    const extras = stage.extras || [];
+    const extraHtml = extras.map(function (x) {
+      if (x === "detective") return detectiveNode();
+      if (x === "desktop") return desktopLabNode();
+      return "";
+    }).join("");
+    const skills = (SkillMap.MASTER_SKILLS || []).filter(function (m) {
+      return (stage.skills || []).indexOf(m.id) !== -1;
+    });
+    const skillsHtml = skills.map(skillNode).join("");
+    section.innerHTML =
+      '<div class="stagehead"><span class="sn">' + stage.num + '</span><h2 class="serif">' + esc(stage.title) + "</h2></div>" +
+      '<p class="stagedesc">' + esc(stage.desc) + "</p>" +
+      (modulesHtml ? '<div class="groupdiv">Modules</div><div class="nodegrid" style="margin-top:8px">' + modulesHtml + "</div>" : "") +
+      (libsHtml ? '<div class="groupdiv">Practice libraries</div><div class="nodegrid" style="margin-top:8px">' + libsHtml + "</div>" : "") +
+      (extraHtml ? '<div class="groupdiv">Labs &amp; detective work</div><div class="nodegrid" style="margin-top:8px">' + extraHtml + "</div>" : "") +
+      (skillsHtml ? '<div class="groupdiv">Skills</div><div class="nodegrid" style="margin-top:8px">' + skillsHtml + "</div>" : "");
+    body.appendChild(section);
+  });
+
+  const overall = CourseProgress.overall();
+  const totalTasks = SkillMap.TASKS.length;
+  const passedTasks = SkillMap.totalTasksPassed();
+  const rec = (typeof AdaptiveEngine !== "undefined") ? AdaptiveEngine.recommend() : null;
+  const whereText = document.getElementById("whereText");
+  const whereBtn = document.getElementById("whereBtn");
+  const m0 = CourseProgress.getExtra("module0") || {};
+  if (passedTasks === 0 && overall.completed === 0 && !m0.visited && !m0.completed) {
+    whereText.textContent = "You haven't started yet. Module 0 (Orientation) is the right place to begin — a short, honest look at the engineering loop this course is built around.";
+    whereBtn.href = "module-00.html";
+    whereBtn.textContent = "Start Module 0 →";
+  } else if (rec && !rec.done && rec.primary) {
+    const libLabel = LIB_META[rec.primary.tool] ? LIB_META[rec.primary.tool].label : rec.primary.tool;
+    const why = (rec.primary.why && rec.primary.why[0]) ? rec.primary.why[0] : "";
+    const level = String(rec.primary.level || "").replace("semiguided", "semi-guided");
+    whereText.textContent = overall.completed + " / " + overall.total + " modules complete, " + passedTasks + " / " + totalTasks + " practice tasks passed. Recommended next: a " + level + " task in the " + libLabel + ". " + why;
+    whereBtn.href = rec.primary.file || "dashboard.html";
+    whereBtn.textContent = "Open " + libLabel + " →";
+  } else {
+    whereText.textContent = overall.completed + " / " + overall.total + " modules complete, " + passedTasks + " / " + totalTasks + " practice tasks passed. Every practice task in the map has been passed at least once. The capstone and portfolio projects are the strongest next step.";
+    whereBtn.href = "projects.html";
+    whereBtn.textContent = "Open Projects →";
+  }
+}
+
+renderRoadmap();
 </script>
 <script src="course-rail.js"></script>
 </body>

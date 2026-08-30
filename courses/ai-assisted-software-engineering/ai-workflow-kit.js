@@ -82,7 +82,7 @@
       const results = runSpecChecks(cfg.specChecks, text);
       state.spec = results.length > 0 && results.every((r) => r.pass);
       fb1.className = "feedback " + (state.spec ? "ok" : "bad");
-      fb1.innerHTML = results.map((r) => (r.pass ? "\u2713 " : "\u2717 ") + esc(r.name)).join("<br>");
+      fb1.innerHTML = results.map((r) => '<span class="i ' + (r.pass ? "i-check" : "i-x") + '"></span> ' + esc(r.name)).join("<br>");
       report();
     };
 
@@ -97,7 +97,7 @@
         const out = PracticeKit.gradeJs({ functionName: cfg.code.functionName, testCases: cfg.code.testCases || [] }, src);
         state.code = out.passed;
         fb2.className = "feedback " + (out.passed ? "ok" : "bad");
-        fb2.innerHTML = out.results.map((r) => (r.pass ? "\u2713 " : "\u2717 ") + esc(r.pass ? r.name : r.hint)).join("<br>") +
+        fb2.innerHTML = out.results.map((r) => '<span class="i ' + (r.pass ? "i-check" : "i-x") + '"></span> ' + esc(r.pass ? r.name : r.hint)).join("<br>") +
           (out.passed ? "<br><b>That is the loop.</b> You specified it, the agent wrote it, and an independent test agreed." : "");
         report();
       };
@@ -121,7 +121,7 @@
       ];
       state.review = results.every((r) => r.pass);
       fb3.className = "feedback " + (state.review ? "ok" : "bad");
-      fb3.innerHTML = results.map((r) => (r.pass ? "\u2713 " : "\u2717 ") + esc(r.name)).join("<br>");
+      fb3.innerHTML = results.map((r) => '<span class="i ' + (r.pass ? "i-check" : "i-x") + '"></span> ' + esc(r.name)).join("<br>");
       report();
     };
 

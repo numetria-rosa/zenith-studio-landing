@@ -1,0 +1,13 @@
+/* AI Engineering accent — lime */
+:root {
+  --accent: #c6f432;
+  --accentd: #0f1405;
+  --accent-soft: rgba(198, 244, 50, 0.14);
+  --bd-hover: rgba(198, 244, 50, 0.38);
+  --info: #a3e635;
+  --lime: #c6f432;
+  --limed: #0f1405;
+  --violet: #a78bfa;
+  --emerald: #34e5a0;
+  --good: #34e5a0;
+}

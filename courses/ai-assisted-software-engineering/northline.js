@@ -532,6 +532,40 @@
     return n;
   }
 
+  function inferLang(code) {
+    const s = String(code || "");
+    if (/^\s*</.test(s)) return "html";
+    if (/\b(def |except:|import |None|True|False)\b/.test(s) || /#\s/.test(s) && /:\s*$/m.test(s)) return "python";
+    if (/^\s*[.#@]/.test(s) || (/{\s*$/m.test(s) && /:\s*[^;\n]+;/m.test(s) && !/\b(function|const|let|return)\b/.test(s))) return "css";
+    return "js";
+  }
+
+  function highlight(code, lang) {
+    let out = esc(code);
+    if (lang === "js" || lang === "python") {
+      out = out.replace(/(&#39;[^&\n]*?&#39;|&quot;[^&\n]*?&quot;|`[^`\n]*?`)/g, '<span class="tk-str">$1</span>');
+      out = out.replace(/(\/\/[^\n]*|#[^\n]*)/g, '<span class="tk-com">$1</span>');
+      out = out.replace(/\b(function|return|const|let|var|if|else|for|while|new|try|catch|throw|async|await|class|def|import|from|True|False|None|null|undefined|true|false|except|pass)\b/g,
+        '<span class="tk-kw">$1</span>');
+      out = out.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="tk-num">$1</span>');
+    } else if (lang === "html") {
+      out = out.replace(/(&lt;\/?[a-zA-Z][\w-]*)/g, '<span class="tk-kw">$1</span>');
+      out = out.replace(/([\w-]+)=(&quot;[^&]*?&quot;)/g, '<span class="tk-num">$1</span>=<span class="tk-str">$2</span>');
+    } else if (lang === "css") {
+      out = out.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="tk-com">$1</span>');
+      out = out.replace(/^(\s*)([-a-z]+)(\s*:)/gm, '$1<span class="tk-kw">$2</span>$3');
+    }
+    return out;
+  }
+
+  function codeBlockHtml(code, lang) {
+    const lines = String(code || "").replace(/\s+$/, "").split("\n");
+    const gutter = lines.map(function (_, i) { return i + 1; }).join("\n");
+    const L = lang || inferLang(code);
+    return '<div class="detcode"><pre class="detgutter" aria-hidden="true">' + gutter + "</pre>" +
+      '<pre class="detsrc"><code>' + highlight(lines.join("\n"), L) + "</code></pre></div>";
+  }
+
   function feedbackNode(cls) {
     const fb = el("div", cls ? "feedback " + cls : "feedback");
     fb.setAttribute("role", "status");
@@ -547,7 +581,7 @@
       node.setAttribute("role", "status");
       host.appendChild(node);
     }
-    node.innerHTML = "<b>\u2713 " + esc(title) + "</b><p>" + esc(detail) + "</p>";
+    node.innerHTML = '<b><span class="i i-check"></span> ' + esc(title) + "</b><p>" + esc(detail) + "</p>";
   }
 
   /* The cast, as a reusable card grid. Uses the existing whycare/whybox
@@ -646,23 +680,33 @@
     const root = document.getElementById(rootId);
     if (!case_ || !root) return;
     root.innerHTML = "";
+    root.classList.add("detcase");
     root.appendChild(el("div", "ilbl", "AI Code Detective \u00b7 labelled simulation"));
+    root.appendChild(el("div", "detbanner", "Potential issue detected"));
     root.appendChild(el("h3", "dtitle", case_.title));
-    root.appendChild(el("p", null, case_.prompt));
-    root.appendChild(el("pre", null, case_.code));
-    const row = el("div", "wf-row");
+    const codeHost = document.createElement("div");
+    codeHost.innerHTML = codeBlockHtml(case_.code, case_.lang);
+    if (codeHost.firstChild) root.appendChild(codeHost.firstChild);
+    root.appendChild(el("p", "detask", case_.prompt || "What would you investigate first?"));
+    const row = el("div", "detfindings");
+    row.setAttribute("role", "group");
+    row.setAttribute("aria-label", "Investigation options");
     const fb = feedbackNode();
     let solved = false;
     shuffle(case_.opts).forEach(function (o) {
-      const b = el("button", "wf-chip", o.t);
+      const b = el("button", "qopt detopt", o.t);
       b.type = "button";
       b.onclick = function () {
         if (solved) return;
+        row.querySelectorAll(".detopt").forEach(function (x) {
+          x.classList.remove("chosen");
+        });
+        b.classList.add("chosen");
         if (o.correct) {
           solved = true;
           b.classList.add("correct");
-          row.querySelectorAll(".wf-chip").forEach(function (x) { if (x !== b) x.disabled = true; });
-          fb.className = "feedback ok";
+          row.querySelectorAll(".detopt").forEach(function (x) { if (x !== b) x.disabled = true; });
+          fb.className = "feedback ok detexplain";
           fb.textContent = (o.whyOk || "That is the defect.") +
             (case_.principle ? "  Principle: " + case_.principle : "");
           showLearned(root, "You reviewed agent output instead of trusting it.",
@@ -670,7 +714,7 @@
         } else {
           b.classList.add("incorrect");
           b.disabled = true;
-          fb.className = "feedback bad";
+          fb.className = "feedback bad detexplain";
           fb.textContent = (o.why || "Not the defect.") + "  Try again.";
         }
       };
@@ -685,8 +729,12 @@
     if (!root) return;
     root.innerHTML = "";
     keys.forEach(function (key, i) {
-      const box = el("div", "interactive");
+      const box = el("div", "interactive detwrap");
       box.id = rootId + "_case" + i;
+      box.style.padding = "0";
+      box.style.background = "transparent";
+      box.style.border = "0";
+      box.style.boxShadow = "none";
       root.appendChild(box);
       renderDetective(key, box.id);
     });
@@ -731,7 +779,7 @@
       if (!missed.length && !falseAlarm.length) {
         fb.className = "feedback ok";
         fb.innerHTML = items.filter(function (x) { return x.bad; }).map(function (x) {
-          return "\u2713 " + esc(x.t) + '<br><span class="fbhint">' + esc(x.why) + "</span>";
+          return '<span class="i i-check"></span> ' + esc(x.t) + '<br><span class="fbhint">' + esc(x.why) + "</span>";
         }).join("<br><br>");
         if (spec.learned) showLearned(root, spec.learned[0], spec.learned[1]);
       } else {
@@ -1044,7 +1092,7 @@
       const ok = checks.every(function (c) { return c.pass; });
       fb.className = "feedback " + (ok ? "ok" : "bad");
       fb.innerHTML = checks.map(function (c) {
-        return (c.pass ? "\u2713 " : "\u2717 ") + esc(c.name);
+        return '<span class="i ' + (c.pass ? "i-check" : "i-x") + '"></span> ' + esc(c.name);
       }).join("<br>");
       if (ok) {
         if (global.CourseProgress) {
@@ -1106,12 +1154,36 @@
       const done = CourseProgress.isModuleComplete(m.id);
       const card = document.createElement(unlocked ? "a" : "div");
       if (unlocked) card.href = m.file;
-      card.className = "ticketcard" + (done ? " done" : "") + (unlocked ? "" : " locked");
-      const state = done ? " \u00b7 done" : unlocked ? "" : " \u00b7 locked";
-      card.innerHTML = '<div class="ticketid">' + esc(t.id) + esc(state) + "</div><h3>" +
-        esc(t.title) + '</h3><p class="tkquote">\u201c' + esc(t.quote) + '\u201d</p>' +
+      card.className = "ticketcard pri-" + (t.priority || "medium").toLowerCase() +
+        (done ? " done" : "") + (unlocked ? "" : " locked");
+      const status = done ? "done" : unlocked ? "open" : "locked";
+      const statusLabel = done ? "Done" : unlocked ? "Open" : "Locked";
+      const pri = (t.priority || "Medium").toLowerCase();
+      const prev = !unlocked ? CourseProgress.MODULES.find(function (x) { return x.id === m.id - 1; }) : null;
+      const prevT = prev ? CourseProgress.ticketFor(prev.id) : null;
+      card.innerHTML =
+        '<div class="tkhead">' +
+          '<span class="tkorg"><span class="tkdot" aria-hidden="true"></span>' + esc(t.org || "Northline Digital") + "</span>" +
+          '<span class="tkstatus ' + status + '">' + statusLabel + "</span>" +
+        "</div>" +
+        '<div class="ticketid">' + esc(t.id) + "</div>" +
+        "<h3>" + esc(t.title) + "</h3>" +
+        '<div class="tkmeta">' +
+          '<div><span>Priority</span><b class="pri-' + esc(pri) + '">' + esc(t.priority || "Medium") + "</b></div>" +
+          "<div><span>Type</span><b>" + esc(t.kind || "Engineering") + "</b></div>" +
+          "<div><span>Estimate</span><b>~" + m.minutes + " min</b></div>" +
+        "</div>" +
+        '<p class="tkquote">\u201c' + esc(t.quote) + '\u201d</p>' +
         '<p class="tkfrom">\u2014 ' + esc(t.from) + "</p>" +
-        '<span class="fmt">Module ' + m.id + " \u00b7 " + esc(m.title) + "</span>";
+        '<span class="fmt">Module ' + m.id + " \u00b7 " + esc(m.title) + "</span>" +
+        (unlocked
+          ? '<div class="tkcta"><span class="primary" style="pointer-events:none">' +
+            (done ? "Review ticket" : "Start ticket") + "</span></div>"
+          : '<div class="tkcta lockedcta">' +
+              '<div class="modlock-lbl">Ticket locked</div>' +
+              "<p>Complete " + esc(prevT ? prevT.id : "the previous ticket") + " first.</p>" +
+              (prev ? '<a href="' + prev.file + '">View previous ticket</a>' : "") +
+            "</div>");
       host.appendChild(card);
     });
   }

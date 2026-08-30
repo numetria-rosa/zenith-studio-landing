@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Roadmap — AI Automation</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">AI Automation</span></div></div>
+<div class="coursenav"><div class="in">
+  <a href="dashboard.html">&larr; Dashboard</a>
+  <a href="syllabus.html">Syllabus</a>
+  <a href="practice-workflows.html">Practice</a>
+  <a href="projects.html">Projects</a>
+  <a href="career.html">Career Path</a>
+</div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Learning Roadmap</span>
+    <h1 class="serif">The whole journey, in one place</h1>
+    <p class="sub">Every module, practice library, challenge, and client brief in this course, grouped by stage, showing what is done, what is next, and why. Practice ticks stay in this browser. Module progress syncs when you are signed in through Zenith Lab.</p>
+    <div class="wherebox">
+      <div class="wlbl">Where you are</div>
+      <div class="wtext" id="whereText">Loading your progress&hellip;</div>
+      <a class="wbtn" id="whereBtn" href="dashboard.html">Open Dashboard &rarr;</a>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--good)"></span> Done</span>
+      <span><span class="dot" style="background:var(--accent)"></span> Current / recommended</span>
+      <span><span class="dot" style="background:var(--info)"></span> Available</span>
+      <span><span class="dot" style="background:var(--mut2)"></span> Locked or not started</span>
+    </div>
+  </header>
+  <div id="roadmapBody"></div>
+  <footer>Zenith Lab &middot; AI Automation &middot; Learning Roadmap</footer>
+</div>
+<script src="course-progress.js"></script>
+<script src="practice-progress.js"></script>
+<script src="practice-tasks.js"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+
+const STAGES = [
+  {
+    id: "foundation", num: "01", title: "Foundation",
+    desc: "Who this is for, then your first client workflow: a trigger, a transform, and a side effect that actually finishes.",
+    modules: [0, 1],
+    libraries: ["workflows"],
+  },
+  {
+    id: "data-apis", num: "02", title: "Data, APIs & webhooks",
+    desc: "JSON paths, missing email, 200s that still store garbage. API vs webhook. Drop a teaching-signature mismatch. Never mail the secret.",
+    modules: [2, 3],
+    libraries: ["apis"],
+  },
+  {
+    id: "reliability", num: "03", title: "Reliability",
+    desc: "Bounded retries so you do not send three invoices. Same event twice, one charge.",
+    modules: [4, 5],
+    libraries: ["reliability"],
+  },
+  {
+    id: "ai-agents", num: "04", title: "AI as a step, not a brain",
+    desc: "Schema or it does not ship. Draft vs execute. Approval before money moves. Cross-module challenges gate the capstone.",
+    modules: [6, 7],
+    libraries: ["ai"],
+    extras: ["challenges"],
+  },
+  {
+    id: "capstone", num: "05", title: "Client-ready delivery",
+    desc: "A lead pipeline that survives retry, replay, and a bad model — plus the briefs you can actually show.",
+    modules: [8],
+    extras: ["projects", "portfolio", "career"],
+  },
+];
+
+const LIB_META = {
+  workflows: { file: "practice-workflows.html", label: "Workflow Practice", key: "workflows" },
+  apis: { file: "practice-apis.html", label: "API Practice", key: "apis" },
+  reliability: { file: "practice-reliability.html", label: "Reliability Practice", key: "reliability" },
+  ai: { file: "practice-ai.html", label: "AI-Step Practice", key: "ai" },
+};
+
+function moduleStatus(id) {
+  if (id === 0) {
+    const m0 = (CourseProgress.getExtra && CourseProgress.getExtra("module0")) || {};
+    if (m0.completed) return "done";
+    return "available";
+  }
+  if (CourseProgress.isModuleComplete(id)) return "done";
+  if (CourseProgress.isUnlocked(id)) return CourseProgress.statusOf(id) === "in-progress" ? "current" : "available";
+  return "locked";
+}
+
+function moduleNode(id) {
+  const status = moduleStatus(id);
+  const href = id === 0 ? "module-00.html" : ("module-" + String(id).padStart(2, "0") + ".html");
+  const titles = { 0: "Orientation" };
+  CourseProgress.MODULES.forEach(function (m) { titles[m.id] = m.title; });
+  const pillLabel = { done: "Done", available: "Available", locked: "Locked", current: "Current" }[status];
+  const tag = status === "locked" ? "div" : "a";
+  const hrefAttr = status === "locked" ? ' aria-disabled="true"' : ' href="' + href + '"';
+  const meta = status === "locked"
+    ? (id === 8 ? "Unlocks after Module 7 and both challenges" : "Unlocks after the previous module")
+    : "Course module";
+  return "<" + tag + ' class="node ' + (status === "available" || status === "current" ? "current" : "") + (status === "locked" ? " locked" : "") + '"' + hrefAttr + ">" +
+    '<div class="ntop"><span class="ntitle">Module ' + id + ": " + esc(titles[id] || "") + '</span><span class="statuspill ' + (status === "current" ? "current" : status) + '">' + pillLabel + "</span></div>" +
+    '<span class="nmeta">' + esc(meta) + "</span></" + tag + ">";
+}
+
+function libraryNode(tool) {
+  const meta = LIB_META[tool];
+  const tasks = (PracticeTasks[meta.key] || []);
+  const passed = PracticeProgress.passedCount(tasks.map(function (t) { return t.id; }));
+  const status = passed === 0 ? "available" : (passed === tasks.length ? "done" : "current");
+  const pillLabel = { done: "Done", available: "Available", current: "In progress" }[status];
+  return '<a class="node ' + (status === "current" ? "current" : "") + '" href="' + meta.file + '">' +
+    '<div class="ntop"><span class="ntitle">' + esc(meta.label) + '</span><span class="statuspill ' + status + '">' + pillLabel + "</span></div>" +
+    '<span class="nmeta">' + passed + " / " + tasks.length + " tasks passed</span></a>";
+}
+
+function extraNode(kind) {
+  if (kind === "challenges") {
+    const done = CourseProgress.crossChallengesComplete();
+    const unlocked = CourseProgress.isModuleComplete(7);
+    const status = done ? "done" : (unlocked ? "available" : "locked");
+    const tag = status === "locked" ? "div" : "a";
+    const hrefAttr = status === "locked" ? ' aria-disabled="true"' : ' href="challenges.html"';
+    return "<" + tag + ' class="node ' + (status === "available" ? "current" : "") + (status === "locked" ? " locked" : "") + '"' + hrefAttr + ">" +
+      '<div class="ntop"><span class="ntitle">Cross-module challenges</span><span class="statuspill ' + status + '">' + (done ? "Done" : unlocked ? "Required" : "Locked") + "</span></div>" +
+      '<span class="nmeta">' + (unlocked ? "Double-charge + runaway agent. Gates Module 8." : "Unlocks after Module 7") + "</span></" + tag + ">";
+  }
+  if (kind === "projects") {
+    const projects = CourseProgress.PROJECTS || [];
+    const done = projects.filter(function (p) { return CourseProgress.getProject(p.id).completed; }).length;
+    const status = done === 0 ? "available" : (done === projects.length ? "done" : "current");
+    return '<a class="node ' + (status === "current" ? "current" : "") + '" href="projects.html">' +
+      '<div class="ntop"><span class="ntitle">Client briefs</span><span class="statuspill ' + status + '">' + (status === "done" ? "Done" : status === "current" ? "In progress" : "Available") + "</span></div>" +
+      '<span class="nmeta">' + done + " / " + projects.length + " projects completed</span></a>";
+  }
+  if (kind === "portfolio") {
+    return '<a class="node" href="portfolio.html"><div class="ntop"><span class="ntitle">Portfolio</span><span class="statuspill available">Open</span></div><span class="nmeta">What you can actually show</span></a>';
+  }
+  if (kind === "career") {
+    return '<a class="node" href="career.html"><div class="ntop"><span class="ntitle">Career Path</span><span class="statuspill available">Open</span></div><span class="nmeta">Freelance and ops roles, honest non-claims</span></a>';
+  }
+  return "";
+}
+
+function renderRoadmap() {
+  const body = document.getElementById("roadmapBody");
+  body.innerHTML = "";
+  STAGES.forEach(function (stage) {
+    const section = document.createElement("div");
+    section.className = "rmstage";
+    const modulesHtml = stage.modules.map(moduleNode).join("");
+    const libsHtml = (stage.libraries || []).map(libraryNode).join("");
+    const extraHtml = (stage.extras || []).map(extraNode).join("");
+    section.innerHTML =
+      '<div class="stagehead"><span class="sn">' + stage.num + '</span><h2 class="serif">' + esc(stage.title) + "</h2></div>" +
+      '<p class="stagedesc">' + esc(stage.desc) + "</p>" +
+      (modulesHtml ? '<div class="groupdiv">Modules</div><div class="nodegrid" style="margin-top:8px">' + modulesHtml + "</div>" : "") +
+      (libsHtml ? '<div class="groupdiv">Practice libraries</div><div class="nodegrid" style="margin-top:8px">' + libsHtml + "</div>" : "") +
+      (extraHtml ? '<div class="groupdiv">Challenges &amp; delivery</div><div class="nodegrid" style="margin-top:8px">' + extraHtml + "</div>" : "");
+    body.appendChild(section);
+  });
+
+  const overall = CourseProgress.overall();
+  let passedTasks = 0, totalTasks = 0;
+  Object.keys(LIB_META).forEach(function (k) {
+    const tasks = PracticeTasks[LIB_META[k].key] || [];
+    totalTasks += tasks.length;
+    passedTasks += PracticeProgress.passedCount(tasks.map(function (t) { return t.id; }));
+  });
+  const whereText = document.getElementById("whereText");
+  const whereBtn = document.getElementById("whereBtn");
+  const m0 = (CourseProgress.getExtra && CourseProgress.getExtra("module0")) || {};
+
+  if (overall.completed === 0 && passedTasks === 0 && !m0.visited && !m0.completed) {
+    whereText.textContent = "You haven't started yet. Orientation is a short, honest look at who this course is for and what we will not promise.";
+    whereBtn.href = "module-00.html";
+    whereBtn.textContent = "Start Orientation →";
+  } else if (CourseProgress.isModuleComplete(7) && !CourseProgress.crossChallengesComplete()) {
+    whereText.textContent = overall.completed + " / " + overall.total + " modules complete, " + passedTasks + " / " + totalTasks + " practice tasks passed. Finish both cross-module challenges to unlock the capstone.";
+    whereBtn.href = "challenges.html";
+    whereBtn.textContent = "Open Challenges →";
+  } else {
+    const next = CourseProgress.MODULES.find(function (m) {
+      return CourseProgress.isUnlocked(m.id) && !CourseProgress.isModuleComplete(m.id);
+    });
+    if (next) {
+      whereText.textContent = overall.completed + " / " + overall.total + " modules complete, " + passedTasks + " / " + totalTasks + " practice tasks passed. Recommended next: Module " + next.id + " — " + next.title + ".";
+      whereBtn.href = next.file;
+      whereBtn.textContent = "Open Module " + next.id + " →";
+    } else {
+      whereText.textContent = overall.completed + " / " + overall.total + " modules complete, " + passedTasks + " / " + totalTasks + " practice tasks passed. The client briefs and portfolio are the strongest next step toward something you can show.";
+      whereBtn.href = "projects.html";
+      whereBtn.textContent = "Open Projects →";
+    }
+  }
+}
+
+renderRoadmap();
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

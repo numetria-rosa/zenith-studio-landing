@@ -287,7 +287,7 @@ document.getElementById("m9btn3").onclick = function () {
     m9.c = true;
     document.getElementById("m9fb3").innerHTML =
       "<b>NL-009 closed properly.</b> Reproduction, then a test that proves the bug, then the fix. Priya's two patients can book, and if someone reintroduces this next quarter your test catches it before they do.<br><br>" +
-      out.results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+      out.results.map(function (r) { return '<span class="i i-check"></span> ' + r.name; }).join("<br>");
     Northline.showLearned(document.getElementById("m9fb3").parentNode,
       "You just closed a bug the way a team can trust.",
       "Reproduce, prove, then fix. The test is what stops this coming back in a different costume.");

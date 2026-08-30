@@ -1,58 +1,6 @@
-/* Zenith Lab, Data Science & Analysis persistent course sidebar.
-   Loaded as the last script on every course page. Wraps the page's
-   existing content (unchanged) in a flex shell and prepends a sticky
-   left rail: course nav plus a live module list with lock/progress
-   status, read from CourseProgress when that script has already loaded
-   on the page. Doing the wrap in JS, once, here, means every page only
-   needs one extra <script> tag instead of hand-edited markup. */
+/* Zenith Lab course rail — Data Science & Analysis */
 (function () {
-  const CSS = `
-    .courseshell{display:flex;align-items:stretch;min-height:100vh}
-    .courserail{width:228px;flex-shrink:0;box-sizing:border-box;padding:20px 14px 24px;
-      border-right:1px solid var(--bd,#232838);position:sticky;top:0;align-self:flex-start;
-      height:100vh;overflow-y:auto;background:var(--bg,#0d0f14);
-      scrollbar-width:thin;scrollbar-color:var(--bd2,#333a4c) transparent}
-    .courserail::-webkit-scrollbar{width:6px}
-    .courserail::-webkit-scrollbar-track{background:transparent}
-    .courserail::-webkit-scrollbar-thumb{background:var(--bd2,#333a4c);border-radius:99px}
-    .courserail::-webkit-scrollbar-thumb:hover{background:var(--amber,#f0b429)}
-    .coursemain{flex:1;min-width:0}
-    .courseshell .coursenav{display:none}
-    .rail-brand{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;
-      text-transform:uppercase;color:var(--mut2,#676e7d)}
-    .rail-title{font-family:'Fraunces',serif;font-size:15.5px;font-weight:600;margin-top:5px;
-      color:var(--tx,#eeeee7);line-height:1.25}
-    .rail-nav{margin-top:20px;display:flex;flex-direction:column;gap:1px}
-    .rail-nav a{font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--mut,#9aa0ae);
-      text-decoration:none;padding:7px 9px;border-radius:7px;transition:.15s;display:block}
-    .rail-nav a:hover{background:var(--card2,#191d26);color:var(--tx,#eeeee7)}
-    .rail-nav a.active{background:rgba(240,180,41,.12);color:var(--amber,#f0b429);font-weight:600}
-    .rail-modlbl{margin-top:20px;font-family:'IBM Plex Mono',monospace;font-size:10px;
-      letter-spacing:.12em;text-transform:uppercase;color:var(--mut2,#676e7d);padding:0 9px}
-    .rail-mods{margin-top:8px;display:flex;flex-direction:column;gap:1px}
-    .rail-mod{display:flex;align-items:center;gap:7px;font-size:11.5px;padding:6px 9px;border-radius:7px;
-      text-decoration:none;color:var(--mut,#9aa0ae);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    a.rail-mod:hover{background:var(--card2,#191d26);color:var(--tx,#eeeee7)}
-    .rail-mod.active{background:rgba(240,180,41,.12);color:var(--amber,#f0b429)}
-    .rail-mod .rmnum{font-family:'IBM Plex Mono',monospace;font-size:10px;width:14px;flex-shrink:0;
-      text-align:center;color:var(--mut2,#676e7d)}
-    .rail-mod .rmdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--bd2,#333a4c)}
-    .rail-mod.done .rmdot{background:var(--good,#4ade95)}
-    .rail-mod.progress .rmdot{background:var(--amber,#f0b429)}
-    .rail-mod.locked{opacity:.55;cursor:not-allowed}
-    span.rail-mod{display:flex}
-    .rail-note{margin-top:14px;padding:0 9px;font-size:10.5px;color:var(--mut2,#676e7d);line-height:1.5}
-    .skip-to-content{position:absolute;left:-999px;top:8px;z-index:400;background:var(--amber,#f0b429);color:var(--amberd,#1a1200);
-      font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:13px;padding:8px 14px;border-radius:8px;text-decoration:none}
-    .skip-to-content:focus{left:8px}
-    @media (max-width:860px){
-      .courseshell{flex-direction:column}
-      .courserail{width:100%;height:auto;max-height:none;position:static;border-right:none;
-        border-top:1px solid var(--bd,#232838);order:2}
-      .coursemain{order:1}
-    }
-  `;
-
+  const TITLE = "Data Science & Analysis";
   const NAV = [
     ["syllabus.html", "Syllabus"],
     ["dashboard.html", "Dashboard"],
@@ -62,23 +10,28 @@
     ["quiz-center.html", "Quiz Center"],
     ["cheatsheets.html", "Cheat Sheets"],
     ["python-survival-guide.html", "Python Survival Guide"],
-    ["practice-sql.html", "SQL Practice Library"],
-    ["practice-excel.html", "Excel Practice Library"],
-    ["practice-python.html", "Python Practice Library"],
-    ["practice-statistics.html", "Statistics Practice Library"],
-    ["practice-tableau.html", "Tableau Practice Library"],
-    ["practice-powerbi.html", "Power BI Practice Library"],
+    ["practice-sql.html", "SQL Practice"],
+    ["practice-excel.html", "Excel Practice"],
+    ["practice-python.html", "Python Practice"],
+    ["practice-statistics.html", "Statistics Practice"],
+    ["practice-tableau.html", "Tableau Practice"],
+    ["practice-powerbi.html", "Power BI Practice"],
     ["desktop-labs.html", "Desktop Labs (required)"],
-    ["practice-automation.html", "Automation Practice Library"],
-    ["practice-integrated.html", "Integrated Cross-Tool Challenges"],
+    ["practice-automation.html", "Automation Practice"],
+    ["practice-integrated.html", "Integrated Challenges"],
     ["projects.html", "Projects"],
     ["portfolio.html", "My Portfolio"],
     ["deploy-guide.html", "Deploy Guide"],
     ["career.html", "Career Path"],
   ];
 
-  function currentFile() {
-    return location.pathname.split("/").pop() || "syllabus.html";
+  function currentFile() { return location.pathname.split("/").pop() || "syllabus.html"; }
+
+  function statusMark(unlocked, status, isCurrent) {
+    if (!unlocked) return { cls: "locked", title: "Locked" };
+    if (status === "completed") return { cls: "done", title: "Completed" };
+    if (isCurrent || status === "in-progress") return { cls: "progress", title: "Current" };
+    return { cls: "upcoming", title: "Upcoming" };
   }
 
   function buildRailHtml() {
@@ -87,79 +40,117 @@
       const cls = cur === file ? ' class="active"' : "";
       return `<a href="${file}"${cls}>${label}</a>`;
     }).join("");
-
     let modsHtml = "";
-    if (window.CourseProgress) {
-      const cp = window.CourseProgress;
-      const m0 = cp.getExtra("module0") || {};
+    let ovHtml = "";
+    const cp = window.CourseProgress;
+    if (cp) {
+      const ov = cp.overall ? cp.overall() : { pct: 0, completed: 0, total: 0 };
+      ovHtml = `<div class="rail-ov"><div class="lbl">Course progress</div>` +
+        `<div class="barline"><i style="width:${ov.pct || 0}%"></i></div>` +
+        `<div class="lbl" style="margin-top:6px">${ov.completed || 0} / ${ov.total || 0} modules</div></div>`;
+      const m0 = (cp.getExtra && cp.getExtra("module0")) || {};
       const m0Cls = ["rail-mod"];
-      if (cur === "module-00.html") m0Cls.push("active");
+      if (cur === "module-00.html") m0Cls.push("active", "progress");
       if (m0.completed) m0Cls.push("done");
       else if (m0.visited) m0Cls.push("progress");
-      modsHtml += `<a href="module-00.html" class="${m0Cls.join(" ")}" title="Orientation"><span class="rmnum">0</span><span class="rmdot"></span>Orientation</a>`;
-
-      cp.MODULES.forEach((m) => {
-        const status = cp.statusOf(m.id);
-        const unlocked = cp.isUnlocked(m.id);
-        const cls = ["rail-mod"];
-        if (cur === m.file) cls.push("active");
-        if (!unlocked) cls.push("locked");
-        else if (status === "completed") cls.push("done");
-        else if (status === "in-progress") cls.push("progress");
-        const inner = `<span class="rmnum">${m.id}</span><span class="rmdot"></span>${m.title}`;
+      modsHtml += `<a href="module-00.html" class="${m0Cls.join(" ")}" title="Orientation">` +
+        `<span class="rmnum">0</span><span class="rmdot" aria-hidden="true"></span>` +
+        `<span>Orientation</span></a>`;
+      (cp.MODULES || []).forEach(function (m) {
+        const status = cp.statusOf ? cp.statusOf(m.id) : "not-started";
+        const unlocked = cp.isUnlocked ? cp.isUnlocked(m.id) : true;
+        const isCurrent = cur === m.file;
+        const mark = statusMark(unlocked, status, isCurrent);
+        const cls = ["rail-mod", mark.cls];
+        if (isCurrent) cls.push("active");
+        const lock = !unlocked ? `<span class="rmlock" aria-hidden="true"><span class="i i-lock"></span></span>` : "";
+        const inner = `<span class="rmnum">${m.id}</span><span class="rmdot" aria-hidden="true"></span>` +
+          `<span>${m.title}</span>${lock}`;
         let title = m.title;
-        if (!unlocked && m.id === 9) title = "Needs Module 8, 3+ practice tasks in two of SQL/Excel/Python, and one Desktop Lab";
-        else if (!unlocked) title = `Unlocks after Module ${m.id - 1}`;
+        if (!unlocked) title = "Unlocks after the previous module";
         if (!unlocked) modsHtml += `<span class="${cls.join(" ")}" aria-disabled="true" title="${title}">${inner}</span>`;
         else modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
       });
-    } else {
-      modsHtml = `<span class="rail-note">Module status loads once CourseProgress is available on this page.</span>`;
     }
+    return `<div class="rail-brand">Zenith Lab</div><div class="rail-title">${TITLE}</div>` +
+      ovHtml + `<nav class="rail-nav">${navHtml}</nav>` +
+      `<div class="rail-modlbl">Modules</div><div class="rail-mods">${modsHtml}</div>`;
+  }
 
-    return `
-      <div class="rail-brand">Zenith Lab</div>
-      <div class="rail-title">Data Science &amp; Analysis</div>
-      <nav class="rail-nav">${navHtml}</nav>
-      <div class="rail-modlbl">Modules</div>
-      <div class="rail-mods">${modsHtml}</div>
-    `;
+  function closeRail() {
+    document.body.classList.remove("rail-open");
+    const btn = document.querySelector(".rail-toggle");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  }
+  function toggleRail() {
+    if (document.body.classList.contains("rail-open")) closeRail();
+    else {
+      document.body.classList.add("rail-open");
+      const btn = document.querySelector(".rail-toggle");
+      if (btn) btn.setAttribute("aria-expanded", "true");
+    }
+  }
+  function injectToggle() {
+    const barIn = document.querySelector(".bar .in");
+    if (!barIn || barIn.querySelector(".rail-toggle")) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "rail-toggle";
+    btn.setAttribute("aria-controls", "course-rail");
+    btn.setAttribute("aria-expanded", "false");
+    btn.setAttribute("aria-label", "Open course navigation");
+    btn.innerHTML = '<span class="i i-menu" aria-hidden="true"></span>';
+    barIn.insertBefore(btn, barIn.firstChild);
+    btn.addEventListener("click", toggleRail);
+  }
+  function ensureCss(href) {
+    const links = document.querySelectorAll("link[rel=stylesheet]");
+    for (let i = 0; i < links.length; i++) {
+      if ((links[i].getAttribute("href") || "").indexOf(href) !== -1) return;
+    }
+    const l = document.createElement("link");
+    l.rel = "stylesheet";
+    l.href = href;
+    document.head.appendChild(l);
   }
 
   function init() {
-    const style = document.createElement("style");
-    style.textContent = CSS;
-    document.head.appendChild(style);
-
+    if (document.querySelector(".courseshell")) return;
+    ensureCss("zenith-lab.css");
+    ensureCss("theme.css");
     const skip = document.createElement("a");
     skip.className = "skip-to-content";
     skip.href = "#main-content";
     skip.textContent = "Skip to content";
-
     const shell = document.createElement("div");
     shell.className = "courseshell";
     const rail = document.createElement("aside");
     rail.className = "courserail";
+    rail.id = "course-rail";
     rail.setAttribute("aria-label", "Course navigation");
     rail.innerHTML = buildRailHtml();
+    const scrim = document.createElement("button");
+    scrim.type = "button";
+    scrim.className = "railscrim";
+    scrim.setAttribute("aria-label", "Close course navigation");
+    scrim.addEventListener("click", closeRail);
     const main = document.createElement("div");
     main.className = "coursemain";
     main.id = "main-content";
     main.setAttribute("role", "main");
     main.tabIndex = -1;
-
-    while (document.body.firstChild) {
-      main.appendChild(document.body.firstChild);
-    }
+    while (document.body.firstChild) main.appendChild(document.body.firstChild);
     shell.appendChild(rail);
     shell.appendChild(main);
     document.body.appendChild(skip);
+    document.body.appendChild(scrim);
     document.body.appendChild(shell);
-
-    document.querySelectorAll('[id$="Results"], [id^="results_"], .feedback').forEach((el) => {
-      if (!el.getAttribute("aria-live")) el.setAttribute("aria-live", "polite");
-    });
+    injectToggle();
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeRail(); });
+    rail.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeRail); });
+    const ui = document.createElement("script");
+    ui.src = "course-ui.js";
+    document.body.appendChild(ui);
   }
-
   init();
 })();

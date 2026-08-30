@@ -255,7 +255,7 @@ document.getElementById("m5check").onclick = function () {
   if (ok) {
     document.getElementById("m5fb").innerHTML =
       "<b>Both functions hold up.</b> Including the empty list, the unknown clinician, and not mutating the input \u2014 which is the difference between a demo and Priya's Monday." +
-      "<br><br>" + results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+      "<br><br>" + results.map(function (r) { return '<span class="i i-check"></span> ' + r.name; }).join("<br>");
     Northline.showLearned(document.getElementById("m5fb").parentNode,
       "You just proved the filter instead of trusting a fluent draft.",
       "Now \u2014 and only now \u2014 an agent may tidy names. It may not change what open means.");

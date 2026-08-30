@@ -1,6 +1,6 @@
 (function (global) {
   function opt(t, correct, why) { return { t: t, correct: !!correct, why: why || "" }; }
-  const POOLS = {
+const POOLS = {
     1: { title: "First client workflow", questions: [
       { text: "Underline the trigger: 'When the form is submitted, we add a row and Slack the owner.'", opts: [opt("Form submitted", true), opt("Slack the owner", false, "Side effect."), opt("Hiring you", false, "Not an event.")] },
       { text: "A graph with save→fetch→save is:", opts: [opt("A cycle and not executable", true), opt("A normal CRM sync", false, "It never terminates."), opt("Required for webhooks", false, "Webhooks do not need a loop back to themselves.")] },
@@ -70,15 +70,15 @@
       { text: "Prompt injection defense that actually works:", opts: [opt("Do not attach execute tools", true), opt("'Be good' in the prompt", false), opt("More adjectives", false)] },
       { text: "refund.draft vs refund.execute:", opts: [opt("Words vs money", true), opt("Same thing", false), opt("Draft is more dangerous", false)] },
       { text: "Client wants 'fully autonomous ops':", opts: [opt("Autonomous inside a box you can name", true), opt("Give production admin to the model", false), opt("Turn off logs", false)] },
-    ]},
-  };
-  function shuffle(arr) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+  ]},
+};
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
       const t = a[i]; a[i] = a[j]; a[j] = t;
-    }
-    return a;
   }
+  return a;
+}
   global.QuizData = { POOLS: POOLS, shuffle: shuffle };
 })(window);

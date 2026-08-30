@@ -76,6 +76,7 @@
           '<span class="detticket">' + esc(task.ticket || "Case") + "</span>" +
           '<span class="detwho">' + esc(task.author || "Written by the coding agent") + "</span>" +
         "</div>" +
+        '<div class="detbanner">Potential issue detected</div>' +
         '<div class="detask"><b>The ask was:</b> ' + esc(task.ask || "") + "</div>" +
         (task.note ? '<div class="detnote">' + esc(task.note) + "</div>" : "") +
         codeBlock(task.code, task.lang) +
@@ -122,9 +123,9 @@
       const lines = [];
       (task.findings || []).forEach(function (f) {
         const chose = picked.indexOf(f.id) !== -1;
-        if (f.real && chose) lines.push('<span class="detok">\u2713 ' + esc(f.label) + "</span> \u2014 " + esc(f.why));
-        else if (f.real && !chose) lines.push('<span class="detbad">\u2717 Missed: ' + esc(f.label) + "</span> \u2014 " + esc(f.why));
-        else if (!f.real && chose) lines.push('<span class="detbad">\u2717 Not a defect: ' + esc(f.label) + "</span> \u2014 " + esc(f.why));
+        if (f.real && chose) lines.push('<span class="detok"><span class="i i-check"></span> ' + esc(f.label) + "</span> \u2014 " + esc(f.why));
+        else if (f.real && !chose) lines.push('<span class="detbad"><span class="i i-x"></span> Missed: ' + esc(f.label) + "</span> \u2014 " + esc(f.why));
+        else if (!f.real && chose) lines.push('<span class="detbad"><span class="i i-x"></span> Not a defect: ' + esc(f.label) + "</span> \u2014 " + esc(f.why));
       });
       if (clean) lines.unshift("<b>Charge sheet accepted.</b> " + (hasFix ? "Phase 2 is open." : ""));
       else lines.unshift("<b>" + (missed.length ? missed.length + " missed. " : "") + (wrongly.length ? wrongly.length + " innocent line" + (wrongly.length > 1 ? "s" : "") + " charged." : "") + "</b>");
@@ -151,7 +152,10 @@
         const out = PracticeKit.gradeJs({ functionName: task.fix.functionName, testCases: task.fix.testCases || [] }, src);
         state.proof = out.passed;
         fb2.className = "feedback " + (out.passed ? "ok" : "bad");
-        fb2.innerHTML = out.results.map((r) => (r.pass ? "\u2713 " : "\u2717 ") + esc(r.pass ? r.name : r.hint)).join("<br>");
+        fb2.innerHTML = out.results.map((r) =>
+          '<span class="i ' + (r.pass ? "i-check" : "i-x") + '"></span>' +
+          esc(r.pass ? r.name : r.hint)
+        ).join("<br>");
         report();
       };
     }

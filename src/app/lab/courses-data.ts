@@ -291,12 +291,12 @@ export const courses: CourseCard[] = [
     level: "Beginner, no prior coding required",
     duration: "12 weeks, self-paced",
     weeklyTime: "~8–10 hrs/week",
-    practiceTasks: 200,
+    practiceTasks: 187,
     portfolioProjects: 8,
     hasCapstone: true,
     price: "$99",
     summary:
-      "Zero to a live web app: write HTML, CSS, and JavaScript yourself, then drive Cursor, review the diff, open a GitHub PR, and deploy. This is not AI Engineering — that course builds LLM products (RAG, tools, eval) and assumes programming logic already.",
+      "Zero to a live Northline Digital web app: write HTML, CSS, and JavaScript yourself, then specify, inspect, test, and ship with an AI coding partner. This is not AI Engineering — that course builds LLM products (RAG, tools, eval) and assumes programming logic already.",
     whatYoullDo: [
       "Build a real page from a brief in HTML, by hand",
       "Match a layout spec in CSS, including one responsive rule",
@@ -316,6 +316,7 @@ export const courses: CourseCard[] = [
       "GitHub",
       "Testing",
       "Python scripts",
+      "AI Code Detective",
     ],
     facts: [
       "AI will write most of the characters. You are paid to specify, reject, test, and ship.",
@@ -328,64 +329,65 @@ export const courses: CourseCard[] = [
     practiceBreakdown: [
       { tool: "HTML", tasks: 20 },
       { tool: "CSS", tasks: 20 },
-      { tool: "JavaScript", tasks: 40 },
-      { tool: "Specs (simulation)", tasks: 20 },
-      { tool: "Git (simulation)", tasks: 20 },
-      { tool: "Review (simulation)", tasks: 20 },
+      { tool: "JavaScript", tasks: 50 },
+      { tool: "Specs", tasks: 10 },
+      { tool: "Git", tasks: 10 },
+      { tool: "Review", tasks: 6 },
+      { tool: "AI Code Detective", tasks: 20 },
       { tool: "Testing", tasks: 20 },
       { tool: "Python", tasks: 25 },
-      { tool: "Integrated", tasks: 15 },
+      { tool: "Integrated", tasks: 6 },
     ],
     curriculum: [
       {
         title: "What this job is",
         description:
-          "Placement self-check. Everyone starts at Module 1. AI will write most of the characters; you are paid to specify, reject, test, and ship.",
+          "The 11-step loop, a labeled bad-vs-good AI workflow, and a first tiny HTML build. Everyone still starts at Module 1.",
       },
       {
         title: "How software works + HTML",
         description:
-          "Files, the browser, errors. Semantic HTML from a brief.",
+          "Ticket NL-001: semantic HTML for the clinic landing page. You write it, then catch what an agent gets subtly wrong.",
       },
       {
         title: "CSS: layout, not decoration",
         description:
-          "Layout, spacing, hierarchy. Match a spec, including one responsive rule.",
+          "Ticket NL-002: box model, flexbox, one breakpoint you can defend when the page opens on a phone.",
       },
       {
         title: "JavaScript you can read",
         description:
-          "Functions, events, DOM. You write them. No Cursor yet.",
+          "Ticket NL-003: hours, filters, greetings — written by you, because you will be reviewing this shape forever.",
       },
       {
         title: "Specs and coding agents",
         description:
-          "Acceptance criteria. Simulations are labeled. Desktop Lab A is the real Cursor evidence.",
+          "Ticket NL-004: turn a one-sentence brief into a spec. Labeled bad vs good AI examples. Desktop Lab A starts here.",
       },
       {
         title: "Git and GitHub",
         description:
-          "Commits, branches, PRs. Simulation here. Desktop Lab B is the real repo.",
+          "Ticket NL-005: read an AI-shaped diff. Reject secrets in logs. One reason per commit.",
       },
       {
         title: "Testing and debugging",
         description:
-          "A failing test is information. Agent “it works” is not.",
+          "Ticket NL-006: write the test that catches the planted booking-validation bug.",
       },
       {
         title: "Multi-file features with AI",
         description:
-          "Spec → implement in Cursor → review → PR. We grade the spec and the test.",
+          "Ticket NL-007: customer reports booking is broken. Spec and test the fix without regressions.",
       },
       {
         title: "Python for scripts",
         description:
-          "Python for scripts: files, functions, JSON, a small CLI. Not RAG.",
+          "Ticket NL-008: a JSON/Python helper for clinic data. Enough Python to kill a Monday chore. Not RAG.",
       },
       {
         title: "Capstone: ship a real app",
         description:
-          "One live product: tests, GitHub, https URL. Both Desktop Labs plus the practice bar.",
+          "Ticket NL-010: one live Northline product — tests, a repo, a release note, and a URL someone else can open.",
       },
     ],
     labBadgeColor: { bg: "#60a5fa", text: "#0b1220" },

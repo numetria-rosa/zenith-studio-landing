@@ -1,0 +1,10 @@
+/* Data Science accent — amber */
+:root {
+  --accent: #f0b429;
+  --accentd: #1a1200;
+  --accent-soft: rgba(240, 180, 41, 0.14);
+  --bd-hover: rgba(240, 180, 41, 0.38);
+  --info: #5fc2e8;
+  --amber: #f0b429;
+  --amberd: #1a1200;
+}

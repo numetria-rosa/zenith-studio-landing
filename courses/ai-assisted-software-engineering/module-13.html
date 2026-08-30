@@ -184,7 +184,7 @@ ModuleKit.renderLoopInto("loopStripEnd", "all", "The whole loop \u00b7 every ste
   var st = CourseProgress.capstonePracticeStatus();
   var labs = CourseProgress.desktopLabReady();
   function row(ok, label) {
-    return '<div class="gaterow"><span class="' + (ok ? "gok" : "gno") + '">' + (ok ? "\u2713" : "\u25cb") + '</span> ' + label + '</div>';
+    return '<div class="gaterow"><span class="' + (ok ? "gok" : "gno") + '"><span class="i ' + (ok ? "i-check" : "i-circle") + '"></span></span> ' + label + '</div>';
   }
   host.innerHTML =
     row(st.html >= 3, "3+ HTML practice tasks passed (" + st.html + ")") +

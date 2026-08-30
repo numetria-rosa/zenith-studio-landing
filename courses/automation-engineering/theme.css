@@ -1,0 +1,11 @@
+/* AI Automation accent — cyan */
+:root {
+  --accent: #22d3ee;
+  --accentd: #04272b;
+  --accent-soft: rgba(34, 211, 238, 0.14);
+  --bd-hover: rgba(34, 211, 238, 0.38);
+  --info: #67e8f9;
+  --violet: #a78bfa;
+  --emerald: #34e5a0;
+  --good: #34e5a0;
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Code Detective &mdash; AI-Assisted Software Engineering</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Practice</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Practice library</span>
+    <h1 class="serif">AI Code Detective</h1>
+    <p class="sub">Plausible AI-generated code. Find the real defects, spare the innocent lines, then prove the fix.</p>
+    <div class="disclosure">Two phases per case. First the <b>charge sheet</b>: select every real defect and nothing else. Selecting everything fails, because a reviewer who rejects all eleven hunks is as useless as one who approves all eleven. Then the <b>proof</b>: fix the code so hidden tests pass. Spotting a bug and being able to prove you fixed it are different skills, and only the second one ships.</div>
+    <div class="objectives"><div class="lbl">Why the decoys are there</div>
+      <ul>
+        <li>Every case includes lines that look suspicious and are fine &mdash; a style preference, a naming quibble, a performance worry that does not apply at this scale</li>
+        <li>Charging them costs you the case, because in a real review three genuine findings mixed with four preferences get discounted as a whole</li>
+        <li>Reading the explanation on a decoy you charged is the most useful thing on this page</li>
+      </ul>
+    </div>
+    <div class="disclosure">These cases do not unlock the capstone on their own. The practice bar is still 3+ passed in two of HTML, CSS, and JavaScript, plus both Desktop Labs.</div>
+    <p class="mono" id="skillMeta" style="margin-top:14px;color:var(--mut2)">0 passed</p>
+  </header>
+  <div id="taskList"></div>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
+</div>
+
+<script src="course-progress.js"></script>
+<script src="practice-progress.js"></script>
+<script src="practice-tasks.js"></script>
+<script src="detective-kit.js"></script>
+<script src="practice-kit.js"></script>
+<script>
+const TASKS = AISE_TASKS.filter(t => t.tool === "detective");
+PracticeKit.renderLibrary(TASKS);
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

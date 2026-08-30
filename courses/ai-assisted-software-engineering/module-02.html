@@ -11,7 +11,7 @@
 <div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Stage 1 &middot; Module 2 &middot; ~70 min</span>
+    <span class="eyebrow">Module 2 · Ticket NL-002</span>
     <h1 class="serif">Give the agent a feature it can actually build</h1>
     <p class="sub">Dan forwarded one sentence and called it a brief. Your job today is not to write booking code. It is to turn that sentence into instructions an AI coding agent can be supervised against &mdash; and to reject a plan that quietly does something else.</p>
     <div id="ticketCard"></div>
@@ -191,7 +191,7 @@ document.getElementById("rqCheck").onclick = function () {
   if (out.passed) {
     document.getElementById("rqFb").innerHTML =
       "<b>That is a spec.</b> A stranger could pick this up, build it, and check their own work against it. In Module 7 these criteria become the request you hand a real agent. In Module 9 they become the tests." +
-      "<br><br>" + out.results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+      "<br><br>" + out.results.map(function (r) { return '<span class="i i-check"></span> ' + r.name; }).join("<br>");
     Northline.showLearned(document.getElementById("rqFb").parentNode,
       "You just practised defining done before anyone wrote code.",
       "That is the skill. The agent can type. It cannot decide what the ticket is.");

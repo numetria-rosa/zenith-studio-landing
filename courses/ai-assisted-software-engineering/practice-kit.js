@@ -206,7 +206,10 @@
         PracticeProgress.recordAttempt(task.id, out.passed);
         const fb = body.querySelector(".feedback");
         fb.className = "feedback " + (out.passed ? "ok" : "bad");
-        fb.innerHTML = out.results.map((r) => (r.pass ? "✓ " : "✗ ") + esc(r.name) + (r.pass ? "" : " — " + esc(r.hint))).join("<br>");
+        fb.innerHTML = out.results.map((r) =>
+          '<span class="i ' + (r.pass ? "i-check" : "i-x") + '" aria-hidden="true"></span>' +
+          esc(r.name) + (r.pass ? "" : " — " + esc(r.hint))
+        ).join("<br>");
         if (out.passed) head.querySelector(".statusdot").classList.add("passed");
         refreshMeta();
       }

@@ -253,7 +253,7 @@ document.getElementById("m6acheck").onclick = function () {
     m6state.a = true;
     document.getElementById("m6afb").innerHTML =
       "<b>Four states handled.</b> The empty one is the one agents skip, and the one Priya will actually hit on a quiet Tuesday.<br><br>" +
-      out.results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+      out.results.map(function (r) { return '<span class="i i-check"></span> ' + r.name; }).join("<br>");
     Northline.showLearned(document.getElementById("m6afb").parentNode,
       "You just designed the states the happy path never exercises.",
       "Loading, failed, empty, and success are four different sentences. An agent will usually write one.");
@@ -313,7 +313,7 @@ document.getElementById("m6bcheck").onclick = function () {
     m6state.b = true;
     document.getElementById("m6bfb").innerHTML =
       "<b>Real clicks, real DOM, correct both ways.</b> Toggling back is the half that breaks in production, because everyone tests the first click.<br><br>" +
-      results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+      results.map(function (r) { return '<span class="i i-check"></span> ' + r.name; }).join("<br>");
     Northline.showLearned(document.getElementById("m6bfb").parentNode,
       "You just proved the toggle both ways with real clicks.",
       "The second click is the half that breaks in production, because everyone tests the first.");

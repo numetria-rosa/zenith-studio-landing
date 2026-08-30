@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Roadmap — AI Engineering</title>
+<link rel="stylesheet" href="zenith-lab.css">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">AI Engineering</span></div></div>
+<div class="coursenav"><div class="in">
+  <a href="dashboard.html">&larr; Dashboard</a>
+  <a href="syllabus.html">Syllabus</a>
+  <a href="python-foundations.html">Python Foundations</a>
+  <a href="challenges.html">Challenges</a>
+  <a href="career.html">Career Path</a>
+</div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Learning Roadmap</span>
+    <h1 class="serif">The whole journey, in one place</h1>
+    <p class="sub">Every module, Python foundation, challenge, and project in this course, grouped by stage, showing what is done, what is next, and why. Progress is stored in this browser unless you are signed in through Zenith Lab.</p>
+    <div class="wherebox">
+      <div class="wlbl">Where you are</div>
+      <div class="wtext" id="whereText">Loading your progress&hellip;</div>
+      <a class="wbtn" id="whereBtn" href="dashboard.html">Open Dashboard &rarr;</a>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--good)"></span> Done</span>
+      <span><span class="dot" style="background:var(--accent)"></span> Current / recommended</span>
+      <span><span class="dot" style="background:var(--info)"></span> Available</span>
+      <span><span class="dot" style="background:var(--mut2)"></span> Locked or not started</span>
+    </div>
+  </header>
+  <div id="roadmapBody"></div>
+  <footer>Zenith Lab &middot; AI Engineering &middot; Learning Roadmap</footer>
+</div>
+<script src="course-progress.js"></script>
+<script>
+const esc = CourseProgress.escapeHtml;
+
+const STAGES = [
+  {
+    id: "start", num: "00", title: "Start here",
+    desc: "What the field is, the Python you need before Module 1, then prompting and structured outputs.",
+    modules: [0],
+    extras: ["python", "m1"],
+  },
+  {
+    id: "context-rag", num: "01", title: "Context & retrieval",
+    desc: "Token budgets, naive truncation, embeddings, cosine similarity, and a relevance threshold.",
+    modules: [2, 3],
+  },
+  {
+    id: "tools-agents", num: "02", title: "Tools & agents",
+    desc: "Validated, idempotent tool execution, then bounded agent loops with real stuck-loop detection.",
+    modules: [4, 5],
+  },
+  {
+    id: "reliability", num: "03", title: "Reliability & evaluation",
+    desc: "Retry, backoff, jitter, a single bounded fallback, then deterministic evaluation before shipping. Cross-module challenges gate the capstone.",
+    modules: [6, 7],
+    extras: ["challenges"],
+  },
+  {
+    id: "capstone", num: "04", title: "Production agent",
+    desc: "Synthesis: design, implement, and debug a production AI agent. Then the portfolio and an honest career read.",
+    modules: [8],
+    extras: ["projects", "portfolio", "career", "final"],
+  },
+];
+
+function module0Status() {
+  const m0 = CourseProgress.getExtra("module0") || {};
+  if (m0.completed) return "done";
+  if (m0.visited) return "current";
+  return "available";
+}
+
+function moduleStatus(id) {
+  if (id === 0) return module0Status();
+  if (CourseProgress.isModuleComplete(id)) return "done";
+  if (CourseProgress.isUnlocked(id)) return CourseProgress.statusOf(id) === "in-progress" ? "current" : "available";
+  return "locked";
+}
+
+function moduleNode(id) {
+  const status = moduleStatus(id);
+  const href = "module-" + String(id).padStart(2, "0") + ".html";
+  const titles = { 0: "Introduction to AI Engineering" };
+  CourseProgress.MODULES.forEach(function (m) { titles[m.id] = m.title; });
+  const pillLabel = { done: "Done", available: "Available", locked: "Locked", current: "Current" }[status];
+  const tag = status === "locked" ? "div" : "a";
+  const hrefAttr = status === "locked" ? ' aria-disabled="true"' : ' href="' + href + '"';
+  const meta = status === "locked"
+    ? (id === 8 ? "Unlocks after Module 7 and both challenges" : "Unlocks after the previous module")
+    : (id === 0 ? "Ungraded · does not block Module 1" : "Course module");
+  return "<" + tag + ' class="node ' + (status === "available" || status === "current" ? "current" : "") + (status === "locked" ? " locked" : "") + '"' + hrefAttr + ">" +
+    '<div class="ntop"><span class="ntitle">Module ' + id + ": " + esc(titles[id] || "") + '</span><span class="statuspill ' + (status === "current" ? "current" : status) + '">' + pillLabel + "</span></div>" +
+    '<span class="nmeta">' + esc(meta) + "</span></" + tag + ">";
+}
+
+function pythonNode() {
+  const pf = CourseProgress.getExtra("pythonFoundations") || {};
+  const exercises = pf.exercises || {};
+  const total = 8;
+  const done = Object.values(exercises).filter(function (e) { return e && e.passCount === e.total && e.total > 0; }).length;
+  const status = done === 0 ? "available" : (done === total ? "done" : "current");
+  const pill = { done: "Done", available: "Available", current: "In progress" }[status];
+  return '<a class="node ' + (status === "current" ? "current" : "") + '" href="python-foundations.html">' +
+    '<div class="ntop"><span class="ntitle">Python Foundations</span><span class="statuspill ' + status + '">' + pill + "</span></div>" +
+    '<span class="nmeta">' + done + " / " + total + " exercises passing · ungraded, does not block Module 1</span></a>";
+}
+
+function extraNode(kind) {
+  if (kind === "python") return pythonNode();
+  if (kind === "m1") return moduleNode(1);
+  if (kind === "challenges") {
+    const done = CourseProgress.crossChallengesComplete();
+    const unlocked = CourseProgress.isModuleComplete(7);
+    const status = done ? "done" : (unlocked ? "available" : "locked");
+    const tag = status === "locked" ? "div" : "a";
+    const hrefAttr = status === "locked" ? ' aria-disabled="true"' : ' href="challenges.html"';
+    return "<" + tag + ' class="node ' + (status === "available" ? "current" : "") + (status === "locked" ? " locked" : "") + '"' + hrefAttr + ">" +
+      '<div class="ntop"><span class="ntitle">Cross-module challenges</span><span class="statuspill ' + status + '">' + (done ? "Done" : unlocked ? "Required" : "Locked") + "</span></div>" +
+      '<span class="nmeta">' + (unlocked ? "RAG bot + failure investigation. Gates Module 8." : "Unlocks after Module 7") + "</span></" + tag + ">";
+  }
+  if (kind === "projects") {
+    const projects = CourseProgress.PROJECTS || [];
+    const done = projects.filter(function (p) { return CourseProgress.getProject(p.id).completed; }).length;
+    const status = done === 0 ? "available" : (done === projects.length ? "done" : "current");
+    return '<a class="node ' + (status === "current" ? "current" : "") + '" href="projects.html">' +
+      '<div class="ntop"><span class="ntitle">Portfolio projects</span><span class="statuspill ' + status + '">' + (status === "done" ? "Done" : status === "current" ? "In progress" : "Available") + "</span></div>" +
+      '<span class="nmeta">' + done + " / " + projects.length + " projects completed</span></a>";
+  }
+  if (kind === "portfolio") {
+    return '<a class="node" href="portfolio.html"><div class="ntop"><span class="ntitle">My Portfolio</span><span class="statuspill available">Open</span></div><span class="nmeta">Your completed project record</span></a>';
+  }
+  if (kind === "career") {
+    return '<a class="node" href="career.html"><div class="ntop"><span class="ntitle">Career Path</span><span class="statuspill available">Open</span></div><span class="nmeta">Readiness score and role pathways</span></a>';
+  }
+  if (kind === "final") {
+    const fa = CourseProgress.getExtra("finalAssessment") || {};
+    const status = fa.passed ? "done" : "available";
+    return '<a class="node ' + (fa.passed ? "" : "current") + '" href="final-assessment.html">' +
+      '<div class="ntop"><span class="ntitle">Final Assessment</span><span class="statuspill ' + status + '">' + (fa.passed ? "Passed" : "Open") + "</span></div>" +
+      '<span class="nmeta">' + (fa.total ? (fa.passCount + " / " + fa.total + " last attempt") : "Cumulative check after the capstone") + "</span></a>";
+  }
+  return "";
+}
+
+function renderRoadmap() {
+  const body = document.getElementById("roadmapBody");
+  body.innerHTML = "";
+  STAGES.forEach(function (stage) {
+    const section = document.createElement("div");
+    section.className = "rmstage";
+    const modulesHtml = (stage.modules || []).map(moduleNode).join("");
+    const extraHtml = (stage.extras || []).map(extraNode).join("");
+    section.innerHTML =
+      '<div class="stagehead"><span class="sn">' + stage.num + '</span><h2 class="serif">' + esc(stage.title) + "</h2></div>" +
+      '<p class="stagedesc">' + esc(stage.desc) + "</p>" +
+      (modulesHtml ? '<div class="groupdiv">Modules</div><div class="nodegrid" style="margin-top:8px">' + modulesHtml + "</div>" : "") +
+      (extraHtml ? '<div class="groupdiv">' + (stage.id === "start" ? "Foundations" : stage.id === "capstone" ? "Delivery" : "Gates") + '</div><div class="nodegrid" style="margin-top:8px">' + extraHtml + "</div>" : "");
+    body.appendChild(section);
+  });
+
+  const overall = CourseProgress.overall();
+  const whereText = document.getElementById("whereText");
+  const whereBtn = document.getElementById("whereBtn");
+  const m0 = CourseProgress.getExtra("module0") || {};
+  const pf = CourseProgress.getExtra("pythonFoundations") || {};
+  const pfDone = Object.values(pf.exercises || {}).filter(function (e) { return e && e.passCount === e.total && e.total > 0; }).length;
+
+  if (overall.completed === 0 && !m0.visited && !m0.completed && pfDone === 0) {
+    whereText.textContent = "You haven't started yet. Module 0 is a short, honest look at what this field is and what this course teaches versus what to learn elsewhere.";
+    whereBtn.href = "module-00.html";
+    whereBtn.textContent = "Start Module 0 →";
+  } else if (CourseProgress.isModuleComplete(7) && !CourseProgress.crossChallengesComplete()) {
+    whereText.textContent = overall.completed + " / " + overall.total + " modules complete. Finish both cross-module challenges to unlock the capstone.";
+    whereBtn.href = "challenges.html";
+    whereBtn.textContent = "Open Challenges →";
+  } else {
+    const next = CourseProgress.MODULES.find(function (m) {
+      return CourseProgress.isUnlocked(m.id) && !CourseProgress.isModuleComplete(m.id);
+    });
+    if (next) {
+      whereText.textContent = overall.completed + " / " + overall.total + " modules complete. Recommended next: Module " + next.id + " — " + next.title + ".";
+      whereBtn.href = next.file;
+      whereBtn.textContent = "Open Module " + next.id + " →";
+    } else {
+      const fa = CourseProgress.getExtra("finalAssessment") || {};
+      if (!fa.passed) {
+        whereText.textContent = overall.completed + " / " + overall.total + " modules complete. The final assessment is the last check after the capstone.";
+        whereBtn.href = "final-assessment.html";
+        whereBtn.textContent = "Open Final Assessment →";
+      } else {
+        whereText.textContent = overall.completed + " / " + overall.total + " modules complete, final assessment passed. The portfolio and Career Path are the strongest next step toward something you can show.";
+        whereBtn.href = "portfolio.html";
+        whereBtn.textContent = "Open Portfolio →";
+      }
+    }
+  }
+}
+
+renderRoadmap();
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>
