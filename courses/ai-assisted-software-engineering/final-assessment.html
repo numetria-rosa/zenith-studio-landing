@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final assessment — AI-Assisted Software Engineering</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Final</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">After the capstone</span>
+    <h1 class="serif">Final competency assessment</h1>
+    <p class="sub">Ten items drawn from later banks. Passing here is extra evidence. It does not replace the live URL.</p>
+    <div id="faGate" class="honestnote"></div>
+    <div id="quizRoot"></div>
+    <p class="mono" id="scoreDisplay" style="margin-top:16px"></p>
+  </header>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<script src="course-progress.js"></script>
+<script src="quiz-data.js"></script>
+<script src="module-kit.js"></script>
+<script>
+const shipped = CourseProgress.PROJECTS.some(function (p) { return p.modules.indexOf(9) !== -1 && CourseProgress.getProject(p.id).completed; });
+const gate = document.getElementById("faGate");
+if (!shipped) {
+  gate.textContent = "Complete project 1 or 2 on Projects (capstone evidence) before this assessment counts as passed.";
+} else {
+  gate.className = "disclosure";
+  gate.textContent = "Capstone project is on file. Draw is 10 items. 80% stores a pass.";
+}
+const pool = []
+  .concat(AISEQuizData.MODULE_QUIZZES[4], AISEQuizData.MODULE_QUIZZES[5], AISEQuizData.MODULE_QUIZZES[6], AISEQuizData.MODULE_QUIZZES[7], AISEQuizData.MODULE_QUIZZES[8], AISEQuizData.CENTER_EXTRA);
+function shuffle(a){ const x=a.slice(); for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); const t=x[i]; x[i]=x[j]; x[j]=t;} return x; }
+ModuleKit.renderQuiz("final", shuffle(pool).slice(0, 10), function () {
+  const m = CourseProgress.getModule("final");
+  if (shipped && m.total && m.score / m.total >= 0.8) {
+    CourseProgress.setExtra("finalAssessment", { passed: true, score: m.score, total: m.total, at: new Date().toISOString() });
+  }
+});
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

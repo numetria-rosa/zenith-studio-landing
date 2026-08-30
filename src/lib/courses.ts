@@ -101,18 +101,16 @@ export const COURSES: Course[] = [
     description:
       "Twelve weeks for people who have never shipped code: HTML, CSS, and JavaScript by hand, then Cursor, GitHub, tests, and a live URL. Not AI Engineering (that course builds LLM products). No job guarantee.",
     thumbnail: "/lab/data-science.webp",
-    whopAccessPassId: "",
-    whopPlanId: "",
-    checkoutUrl: "",
+    whopAccessPassId: "prod_rW17sq9hKeXYN",
+    whopPlanId: "plan_ximKlnIKYO7Bx",
+    checkoutUrl: "https://whop.com/checkout/plan_ximKlnIKYO7Bx",
     contentDir: "courses/ai-assisted-software-engineering",
     firstLessonPath: "module-00",
     waitlistUrl:
       "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20AI-Assisted%20Software%20Engineering%0A",
-    // Content is on disk (modules, practice libraries, desktop labs). Keep
-    // unpublished until the structural verifier, live gate tests, and a real
-    // Whop product exist. Flipping this to true would start serving files
-    // through the guarded course route.
-    published: false,
+    // Content + verifier 200/200 + live gates checked locally. Real Whop
+    // product/plan created 2026-08-30 (prod_rW17sq9hKeXYN / plan_ximKlnIKYO7Bx).
+    published: true,
   },
 ];
 

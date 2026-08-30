@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Path — AI-Assisted Software Engineering</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Career</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Honest non-claims</span>
+    <h1 class="serif">Career path</h1>
+    <p class="sub">A junior who can specify, review, test, and ship a small web feature with a coding agent. Not a senior engineer. Completing this course does not guarantee a job.</p>
+    <div class="honestnote"><b>Follow-on, not a twin.</b> If you later want to build LLM products (RAG, tools, eval), that is <b>AI Engineering</b> — a different catalog course that assumes programming logic. Do not list both as the same skill.</div>
+  </header>
+  <section>
+    <div class="kh"><span class="num">1</span><h2>What this course can evidence</h2></div>
+    <ul class="plain">
+      <li>Hand-written HTML/CSS/JS literacy</li>
+      <li>Specs and review notes</li>
+      <li>GitHub history and a PR</li>
+      <li>Tests that fail on a broken change</li>
+      <li>A live https URL</li>
+      <li>Small Python scripts (not production ML)</li>
+    </ul>
+  </section>
+  <section>
+    <div class="kh"><span class="num">2</span><h2>Gaps we will not pretend to fill</h2></div>
+    <ul class="plain">
+      <li>CS degree-level algorithms and complexity</li>
+      <li>Systems design for large distributed systems</li>
+      <li>Production incident ownership and on-call process</li>
+      <li>Team process at a company (standups, design docs, code owners) beyond what you simulate here</li>
+    </ul>
+  </section>
+  <section>
+    <div class="kh"><span class="num">3</span><h2>Titles to research, not promises</h2></div>
+    <p>Junior frontend, junior full-stack, implementation engineer, “AI-assisted” internships that still expect you to own Git. Read the posting. If it asks for RAG or eval harnesses, that is the other course.</p>
+    <div id="ready" class="overallwrap"></div>
+  </section>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<script src="course-progress.js"></script>
+<script>
+const ov = CourseProgress.overall();
+const labs = CourseProgress.desktopLabReady();
+const pr = CourseProgress.capstonePracticeStatus();
+const shipped = CourseProgress.PROJECTS.filter(function (p) { return CourseProgress.getProject(p.id).completed; }).length;
+document.getElementById("ready").innerHTML =
+  "<p>Modules complete: " + ov.completed + "/" + ov.total + "</p>" +
+  "<p>Desktop labs: " + (labs ? "both submitted" : "not both submitted") + "</p>" +
+  "<p>Practice bar (3+ in two of HTML/CSS/JS): " + (pr.ready ? "met" : "not met") + "</p>" +
+  "<p>Completed project cards: " + shipped + "</p>" +
+  "<p class='assume'>These numbers are course evidence, not an employment probability.</p>";
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

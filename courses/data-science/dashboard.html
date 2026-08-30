@@ -79,7 +79,8 @@ h1{font-family:'Fraunces';font-size:clamp(28px,4.5vw,40px);font-weight:600;lette
 .modcard{display:flex;gap:18px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;text-decoration:none;color:inherit;transition:.15s;position:relative}
 .modcard:hover,.modcard:focus-visible{border-color:var(--bd2)}
 .modcard:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-.modcard.locked{opacity:.7}
+.modcard.locked{opacity:.7;cursor:not-allowed}
+div.modcard.locked:hover{border-color:var(--bd)}
 .modnum{flex-shrink:0;width:46px;height:46px;border-radius:10px;display:grid;place-items:center;font-family:'IBM Plex Mono';font-weight:700;font-size:15px;background:var(--card2);border:1px solid var(--bd2);color:var(--mut)}
 .modcard.completed .modnum{background:rgba(74,222,149,.12);border-color:var(--good);color:var(--good)}
 .modcard.in-progress .modnum{background:rgba(240,180,41,.1);border-color:var(--amber);color:var(--amber)}
@@ -169,7 +170,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <header class="hero">
     <span class="eyebrow">Course Dashboard</span>
     <h1 class="serif">Data Science &amp; Analysis</h1>
-    <p class="sub">Nine modules, spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards, and a Career Path Edition built around getting paid. Signed-in, your module and quiz progress syncs to your account automatically and follows you to any device; the 315 practice-task and skill-mastery progress below is saved in this browser only, on every device, signed in or not.</p>
+    <p class="sub">Nine modules, spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards, and a Career Path Edition built around getting paid. Signed-in, your module, quiz, and practice-task progress syncs to your account and follows you to any device.</p>
   </header>
 
   <div class="sysgrid">
@@ -180,6 +181,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
     <a class="syscard" href="projects.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2z"/></svg></span><span class="systitle">Projects</span><span class="sysdesc">10 portfolio scenarios</span></a>
     <a class="syscard" href="portfolio.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5"/><path d="M3.5 12.5h17"/></svg></span><span class="systitle">My Portfolio</span><span class="sysdesc">Your completed work</span></a>
     <a class="syscard" href="career.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6z"/></svg></span><span class="systitle">Career Path</span><span class="sysdesc">Readiness &amp; job-landing playbook</span></a>
+    <a class="syscard" href="desktop-labs.html"><span class="sysicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span><span class="systitle">Desktop Labs</span><span class="sysdesc">Required Tableau or Power BI</span></a>
   </div>
 
   <div class="overallwrap">
@@ -249,8 +251,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <footer>Zenith Lab · Data Science &amp; Analysis</footer>
 </div>
 
-<script src="course-progress.js?v=6"></script>
-<script src="practice-progress.js"></script>
+<script src="course-progress.js?v=8"></script>
+<script src="practice-progress.js?v=1"></script>
 <script src="skill-map.js?v=2"></script>
 <script src="adaptive-engine.js?v=2"></script>
 <script>
@@ -286,7 +288,7 @@ function renderModule0Card(){
     <div class="modnum">${done ? "✓" : "0"}</div>
     <div class="modbody">
       <div class="modtitle">Module 0, Placement &amp; What This Job Actually Is</div>
-      <div class="moddesc">A short self-check that routes you to Module 1, 3, or 5, plus what the role actually is.</div>
+      <div class="moddesc">A short self-check. Beginners start at Module 1. Later tracks are optional only if you already write code or pandas.</div>
       <div class="modmeta"><span>${meta}</span></div>
     </div>
     <div class="modstatus ${statusClass}">${statusLabel}</div>
@@ -328,7 +330,7 @@ async function renderWelcome() {
 
   const note = document.getElementById("storageNote");
   if (note) {
-    note.childNodes[0].textContent = "Signed in, your module and quiz progress syncs to your account and follows you to any device. Practice-task and skill-mastery progress (the 315 SQL/Excel/Python/etc. tasks) is stored per-browser only and does not follow you to another device yet. ";
+        note.childNodes[0].textContent = "Signed in, your module, quiz, and practice-task progress syncs to your account and follows you to any device. ";
   }
 }
 
@@ -359,8 +361,9 @@ function renderDashboard(){
     const status = CourseProgress.statusOf(m.id);
     const unlocked = CourseProgress.isUnlocked(m.id);
     const mod = CourseProgress.getModule(m.id);
-    const card = document.createElement("a");
-    card.href = m.file;
+    const card = document.createElement(unlocked ? "a" : "div");
+    if (unlocked) card.href = m.file;
+    else card.setAttribute("aria-disabled", "true");
     card.className = "modcard " + status + (unlocked ? "" : " locked");
 
     const statusLabel = !unlocked ? LOCK_ICON + " Not yet reached" :
@@ -371,7 +374,13 @@ function renderDashboard(){
     let metaBits = [`~${m.minutes} min`];
     const modScore = Number(mod.score), modTotal = Number(mod.total);
     if (Number.isFinite(modTotal) && modTotal > 0) metaBits.push(`Last score: ${Number.isFinite(modScore) ? modScore : 0}/${modTotal}`);
-    if (!unlocked) metaBits.push(`Recommended after Module ${m.id - 1}, click to jump ahead anyway`);
+    if (!unlocked && m.id === 9) {
+      const st = CourseProgress.capstonePracticeStatus();
+      const desk = CourseProgress.desktopLabReady() ? "done" : "missing";
+      metaBits.push(`Needs Module 8, 3+ passed tasks in two of SQL (${st.sql}/3), Excel (${st.excel}/3), Python (${st.python}/3), and a Desktop Lab (${desk})`);
+    } else if (!unlocked) {
+      metaBits.push(`Unlocks after Module ${m.id - 1}`);
+    }
 
     card.innerHTML = `
       <div class="modnum">${status === "completed" ? "✓" : m.id}</div>
@@ -424,6 +433,29 @@ function renderDashboard(){
 function renderNextAction(fullyDone){
   const box = document.getElementById("nextAction");
   if (fullyDone) { box.style.display = "none"; return; }
+  const m0 = CourseProgress.getExtra("module0") || {};
+  if (!m0.completed && !m0.placementDone) {
+    box.style.display = "flex";
+    document.getElementById("naText").textContent = "Start with Module 0, a short placement so you do not skip foundations by accident.";
+    document.getElementById("naBtn").href = "module-00.html";
+    document.getElementById("naBtn").textContent = "Start orientation →";
+    return;
+  }
+  if (CourseProgress.isModuleComplete(8) && !CourseProgress.isUnlocked(9)) {
+    const st = CourseProgress.capstonePracticeStatus();
+    box.style.display = "flex";
+    if (!st.ready) {
+      document.getElementById("naText").textContent = `The capstone unlocks after 3+ passed tasks in any two of SQL (${st.sql}/3), Excel (${st.excel}/3), and Python (${st.python}/3).`;
+      const dest = [["practice-sql.html", st.sql], ["practice-excel.html", st.excel], ["practice-python.html", st.python]].sort((a, b) => a[1] - b[1])[0][0];
+      document.getElementById("naBtn").href = dest;
+      document.getElementById("naBtn").textContent = "Open practice →";
+    } else {
+      document.getElementById("naText").textContent = "Complete one Desktop Lab in Tableau Public or Power BI Desktop. The in-browser Tableau and Power BI libraries are simulations and do not count.";
+      document.getElementById("naBtn").href = "desktop-labs.html";
+      document.getElementById("naBtn").textContent = "Open Desktop Labs →";
+    }
+    return;
+  }
   let target = null, text = "";
   for (const m of CourseProgress.MODULES) {
     if (!CourseProgress.isModuleComplete(m.id)) {
@@ -443,6 +475,7 @@ function renderNextAction(fullyDone){
   box.style.display = "flex";
   document.getElementById("naText").textContent = text;
   document.getElementById("naBtn").href = target;
+  document.getElementById("naBtn").textContent = "Continue →";
 }
 
 function done(m, id){ return CourseProgress.isModuleDataComplete(id, m.modules[id]); }
@@ -464,6 +497,9 @@ const SKILLS = [
     evidence: "Module 7 checkpoint + chart-build exercise", check: (m) => done(m, 7) },
   { label: "Build a dashboard and a recommendation a stakeholder can act on",
     evidence: "Module 8 checkpoint + dashboard-build exercise", check: (m) => done(m, 8) },
+  { label: "Build a real view in Tableau Public or Power BI Desktop",
+    evidence: "Desktop Lab evidence (published workbook or Desktop file + write-up)",
+    check: () => CourseProgress.desktopLabReady() },
   { label: "Run a full analysis end to end and present a recommendation",
     evidence: "Capstone project, rubric-scored across 5 categories", check: (m) => done(m, 9) },
   { label: "Pass a final assessment of entirely novel scenarios",
@@ -591,6 +627,6 @@ renderLibraryProgress();
 renderSkillMap();
 renderWelcome();
 </script>
-<script src="course-rail.js?v=8"></script>
+<script src="course-rail.js?v=10"></script>
 </body>
 </html>

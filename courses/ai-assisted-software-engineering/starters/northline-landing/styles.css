@@ -1,0 +1,6 @@
+body { font-family: system-ui, sans-serif; margin: 0; color: #102030; background: #f6f8fb; }
+header, footer, nav, main { padding: 1rem 1.25rem; }
+header { background: #0b1220; color: #eef2ff; }
+nav { display: flex; gap: 1rem; background: #e2e8f4; }
+main { max-width: 40rem; }
+#hours-line { font-weight: 600; }

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desktop Labs, Data Science &amp; Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.65}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
+.bar .in{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--amber);color:var(--amberd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:920px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--amber)}
+.hero{padding:40px 0 20px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:680px;margin-top:10px}
+.disclosure{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.3);border-radius:10px;padding:14px 18px;margin-top:18px;font-size:13px;color:var(--mut)}
+.disclosure b{color:var(--amber)}
+.objectives{background:var(--card);border:1px solid var(--bd);border-left:3px solid var(--good);border-radius:0 10px 10px 0;padding:18px 22px;margin-top:24px}
+.objectives .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--good);margin-bottom:10px;font-weight:700;font-family:'IBM Plex Mono'}
+.objectives ul{list-style:none;display:grid;gap:6px}
+.objectives li{padding-left:20px;position:relative;font-size:14.5px}
+.objectives li:before{content:"→";position:absolute;left:0;color:var(--amber)}
+.statusrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.pill{font-family:'IBM Plex Mono';font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:5px 10px;border-radius:99px;border:1px solid var(--bd2);color:var(--mut2)}
+.pill.done{background:rgba(74,222,149,.14);color:var(--good);border-color:rgba(74,222,149,.35)}
+section{padding:36px 0;border-bottom:1px solid var(--bd)}
+.kh{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.kh .num{font-family:'IBM Plex Mono';font-weight:700;font-size:12px;color:var(--amber);border:1px solid var(--amber);border-radius:99px;width:34px;height:26px;display:grid;place-items:center;flex-shrink:0}
+.kh h2{font-family:'Fraunces';font-size:21px;font-weight:600}
+p{font-size:15.5px}
+p.mut{color:var(--mut)}
+p+p{margin-top:12px}
+.def{background:var(--card2);border:1px solid var(--bd2);border-radius:10px;padding:16px 20px;margin-top:16px}
+.def .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:6px;font-family:'IBM Plex Mono'}
+.def p{font-size:14.5px}
+ol{padding-left:20px;margin-top:12px;font-size:14.5px;line-height:1.8}
+.formrow{margin-top:12px}
+.formrow label{font-size:12.5px;color:var(--mut2);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-family:'IBM Plex Mono'}
+.formrow input,.formrow textarea{width:100%;font-family:'IBM Plex Sans';font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:9px 12px;color:var(--tx)}
+.formrow textarea{min-height:90px;resize:vertical}
+.check{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:14px;cursor:pointer}
+.check input{margin-top:4px}
+button{font-family:'IBM Plex Sans';font-weight:600;font-size:13px;border-radius:8px;padding:9px 16px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;margin-top:14px}
+button.primary{background:var(--amber);color:var(--amberd);border-color:var(--amber)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.feedback{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:none}
+.feedback.ok{display:block;background:rgba(74,222,149,.1);border:1px solid rgba(74,222,149,.35);color:var(--good)}
+.feedback.bad{display:block;background:rgba(255,133,133,.1);border:1px solid rgba(255,133,133,.35);color:var(--bad)}
+a{color:var(--amber)}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} }
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <span class="logo">ZENITH<b>LAB</b></span>
+</div></div>
+<div class="coursenav"><div class="in">
+  <a href="dashboard.html">&larr; Dashboard</a>
+  <a href="practice-tableau.html">Tableau simulation</a>
+  <a href="practice-powerbi.html">Power BI simulation</a>
+  <a href="career.html">Career Path</a>
+</div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Required · pick one tool</span>
+    <h1 class="serif">Desktop Labs</h1>
+    <p class="sub">The in-browser Tableau and Power BI libraries are simulations. They teach judgment. They do not run Desktop. Most junior analyst posts still want hours in one real app. Complete <b>one</b> of the two labs below before the capstone.</p>
+    <div class="disclosure"><b>This page cannot open Tableau or Power BI for you.</b> Download the dataset, build the view on your machine, then paste evidence here. A made-up URL will not pass.</div>
+    <div class="statusrow">
+      <span class="pill" id="stTableau">Tableau: not submitted</span>
+      <span class="pill" id="stPowerbi">Power BI: not submitted</span>
+      <span class="pill" id="stGate">Capstone Desktop Lab: missing</span>
+    </div>
+    <div class="objectives">
+      <div class="lbl">You will</div>
+      <ul>
+        <li>Connect <code>retail_sales_ledger.csv</code> in Tableau Public or Power BI Desktop</li>
+        <li>Build a view of revenue by region and product line</li>
+        <li>Add a date filter so a stakeholder can look at one period</li>
+        <li>Submit a real published or shared link plus an 80-character write-up</li>
+      </ul>
+    </div>
+  </header>
+
+  <section>
+    <div class="kh"><span class="num">01</span><h2 class="serif">The dataset</h2></div>
+    <p>Use the course ledger, not a sample Superstore file. Every row is an order with region, product line, units, unit price, and revenue.</p>
+    <p><a href="datasets/retail_sales_ledger.csv" download>Download retail_sales_ledger.csv</a></p>
+    <div class="def">
+      <div class="k">What to build</div>
+      <p>A view a merchandising manager can use in under ten seconds: revenue by <code>region</code> and <code>product_line</code>, with a filter on <code>order_date</code>. One chart or matrix is enough. Do not screenshot a blank start screen.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">02</span><h2 class="serif">Tableau Public</h2></div>
+    <p class="mut">Free. Publish the workbook, then paste the public URL. Host must be <span class="mono">public.tableau.com</span> over https.</p>
+    <ol>
+      <li>Install <a href="https://public.tableau.com/app/discover" target="_blank" rel="noopener">Tableau Public</a> (or Tableau Desktop if you already have it).</li>
+      <li>Connect to the CSV. Put region and product line on rows or columns, sum of revenue on text or a bar.</li>
+      <li>Add order_date as a filter.</li>
+      <li>Save to Tableau Public. Copy the workbook URL.</li>
+    </ol>
+    <div class="formrow"><label for="tbUrl">Tableau Public URL</label><input id="tbUrl" type="url" placeholder="https://public.tableau.com/app/profile/.../viz/..."></div>
+    <div class="formrow"><label for="tbNotes">What the view shows (80+ characters)</label><textarea id="tbNotes" placeholder="Name the fields you used, the chart type, and one thing a merchandising manager would do with it."></textarea></div>
+    <label class="check"><input type="checkbox" id="tbConfirm"> I built this in Tableau Desktop or Tableau Public. This is not a screenshot of the in-browser simulation.</label>
+    <button class="primary" type="button" id="tbSave">Submit Tableau lab</button>
+    <div class="feedback" id="tbFb"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">03</span><h2 class="serif">Power BI Desktop</h2></div>
+    <p class="mut">Free on Windows. Publish to the Power BI service, share a OneDrive/SharePoint <span class="mono">.pbix</span>, or paste a service link.</p>
+    <ol>
+      <li>Install <a href="https://www.microsoft.com/en-us/download/details.aspx?id=58494" target="_blank" rel="noopener">Power BI Desktop</a>.</li>
+      <li>Get data from the CSV. Build a clustered bar or matrix: region, product line, sum of revenue.</li>
+      <li>Add a date slicer on order_date.</li>
+      <li>Publish or upload the <span class="mono">.pbix</span> somewhere you can share a link.</li>
+    </ol>
+    <div class="formrow"><label for="pbUrl">Power BI or file URL</label><input id="pbUrl" type="url" placeholder="https://app.powerbi.com/... or a .pbix share link"></div>
+    <div class="formrow"><label for="pbNotes">What the view shows (80+ characters)</label><textarea id="pbNotes" placeholder="Name the fields you used, the visual type, and one thing a merchandising manager would do with it."></textarea></div>
+    <label class="check"><input type="checkbox" id="pbConfirm"> I built this in Power BI Desktop. This is not a screenshot of the in-browser simulation.</label>
+    <button class="primary" type="button" id="pbSave">Submit Power BI lab</button>
+    <div class="feedback" id="pbFb"></div>
+  </section>
+
+  <footer>Zenith Lab · Data Science &amp; Analysis · Desktop Labs</footer>
+</div>
+
+<script src="course-progress.js?v=8"></script>
+<script>
+function paintStatus() {
+  const tb = CourseProgress.desktopLabRecord("tableau");
+  const pb = CourseProgress.desktopLabRecord("powerbi");
+  const tbEl = document.getElementById("stTableau");
+  const pbEl = document.getElementById("stPowerbi");
+  const gateEl = document.getElementById("stGate");
+  tbEl.textContent = tb.completed ? "Tableau: submitted" : "Tableau: not submitted";
+  tbEl.className = "pill" + (tb.completed ? " done" : "");
+  pbEl.textContent = pb.completed ? "Power BI: submitted" : "Power BI: not submitted";
+  pbEl.className = "pill" + (pb.completed ? " done" : "");
+  const ready = CourseProgress.desktopLabReady();
+  gateEl.textContent = ready ? "Capstone Desktop Lab: complete (one tool is enough)" : "Capstone Desktop Lab: missing";
+  gateEl.className = "pill" + (ready ? " done" : "");
+  if (tb.url) document.getElementById("tbUrl").value = tb.url;
+  if (tb.notes) document.getElementById("tbNotes").value = tb.notes;
+  if (tb.confirmed) document.getElementById("tbConfirm").checked = true;
+  if (pb.url) document.getElementById("pbUrl").value = pb.url;
+  if (pb.notes) document.getElementById("pbNotes").value = pb.notes;
+  if (pb.confirmed) document.getElementById("pbConfirm").checked = true;
+}
+
+function showFb(id, ok, msg) {
+  const el = document.getElementById(id);
+  el.className = "feedback " + (ok ? "ok" : "bad");
+  el.textContent = msg;
+}
+
+document.getElementById("tbSave").addEventListener("click", function () {
+  const res = CourseProgress.completeDesktopLab("tableau", {
+    url: document.getElementById("tbUrl").value,
+    notes: document.getElementById("tbNotes").value,
+    confirmed: document.getElementById("tbConfirm").checked,
+  });
+  showFb("tbFb", res.ok, res.ok ? "Tableau lab saved. One completed Desktop Lab is enough for the capstone gate." : res.error);
+  paintStatus();
+});
+document.getElementById("pbSave").addEventListener("click", function () {
+  const res = CourseProgress.completeDesktopLab("powerbi", {
+    url: document.getElementById("pbUrl").value,
+    notes: document.getElementById("pbNotes").value,
+    confirmed: document.getElementById("pbConfirm").checked,
+  });
+  showFb("pbFb", res.ok, res.ok ? "Power BI lab saved. One completed Desktop Lab is enough for the capstone gate." : res.error);
+  paintStatus();
+});
+paintStatus();
+</script>
+<script src="course-rail.js?v=10"></script>
+</body>
+</html>

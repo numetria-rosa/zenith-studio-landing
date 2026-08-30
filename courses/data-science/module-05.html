@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 5: Statistics for Analysts</title>
+<title>Module 5: Exploratory Data Analysis &amp; Statistics</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -129,9 +129,13 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
 
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 5 of 9 · Track C starts here</span>
-    <h1 class="serif">Statistics for Analysts</h1>
+    <span class="eyebrow">Module 5 of 9 · Exploratory Data Analysis &amp; Statistics</span>
+    <h1 class="serif">Exploratory Data Analysis &amp; Statistics</h1>
     <p class="sub">Not a maths course. Every concept here exists to answer one question a stakeholder will actually ask you: <i>is this difference real, or did we just get lucky?</i> You'll compute the numbers, and more importantly, learn when not to trust them.</p>
+    <div class="objectives" style="border-left-color:var(--amber);margin-top:18px">
+      <div class="lbl" style="color:var(--amber)">If this module is your first page</div>
+      <p style="font-size:14px">The first exercise is a pandas function on a real survey file. If you have not done Modules 2–4, open <a href="module-01.html" style="color:var(--amber)">Module 1</a> or <a href="module-03.html" style="color:var(--amber)">Module 3</a> first. Track C is optional, not a shortcut past foundations.</p>
+    </div>
     <div class="objectives">
       <div class="lbl">By the end of this module you'll be able to</div>
       <ul>
@@ -372,7 +376,7 @@ Caveat: this analysis covers 8 weeks and does not account for seasonality or dif
   <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete the exercises and checkpoint to continue →</button>
 </div></div>
 
-<script src="course-progress.js?v=6"></script>
+<script src="course-progress.js?v=8"></script>
 <script src="pyodide-sandbox-runner.js"></script>
 <script>
 const MODULE_ID = 5;
@@ -754,6 +758,6 @@ document.getElementById("btnNext").addEventListener("click", () => { window.loca
   updateNextButton();
 })();
 </script>
-<script src="course-rail.js?v=8"></script>
+<script src="course-rail.js?v=10"></script>
 </body>
 </html>

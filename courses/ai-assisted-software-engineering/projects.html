@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects — AI-Assisted Software Engineering</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Projects</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="portfolio.html">Portfolio</a><a href="deploy-guide.html">Deploy</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Evidence</span>
+    <h1 class="serif">Projects</h1>
+    <p class="sub">Capstone briefs are 1 and 2 (need Module 9 unlocked). Portfolio briefs 3–8 can be submitted anytime. Completion requires a real https URL (GitHub repo or live site), ≥80-character write-up, and every rubric line scored above 0.</p>
+  </header>
+  <div id="projList"></div>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<script src="course-progress.js"></script>
+<script>
+function render() {
+  const root = document.getElementById("projList");
+  root.innerHTML = "";
+  CourseProgress.PROJECTS.forEach(function (p) {
+    const rec = CourseProgress.getProject(p.id);
+    const locked = p.modules.indexOf(9) !== -1 && !CourseProgress.isUnlocked(9);
+    const card = document.createElement("div");
+    card.className = "projcard";
+    const rubric = CourseProgress.rubricForProject(p.id);
+    let form = "";
+    if (!locked) {
+      form = '<div class="formrow"><label>GitHub or live https URL</label><input type="url" class="purl" value="' + CourseProgress.escapeHtml(rec.githubUrl || "") + '"></div>' +
+        '<div class="formrow"><label>Write-up</label><textarea class="pdesc">' + CourseProgress.escapeHtml(rec.description || "") + "</textarea></div>";
+      rubric.forEach(function (r) {
+        form += '<div class="formrow"><label>' + r.label + " (" + r.weight + "%)</label><input type='text' class='prub' data-key='" + r.key + "' value='" + (rec.rubricScores[r.key] || "") + "' placeholder='1–5'></div>";
+      });
+      form += '<button class="primary psave" style="margin-top:10px">Save / complete if valid</button><div class="feedback pfb"></div>';
+    } else {
+      form = '<p class="mut">Locked until the capstone gate opens (Module 8, practice bar, both Desktop Labs).</p>';
+    }
+    card.innerHTML = "<div class='modtitle'>" + CourseProgress.escapeHtml(p.title) + (rec.completed ? " · done" : "") + "</div>" +
+      "<div class='moddesc'>" + CourseProgress.escapeHtml(p.summary) + "</div>" +
+      "<div class='modmeta'>" + p.difficulty + " · " + p.stageLabel + "</div>" + form;
+    if (!locked) {
+      card.querySelector(".psave").onclick = function () {
+        const url = card.querySelector(".purl").value;
+        const safe = CourseProgress.safeHttpUrl(url);
+        const desc = card.querySelector(".pdesc").value.trim();
+        const scores = {};
+        let rubOk = true;
+        card.querySelectorAll(".prub").forEach(function (inp) {
+          const n = Number(inp.value);
+          scores[inp.getAttribute("data-key")] = n;
+          if (!(n > 0)) rubOk = false;
+        });
+        const fb = card.querySelector(".pfb");
+        if (!safe || !/^https:/i.test(safe)) {
+          fb.className = "feedback bad"; fb.textContent = "Need a real https URL."; return;
+        }
+        if (desc.length < 80) { fb.className = "feedback bad"; fb.textContent = "Write-up must be at least 80 characters."; return; }
+        if (!rubOk) { fb.className = "feedback bad"; fb.textContent = "Every rubric line needs a score above 0."; return; }
+        CourseProgress.setProject(p.id, { githubUrl: safe, description: desc, rubricScores: scores, completed: true, completedAt: new Date().toISOString() });
+        fb.className = "feedback ok"; fb.textContent = "Saved as complete.";
+        render();
+      };
+    }
+    root.appendChild(card);
+  });
+}
+render();
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

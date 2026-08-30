@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desktop Labs — Cursor and GitHub</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Desktop Labs</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="practice-specs.html">Spec sim</a><a href="practice-git.html">Git sim</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Required · both labs</span>
+    <h1 class="serif">Desktop Labs</h1>
+    <p class="sub">Unlike Data Science (Tableau <i>or</i> Power BI), this course needs <b>both</b> Cursor evidence and a GitHub repo you own. In-browser spec/git/review libraries are labeled simulations. They do not satisfy this page.</p>
+    <div class="disclosure"><b>This page cannot open Cursor or GitHub Desktop for you.</b> Install the tools, do the work, paste an allowlisted https://github.com URL plus 80+ characters of notes.</div>
+    <div class="statusrow">
+      <span class="pill" id="stCursor">Lab A Cursor: not submitted</span>
+      <span class="pill" id="stGithub">Lab B GitHub: not submitted</span>
+      <span class="pill" id="stGate">Capstone labs: missing</span>
+    </div>
+  </header>
+  <section>
+    <div class="kh"><span class="num">A</span><h2>Lab A — Cursor</h2></div>
+    <p>Install <a href="https://cursor.com" target="_blank" rel="noopener">Cursor</a> (VS Code + Copilot is accepted if you confirm it). Open the starter in <code>starters/northline-landing/</code> (download the folder from this course). Change the clinic hours to <b>Tue–Sat 9:00–17:00</b> and add a button whose visible text is <b>Book</b>. Commit and push.</p>
+    <p>Evidence: a commit URL shaped like <code>https://github.com/you/repo/commit/abc123</code>, notes (≥80 characters) on what you changed and how you checked it, and a confirmation this was not the in-browser simulation.</p>
+    <div class="interactive">
+      <div class="formrow"><label for="cUrl">GitHub commit URL</label><input id="cUrl" type="url" placeholder="https://github.com/you/repo/commit/…"></div>
+      <div class="formrow"><label for="cNotes">Notes</label><textarea id="cNotes"></textarea></div>
+      <label class="check"><input type="checkbox" id="cOk"> I made this change in Cursor or VS Code + Copilot, not the in-browser simulation.</label>
+      <button class="primary" id="btnCursor">Submit Lab A</button>
+      <div class="feedback" id="cFb"></div>
+    </div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">B</span><h2>Lab B — GitHub</h2></div>
+    <p>A public repo you own with a README, at least three commits, and either one pull request or a documented feature branch. One repo may satisfy both labs if the commit URL is valid <i>and</i> the repo checks pass.</p>
+    <div class="interactive">
+      <div class="formrow"><label for="gUrl">GitHub repo URL</label><input id="gUrl" type="url" placeholder="https://github.com/you/repo"></div>
+      <div class="formrow"><label for="gNotes">Notes</label><textarea id="gNotes"></textarea></div>
+      <label class="check"><input type="checkbox" id="gOk"> This is a repo I own. It has a README and at least three commits.</label>
+      <button class="primary" id="btnGithub">Submit Lab B</button>
+      <div class="feedback" id="gFb"></div>
+    </div>
+  </section>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<script src="course-progress.js"></script>
+<script>
+function paint() {
+  const a = CourseProgress.desktopLabRecord("cursor");
+  const b = CourseProgress.desktopLabRecord("github");
+  const el = function (id, rec, label) {
+    const n = document.getElementById(id);
+    n.textContent = rec.completed ? label + ": submitted" : label + ": not submitted";
+    n.className = "pill" + (rec.completed ? " done" : "");
+  };
+  el("stCursor", a, "Lab A Cursor");
+  el("stGithub", b, "Lab B GitHub");
+  const g = document.getElementById("stGate");
+  const ready = CourseProgress.desktopLabReady();
+  g.textContent = ready ? "Capstone labs: both done" : "Capstone labs: missing";
+  g.className = "pill" + (ready ? " done" : "");
+  if (a.url) document.getElementById("cUrl").value = a.url;
+  if (a.notes) document.getElementById("cNotes").value = a.notes;
+  if (b.url) document.getElementById("gUrl").value = b.url;
+  if (b.notes) document.getElementById("gNotes").value = b.notes;
+}
+function submit(tool, urlId, notesId, okId, fbId) {
+  const out = CourseProgress.completeDesktopLab(tool, {
+    url: document.getElementById(urlId).value,
+    notes: document.getElementById(notesId).value,
+    confirmed: document.getElementById(okId).checked,
+  });
+  const fb = document.getElementById(fbId);
+  fb.className = "feedback " + (out.ok ? "ok" : "bad");
+  fb.textContent = out.ok ? "Saved. This syncs with module progress when you are signed in." : out.error;
+  paint();
+}
+document.getElementById("btnCursor").onclick = function () { submit("cursor", "cUrl", "cNotes", "cOk", "cFb"); };
+document.getElementById("btnGithub").onclick = function () { submit("github", "gUrl", "gNotes", "gOk", "gFb"); };
+paint();
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

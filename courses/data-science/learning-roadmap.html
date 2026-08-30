@@ -103,8 +103,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Learning Roadmap</footer>
 </div>
 
-<script src="course-progress.js?v=6"></script>
-<script src="practice-progress.js"></script>
+<script src="course-progress.js?v=8"></script>
+<script src="practice-progress.js?v=1"></script>
 <script src="skill-map.js?v=2"></script>
 <script src="adaptive-engine.js?v=2"></script>
 <script>
@@ -129,14 +129,15 @@ const STAGES = [
     libraries: ["sql", "statistics"],
   },
   {
-    id: "visualization", num: "03", title: "Visualization & BI", desc: "Showing the finding: charting principles, then Tableau and Power BI judgment (both decision-based simulations, not live tool execution).",
+    id: "visualization", num: "03", title: "Visualization & BI", desc: "Showing the finding: charting principles, then Tableau and Power BI judgment (both decision-based simulations). A required Desktop Lab in Tableau Public or Power BI Desktop is the real tool time most job posts expect.",
     modules: [7, 8],
     categories: ["Visualization", "BI"],
     libraries: ["tableau", "powerbi"],
+    desktopLab: true,
   },
   {
     id: "automation", num: "04", title: "Automation", desc: "Making an analysis repeatable instead of one-off: real Python scripts that clean, validate, and report without crashing on bad input.",
-    modules: [],
+    modules: [2, 4],
     categories: ["Automation"],
     libraries: ["automation"],
   },
@@ -162,9 +163,21 @@ function moduleNode(id) {
   const status = moduleStatus(id);
   const href = id === 0 ? "module-00.html" : `module-${String(id).padStart(2, "0")}.html`;
   const pillLabel = { done: "Done", available: "Available", locked: "Locked", current: "Current" }[status];
-  return `<a class="node ${status === "available" ? "current" : ""}" href="${href}">
+  const tag = status === "locked" ? "div" : "a";
+  const hrefAttr = status === "locked" ? ' aria-disabled="true"' : ` href="${href}"`;
+  return `<${tag} class="node ${status === "available" ? "current" : ""}"${hrefAttr}>
     <div class="ntop"><span class="ntitle">Module ${id}: ${esc(MODULE_TITLES[id] || "")}</span><span class="statuspill ${status}">${pillLabel}</span></div>
-    <span class="nmeta">Course module</span>
+    <span class="nmeta">${status === "locked" ? "Unlocks after the previous module" : "Course module"}</span>
+  </${tag}>`;
+}
+
+function desktopLabNode() {
+  const done = CourseProgress.desktopLabReady();
+  const status = done ? "done" : "available";
+  const pill = done ? "Done" : "Required";
+  return `<a class="node ${done ? "" : "current"}" href="desktop-labs.html">
+    <div class="ntop"><span class="ntitle">Desktop Lab: Tableau Public or Power BI Desktop</span><span class="statuspill ${status}">${pill}</span></div>
+    <span class="nmeta">Real workbook evidence, not the in-browser simulations</span>
   </a>`;
 }
 
@@ -217,6 +230,7 @@ function renderRoadmap() {
       <p class="stagedesc">${esc(stage.desc)}</p>
       ${modulesHtml ? `<div class="groupdiv">Modules</div><div class="nodegrid" style="margin-top:8px">${modulesHtml}</div>` : ""}
       ${libsHtml ? `<div class="groupdiv">Practice libraries</div><div class="nodegrid" style="margin-top:8px">${libsHtml}</div>` : ""}
+      ${stage.desktopLab ? `<div class="groupdiv">Required Desktop Lab</div><div class="nodegrid" style="margin-top:8px">${desktopLabNode()}</div>` : ""}
       ${skillsHtml ? `<div class="groupdiv">Skills</div><div class="nodegrid" style="margin-top:8px">${skillsHtml}</div>` : ""}
     `;
     body.appendChild(section);
@@ -246,6 +260,6 @@ function renderRoadmap() {
 
 renderRoadmap();
 </script>
-<script src="course-rail.js?v=8"></script>
+<script src="course-rail.js?v=10"></script>
 </body>
 </html>

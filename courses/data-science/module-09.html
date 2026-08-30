@@ -17,6 +17,7 @@ body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif
 .serif{font-family:'Fraunces',serif}
 .mono{font-family:'IBM Plex Mono',monospace}
 .wrap{max-width:960px;margin:0 auto;padding:0 24px 80px}
+body.capstone-locked .wrap > section, body.capstone-locked .scoreboard{display:none}
 .bar{position:sticky;top:0;z-index:40;background:rgba(13,15,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--amber)}
 .bar .in{max-width:960px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
 .bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
@@ -123,8 +124,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Module 9 of 9 · Capstone</span>
-    <h1 class="serif">The Northstar Retail Capstone</h1>
-    <p class="sub">One real client, one real ambiguous problem, every skill from Modules 1&ndash;8 in service of answering it. No numbered steps. You decide what to clean, what to query, what to chart, and what to recommend.</p>
+    <h1 class="serif">Capstone Analysis Project</h1>
+    <p class="sub">The Northstar Retail brief: one real client, one ambiguous problem, every skill from Modules 1&ndash;8. No numbered steps. You decide what to clean, what to query, what to chart, and what to recommend.</p>
+    <div id="capstoneGate" class="objectives" style="border-left-color:var(--amber);display:none;margin-top:18px">
+      <div class="lbl" style="color:var(--amber)">Practice first</div>
+      <p id="capstoneGateText" style="font-size:14px"></p>
+      <p style="font-size:14px;margin-top:8px"><a href="practice-sql.html" style="color:var(--amber)">SQL practice</a> · <a href="practice-excel.html" style="color:var(--amber)">Excel practice</a> · <a href="practice-python.html" style="color:var(--amber)">Python practice</a> · <a href="desktop-labs.html" style="color:var(--amber)">Desktop Labs</a></p>
+    </div>
     <div class="objectives">
       <div class="lbl">By the end of this capstone you'll have</div>
       <ul>
@@ -349,7 +355,7 @@ def validate_significance(df):
   <button class="primary" id="btnNext" disabled style="margin-left:auto">Complete the capstone and checkpoint to finish →</button>
 </div></div>
 
-<script src="course-progress.js?v=6"></script>
+<script src="course-progress.js?v=8"></script>
 <script src="plotly-sandbox-runner.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
 <script>
@@ -357,6 +363,24 @@ const MODULE_ID = 9;
 CourseProgress.touchVisited(MODULE_ID);
 const esc = CourseProgress.escapeHtml;
 const exerciseState = {};
+if (!CourseProgress.isUnlocked(MODULE_ID)) {
+  document.body.classList.add("capstone-locked");
+  const gate = document.getElementById("capstoneGate");
+  if (gate) {
+    gate.style.display = "block";
+    const st = CourseProgress.capstonePracticeStatus();
+    const el = document.getElementById("capstoneGateText");
+    if (el) {
+      if (!CourseProgress.isModuleComplete(8)) {
+        el.textContent = "The capstone unlocks after you complete Module 8 (checkpoint quiz at 80% plus the dashboard exercise).";
+      } else if (!st.ready) {
+        el.textContent = `The capstone unlocks after 3+ passed practice tasks in any two of SQL (${st.sql}/3), Excel (${st.excel}/3), and Python (${st.python}/3).`;
+      } else {
+        el.textContent = "The capstone also needs one Desktop Lab: a real Tableau Public workbook or a Power BI Desktop file. The in-browser Tableau and Power BI libraries are simulations and do not count.";
+      }
+    }
+  }
+}
 
 function markDeliverable(letter) {
   const el = document.getElementById("dstatus" + letter);
@@ -706,8 +730,9 @@ function checkPortfolio() {
   checks.push({ name: "Names the specific finding (Electronics)", pass: mentionsCategory, hint: "A portfolio reader should know exactly what you found, not just that you \"did an analysis.\"" });
   const mentionsTool = /(sql|python|pandas|plotly)/.test(lower);
   checks.push({ name: "Names at least one real tool you used", pass: mentionsTool, hint: "Mention SQL, Python, pandas, or Plotly, whichever you actually used, tools are what a hiring manager scans for first." });
-  const mentionsImpact = /\$|profit|margin|percent|%/.test(lower) && hasRealMagnitudeNumber(text);
-  checks.push({ name: "States a quantified result", pass: mentionsImpact, hint: "Include the actual dollar figure or margin percentage you computed, not a placeholder digit, a portfolio description without a real number is just a claim." });
+  const nums = (text.match(/[\d][\d,]*(\.\d+)?/g) || []).map((n) => Number(String(n).replace(/,/g, "")));
+  const mentionsImpact = /\$|profit|margin|percent|%/.test(lower) && nums.some((n) => n >= 18000 && n <= 26000);
+  checks.push({ name: "States the real quantified result from part C", pass: mentionsImpact, hint: "Include the actual lost-profit figure from part C (about $21,800), not a placeholder or a made-up number." });
   const longEnough = text.length > 100 && !hasPaddingOrPlaceholder(text);
   checks.push({ name: "Long enough to actually describe the project (2-3 sentences)", pass: longEnough, hint: "A single vague sentence, or padding out the length with repeated words or characters, won't differentiate you, aim for a real paragraph." });
 
@@ -744,8 +769,16 @@ function checkWrite() {
     action: document.getElementById("wAction").value.trim(),
   };
   const checks = [];
+  function mentionsCapstoneImpact(text) {
+    const nums = (String(text).match(/[\d][\d,]*(\.\d+)?/g) || []).map((n) => Number(String(n).replace(/,/g, "")));
+    return nums.some((n) => n >= 18000 && n <= 26000);
+  }
+  const cExtra = CourseProgress.getExtra("module9_exC") || {};
+  const cPassed = Number(cExtra.passCount) > 0 && Number(cExtra.passCount) === Number(cExtra.total);
+  checks.push({ name: "Part C (dollar impact) is already passing", pass: cPassed, hint: "Compute the real lost-profit figure in part C first, then write from those numbers." });
   const dataOk = /electronics/i.test(vals.data) && /\d/.test(vals.data);
   checks.push({ name: "Data section names the category and includes a number", pass: dataOk, hint: "Name Electronics specifically, and include a real figure (the margin % or the dollar impact from part C)." });
+  checks.push({ name: "Uses the real part C magnitude (about $21,800), not a made-up dollar figure", pass: mentionsCapstoneImpact(vals.impact) || mentionsCapstoneImpact(vals.data), hint: "Part C's estimated lost profit is about $21,841. Write that magnitude, not $12,000 or another invented number." });
   const findingOk = /electronics/i.test(vals.finding) && /(margin|profit|cost)/i.test(vals.finding);
   checks.push({ name: "Finding names the pattern (which category, what changed)", pass: findingOk, hint: "Mention Electronics and describe what happened to its margin or cost." });
   const impactOk = /\$|dollar/i.test(vals.impact) && vals.impact.length > 10 && hasRealMagnitudeNumber(vals.impact);
@@ -957,6 +990,6 @@ document.getElementById("btnNext").addEventListener("click", () => { window.loca
   updateNextButton();
 })();
 </script>
-<script src="course-rail.js?v=8"></script>
+<script src="course-rail.js?v=10"></script>
 </body>
 </html>

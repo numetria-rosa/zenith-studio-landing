@@ -295,7 +295,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <button class="primary" id="btnNext" style="margin-left:auto">Continue to Module 1 →</button>
 </div></div>
 
-<script src="course-progress.js?v=6"></script>
+<script src="course-progress.js?v=8"></script>
 <script>
 CourseProgress.setExtra("module0", Object.assign({ visited: true }, CourseProgress.getExtra("module0") || {}));
 
@@ -467,9 +467,23 @@ document.getElementById("btnPathResult").addEventListener("click", () => {
   const top = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
   const box = document.getElementById("pathResult");
   box.className = "pathresult show";
+  let extra = `<p style="margin-top:14px;font-size:13px;color:var(--mut)">This is a placement signal from 5 questions, not a binding rule. If pandas, cleaning, or spreadsheets still feel new, start at Module 1 even if a later track was suggested.</p>
+    <p style="margin-top:10px"><a class="primary" href="module-01.html" style="display:inline-block;text-decoration:none">Start at Module 1 →</a></p>`;
+  if (top === "c") {
+    extra = `<p style="margin-top:14px;font-size:13px;color:var(--mut)"><b>Track C is only safe if you already write pandas and have cleaned messy tables.</b> Module 5's first graded exercise is a pandas function. If that sentence felt foreign, you belong on Module 1, not Module 5.</p>
+      <p style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+        <a class="primary" href="module-01.html" style="display:inline-block;text-decoration:none">Start at Module 1 (safe) →</a>
+        <a href="module-05.html" style="display:inline-block;text-decoration:none;color:var(--amber)">I already write pandas, open Module 5</a>
+      </p>`;
+  } else if (top === "b") {
+    extra = `<p style="margin-top:14px;font-size:13px;color:var(--mut)">Track B assumes you have written a little code. Module 3 starts with pandas DataFrames. If you have never written a loop, start at Module 1.</p>
+      <p style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+        <a class="primary" href="module-01.html" style="display:inline-block;text-decoration:none">Start at Module 1 →</a>
+        <a href="module-03.html" style="display:inline-block;text-decoration:none;color:var(--amber)">I already write a little code, open Module 3</a>
+      </p>`;
+  }
   box.innerHTML = `<div class="prtitle">Your recommended starting point</div>
-    <div class="matchcard"><div class="mname">${PATH_NAMES[top]}</div></div>
-    <p style="margin-top:14px;font-size:13px;color:var(--mut)">This is a placement signal from 5 questions, not a binding rule. If it feels wrong once you're in the module, jump anywhere, the sequence is here to help, not gate you.</p>`;
+    <div class="matchcard"><div class="mname">${PATH_NAMES[top]}</div></div>${extra}`;
   CourseProgress.setExtra("module0", Object.assign({}, CourseProgress.getExtra("module0")||{}, { placementDone:true, placementTrack: top }));
   box.scrollIntoView({ behavior:"smooth", block:"center" });
 });
@@ -558,6 +572,6 @@ document.getElementById("btnNext").addEventListener("click", () => { window.loca
   }
 })();
 </script>
-<script src="course-rail.js?v=8"></script>
+<script src="course-rail.js?v=10"></script>
 </body>
 </html>

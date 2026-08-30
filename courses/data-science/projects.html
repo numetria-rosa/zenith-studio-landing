@@ -126,8 +126,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 
     <div class="section">
       <h3>Submission</h3>
-      <div class="formrow"><label for="ghUrl">Link to your work (optional)</label><input type="url" id="ghUrl" placeholder="https://... (Google Sheets, GitHub, a written report, etc.)"></div>
-      <div class="formrow"><label for="projDesc">Short description</label><textarea id="projDesc" placeholder="One or two sentences describing your finding and recommendation..."></textarea></div>
+      <div class="formrow"><label for="ghUrl">Link to your work (required to mark complete)</label><input type="url" id="ghUrl" placeholder="https://github.com/... or a Google Sheets / report URL"></div>
+      <div class="formrow"><label for="projDesc">What you found (required, at least a short paragraph)</label><textarea id="projDesc" placeholder="Name the finding, a real number, and the recommendation. Empty saves stay drafts."></textarea></div>
       <div class="formrow"><label for="projTech">Tools used</label><input type="text" id="projTech" placeholder="e.g. Excel, Python, pandas, matplotlib"></div>
       <div class="formrow"><label for="projTests">Deliverables completed (self-reported)</label><input type="text" id="projTests" placeholder="e.g. memo + dashboard + chart"></div>
       <button class="primary" id="btnSaveProject" style="margin-top:16px">Save project</button>
@@ -138,7 +138,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <footer>Zenith Lab · Data Science &amp; Analysis · Projects</footer>
 </div>
 
-<script src="course-progress.js?v=6"></script>
+<script src="course-progress.js?v=8"></script>
 <script>
 const DETAILS = {
   1: {
@@ -285,7 +285,8 @@ function renderList(){
       card.type = "button";
       card.className = "pcard";
       let statusBadge = `<span class="badge notstarted">Not started</span>`;
-      if (state.completed) statusBadge = `<span class="badge done">✓ Completed</span>`;
+      const reallyDone = !!(state.completed && CourseProgress.safeHttpUrl(state.githubUrl || "") && String(state.description || "").length >= 80 && Number(state.score) > 0);
+      if (reallyDone) statusBadge = `<span class="badge done">✓ Completed</span>`;
       else if (score > 0) statusBadge = `<span class="badge progress">In progress</span>`;
       card.innerHTML = `
         <div class="ptop"><div class="pt">${p.title}</div><span class="badge capstone">${p.difficulty}</span></div>
@@ -366,18 +367,30 @@ function openProject(id){
 
 document.getElementById("btnSaveProject").addEventListener("click", () => {
   const id = currentProjectId;
+  const githubUrl = document.getElementById("ghUrl").value.trim();
+  const description = document.getElementById("projDesc").value.trim();
+  const technologies = document.getElementById("projTech").value.trim();
+  const testsPassed = document.getElementById("projTests").value.trim();
+  const score = rubricTotal(id);
+  const safeUrl = CourseProgress.safeHttpUrl(githubUrl);
+  const canComplete = !!(safeUrl && description.length >= 80 && score > 0);
   CourseProgress.setProject(id, {
-    githubUrl: document.getElementById("ghUrl").value.trim(),
-    description: document.getElementById("projDesc").value.trim(),
-    technologies: document.getElementById("projTech").value.trim(),
-    testsPassed: document.getElementById("projTests").value.trim(),
-    completed: true,
-    completedAt: new Date().toISOString(),
-    score: rubricTotal(id),
+    githubUrl: safeUrl || githubUrl,
+    description,
+    technologies,
+    testsPassed,
+    completed: canComplete,
+    completedAt: canComplete ? new Date().toISOString() : null,
+    score,
   });
   const fb = document.getElementById("saveFb");
-  fb.className = "feedback ok";
-  fb.textContent = "Saved. This project now appears in My Portfolio.";
+  if (canComplete) {
+    fb.className = "feedback ok";
+    fb.textContent = "Marked complete. This project now appears in My Portfolio.";
+  } else {
+    fb.className = "feedback bad";
+    fb.textContent = "Draft saved only. To mark complete: a real http(s) link, an 80+ character description of a finding, and a rubric score above 0.";
+  }
   renderList();
 });
 
@@ -389,6 +402,6 @@ document.getElementById("btnBack").addEventListener("click", () => {
 
 renderList();
 </script>
-<script src="course-rail.js?v=8"></script>
+<script src="course-rail.js?v=10"></script>
 </body>
 </html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 7 — Multi-file features with AI</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 7</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 7 · ~55 min</span>
+    <h1 class="serif">Multi-file features with AI</h1>
+    <p class="sub">Spec → implement in Cursor → review the whole diff → PR. This page grades the spec and the test, not a fake IDE.</p>
+    <div class="disclosure">Do the Cursor work on your machine. Bring the spec and the test back here.</div>
+  </header>
+  <section>
+    <div class="kh"><span class="num">1</span><h2>Scope the files</h2></div>
+    <p>A feature that “just needs a button” often touches HTML, CSS, and JS. List them. If the agent edits a fourth file, that is scope creep until you say otherwise.</p>
+  </section>
+  <section>
+    <div class="kh"><span class="num">2</span><h2>Graded: spec + test for a filter</h2></div>
+    <p>Feature: a status page lists incidents; a JS function <code>filter_open(rows)</code> returns only rows whose <code>status</code> is <code>"open"</code>.</p>
+    <p>1) Write a spec (≥80 chars) that names <code>filter_open</code> and the <code>open</code> status.<br>2) Write <code>test_filter_open(impl)</code> that returns true for a correct filter and false if the impl returns the full list.</p>
+    <div class="interactive">
+      <div class="ilbl">Required exercise · featureSpecExercise</div>
+      <label class="formrow">Spec<textarea id="featSpec"></textarea></label>
+      <label class="formrow">Test<textarea id="featTest" spellcheck="false">function test_filter_open(impl) {
+  return true;
+}
+</textarea></label>
+      <button class="primary" id="btnFeat" style="margin-top:10px">Check spec + test</button>
+      <div class="feedback" id="featFb"></div>
+    </div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+    <div id="quizRoot"></div>
+    <div id="reqList"></div>
+  </section>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
+  <a id="btnNext" href="module-08.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+</div></div>
+<script src="course-progress.js"></script>
+<script src="practice-kit.js"></script>
+<script src="quiz-data.js"></script>
+<script src="module-kit.js"></script>
+<script>
+CourseProgress.touchVisited(7);
+function syncNext() {
+  const btn = document.getElementById("btnNext");
+  const ok = CourseProgress.isModuleComplete(7);
+  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 8' : "Complete the exercise and quiz (80%+) to continue"; }
+  const box = document.getElementById("reqList");
+  if (box) {
+    box.innerHTML = CourseProgress.completionRequirements(7).map(function (r) {
+      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
+    }).join("");
+  }
+}
+ModuleKit.renderQuiz(7, AISEQuizData.MODULE_QUIZZES[7], syncNext);
+syncNext();
+</script>
+<script>
+document.getElementById("btnFeat").onclick = function () {
+  const spec = document.getElementById("featSpec").value;
+  const specOk = spec.trim().length >= 80 && /filter_open/i.test(spec) && /open/i.test(spec);
+  const out = PracticeKit.gradeTesting({
+    functionName: "test_filter_open",
+    goodImpl: "function(rows){return rows.filter(r=>r.status==='open');}",
+    badImpl: "function(rows){return rows;}",
+    bugHint: "Bad impl returns every row. Your test must fail that.",
+  }, document.getElementById("featTest").value);
+  const ok = specOk && out.passed;
+  const fb = document.getElementById("featFb");
+  fb.className = "feedback " + (ok ? "ok" : "bad");
+  fb.innerHTML = (specOk ? "✓ spec" : "✗ spec needs filter_open, open, and 80+ characters") + "<br>" +
+    out.results.map(function (r) { return (r.pass ? "✓ " : "✗ ") + r.name; }).join("<br>");
+  if (ok) CourseProgress.setSection(7, "featureSpecExercise", true);
+  syncNext();
+};
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

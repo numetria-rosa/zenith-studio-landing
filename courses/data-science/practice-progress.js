@@ -2,9 +2,9 @@
    A separate, additive system that sits ALONGSIDE course-progress.js
    (different localStorage key, never touches module/quiz state) and
    tracks per-task and per-skill evidence for the practice-task
-   libraries (SQL, Python, Excel, etc). Mirrors course-progress.js's
-   shape and API conventions on purpose, so it feels like the same
-   system to a developer reading both files. */
+   libraries (SQL, Python, Excel, etc). On save, also mirrors tasks
+   into CourseProgress extra.practiceTasks so /api/progress can follow
+   a signed-in student across devices. */
 (function (global) {
   const STORAGE_KEY = "zenith_ds_practice_v1";
 
@@ -24,9 +24,36 @@
     if (!isPlainObject(data.tasks)) data.tasks = {};
     return data;
   }
+  function persistToCourse(data) {
+    if (!window.CourseProgress || typeof CourseProgress.setExtra !== "function") return;
+    try { CourseProgress.setExtra("practiceTasks", data.tasks); } catch (e) { /* ignore */ }
+  }
   function save(data) {
     if (typeof localStorage === "undefined") return;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* quota/unavailable, degrade silently */ }
+    persistToCourse(data);
+  }
+  function hydrateFromCourse() {
+    if (!window.CourseProgress || typeof CourseProgress.getExtra !== "function") return;
+    const extra = CourseProgress.getExtra("practiceTasks");
+    if (!isPlainObject(extra)) return;
+    const data = load();
+    let changed = false;
+    Object.keys(extra).forEach(function (id) {
+      const rem = extra[id];
+      if (!isPlainObject(rem)) return;
+      const cur = data.tasks[id] || { passed: false, attempts: 0, lastAttemptAt: null };
+      const passed = !!(cur.passed || rem.passed);
+      const attempts = Math.max(Number(cur.attempts) || 0, Number(rem.attempts) || 0);
+      const last = (cur.lastAttemptAt && rem.lastAttemptAt)
+        ? (cur.lastAttemptAt > rem.lastAttemptAt ? cur.lastAttemptAt : rem.lastAttemptAt)
+        : (cur.lastAttemptAt || rem.lastAttemptAt || null);
+      if (passed !== !!cur.passed || attempts !== (Number(cur.attempts) || 0) || last !== cur.lastAttemptAt) {
+        data.tasks[id] = { passed: passed, attempts: attempts, lastAttemptAt: last };
+        changed = true;
+      }
+    });
+    if (changed) save(data);
   }
 
   /* ---- Task result recording -------------------------------------- */
@@ -126,4 +153,6 @@
     getTaskState, recordAttempt, resetTask,
     skillTier, skillProgress, toolProgress, recommendNext,
   };
+
+  hydrateFromCourse();
 })(window);

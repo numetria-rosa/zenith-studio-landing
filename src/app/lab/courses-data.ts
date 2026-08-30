@@ -287,13 +287,14 @@ export const courses: CourseCard[] = [
     name: "AI-Assisted Software Engineering",
     category: "ai",
     categoryLabel: "AI and LLMs",
-    available: false,
+    available: true,
     level: "Beginner, no prior coding required",
     duration: "12 weeks, self-paced",
     weeklyTime: "~8–10 hrs/week",
     practiceTasks: 200,
     portfolioProjects: 8,
     hasCapstone: true,
+    price: "$99",
     summary:
       "Zero to a live web app: write HTML, CSS, and JavaScript yourself, then drive Cursor, review the diff, open a GitHub PR, and deploy. This is not AI Engineering — that course builds LLM products (RAG, tools, eval) and assumes programming logic already.",
     whatYoullDo: [
@@ -334,6 +335,58 @@ export const courses: CourseCard[] = [
       { tool: "Testing", tasks: 20 },
       { tool: "Python", tasks: 25 },
       { tool: "Integrated", tasks: 15 },
+    ],
+    curriculum: [
+      {
+        title: "What this job is",
+        description:
+          "Placement self-check. Everyone starts at Module 1. AI will write most of the characters; you are paid to specify, reject, test, and ship.",
+      },
+      {
+        title: "How software works + HTML",
+        description:
+          "Files, the browser, errors. Semantic HTML from a brief.",
+      },
+      {
+        title: "CSS: layout, not decoration",
+        description:
+          "Layout, spacing, hierarchy. Match a spec, including one responsive rule.",
+      },
+      {
+        title: "JavaScript you can read",
+        description:
+          "Functions, events, DOM. You write them. No Cursor yet.",
+      },
+      {
+        title: "Specs and coding agents",
+        description:
+          "Acceptance criteria. Simulations are labeled. Desktop Lab A is the real Cursor evidence.",
+      },
+      {
+        title: "Git and GitHub",
+        description:
+          "Commits, branches, PRs. Simulation here. Desktop Lab B is the real repo.",
+      },
+      {
+        title: "Testing and debugging",
+        description:
+          "A failing test is information. Agent “it works” is not.",
+      },
+      {
+        title: "Multi-file features with AI",
+        description:
+          "Spec → implement in Cursor → review → PR. We grade the spec and the test.",
+      },
+      {
+        title: "Python for scripts",
+        description:
+          "Python for scripts: files, functions, JSON, a small CLI. Not RAG.",
+      },
+      {
+        title: "Capstone: ship a real app",
+        description:
+          "One live product: tests, GitHub, https URL. Both Desktop Labs plus the practice bar.",
+      },
     ],
     labBadgeColor: { bg: "#60a5fa", text: "#0b1220" },
     includes: [

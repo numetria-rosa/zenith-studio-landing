@@ -300,7 +300,7 @@ export function CourseCatalog({
               </div>
 
               {/* Expandable detail + full details page link */}
-              <div className="mt-4 flex items-center gap-4">
+              <div className="mt-4 flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   onClick={() => setExpandedId(expanded ? null : course.id)}
@@ -322,6 +322,18 @@ export function CourseCatalog({
                   Course details
                   <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
                 </Link>
+
+                {isRealCheckout && (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 self-start rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-black transition hover:scale-[1.02]"
+                  >
+                    <ShoppingCart className="h-3.5 w-3.5" aria-hidden />
+                    Get access
+                  </a>
+                )}
               </div>
 
               <AnimatePresence initial={false}>

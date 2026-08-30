@@ -247,8 +247,8 @@ export default function ZenithLabPage() {
               Eight courses, built in order
             </h2>
             <p className="mt-4 leading-7 text-white/62">
-              Data Science &amp; Analysis and AI Engineering are open now, self-paced,
-              start whenever you&apos;re ready. AI-Assisted Software Engineering,
+              Data Science &amp; Analysis, AI Engineering, and AI-Assisted Software
+              Engineering are open now, self-paced, start whenever you&apos;re ready.
               Cybersecurity &amp; Ethical Hacking, AI Agents &amp; Agentic AI, MCP Servers
               &amp; AI Tool Integration, Automation Engineering, and Web3 Engineering are
               in development, join the waitlist to hear when they open.
@@ -266,9 +266,9 @@ export default function ZenithLabPage() {
                 Pick a course and start building
               </h2>
               <p className="mt-4 leading-7 text-white/62">
-                Data Science &amp; Analysis and AI Engineering are open for enrollment now.
-                For everything else in the catalog, join the waitlist and we&apos;ll let
-                you know the moment it opens.
+                Data Science &amp; Analysis, AI Engineering, and AI-Assisted Software
+                Engineering are open for enrollment now. For everything else in the
+                catalog, join the waitlist and we&apos;ll let you know the moment it opens.
               </p>
               <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
                 <a

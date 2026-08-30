@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 8 — Python for scripts</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 8</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 8 · ~55 min</span>
+    <h1 class="serif">Python for scripts</h1>
+    <p class="sub">Enough Python to drive Cursor on <code>.py</code> files: functions, JSON, a small CLI. Not RAG. Not agents. That is <b>AI Engineering</b>.</p>
+  </header>
+  <section>
+    <div class="kh"><span class="num">1</span><h2>The shape</h2></div>
+    <pre>import json
+
+def keep_open(rows):
+    return [r for r in rows if r.get("status") == "open"]
+
+if __name__ == "__main__":
+    data = json.loads(open("incidents.json", encoding="utf-8").read())
+    print(len(keep_open(data)))</pre>
+    <p>In the browser we grade the function with Pyodide — the same idea as the JavaScript library.</p>
+  </section>
+  <section>
+    <div class="kh"><span class="num">2</span><h2>Graded: transform a JSON list</h2></div>
+    <p>Write <code>keep_open(rows)</code> that returns only dicts whose <code>status</code> is <code>"open"</code>.</p>
+    <div class="interactive">
+      <div class="ilbl">Required exercise · pythonScriptExercise</div>
+      <textarea id="pyEx" spellcheck="false">def keep_open(rows):
+    return rows
+</textarea>
+      <button class="primary" id="btnPy" style="margin-top:10px">Run in Pyodide</button>
+      <div class="feedback" id="pyFb"></div>
+    </div>
+    <p class="mut" style="margin-top:12px"><a href="practice-python.html">Python practice library</a></p>
+  </section>
+  <section>
+    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+    <div id="quizRoot"></div>
+    <div id="reqList"></div>
+  </section>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
+  <a id="btnNext" href="module-09.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+</div></div>
+<script src="course-progress.js"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script src="practice-kit.js"></script>
+<script src="quiz-data.js"></script>
+<script src="module-kit.js"></script>
+<script>
+CourseProgress.touchVisited(8);
+function syncNext() {
+  const btn = document.getElementById("btnNext");
+  const ok = CourseProgress.isModuleComplete(8);
+  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue toward the capstone' : "Complete the exercise and quiz (80%+) to continue"; }
+  const box = document.getElementById("reqList");
+  if (box) {
+    box.innerHTML = CourseProgress.completionRequirements(8).map(function (r) {
+      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
+    }).join("");
+  }
+}
+ModuleKit.renderQuiz(8, AISEQuizData.MODULE_QUIZZES[8], syncNext);
+syncNext();
+</script>
+<script>
+document.getElementById("btnPy").onclick = function () {
+  const fb = document.getElementById("pyFb");
+  fb.className = "feedback";
+  fb.textContent = "Loading Python sandbox…";
+  PracticeKit.gradePython({
+    functionName: "keep_open",
+    testCases: [
+      { name: "filters", args: [[{"status": "open"}, {"status": "closed"}]], expected: [{"status": "open"}] },
+      { name: "empty", args: [[]], expected: [] },
+    ],
+  }, document.getElementById("pyEx").value, function (out) {
+    fb.className = "feedback " + (out.passed ? "ok" : "bad");
+    fb.innerHTML = (out.results || []).map(function (r) { return (r.pass ? "✓ " : "✗ ") + r.name + (r.pass ? "" : " — " + (r.hint || "")); }).join("<br>");
+    if (out.passed) CourseProgress.setSection(8, "pythonScriptExercise", true);
+    syncNext();
+  });
+};
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

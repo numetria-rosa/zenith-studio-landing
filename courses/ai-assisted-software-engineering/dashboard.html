@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — AI-Assisted Software Engineering</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Dashboard</span></div></div>
+<div class="coursenav"><div class="in"><a href="module-00.html">Orientation</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Course dashboard</span>
+    <h1 class="serif">AI-Assisted Software Engineering</h1>
+    <p class="sub">Zero coding to a live URL. Module progress syncs when you are signed in through Zenith Lab. This course is not AI Engineering.</p>
+  </header>
+  <div class="sysgrid">
+    <a class="syscard" href="module-00.html"><span class="systitle">Orientation</span><span class="sysdesc">What this job is</span></a>
+    <a class="syscard" href="quiz-center.html"><span class="systitle">Quiz Center</span><span class="sysdesc">Shuffled extra reps</span></a>
+    <a class="syscard" href="practice-html.html"><span class="systitle">HTML Practice</span><span class="sysdesc">Real DOM checks</span></a>
+    <a class="syscard" href="practice-js.html"><span class="systitle">JS Practice</span><span class="sysdesc">Functions you write</span></a>
+    <a class="syscard" href="desktop-labs.html"><span class="systitle">Desktop Labs</span><span class="sysdesc">Cursor + GitHub</span></a>
+    <a class="syscard" href="projects.html"><span class="systitle">Projects</span><span class="sysdesc">Portfolio briefs</span></a>
+    <a class="syscard" href="portfolio.html"><span class="systitle">Portfolio</span><span class="sysdesc">What you can show</span></a>
+    <a class="syscard" href="career.html"><span class="systitle">Career Path</span><span class="sysdesc">Honest non-claims</span></a>
+    <a class="syscard" href="learning-roadmap.html"><span class="systitle">Roadmap</span><span class="sysdesc">What to do next</span></a>
+    <a class="syscard" href="mastery-profile.html"><span class="systitle">Mastery</span><span class="sysdesc">Skill tiers</span></a>
+    <a class="syscard" href="diagnostic.html"><span class="systitle">Diagnostic</span><span class="sysdesc">Placement check</span></a>
+    <a class="syscard" href="cheatsheets.html"><span class="systitle">Cheat sheets</span><span class="sysdesc">One page per skill</span></a>
+  </div>
+  <div class="overallwrap">
+    <div class="overallrow"><span class="ov-lbl">Overall course progress</span><span class="ov-val" id="ovVal">0 / 9</span></div>
+    <div class="overallbar" id="ovBar"><div class="fill" id="ovFill"></div></div>
+    <div class="nextaction" id="nextAction"></div>
+    <p class="assume" id="syncNote"></p>
+    <button id="btnReset" style="margin-top:10px">Reset module progress in this browser</button>
+  </div>
+  <div class="modgrid-lbl">Modules</div>
+  <div id="modGrid"></div>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+
+<script src="course-progress.js"></script>
+<script>
+const DESC = {
+  1: "Files, the browser, errors. Semantic HTML from a brief.",
+  2: "Layout, spacing, hierarchy. Match a spec, including one responsive rule.",
+  3: "Functions, events, DOM. You write them. No Cursor yet.",
+  4: "Acceptance criteria. Simulations are labeled. Desktop Lab A required to go further honestly.",
+  5: "Commits, branches, PRs. Simulation here. Desktop Lab B is the real repo.",
+  6: "A failing test is information. Agent 'it works' is not.",
+  7: "Spec → implement in Cursor → review → PR. We grade the spec and the test.",
+  8: "Python for scripts: files, functions, JSON, a small CLI. Not RAG.",
+  9: "One live product: tests, GitHub, https URL. Both Desktop Labs plus practice bar.",
+};
+function card(href, unlocked, status, num, title, desc, meta, label) {
+  const el = document.createElement(unlocked ? "a" : "div");
+  if (unlocked) el.href = href;
+  el.className = "modcard " + status + (unlocked ? "" : " locked");
+  el.innerHTML = '<div class="modnum">' + (status === "completed" ? "✓" : num) + '</div><div class="modbody"><div class="modtitle">' +
+    title + '</div><div class="moddesc">' + desc + '</div><div class="modmeta">' + meta +
+    '</div></div><div class="modstatus ' + (unlocked ? status : "locked") + '">' + label + "</div>";
+  return el;
+}
+function render() {
+  const grid = document.getElementById("modGrid");
+  grid.innerHTML = "";
+  grid.appendChild(card("module-00.html", true, "not-started", "0", "Orientation — What this job is", "Placement self-check. Everyone starts at Module 1.", "<span>~20 min</span>", "Open"));
+  CourseProgress.MODULES.forEach(function (m) {
+    const status = CourseProgress.statusOf(m.id);
+    const unlocked = CourseProgress.isUnlocked(m.id);
+    const label = !unlocked ? "Locked" : status === "completed" ? "Completed" : status === "in-progress" ? "In progress" : "Not started";
+    let meta = "~" + m.minutes + " min";
+    if (!unlocked && m.id === 9) meta = "Needs Module 8, 3+ tasks in two of HTML/CSS/JS, both Desktop Labs";
+    else if (!unlocked) meta = "Unlocks after Module " + (m.id - 1) + " (quiz 80% + exercise)";
+    grid.appendChild(card(m.file, unlocked, status, String(m.id), "Module " + m.id + " — " + m.title, DESC[m.id], "<span>" + meta + "</span>", label));
+  });
+  const ov = CourseProgress.overall();
+  document.getElementById("ovVal").textContent = ov.completed + " / " + ov.total + " modules — " + ov.pct + "%";
+  document.getElementById("ovFill").style.width = ov.pct + "%";
+  const next = CourseProgress.MODULES.find(function (m) { return CourseProgress.isUnlocked(m.id) && !CourseProgress.isModuleComplete(m.id); });
+  const na = document.getElementById("nextAction");
+  if (next) na.innerHTML = '<div class="nalbl" style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700">Up next</div><div style="margin-top:6px">Module ' + next.id + " — " + next.title + ' · <a href="' + next.file + '">Open</a></div>';
+  else if (ov.completed === ov.total) na.textContent = "All modules complete. Ship remaining portfolio projects if you want more evidence.";
+  else na.textContent = "Finish Orientation, then Module 1.";
+  document.getElementById("syncNote").textContent = "Module and quiz progress syncs when you are signed in on zenith-studio.site. Practice ticks sync into extra.practiceTasks.";
+}
+document.getElementById("btnReset").onclick = function () {
+  if (confirm("Reset module progress in this browser?")) { CourseProgress.resetAll(); location.reload(); }
+};
+render();
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

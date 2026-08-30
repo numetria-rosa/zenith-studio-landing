@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 9 — Capstone: ship a real app</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 9</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 9 · capstone</span>
+    <h1 class="serif">Ship a real app</h1>
+    <p class="sub">One product: a small web app (JavaScript) plus an optional Python helper. Tests, a GitHub repo, and a live <code>https</code> URL. Rubric: spec, review notes, tests that fail on a broken change, deploy, write-up.</p>
+    <div id="capGate" class="honestnote"></div>
+    <div class="statusrow">
+      <span class="pill" id="stM8">Module 8</span>
+      <span class="pill" id="stPr">Practice bar</span>
+      <span class="pill" id="stLabs">Desktop Labs</span>
+    </div>
+  </header>
+  <section>
+    <div class="kh"><span class="num">1</span><h2>Pick a brief</h2></div>
+    <p>Use project 1 (Northline Landing) or project 2 (Shift Board) on <a href="projects.html">Projects</a>. Same rubric either way. Optional Python helper can live in the same repo.</p>
+  </section>
+  <section>
+    <div class="kh"><span class="num">2</span><h2>Evidence on this page</h2></div>
+    <p>When the gate is open, complete the project card (live URL, GitHub, ≥80-character write-up, rubric scores above zero). That is the capstone completion — there is no fake “Cursor finished it” button.</p>
+    <p><a href="deploy-guide.html">Deploy guide</a> · <a href="portfolio.html">Portfolio</a> · <a href="final-assessment.html">Final assessment</a> (after you ship)</p>
+  </section>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+
+<script src="course-progress.js"></script>
+<script>
+(function () {
+  const m8 = CourseProgress.isModuleComplete(8);
+  const pr = CourseProgress.capstonePracticeStatus();
+  const labs = CourseProgress.desktopLabReady();
+  const ready = CourseProgress.isUnlocked(9);
+  function pill(id, ok, label) {
+    const el = document.getElementById(id);
+    el.textContent = label;
+    el.className = "pill" + (ok ? " done" : "");
+  }
+  pill("stM8", m8, m8 ? "Module 8 complete" : "Module 8 incomplete");
+  pill("stPr", pr.ready, pr.ready ? "Practice bar met" : "Practice: need 3+ in two of HTML/CSS/JS (now " + pr.html + "/" + pr.css + "/" + pr.js + ")");
+  pill("stLabs", labs, labs ? "Both Desktop Labs done" : "Desktop Labs missing");
+  const gate = document.getElementById("capGate");
+  if (ready) {
+    gate.className = "disclosure";
+    gate.innerHTML = "<b>Unlocked.</b> Submit evidence on Projects (1 or 2). In-browser simulations still do not count as the live URL.";
+  } else {
+    document.body.classList.add("capstone-locked");
+    gate.innerHTML = "<b>Locked.</b> Finish Module 8, pass 3+ tasks in any two of the HTML / CSS / JS libraries, and complete both Desktop Labs. This page stays visible so you can see the bar — it is not a skip.";
+  }
+})();
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

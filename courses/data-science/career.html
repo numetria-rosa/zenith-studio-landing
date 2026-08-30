@@ -168,7 +168,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
     <span class="eyebrow">Career Path Edition</span>
     <h1 class="serif">Turning this course into a job search</h1>
     <p class="sub">Every claim below is tied to something you actually did in this course, not generic advice. Where a number appears, its method is shown next to it. Where a skill isn't taught here, that's stated plainly instead of glossed over.</p>
-    <div class="disclosure"><b>What this course is honest about:</b> finishing it prepares you to apply to junior/entry-level analyst roles with real, demonstrable evidence. It does not make you a data scientist, it does not guarantee an interview or a job. Tableau and Power BI ARE covered, but as honest, clearly-labeled decision-based practice simulations, not real execution against the actual desktop or cloud tools, that's a genuine, disclosed gap, not a hidden one. Git and cloud platforms still aren't taught here at all. Read on for exactly what you have and exactly what's still missing.</div>
+    <div class="disclosure"><b>What this course is honest about:</b> finishing it prepares you to apply to junior/entry-level analyst roles with real, demonstrable evidence. It does not make you a data scientist, it does not guarantee an interview or a job. The Tableau and Power BI practice libraries are decision-based simulations. The required Desktop Lab is the one place you must open Tableau Public or Power BI Desktop and submit real evidence. That is still not the same as weeks of job-desk time. Git and cloud platforms still aren't taught here at all.</div>
   </header>
 
   <nav class="toc">
@@ -289,8 +289,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Career Path</footer>
 </div>
 
-<script src="course-progress.js?v=6"></script>
-<script src="practice-progress.js"></script>
+<script src="course-progress.js?v=8"></script>
+<script src="practice-progress.js?v=1"></script>
 <script src="skill-map.js?v=2"></script>
 <script>
 const esc = CourseProgress.escapeHtml;
@@ -395,7 +395,7 @@ const PATHS = [
     evidenceSkills: ["spreadsheet-analysis", "sql-fundamentals-master", "python-data-analysis", "data-cleaning", "business-analysis"] },
   { id: "reporting", name: "Reporting / BI Analyst", align: "medium",
     have: ["Dashboard design and KPI selection (Module 8)", "SQL for querying live data sources (Module 6)", "Data cleaning to keep a recurring report trustworthy (Module 4)", "Chart selection for at-a-glance reporting (Module 7)", "Tableau and Power BI reasoning, Dimension vs. Measure, Calculated Column vs. Measure, DAX, Row-Level Security concepts (Tableau and Power BI Practice Libraries, 80 tasks, decision-based simulation, not real desktop execution)"],
-    need: ["Hands-on time in the ACTUAL Tableau Desktop or Power BI Desktop application, this course teaches the reasoning behind both tools honestly, but never runs the real software, that's a genuine, disclosed gap worth closing with a few real hours in either tool's free version before interviewing", "Scheduled refresh / row-level security configured in a real workspace, not just the concept", "Data-warehouse-scale data, this course's datasets are realistic but small"],
+    need: ["More hours in Tableau Desktop or Power BI Desktop than the required Desktop Lab, most job posts assume you can move around the real app without thinking", "Scheduled refresh / row-level security configured in a real workspace, not just the concept", "Data-warehouse-scale data, this course's datasets are realistic but small"],
     projects: [1, 2, 4, 9, 10],
     jobs: ["BI Analyst", "Reporting Analyst", "Business Intelligence Developer (junior)"],
     method: "Alignment rule: MEDIUM when the role's core loop matches and the underlying tool reasoning is genuinely covered, but real hands-on time in the actual commercial software (not a simulation) is typically required day one.",
@@ -850,6 +850,6 @@ renderCase();
 renderPlan();
 renderIdeas();
 </script>
-<script src="course-rail.js?v=8"></script>
+<script src="course-rail.js?v=10"></script>
 </body>
 </html>

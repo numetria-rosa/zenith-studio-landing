@@ -74,7 +74,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <footer>Zenith Lab · Data Science &amp; Analysis · Portfolio</footer>
 </div>
 
-<script src="course-progress.js?v=6"></script>
+<script src="course-progress.js?v=8"></script>
 <script>
 const SKILL_PHRASES = {
   1: "e-commerce funnel analysis: cleaning messy order data and quantifying conversion drop-off in real revenue terms",
@@ -90,7 +90,10 @@ const SKILL_PHRASES = {
 };
 
 function render(){
-  const projects = CourseProgress.PROJECTS.map(p => ({ meta: p, state: CourseProgress.getProject(p.id) })).filter(x => x.state.completed);
+  const projects = CourseProgress.PROJECTS.map(p => ({ meta: p, state: CourseProgress.getProject(p.id) })).filter(x => {
+    const s = x.state;
+    return !!(s.completed && CourseProgress.safeHttpUrl(s.githubUrl || "") && String(s.description || "").length >= 80 && Number(s.score) > 0);
+  });
   const content = document.getElementById("content");
   const summaryBox = document.getElementById("summaryBox");
   if (projects.length === 0) {
@@ -149,6 +152,6 @@ document.getElementById("btnCopySummary").addEventListener("click", () => {
 
 render();
 </script>
-<script src="course-rail.js?v=8"></script>
+<script src="course-rail.js?v=10"></script>
 </body>
 </html>

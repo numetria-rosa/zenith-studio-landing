@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 2 — CSS: layout, not decoration</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 2</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 2 · ~50 min</span>
+    <h1 class="serif">CSS: layout, not decoration</h1>
+    <p class="sub">Pretty is optional. Spacing, hierarchy, and one responsive rule are not. The agent loves gradients. You are paid for the spec.</p>
+    <div class="objectives"><div class="lbl">You will be able to</div>
+      <ul>
+        <li>Explain margin vs padding on a box</li>
+        <li>Use flexbox for a simple row or column</li>
+        <li>Write one media query that changes the layout</li>
+      </ul>
+    </div>
+  </header>
+  <section>
+    <div class="kh"><span class="num">1</span><h2>The box model</h2></div>
+    <p>Every element is a box: content, padding, border, margin. <code>gap</code> on a flex parent is the modern way to space children without fighting margins.</p>
+    <pre>#card { max-width: 640px; padding: 24px; }
+#row { display: flex; gap: 24px; }
+@media (max-width: 640px) { #row { flex-direction: column; } }</pre>
+  </section>
+  <section>
+    <div class="kh"><span class="num">2</span><h2>Graded: match the spec</h2></div>
+    <p>The fixture is a <code>#card</code> with a <code>#row</code> of two children. Your CSS must: give <code>#card</code> padding of 24px, make <code>#row</code> a flex row with 24px gap, and at max-width 640px stack <code>#row</code> as a column.</p>
+    <div class="interactive">
+      <div class="ilbl">Required exercise · cssLayoutExercise</div>
+      <textarea id="cssEx" spellcheck="false">/* #card, #row */</textarea>
+      <button class="primary" id="btnCss" style="margin-top:10px">Check CSS</button>
+      <div class="feedback" id="cssFb"></div>
+    </div>
+    <p class="mut" style="margin-top:12px"><a href="practice-css.html">CSS practice library</a></p>
+  </section>
+  <section>
+    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+    <div id="quizRoot"></div>
+    <div id="reqList"></div>
+  </section>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
+  <a id="btnNext" href="module-03.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+</div></div>
+<script src="course-progress.js"></script>
+<script src="practice-kit.js"></script>
+<script src="quiz-data.js"></script>
+<script src="module-kit.js"></script>
+<script>
+CourseProgress.touchVisited(2);
+function syncNext() {
+  const btn = document.getElementById("btnNext");
+  const ok = CourseProgress.isModuleComplete(2);
+  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 3' : "Complete the exercise and quiz (80%+) to continue"; }
+  const box = document.getElementById("reqList");
+  if (box) {
+    box.innerHTML = CourseProgress.completionRequirements(2).map(function (r) {
+      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
+    }).join("");
+  }
+}
+ModuleKit.renderQuiz(2, AISEQuizData.MODULE_QUIZZES[2], syncNext);
+syncNext();
+</script>
+<script>
+document.getElementById("btnCss").onclick = function () {
+  const css = document.getElementById("cssEx").value;
+  const task = {
+    fixtureHtml: '<div id="card"><div id="row"><div>A</div><div>B</div></div></div>',
+    checks: [
+      { name: "card padding 24px", test: function (host) {
+        const el = host.querySelector("#card");
+        return el && getComputedStyle(el).paddingTop === "24px";
+      }},
+      { name: "row is flex", test: function (host) {
+        return getComputedStyle(host.querySelector("#row")).display === "flex";
+      }},
+      { name: "row gap 24px", test: function (host) {
+        const g = getComputedStyle(host.querySelector("#row")).gap;
+        return g === "24px" || g === "24px 24px";
+      }},
+      { name: "has a 640px media query", test: function (host, src) {
+        return /@media[^{]*640px/.test(src) && /flex-direction\s*:\s*column/.test(src);
+      }},
+    ],
+  };
+  const out = PracticeKit.gradeCss(task, css);
+  const fb = document.getElementById("cssFb");
+  fb.className = "feedback " + (out.passed ? "ok" : "bad");
+  fb.innerHTML = out.results.map(function (r) { return (r.pass ? "✓ " : "✗ ") + r.name; }).join("<br>");
+  if (out.passed) CourseProgress.setSection(2, "cssLayoutExercise", true);
+  syncNext();
+};
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

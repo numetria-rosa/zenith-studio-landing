@@ -150,6 +150,62 @@
     return !!d && (Object.keys(d.modules || {}).length > 0 || Object.keys(d.extra || {}).length > 0);
   }
 
+  function mergePracticeTasks(a, b) {
+    const out = {};
+    const A = isPlainObject(a) ? a : {};
+    const B = isPlainObject(b) ? b : {};
+    Object.keys(A).concat(Object.keys(B)).forEach(function (id) {
+      if (out[id]) return;
+      const cur = isPlainObject(A[id]) ? A[id] : {};
+      const rem = isPlainObject(B[id]) ? B[id] : {};
+      out[id] = {
+        passed: !!(cur.passed || rem.passed),
+        attempts: Math.max(Number(cur.attempts) || 0, Number(rem.attempts) || 0),
+        lastAttemptAt: (cur.lastAttemptAt && rem.lastAttemptAt)
+          ? (cur.lastAttemptAt > rem.lastAttemptAt ? cur.lastAttemptAt : rem.lastAttemptAt)
+          : (cur.lastAttemptAt || rem.lastAttemptAt || null),
+      };
+    });
+    return out;
+  }
+
+  function mergeDesktopLabs(a, b) {
+    function rec(src) {
+      const r = isPlainObject(src) ? src : {};
+      return {
+        url: r.url || "",
+        notes: r.notes || "",
+        confirmed: !!r.confirmed,
+        completed: !!r.completed,
+        completedAt: r.completedAt || null,
+      };
+    }
+    function pick(key) {
+      const la = rec(isPlainObject(a) ? a[key] : null);
+      const lb = rec(isPlainObject(b) ? b[key] : null);
+      if (la.completed && !lb.completed) return la;
+      if (lb.completed && !la.completed) return lb;
+      if (la.completed && lb.completed) {
+        return (String(la.notes || "").length >= String(lb.notes || "").length) ? la : lb;
+      }
+      return (la.url || la.notes) ? la : lb;
+    }
+    return { tableau: pick("tableau"), powerbi: pick("powerbi") };
+  }
+
+  function applyPracticeToLocalStorage(tasks) {
+    if (typeof localStorage === "undefined") return;
+    try { localStorage.setItem("zenith_ds_practice_v1", JSON.stringify({ tasks: tasks || {} })); } catch (e) { /* quota */ }
+  }
+
+  function loadPracticeTasksLocal() {
+    try {
+      const raw = typeof localStorage !== "undefined" ? localStorage.getItem("zenith_ds_practice_v1") : null;
+      const parsed = raw ? safeParse(raw) : null;
+      return (isPlainObject(parsed) && isPlainObject(parsed.tasks)) ? parsed.tasks : {};
+    } catch (e) { return {}; }
+  }
+
   function pushToServer(data) {
     if (typeof fetch === "undefined") return;
     clearTimeout(pushDebounceTimer);
@@ -163,6 +219,21 @@
     }, 600);
   }
 
+  function extraObj(d) {
+    return (d && isPlainObject(d.extra)) ? d.extra : {};
+  }
+
+  function mergeSyncedExtras(local, serverData) {
+    var serverExtra = extraObj(serverData);
+    var localExtra = extraObj(local);
+    var mergedPractice = mergePracticeTasks(
+      mergePracticeTasks(localExtra.practiceTasks, serverExtra.practiceTasks),
+      loadPracticeTasksLocal()
+    );
+    var mergedDesk = mergeDesktopLabs(localExtra.desktopLabs, serverExtra.desktopLabs);
+    return { mergedPractice: mergedPractice, mergedDesk: mergedDesk };
+  }
+
   function serverSyncOnLoad() {
     if (typeof fetch === "undefined") return;
     fetch("/api/progress?courseId=" + SERVER_COURSE_ID, { credentials: "same-origin" })
@@ -171,10 +242,30 @@
         if (!body) return;
         var serverData = body.data;
         var local = load();
+        var merged = mergeSyncedExtras(local, serverData);
+        var beforePractice = JSON.stringify(loadPracticeTasksLocal());
         if (hasContent(serverData) && !hasContent(local)) {
+          serverData.extra = Object.assign({}, extraObj(serverData), {
+            practiceTasks: merged.mergedPractice,
+            desktopLabs: merged.mergedDesk,
+          });
           save(serverData);
+          applyPracticeToLocalStorage(merged.mergedPractice);
           location.reload();
-        } else if (hasContent(local) && !hasContent(serverData)) {
+          return;
+        }
+        var practiceChanged = beforePractice !== JSON.stringify(merged.mergedPractice);
+        var deskChanged = JSON.stringify(extraObj(local).desktopLabs || {}) !== JSON.stringify(merged.mergedDesk);
+        if (practiceChanged || deskChanged) {
+          local.extra = Object.assign({}, local.extra, {
+            practiceTasks: merged.mergedPractice,
+            desktopLabs: merged.mergedDesk,
+          });
+          save(local);
+          applyPracticeToLocalStorage(merged.mergedPractice);
+          if (practiceChanged) { location.reload(); return; }
+        }
+        if (hasContent(local) && !hasContent(serverData)) {
           fetch("/api/progress/migrate", {
             method: "POST",
             credentials: "same-origin",
@@ -308,9 +399,149 @@
     return { completed, total: MODULES.length, pct: Math.round((completed / MODULES.length) * 100) };
   }
 
+  /* Capstone gate: Module 8 is not enough. Students must also pass real
+     practice-library tasks in two core tools, and submit evidence of one
+     real Desktop Lab (Tableau Public or Power BI Desktop). The in-browser
+     Tableau/Power BI libraries are simulations and do not count. */
+  function practiceTasksStore() {
+    return mergePracticeTasks(loadPracticeTasksLocal(), getExtra("practiceTasks"));
+  }
+  function countPassedPractice(prefix) {
+    try {
+      const tasks = practiceTasksStore();
+      let n = 0;
+      Object.keys(tasks).forEach(function (id) {
+        if (id.indexOf(prefix) === 0 && tasks[id] && tasks[id].passed) n += 1;
+      });
+      return n;
+    } catch (e) { return 0; }
+  }
+  function capstonePracticeStatus() {
+    const sql = countPassedPractice("sql-");
+    const excel = countPassedPractice("xl-");
+    const python = countPassedPractice("py-");
+    const readyTools = (sql >= 3 ? 1 : 0) + (excel >= 3 ? 1 : 0) + (python >= 3 ? 1 : 0);
+    return { sql: sql, excel: excel, python: python, readyTools: readyTools, ready: readyTools >= 2, needPerTool: 3, toolsNeeded: 2 };
+  }
+  function isTableauPublicUrl(url) {
+    const href = safeHttpUrl(url);
+    if (!href) return "";
+    try {
+      const u = new URL(href);
+      if (u.protocol !== "https:") return "";
+      const host = u.hostname.toLowerCase();
+      if (host === "public.tableau.com" || host === "tableaupublic.com" || host.endsWith(".tableaupublic.com")) return href;
+    } catch (e) { /* invalid */ }
+    return "";
+  }
+  function isPowerBiEvidenceUrl(url) {
+    const href = safeHttpUrl(url);
+    if (!href) return "";
+    try {
+      const u = new URL(href);
+      if (u.protocol !== "http:" && u.protocol !== "https:") return "";
+      const host = u.hostname.toLowerCase();
+      const path = u.pathname.toLowerCase();
+      if (path.endsWith(".pbix")) return href;
+      if (host === "app.powerbi.com" || host.endsWith(".powerbi.com") || host === "powerbi.com") return href;
+      if (host.endsWith(".sharepoint.com") || host === "onedrive.live.com" || host === "1drv.ms" || host.endsWith(".1drv.ms")) return href;
+    } catch (e) { /* invalid */ }
+    return "";
+  }
+  function desktopLabRecord(tool) {
+    const labs = getExtra("desktopLabs");
+    const rec = isPlainObject(labs) && isPlainObject(labs[tool]) ? labs[tool] : {};
+    return {
+      url: rec.url || "",
+      notes: rec.notes || "",
+      confirmed: !!rec.confirmed,
+      completed: !!rec.completed,
+      completedAt: rec.completedAt || null,
+    };
+  }
+  function desktopLabReady() {
+    return !!(desktopLabRecord("tableau").completed || desktopLabRecord("powerbi").completed);
+  }
+  function completeDesktopLab(tool, payload) {
+    const notes = String((payload && payload.notes) || "").trim();
+    const confirmed = !!(payload && payload.confirmed);
+    let url = "";
+    if (tool === "tableau") url = isTableauPublicUrl(payload && payload.url);
+    else if (tool === "powerbi") url = isPowerBiEvidenceUrl(payload && payload.url);
+    else return { ok: false, error: "Unknown desktop tool." };
+    if (!url) {
+      return {
+        ok: false,
+        error: tool === "tableau"
+          ? "Need a public https://public.tableau.com/... link."
+          : "Need an http(s) link to a .pbix file, a Power BI service share, or a OneDrive/SharePoint file.",
+      };
+    }
+    if (notes.length < 80) return { ok: false, error: "Write at least 80 characters about what you built and what the view shows." };
+    if (!confirmed) {
+      return {
+        ok: false,
+        error: tool === "tableau"
+          ? "Confirm you built this in Tableau Desktop or Tableau Public."
+          : "Confirm you built this in Power BI Desktop.",
+      };
+    }
+    const labs = Object.assign({}, isPlainObject(getExtra("desktopLabs")) ? getExtra("desktopLabs") : {});
+    labs[tool] = { url: url, notes: notes, confirmed: true, completed: true, completedAt: new Date().toISOString() };
+    setExtra("desktopLabs", labs);
+    return { ok: true, labs: labs };
+  }
+  function capstonePracticeReady() {
+    return capstonePracticeStatus().ready && desktopLabReady();
+  }
+
   function isUnlocked(id) {
     if (id <= 1) return true;
-    return isModuleComplete(id - 1);
+    if (!isModuleComplete(id - 1)) return false;
+    if (id === 9) return capstonePracticeReady();
+    return true;
+  }
+
+  function currentCourseFile() {
+    var file = (location.pathname.split("/").pop() || "").split("?")[0];
+    if (file && file.indexOf(".") === -1) file += ".html";
+    return file;
+  }
+
+  function gateCurrentPage() {
+    try {
+      var file = currentCourseFile();
+      var m = MODULES.find(function (x) { return x.file === file; });
+      if (!m || m.id <= 1) return;
+      if (isUnlocked(m.id)) return;
+      if (file === "module-09.html") return;
+      document.body.classList.add("module-locked");
+      var style = document.createElement("style");
+      style.textContent = "body.module-locked .wrap > section, body.module-locked .scoreboard{display:none !important}";
+      document.head.appendChild(style);
+      var wrap = document.querySelector(".wrap");
+      if (!wrap) return;
+      var box = document.createElement("div");
+      box.className = "objectives";
+      box.setAttribute("role", "alert");
+      box.style.borderLeftColor = "var(--amber)";
+      box.style.marginTop = "18px";
+      var why = "This module unlocks after you complete Module " + (m.id - 1) + " (checkpoint quiz at 80% plus the graded exercise).";
+      box.innerHTML = "<div class=\"lbl\" style=\"color:var(--amber)\">Locked</div><p style=\"font-size:14px\">" + escapeHtml(why) + "</p><p style=\"margin-top:10px\"><a href=\"dashboard.html\" style=\"color:var(--amber)\">Back to dashboard</a></p>";
+      var header = wrap.querySelector("header");
+      if (header && header.nextSibling) wrap.insertBefore(box, header.nextSibling);
+      else wrap.insertBefore(box, wrap.firstChild);
+    } catch (e) { /* page without .wrap, ignore */ }
+  }
+
+  function hydratePracticeIntoExtra() {
+    try {
+      var merged = mergePracticeTasks(loadPracticeTasksLocal(), getExtra("practiceTasks"));
+      if (!Object.keys(merged).length) return;
+      applyPracticeToLocalStorage(merged);
+      var cur = getExtra("practiceTasks") || {};
+      if (JSON.stringify(cur) !== JSON.stringify(merged)) setExtra("practiceTasks", merged);
+    } catch (e) { /* ignore */ }
   }
 
   function statusOf(id) {
@@ -338,7 +569,12 @@
     touchVisited, markComplete, isModuleComplete, isModuleDataComplete, completionRequirements,
     overall, isUnlocked, statusOf, resetAll, resetModule,
     rubricForProject, getProject, setProject,
+    countPassedPractice, capstonePracticeStatus, capstonePracticeReady,
+    desktopLabReady, desktopLabRecord, completeDesktopLab, isTableauPublicUrl, isPowerBiEvidenceUrl,
   };
 
+  hydratePracticeIntoExtra();
   serverSyncOnLoad();
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", gateCurrentPage);
+  else gateCurrentPage();
 })(window);

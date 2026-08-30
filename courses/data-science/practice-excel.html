@@ -120,8 +120,8 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <footer>Zenith Lab &middot; Data Science &amp; Analysis &middot; Practice Library</footer>
 </div>
 
-<script src="course-progress.js?v=6"></script>
-<script src="practice-progress.js"></script>
+<script src="course-progress.js?v=8"></script>
+<script src="practice-progress.js?v=1"></script>
 <script>
 const esc = CourseProgress.escapeHtml;
 
@@ -688,8 +688,8 @@ const TASKS = [
     hints: [
       "SUM adds up every number in a range, exactly what \"total\" means here.",
       "The amount column is F, and the data runs from row 2 (row 1 is headers) to row 25.",
-      "=SUM(F2:F25) adds every cell in that range.",
-      "=SUM(F2:F25)" ],
+      "Write SUM with that amount range inside the parentheses.",
+      "Start with =, then SUM, then the F-column range that skips the header." ],
     explanation: { why: "SUM walks every cell in the range and adds the numeric ones together, ignoring the header row entirely since it isn't part of the range.", mistake: "Including row 1 in the range (F1:F25) would try to add the text \"amount\" into the total, most spreadsheets silently skip non-numeric cells in SUM rather than erroring, but it's still the wrong range to reference on purpose.", tip: "SUM is almost always the first formula worth writing on any new sheet, just to get a feel for the scale of the numbers before asking anything more specific.", business: "Total revenue is the number every other number in this sheet gets compared against, it's the natural starting point for any sales review." } },
 
   { id: "xl-f02", skill: SKILL_ID_FUND, tool: "excel", level: "guided", difficulty: "core", prerequisite: ["xl-f01"],
@@ -1307,7 +1307,7 @@ function renderTasks() {
         <div class="objective"><b>Objective:</b> ${esc(t.objective)}</div>
         <p style="font-size:13.5px;margin-bottom:10px">${t.prompt}</p>
         ${!prereqsMet ? `<div class="feedback bad">Complete the prerequisite task(s) first.</div>` : `
-        <div class="forminput"><span class="fx">fx</span><input id="formula_${t.id}" type="text" spellcheck="false" placeholder="=SUM(F2:F25)" value="${esc(formulaDrafts[t.id] !== undefined ? formulaDrafts[t.id] : t.starterFormula)}"></div>
+        <div class="forminput"><span class="fx">fx</span><input id="formula_${t.id}" type="text" spellcheck="false" placeholder="= start with a function, then a range" value="${esc(formulaDrafts[t.id] !== undefined ? formulaDrafts[t.id] : t.starterFormula)}"></div>
         ${t.written ? `<label class="writtenlbl" for="written_${t.id}">${esc(t.written.label)}</label><textarea id="written_${t.id}" class="writtenbox" rows="3" placeholder="${esc(t.written.placeholder)}">${esc(writtenDrafts[t.id] !== undefined ? writtenDrafts[t.id] : "")}</textarea>` : ""}
         <div class="dagctrl">
           <button data-run="${t.id}">Run formula</button>
@@ -1347,6 +1347,6 @@ renderGrid();
 renderSkillBar();
 renderTasks();
 </script>
-<script src="course-rail.js?v=8"></script>
+<script src="course-rail.js?v=10"></script>
 </body>
 </html>

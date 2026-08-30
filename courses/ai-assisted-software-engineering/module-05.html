@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 5 — Git and GitHub</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 5</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 5 · ~50 min</span>
+    <h1 class="serif">Git and GitHub</h1>
+    <p class="sub">A Cursor transcript is not evidence. A commit is. A PR is how another human (or future you) reviews a branch without merging yet.</p>
+    <div class="honestnote"><b>Labeled simulation.</b> Reading the diff below does not create a repo. <a href="desktop-labs.html">Desktop Lab B</a> requires a public repo you own, with a README and at least three commits.</div>
+  </header>
+  <section>
+    <div class="kh"><span class="num">1</span><h2>The verbs</h2></div>
+    <p><b>commit</b> — a snapshot with a message. <b>branch</b> — a movable pointer so main stays shippable. <b>push</b> — send commits to GitHub. <b>pull request</b> — propose merging a branch. Red <code>-</code> lines are removals; green <code>+</code> lines are additions.</p>
+  </section>
+  <section>
+    <div class="kh"><span class="num">2</span><h2>Graded: reject the unsafe change</h2></div>
+    <p>An agent opened this PR:</p>
+    <pre> function checkout(cart, user) {
+-  return charge(user.card, cart.total);
++  return charge(user.card, cart.total);
++  console.log("card", user.card);
+ }</pre>
+    <div class="interactive">
+      <div class="ilbl">Required exercise · diffReadingExercise</div>
+      <p>What do you do?</p>
+      <button class="qopt" data-v="bad1">Approve. console.log is debugging, harmless.</button>
+      <button class="qopt" data-v="bad2">Approve if CI is green.</button>
+      <button class="qopt" data-v="good">Reject. Logging a card number is a leak. Ask to remove it and use a test instead.</button>
+      <div class="feedback" id="diffFb"></div>
+    </div>
+    <p class="mut" style="margin-top:12px"><a href="practice-git.html">Git practice (simulation)</a> · <a href="desktop-labs.html">Desktop Lab B</a></p>
+  </section>
+  <section>
+    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+    <div id="quizRoot"></div>
+    <div id="reqList"></div>
+  </section>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
+  <a id="btnNext" href="module-06.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+</div></div>
+<script src="course-progress.js"></script>
+<script src="quiz-data.js"></script>
+<script src="module-kit.js"></script>
+<script>
+CourseProgress.touchVisited(5);
+function syncNext() {
+  const btn = document.getElementById("btnNext");
+  const ok = CourseProgress.isModuleComplete(5);
+  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 6' : "Complete the exercise and quiz (80%+) to continue"; }
+  const box = document.getElementById("reqList");
+  if (box) {
+    box.innerHTML = CourseProgress.completionRequirements(5).map(function (r) {
+      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
+    }).join("");
+  }
+}
+ModuleKit.renderQuiz(5, AISEQuizData.MODULE_QUIZZES[5], syncNext);
+syncNext();
+</script>
+<script>
+document.querySelectorAll("#diffFb").forEach(function(){});
+document.querySelectorAll(".qopt[data-v]").forEach(function (b) {
+  b.onclick = function () {
+    const ok = b.getAttribute("data-v") === "good";
+    const fb = document.getElementById("diffFb");
+    fb.className = "feedback " + (ok ? "ok" : "bad");
+    fb.textContent = ok ? "Yes. Secrets in logs are a ship-stopper." : "CI green does not make a card log safe.";
+    if (ok) CourseProgress.setSection(5, "diffReadingExercise", true);
+    syncNext();
+  };
+});
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

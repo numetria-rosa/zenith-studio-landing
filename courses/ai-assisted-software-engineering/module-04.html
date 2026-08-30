@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 4 — Specs and coding agents</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 4</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Module 4 · ~50 min</span>
+    <h1 class="serif">Specs and coding agents</h1>
+    <p class="sub">A prompt that says “make a landing page” is how you get a gradient, three stock photos, and a form that posts to nowhere. Write checks a stranger could run.</p>
+    <div class="honestnote"><b>Labeled simulation.</b> The exercise on this page does not run Cursor. Unlocking later modules still requires <a href="desktop-labs.html">Desktop Lab A</a> before the capstone — a real commit URL from Cursor or VS Code.</div>
+    <div class="objectives"><div class="lbl">You will be able to</div>
+      <ul>
+        <li>Write Given / When / Then acceptance criteria</li>
+        <li>Spot a prompt that is too wide to review</li>
+        <li>Say no to a confident wrong diff</li>
+      </ul>
+    </div>
+  </header>
+  <section>
+    <div class="kh"><span class="num">1</span><h2>What to put in the spec</h2></div>
+    <p>Name the user, the visible change, the files that may change, and how you will know it worked. Mention files with <code>@</code> in Cursor so the agent reads them instead of inventing a second <code>styles.css</code>.</p>
+    <div class="def"><div class="k">Bad</div><p>Make it pop. Use AI. Add auth maybe.</p></div>
+    <div class="def"><div class="k">Good</div><p>Given I am on the Hours section, when I click Book, then a form with labeled Email and Date fields appears in <code>main</code>, and submit does not leave the page.</p></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">2</span><h2>Graded: write criteria a stranger could implement</h2></div>
+    <p>Write acceptance criteria for adding a Book button to the Northline landing page. Must include the words <b>Given</b>, <b>When</b>, and <b>Then</b>, mention a <b>label</b> or <b>labeled</b> field, and be at least 120 characters.</p>
+    <div class="interactive">
+      <div class="ilbl">Required exercise · specWritingExercise</div>
+      <textarea id="specEx" placeholder="Given ... When ... Then ..."></textarea>
+      <button class="primary" id="btnSpec" style="margin-top:10px">Check spec</button>
+      <div class="feedback" id="specFb"></div>
+    </div>
+    <p class="mut" style="margin-top:12px"><a href="practice-specs.html">Specs practice (simulation)</a> · <a href="desktop-labs.html">Desktop Lab A</a></p>
+  </section>
+  <section>
+    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+    <div id="quizRoot"></div>
+    <div id="reqList"></div>
+  </section>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
+  <a id="btnNext" href="module-05.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+</div></div>
+<script src="course-progress.js"></script>
+<script src="quiz-data.js"></script>
+<script src="module-kit.js"></script>
+<script>
+CourseProgress.touchVisited(4);
+function syncNext() {
+  const btn = document.getElementById("btnNext");
+  const ok = CourseProgress.isModuleComplete(4);
+  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 5' : "Complete the exercise and quiz (80%+) to continue"; }
+  const box = document.getElementById("reqList");
+  if (box) {
+    box.innerHTML = CourseProgress.completionRequirements(4).map(function (r) {
+      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
+    }).join("");
+  }
+}
+ModuleKit.renderQuiz(4, AISEQuizData.MODULE_QUIZZES[4], syncNext);
+syncNext();
+</script>
+<script>
+document.getElementById("btnSpec").onclick = function () {
+  const t = document.getElementById("specEx").value;
+  const checks = [
+    { name: "has Given", pass: /\bgiven\b/i.test(t) },
+    { name: "has When", pass: /\bwhen\b/i.test(t) },
+    { name: "has Then", pass: /\bthen\b/i.test(t) },
+    { name: "mentions a label", pass: /label/i.test(t) },
+    { name: "at least 120 characters", pass: t.trim().length >= 120 },
+  ];
+  const ok = checks.every(function (c) { return c.pass; });
+  const fb = document.getElementById("specFb");
+  fb.className = "feedback " + (ok ? "ok" : "bad");
+  fb.innerHTML = checks.map(function (c) { return (c.pass ? "✓ " : "✗ ") + c.name; }).join("<br>");
+  if (ok) CourseProgress.setSection(4, "specWritingExercise", true);
+  syncNext();
+};
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

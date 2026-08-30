@@ -88,7 +88,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <button class="primary nextbtn" id="btnFinish" disabled>Finish assessment</button>
 </div></div>
 
-<script src="course-progress.js?v=6"></script>
+<script src="course-progress.js?v=8"></script>
 <script>
 const POOL = [
   { id: "fa_tidy", tag: "Data literacy (novel scenario)",
@@ -246,7 +246,16 @@ function renderQuestions(){
 
 function checkWritten(text) {
   const t = (text || "").trim();
-  return t.length > 40 && /\b(margin|cost|profit|investigate|expense)\b/i.test(t) && /\b(before|check|why|driv|understand|reason)\b/i.test(t);
+  if (t.length < 80) return false;
+  const words = t.toLowerCase().match(/[a-z']+/g) || [];
+  if (words.length < 12) return false;
+  const uniq = new Set(words);
+  if (uniq.size / words.length < 0.5) return false;
+  if (/(.)\1{6,}/.test(t)) return false;
+  const hasMargin = /\bmargin\b/i.test(t);
+  const hasRevenue = /\b(revenue|growth|sales)\b/i.test(t);
+  const hasInvestigate = /\b(investigat|before celebrat|check why|driving cost|costs? (up|rose|grew))\b/i.test(t);
+  return hasMargin && hasRevenue && hasInvestigate;
 }
 
 function checkDone(){
@@ -292,6 +301,6 @@ document.getElementById("btnRetake").addEventListener("click", () => {
 });
 document.getElementById("btnFinish").addEventListener("click", () => { window.location.href = "dashboard.html"; });
 </script>
-<script src="course-rail.js?v=8"></script>
+<script src="course-rail.js?v=10"></script>
 </body>
 </html>

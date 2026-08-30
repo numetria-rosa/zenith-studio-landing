@@ -39,8 +39,12 @@
     .rail-mod .rmdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:var(--bd2,#333a4c)}
     .rail-mod.done .rmdot{background:var(--good,#4ade95)}
     .rail-mod.progress .rmdot{background:var(--amber,#f0b429)}
-    .rail-mod.locked{opacity:.55}
+    .rail-mod.locked{opacity:.55;cursor:not-allowed}
+    span.rail-mod{display:flex}
     .rail-note{margin-top:14px;padding:0 9px;font-size:10.5px;color:var(--mut2,#676e7d);line-height:1.5}
+    .skip-to-content{position:absolute;left:-999px;top:8px;z-index:400;background:var(--amber,#f0b429);color:var(--amberd,#1a1200);
+      font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:13px;padding:8px 14px;border-radius:8px;text-decoration:none}
+    .skip-to-content:focus{left:8px}
     @media (max-width:860px){
       .courseshell{flex-direction:column}
       .courserail{width:100%;height:auto;max-height:none;position:static;border-right:none;
@@ -64,6 +68,7 @@
     ["practice-statistics.html", "Statistics Practice Library"],
     ["practice-tableau.html", "Tableau Practice Library"],
     ["practice-powerbi.html", "Power BI Practice Library"],
+    ["desktop-labs.html", "Desktop Labs (required)"],
     ["practice-automation.html", "Automation Practice Library"],
     ["practice-integrated.html", "Integrated Cross-Tool Challenges"],
     ["projects.html", "Projects"],
@@ -102,8 +107,11 @@
         else if (status === "completed") cls.push("done");
         else if (status === "in-progress") cls.push("progress");
         const inner = `<span class="rmnum">${m.id}</span><span class="rmdot"></span>${m.title}`;
-        const title = unlocked ? m.title : `Recommended after Module ${m.id - 1}, click to jump ahead anyway`;
-        modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
+        let title = m.title;
+        if (!unlocked && m.id === 9) title = "Needs Module 8, 3+ practice tasks in two of SQL/Excel/Python, and one Desktop Lab";
+        else if (!unlocked) title = `Unlocks after Module ${m.id - 1}`;
+        if (!unlocked) modsHtml += `<span class="${cls.join(" ")}" aria-disabled="true" title="${title}">${inner}</span>`;
+        else modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
       });
     } else {
       modsHtml = `<span class="rail-note">Module status loads once CourseProgress is available on this page.</span>`;
@@ -123,20 +131,34 @@
     style.textContent = CSS;
     document.head.appendChild(style);
 
+    const skip = document.createElement("a");
+    skip.className = "skip-to-content";
+    skip.href = "#main-content";
+    skip.textContent = "Skip to content";
+
     const shell = document.createElement("div");
     shell.className = "courseshell";
     const rail = document.createElement("aside");
     rail.className = "courserail";
+    rail.setAttribute("aria-label", "Course navigation");
     rail.innerHTML = buildRailHtml();
     const main = document.createElement("div");
     main.className = "coursemain";
+    main.id = "main-content";
+    main.setAttribute("role", "main");
+    main.tabIndex = -1;
 
     while (document.body.firstChild) {
       main.appendChild(document.body.firstChild);
     }
     shell.appendChild(rail);
     shell.appendChild(main);
+    document.body.appendChild(skip);
     document.body.appendChild(shell);
+
+    document.querySelectorAll('[id$="Results"], [id^="results_"], .feedback').forEach((el) => {
+      if (!el.getAttribute("aria-live")) el.setAttribute("aria-live", "polite");
+    });
   }
 
   init();
