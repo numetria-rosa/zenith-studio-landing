@@ -3,83 +3,266 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 5 — Git and GitHub</title>
+<title>Module 5 — Add a filter without breaking the list</title>
 <link rel="stylesheet" href="course.css">
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 5</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 5 · ~50 min</span>
-    <h1 class="serif">Git and GitHub</h1>
-    <p class="sub">A Cursor transcript is not evidence. A commit is. A PR is how another human (or future you) reviews a branch without merging yet.</p>
-    <div class="honestnote"><b>Labeled simulation.</b> Reading the diff below does not create a repo. <a href="desktop-labs.html">Desktop Lab B</a> requires a public repo you own, with a README and at least three commits.</div>
-  </header>
-  <section>
-    <div class="kh"><span class="num">1</span><h2>The verbs</h2></div>
-    <p><b>commit</b> — a snapshot with a message. <b>branch</b> — a movable pointer so main stays shippable. <b>push</b> — send commits to GitHub. <b>pull request</b> — propose merging a branch. Red <code>-</code> lines are removals; green <code>+</code> lines are additions.</p>
-  </section>
-  <section>
-    <div class="kh"><span class="num">2</span><h2>Graded: reject the unsafe change</h2></div>
-    <p>An agent opened this PR:</p>
-    <pre> function checkout(cart, user) {
--  return charge(user.card, cart.total);
-+  return charge(user.card, cart.total);
-+  console.log("card", user.card);
- }</pre>
-    <div class="interactive">
-      <div class="ilbl">Required exercise · diffReadingExercise</div>
-      <p>What do you do?</p>
-      <button class="qopt" data-v="bad1">Approve. console.log is debugging, harmless.</button>
-      <button class="qopt" data-v="bad2">Approve if CI is green.</button>
-      <button class="qopt" data-v="good">Reject. Logging a card number is a leak. Ask to remove it and use a test instead.</button>
-      <div class="feedback" id="diffFb"></div>
+    <span class="eyebrow">Stage 2 &middot; Module 5 &middot; ~80 min</span>
+    <h1 class="serif">Add a filter without breaking the list</h1>
+    <p class="sub">Priya gets forty appointments a day. She needs the open ones, and a count per clinician. An agent will write this in four seconds. You write it first, because you cannot catch the version that quietly deletes her cancelled rows unless you have produced the shape yourself.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
+      <ul>
+        <li>Predict what a filter and a count must return, including empty and missing cases</li>
+        <li>Write functions that take input and return output</li>
+        <li>Catch AI-generated JS that mutates, reads the wrong field, or forgets to return</li>
+        <li>Prove a function with cases you chose before you ran it</li>
+        <li>Let an agent improve code only after you can defend the original</li>
+      </ul>
     </div>
-    <p class="mut" style="margin-top:12px"><a href="practice-git.html">Git practice (simulation)</a> · <a href="desktop-labs.html">Desktop Lab B</a></p>
-  </section>
+  </header>
+
   <section>
-    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
-    <div id="quizRoot"></div>
-    <div id="reqList"></div>
+    <div class="kh"><span class="num">00</span><h2>Why this matters</h2></div>
+    <div id="whyGrid"></div>
+    <div class="callout" style="margin-top:18px">The loop today is <b>understand → implement → verify → then let AI improve</b>. Not ask → copy → hope. This is the last module before a real agent is allowed near your code.</div>
   </section>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+
+  <section>
+    <div class="kh"><span class="num">01</span><h2>Before you touch AI</h2></div>
+    <p>The ticket is a list problem. Each row looks like <code>{ patient, clinician, status }</code>. Status is <code>"open"</code>, <code>"done"</code>, or <code>"cancelled"</code>.</p>
+    <p>Decide the answers <i>before</i> anyone writes a function. If you cannot say what should come back, you cannot tell whether the agent got it right.</p>
+    <div id="beforeAi" class="interactive"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">02</span><h2>Enough JavaScript to defend a diff</h2></div>
+    <p>A variable is a name for a value. Prefer <code>const</code>. Use <code>let</code> only when the value must move.</p>
+    <pre>const clinicName = "Northline";
+let openCount = 0;
+
+const patient = { name: "Priya", status: "open" };
+patient.status      // "open"
+patient.phone       // undefined — the field is not there. JS does not object.</pre>
+    <p>A function takes input and returns output. That is what makes it testable.</p>
+    <pre>function isOpen(appointment) {
+  return appointment.status === "open";
+}</pre>
+    <div class="def"><div class="k">Testable</div><p>Give it a row, check the boolean. No setup, no globals.</p></div>
+    <div class="def"><div class="k">Hard to test</div><p><code>function markOpen() { globalCount = globalCount + 1; }</code> — returns nothing, changes the world.</p></div>
+    <p>Use <code>===</code>. And do not write <code>if (appointment.count)</code> — a count of <code>0</code> is falsy, and that is the quiet day at the clinic.</p>
+    <details class="more">
+      <summary>filter, map, reduce — which one the ticket asked for</summary>
+      <pre>rows.filter(r =&gt; r.status === "open");  // shorter list
+rows.map(r =&gt; r.patient);               // same length, new contents
+rows.reduce((n, r) =&gt; n + 1, 0);        // one number</pre>
+      <p><b>filter changes the length. map changes the contents. reduce produces a single value.</b> A <code>map</code> where a <code>filter</code> belonged returns the right length full of <code>undefined</code>.</p>
+      <p>None of these three modify the original array. That is a feature. <code>splice</code> is how an agent “filters” and then Priya’s cancelled rows are gone from the source list.</p>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">03</span><h2>AI Code Detective</h2></div>
+    <p>The agent “added the status filter.” Each snippet is plausible. Find the defect. Options are shuffled.</p>
+    <div id="detectives"></div>
+    <div class="honestnote"><b>What AI got wrong, in one sentence each.</b> It mutated the list. It read <code>state</code> instead of <code>status</code>. It used <code>map</code> and left holes. It counted and forgot to <code>return</code>. It totalled price and ignored quantity. All of that compiles. All of that can look fine in a demo.</div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">04</span><h2>Would you merge this?</h2></div>
+    <p>Labelled simulation. No pull request is opened. You are Sam for thirty seconds.</p>
+    <div id="mergeDrill" class="interactive"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">EX</span><h2>Graded exercise — you write it</h2></div>
+    <p>Ticket <b>NL-005</b>. Two functions. No agent. Hidden tests include an empty list and a clinician who is not there, because those are the cases that break on a quiet Monday.</p>
+    <p>This is the literacy gate. The next module will not open until these pass, written by you.</p>
+    <div class="interactive">
+      <div class="ilbl">Required exercise &middot; jsLogicExercise</div>
+      <p class="mut" style="margin-bottom:10px">Each row looks like <code>{ patient: "A", clinician: "Okafor", status: "open" }</code>. Write <code>filterOpen(rows)</code> returning only rows whose status is exactly <code>"open"</code>, and <code>countFor(rows, clinician)</code> returning how many rows belong to that clinician. Neither may modify the array it was given.</p>
+      <label class="sr" for="m5js">filterOpen and countFor</label>
+      <textarea id="m5js" spellcheck="false" style="min-height:220px">function filterOpen(rows) {
+
+}
+
+function countFor(rows, clinician) {
+
+}
+</textarea>
+      <button class="primary" id="m5check" type="button" style="margin-top:12px">Run hidden tests</button>
+      <div class="feedback" id="m5fb"></div>
+    </div>
+    <p class="mut" style="margin-top:14px">More reps: <a href="practice-js.html">JavaScript practice</a>.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">05</span><h2>Now the agent may improve it</h2></div>
+    <p>Only after you can defend the behaviour. Improving is not rewriting. The request has to say what must stay true.</p>
+    <div id="wfCompare" class="interactive"><div class="ilbl">Choose the better request &middot; labelled simulation</div></div>
+    <p style="margin-top:18px">A safe improvement after your functions pass: clearer names, a shared helper, a comment that states the empty-list rule. An unsafe one: “while I am here” changing what <code>"open"</code> means, or switching to <code>splice</code> because it felt faster.</p>
+    <div class="tip"><b>Engineer's tip.</b> Ask an agent to improve code you cannot yet explain and you will accept a fluent wrong answer. Improve is step nine of the loop, not step one.</div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Options are shuffled. Getting one wrong is information &mdash; read the explanation.</p>
+    <div id="quizRoot"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+  </section>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
 </div>
 <div class="scoreboard"><div class="in">
-  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
-  <a id="btnNext" href="module-06.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
 </div></div>
 <script src="course-progress.js"></script>
+<script src="northline.js"></script>
 <script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
-CourseProgress.touchVisited(5);
-function syncNext() {
-  const btn = document.getElementById("btnNext");
-  const ok = CourseProgress.isModuleComplete(5);
-  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 6' : "Complete the exercise and quiz (80%+) to continue"; }
-  const box = document.getElementById("reqList");
-  if (box) {
-    box.innerHTML = CourseProgress.completionRequirements(5).map(function (r) {
-      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
-    }).join("");
-  }
-}
-ModuleKit.renderQuiz(5, AISEQuizData.MODULE_QUIZZES[5], syncNext);
-syncNext();
-</script>
-<script>
-document.querySelectorAll("#diffFb").forEach(function(){});
-document.querySelectorAll(".qopt[data-v]").forEach(function (b) {
-  b.onclick = function () {
-    const ok = b.getAttribute("data-v") === "good";
-    const fb = document.getElementById("diffFb");
-    fb.className = "feedback " + (ok ? "ok" : "bad");
-    fb.textContent = ok ? "Yes. Secrets in logs are a ship-stopper." : "CI green does not make a card log safe.";
-    if (ok) CourseProgress.setSection(5, "diffReadingExercise", true);
-    syncNext();
-  };
+Northline.renderWhy("whyGrid", {
+  build: "filterOpen and countFor for the morning list, proven against empty and unknown cases.",
+  why: "Priya still needs the full day after she filters. A function that quietly splice-deletes cancelled rows is a data-loss bug that looks like a feature.",
+  aiHelps: "It writes filter and reduce fluently. Useful after you can say what the answers must be.",
+  aiFails: "Mutating splice-filters, the wrong field name, map instead of filter, a missing return, and a total that ignores quantity.",
+  without: "Every line of the graded exercise is yours. The detectives and the simulation never write the functions for you."
 });
+const MK = ModuleKit.mount(5, AISEQuizData.MODULE_QUIZZES[5]);
+
+Northline.renderPrediction("beforeAi", {
+  label: "Predict first \u00b7 no AI, no running it",
+  intro: "Four rows: A Okafor open, B Reid done, C Okafor open, D Okafor cancelled.",
+  code: "filterOpen(rows)\ncountFor(rows, \"Okafor\")\ncountFor(rows, \"Nobody\")\nfilterOpen([])",
+  questions: [
+    { q: "What should filterOpen return?",
+      opts: [
+        { t: "A new list with only A and C \u2014 the rows whose status is exactly \"open\".", correct: true,
+          whyOk: "Exact match. cancelled is not open. The original list must still have four rows afterwards." },
+        { t: "The original list, with done and cancelled deleted from it.", why: "That is a destroyed source list. The front desk still needs those rows." },
+        { t: "A list of four items, with undefined where the row was not open.", why: "That is map, not filter. Priya asked for only the open ones." }
+      ] },
+    { q: "What should happen if the array is empty?",
+      opts: [
+        { t: "filterOpen returns []. countFor returns 0. No throw, no undefined.", correct: true,
+          whyOk: "Empty is a real Monday. Crashing on it is a production bug." },
+        { t: "Both should throw, so the caller knows something is wrong.", why: "Empty is valid data. Zero is the answer, not an exception." },
+        { t: "Return the string \"none\".", why: "Callers expect a list or a number. A string will break the next line." }
+      ] },
+    { q: "A row has no status field. What should filterOpen do with it?",
+      opts: [
+        { t: "Leave it out. status === \"open\" is false when status is undefined.", correct: true,
+          whyOk: "Missing is not open. Do not invent a default." },
+        { t: "Treat it as open, to be safe.", why: "Safe for whom? Priya would book a ghost slot." },
+        { t: "Crash so someone notices.", why: "One bad row should not take down the morning list. Skip it." }
+      ] },
+    { q: "What should the UI display after a successful filter?",
+      opts: [
+        { t: "Only the open cards, and a way to get back to the full list \u2014 because the data is still there.", correct: true,
+          whyOk: "A view is not a delete. The function returns a new array; the source stays." },
+        { t: "A blank page if any row is cancelled.", why: "Cancelled rows are why she asked for a filter, not a reason to hide everything." },
+        { t: "Whatever the agent rendered in its screenshot.", why: "A screenshot is not a specification." }
+      ] }
+  ],
+  learned: ["You specified the answers before anyone typed a function.",
+    "That is the only way a hidden test \u2014 or an agent's confident summary \u2014 can be judged."]
+});
+
+Northline.renderDetectiveSet(
+  ["jsMutate", "jsWrongField", "jsMapNotFilter", "jsNoReturn", "total"],
+  "detectives"
+);
+
+Northline.renderReviewDecision("mergeDrill", {
+  label: "Would you merge this? \u00b7 labelled simulation",
+  intro: "The agent says filterOpen is done and the return-value tests are green.",
+  code: "function filterOpen(rows) {\n  for (let i = rows.length - 1; i >= 0; i--) {\n    if (rows[i].status !== \"open\") rows.splice(i, 1);\n  }\n  return rows;\n}",
+  opts: [
+    { t: "Request changes. It destroys the list it was handed.", correct: true,
+      whyOk: "The morning board still needs cancelled and done. A view must not delete the source." },
+    { t: "Merge it. The tests passed.", why: "Those tests never looked at rows after the call. That is the hole." },
+    { t: "Merge it and tell Priya not to filter twice.", why: "A usage note is not a fix. The second filter would run on a mutilated list." }
+  ],
+  learned: ["You refused to treat a green return value as proof.",
+    "Mutation is a second output. If the tests do not check it, they are incomplete."]
+});
+
+Northline.renderWorkflowCompare("wfCompare", {
+  situation: "Your functions already pass. You want the agent to tidy them. Which request?",
+  bad: { t: "Clean this up and make it more idiomatic. Use whatever you think is best.",
+    why: "You just authorised a rewrite. Idiomatic splice is how the mutation comes back." },
+  good: { t: "In appointments.js only: keep filterOpen and countFor behaviour identical, including empty lists and unknown clinicians. You may extract a helper. Do not mutate inputs. Do not change other functions. Show the diff and the tests you re-ran.",
+    why: "Named files, frozen behaviour, explicit do-nots, and evidence. Improve, not replace." }
+});
+
+document.getElementById("m5check").onclick = function () {
+  var src = document.getElementById("m5js").value;
+  function fixture() {
+    return [
+      { patient: "A", clinician: "Okafor", status: "open" },
+      { patient: "B", clinician: "Reid", status: "done" },
+      { patient: "C", clinician: "Okafor", status: "open" },
+      { patient: "D", clinician: "Okafor", status: "cancelled" }
+    ];
+  }
+  var OPEN = [{ patient: "A", clinician: "Okafor", status: "open" },
+    { patient: "C", clinician: "Okafor", status: "open" }];
+  var a = PracticeKit.gradeJs({
+    functionName: "filterOpen",
+    testCases: [
+      { name: "keeps only open rows", args: [fixture()], expected: OPEN },
+      { name: "an empty list returns an empty list", args: [[]], expected: [] },
+      { name: "a list with no open rows returns empty",
+        args: [[{ patient: "B", clinician: "Reid", status: "done" },
+          { patient: "D", clinician: "Okafor", status: "cancelled" }]], expected: [] },
+      { name: "does not treat 'cancelled' as open",
+        args: [[{ patient: "D", clinician: "Okafor", status: "cancelled" }]], expected: [] },
+      { name: "a row with no status field is not treated as open",
+        args: [[{ patient: "E", clinician: "Okafor" }]], expected: [] }
+    ]
+  }, src);
+  var b = PracticeKit.gradeJs({
+    functionName: "countFor",
+    testCases: [
+      { name: "counts every row for a clinician", args: [fixture(), "Okafor"], expected: 3 },
+      { name: "counts a clinician with one row", args: [fixture(), "Reid"], expected: 1 },
+      { name: "returns 0 for an unknown clinician", args: [fixture(), "Nobody"], expected: 0 },
+      { name: "returns 0 for an empty list", args: [[], "Okafor"], expected: 0 }
+    ]
+  }, src);
+
+  /* Probe a fresh copy. Taking it from a list the student's filterOpen
+     already spliced made the mutation check pass by accident. */
+  var probe = fixture();
+  var before = JSON.stringify(probe);
+  var mutated = false;
+  try {
+    var fn = new Function(src + "\n; return typeof filterOpen === 'function' ? filterOpen : null;")();
+    if (fn) { fn(probe); mutated = JSON.stringify(probe) !== before; }
+  } catch (e) { mutated = false; }
+
+  var results = a.results.concat(b.results);
+  results.push({ name: "filterOpen leaves the original list untouched", pass: !mutated,
+    hint: "Your version modified the array it was given. filter returns a new array; splice edits in place." });
+  var ok = a.passed && b.passed && !mutated;
+  ModuleKit.showResults(document.getElementById("m5fb"), { passed: ok, results: results });
+  if (ok) {
+    document.getElementById("m5fb").innerHTML =
+      "<b>Both functions hold up.</b> Including the empty list, the unknown clinician, and not mutating the input \u2014 which is the difference between a demo and Priya's Monday." +
+      "<br><br>" + results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+    Northline.showLearned(document.getElementById("m5fb").parentNode,
+      "You just proved the filter instead of trusting a fluent draft.",
+      "Now \u2014 and only now \u2014 an agent may tidy names. It may not change what open means.");
+    CourseProgress.setSection(5, "jsLogicExercise", true);
+    MK.sync();
+  }
+};
 </script>
 <script src="course-rail.js"></script>
 </body>

@@ -234,6 +234,60 @@
         { t: "This is the professional way to lock a signed-off design.", why: "It locks a design to one viewport. That is the opposite of responsive." },
       ],
     },
+
+    /* ---- JavaScript literacy (Module 5) ---- */
+    jsMutate: {
+      title: "The filter that edits the list",
+      code: "function filterOpen(rows) {\n  for (let i = rows.length - 1; i >= 0; i--) {\n    if (rows[i].status !== \"open\") rows.splice(i, 1);\n  }\n  return rows;\n}",
+      prompt: "This returns the open rows. Tests that only check the return value go green. What is still wrong?",
+      principle: "A function that filters should not destroy the list it was handed. The front desk still needs the full day.",
+      opts: [
+        { t: "splice edits the original array. After one filter the cancelled and done rows are gone from Priya's list, not just from this view.", correct: true,
+          whyOk: "Return value tests lie when they never look at the input afterwards. filter returns a new array." },
+        { t: "A for loop is illegal in modern JavaScript.", why: "Loops are fine. The mutation is the defect." },
+        { t: "It should use == instead of !==.", why: "=== / !== is correct here. The comparison is not the bug." },
+        { t: "Nothing \u2014 if the return value is right, the function is right.", why: "That is exactly the test gap this snippet exploits." },
+      ],
+    },
+    jsWrongField: {
+      title: "Open, but the wrong field",
+      code: "function filterOpen(rows) {\n  return rows.filter(r => r.state === \"open\");\n}",
+      prompt: "The agent says it filtered by status. The rows look like { patient, clinician, status }. What happens?",
+      principle: "Read the field name against the data, not against the comment above the function.",
+      opts: [
+        { t: "r.state is always undefined, so nothing matches. You get an empty list and a confident function.", correct: true,
+          whyOk: "The field is status. state is a plausible synonym and a complete miss." },
+        { t: "filter cannot compare strings.", why: "It can. It is comparing the wrong one." },
+        { t: "You must use a for loop to read object fields.", why: "filter reads fields fine. The name is wrong." },
+        { t: "state is an alias JavaScript provides for status.", why: "It is not. Do not invent fields." },
+      ],
+    },
+    jsMapNotFilter: {
+      title: "map where filter belonged",
+      code: "function filterOpen(rows) {\n  return rows.map(r => r.status === \"open\" ? r : undefined);\n}",
+      prompt: "The ticket asked for only the open rows. This returns an array the same length as the input, full of holes. Why?",
+      principle: "filter changes the length. map changes the contents. The ticket told you which one.",
+      opts: [
+        { t: "map keeps every slot. Failed rows become undefined instead of disappearing, so the list is the right length and the wrong contents.", correct: true,
+          whyOk: "A reviewer who only checks .length will bless this. Priya will see blank cards." },
+        { t: "map is deprecated.", why: "It is current. It is the wrong method for this ticket." },
+        { t: "undefined is automatically removed from arrays.", why: "It is not. The holes stay." },
+        { t: "This is how you write a filter in modern JavaScript.", why: "No. filter is how you write a filter." },
+      ],
+    },
+    jsNoReturn: {
+      title: "The function that forgot to hand anything back",
+      code: "function countFor(rows, clinician) {\n  let n = 0;\n  rows.forEach(r => {\n    if (r.clinician === clinician) n += 1;\n  });\n}",
+      prompt: "The agent counted. The tests say expected 3, got undefined. What did it forget?",
+      principle: "A function that does not return gives you undefined. The work happened and then vanished.",
+      opts: [
+        { t: "There is no return. n is computed and then thrown away, so the caller gets undefined.", correct: true,
+          whyOk: "forEach does not return a count. You have to hand n back." },
+        { t: "forEach cannot see n because of scope.", why: "n is in the outer function. Scope is fine. The return is missing." },
+        { t: "clinician must be compared with ==.", why: "=== is correct. The value never leaves the function." },
+        { t: "You cannot count with a loop at all.", why: "You can. You just have to return the number." },
+      ],
+    },
   };
 
   /* Progressive interview used by Module 2. Slot answers become the
