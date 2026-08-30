@@ -83,17 +83,15 @@ export const COURSES: Course[] = [
     description:
       "Build client-ready workflow judgment: process mapping, simulated API and webhook labs, retries, idempotency, and bounded AI steps. No programming required. n8n is the example, not the product. Does not promise clients or a job.",
     thumbnail: "/lab/ai-engineering.webp",
-    whopAccessPassId: "",
-    whopPlanId: "",
-    checkoutUrl: "",
+    whopAccessPassId: "prod_2u2WQzQUio8kF",
+    whopPlanId: "plan_ED9yF9ehN2RIa",
+    checkoutUrl: "https://whop.com/checkout/plan_ED9yF9ehN2RIa",
     contentDir: "courses/automation-engineering",
     firstLessonPath: "dashboard",
     waitlistUrl:
       "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20AI%20Automation%0A",
-    // Content is built (8 modules, 80 practice tasks, 8 projects). Whop
-    // product/plan not created yet — checkout falls back to the waitlist.
-    // Create the $149 product via scripts/create-whop-products.mjs, then
-    // fill the three Whop fields and set the catalog card available: true.
+    // Content is built (8 modules, 80 practice tasks, 8 projects). Real Whop
+    // product/plan created 2026-08-30 (prod_2u2WQzQUio8kF / plan_ED9yF9ehN2RIa).
     published: true,
   },
   {

@@ -10,10 +10,10 @@
 // Science come from its real skill-map.js/course-progress.js (315 tasks,
 // 10 projects, confirmed this engagement); price for AI Engineering and
 // Data Science comes from src/lib/courses.ts's real Whop checkoutUrl.
-// AI Automation is in src/lib/courses.ts (content is real) but has no
-// Whop checkout yet, so this card stays available:false and carries no
-// price. practiceTasks/portfolioProjects are counted from practice-tasks.js
-// and course-progress.js. Web3 Engineering still has no COURSES entry.
+// AI Automation price comes from the live Whop plan created 2026-08-30
+// ($149, plan_ED9yF9ehN2RIa). practiceTasks/portfolioProjects are counted
+// from practice-tasks.js and course-progress.js. Web3 Engineering still
+// has no COURSES entry.
 
 export type CourseCategory = "data" | "ai" | "automation" | "blockchain" | "security";
 
@@ -438,13 +438,14 @@ export const courses: CourseCard[] = [
     name: "AI Automation",
     category: "automation",
     categoryLabel: "Automation",
-    available: false,
+    available: true,
     level: "Beginner, no programming required",
     duration: "3–5 weeks if you also rebuild briefs in a real tool",
     weeklyTime: "~4–6 hrs/week",
     practiceTasks: 80,
     portfolioProjects: 8,
     hasCapstone: true,
+    price: "$149",
     summary:
       "Build client-ready workflow judgment: map a real process, survive retries and replayed events in a simulated runtime, and put AI behind a schema and a human gate. n8n is the example, not the product.",
     whatYoullDo: [

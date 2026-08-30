@@ -105,6 +105,9 @@ const PRODUCTS = [
     headline: "Build client-ready workflows and agents",
     description:
       "Build client-ready workflows and agents: process mapping, APIs, webhooks, retries, idempotency, and bounded AI steps. No programming required. n8n is the example, not the product. Does not promise clients or a job.",
+    // Created 2026-08-30: prod_2u2WQzQUio8kF / plan_ED9yF9ehN2RIa.
+    // Keep false — re-running creates a second live product.
+    readyToCreate: false,
     plans: [
       {
         key: "",
