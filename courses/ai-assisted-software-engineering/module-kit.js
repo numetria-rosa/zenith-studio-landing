@@ -7,6 +7,21 @@
 (function (global) {
   const esc = (s) => (global.CourseProgress ? CourseProgress.escapeHtml(s) : String(s || ""));
 
+  /* Question and explanation text in quiz-data.js wraps code fragments in
+     <code> and writes the fragment itself as entities, e.g.
+     "<code>&lt;nav&gt;</code>". Escaping the whole string shows that source
+     to the student verbatim; not escaping it lets arbitrary markup into the
+     page. So escape everything, then restore known entities and a fixed
+     whitelist of inline tags. Anything else stays inert text. */
+  function rich(s) {
+    /* Tags are restored before entities, so a fragment that means to display
+       a whitelisted tag name -- "<code>&lt;b&gt;</code>" -- stays text rather
+       than becoming a real <b>. */
+    return esc(s)
+      .replace(/&lt;(\/?)(code|b|i|em|strong)&gt;/g, "<$1$2>")
+      .replace(/&amp;(lt|gt|amp|quot|nbsp|mdash|ndash|hellip|#39);/g, "&$1;");
+  }
+
   function renderTicket(moduleId) {
     const host = document.getElementById("ticketCard");
     if (!host) return;
@@ -44,7 +59,7 @@
     questions.forEach(function (q) {
       const card = document.createElement("div");
       card.className = "qcard";
-      card.innerHTML = '<div class="qtext">' + esc(q.text) + "</div>";
+      card.innerHTML = '<div class="qtext">' + rich(q.text) + "</div>";
       /* Options are shuffled per render so the correct answer is not always
          in the same slot for students who retake a checkpoint. */
       const opts = (q.opts || []).slice();
@@ -67,7 +82,7 @@
           CourseProgress.setAnswer(moduleId, q.id, opt.t);
           const fb = document.createElement("div");
           fb.className = "feedback " + (ok ? "ok" : "bad");
-          fb.textContent = ok ? (opt.why || "Yes.") : (opt.why || "Not that one.");
+          fb.innerHTML = rich(ok ? (opt.why || "Yes.") : (opt.why || "Not that one."));
           card.appendChild(fb);
           const sd = document.getElementById("scoreDisplay");
           if (sd) sd.textContent = "Checkpoint: " + score + " / " + questions.length;
