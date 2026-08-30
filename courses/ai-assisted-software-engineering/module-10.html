@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 10 — Git, GitHub, and code review</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 10</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Stage 4 &middot; Module 10 &middot; ~60 min</span>
+    <h1 class="serif">Git, GitHub, and code review</h1>
+    <p class="sub">The agent implemented the feature on a branch. It also quietly deleted the check that stops an empty booking being sent, and left a comment claiming the validation moved. You are the last line.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
+      <ul>
+        <li>Use the eight Git commands that cover almost all daily work</li>
+        <li>Explain why a branch matters more when an agent is writing the code</li>
+        <li>Read a diff without skimming past the deletions</li>
+        <li>Write a review comment with a location, a mechanism, and a consequence</li>
+        <li>Write a PR description that tells a reviewer how to verify it</li>
+      </ul>
+    </div>
+  </header>
+  <section>
+  <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
+    <div id="whyGrid"></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">01</span><h2>Before you approve anything</h2></div>
+    <p>The agent implemented notes on a branch. It also deleted a booking guard and logged a patient email. Before you open the hunks, decide what a review comment has to contain, and what you do with a deletion hidden behind a comment.</p>
+    <div id="beforeAi" class="interactive"></div>
+    <div id="detectives" style="margin-top:16px"></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">02</span><h2>Git in the amount you actually need</h2></div>
+    <p>Git is a time machine for your project with a reputation for being confusing. Most of the confusion comes from learning the commands before the model, so here is the model in four sentences.</p>
+    <p>Your project has a <b>history</b>: a sequence of saved states. Each saved state is a <b>commit</b>, and a commit has a message explaining why it exists. A <b>branch</b> is a movable label pointing at a commit, which lets you build a parallel line of history without disturbing the main one. A <b>remote</b> (usually GitHub) is a copy of that history somewhere other than your laptop.</p>
+    <pre>git status                  # what has changed. run this constantly.
+git diff                    # exactly what changed, line by line
+git add notes.js            # stage this file for the next commit
+git commit -m "Add clinician notes to appointments"
+git switch -c notes-feature # new branch, and move onto it
+git push -u origin notes-feature
+git log --oneline           # the history, one line per commit</pre>
+    <p><code>git status</code> is the one to over-use. It tells you where you are and what is about to happen, and nearly every Git disaster starts with someone running a command without knowing either.</p>
+    <div class="def"><div class="k">One reason per commit</div><p>Not one file &mdash; one <i>reason</i>. A rename touching four files is a single commit. A bug fix plus an unrelated tidy-up is two commits, even if both are in the same file. The test: can you write the message without using the word “and”?</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">03</span><h2>Why branches matter more when you work with an agent</h2></div>
+    <p>Branching is often taught as a team-coordination tool, which undersells it badly for your situation.</p>
+    <p>When you are driving an agent, you are going to accept changes that turn out to be wrong. Not occasionally &mdash; regularly. A branch means the wrong version is contained: <code>main</code> still works, and abandoning the attempt costs you nothing but the time you already spent.</p>
+    <p>Without a branch, a bad agent session leaves you picking apart a working state and a broken one in the same place, trying to remember which of forty changed lines you actually wanted.</p>
+    <pre>git switch -c notes-feature   # start
+# ... work, commit, work, commit ...
+# it went wrong:
+git switch main               # main was never touched
+git branch -D notes-feature   # and the mess is gone</pre>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">04</span><h2>Reading a diff without missing the deletions</h2></div>
+    <p>A diff shows what changed: <code>+</code> lines added, <code>-</code> lines removed. The additions draw your eye. <b>The deletions are where the danger is</b>, and they are the thing people reliably skim past.</p>
+    <p>Agents remove code they judge redundant. Sometimes correctly. Sometimes what looked redundant was the guard clause stopping an empty form being submitted &mdash; and its removal is one quiet red line in a diff of forty green ones.</p>
+    <pre>-  if (!canSubmit(form)) return;
++  // validation moved to notes.js
+   sendBooking(form);</pre>
+    <p>Read that. The check is gone. A comment asserts it moved. Did it? The comment is not evidence &mdash; it is a claim, written by the same process that deleted the line. Go and look.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> This exact pattern — remove a check, add a comment explaining where it supposedly went — appears in AI-generated diffs often enough to be worth naming. It is not deception; the agent genuinely predicted that a comment like that would follow. But a comment describing a refactor that did not happen is worse than no comment, because it stops the next person checking.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">05</span><h2>A review is a set of named checks</h2></div>
+    <p>"LGTM" is not a review. Neither is "looks good, nice work". A review is an answer to a specific question: <b>what did you check, and what did you find?</b></p>
+    <p>What a useful review comment contains:</p>
+    <ul class="plain">
+      <li><b>Where.</b> The file and roughly the line. "Somewhere in the notes code" wastes the author's time.</li>
+      <li><b>What.</b> The specific problem, not a feeling. Not "this seems fragile" but "this throws when <code>note.text</code> is undefined".</li>
+      <li><b>Why it matters.</b> Consequence, not doctrine. Not "innerHTML is bad practice" but "a clinician could paste markup here and it would execute".</li>
+      <li><b>What would resolve it.</b> Give the author a route forward.</li>
+    </ul>
+    <p>And the rule from Module 8, which applies just as hard here: <b>do not pad the list.</b> Three real findings land. Three real findings mixed with four style preferences get discounted as a whole, including the one about the patient email in the log.</p>
+    <div class="def"><div class="k">The question you cannot dodge</div><p>Would you be comfortable if this broke in production and someone asked what you checked before approving it? If the honest answer is “I would say the agent wrote it”, you have not reviewed it. Approval means you vouch for it.</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">06</span><h2>Pull requests, and what they are actually for</h2></div>
+    <p>A pull request says: <i>here is a branch, here is what it does, please look before it joins main.</i> Its value is almost entirely in the description.</p>
+    <p>A PR description worth reading has four things:</p>
+    <ol>
+      <li><b>What changed</b>, in a sentence a non-author can follow.</li>
+      <li><b>Why</b>, ideally with the ticket.</li>
+      <li><b>How to verify it</b> &mdash; the steps a reviewer should take. This is the part people omit and it is the most useful.</li>
+      <li><b>What the risk is.</b> What might this break? What did you deliberately not do?</li>
+    </ol>
+    <p>A 900-line PR with an empty description is not a review request; it is a request to be trusted. Ask for the description before you read a line, because without a stated intent you cannot distinguish a deliberate change from an accident.</p>
+    <div class="disclosure">Desktop Lab B is where this becomes real: a repository you own, with a README, at least three commits, and a pull request or a documented branch. A Cursor transcript is not evidence. A GitHub URL is.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-010</b>. The agent has implemented clinician notes on a branch. Dan's instruction was explicit: new feature, same release, and <i>if booking regresses I have to call the client myself</i>.</p>
+    <p>Six hunks. Accept or reject each one, and for every rejection say what is wrong. Same standard as Module 8: rejecting all six fails, and so does accepting a regression.</p>
+    <div class="interactive">
+      <div class="ilbl">Required exercise &middot; reviewExercise</div>
+      <div id="prReview"></div>
+      <button class="primary" id="m10check" style="margin-top:16px">Submit review</button>
+      <div class="feedback" id="m10fb"></div>
+    </div>
+    <p class="mut" style="margin-top:14px">More reps: <a href="practice-git.html">Git practice</a> (write the commands) and <a href="practice-review.html">review practice</a> (five more AI pull requests) &middot; <a href="desktop-labs.html">Desktop Lab B</a> is the real repo.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
+    <div id="quizRoot"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+
+  </section>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
+</div></div>
+<script src="course-progress.js"></script>
+<script src="northline.js"></script>
+<script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
+<script src="detective-kit.js"></script>
+<script src="module-kit.js"></script>
+<script>
+Northline.renderWhy('whyGrid', {"build": "A hunk-by-hunk review of an AI-authored pull request, with written reasons for every rejection.", "why": "Review is where accountability actually happens. Approving means you vouch for it, whoever typed it.", "aiHelps": "Drafting commit messages and PR descriptions from a diff — genuinely useful, then you correct them.", "aiFails": "Deleting guard clauses it judged redundant, then adding a comment describing a refactor that never happened.", "without": "Every verdict and every reason is yours, and the grader checks that your reasons name a real mechanism."});
+const MK = ModuleKit.mount(10, AISEQuizData.MODULE_QUIZZES[10]);
+</script>
+<script>
+Northline.renderPrediction("beforeAi", {
+  label: "Predict first \u00b7 what a review comment is",
+  questions: [
+    { q: "A review comment that Dan can act on contains what?",
+      opts: [
+        { t: "A location, the mechanism, and the consequence.", correct: true,
+          whyOk: "Without those three, it is a vibe. With them, someone can fix it." },
+        { t: "LGTM and a compliment, so the author stays motivated.", why: "Kindness is free. It is not a review." },
+        { t: "A request to rewrite it in a different style.", why: "Style without a consequence is noise. Save your credibility for the deletion." }
+      ] },
+    { q: "The diff deletes a canSubmit guard and adds a comment saying validation moved. Merge?",
+      opts: [
+        { t: "Reject it. A comment is not a move. Booking will accept empty forms.", correct: true,
+          whyOk: "Deletions hide. A sentence claiming a refactor that did not happen is how this ships." },
+        { t: "Accept it if the new file exists.", why: "Existing is not moved. Read the new file. If the check is not there, the comment is a lie." },
+        { t: "Accept it. Comments document intent.", why: "This comment documents a fiction. That is worse than silence." }
+      ] }
+  ],
+  learned: ["You decided what a review has to contain before you saw the hunks.",
+    "Approving means your name is on it, whoever typed it."]
+});
+Northline.renderDetectiveSet(["leftover", "leak", "xssInnerHtml"], "detectives");
+var HUNKS = [{"id": "h1", "file": "notes.js", "verdict": "accept", "code": "+function clinicianNote(appointmentId, text) {\n+  return { appointmentId: appointmentId, text: String(text || \"\").trim() };\n+}", "why": "Small, does one thing, defends against a missing text argument, and returns rather than mutating. This is what you asked for."}, {"id": "h2", "file": "notes.js", "verdict": "reject", "code": "+function renderNote(note) {\n+  const el = document.createElement(\"p\");\n+  el.innerHTML = note.text;\n+  return el;\n+}", "why": "innerHTML with text a clinician typed. That is an injection point on a page handling patient data. textContent is the one-word fix."}, {"id": "h3", "file": "booking.js", "verdict": "reject", "code": "-  if (!canSubmit(form)) return;\n+  // validation moved to notes.js\n   sendBooking(form);", "why": "It deleted the booking guard and left a comment claiming the check moved somewhere it did not. This is the regression Dan explicitly told you not to cause, and it is a deletion — the easiest thing in a diff to skim past."}, {"id": "h4", "file": "notes.js", "verdict": "accept", "code": "+// Notes are per appointment, not per patient: the same patient can\n+// have contradictory notes on two visits and both are correct.\n+const NOTES_BY_APPOINTMENT = new Map();", "why": "A comment explaining a non-obvious domain decision, which is exactly what comments are for. Nothing to object to here."}, {"id": "h5", "file": "notes.js", "verdict": "reject", "code": "+function saveNote(note) {\n+  console.log(\"saving note for\", note.patientEmail, note.text);\n+  NOTES_BY_APPOINTMENT.set(note.appointmentId, note);\n+}", "why": "A patient email and clinical note written to the log. Logs get copied, shipped to third parties, and read by people with no clinical relationship to that patient."}, {"id": "h6", "file": "styles.css", "verdict": "reject", "code": "+.note:focus {\n+  outline: none;\n+}", "why": "Nobody asked for a CSS change, and this one removes the only cue a keyboard user has about where they are. Two reasons to reject in three lines."}];
+(function () {
+  var host = document.getElementById("prReview");
+  host.innerHTML = HUNKS.map(function (h, i) {
+    return '<div class="detcase" style="margin-top:14px" data-h="' + h.id + '">' +
+      '<div class="detmeta"><span class="detticket">Hunk ' + (i + 1) + ' of ' + HUNKS.length + '</span>' +
+      '<span class="detwho">' + h.file + '</span></div>' +
+      DetectiveKit.codeBlock(h.code, h.file.indexOf(".css") !== -1 ? "css" : "js") +
+      '<div class="verdicts"><button type="button" class="vbtn" data-v="accept">Accept</button>' +
+      '<button type="button" class="vbtn" data-v="reject">Reject</button></div>' +
+      '<div class="formrow reasonbox" hidden><label>Why are you rejecting it?</label>' +
+      '<textarea class="reason" style="min-height:64px" placeholder="File, what is wrong, and the consequence."></textarea></div>' +
+      '</div>';
+  }).join("");
+  host.querySelectorAll(".detcase").forEach(function (card) {
+    card.querySelectorAll(".vbtn").forEach(function (btn) {
+      btn.onclick = function () {
+        card.querySelectorAll(".vbtn").forEach(function (b) { b.classList.remove("chosen"); });
+        btn.classList.add("chosen");
+        card.dataset.verdict = btn.getAttribute("data-v");
+        card.querySelector(".reasonbox").hidden = btn.getAttribute("data-v") !== "reject";
+      };
+    });
+  });
+})();
+
+document.getElementById("m10check").onclick = function () {
+  var results = [];
+  var cards = document.querySelectorAll("#prReview .detcase");
+  var unanswered = 0;
+  cards.forEach(function (card) { if (!card.dataset.verdict) unanswered += 1; });
+  if (unanswered) {
+    ModuleKit.showResults(document.getElementById("m10fb"),
+      { passed: false, results: [{ name: "every hunk has a verdict", pass: false, hint: unanswered + " still undecided. A reviewer does not leave hunks blank." }] });
+    return;
+  }
+  HUNKS.forEach(function (h, i) {
+    var card = cards[i];
+    var got = card.dataset.verdict;
+    var right = got === h.verdict;
+    results.push({
+      name: "Hunk " + (i + 1) + " (" + h.file + ") \u2014 " + (h.verdict === "accept" ? "should be accepted" : "should be rejected"),
+      pass: right,
+      hint: h.verdict === "accept"
+        ? "You rejected a hunk that is fine. " + h.why
+        : "You accepted a hunk that should not ship. " + h.why
+    });
+    if (h.verdict === "reject" && right) {
+      var reason = (card.querySelector(".reason") || { value: "" }).value.trim();
+      var specific = reason.length >= 60 && /(innerHTML|textContent|log|email|outline|focus|keyboard|delet|remov|guard|check|valid|regress|inject|xss|scope|css|patient)/i.test(reason);
+      results.push({
+        name: "Hunk " + (i + 1) + " \u2014 your reason names the problem and its consequence",
+        pass: specific,
+        hint: "At least 60 characters, and it has to name the actual mechanism. \u201cThis looks wrong\u201d is not a review comment. " + h.why
+      });
+    }
+  });
+  var ok = results.every(function (r) { return r.pass; });
+  ModuleKit.showResults(document.getElementById("m10fb"), { passed: ok, results: results });
+  if (ok) {
+    document.getElementById("m10fb").innerHTML =
+      "<b>That is a review Dan can act on.</b> You cleared the two hunks that were genuinely fine, and you caught the deleted booking guard \u2014 which was hiding behind a comment claiming the validation had moved. That one is the regression Dan said he would have to phone the client about.<br><br>" +
+      results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+    CourseProgress.setSection(10, "reviewExercise", { passed: true, at: new Date().toISOString() });
+    Northline.showLearned(document.getElementById("m10fb").parentNode,
+      "You just wrote a review someone can act on.",
+      "You cleared the two hunks that were fine and caught the deleted booking guard. That is discrimination, not volume.");
+    MK.sync();
+  }
+};
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

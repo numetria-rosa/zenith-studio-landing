@@ -3,93 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 8 — Python for scripts</title>
+<title>Module 8 — AI Code Detective</title>
 <link rel="stylesheet" href="course.css">
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 8</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 8 · ~55 min</span>
-    <h1 class="serif">Python for scripts</h1>
-    <p class="sub">Enough Python to drive Cursor on <code>.py</code> files: functions, JSON, a small CLI. Not RAG. Not agents. That is <b>AI Engineering</b>.</p>
+    <span class="eyebrow">Stage 3 &middot; Module 8 &middot; ~65 min</span>
+    <h1 class="serif">AI Code Detective</h1>
+    <p class="sub">Two hunks from a real AI-authored pull request. Both run. Both are wrong. Find the defects, spare the lines that are actually fine, and prove the fix against tests you cannot see.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
+      <ul>
+        <li>Explain why AI defects are systematically harder to spot than human ones</li>
+        <li>Recognise the eleven failure shapes by category</li>
+        <li>Distinguish a real finding from a style preference — and know why that distinction protects your credibility</li>
+        <li>Avoid the most common false positive in code review</li>
+        <li>Turn a diagnosis into a fix that passes an independent test</li>
+      </ul>
+    </div>
   </header>
   <section>
-    <div class="kh"><span class="num">1</span><h2>The shape</h2></div>
-    <pre>import json
+  <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
+    <div id="whyGrid"></div>
 
-def keep_open(rows):
-    return [r for r in rows if r.get("status") == "open"]
-
-if __name__ == "__main__":
-    data = json.loads(open("incidents.json", encoding="utf-8").read())
-    print(len(keep_open(data)))</pre>
-    <p>In the browser we grade the function with Pyodide — the same idea as the JavaScript library.</p>
   </section>
   <section>
-    <div class="kh"><span class="num">2</span><h2>Graded: transform a JSON list</h2></div>
-    <p>Write <code>keep_open(rows)</code> that returns only dicts whose <code>status</code> is <code>"open"</code>.</p>
-    <div class="interactive">
-      <div class="ilbl">Required exercise · pythonScriptExercise</div>
-      <textarea id="pyEx" spellcheck="false">def keep_open(rows):
-    return rows
-</textarea>
-      <button class="primary" id="btnPy" style="margin-top:10px">Run in Pyodide</button>
-      <div class="feedback" id="pyFb"></div>
+  <div class="kh"><span class="num">01</span><h2>Before you charge anything</h2></div>
+    <p>Two hunks are coming. Both run. Both look like code you have seen before. Before you open them, decide what you are hunting and what you will refuse to flag.</p>
+    <div id="beforeAi" class="interactive"></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">02</span><h2>The defect that matters is the one that looks fine</h2></div>
+    <p>There are two kinds of wrong code. The first kind announces itself: it crashes, it fails to parse, the page goes blank. That kind is cheap, because you find it in seconds and nobody ships it.</p>
+    <p>The second kind runs perfectly, produces a plausible number, and is wrong. Nobody notices for four months. Then an accountant does.</p>
+    <p>Agents are extraordinarily good at producing the second kind, and it is not a flaw in the models &mdash; it is a direct consequence of how they work. They generate what code <i>usually looks like</i> in this situation. Code that usually looks right is, by construction, code that passes a skim. It has the correct shape, idiomatic style, sensible variable names, and reasonable formatting. Every surface signal you unconsciously use to judge code quality has been satisfied.</p>
+    <div class="callout">Which means the review habits you inherited from reading human code do not transfer cleanly. A tired human writes sloppy code with obvious bugs. An agent writes immaculate code with subtle ones. You have to read for <b>meaning</b>, not for smell.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">03</span><h2>The eleven failure shapes</h2></div>
+    <p>Across a lot of AI-generated code, the defects cluster. These are the categories you are hunting, and after a while you start seeing them by reflex.</p>
+    <div class="whycare">
+      <div class="whybox"><h4>Logic</h4><p>Right shape, wrong arithmetic. Quantity omitted. Off by one on a boundary. <code>=</code> where <code>===</code> belonged.</p></div>
+      <div class="whybox"><h4>Edge cases</h4><p>Works for the case in your example. Empty list, single item, zero, missing field, duplicate: unconsidered.</p></div>
+      <div class="whybox"><h4>Missing validation</h4><p>Assumes input is well-formed. Crashes on an absent field. Trusts a string is a number.</p></div>
+      <div class="whybox"><h4>Security</h4><p><code>innerHTML</code> with user data. A secret in a log. A disabled check with a TEMP comment. <code>eval</code>.</p></div>
+      <div class="whybox"><h4>Accessibility</h4><p>Clickable divs. Missing labels. <code>outline: none</code>. Colour as the only signal.</p></div>
+      <div class="whybox"><h4>Misleading comments</h4><p>A comment describing what the code was supposed to do rather than what it does. Worse than silence.</p></div>
+      <div class="whybox"><h4>Wrong assumptions</h4><p>Invented field names. A returned string where a number was needed. Assumed sort order.</p></div>
+      <div class="whybox"><h4>Duplication</h4><p>A third copy of a function that already exists twice, so a fix in one leaves two broken.</p></div>
+      <div class="whybox"><h4>Needless complexity</h4><p>Forty lines and an abstraction layer for something that was six lines.</p></div>
+      <div class="whybox"><h4>Performance</h4><p>A DOM query inside a loop over ten thousand rows. Re-reading a file every iteration.</p></div>
+      <div class="whybox"><h4>Naming</h4><p><code>data</code>, <code>temp</code>, <code>handleIt</code>, <code>result2</code>. Names that describe nothing.</p></div>
     </div>
-    <p class="mut" style="margin-top:12px"><a href="practice-python.html">Python practice library</a></p>
+
   </section>
   <section>
-    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
-    <div id="quizRoot"></div>
-    <div id="reqList"></div>
+  <div class="kh"><span class="num">04</span><h2>The skill nobody teaches: not charging the innocent</h2></div>
+    <p>Here is the thing that separates a reviewer people trust from one they route around.</p>
+    <p>When a nervous junior is handed a large AI-written pull request, the safe-feeling move is to object to everything. Flag the loop, flag the variable name, ask for a library, request more comments. It feels rigorous. It is the opposite.</p>
+    <p><b>A review that rejects everything carries exactly as much information as one that approves everything.</b> Both are refusals to discriminate. And there is a practical cost: if three of your five objections are wrong, the author starts discounting all five &mdash; including the one about the money.</p>
+    <div class="def"><div class="k">Real finding</div><p>"Line 4 sums price but never multiplies by quantity, so an order of two £3 items returns £3. Here is a failing case."</p></div>
+    <div class="def"><div class="k">Not a finding</div><p>"You should use reduce instead of a for loop." &mdash; A preference. The loop is correct and readable. Saying this alongside the real finding dilutes it.</p></div>
+    <p>So the exercise below is graded both ways. Miss a real defect and you fail. Charge a line that is actually fine and you also fail. Selecting everything is not caution; it is the same abdication with better optics.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> The single most common false positive in this whole course: flagging <code>a &lt; b</code> on ISO date strings as broken. Comparing <code>"2026-08-30"</code> to <code>"2026-08-24"</code> as text gives the correct answer, because that format was designed to sort lexicographically. It appears in Case 2 below. Do not charge it.</div>
+
   </section>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+  <section>
+  <div class="kh"><span class="num">05</span><h2>Finding it is half. Proving it is the half that ships.</h2></div>
+    <p>Plenty of people can look at code and feel uneasy. Far fewer can produce a version that provably works, which is the only thing anyone is paying for.</p>
+    <p>So every case here has two phases. First the charge sheet: name the real defects, spare the innocent lines. Then the proof: rewrite it so hidden tests pass. Phase two stays locked until phase one is clean, because otherwise you could brute-force the charge sheet by watching which tests go green.</p>
+    <p>The proof phase is also where you discover that "I know what is wrong with this" and "I can fix it correctly" are genuinely different states. Case 1's fix has five separate requirements and most people miss one on the first attempt.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-008</b>. A contractor pushed a large AI-written pull request and went on leave. It runs. Dan will not merge it blind, and you are the reviewer of record.</p>
+    <p>Two hunks. Both must be cleared &mdash; charge sheet clean, fix passing.</p>
+    <div class="interactive">
+      <div class="ilbl">Required exercise &middot; detectiveExercise &middot; case 1 of 2</div>
+      <div id="det1"></div>
+    </div>
+    <div class="interactive" style="margin-top:24px">
+      <div class="ilbl">Required exercise &middot; detectiveExercise &middot; case 2 of 2</div>
+      <div id="det2"></div>
+    </div>
+    <p class="mut" style="margin-top:16px">Twenty-four more cases in the <a href="practice-detective.html">AI Code Detective library</a>. Three of those are part of the capstone practice bar.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
+    <div id="quizRoot"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+
+  </section>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
 </div>
 <div class="scoreboard"><div class="in">
-  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
-  <a id="btnNext" href="module-09.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
 </div></div>
 <script src="course-progress.js"></script>
-<script src="pyodide-sandbox-runner.js"></script>
-<script src="practice-kit.js"></script>
+<script src="northline.js"></script>
 <script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
+<script src="detective-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
-CourseProgress.touchVisited(8);
-function syncNext() {
-  const btn = document.getElementById("btnNext");
-  const ok = CourseProgress.isModuleComplete(8);
-  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue toward the capstone' : "Complete the exercise and quiz (80%+) to continue"; }
-  const box = document.getElementById("reqList");
-  if (box) {
-    box.innerHTML = CourseProgress.completionRequirements(8).map(function (r) {
-      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
-    }).join("");
-  }
-}
-ModuleKit.renderQuiz(8, AISEQuizData.MODULE_QUIZZES[8], syncNext);
-syncNext();
+Northline.renderWhy('whyGrid', {"build": "A clean charge sheet and a working fix for two hunks of an AI-written pull request.", "why": "This is the skill that makes you worth hiring in a world where code is cheap. Anyone can generate a feature; you can tell whether it is correct.", "aiHelps": "Nowhere in this module. You are the review.", "aiFails": "This entire module is a catalogue of how.", "without": "Both phases are yours. And rejecting everything fails just as hard as approving everything — the decoys are graded."});
+const MK = ModuleKit.mount(8, AISEQuizData.MODULE_QUIZZES[8]);
 </script>
 <script>
-document.getElementById("btnPy").onclick = function () {
-  const fb = document.getElementById("pyFb");
-  fb.className = "feedback";
-  fb.textContent = "Loading Python sandbox…";
-  PracticeKit.gradePython({
-    functionName: "keep_open",
-    testCases: [
-      { name: "filters", args: [[{"status": "open"}, {"status": "closed"}]], expected: [{"status": "open"}] },
-      { name: "empty", args: [[]], expected: [] },
-    ],
-  }, document.getElementById("pyEx").value, function (out) {
-    fb.className = "feedback " + (out.passed ? "ok" : "bad");
-    fb.innerHTML = (out.results || []).map(function (r) { return (r.pass ? "✓ " : "✗ ") + r.name + (r.pass ? "" : " — " + (r.hint || "")); }).join("<br>");
-    if (out.passed) CourseProgress.setSection(8, "pythonScriptExercise", true);
-    syncNext();
-  });
-};
+Northline.renderPrediction("beforeAi", {
+  label: "Predict first \u00b7 what a finding is",
+  questions: [
+    { q: "Which of these is a real review finding?",
+      opts: [
+        { t: "It sums price and ignores quantity, so two \u00a33 items total \u00a33. Here is a failing case.", correct: true,
+          whyOk: "Location, mechanism, consequence. That is a finding someone can act on." },
+        { t: "It uses a for loop instead of reduce.", why: "A preference. The loop can be correct. Charging it next to the money bug dilutes the money bug." },
+        { t: "Variable names should be more descriptive.", why: "Sometimes true. Not a defect until you can name the misunderstanding it causes." }
+      ] },
+    { q: "ISO dates compared with < . Do you charge it?",
+      opts: [
+        { t: "No. YYYY-MM-DD sorts as text. Charging it is the most common false positive in this course.", correct: true,
+          whyOk: "The format exists so this comparison works. Check the claim before you make it." },
+        { t: "Yes. Dates must always use a library.", why: "A library for one string compare is the wrong trade. This is not automatically a finding." },
+        { t: "Yes if the names are startDate and endDate.", why: "The names do not change the format. The format is what makes < safe." }
+      ] }
+  ],
+  learned: ["You decided what counts as a finding before you saw the hunks.",
+    "Rejecting everything is the same abdication as approving everything."]
+});
+var detState = { c1: false, c2: false };
+function detSync() {
+  var box = document.getElementById("detProgress");
+  if (box) {
+    box.textContent = "Cases cleared: " + ((detState.c1 ? 1 : 0) + (detState.c2 ? 1 : 0)) + " / 2";
+  }
+  if (detState.c1 && detState.c2) {
+    CourseProgress.setSection(8, "detectiveExercise", { passed: true, cases: 2, at: new Date().toISOString() });
+    var host = document.getElementById("det2");
+    if (host) {
+      Northline.showLearned(host.parentNode,
+        "You just reviewed like someone whose name goes on the merge.",
+        "You named real defects, spared the innocent lines, and proved the fix. That is the whole skill.");
+    }
+    MK.sync();
+  }
+}
+DetectiveKit.render("det1", {"ticket": "NL-008 · hunk 3 of 11", "author": "Written by the coding agent, approved by nobody", "ask": "“Add a function that totals a supply order, including quantities.”", "lang": "js", "note": "It runs. It has no syntax errors. A linter is silent. Finance is off by thousands a year.", "code": "// Calculates the order total, including quantity\nfunction calculateTotal(items) {\n  let total = 0;\n  for (let i = 0; i < items.length; i++) {\n    total = total + items[i].price;\n  }\n  return total.toFixed(2);\n}", "findings": [{"id": "qty", "cat": "logic", "real": true, "label": "Quantity is never used — two units of a £3 item total £3.", "why": "The one that costs money. It reads correctly because it has the shape you expected a total to have."}, {"id": "comment", "cat": "comment", "real": true, "label": "The comment claims it includes quantity, so it actively misleads the next reader.", "why": "A wrong comment is worse than no comment: it stops the next person looking, which is exactly how this survives review twice."}, {"id": "string", "cat": "assumption", "real": true, "label": "toFixed returns a string, so any caller doing arithmetic on the result gets concatenation.", "why": "total + shipping becomes \"6.00\" + 5 = \"6.005\". A formatting decision buried inside a calculation function."}, {"id": "forloop", "cat": "complexity", "real": false, "label": "It uses an indexed for loop instead of reduce.", "why": "Not a defect. reduce would be more idiomatic; the loop is perfectly clear and correct. Style preferences are not review findings."}, {"id": "let", "cat": "naming", "real": false, "label": "total is declared with let instead of const.", "why": "Not a defect — it has to be reassigned. Applying “prefer const” without thinking is how reviews lose credibility."}, {"id": "empty", "cat": "edge", "real": false, "label": "It does not handle an empty items array.", "why": "It handles it fine: the loop does not execute and it returns 0.00. Check the claim before you make it."}], "fix": {"functionName": "calculateTotal", "note": "Rewrite it. Return a <b>number</b> (not a string) rounded to 2 decimal places, and use quantity. An empty list returns 0.", "starter": "function calculateTotal(items) {\n\n}", "testCases": [{"name": "two units of a £3 item totals 6", "args": [[{"price": 3, "quantity": 2}]], "expected": 6}, {"name": "an empty order totals 0", "args": [[]], "expected": 0}, {"name": "mixed lines add up", "args": [[{"price": 2.5, "quantity": 2}, {"price": 1, "quantity": 3}]], "expected": 8}, {"name": "single units still work", "args": [[{"price": 4, "quantity": 1}, {"price": 6, "quantity": 1}]], "expected": 10}, {"name": "returns a number, not a string", "args": [[{"price": 1, "quantity": 1}]], "expected": 1}, {"name": "rounds to 2 decimal places", "args": [[{"price": 0.1, "quantity": 3}]], "expected": 0.3}]}}, function (st) { detState.c1 = st.passed; detSync(); });
+DetectiveKit.render("det2", {"ticket": "NL-008 · hunk 7 of 11", "author": "Written by the coding agent, tests reported green", "ask": "“Validate the booking form before we submit it.”", "lang": "js", "note": "The contractor's note on the PR says “adds validation, all tests passing”. Read it properly.", "code": "// Returns true if the booking is valid\nfunction validateBooking(form, today) {\n  const errors = [];\n  if (!form.name) errors.push(\"Name is required\");\n  if (!form.email.includes(\"@\")) errors.push(\"Email is not valid\");\n  if (form.date < today) errors.push(\"Date cannot be in the past\");\n  return errors.length = 0;\n}", "findings": [{"id": "assign", "cat": "logic", "real": true, "label": "errors.length = 0 assigns instead of comparing, so it always returns 0 — every booking is rejected.", "why": "One character. It is valid JavaScript, so nothing complains, and it also empties the array as a side effect. This is why === matters."}, {"id": "throws", "cat": "validation", "real": true, "label": "If email is missing entirely, .includes throws and the whole function dies.", "why": "A validator that crashes on absent input is the one thing a validator must never do. Test it with {} and watch."}, {"id": "discard", "cat": "assumption", "real": true, "label": "It collects specific error messages and then throws them all away, returning only a boolean.", "why": "The caller cannot tell the patient what was wrong, so the form can only say “invalid”. The useful information was computed and discarded."}, {"id": "blank", "cat": "edge", "real": true, "label": "A name of \" \" passes, because a space is truthy.", "why": "!form.name catches empty string but not whitespace. Trim before checking."}, {"id": "datestr", "cat": "logic", "real": false, "label": "Comparing dates as strings with < is broken.", "why": "Not a defect. ISO format (YYYY-MM-DD) sorts correctly as text, which is the whole reason that format exists. A very common false positive — charging it costs you credibility."}, {"id": "lib", "cat": "complexity", "real": false, "label": "It should use a date library rather than hand-rolled comparison.", "why": "Adding a dependency for one string comparison is the wrong trade. “Use a library” is not automatically a review finding."}, {"id": "arrow", "cat": "naming", "real": false, "label": "errors is a poor variable name.", "why": "It is an array of errors. The name is fine. Do not pad a review."}], "fix": {"functionName": "validateBooking", "note": "Rewrite it to return an <b>array of error strings</b> so the form can tell the patient what to fix. Use exactly these messages, in this order: <code>\"Name is required\"</code>, <code>\"Email is not valid\"</code>, <code>\"Date cannot be in the past\"</code>. A blank or whitespace-only name fails. A missing email fails without throwing. An email must contain an @ with a dot after it. A missing date fails. Valid input returns <code>[]</code>.", "starter": "function validateBooking(form, today) {\n\n}", "testCases": [{"name": "a valid booking returns no errors", "args": [{"name": "Priya", "email": "p@northline.co", "date": "2026-09-02"}, "2026-08-30"], "expected": []}, {"name": "a whitespace-only name is rejected", "args": [{"name": "   ", "email": "p@northline.co", "date": "2026-09-02"}, "2026-08-30"], "expected": ["Name is required"]}, {"name": "a missing email does not throw", "args": [{"name": "Priya", "date": "2026-09-02"}, "2026-08-30"], "expected": ["Email is not valid"]}, {"name": "an email with no dot after the @ is rejected", "args": [{"name": "Priya", "email": "p@northline", "date": "2026-09-02"}, "2026-08-30"], "expected": ["Email is not valid"]}, {"name": "a past date is rejected", "args": [{"name": "Priya", "email": "p@northline.co", "date": "2026-08-01"}, "2026-08-30"], "expected": ["Date cannot be in the past"]}, {"name": "today itself is allowed", "args": [{"name": "Priya", "email": "p@northline.co", "date": "2026-08-30"}, "2026-08-30"], "expected": []}, {"name": "several problems are all reported, in order", "args": [{"name": "", "email": "nope", "date": "2026-01-01"}, "2026-08-30"], "expected": ["Name is required", "Email is not valid", "Date cannot be in the past"]}, {"name": "a missing date is rejected", "args": [{"name": "Priya", "email": "p@northline.co"}, "2026-08-30"], "expected": ["Date cannot be in the past"]}]}}, function (st) { detState.c2 = st.passed; detSync(); });
 </script>
 <script src="course-rail.js"></script>
 </body>

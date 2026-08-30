@@ -100,6 +100,66 @@
         { t: "Only on staging.", why: "Staging logs get copied. Still a leak." },
       ],
     },
+    xssInnerHtml: {
+      title: "Rendering a patient name",
+      code: "list.innerHTML += '<li>' + row.name + '</li>';",
+      prompt: "The agent rendered the appointment list this way. What is the defect?",
+      principle: "User data is text. innerHTML parses it as markup.",
+      opts: [
+        { t: "A name can become a real element and run a handler. textContent would have shown the characters and stopped.", correct: true,
+          whyOk: "This is XSS from a name field. Agents reach for innerHTML because it is the shortest way to build rows." },
+        { t: "innerHTML is illegal in browsers.", why: "It is legal. That is why it is dangerous." },
+        { t: "You must never render a list.", why: "Render it. Just do not parse the patient's name as HTML." },
+      ],
+    },
+    fetchNoOk: {
+      title: "Loading appointments.json",
+      code: "const rows = await fetch('appointments.json').then(r => r.json());",
+      prompt: "The file is missing. The server returns 404. What happens?",
+      principle: "fetch does not throw on HTTP errors. response.ok is the check.",
+      opts: [
+        { t: "fetch succeeds with a 404 body. .json() then fails or you parse an error page. The empty and failed states never appear.", correct: true,
+          whyOk: "You must check response.ok. A missing file is not an exception; it is a response." },
+        { t: "fetch throws, so a try/catch is enough.", why: "It does not throw on 404. That is the trap." },
+        { t: "The browser shows a 404 page and your code never runs.", why: "Your JS still runs. You just got the wrong body." },
+      ],
+    },
+    testAlwaysTrue: {
+      title: "The agent's passing test",
+      code: "function test_canSubmit(impl) {\n  impl({ name: 'Priya', email: 'p@x.co', date: '2026-09-02' });\n  return true;\n}",
+      prompt: "This test is green on the broken function and the fixed one. What is it worth?",
+      principle: "A test that cannot fail is a comment that costs CPU.",
+      opts: [
+        { t: "Nothing. It never looks at the return value, and it always returns true.", correct: true,
+          whyOk: "Green here means the function existed and did not throw on Priya's input \u2014 the case that already works." },
+        { t: "It proves the happy path, which is enough.", why: "Priya's path was never the bug. A test that cannot fail on the report is not a test of the report." },
+        { t: "return true is a standard pass signal.", why: "The signal has to be earned. This one is hardcoded." },
+      ],
+    },
+    pyExceptPass: {
+      title: "The cleanup script's error handling",
+      code: "try:\n    rows = json.load(open(path))\nexcept:\n    pass",
+      prompt: "The agent added this so the script 'never crashes'. What did it actually do?",
+      principle: "Silent except is silent data loss.",
+      opts: [
+        { t: "A missing file, a malformed row, or a permission error becomes an empty success. Nobody is told.", correct: true,
+          whyOk: "except: pass converts 'this file was malformed' into 'the file was fine, here are 200 rows instead of 4,000'." },
+        { t: "pass is required in Python after except.", why: "A body is required. The body should raise, log, or return a failure \u2014 not disappear." },
+        { t: "This is how you skip blank rows.", why: "Blank rows are data. Handle them in the loop. Do not swallow every error to get there." },
+      ],
+    },
+    pyOverwrite: {
+      title: "Writing the clean file",
+      code: "clean_csv(path, path)  # read and write the same file",
+      prompt: "What is wrong with this tool?",
+      principle: "A cleanup script that overwrites its input can eat the only copy.",
+      opts: [
+        { t: "If the script is wrong, the original export is gone. Read one path, write another.", correct: true,
+          whyOk: "The first rule of a destructive tool: never eat the input. Dan cannot re-export last Monday." },
+        { t: "Python cannot write the file it is reading.", why: "It can. That is the problem." },
+        { t: "You should copy the file in the same function after writing.", why: "Too late. Write a different path first." },
+      ],
+    },
 
     /* ---- HTML structure ---- */
     htmlDivSoup: {

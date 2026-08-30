@@ -3,60 +3,297 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 9 — Capstone: ship a real app</title>
+<title>Module 9 — Testing and debugging under pressure</title>
 <link rel="stylesheet" href="course.css">
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 9</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 9 · capstone</span>
-    <h1 class="serif">Ship a real app</h1>
-    <p class="sub">One product: a small web app (JavaScript) plus an optional Python helper. Tests, a GitHub repo, and a live <code>https</code> URL. Rubric: spec, review notes, tests that fail on a broken change, deploy, write-up.</p>
-    <div id="capGate" class="honestnote"></div>
-    <div class="statusrow">
-      <span class="pill" id="stM8">Module 8</span>
-      <span class="pill" id="stPr">Practice bar</span>
-      <span class="pill" id="stLabs">Desktop Labs</span>
+    <span class="eyebrow">Stage 4 &middot; Module 9 &middot; ~65 min</span>
+    <h1 class="serif">Testing and debugging under pressure</h1>
+    <p class="sub">Two patients cannot book. It works for Priya every time. Both facts are true, and the gap between them is where the bug lives.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
+      <ul>
+        <li>Turn “it works for me” into a list of things that differ between you and the reporter</li>
+        <li>Produce a reproduction before writing any fix, and say why that order is not optional</li>
+        <li>Recognise a test that cannot fail, in three common shapes</li>
+        <li>Write the failing test before the fix, and watch it go red</li>
+        <li>Debug by narrowing rather than staring</li>
+      </ul>
     </div>
   </header>
   <section>
-    <div class="kh"><span class="num">1</span><h2>Pick a brief</h2></div>
-    <p>Use project 1 (Northline Landing) or project 2 (Shift Board) on <a href="projects.html">Projects</a>. Same rubric either way. Optional Python helper can live in the same repo.</p>
+  <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
+    <div id="whyGrid"></div>
+
   </section>
   <section>
-    <div class="kh"><span class="num">2</span><h2>Evidence on this page</h2></div>
-    <p>When the gate is open, complete the project card (live URL, GitHub, ≥80-character write-up, rubric scores above zero). That is the capstone completion — there is no fake “Cursor finished it” button.</p>
-    <p><a href="deploy-guide.html">Deploy guide</a> · <a href="portfolio.html">Portfolio</a> · <a href="final-assessment.html">Final assessment</a> (after you ship)</p>
-  </section>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
-</div>
+  <div class="kh"><span class="num">01</span><h2>Before you touch AI</h2></div>
+    <p>Two patients cannot book. It works for Priya. The function behind the button is four lines and looks ordinary. Predict the class of bug before you ask an agent to fix it.</p>
+    <div id="beforeAi" class="interactive"></div>
+    <p style="margin-top:16px">Then look at the test an agent is likely to write. If it cannot fail, it is not a test.</p>
+    <div id="detectives"></div>
 
+  </section>
+  <section>
+  <div class="kh"><span class="num">02</span><h2>“Works on my machine” is a clue, not a defence</h2></div>
+    <p>Priya says two patients hit Request and nothing happened. She tried it herself and it worked.</p>
+    <p>Both statements are true. That is the useful part. If it works for her and not for them, then the behaviour depends on <b>something that differs between them</b> &mdash; and your job is to find out what. Candidates, roughly in order of likelihood:</p>
+    <ul class="plain">
+      <li><b>Different input.</b> They left a field blank, typed something unexpected, used a different date format, or had a name with an apostrophe in it.</li>
+      <li><b>Different path through the interface.</b> She fills the form top to bottom every time. They tabbed, or pressed Enter, or came back to a half-filled form.</li>
+      <li><b>Different data.</b> Their record has a field hers does not.</li>
+      <li><b>Different environment.</b> Older browser, different phone, slow connection, blocked script.</li>
+      <li><b>Different timing.</b> They clicked before something finished loading.</li>
+    </ul>
+    <p>Notice that the first two account for most real bugs, and both are about <i>what the user did</i>, not about the code. Which is why the most valuable question you can ask a non-technical reporter is not "what went wrong" but "walk me through exactly what you typed".</p>
+    <div class="def"><div class="k">The word to strike from your vocabulary</div><p>“Intermittent.” Almost nothing is genuinely intermittent. “Intermittent” nearly always means “the condition that triggers it has not been identified yet”, and calling it intermittent is how a team gives up on a bug that has a perfectly findable cause.</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">03</span><h2>Reproduce first. Always first.</h2></div>
+    <p>The temptation, especially with an agent available, is to read the report, form a theory, and start fixing. Resist it, because without a reproduction you cannot tell a fix from a coincidence.</p>
+    <p>A reproduction is: <b>the exact steps and the exact data that make it fail every time.</b> It has three uses, and all three matter.</p>
+    <ol>
+      <li>It proves the bug exists and is not a misunderstanding.</li>
+      <li>It tells you when you have actually fixed it, rather than changed something and hoped.</li>
+      <li>It becomes the test. Literally &mdash; the reproduction is the failing test case you write next.</li>
+    </ol>
+    <p>Finding one is a search, and the search is narrowing. Vary one thing at a time. Start from a working case and remove things until it breaks, or start from the broken report and add things until it works. Both directions are fine. Changing three things at once is not.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> Hand an agent a bug report with no reproduction and it will confidently produce a fix, often with a plausible explanation attached. Sometimes it is right. You have no way of knowing, because you cannot check something you cannot trigger — and now there is a change in your codebase whose justification is a guess.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">04</span><h2>A test is only worth what it can catch</h2></div>
+    <p>Here is the whole idea, and it is not the one most courses lead with:</p>
+    <div class="callout">A test that cannot fail is not a test. It is a comment that costs CPU time. Before you trust a test, break the thing it tests on purpose and watch it go red. If it stays green, you have learned something far more important than whether the code works.</div>
+    <p>This matters enormously with agent-written tests, because a test that always passes looks identical to a test that works &mdash; green, named sensibly, sitting in the right file. Three shapes to recognise on sight:</p>
+    <pre>// Tests nothing. Cannot fail.
+expect(true).toBe(true);
+
+// Tests that the function exists. Not that it is correct.
+expect(typeof calculateTotal).toBe("function");
+
+// Tests that the code does what the code does. Always passes,
+// including when the code is wrong.
+expect(calculateTotal(items)).toBe(calculateTotal(items));</pre>
+    <p>A real test states an expectation <b>independently</b> of the implementation:</p>
+    <pre>// You worked out that 2 x 3 = 6 with your own brain.
+// Now the code has to agree with you.
+expect(calculateTotal([{ price: 3, quantity: 2 }])).toBe(6);</pre>
+    <p>The order matters: decide the expected answer first, then run. If you run it first and then write down whatever it produced, you have not tested anything &mdash; you have recorded the current behaviour, bug included.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">05</span><h2>What to test, when there is never time to test everything</h2></div>
+    <p>You will not have time for exhaustive tests, and chasing a coverage percentage is a well-documented way to feel safe without being safe. Spend your effort where a failure would actually hurt:</p>
+    <ul class="plain">
+      <li><b>The thing the ticket was about.</b> If you fixed a bug, there is now a test that fails on the old behaviour. Non-negotiable.</li>
+      <li><b>The boundaries.</b> Zero, one, empty, the first, the last, the day the window opens and the day it closes. Almost all off-by-one bugs live here.</li>
+      <li><b>Anything involving money, dates, or personal data.</b> Highest consequence per line of code in almost any application.</li>
+      <li><b>The unhappy paths.</b> Missing field, malformed input, failed request.</li>
+    </ul>
+    <p>And a habit worth more than any single test: <b>when you fix a bug, write the test before the fix.</b> Watch it go red. Then fix it. Watch it go green. You now have proof of the bug, proof of the fix, and permanent protection against it coming back. That last part is the point &mdash; the same bug returning six months later is one of the most demoralising things that happens in software, and this is the only thing that prevents it.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">06</span><h2>Debugging is narrowing, not staring</h2></div>
+    <p>Staring at code hoping to spot the flaw is the slowest available method, and it is what everyone does first. Narrowing is faster and it always terminates.</p>
+    <ol>
+      <li><b>Read the error properly.</b> All of it. The message names the problem, and the stack trace names the line. An enormous number of people scroll past this to go and guess instead.</li>
+      <li><b>Confirm your assumption about reality.</b> Print the value. <code>console.log("form:", form)</code>. Nine times in ten the bug is that a variable does not contain what you were certain it contained.</li>
+      <li><b>Bisect.</b> Is it broken halfway through? Then the problem is in the first half. Repeat. Twenty steps of this will find a bug in a million lines.</li>
+      <li><b>Change one thing.</b> If you change three and it works, you do not know why, and you cannot rely on it.</li>
+      <li><b>Explain it out loud.</b> To a colleague, to a rubber duck, to the agent. Articulating it forces the assumption you never examined to the surface. This works absurdly often.</li>
+    </ol>
+    <div class="def"><div class="k">Where an agent genuinely helps debugging</div><p>Paste the error and the relevant function and ask <i>“what are five things that could produce this error?”</i> It is excellent at generating a candidate list — breadth is its strength. Then <b>you</b> test the candidates. Asking it to “fix the bug” skips the step where you find out what the bug was, and you will meet the same bug again in a different costume.</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-009</b>. Two patients report that Request does nothing. It works every time for Priya. Here is the function behind the button.</p>
+    <div id="m9code"></div>
+    <p class="mut" style="margin-top:10px">Three parts, in the order a professional actually does them: reproduce, then prove, then fix.</p>
+
+    <div class="interactive">
+      <div class="ilbl">Required exercise &middot; debugExercise &middot; 1 of 3 &middot; reproduce</div>
+      <p><b>Find an input that breaks it.</b> Describe a form object as JSON. We will run the real buggy function against it. You pass this part when your input makes it either throw or return the wrong answer &mdash; that is a reproduction, and it is what Priya could not give you.</p>
+      <p class="mut">Priya's own input, which works: <code>{"name":"Priya","email":"p@northline.co","date":"2026-09-02"}</code></p>
+      <div class="formrow"><label>A form object that breaks it</label><textarea id="m9repro" spellcheck="false" style="min-height:70px">{"name":"Priya","email":"p@northline.co","date":"2026-09-02"}</textarea></div>
+      <button type="button" class="primary" id="m9btn1" style="margin-top:10px">Run the buggy function against it</button>
+      <div class="feedback" id="m9fb1"></div>
+    </div>
+
+    <div class="interactive" style="margin-top:20px">
+      <div class="ilbl">Required exercise &middot; debugExercise &middot; 2 of 3 &middot; prove</div>
+      <p><b>Write the failing test.</b> Write <code>test_canSubmit(impl)</code> which returns <code>true</code> when handed a correct implementation and <code>false</code> when handed the broken one. We run it against both. A test that returns <code>true</code> for everything fails this part, which is the entire lesson of section 3.</p>
+      <div class="formrow"><label>Your test</label><textarea id="m9test" spellcheck="false" style="min-height:150px">function test_canSubmit(impl) {
+  // Call impl with form objects. Return true only if it behaves correctly.
+  return true;
+}</textarea></div>
+      <button type="button" class="primary" id="m9btn2" style="margin-top:10px">Run against a good and a broken implementation</button>
+      <div class="feedback" id="m9fb2"></div>
+    </div>
+
+    <div class="interactive" style="margin-top:20px">
+      <div class="ilbl">Required exercise &middot; debugExercise &middot; 3 of 3 &middot; fix</div>
+      <p><b>Now fix it.</b> <code>canSubmit(form)</code> returns <code>true</code> only when name, email and date are all present and not blank &mdash; and it must never throw, whatever it is handed.</p>
+      <div class="formrow"><label>The fix</label><textarea id="m9fix" spellcheck="false" style="min-height:140px">function canSubmit(form) {
+
+}</textarea></div>
+      <button type="button" class="primary" id="m9btn3" style="margin-top:10px">Run hidden tests</button>
+      <div class="feedback" id="m9fb3"></div>
+    </div>
+    <p class="mut" style="margin-top:14px">More reps: <a href="practice-testing.html">testing practice</a> &middot; <a href="practice-detective.html">AI Code Detective</a>.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
+    <div id="quizRoot"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+
+  </section>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
+</div></div>
 <script src="course-progress.js"></script>
+<script src="northline.js"></script>
+<script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
+<script src="detective-kit.js"></script>
+<script src="module-kit.js"></script>
 <script>
-(function () {
-  const m8 = CourseProgress.isModuleComplete(8);
-  const pr = CourseProgress.capstonePracticeStatus();
-  const labs = CourseProgress.desktopLabReady();
-  const ready = CourseProgress.isUnlocked(9);
-  function pill(id, ok, label) {
-    const el = document.getElementById(id);
-    el.textContent = label;
-    el.className = "pill" + (ok ? " done" : "");
+Northline.renderWhy('whyGrid', {"build": "A reproduction, a test that fails on the real bug, and the fix — in that order, all three graded.", "why": "This is the module that separates “it ran once” from “I can prove it works”. It is also the most common gap in self-taught developers.", "aiHelps": "Generating a list of possible causes from an error message. Breadth again.", "aiFails": "It will produce a confident fix for a bug it cannot reproduce, and write tests that cannot fail while reporting them as passing.", "without": "You find the breaking input yourself. Part 2 explicitly fails a test that always returns true, so there is no way through by guessing."});
+const MK = ModuleKit.mount(9, AISEQuizData.MODULE_QUIZZES[9]);
+</script>
+<script>
+Northline.renderPrediction("beforeAi", {
+  label: "Predict first \u00b7 what differs",
+  intro: "Priya's input works: { name, email, date } all filled. Two patients hit Request and nothing happened.",
+  questions: [
+    { q: "What is the most likely difference between Priya and the two patients?",
+      opts: [
+        { t: "They left a field untouched. The code reads .length on undefined and throws.", correct: true,
+          whyOk: "Priya fills every field. A missing field is the case she has never triggered." },
+        { t: "Their browsers cannot run JavaScript.", why: "Possible, last on the list. Start with input. That is where most of these live." },
+        { t: "The function is fine and they mis-clicked.", why: "Two independent reports. Believe the report until you have a reproduction that fails." }
+      ] },
+    { q: "An agent offers a fix with no reproduction. What do you do?",
+      opts: [
+        { t: "Refuse it. Without a case that fails every time you cannot tell a fix from a coincidence.", correct: true,
+          whyOk: "A confident explanation attached to an untriggerable change is how a guess lands in the codebase." },
+        { t: "Merge it. Speed matters under pressure.", why: "Pressure is why you reproduce first. A wrong fix under pressure is two bugs." },
+        { t: "Ask it to also write tests, then merge.", why: "Tests written after a guessed fix often record the guess." }
+      ] }
+  ],
+  learned: ["You named the missing-field class before you saw the function.",
+    "Reproduction first is not optional. It is the only way a later green test means anything."]
+});
+Northline.renderDetectiveSet(["testAlwaysTrue", "validate", "leftover"], "detectives");
+var BUGGY = "function canSubmit(form) {\n  return form.name.length > 0 && form.email.length > 0 && form.date.length > 0;\n}";
+document.getElementById("m9code").innerHTML = DetectiveKit.codeBlock(BUGGY, "js") +
+  '<p class="mut" style="margin-top:8px">It works for Priya. It has worked for months. Nothing in it looks unusual.</p>';
+
+var m9 = { a: false, b: false, c: false };
+function m9sync() {
+  if (m9.a && m9.b && m9.c) {
+    CourseProgress.setSection(9, "debugExercise", { passed: true, at: new Date().toISOString() });
+    MK.sync();
   }
-  pill("stM8", m8, m8 ? "Module 8 complete" : "Module 8 incomplete");
-  pill("stPr", pr.ready, pr.ready ? "Practice bar met" : "Practice: need 3+ in two of HTML/CSS/JS (now " + pr.html + "/" + pr.css + "/" + pr.js + ")");
-  pill("stLabs", labs, labs ? "Both Desktop Labs done" : "Desktop Labs missing");
-  const gate = document.getElementById("capGate");
-  if (ready) {
-    gate.className = "disclosure";
-    gate.innerHTML = "<b>Unlocked.</b> Submit evidence on Projects (1 or 2). In-browser simulations still do not count as the live URL.";
-  } else {
-    document.body.classList.add("capstone-locked");
-    gate.innerHTML = "<b>Locked.</b> Finish Module 8, pass 3+ tasks in any two of the HTML / CSS / JS libraries, and complete both Desktop Labs. This page stays visible so you can see the bar — it is not a skip.";
+}
+function buggyFn() { return new Function(BUGGY + "\n; return canSubmit;")(); }
+function correctFn() {
+  return function (form) {
+    if (!form) return false;
+    function filled(v) { return typeof v === "string" && v.trim().length > 0; }
+    return filled(form.name) && filled(form.email) && filled(form.date);
+  };
+}
+
+document.getElementById("m9btn1").onclick = function () {
+  var raw = document.getElementById("m9repro").value;
+  var parsed;
+  try { parsed = JSON.parse(raw); } catch (e) {
+    ModuleKit.showResults(document.getElementById("m9fb1"),
+      { passed: false, results: [{ name: "your input is valid JSON", pass: false, hint: e.message }] });
+    return;
   }
-})();
+  var threw = false, got, err = "";
+  try { got = buggyFn()(parsed); } catch (e) { threw = true; err = e.message; }
+  var expected = correctFn()(parsed);
+  var wrongAnswer = !threw && got !== expected;
+  var reproduced = threw || wrongAnswer;
+  var results = [
+    { name: "your input is valid JSON", pass: true },
+    { name: "the buggy function misbehaves on it", pass: reproduced,
+      hint: "It returned " + JSON.stringify(got) + ", which is correct for that input. Keep looking \u2014 what would a real patient do that Priya never does? Think about a field she always fills in and they might not touch at all." }
+  ];
+  if (reproduced) {
+    results.push({ name: threw ? "it throws: " + err : "it returns " + JSON.stringify(got) + " when the answer is " + JSON.stringify(expected), pass: true });
+  }
+  var ok = reproduced;
+  ModuleKit.showResults(document.getElementById("m9fb1"), { passed: ok, results: results });
+  if (ok) {
+    m9.a = true;
+    document.getElementById("m9fb1").innerHTML =
+      "<b>Reproduced.</b> " + (threw
+        ? "It throws, because <code>.length</code> on a field the patient never touched is <code>.length</code> on <code>undefined</code>. Priya fills in every field, so she has never once triggered it."
+        : "It returns the wrong answer for that input.") +
+      " You now have something Priya could not give you: a case that fails every single time. That is what makes the next two parts possible.";
+    m9sync();
+  }
+};
+
+document.getElementById("m9btn2").onclick = function () {
+  var out = PracticeKit.gradeTesting({
+    functionName: "test_canSubmit",
+    goodImpl: correctFn(),
+    badImpl: buggyFn(),
+    bugHint: "Your test passed the broken implementation. Give it a form with a missing or blank field \u2014 that is the case that breaks."
+  }, document.getElementById("m9test").value);
+  ModuleKit.showResults(document.getElementById("m9fb2"), out);
+  if (out.passed) {
+    m9.b = true;
+    document.getElementById("m9fb2").innerHTML =
+      "<b>That test can fail.</b> Which is the only property that makes green mean anything. Note what you did: you decided the right answer yourself, then required the code to agree \u2014 rather than recording whatever it happened to return.";
+    m9sync();
+  }
+};
+
+document.getElementById("m9btn3").onclick = function () {
+  var out = PracticeKit.gradeJs({
+    functionName: "canSubmit",
+    testCases: [
+      { name: "a complete form can submit", args: [{ name: "Priya", email: "p@northline.co", date: "2026-09-02" }], expected: true },
+      { name: "a missing date does not throw, and blocks submit", args: [{ name: "Priya", email: "p@northline.co" }], expected: false },
+      { name: "a missing email blocks submit", args: [{ name: "Priya", date: "2026-09-02" }], expected: false },
+      { name: "a missing name blocks submit", args: [{ email: "p@northline.co", date: "2026-09-02" }], expected: false },
+      { name: "an empty string blocks submit", args: [{ name: "", email: "p@northline.co", date: "2026-09-02" }], expected: false },
+      { name: "whitespace only blocks submit", args: [{ name: "   ", email: "p@northline.co", date: "2026-09-02" }], expected: false },
+      { name: "an entirely empty object does not throw", args: [{}], expected: false },
+      { name: "a null form does not throw", args: [null], expected: false }
+    ]
+  }, document.getElementById("m9fix").value);
+  ModuleKit.showResults(document.getElementById("m9fb3"), out);
+  if (out.passed) {
+    m9.c = true;
+    document.getElementById("m9fb3").innerHTML =
+      "<b>NL-009 closed properly.</b> Reproduction, then a test that proves the bug, then the fix. Priya's two patients can book, and if someone reintroduces this next quarter your test catches it before they do.<br><br>" +
+      out.results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+    Northline.showLearned(document.getElementById("m9fb3").parentNode,
+      "You just closed a bug the way a team can trust.",
+      "Reproduce, prove, then fix. The test is what stops this coming back in a different costume.");
+    m9sync();
+  }
+};
 </script>
 <script src="course-rail.js"></script>
 </body>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 12 — Python for tools and automation</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 12</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Stage 5 &middot; Module 12 &middot; ~60 min</span>
+    <h1 class="serif">Python for tools and automation</h1>
+    <p class="sub">4,000 rows of duplicated, blank, inconsistently capitalised booking data. Not a job for a web page, and not a job for a human.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
+      <ul>
+        <li>Read and write Python having learned JavaScript, including the indentation rule</li>
+        <li>Work with lists of dictionaries, the shape almost all real data arrives in</li>
+        <li>Normalise before comparing, and explain why deduplication fails without it</li>
+        <li>Write a script that takes arguments, never overwrites its input, and reports what it did</li>
+        <li>Write assertions for a tool, and check that they can fail</li>
+      </ul>
+    </div>
+  </header>
+  <section>
+  <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
+    <div id="whyGrid"></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">01</span><h2>Before you touch AI</h2></div>
+    <p>4,000 rows. Duplicate emails, blank rows, mixed capitals. Before anyone writes a script, decide what “the same person” means and what a tool is not allowed to do to the original file.</p>
+    <div id="beforeAi" class="interactive"></div>
+    <div id="detectives" style="margin-top:16px"></div>
+    <div id="wfCompare" class="interactive" style="margin-top:16px"><div class="ilbl">Choose the better request &middot; labelled simulation</div></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">02</span><h2>Why a second language, and why this one</h2></div>
+    <p>Dan has a 4,000-row export from the old booking system. Duplicates, blank rows, emails in six different capitalisations. Nobody is fixing that by hand, and it is not a job for the website.</p>
+    <p>This is the category of work Python owns: <b>a script that reads a file, does something to it, and writes a file out.</b> Data cleanup, renaming a thousand images, pulling numbers off an API into a spreadsheet, generating a report every Monday. JavaScript can do all of it; Python is simply less ceremony for this shape of problem, and it is what the rest of the industry reaches for.</p>
+    <p>You already know how to program. Almost everything from Module 5 transfers directly &mdash; variables, functions, conditions, loops, collections. What changes is spelling and a few habits.</p>
+    <pre>// JavaScript                        # Python
+const total = 0;                      total = 0
+function add(a, b) { return a + b; }  def add(a, b):
+                                          return a + b
+if (x &gt; 3) { ... }                    if x &gt; 3:
+                                          ...
+items.forEach(i =&gt; { ... })           for i in items:
+                                          ...
+[1, 2, 3]                             [1, 2, 3]
+{ name: "Priya" }                     {"name": "Priya"}
+null                                  None
+true / false                          True / False</pre>
+    <p>The one difference that will actually bite you: <b>indentation is the syntax</b>. Python has no braces. The block is whatever is indented under the <code>def</code> or the <code>if</code>. Get it wrong and the code does something different, not nothing.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">03</span><h2>Lists, dictionaries, and the shape of messy data</h2></div>
+    <p>Two collections carry most of the weight, and the export you are about to clean is made of both: a <b>list</b> of rows, where each row is a <b>dictionary</b>.</p>
+    <pre>rows = [
+    {"name": "Priya Raman", "email": "P.Raman@Northline.co "},
+    {"name": "Priya Raman", "email": "p.raman@northline.co"},
+    {"name": "", "email": ""},
+]
+
+for row in rows:
+    print(row["email"])          # square brackets, like JS
+    print(row.get("phone"))      # None instead of an error, if absent</pre>
+    <p>Look at the first two rows. To a computer comparing strings they are different: different capitals, a trailing space. To a human they are obviously the same person, which is why the email will get sent twice and Dan will hear about it.</p>
+    <p>So <b>normalise before you compare</b>. Not after, not sometimes:</p>
+    <pre>key = row["email"].strip().lower()   # "p.raman@northline.co"
+
+seen = set()                          # a set remembers what it has seen
+if key not in seen:
+    seen.add(key)
+    keep.append(row)</pre>
+    <div class="def"><div class="k">The pattern behind almost every cleanup script</div><p>Walk the rows once. For each row, build a normalised key. If you have not seen that key, keep the row and remember the key. That is deduplication, and it is worth recognising because you will write it in some form for the rest of your career.</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">04</span><h2>A script is a tool other people run</h2></div>
+    <p>The moment a script does something useful, someone else runs it &mdash; and “someone else” includes you in four months. Three things make that survivable.</p>
+    <p><b>Take input, do not hardcode it.</b> A path baked into line 3 is a script that works exactly once.</p>
+    <pre>import argparse
+
+parser = argparse.ArgumentParser(description="Clean a booking export.")
+parser.add_argument("infile")
+parser.add_argument("outfile")
+args = parser.parse_args()
+
+# python clean.py messy.csv clean.csv</pre>
+    <p><b>Never overwrite the input.</b> Read one file, write a different one. A cleanup script with a bug that has already eaten the only copy of the original data is a bad afternoon that no amount of care afterwards can undo.</p>
+    <p><b>Say what it did.</b> <code>print(f"Read {len(rows)} rows, wrote {len(clean)}, removed {len(rows) - len(clean)}")</code>. Silence is indistinguishable from failure. And this is the number Dan will ask you for.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> Ask an agent for a cleanup script and it will very often write one that reads and writes the same path, or that assumes every row has every column. It also loves <code>except: pass</code>, which converts “this file was malformed” into “the file was fine, here are 200 rows instead of 4,000”. Silent data loss is the worst failure mode there is, because nothing tells you it happened.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">05</span><h2>Tools need tests more than web pages do</h2></div>
+    <p>Counter-intuitive but true. If a web page breaks, someone sees it break. If a cleanup script breaks, it produces a file &mdash; a plausible-looking file, with the wrong contents, that goes on to be used for something.</p>
+    <p>You do not need a framework to start. A function, a few assertions, run it:</p>
+    <pre>def test_clean_rows():
+    rows = [
+        {"name": "A", "email": "a@x.co"},
+        {"name": "A", "email": "A@X.CO "},     # same person
+        {"name": "", "email": ""},             # blank row
+    ]
+    out = clean_rows(rows)
+    assert len(out) == 1, f"expected 1 row, got {len(out)}"
+    assert out[0]["email"] == "a@x.co", "email should be normalised"
+
+test_clean_rows()
+print("ok")</pre>
+    <p>Now break <code>clean_rows</code> on purpose and run it again. If it still prints <code>ok</code>, your test is decoration &mdash; the same check from Module 9, and it applies to every test you will ever write, in any language.</p>
+    <div class="disclosure">The exercise below runs real CPython in your browser, compiled to WebAssembly. It is genuinely executing your code, not pattern-matching it, which is why the first run takes a few seconds to warm up.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">06</span><h2>Where this goes next</h2></div>
+    <p>You are not going to become a Python specialist from one module, and you do not need to. What you have is the ability to recognise the shape of problem Python suits and write a small, tested, honest tool for it.</p>
+    <p>The natural next steps, when a real need appears:</p>
+    <ul class="plain">
+      <li><b><code>csv</code> and <code>json</code></b> from the standard library. Reading tabular data properly, rather than splitting on commas and discovering that one of the names contains a comma.</li>
+      <li><b><code>pathlib</code></b> for files and folders without string-concatenating paths.</li>
+      <li><b><code>requests</code></b> for pulling data from an API.</li>
+      <li><b><code>pytest</code></b> when a handful of asserts stops being enough.</li>
+    </ul>
+    <p>And the habit that matters more than any library: when you reach for an agent to write a script, you still specify the behaviour, you still read what came back, and you still write the test that would catch it being wrong. The language changed. The loop did not.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-012</b>: <i>"4,000 rows from the old system. Duplicate emails, blank rows, inconsistent capitalisation. I need one clean file and I need to know how many rows you dropped."</i></p>
+    <div class="interactive">
+      <div class="ilbl">Required exercise &middot; pythonToolExercise &middot; real CPython</div>
+      <p>Write <code>clean_rows(rows)</code>. It takes a list of dictionaries and returns a new list where:</p>
+      <ul class="plain">
+        <li>rows with a blank or missing email are dropped</li>
+        <li>duplicates are removed by email compared <b>after</b> stripping whitespace and lowercasing</li>
+        <li>the <b>first</b> occurrence of each email survives, in its original position</li>
+        <li>the surviving row's <code>email</code> is stored stripped and lowercased</li>
+      </ul>
+      <p class="mut">Hidden tests include the cases an agent usually misses: the blank row, a row with no <code>email</code> key at all, the trailing space, and keeping the first occurrence rather than the last.</p>
+      <p class="mut">One thing the grader cannot check but a reviewer would: build a new dictionary rather than editing the one you were handed. Writing <code>row["email"] = key</code> silently changes the caller's data, which is exactly the class of surprise that makes a shared function untrustworthy.</p>
+      <div class="formrow"><label>clean.py</label><textarea id="m12py" spellcheck="false" style="min-height:220px">def clean_rows(rows):
+    clean = []
+    seen = set()
+    for row in rows:
+        pass
+    return clean
+</textarea></div>
+      <button class="primary" id="m12run" style="margin-top:12px">Run in CPython</button>
+      <p class="mut" id="m12note" style="margin-top:8px">First run downloads the Python interpreter. Give it a few seconds.</p>
+      <div class="feedback" id="m12fb"></div>
+    </div>
+    <p class="mut" style="margin-top:14px">More reps: <a href="practice-python.html">Python practice</a> &middot; the finished tool is portfolio project <a href="projects.html">"CSV Cleaner"</a>.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
+    <div id="quizRoot"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+
+  </section>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
+</div></div>
+<script src="course-progress.js"></script>
+<script src="northline.js"></script>
+<script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
+<script src="pyodide-sandbox-runner.js"></script>
+<script src="detective-kit.js"></script>
+<script src="module-kit.js"></script>
+<script>
+Northline.renderWhy('whyGrid', {"build": "clean_rows() — a real deduplicator, graded by CPython running in your browser.", "why": "Most automation, data work, and glue in the industry is written in Python. This is also the shape of task agents are asked for most.", "aiHelps": "Boilerplate: argparse, csv reading, file handling. It is fast at all of it.", "aiFails": "Reading and writing the same path, assuming every row has every column, and bare except: pass turning malformed data into silent data loss.", "without": "You write the dedupe logic. The hidden tests are the three cases agents miss: the blank row, the trailing space, and first-versus-last."});
+const MK = ModuleKit.mount(12, AISEQuizData.MODULE_QUIZZES[12]);
+</script>
+<script>
+Northline.renderPrediction("beforeAi", {
+  label: "Predict first \u00b7 what clean means",
+  questions: [
+    { q: "P.Raman@Northline.co[space] and p.raman@northline.co. Same person?",
+      opts: [
+        { t: "Yes, after strip and lower. Compare the normalised key, store the normalised email.", correct: true,
+          whyOk: "To a computer they are different strings. To Dan they are one inbox, twice." },
+        { t: "No. Different spelling means different people.", why: "Capitals and a trailing space are not a different person." },
+        { t: "Keep both and let Priya decide.", why: "That is the Monday chore this ticket exists to kill." }
+      ] },
+    { q: "The agent writes a script that reads and writes the same path, with except: pass around the load. Ship it?",
+      opts: [
+        { t: "No. A wrong run eats the only export, and a malformed file becomes a silent success.", correct: true,
+          whyOk: "Two failure modes in two lines. Read one path, write another, and say what you did." },
+        { t: "Yes if it prints ok at the end.", why: "ok is what except: pass is designed to print." },
+        { t: "Yes if you keep a backup on your desktop.", why: "Your desktop is not the tool. The tool has to be safe when someone else runs it." }
+      ] }
+  ],
+  learned: ["You defined same-person and non-negotiable safety before anyone wrote Python.",
+    "Normalise before you compare. Never overwrite the input."]
+});
+Northline.renderDetectiveSet(["pyExceptPass", "pyOverwrite"], "detectives");
+Northline.renderWorkflowCompare("wfCompare", {
+  situation: "You are about to ask an agent for the cleanup script. First message?",
+  bad: { t: "Write a Python script that cleans our booking export. Make it robust.",
+    why: "Robust will arrive as except: pass and a single path. You will not see the data-loss until Monday." },
+  good: { t: "Write clean_rows(rows) only. Drop blank or missing emails. Dedupe by email after strip and lower, keep the first occurrence, store the normalised email. Return a new list. Do not mutate the input rows. Do not write any files. Include a test that fails if A@X.CO[space] and a@x.co both survive.",
+    why: "One function, the normalisation rule, first-vs-last, and a test that can fail. Files come after the function is proven." }
+});
+document.getElementById("m12run").onclick = function () {
+  var btn = this;
+  btn.disabled = true;
+  btn.textContent = "Running in CPython\u2026";
+  var fb = document.getElementById("m12fb");
+  fb.className = "feedback";
+  fb.innerHTML = "Starting the interpreter\u2026";
+  PracticeKit.gradePython({
+    functionName: "clean_rows",
+    testCases: [
+      { name: "an exact duplicate email is removed",
+        args: [[{ name: "A", email: "a@x.co" }, { name: "A", email: "a@x.co" }]],
+        expected: [{ name: "A", email: "a@x.co" }] },
+      { name: "capitalisation and trailing spaces still count as the same person",
+        args: [[{ name: "A", email: "a@x.co" }, { name: "A", email: "A@X.CO " }]],
+        expected: [{ name: "A", email: "a@x.co" }] },
+      { name: "the stored email is normalised, not left as typed",
+        args: [[{ name: "P", email: "  P.Raman@Northline.co " }]],
+        expected: [{ name: "P", email: "p.raman@northline.co" }] },
+      { name: "a blank email is dropped",
+        args: [[{ name: "", email: "" }, { name: "B", email: "b@x.co" }]],
+        expected: [{ name: "B", email: "b@x.co" }] },
+      { name: "a whitespace-only email is dropped",
+        args: [[{ name: "C", email: "   " }, { name: "B", email: "b@x.co" }]],
+        expected: [{ name: "B", email: "b@x.co" }] },
+      { name: "a missing email key does not crash the run",
+        args: [[{ name: "D" }, { name: "B", email: "b@x.co" }]],
+        expected: [{ name: "B", email: "b@x.co" }] },
+      { name: "the FIRST occurrence survives, not the last",
+        args: [[{ name: "First", email: "a@x.co" }, { name: "Second", email: "a@x.co" }]],
+        expected: [{ name: "First", email: "a@x.co" }] },
+      { name: "original order is preserved",
+        args: [[{ name: "1", email: "c@x.co" }, { name: "2", email: "a@x.co" }, { name: "3", email: "b@x.co" }]],
+        expected: [{ name: "1", email: "c@x.co" }, { name: "2", email: "a@x.co" }, { name: "3", email: "b@x.co" }] },
+      { name: "an empty list returns an empty list",
+        args: [[]], expected: [] }
+    ]
+  }, document.getElementById("m12py").value, function (out) {
+    btn.disabled = false;
+    btn.textContent = "Run in CPython";
+    document.getElementById("m12note").hidden = true;
+    ModuleKit.showResults(fb, out);
+    if (out.passed) {
+      fb.innerHTML = "<b>That is a tool Dan can run on the real export.</b> It survives the blank row, treats <code>A@X.CO </code> and <code>a@x.co</code> as one person, and keeps the first occurrence rather than the last \u2014 which is the difference between the original record and whatever got typed second.<br><br>" +
+        out.results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+      CourseProgress.setSection(12, "pythonToolExercise", { passed: true, at: new Date().toISOString() });
+      Northline.showLearned(fb.parentNode,
+        "You just shipped a tool Dan can run on the real export.",
+        "Blank rows drop, capitals collapse, the first record wins. That is the Monday chore, finished.");
+      MK.sync();
+    }
+  });
+};
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

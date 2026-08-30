@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 11 — Refactoring, security, and maintenance</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 11</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Stage 4 &middot; Module 11 &middot; ~60 min</span>
+    <h1 class="serif">Refactoring, security, and maintenance</h1>
+    <p class="sub">Three copies of the same function and a patient email in the log. Change the shape without changing the behaviour — and understand why that constraint is the whole point.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
+      <ul>
+        <li>State the one rule of refactoring, and why mislabelling a change misleads your reviewer</li>
+        <li>Explain why duplicated logic is a correctness problem rather than an aesthetic one</li>
+        <li>Apply the four refactors that cover most real work</li>
+        <li>Apply five security rules that come up in small projects every week</li>
+        <li>Leave a project someone else can pick up</li>
+      </ul>
+    </div>
+  </header>
+  <section>
+  <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
+    <div id="whyGrid"></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">01</span><h2>Before you tidy anything</h2></div>
+    <p>Three copies of a date function and a patient email in the log. Before you rewrite, decide what “refactor” allows you to change, and what a cleanup is not allowed to do.</p>
+    <div id="beforeAi" class="interactive"></div>
+    <div id="detectives" style="margin-top:16px"></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">02</span><h2>Refactoring has exactly one rule</h2></div>
+    <p><b>Behaviour does not change. Only structure does.</b></p>
+    <p>That is the whole definition, and it is worth being pedantic about, because the word gets used for any change that feels like tidying. If observable behaviour changes &mdash; even in one edge case, even for the better &mdash; it is not a refactor. It is a fix or a feature, and it needs its own review and its own test.</p>
+    <p>Why the distinction matters practically: it sets what a reviewer checks. Told "this is a refactor", Sam checks that nothing moved. Told "this changes how blank names are handled", he checks that the new handling is right. Mislabel it and he checks for the wrong thing.</p>
+    <div class="def"><div class="k">What makes a refactor safe at all</div><p>Tests that would fail if behaviour changed. Without them you are rearranging code and hoping, and “I was only tidying” is the preamble to a surprising number of outages. This is why Module 9 comes before this one.</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">03</span><h2>Duplication is a correctness problem</h2></div>
+    <p>Dan says there are three copies of the same date function. This gets filed as untidiness. It is not; it is a bug waiting for a schedule.</p>
+    <p>Here is what happens. Someone finds a bug in one copy and fixes it. The other two stay broken. Nobody knows which callers use which copy, so the bug is now <i>intermittent</i> from the user's point of view &mdash; it depends on which screen you came from. Then the three copies drift further, because each gets patched for its own caller, until they are genuinely different functions with the same name and nobody dares merge them.</p>
+    <p>The fix is boring and that is fine: one function, one place, every caller pointing at it.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> Agents create duplication constantly, and it is structural rather than careless. Ask for a date formatter and it writes one, because it usually cannot see that <code>utils.js</code> already has one. This is why “there is already a formatDate in utils.js, use it” belongs in your request — the context you provide is the only thing preventing a third copy.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">04</span><h2>The refactors worth knowing</h2></div>
+    <p>Four moves cover most of what you will do:</p>
+    <ul class="plain">
+      <li><b>Extract a function.</b> A block of code that needs a comment to explain what it does usually wants to be a function whose name says it. The comment becomes unnecessary, which is the sign you did it right.</li>
+      <li><b>Name a value.</b> <code>if (days > 86400000)</code> becomes <code>if (days > MS_PER_DAY)</code>. Magic numbers are where off-by-a-factor-of-sixty bugs live.</li>
+      <li><b>Remove a duplicate.</b> Three copies to one. Point the callers at it.</li>
+      <li><b>Reduce nesting.</b> Return early instead of wrapping the whole body in an <code>if</code>. Four levels of indentation is a reliable sign that something wants extracting.</li>
+    </ul>
+    <p>Notice what is not on the list: renaming things to your personal taste, introducing an abstraction for a single caller, converting working loops to a different style. Those are changes with a cost and no stated benefit, and in a review they read as noise.</p>
+    <pre>// Before: nested, magic number, unnamed intent
+function check(a) {
+  if (a) {
+    if (a.date) {
+      if (Date.now() - Date.parse(a.date) &lt; 604800000) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// After: same behaviour, one reason per line
+const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
+
+function isWithinLastWeek(appointment) {
+  if (!appointment || !appointment.date) return false;
+  return Date.now() - Date.parse(appointment.date) &lt; MS_PER_WEEK;
+}</pre>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">05</span><h2>Security you can actually apply this week</h2></div>
+    <p>Not a compliance course. Five things that come up in real small projects, all of which you have now met at least once:</p>
+    <ul class="plain">
+      <li><b>Never log personal data.</b> Patient emails, names, clinical notes, card numbers, tokens. Logs get copied to third-party services, pasted into tickets, and read by people with no relationship to that patient. Dan's ticket mentions exactly this.</li>
+      <li><b>Never commit secrets.</b> API keys go in environment configuration, and the file goes in <code>.gitignore</code>. And note: deleting a committed secret does not remove it from history. It has to be rotated. Treat a committed key as compromised, because it is.</li>
+      <li><b>Never put untrusted input into <code>innerHTML</code>.</b> <code>textContent</code> for anything a person typed.</li>
+      <li><b>Validate on arrival.</b> Check input at the boundary where it enters your system, not in the middle where you have already used it twice.</li>
+      <li><b>Do not disable a check to make something work.</b> The <code>// TEMP: skipping validation for the demo</code> comment is honest and the code is broken. Demo shortcuts become production behaviour, because nothing forces anyone to come back.</li>
+    </ul>
+    <div class="disclosure">None of these need a security specialist. They need somebody who reads the diff, which is now your job.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">06</span><h2>Maintenance: writing for the person who inherits it</h2></div>
+    <p>Most of a codebase's life is after it is written, and most of the reading is done by someone with no memory of why. Often you.</p>
+    <ul class="plain">
+      <li><b>A README that says how to run it.</b> Not what it is &mdash; how to start it. This is the single highest-value document in any small project.</li>
+      <li><b>Comments that say why, never what.</b> <code>// increment i</code> is noise. <code>// Notes are per appointment, not per patient: the same patient can have contradictory notes on two visits</code> is worth its space forever.</li>
+      <li><b>Names that survive.</b> <code>data</code>, <code>temp</code>, <code>result2</code>, <code>handleIt</code> mean nothing a month later.</li>
+      <li><b>Record decisions and their alternatives.</b> "We store notes per appointment rather than per patient because visits can legitimately contradict each other." Without this, someone reverses it in six months, reasonably, and breaks something.</li>
+    </ul>
+    <div class="def"><div class="k">The maintenance test</div><p>Could someone who has never seen this project run it, find the thing that handles bookings, and understand why the odd-looking decision was made? If not, the gap is documentation, not cleverness.</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-011</b>: <i>"Three copies of the same date function and a console.log with a patient email in it. Tidy it without changing behaviour."</i></p>
+    <div id="m11code"></div>
+    <div class="interactive">
+      <div class="ilbl">Required exercise &middot; refactorExercise</div>
+      <p>Replace all of that with <b>one</b> function, <code>isWithinDays(dateStr, today, days)</code>, returning <code>true</code> when <code>dateStr</code> falls inside the window of <code>days</code> ending on <code>today</code> inclusive. It must not throw on missing input. Then declare the constant and drop the logging.</p>
+      <p class="mut">Graded on three things at once: the behaviour is preserved for every window the three originals covered, there is only one function, and the patient email is no longer written to the log. That is what “refactor” means.</p>
+      <div class="formrow"><label>Your refactor</label><textarea id="m11js" spellcheck="false" style="min-height:200px">const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function isWithinDays(dateStr, today, days) {
+
+}
+</textarea></div>
+      <button class="primary" id="m11check" style="margin-top:12px">Check behaviour and cleanliness</button>
+      <div class="feedback" id="m11fb"></div>
+    </div>
+    <p class="mut" style="margin-top:14px">More reps: <a href="practice-detective.html">AI Code Detective</a> &middot; <a href="practice-integrated.html">integrated challenges</a>.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
+    <div id="quizRoot"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+
+  </section>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
+</div></div>
+<script src="course-progress.js"></script>
+<script src="northline.js"></script>
+<script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
+<script src="detective-kit.js"></script>
+<script src="module-kit.js"></script>
+<script>
+Northline.renderWhy('whyGrid', {"build": "One function replacing three, with the magic numbers named and the patient email out of the log.", "why": "Most of a codebase's life happens after it is written, and most of that reading is done by someone with no memory of why.", "aiHelps": "Mechanical refactors are something it does quickly and usually well.", "aiFails": "It creates the duplication in the first place, and it will change behaviour while “tidying” and describe it as cleanup.", "without": "You do the refactor. The grader checks behaviour is preserved across every window the three originals covered."});
+const MK = ModuleKit.mount(11, AISEQuizData.MODULE_QUIZZES[11]);
+</script>
+<script>
+Northline.renderPrediction("beforeAi", {
+  label: "Predict first \u00b7 what refactor allows",
+  questions: [
+    { q: "You improve a date helper and also start treating a blank date as today. What is that change?",
+      opts: [
+        { t: "A fix or a feature, not a refactor. Behaviour moved. It needs its own review and test.", correct: true,
+          whyOk: "Told 'this is a refactor', Sam checks that nothing moved. Mislabel it and he checks for the wrong thing." },
+        { t: "A refactor, because the code is cleaner.", why: "Cleaner is not the definition. Behaviour did not stay still." },
+        { t: "A refactor if the tests still pass.", why: "Tests that never covered blank dates will stay green. That is the hole." }
+      ] },
+    { q: "The tidy-up still has console.log('checking', d.patientEmail). Merge?",
+      opts: [
+        { t: "No. Personal data in a log is a disclosure. Remove it, do not comment it out.", correct: true,
+          whyOk: "Logs get copied. A patient email in a cleanup PR is the leak Dan named." },
+        { t: "Yes if it is only on the server.", why: "Server logs get shipped too. Still a leak." },
+        { t: "Yes. Debug logs are part of maintenance.", why: "Maintenance is a README and a named constant, not a inbox dump." }
+      ] }
+  ],
+  learned: ["You drew the line before you touched the three copies.",
+    "Behaviour stays. Structure moves. A log of a patient email does neither \u2014 it just leaves."]
+});
+Northline.renderDetectiveSet(["leak", "leftover", "xssInnerHtml"], "detectives");
+var LEGACY = "// checks if within a week\nfunction withinWeek(d) {\n  console.log('checking', d.patientEmail);\n  return Date.now() - Date.parse(d.date) < 604800000;\n}\n\n// same thing but 30 days\nfunction within30(d) {\n  return Date.now() - Date.parse(d.date) < 2592000000;\n}\n\n// same thing but a day\nfunction isToday(d) {\n  return Date.now() - Date.parse(d.date) < 86400000;\n}";
+document.getElementById("m11code").innerHTML = DetectiveKit.codeBlock(LEGACY, "js") +
+  '<p class="mut" style="margin-top:8px">Three functions, one idea, three magic numbers, and a patient email going to the log.</p>';
+
+document.getElementById("m11check").onclick = function () {
+  var src = document.getElementById("m11js").value;
+  var out = PracticeKit.gradeJs({
+    functionName: "isWithinDays",
+    testCases: [
+      { name: "today is inside a 1-day window", args: ["2026-08-30", "2026-08-30", 1], expected: true },
+      { name: "yesterday is outside a 1-day window", args: ["2026-08-29", "2026-08-30", 1], expected: false },
+      { name: "6 days back is inside a 7-day window", args: ["2026-08-24", "2026-08-30", 7], expected: true },
+      { name: "7 days back is outside a 7-day window", args: ["2026-08-23", "2026-08-30", 7], expected: false },
+      { name: "29 days back is inside a 30-day window", args: ["2026-08-01", "2026-08-30", 30], expected: true },
+      { name: "a future date is outside the window", args: ["2026-08-31", "2026-08-30", 7], expected: false },
+      { name: "a missing date does not throw", args: [null, "2026-08-30", 7], expected: false },
+      { name: "an unparseable date does not throw", args: ["not a date", "2026-08-30", 7], expected: false }
+    ]
+  }, src);
+
+  var extra = [
+    { name: "exactly one function is declared", pass: (src.match(/function\s+[A-Za-z_$][\w$]*\s*\(/g) || []).length === 1,
+      hint: "The point of the ticket is one function, not three. Found " + (src.match(/function\s+[A-Za-z_$][\w$]*\s*\(/g) || []).length + "." },
+    { name: "the patient email is no longer logged", pass: !/console\.(log|info|warn|debug)[\s\S]*?(patientEmail|email)/i.test(src),
+      hint: "Personal data in logs is a disclosure. Remove it, do not comment it out." },
+    { name: "no leftover console logging at all", pass: !/console\.(log|info|debug)\s*\(/.test(src),
+      hint: "Debug logging is not part of a finished refactor." },
+    { name: "the day length is a named constant, not a magic number", pass: /MS_PER_DAY/.test(src) && !/\b(604800000|2592000000|86400000)\b/.test(src),
+      hint: "Use MS_PER_DAY and multiply by days. 604800000 tells the next reader nothing." }
+  ];
+  var results = out.results.concat(extra);
+  var ok = out.passed && extra.every(function (r) { return r.pass; });
+  ModuleKit.showResults(document.getElementById("m11fb"), { passed: ok, results: results });
+  if (ok) {
+    document.getElementById("m11fb").innerHTML =
+      "<b>Same behaviour, one third of the code, and no patient data in the log.</b> Every window the three originals handled still returns what it returned before \u2014 which is the only thing that entitles you to call this a refactor rather than a rewrite.<br><br>" +
+      results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+    CourseProgress.setSection(11, "refactorExercise", { passed: true, at: new Date().toISOString() });
+    Northline.showLearned(document.getElementById("m11fb").parentNode,
+      "You just changed the shape and left the behaviour where it was.",
+      "One function, named constants, no patient data in the log. That is what entitles you to call it a refactor.");
+    MK.sync();
+  }
+};
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

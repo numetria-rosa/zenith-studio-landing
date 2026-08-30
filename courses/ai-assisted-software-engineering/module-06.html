@@ -3,80 +3,322 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 6 — Testing and debugging</title>
+<title>Module 6 — The DOM, events, and data that arrives late</title>
 <link rel="stylesheet" href="course.css">
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 6</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 6 · ~50 min</span>
-    <h1 class="serif">Testing and debugging</h1>
-    <p class="sub">“The agent said it works” is not an assertion. A useful test fails when the behavior you care about is wrong.</p>
+    <span class="eyebrow">Stage 2 &middot; Module 6 &middot; ~65 min</span>
+    <h1 class="serif">The DOM, events, and data that arrives late</h1>
+    <p class="sub">Logic in a file does nothing. Now wire it to something a person can press, load real data over a real network, and handle the three states that only show up after you have shipped.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
+      <ul>
+        <li>Explain why the DOM and your HTML file are different things</li>
+        <li>Choose textContent over innerHTML for user data, and say what the attack is</li>
+        <li>Attach event listeners to real controls, and stop a form navigating away</li>
+        <li>Load JSON with async and await, and check response.ok</li>
+        <li>Handle loading, empty, and failed states — not just the happy path</li>
+      </ul>
+    </div>
   </header>
   <section>
-    <div class="kh"><span class="num">1</span><h2>Console vs test</h2></div>
-    <p><code>console.log</code> is a flashlight. A test is a contract. If you delete the flashlight, the contract should still fail on the bug.</p>
+  <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
+    <div id="whyGrid"></div>
+
   </section>
   <section>
-    <div class="kh"><span class="num">2</span><h2>Graded: catch the planted bug</h2></div>
-    <p>Write <code>test_clamp(impl)</code> that returns true only if <code>impl(50, 0, 10) === 10</code> and <code>impl(-2, 0, 10) === 0</code>. We will run it on a correct clamp and on one that returns <code>n</code> unchanged.</p>
+  <div class="kh"><span class="num">01</span><h2>Before you touch AI</h2></div>
+    <p>Dan wants the list loaded from a file, and a toggle that shows only open appointments. Before anyone writes <code>fetch</code> or a click handler, decide what the page must say in each state, and what a second click must do.</p>
+    <div id="beforeAi" class="interactive"></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">02</span><h2>AI Code Detective</h2></div>
+    <p>The agent “wired the list.” Each snippet compiles. Find the defect. Options are shuffled.</p>
+    <div id="detectives"></div>
+    <div class="honestnote"><b>What AI got wrong, in one sentence each.</b> It parsed a patient name as HTML. It treated a 404 as success. It hid rows on setup instead of on click. All of that can look fine in a demo on a fast laptop with clean data.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">03</span><h2>The DOM is not your HTML file</h2></div>
+    <p>You wrote a file. The browser read it and built something else out of it: a live tree of objects. That tree is the DOM, and it is what is actually on screen.</p>
+    <p>This distinction matters because they can diverge immediately. JavaScript changes the DOM; the file on disk is untouched. Reload and your changes are gone. Every "why did my change disappear" question is this.</p>
+    <pre>// find things
+document.querySelector("#hoursList");      // the first match for a CSS selector
+document.querySelectorAll(".row");         // all matches
+
+// read and change
+el.textContent = "Closed today";           // the text inside
+el.classList.add("is-open");               // add a class
+el.hidden = true;                          // hide it</pre>
+    <p><code>querySelector</code> takes exactly the selectors you learned in Module 4, which is a genuine kindness.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">04</span><h2>textContent versus innerHTML, and why it is a security question</h2></div>
+    <p>Two ways to put content into an element. They are not interchangeable.</p>
+    <pre>el.textContent = value;   // inserts value as TEXT. tags become visible characters.
+el.innerHTML  = value;    // PARSES value as markup. tags become elements.</pre>
+    <p>For content you wrote, <code>innerHTML</code> is fine and often convenient. For anything a user typed, it is a vulnerability:</p>
+    <pre>const name = '&lt;img src=x onerror="alert(document.cookie)"&gt;';
+
+el.textContent = name;   // shows those characters on screen. harmless.
+el.innerHTML  = name;    // creates a real element and runs the handler.</pre>
+    <p>That is cross-site scripting, in one line, from a name field. The rule is simple: <b>user data goes in with <code>textContent</code></b>. If you genuinely need markup from user input, that is a real problem requiring a real sanitiser, not a convenient property.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> Agents reach for <code>innerHTML</code> by default when rendering a list, because it is the shortest way to build rows from data. On a page rendering patient names it is an injection point. This is the single most common security defect you will find in AI-generated front-end code, and it is completely invisible until someone types the wrong thing.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">05</span><h2>Events: reacting to a person</h2></div>
+    <p>An event is something happening &mdash; a click, a keystroke, a form submission. You attach a listener and it runs.</p>
+    <pre>button.addEventListener("click", function () {
+  // runs each time it is clicked
+});
+
+input.addEventListener("input", function (event) {
+  const typed = event.target.value;   // what is in the box now
+});
+
+form.addEventListener("submit", function (event) {
+  event.preventDefault();   // stop the browser navigating away
+  // now handle it yourself
+});</pre>
+    <p><code>event.preventDefault()</code> on a submit handler is the one to remember. The browser's default is to leave the page, which takes your JavaScript with it. Without that line your handler appears not to run at all &mdash; it runs, and then everything is thrown away.</p>
+    <p>Two habits that matter:</p>
+    <ul class="plain">
+      <li><b>Attach to real controls.</b> A listener on a <code>&lt;div&gt;</code> only fires for a mouse. Put it on a <code>&lt;button&gt;</code> and Enter, Space, and assistive technology all work for free.</li>
+      <li><b>Guard against the double press.</b> If nothing visible happens when someone submits, they press again. That is not user error; that is your interface failing to acknowledge them &mdash; and it is why NL-002 was really about a confirmation message.</li>
+    </ul>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">06</span><h2>Data that arrives late</h2></div>
+    <p>Ticket NL-006: stop hard-coding the list, read <code>appointments.json</code>. That introduces time.</p>
+    <p>Fetching a file takes a while &mdash; milliseconds on your laptop, seconds on a phone on a train. JavaScript does not wait. It fires the request and keeps going, and the data turns up later.</p>
+    <pre>// Wrong, and the classic first mistake:
+const rows = fetch("appointments.json");
+console.log(rows.length);   // undefined. nothing has arrived yet.
+
+// Right: await says "pause here until it resolves".
+async function loadAppointments() {
+  const response = await fetch("appointments.json");
+  const rows = await response.json();
+  return rows;
+}</pre>
+    <p><code>async</code> marks a function as one that can wait. <code>await</code> is where it waits. Anything depending on the data goes after the <code>await</code>, not before.</p>
+    <p>And then the part the happy path never exercises. <b>Four states, not one:</b></p>
+    <ul class="plain">
+      <li><b>Loading</b> &mdash; the request is out. Say so, or the page looks broken.</li>
+      <li><b>Success with data</b> &mdash; render it.</li>
+      <li><b>Success with nothing</b> &mdash; the file was fine and the list is empty. "No appointments today" is a real, correct, designed state. A blank area is not.</li>
+      <li><b>Failure</b> &mdash; the file is missing, the connection dropped, the JSON is malformed. Say something honest and, if you can, offer a retry.</li>
+    </ul>
+    <pre>async function loadAppointments() {
+  try {
+    const response = await fetch("appointments.json");
+    if (!response.ok) return { ok: false, rows: [] };   // 404, 500
+    return { ok: true, rows: await response.json() };
+  } catch (err) {
+    return { ok: false, rows: [] };                     // offline, bad JSON
+  }
+}</pre>
+    <p>Note that <code>fetch</code> does <i>not</i> throw on a 404. It resolves successfully with a response whose <code>ok</code> is false. Forgetting to check <code>response.ok</code> means your code cheerfully tries to parse an error page as JSON.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> Ask an agent for data loading and you will get the happy path, correctly. Ask twice and you may get a try/catch. You will almost never get the <i>empty</i> state, because an empty list is not an error and nothing about it looks like a bug — until Priya opens the dashboard on a quiet Tuesday and sees a blank rectangle and calls Dan.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-006</b>, in two parts. Both are graded.</p>
     <div class="interactive">
-      <div class="ilbl">Required exercise · failingTestExercise</div>
-      <textarea id="tsEx" spellcheck="false">function test_clamp(impl) {
-  return true;
+      <div class="ilbl">Required exercise &middot; domDataExercise &middot; part 1 of 2</div>
+      <p><b>All four states.</b> Write <code>summarise(result)</code> where <code>result</code> is what the loader returns: <code>{ ok, rows }</code>, or <code>null</code> while the request is still in flight.</p>
+      <ul class="plain" style="font-size:14px">
+        <li><code>null</code> &rarr; <code>"Loading appointments..."</code></li>
+        <li><code>ok: false</code> &rarr; <code>"Could not load appointments."</code></li>
+        <li><code>ok: true</code> with an empty list &rarr; <code>"No appointments today."</code></li>
+        <li><code>ok: true</code> with rows &rarr; <code>"4 appointments, 2 still open"</code> &mdash; and <code>"1 appointment, 1 still open"</code> for a single row.</li>
+      </ul>
+      <textarea id="m6a" spellcheck="false" style="min-height:180px">function summarise(result) {
+
 }
 </textarea>
-      <button class="primary" id="btnTs" style="margin-top:10px">Run mutation check</button>
-      <div class="feedback" id="tsFb"></div>
+      <button type="button" class="primary" id="m6acheck" style="margin-top:10px">Test the four states</button>
+      <div class="feedback" id="m6afb"></div>
     </div>
-    <p class="mut" style="margin-top:12px"><a href="practice-testing.html">Testing practice</a></p>
+    <div class="interactive" style="margin-top:20px">
+      <div class="ilbl">Required exercise &middot; domDataExercise &middot; part 2 of 2</div>
+      <p><b>Wire it to a real interface.</b> Write <code>wireFilter(root)</code>. Inside <code>root</code> there is a <code>&lt;button id="toggle"&gt;</code> and a <code>&lt;ul id="list"&gt;</code> whose <code>&lt;li&gt;</code> elements each carry <code>data-status</code>. Clicking the button hides every row that is not <code>open</code>; clicking it again shows them all. Hide with the <code>hidden</code> property.</p>
+      <p class="mut">This runs for real: we build the elements, call your function, dispatch actual clicks, and read the resulting DOM.</p>
+      <textarea id="m6b" spellcheck="false" style="min-height:200px">function wireFilter(root) {
+
+}
+</textarea>
+      <button type="button" class="primary" id="m6bcheck" style="margin-top:10px">Dispatch real clicks</button>
+      <div class="feedback" id="m6bfb"></div>
+    </div>
+    <p class="mut" style="margin-top:14px">More reps: <a href="practice-js.html">JavaScript practice</a> &middot; <a href="practice-detective.html">AI Code Detective</a>.</p>
+
   </section>
   <section>
-    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+  <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
     <div id="quizRoot"></div>
-    <div id="reqList"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+
   </section>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
 </div>
 <div class="scoreboard"><div class="in">
-  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
-  <a id="btnNext" href="module-07.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
 </div></div>
 <script src="course-progress.js"></script>
-<script src="practice-kit.js"></script>
+<script src="northline.js"></script>
 <script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
+<script src="detective-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
-CourseProgress.touchVisited(6);
-function syncNext() {
-  const btn = document.getElementById("btnNext");
-  const ok = CourseProgress.isModuleComplete(6);
-  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 7' : "Complete the exercise and quiz (80%+) to continue"; }
-  const box = document.getElementById("reqList");
-  if (box) {
-    box.innerHTML = CourseProgress.completionRequirements(6).map(function (r) {
-      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
-    }).join("");
-  }
-}
-ModuleKit.renderQuiz(6, AISEQuizData.MODULE_QUIZZES[6], syncNext);
-syncNext();
+Northline.renderWhy('whyGrid', {"build": "The state summary for NL-006 and a working filter toggle, both graded by dispatching real clicks against a real DOM.", "why": "This is where a page stops being a document and becomes software. It is also where the security and timing bugs live.", "aiHelps": "It writes fetch and event wiring quickly and usually correctly on the happy path.", "aiFails": "innerHTML with user data, no empty state, unchecked response.ok, and a toggle that only works the first time.", "without": "You write both functions. The grader fires genuine click events at your code, so a plausible-looking answer is not enough."});
+const MK = ModuleKit.mount(6, AISEQuizData.MODULE_QUIZZES[6]);
 </script>
 <script>
-document.getElementById("btnTs").onclick = function () {
-  const out = PracticeKit.gradeTesting({
-    functionName: "test_clamp",
-    goodImpl: "function(n,lo,hi){return Math.min(hi,Math.max(lo,n));}",
-    badImpl: "function(n,lo,hi){return n;}",
-    bugHint: "The bad impl ignores bounds. Return false for impl(50,0,10).",
-  }, document.getElementById("tsEx").value);
-  const fb = document.getElementById("tsFb");
-  fb.className = "feedback " + (out.passed ? "ok" : "bad");
-  fb.innerHTML = out.results.map(function (r) { return (r.pass ? "✓ " : "✗ ") + r.name + (r.pass ? "" : " — " + r.hint); }).join("<br>");
-  if (out.passed) CourseProgress.setSection(6, "failingTestExercise", true);
-  syncNext();
+Northline.renderPrediction("beforeAi", {
+  label: "Predict first \u00b7 no AI, no running it",
+  intro: "The loader returns { ok, rows }, or null while the request is still in flight. The toggle must hide non-open rows, then show them again.",
+  questions: [
+    { q: "The request is still in flight. What should the page say?",
+      opts: [
+        { t: "Loading appointments...", correct: true,
+          whyOk: "A blank rectangle looks broken. Loading is a designed state." },
+        { t: "No appointments today.", why: "You do not know that yet. Empty and loading are different." },
+        { t: "Nothing. Wait for the JSON.", why: "Waiting silently is how Priya thinks the dashboard is down." }
+      ] },
+    { q: "The file is missing. fetch returned 404. What should the page say?",
+      opts: [
+        { t: "Could not load appointments.", correct: true,
+          whyOk: "A 404 is a failed load, not an empty clinic day." },
+        { t: "No appointments today.", why: "That is the empty-success state. A missing file is a failure." },
+        { t: "Throw, so the console shows it.", why: "The console is not the interface. Say something honest on the page." }
+      ] },
+    { q: "The file loaded and the list is empty. What should the page say?",
+      opts: [
+        { t: "No appointments today.", correct: true,
+          whyOk: "Empty is valid. It is the quiet Tuesday. Design it." },
+        { t: "Could not load appointments.", why: "The load worked. Lying about failure trains people to ignore the real one." },
+        { t: "Leave the list blank.", why: "Blank is indistinguishable from broken." }
+      ] },
+    { q: "After one click the list shows only open rows. What must the second click do?",
+      opts: [
+        { t: "Show every row again. A filter is a view, not a delete.", correct: true,
+          whyOk: "Everyone tests the first click. The second click is what breaks in production." },
+        { t: "Keep them hidden. She asked for open only.", why: "She also needs to get back. A one-way filter is a trap." },
+        { t: "Reload the JSON.", why: "The data is already there. Toggle the view." }
+      ] }
+  ],
+  learned: ["You specified the four states and the toggle-back before anyone wrote fetch.",
+    "That is the only way you can tell a happy-path agent draft from a finished feature."]
+});
+Northline.renderDetectiveSet(["xssInnerHtml", "fetchNoOk", "a11y"], "detectives");
+
+var m6state = { a: false, b: false };
+function m6sync() {
+  if (m6state.a && m6state.b) {
+    CourseProgress.setSection(6, "domDataExercise", true);
+    MK.sync();
+  }
+}
+
+document.getElementById("m6acheck").onclick = function () {
+  var src = document.getElementById("m6a").value;
+  var rows4 = [{ status: "open" }, { status: "done" }, { status: "open" }, { status: "cancelled" }];
+  var out = PracticeKit.gradeJs({
+    functionName: "summarise",
+    testCases: [
+      { name: "loading state (null)", args: [null], expected: "Loading appointments..." },
+      { name: "failure state (ok: false)", args: [{ ok: false, rows: [] }], expected: "Could not load appointments." },
+      { name: "loaded but empty", args: [{ ok: true, rows: [] }], expected: "No appointments today." },
+      { name: "four rows, two open", args: [{ ok: true, rows: rows4 }], expected: "4 appointments, 2 still open" },
+      { name: "one row, singular wording", args: [{ ok: true, rows: [{ status: "open" }] }], expected: "1 appointment, 1 still open" },
+      { name: "rows present but none open", args: [{ ok: true, rows: [{ status: "done" }] }], expected: "1 appointment, 0 still open" }
+    ]
+  }, src);
+  ModuleKit.showResults(document.getElementById("m6afb"), out);
+  if (out.passed) {
+    m6state.a = true;
+    document.getElementById("m6afb").innerHTML =
+      "<b>Four states handled.</b> The empty one is the one agents skip, and the one Priya will actually hit on a quiet Tuesday.<br><br>" +
+      out.results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+    Northline.showLearned(document.getElementById("m6afb").parentNode,
+      "You just designed the states the happy path never exercises.",
+      "Loading, failed, empty, and success are four different sentences. An agent will usually write one.");
+    m6sync();
+  }
+};
+
+document.getElementById("m6bcheck").onclick = function () {
+  var src = document.getElementById("m6b").value;
+  var results = [];
+  var fn = null;
+  try {
+    fn = new Function(src + "\n; return typeof wireFilter === 'function' ? wireFilter : null;")();
+  } catch (e) {
+    ModuleKit.showResults(document.getElementById("m6bfb"),
+      { passed: false, results: [{ name: "your code parses", pass: false, hint: e.message }] });
+    return;
+  }
+  if (!fn) {
+    ModuleKit.showResults(document.getElementById("m6bfb"),
+      { passed: false, results: [{ name: "wireFilter is defined", pass: false, hint: "Define a function named exactly wireFilter." }] });
+    return;
+  }
+
+  /* Build a detached fixture, hand it to the student's function, then fire
+     genuine click events. Detached from the document so nothing they write
+     can disturb the page around it. */
+  var root = document.createElement("div");
+  root.innerHTML = '<button id="toggle">Open only</button><ul id="list">' +
+    '<li data-status="open">A</li><li data-status="done">B</li>' +
+    '<li data-status="open">C</li><li data-status="cancelled">D</li></ul>';
+  var btn = root.querySelector("#toggle");
+  var lis = Array.prototype.slice.call(root.querySelectorAll("li"));
+  function hiddenPattern() { return lis.map(function (li) { return li.hidden ? "H" : "-"; }).join(""); }
+
+  try { fn(root); } catch (e) {
+    results.push({ name: "wireFilter runs without throwing", pass: false, hint: e.message });
+  }
+  if (!results.length) {
+    results.push({ name: "nothing is hidden before the first click", pass: hiddenPattern() === "----",
+      hint: "Do not filter on setup. Wait for the click. Currently: " + hiddenPattern() });
+    btn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    results.push({ name: "after one click, only non-open rows are hidden", pass: hiddenPattern() === "-H-H",
+      hint: "Expected -H-H (B and D hidden), got " + hiddenPattern() + ". Set li.hidden = true on rows whose data-status is not 'open'." });
+    btn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    results.push({ name: "a second click shows everything again", pass: hiddenPattern() === "----",
+      hint: "Expected ---- after toggling back, got " + hiddenPattern() + ". Track the current state and reverse it." });
+    btn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    results.push({ name: "a third click filters again", pass: hiddenPattern() === "-H-H",
+      hint: "The toggle should keep working, got " + hiddenPattern() + "." });
+    results.push({ name: "you read data-status rather than the visible text", pass: !/textContent\s*===|innerText\s*===/.test(src),
+      hint: "Read li.dataset.status. Matching on the visible label breaks the moment the wording changes." });
+  }
+  var ok = results.every(function (r) { return r.pass; });
+  ModuleKit.showResults(document.getElementById("m6bfb"), { passed: ok, results: results });
+  if (ok) {
+    m6state.b = true;
+    document.getElementById("m6bfb").innerHTML =
+      "<b>Real clicks, real DOM, correct both ways.</b> Toggling back is the half that breaks in production, because everyone tests the first click.<br><br>" +
+      results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+    Northline.showLearned(document.getElementById("m6bfb").parentNode,
+      "You just proved the toggle both ways with real clicks.",
+      "The second click is the half that breaks in production, because everyone tests the first.");
+    m6sync();
+  }
 };
 </script>
 <script src="course-rail.js"></script>

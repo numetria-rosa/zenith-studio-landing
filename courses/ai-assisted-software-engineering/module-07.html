@@ -3,87 +3,240 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 7 — Multi-file features with AI</title>
+<title>Module 7 — AI as your pair programmer</title>
 <link rel="stylesheet" href="course.css">
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 7</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 7 · ~55 min</span>
-    <h1 class="serif">Multi-file features with AI</h1>
-    <p class="sub">Spec → implement in Cursor → review the whole diff → PR. This page grades the spec and the test, not a fake IDE.</p>
-    <div class="disclosure">Do the Cursor work on your machine. Bring the spec and the test back here.</div>
+    <span class="eyebrow">Stage 3 &middot; Module 7 &middot; ~65 min</span>
+    <h1 class="serif">AI as your pair programmer</h1>
+    <p class="sub">The full loop, for real, in your own editor. You write the spec, drive the agent, read the diff, and bring the actual code back — where our tests, not your opinion, decide whether it works.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
+      <ul>
+        <li>Give an agent context, task, constraints, acceptance criteria, and an output format</li>
+        <li>Say what not to touch, and why that sentence saves you a forty-line diff</li>
+        <li>Read a diff with a six-point checklist, including what got deleted</li>
+        <li>Treat “all tests pass” as a claim requiring verification</li>
+        <li>Iterate on a failing case with specific evidence instead of “that’s wrong, fix it”</li>
+      </ul>
+    </div>
   </header>
   <section>
-    <div class="kh"><span class="num">1</span><h2>Scope the files</h2></div>
-    <p>A feature that “just needs a button” often touches HTML, CSS, and JS. List them. If the agent edits a fourth file, that is scope creep until you say otherwise.</p>
+  <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
+    <div id="whyGrid"></div>
+
   </section>
   <section>
-    <div class="kh"><span class="num">2</span><h2>Graded: spec + test for a filter</h2></div>
-    <p>Feature: a status page lists incidents; a JS function <code>filter_open(rows)</code> returns only rows whose <code>status</code> is <code>"open"</code>.</p>
-    <p>1) Write a spec (≥80 chars) that names <code>filter_open</code> and the <code>open</code> status.<br>2) Write <code>test_filter_open(impl)</code> that returns true for a correct filter and false if the impl returns the full list.</p>
+  <div class="kh"><span class="num">01</span><h2>Before you touch AI</h2></div>
+    <p>Priya wants three numbers. The dangerous one is the seven-day no-show window. Decide what counts <i>before</i> you open the editor. That prediction is the only thing that makes a failing hidden test useful.</p>
+    <div id="beforeAi" class="interactive"></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">02</span><h2>You have been building up to this on purpose</h2></div>
+    <p>Six modules in and you have not used a coding agent for a single graded exercise. That was deliberate, and now it pays off.</p>
+    <p>You can read markup and spot a missing label. You know what padding does. You have written a filter, handled an empty list, and wired a real click. Which means when an agent hands you two hundred lines, you are not guessing &mdash; you are checking. That difference is the entire value of this course.</p>
+    <p>From here, the agent writes most of the characters. You are responsible for all of the consequences.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">03</span><h2>The two workflows</h2></div>
+    <p>Watch what actually happens in each.</p>
+    <div class="def"><div class="k">The workflow that feels fast</div><p>You type <i>"build me a dashboard for the clinic"</i>. Forty seconds later there are four new files, a charting library you did not choose, some placeholder data, and a layout in a style nobody asked for. It runs. It looks impressive. You have no idea which parts are real and which are scaffolding, you cannot explain a single decision in it, and when Priya asks why no-shows are counted from Monday instead of the last seven days you will have to read it all to find out. You have not saved time. You have moved the work to the worst possible place: after it is already written.</p></div>
+    <div class="def"><div class="k">The workflow that is fast</div><p>You write down what the function must do, including the boundary cases. You name the file. You say what not to touch. You ask for one function. You read the diff &mdash; it is eleven lines, so this takes forty seconds. You run your tests. One fails on the seven-day boundary. You tell it exactly that, it fixes it, you read the new diff. You commit. Total elapsed time: about the same. Total code you cannot explain: zero.</p></div>
+    <div id="wfCompare" class="interactive" style="margin-top:20px"><div class="ilbl">Choose the better request &middot; labelled simulation</div></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">04</span><h2>Context: the part people skip</h2></div>
+    <p>An agent's output quality depends far more on what it can see than on how politely you ask. Prompt phrasing is a rounding error next to context.</p>
+    <ul class="plain">
+      <li><b>Point at the actual files.</b> In Cursor, <code>@filename</code> puts a file in context. Without it the agent invents a plausible version of your code and writes against that &mdash; which is how you end up with a second <code>styles.css</code> and a function that calls something that does not exist.</li>
+      <li><b>Include the data shape.</b> Paste one real record. Every wrong assumption about field names comes from this being missing.</li>
+      <li><b>State the conventions.</b> "This project uses plain JavaScript, no framework, no build step." Otherwise you will get an import.</li>
+      <li><b>Say what already exists.</b> "There is already a <code>filterOpen</code> in <code>appointments.js</code>; use it, do not reimplement it." Duplicated logic is a maintenance bill.</li>
+    </ul>
+    <div class="def"><div class="k">The shape of a request worth sending</div><p>Context (which files, what the data looks like) &middot; Task (one thing, named) &middot; Constraints (what not to touch, what to reuse) &middot; Acceptance (the cases it must satisfy) &middot; Output (show me the diff).</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">05</span><h2>Constraints are how you stay in control</h2></div>
+    <p>An agent with no constraints will do more than you asked, every time, because being helpful is what it is for. Constraints are not distrust; they are scope, written down.</p>
+    <ul class="plain">
+      <li><b>Name the files it may change.</b> "Only <code>dashboard.js</code>."</li>
+      <li><b>Name what it must not touch.</b> "Do not modify existing functions. Do not change the HTML."</li>
+      <li><b>Ban new dependencies.</b> "No new packages." Otherwise a date library arrives for one line of arithmetic.</li>
+      <li><b>Bound the size.</b> "One function. If this needs more than one, tell me why instead of writing it."</li>
+      <li><b>Ask for the diff.</b> Not the finished file. You want to see what changed, not read the whole thing again.</li>
+    </ul>
+    <div class="honestnote"><b>Where the agent trips.</b> The most expensive unconstrained request is the follow-up. You ask for a fix, and it also renames three things, reformats the file, and “tidies” a function you never mentioned. Now your one-line fix is a forty-line diff and you cannot see the fix inside it. Say <i>“change only what is needed for this; do not reformat”</i> on every follow-up.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">06</span><h2>Inspect, and what you are looking for</h2></div>
+    <p>Reading a diff is a skill with a checklist. Green lines are additions, red are deletions, and the deletions are where the danger is &mdash; a removed line is the easiest thing in a diff to miss.</p>
+    <ol>
+      <li><b>Is it only what I asked for?</b> Count the files. Count the functions. Anything extra is unreviewed code you are about to own.</li>
+      <li><b>Do I understand every line?</b> Not "does it look reasonable" &mdash; can you say what it does out loud? If not, that is the line to ask about.</li>
+      <li><b>What got deleted?</b> Agents remove things they judge redundant. Sometimes they are right. Sometimes it was a guard clause that mattered.</li>
+      <li><b>Does the logic match the acceptance criteria?</b> Walk one real case through it by hand. Especially a boundary.</li>
+      <li><b>Any of the known failure shapes?</b> <code>innerHTML</code> with user data, <code>if (value)</code> on a number, a missing empty state, a half-completed rename, a magic number, a secret in a log.</li>
+      <li><b>Would I defend this to Sam?</b> If the honest answer is "I would say the agent wrote it", it is not ready.</li>
+    </ol>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">07</span><h2>Run and test, in that order</h2></div>
+    <p><b>Run it.</b> Open the thing. Click the thing. Watch the console. This catches an enormous class of defect in about four seconds, and it is the step people skip because the diff looked right.</p>
+    <p><b>Then test it.</b> Which means: decide the expected answer <i>before</i> you run the code, then check. Reading a result and deciding it looks plausible is not testing; it is agreeing with yourself.</p>
+    <p>And the sentence to be suspicious of, every single time:</p>
+    <div class="honestnote"><b>&ldquo;All tests pass and the feature works correctly.&rdquo;</b> This is worth nothing until you have run the tests yourself and read what they assert. Agents write tests that cannot fail &mdash; asserting a function is defined, asserting <code>true === true</code>, asserting the output equals whatever the function currently returns. All green. All meaningless. Module 9 is about the difference.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">08</span><h2>How this module is graded, and why</h2></div>
+    <p>This site will not pretend to be Cursor. There is no fake chat panel here that congratulates you for typing a prompt into it.</p>
+    <p>So the exercise below works differently: <b>you do the work in your real editor, and bring the artifacts back.</b> The spec you wrote is checked for shape. Your review notes are checked for specificity. And the code the agent produced is <b>executed against tests you cannot see</b>.</p>
+    <p>That last part is the honest bit. We are not asking whether you reviewed it and trusting your answer. We are running our own tests against whatever you paste. If the agent's first draft is wrong &mdash; and on the boundary case below it very often is &mdash; you will find out here, go back, tell it what failed, and return with something that works. That round trip <i>is</i> the module.</p>
+    <div class="disclosure">Any agent works: Cursor, Copilot, Continue, Cline, Claude, ChatGPT. The course is vendor-neutral. What is graded is the artifact, not the brand.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-007</b>. Priya wants three numbers on one screen for the 8am huddle.</p>
+    <p>Here is the acceptance criteria Sam has already agreed with her. Your job is to turn it into a request, drive the agent, review the result, and come back with code that passes.</p>
+    <div class="def"><div class="k">Acceptance criteria &mdash; dashboardCounts</div><p>Write <code>dashboardCounts(appointments, today)</code>.<br><br>
+    Each appointment looks like <code>{ date: "2026-08-30", status: "open" }</code>, where <code>status</code> is <code>"open"</code>, <code>"done"</code>, or <code>"no-show"</code>. <code>today</code> is a date string in the same format.<br><br>
+    It returns <code>{ today, open, noShows }</code> where:<br>
+    &bull; <code>today</code> = how many appointments fall on <code>today</code><br>
+    &bull; <code>open</code> = how many appointments on <code>today</code> have status <code>"open"</code><br>
+    &bull; <code>noShows</code> = how many appointments have status <code>"no-show"</code> in the seven-day window ending on <code>today</code> <b>inclusive</b> &mdash; so <code>today</code> counts, and so does the date six days before it, and the date seven days before it does <b>not</b><br><br>
+    An empty list returns <code>{ today: 0, open: 0, noShows: 0 }</code>. Dates in the future are ignored for <code>noShows</code>.</p></div>
+    <div class="honestnote"><b>Prediction.</b> Most agents get the seven-day window off by one on the first attempt, because "the last seven days" is ambiguous in English and unambiguous in the criteria above. When our tests fail, that is not you failing &mdash; that is the module working. Go back, quote the exact failing case, and review the second diff as carefully as the first.</div>
     <div class="interactive">
-      <div class="ilbl">Required exercise · featureSpecExercise</div>
-      <label class="formrow">Spec<textarea id="featSpec"></textarea></label>
-      <label class="formrow">Test<textarea id="featTest" spellcheck="false">function test_filter_open(impl) {
-  return true;
-}
-</textarea></label>
-      <button class="primary" id="btnFeat" style="margin-top:10px">Check spec + test</button>
-      <div class="feedback" id="featFb"></div>
+      <div class="ilbl">Required exercise &middot; aiWorkflowExercise &middot; real agent work</div>
+      <div id="aiwf"></div>
     </div>
+    <p class="mut" style="margin-top:14px">The two required <a href="desktop-labs.html">Desktop Labs</a> are where this becomes a real commit and a real repo. Both are needed before the capstone.</p>
+
   </section>
   <section>
-    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+  <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
     <div id="quizRoot"></div>
-    <div id="reqList"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+
   </section>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
 </div>
 <div class="scoreboard"><div class="in">
-  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
-  <a id="btnNext" href="module-08.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
 </div></div>
 <script src="course-progress.js"></script>
-<script src="practice-kit.js"></script>
+<script src="northline.js"></script>
 <script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
+<script src="ai-workflow-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
-CourseProgress.touchVisited(7);
-function syncNext() {
-  const btn = document.getElementById("btnNext");
-  const ok = CourseProgress.isModuleComplete(7);
-  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 8' : "Complete the exercise and quiz (80%+) to continue"; }
-  const box = document.getElementById("reqList");
-  if (box) {
-    box.innerHTML = CourseProgress.completionRequirements(7).map(function (r) {
-      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
-    }).join("");
-  }
-}
-ModuleKit.renderQuiz(7, AISEQuizData.MODULE_QUIZZES[7], syncNext);
-syncNext();
+Northline.renderWhy('whyGrid', {"build": "The dashboardCounts function for NL-007, specified by you, written by an agent, and passing tests you did not write.", "why": "This is the loop the whole course is named after, run end to end for the first time.", "aiHelps": "Everywhere. It writes the function, and if your criteria are precise it will usually get it nearly right.", "aiFails": "The seven-day boundary. “The last seven days” is ambiguous in English, and confident wrong arithmetic is the house speciality.", "without": "The spec is yours, the review is yours, and the accountability is yours. You cannot pass by claiming you reviewed it — the code has to survive our tests."});
+const MK = ModuleKit.mount(7, AISEQuizData.MODULE_QUIZZES[7]);
 </script>
 <script>
-document.getElementById("btnFeat").onclick = function () {
-  const spec = document.getElementById("featSpec").value;
-  const specOk = spec.trim().length >= 80 && /filter_open/i.test(spec) && /open/i.test(spec);
-  const out = PracticeKit.gradeTesting({
-    functionName: "test_filter_open",
-    goodImpl: "function(rows){return rows.filter(r=>r.status==='open');}",
-    badImpl: "function(rows){return rows;}",
-    bugHint: "Bad impl returns every row. Your test must fail that.",
-  }, document.getElementById("featTest").value);
-  const ok = specOk && out.passed;
-  const fb = document.getElementById("featFb");
-  fb.className = "feedback " + (ok ? "ok" : "bad");
-  fb.innerHTML = (specOk ? "✓ spec" : "✗ spec needs filter_open, open, and 80+ characters") + "<br>" +
-    out.results.map(function (r) { return (r.pass ? "✓ " : "✗ ") + r.name; }).join("<br>");
-  if (ok) CourseProgress.setSection(7, "featureSpecExercise", true);
-  syncNext();
-};
+Northline.renderPrediction("beforeAi", {
+  label: "Predict first \u00b7 the window, not the prompt",
+  intro: "today is 2026-08-30. A no-show on 2026-08-24 is six days before. A no-show on 2026-08-23 is seven days before. A no-show on 2026-08-31 is tomorrow.",
+  questions: [
+    { q: "Which no-shows count in the seven-day window ending on today, inclusive?",
+      opts: [
+        { t: "08-24 counts. 08-23 does not. 08-31 does not. Today itself does.", correct: true,
+          whyOk: "Inclusive means today and the six days before it. Seven days back is outside. The future is outside." },
+        { t: "Anything in the same calendar week, Monday to Sunday.", why: "Priya said this week at 8am, but the criteria spelled out seven days ending today. Do not invent a week start." },
+        { t: "08-23 through 08-30, because last seven days means seven previous days plus today.", why: "That is eight days. 'Last seven inclusive' is today and six back." }
+      ] },
+    { q: "The agent says all tests pass. What do you do?",
+      opts: [
+        { t: "Run the tests yourself and read what they assert. Then walk the 08-23 and 08-24 cases by hand.", correct: true,
+          whyOk: "The sentence is a claim. The boundary is where the claim usually dies." },
+        { t: "Trust it. The model is good at dates.", why: "Dates are exactly where fluent wrong arithmetic lives." },
+        { t: "Ask it to write more tests.", why: "More tests that cannot fail are more green. Read the ones you have." }
+      ] }
+  ],
+  learned: ["You decided the window before anyone wrote a line.",
+    "When the hidden test fails on 08-23, you will know it is the module working, not you failing."]
+});
+Northline.renderWorkflowCompare("wfCompare", {
+  situation: "You have the acceptance criteria for the dashboard. You open Cursor with dashboard.js in front of you. First message?",
+  bad: { t: "Build a dashboard for the clinic showing appointments today, open appointments and no-shows this week. Make it look good.",
+    why: "You will get HTML, CSS, a chart, and a counting function buried somewhere inside it. Every one of those is a decision you did not make, and the only part you specified \u2014 the seven-day window \u2014 is the part most likely to be wrong and hardest to find." },
+  good: { t: "@dashboard.js Add one function dashboardCounts(appointments, today). A record is { date: '2026-08-30', status: 'open' | 'done' | 'no-show' }. Return { today, open, noShows }: today = records on `today`; open = records on `today` with status 'open'; noShows = status 'no-show' within the 7-day window ending on `today` inclusive, so 6 days before counts and 7 days before does not. Empty list returns all zeros. No new dependencies, do not change existing functions, show me the diff.",
+    why: "One function, one file, the data shape included, the ambiguous boundary spelled out explicitly, no new dependencies, and a diff. If it still gets the window wrong you will see it in eleven lines instead of hunting through four files." }
+});
+
+AIWorkflowKit.render("aiwf", {
+  specPlaceholder: "@dashboard.js Add one function dashboardCounts(appointments, today) ...",
+  specChecks: [
+    { name: "names the function dashboardCounts", test: function (t) { return /dashboardCounts/.test(t); } },
+    { name: "points at a specific file", test: function (t) { return /@|\.js\b|dashboard\.js/.test(t); } },
+    { name: "includes the data shape (a date and a status)", test: function (t) { return /date/i.test(t) && /status/i.test(t); } },
+    { name: "spells out the seven-day boundary", test: function (t) { return /(7|seven)[\s-]*day/i.test(t) && /(inclusive|includ|boundary|6|six)/i.test(t); } },
+    { name: "states a constraint \u2014 what not to change, or no new dependencies",
+      test: function (t) { return /(do not|don't|only|without changing|no new|do no)/i.test(t); } },
+    { name: "asks for the diff", test: function (t) { return /diff/i.test(t); } },
+    { name: "at least 200 characters of actual specification", test: function (t) { return t.trim().length >= 200; } }
+  ],
+  code: {
+    functionName: "dashboardCounts",
+    starter: "// Paste the function the agent wrote, exactly as it wrote it.\n",
+    testCases: (function () {
+      var rows = [
+        { date: "2026-08-30", status: "open" },
+        { date: "2026-08-30", status: "done" },
+        { date: "2026-08-30", status: "no-show" },
+        { date: "2026-08-29", status: "no-show" },
+        { date: "2026-08-25", status: "no-show" },
+        { date: "2026-08-24", status: "no-show" },
+        { date: "2026-08-23", status: "no-show" },
+        { date: "2026-08-31", status: "no-show" },
+        { date: "2026-08-28", status: "open" }
+      ];
+      return [
+        /* noShows is 4, not 5: the window is 2026-08-24..2026-08-30, so
+           08-30, 08-29, 08-25 and 08-24 count while 08-23 (7 days back)
+           and 08-31 (future) do not. */
+        { name: "counts today's appointments", args: [rows, "2026-08-30"], expected: { today: 3, open: 1, noShows: 4 } },
+        { name: "an empty list returns all zeros", args: [[], "2026-08-30"], expected: { today: 0, open: 0, noShows: 0 } },
+        { name: "the 7-day window includes 6 days before today",
+          args: [[{ date: "2026-08-24", status: "no-show" }], "2026-08-30"], expected: { today: 0, open: 0, noShows: 1 } },
+        { name: "the 7-day window EXCLUDES 7 days before today",
+          args: [[{ date: "2026-08-23", status: "no-show" }], "2026-08-30"], expected: { today: 0, open: 0, noShows: 0 } },
+        { name: "future dates are not counted as no-shows",
+          args: [[{ date: "2026-08-31", status: "no-show" }], "2026-08-30"], expected: { today: 0, open: 0, noShows: 0 } },
+        { name: "a day with no open appointments reports 0, not nothing",
+          args: [[{ date: "2026-08-30", status: "done" }], "2026-08-30"], expected: { today: 1, open: 0, noShows: 0 } }
+      ];
+    })()
+  },
+  reviewHint: "Name one specific thing you checked in the diff and one specific thing you changed, rejected, or had to correct. If the first attempt got the window boundary wrong, say so and say how you found out."
+}, function (st) {
+  if (st.passed) {
+    CourseProgress.setSection(7, "aiWorkflowExercise",
+      { passed: true, firstTry: st.firstTry, at: new Date().toISOString() });
+    var host = document.getElementById("aiwf");
+    if (host) {
+      Northline.showLearned(host,
+        "You just closed the loop with evidence, not a screenshot.",
+        "The spec was yours, the review was yours, and the function survived tests you did not write.");
+    }
+    MK.sync();
+  }
+});
 </script>
 <script src="course-rail.js"></script>
 </body>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 13 — Release, ship, and the loop that does not end</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 13</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Stage 5 &middot; Module 13 &middot; ~150 min</span>
+    <h1 class="serif">Release, ship, and the loop that does not end</h1>
+    <p class="sub">“It works on my laptop” and “it works” are different claims. This module is about the distance between them, and about writing down how to undo it before you need to.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
+      <ul>
+        <li>State what “done” means in terms someone else can check</li>
+        <li>Deploy a static site so that the live version is a function of what is in Git</li>
+        <li>Run a pre-flight checklist in the order that makes it meaningful</li>
+        <li>Write release notes that name a limitation before a user finds it</li>
+        <li>Write a rollback plan with a mechanism and a trigger, before deploying</li>
+      </ul>
+    </div>
+  </header>
+  <section>
+  <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
+    <div id="whyGrid"></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">01</span><h2>Before you declare it shipped</h2></div>
+    <p>Dan wants a live URL, notes he can read on a phone, and a way back. Before you paste a URL, decide what “shipped” excludes, and what you write down while you are still calm.</p>
+    <div id="beforeAi" class="interactive"></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">02</span><h2>“Done” has a specific meaning</h2></div>
+    <p>There is a gap between "it works on my laptop" and "it works", and almost everything painful in software lives in that gap.</p>
+    <p>On your machine the file paths are yours, the data is the sample you have been testing with, the browser is the one you always use, the connection is instant, and you know which order to click things in. None of that is true for anyone else. Shipping is the act of finding out which of those assumptions you were relying on.</p>
+    <p>Which is why the definition of done is not "I finished writing it" but something closer to:</p>
+    <div class="callout">Someone who has never seen this can reach it, use it for its intended purpose, and not hit a broken state &mdash; and if they do, you can put it back the way it was within a few minutes.</div>
+    <p>That last clause is the one people forget, and it is the one that separates a nervous release from a routine one.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">03</span><h2>What deploying a static site actually does</h2></div>
+    <p>Your site is files: HTML, CSS, JavaScript, images. Deploying means putting those files on a computer that is always on and has a public address. That is the entire concept. The tooling around it is convenience.</p>
+    <p>Two routes worth knowing, both free for this:</p>
+    <ul class="plain">
+      <li><b>GitHub Pages.</b> Your repository already holds the files. Turn Pages on and GitHub serves them at a URL. Push to the branch and the live site updates. Nothing to configure.</li>
+      <li><b>Netlify or Vercel.</b> Connect the repository once; every push triggers a deploy, and each gets its own preview URL. The preview URLs are the genuinely useful part &mdash; you can send Dan a link to a change before it is live.</li>
+    </ul>
+    <p>Both give you the property that matters: <b>the live site is a function of what is in Git.</b> No dragging files over FTP, no wondering which version is up there. If it is in the branch, it is live; if it is not, it is not.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> Local paths. <code>&lt;img src='C:/Users/you/Desktop/logo.png'&gt;</code> works perfectly on your machine and is a broken image for the entire rest of the world. Same for <code>file:///</code> links and any absolute path starting from your own drive. Agents produce these routinely because they have no way to know which files will exist on the server. Always open the deployed URL, not the local file.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">04</span><h2>The pre-flight checklist</h2></div>
+    <p>Run this before every release. It takes five minutes and it catches the things that generate a phone call.</p>
+    <ul class="plain">
+      <li><b>Open the deployed URL, not your local file.</b> Different origin, different paths, different behaviour.</li>
+      <li><b>Open it on an actual phone.</b> Not just a narrow browser window. Real touch targets, real fonts, real network.</li>
+      <li><b>Check the console for errors.</b> A red error the user cannot see is still a broken feature.</li>
+      <li><b>Use the main path with a keyboard only.</b> Tab to the form, fill it, submit it. If you cannot, some of your users cannot.</li>
+      <li><b>Submit the form empty, and with nonsense.</b> Then with something valid.</li>
+      <li><b>Check every link and image.</b> This is where the local paths surface.</li>
+      <li><b>Run your tests one more time.</b> On the branch you are actually shipping.</li>
+      <li><b>Confirm no secrets and no personal data</b> in the repo, the logs, or the committed files.</li>
+    </ul>
+    <div class="def"><div class="k">Do it in that order</div><p>Deployed URL first, because everything after it is only meaningful against the version people will actually load. Checking the console on your local copy and then deploying tells you about a site nobody is going to visit.</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">05</span><h2>Release notes, and the rollback plan you write before you need it</h2></div>
+    <p>A release note is for the person who did not do the work. Dan reading it on his phone, or you in three months trying to work out when something changed. Four lines:</p>
+    <pre>v1.2.0 - 2026-08-30
+
+Added:   Appointment filtering by status on the clinic page.
+Fixed:   NL-009 - Request button did nothing when a field was left untouched.
+Changed: Date formatting unified into one function (no behaviour change).
+Known:   Filtering is client-side only; with 500+ appointments it will need paging.</pre>
+    <p>That "Known" line is what a professional release note has and an amateur one does not. Naming a limitation before someone finds it turns a bug report into a planned piece of work.</p>
+    <p>Then the part that gets skipped: <b>how do you undo this?</b> Write it down before you deploy, while you are calm and nothing is on fire.</p>
+    <ul class="plain">
+      <li><b>Static site:</b> revert the commit and push, or redeploy the previous deployment. Both are about a minute.</li>
+      <li><b>Know which commit was good.</b> "The one before mine" is only obvious to you and only today.</li>
+      <li><b>Decide the trigger in advance.</b> What symptom means roll back rather than fix forward? Booking broken is a rollback. A misaligned heading is not.</li>
+    </ul>
+    <div class="disclosure">Rolling back is not a failure or an embarrassment. It is the thing that makes shipping frequently safe. Teams that cannot roll back ship rarely and nervously, and their releases are worse for it.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">06</span><h2>After the release, the loop starts again</h2></div>
+    <p>Shipping is not the end of the ticket. It is where the ticket meets reality, and reality has opinions.</p>
+    <ul class="plain">
+      <li><b>Watch it.</b> For a static site: load it yourself, and ask one person to use it while you are there. Watching someone use your interface for ninety seconds is worth more feedback than any amount of self-testing.</li>
+      <li><b>Expect a report you did not anticipate.</b> This is normal and is not a sign you did it badly.</li>
+      <li><b>Turn the report into the next ticket.</b> Which puts you back at UNDERSTAND, which is where you started.</li>
+    </ul>
+    <div id="loopStripEnd"></div>
+    <p style="margin-top:16px">That is the whole course. Not a list of technologies &mdash; a loop you can run on any ticket, in any language, with or without an agent. The web knowledge from Stage 2 will date. The Python from Module 12 will date. The loop will not, because it is a description of how you establish that something is correct, and that problem does not change when the tools do.</p>
+    <div class="def"><div class="k">What you can now say about yourself, accurately</div><p>Not “I know HTML, CSS and JavaScript.” Anyone can claim that. Instead: <i>“I can take a vague request, turn it into acceptance criteria, drive a coding agent against them, find the bugs in what it produces, prove the fix with a test, review the diff, and ship it with a rollback plan.”</i> That is a considerably rarer sentence, and every clause of it is something you were graded on.</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-013</b>: <i>"Ship it. And write me something I can read on my phone that tells me what changed and what to do if it goes wrong."</i></p>
+    <p>This is the last graded exercise in the course, and it is deliberately not code. Deploy your site, then write the release the way you would hand it to Dan.</p>
+    <div class="interactive">
+      <div class="ilbl">Required exercise &middot; releasePlan</div>
+      <div class="formrow"><label for="rpUrl">The live URL (https, publicly reachable)</label><input id="rpUrl" type="url" placeholder="https://yourname.github.io/northline-clinic/"></div>
+      <div class="formrow" style="margin-top:12px"><label for="rpNotes">Release notes &mdash; Added / Fixed / Changed / Known</label><textarea id="rpNotes" style="min-height:130px" placeholder="Added:   ...&#10;Fixed:   ...&#10;Changed: ...&#10;Known:   ..."></textarea></div>
+      <div class="formrow" style="margin-top:12px"><label for="rpVerify">How you verified it, on the deployed URL</label><textarea id="rpVerify" style="min-height:110px" placeholder="The actual steps you took. Which browser, which device, what you submitted, what the console said."></textarea></div>
+      <div class="formrow" style="margin-top:12px"><label for="rpRisk">What might break, and what you deliberately did not do</label><textarea id="rpRisk" style="min-height:90px"></textarea></div>
+      <div class="formrow" style="margin-top:12px"><label for="rpRollback">The rollback plan &mdash; the mechanism, and the symptom that triggers it</label><textarea id="rpRollback" style="min-height:90px" placeholder="If X happens, I will ... (name the actual command or button, and the known-good commit)"></textarea></div>
+      <div class="wf-check" style="margin-top:14px"><label><input type="checkbox" id="rpPhone"> I opened the deployed URL on a real phone, not a narrow browser window</label></div>
+      <div class="wf-check"><label><input type="checkbox" id="rpConsole"> I checked the browser console on the deployed site and there are no errors</label></div>
+      <div class="wf-check"><label><input type="checkbox" id="rpKeyboard"> I completed the main task using only the keyboard</label></div>
+      <button class="primary" id="rpCheck" style="margin-top:14px">Submit the release</button>
+      <div class="feedback" id="rpFb"></div>
+    </div>
+
+    <div class="interactive" style="margin-top:24px">
+      <div class="ilbl">Capstone</div>
+      <p>The capstone is assessed on <a href="projects.html">the projects page</a> against the published rubric: spec, review, tests, deploy, write-up. Pick <b>Northline Clinic</b> (the site you have built since Module 3) or <b>Shift Board</b> if you want a harder one.</p>
+      <div id="capGate"></div>
+    </div>
+    <p class="mut" style="margin-top:14px">Reference: <a href="deploy-guide.html">deploy guide</a> &middot; <a href="desktop-labs.html">Desktop Labs</a> &middot; <a href="career.html">what to do next</a>.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
+    <div id="quizRoot"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+
+  </section>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
+</div></div>
+<script src="course-progress.js"></script>
+<script src="northline.js"></script>
+<script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
+<script src="module-kit.js"></script>
+<script>
+Northline.renderWhy('whyGrid', {"build": "A real deployment, release notes, a verification record, and a rollback plan — all graded.", "why": "Code nobody can reach is not software. And a release you cannot undo is the reason teams ship rarely and nervously.", "aiHelps": "Drafting release notes from your commit history, and walking you through a Pages or Netlify setup.", "aiFails": "Absolute local paths that work perfectly for you and are broken images for everyone else. It cannot know what exists on the server.", "without": "You deploy it, you verify it on a real phone with a real keyboard, and you write the rollback plan yourself."});
+const MK = ModuleKit.mount(13, AISEQuizData.MODULE_QUIZZES[13]);
+</script>
+<script>
+Northline.renderPrediction("beforeAi", {
+  label: "Predict first \u00b7 what shipped excludes",
+  questions: [
+    { q: "Which of these is not shipped?",
+      opts: [
+        { t: "file:///Users/you/northline/index.html or http://localhost:5173.", correct: true,
+          whyOk: "Nobody else can open that. Shipped is a public https URL that is a function of what is in Git." },
+        { t: "A GitHub Pages URL you opened on your phone.", why: "That is the bar. Someone who has never seen it can reach it." },
+        { t: "A Netlify preview you sent Dan before merging.", why: "A preview is a valid way to show work. The release still needs the production URL." }
+      ] },
+    { q: "When do you write the rollback plan?",
+      opts: [
+        { t: "Before you deploy, while you are calm, with the mechanism and the trigger named.", correct: true,
+          whyOk: "After it is on fire you will not remember the last good commit. Write it now." },
+        { t: "After the first production bug, when you know what went wrong.", why: "That is when you need it, which is why it has to already exist." },
+        { t: "You do not need one for a static site.", why: "Revert and push is a one-minute rollback \u2014 only if you wrote down which commit was good." }
+      ] }
+  ],
+  learned: ["You separated 'works on my laptop' from 'works' before you pasted a URL.",
+    "A release you cannot undo is why teams ship rarely and nervously."]
+});
+ModuleKit.renderLoopInto("loopStripEnd", "all", "The whole loop \u00b7 every step you were graded on");
+
+(function () {
+  var host = document.getElementById("capGate");
+  if (!host) return;
+  var st = CourseProgress.capstonePracticeStatus();
+  var labs = CourseProgress.desktopLabReady();
+  function row(ok, label) {
+    return '<div class="gaterow"><span class="' + (ok ? "gok" : "gno") + '">' + (ok ? "\u2713" : "\u25cb") + '</span> ' + label + '</div>';
+  }
+  host.innerHTML =
+    row(st.html >= 3, "3+ HTML practice tasks passed (" + st.html + ")") +
+    row(st.css >= 3, "3+ CSS practice tasks passed (" + st.css + ")") +
+    row(st.js >= 3, "3+ JavaScript practice tasks passed (" + st.js + ")") +
+    row(st.det >= 3, "3+ AI Code Detective cases solved (" + st.det + ")") +
+    row(labs, "Both Desktop Labs recorded with real GitHub URLs") +
+    '<p class="mut" style="margin-top:10px">You need at least three of the four practice tracks plus both Desktop Labs. ' +
+    (CourseProgress.capstonePracticeReady() ? "<b>You are clear to start.</b>" : "Not there yet \u2014 <a href=\"dashboard.html\">the dashboard</a> shows what is short.") + '</p>';
+})();
+
+document.getElementById("rpCheck").onclick = function () {
+  var url = CourseProgress.safeHttpUrl(document.getElementById("rpUrl").value);
+  var notes = document.getElementById("rpNotes").value.trim();
+  var verify = document.getElementById("rpVerify").value.trim();
+  var risk = document.getElementById("rpRisk").value.trim();
+  var rollback = document.getElementById("rpRollback").value.trim();
+  var results = [
+    { name: "a live https URL", pass: !!url && /^https:/i.test(url),
+      hint: "It has to be a public https address. A file:// path or localhost is not shipped." },
+    { name: "release notes cover what changed", pass: notes.length >= 80 && /added|fixed|changed/i.test(notes),
+      hint: "At least 80 characters, and name what was Added, Fixed or Changed. Dan cannot read a diff." },
+    { name: "release notes state a known limitation", pass: /known|limit|only|not yet|does not|doesn't|future|paging|client-side/i.test(notes),
+      hint: "Name something it does not do. A limitation you declare is planned work; one someone else finds is a bug report." },
+    { name: "verification names concrete steps on the deployed URL", pass: verify.length >= 100 && /(phone|mobile|chrome|safari|firefox|console|submit|tab|keyboard|empty|blank|refresh|reload)/i.test(verify),
+      hint: "At least 100 characters describing what you actually did. \u201cI tested it\u201d is not a verification record." },
+    { name: "you named a risk and something out of scope", pass: risk.length >= 60,
+      hint: "At least 60 characters. What could this break, and what did you consciously leave out?" },
+    { name: "the rollback plan names a real mechanism", pass: rollback.length >= 60 && /(revert|rollback|roll back|redeploy|previous (commit|deploy)|git reset|restore|reset --hard|last known good)/i.test(rollback),
+      hint: "Name the actual mechanism \u2014 revert the commit, redeploy the previous build \u2014 and the symptom that triggers it. \u201cI would fix it\u201d is not a rollback plan." },
+    { name: "checked on a real phone", pass: document.getElementById("rpPhone").checked, hint: "A narrow window is not a phone." },
+    { name: "console clean on the deployed site", pass: document.getElementById("rpConsole").checked, hint: "Open devtools on the live URL." },
+    { name: "main task completed with the keyboard only", pass: document.getElementById("rpKeyboard").checked, hint: "Tab to the form, fill it, submit it." }
+  ];
+  var ok = results.every(function (r) { return r.pass; });
+  ModuleKit.showResults(document.getElementById("rpFb"), { passed: ok, results: results });
+  if (ok) {
+    CourseProgress.setExtra("releasePlan", { url: url, notes: notes, verify: verify, risk: risk, rollback: rollback, at: new Date().toISOString() });
+    CourseProgress.setSection(13, "releasePlan", { passed: true, at: new Date().toISOString() });
+    document.getElementById("rpFb").innerHTML =
+      "<b>Shipped, documented, and reversible.</b> That is the whole loop closed: you understood a ticket, specified it, built it with an agent, inspected it, tested it, debugged it, reviewed it, and released it with a way back. Pass the checkpoint below and the course is complete \u2014 then <a href=\"projects.html\">the capstone</a> is where you prove you can do it unaided.";
+    Northline.showLearned(document.getElementById("rpFb").parentNode,
+      "You just shipped something someone else can open, and you can undo.",
+      "That sentence is the course. The loop starts again the first time reality files a ticket.");
+    MK.sync();
+  }
+};
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>
