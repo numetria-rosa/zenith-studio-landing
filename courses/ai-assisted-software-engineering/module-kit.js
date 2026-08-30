@@ -36,13 +36,17 @@
       '<div class="tkfrom">\u2014 ' + esc(t.from) + "</div>";
   }
 
-  function renderLoop(moduleId) {
-    const host = document.getElementById("loopStrip");
+  /* `active` is the list of loop step ids this module drills; pass "all" to
+     light the whole loop up, which Module 13 does to close the course. */
+  function renderLoopInto(hostId, moduleId, label) {
+    const host = document.getElementById(hostId);
     if (!host) return;
-    const active = CourseProgress.loopFor(moduleId);
+    const active = moduleId === "all"
+      ? CourseProgress.LOOP.map(function (s) { return s.id; })
+      : CourseProgress.loopFor(moduleId);
     host.className = "loopstrip";
     host.innerHTML =
-      '<div class="looplbl">The loop \u00b7 this module drills the highlighted steps</div>' +
+      '<div class="looplbl">' + esc(label || "The loop \u00b7 this module drills the highlighted steps") + "</div>" +
       '<ol class="loopsteps">' +
         CourseProgress.LOOP.map(function (s) {
           const on = active.indexOf(s.id) !== -1;
@@ -51,7 +55,13 @@
       "</ol>";
   }
 
-  function renderQuiz(moduleId, questions, onPass) {
+  function renderLoop(moduleId) { renderLoopInto("loopStrip", moduleId); }
+
+  /* onPass fires only at or above the pass threshold, which is what a module
+     checkpoint needs. onDone fires on every completed set with the score, which
+     is what the diagnostic and the final assessment need: they report a result
+     rather than unlocking anything. */
+  function renderQuiz(moduleId, questions, onPass, onDone) {
     const root = document.getElementById("quizRoot");
     if (!root) return;
     let score = 0, answered = 0;
@@ -82,13 +92,14 @@
           CourseProgress.setAnswer(moduleId, q.id, opt.t);
           const fb = document.createElement("div");
           fb.className = "feedback " + (ok ? "ok" : "bad");
-          fb.innerHTML = rich(ok ? (opt.why || "Yes.") : (opt.why || "Not that one."));
+          fb.innerHTML = rich(ok ? (opt.whyOk || opt.why || "Yes.") : (opt.why || "Not that one."));
           card.appendChild(fb);
           const sd = document.getElementById("scoreDisplay");
           if (sd) sd.textContent = "Checkpoint: " + score + " / " + questions.length;
           if (answered === questions.length) {
             CourseProgress.markComplete(moduleId, score, questions.length);
             if (score / questions.length >= CourseProgress.PASS_THRESHOLD && onPass) onPass();
+            if (onDone) onDone({ score: score, total: questions.length });
           }
         };
         card.appendChild(b);
@@ -193,5 +204,5 @@
     }).join("<br>");
   }
 
-  global.ModuleKit = { mount, renderQuiz, renderTicket, renderLoop, gradeRequirements, showResults };
+  global.ModuleKit = { mount, renderQuiz, renderTicket, renderLoop, renderLoopInto, gradeRequirements, showResults };
 })(window);

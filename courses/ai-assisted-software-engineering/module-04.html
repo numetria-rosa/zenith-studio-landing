@@ -3,89 +3,331 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 4 — Specs and coding agents</title>
+<title>Module 4 — Make the clinic page work on a phone</title>
 <link rel="stylesheet" href="course.css">
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 4</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 4 · ~50 min</span>
-    <h1 class="serif">Specs and coding agents</h1>
-    <p class="sub">A prompt that says “make a landing page” is how you get a gradient, three stock photos, and a form that posts to nowhere. Write checks a stranger could run.</p>
-    <div class="honestnote"><b>Labeled simulation.</b> The exercise on this page does not run Cursor. Unlocking later modules still requires <a href="desktop-labs.html">Desktop Lab A</a> before the capstone — a real commit URL from Cursor or VS Code.</div>
-    <div class="objectives"><div class="lbl">You will be able to</div>
+    <span class="eyebrow">Stage 2 &middot; Module 4 &middot; ~70 min</span>
+    <h1 class="serif">Make the clinic page work on a phone</h1>
+    <p class="sub">Support says it looks fine on a laptop and unusable on a phone. Nothing is crashed. The layout was written with numbers that assume a wide screen. A patient trying to book should not have to pinch and fight the interface.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
       <ul>
-        <li>Write Given / When / Then acceptance criteria</li>
-        <li>Spot a prompt that is too wide to review</li>
-        <li>Say no to a confident wrong diff</li>
+        <li>Explain padding, margin, border, and why box-sizing exists</li>
+        <li>Lay out a row with flexbox and a reflowing card set with grid</li>
+        <li>Make a layout responsive with max-width and one justified breakpoint</li>
+        <li>Inspect AI-generated CSS for overflow, inverted queries, and tiny tap targets</li>
+        <li>Explain why a fix works, not just that it passed</li>
       </ul>
     </div>
   </header>
+
   <section>
-    <div class="kh"><span class="num">1</span><h2>What to put in the spec</h2></div>
-    <p>Name the user, the visible change, the files that may change, and how you will know it worked. Mention files with <code>@</code> in Cursor so the agent reads them instead of inventing a second <code>styles.css</code>.</p>
-    <div class="def"><div class="k">Bad</div><p>Make it pop. Use AI. Add auth maybe.</p></div>
-    <div class="def"><div class="k">Good</div><p>Given I am on the Hours section, when I click Book, then a form with labeled Email and Date fields appears in <code>main</code>, and submit does not leave the page.</p></div>
+    <div class="kh"><span class="num">00</span><h2>Why this matters</h2></div>
+    <div id="whyGrid"></div>
+    <div class="callout" style="margin-top:18px">Most of Priya's patients open this page on a phone. A layout that only works on your laptop fails for most of the people the clinic exists to serve.</div>
   </section>
+
   <section>
-    <div class="kh"><span class="num">2</span><h2>Graded: write criteria a stranger could implement</h2></div>
-    <p>Write acceptance criteria for adding a Book button to the Northline landing page. Must include the words <b>Given</b>, <b>When</b>, and <b>Then</b>, mention a <b>label</b> or <b>labeled</b> field, and be at least 120 characters.</p>
+    <div class="kh"><span class="num">01</span><h2>Before you touch AI</h2></div>
+    <p>Name the problem, the constraints, and what must not change. "Make this responsive" is not a request. It is a shrug.</p>
+    <div id="beforeAi" class="interactive"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">02</span><h2>Bad request, better request</h2></div>
+    <p>Same ticket. One request gives you five unjustifiable breakpoints and a restyled desktop. The other names the element, the symptom, the breakpoint, and the do-nots.</p>
+    <div id="wfCompare" class="interactive"><div class="ilbl">Choose the better request &middot; labelled simulation</div></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">03</span><h2>The box, the row, and the grid</h2></div>
+    <p>Colour is the easy part of CSS. Layout is the part with a right answer. Every element is a box: content, then padding (inside, background reaches it), then border, then margin (outside, background does not).</p>
+    <pre>.card {
+  width: 300px;
+  padding: 20px;
+  border: 2px solid;
+}
+/* Default rendered width: 300 + 20 + 20 + 2 + 2 = 344px */</pre>
+    <pre>*, *::before, *::after { box-sizing: border-box; }
+/* Now width: 300px means 300px on screen. */</pre>
+    <p>Flexbox is one axis. You set it on the parent:</p>
+    <pre>.nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+/* The phone move: flex-wrap: wrap  or  flex-direction: column */</pre>
+    <p>Grid is two axes. One line that reflows without a media query:</p>
+    <pre>.services {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}</pre>
+    <p>Read that in English: <i>fit as many columns as you can, each at least 240px, sharing leftover space.</i> Wide screen: several columns. Phone: one. You described a constraint, not a device list.</p>
+    <details class="more">
+      <summary>Hierarchy, contrast, and the outline you must not delete</summary>
+      <ul class="plain">
+        <li><b>Size and weight</b> &mdash; two or three sizes, not seven.</li>
+        <li><b>Space</b> &mdash; related things sit close; unrelated things get a gap.</li>
+        <li><b>Contrast</b> &mdash; body text needs a real ratio against its background. Light grey on white fails.</li>
+        <li><b>Never <code>outline: none</code></b> &mdash; that ring is how a keyboard user knows where they are. Restyle it; do not delete it.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">04</span><h2>AI Code Detective</h2></div>
+    <p>The agent "fixed" the mobile page. Each snippet is plausible. Find the defect. Options are shuffled; the longest sentence is not a hint.</p>
+    <div id="detectives"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">05</span><h2>The three things that actually fix a phone</h2></div>
+    <ol>
+      <li><b>Viewport meta tag.</b> Without it, a phone pretends to be 980px and shrinks everything.
+        <pre>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</pre>
+      </li>
+      <li><b>Stop using fixed widths for layout.</b> <code>max-width</code> is a ceiling. <code>width: 420px</code> is a promise a 375px screen cannot keep.
+        <pre>main { max-width: 68ch; margin: 0 auto; padding: 0 20px; }</pre>
+      </li>
+      <li><b>Then one media query</b> at the width where <i>your</i> layout breaks &mdash; found by shrinking the window, not from a device list.
+        <pre>@media (max-width: 640px) {
+  .layout { flex-direction: column; }
+}</pre>
+      </li>
+    </ol>
+    <div class="honestnote"><b>Where the agent trips.</b> Five breakpoints at "standard" device widths, none of which match your content. And <code>!important</code> when a rule loses, instead of finding out why. Both work today. Both make the next change harder.</div>
+    <div class="tip"><b>Engineer's tip.</b> AI can make a page look responsive at one breakpoint while quietly breaking another. Test the behaviour &mdash; shrink the window, tap the button &mdash; not just the code.</div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-004</b>. The markup below is fixed &mdash; you cannot change it. Write CSS that satisfies the layout spec, including the phone case. Write it yourself; the grader reads real computed styles.</p>
+    <div class="def"><div class="k">Layout spec</div><p>1. Border-box sizing applied to everything.<br>2. <code>.layout</code> puts <code>.main</code> and <code>.side</code> in a row with at least 16px between them.<br>3. <code>.page</code> is centred with a <code>max-width</code> no greater than 900px.<br>4. <code>.services</code> is a grid whose columns are at least 200px and reflow on their own.<br>5. At 640px and below, <code>.layout</code> stacks into a column.<br>6. Focus outlines are not removed anywhere.</p></div>
     <div class="interactive">
-      <div class="ilbl">Required exercise · specWritingExercise</div>
-      <textarea id="specEx" placeholder="Given ... When ... Then ..."></textarea>
-      <button class="primary" id="btnSpec" style="margin-top:10px">Check spec</button>
-      <div class="feedback" id="specFb"></div>
+      <div class="ilbl">Required exercise &middot; cssResponsiveExercise</div>
+      <p class="mut" style="margin-bottom:8px">The markup you are styling (read-only):</p>
+      <pre id="m4fixture">&lt;div class="page"&gt;
+  &lt;div class="layout"&gt;
+    &lt;main class="main"&gt;&lt;h1&gt;Northline Clinic&lt;/h1&gt;&lt;/main&gt;
+    &lt;aside class="side"&gt;&lt;h2&gt;Hours&lt;/h2&gt;&lt;/aside&gt;
+  &lt;/div&gt;
+  &lt;div class="services"&gt;&lt;div&gt;A&lt;/div&gt;&lt;div&gt;B&lt;/div&gt;&lt;div&gt;C&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+      <label class="sr" for="m4css">Your CSS</label>
+      <textarea id="m4css" spellcheck="false" style="min-height:240px">*, *::before, *::after {
+  /* start here */
+}
+</textarea>
+      <div class="wf-row">
+        <button type="button" id="m4preview">Preview at 375px</button>
+        <button class="primary" type="button" id="m4check">Check against the spec</button>
+      </div>
+      <div class="phoneframe" id="m4phonewrap" hidden>
+        <iframe id="m4frame" title="Phone-width preview of your CSS" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="feedback" id="m4fb"></div>
     </div>
-    <p class="mut" style="margin-top:12px"><a href="practice-specs.html">Specs practice (simulation)</a> · <a href="desktop-labs.html">Desktop Lab A</a></p>
+    <div id="m4explain" class="interactive" style="margin-top:20px"></div>
+    <p class="mut" style="margin-top:14px">More reps: <a href="practice-css.html">CSS practice</a>.</p>
   </section>
+
   <section>
-    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+    <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Options are shuffled. Getting one wrong is information &mdash; read the explanation.</p>
     <div id="quizRoot"></div>
-    <div id="reqList"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
   </section>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
 </div>
 <div class="scoreboard"><div class="in">
-  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
-  <a id="btnNext" href="module-05.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
 </div></div>
 <script src="course-progress.js"></script>
+<script src="northline.js"></script>
 <script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
-CourseProgress.touchVisited(4);
-function syncNext() {
-  const btn = document.getElementById("btnNext");
-  const ok = CourseProgress.isModuleComplete(4);
-  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 5' : "Complete the exercise and quiz (80%+) to continue"; }
-  const box = document.getElementById("reqList");
-  if (box) {
-    box.innerHTML = CourseProgress.completionRequirements(4).map(function (r) {
-      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
-    }).join("");
+Northline.renderWhy("whyGrid", {
+  build: "The stylesheet that closes NL-004: a two-column layout that stacks on a phone and a card grid that reflows without a media query.",
+  why: "A patient booking on a phone should not pinch, scroll sideways, or miss the Book button. This is the most common real-world CSS complaint.",
+  aiHelps: "It knows the flexbox and grid syntax you will keep forgetting, and writes it instantly.",
+  aiFails: "Five unjustifiable breakpoints, !important instead of resolving specificity, outline: none, and a desktop redesign you did not ask for.",
+  without: "You write the CSS. The graded checks read real computed styles, so guessing does not work."
+});
+const MK = ModuleKit.mount(4, AISEQuizData.MODULE_QUIZZES[4]);
+
+Northline.renderPrediction("beforeAi", {
+  label: "Before you touch AI \u00b7 name the problem first",
+  intro: "Support: fine on a laptop, unusable on a phone. The appointment card is too wide, buttons are hard to hit, the nav wraps badly.",
+  questions: [
+    { q: "What is actually wrong?",
+      opts: [
+        { t: "Fixed widths and a row that cannot wrap, so content is wider than the phone.", correct: true,
+          whyOk: "The page is not crashed. It was built for one width." },
+        { t: "Phones cannot run CSS.", why: "They run CSS fine. These rules assume a wide screen." },
+        { t: "The HTML from Module 3 needs to be rewritten.", why: "The ticket is layout. Rewriting markup is a different ticket." }
+      ] },
+    { q: "What must not change?",
+      opts: [
+        { t: "The content, the landmarks, and the desktop layout that already works.", correct: true,
+          whyOk: "A mobile fix that redesigns desktop is two tickets pretending to be one." },
+        { t: "Nothing \u2014 this is a chance to restyle the brand.", why: "Scope creep. Support asked for readable hours on a phone." },
+        { t: "The exact pixel widths from the design file.", why: "Those widths are the bug." }
+      ] },
+    { q: "What should change?",
+      opts: [
+        { t: "Widths become ceilings, the row stacks at a content breakpoint, tap targets get real padding.", correct: true,
+          whyOk: "Three concrete changes. That is a request an agent can execute." },
+        { t: "Add six breakpoints for every popular phone.", why: "Maintenance for no gain. One justified breakpoint first." },
+        { t: "Switch the site to a CSS framework.", why: "A dependency to fix overflow is how a two-hour ticket becomes a week." }
+      ] }
+  ],
+  learned: ["You specified the change before asking for it.", "The agent can write the CSS. It cannot decide what must stay still."]
+});
+
+Northline.renderWorkflowCompare("wfCompare", {
+  situation: "You are about to ask an agent to fix the phone layout. Which request?",
+  bad: { t: "Make this responsive.",
+    why: "Weak. No element, no symptom, no breakpoint, no do-not. You will get a redesign and five device breakpoints, and you will not be able to call it wrong." },
+  good: { t: "In styles.css only: .appointment-card overflows at 375px because width is 420px. Use max-width, flex-wrap on nav, stack .layout at max-width 640px. Do not change desktop above 640, do not use absolute, do not remove outlines. Show the diff.",
+    why: "Target, symptom, desired behaviour, breakpoint, constraints, acceptance. You can review this." }
+});
+
+Northline.renderDetectiveSet(
+  ["cssFixedWidth", "cssNoWrap", "cssBoxSizing", "cssMediaSelector", "cssTouchTarget", "cssAbsolute"],
+  "detectives"
+);
+
+Northline.renderExplain("m4explain", {
+  label: "Explain your fix \u00b7 tracked, not gated",
+  intro: "After the spec passes, say why it works in your own words. Mention max-width or the breakpoint, and mention the phone.",
+  aria: "Explain why your CSS fix works on a phone",
+  storeKey: "m4Explain",
+  minLength: 80,
+  mustMention: [
+    { name: "mentions max-width, flex, grid, or the breakpoint",
+      any: ["max-width", "max width", "flex", "grid", "640", "breakpoint", "media"] },
+    { name: "mentions the phone, mobile, or a narrow viewport",
+      any: ["phone", "mobile", "375", "narrow", "viewport", "small screen"] }
+  ],
+  learned: ["You just explained a layout, not only a passing grade.",
+    "If you cannot say why max-width beats width, you will accept the next agent snippet that uses width again."],
+  cta: "Save my explanation"
+});
+
+var M4_FIXTURE = '<div class="page"><div class="layout">' +
+  '<main class="main"><h1>Northline Clinic</h1></main>' +
+  '<aside class="side"><h2>Hours</h2></aside></div>' +
+  '<div class="services"><div>A</div><div>B</div><div>C</div></div></div>';
+
+document.getElementById("m4preview").onclick = function () {
+  var wrap = document.getElementById("m4phonewrap");
+  var frame = document.getElementById("m4frame");
+  var css = document.getElementById("m4css").value.replace(/<\/style/gi, "<\\/style");
+  wrap.hidden = false;
+  var doc = frame.contentDocument;
+  if (!doc) return;
+  doc.open();
+  doc.write("<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'>" +
+    "<style>body{margin:12px;font-family:sans-serif;color:#111}" + css + "</style></head><body>" + M4_FIXTURE + "</body></html>");
+  doc.close();
+};
+
+document.getElementById("m4check").onclick = function () {
+  var css = document.getElementById("m4css").value;
+
+  function mediaBlocks(text) {
+    var out = [];
+    var re = /@media([^{]+)\{/g;
+    var m;
+    while ((m = re.exec(text))) {
+      var i = m.index + m[0].length, depth = 1, start = i;
+      while (i < text.length && depth > 0) {
+        if (text[i] === "{") depth++;
+        else if (text[i] === "}") depth--;
+        i++;
+      }
+      out.push({ cond: m[1], body: text.slice(start, i - 1) });
+    }
+    return out;
   }
-}
-ModuleKit.renderQuiz(4, AISEQuizData.MODULE_QUIZZES[4], syncNext);
-syncNext();
-</script>
-<script>
-document.getElementById("btnSpec").onclick = function () {
-  const t = document.getElementById("specEx").value;
-  const checks = [
-    { name: "has Given", pass: /\bgiven\b/i.test(t) },
-    { name: "has When", pass: /\bwhen\b/i.test(t) },
-    { name: "has Then", pass: /\bthen\b/i.test(t) },
-    { name: "mentions a label", pass: /label/i.test(t) },
-    { name: "at least 120 characters", pass: t.trim().length >= 120 },
-  ];
-  const ok = checks.every(function (c) { return c.pass; });
-  const fb = document.getElementById("specFb");
-  fb.className = "feedback " + (ok ? "ok" : "bad");
-  fb.innerHTML = checks.map(function (c) { return (c.pass ? "✓ " : "✗ ") + c.name; }).join("<br>");
-  if (ok) CourseProgress.setSection(4, "specWritingExercise", true);
-  syncNext();
+  var narrow = mediaBlocks(css).filter(function (b) {
+    var m = b.cond.match(/max-width\s*:\s*(\d+)/);
+    return m && Number(m[1]) <= 900;
+  });
+  var stacks = narrow.some(function (b) {
+    return /\.layout\b[^{]*\{[^}]*flex-direction\s*:\s*column/.test(b.body);
+  });
+
+  var out = PracticeKit.gradeCss({
+    fixtureHtml: M4_FIXTURE,
+    checks: [
+      { name: "border-box sizing applied to elements",
+        test: function (host, text) {
+          return /box-sizing\s*:\s*border-box/.test(text) &&
+            getComputedStyle(host.querySelector(".main")).boxSizing === "border-box";
+        },
+        hint: "Set box-sizing: border-box on *, *::before, *::after." },
+      { name: ".layout is a flex container",
+        test: function (host) { return getComputedStyle(host.querySelector(".layout")).display === "flex"; },
+        hint: "display: flex on .layout." },
+      { name: ".layout has a gap of at least 16px",
+        test: function (host) { return parseFloat(getComputedStyle(host.querySelector(".layout")).columnGap) >= 16; },
+        hint: "Use gap rather than margins on the children." },
+      { name: ".page has a max-width of 900px or less",
+        test: function (host) {
+          var w = getComputedStyle(host.querySelector(".page")).maxWidth;
+          return w !== "none" && parseFloat(w) > 0 && parseFloat(w) <= 900;
+        },
+        hint: "max-width lets the container shrink on a phone; width does not." },
+      { name: ".page is horizontally centred",
+        test: function (host, text) {
+          var s = getComputedStyle(host.querySelector(".page"));
+          if (s.marginLeft === s.marginRight && (s.marginLeft === "auto" || parseFloat(s.marginLeft) > 0)) return true;
+          /* Off-screen fixture: auto margins often compute to 0px even when the
+             rule is correct. Accept a .page margin that includes auto. */
+          return /\.page\b[^{]*\{[^}]*margin[^;}]*auto/.test(text);
+        },
+        hint: "margin: 0 auto centres a block with a max-width." },
+      { name: ".services is a grid",
+        test: function (host) { return getComputedStyle(host.querySelector(".services")).display === "grid"; },
+        hint: "display: grid on .services." },
+      { name: ".services columns are at least 200px and reflow",
+        test: function (host, text) { return /repeat\(\s*auto-(fit|fill)\s*,\s*minmax\(\s*2[0-9][0-9]px/.test(text); },
+        hint: "grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));" },
+      { name: "a max-width media query exists for narrow screens",
+        test: function () { return narrow.length > 0; },
+        hint: "Add @media (max-width: 640px) { ... }." },
+      { name: ".layout stacks to a column inside that media query",
+        test: function () { return stacks; },
+        hint: "Inside the media query: .layout { flex-direction: column; }" },
+      { name: "focus outlines are not removed",
+        test: function (host, text) { return !/outline\s*:\s*(none|0)\b/.test(text); },
+        hint: "outline: none removes the only cue a keyboard user has. Restyle it instead of deleting it." }
+    ]
+  }, css);
+
+  ModuleKit.showResults(document.getElementById("m4fb"), out);
+  if (out.passed) {
+    document.getElementById("m4fb").innerHTML =
+      "<b>NL-004 closed.</b> What fixed it: border-box, a max-width instead of a width, a grid that describes a constraint, and exactly one breakpoint you could justify." +
+      "<br><br>" + out.results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+    Northline.showLearned(document.getElementById("m4fb").parentNode,
+      "You just made a layout that survives a phone.",
+      "You can now inspect the CSS an agent will offer you and say whether it will overflow at 375px.");
+    CourseProgress.setSection(4, "cssResponsiveExercise", true);
+    MK.sync();
+  }
 };
 </script>
 <script src="course-rail.js"></script>

@@ -221,6 +221,108 @@
         { t: "The parent needs overflow: scroll.", why: "That papers over the overflow rather than sizing the field correctly." },
       ],
     },
+    cssAbsolute: {
+      title: "The layout held together with pins",
+      code: ".appointment-card {\n  position: absolute;\n  top: 120px;\n  left: 40px;\n  width: 420px;\n}",
+      prompt: "The agent \u201cfixed\u201d the desktop card with absolute positioning. What happens on a phone?",
+      principle: "Absolute positioning takes a box out of flow. It is a last resort, not a layout system.",
+      opts: [
+        { t: "The card is pinned to desktop coordinates, so on a 375px screen it overflows and ignores document flow. Use normal flow, flex, or grid.", correct: true,
+          whyOk: "Absolute is a pin. Pins do not reflow when the viewport changes." },
+        { t: "position: absolute is invalid on a class selector.", why: "It is valid. The problem is what it does to flow, not the syntax." },
+        { t: "You need a higher z-index so it stays on top.", why: "Stacking is not the defect. The coordinates are." },
+        { t: "This is the professional way to lock a signed-off design.", why: "It locks a design to one viewport. That is the opposite of responsive." },
+      ],
+    },
+  };
+
+  /* Progressive interview used by Module 2. Slot answers become the
+     specification draft the student then types into the graded exercise. */
+  const BREAKDOWN_BOOKING = {
+    who: "Dan, via Slack",
+    request: "Client says booking is confusing. Can you just make it better?",
+    steps: [
+      { slot: "What's missing?",
+        q: "Dan's message is one sentence. What information is actually missing before anyone should write code?",
+        answer: "Who gets stuck, what they do next, what done looks like, and what you are deliberately not doing.",
+        opts: [
+          { t: "Who gets stuck, what they do next, what done looks like, and what you are not doing.", correct: true,
+            whyOk: "Those four questions turn a verdict into a job." },
+          { t: "Which CSS framework Priya prefers.", why: "She is not choosing a framework. That question delays the real ones." },
+          { t: "The file list and function names.", why: "Implementation comes after you know the behaviour. Asking for files now is guessing." },
+          { t: "Nothing \u2014 \u201cconfusing\u201d is enough to start a redesign.", why: "A redesign is one possible guess. You do not yet know if that is the problem." },
+        ] },
+      { slot: "Who?",
+        q: "Who is the user of this change?",
+        answer: "Patients booking on a phone, and the receptionist who fields the calls when they cannot tell if it worked.",
+        opts: [
+          { t: "Patients trying to book, and the receptionist who answers when they cannot tell if it worked.", correct: true,
+            whyOk: "Two roles, one symptom. The confirmation is for both of them." },
+          { t: "Dan, because he filed the ticket.", why: "Dan forwarded a sentence. He is not the user." },
+          { t: "Whoever writes the CSS.", why: "That is you. You are not the user." },
+          { t: "All clinic staff, so we should rebuild the whole intranet.", why: "That is how a confirmation message becomes a six-week project." },
+        ] },
+      { slot: "What?",
+        q: "After you talk to Priya, eight people a week call because they cannot tell whether the form submitted. What is the actual feature?",
+        answer: "A visible confirmation after a successful request, and a guard against a second click creating a second booking.",
+        opts: [
+          { t: "A confirmation they can see, and a way to stop a second click creating a second booking.", correct: true,
+            whyOk: "The phone calls are the requirement in disguise." },
+          { t: "A full visual redesign of the booking page.", why: "Looks nicer. Does not answer \u201cdid it go through?\u201d" },
+          { t: "An accounts system so they can log in and see history.", why: "Useful someday. Not this ticket. That is a product, not a confirmation." },
+          { t: "Better placeholder text on the email field.", why: "Placeholders do not tell you a request arrived." },
+        ] },
+      { slot: "When?",
+        q: "When should the confirmation appear?",
+        answer: "After a successful submit \u2014 not on page load, and not while the request is still in flight.",
+        opts: [
+          { t: "After a successful submit \u2014 not on load, not while the request is still going.", correct: true,
+            whyOk: "Timing is a requirement. Wrong timing is a bug that looks like a feature." },
+          { t: "As soon as they open the page, so they feel welcomed.", why: "That is a greeting, not a confirmation. It would make the problem worse." },
+          { t: "Whenever any button on the page is clicked.", why: "The hours link is not a booking." },
+          { t: "Only after a staff member approves it by email.", why: "That is a different product. Patients would still phone." },
+        ] },
+      { slot: "What should happen?",
+        q: "What does the patient actually see, and what happens to the button?",
+        answer: "A specific written message appears, and submit cannot fire again until the request finishes.",
+        opts: [
+          { t: "A specific written message appears, and the submit button cannot fire again until the request finishes.", correct: true,
+            whyOk: "Named text plus a disabled button. A stranger can check both." },
+          { t: "A tasteful animation plays.", why: "Animations are not evidence. Patients phone because they saw nothing they trusted." },
+          { t: "The page reloads to a blank home page.", why: "That looks like a crash. They will book again." },
+          { t: "An email is sent, and the page stays exactly as it was.", why: "Email can fail silently. The page is what they are looking at." },
+        ] },
+      { slot: "What should not happen?",
+        q: "What is explicitly out of scope for this ticket?",
+        answer: "No redesign, no accounts, no SMS, no payment \u2014 confirmation and double-submit only.",
+        opts: [
+          { t: "No redesign, no accounts, no SMS, no payment \u2014 confirmation and double-submit only.", correct: true,
+            whyOk: "Written down, this is how you say no once." },
+          { t: "Nothing is out of scope if it improves UX.", why: "That sentence is how tickets never end." },
+          { t: "You must not talk to Priya.", why: "Talking to her is how you found the eight phone calls." },
+          { t: "You must not write any checks later.", why: "A Given/When/Then is how you prove the double-submit case. That is not \u2018the feature\u2019, but it is not banned either." },
+        ] },
+      { slot: "Edge case?",
+        q: "Which edge case will an agent almost certainly miss unless you write it down?",
+        answer: "A Sunday date (clinic closed) and a second click while the first request is still in flight.",
+        opts: [
+          { t: "A Sunday date (clinic closed) and a second click while the first request is still in flight.", correct: true,
+            whyOk: "Empty-string validation is famous. Domain rules and double-submit are yours." },
+          { t: "A null pointer in the CSS.", why: "CSS does not have null pointers. That is a made-up defect." },
+          { t: "The form using the wrong shade of green.", why: "Colour is not an edge case. It is also out of scope." },
+          { t: "Users who have never used a computer.", why: "Worth designing for, but it is not a checkable edge case until you name a behaviour." },
+        ] },
+      { slot: "Success criteria?",
+        q: "Which Given / When / Then can a stranger run without calling you?",
+        answer: "Given a filled form, when I click Request twice quickly, then exactly one booking is recorded and one confirmation shows.",
+        opts: [
+          { t: "Given a filled form, when I click Request twice quickly, then exactly one booking is recorded and one confirmation shows.", correct: true,
+            whyOk: "A stranger can do that. That is the bar." },
+          { t: "The form should feel more trustworthy.", why: "Feel is not checkable." },
+          { t: "Given best practices, when we ship, then UX is improved.", why: "Three vague words in a trenchcoat." },
+          { t: "The code should be clean and well commented.", why: "That is a review preference, not an acceptance criterion for the patient." },
+        ] },
+    ],
   };
 
   /* ---------------------------------------------------------------- *
@@ -901,7 +1003,7 @@
   }
 
   global.Northline = {
-    COMPANY, PEOPLE, DETECTIVES, AGENT_SIM, shuffle,
+    COMPANY, PEOPLE, DETECTIVES, AGENT_SIM, BREAKDOWN_BOOKING, shuffle,
     renderPeople, renderWhy,
     renderWorkflowCompare, renderRequestCompare,
     renderDetective, renderDetectiveSet,

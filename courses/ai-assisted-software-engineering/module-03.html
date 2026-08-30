@@ -3,106 +3,263 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 3 — JavaScript you can read</title>
+<title>Module 3 — We need a real page for the clinic</title>
 <link rel="stylesheet" href="course.css">
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 3</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 3 · ~60 min · literacy gate</span>
-    <h1 class="serif">JavaScript you can read</h1>
-    <p class="sub">If you cannot write a ten-line function, you cannot tell when the agent invented <code>orders.totalize()</code>. Cursor comes after this module, not instead of it.</p>
-    <div class="objectives"><div class="lbl">You will be able to</div>
+    <span class="eyebrow">Stage 2 &middot; Module 3 &middot; ~60 min</span>
+    <h1 class="serif">We need a real page for the clinic</h1>
+    <p class="sub">Priya does not want a paragraph. She wants hours, services, a way to reach the clinic, and a request form. Two pages can look identical and only one of them works with a keyboard. The difference is in the tags &mdash; which is why you read them before you trust an agent.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
       <ul>
-        <li>Write a named function with arguments and a return value</li>
-        <li>Loop an array and build a new one</li>
-        <li>Attach a click handler with querySelector</li>
+        <li>Choose elements for meaning instead of appearance</li>
+        <li>Lay out a page with landmarks and a correct heading outline</li>
+        <li>Build a form whose fields are labelled and validated by the browser</li>
+        <li>Catch the markup defects agents produce most often</li>
+        <li>Reject unrequested extras in a generated page</li>
       </ul>
     </div>
   </header>
+
   <section>
-    <div class="kh"><span class="num">1</span><h2>The units you will see in agent output</h2></div>
-    <pre>function total_revenue(orders) {
-  let sum = 0;
-  for (const row of orders) sum += row.amount;
-  return sum;
-}
-document.querySelector("#save").addEventListener("click", function () {
-  // read inputs, call a function, write to the page
-});</pre>
-    <p>Prefer <code>const</code> and <code>let</code>. Return a value the test can see. Side effects (the DOM) belong in a thin handler, not buried inside math.</p>
+    <div class="kh"><span class="num">00</span><h2>Why this matters</h2></div>
+    <div id="whyGrid"></div>
   </section>
+
   <section>
-    <div class="kh"><span class="num">2</span><h2>Graded: write the functions</h2></div>
-    <p>Implement <code>total_revenue(orders)</code> (sum <code>amount</code>, empty is 0) and <code>pluck_names(rows)</code> (array of <code>name</code>).</p>
+    <div class="kh"><span class="num">01</span><h2>Before you touch AI</h2></div>
+    <p>A page is a document, not a picture. The browser builds a tree from your tags, and everything else &mdash; how it looks, how a screen reader announces it, how a keyboard moves &mdash; hangs off that tree.</p>
+    <p>The criterion for which element to use is not "which one looks right". None of them look like anything without CSS. The criterion is <b>which one means what you are trying to say</b>.</p>
+    <div id="beforeAi" class="interactive"></div>
+    <div class="def"><div class="k">Semantic HTML</div><p><code>&lt;nav&gt;</code> and <code>&lt;div class="nav"&gt;</code> can render identically. Only one of them tells every other piece of software that this is the navigation.</p></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">02</span><h2>AI Code Detective</h2></div>
+    <p>You will spend more time reading markup an agent wrote than writing it yourself. These four snippets all "look fine" in a browser. Find what they actually got wrong.</p>
+    <div id="detectives"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">03</span><h2>The landmarks, and the form everyone skips</h2></div>
+    <pre>&lt;body&gt;
+  &lt;header&gt;
+    &lt;nav&gt;&lt;!-- primary links --&gt;&lt;/nav&gt;
+  &lt;/header&gt;
+  &lt;main&gt;
+    &lt;h1&gt;Northline Clinic&lt;/h1&gt;
+    &lt;section&gt;
+      &lt;h2&gt;Opening hours&lt;/h2&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+  &lt;footer&gt;&lt;/footer&gt;
+&lt;/body&gt;</pre>
+    <ul class="plain">
+      <li><b>One <code>&lt;main&gt;</code></b> &mdash; the unique content of this page. Screen reader users jump to it.</li>
+      <li><b>One <code>&lt;h1&gt;</code></b>, then headings that descend in order. Size is CSS's job.</li>
+    </ul>
+    <pre>&lt;form&gt;
+  &lt;label for="email"&gt;Email address&lt;/label&gt;
+  &lt;input type="email" id="email" name="email" required&gt;
+  &lt;label for="date"&gt;Preferred date&lt;/label&gt;
+  &lt;input type="date" id="date" name="date" required&gt;
+  &lt;button type="submit"&gt;Request appointment&lt;/button&gt;
+&lt;/form&gt;</pre>
+    <p><code>label for</code> names the field and makes the words clickable. <code>type="email"</code> gets the right keyboard on a phone. <code>required</code> stops empty submit with no JavaScript. A placeholder is a hint that leaves; a label stays.</p>
+    <details class="more">
+      <summary>Four accessibility rules that cover most of this page</summary>
+      <ol>
+        <li><b>Real controls.</b> <code>&lt;button&gt;</code> for actions, <code>&lt;a href&gt;</code> for navigation. A <code>&lt;div onclick&gt;</code> cannot be Tabbed to.</li>
+        <li><b>Every input has a label.</b></li>
+        <li><b>Images have <code>alt</code></b>. Decorative images get <code>alt=""</code> deliberately.</li>
+        <li><b>Link text names the destination.</b> "Click here" is meaningless out of context.</li>
+      </ol>
+      <p>Put the mouse down and press Tab. If a control cannot be reached, it does not exist for a real portion of Priya's patients.</p>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">04</span><h2>Bad request, better request</h2></div>
+    <p>The same ticket, two ways to ask. One produces a picture. The other produces a document you can review.</p>
+    <div id="wfCompare" class="interactive"><div class="ilbl">Choose the better request &middot; labelled simulation</div></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">05</span><h2>Would you merge this?</h2></div>
+    <p>The agent shipped a Book control. You are the reviewer. This is a labelled simulation &mdash; no pull request is opened.</p>
+    <div id="mergeDrill" class="interactive"></div>
+    <div class="honestnote"><b>Where the agent trips.</b> Ask for “a clinic landing page” and you will often get a <code>&lt;div&gt;</code> for every landmark, a placeholder instead of a label, and a newsletter signup nobody asked for. It will look completely fine. You only catch it by reading the tags.</div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-003</b>. From Priya: hours, services, how to reach the clinic, and a way to request an appointment.</p>
+    <p>Build the structure yourself. No CSS &mdash; this is about the document. It will look plain. That is correct. An agent is not allowed to write this one for you; you cannot review a shape you have never produced.</p>
     <div class="interactive">
-      <div class="ilbl">Required exercise · jsFunctionExercise</div>
-      <textarea id="jsEx" spellcheck="false" style="min-height:160px">function total_revenue(orders) {
-  return 0;
-}
-function pluck_names(rows) {
-  return [];
-}
-</textarea>
-      <button class="primary" id="btnJs" style="margin-top:10px">Run tests</button>
-      <div class="feedback" id="jsFb"></div>
+      <div class="ilbl">Required exercise &middot; htmlStructureExercise</div>
+      <p class="mut" style="margin-bottom:10px">Must include: the landmark elements, exactly one <code>h1</code>, a <code>section</code> per topic with an <code>h2</code>, the hours as a <code>dl</code>, and a request form with a labelled email field, a labelled date field, and a real submit button.</p>
+      <label class="sr" for="m3html">Clinic page HTML</label>
+      <textarea id="m3html" spellcheck="false" style="min-height:300px">&lt;body&gt;
+
+&lt;/body&gt;</textarea>
+      <button type="button" id="m3preview" style="margin-top:10px">Run it</button>
+      <div class="previewbox" id="m3prev"><span class="mut" style="font-size:13px">Renders here. It will look unstyled. Structure first.</span></div>
+      <button class="primary" id="m3check" type="button" style="margin-top:12px">Submit structure</button>
+      <div class="feedback" id="m3fb"></div>
     </div>
-    <p class="mut" style="margin-top:12px"><a href="practice-js.html">JavaScript practice library</a> — largest library. This is the literacy gate.</p>
+    <p class="mut" style="margin-top:14px">More reps: <a href="practice-html.html">HTML practice</a> &middot; <a href="practice-detective.html">AI Code Detective</a>.</p>
   </section>
+
   <section>
-    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+    <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Options are shuffled. Getting one wrong is information &mdash; read the explanation.</p>
     <div id="quizRoot"></div>
-    <div id="reqList"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
   </section>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
 </div>
 <div class="scoreboard"><div class="in">
-  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
-  <a id="btnNext" href="module-04.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
 </div></div>
 <script src="course-progress.js"></script>
-<script src="practice-kit.js"></script>
+<script src="northline.js"></script>
 <script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
-CourseProgress.touchVisited(3);
-function syncNext() {
-  const btn = document.getElementById("btnNext");
-  const ok = CourseProgress.isModuleComplete(3);
-  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 4' : "Complete the exercise and quiz (80%+) to continue"; }
-  const box = document.getElementById("reqList");
-  if (box) {
-    box.innerHTML = CourseProgress.completionRequirements(3).map(function (r) {
-      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
-    }).join("");
+Northline.renderWhy("whyGrid", {
+  build: "The full structure of the Northline Clinic page: landmarks, headings, an hours list, and a working request form.",
+  why: "A patient on a keyboard, or using a screen reader, cannot book if the page is only a picture. Structure is also the layer agents most reliably get subtly wrong.",
+  aiHelps: "Producing a lot of correct-looking markup instantly, and remembering attributes you forget.",
+  aiFails: "Divs where landmarks belong, placeholders instead of labels, clickable divs instead of buttons, and features nobody asked for.",
+  without: "You write every tag in the graded exercise. The review checklist only works if you have built the thing yourself."
+});
+const MK = ModuleKit.mount(3, AISEQuizData.MODULE_QUIZZES[3]);
+
+Northline.renderPrediction("beforeAi", {
+  label: "Before you touch AI \u00b7 what is this ticket actually asking for?",
+  intro: "Priya listed four things. Decide what you are building before anyone generates markup.",
+  questions: [
+    { q: "What is your first job?",
+      opts: [
+        { t: "Choose elements that mean hours, services, contact, and a request form \u2014 before any styling.", correct: true,
+          whyOk: "Structure first. Appearance is the next ticket." },
+        { t: "Ask the agent for a beautiful modern landing page.", why: "You will get a picture. You need a document." },
+        { t: "Pick a colour palette so it feels like a clinic.", why: "Colour is CSS. This ticket is HTML." }
+      ] },
+    { q: "What must not change about how you choose tags?",
+      opts: [
+        { t: "Meaning first. If two elements look the same, pick the one a keyboard and a screen reader can use.", correct: true,
+          whyOk: "Looks-right is CSS. Is-right is the tag." },
+        { t: "Always use divs \u2014 they are the most flexible.", why: "Flexible and meaningless. That is the most common agent defect." },
+        { t: "Pick whichever tag makes the font the size you want.", why: "Heading level is outline, not font size. Size is CSS." }
+      ] },
+    { q: "What should the request form prove, even without JavaScript?",
+      opts: [
+        { t: "Every field has a label, email and date use the right types, required is set, and submit is a real button.", correct: true,
+          whyOk: "The browser will do a surprising amount of work if the markup is honest." },
+        { t: "It looks like the design file.", why: "There is no design file on this ticket. There is a receptionist who needs requests." },
+        { t: "It uses a JavaScript validation library.", why: "Not this module. Native required and type get you a long way first." }
+      ] }
+  ],
+  learned: ["You specified the document before anyone typed a tag.", "An agent can generate a page in seconds. It cannot decide what the page must mean."]
+});
+
+Northline.renderDetectiveSet(["htmlDivSoup", "htmlLabel", "htmlHeadingSkip", "htmlAltText"], "detectives");
+
+Northline.renderWorkflowCompare("wfCompare", {
+  situation: "You are about to ask an agent for a first draft of the clinic page. Which request?",
+  bad: { t: "Build me a modern clinic website with best-practice UX.",
+    why: "You will get a picture: newsletter signup, cookie banner, map embed, and a forest of divs. None of that was the ticket." },
+  good: { t: "Write semantic HTML only: header+nav, one main, one h1, sections with h2 for hours/services/contact, hours as a dl, a form with labelled email and date, a real submit button. No CSS, no extras.",
+    why: "Named landmarks, named form rules, an explicit do-not. You can review this in a minute." }
+});
+
+Northline.renderReviewDecision("mergeDrill", {
+  label: "Would you merge this? \u00b7 labelled simulation",
+  intro: "The agent says the Book control is done. The page looks right in Chrome with a mouse.",
+  code: "<div class=\"btn\" onclick=\"openModal()\">Book</div>",
+  opts: [
+    { t: "Request changes. A div with onclick is not a control.", correct: true,
+      whyOk: "Keyboard and assistive tech lose. Looks-like-a-button is the least important property of a button." },
+    { t: "Merge it. It works when I click it.", why: "You tested the one case that already worked. Tab to it. Press Enter. It will fail both." },
+    { t: "Merge it and open a follow-up ticket for accessibility.", why: "\u201cLater\u201d on a fake button is how the fake button ships. Fix the element." }
+  ],
+  learned: ["You reviewed meaning, not pixels.", "If you cannot Tab to it, it does not exist for a real share of Priya's patients."]
+});
+
+document.getElementById("m3preview").onclick = function () {
+  document.getElementById("m3prev").innerHTML = document.getElementById("m3html").value;
+};
+
+document.getElementById("m3check").onclick = function () {
+  var src = document.getElementById("m3html").value;
+  var doc = PracticeKit.parseHtml(src);
+  var inputs = Array.prototype.slice.call(doc.querySelectorAll("input"));
+  function labelled(sel) {
+    var el = doc.querySelector(sel);
+    if (!el) return false;
+    if (el.id && doc.querySelector('label[for="' + el.id + '"]')) return true;
+    return !!el.closest("label");
   }
-}
-ModuleKit.renderQuiz(3, AISEQuizData.MODULE_QUIZZES[3], syncNext);
-syncNext();
-</script>
-<script>
-document.getElementById("btnJs").onclick = function () {
-  const src = document.getElementById("jsEx").value;
-  const a = PracticeKit.gradeJs({
-    functionName: "total_revenue",
-    testCases: [
-      { name: "two", args: [[{ amount: 10 }, { amount: 2.5 }]], expected: 12.5 },
-      { name: "empty", args: [[]], expected: 0 },
-    ],
-  }, src);
-  const b = PracticeKit.gradeJs({
-    functionName: "pluck_names",
-    testCases: [{ name: "two", args: [[{ name: "A" }, { name: "B" }]], expected: ["A", "B"] }],
-  }, src);
-  const results = a.results.concat(b.results);
-  const ok = a.passed && b.passed;
-  const fb = document.getElementById("jsFb");
-  fb.className = "feedback " + (ok ? "ok" : "bad");
-  fb.innerHTML = results.map(function (r) { return (r.pass ? "✓ " : "✗ ") + r.hint; }).join("<br>");
-  if (ok) CourseProgress.setSection(3, "jsFunctionExercise", true);
-  syncNext();
+  var clickableDivs = Array.prototype.slice.call(doc.querySelectorAll("div[onclick], span[onclick]"));
+  var checks = [
+    { name: "a <header> containing a <nav>", pass: !!doc.querySelector("header nav"),
+      hint: "Wrap the site links in <nav>, inside <header>." },
+    { name: "exactly one <main>", pass: doc.querySelectorAll("main").length === 1,
+      hint: "One <main> per page, holding this page's unique content." },
+    { name: "exactly one <h1>", pass: doc.querySelectorAll("h1").length === 1,
+      hint: "One top-level heading. Found " + doc.querySelectorAll("h1").length + "." },
+    { name: "a <footer>", pass: !!doc.querySelector("footer"), hint: "Add a footer." },
+    { name: "three or more <section> elements inside <main>", pass: doc.querySelectorAll("main section").length >= 3,
+      hint: "Hours, services, and contact are three topics. Found " + doc.querySelectorAll("main section").length + "." },
+    { name: "every section has its own <h2>", pass: doc.querySelectorAll("main section").length >= 3 &&
+        Array.prototype.every.call(doc.querySelectorAll("main section"), function (s) { return !!s.querySelector("h2"); }),
+      hint: "A section without a heading is a div with ambitions." },
+    { name: "no skipped heading levels (no h3 before an h2)", pass: !(doc.querySelector("h3") && !doc.querySelector("h2")),
+      hint: "Headings descend in order." },
+    { name: "opening hours marked up as a <dl> with day/value pairs", pass: !!doc.querySelector("dl") && doc.querySelectorAll("dl dt").length >= 2 && doc.querySelectorAll("dl dd").length >= 2,
+      hint: "A definition list pairs a term with a value, which is what hours are." },
+    { name: "a <form>", pass: !!doc.querySelector("form"), hint: "The request form is the point of the page." },
+    { name: "an email input of type=email", pass: !!doc.querySelector('form input[type="email"]'),
+      hint: 'Use type="email" so mobile keyboards and browser validation help you.' },
+    { name: "the email input has a label pointing at it", pass: labelled('form input[type="email"]'),
+      hint: 'Give the input an id and add <label for="that-id">, or wrap it in the label. A placeholder is not a label.' },
+    { name: "a date input of type=date", pass: !!doc.querySelector('form input[type="date"]'),
+      hint: 'Use type="date".' },
+    { name: "the date input has a label pointing at it", pass: labelled('form input[type="date"]'),
+      hint: "Same rule. Every input gets a label." },
+    { name: "at least one input marked required", pass: inputs.some(function (i) { return i.hasAttribute("required"); }),
+      hint: "required stops empty submission with no JavaScript at all." },
+    { name: "a real <button type=submit>", pass: !!doc.querySelector('form button[type="submit"], form button:not([type])'),
+      hint: "A real button is focusable and works with Enter and Space." },
+    { name: "nothing clickable that is not a button or link", pass: clickableDivs.length === 0,
+      hint: "Found " + clickableDivs.length + " div/span with onclick. A keyboard cannot reach those." },
+    { name: "every <img> has an alt attribute", pass: Array.prototype.every.call(doc.querySelectorAll("img"), function (i) { return i.hasAttribute("alt"); }),
+      hint: 'Every image needs alt. Decorative images get alt="" deliberately.' },
+    { name: "no vague link text", pass: !Array.prototype.some.call(doc.querySelectorAll("a"), function (a) {
+        return /^(click here|here|read more|more|link)$/i.test(a.textContent.trim()); }),
+      hint: "Link text should name the destination." }
+  ];
+  var ok = checks.every(function (c) { return c.pass; });
+  ModuleKit.showResults(document.getElementById("m3fb"), { passed: ok, results: checks });
+  if (ok) {
+    document.getElementById("m3fb").innerHTML =
+      "<b>That is a well-structured document.</b> It is also the checklist you will run against agent-generated markup for the rest of this course." +
+      "<br><br>" + checks.map(function (c) { return "\u2713 " + c.name; }).join("<br>");
+    Northline.showLearned(document.getElementById("m3fb").parentNode,
+      "You just built a page a keyboard can use.",
+      "Looks-right is cheap. Is-right is the ticket. You can now catch the version an agent will offer you.");
+    CourseProgress.setSection(3, "htmlStructureExercise", true);
+    MK.sync();
+  }
 };
 </script>
 <script src="course-rail.js"></script>

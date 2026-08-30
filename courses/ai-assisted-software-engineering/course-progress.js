@@ -88,14 +88,14 @@
     { id: 1, file: "module-01.html", stage: 0, title: "Your first shipped change", minutes: 45,
       loop: ["understand", "run", "commit", "ship"],
       teaser: "Read a real ticket, change one line, prove it, and ship it. Today." },
-    { id: 2, file: "module-02.html", stage: 1, title: "Requirements: turning \u201cmake it better\u201d into work", minutes: 60,
-      loop: ["understand", "specify"],
-      teaser: "The most valuable thing you do all week happens before any code exists." },
-    { id: 3, file: "module-03.html", stage: 2, title: "HTML: the structure under every page", minutes: 55,
-      loop: ["specify", "inspect", "run"],
+    { id: 2, file: "module-02.html", stage: 1, title: "Requirements: turning \u201cmake it better\u201d into work", minutes: 70,
+      loop: ["understand", "specify", "ask", "review"],
+      teaser: "Turn Dan's one sentence into a spec an agent can be supervised against." },
+    { id: 3, file: "module-03.html", stage: 2, title: "HTML: the structure under every page", minutes: 60,
+      loop: ["specify", "inspect", "run", "review"],
       teaser: "Landmarks, forms, and labels. The skeleton AI keeps getting subtly wrong." },
-    { id: 4, file: "module-04.html", stage: 2, title: "CSS: layout that survives a phone", minutes: 60,
-      loop: ["specify", "run", "review"],
+    { id: 4, file: "module-04.html", stage: 2, title: "CSS: layout that survives a phone", minutes: 70,
+      loop: ["specify", "inspect", "run", "review"],
       teaser: "Box model, flexbox, grid, one breakpoint you can defend." },
     { id: 5, file: "module-05.html", stage: 2, title: "JavaScript: logic you can defend", minutes: 70,
       loop: ["specify", "test", "debug"],
@@ -189,7 +189,7 @@
     10: ["reviewExercise"],
     11: ["refactorExercise"],
     12: ["pythonToolExercise"],
-    13: [],
+    13: ["releasePlan"],
   };
   const SECTION_LABELS = {
     shipFirstChange: "Fix ticket NL-001 in the real markup",
@@ -204,6 +204,7 @@
     reviewExercise: "Review the AI pull request hunk by hunk with reasons",
     refactorExercise: "Refactor without changing behaviour and remove the leak",
     pythonToolExercise: "Ship the data-cleanup tool with a test that catches duplicates",
+    releasePlan: "Write the release notes, the verification steps, and the rollback plan",
   };
 
   function safeParse(raw) { try { return JSON.parse(raw); } catch (e) { return null; } }
@@ -483,15 +484,6 @@
       return href;
     } catch (e) { return ""; }
   }
-  function isGithubCommitUrl(url) {
-    const href = isGithubRepoUrl(url);
-    if (!href) return "";
-    try {
-      const u = new URL(href);
-      if (u.pathname.indexOf("/commit/") === -1 && u.pathname.indexOf("/commits/") === -1) return "";
-      return href;
-    } catch (e) { return ""; }
-  }
   function desktopLabRecord(tool) {
     const labs = getExtra("desktopLabs");
     const rec = isPlainObject(labs) && isPlainObject(labs[tool]) ? labs[tool] : {};
@@ -503,25 +495,28 @@
   function completeDesktopLab(tool, payload) {
     const notes = String((payload && payload.notes) || "").trim();
     const confirmed = !!(payload && payload.confirmed);
+    const raw = String((payload && payload.url) || "").trim();
     let url = "";
-    if (tool === "cursor") url = isGithubCommitUrl(payload && payload.url);
-    else if (tool === "github") url = isGithubRepoUrl(payload && payload.url);
-    else return { ok: false, error: "Unknown lab." };
-    if (!url) {
-      return {
-        ok: false,
-        error: tool === "cursor"
-          ? "Need an https://github.com/.../commit/... URL from a real push."
-          : "Need an https://github.com/owner/repo URL.",
-      };
+    if (tool === "cursor") {
+      /* Lab A is the agent session, which happens before anything is pushed, so
+         demanding a commit URL here would make it impossible to finish in the
+         order the page teaches. The link is optional; the notes carry the
+         evidence. Lab B is where a real GitHub URL is required. */
+      url = raw ? safeHttpUrl(raw) : "";
+      if (raw && !url) return { ok: false, error: "That link is not a URL we can open. Leave it blank if you have nothing to point at." };
+    } else if (tool === "github") {
+      url = isGithubRepoUrl(raw);
+      if (!url) return { ok: false, error: "Need an https://github.com/owner/repo URL." };
+    } else {
+      return { ok: false, error: "Unknown lab." };
     }
     if (notes.length < 80) return { ok: false, error: "Write at least 80 characters about what you changed and how you checked it." };
     if (!confirmed) {
       return {
         ok: false,
         error: tool === "cursor"
-          ? "Confirm you made this change in Cursor or VS Code, not the in-browser exercise."
-          : "Confirm this is a repo you own and that it has a README plus at least three commits.",
+          ? "Tick the box to confirm this was a real session in Cursor or VS Code, not the in-browser exercise."
+          : "Tick the box to confirm the repo is yours and pushed.",
       };
     }
     const labs = Object.assign({}, isPlainObject(getExtra("desktopLabs")) ? getExtra("desktopLabs") : {});
@@ -600,7 +595,7 @@
     isUnlocked, statusOf, resetAll, resetModule,
     rubricForProject, getProject, setProject,
     countPassedPractice, capstonePracticeStatus, capstonePracticeReady,
-    desktopLabReady, desktopLabRecord, completeDesktopLab, isGithubRepoUrl, isGithubCommitUrl,
+    desktopLabReady, desktopLabRecord, completeDesktopLab, isGithubRepoUrl,
   };
 
   rescueLegacy();
