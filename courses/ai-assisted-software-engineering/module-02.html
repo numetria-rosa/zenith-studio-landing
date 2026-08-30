@@ -3,102 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 2 — CSS: layout, not decoration</title>
+<title>Module 2 — Requirements: turning “make it better” into work</title>
 <link rel="stylesheet" href="course.css">
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 2</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 2 · ~50 min</span>
-    <h1 class="serif">CSS: layout, not decoration</h1>
-    <p class="sub">Pretty is optional. Spacing, hierarchy, and one responsive rule are not. The agent loves gradients. You are paid for the spec.</p>
-    <div class="objectives"><div class="lbl">You will be able to</div>
+    <span class="eyebrow">Stage 1 &middot; Module 2 &middot; ~60 min</span>
+    <h1 class="serif">Requirements: turning “make it better” into work</h1>
+    <p class="sub">An agent will never ask you what you meant. It will guess, instantly, in four hundred confident lines. So the most valuable half hour of your week is the one before any code exists.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
       <ul>
-        <li>Explain margin vs padding on a box</li>
-        <li>Use flexbox for a simple row or column</li>
-        <li>Write one media query that changes the layout</li>
+        <li>Turn a second-hand complaint into questions that have factual answers</li>
+        <li>Write user stories with a reason clause that can rule solutions out</li>
+        <li>Write acceptance criteria a stranger could check without asking you what you meant</li>
+        <li>Find edge cases systematically instead of hoping</li>
+        <li>Break a vague request into finishable tasks, and write down what you are not doing</li>
+        <li>Use an agent to widen a spec without letting it decide the spec</li>
       </ul>
     </div>
   </header>
   <section>
-    <div class="kh"><span class="num">1</span><h2>The box model</h2></div>
-    <p>Every element is a box: content, padding, border, margin. <code>gap</code> on a flex parent is the modern way to space children without fighting margins.</p>
-    <pre>#card { max-width: 640px; padding: 24px; }
-#row { display: flex; gap: 24px; }
-@media (max-width: 640px) { #row { flex-direction: column; } }</pre>
+  <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
+    <div id="whyGrid"></div>
+
   </section>
   <section>
-    <div class="kh"><span class="num">2</span><h2>Graded: match the spec</h2></div>
-    <p>The fixture is a <code>#card</code> with a <code>#row</code> of two children. Your CSS must: give <code>#card</code> padding of 24px, make <code>#row</code> a flex row with 24px gap, and at max-width 640px stack <code>#row</code> as a column.</p>
+  <div class="kh"><span class="num">01</span><h2>The most expensive bug is building the wrong thing</h2></div>
+    <p>Every other kind of bug is cheap by comparison. A crash gets found in minutes. A logic error gets found by a test. A feature that works perfectly and solves a problem nobody had gets found in six weeks, by an unhappy client, after you have built the whole thing.</p>
+    <p>Now consider what an agent does to that risk. Ask one to "make the booking system better" and it will not push back. It will not say "better in what way?" It will produce four hundred lines of confident, plausible, well-formatted code implementing <i>its</i> guess at what better means. And it will be a good guess. It just will not be Priya's.</p>
+    <div class="callout">This is the single most important idea in the course: <b>the faster your tools can build, the more expensive it becomes to be wrong about what to build.</b> Cheap implementation makes requirements more valuable, not less.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">02</span><h2>From complaint to requirement</h2></div>
+    <p>Dan's message is: <i>"Client says booking is confusing. Can you just make it better?"</i></p>
+    <p>There are no requirements in that sentence. There is a symptom, reported second-hand, with a verdict attached. Your first move is not to open an editor. It is to work out what "confusing" means by asking questions that have factual answers.</p>
+    <div class="def"><div class="k">Useless question</div><p>"What would you like it to look like?" &mdash; Priya is not a designer. You are outsourcing your job to someone who cannot do it.</p></div>
+    <div class="def"><div class="k">Useful questions</div><p>"When someone gets confused, what do they do next &mdash; call you, or give up?" &middot; "How many bookings come in by phone because the form did not work?" &middot; "Show me the last person who got stuck." &middot; "What do you have to fix by hand afterwards?"</p></div>
+    <p>Those questions produce facts: <i>eight people a week call because they could not tell whether the form submitted.</i> That is a requirement in disguise. "Confusing" was not.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> An agent is genuinely good at generating candidate questions, and genuinely bad at knowing which answers matter, because it has never had to phone a client back. Use it to widen the list, then cut the list yourself.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">03</span><h2>User stories: role, want, reason</h2></div>
+    <p>A user story is one sentence in a fixed shape, and the shape exists to stop you skipping a part.</p>
+    <pre>As a [role], I want [capability], so that [outcome].</pre>
+    <p>Applied to what Priya actually told you:</p>
+    <div class="def"><div class="k">Example</div><p>As a <b>patient</b>, I want <b>a clear confirmation after I submit a booking request</b>, so that <b>I do not phone the clinic to check whether it went through</b>.</p></div>
+    <p>The third clause is the one everybody drops, and it is the one that earns its place. Without <i>so that</i> you cannot tell whether a proposed solution is any good. With it, you can: does a green "Request received &mdash; we will call you within one working day" message stop someone phoning? Probably. Does a fancier submit button? No. The reason clause is a test for solutions.</p>
+    <p>It also protects you politically. When someone asks why you built the confirmation message instead of the redesign, the answer is a sentence, not an argument.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">04</span><h2>Acceptance criteria: Given, When, Then</h2></div>
+    <p>A story says what someone wants. Acceptance criteria say how anyone can check whether you delivered it. The standard shape:</p>
+    <pre>Given   some starting situation
+When    someone does something specific
+Then    something specific and observable happens</pre>
+    <div class="def"><div class="k">Not a criterion</div><p>"The form should work properly and be user friendly."</p></div>
+    <div class="def"><div class="k">A criterion</div><p><b>Given</b> I have filled in name, email, and a preferred date, <b>when</b> I press Request appointment, <b>then</b> the form is replaced by the message "Request received &mdash; we will call you within one working day" and my details stay visible above it.</p></div>
+    <p>The difference is that a stranger could run the second one. They could follow those steps on your finished work and reach a verdict of yes or no, without asking you what you meant. That is the whole bar: <b>could someone who has never spoken to you check this?</b></p>
+    <p>Two habits that make criteria checkable: use a real value rather than a category (<i>"09:00 &ndash; 13:00"</i>, not <i>"the correct hours"</i>), and quote the exact text the user will see. "An appropriate message" is where arguments come from.</p>
+    <div class="disclosure">Criteria written this way are the input to two later modules almost verbatim. In Module 7 they become the prompt you hand the agent. In Module 9 they become the tests. Time spent here is not overhead; it is the same work, done once, in the cheapest place to change it.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">05</span><h2>Edge cases: the unhappy half</h2></div>
+    <p>The happy path is one path. Beginners specify it and stop. Then real people arrive.</p>
+    <p>A useful way to find edge cases is to walk your criteria and ask, at each step, <i>what if this is not normal?</i></p>
+    <ul class="plain">
+      <li><b>Empty</b> &mdash; nothing filled in at all. Blank name. Blank date.</li>
+      <li><b>Wrong</b> &mdash; "next tuesday" typed into a date field. An email with no <code>@</code>. A phone number with letters.</li>
+      <li><b>Too much</b> &mdash; a 4,000-character message. A name with an apostrophe. Emoji.</li>
+      <li><b>Too many</b> &mdash; the same person pressing Request four times because nothing appeared to happen.</li>
+      <li><b>Impossible</b> &mdash; a date in the past. A Sunday, when the clinic is closed.</li>
+      <li><b>Broken world</b> &mdash; the connection drops mid-submit. The server is down. The patient is on a train.</li>
+    </ul>
+    <p>Every one of those has a right answer, and the right answer is a decision, not an accident. If you do not decide, the code decides for you &mdash; and what code does by default when handed a blank field is usually to accept it silently.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> Ask an agent to “handle edge cases” and you will get validation for the ones that are famous — empty string, null, negative numbers. You will not get <i>the clinic is closed on Sunday, so a Sunday request is a promise you cannot keep</i>. Domain edge cases come from the domain, and the agent has never met Priya.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">06</span><h2>Decomposition, and the word that makes it finite</h2></div>
+    <p>You now have stories, criteria, and edge cases. Turn them into work: pieces small enough that you could finish one in a sitting and know it is done.</p>
+    <p>The test for a good task is that it has a visible result and an obvious finish line. "Improve the form" fails both. "Add a required <code>email</code> field with a label and an inline error when it is empty or missing an @" passes both.</p>
+    <p>And then the step that almost nobody does, which is the one that turns "make it better" from an infinite request into a job you can complete:</p>
+    <div class="def"><div class="k">Out of scope, this ticket</div><p>Rescheduling. SMS reminders. Online payment. Visual redesign. Accounts and login. We are fixing whether a patient can tell that their request arrived. Everything else is a separate conversation.</p></div>
+    <p>Written down, that paragraph is a shield. It is how you say no once, in writing, instead of six times, defensively, in meetings. Sam will look for it in your ticket before he looks at your code.</p>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">07</span><h2>Where the agent earns its place here</h2></div>
+    <p>None of this means working alone. It means knowing which half is yours.</p>
+    <div id="wfCompare" class="interactive"><div class="ilbl">Choose the better request &middot; labelled simulation</div></div>
+    <p style="margin-top:20px">Good uses of an agent at the requirements stage:</p>
+    <ul class="plain">
+      <li><b>Widen the edge-case list.</b> "Here are my acceptance criteria for a booking form. List twenty ways a real user could break this." It will find things you missed. You decide which ones matter.</li>
+      <li><b>Attack your own spec.</b> "Read these criteria as a hostile reviewer. Where are they ambiguous?" Genuinely useful, and cheap.</li>
+      <li><b>Tighten wording.</b> Turning a rambling criterion into a crisp Given/When/Then.</li>
+    </ul>
+    <p>Bad uses, all of which produce confident output:</p>
+    <ul class="plain">
+      <li>Asking it to <i>decide</i> what the client needs. It will decide. It has no information.</li>
+      <li>Asking it to prioritise. Priority comes from consequences it cannot see.</li>
+      <li>Accepting its edge cases wholesale. A list of thirty makes a ten-line feature into a month.</li>
+    </ul>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-002</b>, in full: <i>"Client says booking is confusing. Can you just make it better?"</i></p>
+    <p>Turn it into work. Five boxes. This is the exercise Sam would set you in your first week, and it is graded on shape, not on style &mdash; we check that these are actually stories, that the criteria are checkable, that you thought about failure, that the work is broken down, and that you wrote down what you are <i>not</i> doing.</p>
     <div class="interactive">
-      <div class="ilbl">Required exercise · cssLayoutExercise</div>
-      <textarea id="cssEx" spellcheck="false">/* #card, #row */</textarea>
-      <button class="primary" id="btnCss" style="margin-top:10px">Check CSS</button>
-      <div class="feedback" id="cssFb"></div>
+      <div class="ilbl">Required exercise &middot; requirementsExercise</div>
+      <label class="formrow"><label>User stories &mdash; one per line, three or more</label><textarea id="rqStories" placeholder="As a patient, I want ... so that ...&#10;As a receptionist, I want ... so that ..."></textarea></label>
+      <label class="formrow"><label>Acceptance criteria &mdash; three or more, Given / When / Then</label><textarea id="rqCriteria" placeholder="Given I have filled in name, email and date, when I press Request appointment, then ..."></textarea></label>
+      <label class="formrow"><label>Edge cases &mdash; one per line, three or more</label><textarea id="rqEdges" placeholder="Empty email field&#10;Date in the past&#10;Submitted twice by mistake"></textarea></label>
+      <label class="formrow"><label>Tasks &mdash; one per line, four or more, each finishable in a sitting</label><textarea id="rqTasks"></textarea></label>
+      <label class="formrow"><label>Explicitly out of scope</label><textarea id="rqScope" placeholder="Not doing in this ticket, and why:"></textarea></label>
+      <button class="primary" id="rqCheck" style="margin-top:12px">Submit requirements</button>
+      <div class="feedback" id="rqFb"></div>
     </div>
-    <p class="mut" style="margin-top:12px"><a href="practice-css.html">CSS practice library</a></p>
+    <p class="mut" style="margin-top:14px">More reps: <a href="practice-specs.html">specs practice</a> (labelled simulation).</p>
+
   </section>
   <section>
-    <div class="kh"><span class="num">3</span><h2>Checkpoint</h2></div>
+  <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
     <div id="quizRoot"></div>
-    <div id="reqList"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+
   </section>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
 </div>
 <div class="scoreboard"><div class="in">
-  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
-  <a id="btnNext" href="module-03.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
 </div></div>
 <script src="course-progress.js"></script>
-<script src="practice-kit.js"></script>
+<script src="northline.js"></script>
 <script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
-CourseProgress.touchVisited(2);
-function syncNext() {
-  const btn = document.getElementById("btnNext");
-  const ok = CourseProgress.isModuleComplete(2);
-  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 3' : "Complete the exercise and quiz (80%+) to continue"; }
-  const box = document.getElementById("reqList");
-  if (box) {
-    box.innerHTML = CourseProgress.completionRequirements(2).map(function (r) {
-      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
-    }).join("");
-  }
-}
-ModuleKit.renderQuiz(2, AISEQuizData.MODULE_QUIZZES[2], syncNext);
-syncNext();
+Northline.renderWhy('whyGrid', {"build": "A complete, defensible spec for the booking ticket: stories, criteria, edge cases, tasks, and an explicit out-of-scope list.", "why": "This is the highest-leverage skill in the course. Cheap code makes being wrong about what to build more expensive, not less.", "aiHelps": "Generating candidate edge cases and attacking your own criteria for ambiguity. It is genuinely good at breadth.", "aiFails": "It cannot decide what matters, cannot prioritise, and will never say “that is out of scope”. Domain rules — like the clinic being shut on Sunday — are invisible to it.", "without": "Every word of the spec is yours. No agent involvement in the graded exercise at all."});
+const MK = ModuleKit.mount(2, AISEQuizData.MODULE_QUIZZES[2]);
 </script>
 <script>
-document.getElementById("btnCss").onclick = function () {
-  const css = document.getElementById("cssEx").value;
-  const task = {
-    fixtureHtml: '<div id="card"><div id="row"><div>A</div><div>B</div></div></div>',
-    checks: [
-      { name: "card padding 24px", test: function (host) {
-        const el = host.querySelector("#card");
-        return el && getComputedStyle(el).paddingTop === "24px";
-      }},
-      { name: "row is flex", test: function (host) {
-        return getComputedStyle(host.querySelector("#row")).display === "flex";
-      }},
-      { name: "row gap 24px", test: function (host) {
-        const g = getComputedStyle(host.querySelector("#row")).gap;
-        return g === "24px" || g === "24px 24px";
-      }},
-      { name: "has a 640px media query", test: function (host, src) {
-        return /@media[^{]*640px/.test(src) && /flex-direction\s*:\s*column/.test(src);
-      }},
-    ],
-  };
-  const out = PracticeKit.gradeCss(task, css);
-  const fb = document.getElementById("cssFb");
-  fb.className = "feedback " + (out.passed ? "ok" : "bad");
-  fb.innerHTML = out.results.map(function (r) { return (r.pass ? "✓ " : "✗ ") + r.name; }).join("<br>");
-  if (out.passed) CourseProgress.setSection(2, "cssLayoutExercise", true);
-  syncNext();
+Northline.renderWorkflowCompare("wfCompare", {
+  situation: "Dan forwards the booking complaint. You open Cursor. Which request do you send first?",
+  bad: { t: "The booking form is confusing. Make it better and follow UX best practices.",
+    why: "It will produce a redesign. Possibly a nice one. It will not add the confirmation message that stops eight phone calls a week, because nobody told it that was the actual problem \u2014 you had not worked it out yet." },
+  good: { t: "Read these three acceptance criteria for the booking form. Act as a hostile reviewer: list every ambiguity and every user behaviour these criteria fail to cover. Do not write code.",
+    why: "You are using it for the thing it is good at \u2014 breadth \u2014 while keeping the decision. You will get edge cases you missed, and you will cut two thirds of them, and the spec that survives is yours." }
+});
+
+document.getElementById("rqCheck").onclick = function () {
+  var out = ModuleKit.gradeRequirements({
+    stories: document.getElementById("rqStories").value,
+    criteria: document.getElementById("rqCriteria").value,
+    edges: document.getElementById("rqEdges").value,
+    tasks: document.getElementById("rqTasks").value,
+    outOfScope: document.getElementById("rqScope").value
+  });
+  ModuleKit.showResults(document.getElementById("rqFb"), out);
+  if (out.passed) {
+    document.getElementById("rqFb").innerHTML =
+      "<b>That is a spec.</b> A stranger could pick this up, build it, and check their own work against it \u2014 and you could defend every line of it to Dan. Keep it: in Module 7 these criteria become the prompt you hand the agent, and in Module 9 they become the tests." +
+      "<br><br>" + out.results.map(function (r) { return "\u2713 " + r.name; }).join("<br>");
+    CourseProgress.setSection(2, "requirementsExercise", true);
+    MK.sync();
+  }
 };
 </script>
 <script src="course-rail.js"></script>

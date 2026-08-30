@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Northline Digital — Ticket board</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Tickets</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="module-00.html">Orientation</a><a href="syllabus.html">Syllabus</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Northline Digital</span>
+    <h1 class="serif">Ticket board</h1>
+    <p class="sub">You are the junior. Each ticket is a module. Done means the module quiz and exercise passed — not sprint theater. Tickets #009–#010 wait on Module 8, the practice bar, and both Desktop Labs.</p>
+  </header>
+  <div id="ticketBoard" class="ticketboard"></div>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<script src="course-progress.js"></script>
+<script src="northline.js"></script>
+<script>Northline.renderBoard("ticketBoard");</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

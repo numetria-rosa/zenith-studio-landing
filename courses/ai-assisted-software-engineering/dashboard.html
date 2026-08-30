@@ -13,10 +13,11 @@
   <header class="hero">
     <span class="eyebrow">Course dashboard</span>
     <h1 class="serif">AI-Assisted Software Engineering</h1>
-    <p class="sub">Zero coding to a live URL. Module progress syncs when you are signed in through Zenith Lab. This course is not AI Engineering.</p>
+    <p class="sub">Specify, inspect, test, review, and ship with AI as the pair. Module progress syncs when you are signed in. This is not AI Engineering.</p>
   </header>
   <div class="sysgrid">
-    <a class="syscard" href="module-00.html"><span class="systitle">Orientation</span><span class="sysdesc">What this job is</span></a>
+    <a class="syscard" href="module-00.html"><span class="systitle">Orientation</span><span class="sysdesc">The engineering loop</span></a>
+    <a class="syscard" href="tickets.html"><span class="systitle">Tickets</span><span class="sysdesc">Northline Digital board</span></a>
     <a class="syscard" href="quiz-center.html"><span class="systitle">Quiz Center</span><span class="sysdesc">Shuffled extra reps</span></a>
     <a class="syscard" href="practice-html.html"><span class="systitle">HTML Practice</span><span class="sysdesc">Real DOM checks</span></a>
     <a class="syscard" href="practice-js.html"><span class="systitle">JS Practice</span><span class="sysdesc">Functions you write</span></a>
@@ -44,7 +45,7 @@
 <script src="course-progress.js"></script>
 <script>
 const DESC = {
-  1: "Files, the browser, errors. Semantic HTML from a brief.",
+  1: "Ticket #001. Landmarks by hand. Catch a fake Book button.",
   2: "Layout, spacing, hierarchy. Match a spec, including one responsive rule.",
   3: "Functions, events, DOM. You write them. No Cursor yet.",
   4: "Acceptance criteria. Simulations are labeled. Desktop Lab A required to go further honestly.",
@@ -66,7 +67,7 @@ function card(href, unlocked, status, num, title, desc, meta, label) {
 function render() {
   const grid = document.getElementById("modGrid");
   grid.innerHTML = "";
-  grid.appendChild(card("module-00.html", true, "not-started", "0", "Orientation — What this job is", "Placement self-check. Everyone starts at Module 1.", "<span>~20 min</span>", "Open"));
+  grid.appendChild(card("module-00.html", true, "not-started", "0", "Orientation — Welcome to AI-assisted development", "The loop, a first preview, and the honesty bar.", "<span>~25 min</span>", "Open"));
   CourseProgress.MODULES.forEach(function (m) {
     const status = CourseProgress.statusOf(m.id);
     const unlocked = CourseProgress.isUnlocked(m.id);

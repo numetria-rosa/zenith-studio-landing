@@ -3,104 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 1 — How software works + HTML</title>
+<title>Module 1 — Your first shipped change</title>
 <link rel="stylesheet" href="course.css">
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 1</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">Module 1 · ~50 min</span>
-    <h1 class="serif">How software works + HTML</h1>
-    <p class="sub">A site is files in folders. The browser requests a URL, gets HTML, builds a tree, then paints. If the tree is wrong, CSS and JavaScript cannot save the meaning.</p>
-    <div class="objectives"><div class="lbl">You will be able to</div>
+    <span class="eyebrow">Stage 0 &middot; Module 1 &middot; ~45 min</span>
+    <h1 class="serif">Your first shipped change</h1>
+    <p class="sub">No setup, no theory warm-up. There is a ticket, there is a real bug, and by the end of this page you will have fixed it and written the commit message a colleague would accept.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
       <ul>
-        <li>Name file, folder, URL, and 404 without hand-waving</li>
-        <li>Write semantic landmarks: header, nav, main, footer</li>
-        <li>Build a real page structure from a brief</li>
+        <li>Read a non-technical complaint and extract the actual defect</li>
+        <li>Explain what a tag, its content, and an attribute each do</li>
+        <li>Make the smallest change that resolves a ticket, and say why that matters</li>
+        <li>Render your change and check it with your own eyes before claiming it works</li>
+        <li>Write a commit message a stranger could search for in six months</li>
       </ul>
     </div>
   </header>
   <section>
-    <div class="kh"><span class="num">1</span><h2>The path to a pixel</h2></div>
-    <p>You save <code>index.html</code> in a folder. A server (or a local preview) maps a URL to that file. The browser parses tags into a document. A missing file is a 404. A JS error is a console message — different layer.</p>
-    <pre>&lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;Northline&lt;/title&gt;&lt;/head&gt;
-&lt;body&gt;
-  &lt;header&gt;&lt;p&gt;Northline Clinic&lt;/p&gt;&lt;/header&gt;
-  &lt;nav&gt;&lt;a href="#hours"&gt;Hours&lt;/a&gt;&lt;/nav&gt;
-  &lt;main&gt;&lt;h1&gt;Same-week appointments&lt;/h1&gt;&lt;/main&gt;
-  &lt;footer&gt;&lt;p&gt;Fictional clinic for class.&lt;/p&gt;&lt;/footer&gt;
-&lt;/body&gt;
-&lt;/html&gt;</pre>
+  <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
+    <div id="whyGrid"></div>
+
   </section>
   <section>
-    <div class="kh"><span class="num">2</span><h2>Semantic, not div soup</h2></div>
-    <p>Use <code>&lt;h1&gt;</code> once for the page title. Put unique content in <code>&lt;main&gt;</code>. Give every form control a <code>&lt;label&gt;</code>. A <code>&lt;div&gt;</code> is a box with no meaning — fine for layout, wrong as your only structure.</p>
+  <div class="kh"><span class="num">01</span><h2>Read the ticket like an engineer</h2></div>
+    <p>Priya did not file a bug report. She described a consequence: people are showing up to a locked door. Underneath that sentence there are three separate facts, and only one of them is your job today.</p>
+    <ul class="plain">
+      <li><b>Fact:</b> the site says the clinic is closed on Saturday.</li>
+      <li><b>Fact:</b> the clinic is actually open Saturday morning.</li>
+      <li><b>Consequence:</b> patients are wasting a trip.</li>
+    </ul>
+    <p>The fix is to change what the page says. That is it. Notice what is <i>not</i> in scope: redesigning the hours section, adding an opening-hours widget, converting the site to a framework, or "modernising the styling while I am in there". Every one of those is a real thing juniors do, and every one of them turns a two-minute ticket into a two-day review.</p>
+    <div class="def"><div class="k">The question that saves you</div><p>Before touching anything, ask: <i>what is the smallest change that makes this complaint go away?</i> If your answer involves more than one file on a ticket like this, you have misunderstood the ticket.</p></div>
+    <div class="honestnote"><b>Where the agent trips.</b> Give an agent this ticket and there is a good chance it returns a rewritten hours section with a new CSS class, a <code>&lt;table&gt;</code> where there was a list, and an <code>aria-label</code> it invented. All of that might be fine. None of it was asked for, and now the reviewer has to evaluate five changes instead of one. Scope creep is not a style preference; it is the main reason AI-authored changes get rejected.</div>
+
   </section>
   <section>
-    <div class="kh"><span class="num">3</span><h2>Graded: page from a brief</h2></div>
-    <p>Northline Clinic needs a one-page skeleton: a header with the clinic name, a nav with links to Hours and Contact, a main with an <code>h1</code> that includes the word “Northline”, and a footer.</p>
+  <div class="kh"><span class="num">02</span><h2>Where the words on a page actually live</h2></div>
+    <p>A web page is a text file. That is the whole secret. When you open the clinic site, your browser downloads a file full of angle brackets and turns it into something that looks designed.</p>
+    <pre>&lt;dl class="hours"&gt;
+  &lt;dt&gt;Monday &amp;ndash; Friday&lt;/dt&gt;&lt;dd&gt;08:00 &amp;ndash; 18:00&lt;/dd&gt;
+  &lt;dt&gt;Saturday&lt;/dt&gt;&lt;dd&gt;Closed&lt;/dd&gt;
+&lt;/dl&gt;</pre>
+    <p>Three things are happening here, and they are the three things every HTML element does:</p>
+    <ul class="plain">
+      <li><b>A tag</b> like <code>&lt;dd&gt;</code> says what kind of thing this is. This one means "description" &mdash; the value paired with a term.</li>
+      <li><b>Content</b> between the opening and closing tag is what humans read. <code>Closed</code> is content. Change it and the page changes.</li>
+      <li><b>An attribute</b> like <code>class="hours"</code> is metadata. It does not show on screen; it is a handle so CSS and JavaScript can find this element later.</li>
+    </ul>
+    <p>So "the website says the wrong thing" is almost always "some content between two tags is wrong". You are about to fix exactly that.</p>
+    <div class="disclosure">Why <code>&lt;dl&gt;</code> and not a <code>&lt;table&gt;</code>? A definition list pairs a term with a value, which is precisely what opening hours are. A table implies rows and columns of comparable data. Choosing the element that matches the meaning is a real skill and Module 3 is entirely about it.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">03</span><h2>The smallest change that solves it</h2></div>
+    <p>Professional discipline, on day one: <b>change only what the ticket asks for.</b></p>
+    <p>This is not pedantry, and it is not about being timid. It is about making your work reviewable. A change with one reason in it can be checked in thirty seconds. A change with six reasons in it &mdash; one of which is the actual fix and five of which are "while I was in there" &mdash; takes twenty minutes and usually gets sent back.</p>
+    <p>It also matters when something breaks. If Saturday's hours are wrong next month, a one-line change is trivially findable. If your change touched forty lines, nobody knows which one did it.</p>
+    <div class="def"><div class="k">Say this out loud before you commit</div><p>“I changed X, because Y, and here is how I know it worked.” If you cannot fill in all three blanks in one breath, your change is doing too much.</p></div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">04</span><h2>Prove it, then say what you did</h2></div>
+    <p>Two steps that separate a change from a shipped change.</p>
+    <p><b>Run it.</b> Open the page. Look at the thing you changed. This sounds too obvious to state, until you have watched someone confidently push a fix they never looked at. The agent saying "I have updated the hours" is not evidence. Your eyes on the rendered page are evidence.</p>
+    <p><b>Then write the commit message.</b> A commit is a labelled point in your project's history. The label is for a future human &mdash; often you, six months from now, trying to work out when Saturday broke.</p>
+    <div class="def"><div class="k">Useless</div><p><code>update</code> &middot; <code>fix</code> &middot; <code>changes</code> &middot; <code>asdf</code> &middot; <code>final v2</code></p></div>
+    <div class="def"><div class="k">Useful</div><p><code>Correct Saturday hours to 09:00-13:00</code></p></div>
+    <p>The pattern: start with a verb in the imperative &mdash; <i>Correct</i>, <i>Add</i>, <i>Remove</i>, <i>Fix</i> &mdash; as though completing the sentence "this commit will…". Say what changed. Keep the first line short enough to read in a list, roughly seventy characters. One reason per commit.</p>
+    <div class="honestnote"><b>Where the agent trips.</b> Agents write commit messages that describe the code instead of the reason: <code>Modified dd element in dl.hours</code>. That tells a future reader what the diff already shows and hides the only thing they wanted to know, which is <i>why</i>. Rewrite them.</div>
+
+  </section>
+  <section>
+  <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
+    <p>Ticket <b>NL-001</b>. Below is the real markup from the clinic's hours section. The clinic is now open <b>09:00 &ndash; 13:00 on Saturday</b>. Sunday is still closed. Weekday hours have not changed.</p>
+    <p>Fix it &mdash; and <i>only</i> it. The grader checks both that Saturday is right and that you left everything else alone, because that is the actual skill.</p>
     <div class="interactive">
-      <div class="ilbl">Required exercise · htmlPageExercise</div>
-      <textarea id="htmlEx" spellcheck="false" style="min-height:200px">&lt;!-- Write a full HTML document --&gt;
-</textarea>
-      <button class="primary" id="btnHtml" style="margin-top:10px">Check structure</button>
-      <div class="feedback" id="htmlFb"></div>
+      <div class="ilbl">Required exercise &middot; shipFirstChange</div>
+      <label class="formrow"><label>The markup</label><textarea id="m1html" spellcheck="false">&lt;dl class="hours"&gt;
+  &lt;dt&gt;Monday &ndash; Friday&lt;/dt&gt;
+  &lt;dd&gt;08:00 &ndash; 18:00&lt;/dd&gt;
+  &lt;dt&gt;Saturday&lt;/dt&gt;
+  &lt;dd&gt;Closed&lt;/dd&gt;
+  &lt;dt&gt;Sunday&lt;/dt&gt;
+  &lt;dd&gt;Closed&lt;/dd&gt;
+&lt;/dl&gt;</textarea></label>
+      <button type="button" id="m1preview" style="margin-top:10px">Run it (render the page)</button>
+      <div class="previewbox" id="m1prev"><span class="mut" style="font-size:13px">Your markup renders here. Look at it before you submit &mdash; that is the Run step.</span></div>
+      <label class="formrow" style="margin-top:18px"><label>Commit message (first line)</label><input type="text" id="m1commit" placeholder="Correct ..." autocomplete="off"></label>
+      <button class="primary" id="m1check" style="margin-top:12px">Submit the fix</button>
+      <div class="feedback" id="m1fb"></div>
     </div>
-    <p class="mut" style="margin-top:12px">More reps: <a href="practice-html.html">HTML practice library</a>.</p>
+    <p class="mut" style="margin-top:14px">More reps: <a href="practice-html.html">HTML practice</a>.</p>
+
   </section>
   <section>
-    <div class="kh"><span class="num">4</span><h2>Checkpoint</h2></div>
+  <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
     <div id="quizRoot"></div>
-    <div id="reqList"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+
   </section>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
 </div>
 <div class="scoreboard"><div class="in">
-  <span class="sc" id="scoreDisplay">Checkpoint score: —</span>
-  <a id="btnNext" href="module-02.html" class="primary nextbtn" style="text-decoration:none">Complete the exercise and quiz (80%+) to continue</a>
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
 </div></div>
 <script src="course-progress.js"></script>
-<script src="practice-kit.js"></script>
+<script src="northline.js"></script>
 <script src="quiz-data.js"></script>
+<script src="practice-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
-CourseProgress.touchVisited(1);
-function syncNext() {
-  const btn = document.getElementById("btnNext");
-  const ok = CourseProgress.isModuleComplete(1);
-  if (btn) { btn.disabled = !ok; btn.textContent = ok ? 'Continue to Module 2' : "Complete the exercise and quiz (80%+) to continue"; }
-  const box = document.getElementById("reqList");
-  if (box) {
-    box.innerHTML = CourseProgress.completionRequirements(1).map(function (r) {
-      return '<div class="req ' + (r.satisfied ? "ok" : "bad") + '">' + (r.satisfied ? "✓ " : "○ ") + r.label + "</div>";
-    }).join("");
-  }
-}
-ModuleKit.renderQuiz(1, AISEQuizData.MODULE_QUIZZES[1], syncNext);
-syncNext();
+Northline.renderWhy('whyGrid', {"build": "The real fix for Northline Clinic's opening hours, plus the commit message that ships it.", "why": "Patients are turning up to a locked door. This is the smallest possible version of the only thing that matters: someone was affected, and you fixed it.", "aiHelps": "An agent would find and change this line instantly, and correctly.", "aiFails": "It will also cheerfully restructure the section you did not ask it to touch, and describe the diff instead of the reason in the commit message.", "without": "You type this fix yourself. You cannot judge an agent's diff until you know what a small, correct diff looks like."});
+const MK = ModuleKit.mount(1, AISEQuizData.MODULE_QUIZZES[1]);
 </script>
 <script>
-document.getElementById("btnHtml").onclick = function () {
-  const html = document.getElementById("htmlEx").value;
-  const doc = PracticeKit.parseHtml(html);
-  const checks = [
-    { name: "has header", pass: !!doc.querySelector("header") },
-    { name: "has nav", pass: !!doc.querySelector("nav") },
-    { name: "nav has 2+ links", pass: doc.querySelectorAll("nav a").length >= 2 },
-    { name: "has main", pass: !!doc.querySelector("main") },
-    { name: "h1 mentions Northline", pass: !!(doc.querySelector("h1") && /northline/i.test(doc.querySelector("h1").textContent)) },
-    { name: "has footer", pass: !!doc.querySelector("footer") },
+document.getElementById("m1preview").onclick = function () {
+  /* Rendering the student's own markup is the point of the Run step, so this
+     has to be real HTML in the document. It is their own input echoed back
+     to them, never persisted and never shown to anyone else. */
+  document.getElementById("m1prev").innerHTML = document.getElementById("m1html").value;
+};
+
+document.getElementById("m1check").onclick = function () {
+  var src = document.getElementById("m1html").value;
+  var msg = document.getElementById("m1commit").value.trim();
+  var doc = PracticeKit.parseHtml(src);
+  var dl = doc.querySelector("dl.hours");
+  var dts = Array.prototype.map.call(doc.querySelectorAll("dt"), function (n) { return n.textContent.trim(); });
+  var dds = Array.prototype.map.call(doc.querySelectorAll("dd"), function (n) { return n.textContent.trim(); });
+  function ddFor(term) {
+    var i = dts.findIndex(function (t) { return t.toLowerCase().indexOf(term) === 0; });
+    return i === -1 ? "" : (dds[i] || "");
+  }
+  var sat = ddFor("saturday");
+  var checks = [
+    { name: "the hours list is still a dl with class \"hours\"", pass: !!dl,
+      hint: "You removed or replaced the list. The ticket asked for a content fix, not a rewrite." },
+    { name: "still exactly three days listed", pass: dts.length === 3 && dds.length === 3,
+      hint: "There should still be three terms and three values. Do not add or drop days." },
+    { name: "Saturday now shows 09:00", pass: /\b0?9[:.]00\b|\b9\s*am\b/i.test(sat),
+      hint: "Saturday's value needs the opening time. It currently reads: " + (sat || "(nothing)") },
+    { name: "Saturday now shows 13:00", pass: /\b13[:.]00\b|\b1\s*pm\b/i.test(sat),
+      hint: "Saturday's value needs the closing time too." },
+    { name: "Saturday no longer says Closed", pass: !/closed/i.test(sat),
+      hint: "The old value is still in there." },
+    { name: "weekday hours untouched (08:00 - 18:00)", pass: /08[:.]00/.test(ddFor("monday")) && /18[:.]00/.test(ddFor("monday")),
+      hint: "You changed a line the ticket did not mention. Put it back." },
+    { name: "Sunday still Closed", pass: /closed/i.test(ddFor("sunday")),
+      hint: "Sunday was not in scope. Priya said Saturday." },
+    { name: "commit message starts with an imperative verb", pass: /^(correct|fix|update|change|add|remove|set)\b/i.test(msg),
+      hint: "Complete the sentence \"this commit will...\". Start with a verb." },
+    { name: "commit message says what changed", pass: /saturday|hours/i.test(msg),
+      hint: "A future reader searching for \"saturday\" should find this commit." },
+    { name: "commit message is not vague filler", pass: msg.length >= 18 && !/^(update|fix|changes?|final|wip|stuff)$/i.test(msg),
+      hint: "\"update\" tells the next person nothing." },
+    { name: "commit first line under 72 characters", pass: msg.length > 0 && msg.length <= 72,
+      hint: "Keep the subject line short so it reads in a log. Currently " + msg.length + "." }
   ];
-  const ok = checks.every(function (c) { return c.pass; });
-  const fb = document.getElementById("htmlFb");
-  fb.className = "feedback " + (ok ? "ok" : "bad");
-  fb.innerHTML = checks.map(function (c) { return (c.pass ? "✓ " : "✗ ") + c.name; }).join("<br>");
-  if (ok) CourseProgress.setSection(1, "htmlPageExercise", true);
-  syncNext();
+  var ok = checks.every(function (c) { return c.pass; });
+  ModuleKit.showResults(document.getElementById("m1fb"),
+    { passed: ok, results: checks });
+  if (ok) {
+    document.getElementById("m1fb").innerHTML =
+      "<b>Shipped.</b> You read a ticket, found the smallest change that resolved it, rendered it to check, left everything else alone, and labelled it for the next human. That is the whole job in miniature &mdash; every module from here adds one more thing you can prove." +
+      "<br><br>" + checks.map(function (c) { return "\u2713 " + c.name; }).join("<br>");
+    CourseProgress.setSection(1, "shipFirstChange", true);
+    MK.sync();
+  }
 };
 </script>
 <script src="course-rail.js"></script>

@@ -15,6 +15,7 @@
     .rail-nav a.active{background:rgba(96,165,250,.14);color:var(--accent,#60a5fa);font-weight:600}
     .rail-modlbl{margin-top:20px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut2,#6b7690);padding:0 9px}
     .rail-mods{margin-top:8px;display:flex;flex-direction:column;gap:1px}
+    .rail-stage{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut2,#6b7690);padding:12px 9px 4px;line-height:1.35}
     .rail-mod{display:flex;align-items:center;gap:7px;font-size:11.5px;padding:6px 9px;border-radius:7px;text-decoration:none;color:var(--mut,#9aa6c2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     a.rail-mod:hover{background:var(--card2,#1a2134);color:var(--tx,#eef2ff)}
     .rail-mod.active{background:rgba(96,165,250,.14);color:var(--accent,#60a5fa)}
@@ -35,11 +36,13 @@
   const NAV = [
     ["syllabus.html", "Syllabus"],
     ["dashboard.html", "Dashboard"],
+    ["tickets.html", "Ticket board"],
     ["learning-roadmap.html", "Learning Roadmap"],
     ["mastery-profile.html", "Mastery Profile"],
     ["diagnostic.html", "Skill Diagnostic"],
     ["quiz-center.html", "Quiz Center"],
     ["cheatsheets.html", "Cheat Sheets"],
+    ["practice-detective.html", "AI Code Detective"],
     ["practice-html.html", "HTML Practice"],
     ["practice-css.html", "CSS Practice"],
     ["practice-js.html", "JavaScript Practice"],
@@ -71,20 +74,25 @@
       if (m0.completed) m0Cls.push("done");
       else if (m0.visited) m0Cls.push("progress");
       modsHtml += `<a href="module-00.html" class="${m0Cls.join(" ")}" title="Orientation"><span class="rmnum">0</span><span class="rmdot"></span>Orientation</a>`;
-      cp.MODULES.forEach((m) => {
-        const status = cp.statusOf(m.id);
-        const unlocked = cp.isUnlocked(m.id);
-        const cls = ["rail-mod"];
-        if (cur === m.file) cls.push("active");
-        if (!unlocked) cls.push("locked");
-        else if (status === "completed") cls.push("done");
-        else if (status === "in-progress") cls.push("progress");
-        const inner = `<span class="rmnum">${m.id}</span><span class="rmdot"></span>${m.title}`;
-        let title = m.title;
-        if (!unlocked && m.id === 9) title = "Needs Module 8, 3+ HTML/CSS/JS tasks in two libraries, and both Desktop Labs";
-        else if (!unlocked) title = "Unlocks after Module " + (m.id - 1);
-        if (!unlocked) modsHtml += `<span class="${cls.join(" ")}" aria-disabled="true" title="${title}">${inner}</span>`;
-        else modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
+      cp.STAGES.forEach((stage) => {
+        modsHtml += `<div class="rail-stage">${stage.label} · ${stage.title}</div>`;
+        stage.modules.forEach((id) => {
+          const m = cp.MODULES.find((x) => x.id === id);
+          if (!m) return;
+          const status = cp.statusOf(m.id);
+          const unlocked = cp.isUnlocked(m.id);
+          const cls = ["rail-mod"];
+          if (cur === m.file) cls.push("active");
+          if (!unlocked) cls.push("locked");
+          else if (status === "completed") cls.push("done");
+          else if (status === "in-progress") cls.push("progress");
+          const inner = `<span class="rmnum">${m.id}</span><span class="rmdot"></span>${m.title}`;
+          let title = m.title;
+          if (!unlocked && m.id === cp.CAPSTONE_ID) title = "Needs Module " + (cp.CAPSTONE_ID - 1) + ", the practice bar, and both Desktop Labs";
+          else if (!unlocked) title = "Unlocks after Module " + (m.id - 1);
+          if (!unlocked) modsHtml += `<span class="${cls.join(" ")}" aria-disabled="true" title="${title}">${inner}</span>`;
+          else modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
+        });
       });
     }
     return `<div class="rail-brand">Zenith Lab</div><div class="rail-title">AI-Assisted Software Engineering</div><nav class="rail-nav">${navHtml}</nav><div class="rail-modlbl">Modules</div><div class="rail-mods">${modsHtml}</div>`;

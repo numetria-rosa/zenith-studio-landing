@@ -166,7 +166,12 @@
       body.className = "taskbody";
       let editor = "";
       if (task.kind === "choice") {
-        editor = (task.options || []).map(function (opt, i) {
+        const opts = (task.options || []).slice();
+        for (let i = opts.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = opts[i]; opts[i] = opts[j]; opts[j] = tmp;
+        }
+        editor = opts.map(function (opt) {
           return '<button type="button" class="qopt" data-val="' + esc(opt.value) + '">' + esc(opt.label) + "</button>";
         }).join("");
       } else {

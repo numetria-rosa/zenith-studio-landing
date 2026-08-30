@@ -1,7 +1,16 @@
 /* Zenith Lab, AI-Assisted Software Engineering progress.
-   Same public API as the Data Science course-progress.js. */
+
+   Schema 2 (2026-08-30 rebuild). The course was restructured from 9 flat
+   modules into 5 stages / 13 modules driven by Northline Digital tickets,
+   so module 4 no longer means what it meant in schema 1. Old records are
+   deliberately NOT migrated — a schema-1 "module 4 complete" would silently
+   mark a completely different module done and hand out a gate the student
+   never earned. loadRaw() ignores any blob without schema >= 2. */
 (function (global) {
-  const STORAGE_KEY = "zenith_aise_progress_v1";
+  const STORAGE_KEY = "zenith_aise_progress_v2";
+  const LEGACY_KEYS = ["zenith_aise_progress_v1"];
+  const SCHEMA = 2;
+
   const HTML_ESCAPE_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
   function escapeHtml(str) {
     if (str === null || str === undefined) return "";
@@ -17,53 +26,142 @@
     return "";
   }
 
-  const MODULES = [
-    { id: 1, file: "module-01.html", title: "How software works + HTML", minutes: 50 },
-    { id: 2, file: "module-02.html", title: "CSS: layout, not decoration", minutes: 50 },
-    { id: 3, file: "module-03.html", title: "JavaScript you can read", minutes: 60 },
-    { id: 4, file: "module-04.html", title: "Specs and coding agents", minutes: 50 },
-    { id: 5, file: "module-05.html", title: "Git and GitHub", minutes: 50 },
-    { id: 6, file: "module-06.html", title: "Testing and debugging", minutes: 50 },
-    { id: 7, file: "module-07.html", title: "Multi-file features with AI", minutes: 55 },
-    { id: 8, file: "module-08.html", title: "Python for scripts", minutes: 55 },
-    { id: 9, file: "module-09.html", title: "Capstone: ship a real app", minutes: 120 },
+  /* The loop the whole course is built around. Every module page renders it
+     and highlights the steps that module is actually about, so the student
+     sees where today's work sits inside the real job. */
+  const LOOP = [
+    { id: "understand", label: "Understand", blurb: "What is the person actually asking for?" },
+    { id: "specify", label: "Specify", blurb: "Write the checks before the code." },
+    { id: "ask", label: "Ask AI", blurb: "Small scope, real context, stated constraints." },
+    { id: "inspect", label: "Inspect", blurb: "Read every line it changed." },
+    { id: "run", label: "Run", blurb: "Open it. Click it. Watch the console." },
+    { id: "test", label: "Test", blurb: "A test that cannot fail proves nothing." },
+    { id: "debug", label: "Debug", blurb: "Find the cause, not the symptom." },
+    { id: "review", label: "Review", blurb: "Would you defend this hunk out loud?" },
+    { id: "improve", label: "Improve", blurb: "Name things. Delete duplication." },
+    { id: "commit", label: "Commit", blurb: "One reason per commit." },
+    { id: "ship", label: "Ship", blurb: "A URL someone else can open." },
   ];
 
+  const STAGES = [
+    { id: 0, label: "Stage 0", title: "Welcome to AI-assisted development", modules: [1] },
+    { id: 1, label: "Stage 1", title: "Think like a software engineer", modules: [2] },
+    { id: 2, label: "Stage 2", title: "Understand the web", modules: [3, 4, 5, 6] },
+    { id: 3, label: "Stage 3", title: "AI as your pair programmer", modules: [7, 8] },
+    { id: 4, label: "Stage 4", title: "Engineering discipline", modules: [9, 10, 11] },
+    { id: 5, label: "Stage 5", title: "Release and ship", modules: [12, 13] },
+  ];
+
+  /* Northline Digital: a fictional five-person shop that builds internal
+     tools and small customer-facing apps. The student is the junior dev.
+     Every module is one ticket from their tracker. */
+  const TICKETS = {
+    1: { id: "NL-001", from: "Priya (office manager, Northline Clinic)", title: "The hours on the site are wrong",
+         quote: "We changed our Saturday hours three weeks ago and the website still says we're closed. People are showing up to a locked door." },
+    2: { id: "NL-002", from: "Dan (Northline Digital, account lead)", title: "Make the booking system better",
+         quote: "Client says booking is confusing. Can you just make it better? I told them we'd scope it this week." },
+    3: { id: "NL-003", from: "Priya (Northline Clinic)", title: "We need a real page for the clinic",
+         quote: "Right now there's one paragraph. We need hours, services, how to reach us, and a way to ask for an appointment." },
+    4: { id: "NL-004", from: "Support inbox", title: "It looks broken on my phone",
+         quote: "Everything is squashed into a column on the left and I have to pinch to read the hours. Fine on my laptop." },
+    5: { id: "NL-005", from: "Priya (Northline Clinic)", title: "Let the front desk filter appointments",
+         quote: "We get 40 a day. I need to see just the ones that are still open, and just the ones for a given clinician." },
+    6: { id: "NL-006", from: "Dan (Northline Digital)", title: "Load the appointments from the data file",
+         quote: "Stop hard-coding the list. It should read appointments.json and still work if the file is slow or empty." },
+    7: { id: "NL-007", from: "Priya (Northline Clinic)", title: "A dashboard for the morning huddle",
+         quote: "Three numbers on one screen: appointments today, still open, and no-shows this week. We read it out at 8am." },
+    8: { id: "NL-008", from: "Dan (Northline Digital)", title: "Review this AI-generated pull request",
+         quote: "Contractor pushed a big AI-written PR before going on leave. It runs. I still do not want to merge it blind. You are the reviewer." },
+    9: { id: "NL-009", from: "Priya (Northline Clinic)", title: "The booking form is broken for some people",
+         quote: "Two patients said they hit Request and nothing happened. It works when I try it. I do not know what is different." },
+    10: { id: "NL-010", from: "Dan (Northline Digital)", title: "Add clinician notes without breaking booking",
+         quote: "New feature, same release. If booking regresses I have to call the client myself, so prove it still works." },
+    11: { id: "NL-011", from: "Dan (Northline Digital)", title: "Clean this up before the release",
+         quote: "There are three copies of the same date function and a console.log with a patient email in it. Tidy it without changing behaviour." },
+    12: { id: "NL-012", from: "Priya (Northline Clinic)", title: "The exported patient list is a mess",
+         quote: "Our old system exports a file full of duplicates and blank rows. Somebody cleans it by hand every Monday. Please stop that." },
+    13: { id: "NL-013", from: "Dan (Northline Digital)", title: "Prepare the release and ship it",
+         quote: "Client demo is Friday. I need a live URL, tests that actually catch a break, and a note explaining what you decided and why." },
+  };
+
+  const MODULES = [
+    { id: 1, file: "module-01.html", stage: 0, title: "Your first shipped change", minutes: 45,
+      loop: ["understand", "run", "commit", "ship"],
+      teaser: "Read a real ticket, change one line, prove it, and ship it. Today." },
+    { id: 2, file: "module-02.html", stage: 1, title: "Requirements: turning \u201cmake it better\u201d into work", minutes: 60,
+      loop: ["understand", "specify"],
+      teaser: "The most valuable thing you do all week happens before any code exists." },
+    { id: 3, file: "module-03.html", stage: 2, title: "HTML: the structure under every page", minutes: 55,
+      loop: ["specify", "inspect", "run"],
+      teaser: "Landmarks, forms, and labels. The skeleton AI keeps getting subtly wrong." },
+    { id: 4, file: "module-04.html", stage: 2, title: "CSS: layout that survives a phone", minutes: 60,
+      loop: ["specify", "run", "review"],
+      teaser: "Box model, flexbox, grid, one breakpoint you can defend." },
+    { id: 5, file: "module-05.html", stage: 2, title: "JavaScript: logic you can defend", minutes: 70,
+      loop: ["specify", "test", "debug"],
+      teaser: "Functions, arrays, objects, conditions. Written by you, because you will be reviewing this shape forever." },
+    { id: 6, file: "module-06.html", stage: 2, title: "The DOM, events, and data that arrives late", minutes: 65,
+      loop: ["run", "debug", "test"],
+      teaser: "Wire logic to a real interface, then handle the file being slow, empty, or broken." },
+    { id: 7, file: "module-07.html", stage: 3, title: "AI as your pair programmer", minutes: 65,
+      loop: ["specify", "ask", "inspect", "run", "test", "review"],
+      teaser: "The full loop, for real, in Cursor. You bring the actual output back and we run tests against it." },
+    { id: 8, file: "module-08.html", stage: 3, title: "AI Code Detective", minutes: 65,
+      loop: ["inspect", "test", "debug", "review"],
+      teaser: "Plausible AI code with real defects. Find them, prove them, fix them \u2014 without rejecting the innocent lines." },
+    { id: 9, file: "module-09.html", stage: 4, title: "Testing and debugging under pressure", minutes: 65,
+      loop: ["debug", "test", "improve"],
+      teaser: "\u201cWorks on my machine\u201d is a starting point, not a defence." },
+    { id: 10, file: "module-10.html", stage: 4, title: "Git, GitHub, and code review", minutes: 60,
+      loop: ["review", "commit"],
+      teaser: "Branch, diff, PR, and a review that names what you actually checked." },
+    { id: 11, file: "module-11.html", stage: 4, title: "Refactoring, security, and maintenance", minutes: 60,
+      loop: ["improve", "review", "test"],
+      teaser: "Change the shape without changing the behaviour. Then find the leak." },
+    { id: 12, file: "module-12.html", stage: 5, title: "Python for scripts and small tools", minutes: 60,
+      loop: ["specify", "test", "ship"],
+      teaser: "Enough Python to kill a recurring manual chore. Not RAG. Not agents." },
+    { id: 13, file: "module-13.html", stage: 5, title: "Release: ship the application", minutes: 150,
+      loop: ["review", "test", "commit", "ship"],
+      teaser: "One live product with tests, a repo, a release note, and decisions you can defend." },
+  ];
+
+  const CAPSTONE_ID = 13;
   const PASS_THRESHOLD = 0.8;
   const RUBRIC_WEIGHTS = { spec: 20, review: 20, tests: 25, deploy: 20, writeup: 15 };
 
   const PROJECTS = [
-    { id: 1, title: '"Northline Landing"', modules: [9], difficulty: "Capstone · Web",
-      stage: 1, stageLabel: "Ship",
-      summary: "A one-page marketing site for a fictional clinic: semantic HTML, a working form, tests, GitHub, and a live URL.",
+    { id: 1, title: '"Northline Clinic" \u2014 the live site', modules: [13], difficulty: "Capstone \u00b7 Web",
+      stage: 1, stageLabel: "Ship", ticket: "NL-013",
+      summary: "The site you have been building since Module 3, released: semantic structure, responsive layout, a working request form, filtering, tests, a repo, and a live URL.",
       rubric: ["spec", "review", "tests", "deploy", "writeup"] },
-    { id: 2, title: '"Shift Board"', modules: [9], difficulty: "Capstone · Web app",
-      stage: 1, stageLabel: "Ship",
-      summary: "A small shift-list app: add/remove rows in the browser, persist in localStorage, tests that fail if add is broken.",
+    { id: 2, title: '"Shift Board" \u2014 an internal tool', modules: [13], difficulty: "Capstone \u00b7 Web app",
+      stage: 1, stageLabel: "Ship", ticket: "NL-013",
+      summary: "Alternative capstone: a shift list staff can add to, remove from, and reload, persisted in the browser, with tests that fail if add breaks.",
       rubric: ["spec", "review", "tests", "deploy", "writeup"] },
-    { id: 3, title: '"Receipt Splitter"', modules: [], difficulty: "Portfolio · JS",
-      stage: 2, stageLabel: "JavaScript",
-      summary: "Split a bill across people with tip and rounding you can defend.",
+    { id: 3, title: '"Receipt Splitter"', modules: [], difficulty: "Portfolio \u00b7 JS logic",
+      stage: 2, stageLabel: "Logic",
+      summary: "Split a bill with tip and rounding rules you can defend when someone is short 1p.",
       rubric: ["spec", "tests", "writeup"] },
-    { id: 4, title: '"Accessible FAQ"', modules: [], difficulty: "Portfolio · HTML/CSS",
+    { id: 4, title: '"Accessible FAQ"', modules: [], difficulty: "Portfolio \u00b7 HTML/CSS",
       stage: 2, stageLabel: "Markup",
-      summary: "An FAQ page that works with a keyboard and a screen-reader mental model, not just a pretty accordion.",
+      summary: "An FAQ that works with a keyboard and reads correctly to a screen reader, not just a pretty accordion.",
       rubric: ["spec", "review", "writeup"] },
-    { id: 5, title: '"PR Review Log"', modules: [], difficulty: "Portfolio · Git + review",
+    { id: 5, title: '"AI PR Review Log"', modules: [], difficulty: "Portfolio \u00b7 Review",
       stage: 3, stageLabel: "Review",
-      summary: "A public repo where you review an AI-authored PR and write why you accepted or rejected each change.",
+      summary: "A public repo where you review a real AI-authored PR hunk by hunk and record what you accepted, rejected, and verified.",
       rubric: ["review", "writeup"] },
-    { id: 6, title: '"CSV Cleaner"', modules: [], difficulty: "Portfolio · Python",
-      stage: 4, stageLabel: "Python",
-      summary: "A script that reads a messy CSV, writes a cleaned one, and fails a test if a duplicate slips through.",
+    { id: 6, title: '"CSV Cleaner"', modules: [], difficulty: "Portfolio \u00b7 Python",
+      stage: 5, stageLabel: "Python",
+      summary: "The NL-012 tool, finished: reads a messy export, writes a clean file, and fails a test if a duplicate slips through.",
       rubric: ["spec", "tests", "writeup"] },
-    { id: 7, title: '"Status Page"', modules: [], difficulty: "Portfolio · Multi-file",
+    { id: 7, title: '"Status Page"', modules: [], difficulty: "Portfolio \u00b7 Multi-file",
       stage: 3, stageLabel: "Features",
-      summary: "Three HTML pages sharing one CSS file plus a tiny JS filter. Spec first, then Cursor, then your review notes.",
+      summary: "Three pages sharing one stylesheet plus a filter. Spec first, then AI, then your review notes on its diff.",
       rubric: ["spec", "review", "deploy", "writeup"] },
-    { id: 8, title: '"Form Validator"', modules: [], difficulty: "Portfolio · Testing",
-      stage: 3, stageLabel: "Tests",
-      summary: "Email/password rules with tests that catch the empty-string and the missing-@ cases.",
+    { id: 8, title: '"Form Validator"', modules: [], difficulty: "Portfolio \u00b7 Testing",
+      stage: 4, stageLabel: "Tests",
+      summary: "Email and password rules with tests that catch the empty string, the missing @, and the trailing space.",
       rubric: ["tests", "spec", "writeup"] },
   ];
 
@@ -79,44 +177,85 @@
   }
 
   const REQUIRED_SECTIONS = {
-    1: ["htmlPageExercise"],
-    2: ["cssLayoutExercise"],
-    3: ["jsFunctionExercise"],
-    4: ["specWritingExercise"],
-    5: ["diffReadingExercise"],
-    6: ["failingTestExercise"],
-    7: ["featureSpecExercise"],
-    8: ["pythonScriptExercise"],
-    9: [],
+    1: ["shipFirstChange"],
+    2: ["requirementsExercise"],
+    3: ["htmlStructureExercise"],
+    4: ["cssResponsiveExercise"],
+    5: ["jsLogicExercise"],
+    6: ["domDataExercise"],
+    7: ["aiWorkflowExercise"],
+    8: ["detectiveExercise"],
+    9: ["debugExercise"],
+    10: ["reviewExercise"],
+    11: ["refactorExercise"],
+    12: ["pythonToolExercise"],
+    13: [],
   };
   const SECTION_LABELS = {
-    htmlPageExercise: "Build a semantic HTML page from a brief",
-    cssLayoutExercise: "Match a layout spec in CSS",
-    jsFunctionExercise: "Write the required JavaScript functions by hand",
-    specWritingExercise: "Write acceptance criteria a stranger could implement",
-    diffReadingExercise: "Read a diff and reject the unsafe change",
-    failingTestExercise: "Write a test that fails on the planted bug",
-    featureSpecExercise: "Spec + test for a multi-file feature",
-    pythonScriptExercise: "Python script that transforms a JSON list",
+    shipFirstChange: "Fix ticket NL-001 in the real markup",
+    requirementsExercise: "Turn a vague request into acceptance criteria and edge cases",
+    htmlStructureExercise: "Build the clinic page structure from the ticket",
+    cssResponsiveExercise: "Match the layout spec, including the phone breakpoint",
+    jsLogicExercise: "Write the filtering logic by hand",
+    domDataExercise: "Wire the UI and survive slow, empty, and malformed data",
+    aiWorkflowExercise: "Run the full loop in Cursor and pass tests with the code AI produced",
+    detectiveExercise: "Find the real defects, spare the innocent lines, and prove the fix",
+    debugExercise: "Reproduce the reported bug, write the failing test, then fix it",
+    reviewExercise: "Review the AI pull request hunk by hunk with reasons",
+    refactorExercise: "Refactor without changing behaviour and remove the leak",
+    pythonToolExercise: "Ship the data-cleanup tool with a test that catches duplicates",
   };
 
   function safeParse(raw) { try { return JSON.parse(raw); } catch (e) { return null; } }
   function isPlainObject(v) { return !!v && typeof v === "object" && !Array.isArray(v); }
+
+  function blankData() { return { schema: SCHEMA, modules: {}, extra: {} }; }
+  function normalize(parsed) {
+    const data = isPlainObject(parsed) ? parsed : {};
+    if (Number(data.schema) < SCHEMA) return blankData();
+    data.schema = SCHEMA;
+    if (!isPlainObject(data.modules)) data.modules = {};
+    if (!isPlainObject(data.extra)) data.extra = {};
+    return data;
+  }
   function load() {
     let raw = null;
     if (typeof localStorage !== "undefined") {
       try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { raw = null; }
     }
-    const parsed = raw ? safeParse(raw) : null;
-    const data = isPlainObject(parsed) ? parsed : {};
-    if (!isPlainObject(data.modules)) data.modules = {};
-    if (!isPlainObject(data.extra)) data.extra = {};
-    return data;
+    return normalize(raw ? safeParse(raw) : null);
   }
   function save(data) {
+    const clean = normalize(data);
+    if (typeof localStorage === "undefined") return clean;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(clean)); } catch (e) { /* quota */ }
+    pushToServer(clean);
+    return clean;
+  }
+  /* Schema-1 progress is unusable (module numbers changed meaning) but the
+     student's own words are worth keeping, so their desktop-lab evidence and
+     project write-ups survive the restructure. Nothing that grants a gate
+     is carried over. */
+  function rescueLegacy() {
     if (typeof localStorage === "undefined") return;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* quota */ }
-    pushToServer(data);
+    let rescued = false;
+    const cur = load();
+    LEGACY_KEYS.forEach(function (key) {
+      let old = null;
+      try { old = safeParse(localStorage.getItem(key)); } catch (e) { old = null; }
+      if (!isPlainObject(old) || !isPlainObject(old.extra)) return;
+      Object.keys(old.extra).forEach(function (k) {
+        const keepable = k === "desktopLabs" || k.indexOf("project_") === 0;
+        if (!keepable || cur.extra[k] !== undefined) return;
+        cur.extra[k] = old.extra[k];
+        rescued = true;
+      });
+      try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
+    });
+    if (rescued) {
+      cur.extra.restructuredAt = new Date().toISOString();
+      save(cur);
+    }
   }
 
   var SERVER_COURSE_ID = "ai-assisted-software-engineering";
@@ -172,7 +311,8 @@
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (body) {
         if (!body) return;
-        var serverData = body.data;
+        /* A stored blob from schema 1 is dropped here, same as locally. */
+        var serverData = (isPlainObject(body.data) && Number(body.data.schema) >= SCHEMA) ? body.data : null;
         var local = load();
         var mergedPractice = mergePracticeTasks(
           mergePracticeTasks(extraObj(local).practiceTasks, extraObj(serverData).practiceTasks),
@@ -222,7 +362,7 @@
   }
   function getProject(id) {
     const extra = getExtra("project_" + id);
-    const base = { checklist: {}, rubricScores: {}, githubUrl: "", description: "", completed: false };
+    const base = { checklist: {}, rubricScores: {}, githubUrl: "", liveUrl: "", description: "", completed: false };
     if (!isPlainObject(extra)) return base;
     return Object.assign({}, base, extra, {
       checklist: isPlainObject(extra.checklist) ? extra.checklist : {},
@@ -262,6 +402,7 @@
     const v = sections && sections[key];
     if (v === true) return true;
     if (v && typeof v === "object" && typeof v.total === "number" && v.total > 0 && v.passCount === v.total) return true;
+    if (v && typeof v === "object" && v.passed === true) return true;
     return false;
   }
   function isModuleDataComplete(id, m) {
@@ -270,7 +411,7 @@
   }
   function completionRequirements(id) {
     const m = getModule(id);
-    const reqs = [{ key: "quiz", label: "Checkpoint quiz ≥ 80%", satisfied: quizPassed(m) }];
+    const reqs = [{ key: "quiz", label: "Checkpoint quiz \u2265 80%", satisfied: quizPassed(m) }];
     (REQUIRED_SECTIONS[id] || []).forEach((key) => {
       reqs.push({ key, label: SECTION_LABELS[key] || key, satisfied: sectionSatisfied(m.sections, key) });
     });
@@ -292,6 +433,20 @@
     MODULES.forEach((m) => { if (isModuleComplete(m.id)) completed++; });
     return { completed, total: MODULES.length, pct: Math.round((completed / MODULES.length) * 100) };
   }
+  function stageOf(moduleId) {
+    return STAGES.find(function (s) { return s.modules.indexOf(moduleId) !== -1; }) || null;
+  }
+  function stageProgress(stageId) {
+    const s = STAGES.find(function (x) { return x.id === stageId; });
+    if (!s) return { completed: 0, total: 0, pct: 0 };
+    const done = s.modules.filter(function (id) { return isModuleComplete(id); }).length;
+    return { completed: done, total: s.modules.length, pct: s.modules.length ? Math.round((done / s.modules.length) * 100) : 0 };
+  }
+  function ticketFor(moduleId) { return TICKETS[moduleId] || null; }
+  function loopFor(moduleId) {
+    const m = MODULES.find(function (x) { return x.id === moduleId; });
+    return (m && m.loop) || [];
+  }
 
   function practiceTasksStore() {
     return mergePracticeTasks(loadPracticeTasksLocal(), getExtra("practiceTasks"));
@@ -304,12 +459,16 @@
     });
     return n;
   }
+  /* Capstone practice bar. Build skills (html/css/js) still gate the ship,
+     and the detective library now counts as a fourth pillar because reading
+     AI output is the actual job this course claims to teach. */
   function capstonePracticeStatus() {
     const html = countPassedPractice("html-");
     const css = countPassedPractice("css-");
     const js = countPassedPractice("js-");
-    const readyTools = (html >= 3 ? 1 : 0) + (css >= 3 ? 1 : 0) + (js >= 3 ? 1 : 0);
-    return { html, css, js, readyTools, ready: readyTools >= 2, needPerTool: 3, toolsNeeded: 2 };
+    const det = countPassedPractice("det-");
+    const readyTools = (html >= 3 ? 1 : 0) + (css >= 3 ? 1 : 0) + (js >= 3 ? 1 : 0) + (det >= 3 ? 1 : 0);
+    return { html, css, js, det, readyTools, ready: readyTools >= 3, needPerTool: 3, toolsNeeded: 3 };
   }
   function isGithubRepoUrl(url) {
     const href = safeHttpUrl(url);
@@ -361,7 +520,7 @@
       return {
         ok: false,
         error: tool === "cursor"
-          ? "Confirm you made this change in Cursor or VS Code, not the in-browser simulation."
+          ? "Confirm you made this change in Cursor or VS Code, not the in-browser exercise."
           : "Confirm this is a repo you own and that it has a README plus at least three commits.",
       };
     }
@@ -376,7 +535,7 @@
   function isUnlocked(id) {
     if (id <= 1) return true;
     if (!isModuleComplete(id - 1)) return false;
-    if (id === 9) return capstonePracticeReady();
+    if (id === CAPSTONE_ID) return capstonePracticeReady();
     return true;
   }
   function statusOf(id) {
@@ -405,16 +564,17 @@
       var m = MODULES.find(function (x) { return x.file === file; });
       if (!m || m.id <= 1) return;
       if (isUnlocked(m.id)) return;
-      if (file === "module-09.html") return;
+      if (m.id === CAPSTONE_ID) return;
       document.body.classList.add("module-locked");
       var wrap = document.querySelector(".wrap");
       if (!wrap) return;
+      var prev = MODULES.find(function (x) { return x.id === m.id - 1; });
       var box = document.createElement("div");
       box.className = "objectives";
       box.setAttribute("role", "alert");
       box.style.borderLeftColor = "var(--amber)";
       box.style.marginTop = "18px";
-      box.innerHTML = "<div class=\"lbl\" style=\"color:var(--amber)\">Locked</div><p style=\"font-size:14px\">This module unlocks after you complete Module " + (m.id - 1) + " (checkpoint quiz at 80% plus the graded exercise).</p><p style=\"margin-top:10px\"><a href=\"dashboard.html\">Back to dashboard</a></p>";
+      box.innerHTML = "<div class=\"lbl\" style=\"color:var(--amber)\">Locked</div><p style=\"font-size:14px\">This module opens once Module " + (m.id - 1) + (prev ? " (" + escapeHtml(prev.title) + ")" : "") + " is complete \u2014 checkpoint quiz at 80% plus its graded exercise.</p><p style=\"margin-top:10px\"><a href=\"" + (prev ? prev.file : "dashboard.html") + "\">Go to Module " + (m.id - 1) + "</a> \u00b7 <a href=\"dashboard.html\">Dashboard</a></p>";
       var header = wrap.querySelector("header");
       if (header && header.nextSibling) wrap.insertBefore(box, header.nextSibling);
       else wrap.insertBefore(box, wrap.firstChild);
@@ -431,16 +591,19 @@
   }
 
   global.CourseProgress = {
-    STORAGE_KEY, MODULES, PASS_THRESHOLD, REQUIRED_SECTIONS, SECTION_LABELS, PROJECTS, RUBRIC_WEIGHTS,
+    STORAGE_KEY, SCHEMA, MODULES, STAGES, TICKETS, LOOP, CAPSTONE_ID,
+    PASS_THRESHOLD, REQUIRED_SECTIONS, SECTION_LABELS, PROJECTS, RUBRIC_WEIGHTS,
     escapeHtml, safeHttpUrl,
     load, save, getModule, setModuleField, setAnswer, setSection, getExtra, setExtra,
     touchVisited, markComplete, isModuleComplete, isModuleDataComplete, completionRequirements,
-    overall, isUnlocked, statusOf, resetAll, resetModule,
+    overall, stageOf, stageProgress, ticketFor, loopFor,
+    isUnlocked, statusOf, resetAll, resetModule,
     rubricForProject, getProject, setProject,
     countPassedPractice, capstonePracticeStatus, capstonePracticeReady,
     desktopLabReady, desktopLabRecord, completeDesktopLab, isGithubRepoUrl, isGithubCommitUrl,
   };
 
+  rescueLegacy();
   hydratePracticeIntoExtra();
   serverSyncOnLoad();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", gateCurrentPage);
