@@ -226,11 +226,18 @@
   function polishHero() {
     const m = currentModule();
     if (!m || !global.CourseProgress) return;
-    const t = CourseProgress.ticketFor(m.id);
+    // ticketFor/stageOf only exist on courses with a ticket-apprenticeship
+    // system (currently AI-Assisted Software Engineering) — this file is
+    // shared "lab chrome" across courses that don't have one, so both must
+    // be optional-call-guarded like every other CourseProgress lookup in
+    // this file, or every module page on those courses throws here and
+    // silently skips the rest of init() (icons, code-block wrapping, hero
+    // meta, the scroll context bar never render).
+    const t = CourseProgress.ticketFor ? CourseProgress.ticketFor(m.id) : null;
     const hero = document.querySelector(".hero");
     const eye = hero && hero.querySelector(".eyebrow");
     if (!eye) return;
-    const stage = CourseProgress.stageOf(m.id);
+    const stage = CourseProgress.stageOf ? CourseProgress.stageOf(m.id) : null;
     eye.textContent = (stage ? stage.label + " · " : "") + "Module " + m.id;
     if (t && !hero.querySelector(".heroticket")) {
       const lab = document.createElement("div");
