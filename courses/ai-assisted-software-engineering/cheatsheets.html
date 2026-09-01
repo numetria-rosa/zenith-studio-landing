@@ -3,53 +3,251 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cheat sheets — AI-Assisted Software Engineering</title>
+<title>Cheat Sheets — AI-Assisted Software Engineering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="course.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#070b14;--bg2:#0b1020;--card:#121828;--card2:#1a2236;--bd:#232c42;--bd2:#333e5a;--tx:#eef2ff;--mut:#9aa6c2;--mut2:#6b7690;--accent:#60a5fa;--accentd:#0b1220;--info:#7dd3fc;--good:#4ade95;--bad:#ff8585;}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}
+.serif{font-family:'Fraunces',serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+.bar{position:sticky;top:0;z-index:40;background:rgba(7,11,20,.92);backdrop-filter:blur(10px);border-bottom:3px solid var(--accent)}
+.bar .in{max-width:1080px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:14px}
+.bar .logo{font-weight:800;letter-spacing:-.02em;font-size:16px;font-family:'Fraunces'}
+.bar .logo b{background:var(--accent);color:var(--accentd);padding:1px 7px;margin-left:2px;border-radius:2px}
+.coursenav{background:var(--bg2);border-bottom:1px solid var(--bd)}
+.coursenav .in{max-width:1080px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:16px;font-size:12.5px}
+.coursenav a{color:var(--mut);text-decoration:none;font-family:'IBM Plex Mono'}
+.coursenav a:hover{color:var(--accent)}
+.hero{padding:36px 0 20px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-family:'IBM Plex Mono'}
+h1{font-family:'Fraunces';font-size:clamp(26px,4vw,36px);font-weight:600;letter-spacing:-.02em;margin-top:10px}
+.sub{color:var(--mut);font-size:14.5px;max-width:680px;margin-top:10px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px}
+.toolbar input[type=search]{flex:1;min-width:200px;font-family:'IBM Plex Sans';font-size:14px;background:var(--card2);border:1px solid var(--bd2);border-radius:8px;padding:9px 14px;color:var(--tx)}
+.filterbtn{font-family:'IBM Plex Mono';font-size:12px;padding:7px 12px;border-radius:99px;border:1px solid var(--bd2);background:var(--card2);color:var(--mut);cursor:pointer}
+.filterbtn.active{background:var(--accent);color:var(--accentd);border-color:var(--accent)}
+.filterbtn:hover{border-color:var(--accent)}
+button.plain{font-family:'IBM Plex Sans';font-weight:600;font-size:12.5px;border-radius:8px;padding:8px 14px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx);cursor:pointer;display:inline-flex;align-items:center}
+button.plain:hover{border-color:var(--accent);color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sheetgrid{display:grid;gap:20px;margin-top:24px}
+.sheet{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:26px 28px}
+.sheet .shead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.sheet h2{font-size:19px;font-weight:600}
+.sheet .stag{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-family:'IBM Plex Mono'}
+.sheet .sactions{display:flex;gap:8px}
+.bookmarkbtn{background:none;border:1px solid var(--bd2);border-radius:8px;padding:7px 10px;cursor:pointer;color:var(--mut2);font-size:14px}
+.bookmarkbtn.on{color:var(--accent);border-color:var(--accent)}
+.sec{margin-top:18px}
+.sec .slbl{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--info);margin-bottom:8px;font-family:'IBM Plex Mono'}
+.sec ul{padding-left:18px;color:var(--tx);font-size:13.5px;line-height:1.85}
+.sec ul li b{color:var(--tx)}
+.formula{background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;padding:14px 18px;font-family:'IBM Plex Mono';font-size:13.5px;color:var(--accent);margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;white-space:pre-wrap}
+.formula button{flex-shrink:0}
+.checklist{margin-top:8px}
+.checklist label{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;padding:4px 0;color:var(--tx)}
+code{font-family:'IBM Plex Mono';font-size:12.5px;background:rgba(96,165,250,.12);color:var(--accent);padding:1px 6px;border-radius:4px}
+.copybtn{font-family:'IBM Plex Mono';font-size:11px;padding:4px 9px;border-radius:6px;border:1px solid var(--bd2);background:var(--card2);color:var(--mut);cursor:pointer}
+.copybtn:hover{color:var(--accent);border-color:var(--accent)}
+.copybtn.done{color:var(--good);border-color:var(--good)}
+.emptystate{color:var(--mut2);text-align:center;padding:40px 0;font-size:14px}
+footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
+@media (max-width:640px){ .wrap{padding:0 16px 60px} .sheet{padding:18px} }
+@media print {
+  .bar,.coursenav,.toolbar,.bookmarkbtn,footer{display:none !important}
+  body{background:#fff;color:#000}
+  .hero .eyebrow,.hero .sub{color:#000}
+  .sheet{background:#fff;border:1px solid #999;break-inside:avoid;page-break-inside:avoid;margin-bottom:16px}
+  .sheet h2,.sec .slbl,.sheet .stag{color:#000}
+  .sec ul,.sec ul li b,.checklist label{color:#000}
+  .formula{background:#f3f3f3;color:#000;border:1px solid #999}
+  code{background:#eee;color:#000}
+  .copybtn{display:none}
+}
+</style>
 </head>
 <body>
-<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Cheat sheets</span></div></div>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span></div></div>
 <div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a></div></div>
+
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow">One page</span>
-    <h1 class="serif">Cheat sheets</h1>
+    <span class="eyebrow">Cheat Sheets</span>
+    <h1 class="serif">Quick reference, not another lesson</h1>
+    <p class="sub">Built to keep open beside your editor or terminal. Search finds a term across all sheets; module filters narrow the list; print gives you a clean black-and-white handout.</p>
+    <div class="toolbar">
+      <input type="search" id="searchBox" placeholder="Search cheat sheets (e.g. &quot;label&quot;, &quot;flex&quot;, &quot;git&quot;)...">
+      <button class="plain" id="btnPrint"><span style="width:13px;height:13px;margin-right:5px;display:inline-block;vertical-align:-2px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="1.5"/><rect x="7" y="14" width="10" height="7"/></svg></span>Print</button>
+      <button class="plain" id="btnBookmarkedOnly">★ Bookmarked only</button>
+    </div>
+    <div class="toolbar" id="filterRow"></div>
   </header>
-  <section>
-    <div class="kh"><span class="num">01</span><h2>HTML</h2></div>
-    <p><code>&lt;main&gt;</code> once. One <code>h1</code>. Every input has a <code>&lt;label&gt;</code>. Links name the destination.</p>
-  </section>
-  <section>
-    <div class="kh"><span class="num">02</span><h2>CSS</h2></div>
-    <p>Padding inside, margin outside. Flex on the parent. One breakpoint you can defend.</p>
-  </section>
-  <section>
-    <div class="kh"><span class="num">03</span><h2>JavaScript</h2></div>
-    <p>Name the function. Return a value. Tests call it. <code>querySelector</code> + <code>addEventListener</code> for the DOM.</p>
-  </section>
-  <section>
-    <div class="kh"><span class="num">04</span><h2>Specs</h2></div>
-    <p>Given / When / Then. Name files. Name the failing check. Say no to unbounded prompts.</p>
-  </section>
-  <section>
-    <div class="kh"><span class="num">05</span><h2>Prompting (engineering, not magic words)</h2></div>
-    <p>Context → Task → Constraints → Acceptance → Verify. Minimum sufficient context. Name the case, not the word “tests.” Bound agents: allowed files, plan first, stop if the API conflicts. Full templates: <a href="module-14.html">Module 14</a>.</p>
-  </section>
-  <section>
-    <div class="kh"><span class="num">06</span><h2>Git</h2></div>
-    <p>One idea per commit. Branch off main. PR is the review unit. Minus is deletion.</p>
-  </section>
-  <section>
-    <div class="kh"><span class="num">07</span><h2>Tests</h2></div>
-    <p>Must be able to fail. Mutation mindset: plant a bug, watch the test go red.</p>
-  </section>
-  <section>
-    <div class="kh"><span class="num">08</span><h2>Python scripts</h2></div>
-    <p><code>def</code>, <code>json.loads</code> / <code>dumps</code>, nonzero exit on bad input. Not RAG.</p>
-  </section>
-<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
-</div>
-<script src="course-progress.js"></script>
 
+  <div class="sheetgrid" id="sheetGrid"></div>
+  <div class="emptystate" id="emptyState" style="display:none">No cheat sheets match your search.</div>
+
+  <footer>Zenith Lab · AI-Assisted Software Engineering · Cheat Sheets</footer>
+</div>
+
+<script src="course-progress.js"></script>
+<script>
+const SHEETS = [
+  { id: 1, title: "HTML Cheat Sheet", tag: "HTML",
+    sections: [
+      { label: "Structure rules", items: ["Exactly one <code>&lt;main&gt;</code> per page, and exactly one <code>&lt;h1&gt;</code>, both act as the page's single anchor point for a reader or a screen reader.", "Headings nest in order (<code>h1</code> → <code>h2</code> → <code>h3</code>), skipping a level breaks the outline a screen reader user navigates by."] },
+      { label: "Forms and labels", items: ["Every input needs a real <code>&lt;label&gt;</code>, either wrapping it or linked via <code>for</code>/<code>id</code>, a placeholder is not a label, it disappears the moment someone starts typing.", "A required field should be marked with the <code>required</code> attribute, not just described in nearby text."] },
+      { label: "Links that name their destination", items: ["\"Click here\" tells a screen reader user nothing when links are read out of context, name the actual destination: \"View the pricing page.\"", "A link that triggers an action (not navigation) should be a <code>&lt;button&gt;</code>, not an <code>&lt;a&gt;</code> with no <code>href</code>."] },
+      { label: "Common mistakes", items: ["Using a <code>&lt;div&gt;</code> with a click handler instead of a real <code>&lt;button&gt;</code>, losing keyboard access and screen-reader semantics for free.", "Multiple <code>&lt;h1&gt;</code> tags on one page, or skipping straight from <code>h1</code> to <code>h4</code>.", "An image with no <code>alt</code> text, or worse, unhelpful alt text like <code>\"image1.png\"</code>."] },
+    ] },
+  { id: 2, title: "CSS Cheat Sheet", tag: "CSS",
+    sections: [
+      { label: "The box model rule of thumb", items: ["Padding goes INSIDE an element (space between its border and its own content).", "Margin goes OUTSIDE an element (space between it and its neighbors), mixing the two up is the single most common layout confusion."] },
+      { label: "Flexbox basics", formula: ".parent { display: flex; gap: 12px; align-items: center; }" },
+      { label: "Flex placement", items: ["<code>display: flex</code> goes on the PARENT, not the children, a common early mistake is applying flex properties to the item you're trying to move.", "<code>gap</code> replaces manually adding margin between flex children, one property instead of margin-juggling."] },
+      { label: "Responsive breakpoints", items: ["One breakpoint you can explain and defend beats five copy-pasted ones nobody remembers the reason for.", "Design mobile-first: base styles for small screens, then a <code>min-width</code> media query adds complexity for larger ones, not the reverse."] },
+      { label: "Common mistakes", items: ["Setting <code>display: flex</code> on the child instead of the parent.", "Using margin to create equal spacing between flex/grid children instead of <code>gap</code>.", "A single breakpoint copied from a tutorial without checking it actually matches where this specific layout breaks."] },
+    ] },
+  { id: 3, title: "JavaScript Cheat Sheet", tag: "JavaScript",
+    sections: [
+      { label: "Function basics", items: ["Name the function for what it does, not <code>doStuff</code> or <code>handleThing</code>, a name is documentation.", "A function that's supposed to produce a value should <code>return</code> it, not just log it, a test can't call <code>console.log</code>."] },
+      { label: "DOM interaction pattern", formula: "const el = document.querySelector('.thing');\nel.addEventListener('click', () => { /* handler */ });" },
+      { label: "Why tests need a return value", items: ["A test calls your function and checks what comes back, if the function only prints to the console and returns <code>undefined</code>, there's nothing for the test to check."] },
+      { label: "Common mistakes", items: ["Writing a function that logs its result instead of returning it, making it untestable.", "Attaching an event listener before the element exists in the DOM (script runs before the HTML it targets has loaded).", "Using <code>==</code> instead of <code>===</code>, allowing silent type coercion to hide a bug."] },
+    ] },
+  { id: 4, title: "Specs Cheat Sheet", tag: "Specs",
+    sections: [
+      { label: "Given / When / Then", formula: "Given [the starting state]\nWhen [the action happens]\nThen [the expected, checkable outcome]" },
+      { label: "Naming the failing check", items: ["A good spec names the SPECIFIC check that fails, not just \"it doesn't work,\" a vague spec produces a vague fix.", "\"The form should work correctly\" is not a spec, \"submitting with an empty email shows a required-field error\" is."] },
+      { label: "Bounding an AI request", items: ["Say no to unbounded prompts like \"make the booking system better,\" a spec needs a stated scope: which files, which behavior, which acceptance check.", "Name the files the change is allowed to touch, an unscoped request risks the AI changing things nobody asked about."] },
+      { label: "Common mistakes", items: ["Writing a spec around a vague feeling (\"confusing,\" \"better\") instead of a specific, checkable behavior.", "Skipping the \"Then\" clause, a spec without a checkable outcome can't be verified as done.", "Handing an AI agent a request with no file scope or constraints and hoping it guesses the right boundaries."] },
+    ] },
+  { id: 5, title: "Prompting Cheat Sheet", tag: "Prompting",
+    sections: [
+      { label: "The five-part shape", formula: "Context → Task → Constraints → Acceptance → Verify" },
+      { label: "Minimum sufficient context", items: ["Give the model exactly what it needs to do the task correctly, no more, no less, dumping an entire codebase \"just in case\" buries the actual instruction.", "Name the specific failing case, not the word \"tests,\" \"the login test fails when the password field is empty\" beats \"fix the tests.\""] },
+      { label: "Bounding an agent", items: ["State which files are allowed to change.", "Ask for a plan before execution on anything non-trivial, review the plan, then approve.", "Tell it explicitly to stop and ask if the request conflicts with the existing API or an established pattern."] },
+      { label: "Common mistakes", items: ["Context so broad the actual task gets lost in it.", "No acceptance criteria, so there's no way to check whether the output actually satisfies the request.", "Letting an agent proceed after it hits a conflict with existing code, instead of having it stop and flag the conflict."] },
+    ] },
+  { id: 6, title: "Git Cheat Sheet", tag: "Git",
+    sections: [
+      { label: "One idea per commit", items: ["A commit should represent one logical change, a reviewer (or future you) should be able to read the message and know exactly what changed and why.", "Branch off <code>main</code> for new work, never commit directly to <code>main</code> on a team project."] },
+      { label: "Commit message shape", formula: "Fix the login form's empty-password validation error.\n\n(one blank line, then optional detail on why, not what)" },
+      { label: "The PR is the review unit", items: ["A pull request is where a human (or a review process) actually looks at the diff before it merges, that review is the real safety check, not a formality to skip.", "A minus sign in a diff means deletion, always read what's being removed as carefully as what's being added."] },
+      { label: "Common mistakes", items: ["A commit message like \"fixes\" or \"updates\" that explains nothing about what changed.", "Bundling three unrelated changes into one commit, making it impossible to revert just one of them later.", "Merging your own PR without anyone (or anything) actually reviewing the diff."] },
+    ] },
+  { id: 7, title: "Tests Cheat Sheet", tag: "Tests",
+    sections: [
+      { label: "A test that can't fail proves nothing", items: ["If you can't describe the exact input that would make a test go red, it isn't really testing anything, it's decoration.", "Before trusting a new test, break the code on purpose and confirm the test actually fails, this is the mutation-testing mindset."] },
+      { label: "The plant-a-bug check", formula: "1. Write the test.\n2. Deliberately break the function it tests.\n3. Run the test — it MUST fail.\n4. Fix the function back.\n5. Run the test again — it MUST pass." },
+      { label: "Common mistakes", items: ["A test that only checks the function doesn't crash, without checking the actual returned value is correct.", "Never having verified the test can fail, so a test that's silently broken (always passes) goes unnoticed indefinitely.", "Testing implementation details (how it works internally) instead of behavior (what it should produce)."] },
+    ] },
+  { id: 8, title: "Python Scripts Cheat Sheet", tag: "Python",
+    sections: [
+      { label: "Core shape of a script", formula: "import json, sys\n\ndef main():\n    data = json.loads(sys.stdin.read())\n    # do the actual work\n    print(json.dumps(result))\n\nif __name__ == \"__main__\":\n    main()" },
+      { label: "JSON in and out", items: ["<code>json.loads(text)</code>, parse text into a Python object, raises on malformed input, don't silently swallow that exception.", "<code>json.dumps(obj)</code>, serialize a Python object back into a JSON string for output."] },
+      { label: "Exit codes matter", items: ["A script should exit nonzero on bad input or failure, a caller (another script, a CI pipeline) checks the exit code to know whether it actually worked, not just whether it printed something.", "This course's scripts are small, scoped utilities, not a retrieval-augmented-generation pipeline, don't over-scope a simple script into something it isn't."] },
+      { label: "Common mistakes", items: ["A script that always exits 0, even when it failed, silently breaking anything that depends on its exit code.", "Catching every exception with a bare <code>except:</code>, hiding a real bug alongside an expected failure.", "Printing debug output mixed into the same stream as the script's actual JSON output, corrupting what a caller tries to parse."] },
+    ] },
+];
+
+function bookmarks(){ const v = CourseProgress.getExtra("cheatsheetBookmarks"); return Array.isArray(v) ? v : []; }
+function toggleBookmark(id){
+  const b = bookmarks();
+  const idx = b.indexOf(id);
+  if (idx === -1) b.push(id); else b.splice(idx, 1);
+  CourseProgress.setExtra("cheatsheetBookmarks", b);
+}
+
+let activeModule = null;
+let bookmarkedOnly = false;
+
+function renderFilters(){
+  const row = document.getElementById("filterRow");
+  row.innerHTML = "";
+  const allBtn = document.createElement("button");
+  allBtn.className = "filterbtn" + (activeModule === null ? " active" : "");
+  allBtn.textContent = "All topics";
+  allBtn.addEventListener("click", () => { activeModule = null; renderFilters(); renderSheets(); });
+  row.appendChild(allBtn);
+  SHEETS.forEach(s => {
+    const btn = document.createElement("button");
+    btn.className = "filterbtn" + (activeModule === s.id ? " active" : "");
+    btn.textContent = s.tag;
+    btn.addEventListener("click", () => { activeModule = s.id; renderFilters(); renderSheets(); });
+    row.appendChild(btn);
+  });
+}
+
+function sectionMatches(sec, term){
+  const hay = [sec.label, ...(sec.items || []), ...((sec.checklist)||[]), sec.formula || ""].join(" ").toLowerCase();
+  return hay.includes(term);
+}
+
+function renderSheets(){
+  const term = document.getElementById("searchBox").value.trim().toLowerCase();
+  const bm = bookmarks();
+  const grid = document.getElementById("sheetGrid");
+  grid.innerHTML = "";
+  let visibleCount = 0;
+  SHEETS.forEach(sheet => {
+    if (activeModule !== null && sheet.id !== activeModule) return;
+    if (bookmarkedOnly && !bm.includes(sheet.id)) return;
+    const matches = !term || sheet.title.toLowerCase().includes(term) || sheet.sections.some(s => sectionMatches(s, term));
+    if (!matches) return;
+    visibleCount++;
+    const el = document.createElement("div");
+    el.className = "sheet";
+    const isBookmarked = bm.includes(sheet.id);
+    let secHtml = "";
+    sheet.sections.forEach(sec => {
+      if (term && !sectionMatches(sec, term) && !sheet.title.toLowerCase().includes(term)) return;
+      secHtml += `<div class="sec"><div class="slbl">${sec.label}</div>`;
+      if (sec.items) secHtml += `<ul>${sec.items.map(i => `<li>${i}</li>`).join("")}</ul>`;
+      if (sec.formula) secHtml += `<div class="formula"><span>${sec.formula}</span><button class="copybtn" data-copy="${sec.formula.replace(/"/g,'&quot;')}">Copy</button></div>`;
+      if (sec.checklist) secHtml += `<div class="checklist">${sec.checklist.map(c => `<label><input type="checkbox">${c}</label>`).join("")}</div>`;
+      secHtml += `</div>`;
+    });
+    el.innerHTML = `
+      <div class="shead">
+        <div><div class="stag">${sheet.tag}</div><h2 class="serif">${sheet.title}</h2></div>
+        <div class="sactions"><button class="bookmarkbtn${isBookmarked ? " on" : ""}" data-id="${sheet.id}">${isBookmarked ? "★" : "☆"}</button></div>
+      </div>
+      ${secHtml}
+    `;
+    grid.appendChild(el);
+  });
+  document.getElementById("emptyState").style.display = visibleCount === 0 ? "block" : "none";
+
+  grid.querySelectorAll(".bookmarkbtn").forEach(btn => {
+    btn.addEventListener("click", () => { toggleBookmark(Number(btn.dataset.id)); renderSheets(); });
+  });
+  grid.querySelectorAll(".copybtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const text = btn.dataset.copy;
+      navigator.clipboard?.writeText(text).catch(() => {});
+      btn.textContent = "Copied"; btn.classList.add("done");
+      setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1200);
+    });
+  });
+}
+
+document.getElementById("searchBox").addEventListener("input", renderSheets);
+document.getElementById("btnPrint").addEventListener("click", () => window.print());
+document.getElementById("btnBookmarkedOnly").addEventListener("click", (e) => {
+  bookmarkedOnly = !bookmarkedOnly;
+  e.target.style.borderColor = bookmarkedOnly ? "var(--accent)" : "";
+  e.target.style.color = bookmarkedOnly ? "var(--accent)" : "";
+  renderSheets();
+});
+
+renderFilters();
+renderSheets();
+</script>
 <script src="course-rail.js"></script>
 </body>
 </html>

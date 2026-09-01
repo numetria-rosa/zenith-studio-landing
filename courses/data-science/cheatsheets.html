@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cheat Sheets, Data Science &amp; Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;}
 body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}
@@ -60,8 +62,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
 @media print {
   .bar,.coursenav,.toolbar,.bookmarkbtn,footer{display:none !important}
   body{background:#fff;color:#000}
+  .hero .eyebrow,.hero .sub{color:#000}
   .sheet{background:#fff;border:1px solid #999;break-inside:avoid;page-break-inside:avoid;margin-bottom:16px}
-  .sheet h2,.sec .slbl{color:#000}
+  .sheet h2,.sec .slbl,.sheet .stag{color:#000}
+  .sec ul,.sec ul li b,.checklist label{color:#000}
   .formula{background:#f3f3f3;color:#000;border:1px solid #999}
   code{background:#eee;color:#000}
   .copybtn{display:none}

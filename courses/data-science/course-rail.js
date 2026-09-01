@@ -35,7 +35,17 @@
     ] },
   ];
 
-  function currentFile() { return location.pathname.split("/").pop() || "syllabus.html"; }
+  function currentFile() {
+    // Production serves every course page through a guarded route that
+    // permanently redirects "/foo.html" to the clean "/foo" (see
+    // src/app/courses/[courseId]/[...path]/route.ts), so location.pathname
+    // never carries ".html" there, only in local/static testing. Every nav
+    // and module entry in this file is keyed WITH ".html", so without this
+    // normalization cur !== file on every single page in production and
+    // nothing in the sidebar ever highlights or auto-expands.
+    const last = location.pathname.split("/").pop() || "syllabus";
+    return last.toLowerCase().endsWith(".html") ? last : last + ".html";
+  }
 
   function statusMark(unlocked, status, isCurrent) {
     if (!unlocked) return { cls: "locked", title: "Locked" };

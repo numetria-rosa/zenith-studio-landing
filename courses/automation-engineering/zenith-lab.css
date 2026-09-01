@@ -1,5 +1,7 @@
-/* Zenith Lab shared course chrome. Accent comes from theme.css in this folder. */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* Zenith Lab shared course chrome. Accent comes from theme.css in this folder.
+   The Fraunces/IBM Plex font family is loaded via real <link> tags in each
+   page's <head> (not an @import here), so this stylesheet's own CSSOM isn't
+   gated behind a font fetch before any of its rules can apply. */
 
 /* --------------------------------------------------------------------------
    Zenith Lab — shared course design system
