@@ -34,6 +34,13 @@
     { id: 8, file: "module-08.html", title: "Capstone: A Production AI Agent", minutes: 90 },
   ];
 
+  const STAGES = [
+    { id: 0, label: "Stage 0", title: "Prompting foundations", modules: [1, 2] },
+    { id: 1, label: "Stage 1", title: "Retrieval and tools", modules: [3, 4] },
+    { id: 2, label: "Stage 2", title: "Agents in production", modules: [5, 6, 7] },
+    { id: 3, label: "Stage 3", title: "Capstone", modules: [8] },
+  ];
+
   const PASS_THRESHOLD = 0.8;
 
   const RUBRIC_WEIGHTS = { architecture: 20, implementation: 25, reliability: 15, security: 15, testing: 10, observability: 10, documentation: 5 };
@@ -332,7 +339,7 @@
   }
 
   global.CourseProgress = {
-    STORAGE_KEY, MODULES, PASS_THRESHOLD, REQUIRED_SECTIONS, SECTION_LABELS, PROJECTS, RUBRIC_WEIGHTS,
+    STORAGE_KEY, MODULES, STAGES, PASS_THRESHOLD, REQUIRED_SECTIONS, SECTION_LABELS, PROJECTS, RUBRIC_WEIGHTS,
     escapeHtml, safeHttpUrl,
     load, save, getModule, setModuleField, setAnswer, setSection, getExtra, setExtra,
     touchVisited, markComplete, isModuleComplete, isModuleDataComplete, completionRequirements,

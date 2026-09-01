@@ -31,6 +31,13 @@
     { id: 8, file: "module-08.html", title: "Capstone: A Client-Ready Lead Pipeline", minutes: 90 },
   ];
 
+  const STAGES = [
+    { id: 0, label: "Stage 0", title: "Workflow foundations", modules: [1, 2] },
+    { id: 1, label: "Stage 1", title: "Real integrations", modules: [3, 4] },
+    { id: 2, label: "Stage 2", title: "Production discipline", modules: [5, 6, 7] },
+    { id: 3, label: "Stage 3", title: "Capstone", modules: [8] },
+  ];
+
   const PASS_THRESHOLD = 0.8;
   const RUBRIC_WEIGHTS = { architecture: 20, reliability: 25, safety: 20, implementation: 20, documentation: 15 };
 
@@ -287,7 +294,7 @@
   }
 
   global.CourseProgress = {
-    STORAGE_KEY, MODULES, PASS_THRESHOLD, REQUIRED_SECTIONS, SECTION_LABELS, PROJECTS, RUBRIC_WEIGHTS,
+    STORAGE_KEY, MODULES, STAGES, PASS_THRESHOLD, REQUIRED_SECTIONS, SECTION_LABELS, PROJECTS, RUBRIC_WEIGHTS,
     escapeHtml, safeHttpUrl,
     load, save, getModule, setModuleField, setAnswer, setSection, getExtra, setExtra,
     touchVisited, markComplete, isModuleComplete, isModuleDataComplete, completionRequirements,

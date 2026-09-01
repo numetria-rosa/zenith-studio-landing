@@ -188,8 +188,13 @@ export default async function CourseDetailsPage({
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-5 pb-24 pt-12 sm:px-7 lg:grid lg:grid-cols-[1fr_300px] lg:items-start lg:gap-12">
-        {/* Sidebar: section nav + sticky price/purchase card */}
+      <div className="mx-auto flex max-w-6xl flex-col px-5 pb-24 pt-12 sm:px-7 lg:grid lg:grid-cols-[1fr_300px] lg:items-start lg:gap-12">
+        {/* Sidebar: section nav + sticky price/purchase card. order-2 only
+            reorders once flex/grid is active, so the wrapper above needs a
+            flex/grid display at every breakpoint — otherwise below lg (most
+            visits: mobile, tablet, many laptop windows) this renders in DOM
+            order, meaning the jump-nav and price card before the visitor
+            ever sees the course title or what it teaches. */}
         <aside className="order-2 mb-10 lg:sticky lg:top-24 lg:mb-0 lg:self-start">
           <nav
             className="rounded-2xl border p-2"

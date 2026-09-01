@@ -1,19 +1,27 @@
 /* Zenith Lab course rail — AI Automation */
 (function () {
   const TITLE = "AI Automation";
-  const NAV = [
-    ["dashboard.html", "Dashboard"],
-    ["syllabus.html", "Syllabus"],
-    ["learning-roadmap.html", "Learning Roadmap"],
-    ["quiz-center.html", "Quiz Center"],
-    ["cheatsheets.html", "Cheat Sheets"],
-    ["practice-workflows.html", "Workflow Practice"],
-    ["practice-apis.html", "API Practice"],
-    ["practice-reliability.html", "Reliability Practice"],
-    ["practice-ai.html", "AI-Step Practice"],
-    ["projects.html", "Projects"],
-    ["portfolio.html", "Portfolio"],
-    ["career.html", "Career Path"],
+  const NAV_GROUPS = [
+    { id: "learn", label: "Learn", items: [
+      ["dashboard.html", "Dashboard"],
+      ["syllabus.html", "Syllabus"],
+      ["learning-roadmap.html", "Learning Roadmap"],
+      ["cheatsheets.html", "Cheat Sheets"],
+    ] },
+    { id: "practice", label: "Practice", items: [
+      ["quiz-center.html", "Quiz Center"],
+      ["practice-workflows.html", "Workflow Practice"],
+      ["practice-apis.html", "API Practice"],
+      ["practice-reliability.html", "Reliability Practice"],
+      ["practice-ai.html", "AI-Step Practice"],
+    ] },
+    { id: "build", label: "Build", items: [
+      ["projects.html", "Projects"],
+    ] },
+    { id: "evidence", label: "Evidence", items: [
+      ["portfolio.html", "Portfolio"],
+      ["career.html", "Career Path"],
+    ] },
   ];
 
   function currentFile() { return location.pathname.split("/").pop() || "dashboard.html"; }
@@ -27,9 +35,14 @@
 
   function buildRailHtml() {
     const cur = currentFile();
-    const navHtml = NAV.map(([file, label]) => {
-      const cls = cur === file ? ' class="active"' : "";
-      return `<a href="${file}"${cls}>${label}</a>`;
+    const navHtml = NAV_GROUPS.map(function (g) {
+      const open = g.items.some(function (it) { return it[0] === cur; });
+      const links = g.items.map(function (pair) {
+        const file = pair[0], label = pair[1];
+        const cls = cur === file ? ' class="active"' : "";
+        return `<a href="${file}"${cls}>${label}</a>`;
+      }).join("");
+      return `<details class="rail-g"${open ? " open" : ""}><summary>${g.label}</summary>${links}</details>`;
     }).join("");
     let modsHtml = "";
     let ovHtml = "";
@@ -47,19 +60,27 @@
       modsHtml += `<a href="module-00.html" class="${m0Cls.join(" ")}" title="Orientation">` +
         `<span class="rmnum">0</span><span class="rmdot" aria-hidden="true"></span>` +
         `<span>Orientation</span></a>`;
-      (cp.MODULES || []).forEach(function (m) {
-        const status = cp.statusOf ? cp.statusOf(m.id) : "not-started";
-        const unlocked = cp.isUnlocked ? cp.isUnlocked(m.id) : true;
-        const isCurrent = cur === m.file;
-        const mark = statusMark(unlocked, status, isCurrent);
-        const cls = ["rail-mod", mark.cls];
-        if (isCurrent) cls.push("active");
-        const lock = !unlocked ? `<span class="rmlock" aria-hidden="true"><span class="i i-lock"></span></span>` : "";
-        const inner = `<span class="rmnum">${m.id}</span><span class="rmdot" aria-hidden="true"></span>` +
-          `<span>${m.title}</span>${lock}`;
-        const title = unlocked ? m.title : "Unlocks after the previous module";
-        if (!unlocked) modsHtml += `<span class="${cls.join(" ")}" aria-disabled="true" title="${title}">${inner}</span>`;
-        else modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
+      const stages = cp.STAGES || [{ id: 0, label: "", title: "", modules: (cp.MODULES || []).map(function (m) { return m.id; }) }];
+      stages.forEach(function (stage) {
+        if (stage.label || stage.title) {
+          modsHtml += `<div class="rail-stage">${[stage.label, stage.title].filter(Boolean).join(" · ")}</div>`;
+        }
+        stage.modules.forEach(function (id) {
+          const m = (cp.MODULES || []).find(function (x) { return x.id === id; });
+          if (!m) return;
+          const status = cp.statusOf ? cp.statusOf(m.id) : "not-started";
+          const unlocked = cp.isUnlocked ? cp.isUnlocked(m.id) : true;
+          const isCurrent = cur === m.file;
+          const mark = statusMark(unlocked, status, isCurrent);
+          const cls = ["rail-mod", mark.cls];
+          if (isCurrent) cls.push("active");
+          const lock = !unlocked ? `<span class="rmlock" aria-hidden="true"><span class="i i-lock"></span></span>` : "";
+          const inner = `<span class="rmnum">${m.id}</span><span class="rmdot" aria-hidden="true"></span>` +
+            `<span>${m.title}</span>${lock}`;
+          const title = unlocked ? m.title : "Unlocks after the previous module";
+          if (!unlocked) modsHtml += `<span class="${cls.join(" ")}" aria-disabled="true" title="${title}">${inner}</span>`;
+          else modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
+        });
       });
     }
     const accountHtml = `<div class="rail-account">` +
