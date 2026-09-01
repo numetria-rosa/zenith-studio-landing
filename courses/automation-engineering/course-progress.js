@@ -140,6 +140,7 @@
       fetch("/api/progress", {
         method: "POST",
         credentials: "same-origin",
+        keepalive: true,
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ courseId: SERVER_COURSE_ID, data: data }),
       }).catch(function () {});
@@ -161,6 +162,7 @@
           fetch("/api/progress/migrate", {
             method: "POST",
             credentials: "same-origin",
+            keepalive: true,
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ courseId: SERVER_COURSE_ID, data: local }),
           }).catch(function () {});
