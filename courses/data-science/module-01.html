@@ -131,6 +131,17 @@ table.sheet td.num{font-family:'IBM Plex Mono';text-align:right}
   <section>
     <div class="kh"><span class="num">1.1</span><h2 class="serif">What a dataset actually is</h2></div>
     <p>A dataset is a table. Each <b>row</b> is one observation (one order, one employee, one survey response). Each <b>column</b> is one variable about that observation (the date, the amount, the region). Every real analysis technique in this course, spreadsheets, pandas, SQL, is a different way of asking questions of that same row/column structure.</p>
+
+    <div class="sheetwrap" style="margin-top:16px"><table class="sheet">
+      <thead><tr><th>order_id</th><th>product</th><th>amount</th></tr></thead>
+      <tbody>
+        <tr><td>RS-1001</td><td>Outdoor</td><td class="num">$129.90</td></tr>
+        <tr><td>RS-1002</td><td>Apparel</td><td class="num">$45.00</td></tr>
+        <tr><td>RS-1003</td><td>Electronics</td><td class="num">$612.00</td></tr>
+      </tbody>
+    </table></div>
+    <p class="mut" style="margin-top:10px;font-size:14px">Three rows, three observations: three separate orders. Three columns, three variables: which order, what was sold, how much. <code>RS-1002</code>, <code>Apparel</code>, and <code>$45.00</code> in the second row all describe the <i>same</i> order, that's what makes it one row and not three.</p>
+
     <div class="def">
       <div class="k">Definition: Tidy data</div>
       <p>A dataset where every column is a single variable, every row is a single observation, and every cell is a single value. Not two dates crammed into one cell. Not a column that's sometimes text and sometimes a number. Tidy data is what makes a formula, a pandas function, or a SQL query behave predictably instead of silently doing the wrong thing.</p>
@@ -167,10 +178,21 @@ table.sheet td.num{font-family:'IBM Plex Mono';text-align:right}
   <section>
     <div class="kh"><span class="num">1.3</span><h2 class="serif">Sorting, filtering, and building a summary table</h2></div>
     <p>Sorting reorders rows without changing them. Filtering hides rows that don't match a condition, also without changing them. Both are non-destructive, which is exactly why they're the first thing to reach for before writing any formula: they let you SEE the answer before you have to compute it.</p>
-    <p>Below is a small, real (if simplified) sales ledger. Click a column header to sort by it, ascending then descending.</p>
+    <p>Below is a small, real (if simplified) sales ledger. Click a column header to sort by it, ascending then descending. Use the region filter to see only some rows, then clear it, the full 8 rows are still there underneath, filtering never deleted them.</p>
 
     <div class="interactive">
-      <span class="ilbl">Retail Sales Ledger · click a header to sort</span>
+      <span class="ilbl">Retail Sales Ledger · click a header to sort, or filter by region</span>
+      <div class="dagctrl" style="margin-top:0;margin-bottom:14px">
+        <label class="mut" for="regionFilter" style="font-size:13px">Filter by region:</label>
+        <select id="regionFilter" style="font-family:'IBM Plex Mono';font-size:13px;padding:6px 10px;border-radius:6px;border:1px solid var(--bd2);background:var(--card2);color:var(--tx)">
+          <option value="">All regions (8 rows)</option>
+          <option value="West">West</option>
+          <option value="East">East</option>
+          <option value="North">North</option>
+          <option value="South">South</option>
+        </select>
+        <span class="mono" id="filterCount" style="font-size:12.5px;color:var(--mut2)"></span>
+      </div>
       <div class="sheetwrap"><table class="sheet" id="sheetTable"></table></div>
     </div>
 
@@ -299,10 +321,10 @@ const SHEET_DATA = [
   { region:"South", product:"Apparel", units:502, revenue:24098 },
   { region:"North", product:"Electronics", units:88, revenue:15840 },
 ];
-let sortKey = null, sortDir = 1;
+let sortKey = null, sortDir = 1, filterRegion = "";
 function renderSheet(){
   const table = document.getElementById("sheetTable");
-  const rows = [...SHEET_DATA];
+  let rows = filterRegion ? SHEET_DATA.filter(r => r.region === filterRegion) : [...SHEET_DATA];
   if (sortKey) rows.sort((a,b) => {
     const av = a[sortKey], bv = b[sortKey];
     if (typeof av === "number") return (av - bv) * sortDir;
@@ -318,19 +340,25 @@ function renderSheet(){
       renderSheet();
     });
   });
+  const countEl = document.getElementById("filterCount");
+  if (countEl) countEl.textContent = filterRegion ? `Showing ${rows.length} of ${SHEET_DATA.length} rows, filtered to ${filterRegion}` : "";
 }
 renderSheet();
+document.getElementById("regionFilter").addEventListener("change", (e) => {
+  filterRegion = e.target.value;
+  renderSheet();
+});
 
 /* ---------------- 1.3: graded exercise ---------------- */
 const EXERCISE_Q = [
   { q:"Sort by Revenue, descending. Which product line earns the single highest-revenue row?", opts:["Electronics","Apparel","Outdoor"], answer:"Electronics",
-    explain:"Correct. South/Electronics at $61,200 is the highest single row once sorted by Revenue descending." },
+    explain:"South/Electronics at $61,200 is the highest single row once sorted by Revenue descending." },
   { q:"Sort by Units, descending. Which region has the highest-unit single row?", opts:["West","East","South"], answer:"East",
-    explain:"Correct. East/Apparel at 588 units is the highest when sorted by Units descending." },
+    explain:"East/Apparel at 588 units is the highest when sorted by Units descending." },
   { q:"Which region appears most often across all 8 rows?", opts:["West","East (tied)","All regions appear exactly twice"], answer:"All regions appear exactly twice",
-    explain:"Correct. Each of West, East, North, and South appears in exactly 2 of the 8 rows." },
+    explain:"Each of West, East, North, and South appears in exactly 2 of the 8 rows." },
   { q:"Sort by Region alphabetically ascending. Which region's rows appear first?", opts:["East","North","West"], answer:"East",
-    explain:"Correct. Alphabetically, East comes before North, South, and West." },
+    explain:"Alphabetically, East comes before North, South, and West." },
 ];
 let exCorrect = 0;
 const exAnswered = {};
@@ -358,7 +386,7 @@ function renderExercise(){
         });
         const ex = document.getElementById(`exexplain_${i}`);
         ex.style.display = "block";
-        if (opt === eq.answer) { exCorrect++; ex.textContent = eq.explain; }
+        if (opt === eq.answer) { exCorrect++; ex.textContent = "Correct. " + eq.explain; }
         else { ex.textContent = "Not quite. " + eq.explain; }
         document.getElementById("exerciseScore").textContent = `${exCorrect} / ${EXERCISE_Q.length} correct`;
         if (Object.keys(exAnswered).length === EXERCISE_Q.length) {

@@ -280,7 +280,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
   <h2 class="sectitle" id="honest"><span class="n">14</span>Can I get a job after this course?</h2>
   <div class="disclosure" style="border-color:rgba(95,194,232,.35);background:rgba(95,194,232,.06)">
     <p><b>Honest answer:</b> this course gives you a practical, demonstrable foundation for applying to junior and entry-level analyst roles: Junior Data Analyst, Entry-Level Data Analyst, Reporting Analyst, Analytics Intern, and Business/Data Analyst trainee positions. It does <b>not</b> guarantee employment. Your actual competitiveness depends on your portfolio quality, communication, interview performance, the job market where you're applying, and whether a given role additionally requires a BI tool this course doesn't teach.</p>
-    <p style="margin-top:10px"><b>What you have:</b> real, verifiable evidence across Python, pandas, SQL, statistics, visualization, and dashboards, plus one complete end-to-end analysis (the Northstar capstone) you can walk an interviewer through in detail.</p>
+    <p style="margin-top:10px" id="whatYouHave"></p>
     <p style="margin-top:10px"><b>What you still need:</b> at minimum, one more portfolio project in a different domain, a published GitHub with a real README, and (for most postings) at least conversational familiarity with a BI tool.</p>
     <p style="margin-top:10px"><b>What to do next:</b> section 12's 30/60/90 plan above is the literal next step, not a metaphor. Start it today.</p>
   </div>
@@ -520,6 +520,19 @@ function renderClaims() {
     div.innerHTML = `<div class="clbl">${unlocked ? "You can claim this" : "Not yet, locked"}</div>${esc(c.text)}` + (unlocked ? "" : `<div style="margin-top:6px;font-size:12px;color:var(--mut2)">Unlock by: ${esc(c.unlockHint)}</div>`);
     el.appendChild(div);
   });
+}
+
+/* ================= 14: honest "what you have" summary ================= */
+function renderWhatYouHave() {
+  const el = document.getElementById("whatYouHave");
+  const passedModules = [3,4,5,6,7,8].filter(moduleDone).length;
+  if (capstoneFullyComplete()) {
+    el.innerHTML = "<b>What you have:</b> real, verifiable evidence across Python, pandas, SQL, statistics, visualization, and dashboards, plus one complete end-to-end analysis (the Northstar capstone) you can walk an interviewer through in detail.";
+  } else if (passedModules > 0 || capstoneDeliverablesPassing() > 0) {
+    el.innerHTML = `<b>What you have so far:</b> real, verifiable evidence for the modules and capstone deliverables you've actually passed (see section 04 above, ${passedModules}/6 core modules and ${capstoneDeliverablesPassing()}/8 capstone deliverables done). The rest of this page describes what the finished course gives you, not what you already have.`;
+  } else {
+    el.innerHTML = "<b>What you have:</b> nothing evidenced yet, this page describes what completing the course and capstone gives you, not your current progress. Section 04 above will fill in as you complete modules.";
+  }
 }
 
 /* ================= 05: CV bullet ================= */
@@ -845,6 +858,7 @@ renderPathDetail();
 renderMatrix();
 renderClaims();
 renderBullet();
+renderWhatYouHave();
 renderInterview();
 renderCase();
 renderPlan();

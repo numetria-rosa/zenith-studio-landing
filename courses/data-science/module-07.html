@@ -147,9 +147,10 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
       <p class="mut" style="margin-bottom:10px">Write real code: convert <code>satisfaction_score</code> to numeric, drop blanks only (keep 0s and 6s, don't filter the range), and build <code>fig = px.histogram(...)</code> with a bin per whole score. <code>df</code> is already loaded for you.</p>
       <textarea id="ex1Editor" class="testin" spellcheck="false" rows="6">import plotly.express as px
 
-score = pd.to_numeric(df["satisfaction_score"], errors="coerce").dropna()
-fig = px.histogram(score, nbins=7, title="Satisfaction score distribution")
-fig.update_xaxes(title="Score")</textarea>
+# 1. convert satisfaction_score to numeric (errors="coerce"), then drop only the blanks
+# 2. build fig = px.histogram(...) over the cleaned scores, one bin per whole score
+score = df["satisfaction_score"]
+fig = None</textarea>
       <div class="hints">
         <details><summary>Hint 1, conceptual</summary><div class="hbody">You want every distinct score value to show up as its own bar, including ones outside 1&ndash;5. Don't filter the range before charting it, that's the whole point of this exercise.</div></details>
         <details><summary>Hint 2, technical</summary><div class="hbody"><code>pd.to_numeric(df["satisfaction_score"], errors="coerce")</code> turns blanks into NaN without raising. <code>.dropna()</code> removes only those.</div></details>
@@ -174,9 +175,9 @@ fig.update_xaxes(title="Score")</textarea>
       <p class="mut" style="margin-bottom:10px">Count events per stage, then build a bar chart. <code>df</code> is already loaded.</p>
       <textarea id="ex2Editor" class="testin" spellcheck="false" rows="6">import plotly.express as px
 
-counts = df["event_name"].value_counts().reset_index()
-counts.columns = ["stage", "count"]
-fig = px.bar(counts, x="stage", y="count", title="Funnel stage counts")</textarea>
+# count events per stage (df["event_name"].value_counts()), reset_index so stage
+# becomes a real column, then build fig = px.bar(...) over the counts
+fig = None</textarea>
       <div class="hints">
         <details><summary>Hint 1, conceptual</summary><div class="hbody">This is a comparison across four discrete categories, right now, not a trend. That's a bar chart, not a line.</div></details>
         <details><summary>Hint 2, technical</summary><div class="hbody"><code>df["event_name"].value_counts()</code> gives you the count per stage directly. <code>px.bar</code> needs an x column (the stage names) and a y column (the counts).</div></details>
@@ -203,15 +204,11 @@ fig = px.bar(counts, x="stage", y="count", title="Funnel stage counts")</textare
       <p class="mut" style="margin-bottom:10px">Build <b>two</b> figures: <code>fig_daily</code>, a line chart of purchases per calendar date, and <code>fig_dow</code>, a bar chart of purchases per day of week (Monday..Sunday). <code>df</code> is already loaded and filtered to purchase events with a real datetime column <code>ts</code>.</p>
       <textarea id="ex3Editor" class="testin" spellcheck="false" rows="9">import plotly.express as px
 
-daily = df["ts"].dt.date.astype(str).value_counts().reset_index()
-daily.columns = ["date", "count"]
-daily = daily.sort_values("date")
-fig_daily = px.line(daily, x="date", y="count", title="Daily purchases (noisy)")
-
-dow_order = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-dow = df["ts"].dt.day_name().value_counts().reindex(dow_order).reset_index()
-dow.columns = ["day", "count"]
-fig_dow = px.bar(dow, x="day", y="count", title="Purchases by day of week")</textarea>
+# build fig_daily: a line chart of purchase counts per calendar date (df["ts"].dt.date)
+# build fig_dow: a bar chart of purchase counts per day of week (df["ts"].dt.day_name()),
+#   ordered Monday..Sunday
+fig_daily = None
+fig_dow = None</textarea>
       <div class="hints">
         <details><summary>Hint 1, conceptual</summary><div class="hbody">Build both charts even though only one actually answers the question. Comparing them side by side is the point.</div></details>
         <details><summary>Hint 2, technical</summary><div class="hbody"><code>.dt.date</code> gives you a calendar date to group daily purchases by. <code>.dt.day_name()</code> gives you the weekday name to group the other way.</div></details>
@@ -253,10 +250,9 @@ fig = px.bar(g.sort_values("cvr", ascending=False), x="channel", y="cvr", title=
       <p class="mut" style="margin-bottom:10px">Rebuild the chart correctly: filter to reliable channels only, then build the bar chart. <code>df</code> is already loaded.</p>
       <textarea id="ex4Editor" class="testin" spellcheck="false" rows="7">import plotly.express as px
 
-g = df.groupby("channel").agg(clicks=("clicks","sum"), conversions=("conversions","sum")).reset_index()
-g["cvr"] = g["conversions"] / g["clicks"] * 100
-reliable = g[(g["clicks"] >= 30) & (g["conversions"] >= 5)]
-fig = px.bar(reliable.sort_values("cvr", ascending=False), x="channel", y="cvr", title="Conversion rate, reliable channels only")</textarea>
+# group by channel, compute cvr, filter to reliable channels only
+# (clicks >= 30 AND conversions >= 5), then build fig = px.bar(...) over just those
+fig = None</textarea>
       <div class="hints">
         <details><summary>Hint 1, conceptual</summary><div class="hbody">The fix isn't a different chart type, it's different underlying data. Filter before you chart, not after.</div></details>
         <details><summary>Hint 2, technical</summary><div class="hbody">Same groupby as the bad chart above, just add a filter: <code>clicks &gt;= 30</code> and <code>conversions &gt;= 5</code>, both true, before building the figure.</div></details>
@@ -282,11 +278,9 @@ fig = px.bar(reliable.sort_values("cvr", ascending=False), x="channel", y="cvr",
       <textarea id="ex5Editor" class="testin" spellcheck="false" rows="9">import plotly.express as px
 
 df = pd.read_excel(xls_bytes)
-g = df.groupby("channel").agg(clicks=("clicks","sum"), conversions=("conversions","sum")).reset_index()
-g["cvr"] = g["conversions"] / g["clicks"] * 100
-reliable = g[(g["clicks"] >= 30) & (g["conversions"] >= 5)].sort_values("cvr", ascending=False)
-top2 = reliable.head(2)
-fig = px.bar(top2, x="channel", y="cvr", title="Recommended channel vs. runner-up")</textarea>
+# group by channel, compute cvr, filter to reliable channels (same rule as 7.4),
+# take the top 2 reliable channels by cvr, then build fig = px.bar(...) over just those two
+fig = None</textarea>
       <div class="hints">
         <details><summary>Hint 1, conceptual</summary><div class="hbody">Same analysis as 7.4, the only new step is the file format at the start.</div></details>
         <details><summary>Hint 2, technical</summary><div class="hbody"><code>pd.read_excel</code> needs a file-like object or path, not a CSV text string. <code>xls_bytes</code> is already set up for you to pass directly.</div></details>

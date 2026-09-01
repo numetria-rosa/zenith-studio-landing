@@ -1,28 +1,38 @@
 /* Zenith Lab course rail — Data Science & Analysis */
 (function () {
   const TITLE = "Data Science & Analysis";
-  const NAV = [
-    ["syllabus.html", "Syllabus"],
-    ["dashboard.html", "Dashboard"],
-    ["learning-roadmap.html", "Learning Roadmap"],
-    ["mastery-profile.html", "Mastery Profile"],
-    ["diagnostic.html", "Skill Diagnostic"],
-    ["quiz-center.html", "Quiz Center"],
-    ["cheatsheets.html", "Cheat Sheets"],
-    ["python-survival-guide.html", "Python Survival Guide"],
-    ["practice-sql.html", "SQL Practice"],
-    ["practice-excel.html", "Excel Practice"],
-    ["practice-python.html", "Python Practice"],
-    ["practice-statistics.html", "Statistics Practice"],
-    ["practice-tableau.html", "Tableau Practice"],
-    ["practice-powerbi.html", "Power BI Practice"],
-    ["desktop-labs.html", "Desktop Labs (required)"],
-    ["practice-automation.html", "Automation Practice"],
-    ["practice-integrated.html", "Integrated Challenges"],
-    ["projects.html", "Projects"],
-    ["portfolio.html", "My Portfolio"],
-    ["deploy-guide.html", "Deploy Guide"],
-    ["career.html", "Career Path"],
+  const NAV_GROUPS = [
+    { id: "learn", label: "Learn", items: [
+      ["dashboard.html", "Dashboard"],
+      ["syllabus.html", "Syllabus"],
+      ["learning-roadmap.html", "Learning Roadmap"],
+      ["cheatsheets.html", "Cheat Sheets"],
+      ["python-survival-guide.html", "Python Survival Guide"],
+    ] },
+    { id: "practice", label: "Practice", items: [
+      ["quiz-center.html", "Quiz Center"],
+      ["practice-sql.html", "SQL Practice"],
+      ["practice-excel.html", "Excel Practice"],
+      ["practice-python.html", "Python Practice"],
+      ["practice-statistics.html", "Statistics Practice"],
+      ["practice-automation.html", "Automation Practice"],
+      ["practice-integrated.html", "Integrated Challenges"],
+      ["diagnostic.html", "Skill Diagnostic"],
+      ["mastery-profile.html", "Mastery Profile"],
+    ] },
+    { id: "decide", label: "Decide · simulations", items: [
+      ["practice-tableau.html", "Tableau Practice"],
+      ["practice-powerbi.html", "Power BI Practice"],
+    ] },
+    { id: "build", label: "Build", items: [
+      ["desktop-labs.html", "Desktop Labs (required)"],
+      ["projects.html", "Projects"],
+      ["deploy-guide.html", "Deploy Guide"],
+    ] },
+    { id: "evidence", label: "Evidence", items: [
+      ["portfolio.html", "My Portfolio"],
+      ["career.html", "Career Path"],
+    ] },
   ];
 
   function currentFile() { return location.pathname.split("/").pop() || "syllabus.html"; }
@@ -36,9 +46,15 @@
 
   function buildRailHtml() {
     const cur = currentFile();
-    const navHtml = NAV.map(([file, label]) => {
-      const cls = cur === file ? ' class="active"' : "";
-      return `<a href="${file}"${cls}>${label}</a>`;
+    const navHtml = NAV_GROUPS.map(function (g) {
+      const open = g.items.some(function (it) { return it[0] === cur; });
+      const links = g.items.map(function (pair) {
+        const file = pair[0], label = pair[1];
+        const cls = cur === file ? ' class="active"' : "";
+        const curAttr = cur === file ? ' aria-current="page"' : "";
+        return `<a href="${file}"${cls}${curAttr}>${label}</a>`;
+      }).join("");
+      return `<details class="rail-g"${open ? " open" : ""}><summary>${g.label}</summary>${links}</details>`;
     }).join("");
     let modsHtml = "";
     let ovHtml = "";
@@ -56,20 +72,28 @@
       modsHtml += `<a href="module-00.html" class="${m0Cls.join(" ")}" title="Orientation">` +
         `<span class="rmnum">0</span><span class="rmdot" aria-hidden="true"></span>` +
         `<span>Orientation</span></a>`;
-      (cp.MODULES || []).forEach(function (m) {
-        const status = cp.statusOf ? cp.statusOf(m.id) : "not-started";
-        const unlocked = cp.isUnlocked ? cp.isUnlocked(m.id) : true;
-        const isCurrent = cur === m.file;
-        const mark = statusMark(unlocked, status, isCurrent);
-        const cls = ["rail-mod", mark.cls];
-        if (isCurrent) cls.push("active");
-        const lock = !unlocked ? `<span class="rmlock" aria-hidden="true"><span class="i i-lock"></span></span>` : "";
-        const inner = `<span class="rmnum">${m.id}</span><span class="rmdot" aria-hidden="true"></span>` +
-          `<span>${m.title}</span>${lock}`;
-        let title = m.title;
-        if (!unlocked) title = "Unlocks after the previous module";
-        if (!unlocked) modsHtml += `<span class="${cls.join(" ")}" aria-disabled="true" title="${title}">${inner}</span>`;
-        else modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
+      const stages = cp.STAGES || [{ id: 0, label: "", title: "", modules: (cp.MODULES || []).map(function (m) { return m.id; }) }];
+      stages.forEach(function (stage) {
+        if (stage.label || stage.title) {
+          modsHtml += `<div class="rail-stage">${[stage.label, stage.title].filter(Boolean).join(" · ")}</div>`;
+        }
+        stage.modules.forEach(function (id) {
+          const m = (cp.MODULES || []).find(function (x) { return x.id === id; });
+          if (!m) return;
+          const status = cp.statusOf ? cp.statusOf(m.id) : "not-started";
+          const unlocked = cp.isUnlocked ? cp.isUnlocked(m.id) : true;
+          const isCurrent = cur === m.file;
+          const mark = statusMark(unlocked, status, isCurrent);
+          const cls = ["rail-mod", mark.cls];
+          if (isCurrent) cls.push("active");
+          const lock = !unlocked ? `<span class="rmlock" aria-hidden="true"><span class="i i-lock"></span></span>` : "";
+          const inner = `<span class="rmnum">${m.id}</span><span class="rmdot" aria-hidden="true"></span>` +
+            `<span>${m.title}</span>${lock}`;
+          let title = m.title;
+          if (!unlocked) title = "Unlocks after the previous module";
+          if (!unlocked) modsHtml += `<span class="${cls.join(" ")}" aria-disabled="true" title="${title}">${inner}</span>`;
+          else modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
+        });
       });
     }
     return `<div class="rail-brand">Zenith Lab</div><div class="rail-title">${TITLE}</div>` +

@@ -83,6 +83,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-family:'IBM Plex Mono'}
 .why{border-left:3px solid var(--info);background:rgba(95,194,232,.06);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:14px;font-size:13.5px;color:var(--mut)}
 .why b{color:var(--info)}
+.beginner{border-left:3px solid var(--good);background:rgba(74,222,149,.05);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:12px;font-size:13.5px;color:var(--mut)}
+.beginner b{color:var(--good)}
 details.challenge{margin-top:14px}
 details.challenge summary{cursor:pointer;color:var(--amber);font-size:13px;font-weight:600;list-style:none}
 details.challenge summary::-webkit-details-marker{display:none}
@@ -211,6 +213,7 @@ details.challenge .chbody{margin-top:10px;padding:14px 16px;background:var(--bg2
     <span class="kw">else</span>:
         <span class="kw">return</span> <span class="s">"Low"</span></pre>
     <div class="demoresult">classify(1500) &rarr; High &nbsp;·&nbsp; classify(500) &rarr; Medium &nbsp;·&nbsp; classify(50) &rarr; Low</div>
+    <div class="beginner"><b>Notice the order: highest threshold first.</b> Python checks these top to bottom and stops at the first one that's true. If <code>&gt;= 200</code> were checked before <code>&gt;= 1000</code>, an amount of 1500 would hit "Medium" and stop there, the "High" check below it would never run. Whenever you write an <code>elif</code> chain of numeric thresholds, order them from most restrictive to least restrictive, or you'll silently miscategorize your highest values.</div>
 
     <div class="interactive">
       <span class="ilbl">Exercise 4 · runs in a real Python interpreter</span>
@@ -399,7 +402,7 @@ const EX1_HARNESS = [
   "            p = out == expected",
   "            results.append({'name': name, 'pass': p, 'hint': f'Expected {expected!r}, got {out!r}.'})",
   "        except Exception as e:",
-  "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    check('Outdoor at 129.9 formats to 2 decimals', ('Outdoor', 129.9), 'Outdoor: $129.90')",
   "    check('Apparel at 24 formats to 24.00, not 24', ('Apparel', 24), 'Apparel: $24.00')",
   "    check('Electronics at 5.005 rounds/truncates to 2 places', ('Electronics', 5.005), 'Electronics: $5.01' if round(5.005,2)==5.01 else 'Electronics: $5.00')",
@@ -410,7 +413,7 @@ const EX1_HARNESS = [
   "        out, exp = fn(rp, ra), _ref(rp, ra)",
   "        results.append({'name': 'Matches a reference implementation on a freshly randomized input (not hardcoded)', 'pass': out == exp, 'hint': f'For ({rp!r}, {ra!r}) expected {exp!r}, got {out!r}. This input changes every run, a fixed/memorized answer cannot pass it.'})",
   "    except Exception as e:",
-  "        results.append({'name': 'Matches a reference implementation on a freshly randomized input (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "        results.append({'name': 'Matches a reference implementation on a freshly randomized input (not hardcoded)', 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    if fn is None: results = [{'name':'format_sale_summary is defined','pass':False,'hint':'Define a function named exactly format_sale_summary.'}]",
   "    return {'ranOk': True, 'results': results}",
 ].join("\n");
@@ -433,7 +436,7 @@ const EX2_HARNESS = [
   "            out = fn(*args)",
   "            results.append({'name': name, 'pass': out == expected, 'hint': f'Expected {expected!r}, got {out!r}.'})",
   "        except Exception as e:",
-  "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    check('[10,20,30,40] above 25 -> 2', ([10,20,30,40], 25), 2)",
   "    check('[5,5,5] above 10 -> 0', ([5,5,5], 10), 0)",
   "    check('empty list -> 0', ([], 5), 0)",
@@ -447,7 +450,7 @@ const EX2_HARNESS = [
   "        out, exp = fn(rs, rt), _ref(rs, rt)",
   "        results.append({'name': 'Matches a reference implementation on a freshly randomized list (not hardcoded)', 'pass': out == exp, 'hint': f'For sales={rs!r}, threshold={rt!r} expected {exp!r}, got {out!r}. This input changes every run, a fixed/memorized answer cannot pass it.'})",
   "    except Exception as e:",
-  "        results.append({'name': 'Matches a reference implementation on a freshly randomized list (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "        results.append({'name': 'Matches a reference implementation on a freshly randomized list (not hardcoded)', 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    if fn is None: results = [{'name':'count_above_threshold is defined','pass':False,'hint':'Define a function named exactly count_above_threshold.'}]",
   "    return {'ranOk': True, 'results': results}",
 ].join("\n");
@@ -470,7 +473,7 @@ const EX3_HARNESS = [
   "            out = fn(arg)",
   "            results.append({'name': name, 'pass': out == expected, 'hint': f'Expected {expected!r}, got {out!r}.'})",
   "        except Exception as e:",
-  "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    check('two orders sum to 30', {'name':'A','orders':[10,20]}, 30)",
   "    check('no orders sums to 0', {'name':'B','orders':[]}, 0)",
   "    check('a single decimal order', {'name':'C','orders':[5.5]}, 5.5)",
@@ -482,7 +485,7 @@ const EX3_HARNESS = [
   "        okr = isinstance(out,(int,float)) and abs(out-exp) < 0.01",
   "        results.append({'name': 'Matches a reference implementation on a freshly randomized record (not hardcoded)', 'pass': okr, 'hint': f'For {rec!r} expected {exp!r}, got {out!r}. This input changes every run, a fixed/memorized answer cannot pass it.'})",
   "    except Exception as e:",
-  "        results.append({'name': 'Matches a reference implementation on a freshly randomized record (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "        results.append({'name': 'Matches a reference implementation on a freshly randomized record (not hardcoded)', 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    if fn is None: results = [{'name':'customer_total is defined','pass':False,'hint':'Define a function named exactly customer_total.'}]",
   "    return {'ranOk': True, 'results': results}",
 ].join("\n");
@@ -505,7 +508,7 @@ const EX4_HARNESS = [
   "            out = fn(arg)",
   "            results.append({'name': name, 'pass': out == expected, 'hint': f'classify_order({arg}) should be {expected!r}, got {out!r}.'})",
   "        except Exception as e:",
-  "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    check('1000 is High (boundary)', 1000, 'High')",
   "    check('999.99 is Medium, just under High', 999.99, 'Medium')",
   "    check('200 is Medium (boundary)', 200, 'Medium')",
@@ -518,7 +521,7 @@ const EX4_HARNESS = [
   "        out, exp = fn(ra), _ref(ra)",
   "        results.append({'name': 'Matches a reference implementation on a freshly randomized amount (not hardcoded)', 'pass': out == exp, 'hint': f'classify_order({ra!r}) expected {exp!r}, got {out!r}. This input changes every run, a fixed/memorized answer cannot pass it.'})",
   "    except Exception as e:",
-  "        results.append({'name': 'Matches a reference implementation on a freshly randomized amount (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "        results.append({'name': 'Matches a reference implementation on a freshly randomized amount (not hardcoded)', 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    if fn is None: results = [{'name':'classify_order is defined','pass':False,'hint':'Define a function named exactly classify_order.'}]",
   "    return {'ranOk': True, 'results': results}",
 ].join("\n");
@@ -541,7 +544,7 @@ const EX5_HARNESS = [
   "            out = fn(*args)",
   "            results.append({'name': name, 'pass': out == expected, 'hint': f'Expected {expected!r}, got {out!r}.'})",
   "        except Exception as e:",
-  "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "            results.append({'name': name, 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    check('200 visitors, 10 conversions -> 5.0', (200, 10), 5.0)",
   "    check('0 visitors never raises, returns 0.0', (0, 0), 0.0)",
   "    check('1000 visitors, 1 conversion -> 0.1 (rounded)', (1000, 1), 0.1)",
@@ -553,7 +556,7 @@ const EX5_HARNESS = [
   "        okr = isinstance(out,(int,float)) and abs(out-exp) < 0.05",
   "        results.append({'name': 'Matches a reference implementation on a freshly randomized input (not hardcoded)', 'pass': okr, 'hint': f'conversion_rate({rv!r}, {rc!r}) expected {exp!r}, got {out!r}. This input changes every run, a fixed/memorized answer cannot pass it.'})",
   "    except Exception as e:",
-  "        results.append({'name': 'Matches a reference implementation on a freshly randomized input (not hardcoded)', 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "        results.append({'name': 'Matches a reference implementation on a freshly randomized input (not hardcoded)', 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    if fn is None: results = [{'name':'conversion_rate is defined','pass':False,'hint':'Define a function named exactly conversion_rate.'}]",
   "    return {'ranOk': True, 'results': results}",
 ].join("\n");
@@ -579,13 +582,13 @@ const EX6_HARNESS = [
   "        p = abs(out - 30.5) < 0.001",
   "        results.append({'name': '3-row sample sums to 30.5', 'pass': p, 'hint': f'Expected 30.5, got {out!r}. Check you are reading the LAST comma-separated field as the revenue.'})",
   "    except Exception as e:",
-  "        results.append({'name': '3-row sample sums to 30.5', 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "        results.append({'name': '3-row sample sums to 30.5', 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    try:",
   "        out2 = fn(real_csv)",
   "        p2 = abs(out2 - 1536699.68) < 1.0",
   "        results.append({'name': 'Real 62-row retail_sales_ledger.csv sums correctly', 'pass': p2, 'hint': f'Expected approximately 1536699.68, got {out2!r}. Real files can have a blank trailing line, make sure you skip empty lines.'})",
   "    except Exception as e:",
-  "        results.append({'name': 'Real 62-row retail_sales_ledger.csv sums correctly', 'pass': False, 'hint': f'Your code raised on the real file: {e}'})",
+  "        results.append({'name': 'Real 62-row retail_sales_ledger.csv sums correctly', 'pass': False, 'hint': f'Your code raised a {type(e).__name__} on the real file: {e}'})",
   "    import random",
   "    try:",
   "        n = random.randint(2,6)",
@@ -598,7 +601,7 @@ const EX6_HARNESS = [
   "        p3 = abs(out3 - expected) < 0.01",
   "        results.append({'name': 'Matches a freshly randomized CSV each run (not hardcoded to 30.5 / 1536699.68)', 'pass': p3, 'hint': f'A {n}-row randomized CSV summing to {expected!r} returned {out3!r} instead. If your function only handles the two examples above, it will fail here, and again next run with different numbers.'})",
   "    except Exception as e:",
-  "        results.append({'name': 'Matches a freshly randomized CSV each run (not hardcoded to 30.5 / 1536699.68)', 'pass': False, 'hint': f'Your code raised: {e}'})",
+  "        results.append({'name': 'Matches a freshly randomized CSV each run (not hardcoded to 30.5 / 1536699.68)', 'pass': False, 'hint': f'Your code raised a {type(e).__name__}: {e}'})",
   "    return {'ranOk': True, 'results': results}",
 ].join("\n");
 

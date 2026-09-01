@@ -316,6 +316,32 @@ function getDb() {
   return dbPromise;
 }
 
+/* A second, genuinely different database with the same schema, used only to
+   catch hardcoded literal answers: a query that never reads the tables (e.g.
+   a UNION ALL of the expected numbers, copied from a classmate or this very
+   audit) returns the same rows regardless of the underlying data, so running
+   the student's query against a different dataset and comparing it to the
+   reference query run on THAT SAME dataset catches it, the same anti-hardcode
+   standard every other module's Python exercises already apply. */
+let shadowDbPromise = null;
+function getShadowDb() {
+  if (!shadowDbPromise) {
+    shadowDbPromise = (async () => {
+      const SQL = await initSqlJs({ locateFile: f => "https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/" + f });
+      const sqlText = await (await fetch("datasets/shop.sql")).text();
+      const db = new SQL.Database();
+      db.run(sqlText);
+      db.run(`
+        DELETE FROM order_items WHERE order_id IN (SELECT order_id FROM orders WHERE customer_id % 2 = 0);
+        DELETE FROM orders WHERE customer_id % 2 = 0;
+        DELETE FROM customers WHERE customer_id % 2 = 0;
+      `);
+      return db;
+    })();
+  }
+  return shadowDbPromise;
+}
+
 function execToRows(db, query) {
   const res = db.exec(query);
   if (!res.length) return { columns: [], rows: [] };
@@ -377,14 +403,32 @@ async function checkExercise(id, editorId, resultsId, referenceSql, sectionKey, 
     return;
   }
   const refResult = execToRows(db, referenceSql);
-  const pass = rowsEqual(studentResult.rows, refResult.rows, !!orderMatters);
+  const mainPass = rowsEqual(studentResult.rows, refResult.rows, !!orderMatters);
   resultsEl.innerHTML = "";
   renderResultTable(resultsEl, studentResult.columns, studentResult.rows, 20);
+
+  let pass = mainPass, hardcodeHint = "";
+  if (mainPass) {
+    try {
+      const shadowDb = await getShadowDb();
+      const shadowStudent = execToRows(shadowDb, studentSql);
+      const shadowRef = execToRows(shadowDb, referenceSql);
+      const notHardcoded = rowsEqual(shadowStudent.rows, shadowRef.rows, !!orderMatters);
+      pass = notHardcoded;
+      if (!notHardcoded) hardcodeHint = "Your query passed against the practice database, but returned the same fixed rows against a different dataset instead of recomputing from the actual tables. That usually means hardcoded literal values instead of a real query.";
+    } catch (e) {
+      pass = false;
+      hardcodeHint = "Your query passed against the practice database, but errored when run against a different one: " + CourseProgress.escapeHtml(e.message) + ". A query that only works on one specific database is usually hardcoded rather than reading the tables generically.";
+    }
+  }
+
   const verdict = document.createElement("div");
   verdict.className = "feedback " + (pass ? "ok" : "bad");
   verdict.innerHTML = pass
     ? "<b>Correct.</b> Your query's results match the expected answer, checked by running the reference query against the same live database, not by comparing to a fixed number."
-    : `<b>Not quite.</b> Your query ran, but the results don't match. Row count: yours ${studentResult.rows.length}, expected ${refResult.rows.length}. Re-check the pattern described above.`;
+    : mainPass
+      ? `<b>Not quite.</b> ${hardcodeHint}`
+      : `<b>Not quite.</b> Your query ran, but the results don't match. Row count: yours ${studentResult.rows.length}, expected ${refResult.rows.length}. Re-check the pattern described above.`;
   resultsEl.appendChild(verdict);
   exerciseState[id] = { passCount: pass ? 1 : 0, total: 1 };
   CourseProgress.setExtra("module6_" + id, exerciseState[id]);

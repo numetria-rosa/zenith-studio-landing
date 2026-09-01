@@ -184,14 +184,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
       <span class="ilbl">Exercise A · real Python, graded, required</span>
       <p class="mut" style="margin-bottom:10px">Write <code>store_kpis(df)</code>, returning a dict with <code>total_revenue</code>, <code>total_orders</code>, and <code>average_order_value</code>, counting <b>completed sales only</b>. <code>df</code> is already loaded and has a <code>line_total</code> column (<code>quantity &times; unit_price</code>) precomputed for you, the same cleaning from Module 4 (duplicates dropped, negative quantities removed) is already applied.</p>
       <textarea id="exAEditor" class="testin" spellcheck="false" rows="9">def store_kpis(df):
-    completed = df[df["status"].isin(["payment", "shipped"])]
-    total_revenue = round(completed["line_total"].sum(), 2)
-    total_orders = completed["order_id"].nunique()
-    average_order_value = round(total_revenue / total_orders, 2) if total_orders else 0.0
+    # filter to completed sales only (status is "payment" or "shipped")
+    # compute total_revenue (sum of line_total), total_orders (nunique order_id),
+    # and average_order_value (total_revenue / total_orders)
     return {
-        "total_revenue": total_revenue,
-        "total_orders": total_orders,
-        "average_order_value": average_order_value,
+        "total_revenue": 0.0,
+        "total_orders": 0,
+        "average_order_value": 0.0,
     }</textarea>
       <div class="hints">
         <details><summary>Hint 1, conceptual</summary><div class="hbody">Think about what one row in this dataset represents. Not every row is a sale, some are carts that were never paid for.</div></details>
@@ -215,10 +214,9 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px;font-fa
       <p class="mut" style="margin-bottom:10px">Build a bar chart of total revenue by <code>product_category</code>, completed orders only. <code>df</code> is already loaded with <code>line_total</code> precomputed.</p>
       <textarea id="exBEditor" class="testin" spellcheck="false" rows="7">import plotly.express as px
 
-completed = df[df["status"].isin(["payment", "shipped"])]
-g = completed.groupby("product_category")["line_total"].sum().reset_index()
-g.columns = ["category", "revenue"]
-fig = px.bar(g.sort_values("revenue", ascending=False), x="category", y="revenue", title="Revenue by category (completed orders)")</textarea>
+# filter to completed sales only, group by product_category, sum line_total,
+# then build fig = px.bar(...) ranked highest revenue first
+fig = None</textarea>
       <div class="hints">
         <details><summary>Hint 1, conceptual</summary><div class="hbody">Same filter as 8.2 applies here. A chart doesn't automatically know which rows count as real sales, you still have to tell it.</div></details>
         <details><summary>Hint 2, more specific</summary><div class="hbody">Filter to completed status first, then group by category and sum <code>line_total</code>.</div></details>
@@ -260,11 +258,10 @@ fig.update_yaxes(range=[10500, 13500])</textarea>
       <p class="mut" style="margin-bottom:10px">Rebuild the monthly revenue line chart honestly, same data, no manually restricted y-axis range. <code>df</code> is already loaded, and a real datetime column <code>dt</code> is already parsed for you (the order dates use three different formats, exactly like Module 4).</p>
       <textarea id="exCEditor" class="testin" spellcheck="false" rows="7">import plotly.express as px
 
-completed = df[df["status"].isin(["payment", "shipped"])].copy()
-completed["month"] = completed["dt"].dt.strftime("%Y-%m")
-m = completed.groupby("month")["line_total"].sum().reset_index()
-m.columns = ["month", "revenue"]
-fig = px.line(m.sort_values("month"), x="month", y="revenue", title="Monthly revenue (completed orders)", markers=True)</textarea>
+# filter to completed sales only, group by month (dt.dt.strftime("%Y-%m")),
+# sum line_total, sort chronologically, then build fig = px.line(...)
+# do NOT call fig.update_yaxes with a manually restricted range
+fig = None</textarea>
       <div class="hints">
         <details><summary>Hint 1, conceptual</summary><div class="hbody">This is the same analysis as the bad chart above, minus the one line that damaged it.</div></details>
         <details><summary>Hint 2, more specific</summary><div class="hbody">Don't call <code>fig.update_yaxes(range=[...])</code> at all, let Plotly choose a range that includes zero.</div></details>
@@ -288,11 +285,9 @@ fig = px.line(m.sort_values("month"), x="month", y="revenue", title="Monthly rev
       <p class="mut" style="margin-bottom:10px">Build a grouped bar chart of revenue by month, split by category (<code>color="product_category"</code>), completed orders only. Once it renders, click a category name in the legend, it will toggle in and out of the chart.</p>
       <textarea id="exDEditor" class="testin" spellcheck="false" rows="8">import plotly.express as px
 
-completed = df[df["status"].isin(["payment", "shipped"])].copy()
-completed["month"] = completed["dt"].dt.strftime("%Y-%m")
-g = completed.groupby(["month", "product_category"])["line_total"].sum().reset_index()
-g.columns = ["month", "category", "revenue"]
-fig = px.bar(g.sort_values("month"), x="month", y="revenue", color="category", barmode="group", title="Revenue by month and category (click the legend to filter)")</textarea>
+# filter to completed sales only, group by ["month", "product_category"],
+# sum line_total, then build fig = px.bar(..., color="category", barmode="group")
+fig = None</textarea>
       <div class="hints">
         <details><summary>Hint 1, conceptual</summary><div class="hbody">This is 8.4's grouping, with one more dimension. Group by both month and category instead of month alone.</div></details>
         <details><summary>Hint 2, more specific</summary><div class="hbody"><code>groupby(["month", "product_category"])</code> gives you one row per month/category pair.</div></details>
@@ -375,8 +370,8 @@ fig = px.bar(g.sort_values("month"), x="month", y="revenue", color="category", b
       <span class="ilbl">Auto-graded anchor · required</span>
       <p class="mut" style="margin-bottom:10px">Write <code>dashboard_kpis(df)</code>, returning a dict with at minimum <code>total_revenue</code>. <code>df</code> is the raw file, unfiltered, uncleaned, exactly as downloaded.</p>
       <textarea id="exFEditor" class="testin" spellcheck="false" rows="6">def dashboard_kpis(df):
-    total_revenue = round(df["revenue"].sum(), 2)
-    return {"total_revenue": total_revenue}</textarea>
+    # sum the revenue column and return it as total_revenue
+    return {"total_revenue": 0.0}</textarea>
       <div class="hints">
         <details><summary>Hint 1, conceptual</summary><div class="hbody">Nothing to filter here by status, this file only contains real transactions, so this one is more direct than 8.2.</div></details>
         <details><summary>Hint 2, technical</summary><div class="hbody"><code>df["revenue"].sum()</code> directly, no groupby needed for the total.</div></details>

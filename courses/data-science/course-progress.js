@@ -35,6 +35,14 @@
     { id: 9, file: "module-09.html", title: "Capstone Analysis Project", minutes: 120 },
   ];
 
+  const STAGES = [
+    { id: 0, label: "Stage 0", title: "Spreadsheets before code", modules: [1] },
+    { id: 1, label: "Stage 1", title: "Python foundations for data", modules: [2, 3] },
+    { id: 2, label: "Stage 2", title: "Real-world data skills", modules: [4, 5] },
+    { id: 3, label: "Stage 3", title: "Querying and communicating", modules: [6, 7, 8] },
+    { id: 4, label: "Stage 4", title: "Capstone", modules: [9] },
+  ];
+
   const PASS_THRESHOLD = 0.8;
 
   const RUBRIC_WEIGHTS = { dataCleaning: 20, analysis: 30, visualization: 20, communication: 20, documentation: 10 };
@@ -557,13 +565,25 @@
   }
 
   function resetModule(id) {
+    // "Retry checkpoint" only clears the quiz (answers/score/completed) so a
+    // student can retake it. It must NOT drop `sections` — that's where
+    // completed graded exercises record themselves, and deleting the whole
+    // module record here silently un-satisfies REQUIRED_SECTIONS even though
+    // the student never touched the exercise, blocking the next module while
+    // the exercise UI still (misleadingly) shows it as passing from its own
+    // separate "extra" cache.
     const data = load();
-    delete data.modules[id];
+    const existing = data.modules[id];
+    if (existing && existing.sections) {
+      data.modules[id] = { sections: existing.sections };
+    } else {
+      delete data.modules[id];
+    }
     save(data);
   }
 
   global.CourseProgress = {
-    STORAGE_KEY, MODULES, PASS_THRESHOLD, REQUIRED_SECTIONS, SECTION_LABELS, PROJECTS, RUBRIC_WEIGHTS,
+    STORAGE_KEY, MODULES, STAGES, PASS_THRESHOLD, REQUIRED_SECTIONS, SECTION_LABELS, PROJECTS, RUBRIC_WEIGHTS,
     escapeHtml, safeHttpUrl,
     load, save, getModule, setModuleField, setAnswer, setSection, getExtra, setExtra,
     touchVisited, markComplete, isModuleComplete, isModuleDataComplete, completionRequirements,
