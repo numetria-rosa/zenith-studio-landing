@@ -89,8 +89,27 @@ export async function GET(
   const ext = path.extname(resolved).toLowerCase();
   const contentType = CONTENT_TYPES[ext] ?? "application/octet-stream";
 
+  // The shared "lab chrome" (course-progress.js, course-rail.js,
+  // course-ui.js, zenith-lab.css, theme.css, datasets, images) is byte-
+  // identical across every page of a course, but with no cache header at
+  // all every single page navigation re-ran this route's full session +
+  // DB entitlement check AND re-downloaded all of it from scratch — a real
+  // contributor to page-to-page transitions feeling slow, on top of the
+  // sidebar itself being torn down and rebuilt by JS on every load (this is
+  // a static multi-page course, not a client-side-routed SPA, so a full
+  // reload is inherent; this at least removes the redundant re-fetching).
+  // "private" (never a shared/CDN cache, only the entitled student's own
+  // browser) since this route is auth-gated — a shared cache serving this
+  // response to a different, unauthenticated request would leak paid
+  // content. HTML/JSON stay effectively uncached since they're the actual
+  // lesson content, which changes as the course is edited.
+  const isSharedAsset = ext === ".js" || ext === ".css" || ext === ".svg" || ext === ".webp" || ext === ".png";
+  const cacheControl = isSharedAsset
+    ? "private, max-age=3600"
+    : "private, max-age=0, must-revalidate";
+
   return new NextResponse(fileBuffer as unknown as BodyInit, {
     status: 200,
-    headers: { "content-type": contentType },
+    headers: { "content-type": contentType, "cache-control": cacheControl },
   });
 }

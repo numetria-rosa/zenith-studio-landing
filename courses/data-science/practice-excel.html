@@ -10,6 +10,8 @@
 <link rel="stylesheet" href="zenith-lab.css">
 <link rel="stylesheet" href="theme.css">
 <style>
+/* Smooth cross-document navigation between pages (Chromium; a no-op, plain-navigation fallback everywhere else). */
+@view-transition { navigation: auto; }
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0d0f14;--bg2:#0a0c10;--card:#151920;--card2:#191d26;--bd:#232838;--bd2:#333a4c;--tx:#eeeee7;--mut:#9aa0ae;--mut2:#676e7d;--amber:#f0b429;--amberd:#1a1200;--info:#5fc2e8;--good:#4ade95;--bad:#ff8585;--green:#3fae62;}
 body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',sans-serif;line-height:1.6}

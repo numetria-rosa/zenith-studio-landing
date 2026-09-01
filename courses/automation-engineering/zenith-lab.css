@@ -3,6 +3,9 @@
    page's <head> (not an @import here), so this stylesheet's own CSSOM isn't
    gated behind a font fetch before any of its rules can apply. */
 
+/* Smooth cross-document navigation between pages (Chromium; a no-op, plain-navigation fallback everywhere else). */
+@view-transition { navigation: auto; }
+
 /* --------------------------------------------------------------------------
    Zenith Lab — shared course design system
    Design tokens. Every surface, motion, and type size should come from here.
