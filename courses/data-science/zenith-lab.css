@@ -118,7 +118,17 @@ button, a.primary, a.nextbtn, .qopt, .detopt, .wf-chip, .vbtn { touch-action: ma
   margin: 0 auto;
   padding: 0 var(--s-5) 100px;
   position: relative;
-  z-index: 1;
+  /* No z-index here (deliberately): a positioned element with a z-index
+     other than auto establishes its own stacking context, which traps any
+     position:fixed descendant's z-index inside it — comparing that
+     descendant only against .wrap's siblings (like .bar) rather than the
+     ancestor .courseshell's siblings. That's what hid #welcomeCard (a
+     fixed toast nested inside .wrap) behind .bar's sticky header despite
+     the toast's own far higher z-index. .courseshell already lifts this
+     whole subtree above body::before's background layer, so .wrap doesn't
+     need its own stacking context for that; dropping it lets fixed
+     descendants escape into .courseshell's shared context instead, where
+     their z-index is compared directly against .bar's. */
 }
 
 /* --------------------------------------------------------------------------
