@@ -61,8 +61,11 @@
         else modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
       });
     }
+    const accountHtml = `<div class="rail-account">` +
+      `<a href="/lab/dashboard">&larr; Zenith Lab Dashboard</a>` +
+      `<a href="/profile">My Profile</a></div>`;
     return `<div class="rail-brand">Zenith Lab</div><div class="rail-title">${TITLE}</div>` +
-      ovHtml + `<nav class="rail-nav">${navHtml}</nav>` +
+      accountHtml + ovHtml + `<nav class="rail-nav">${navHtml}</nav>` +
       `<div class="rail-modlbl">Modules</div><div class="rail-mods">${modsHtml}</div>`;
   }
 

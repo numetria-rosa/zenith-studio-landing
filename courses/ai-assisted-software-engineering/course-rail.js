@@ -113,8 +113,12 @@
         });
       });
     }
+    const accountHtml = `<div class="rail-account">` +
+      `<a href="/lab/dashboard">&larr; Zenith Lab Dashboard</a>` +
+      `<a href="/profile">My Profile</a></div>`;
     return `<div class="rail-brand">Zenith Lab</div>` +
       `<div class="rail-title">AI-Assisted Software Engineering</div>` +
+      accountHtml +
       ovHtml +
       `<nav class="rail-nav">${navHtml}</nav>` +
       `<div class="rail-modlbl">Modules</div>` +
