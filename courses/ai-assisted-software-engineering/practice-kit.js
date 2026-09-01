@@ -18,23 +18,27 @@
   }
 
   function gradeCss(task, studentCss) {
+    /* Isolate from course.css. A page-level border-box reset would otherwise
+       make box-sizing tasks pass with an empty or commented stylesheet. */
     const host = document.createElement("div");
-    host.style.cssText = "position:absolute;left:-9999px;top:0";
-    host.innerHTML = task.fixtureHtml || "<div id='root'></div>";
-    const style = document.createElement("style");
-    style.textContent = studentCss;
+    host.style.cssText = "position:absolute;left:-9999px;top:0;width:400px";
     document.body.appendChild(host);
-    document.head.appendChild(style);
+    const shadow = host.attachShadow({ mode: "open" });
+    const style = document.createElement("style");
+    style.textContent = "*, *::before, *::after { box-sizing: content-box; }\n" + String(studentCss || "");
+    const wrap = document.createElement("div");
+    wrap.innerHTML = task.fixtureHtml || "<div id='root'></div>";
+    shadow.appendChild(style);
+    shadow.appendChild(wrap);
     const results = [];
     try {
       (task.checks || []).forEach(function (c) {
         let ok = false;
-        try { ok = !!c.test(host, studentCss); } catch (e) { ok = false; }
+        try { ok = !!c.test(wrap, studentCss); } catch (e) { ok = false; }
         results.push({ name: c.name, pass: ok, hint: c.hint || "" });
       });
     } finally {
       host.remove();
-      style.remove();
     }
     return { passed: results.length > 0 && results.every((r) => r.pass), results };
   }
@@ -174,10 +178,13 @@
         editor = opts.map(function (opt) {
           return '<button type="button" class="qopt" data-val="' + esc(opt.value) + '">' + esc(opt.label) + "</button>";
         }).join("");
+      } else if (task.kind === "detective") {
+        editor = '<div class="detmount" id="detmount-' + esc(task.id) + '"></div>';
       } else {
         editor = '<textarea class="student" spellcheck="false">' + esc(task.starter || "") + "</textarea><button type='button' class='primary gradebtn' style='margin-top:10px'>Check</button>";
       }
-      body.innerHTML = '<p class="mut" style="margin-bottom:10px">' + esc(task.prompt || task.objective || "") + "</p>" + editor + '<div class="feedback"></div>';
+      body.innerHTML = (task.kind === "detective" ? "" : '<p class="mut" style="margin-bottom:10px">' + esc(task.prompt || task.objective || "") + "</p>") +
+        editor + '<div class="feedback"></div>';
       head.onclick = function () { body.classList.toggle("open"); };
       body.querySelectorAll(".qopt").forEach(function (btn) {
         btn.onclick = function () {
@@ -216,6 +223,12 @@
       card.appendChild(head);
       card.appendChild(body);
       list.appendChild(card);
+      /* Mount must be in the document before DetectiveKit looks it up. */
+      if (task.kind === "detective" && global.DetectiveKit) {
+        global.DetectiveKit.render("detmount-" + task.id, task, function (st) {
+          if (st && st.passed) finish({ passed: true, results: [{ name: "case solved", pass: true, hint: "" }] });
+        });
+      }
     });
   }
 

@@ -25,10 +25,18 @@
         <li>Iterate on a failing case with specific evidence instead of “that’s wrong, fix it”</li>
       </ul>
     </div>
+    <div class="nowbox">
+      <div class="now-lbl">Do this now</div>
+      <p><b>What:</b> you drive a real editor for the first graded agent task. <b>Why:</b> modules 1–6 plus prompt engineering exist so you can write the instruction and read the diff. <b>Do:</b> write the spec (including the seven-day window), then inspect deletions, then prove the number with a fixture from eight days ago. Record the session in <a href="work-session.html">AI work session</a> (self-reported — we cannot see Cursor). <b>Success:</b> you can name what the agent got wrong.</p>
+    </div>
   </header>
   <section>
   <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
     <div id="whyGrid"></div>
+    <details class="more">
+      <summary>Go deeper: how engineers actually work with AI (optional)</summary>
+      <p>Context first (the file, the ticket, the constraints). Then acceptance criteria. Then a short ask. Then inspect the diff, including deletions. Ask the agent what it assumed and what it is uncertain about. Generate tests, then try to make them fail. Never paste a dependency you did not look up. If the conversation is long, start a new one with the spec pasted again. Practice that loop in the <a href="ai-review.html">AI Review Lab</a> and later in Desktop Lab A.</p>
+    </details>
 
   </section>
   <section>
@@ -39,7 +47,7 @@
   </section>
   <section>
   <div class="kh"><span class="num">02</span><h2>You have been building up to this on purpose</h2></div>
-    <p>Six modules in and you have not used a coding agent for a single graded exercise. That was deliberate, and now it pays off.</p>
+    <p>You have HTML, CSS, JavaScript, and a prompting framework. You have not yet used a coding agent for a graded exercise that runs in a real editor. That was deliberate, and now it pays off.</p>
     <p>You can read markup and spot a missing label. You know what padding does. You have written a filter, handled an empty list, and wired a real click. Which means when an agent hands you two hundred lines, you are not guessing &mdash; you are checking. That difference is the entire value of this course.</p>
     <p>From here, the agent writes most of the characters. You are responsible for all of the consequences.</p>
 
@@ -126,6 +134,11 @@
 
   </section>
   <section>
+  <div class="kh"><span class="num">SHIP</span><h2>Would you ship this?</h2></div>
+    <p>A judgment call on a plausible agent draft. Not a deploy. You can change your mind.</p>
+    <div id="shipM7" class="interactive"></div>
+  </section>
+  <section>
   <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
     <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
     <div id="quizRoot"></div>
@@ -143,6 +156,7 @@
 <script src="quiz-data.js"></script>
 <script src="practice-kit.js"></script>
 <script src="ai-workflow-kit.js"></script>
+<script src="eng-lab-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
 Northline.renderWhy('whyGrid', {"build": "The dashboardCounts function for NL-007, specified by you, written by an agent, and passing tests you did not write.", "why": "This is the loop the whole course is named after, run end to end for the first time.", "aiHelps": "Everywhere. It writes the function, and if your criteria are precise it will usually get it nearly right.", "aiFails": "The seven-day boundary. “The last seven days” is ambiguous in English, and confident wrong arithmetic is the house speciality.", "without": "The spec is yours, the review is yours, and the accountability is yours. You cannot pass by claiming you reviewed it — the code has to survive our tests."});
@@ -237,6 +251,9 @@ AIWorkflowKit.render("aiwf", {
     MK.sync();
   }
 });
+</script>
+<script>
+EngLab.renderShip("shipM7", "ship-m7");
 </script>
 <script src="course-rail.js"></script>
 </body>

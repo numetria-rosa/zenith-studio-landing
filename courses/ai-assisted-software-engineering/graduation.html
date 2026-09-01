@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graduation — AI-Assisted Software Engineering</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Graduation</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="portfolio.html">Portfolio</a><a href="career.html">Career</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow" id="gradEyebrow">Evidence inventory</span>
+    <h1 class="serif" id="gradTitle">What you can actually show</h1>
+    <p class="sub" id="gradSub">This page lists submitted evidence. It is not a job-readiness score, and completing the course does not guarantee employment.</p>
+    <div class="honestnote"><b>What Zenith Lab verifies:</b> module checkpoints, in-browser graders, URL shape, GitHub API when it answers, and that required fields were filled. <b>What it does not verify:</b> Cursor sessions, semantic code quality, or whether a live site is good software.</div>
+  </header>
+  <div id="gradBanner" class="grad-banner" hidden></div>
+  <section>
+    <div class="kh"><span class="num">1</span><h2>Engineering Evidence Score</h2></div>
+    <div id="scoreBox" class="e-score"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">2</span><h2>Submitted evidence</h2></div>
+    <div id="evList" class="evlist"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">3</span><h2>Evidence timeline</h2></div>
+    <div id="timeline" class="timeline"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">4</span><h2>What you can honestly say you practiced</h2></div>
+    <p class="mut">Only lines with evidence turn on. Empty lines are still ahead of you, not failures.</p>
+    <div id="claimList" class="evlist"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">5</span><h2>What you can actually do now</h2></div>
+    <div id="canDo" class="evlist"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">6</span><h2>Limitations check</h2></div>
+    <p class="mut">Gates evaluate judgment. They do not certify the quality of your deployed application. Name what was verified and what was not. Optional for students who already completed modules.</p>
+    <div id="limCheck"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">7</span><h2>Career copy (from evidence only)</h2></div>
+    <pre id="gradCopy" class="copy-pre"></pre>
+  </section>
+  <section>
+    <div class="kh"><span class="num">8</span><h2>Case study</h2></div>
+    <div id="gradCase"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">9</span><h2>Next 30 days</h2></div>
+    <p class="mut">Personalised from competencies you have not demonstrated yet. Not a job plan.</p>
+    <div id="next30" class="timeline"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">10</span><h2>What this course did not teach</h2></div>
+    <ul class="plain">
+      <li>Algorithms and complexity as a CS degree would</li>
+      <li>Systems design for large production systems</li>
+      <li>Real team process: standups, code owners, on-call, incidents (you simulated one)</li>
+      <li>Advanced backend, databases at scale, or DevOps careers</li>
+      <li>AI Engineering: RAG, tool-calling agents, model eval. That is a different course.</li>
+    </ul>
+  </section>
+  <section>
+    <div class="kh"><span class="num">11</span><h2>Final checklist</h2></div>
+    <ul class="plain">
+      <li>Portfolio project on <a href="portfolio.html">portfolio</a></li>
+      <li>Repository URL (artifact-checked when GitHub answers)</li>
+      <li>Deployment URL (format-checked; quality not audited)</li>
+      <li>Engineering evidence on <a href="passport.html">Evidence Passport</a></li>
+      <li>Interview story from <a href="interview.html">interview simulation</a></li>
+      <li>A second tiny project — see the 30-day plan</li>
+    </ul>
+    <p>Take wording to the <a href="career.html">career page</a>. If tickets are still open, the <a href="dashboard.html">dashboard</a> is the next click.</p>
+  </section>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<script src="course-progress.js"></script>
+<script src="evidence-kit.js"></script>
+<script>
+const ev = CourseProgress.evidenceSnapshot();
+const esc = CourseProgress.escapeHtml;
+const score = EvidenceKit.evidenceScore();
+document.getElementById("scoreBox").innerHTML =
+  '<div class="e-score-pct">' + score.pct + "</div>" +
+  "<p><b>Engineering Evidence Score: " + score.pct + " / 100 of counted items.</b> Not job readiness.</p>" +
+  '<div class="klass-row">' +
+    '<span class="klass platform">Platform ' + score.platform + "/" + score.platformMax + "</span>" +
+    '<span class="klass artifact">Artifact ' + score.artifact + "/" + score.artifactMax + "</span>" +
+    '<span class="klass self">Self-reported ' + score.self + "/" + score.selfMax + "</span>" +
+  "</div>";
+if (ev.courseModulesComplete) {
+  document.getElementById("gradEyebrow").textContent = "Northline tickets closed";
+  document.getElementById("gradTitle").textContent = "You finished an AI-assisted engineering workflow";
+  document.getElementById("gradSub").textContent = ev.modules.total + " tickets specified, inspected, tested, and shipped in this course. Here is the evidence you built, what it demonstrates, and what still sits outside this syllabus.";
+  const b = document.getElementById("gradBanner");
+  b.hidden = false;
+  b.innerHTML = "<b>Course modules complete.</b> AI can generate code. You practiced deciding what to ask for, what to trust, what to test, and what should not ship.";
+}
+function row(on, label, meta) {
+  return '<div class="evrow' + (on ? " is-on" : "") + '">' +
+    '<span class="evdot" aria-hidden="true"></span>' +
+    "<div><div class='evlabel'>" + esc(label) + "</div>" +
+    (meta ? "<div class='evmeta'>" + esc(meta) + "</div>" : "") +
+    "</div></div>";
+}
+document.getElementById("evList").innerHTML =
+  row(ev.orientation, "Orientation", ev.orientation ? "Completed" : "Not yet") +
+  row(ev.modules.completed > 0, "Modules / tickets", ev.modules.completed + " / " + ev.modules.total) +
+  row(ev.html + ev.css + ev.js > 0, "HTML / CSS / JavaScript practice", "HTML " + ev.html + " · CSS " + ev.css + " · JS " + ev.js) +
+  row(ev.det > 0, "AI Code Detective", ev.det + " cases passed") +
+  row(ev.eng.spec, "Specification Lab", ev.eng.spec ? "Platform verified" : "Not yet") +
+  row(ev.eng.git, "Git Lab (simulation)", ev.eng.git ? "Platform verified" : "Not yet") +
+  row(ev.eng.review, "PR Review Lab (simulation)", ev.eng.review ? "Platform verified" : "Not yet") +
+  row(ev.eng.integrated, "Integrated next-step lab", ev.eng.integrated ? "Platform verified" : "Not yet") +
+  row(ev.eng.aiReview, "AI Review Lab", ev.eng.aiReview ? "Platform verified" : "Not yet") +
+  row(ev.eng.interview, "Interview simulation", ev.eng.interview ? "Platform verified" : "Not yet") +
+  row(ev.eng.incident, "Production incident", ev.eng.incident ? "Platform verified" : "Not yet") +
+  row(ev.eng.releaseReview, "Release review", ev.eng.releaseReview ? "Platform verified" : "Not yet") +
+  row(ev.eng.preship, "Pre-ship quality review", ev.eng.preship ? "Platform verified" : "Not yet") +
+  row(ev.workSession, "AI work session record", ev.workSession ? "Self-reported" : "Not saved") +
+  row(ev.eng.shipCorrect > 0, "Would you ship this?", ev.eng.shipCorrect + " judged correctly") +
+  row(ev.labs.cursor, "Desktop Lab A · Cursor", ev.labs.cursor ? "Self-reported session" : "Not submitted") +
+  row(ev.labs.github, "Desktop Lab B · GitHub", ev.labs.github ? "Repo URL recorded (artifact check when API answers)" : "Not submitted") +
+  row(ev.capstoneGates, "Capstone judgment gates", ev.capstoneGates ? "Platform verified" : "Not yet") +
+  row(ev.projectsCompleted > 0, "Project cards", ev.projectsCompleted + " / " + ev.projects.length) +
+  row(ev.capstoneShipped, "Capstone live URL", ev.capstoneShipped ? "Submitted (not independently audited)" : "Not submitted") +
+  row(ev.finalPassed, "Final assessment", ev.finalPassed ? "Passed" : "Optional extra evidence");
+
+const claims = [
+  { on: ev.html >= 1 || ev.css >= 1, t: "Translating a brief into HTML and CSS I can defend" },
+  { on: ev.js >= 1, t: "Writing a small JavaScript function and proving it with tests" },
+  { on: ev.eng.spec, t: "Turning a messy request into in-scope work, out-of-scope work, and acceptance criteria" },
+  { on: ev.det >= 1, t: "Inspecting AI-generated code and charging real defects, not style nits" },
+  { on: ev.eng.review || ev.det >= 1 || ev.eng.aiReview, t: "Spotting hallucinated APIs, missing requirements, and tests that cannot fail" },
+  { on: ev.eng.git, t: "Reasoning about branches, hotfixes, and conflicts (simulation, not a git binary)" },
+  { on: ev.eng.shipCorrect > 0, t: "Making a ship / investigate / request-changes call with a reason" },
+  { on: ev.eng.incident, t: "Walking a production-shaped incident without blindly trusting the agent" },
+  { on: ev.labs.cursor, t: "Working in Cursor or VS Code + Copilot on a real starter (self-recorded)" },
+  { on: ev.labs.github, t: "Pointing at a GitHub repo I own (URL recorded; contents checked when GitHub's API answers)" },
+  { on: ev.capstoneShipped, t: "Publishing a small web app at a public https URL that is not the repo itself" },
+];
+document.getElementById("claimList").innerHTML = claims.map(function (c) {
+  return row(c.on, c.t, c.on ? "Evidence on file" : "No evidence yet");
+}).join("");
+
+const comps = EvidenceKit.competencies();
+const practiced = comps.filter(function (c) { return c.practiced; });
+const demonstrated = comps.filter(function (c) { return c.demonstrated; });
+const gaps = comps.filter(function (c) { return !c.demonstrated; });
+document.getElementById("canDo").innerHTML =
+  row(practiced.length > 0, "You practiced", practiced.map(function (c) { return c.label; }).join(", ") || "Nothing recorded yet") +
+  row(demonstrated.length > 0, "You demonstrated", demonstrated.map(function (c) { return c.label; }).join(", ") || "Nothing recorded yet") +
+  row(ev.capstoneShipped || ev.labs.github, "You can show", (ev.labs.github ? "a GitHub URL" : "no repo yet") + (ev.capstoneShipped ? ", a live https URL" : ", no live URL yet")) +
+  row(true, "You should keep practicing", gaps.slice(0, 4).map(function (c) { return c.label; }).join(", ") || "Keep shipping small public work") +
+  row(true, "The course did not teach", "CS algorithms, large-system design, real on-call, RAG / eval (different course)");
+
+const plan = EvidenceKit.next30();
+document.getElementById("timeline").innerHTML = EvidenceKit.timeline().map(function (it) {
+  return '<div class="tl-item"><span class="tl-when">' + esc(it.when) + "</span><span class='tl-t'>" + esc(it.t) + "</span></div>";
+}).join("") || "<p class='mut'>Nothing on the timeline yet.</p>";
+document.getElementById("next30").innerHTML = plan.plan.map(function (p) {
+  return '<div class="tl-item"><span class="tl-when">' + esc(p.days) + "</span><span class='tl-t'>" + esc(p.t) + "</span></div>";
+}).join("");
+EvidenceKit.renderLimitationsCheck("limCheck");
+const pack = EvidenceKit.copyPack();
+document.getElementById("gradCopy").textContent = pack.linkedin + "\n\n" + pack.cv + "\n\n" + pack.portfolio;
+const cs = EvidenceKit.caseStudy();
+const gc = document.getElementById("gradCase");
+if (cs.empty) gc.innerHTML = "<p class='mut'>" + esc(cs.text) + "</p>";
+else gc.innerHTML = cs.sections.map(function (s) {
+  return "<div class='copyblock'><div class='copy-lbl'>" + esc(s[0]) + "</div><p>" + esc(s[1]) + "</p></div>";
+}).join("");
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

@@ -35,7 +35,12 @@ ModuleKit.renderQuiz("diagnostic", Q, function () {
   const m = CourseProgress.getModule("diagnostic");
   const box = document.getElementById("diagOut");
   box.style.display = "block";
-  box.innerHTML = "<b>Still start at Module 1.</b> Score stored as a diagnostic only (" + m.score + "/" + m.total + "). Weakest feeling area: use HTML, CSS, then JS practice in that order if the score is under 80%.";
+  var pct = m.total ? m.score / m.total : 0;
+  if (pct >= 0.8) {
+    box.innerHTML = "<b>Still start at Module 1.</b> Score stored as a diagnostic only (" + m.score + "/" + m.total + "). Stage 2 (HTML/CSS/JS) will feel like revision &mdash; do the graded exercises anyway; they check things tutorials skip. Stage 3 onward (Cursor, AI Code Detective, tests, Git, ship) is where this course is not a YouTube playlist.";
+  } else {
+    box.innerHTML = "<b>Still start at Module 1.</b> Score stored as a diagnostic only (" + m.score + "/" + m.total + "). Spend extra time in HTML, CSS, then JavaScript practice, in that order. The agent work in Module 7 is much easier if you can already read a small function.";
+  }
   CourseProgress.setExtra("diagnostic", { score: m.score, total: m.total, at: new Date().toISOString() });
 });
 </script>

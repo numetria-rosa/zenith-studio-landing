@@ -13,31 +13,38 @@
   <header class="hero">
     <span class="eyebrow">12 weeks · ~8–10 hrs/week</span>
     <h1 class="serif">Syllabus</h1>
-    <p class="sub">Hand-writing comes before agent work. That is the equivalent of a data course making you write SQL instead of only clicking a dashboard tool.</p>
+    <p class="sub">Fourteen Northline Digital tickets. You write the spec, inspect what an agent produced, run it, test it, review it, and ship it. Hand-writing comes before agent work. Prompt engineering sits after the web modules and before Cursor.</p>
     <div class="honestnote"><b>This is not AI Engineering.</b> That course builds LLM products (RAG, tools, eval) and assumes programming logic. This course starts at zero and ends at a live web app you specified, reviewed, tested, and shipped with Cursor and GitHub.</div>
+    <div class="honestnote"><b>Access.</b> On zenith-studio.site, course files are served only after sign-in and a Whop entitlement. Opening this folder on disk is for authors. Duplicate payment webhooks do not double-grant. This syllabus cannot run a live card payment. Entitled paying-user click-through was not independently re-run in this audit (needs a real login and a real card). Anonymous production probes: unpublished courses 404; signed-out hits on published modules redirect to sign-in; the catalog landing stays public.</div>
+    <div class="honestnote"><b>Accessibility.</b> Practical checks: skip link, <code>role="main"</code>, labelled forms, visible focus, <code>aria-live</code> on graders, Escape closes the nav drawer, 320–1440px overflow. Not a WCAG certification. Screen-reader behaviour (NVDA / VoiceOver) is not independently certified.</div>
   </header>
   <section>
     <div class="kh"><span class="num">00</span><h2>What you will be able to do</h2></div>
-    <p>Specify a small web feature, drive Cursor, read the diff, write and run tests, open a GitHub PR, and deploy a live https URL. You will not be a senior engineer. We do not guarantee a job.</p>
+    <p>Specify a small web feature, write an engineering prompt an AI coding assistant can be supervised against, drive Cursor, read the diff, write and run tests, open a GitHub PR, and deploy a live https URL. You will not be a senior engineer. We do not guarantee a job.</p>
   </section>
   <section>
     <div class="kh"><span class="num">01</span><h2>Modules</h2></div>
     <ol>
-      <li><b>0 Orientation.</b> Placement self-check. Everyone starts at Module 1.</li>
-      <li><b>1 How software works + HTML.</b> Files, folders, the browser, errors. Semantic HTML by hand.</li>
-      <li><b>2 CSS.</b> Layout, not decoration. Match a spec, including one responsive rule.</li>
-      <li><b>3 JavaScript you can read.</b> Variables, functions, events, DOM. Literacy gate. No Cursor yet.</li>
-      <li><b>4 Specs and coding agents.</b> Acceptance criteria. In-browser = labeled simulation. Desktop Lab A required.</li>
-      <li><b>5 Git and GitHub.</b> Commits, branches, PRs. Simulation here. Desktop Lab B: a repo you own.</li>
-      <li><b>6 Testing and debugging.</b> Write a test that catches a planted bug.</li>
-      <li><b>7 Multi-file features with AI.</b> Spec → Cursor → review → PR. We grade spec + test.</li>
-      <li><b>8 Python for scripts.</b> Files, functions, JSON, a small CLI. Not RAG. Not agents.</li>
-      <li><b>9 Capstone.</b> Live web app, tests, GitHub, write-up. Optional Python helper.</li>
+      <li><b>0 Orientation.</b> The eleven-step loop, Northline Digital, an honest self-check. Everyone still starts at Module 1. Nothing here locks.</li>
+      <li><b>1 NL-001 — Your first shipped change.</b> Read a ticket, change one line of HTML, render it, write a commit message a colleague would accept.</li>
+      <li><b>2 NL-002 — Requirements.</b> Turn “make it better” into stories, acceptance criteria, edges, and an out-of-scope list. Specs practice is a labeled multiple-choice simulation.</li>
+      <li><b>3 NL-003 — HTML structure.</b> Landmarks, forms, labels. Catch the agent’s div soup.</li>
+      <li><b>4 NL-004 — CSS that survives a phone.</b> Box model, flexbox, one breakpoint you can defend.</li>
+      <li><b>5 NL-005 — JavaScript you can defend.</b> Predict, catch the agent’s filter, then write <code>filterOpen</code> and <code>countFor</code> yourself.</li>
+      <li><b>6 NL-006 — DOM, events, late data.</b> Four UI states (loading / empty / error / data). We grade those states and a real click handler, not a live <code>fetch</code>.</li>
+      <li><b>14 NL-014 — Prompt Engineering for Software Engineers.</b> Turn vague requests into Context → Task → Constraints → Acceptance → Verify. Five graded prompt labs plus a Northline invoice challenge. Not ChatGPT tricks. Unlocks before Cursor so you can use the skill in later labs.</li>
+      <li><b>7 NL-007 — AI as your pair programmer.</b> The full loop in Cursor. You bring the output back; we run tests against it. Desktop Lab A starts here.</li>
+      <li><b>8 NL-008 — AI Code Detective.</b> Plausible AI code with real defects mixed with innocent lines. Find them, then prove the fix.</li>
+      <li><b>9 NL-009 — Testing and debugging.</b> Write a test that can fail. “Works on my machine” is a starting point, not a defence.</li>
+      <li><b>10 NL-010 — Git, GitHub, and review.</b> Branch, diff, PR. In-browser git/review libraries are labeled simulations. Desktop Lab B: a repo you own.</li>
+      <li><b>11 NL-011 — Refactoring, security, maintenance.</b> Change the shape without changing behaviour. Then find the leak.</li>
+      <li><b>12 NL-012 — Python for scripts.</b> Enough Python to kill a Monday chore. Not RAG. Not agents.</li>
+      <li><b>13 NL-013 — Release and ship.</b> Live URL (not a github.com repo), tests, release notes, rollback plan. Capstone briefs on Projects.</li>
     </ol>
   </section>
   <section>
     <div class="kh"><span class="num">02</span><h2>Gates</h2></div>
-    <p>From Module 2 onward a module unlocks only after the previous module’s checkpoint quiz is ≥80% and its required exercise is done. The capstone also needs 3+ passed practice tasks in any two of HTML / CSS / JS, plus <b>both</b> Desktop Labs.</p>
+    <p>From Module 2 onward a module unlocks only after the previous module in sequence has its checkpoint quiz ≥80% and its required exercise done. NL-014 sits after Module 6 and before Module 7. Completed tickets stay completed if you already finished 7–13 before this module existed. Module 13 also needs <b>3+ passed tasks in at least three of four tracks</b> (HTML, CSS, JavaScript, AI Code Detective) plus <b>both</b> Desktop Labs. Lab A’s commit URL is optional; the notes carry the evidence. Lab B requires a GitHub repo URL.</p>
   </section>
   <section>
     <div class="kh"><span class="num">03</span><h2>What we will not do</h2></div>
@@ -47,6 +54,12 @@
       <li>No invented task counts on the public catalog until a verifier agrees.</li>
       <li>No job guarantee. Career page lists the gaps: algorithms, systems design, incident ownership, team process.</li>
     </ul>
+  </section>
+  <section>
+    <div class="kh"><span class="num">04</span><h2>What this course can and cannot verify</h2></div>
+    <p><b>Can verify (platform):</b> module checkpoints, in-browser graders, judgment labs (including simulations), required field length, GitHub API when it answers, live-URL shape when CORS allows.</p>
+    <p><b>Can partially verify (artifact):</b> a public repo exists; a URL is https and not github.com/localhost/example; an obvious parked page if the body is readable.</p>
+    <p><b>Cannot verify:</b> that Cursor was open; that an arbitrary live app is high quality; professional employment; real production on-call; WCAG certification; NVDA/VoiceOver behaviour; a live card payment in this syllabus tab.</p>
   </section>
 <footer>Zenith Lab · AI-Assisted Software Engineering</footer>
 </div>

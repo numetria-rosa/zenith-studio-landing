@@ -25,6 +25,14 @@
         <li>Leave a project someone else can pick up</li>
       </ul>
     </div>
+    <div class="nowbox">
+      <div class="now-lbl">Do this now</div>
+      <p><b>What:</b> one date helper, no patient email in the log. <b>Why:</b> three copies is a correctness bug, not tidiness. <b>Do:</b> unify the helper, delete the leak, do not rename the world in the same PR. <b>At work:</b> this is the review comment that prevents a second incident.</p>
+    </div>
+    <details class="more">
+      <summary>Already refactor in production? Go deeper (optional)</summary>
+      <p>Still do the detective (the leftover skip, the log). Then <a href="incident.html">incident simulation</a> and the security cards in <a href="release-review.html">release review</a>. This course still does not inspect your real production.</p>
+    </details>
   </header>
   <section>
   <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
@@ -131,6 +139,11 @@ function isWithinDays(dateStr, today, days) {
 
   </section>
   <section>
+  <div class="kh"><span class="num">SHIP</span><h2>Would you ship this?</h2></div>
+    <p>A 400-line tidy that also does the ticket. Read before you bounce or merge.</p>
+    <div id="shipM11" class="interactive"></div>
+  </section>
+  <section>
   <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
     <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
     <div id="quizRoot"></div>
@@ -148,10 +161,12 @@ function isWithinDays(dateStr, today, days) {
 <script src="quiz-data.js"></script>
 <script src="practice-kit.js"></script>
 <script src="detective-kit.js"></script>
+<script src="eng-lab-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
 Northline.renderWhy('whyGrid', {"build": "One function replacing three, with the magic numbers named and the patient email out of the log.", "why": "Most of a codebase's life happens after it is written, and most of that reading is done by someone with no memory of why.", "aiHelps": "Mechanical refactors are something it does quickly and usually well.", "aiFails": "It creates the duplication in the first place, and it will change behaviour while “tidying” and describe it as cleanup.", "without": "You do the refactor. The grader checks behaviour is preserved across every window the three originals covered."});
 const MK = ModuleKit.mount(11, AISEQuizData.MODULE_QUIZZES[11]);
+EngLab.renderShip("shipM11", "ship-m11");
 </script>
 <script>
 Northline.renderPrediction("beforeAi", {

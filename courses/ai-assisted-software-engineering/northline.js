@@ -1159,7 +1159,7 @@
       const status = done ? "done" : unlocked ? "open" : "locked";
       const statusLabel = done ? "Done" : unlocked ? "Open" : "Locked";
       const pri = (t.priority || "Medium").toLowerCase();
-      const prev = !unlocked ? CourseProgress.MODULES.find(function (x) { return x.id === m.id - 1; }) : null;
+      const prev = !unlocked ? (CourseProgress.prevInSequence ? CourseProgress.prevInSequence(m.id) : CourseProgress.MODULES.find(function (x) { return x.id === m.id - 1; })) : null;
       const prevT = prev ? CourseProgress.ticketFor(prev.id) : null;
       card.innerHTML =
         '<div class="tkhead">' +

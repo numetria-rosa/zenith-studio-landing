@@ -13,10 +13,11 @@
   <header class="hero">
     <span class="eyebrow">Practice library</span>
     <h1 class="serif">Git Practice</h1>
-    <p class="sub">Labeled simulation: reading workflow and diffs. The required GitHub lab is on Desktop Labs.</p>
-    <div class="honestnote"><b>Simulation.</b> Labeled simulation: reading workflow and diffs. The required GitHub lab is on Desktop Labs. These tasks do not unlock the capstone by themselves.</div>
+    <p class="sub">Interactive Git workflow lab, then MCQ reps. Neither is real Git. Desktop Lab B is the repo you own.</p>
+    <div class="honestnote"><b>Simulation.</b> The graph below is a decision lab. It does not run <code>git</code>. These MCQs do not unlock the capstone.</div>
     <p class="mono" id="skillMeta" style="margin-top:14px;color:var(--mut2)">0 passed</p>
   </header>
+  <div id="gitLab" class="interactive"></div>
   <div id="taskList"></div>
 <footer>Zenith Lab · AI-Assisted Software Engineering</footer>
 </div>
@@ -25,7 +26,9 @@
 <script src="practice-progress.js"></script>
 <script src="practice-tasks.js"></script>
 <script src="practice-kit.js"></script>
+<script src="eng-lab-kit.js"></script>
 <script>
+EngLab.renderGit("gitLab");
 const TASKS = AISE_TASKS.filter(t => t.tool === "git");
 PracticeKit.renderLibrary(TASKS);
 </script>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 14 — Prompt Engineering for Software Engineers</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Module 14</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="tickets.html">Ticket board</a><a href="syllabus.html">Syllabus</a><a href="cheatsheets.html">Cheat sheets</a><a href="desktop-labs.html">Desktop Labs</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">After Module 6 &middot; before Cursor &middot; Ticket NL-014</span>
+    <h1 class="serif">Prompt Engineering for Software Engineers</h1>
+    <p class="sub">Turn vague requests into reliable engineering instructions for AI coding assistants.</p>
+    <div id="ticketCard"></div>
+    <div id="loopStrip"></div>
+    <div class="callout">You are not learning magic words that make AI smarter. You are learning how to give an AI coding assistant enough context, constraints, evidence, and success criteria to produce useful engineering work &mdash; and how to recognise when your prompt is still underspecified.</div>
+    <p>A good AI result starts with a good engineering request. Prompting sits inside <b>specification &rarr; implementation &rarr; testing &rarr; review &rarr; shipping</b>. It is not a separate trick.</p>
+    <div class="objectives"><div class="lbl">By the end of this module you can</div>
+      <ul>
+        <li>Turn a vague ticket into a prompt with context, task, constraints, acceptance criteria, and verification</li>
+        <li>Give the minimum sufficient context, not a whole-repository dump</li>
+        <li>Bound an agent: allowed files, prohibited changes, plan first, stop conditions</li>
+        <li>Catch AI failure modes: missing constraints, test theatre, false confidence, confirmation bias</li>
+        <li>Know when the correct move is to stop prompting and gather evidence yourself</li>
+      </ul>
+    </div>
+    <div class="nowbox">
+      <div class="now-lbl">Do this now</div>
+      <p><b>What:</b> Dan said \u201cmake the huddle dashboard better.\u201d <b>Why:</b> that is how the last contractor lost booking.js. <b>Do:</b> read the framework, then write five graded prompts and the invoice challenge. <b>Success:</b> the grader finds engineering information, not the word \u201ctests.\u201d <b>Next:</b> Module 7 in Cursor, using this same shape.</p>
+    </div>
+  </header>
+
+  <section>
+    <div class="kh"><span class="num">00</span><h2>What is a prompt?</h2></div>
+    <div id="whyGrid"></div>
+    <p>A prompt is the instruction and context you give an AI system. For software engineering, a useful one often contains context, an objective, relevant files or code, constraints, expected behaviour, acceptance criteria, tests, and output requirements.</p>
+    <div class="def"><div class="k">Vague prompt</div><p>Like a ticket that says \u201cmake the checkout better.\u201d</p></div>
+    <div class="def"><div class="k">Strong prompt</div><p>Like giving a developer the affected flow, current behaviour, business rule, constraints, acceptance criteria, and tests.</p></div>
+    <p><b>Give the AI the minimum sufficient context required to make a correct decision.</b> Not every prompt must be enormous. Better prompting is not simply more prompting.</p>
+    <p class="mut"><b>Do this now.</b> Take \u201cfix the login bug.\u201d Add one piece of context (which flow) and one acceptance criterion you could check without asking what \u201cfixed\u201d meant.</p>
+    <details class="more"><summary>Go deeper: context windows and indexing (optional)</summary>
+      <p>Models have a finite context window. Repository indexing helps an agent find files, and it still guesses if you do not point at the relevant ones. Structured output (a plan, then a diff) beats a wall of code. Prompt templates are reusable specs, not spells. None of that replaces naming the ticket, the file, and the test.</p>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">01</span><h2>CONTEXT &rarr; TASK &rarr; CONSTRAINTS &rarr; ACCEPTANCE &rarr; VERIFY</h2></div>
+    <p>Use this throughout the rest of the course. Memorise the five words, not a 400-line template.</p>
+    <ul class="plain">
+      <li><b>Context</b> &mdash; What does the AI need to know? Files, data shape, current behaviour, the error.</li>
+      <li><b>Task</b> &mdash; What exactly should it do? Investigate, plan, implement, or review &mdash; pick one.</li>
+      <li><b>Constraints</b> &mdash; What must it not change? API, schema, unrelated files, dependencies.</li>
+      <li><b>Acceptance</b> &mdash; How do we know it is correct? Observable behaviour a stranger could check.</li>
+      <li><b>Verify</b> &mdash; How should the result be tested? Name the case, not the word \u201ctests.\u201d</li>
+    </ul>
+    <p class="mut"><b>Do this now.</b> Say the five words out loud, then look at Dan's ticket and name one item for each.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">02</span><h2>Vague vs engineered prompts</h2></div>
+    <div class="def"><div class="k">Bad</div><p>Fix the login bug.</p></div>
+    <div class="def"><div class="k">Better</div><p>Investigate the login failure in the authentication flow. Identify the likely cause before changing code. Check the login request, response handling, and session creation. Do not modify unrelated authentication behaviour.</p></div>
+    <div class="def"><div class="k">Strong</div><p>Investigate the login failure in the authentication flow. First inspect the request payload, authentication response, and session creation path. Identify the root cause before editing code. Preserve the existing authentication API and validation behaviour. After the fix, add or update a regression test that reproduces the original failure and verify both successful and failed login paths. Do not claim the issue is fixed until the test passes.</p></div>
+    <p>The third is better because it sequences investigation before edits, names the paths to inspect, freezes the API, and refuses a success claim without a regression case. The second is scoped. The first lets the AI invent the bug, the file, and the definition of done.</p>
+    <div id="vaguePick" class="interactive"></div>
+    <p class="mut"><b>Do this now.</b> Underline, in the strong prompt, the constraint and the verification sentence. Those two are what stop a rewrite.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">03</span><h2>Context engineering</h2></div>
+    <p>AI quality depends on what it can see: project structure, relevant files, data models, API contracts, existing tests, error messages, logs, requirements, constraints. Do not dump the entire repository. Provide the smallest relevant context that changes the answer.</p>
+    <p>Messy bug report: <i>\u201cThe huddle numbers are weird some mornings. Also the site is slow. Can you look at everything?\u201d</i></p>
+    <div id="ctxPick" class="interactive"></div>
+    <p class="mut"><b>Do this now.</b> Before the next lab, list the three files you would @-mention in Cursor for this bug &mdash; and one you would leave out.</p>
+    <details class="more"><summary>Go deeper: context management (optional)</summary>
+      <p>If the conversation is long, start a new thread and paste the spec again. Indexing is not understanding. A 2,000-line paste can bury the one stack trace that mattered. Prompt versioning (saving the instruction that worked) is an engineering artefact, same as a runbook.</p>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">04</span><h2>Specification prompting</h2></div>
+    <p>Make requirements explicit: objective, inputs, outputs, edge cases, constraints, dependencies, acceptance criteria. You already practised this shape in Module 2. Here you learn to <i>send</i> it. Do not require every possible detail if it is irrelevant. Relevant completeness beats a novel.</p>
+    <p class="mut"><b>Do this now.</b> For \u201cadd a dashboard filter,\u201d write one line each: what is filtered, where it happens, empty state. Lab 3 grades the full set.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">05</span><h2>Constraints</h2></div>
+    <p>Tell the AI what it must preserve: API, database schema, existing behaviour, no new dependencies, mobile layout, accessibility, unrelated files, existing tests. Constraints matter because helpfulness without a fence is a rewrite.</p>
+    <div id="missingC" class="interactive"></div>
+    <p class="mut"><b>Do this now.</b> Add one constraint to a prompt you wrote this week, even a private one: \u201cDo not modify files outside X.\u201d</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">06</span><h2>Acceptance criteria</h2></div>
+    <div class="def"><div class="k">Bad</div><p>Build the form.</p></div>
+    <div class="def"><div class="k">Strong</div><p>The form must reject an empty email, reject invalid email format, show an accessible error message, preserve valid values after validation failure, submit only when all required fields pass, and include tests for each failure case.</p></div>
+    <p>If success cannot be checked, the AI has too much freedom. Criteria must be observable and testable.</p>
+    <p class="mut"><b>Do this now.</b> Rewrite \u201cthe form should work\u201d as one Given / When / Then you could demo on a phone.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">07</span><h2>Prompting for planning</h2></div>
+    <p>Separate <b>PLAN &rarr; IMPLEMENT &rarr; VERIFY</b>. Do not start with \u201cbuild this.\u201d First: inspect the existing implementation and propose a plan. Identify affected files, dependencies, risks, and tests. Do not modify code yet. Then implement the approved plan. Then run the relevant tests and report failures. That reduces blind AI changes.</p>
+    <p class="mut"><b>Do this now.</b> Prefix your next agent request with: \u201cDo not modify code yet. Propose a plan.\u201d</p>
+    <details class="more"><summary>Go deeper: planning and verification loops (optional)</summary>
+      <p>Some agents run a plan loop and a tool loop. Your job is to set the checkpoint: plan visible, then permission to edit, then tests. Tool-use boundaries (which commands, which directories) are the same idea as file constraints.</p>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">08</span><h2>Prompting for debugging</h2></div>
+    <p>Structure: symptom, expected behaviour, actual behaviour, reproduction steps, relevant code, error/log, constraints, verification requirement.</p>
+    <div id="debugNext" class="interactive"></div>
+    <p class="mut"><b>Do this now.</b> Paste a real error from practice into that shape. If you have none, use the TypeError in Lab 4.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">09</span><h2>Prompting for tests</h2></div>
+    <p>Do not ask \u201cwrite tests for this function\u201d and trust the suite. Ask it to identify intended behaviour and edge cases first, then propose tests for normal input, invalid input, boundary conditions, empty input, and the regression you care about. Do not use assertions that can pass without executing the actual behaviour.</p>
+    <p>This is the course's anti-hardcode rule applied to prompts: <b>AI can generate tests that look impressive while testing almost nothing.</b></p>
+    <p class="mut"><b>Do this now.</b> Take a function you wrote in Module 5. Name one case that would stay green if the function always returned <code>[]</code>.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">10</span><h2>Prompting for code review</h2></div>
+    <p>Ask: review for correctness, security, accessibility, maintainability, and test coverage. Do not merely summarise. Identify concrete risks, explain why they matter, recommend verification, distinguish confirmed defects from potential concerns. You will reuse this in the AI Review Lab.</p>
+    <pre>function lineTotal(item) {
+  return item.price;
+}
+function grandTotal(items) {
+  return items.reduce((t, i) => t + lineTotal(i), 0);
+}</pre>
+    <div id="reviewMiss" class="interactive"></div>
+    <p class="mut"><b>Do this now.</b> Write one review question this sample does not answer: what happens when quantity is 2?</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">11</span><h2>Security prompting</h2></div>
+    <p>Do not ask \u201cis this secure?\u201d Ask the model to evaluate specific threat categories and provide evidence: authentication, authorization, input validation, injection, secrets, XSS, CSRF where relevant, file uploads, exposed APIs, insecure defaults.</p>
+    <div class="def"><div class="k">Bad</div><p>Is this secure?</p></div>
+    <div class="def"><div class="k">Better</div><p>Review this endpoint for authorization bypass, injection, sensitive-data exposure, and unsafe input handling. For each concern, identify the exact code path and explain how it could fail. Do not claim the endpoint is secure unless each category has been checked.</p></div>
+    <p class="mut"><b>Do this now.</b> Add two threat names to any \u201creview this\u201d prompt you will use in Module 11.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">12</span><h2>Accessibility prompting</h2></div>
+    <p>Do not ask \u201cmake it accessible.\u201d Ask: review this form for keyboard use, labels, focus management, validation errors, and semantic structure. Identify specific issues and propose tests. Same philosophy as Module 3: a placeholder is not a label.</p>
+    <p class="mut"><b>Do this now.</b> Name one accessibility check you can perform without a screen reader (Tab order, visible label, focus ring).</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">13</span><h2>Prompting agents</h2></div>
+    <p>Asking AI a question is not the same as giving an AI agent authority to modify a project. Define scope, allowed files, prohibited changes, checkpoints, tests, stopping conditions, and review requirements. The more autonomy the agent has, the more explicit the boundaries should become.</p>
+    <div class="def"><div class="k">Bounded agent</div><p>Work only inside <code>/src/auth</code>. Do not modify the database schema or package dependencies. First inspect and propose a plan. After implementation, run the authentication tests. Stop if the required behaviour conflicts with an existing API contract.</p></div>
+    <p class="mut"><b>Do this now.</b> Write the stop sentence you will reuse in Lab 5.</p>
+    <details class="more"><summary>Go deeper: agent permissions (optional)</summary>
+      <p>Editor agents may have shell, network, and file tools. Treat permissions like production access: least privilege. A plan-only mode is a checkpoint, not a personality setting.</p>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">14</span><h2>Iterative prompting</h2></div>
+    <p>Good prompting is often a conversation, not one enormous instruction: understand &rarr; plan &rarr; implement &rarr; test &rarr; review &rarr; correct &rarr; summarise evidence. Do not cram every possible instruction into prompt 1.</p>
+    <p class="mut"><b>Do this now.</b> Split \u201cbuild the dashboard and tests and review it\u201d into three sends.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">15</span><h2>When not to prompt</h2></div>
+    <p>Sometimes the correct action is to stop asking AI and investigate yourself: unclear business rule, missing production data, ambiguous security requirement, conflicting specs, unexplained test failure, uncertain legal/compliance, AI contradicts observed behaviour. Gather evidence first.</p>
+    <div id="stopAsk" class="interactive"></div>
+    <p class="mut"><b>Do this now.</b> Name one question in your own work that an agent cannot answer because only Priya (or your real stakeholder) can.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">16</span><h2>AI failure modes</h2></div>
+    <ul class="plain">
+      <li><b>Ambiguity</b> &mdash; AI guesses what you meant.</li>
+      <li><b>Missing context</b> &mdash; AI assumes an architecture.</li>
+      <li><b>Missing constraints</b> &mdash; AI changes too much.</li>
+      <li><b>Missing acceptance</b> &mdash; AI decides what \u201cdone\u201d means.</li>
+      <li><b>Confirmation bias</b> &mdash; AI agrees with your wrong assumption.</li>
+      <li><b>Overly broad scope</b> &mdash; unrelated files change.</li>
+      <li><b>False confidence</b> &mdash; success reported without evidence.</li>
+      <li><b>Test theatre</b> &mdash; tests that do not execute the behaviour.</li>
+      <li><b>Context overload</b> &mdash; the relevant line is buried.</li>
+      <li><b>Prompt overengineering</b> &mdash; a huge prompt that still underspecifies the task.</li>
+    </ul>
+    <p>Better prompting is not simply more prompting. A prompt is an engineering specification. The better the AI gets, the more important it becomes to specify, verify, and review its work.</p>
+    <p class="mut"><b>Do this now.</b> Pick one failure mode you have already seen in this course (Module 2's wandering plan counts).</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">EX</span><h2>Graded prompt labs</h2></div>
+    <p>Five labs plus one challenge. Rubric grading: engineering information, not exact wording. Keyword stuffing, copying the login example, and \u201cadd tests\u201d with no case will not pass. These persist in this browser. They are platform-graded prompt text, not proof you opened Cursor.</p>
+    <div id="pkLab_repair" class="interactive"></div>
+    <div id="pkLab_constraints" class="interactive" style="margin-top:22px"></div>
+    <div id="pkLab_acceptance" class="interactive" style="margin-top:22px"></div>
+    <div id="pkLab_debug" class="interactive" style="margin-top:22px"></div>
+    <div id="pkLab_agent" class="interactive" style="margin-top:22px"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">CH</span><h2>Prompt Engineering Challenge</h2></div>
+    <div id="pkChallenge" class="interactive"></div>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">T</span><h2>Prompt template library</h2></div>
+    <p>Reuse these. Each follows Context &rarr; Task &rarr; Constraints &rarr; Acceptance &rarr; Verify. Fill the brackets; delete unused lines.</p>
+    <details class="more"><summary>Feature implementation</summary>
+      <pre>Context: [files, current behaviour]
+Task: Implement [feature] in [file].
+Constraints: Do not change [API / schema / unrelated files]. No new dependencies.
+Acceptance: [observable Given/When/Then]
+Verify: Add/update tests for [normal, empty, invalid]. Do not claim done until they pass.</pre>
+    </details>
+    <details class="more"><summary>Bug investigation</summary>
+      <pre>Context: [symptom, file, error]
+Task: Identify the root cause before editing.
+Constraints: Preserve [API / existing tests].
+Acceptance: Cause named with evidence (code path or failing case).
+Verify: A reproduction or failing test exists before a fix.</pre>
+    </details>
+    <details class="more"><summary>Debugging</summary>
+      <pre>Symptom / expected / actual / repro steps
+Relevant code: [file:line]
+Error/log: [paste]
+Constraints: Do not rewrite [module]
+Verify: [the original repro] fails before the fix and passes after.</pre>
+    </details>
+    <details class="more"><summary>Test generation</summary>
+      <pre>Identify intended behaviour and edges first.
+Propose tests: normal, invalid, boundary, empty, regression [describe].
+Do not add assertions that can pass without executing the behaviour.</pre>
+    </details>
+    <details class="more"><summary>Code review</summary>
+      <pre>Review for correctness, security, accessibility, maintainability, coverage.
+Do not summarise. Name concrete risks, why they matter, how to verify.
+Distinguish confirmed defects from potential concerns.</pre>
+    </details>
+    <details class="more"><summary>Security review</summary>
+      <pre>Evaluate [authz, injection, sensitive data, unsafe input] with code paths.
+Do not claim it is secure unless each category was checked with evidence.</pre>
+    </details>
+    <details class="more"><summary>Accessibility review</summary>
+      <pre>Review [form/page] for labels, keyboard, focus, errors, semantics.
+Identify specific issues and propose tests. Do not say \u201cmake it accessible.\u201d</pre>
+    </details>
+    <details class="more"><summary>Refactoring</summary>
+      <pre>Change structure only. Observable behaviour must not change.
+Constraints: keep tests green; no feature work.
+Verify: existing tests still fail if behaviour moves.</pre>
+    </details>
+    <details class="more"><summary>Documentation</summary>
+      <pre>Document [behaviour] for [audience]. Do not invent APIs.
+Cite the files you read. Mark anything you did not verify.</pre>
+    </details>
+    <details class="more"><summary>Agent task</summary>
+      <pre>Work only in [path]. Do not modify [schema / deps / unrelated].
+Plan first; no edits until the plan is approved.
+Run [named tests]. Stop if [API conflict / missing rule].</pre>
+    </details>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">CX</span><h2>How this connects</h2></div>
+    <p>Prompt engineering is not another topic. It is part of the engineering loop you are about to practise.</p>
+    <ul class="plain">
+      <li>You will use these skills in the <a href="practice-specs.html">Spec Lab</a>.</li>
+      <li>You will use them when reviewing AI-generated code and in the <a href="ai-review.html">AI Review Lab</a>.</li>
+      <li>You will use them in <a href="desktop-labs.html">Desktop Labs</a> and the <a href="work-session.html">AI Work Session Record</a>.</li>
+      <li>You will use them during the capstone.</li>
+    </ul>
+    <p>Next ticket is NL-007: the huddle dashboard, in a real editor. The prompt shape you just wrote is the one you will send.</p>
+  </section>
+
+  <section>
+    <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
+    <p class="mut">Five judgement questions. 80% to continue. Options are shuffled.</p>
+    <div id="quizRoot"></div>
+    <div style="margin-top:22px"><div class="ov-lbl">To finish this module</div><div id="reqList"></div></div>
+  </section>
+<footer>Zenith Lab &middot; AI-Assisted Software Engineering</footer>
+</div>
+<div class="scoreboard"><div class="in">
+  <span class="sc" id="scoreDisplay">Checkpoint: &mdash;</span>
+  <a id="btnNext" class="primary nextbtn isdisabled" aria-disabled="true" style="text-decoration:none;margin-left:auto">Finish the exercise and checkpoint (80%) to continue</a>
+</div></div>
+<script src="course-progress.js"></script>
+<script src="northline.js"></script>
+<script src="quiz-data.js"></script>
+<script src="prompt-kit.js"></script>
+<script src="module-kit.js"></script>
+<script>
+Northline.renderWhy("whyGrid", {
+  build: "Five graded engineering prompts plus a Northline invoice challenge, using Context \u2192 Task \u2192 Constraints \u2192 Acceptance \u2192 Verify.",
+  why: "The last contractor said \u201cmake it better\u201d and booking.js was rewritten. Dan will not take another vibe prompt.",
+  aiHelps: "Drafting a plan, listing edges, tightening wording \u2014 after you named the ticket.",
+  aiFails: "Guessing the bug, widening scope, inventing tests that cannot fail, claiming done without evidence.",
+  without: "Every graded prompt is yours. The login example is teaching, not a paste bin."
+});
+const MK = ModuleKit.mount(14, AISEQuizData.MODULE_QUIZZES[14]);
+PromptKit.mountAll(function () { MK.sync(); });
+
+Northline.renderRequestCompare("vaguePick", {
+  label: "Which prompt is safer to send? \u00b7 labelled simulation",
+  situation: "Login fails for some patients. You have not inspected the request yet.",
+  opts: [
+    { t: "Fix the login bug and make auth more modern.",
+      why: "No cause, no file, and \u201cmodern\u201d is a rewrite invitation." },
+    { t: "Investigate login in the auth flow first. Do not change the API. Add a regression test for the reported failure before claiming a fix.",
+      correct: true,
+      whyOk: "Investigation first, API frozen, success tied to a test. That is an engineering request." }
+  ],
+  learnedTitle: "A prompt is a spec.",
+  learnedNote: "The safer prompt did not use magic words. It named sequence, a fence, and a check."
+});
+
+Northline.renderMultiFlag("ctxPick", {
+  label: "What context should you provide? \u00b7 grade the decision",
+  intro: "Priya: huddle numbers are weird some mornings. The site also \u201cfeels slow.\u201d Check what actually changes the answer.",
+  cta: "Submit context choices",
+  items: [
+    { t: "dashboard.js and the huddle calculation for today / open / no-shows", bad: true,
+      why: "This is the behaviour under suspicion. Smallest relevant context." },
+    { t: "The existing test for the seven-day no-show window", bad: true,
+      why: "Tells the AI what \u201ccorrect\u201d already means." },
+    { t: "This morning's screenshot of the three numbers vs the appointment list", bad: true,
+      why: "Evidence. Without it the AI guesses which number is wrong." },
+    { t: "The entire repository including unused marketing pages", bad: false,
+      why: "Dump. Relevant lines get buried. Context overload is a failure mode." },
+    { t: "A request to rewrite CSS because slowness was mentioned", bad: false,
+      why: "A second, unconfirmed problem. Do not widen scope on a vibe." },
+    { t: "appointments.json shape (one real record)", bad: true,
+      why: "Field names are how silent logic bugs happen." }
+  ],
+  learned: ["Smallest relevant context.", "The screenshot and the test change the answer. The marketing site does not."]
+});
+
+Northline.renderReviewDecision("missingC", {
+  label: "The agent rewrote auth to fix a label \u00b7 labelled simulation",
+  intro: "You asked: \u201cThe huddle heading is wrong, fix it.\u201d The agent replaced the authentication module because \u201cshared session helpers looked messy.\u201d What constraint was missing?",
+  opts: [
+    { t: "Do not modify authentication or unrelated files; only change the huddle heading in the dashboard view.",
+      correct: true,
+      whyOk: "A small UI defect does not license an auth rewrite. The missing sentence was the fence." },
+    { t: "Ask it to use a more popular auth library while it is in there.",
+      why: "That is how a label bug becomes a week of migration." },
+    { t: "Nothing \u2014 a rewrite is fine if tests pass.",
+      why: "You did not have auth tests in the prompt, and passing tests would not make the rewrite in scope." }
+  ],
+  learned: ["Constraints are how you stay in control.", "Helpfulness without a fence is a rewrite."]
+});
+
+Northline.renderPrediction("debugNext", {
+  label: "The AI replied. What do you ask next?",
+  intro: "You sent a vague \u201clogin is broken.\u201d The AI replies: \u201cFixed. The session cookie was wrong. I also cleaned auth.js. All good.\u201d No diff, no test, no repro.",
+  questions: [
+    { q: "What should you ask next?",
+      opts: [
+        { t: "Request evidence: the repro, the diff, and a test that failed before the change. Do not accept a cleanup of auth.js on this ticket.",
+          correct: true,
+          whyOk: "False confidence plus extra files. Evidence first, then maybe a fix." },
+        { t: "Change code immediately in the same direction \u2014 it already knows.",
+          why: "You still have no repro. You would own an unexplained auth rewrite." },
+        { t: "Ship. It said all good.",
+          why: "A summary is not a passing test." }
+      ] }
+  ]
+});
+
+Northline.renderMultiFlag("reviewMiss", {
+  label: "Persuasive AI review \u00b7 what did it miss?",
+  intro: "AI review of the totals sample above: \u201cClean reduce usage, good naming, no security issues, looks production-ready.\u201d Check the defects it skipped.",
+  cta: "Submit what it missed",
+  items: [
+    { t: "lineTotal ignores quantity, so two packs at $3 bill as $3", bad: true,
+      why: "A confirmed defect against the business rule." },
+    { t: "The review summarised style and skipped the formula", bad: true,
+      why: "You asked it not to merely summarise." },
+    { t: "No test was recommended that would fail if quantity is ignored", bad: true,
+      why: "Verification was the point of the review prompt." },
+    { t: "reduce is illegal in JavaScript", bad: false,
+      why: "reduce is fine. Inventing a language error is the false-alarm path." },
+    { t: "Function names are too short to ship", bad: false,
+      why: "Naming is fine. Do not charge style as the defect." }
+  ],
+  learned: ["Reviews need a target.", "A fluent summary can miss the only line that costs money."]
+});
+
+Northline.renderPrediction("stopAsk", {
+  label: "When not to prompt \u00b7 engineering judgement",
+  intro: "Sam flags that weekend surcharge on invoices is undefined in the contract. The agent offers to \u201cuse the industry-standard 10%.\u201d",
+  questions: [
+    { q: "Correct move?",
+      opts: [
+        { t: "Stop prompting. Ask Dan or Priya what the contract says. An invented rate is a billing defect.",
+          correct: true,
+          whyOk: "Unclear business / legal requirement. Gather evidence from a human." },
+        { t: "Accept 10% and add a comment that it can change later.",
+          why: "Comments do not un-charge patients." },
+        { t: "Ask the agent to pick a rate that \u201cfeels fair.\u201d",
+          why: "Fairness is not a spec, and the agent has no contract." }
+      ] }
+  ]
+});
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

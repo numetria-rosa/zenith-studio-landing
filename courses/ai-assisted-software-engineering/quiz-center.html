@@ -13,28 +13,38 @@
   <header class="hero">
     <span class="eyebrow">Extra reps</span>
     <h1 class="serif">Quiz Center</h1>
-    <p class="sub">Shuffled questions from module banks plus extras. This does not replace module checkpoints and does not unlock modules by itself.</p>
+    <p class="sub">Shuffled questions from module banks. Extra reps only. This does not replace checkpoints, labs, or a live URL, and it does not unlock modules.</p>
+    <div class="honestnote"><b>Not the job.</b> If you miss a concept, do not grind another five MCQs first. Open the matching lab: <a href="ai-review.html">AI Review</a>, <a href="practice-review.html">PR lab</a>, <a href="practice-detective.html">AI Code Detective</a>, or <a href="practice-integrated.html">what would you do next</a>.</div>
   </header>
   <div class="formrow"><label for="modPick">Bank</label>
     <select id="modPick" style="width:auto;padding:8px 10px;border-radius:8px;background:var(--bg2);color:var(--tx);border:1px solid var(--bd2)">
       <option value="mix">Mixed extra + modules</option>
       <option value="1">Module 1</option><option value="2">Module 2</option><option value="3">Module 3</option>
-      <option value="4">Module 4</option><option value="5">Module 5</option><option value="6">Module 6</option>
+      <option value="4">Module 4</option><option value="5">Module 5</option>      <option value="6">Module 6</option>
+      <option value="14">Module 14 — Prompt engineering</option>
       <option value="7">Module 7</option><option value="8">Module 8</option>
+      <option value="9">Module 9</option><option value="10">Module 10</option><option value="11">Module 11</option>
+      <option value="12">Module 12</option><option value="13">Module 13</option>
     </select>
     <button class="primary" id="btnGo" style="margin-left:8px">Draw 5</button>
   </div>
   <div id="quizRoot"></div>
   <p class="mono" id="scoreDisplay" style="margin-top:16px"></p>
+  <div id="quizHint" class="nowbox" hidden></div>
 <footer>Zenith Lab · AI-Assisted Software Engineering</footer>
 </div>
 <script src="course-progress.js"></script>
 <script src="quiz-data.js"></script>
 <script src="module-kit.js"></script>
 <script>
+function flattenExtra() {
+  const extra = AISEQuizData.CENTER_EXTRA;
+  if (Array.isArray(extra)) return extra.slice();
+  return Object.keys(extra).reduce(function (acc, k) { return acc.concat(extra[k] || []); }, []);
+}
 function pool(key) {
   if (key === "mix") {
-    let all = AISEQuizData.CENTER_EXTRA.slice();
+    let all = flattenExtra();
     Object.keys(AISEQuizData.MODULE_QUIZZES).forEach(function (k) {
       all = all.concat(AISEQuizData.MODULE_QUIZZES[k]);
     });
@@ -50,9 +60,26 @@ function shuffle(arr) {
   }
   return a;
 }
+const LAB_HINT = {
+  1: { href: "module-01.html", t: "You missed a Module 1 idea. Re-open NL-001 and make the smallest hours change." },
+  2: { href: "practice-specs.html", t: "You missed a spec idea. Try the Specification Lab (5 minutes)." },
+  14: { href: "module-14.html", t: "You missed a prompting idea. Re-open NL-014 and rewrite the request with a constraint and a named test case." },
+  7: { href: "ai-review.html", t: "You missed an AI-collaboration idea. Try the 5-minute AI Review Lab." },
+  8: { href: "practice-review.html", t: "You missed a review idea. Open the PR Review Lab." },
+  9: { href: "practice-detective.html", t: "You missed a testing idea. Open AI Code Detective (tautology / happy-path cases)." },
+  11: { href: "incident.html", t: "You missed a shipping/refactor idea. Try the production incident simulation." },
+  13: { href: "projects.html", t: "You missed a ship idea. Re-read the capstone brief and gates." },
+};
 document.getElementById("btnGo").onclick = function () {
-  const qs = shuffle(pool(document.getElementById("modPick").value)).slice(0, 5);
-  ModuleKit.renderQuiz("quiz-center", qs, function () {});
+  const key = document.getElementById("modPick").value;
+  const qs = shuffle(pool(key)).slice(0, 5);
+  ModuleKit.renderQuiz("quiz-center", qs, function () {}, function (res) {
+    const hint = document.getElementById("quizHint");
+    if (!res || res.score === res.total) { hint.hidden = true; return; }
+    const map = LAB_HINT[key] || { href: "ai-review.html", t: "You missed a concept. Try the 5-minute AI Review Lab rather than another quiz round." };
+    hint.hidden = false;
+    hint.innerHTML = "<div class='now-lbl'>Quiz \u2192 practice</div><p>" + map.t + ' <a href="' + map.href + '">Open the lab</a>.</p>';
+  });
 };
 </script>
 <script src="course-rail.js"></script>

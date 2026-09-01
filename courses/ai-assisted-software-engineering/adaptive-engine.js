@@ -1,7 +1,7 @@
 (function (global) {
   const LEVEL_ORDER = { guided: 0, semiguided: 1, challenge: 2, mastery: 3 };
   function toolLabel(id) {
-    return ({ html: "HTML", css: "CSS", js: "JavaScript", specs: "Specs", git: "Git", testing: "Testing", review: "Review", python: "Python", integrated: "Integrated" })[id] || id;
+    return ({ html: "HTML", css: "CSS", js: "JavaScript", specs: "Specs", git: "Git", testing: "Testing", review: "Review", python: "Python", integrated: "Integrated", detective: "AI Code Detective" })[id] || id;
   }
   function recommend() {
     if (typeof SkillMap === "undefined" || typeof PracticeProgress === "undefined") return { done: true, primary: null };

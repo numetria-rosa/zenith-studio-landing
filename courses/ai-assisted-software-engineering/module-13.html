@@ -25,6 +25,10 @@
         <li>Write a rollback plan with a mechanism and a trigger, before deploying</li>
       </ul>
     </div>
+    <div class="nowbox">
+      <div class="now-lbl">Do this now</div>
+      <p><b>What:</b> a public https URL a stranger can open, plus a repo that is source not the live app. <b>Do:</b> pre-flight the deployed URL (not localhost), 390px, keyboard, empty form, then the <a href="release-review.html">release review</a> and six gates on Projects. <b>Success:</b> you can name a limitation and a rollback trigger. This is not a job.</p>
+    </div>
   </header>
   <section>
   <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
@@ -191,20 +195,20 @@ ModuleKit.renderLoopInto("loopStripEnd", "all", "The whole loop \u00b7 every ste
     row(st.css >= 3, "3+ CSS practice tasks passed (" + st.css + ")") +
     row(st.js >= 3, "3+ JavaScript practice tasks passed (" + st.js + ")") +
     row(st.det >= 3, "3+ AI Code Detective cases solved (" + st.det + ")") +
-    row(labs, "Both Desktop Labs recorded with real GitHub URLs") +
+    row(labs, "Both Desktop Labs recorded") +
     '<p class="mut" style="margin-top:10px">You need at least three of the four practice tracks plus both Desktop Labs. ' +
     (CourseProgress.capstonePracticeReady() ? "<b>You are clear to start.</b>" : "Not there yet \u2014 <a href=\"dashboard.html\">the dashboard</a> shows what is short.") + '</p>';
 })();
 
 document.getElementById("rpCheck").onclick = function () {
-  var url = CourseProgress.safeHttpUrl(document.getElementById("rpUrl").value);
+  var url = CourseProgress.isLiveAppUrl(document.getElementById("rpUrl").value);
   var notes = document.getElementById("rpNotes").value.trim();
   var verify = document.getElementById("rpVerify").value.trim();
   var risk = document.getElementById("rpRisk").value.trim();
   var rollback = document.getElementById("rpRollback").value.trim();
   var results = [
-    { name: "a live https URL", pass: !!url && /^https:/i.test(url),
-      hint: "It has to be a public https address. A file:// path or localhost is not shipped." },
+    { name: "a live https URL someone else can open", pass: !!CourseProgress.isLiveAppUrl(url),
+      hint: "A public https address \u2014 GitHub Pages, Netlify, Vercel. A github.com repo URL is source, not a live app. file:// and localhost are not shipped." },
     { name: "release notes cover what changed", pass: notes.length >= 80 && /added|fixed|changed/i.test(notes),
       hint: "At least 80 characters, and name what was Added, Fixed or Changed. Dan cannot read a diff." },
     { name: "release notes state a known limitation", pass: /known|limit|only|not yet|does not|doesn't|future|paging|client-side/i.test(notes),
@@ -222,10 +226,15 @@ document.getElementById("rpCheck").onclick = function () {
   var ok = results.every(function (r) { return r.pass; });
   ModuleKit.showResults(document.getElementById("rpFb"), { passed: ok, results: results });
   if (ok) {
+    if (!CourseProgress.capstonePracticeReady()) {
+      document.getElementById("rpFb").className = "feedback bad";
+      document.getElementById("rpFb").textContent = "The write-up is in shape, but Module 13 does not record as complete until the practice bar and both Desktop Labs are done. The dashboard shows what is short.";
+      return;
+    }
     CourseProgress.setExtra("releasePlan", { url: url, notes: notes, verify: verify, risk: risk, rollback: rollback, at: new Date().toISOString() });
     CourseProgress.setSection(13, "releasePlan", { passed: true, at: new Date().toISOString() });
     document.getElementById("rpFb").innerHTML =
-      "<b>Shipped, documented, and reversible.</b> That is the whole loop closed: you understood a ticket, specified it, built it with an agent, inspected it, tested it, debugged it, reviewed it, and released it with a way back. Pass the checkpoint below and the course is complete \u2014 then <a href=\"projects.html\">the capstone</a> is where you prove you can do it unaided.";
+      "<b>Shipped, documented, and reversible.</b> That is the whole loop closed. Pass the checkpoint below, then open <a href=\"graduation.html\">graduation</a> for the evidence inventory. The <a href=\"projects.html\">capstone</a> is where you prove you can do it unaided.";
     Northline.showLearned(document.getElementById("rpFb").parentNode,
       "You just shipped something someone else can open, and you can undo.",
       "That sentence is the course. The loop starts again the first time reality files a ticket.");

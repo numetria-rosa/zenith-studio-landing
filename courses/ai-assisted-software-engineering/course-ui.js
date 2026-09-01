@@ -99,8 +99,8 @@
 
   function wrapCodeBlocks() {
     document.querySelectorAll("pre").forEach(function (pre) {
-      if (pre.classList.contains("detgutter") || pre.classList.contains("detsrc")) return;
-      if (pre.closest(".detcode")) return;
+      if (pre.classList.contains("detgutter") || pre.classList.contains("detsrc") || pre.classList.contains("prdiff")) return;
+      if (pre.closest(".detcode") || pre.closest(".elab") || pre.closest(".conflict")) return;
       if (pre.closest(".ba-col")) {
         enhancePre(pre);
         return;

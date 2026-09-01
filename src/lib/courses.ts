@@ -82,7 +82,7 @@ export const COURSES: Course[] = [
     title: "AI Automation",
     description:
       "Build client-ready workflow judgment: process mapping, simulated API and webhook labs, retries, idempotency, and bounded AI steps. No programming required. n8n is the example, not the product. Does not promise clients or a job.",
-    thumbnail: "/lab/ai-engineering.webp",
+    thumbnail: "/lab/ai-automation.webp",
     whopAccessPassId: "prod_2u2WQzQUio8kF",
     whopPlanId: "plan_ED9yF9ehN2RIa",
     checkoutUrl: "https://whop.com/checkout/plan_ED9yF9ehN2RIa",
@@ -99,8 +99,8 @@ export const COURSES: Course[] = [
     slug: "ai-assisted-software-engineering",
     title: "AI-Assisted Software Engineering",
     description:
-      "Software engineering with AI as your pair programmer, for people who have never shipped code. Ten Northline Digital tickets: you write the spec, inspect what an agent produced, run it, test it, review it, and ship it. Graded practice across HTML, CSS, JavaScript, specs, Git, review, testing, Python, and AI Code Detective — plus a real Cursor session, a real GitHub repo, and a live URL. Not AI Engineering (that course builds LLM products). No job guarantee.",
-    thumbnail: "/lab/data-science.webp",
+      "Software engineering with AI as your pair programmer, for people who have never shipped code. Fourteen Northline Digital tickets: you write the spec, write engineering prompts for an AI coding assistant, inspect what an agent produced, run it, test it, review it, and ship it. Graded practice across HTML, CSS, JavaScript, specs, Git, review, testing, Python, and AI Code Detective — plus a real Cursor session, a real GitHub repo, and a live URL that is not the repo itself. Not AI Engineering (that course builds LLM products). No job guarantee.",
+    thumbnail: "/lab/ai-assisted-software-engineering.webp",
     whopAccessPassId: "prod_rW17sq9hKeXYN",
     whopPlanId: "plan_ximKlnIKYO7Bx",
     checkoutUrl: "https://whop.com/checkout/plan_ximKlnIKYO7Bx",
@@ -108,8 +108,9 @@ export const COURSES: Course[] = [
     firstLessonPath: "module-00",
     waitlistUrl:
       "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20AI-Assisted%20Software%20Engineering%0A",
-    // Live 9-module path (ids 1–9, storage v1) plus orientation. Ten Northline
-    // Digital tickets, the 11-step loop, AI Code Detective, Desktop Labs.
+    // Live path: module ids 1–13 plus NL-014 (prompt engineering) inserted
+    // after module 6. Storage stays schema 2 so existing completions are not remapped.
+    // Fourteen Northline Digital tickets, the 11-step loop, AI Code Detective, Desktop Labs.
     // Practice-task count is whatever verify-aise-practice-tasks.py reports.
     // Real Whop product/plan created 2026-08-30
     // (prod_rW17sq9hKeXYN / plan_ximKlnIKYO7Bx).

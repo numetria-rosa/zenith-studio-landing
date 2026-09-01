@@ -25,6 +25,14 @@
         <li>Debug by narrowing rather than staring</li>
       </ul>
     </div>
+    <div class="nowbox">
+      <div class="now-lbl">Do this now</div>
+      <p><b>What:</b> a reproduction, then a test that can fail. <b>Why:</b> “it works for me” is a clue, not a defence. <b>Do:</b> write the empty-email failing test <i>before</i> the fix. Reject <code>expect(true).toBe(true)</code>. Then the “Would you ship this?” card — shipping the disabled-guard is how blank patients appear on Tuesday. <b>At work:</b> this is the first hour of every incident.</p>
+    </div>
+    <details class="more">
+      <summary>Already write tests? Go deeper (optional)</summary>
+      <p>Still catch the tautology and the ship card. Then <a href="practice-testing.html">testing practice</a> and the <a href="incident.html">incident simulation</a>.</p>
+    </details>
   </header>
   <section>
   <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
@@ -152,6 +160,11 @@ expect(calculateTotal([{ price: 3, quantity: 2 }])).toBe(6);</pre>
 
   </section>
   <section>
+  <div class="kh"><span class="num">SHIP</span><h2>Would you ship this?</h2></div>
+    <p>The button works. That is not the same as the ticket being done.</p>
+    <div id="shipM9" class="interactive"></div>
+  </section>
+  <section>
   <div class="kh"><span class="num">CP</span><h2>Checkpoint</h2></div>
     <p class="mut">Five questions. You need 80% to move on. Getting one wrong is information, not failure &mdash; read the explanation.</p>
     <div id="quizRoot"></div>
@@ -169,10 +182,12 @@ expect(calculateTotal([{ price: 3, quantity: 2 }])).toBe(6);</pre>
 <script src="quiz-data.js"></script>
 <script src="practice-kit.js"></script>
 <script src="detective-kit.js"></script>
+<script src="eng-lab-kit.js"></script>
 <script src="module-kit.js"></script>
 <script>
 Northline.renderWhy('whyGrid', {"build": "A reproduction, a test that fails on the real bug, and the fix — in that order, all three graded.", "why": "This is the module that separates “it ran once” from “I can prove it works”. It is also the most common gap in self-taught developers.", "aiHelps": "Generating a list of possible causes from an error message. Breadth again.", "aiFails": "It will produce a confident fix for a bug it cannot reproduce, and write tests that cannot fail while reporting them as passing.", "without": "You find the breaking input yourself. Part 2 explicitly fails a test that always returns true, so there is no way through by guessing."});
 const MK = ModuleKit.mount(9, AISEQuizData.MODULE_QUIZZES[9]);
+EngLab.renderShip("shipM9", "ship-m9");
 </script>
 <script>
 Northline.renderPrediction("beforeAi", {

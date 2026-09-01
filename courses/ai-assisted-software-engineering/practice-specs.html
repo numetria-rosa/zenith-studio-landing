@@ -13,10 +13,11 @@
   <header class="hero">
     <span class="eyebrow">Practice library</span>
     <h1 class="serif">Specs Practice</h1>
-    <p class="sub">Labeled simulation: judgment about tickets and prompts. Does not run Cursor.</p>
-    <div class="honestnote"><b>Simulation.</b> Labeled simulation: judgment about tickets and prompts. Does not run Cursor. These tasks do not unlock the capstone by themselves.</div>
+    <p class="sub">Interactive spec workshop, then MCQ reps. Does not run Cursor.</p>
+    <div class="honestnote"><b>Simulation.</b> You scope a messy ticket. The cards below are extra reps. Neither unlocks the capstone.</div>
     <p class="mono" id="skillMeta" style="margin-top:14px;color:var(--mut2)">0 passed</p>
   </header>
+  <div id="specLab" class="interactive"></div>
   <div id="taskList"></div>
 <footer>Zenith Lab · AI-Assisted Software Engineering</footer>
 </div>
@@ -25,7 +26,9 @@
 <script src="practice-progress.js"></script>
 <script src="practice-tasks.js"></script>
 <script src="practice-kit.js"></script>
+<script src="eng-lab-kit.js"></script>
 <script>
+EngLab.renderSpec("specLab");
 const TASKS = AISE_TASKS.filter(t => t.tool === "specs");
 PracticeKit.renderLibrary(TASKS);
 </script>

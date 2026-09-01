@@ -8,13 +8,13 @@
 </head>
 <body>
 <div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Desktop Labs</span></div></div>
-<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="practice-specs.html">Spec sim</a><a href="practice-git.html">Git sim</a></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="syllabus.html">Syllabus</a><a href="practice-specs.html">Spec lab</a><a href="practice-git.html">Git lab</a></div></div>
 <div class="wrap">
   <header class="hero">
     <span class="eyebrow">Required · both labs</span>
     <h1 class="serif">Desktop Labs</h1>
-    <p class="sub">Unlike Data Science (Tableau <i>or</i> Power BI), this course needs <b>both</b> Cursor evidence and a GitHub repo you own. In-browser spec/git/review libraries are labeled simulations. They do not satisfy this page.</p>
-    <div class="disclosure"><b>This page cannot open Cursor or GitHub Desktop for you.</b> Install the tools, do the work, paste an allowlisted https://github.com URL plus 80+ characters of notes.</div>
+    <p class="sub">Unlike Data Science (Tableau <i>or</i> Power BI), this course needs <b>both</b> Cursor evidence and a GitHub repo you own. In-browser labs are labeled simulations. They do not satisfy this page.</p>
+    <div class="disclosure"><b>This page cannot open Cursor or inspect your repo for you.</b> Lab A is self-reported. Lab B checks URL shape always, and asks GitHub's public API when the browser can reach it. A 404 fails. Rate-limits and CORS do not fail the lab — they are labeled “format valid, contents not confirmed.”</div>
     <div class="statusrow">
       <span class="pill" id="stCursor">Lab A Cursor: not submitted</span>
       <span class="pill" id="stGithub">Lab B GitHub: not submitted</span>
@@ -23,11 +23,22 @@
   </header>
   <section>
     <div class="kh"><span class="num">A</span><h2>Lab A — Cursor</h2></div>
-    <p>Install <a href="https://cursor.com" target="_blank" rel="noopener">Cursor</a> (VS Code + Copilot is accepted if you confirm it). Open the starter in <code>starters/northline-landing/</code> (download the folder from this course). Change the clinic hours to <b>Tue–Sat 9:00–17:00</b> and add a button whose visible text is <b>Book</b>. Commit and push.</p>
-    <p>Evidence: a commit URL shaped like <code>https://github.com/you/repo/commit/abc123</code>, notes (≥80 characters) on what you changed and how you checked it, and a confirmation this was not the in-browser simulation.</p>
+    <p>Install <a href="https://cursor.com" target="_blank" rel="noopener">Cursor</a> (VS Code + Copilot is accepted if you confirm it). Open the starter in <code>starters/northline-landing/</code>. Change the clinic hours to <b>Tue–Sat 9:00–17:00</b> and add a button whose visible text is <b>Book</b>. Commit and push if you can.</p>
+    <div class="nowbox">
+      <div class="now-lbl">What counts as success</div>
+      <p><b>Do:</b> a real editor session, then answer every field including what AI got wrong, whether you would ship, and what you would monitor. <b>Submit:</b> the form, not a screenshot of chat. <b>This page cannot see Cursor.</b> Lab B can ask GitHub’s API whether the repo exists.</p>
+    </div>
     <div class="interactive">
-      <div class="formrow"><label for="cUrl">GitHub commit URL</label><input id="cUrl" type="url" placeholder="https://github.com/you/repo/commit/…"></div>
-      <div class="formrow"><label for="cNotes">Notes</label><textarea id="cNotes"></textarea></div>
+      <div class="formrow"><label for="cTicket">What was the ticket?</label><textarea id="cTicket" placeholder="Saturday hours, Book button…"></textarea></div>
+      <div class="formrow"><label for="cAsk">What did you ask the AI to do?</label><textarea id="cAsk"></textarea></div>
+      <div class="formrow"><label for="cGen">What did it generate?</label><textarea id="cGen"></textarea></div>
+      <div class="formrow"><label for="cWrong">What did the AI get wrong?</label><textarea id="cWrong" placeholder="Invented a payment form, skipped Saturday…"></textarea></div>
+      <div class="formrow"><label for="cInspect">What did you inspect or change by hand?</label><textarea id="cInspect"></textarea></div>
+      <div class="formrow"><label for="cTest">What did you test?</label><textarea id="cTest"></textarea></div>
+      <div class="formrow"><label for="cSurprise">What surprised you?</label><textarea id="cSurprise"></textarea></div>
+      <div class="formrow"><label for="cShip">Would you ship this? Why or why not?</label><textarea id="cShip" placeholder="I would not ship until Saturday hours are checked on a phone-sized window…"></textarea></div>
+      <div class="formrow"><label for="cMon">What would you monitor after shipping?</label><textarea id="cMon" placeholder="Failed Book clicks, 404s on the hours page…"></textarea></div>
+      <div class="formrow"><label for="cUrl">GitHub commit URL (optional)</label><input id="cUrl" type="url" placeholder="https://github.com/you/repo/commit/…"></div>
       <label class="check"><input type="checkbox" id="cOk"> I made this change in Cursor or VS Code + Copilot, not the in-browser simulation.</label>
       <button class="primary" id="btnCursor">Submit Lab A</button>
       <div class="feedback" id="cFb"></div>
@@ -37,17 +48,27 @@
     <div class="kh"><span class="num">B</span><h2>Lab B — GitHub</h2></div>
     <p>A public repo you own with a README, at least three commits, and either one pull request or a documented feature branch. One repo may satisfy both labs if the commit URL is valid <i>and</i> the repo checks pass.</p>
     <div class="interactive">
-      <div class="formrow"><label for="gUrl">GitHub repo URL</label><input id="gUrl" type="url" placeholder="https://github.com/you/repo"></div>
-      <div class="formrow"><label for="gNotes">Notes</label><textarea id="gNotes"></textarea></div>
+      <div class="formrow"><label for="gUrl">GitHub repository URL</label><input id="gUrl" type="url" placeholder="https://github.com/you/repo"></div>
+      <div class="formrow"><label for="gPr">Commit or pull-request URL (optional)</label><input id="gPr" type="url" placeholder="https://github.com/you/repo/pull/1"></div>
+      <div class="formrow"><label for="gChanged">What changed?</label><textarea id="gChanged"></textarea></div>
+      <div class="formrow"><label for="gProblem">One problem you hit</label><textarea id="gProblem"></textarea></div>
+      <div class="formrow"><label for="gResolved">How you resolved it</label><textarea id="gResolved"></textarea></div>
+      <div class="formrow"><label for="gCheck">What would you verify before a stranger used this repo?</label><textarea id="gCheck" placeholder="README clone steps, that the live URL is not localhost…"></textarea></div>
       <label class="check"><input type="checkbox" id="gOk"> This is a repo I own. It has a README and at least three commits.</label>
       <button class="primary" id="btnGithub">Submit Lab B</button>
-      <div class="feedback" id="gFb"></div>
+      <div class="feedback" id="gFb" role="status" aria-live="polite"></div>
     </div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">C</span><h2>Optional — AI work session record</h2></div>
+    <p>Lab A cannot prove Cursor was open. If you want a reviewer to inspect your reasoning (prompt strategy, what AI got wrong, tests, decision), save a structured session. <a href="work-session.html">Open the work session record</a>.</p>
   </section>
 <footer>Zenith Lab · AI-Assisted Software Engineering</footer>
 </div>
 <script src="course-progress.js"></script>
+<script src="evidence-kit.js"></script>
 <script>
+function fill(id, val) { const n = document.getElementById(id); if (n && val) n.value = val; }
 function paint() {
   const a = CourseProgress.desktopLabRecord("cursor");
   const b = CourseProgress.desktopLabRecord("github");
@@ -62,24 +83,65 @@ function paint() {
   const ready = CourseProgress.desktopLabReady();
   g.textContent = ready ? "Capstone labs: both done" : "Capstone labs: missing";
   g.className = "pill" + (ready ? " done" : "");
-  if (a.url) document.getElementById("cUrl").value = a.url;
-  if (a.notes) document.getElementById("cNotes").value = a.notes;
-  if (b.url) document.getElementById("gUrl").value = b.url;
-  if (b.notes) document.getElementById("gNotes").value = b.notes;
+  fill("cUrl", a.url);
+  fill("cTicket", a.fields.ticket);
+  fill("cAsk", a.fields.ask);
+  fill("cGen", a.fields.generated);
+  fill("cWrong", a.fields.aiWrong);
+  fill("cInspect", a.fields.inspected);
+  fill("cTest", a.fields.tested);
+  fill("cSurprise", a.fields.surprised);
+  fill("cShip", a.fields.shipCall);
+  fill("cMon", a.fields.monitor);
+  fill("gUrl", b.url);
+  fill("gPr", b.prUrl);
+  fill("gChanged", b.fields.changed);
+  fill("gProblem", b.fields.problem);
+  fill("gResolved", b.fields.resolved);
+  fill("gCheck", b.fields.userCheck);
 }
-function submit(tool, urlId, notesId, okId, fbId) {
-  const out = CourseProgress.completeDesktopLab(tool, {
-    url: document.getElementById(urlId).value,
-    notes: document.getElementById(notesId).value,
-    confirmed: document.getElementById(okId).checked,
+function val(id) { return document.getElementById(id).value; }
+document.getElementById("btnCursor").onclick = function () {
+  const out = CourseProgress.completeDesktopLab("cursor", {
+    url: val("cUrl"),
+    confirmed: document.getElementById("cOk").checked,
+    fields: {
+      ticket: val("cTicket"), ask: val("cAsk"), generated: val("cGen"),
+      aiWrong: val("cWrong"), inspected: val("cInspect"), tested: val("cTest"), surprised: val("cSurprise"),
+      shipCall: val("cShip"), monitor: val("cMon"),
+    },
   });
-  const fb = document.getElementById(fbId);
+  const fb = document.getElementById("cFb");
   fb.className = "feedback " + (out.ok ? "ok" : "bad");
-  fb.textContent = out.ok ? "Saved. This syncs with module progress when you are signed in." : out.error;
+  fb.textContent = out.ok ? "Saved as self-reported session evidence. This is not an audit of Cursor." : out.error;
   paint();
-}
-document.getElementById("btnCursor").onclick = function () { submit("cursor", "cUrl", "cNotes", "cOk", "cFb"); };
-document.getElementById("btnGithub").onclick = function () { submit("github", "gUrl", "gNotes", "gOk", "gFb"); };
+};
+document.getElementById("btnGithub").onclick = async function () {
+  const fb = document.getElementById("gFb");
+  fb.className = "feedback";
+  fb.textContent = "Checking GitHub…";
+  const probe = await EvidenceKit.probeGithub(val("gUrl"));
+  if (probe.hardFail) {
+    fb.className = "feedback bad";
+    fb.textContent = probe.error;
+    return;
+  }
+  const out = CourseProgress.completeDesktopLab("github", {
+    url: val("gUrl"),
+    prUrl: val("gPr"),
+    confirmed: document.getElementById("gOk").checked,
+    probe: probe,
+    fields: { changed: val("gChanged"), problem: val("gProblem"), resolved: val("gResolved"), userCheck: val("gCheck") },
+  });
+  fb.className = "feedback " + (out.ok ? "ok" : "bad");
+  if (!out.ok) { fb.textContent = out.error; paint(); return; }
+  if (probe.ok && probe.klass === "artifact") {
+    fb.textContent = "Saved. GitHub confirmed a public repo" + (probe.hasReadme ? " with a README" : "") + ". This is not a code-quality audit.";
+  } else {
+    fb.textContent = "Saved. URL shape is valid. " + (probe.error || "Contents were not independently confirmed.");
+  }
+  paint();
+};
 paint();
 </script>
 <script src="course-rail.js"></script>

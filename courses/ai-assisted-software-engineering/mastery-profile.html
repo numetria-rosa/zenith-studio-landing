@@ -13,16 +13,20 @@
   <header class="hero">
     <span class="eyebrow">Evidence</span>
     <h1 class="serif">Mastery profile</h1>
-    <p class="sub">Tiers come from passed practice tasks and completed projects. Simulations are labeled. This is not a job-readiness score.</p>
+    <p class="sub">Tiers come from passed practice tasks and completed projects. Below that is a competency profile: practiced, demonstrated, evidence, remaining gap. Simulations are labeled. This is not a job-readiness score.</p>
   </header>
+  <div id="compDetail"></div>
+  <h2 class="serif" style="margin-top:28px">Practice-task tiers</h2>
   <div id="masteryList"></div>
 <footer>Zenith Lab · AI-Assisted Software Engineering</footer>
 </div>
 <script src="course-progress.js"></script>
+<script src="evidence-kit.js"></script>
 <script src="practice-progress.js"></script>
 <script src="practice-tasks.js"></script>
 <script src="skill-map.js"></script>
 <script>
+EvidenceKit.renderCompetencyDetail("compDetail");
 SkillMap.allMasterSkillProgress().forEach(function (m) {
   const d = document.createElement("div");
   d.className = "projcard";

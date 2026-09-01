@@ -25,6 +25,14 @@
         <li>Handle loading, empty, and failed states — not just the happy path</li>
       </ul>
     </div>
+    <div class="nowbox">
+      <div class="now-lbl">Do this now</div>
+      <p><b>What:</b> four UI states and a real click. <b>Why:</b> a demo on a fast laptop with clean data hides 404s and empty lists. <b>Do:</b> predict loading / empty / error / data, then wire the toggle. User-typed names go in with <code>textContent</code>, never <code>innerHTML</code> (that is how a name field becomes an attack — called XSS, cross-site scripting). <b>Git / Cursor:</b> not yet. <b>At work:</b> this is the XSS and empty-state review on every AI-generated list.</p>
+    </div>
+    <details class="more">
+      <summary>Already use fetch daily? Go deeper (optional)</summary>
+      <p>Still do the detective — <code>innerHTML</code> of names is the most common front-end leak in this course. Then <a href="ai-review.html">AI Review Lab</a> and JavaScript practice challenges.</p>
+    </details>
   </header>
   <section>
   <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
@@ -134,6 +142,7 @@ async function loadAppointments() {
   <section>
   <div class="kh"><span class="num">EX</span><h2>Graded exercise</h2></div>
     <p>Ticket <b>NL-006</b>, in two parts. Both are graded.</p>
+    <div class="honestnote"><b>What we actually grade.</b> We do not run <code>fetch</code> in this grader. We grade the four UI states a fetch must produce, plus a real click handler on a live DOM. That is the part AI drafts usually skip, and it is the part a receptionist actually sees.</div>
     <div class="interactive">
       <div class="ilbl">Required exercise &middot; domDataExercise &middot; part 1 of 2</div>
       <p><b>All four states.</b> Write <code>summarise(result)</code> where <code>result</code> is what the loader returns: <code>{ ok, rows }</code>, or <code>null</code> while the request is still in flight.</p>

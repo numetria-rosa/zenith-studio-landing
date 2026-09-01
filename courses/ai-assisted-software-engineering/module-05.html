@@ -25,6 +25,10 @@
         <li>Let an agent improve code only after you can defend the original</li>
       </ul>
     </div>
+    <div class="nowbox">
+      <div class="now-lbl">Do this now</div>
+      <p><b>What:</b> a list of appointments and a filter. <b>Why:</b> you cannot catch an agent that deletes cancelled rows unless you can say what the function must return. <b>Do:</b> predict empty and missing cases, write the function, prove it. <b>Git:</b> you do not need it yet. <b>Cursor:</b> not until Module 7.</p>
+    </div>
   </header>
 
   <section>
@@ -56,14 +60,13 @@ patient.phone       // undefined — the field is not there. JS does not object.
     <div class="def"><div class="k">Testable</div><p>Give it a row, check the boolean. No setup, no globals.</p></div>
     <div class="def"><div class="k">Hard to test</div><p><code>function markOpen() { globalCount = globalCount + 1; }</code> — returns nothing, changes the world.</p></div>
     <p>Use <code>===</code>. And do not write <code>if (appointment.count)</code> — a count of <code>0</code> is falsy, and that is the quiet day at the clinic.</p>
-    <details class="more">
-      <summary>filter, map, reduce — which one the ticket asked for</summary>
+    <div class="def"><div class="k">filter, map, reduce &mdash; which one the ticket asked for</div>
       <pre>rows.filter(r =&gt; r.status === "open");  // shorter list
 rows.map(r =&gt; r.patient);               // same length, new contents
 rows.reduce((n, r) =&gt; n + 1, 0);        // one number</pre>
       <p><b>filter changes the length. map changes the contents. reduce produces a single value.</b> A <code>map</code> where a <code>filter</code> belonged returns the right length full of <code>undefined</code>.</p>
       <p>None of these three modify the original array. That is a feature. <code>splice</code> is how an agent “filters” and then Priya’s cancelled rows are gone from the source list.</p>
-    </details>
+    </div>
   </section>
 
   <section>

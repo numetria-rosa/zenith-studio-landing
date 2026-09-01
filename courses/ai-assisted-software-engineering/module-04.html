@@ -25,6 +25,14 @@
         <li>Explain why a fix works, not just that it passed</li>
       </ul>
     </div>
+    <div class="nowbox">
+      <div class="now-lbl">Do this now</div>
+      <p><b>What:</b> a layout that works at 390px. <b>Why:</b> most of Priya's patients are on a phone. <b>Do:</b> box model → one flex row → one grid that reflows → one breakpoint you can defend. <b>Git / Cursor:</b> not yet. <b>Success:</b> no horizontal scroll at 390px. <b>At work:</b> this is the check a green desktop screenshot does not replace.</p>
+    </div>
+    <details class="more">
+      <summary>Already write media queries? Go deeper (optional)</summary>
+      <p>Still catch inverted queries and tiny tap targets in the detective. Then the challenge tasks in <a href="practice-css.html">CSS practice</a>. Do not skip the 390px check — that is the ticket, not a tutorial.</p>
+    </details>
   </header>
 
   <section>
@@ -107,6 +115,7 @@
       </li>
       <li><b>Stop using fixed widths for layout.</b> <code>max-width</code> is a ceiling. <code>width: 420px</code> is a promise a 375px screen cannot keep.
         <pre>main { max-width: 68ch; margin: 0 auto; padding: 0 20px; }</pre>
+        <p class="mut"><code>ch</code> is the width of a &ldquo;0&rdquo; in the current font &mdash; roughly a readable line length, not a device size. <b>Specificity</b> is how CSS decides which rule wins when two rules target the same element: more specific selectors beat less specific ones; <code>!important</code> is the agent&rsquo;s way of skipping that conversation.</p>
       </li>
       <li><b>Then one media query</b> at the width where <i>your</i> layout breaks &mdash; found by shrinking the window, not from a device list.
         <pre>@media (max-width: 640px) {

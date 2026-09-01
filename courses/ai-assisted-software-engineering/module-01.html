@@ -25,6 +25,14 @@
         <li>Write a commit message a stranger could search for in six months</li>
       </ul>
     </div>
+    <div class="nowbox">
+      <div class="now-lbl">Do this now</div>
+      <p><b>What:</b> Priya says patients arrive at a locked door. <b>Why:</b> the site still says Saturday is closed. <b>Do:</b> change only Saturday to 09:00–13:00 in the hours list below. Do not redesign anything. <b>Success:</b> you can point at the new hours on the page. <b>Next:</b> the checkpoint quiz, then Module 2.</p>
+    </div>
+    <details class="more">
+      <summary>Already ship HTML? Go deeper (optional)</summary>
+      <p>Do the one-line change anyway — the grader is training smallest-diff, not HTML trivia. Then the <a href="practice-specs.html">Specification Lab</a> rather than re-reading tags.</p>
+    </details>
   </header>
   <section>
   <div class="kh"><span class="num">00</span><h2>Why you should care</h2></div>
@@ -42,6 +50,7 @@
     <p>The fix is to change what the page says. That is it. Notice what is <i>not</i> in scope: redesigning the hours section, adding an opening-hours widget, converting the site to a framework, or "modernising the styling while I am in there". Every one of those is a real thing juniors do, and every one of them turns a two-minute ticket into a two-day review.</p>
     <div class="def"><div class="k">The question that saves you</div><p>Before touching anything, ask: <i>what is the smallest change that makes this complaint go away?</i> If your answer involves more than one file on a ticket like this, you have misunderstood the ticket.</p></div>
     <div class="honestnote"><b>Where the agent trips.</b> Give an agent this ticket and there is a good chance it returns a rewritten hours section with a new CSS class, a <code>&lt;table&gt;</code> where there was a list, and an <code>aria-label</code> it invented. All of that might be fine. None of it was asked for, and now the reviewer has to evaluate five changes instead of one. Scope creep is not a style preference; it is the main reason AI-authored changes get rejected.</div>
+    <div id="beforeAi" class="interactive"></div>
 
   </section>
   <section>
@@ -124,6 +133,27 @@
 <script>
 Northline.renderWhy('whyGrid', {"build": "The real fix for Northline Clinic's opening hours, plus the commit message that ships it.", "why": "Patients are turning up to a locked door. This is the smallest possible version of the only thing that matters: someone was affected, and you fixed it.", "aiHelps": "An agent would find and change this line instantly, and correctly.", "aiFails": "It will also cheerfully restructure the section you did not ask it to touch, and describe the diff instead of the reason in the commit message.", "without": "You type this fix yourself. You cannot judge an agent's diff until you know what a small, correct diff looks like."});
 const MK = ModuleKit.mount(1, AISEQuizData.MODULE_QUIZZES[1]);
+Northline.renderPrediction("beforeAi", {
+  label: "Think before you type \u00b7 what would you change?",
+  intro: "Priya said people are showing up to a locked door. Before you open the markup:",
+  questions: [
+    { q: "What is actually broken?",
+      opts: [
+        { t: "The Saturday hours on the page still say Closed. That is the defect.", correct: true,
+          whyOk: "The locked door is the consequence. The wrong content is the defect. Fix the content." },
+        { t: "The whole hours section needs a redesign.", why: "That is a different ticket. Today you change one value." },
+        { t: "The clinic should send a text reminder instead.", why: "Maybe later. It does not make Saturday's hours true." }
+      ] },
+    { q: "What would you ask an agent \u2014 later, not today?",
+      opts: [
+        { t: "Change only Saturday to 09:00\u201313:00. Do not restyle, do not add a widget, do not touch Sunday.", correct: true,
+          whyOk: "Small scope, stated constraints. That is the Ask step. Today you type it so you can recognise a small diff." },
+        { t: "Modernise the hours while you are in there.", why: "That is how a two-minute ticket becomes a two-day review." },
+        { t: "Just make it better.", why: "You already know what that produces: four hundred lines and a new class name." }
+      ] }
+  ],
+  learned: ["You named the defect before touching the file.", "Scope creep is the main reason AI-authored changes get rejected."]
+});
 </script>
 <script>
 document.getElementById("m1preview").onclick = function () {

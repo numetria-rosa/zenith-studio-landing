@@ -3,30 +3,47 @@
    wires the drawer. CourseUI (course-ui.js) hydrates icons, copy buttons,
    and hero metadata after the shell exists. */
 (function () {
-  const NAV = [
-    ["syllabus.html", "Syllabus"],
-    ["dashboard.html", "Dashboard"],
-    ["tickets.html", "Ticket board"],
-    ["learning-roadmap.html", "Learning Roadmap"],
-    ["mastery-profile.html", "Mastery Profile"],
-    ["diagnostic.html", "Skill Diagnostic"],
-    ["quiz-center.html", "Quiz Center"],
-    ["cheatsheets.html", "Cheat Sheets"],
-    ["practice-detective.html", "AI Code Detective"],
-    ["practice-html.html", "HTML Practice"],
-    ["practice-css.html", "CSS Practice"],
-    ["practice-js.html", "JavaScript Practice"],
-    ["practice-specs.html", "Specs Practice (sim)"],
-    ["practice-git.html", "Git Practice (sim)"],
-    ["practice-testing.html", "Testing Practice"],
-    ["practice-review.html", "Review Practice (sim)"],
-    ["practice-python.html", "Python Practice"],
-    ["practice-integrated.html", "Integrated Challenges"],
-    ["desktop-labs.html", "Desktop Labs (required)"],
-    ["projects.html", "Projects"],
-    ["portfolio.html", "My Portfolio"],
-    ["deploy-guide.html", "Deploy Guide"],
-    ["career.html", "Career Path"],
+  const NAV_GROUPS = [
+    { id: "learn", label: "Learn", items: [
+      ["dashboard.html", "Dashboard"],
+      ["syllabus.html", "Syllabus"],
+      ["tickets.html", "Ticket board"],
+      ["learning-roadmap.html", "Learning Roadmap"],
+      ["cheatsheets.html", "Cheat Sheets"],
+    ] },
+    { id: "practice", label: "Practice", items: [
+      ["quiz-center.html", "Quiz Center"],
+      ["practice-html.html", "HTML"],
+      ["practice-css.html", "CSS"],
+      ["practice-js.html", "JavaScript"],
+      ["practice-testing.html", "Testing"],
+      ["practice-python.html", "Python"],
+      ["practice-detective.html", "AI Code Detective"],
+      ["diagnostic.html", "Skill Diagnostic"],
+      ["mastery-profile.html", "Mastery Profile"],
+    ] },
+    { id: "decide", label: "Decide · simulations", items: [
+      ["practice-specs.html", "Specs Lab"],
+      ["practice-git.html", "Git Lab"],
+      ["practice-review.html", "PR Review Lab"],
+      ["practice-integrated.html", "Integrated"],
+      ["ai-review.html", "AI Review Lab"],
+      ["interview.html", "Interview"],
+      ["incident.html", "Incident"],
+      ["release-review.html", "Release review"],
+    ] },
+    { id: "build", label: "Build", items: [
+      ["desktop-labs.html", "Desktop Labs"],
+      ["work-session.html", "AI work session"],
+      ["projects.html", "Projects"],
+      ["deploy-guide.html", "Deploy Guide"],
+    ] },
+    { id: "evidence", label: "Evidence", items: [
+      ["passport.html", "Evidence Passport"],
+      ["portfolio.html", "Portfolio"],
+      ["career.html", "Career Path"],
+      ["graduation.html", "Graduation"],
+    ] },
   ];
 
   function currentFile() { return location.pathname.split("/").pop() || "syllabus.html"; }
@@ -40,9 +57,15 @@
 
   function buildRailHtml() {
     const cur = currentFile();
-    const navHtml = NAV.map(([file, label]) => {
-      const cls = cur === file ? ' class="active"' : "";
-      return `<a href="${file}"${cls}>${label}</a>`;
+    const navHtml = NAV_GROUPS.map(function (g) {
+      const open = g.items.some(function (it) { return it[0] === cur; });
+      const links = g.items.map(function (pair) {
+        const file = pair[0], label = pair[1];
+        const cls = cur === file ? ' class="active"' : "";
+        const curAttr = cur === file ? ' aria-current="page"' : "";
+        return `<a href="${file}"${cls}${curAttr}>${label}</a>`;
+      }).join("");
+      return `<details class="rail-g"${open ? " open" : ""}><summary>${g.label}</summary>${links}</details>`;
     }).join("");
     let modsHtml = "";
     let ovHtml = "";
@@ -80,8 +103,11 @@
           const inner = `<span class="rmnum">${m.id}</span><span class="rmdot rmdot-${mark.cls}" aria-hidden="true"></span>` +
             `<span class="rmtitle">${m.title}</span>${lock}`;
           let title = m.title + (t ? " · " + t.id : "");
-          if (!unlocked && m.id === cp.CAPSTONE_ID) title = "Needs Module " + (cp.CAPSTONE_ID - 1) + ", the practice bar, and both Desktop Labs";
-          else if (!unlocked) title = "Unlocks after Module " + (m.id - 1);
+          if (!unlocked && m.id === cp.CAPSTONE_ID) title = "Needs Module 12, the practice bar, and both Desktop Labs";
+          else if (!unlocked) {
+            const prev = cp.prevInSequence ? cp.prevInSequence(m.id) : null;
+            title = prev ? ("Unlocks after Module " + prev.id + " (" + prev.title + ")") : "Locked";
+          }
           if (!unlocked) modsHtml += `<span class="${cls.join(" ")}" aria-disabled="true" title="${title}">${inner}</span>`;
           else modsHtml += `<a href="${m.file}" class="${cls.join(" ")}" title="${title}">${inner}</a>`;
         });
@@ -98,12 +124,20 @@
   function closeRail() {
     document.body.classList.remove("rail-open");
     const btn = document.querySelector(".rail-toggle");
-    if (btn) btn.setAttribute("aria-expanded", "false");
+    if (btn) {
+      btn.setAttribute("aria-expanded", "false");
+      btn.setAttribute("aria-label", "Open course navigation");
+    }
   }
   function openRail() {
     document.body.classList.add("rail-open");
     const btn = document.querySelector(".rail-toggle");
-    if (btn) btn.setAttribute("aria-expanded", "true");
+    if (btn) {
+      btn.setAttribute("aria-expanded", "true");
+      btn.setAttribute("aria-label", "Close course navigation");
+    }
+    const first = document.querySelector("#course-rail a, #course-rail summary");
+    if (first) first.focus();
   }
   function toggleRail() {
     if (document.body.classList.contains("rail-open")) closeRail();
@@ -155,6 +189,21 @@
     injectToggle();
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") closeRail();
+      if (e.key !== "Tab" || !document.body.classList.contains("rail-open")) return;
+      const toggle = document.querySelector(".rail-toggle");
+      const nodes = [];
+      if (toggle) nodes.push(toggle);
+      rail.querySelectorAll("a, button, summary").forEach(function (el) { nodes.push(el); });
+      if (!nodes.length) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     });
     rail.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", closeRail);

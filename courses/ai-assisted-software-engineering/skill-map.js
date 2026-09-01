@@ -2,7 +2,8 @@
   const TOOL_LIBRARIES = {
     html: "practice-html.html", css: "practice-css.html", js: "practice-js.html",
     specs: "practice-specs.html", git: "practice-git.html", testing: "practice-testing.html",
-    review: "practice-review.html", python: "practice-python.html", integrated: "practice-integrated.html"
+    review: "practice-review.html", python: "practice-python.html", integrated: "practice-integrated.html",
+    detective: "practice-detective.html"
   };
   const TASKS = [
     { id: "html-f01", skill: "html-structure", tool: "html", level: "guided" },
@@ -205,6 +206,18 @@
     { id: "ct-13", skill: "integrated-flow", tool: "integrated", level: "challenge" },
     { id: "ct-14", skill: "integrated-flow", tool: "integrated", level: "semiguided" },
     { id: "ct-15", skill: "integrated-flow", tool: "integrated", level: "mastery" },
+    { id: "det-01", skill: "ai-failure-detection", tool: "detective", level: "guided" },
+    { id: "det-02", skill: "ai-failure-detection", tool: "detective", level: "guided" },
+    { id: "det-03", skill: "ai-failure-detection", tool: "detective", level: "semiguided" },
+    { id: "det-04", skill: "ai-failure-detection", tool: "detective", level: "semiguided" },
+    { id: "det-05", skill: "ai-failure-detection", tool: "detective", level: "challenge" },
+    { id: "det-06", skill: "ai-failure-detection", tool: "detective", level: "challenge" },
+    { id: "det-07", skill: "ai-failure-detection", tool: "detective", level: "mastery" },
+    { id: "det-08", skill: "ai-failure-detection", tool: "detective", level: "mastery" },
+    { id: "det-09", skill: "ai-failure-detection", tool: "detective", level: "challenge" },
+    { id: "det-10", skill: "ai-failure-detection", tool: "detective", level: "challenge" },
+    { id: "det-11", skill: "ai-failure-detection", tool: "detective", level: "mastery" },
+    { id: "det-12", skill: "ai-failure-detection", tool: "detective", level: "mastery" },
   ];
   const SKILL_META = {
     "html-structure": { id: "html-structure", label: "HTML structure" },
@@ -231,6 +244,7 @@
     "python-json": { id: "python-json", label: "Python and JSON" },
     "python-files": { id: "python-files", label: "Python text/files" },
     "integrated-flow": { id: "integrated-flow", label: "Integrated judgment" },
+    "ai-failure-detection": { id: "ai-failure-detection", label: "Finding defects in AI output" },
   };
   const MASTER_SKILLS = [
     { id: "m-html", label: "HTML you can write", category: "Literacy", members: ["html-structure","html-links","html-forms","html-images","html-tables"] },
@@ -239,9 +253,10 @@
     { id: "m-specs", label: "Specs for an agent", category: "Agent", members: ["specs-criteria"], simulation: true },
     { id: "m-git", label: "Git judgment", category: "Agent", members: ["git-workflow"], simulation: true },
     { id: "m-review", label: "Reviewing AI diffs", category: "Agent", members: ["review-judgment"], simulation: true },
+    { id: "m-det", label: "AI Code Detective", category: "Agent", members: ["ai-failure-detection"] },
     { id: "m-test", label: "Tests that can fail", category: "Quality", members: ["testing-assertions","testing-mutations"] },
     { id: "m-py", label: "Python scripts", category: "Scripts", members: ["python-basics","python-strings","python-json","python-files"] },
-    { id: "m-int", label: "End-to-end judgment", category: "Integration", members: ["integrated-flow"] },
+    { id: "m-int", label: "End-to-end judgment", category: "Integration", members: ["integrated-flow"], simulation: true },
     { id: "m-port", label: "Portfolio delivery", category: "Portfolio", special: "portfolio" },
   ];
   function tasksForMasterSkill(id) {

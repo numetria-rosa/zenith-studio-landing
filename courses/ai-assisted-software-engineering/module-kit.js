@@ -2,7 +2,7 @@
    checkpoint quiz, and the requirements grader.
 
    Every module page calls ModuleKit.mount(id) once. That keeps the ticket
-   framing and the loop diagram identical across 13 pages instead of
+   framing and the loop diagram identical across module pages instead of
    drifting per page, and it means the gate wiring lives in one file. */
 (function (global) {
   const esc = (s) => (global.CourseProgress ? CourseProgress.escapeHtml(s) : String(s || ""));
@@ -151,7 +151,7 @@
         if (!next) {
           btn.textContent = ok ? "Module complete" : "Finish the exercise and checkpoint";
         } else if (ok) {
-          btn.textContent = "Continue to Module " + next.id;
+          btn.textContent = "Continue to " + (next.id === 14 ? "Prompt Engineering" : ("Module " + next.id));
           btn.href = next.file;
           btn.removeAttribute("aria-disabled");
           btn.classList.remove("isdisabled");

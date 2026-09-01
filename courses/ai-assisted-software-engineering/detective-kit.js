@@ -129,7 +129,7 @@
       });
       if (clean) lines.unshift("<b>Charge sheet accepted.</b> " + (hasFix ? "Phase 2 is open." : ""));
       else lines.unshift("<b>" + (missed.length ? missed.length + " missed. " : "") + (wrongly.length ? wrongly.length + " innocent line" + (wrongly.length > 1 ? "s" : "") + " charged." : "") + "</b>");
-      fb1.className = "feedback " + (clean ? "ok" : "bad");
+      fb1.className = "feedback detfb1 " + (clean ? "ok" : "bad");
       fb1.innerHTML = lines.join("<br>");
 
       if (clean && proofBox) {
@@ -151,7 +151,7 @@
         const src = mount.querySelector(".detfix").value;
         const out = PracticeKit.gradeJs({ functionName: task.fix.functionName, testCases: task.fix.testCases || [] }, src);
         state.proof = out.passed;
-        fb2.className = "feedback " + (out.passed ? "ok" : "bad");
+        fb2.className = "feedback detfb2 " + (out.passed ? "ok" : "bad");
         fb2.innerHTML = out.results.map((r) =>
           '<span class="i ' + (r.pass ? "i-check" : "i-x") + '"></span>' +
           esc(r.pass ? r.name : r.hint)

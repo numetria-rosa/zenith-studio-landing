@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evidence Passport — AI-Assisted Software Engineering</title>
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+<div class="bar"><div class="in"><span class="logo">ZENITH<b>LAB</b></span><span class="tag">Evidence</span></div></div>
+<div class="coursenav"><div class="in"><a href="dashboard.html">&larr; Dashboard</a><a href="graduation.html">Graduation</a><a href="career.html">Career</a></div></div>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">Course-native evidence</span>
+    <h1 class="serif">Evidence Passport</h1>
+    <p class="sub">What this browser can actually prove. Not a job-readiness score. Not an audit of Cursor or of a live site's quality.</p>
+    <div class="honestnote"><b>Four classes of evidence.</b> Platform verified = graded in the course. Artifact checked = GitHub API or URL-shape checks. External, format only = a URL we could parse but not independently confirm. Self-reported = you said a desktop session happened.</div>
+  </header>
+  <section>
+    <div class="kh"><span class="num">1</span><h2>At a glance</h2></div>
+    <p class="mut">What you practiced, what you demonstrated, and what remains unverified. The score below is not job-readiness.</p>
+    <div id="buckets" class="ev-buckets"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">2</span><h2>Engineering Evidence Score</h2></div>
+    <p class="mut">Counts platform-graded labs, artifact checks, and submitted self-reports. It does not measure employment probability.</p>
+    <div id="scoreBox" class="e-score"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">3</span><h2>Evidence timeline</h2></div>
+    <div id="timeline" class="timeline"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">4</span><h2>Competency profile</h2></div>
+    <p class="mut">Practiced vs demonstrated vs remaining gap. Empty gaps are honest, not a failure grade. Open a row for where you practiced it and what to do next.</p>
+    <div id="compDetail"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">5</span><h2>Evidence log</h2></div>
+    <p class="mut">Skill, activity, result, class, what remains unverified. Progressive disclosure — open a row.</p>
+    <div id="passLog"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">6</span><h2>Artifact checks</h2></div>
+    <p class="mut">Structural checks only. Semantic quality is not verified.</p>
+    <div id="artChecks"></div>
+  </section>
+  <section>
+    <div class="kh"><span class="num">7</span><h2>What to do next</h2></div>
+    <ul class="plain">
+      <li><a href="work-session.html">AI work session record</a> — self-reported, inspectable reasoning</li>
+      <li><a href="release-review.html">Release review</a> — 10 ship decisions</li>
+      <li><a href="ai-review.html">AI Review Lab</a></li>
+      <li><a href="interview.html">Interview simulation</a></li>
+      <li><a href="incident.html">Production incident</a></li>
+    </ul>
+  </section>
+<footer>Zenith Lab · AI-Assisted Software Engineering</footer>
+</div>
+<script src="course-progress.js"></script>
+<script src="evidence-kit.js"></script>
+<script>
+(function () {
+  const esc = CourseProgress.escapeHtml;
+  const b = EvidenceKit.evidenceBuckets();
+  function lis(arr) {
+    if (!arr.length) return "<p class='mut'>None yet.</p>";
+    return "<ul class='plain'>" + arr.map(function (x) { return "<li>" + esc(typeof x === "string" ? x : (x.activity || x.label || "")) + "</li>"; }).join("") + "</ul>";
+  }
+  document.getElementById("buckets").innerHTML =
+    "<div class='ev-bucket'><h3>What I practiced</h3>" + lis(b.practiced) + "</div>" +
+    "<div class='ev-bucket'><h3>What I demonstrated</h3>" + lis(b.demonstrated) + "</div>" +
+    "<div class='ev-bucket'><h3>Platform verified</h3>" + lis(b.platform.map(function (x) { return x.activity; })) + "</div>" +
+    "<div class='ev-bucket'><h3>Artifact checked</h3>" + lis(b.artifact.map(function (x) { return x.activity; }).concat(b.external.map(function (x) { return x.activity + " (format only)"; }))) + "</div>" +
+    "<div class='ev-bucket'><h3>Self-reported</h3>" + lis(b.self.map(function (x) { return x.activity; })) + "</div>" +
+    "<div class='ev-bucket'><h3>What remains unverified</h3>" + lis(b.unverified) + "</div>";
+  const score = EvidenceKit.evidenceScore();
+  document.getElementById("scoreBox").innerHTML =
+    '<div class="e-score-pct" aria-label="Engineering Evidence Score">' + score.pct + "</div>" +
+    "<p><b>Engineering Evidence Score: " + score.pct + " / 100 of counted items.</b></p>" +
+    "<p class='mut'>" + esc(score.note) + "</p>" +
+    '<div class="klass-row">' +
+      '<span class="klass platform">Platform ' + score.platform + "/" + score.platformMax + "</span>" +
+      '<span class="klass artifact">Artifact ' + score.artifact + "/" + score.artifactMax + "</span>" +
+      '<span class="klass self">Self-reported ' + score.self + "/" + score.selfMax + "</span>" +
+    "</div>";
+  const items = EvidenceKit.timeline();
+  const tl = document.getElementById("timeline");
+  if (!items.length) {
+    tl.innerHTML = "<p class='mut'>Nothing recorded yet. Start at <a href='module-00.html'>orientation</a>.</p>";
+  } else {
+    tl.innerHTML = items.map(function (it) {
+      return '<div class="tl-item"><span class="tl-when">' + esc(it.when) + "</span><span class='tl-t'>" + esc(it.t) + "</span></div>";
+    }).join("");
+  }
+  EvidenceKit.renderCompetencyDetail("compDetail");
+  document.getElementById("passLog").innerHTML = EvidenceKit.passportItems().map(function (it) {
+    return '<details class="more"><summary>' + esc(it.skill) + " · " + esc(it.activity) + " · " + esc(EvidenceKit.CLASS_LABEL[it.klass] || it.klass) + "</summary>" +
+      "<p><b>Result:</b> " + esc(it.result) + "</p>" +
+      (it.at ? "<p><b>When:</b> " + esc(it.at) + "</p>" : "") +
+      (it.artifact ? "<p><b>Artifact:</b> " + esc(it.artifact) + "</p>" : "") +
+      "<p><b>Still unverified:</b> " + esc(it.unverified) + "</p></details>";
+  }).join("") || "<p class='mut'>No passport rows yet.</p>";
+  EvidenceKit.renderArtifactPanel("artChecks");
+})();
+</script>
+<script src="course-rail.js"></script>
+</body>
+</html>

@@ -48,6 +48,28 @@
     <div class="callout">Watch what happens if you delete steps. Skip <b>Specify</b> and you get code that does something adjacent to what you wanted. Skip <b>Inspect</b> and you have shipped a stranger's code under your name. Skip <b>Test</b> and "it works" means "it did not crash in the one case I happened to try". Skip <b>Review</b> and you cannot defend a single line of it. The loop is not bureaucracy. Each step exists because skipping it has a specific failure mode.</div>
   </section>
   <section>
+    <div class="kh"><span class="num">03b</span><h2>The loop on a real ticket</h2></div>
+    <p>Abstract lists do not stick. Here is ticket <b>NL-001</b> &mdash; the first one you will actually do &mdash; run through every step. You do not need to remember the names. You need to recognise the moves.</p>
+    <div class="ticketcard" style="margin:16px 0">
+      <div class="lbl">NL-001 · Priya, office manager</div>
+      <p><b>The hours on the site are wrong.</b> “We changed our Saturday hours three weeks ago and the website still says we're closed. People are showing up to a locked door.”</p>
+    </div>
+    <ol>
+      <li><b>Understand.</b> Patients are wasting a trip. The site says Closed on Saturday. The clinic is open 09:00–13:00. That last fact is the defect. Redesigning the hours section is not.</li>
+      <li><b>Specify.</b> Saturday’s value becomes 09:00–13:00. Weekdays and Sunday do not change. The list stays a <code>&lt;dl&gt;</code>. Done means a stranger can open the page and read the new hours.</li>
+      <li><b>Ask AI</b> (later in the course). “Change only Saturday’s hours to 09:00–13:00. Do not restyle, do not add a widget.” Small scope, stated constraints. Module 1 you type it yourself so you know what a small diff looks like.</li>
+      <li><b>Inspect.</b> Did it also rewrite the weekdays? Invent a table? Change the class name CSS depends on?</li>
+      <li><b>Run.</b> Open the page. Look at Saturday with your eyes. The agent saying “updated” is not evidence.</li>
+      <li><b>Test.</b> Later modules: a check that fails if Saturday is still Closed. Today: you look.</li>
+      <li><b>Debug.</b> If the page still says Closed, the file you edited is not the file the browser loaded. That is a real junior hour.</li>
+      <li><b>Review.</b> Would you defend this hunk out loud? One line of content is easy. Forty “while I was in there” lines are not.</li>
+      <li><b>Improve.</b> On this ticket: nothing. Scope creep is the failure mode.</li>
+      <li><b>Commit.</b> <code>Correct Saturday hours to 09:00-13:00</code> — not <code>update</code>.</li>
+      <li><b>Ship.</b> Someone other than you can see the change. Module 13 is the public URL version of this same idea.</li>
+    </ol>
+    <div class="def"><div class="k">What you just did</div><p>You received a ticket, named the actual defect, decided what AI should and should not touch, and listed how you would know it worked. That is the job. Every module drills a different step of the same loop.</p></div>
+  </section>
+  <section>
     <div class="kh"><span class="num">04</span><h2>Meet Northline Digital</h2></div>
     <p>You are not going to learn this from abstract exercises. From Module 1 you work at a small agency, and every module is a real ticket from their board.</p>
     <p class="mut" id="companyBlurb"></p>
@@ -96,6 +118,14 @@
   <section>
     <div class="kh"><span class="num">09</span><h2>Ready</h2></div>
     <p>Module 1 takes about forty-five minutes and ends with you having fixed a real ticket and written the commit message for it. You will make something today.</p>
+    <div class="nowbox">
+      <div class="now-lbl">What you do next</div>
+      <p><b>What is happening:</b> you are about to join a fake agency named Northline. <b>Why it matters:</b> every later module is a ticket, not a lecture. <b>What to do:</b> tick the box, start Module 1, change Saturday hours. <b>Success:</b> a stranger could read the new hours. You do not need Git yet. You do not need Cursor yet.</p>
+    </div>
+    <details class="more">
+      <summary>Already write code? Go deeper (optional)</summary>
+      <p>Do not skip Module 1. The graded exercise is small on purpose &mdash; it trains the smallest-diff habit the rest of the course depends on. After you pass it, jump to the <a href="practice-specs.html">Specification Lab</a> and <a href="ai-review.html">AI Review Lab</a> rather than re-reading HTML basics.</p>
+    </details>
     <div class="interactive">
       <label class="check"><input type="checkbox" id="ackHonest"> I understand that this course will not simulate a coding agent, that real agent work happens in my own editor, and that the two Desktop Labs are required before the capstone.</label>
       <button class="primary" id="btnAck" style="margin-top:14px">Start Module 1</button>

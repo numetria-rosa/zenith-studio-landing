@@ -11,7 +11,7 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "courses" / "ai-assisted-software-engineering"
-EXPECTED = 187
+EXPECTED = 212
 
 KIND_HOOKS = {
     "html": ("checks",),
@@ -23,7 +23,7 @@ KIND_HOOKS = {
     "spec": ("checks",),
     "command": ("checks",),
     "review": ("hunks",),
-    "detective": ("case",),
+    "detective": ("findings", "code"),
 }
 
 
@@ -101,17 +101,17 @@ def split_objects(array_src: str) -> list[str]:
 
 
 def parse_id(block: str) -> str | None:
-    m = re.search(r'\bid\s*:\s*"([^"]+)"', block)
+    m = re.search(r'"?id"?\s*:\s*"([^"]+)"', block)
     return m.group(1) if m else None
 
 
 def parse_kind(block: str) -> str | None:
-    m = re.search(r'\bkind\s*:\s*"([^"]+)"', block)
+    m = re.search(r'"?kind"?\s*:\s*"([^"]+)"', block)
     return m.group(1) if m else None
 
 
 def field_present(block: str, name: str) -> bool:
-    return re.search(rf"\b{re.escape(name)}\s*:", block) is not None
+    return re.search(rf'"?{re.escape(name)}"?\s*:', block) is not None
 
 
 def main() -> int:
@@ -119,7 +119,9 @@ def main() -> int:
     sm_text = (ROOT / "skill-map.js").read_text(encoding="utf-8")
     # Slice by `{ id: "` so regex literals in graders cannot confuse a
     # quote-and-brace walk. Each slice runs to the next task id.
-    id_pat = re.compile(r'\{ id: "([^"]+)"')
+    # Task objects are 2–4 spaces from the left. Nested finding ids like
+    # {"id": "f1"} sit inline and must not count as tasks.
+    id_pat = re.compile(r'^[ \t]{2,4}\{\s*"?id"?\s*:\s*"([^"]+)"', re.M)
     id_hits = list(id_pat.finditer(tasks_text))
     blocks = []
     for n, m in enumerate(id_hits):

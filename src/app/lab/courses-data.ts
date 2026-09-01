@@ -291,7 +291,7 @@ export const courses: CourseCard[] = [
     level: "Beginner, no prior coding required",
     duration: "12 weeks, self-paced",
     weeklyTime: "~8–10 hrs/week",
-    practiceTasks: 187,
+    practiceTasks: 212,
     portfolioProjects: 8,
     hasCapstone: true,
     price: "$99",
@@ -302,16 +302,18 @@ export const courses: CourseCard[] = [
       "Match a layout spec in CSS, including one responsive rule",
       "Write JavaScript functions in the browser before any coding agent",
       "Write acceptance criteria a stranger could implement",
-      "Install Cursor, change a starter repo, and submit a real GitHub commit URL",
+      "Write engineering prompts for an AI coding assistant with context, constraints, and verification",
+      "Install Cursor, change a starter repo, and record a real Desktop Lab",
       "Own a public repo with a README, at least three commits, and a PR or documented branch",
       "Write a test that fails on a planted bug",
-      "Ship a small web app with tests, a GitHub repo, and a live https URL",
+      "Ship a small web app with tests, a GitHub repo, and a live https URL that is not the repo itself",
     ],
     topics: [
       "HTML",
       "CSS",
       "JavaScript",
       "Specs",
+      "Prompt engineering",
       "Cursor",
       "GitHub",
       "Testing",
@@ -320,7 +322,7 @@ export const courses: CourseCard[] = [
     ],
     facts: [
       "AI will write most of the characters. You are paid to specify, reject, test, and ship.",
-      "In-browser spec and diff practice is a labeled simulation. It never unlocks the capstone.",
+      "In-browser Spec, Git, and PR labs are labeled simulations. They never unlock the capstone.",
       "Both Desktop Labs are required: Cursor evidence and a GitHub repo you own. Pick-one is not enough.",
       "This course does not teach RAG, tool-calling agents, or model eval — that is AI Engineering.",
     ],
@@ -329,74 +331,100 @@ export const courses: CourseCard[] = [
     practiceBreakdown: [
       { tool: "HTML", tasks: 20 },
       { tool: "CSS", tasks: 20 },
-      { tool: "JavaScript", tasks: 50 },
-      { tool: "Specs", tasks: 10 },
-      { tool: "Git", tasks: 10 },
-      { tool: "Review", tasks: 6 },
-      { tool: "AI Code Detective", tasks: 20 },
+      { tool: "JavaScript", tasks: 40 },
+      { tool: "Specs (labeled simulation)", tasks: 20 },
+      { tool: "Git (labeled simulation)", tasks: 20 },
+      { tool: "Review (labeled simulation)", tasks: 20 },
+      { tool: "AI Code Detective", tasks: 12 },
       { tool: "Testing", tasks: 20 },
       { tool: "Python", tasks: 25 },
-      { tool: "Integrated", tasks: 6 },
+      { tool: "Integrated (labeled simulation)", tasks: 15 },
     ],
     curriculum: [
       {
-        title: "What this job is",
+        title: "Orientation",
         description:
-          "The 11-step loop, a labeled bad-vs-good AI workflow, and a first tiny HTML build. Everyone still starts at Module 1.",
+          "The 11-step loop, a labeled bad-vs-good AI workflow, and an honest self-check. Everyone still starts at Module 1. Nothing here locks.",
       },
       {
-        title: "How software works + HTML",
+        title: "Your first shipped change",
         description:
-          "Ticket NL-001: semantic HTML for the clinic landing page. You write it, then catch what an agent gets subtly wrong.",
+          "Ticket NL-001: Saturday hours are wrong. Change one line, render it, write a commit message a colleague would accept.",
       },
       {
-        title: "CSS: layout, not decoration",
+        title: "Requirements: turning “make it better” into work",
         description:
-          "Ticket NL-002: box model, flexbox, one breakpoint you can defend when the page opens on a phone.",
+          "Ticket NL-002: Dan’s one-sentence brief. Stories, acceptance criteria, edges, and an explicit out-of-scope list before any agent.",
       },
       {
-        title: "JavaScript you can read",
+        title: "HTML: the structure under every page",
         description:
-          "Ticket NL-003: hours, filters, greetings — written by you, because you will be reviewing this shape forever.",
+          "Ticket NL-003: semantic HTML for the clinic landing page. You write it, then catch what an agent gets subtly wrong.",
       },
       {
-        title: "Specs and coding agents",
+        title: "CSS: layout that survives a phone",
         description:
-          "Ticket NL-004: turn a one-sentence brief into a spec. Labeled bad vs good AI examples. Desktop Lab A starts here.",
+          "Ticket NL-004: box model, flexbox, one breakpoint you can defend when the page opens on a phone.",
       },
       {
-        title: "Git and GitHub",
+        title: "JavaScript: logic you can defend",
         description:
-          "Ticket NL-005: read an AI-shaped diff. Reject secrets in logs. One reason per commit.",
+          "Ticket NL-005: hours, filters, greetings — written by you, because you will be reviewing this shape forever.",
       },
       {
-        title: "Testing and debugging",
+        title: "The DOM, events, and data that arrives late",
         description:
-          "Ticket NL-006: write the test that catches the planted booking-validation bug.",
+          "Ticket NL-006: four UI states (loading, empty, error, data) and a real click handler. We do not pretend to grade a live fetch.",
       },
       {
-        title: "Multi-file features with AI",
+        title: "Prompt Engineering for Software Engineers",
         description:
-          "Ticket NL-007: customer reports booking is broken. Spec and test the fix without regressions.",
+          "Ticket NL-014: turn vague requests into Context → Task → Constraints → Acceptance → Verify. Graded prompt labs, not ChatGPT tricks. Sits before Cursor so you can use the skill in later labs.",
       },
       {
-        title: "Python for scripts",
+        title: "AI as your pair programmer",
         description:
-          "Ticket NL-008: a JSON/Python helper for clinic data. Enough Python to kill a Monday chore. Not RAG.",
+          "Ticket NL-007: the full loop in Cursor. You bring the actual output back and we run tests against it. Desktop Lab A starts here.",
       },
       {
-        title: "Capstone: ship a real app",
+        title: "AI Code Detective",
         description:
-          "Ticket NL-010: one live Northline product — tests, a repo, a release note, and a URL someone else can open.",
+          "Ticket NL-008: plausible AI code with real defects mixed with innocent lines. Find them, then prove the fix.",
+      },
+      {
+        title: "Testing and debugging under pressure",
+        description:
+          "Ticket NL-009: write the test that catches the planted booking-validation bug. “Works on my machine” is not a defence.",
+      },
+      {
+        title: "Git, GitHub, and code review",
+        description:
+          "Ticket NL-010: branch, diff, PR. In-browser git practice is a labeled simulation. Desktop Lab B is a repo you own.",
+      },
+      {
+        title: "Refactoring, security, and maintenance",
+        description:
+          "Ticket NL-011: change the shape without changing the behaviour. Then find the leak.",
+      },
+      {
+        title: "Python for scripts and small tools",
+        description:
+          "Ticket NL-012: a JSON/Python helper for clinic data. Enough Python to kill a Monday chore. Not RAG.",
+      },
+      {
+        title: "Release: ship the application",
+        description:
+          "Ticket NL-013: one live Northline product — tests, a repo, a release note, and a URL someone else can open. A github.com repo is not that URL.",
       },
     ],
     labBadgeColor: { bg: "#60a5fa", text: "#0b1220" },
     includes: [
-      "Module 0 orientation plus nine sequential modules",
+      "Module 0 orientation plus 14 sequential modules (NL-001 through NL-014, with prompt engineering after the web tickets)",
       "Hard locks from Module 2 (quiz ≥80% and the graded exercise)",
-      "Desktop Labs for Cursor and GitHub (both required)",
+      "Capstone also needs 3+ passes in at least three of HTML / CSS / JS / Detective, plus both Desktop Labs",
+      "Desktop Labs for Cursor and GitHub (both required; Lab A URL optional)",
       "Quiz Center, diagnostic, mastery profile, learning roadmap",
-      "Projects, portfolio, deploy guide, career path with explicit gaps",
+      "Projects with separate repo and live URLs, portfolio, deploy guide, career path with explicit gaps",
     ],
   },
   {

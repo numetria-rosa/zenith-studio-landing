@@ -1,11 +1,11 @@
 /* Zenith Lab, AI-Assisted Software Engineering progress.
 
    Schema 2 (2026-08-30 rebuild). The course was restructured from 9 flat
-   modules into 5 stages / 13 modules driven by Northline Digital tickets,
-   so module 4 no longer means what it meant in schema 1. Old records are
-   deliberately NOT migrated — a schema-1 "module 4 complete" would silently
-   mark a completely different module done and hand out a gate the student
-   never earned. loadRaw() ignores any blob without schema >= 2. */
+   modules into Northline Digital tickets. Module numbers are stable ids,
+   not array positions: inserting NL-014 (id 14) between 6 and 7 must not
+   remap an existing "module 7 complete" onto a different ticket. Schema
+   stays 2 so existing v2 progress is not wiped. loadRaw() ignores any
+   blob without schema >= 2. */
 (function (global) {
   const STORAGE_KEY = "zenith_aise_progress_v2";
   const LEGACY_KEYS = ["zenith_aise_progress_v1"];
@@ -47,7 +47,7 @@
     { id: 0, label: "Stage 0", title: "Welcome to AI-assisted development", modules: [1] },
     { id: 1, label: "Stage 1", title: "Think like a software engineer", modules: [2] },
     { id: 2, label: "Stage 2", title: "Understand the web", modules: [3, 4, 5, 6] },
-    { id: 3, label: "Stage 3", title: "AI as your pair programmer", modules: [7, 8] },
+    { id: 3, label: "Stage 3", title: "AI as your pair programmer", modules: [14, 7, 8] },
     { id: 4, label: "Stage 4", title: "Engineering discipline", modules: [9, 10, 11] },
     { id: 5, label: "Stage 5", title: "Release and ship", modules: [12, 13] },
   ];
@@ -74,6 +74,9 @@
     6: { id: "NL-006", from: "Dan (Northline Digital)", title: "Load the appointments from the data file",
          quote: "Stop hard-coding the list. It should read appointments.json and still work if the file is slow or empty.",
          priority: "Medium", kind: "JavaScript", org: "Northline Digital" },
+    14: { id: "NL-014", from: "Dan (Northline Digital)", title: "Write the instruction before you open the agent",
+         quote: "The contractor asked the AI to 'make the huddle dashboard better' and it rewrote half of booking.js. Write the instruction yourself this time \u2014 I need a prompt I would actually send, not a vibe.",
+         priority: "High", kind: "Prompt", org: "Northline Digital" },
     7: { id: "NL-007", from: "Priya (Northline Clinic)", title: "A dashboard for the morning huddle",
          quote: "Three numbers on one screen: appointments today, still open, and no-shows this week. We read it out at 8am.",
          priority: "High", kind: "JavaScript", org: "Northline Clinic" },
@@ -116,6 +119,9 @@
     { id: 6, file: "module-06.html", stage: 2, title: "The DOM, events, and data that arrives late", minutes: 65,
       loop: ["run", "debug", "test"],
       teaser: "Wire logic to a real interface, then handle the file being slow, empty, or broken." },
+    { id: 14, file: "module-14.html", stage: 3, title: "Prompt Engineering for Software Engineers", minutes: 80,
+      loop: ["understand", "specify", "ask", "review"],
+      teaser: "Turn vague requests into reliable engineering instructions for AI coding assistants." },
     { id: 7, file: "module-07.html", stage: 3, title: "AI as your pair programmer", minutes: 65,
       loop: ["specify", "ask", "inspect", "run", "test", "review"],
       teaser: "The full loop, for real, in Cursor. You bring the actual output back and we run tests against it." },
@@ -196,6 +202,7 @@
     4: ["cssResponsiveExercise"],
     5: ["jsLogicExercise"],
     6: ["domDataExercise"],
+    14: ["promptLabsExercise"],
     7: ["aiWorkflowExercise"],
     8: ["detectiveExercise"],
     9: ["debugExercise"],
@@ -211,6 +218,7 @@
     cssResponsiveExercise: "Match the layout spec, including the phone breakpoint",
     jsLogicExercise: "Write the filtering logic by hand",
     domDataExercise: "Wire the UI and survive slow, empty, and malformed data",
+    promptLabsExercise: "Five prompt labs plus the Prompt Engineering Challenge",
     aiWorkflowExercise: "Run the full loop in Cursor and pass tests with the code AI produced",
     detectiveExercise: "Find the real defects, spare the innocent lines, and prove the fix",
     debugExercise: "Reproduce the reported bug, write the failing test, then fix it",
@@ -376,11 +384,12 @@
   }
   function getProject(id) {
     const extra = getExtra("project_" + id);
-    const base = { checklist: {}, rubricScores: {}, githubUrl: "", liveUrl: "", description: "", completed: false };
+    const base = { checklist: {}, rubricScores: {}, githubUrl: "", liveUrl: "", description: "", evidence: {}, completed: false };
     if (!isPlainObject(extra)) return base;
     return Object.assign({}, base, extra, {
       checklist: isPlainObject(extra.checklist) ? extra.checklist : {},
       rubricScores: isPlainObject(extra.rubricScores) ? extra.rubricScores : {},
+      evidence: isPlainObject(extra.evidence) ? extra.evidence : {},
     });
   }
   function setProject(id, patch) {
@@ -497,33 +506,94 @@
       return href;
     } catch (e) { return ""; }
   }
+  /* A live app is a public https URL someone else can open. A GitHub
+     repository is evidence of source, not of a deployed application.
+     github.io, Vercel, Netlify, and similar hosts pass. localhost does not.
+     Placeholders and this course's own host are not a shipped app. */
+  function isBlockedLiveHost(host) {
+    const h = String(host || "").toLowerCase();
+    if (h === "localhost" || h === "127.0.0.1" || h === "::1" || h.endsWith(".localhost")) return true;
+    if (h === "github.com" || h === "www.github.com" || h === "gist.github.com") return true;
+    if (h === "example.com" || h === "www.example.com" || h === "example.org" || h === "www.example.org") return true;
+    if (h === "zenith-studio.site" || h === "www.zenith-studio.site") return true;
+    if (h === "zenithstudio.com" || h === "www.zenithstudio.com") return true;
+    return false;
+  }
+  function isLiveAppUrl(url) {
+    const href = safeHttpUrl(url);
+    if (!href) return "";
+    try {
+      const u = new URL(href);
+      if (u.protocol !== "https:") return "";
+      const host = u.hostname.toLowerCase();
+      if (isBlockedLiveHost(host)) return "";
+      const path = (u.pathname || "/").replace(/\/+$/, "") || "/";
+      if (path === "/" && (host === "github.io" || host === "www.github.io")) return "";
+      return href;
+    } catch (e) { return ""; }
+  }
   function desktopLabRecord(tool) {
     const labs = getExtra("desktopLabs");
     const rec = isPlainObject(labs) && isPlainObject(labs[tool]) ? labs[tool] : {};
-    return { url: rec.url || "", notes: rec.notes || "", confirmed: !!rec.confirmed, completed: !!rec.completed, completedAt: rec.completedAt || null };
+    return {
+      url: rec.url || "",
+      notes: rec.notes || "",
+      fields: isPlainObject(rec.fields) ? rec.fields : {},
+      prUrl: rec.prUrl || "",
+      confirmed: !!rec.confirmed,
+      completed: !!rec.completed,
+      completedAt: rec.completedAt || null,
+      probe: isPlainObject(rec.probe) ? rec.probe : null,
+      evidenceClass: rec.evidenceClass || (tool === "cursor" ? "self" : "external"),
+    };
   }
   function desktopLabReady() {
     return !!(desktopLabRecord("cursor").completed && desktopLabRecord("github").completed);
   }
   function completeDesktopLab(tool, payload) {
-    const notes = String((payload && payload.notes) || "").trim();
     const confirmed = !!(payload && payload.confirmed);
     const raw = String((payload && payload.url) || "").trim();
+    const fields = isPlainObject(payload && payload.fields) ? payload.fields : {};
+    const prRaw = String((payload && payload.prUrl) || "").trim();
+    function need(key, n, label) {
+      const s = String(fields[key] || "").trim();
+      if (s.length < n) return label + " needs at least " + n + " characters. A sentence, not a shrug.";
+      return "";
+    }
     let url = "";
+    let prUrl = "";
+    let notes = "";
     if (tool === "cursor") {
-      /* Lab A is the agent session, which happens before anything is pushed, so
-         demanding a commit URL here would make it impossible to finish in the
-         order the page teaches. The link is optional; the notes carry the
-         evidence. Lab B is where a real GitHub URL is required. */
       url = raw ? safeHttpUrl(raw) : "";
       if (raw && !url) return { ok: false, error: "That link is not a URL we can open. Leave it blank if you have nothing to point at." };
+      const err = need("ticket", 24, "The ticket") || need("ask", 24, "What you asked the AI") ||
+        need("generated", 24, "What it generated") || need("aiWrong", 24, "What the AI got wrong") ||
+        need("inspected", 40, "What you inspected or changed") ||
+        need("tested", 24, "What you tested") || need("surprised", 24, "What surprised you") ||
+        need("shipCall", 24, "Your ship / no-ship call") ||
+        need("monitor", 24, "What you would monitor after shipping");
+      if (err) return { ok: false, error: err };
+      notes = ["Ticket: " + fields.ticket, "Ask: " + fields.ask, "Generated: " + fields.generated,
+        "AI got wrong: " + fields.aiWrong, "Inspected: " + fields.inspected,
+        "Tested: " + fields.tested, "Surprised: " + fields.surprised,
+        "Ship call: " + fields.shipCall, "Monitor: " + fields.monitor].join("\n\n");
     } else if (tool === "github") {
       url = isGithubRepoUrl(raw);
       if (!url) return { ok: false, error: "Need an https://github.com/owner/repo URL." };
+      if (prRaw) {
+        prUrl = isGithubEvidenceUrl(prRaw);
+        if (!prUrl) return { ok: false, error: "The commit/PR link must be an https://github.com URL, or leave it blank." };
+      }
+      const err = need("changed", 24, "What changed") || need("problem", 24, "One problem you hit") ||
+        need("resolved", 24, "How you resolved it") ||
+        need("userCheck", 24, "What you would verify before a stranger used it");
+      if (err) return { ok: false, error: err };
+      notes = ["Changed: " + fields.changed, "Problem: " + fields.problem, "Resolved: " + fields.resolved,
+        "Before a stranger: " + fields.userCheck].join("\n\n");
     } else {
       return { ok: false, error: "Unknown lab." };
     }
-    if (notes.length < 80) return { ok: false, error: "Write at least 80 characters about what you changed and how you checked it." };
+    if (notes.length < 80) return { ok: false, error: "Write at least 80 characters across the evidence fields." };
     if (!confirmed) {
       return {
         ok: false,
@@ -532,17 +602,115 @@
           : "Tick the box to confirm the repo is yours and pushed.",
       };
     }
+    const probe = isPlainObject(payload && payload.probe) ? payload.probe : null;
+    if (probe && probe.hardFail) {
+      return { ok: false, error: probe.error || "That artifact did not pass a structural check." };
+    }
+    let evidenceClass = tool === "cursor" ? "self" : "external";
+    if (tool === "github" && probe && probe.ok && probe.klass === "artifact") evidenceClass = "artifact";
+    else if (tool === "github" && probe && !probe.ok && !probe.hardFail) evidenceClass = "external";
+    else if (tool === "github" && !probe) evidenceClass = "external";
     const labs = Object.assign({}, isPlainObject(getExtra("desktopLabs")) ? getExtra("desktopLabs") : {});
-    labs[tool] = { url, notes, confirmed: true, completed: true, completedAt: new Date().toISOString() };
+    labs[tool] = { url, prUrl, notes, fields, probe: probe, evidenceClass: evidenceClass, confirmed: true, completed: true, completedAt: new Date().toISOString() };
     setExtra("desktopLabs", labs);
-    return { ok: true, labs };
+    return { ok: true, labs, evidenceClass: evidenceClass };
+  }
+  function isGithubEvidenceUrl(url) {
+    const href = safeHttpUrl(url);
+    if (!href) return "";
+    try {
+      const u = new URL(href);
+      if (u.protocol !== "https:") return "";
+      const host = u.hostname.toLowerCase();
+      if (host !== "github.com" && host !== "www.github.com") return "";
+      const parts = u.pathname.split("/").filter(Boolean);
+      if (parts.length < 2) return "";
+      return href;
+    } catch (e) { return ""; }
   }
   function capstonePracticeReady() {
     return capstonePracticeStatus().ready && desktopLabReady();
   }
+  /* Honest inventory for graduation, career, and portfolio.
+     This is a count of submitted evidence, not a job-readiness score. */
+  function evidenceSnapshot() {
+    const ov = overall();
+    const eng = isPlainObject(getExtra("engLabs")) ? getExtra("engLabs") : {};
+    const ship = isPlainObject(eng.ship) ? eng.ship : {};
+    const shipCorrect = Object.keys(ship).filter(function (k) { return ship[k] && ship[k].correct; }).length;
+    const finalA = isPlainObject(getExtra("finalAssessment")) ? getExtra("finalAssessment") : {};
+    const m0 = isPlainObject(getExtra("module0")) ? getExtra("module0") : {};
+    const projects = PROJECTS.map(function (p) {
+      const rec = getProject(p.id);
+      return {
+        id: p.id,
+        title: p.title,
+        completed: !!rec.completed,
+        githubUrl: rec.githubUrl || "",
+        liveUrl: rec.liveUrl || "",
+        isCapstone: p.modules.indexOf(CAPSTONE_ID) !== -1,
+      };
+    });
+    return {
+      orientation: !!m0.completed,
+      modules: ov,
+      html: countPassedPractice("html-"),
+      css: countPassedPractice("css-"),
+      js: countPassedPractice("js-"),
+      det: countPassedPractice("det-"),
+      practiceBar: capstonePracticeStatus(),
+      labs: {
+        cursor: desktopLabRecord("cursor").completed,
+        github: desktopLabRecord("github").completed,
+        ready: desktopLabReady(),
+      },
+      eng: {
+        spec: !!(eng.spec && eng.spec.passed),
+        git: !!(eng.git && eng.git.passed),
+        review: !!(eng.review && eng.review.passed),
+        integrated: !!(eng.integrated && eng.integrated.passed),
+        shipCorrect: shipCorrect,
+        interview: !!(eng.interview && eng.interview.passed),
+        incident: !!(eng.incident && eng.incident.passed),
+        aiReview: !!(eng.aiReview && eng.aiReview.passed),
+        releaseReview: !!(eng.releaseReview && eng.releaseReview.passed),
+        preship: !!(eng.preship && eng.preship.passed),
+      },
+      workSession: !!(isPlainObject(getExtra("workSession")) && getExtra("workSession").saved),
+      promptLabs: (function () {
+        const rec = isPlainObject(getExtra("promptLabs")) ? getExtra("promptLabs") : {};
+        const labs = isPlainObject(rec.labs) ? rec.labs : {};
+        let labPass = 0;
+        Object.keys(labs).forEach(function (k) { if (labs[k] && labs[k].passed) labPass += 1; });
+        return {
+          labPass: labPass,
+          challenge: !!(rec.challenge && rec.challenge.passed),
+          moduleComplete: isModuleComplete(14),
+        };
+      })(),
+      capstoneGates: !!(isPlainObject(getExtra("capstoneGates")) && getExtra("capstoneGates").passed),
+      projects: projects,
+      projectsCompleted: projects.filter(function (p) { return p.completed; }).length,
+      capstoneShipped: projects.some(function (p) { return p.isCapstone && p.completed; }),
+      finalPassed: !!finalA.passed,
+      courseModulesComplete: ov.completed === ov.total && ov.total > 0,
+    };
+  }
+  function prevInSequence(id) {
+    const i = MODULES.findIndex(function (m) { return m.id === id; });
+    if (i <= 0) return null;
+    return MODULES[i - 1];
+  }
+  function nextInSequence(id) {
+    const i = MODULES.findIndex(function (m) { return m.id === id; });
+    if (i < 0 || i >= MODULES.length - 1) return null;
+    return MODULES[i + 1];
+  }
   function isUnlocked(id) {
     if (id <= 1) return true;
-    if (!isModuleComplete(id - 1)) return false;
+    if (isModuleComplete(id)) return true;
+    const prev = prevInSequence(id);
+    if (prev && !isModuleComplete(prev.id)) return false;
     if (id === CAPSTONE_ID) return capstonePracticeReady();
     return true;
   }
@@ -572,24 +740,38 @@
       var m = MODULES.find(function (x) { return x.file === file; });
       if (!m || m.id <= 1) return;
       if (isUnlocked(m.id)) return;
-      if (m.id === CAPSTONE_ID) return;
-      document.body.classList.add("module-locked");
+      document.body.classList.add(m.id === CAPSTONE_ID ? "capstone-locked" : "module-locked");
       var wrap = document.querySelector(".wrap");
       if (!wrap) return;
-      var prev = MODULES.find(function (x) { return x.id === m.id - 1; });
+      var prev = prevInSequence(m.id);
       var prevTicket = prev ? ticketFor(prev.id) : null;
       var box = document.createElement("div");
       box.className = "lockedgate";
       box.setAttribute("role", "alert");
-      box.innerHTML = "<div class=\"lbl\">Module locked</div>" +
-        "<h2>Complete " + (prevTicket ? escapeHtml(prevTicket.id) : "the previous ticket") + " first</h2>" +
-        "<p>This module opens once Module " + (m.id - 1) +
-        (prev ? " (" + escapeHtml(prev.title) + ")" : "") +
-        " is complete \u2014 checkpoint quiz at 80% plus its graded exercise.</p>" +
-        "<div class=\"actions\">" +
-          "<a class=\"primary\" href=\"" + (prev ? prev.file : "dashboard.html") + "\">View previous ticket</a>" +
-          "<a href=\"dashboard.html\">Dashboard</a>" +
-        "</div>";
+      if (m.id === CAPSTONE_ID) {
+        var st = capstonePracticeStatus();
+        var labsOk = desktopLabReady();
+        box.innerHTML = "<div class=\"lbl\">Capstone locked</div>" +
+          "<h2>The practice bar and both Desktop Labs still gate this ticket</h2>" +
+          "<p>NL-013 opens after Module 12 is complete, at least three of four practice tracks have 3+ passes (HTML, CSS, JavaScript, AI Code Detective), and both Desktop Labs are recorded.</p>" +
+          "<p class=\"mut\">HTML " + st.html + "/3 &middot; CSS " + st.css + "/3 &middot; JS " + st.js + "/3 &middot; Detective " + st.det + "/3 &middot; Labs: " +
+          (labsOk ? "both submitted" : "not both submitted") + ".</p>" +
+          "<div class=\"actions\">" +
+            "<a class=\"primary\" href=\"dashboard.html\">Dashboard</a>" +
+            "<a href=\"desktop-labs.html\">Desktop Labs</a>" +
+            "<a href=\"practice-detective.html\">AI Code Detective</a>" +
+          "</div>";
+      } else {
+        box.innerHTML = "<div class=\"lbl\">Module locked</div>" +
+          "<h2>Complete " + (prevTicket ? escapeHtml(prevTicket.id) : "the previous ticket") + " first</h2>" +
+          "<p>This module opens once Module " + (prev ? prev.id : "the previous ticket") +
+          (prev ? " (" + escapeHtml(prev.title) + ")" : "") +
+          " is complete \u2014 checkpoint quiz at 80% plus its graded exercise.</p>" +
+          "<div class=\"actions\">" +
+            "<a class=\"primary\" href=\"" + (prev ? prev.file : "dashboard.html") + "\">View previous ticket</a>" +
+            "<a href=\"dashboard.html\">Dashboard</a>" +
+          "</div>";
+      }
       var header = wrap.querySelector("header");
       if (header && header.nextSibling) wrap.insertBefore(box, header.nextSibling);
       else wrap.insertBefore(box, wrap.firstChild);
@@ -612,10 +794,10 @@
     load, save, getModule, setModuleField, setAnswer, setSection, getExtra, setExtra,
     touchVisited, markComplete, isModuleComplete, isModuleDataComplete, completionRequirements,
     overall, stageOf, stageProgress, ticketFor, loopFor,
-    isUnlocked, statusOf, resetAll, resetModule,
+    isUnlocked, statusOf, prevInSequence, nextInSequence, resetAll, resetModule,
     rubricForProject, getProject, setProject,
-    countPassedPractice, capstonePracticeStatus, capstonePracticeReady,
-    desktopLabReady, desktopLabRecord, completeDesktopLab, isGithubRepoUrl,
+    countPassedPractice, capstonePracticeStatus, capstonePracticeReady, evidenceSnapshot,
+    desktopLabReady, desktopLabRecord, completeDesktopLab, isGithubRepoUrl, isLiveAppUrl, isGithubEvidenceUrl,
   };
 
   rescueLegacy();
