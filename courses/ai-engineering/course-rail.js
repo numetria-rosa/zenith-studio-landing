@@ -141,6 +141,15 @@
     if (document.querySelector(".courseshell")) return;
     ensureCss("zenith-lab.css");
     ensureCss("theme.css");
+    // Kick off course-ui.js's fetch immediately, before doing any of the
+    // (synchronous, CPU-only) rail-building work below, instead of only
+    // starting it once that work finishes — the two run in parallel, so by
+    // the time this script has downloaded and starts executing, the rail
+    // DOM it hydrates icons into already exists, but its network request
+    // didn't have to wait for that DOM-building to complete first.
+    const ui = document.createElement("script");
+    ui.src = "course-ui.js";
+    document.head.appendChild(ui);
     const skip = document.createElement("a");
     skip.className = "skip-to-content";
     skip.href = "#main-content";
@@ -171,9 +180,6 @@
     injectToggle();
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeRail(); });
     rail.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeRail); });
-    const ui = document.createElement("script");
-    ui.src = "course-ui.js";
-    document.body.appendChild(ui);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();

@@ -1728,6 +1728,30 @@ details.more[open] > summary { margin-bottom: 10px }
 }
 
 /* Course rail (desktop styles; mobile drawer lives with course-rail.js) */
+@media print {
+  .courserail, .rail-toggle, .railscrim, .skip-to-content { display: none !important; }
+}
+
+/* course-rail.js builds the whole .courseshell/.courserail structure via
+   JS, after the page's raw HTML has already parsed and painted — until
+   then this stylesheet (loaded statically, so it's already active at
+   first paint) has nothing to hold the page's own content back from the
+   full viewport width. The instant the sidebar DOM is inserted, the flex
+   layout below claims 248px for it and the content visibly narrows and
+   re-centers — a real, measurable layout shift, not a rendering fluke.
+   Reserving the identical space on <body> BEFORE .courseshell exists (and
+   only above the breakpoint where the rail is a persistent column, not an
+   off-canvas drawer) means the content is already positioned correctly
+   from the very first paint, so there's nothing left to visibly shift
+   once the real sidebar takes over that same space a moment later. */
+body:not(:has(.courseshell)) { padding-left: 248px; box-sizing: border-box }
+@media (max-width: 1024px) {
+  body:not(:has(.courseshell)) { padding-left: 220px }
+}
+@media (max-width: 860px) {
+  body:not(:has(.courseshell)) { padding-left: 0 }
+}
+
 .courseshell { display: flex; align-items: stretch; min-height: 100vh; position: relative; z-index: 1 }
 .courserail {
   width: 248px;
@@ -1739,6 +1763,13 @@ details.more[open] > summary { margin-bottom: 10px }
   top: 0;
   align-self: flex-start;
   height: 100vh;
+  /* Names the sidebar as a stable, continuous region for the browser's
+     cross-document view transition (see @view-transition above): instead
+     of crossfading it as part of the whole-page image like everything
+     else, a supporting browser holds it visually in place across the
+     navigation while only the main content area changes underneath it —
+     the actual "shell stays, content changes" feel, not a CSS mask. */
+  view-transition-name: course-sidebar;
   overflow-y: auto;
   background: var(--glass);
   backdrop-filter: blur(18px) saturate(1.25);
