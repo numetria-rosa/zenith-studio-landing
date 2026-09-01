@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { decideCourseAccess } from "@/lib/course-access";
 import { getCourse } from "@/lib/courses";
 import { hasCourseAccess } from "@/lib/entitlements";
+import { fileNameFromPath, wrapCoursePage } from "@/lib/course-rail-template";
 
 /* THE GUARD (Phase 9). Every request for course content — module pages, the
    in-course dashboard, course-progress.js, quiz-data.js, everything — comes
@@ -89,6 +90,20 @@ export async function GET(
   const ext = path.extname(resolved).toLowerCase();
   const contentType = CONTENT_TYPES[ext] ?? "application/octet-stream";
 
+  // Server-render the sidebar shell into the page itself instead of letting
+  // client JS tear down and rebuild the whole DOM on every navigation (the
+  // root cause of the old sidebar flicker). The rail's static parts — nav
+  // links, module list, which one is "active" — are fully knowable here:
+  // the URL is already resolved. Only completion/lock state (localStorage)
+  // still needs client hydration, patching classes onto elements that
+  // already exist rather than constructing them.
+  let responseBody: Buffer | string = fileBuffer;
+  if (ext === ".html") {
+    const dirName = path.basename(course.contentDir);
+    const currentFile = fileNameFromPath(resolved);
+    responseBody = wrapCoursePage(fileBuffer.toString("utf-8"), dirName, currentFile);
+  }
+
   // The shared "lab chrome" (course-progress.js, course-rail.js,
   // course-ui.js, zenith-lab.css, theme.css, datasets, images) is byte-
   // identical across every page of a course, but with no cache header at
@@ -108,7 +123,7 @@ export async function GET(
     ? "private, max-age=3600"
     : "private, max-age=0, must-revalidate";
 
-  return new NextResponse(fileBuffer as unknown as BodyInit, {
+  return new NextResponse(responseBody as unknown as BodyInit, {
     status: 200,
     headers: { "content-type": contentType, "cache-control": cacheControl },
   });
