@@ -3,9 +3,11 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { auth } from "@/lib/auth";
 import { decideCourseAccess } from "@/lib/course-access";
+import { getCachedAccess, setCachedAccess } from "@/lib/course-access-cache";
 import { getCourse } from "@/lib/courses";
 import { hasCourseAccess } from "@/lib/entitlements";
 import { fileNameFromPath, wrapCoursePage } from "@/lib/course-rail-template";
+import { SESSION_COOKIE_NAME } from "@/lib/session";
 
 /* THE GUARD (Phase 9). Every request for course content — module pages, the
    in-course dashboard, course-progress.js, quiz-data.js, everything — comes
@@ -46,9 +48,25 @@ export async function GET(
     return NextResponse.redirect(canonicalUrl, 308);
   }
 
-  const session = await auth();
-  const userId = session?.user?.id ?? null;
-  const entitled = userId ? await hasCourseAccess(userId, courseId) : false;
+  // This guard runs on every request for this course — not just each page
+  // navigation, but every asset a page pulls (course-rail.js, css, images,
+  // datasets), since they're all served through this same route. auth()
+  // and hasCourseAccess() are both DB round trips; a short-lived cache
+  // keyed by the raw session cookie avoids paying that cost on every one
+  // of a page's 8-10+ chrome requests. See course-access-cache.ts for the
+  // staleness tradeoff (20s).
+  const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const cached = sessionToken ? getCachedAccess(sessionToken, courseId) : null;
+  let userId: string | null;
+  let entitled: boolean;
+  if (cached) {
+    ({ userId, entitled } = cached);
+  } else {
+    const session = await auth();
+    userId = session?.user?.id ?? null;
+    entitled = userId ? await hasCourseAccess(userId, courseId) : false;
+    if (sessionToken) setCachedAccess(sessionToken, courseId, userId, entitled);
+  }
   const decision = decideCourseAccess({
     coursePublished: true,
     userId,

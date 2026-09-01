@@ -9,7 +9,7 @@ import { db } from "@/lib/db";
    database-session throughout for the Resend magic-link provider). Cookie
    name/flags mirror @auth/core/lib/utils/cookie.js defaultCookies() exactly,
    so auth() reads these sessions identically to ones NextAuth creates itself. */
-const SESSION_COOKIE_NAME =
+export const SESSION_COOKIE_NAME =
   process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token";
 const SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days, Auth.js's default
 
