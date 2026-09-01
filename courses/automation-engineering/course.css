@@ -1,5 +1,6 @@
-@import url("zenith-lab.css");
-@import url("theme.css");
+/* zenith-lab.css and theme.css are loaded via real <link> tags in each
+   page's <head> (not an @import here), so a page doesn't have to wait for
+   this file to load before the browser even starts fetching them. */
 
 /* Automation-specific widgets. Shared chrome lives in zenith-lab.css. */
 .wf-canvas { display: grid; gap: 10px; margin-top: 12px }

@@ -136,7 +136,15 @@
   }
 
   function fileName() {
-    return (location.pathname.split("/").pop() || "").split("?")[0];
+    // Production serves every course page through a guarded route that
+    // permanently redirects "/foo.html" to the clean "/foo" (see
+    // src/app/courses/[courseId]/[...path]/route.ts), so location.pathname
+    // never carries ".html" there, only in local/static testing. MODULES
+    // entries are keyed WITH ".html", so without this normalization
+    // currentModule() always returns null in production and the hero
+    // meta chips, ticket badge, and scroll context bar never render.
+    const last = (location.pathname.split("/").pop() || "").split("?")[0];
+    return last && last.indexOf(".") === -1 ? last + ".html" : last;
   }
 
   function currentModule() {
