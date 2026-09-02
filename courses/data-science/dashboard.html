@@ -319,25 +319,26 @@ async function renderWelcome() {
   } catch (e) {
     return;
   }
-  const name = (me && me.name) || (me && me.email) || "there";
-  const initial = name.trim().charAt(0).toUpperCase() || "?";
-  document.getElementById("wcAvatar").textContent = initial;
-
-  const ov = CourseProgress.overall();
-  const passedTasks = (typeof SkillMap !== "undefined") ? SkillMap.totalTasksPassed() : 0;
-  const totalTasks = (typeof SkillMap !== "undefined") ? SkillMap.TASKS.length : 0;
-  const isFirstVisit = ov.completed === 0 && passedTasks === 0;
-
-  document.getElementById("wcTitle").textContent = isFirstVisit ? `Welcome, ${name}` : `Welcome back, ${name}`;
-  document.getElementById("wcSub").textContent = isFirstVisit
-    ? "Your account is ready. Jump in below whenever you're set."
-    : `${ov.completed} / ${ov.total} modules complete, ${passedTasks} / ${totalTasks} practice tasks passed.`;
-  showWelcomeCard();
-
   const note = document.getElementById("storageNote");
   if (note) {
         note.childNodes[0].textContent = "Signed in, your module, quiz, and practice-task progress syncs to your account and follows you to any device. ";
   }
+
+  // Show the toast once ever, the first time this account opens this
+  // course's dashboard (e.g. right after buying it) — not on every single
+  // visit until they happen to finish a module. The flag lives in
+  // CourseProgress extras, so it syncs to the server and stays "shown"
+  // across devices, same as the rest of this account's progress.
+  if (CourseProgress.getExtra("dashboardWelcomed")) return;
+  CourseProgress.setExtra("dashboardWelcomed", true);
+
+  const name = (me && me.name) || (me && me.email) || "there";
+  const initial = name.trim().charAt(0).toUpperCase() || "?";
+  document.getElementById("wcAvatar").textContent = initial;
+
+  document.getElementById("wcTitle").textContent = `Welcome, ${name}`;
+  document.getElementById("wcSub").textContent = "Your account is ready. Jump in below whenever you're set.";
+  showWelcomeCard();
 }
 
 // A floating toast, not an inline banner: shows once per page load, closes
