@@ -22,6 +22,12 @@ export type CourseCard = {
   name: string;
   category: CourseCategory;
   categoryLabel: string;
+  /** A short, punchy outcome-framed line shown above the title on the
+      marketplace card — distinct from `summary` (which explains what the
+      course covers). Written around real search intent for this topic
+      (what people actually type looking for this skill) and a genuine
+      stat/outcome from this course, never a claim the course can't back up. */
+  hook?: string;
   /** True once a real Whop checkout exists for this course (checked again live via getCourse/getCheckoutUrl at render time; this only controls display copy like "Coming soon" vs a real price). */
   available: boolean;
   level: string;
@@ -37,7 +43,7 @@ export type CourseCard = {
   discountPercent?: number;
   /** ISO timestamp the discount actually ends at. The real Whop plan price has to be
       raised back to originalPrice by hand on this date too (Whop's API has no
-      scheduled-price-change field), see scripts/update-data-science-price.mjs. The
+      scheduled-price-change field), see scripts/revert-launch-discount.mjs. The
       countdown and the displayed price both switch automatically once this passes,
       whether or not that manual step has happened yet, so do it on time. */
   discountDeadline?: string;
@@ -63,7 +69,8 @@ export const courses: CourseCard[] = [
     id: "data-science",
     name: "Data Science & Analysis",
     category: "data",
-    categoryLabel: "Data",
+    categoryLabel: "Data Analyst Track",
+    hook: "Excel, SQL, Python, and statistics in one track, so you stop learning tools in isolation and start building the portfolio a data analyst job actually asks for.",
     available: true,
     level: "Beginner, no prior coding required",
     duration: "12 weeks, self-paced",
@@ -73,7 +80,7 @@ export const courses: CourseCard[] = [
     price: "$30",
     originalPrice: "$120",
     discountPercent: 75,
-    discountDeadline: "2026-09-01T23:59:59-00:00",
+    discountDeadline: "2026-09-05T23:59:59-00:00",
     summary:
       "Spreadsheets through a full capstone analysis: clean real messy data, query it, analyze it in Python, validate it statistically, and ship a dashboard that answers an actual business question.",
     whatYoullDo: [
@@ -199,12 +206,16 @@ export const courses: CourseCard[] = [
     id: "ai-engineering",
     name: "AI Engineering",
     category: "ai",
-    categoryLabel: "AI and LLMs",
+    categoryLabel: "Build AI Agents & LLM Apps",
+    hook: "RAG, tool use, and agents, the actual engineering behind AI products, not another single-prompt chatbot demo.",
     available: true,
     level: "Basic programming logic required, no prior Python needed",
     duration: "8 weeks",
     weeklyTime: "~10 hrs/week",
-    price: "$99",
+    price: "$24.75",
+    originalPrice: "$99",
+    discountPercent: 75,
+    discountDeadline: "2026-09-05T23:59:59-00:00",
     summary:
       "The exact stack behind VoyAI and SmartRevise: prompting, retrieval, agents, tool use, structured outputs, and evaluation, applied to a real shipped product, not a toy chatbot.",
     whatYoullDo: [
@@ -286,7 +297,8 @@ export const courses: CourseCard[] = [
     id: "ai-assisted-software-engineering",
     name: "AI-Assisted Software Engineering",
     category: "ai",
-    categoryLabel: "AI and LLMs",
+    categoryLabel: "Learn to Code with AI",
+    hook: "Write real HTML, CSS, and JavaScript yourself first, then drive Cursor like an engineer who can read the diff, not someone hoping the AI got it right.",
     available: true,
     level: "Beginner, no prior coding required",
     duration: "12 weeks, self-paced",
@@ -294,7 +306,10 @@ export const courses: CourseCard[] = [
     practiceTasks: 212,
     portfolioProjects: 8,
     hasCapstone: true,
-    price: "$99",
+    price: "$24.75",
+    originalPrice: "$99",
+    discountPercent: 75,
+    discountDeadline: "2026-09-05T23:59:59-00:00",
     summary:
       "Zero to a live Northline Digital web app: write HTML, CSS, and JavaScript yourself, then specify, inspect, test, and ship with an AI coding partner. This is not AI Engineering — that course builds LLM products (RAG, tools, eval) and assumes programming logic already.",
     whatYoullDo: [
@@ -428,99 +443,11 @@ export const courses: CourseCard[] = [
     ],
   },
   {
-    id: "cybersecurity-ethical-hacking",
-    name: "Cybersecurity & Ethical Hacking",
-    category: "security",
-    categoryLabel: "Cybersecurity",
-    available: false,
-    level: "Beginner-friendly foundations, advanced cloud/AI security track after",
-    duration: "Coming soon",
-    summary:
-      "Authorized, hands-on offensive security: network and web app penetration testing against real vulnerable lab environments, then the advanced track into cloud misconfigurations and AI/LLM-specific attacks.",
-    whatYoullDo: [
-      "Run reconnaissance and enumeration against a lab target",
-      "Exploit real vulnerabilities in a deliberately vulnerable web app",
-      "Escalate privileges and move through a compromised host",
-      "Write a pentest report a client can actually act on",
-      "Break and harden cloud IAM and container configurations",
-      "Attack and defend an LLM agent against prompt injection",
-    ],
-    topics: [
-      "Penetration Testing",
-      "Network Security",
-      "Web App Security",
-      "Cloud Security",
-      "AI/LLM Security",
-      "Reporting",
-    ],
-    facts: [
-      "A pentest report nobody can act on is worth less than the engagement that produced it.",
-      "Most real breaches start with a misconfiguration, not a zero-day.",
-      "Prompt injection can hijack an AI agent's tool access, not just its output.",
-    ],
-    careerPath:
-      "A documented pentest engagement plus a cloud/AI security lab writeup, evidence that maps directly to Security+/OSCP-track roles.",
-    labBadgeColor: { bg: "#f87171", text: "#2a0a0a" },
-  },
-  {
-    id: "agentic-ai",
-    name: "AI Agents & Agentic AI",
-    category: "ai",
-    categoryLabel: "AI and LLMs",
-    available: false,
-    level: "Intermediate, comfortable with core AI/LLM fundamentals",
-    duration: "Coming soon",
-    summary:
-      "Beyond a single prompt and response: planning loops, multi-agent orchestration, memory, and the guardrails that keep an autonomous agent from running away with your production system.",
-    whatYoullDo: [
-      "Build a planning loop that reasons over multiple steps",
-      "Manage state and memory across an agent's turns",
-      "Orchestrate multiple agents that delegate to each other",
-      "Design tool schemas an agent can't misuse",
-      "Add guardrails and human-in-the-loop checkpoints",
-      "Evaluate an agentic system, not just a single response",
-    ],
-    topics: ["Agent Architectures", "Planning", "Multi-Agent Systems", "Tool Design", "Guardrails", "Evaluation"],
-    facts: [
-      "An agent loop without a hard stop condition doesn't stop on its own.",
-      "Multi-agent systems fail in ways a single-agent system never does: agents can loop, contradict each other, or delegate forever.",
-      "Giving an agent a tool is also giving it a way to misuse that tool.",
-    ],
-    careerPath:
-      "A working multi-step autonomous agent with real guardrails, tested against failure cases, not just the happy path demo.",
-    labBadgeColor: { bg: "#34d399", text: "#04231a" },
-  },
-  {
-    id: "mcp-servers",
-    name: "MCP Servers & AI Tool Integration",
-    category: "ai",
-    categoryLabel: "AI and LLMs",
-    available: false,
-    level: "Intermediate, basic programming required",
-    duration: "Coming soon",
-    summary:
-      "Build and ship real Model Context Protocol servers: the actual integration layer connecting AI agents to tools, data, and systems in production right now.",
-    whatYoullDo: [
-      "Build a real, runnable MCP server from scratch",
-      "Expose resources, tools, and prompts through the protocol",
-      "Scope tool permissions so an agent can't overreach",
-      "Connect an agent client to your own MCP server",
-      "Debug, version, and deploy an MCP server",
-    ],
-    topics: ["MCP Protocol", "Tool Integration", "API Design", "Auth & Scoping", "Deployment"],
-    facts: [
-      "MCP standardizes how an AI agent discovers and calls tools, instead of every integration inventing its own function-calling format.",
-      "A tool with over-broad permissions is the most common way an agent ends up doing something it shouldn't.",
-    ],
-    careerPath:
-      "A real MCP server solving an actual integration problem, connected to a live agent, the kind of concrete build employers are asking for right now.",
-    labBadgeColor: { bg: "#fb923c", text: "#271200" },
-  },
-  {
     id: "ai-automation",
     name: "AI Automation",
     category: "automation",
-    categoryLabel: "Automation",
+    categoryLabel: "No-Code Workflow Automation",
+    hook: "The n8n and workflow-automation judgment clients actually pay for: retries, idempotency, and AI kept on a leash, not a demo that breaks the first time an API hiccups.",
     available: true,
     level: "Beginner, no programming required",
     duration: "3–5 weeks if you also rebuild briefs in a real tool",
@@ -528,7 +455,10 @@ export const courses: CourseCard[] = [
     practiceTasks: 80,
     portfolioProjects: 8,
     hasCapstone: true,
-    price: "$149",
+    price: "$37.25",
+    originalPrice: "$149",
+    discountPercent: 75,
+    discountDeadline: "2026-09-05T23:59:59-00:00",
     summary:
       "Build client-ready workflow judgment: map a real process, survive retries and replayed events in a simulated runtime, and put AI behind a schema and a human gate. n8n is the example, not the product.",
     whatYoullDo: [
@@ -630,6 +560,95 @@ export const courses: CourseCard[] = [
       "8 client-style briefs you rebuild in a real tool and score on the Portfolio page",
       "Career Path Edition: freelance vs W-2, no job promise",
     ],
+  },
+  {
+    id: "cybersecurity-ethical-hacking",
+    name: "Cybersecurity & Ethical Hacking",
+    category: "security",
+    categoryLabel: "Cybersecurity",
+    available: false,
+    level: "Beginner-friendly foundations, advanced cloud/AI security track after",
+    duration: "Coming soon",
+    summary:
+      "Authorized, hands-on offensive security: network and web app penetration testing against real vulnerable lab environments, then the advanced track into cloud misconfigurations and AI/LLM-specific attacks.",
+    whatYoullDo: [
+      "Run reconnaissance and enumeration against a lab target",
+      "Exploit real vulnerabilities in a deliberately vulnerable web app",
+      "Escalate privileges and move through a compromised host",
+      "Write a pentest report a client can actually act on",
+      "Break and harden cloud IAM and container configurations",
+      "Attack and defend an LLM agent against prompt injection",
+    ],
+    topics: [
+      "Penetration Testing",
+      "Network Security",
+      "Web App Security",
+      "Cloud Security",
+      "AI/LLM Security",
+      "Reporting",
+    ],
+    facts: [
+      "A pentest report nobody can act on is worth less than the engagement that produced it.",
+      "Most real breaches start with a misconfiguration, not a zero-day.",
+      "Prompt injection can hijack an AI agent's tool access, not just its output.",
+    ],
+    careerPath:
+      "A documented pentest engagement plus a cloud/AI security lab writeup, evidence that maps directly to Security+/OSCP-track roles.",
+    labBadgeColor: { bg: "#f87171", text: "#2a0a0a" },
+  },
+  {
+    id: "agentic-ai",
+    name: "AI Agents & Agentic AI",
+    category: "ai",
+    categoryLabel: "AI and LLMs",
+    available: false,
+    level: "Intermediate, comfortable with core AI/LLM fundamentals",
+    duration: "Coming soon",
+    summary:
+      "Beyond a single prompt and response: planning loops, multi-agent orchestration, memory, and the guardrails that keep an autonomous agent from running away with your production system.",
+    whatYoullDo: [
+      "Build a planning loop that reasons over multiple steps",
+      "Manage state and memory across an agent's turns",
+      "Orchestrate multiple agents that delegate to each other",
+      "Design tool schemas an agent can't misuse",
+      "Add guardrails and human-in-the-loop checkpoints",
+      "Evaluate an agentic system, not just a single response",
+    ],
+    topics: ["Agent Architectures", "Planning", "Multi-Agent Systems", "Tool Design", "Guardrails", "Evaluation"],
+    facts: [
+      "An agent loop without a hard stop condition doesn't stop on its own.",
+      "Multi-agent systems fail in ways a single-agent system never does: agents can loop, contradict each other, or delegate forever.",
+      "Giving an agent a tool is also giving it a way to misuse that tool.",
+    ],
+    careerPath:
+      "A working multi-step autonomous agent with real guardrails, tested against failure cases, not just the happy path demo.",
+    labBadgeColor: { bg: "#34d399", text: "#04231a" },
+  },
+  {
+    id: "mcp-servers",
+    name: "MCP Servers & AI Tool Integration",
+    category: "ai",
+    categoryLabel: "AI and LLMs",
+    available: false,
+    level: "Intermediate, basic programming required",
+    duration: "Coming soon",
+    summary:
+      "Build and ship real Model Context Protocol servers: the actual integration layer connecting AI agents to tools, data, and systems in production right now.",
+    whatYoullDo: [
+      "Build a real, runnable MCP server from scratch",
+      "Expose resources, tools, and prompts through the protocol",
+      "Scope tool permissions so an agent can't overreach",
+      "Connect an agent client to your own MCP server",
+      "Debug, version, and deploy an MCP server",
+    ],
+    topics: ["MCP Protocol", "Tool Integration", "API Design", "Auth & Scoping", "Deployment"],
+    facts: [
+      "MCP standardizes how an AI agent discovers and calls tools, instead of every integration inventing its own function-calling format.",
+      "A tool with over-broad permissions is the most common way an agent ends up doing something it shouldn't.",
+    ],
+    careerPath:
+      "A real MCP server solving an actual integration problem, connected to a live agent, the kind of concrete build employers are asking for right now.",
+    labBadgeColor: { bg: "#fb923c", text: "#271200" },
   },
   {
     id: "web3-engineering",

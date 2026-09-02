@@ -404,7 +404,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               <a href="#work" className="hover:text-white transition-colors">Work</a>
               <a href="#services" className="hover:text-white transition-colors">Services</a>
               <a href="#systems" className="hover:text-white transition-colors">Pricing</a>
-              <Link href="/lab" className="hover:text-white transition-colors">Lab</Link>
+              <Link href="/lab" className="hover:text-white transition-colors">Courses</Link>
               <a href="#contact" className="hover:text-white transition-colors">Contact</a>
             </nav>
 
@@ -1183,7 +1183,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
             <a href="#work" className="hover:text-white/70">Work</a>
             <a href="#services" className="hover:text-white/70">Services</a>
             <a href="#systems" className="hover:text-white/70">Pricing</a>
-            <Link href="/lab" className="hover:text-white/70">Lab</Link>
+            <Link href="/lab" className="hover:text-white/70">Courses</Link>
             <a href="#contact" className="hover:text-white/70">Connect</a>
           </div>
         </div>

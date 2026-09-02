@@ -35,6 +35,10 @@ import {
   Server,
   KeyRound,
   FileText,
+  Search,
+  ArrowDownAZ,
+  Flame,
+  Zap,
 } from "lucide-react";
 import { fraunces } from "@/lib/fonts";
 import type { CourseCard, CourseCategory } from "./courses-data";
@@ -176,6 +180,31 @@ const FILTERS: { id: CourseCategory | "all"; label: string }[] = [
   { id: "blockchain", label: "Blockchain" },
 ];
 
+type SortMode = "recommended" | "price-asc" | "tasks-desc";
+const SORTS: { id: SortMode; label: string }[] = [
+  { id: "recommended", label: "Recommended" },
+  { id: "price-asc", label: "Price: low to high" },
+  { id: "tasks-desc", label: "Most hands-on practice" },
+];
+
+function parsePrice(price: string | undefined): number {
+  if (!price) return Number.POSITIVE_INFINITY;
+  const n = Number(price.replace(/[^0-9.]/g, ""));
+  return Number.isFinite(n) ? n : Number.POSITIVE_INFINITY;
+}
+
+function matchesSearch(course: CourseCard, query: string): boolean {
+  if (!query.trim()) return true;
+  const haystack = [course.name, course.categoryLabel, course.hook ?? "", course.summary, ...course.topics]
+    .join(" ")
+    .toLowerCase();
+  return query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .every((word) => haystack.includes(word));
+}
+
 export function CourseCatalog({
   courses,
   checkoutInfo,
@@ -186,13 +215,58 @@ export function CourseCatalog({
   waitlistLink: string;
 }) {
   const [filter, setFilter] = useState<CourseCategory | "all">("all");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortMode>("recommended");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  const visible = filter === "all" ? courses : courses.filter((c) => c.category === filter);
+  const filtered = courses
+    .filter((c) => filter === "all" || c.category === filter)
+    .filter((c) => matchesSearch(c, search));
+
+  // Availability is always the primary sort key — "Coming soon" courses
+  // stay at the bottom no matter what sort is chosen, since sorting a
+  // course with no price or task count to the top of "cheapest first"
+  // would be a display bug, not a feature. The chosen sort only reorders
+  // within each group; "Recommended" leaves the curated catalog order.
+  const visible = [...filtered].sort((a, b) => {
+    if (a.available !== b.available) return a.available ? -1 : 1;
+    if (sort === "price-asc") return parsePrice(a.price) - parsePrice(b.price);
+    if (sort === "tasks-desc") return (b.practiceTasks ?? -1) - (a.practiceTasks ?? -1);
+    return 0;
+  });
 
   return (
     <div>
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative flex-1 sm:max-w-xs">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" aria-hidden />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search courses, tools, topics…"
+            aria-label="Search courses"
+            className="w-full rounded-full border border-white/10 bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/35 backdrop-blur-xl transition focus:border-emerald-300/40 focus:bg-white/[0.06] focus:outline-none"
+          />
+        </div>
+        <div className="relative sm:ml-auto">
+          <ArrowDownAZ className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" aria-hidden />
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortMode)}
+            aria-label="Sort courses"
+            className="w-full appearance-none rounded-full border border-white/10 bg-white/[0.04] py-2.5 pl-10 pr-8 text-sm text-white/80 backdrop-blur-xl transition focus:border-emerald-300/40 focus:outline-none sm:w-auto"
+          >
+            {SORTS.map((s) => (
+              <option key={s.id} value={s.id} className="bg-[#0a1410] text-white">
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div
         role="tablist"
         aria-label="Filter courses by category"
@@ -216,6 +290,12 @@ export function CourseCatalog({
         ))}
       </div>
 
+      {visible.length === 0 && (
+        <div className="rounded-[24px] border border-white/10 bg-white/[0.03] px-6 py-12 text-center text-sm text-white/50">
+          No courses match &ldquo;{search}&rdquo;. Try a different tool or topic.
+        </div>
+      )}
+
       <div className="grid gap-5 lg:grid-cols-2">
         {visible.map((course) => {
           const { url, isRealCheckout } = checkoutInfo[course.id] ?? {
@@ -228,13 +308,26 @@ export function CourseCatalog({
             <div
               key={course.id}
               id={course.id}
-              className={`flex flex-col rounded-[30px] border p-7 backdrop-blur-xl transition ${
+              className={`group relative flex flex-col overflow-hidden rounded-[30px] border p-7 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 ${
                 course.available
-                  ? "border-emerald-300/30 bg-emerald-400/[0.05] shadow-[0_0_50px_rgba(52,211,153,0.08)]"
-                  : "border-white/10 bg-white/[0.04]"
+                  ? "border-emerald-300/30 bg-emerald-400/[0.05] shadow-[0_0_50px_rgba(52,211,153,0.08)] hover:border-emerald-300/50 hover:shadow-[0_20px_70px_rgba(52,211,153,0.16)]"
+                  : "border-white/10 bg-white/[0.04] hover:border-white/20"
               }`}
             >
-              <div className="flex items-center justify-between gap-4">
+              {/* Glassmorphism sheen: a soft diagonal highlight sitting above the
+                  blurred background, the layered-glass look, not just a blur. */}
+              <div
+                className="pointer-events-none absolute inset-0 rounded-[30px] opacity-60"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 30%, transparent 70%, rgba(255,255,255,0.03) 100%)",
+                }}
+                aria-hidden
+              />
+
+              <DiscountRibbon course={course} />
+
+              <div className="relative flex items-center justify-between gap-4">
                 <span className="rounded-full border border-white/12 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/55">
                   {course.categoryLabel}
                 </span>
@@ -250,8 +343,14 @@ export function CourseCatalog({
                 </div>
               </div>
 
-              <h3 className="mt-5 text-2xl font-semibold tracking-[-0.03em]">{course.name}</h3>
-              <p className="mt-3 text-sm leading-7 text-white/60">{course.summary}</p>
+              <h3 className="relative mt-5 text-2xl font-semibold tracking-[-0.03em]">{course.name}</h3>
+              {course.hook && (
+                <p className="relative mt-2 flex items-start gap-1.5 text-sm font-medium leading-6 text-emerald-100/90">
+                  <Zap className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-emerald-300" aria-hidden />
+                  {course.hook}
+                </p>
+              )}
+              <p className="relative mt-3 text-sm leading-7 text-white/60">{course.summary}</p>
 
               {/* Metadata row */}
               <div className="mt-5 flex flex-wrap gap-2">
@@ -415,6 +514,31 @@ export function CourseCatalog({
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+/** Corner ribbon on the card itself, separate from PriceRow's inline badge —
+    a launch discount should be visible scanning the grid, not just after
+    reading down to the price. Own component (not inline in the map) so its
+    own useCountdown call is hooks-rule-safe per course card. */
+function DiscountRibbon({ course }: { course: CourseCard }) {
+  const { active: deadlineActive } = useCountdown(course.discountDeadline);
+  const discountLive = Boolean(course.discountPercent) && deadlineActive;
+  if (!discountLive) return null;
+
+  // A ribbon needs its own small clipped box, not the card's overflow-
+  // hidden — relying on the card's rounded corner to clip a diagonal strip
+  // whose offset was tuned by eye clipped nearly the whole thing, leaving
+  // only a sliver visible. This is the standard corner-ribbon recipe: a
+  // fixed square window at the corner, with the rotated strip positioned
+  // and sized so its full diagonal actually falls inside that window.
+  return (
+    <div className="absolute right-0 top-0 z-10 h-20 w-20 overflow-hidden">
+      <div className="absolute right-[-32px] top-[16px] flex w-[130px] items-center justify-center gap-1 rotate-45 bg-gradient-to-r from-amber-400 to-orange-400 py-1 text-[10px] font-bold uppercase tracking-[0.06em] text-amber-950 shadow-[0_2px_12px_rgba(251,191,36,0.5)]">
+        <Flame className="h-2.5 w-2.5" aria-hidden />
+        {course.discountPercent}% off
       </div>
     </div>
   );
