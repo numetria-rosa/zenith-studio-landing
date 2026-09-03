@@ -1,40 +1,19 @@
-"use client";
-
-import { useState } from "react";
-import { ChevronDown, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { fraunces } from "@/lib/fonts";
 
 type Module = { title: string; description: string };
 type Stage = { label: string; title: string; moduleTitles: string[] };
 
-// Top-level, not nested inside CurriculumAccordion: a component defined
-// inside another component's body gets a new function identity every
-// render, so React treats it as a different component type each time and
-// remounts the whole subtree instead of just re-rendering it — which is
-// exactly what silently broke the expand/collapse toggle here the first
-// time around (state changed, but the just-remounted button read as
-// closed again). Open state stays lifted in the parent and passed down.
-function ModuleRow({
-  index,
-  mod,
-  minutes,
-  open,
-  onToggle,
-}: {
-  index: number;
-  mod: Module;
-  minutes?: number;
-  open: boolean;
-  onToggle: () => void;
-}) {
+// Was an accordion (title only, description hidden behind a click) — a
+// prospective buyer skimming this page has no other way to judge how much
+// is actually in the course, so hiding the one thing that proves it was
+// working against the point of the page. Everything renders open, always;
+// no client JS needed for a static list, so this is a plain server
+// component now, not "use client".
+function ModuleRow({ index, mod, minutes }: { index: number; mod: Module; minutes?: number }) {
   return (
-    <li className="rounded-xl border" style={{ borderColor: "var(--bd)", background: "var(--card)" }}>
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left"
-      >
+    <li className="rounded-xl border px-4 py-3.5" style={{ borderColor: "var(--bd)", background: "var(--card)" }}>
+      <div className="flex items-center gap-3">
         <span
           className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-xs font-bold"
           style={{
@@ -60,17 +39,10 @@ function ModuleRow({
             {minutes}m
           </span>
         )}
-        <ChevronDown
-          className="h-4 w-4 flex-shrink-0 transition-transform"
-          style={{ color: "var(--mut)", transform: open ? "rotate(180deg)" : undefined }}
-          aria-hidden
-        />
-      </button>
-      {open && (
-        <div className="px-4 pb-4 pl-[52px] text-sm leading-6" style={{ color: "var(--mut)" }}>
-          {mod.description}
-        </div>
-      )}
+      </div>
+      <div className="mt-2 pl-[40px] text-sm leading-6" style={{ color: "var(--mut)" }}>
+        {mod.description}
+      </div>
     </li>
   );
 }
@@ -84,8 +56,6 @@ export function CurriculumAccordion({
   stages?: Stage[];
   moduleMinutes?: Record<string, number>;
 }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
   // Number modules sequentially through the curriculum array (0 =
   // Orientation when present) rather than by the in-app module id — the
   // in-app id can jump around (AISE inserts its prompt-engineering module
@@ -96,16 +66,7 @@ export function CurriculumAccordion({
 
   function renderRow(m: Module) {
     const i = indexOf.get(m.title) ?? 0;
-    return (
-      <ModuleRow
-        key={m.title}
-        index={i}
-        mod={m}
-        minutes={moduleMinutes?.[m.title]}
-        open={openIndex === i}
-        onToggle={() => setOpenIndex(openIndex === i ? null : i)}
-      />
-    );
+    return <ModuleRow key={m.title} index={i} mod={m} minutes={moduleMinutes?.[m.title]} />;
   }
 
   if (!stages || stages.length === 0) {

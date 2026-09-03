@@ -101,6 +101,27 @@ export default async function CourseDetailsPage({
   // "automation-engineering", same mismatch route.ts already handles.
   const railData = catalogCourse ? COURSE_RAIL_DATA[path.basename(catalogCourse.contentDir)] : undefined;
 
+  // "By the numbers" — every figure here is a real count, not a marketing
+  // round number: real modules from course.stages (excludes the ungrouped
+  // Orientation entry, matching how the sidebar itself counts "N modules"),
+  // real pages from railData's own nav groups, real hours summed from the
+  // same moduleMinutes course-progress.js provides for the time badges.
+  // A prospective buyer skimming this page has no other way to tell how
+  // much is actually in here before paying — this is that signal.
+  const totalRealModules = course.stages?.reduce((n, s) => n + s.moduleTitles.length, 0) ?? 0;
+  const totalNavPages = railData ? railData.navGroups.reduce((n, g) => n + g.items.length, 0) : 0;
+  const totalMinutes = course.moduleMinutes
+    ? Object.values(course.moduleMinutes).reduce((n, m) => n + m, 0)
+    : 0;
+  const totalHours = totalMinutes > 0 ? Math.round((totalMinutes / 60) * 10) / 10 : 0;
+  const byTheNumbers: { value: string; label: string }[] = [
+    ...(totalRealModules > 0 ? [{ value: String(totalRealModules), label: "modules" }] : []),
+    ...(typeof course.practiceTasks === "number" ? [{ value: String(course.practiceTasks), label: "practice tasks" }] : []),
+    ...(typeof course.portfolioProjects === "number" ? [{ value: String(course.portfolioProjects), label: "portfolio projects" }] : []),
+    ...(totalNavPages > 0 ? [{ value: String(totalNavPages), label: "in-app pages" }] : []),
+    ...(totalHours > 0 ? [{ value: `${totalHours}h`, label: "of module content" }] : []),
+  ];
+
   // Forward whatever UTM params brought this visitor straight to a course's
   // details page (an ad can link here directly, not just to /lab) into the
   // checkout link, same as CourseCatalog.tsx does for the catalog page — see
@@ -364,6 +385,31 @@ export default async function CourseDetailsPage({
             {course.summary}
           </p>
 
+          {/* By the numbers: real, computed totals up front — a buyer
+              shouldn't have to click through every section to tell how much
+              is actually in here. */}
+          {byTheNumbers.length > 0 && (
+            <div className="mt-8 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+              {byTheNumbers.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-xl border px-3 py-3.5 text-center"
+                  style={{ borderColor: "var(--bd)", background: "var(--card)" }}
+                >
+                  <div
+                    className={`${fraunces.className} text-2xl font-bold`}
+                    style={{ fontFamily: "var(--font-course-serif), serif", color: "var(--accent)" }}
+                  >
+                    {stat.value}
+                  </div>
+                  <div className="mt-0.5 text-[11px] leading-tight" style={{ color: "var(--mut)" }}>
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Full curriculum */}
           {course.curriculum && course.curriculum.length > 0 && (
             <Section id="curriculum" eyebrow="Full curriculum" title={`${course.curriculum.length} modules, in order`}>
@@ -381,13 +427,18 @@ export default async function CourseDetailsPage({
               title={`${railData.navGroups.length} sections, ${railData.navGroups.reduce((n, g) => n + g.items.length, 0)} real pages`}
             >
               <div className="grid gap-3">
-                {railData.navGroups.map((group, i) => {
+                {railData.navGroups.map((group) => {
                   const meta = NAV_GROUP_META[group.id] ?? { icon: BookOpen, description: "" };
                   const Icon = meta.icon;
                   return (
                     <details
                       key={group.id}
-                      open={i === 0}
+                      open
+                      // All open by default, same reasoning as
+                      // CurriculumAccordion: a buyer shouldn't have to click
+                      // through 5 sections to see what's actually inside.
+                      // Still collapsible for anyone who wants to tidy the
+                      // page up once they've seen it.
                       className="group overflow-hidden rounded-2xl border transition-colors [&::-webkit-details-marker]:hidden [&_summary]:list-none"
                       style={{ borderColor: "var(--bd)", background: "var(--card)" }}
                     >
