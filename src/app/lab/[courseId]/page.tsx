@@ -337,7 +337,7 @@ export default async function CourseDetailsPage({
           {/* Full curriculum */}
           {course.curriculum && course.curriculum.length > 0 && (
             <Section id="curriculum" eyebrow="Full curriculum" title={`${course.curriculum.length} modules, in order`}>
-              <CurriculumAccordion modules={course.curriculum} />
+              <CurriculumAccordion modules={course.curriculum} stages={course.stages} moduleMinutes={course.moduleMinutes} />
             </Section>
           )}
 

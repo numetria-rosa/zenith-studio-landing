@@ -54,6 +54,14 @@ export type CourseCard = {
   careerPath: string;
   /** Real module list, in order, straight from the course's own course-progress.js MODULES array. `description` is the real module page's own "sub" copy, not invented. Only set for courses that are actually built and published — never invent a curriculum for a "Coming soon" course. */
   curriculum?: { title: string; description: string }[];
+  /** Groups curriculum entries into the same stages the real in-course
+      sidebar (course-rail.js) shows, straight from each course's own
+      course-progress.js STAGES array — never invented. "Orientation" (when
+      curriculum has it) stays ungrouped above these, same as the sidebar. */
+  stages?: { label: string; title: string; moduleTitles: string[] }[];
+  /** Real per-module minutes, straight from course-progress.js's MODULES
+      array, keyed by the exact curriculum entry title. */
+  moduleMinutes?: Record<string, number>;
   /** The LAB badge's accent color for this course. Data Science and AI Engineering pull the real color straight from their own static pages' `.logo b` badge. AI Automation uses the cyan from courses/automation-engineering/course.css. Web3 is a catalog-only choice. */
   labBadgeColor?: { bg: string; text: string };
   /** Real per-tool practice task counts, straight from each practice library's real task count (confirmed against course-progress.js/skill-map.js). Should sum to practiceTasks. */
@@ -167,6 +175,24 @@ export const courses: CourseCard[] = [
           "One real client, one real ambiguous problem, every skill from Modules 1-8 in service of answering it. No numbered steps: you decide what to clean, what to query, what to chart, and what to recommend.",
       },
     ],
+    stages: [
+      { label: "Stage 0", title: "Spreadsheets before code", moduleTitles: ["Spreadsheet & Data Literacy Foundations"] },
+      { label: "Stage 1", title: "Python foundations for data", moduleTitles: ["Python Foundations for Data", "Pandas & NumPy Fundamentals"] },
+      { label: "Stage 2", title: "Real-world data skills", moduleTitles: ["Data Cleaning & Validation", "Exploratory Data Analysis & Statistics"] },
+      { label: "Stage 3", title: "Querying and communicating", moduleTitles: ["SQL for Analysts", "Data Visualization & Storytelling", "Dashboards & Business Communication"] },
+      { label: "Stage 4", title: "Capstone", moduleTitles: ["Capstone Analysis Project"] },
+    ],
+    moduleMinutes: {
+      "Spreadsheet & Data Literacy Foundations": 40,
+      "Python Foundations for Data": 45,
+      "Pandas & NumPy Fundamentals": 50,
+      "Data Cleaning & Validation": 55,
+      "Exploratory Data Analysis & Statistics": 50,
+      "SQL for Analysts": 45,
+      "Data Visualization & Storytelling": 45,
+      "Dashboards & Business Communication": 50,
+      "Capstone Analysis Project": 120,
+    },
     labBadgeColor: { bg: "#f0b429", text: "#1a1200" },
     practiceBreakdown: [
       { tool: "Excel", tasks: 35 },
@@ -291,6 +317,22 @@ export const courses: CourseCard[] = [
           "A client brief: a support bot that must answer from a knowledge base, act on tools safely, run inside a bounded loop, and survive a flaky model API, graded against a rubric, not vibes.",
       },
     ],
+    stages: [
+      { label: "Stage 0", title: "Prompting foundations", moduleTitles: ["Prompting & Structured Outputs", "Context Windows & Token Economics"] },
+      { label: "Stage 1", title: "Retrieval and tools", moduleTitles: ["Retrieval-Augmented Generation", "Tool Use & Function Calling"] },
+      { label: "Stage 2", title: "Agents in production", moduleTitles: ["Agent Architectures & Control Flow", "Reliability for LLM Systems", "Evaluation, Testing & Observability"] },
+      { label: "Stage 3", title: "Capstone", moduleTitles: ["Capstone: A Production AI Agent"] },
+    ],
+    moduleMinutes: {
+      "Prompting & Structured Outputs": 45,
+      "Context Windows & Token Economics": 40,
+      "Retrieval-Augmented Generation": 45,
+      "Tool Use & Function Calling": 45,
+      "Agent Architectures & Control Flow": 45,
+      "Reliability for LLM Systems": 40,
+      "Evaluation, Testing & Observability": 40,
+      "Capstone: A Production AI Agent": 90,
+    },
     labBadgeColor: { bg: "#c6f432", text: "#0f1405" },
   },
   {
@@ -432,6 +474,30 @@ export const courses: CourseCard[] = [
           "Ticket NL-013: one live Northline product — tests, a repo, a release note, and a URL someone else can open. A github.com repo is not that URL.",
       },
     ],
+    stages: [
+      { label: "Stage 0", title: "Welcome to AI-assisted development", moduleTitles: ["Your first shipped change"] },
+      { label: "Stage 1", title: "Think like a software engineer", moduleTitles: ["Requirements: turning “make it better” into work"] },
+      { label: "Stage 2", title: "Understand the web", moduleTitles: ["HTML: the structure under every page", "CSS: layout that survives a phone", "JavaScript: logic you can defend", "The DOM, events, and data that arrives late"] },
+      { label: "Stage 3", title: "AI as your pair programmer", moduleTitles: ["Prompt Engineering for Software Engineers", "AI as your pair programmer", "AI Code Detective"] },
+      { label: "Stage 4", title: "Engineering discipline", moduleTitles: ["Testing and debugging under pressure", "Git, GitHub, and code review", "Refactoring, security, and maintenance"] },
+      { label: "Stage 5", title: "Release and ship", moduleTitles: ["Python for scripts and small tools", "Release: ship the application"] },
+    ],
+    moduleMinutes: {
+      "Your first shipped change": 45,
+      "Requirements: turning “make it better” into work": 70,
+      "HTML: the structure under every page": 60,
+      "CSS: layout that survives a phone": 70,
+      "JavaScript: logic you can defend": 80,
+      "The DOM, events, and data that arrives late": 65,
+      "Prompt Engineering for Software Engineers": 80,
+      "AI as your pair programmer": 65,
+      "AI Code Detective": 65,
+      "Testing and debugging under pressure": 65,
+      "Git, GitHub, and code review": 60,
+      "Refactoring, security, and maintenance": 60,
+      "Python for scripts and small tools": 60,
+      "Release: ship the application": 150,
+    },
     labBadgeColor: { bg: "#60a5fa", text: "#0b1220" },
     includes: [
       "Module 0 orientation plus 14 sequential modules (NL-001 through NL-014, with prompt engineering after the web tickets)",
@@ -536,6 +602,22 @@ export const courses: CourseCard[] = [
           "Enrich, extract, CRM, Slack. Survive two CRM failures, a replay, and a model that returns a sentence.",
       },
     ],
+    stages: [
+      { label: "Stage 0", title: "Workflow foundations", moduleTitles: ["Your First Client Workflow", "Data That Moves"] },
+      { label: "Stage 1", title: "Real integrations", moduleTitles: ["APIs, Webhooks & Auth", "When Things Fail"] },
+      { label: "Stage 2", title: "Production discipline", moduleTitles: ["Do It Once", "AI as a Step, Not a Brain", "Agents That Can't Run Away"] },
+      { label: "Stage 3", title: "Capstone", moduleTitles: ["Capstone: A Client-Ready Lead Pipeline"] },
+    ],
+    moduleMinutes: {
+      "Your First Client Workflow": 50,
+      "Data That Moves": 45,
+      "APIs, Webhooks & Auth": 50,
+      "When Things Fail": 50,
+      "Do It Once": 45,
+      "AI as a Step, Not a Brain": 50,
+      "Agents That Can't Run Away": 50,
+      "Capstone: A Client-Ready Lead Pipeline": 90,
+    },
     labBadgeColor: { bg: "#22d3ee", text: "#04272b" },
     practiceBreakdown: [
       { tool: "Workflow design", tasks: 20 },
