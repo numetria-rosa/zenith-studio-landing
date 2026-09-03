@@ -40,7 +40,7 @@ export const COURSES: Course[] = [
     slug: "ai-engineering",
     title: "AI Engineering",
     description:
-      "An 8-week accelerated program, ~10 hours a week: prompting, retrieval, agents, tool use, structured outputs, and evaluation. The exact stack behind VoyAI and SmartRevise. Basic programming logic required, no prior Python needed.",
+      "An 8-week accelerated program, ~10 hours a week: prompting, retrieval, agents, tool use, structured outputs, and evaluation, the real stack behind production AI products. Basic programming logic required, no prior Python needed.",
     thumbnail: "/lab/ai-engineering.webp",
     whopAccessPassId: "prod_CKyY55RfnSTlU",
     whopPlanId: "plan_VSU3hyAITNsNk",
