@@ -24,6 +24,7 @@ import {
 import { fraunces, courseFontVars } from "@/lib/fonts";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
 import { COURSE_RAIL_DATA } from "@/lib/course-rail-data";
+import { COURSE_PAGE_DESCRIPTIONS } from "@/lib/course-page-descriptions";
 import { courses } from "../courses-data";
 import { CurriculumAccordion } from "./CurriculumAccordion";
 
@@ -477,19 +478,27 @@ export default async function CourseDetailsPage({
                         />
                       </summary>
                       <ul
-                        className="grid gap-2 border-t px-5 py-4 pl-[74px] sm:grid-cols-2"
+                        className="grid gap-3 border-t px-5 py-4 pl-[74px] sm:grid-cols-2"
                         style={{ borderColor: "var(--bd)" }}
                       >
-                        {group.items.map(([file, label]) => (
-                          <li
-                            key={file}
-                            className="flex items-center gap-2 text-sm"
-                            style={{ color: "var(--tx)" }}
-                          >
-                            <Check className="h-3.5 w-3.5 flex-shrink-0" style={{ color: "var(--accent)" }} aria-hidden />
-                            {label}
-                          </li>
-                        ))}
+                        {group.items.map(([file, label]) => {
+                          const desc = COURSE_PAGE_DESCRIPTIONS[file];
+                          return (
+                            <li key={file} className="flex items-start gap-2">
+                              <Check className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" style={{ color: "var(--accent)" }} aria-hidden />
+                              <span>
+                                <span className="block text-sm font-medium" style={{ color: "var(--tx)" }}>
+                                  {label}
+                                </span>
+                                {desc && (
+                                  <span className="mt-0.5 block text-xs leading-snug" style={{ color: "var(--mut)" }}>
+                                    {desc}
+                                  </span>
+                                )}
+                              </span>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </details>
                   );
