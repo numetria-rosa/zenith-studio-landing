@@ -238,12 +238,12 @@ export const courses: CourseCard[] = [
     level: "Basic programming logic required, no prior Python needed",
     duration: "8 weeks",
     weeklyTime: "~10 hrs/week",
-    price: "$24.75",
-    originalPrice: "$99",
+    price: "$28.75",
+    originalPrice: "$115",
     discountPercent: 75,
     discountDeadline: "2026-09-05T23:59:59-00:00",
     summary:
-      "The exact stack behind VoyAI and SmartRevise: prompting, retrieval, agents, tool use, structured outputs, and evaluation, applied to a real shipped product, not a toy chatbot.",
+      "The real stack behind production AI products: prompting, retrieval, agents, tool use, structured outputs, and evaluation, applied to a real shipped product, not a toy chatbot.",
     whatYoullDo: [
       "Write prompts that produce reliable, structured output",
       "Ground a model on your own data with retrieval",

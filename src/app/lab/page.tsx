@@ -138,7 +138,7 @@ export default function ZenithLabPage() {
             </h1>
 
             <p className="mt-6 max-w-2xl text-lg leading-8 text-white/62">
-              Hands-on courses from the team behind VoyAI and SmartRevise. Every course
+              Hands-on courses built the way real production software gets built. Every course
               ends with a <span className="text-white/90">Career Path Edition</span>, so
               you do not just learn the skill, you know exactly where to apply it.
             </p>
