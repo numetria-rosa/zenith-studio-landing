@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
-import { Hammer, Briefcase, Rocket } from "lucide-react";
+import { Hammer, Briefcase, Rocket, Package, ArrowUpRight } from "lucide-react";
 import { GlowBackdrop } from "@/components/GlowBackdrop";
 import { fraunces } from "@/lib/fonts";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
+import { BUNDLES } from "@/lib/bundles";
 import { CourseCatalog } from "./CourseCatalog";
 import { courses } from "./courses-data";
 
@@ -108,13 +109,14 @@ export default function ZenithLabPage() {
 
             <nav className="hidden items-center gap-8 text-sm text-white/70 md:flex">
               <a href="#catalog" className="transition-colors hover:text-white">Courses</a>
+              <a href="#bundles" className="transition-colors hover:text-white">Bundles</a>
               <a href="#career-path" className="transition-colors hover:text-white">Career Path</a>
               <Link href="/" className="transition-colors hover:text-white">Studio</Link>
             </nav>
 
             <a
               href="#catalog"
-              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
+              className="hidden rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02] sm:inline-flex"
             >
               Browse courses
             </a>
@@ -174,29 +176,37 @@ export default function ZenithLabPage() {
             </dl>
           </div>
 
-          <div className="relative min-h-[520px] lg:min-h-[680px]">
+          <div className="relative lg:min-h-[680px]">
             <div className="absolute inset-x-10 top-10 h-56 rounded-full bg-teal-500/20 blur-[110px]" />
             <div className="absolute right-6 top-6 h-56 w-56 rounded-full bg-emerald-400/20 blur-[95px]" />
             <div className="absolute left-8 bottom-16 h-52 w-52 rounded-full bg-cyan-500/20 blur-[100px]" />
 
-            <div className="absolute inset-0 flex items-center justify-center -translate-y-14 lg:-translate-y-24">
+            <div className="relative flex items-center justify-center lg:absolute lg:inset-0 lg:-translate-y-24">
               <img
                 src="/lab-capsule.webp"
                 alt="Zenith Lab"
-                className="pointer-events-none select-none drop-shadow-[0_40px_120px_rgba(0,0,0,0.7)] w-[420px] lg:w-[520px]"
+                className="pointer-events-none select-none drop-shadow-[0_40px_120px_rgba(0,0,0,0.7)] w-[240px] sm:w-[320px] lg:w-[520px]"
                 style={{ animation: "zenithFloat 3.2s ease-in-out infinite" }}
               />
             </div>
 
-            <div className="absolute bottom-[30%] left-[0%] rounded-[28px] border border-white/12 bg-white/[0.04] px-4 py-4 backdrop-blur-2xl shadow-[0_0_40px_rgba(52,211,153,0.12)]">
-              <div className="text-xs uppercase tracking-[0.2em] text-white/45">Built for</div>
-              <div className="mt-2 text-sm font-medium text-white/85">No prior experience needed</div>
-            </div>
+            {/* Below lg, these two cards flow normally under the capsule
+                (display:contents at lg drops the wrapper so each card can
+                go back to being absolutely positioned over the image,
+                exactly as before — the wrapper only exists to stack them
+                on narrower screens where the absolute coordinates tuned for
+                the desktop image size would otherwise overlap each other). */}
+            <div className="relative z-10 mt-6 flex flex-col gap-3 lg:contents">
+              <div className="rounded-[28px] border border-white/12 bg-white/[0.04] px-4 py-4 backdrop-blur-2xl shadow-[0_0_40px_rgba(52,211,153,0.12)] lg:absolute lg:bottom-[30%] lg:left-[0%]">
+                <div className="text-xs uppercase tracking-[0.2em] text-white/45">Built for</div>
+                <div className="mt-2 text-sm font-medium text-white/85">No prior experience needed</div>
+              </div>
 
-            <div className="absolute right-[2%] bottom-[30%] rounded-[26px] border border-white/12 bg-white/[0.05] px-4 py-4 backdrop-blur-2xl shadow-[0_0_30px_rgba(94,234,212,0.12)]">
-              <div className="text-xs uppercase tracking-[0.2em] text-white/45">Core outcome</div>
-              <div className="mt-2 text-2xl font-semibold tracking-[-0.04em]">A real portfolio</div>
-              <div className="text-sm text-white/55">Not another certificate.</div>
+              <div className="rounded-[26px] border border-white/12 bg-white/[0.05] px-4 py-4 backdrop-blur-2xl shadow-[0_0_30px_rgba(94,234,212,0.12)] lg:absolute lg:right-[2%] lg:bottom-[30%]">
+                <div className="text-xs uppercase tracking-[0.2em] text-white/45">Core outcome</div>
+                <div className="mt-2 text-2xl font-semibold tracking-[-0.04em]">A real portfolio</div>
+                <div className="text-sm text-white/55">Not another certificate.</div>
+              </div>
             </div>
 
             <style>{`
@@ -260,6 +270,58 @@ export default function ZenithLabPage() {
             <CourseCatalog courses={courses} checkoutInfo={checkoutInfo} waitlistLink={WAITLIST_LINK} />
           </Suspense>
         </section>
+
+        {BUNDLES.length > 0 && (
+          <section id="bundles" className="mx-auto max-w-7xl border-t border-white/10 py-14">
+            <div className="mb-10 max-w-3xl">
+              <div className="text-xs uppercase tracking-[0.3em] text-emerald-200/70">Buy together, save</div>
+              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Course bundles</h2>
+              <p className="mt-4 leading-7 text-white/62">
+                Two courses, one checkout, one price, 15% off buying them separately.
+              </p>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              {BUNDLES.map((bundle) => {
+                const includedNames = bundle.courseIds.map(
+                  (id) => courses.find((c) => c.id === id)?.name ?? id
+                );
+                return (
+                  <div
+                    key={bundle.id}
+                    className="flex flex-col rounded-[28px] border border-emerald-300/25 bg-emerald-400/[0.04] p-7 backdrop-blur-xl transition hover:-translate-y-1 hover:border-emerald-300/45"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-400/15">
+                      <Package className="h-4.5 w-4.5 text-emerald-200" aria-hidden />
+                    </div>
+                    <h3 className="mt-5 text-xl font-semibold tracking-[-0.02em]">{bundle.title}</h3>
+                    <ul className="mt-3 space-y-1.5">
+                      {includedNames.map((name) => (
+                        <li key={name} className="flex items-center gap-2 text-sm text-white/70">
+                          <span className="h-1 w-1 rounded-full bg-emerald-300" aria-hidden />
+                          {name}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-4 text-sm leading-6 text-white/60">{bundle.description}</p>
+                    <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+                      <span className="text-3xl font-semibold tracking-[-0.04em]">{bundle.price}</span>
+                      <a
+                        href={bundle.checkoutUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:scale-[1.02]"
+                      >
+                        Get the bundle
+                        <ArrowUpRight className="h-4 w-4" aria-hidden />
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         <section className="mx-auto max-w-7xl border-t border-white/10 py-14 pb-24">
           <div className="overflow-hidden rounded-[38px] border border-white/10 bg-white/[0.05] p-8 backdrop-blur-2xl sm:p-12">

@@ -4,6 +4,7 @@ import type { Payment, Membership } from "@whop/sdk/resources.js";
 import { getWhopClient } from "@/lib/whop";
 import { db } from "@/lib/db";
 import { courseIdForWhopProductId } from "@/lib/courses";
+import { courseIdsForWhopBundleProductId } from "@/lib/bundles";
 import { serviceKindForWhopPlanId, getService } from "@/lib/services";
 import { generateStrongPassword, encryptPassword } from "@/lib/password";
 import { createServiceProjectWithDefaults } from "@/lib/service-projects";
@@ -70,14 +71,19 @@ type Tx = Prisma.TransactionClient;
 async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
   const productId = payment.product?.id;
   const courseId = productId ? courseIdForWhopProductId(productId) : null;
-  const serviceMatch = courseId ? null : serviceKindForWhopPlanId(payment.plan?.id);
+  // A bundle is its own Whop product (see src/lib/bundles.ts) — resolved
+  // separately from courseId since one payment against it grants MULTIPLE
+  // CourseEntitlement rows, not one.
+  const bundleCourseIds = !courseId && productId ? courseIdsForWhopBundleProductId(productId) : null;
+  const serviceMatch = courseId || bundleCourseIds ? null : serviceKindForWhopPlanId(payment.plan?.id);
   // Proposal plans are created dynamically per-approval (src/lib/
   // proposal-payments.ts), never hardcoded like courses.ts/services.ts —
   // so they can only be resolved with a DB lookup, and only need to be
-  // attempted once the two static maps above have both already missed.
-  const proposalMatch = !courseId && !serviceMatch ? await resolveProposalByWhopPlanId(payment.plan?.id) : null;
+  // attempted once the static maps above have all already missed.
+  const proposalMatch =
+    !courseId && !bundleCourseIds && !serviceMatch ? await resolveProposalByWhopPlanId(payment.plan?.id) : null;
 
-  if (!courseId && !serviceMatch && !proposalMatch) {
+  if (!courseId && !bundleCourseIds && !serviceMatch && !proposalMatch) {
     // Doc's "safely rejected/logged rather than granting random access"
     // (Phase 14) — an unrecognized product/plan must never grant anything.
     console.warn(
@@ -155,6 +161,33 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
         whopPaymentId: payment.id,
       },
     });
+    return;
+  }
+
+  if (bundleCourseIds) {
+    // One payment, one membership id, but every bundled course gets its own
+    // real CourseEntitlement row — the dashboard/access-guard code reads
+    // per-course rows and has no notion of a bundle, by design, so a bundle
+    // buyer must look identical to someone who bought each course separately.
+    for (const bundledCourseId of bundleCourseIds) {
+      await tx.courseEntitlement.upsert({
+        where: { userId_courseId: { userId: user.id, courseId: bundledCourseId } },
+        create: {
+          userId: user.id,
+          courseId: bundledCourseId,
+          status: "active",
+          source: "whop",
+          whopMembershipId: payment.membership?.id ?? null,
+          whopPaymentId: payment.id,
+        },
+        update: {
+          status: "active",
+          revokedAt: null,
+          whopMembershipId: payment.membership?.id ?? undefined,
+          whopPaymentId: payment.id,
+        },
+      });
+    }
     return;
   }
 
