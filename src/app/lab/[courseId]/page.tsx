@@ -15,6 +15,11 @@ import {
   ShoppingCart,
   Lock,
   ChevronDown,
+  BookOpen,
+  Target,
+  Scale,
+  Hammer,
+  Award,
 } from "lucide-react";
 import { fraunces, courseFontVars } from "@/lib/fonts";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
@@ -28,6 +33,18 @@ const WAITLIST_LINK =
   "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20%0A%0AWhat%20I%20want%20to%20be%20able%20to%20do%20after%20the%20course%3A%20%0A";
 
 const DEFAULT_ACCENT = { bg: "#f0b429", text: "#1a1200" };
+
+// Same 5 group ids every course's sidebar uses (course-rail-data.ts) — a
+// short, honest description of what that category of page actually is,
+// generic enough to hold across all 4 courses (checked against every
+// course's real item list, not just one).
+const NAV_GROUP_META: Record<string, { icon: typeof BookOpen; description: string }> = {
+  learn: { icon: BookOpen, description: "Course structure, reference material, and where you left off" },
+  practice: { icon: Target, description: "Extra reps, quizzes, and skill tracking" },
+  decide: { icon: Scale, description: "Judgment-call scenarios, labeled simulations" },
+  build: { icon: Hammer, description: "The real projects and labs you'll actually ship" },
+  evidence: { icon: Award, description: "Portfolio, career path, and proof you can show" },
+};
 
 function findCourse(courseId: string) {
   return courses.find((c) => c.id === courseId);
@@ -358,44 +375,74 @@ export default async function CourseDetailsPage({
               Practice/Decide/Build/Evidence), so a visitor can see the
               actual toolset before buying, not just the module list. */}
           {railData && railData.navGroups.length > 0 && (
-            <Section id="inside" eyebrow="Inside the course" title="Everything you get access to">
-              <div className="grid gap-2.5">
-                {railData.navGroups.map((group) => (
-                  <details
-                    key={group.id}
-                    className="group rounded-2xl border [&::-webkit-details-marker]:hidden [&_summary]:list-none"
-                    style={{ borderColor: "var(--bd)", background: "var(--card)" }}
-                  >
-                    <summary className="flex cursor-pointer items-center justify-between px-4 py-3.5">
-                      <span
-                        className="text-xs font-semibold uppercase tracking-[0.18em]"
-                        style={{ color: "var(--mut)", fontFamily: "var(--font-course-mono), monospace" }}
-                      >
-                        {group.label}
-                      </span>
-                      <ChevronDown
-                        className="h-4 w-4 flex-shrink-0 transition-transform group-open:rotate-180"
-                        style={{ color: "var(--mut2)" }}
-                        aria-hidden
-                      />
-                    </summary>
-                    <ul
-                      className="grid gap-2 border-t px-4 py-3.5 sm:grid-cols-2"
-                      style={{ borderColor: "var(--bd)" }}
+            <Section
+              id="inside"
+              eyebrow="Inside the course"
+              title={`${railData.navGroups.length} sections, ${railData.navGroups.reduce((n, g) => n + g.items.length, 0)} real pages`}
+            >
+              <div className="grid gap-3">
+                {railData.navGroups.map((group, i) => {
+                  const meta = NAV_GROUP_META[group.id] ?? { icon: BookOpen, description: "" };
+                  const Icon = meta.icon;
+                  return (
+                    <details
+                      key={group.id}
+                      open={i === 0}
+                      className="group overflow-hidden rounded-2xl border transition-colors [&::-webkit-details-marker]:hidden [&_summary]:list-none"
+                      style={{ borderColor: "var(--bd)", background: "var(--card)" }}
                     >
-                      {group.items.map(([file, label]) => (
-                        <li
-                          key={file}
-                          className="flex items-center gap-2 text-sm"
-                          style={{ color: "var(--tx)" }}
+                      <summary className="flex cursor-pointer items-center gap-3.5 px-5 py-4">
+                        <span
+                          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
+                          style={{ background: "color-mix(in srgb, var(--accent) 15%, transparent)" }}
                         >
-                          <Check className="h-3.5 w-3.5 flex-shrink-0" style={{ color: "var(--accent)" }} aria-hidden />
-                          {label}
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                ))}
+                          <Icon className="h-[18px] w-[18px]" style={{ color: "var(--accent)" }} aria-hidden />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="flex items-baseline gap-2.5">
+                            <span
+                              className={`${fraunces.className} text-[15px] font-semibold`}
+                              style={{ fontFamily: "var(--font-course-serif), serif" }}
+                            >
+                              {group.label}
+                            </span>
+                            <span
+                              className="text-[11px]"
+                              style={{ color: "var(--mut2)", fontFamily: "var(--font-course-mono), monospace" }}
+                            >
+                              {group.items.length} pages
+                            </span>
+                          </span>
+                          {meta.description && (
+                            <span className="mt-0.5 block truncate text-xs" style={{ color: "var(--mut)" }}>
+                              {meta.description}
+                            </span>
+                          )}
+                        </span>
+                        <ChevronDown
+                          className="h-4 w-4 flex-shrink-0 transition-transform group-open:rotate-180"
+                          style={{ color: "var(--mut2)" }}
+                          aria-hidden
+                        />
+                      </summary>
+                      <ul
+                        className="grid gap-2 border-t px-5 py-4 pl-[74px] sm:grid-cols-2"
+                        style={{ borderColor: "var(--bd)" }}
+                      >
+                        {group.items.map(([file, label]) => (
+                          <li
+                            key={file}
+                            className="flex items-center gap-2 text-sm"
+                            style={{ color: "var(--tx)" }}
+                          >
+                            <Check className="h-3.5 w-3.5 flex-shrink-0" style={{ color: "var(--accent)" }} aria-hidden />
+                            {label}
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  );
+                })}
               </div>
             </Section>
           )}
