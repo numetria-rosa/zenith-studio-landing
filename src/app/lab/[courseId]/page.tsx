@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import path from "node:path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -13,9 +14,11 @@ import {
   ArrowLeft,
   ShoppingCart,
   Lock,
+  ChevronDown,
 } from "lucide-react";
 import { fraunces, courseFontVars } from "@/lib/fonts";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
+import { COURSE_RAIL_DATA } from "@/lib/course-rail-data";
 import { courses } from "../courses-data";
 import { CurriculumAccordion } from "./CurriculumAccordion";
 
@@ -72,6 +75,15 @@ export default async function CourseDetailsPage({
     ? getCheckoutUrl(catalogCourse)
     : { url: WAITLIST_LINK, isRealCheckout: false };
 
+  // The real in-course sidebar's nav groups (LEARN/PRACTICE/DECIDE/BUILD/
+  // EVIDENCE) — reused directly from course-rail-data.ts (the same data
+  // route.ts server-renders the actual sidebar from) rather than re-typed
+  // here, so this can never drift from what's really inside the course.
+  // Keyed by content directory, not course.id — course.id is "ai-automation"
+  // in the catalog but the directory (and course-rail-data.ts's key) is
+  // "automation-engineering", same mismatch route.ts already handles.
+  const railData = catalogCourse ? COURSE_RAIL_DATA[path.basename(catalogCourse.contentDir)] : undefined;
+
   // Forward whatever UTM params brought this visitor straight to a course's
   // details page (an ad can link here directly, not just to /lab) into the
   // checkout link, same as CourseCatalog.tsx does for the catalog page — see
@@ -115,6 +127,7 @@ export default async function CourseDetailsPage({
   const navItems: { href: string; label: string }[] = [
     { href: "#overview", label: "Overview" },
     ...(course.curriculum && course.curriculum.length > 0 ? [{ href: "#curriculum", label: "Curriculum" }] : []),
+    ...(railData && railData.navGroups.length > 0 ? [{ href: "#inside", label: "Inside the course" }] : []),
     ...(course.practiceBreakdown && course.practiceBreakdown.length > 0
       ? [{ href: "#practice", label: "Practice tasks" }]
       : []),
@@ -338,6 +351,52 @@ export default async function CourseDetailsPage({
           {course.curriculum && course.curriculum.length > 0 && (
             <Section id="curriculum" eyebrow="Full curriculum" title={`${course.curriculum.length} modules, in order`}>
               <CurriculumAccordion modules={course.curriculum} stages={course.stages} moduleMinutes={course.moduleMinutes} />
+            </Section>
+          )}
+
+          {/* Inside the course: the real sidebar's own nav groups (Learn/
+              Practice/Decide/Build/Evidence), so a visitor can see the
+              actual toolset before buying, not just the module list. */}
+          {railData && railData.navGroups.length > 0 && (
+            <Section id="inside" eyebrow="Inside the course" title="Everything you get access to">
+              <div className="grid gap-2.5">
+                {railData.navGroups.map((group) => (
+                  <details
+                    key={group.id}
+                    className="group rounded-2xl border [&::-webkit-details-marker]:hidden [&_summary]:list-none"
+                    style={{ borderColor: "var(--bd)", background: "var(--card)" }}
+                  >
+                    <summary className="flex cursor-pointer items-center justify-between px-4 py-3.5">
+                      <span
+                        className="text-xs font-semibold uppercase tracking-[0.18em]"
+                        style={{ color: "var(--mut)", fontFamily: "var(--font-course-mono), monospace" }}
+                      >
+                        {group.label}
+                      </span>
+                      <ChevronDown
+                        className="h-4 w-4 flex-shrink-0 transition-transform group-open:rotate-180"
+                        style={{ color: "var(--mut2)" }}
+                        aria-hidden
+                      />
+                    </summary>
+                    <ul
+                      className="grid gap-2 border-t px-4 py-3.5 sm:grid-cols-2"
+                      style={{ borderColor: "var(--bd)" }}
+                    >
+                      {group.items.map(([file, label]) => (
+                        <li
+                          key={file}
+                          className="flex items-center gap-2 text-sm"
+                          style={{ color: "var(--tx)" }}
+                        >
+                          <Check className="h-3.5 w-3.5 flex-shrink-0" style={{ color: "var(--accent)" }} aria-hidden />
+                          {label}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ))}
+              </div>
             </Section>
           )}
 
