@@ -52,6 +52,28 @@ p+p{margin-top:14px}
 code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
 .callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
 .callout b{color:var(--amber)}
+.decision{background:var(--card2);border:1px solid var(--amber);border-radius:12px;padding:20px 22px;margin-top:20px}
+.decision .dlbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);background:rgba(255,207,77,.1);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+.decision .dsit{font-size:14.5px;color:var(--tx);margin-bottom:14px;line-height:1.7}
+.decision .dsit b{color:var(--amber)}
+.decision .dopt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;font-size:14px;background:var(--bg2);color:var(--tx);font-family:'Space Grotesk',sans-serif}
+.decision .dopt:hover{border-color:var(--bd2)}
+.decision .dopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.decision .dopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.decision .dexplain{margin-top:12px;padding:14px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd);line-height:1.7}
+.prodwarn{border:1px solid rgba(255,107,107,.35);background:rgba(255,107,107,.05);border-radius:12px;padding:20px 22px;margin-top:20px}
+.prodwarn .plbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:12px}
+.prodwarn ul{list-style:none;display:grid;gap:8px;margin-top:4px}
+.prodwarn ul li{padding-left:20px;position:relative;font-size:14px;color:var(--tx)}
+.prodwarn ul li:before{content:"✗";position:absolute;left:0;color:var(--red);font-weight:700}
+.prodwarn .prule{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,107,107,.2);font-size:13.5px;color:var(--mut)}
+.prodwarn .prule b{color:var(--red)}
+.debugcase{background:var(--card);border:1px solid var(--violet);border-radius:14px;padding:24px;margin-top:20px}
+.debugcase .glbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);background:rgba(167,139,250,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.debugcase .evidence{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:'JetBrains Mono';font-size:12.5px;color:var(--mut);white-space:pre-wrap;line-height:1.7}
+.debugcase .gquestion{font-size:14.5px;font-weight:600;margin-top:14px;margin-bottom:10px}
+.connection{background:linear-gradient(135deg,rgba(198,244,50,.06),rgba(167,139,250,.05));border:1px solid var(--bd2);border-radius:12px;padding:20px 22px;margin-top:18px}
+.connection .clbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:10px}
 .interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
 .interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
 .interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
@@ -93,8 +115,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 .orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
 .orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
+.orient h2{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h2:first-of-type{margin-top:0}
 .orient p{font-size:14.5px;color:var(--mut)}
 .orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
 .orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
@@ -162,14 +184,14 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
   <div class="orient">
     <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module assumes</h3>
+    <h2 class="serif">What this module assumes</h2>
     <p>No prior AI/ML background is assumed. If you've used a chat interface, you already have the raw material, this module is about what changes when the consumer of the output is a program instead of a person reading a screen.</p>
-    <h3 class="serif">What's new</h3>
+    <h2 class="serif">What's new</h2>
     <p>This course does not call a real hosted model API, network cost and reliability aren't the point of Module 1. Instead you'll work with realistic, representative raw model output as fixed text, exactly the kind of malformed and well-formed responses a real model produces, and build the validation logic a production system actually needs around it.</p>
-    <h3 class="serif">What's assumed</h3>
+    <h2 class="serif">What's assumed</h2>
     <div class="assume">Basic programming fundamentals: variables, functions, dictionaries, conditionals, try/except. No prior Python required, this module teaches the Python you need as you go.</div>
     <div class="assume">No prior prompting, LLM, or AI experience required.</div>
-    <h3 class="serif">How to work through it</h3>
+    <h2 class="serif">How to work through it</h2>
     <ol>
       <li>Read each section, then run the matching interactive.</li>
       <li>Answer the practice check before revealing the answer.</li>
@@ -257,6 +279,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
         <div class="ans">Response A is a repair-pass case: it's JSON with exactly one syntax defect, a trailing comma before the closing brace, that's the deterministic, mechanical fix this module's repair pass exists for, strip it and parse succeeds cleanly. Response B is not malformed JSON, it's not JSON at all, it's the model declining to answer in prose. No amount of fence-stripping or comma-stripping turns a sentence into a valid order object, there's no syntax defect to repair. That's a signal to retry (maybe with a clearer instruction or more context) or reject and surface an error, not a job for the repair pass. Treating B like A, running it through the same repair regexes, just wastes a step, the failure is content-level, not formatting-level.</div>
       </details>
     </div>
+
+    <div class="decision" id="decision1">
+      <div class="dlbl">⚖ AI Engineering Decision</div>
+      <div class="dsit">Your model returns valid JSON. However: <b>8%</b> of responses omit one optional field, <b>1%</b> contain an unexpected value outside the allowed set, and the downstream API <b>rejects unknown values outright</b>. What should happen?</div>
+      <div id="decision1opts"></div>
+      <div class="dexplain" id="decision1explain"></div>
+    </div>
   </section>
 
   <section>
@@ -328,9 +357,20 @@ def extract_structured_output(raw_text, schema):
       <li>Implement a validator in Python that never raises, even on completely non-JSON input.</li>
     </ul>
 
-    <div class="practice">
-      <div class="lbl">Looking ahead</div>
-      <p>This module treated the model's context as unlimited, one prompt, one response. Module 2 removes that assumption: every prompt has a token budget, and what you choose to cut when content doesn't fit is its own design problem.</p>
+    <div class="prodwarn">
+      <div class="plbl">⚠ What would break in production?</div>
+      <ul>
+        <li><b>Missing optional fields.</b> A validator that only checks "the required keys are present" waves through an empty string or null where a real value belongs.</li>
+        <li><b>Invalid enum values.</b> The model invents a category, status, or label that isn't in your allowed set, and a naive validator, which only checks presence and type, lets it through.</li>
+        <li><b>Silent schema drift.</b> A prompt change six months from now adds a field nobody updates the validator for, and it starts silently passing incomplete data.</li>
+        <li><b>Partial output on a long response.</b> The model gets cut off mid-JSON by a token limit, and the repair pass has nothing to strip, it's not malformed, it's incomplete.</li>
+      </ul>
+      <div class="prule"><b>Rule of thumb:</b> if a model's output will trigger a database write, a payment, a permission change, or any other external action, "the JSON parsed" is not the same claim as "the data is safe to act on."</div>
+    </div>
+
+    <div class="connection">
+      <div class="clbl">The engineering connection</div>
+      <p>You can now turn a model's raw text into data your program can trust. But this module assumed the entire response fits in the prompt with room to spare, real prompts don't have unlimited room. Module 2 removes that assumption: every prompt has a token budget, and what you choose to cut when content doesn't fit is its own engineering decision, not an afterthought.</p>
     </div>
   </section>
 
@@ -421,7 +461,7 @@ def extract_structured_output(raw_text, schema):
   <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
 </div></div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="pyodide-sandbox-runner.js"></script>
 <script>
 const MODULE_ID = 1;
@@ -464,6 +504,39 @@ SAMPLES.forEach(s => {
   });
   sampleGrid.appendChild(card);
 });
+
+/* ---------------- Section 5: AI Engineering Decision (ungraded, judgment practice) ---------------- */
+const DECISION1_OPTS = [
+  { t: "A. Trust it, since the JSON parses without error", correct: false,
+    why: "Parsing without error only tells you the SYNTAX was fine. It says nothing about the 8% missing an optional field or the 1% with a value outside your allowed set, both of which parse cleanly and still break the downstream API." },
+  { t: "B. Retry every response automatically, just in case", correct: false,
+    why: "Retrying everything wastes a model call and money on the 91% of responses that were already fine, and it doesn't even fix the problem: a retried call can produce the exact same missing field or bad enum value again, nothing about a retry guarantees a different outcome." },
+  { t: "C. Validate the schema, and explicitly handle the missing-field and invalid-value cases before the API call", correct: true,
+    why: "This is the only option that acts on what you actually know: two specific, named failure modes with measured rates. A schema validator that checks required-vs-optional correctly and checks enum membership catches both before they ever reach the downstream API, which is exactly the kind of check a service boundary needs." },
+  { t: "D. Ask the model to \"be more careful\" in the prompt", correct: false,
+    why: "A stronger instruction can lower the RATE (this module's few-shot lesson), it can't lower it to zero, and it does nothing for the two specific failure modes you've already measured. You have real data on how this model behaves; engineer around the data, don't just ask nicer." },
+];
+(function initDecision1(){
+  const el = document.getElementById("decision1opts");
+  let answered = false;
+  DECISION1_OPTS.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "dopt";
+    btn.textContent = opt.t;
+    btn.addEventListener("click", () => {
+      if (answered) return;
+      answered = true;
+      Array.from(el.children).forEach((b, j) => {
+        if (DECISION1_OPTS[j].correct) b.classList.add("correct");
+        else if (j === i) b.classList.add("incorrect");
+      });
+      const ex = document.getElementById("decision1explain");
+      ex.style.display = "block";
+      ex.textContent = (opt.correct ? "Correct. " : "Not the strongest call here. ") + opt.why;
+    });
+    el.appendChild(btn);
+  });
+})();
 
 /* ---------------- Section 6: structured output validator exercise (Python) ---------------- */
 const STRUCT_STARTER = `import json
@@ -692,6 +765,14 @@ PIPE_SAMPLES.forEach(s => {
 let score = 0;
 const answered = { q1:false, q2:false, q3:false, q4:false, q5:false };
 
+// Renders feedback as: what you'd get right, why a wrong pick is wrong, and the durable
+// engineering principle underneath the question, not just "incorrect."
+function renderQuizExplain(ex, opt, principle){
+  ex.innerHTML = opt.correct
+    ? `<b>Correct.</b> ${CourseProgress.escapeHtml(principle)}`
+    : `<b>Why this is wrong:</b> ${CourseProgress.escapeHtml(opt.reason)}<br><br><b>Engineering principle:</b> ${CourseProgress.escapeHtml(principle)}`;
+}
+
 function updateScore(){
   document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
   const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
@@ -722,8 +803,8 @@ q1Options.forEach((opt, i) => {
     });
     const ex = document.getElementById("q1explain");
     ex.style.display = "block";
-    if (opt.correct) { score++; ex.textContent = "Correct. Treat model output like any other untrusted input, validate before use."; }
-    else { ex.textContent = "Not quite. " + opt.reason; }
+    if (opt.correct) score++;
+    renderQuizExplain(ex, opt, "Treat model output like any other untrusted input, validate before use.");
     updateScore();
   });
   q1el.appendChild(div);
@@ -750,8 +831,8 @@ q2Options.forEach((opt, i) => {
     });
     const ex = document.getElementById("q2explain");
     ex.style.display = "block";
-    if (opt.correct) { score++; ex.textContent = "Correct. The system role is for standing instructions that apply across the whole conversation."; }
-    else { ex.textContent = "Not quite. " + opt.reason; }
+    if (opt.correct) score++;
+    renderQuizExplain(ex, opt, "The system role is for standing instructions that apply across the whole conversation.");
     updateScore();
   });
   q2el.appendChild(div);
@@ -778,8 +859,8 @@ q3Options.forEach((opt, i) => {
     });
     const ex = document.getElementById("q3explain");
     ex.style.display = "block";
-    if (opt.correct) { score++; ex.textContent = "Correct. Syntactically valid but semantically incomplete is a validation problem, not a repair-pass problem."; }
-    else { ex.textContent = "Not quite. " + opt.reason; }
+    if (opt.correct) score++;
+    renderQuizExplain(ex, opt, "Syntactically valid but semantically incomplete is a validation problem, not a repair-pass problem.");
     updateScore();
   });
   q3el.appendChild(div);
@@ -806,8 +887,8 @@ q4Options.forEach((opt, i) => {
     });
     const ex = document.getElementById("q4explain");
     ex.style.display = "block";
-    if (opt.correct) { score++; ex.textContent = "Correct. Concrete examples remove interpretive ambiguity that prose descriptions leave open."; }
-    else { ex.textContent = "Not quite. " + opt.reason; }
+    if (opt.correct) score++;
+    renderQuizExplain(ex, opt, "Concrete examples remove interpretive ambiguity that prose descriptions leave open.");
     updateScore();
   });
   q4el.appendChild(div);
@@ -844,7 +925,7 @@ function maybeShowRetry(){
   btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
 }
 document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
-  CourseProgress.resetModule(MODULE_ID);
+  CourseProgress.resetModuleAnswers(MODULE_ID);
   window.location.reload();
 });
 const _origUpdateScore = updateScore;

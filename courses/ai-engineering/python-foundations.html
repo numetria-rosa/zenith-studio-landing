@@ -84,8 +84,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 .orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
 .orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--emerald);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
+.orient h2{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h2:first-of-type{margin-top:0}
 .orient p{font-size:14.5px;color:var(--mut)}
 .orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
 .practice{background:transparent;border:1px dashed var(--bd2);border-radius:10px;padding:16px 20px;margin-top:18px}
@@ -148,9 +148,9 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
   <div class="orient">
     <div class="lbl">Before you start</div>
-    <h3 class="serif">What this page assumes</h3>
+    <h2 class="serif">What this page assumes</h2>
     <p>Nothing about Python specifically. If you've ever written a variable assignment or a loop in any language, you're ready. If you haven't, the WHY and CONCEPT sections below explain everything from first principles before any code appears.</p>
-    <h3 class="serif">How to work through it</h3>
+    <h2 class="serif">How to work through it</h2>
     <ol>
       <li>Read the WHY, then the CONCEPT, then the worked EXAMPLE.</li>
       <li>Write the exercise function yourself, then click Run tests, real Python, real results.</li>
@@ -563,10 +563,9 @@ def parse_or_none(text):
   <button class="primary nextbtn" id="btnNext">Continue to Module 1 →</button>
 </div></div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="pyodide-sandbox-runner.js"></script>
 <script>
-CourseProgress.touchVisited && null;
 const PF_KEY = "pythonFoundations";
 function pfState(){ return CourseProgress.getExtra(PF_KEY) || { exercises: {}, selfCheck: {} }; }
 function pfSave(state){ CourseProgress.setExtra(PF_KEY, state); }

@@ -52,6 +52,33 @@ p+p{margin-top:14px}
 code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
 .callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
 .callout b{color:var(--amber)}
+.decision{background:var(--card2);border:1px solid var(--amber);border-radius:12px;padding:20px 22px;margin-top:20px}
+.decision .dlbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);background:rgba(255,207,77,.1);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+.decision .dsit{font-size:14.5px;color:var(--tx);margin-bottom:14px;line-height:1.7}
+.decision .dsit b{color:var(--amber)}
+.decision .dopt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;font-size:14px;background:var(--bg2);color:var(--tx);font-family:'Space Grotesk',sans-serif}
+.decision .dopt:hover{border-color:var(--bd2)}
+.decision .dopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.decision .dopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.decision .dexplain{margin-top:12px;padding:14px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd);line-height:1.7}
+.prodwarn{border:1px solid rgba(255,107,107,.35);background:rgba(255,107,107,.05);border-radius:12px;padding:20px 22px;margin-top:20px}
+.prodwarn .plbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:12px}
+.prodwarn ul{list-style:none;display:grid;gap:8px;margin-top:4px}
+.prodwarn ul li{padding-left:20px;position:relative;font-size:14px;color:var(--tx)}
+.prodwarn ul li:before{content:"✗";position:absolute;left:0;color:var(--red);font-weight:700}
+.prodwarn .prule{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,107,107,.2);font-size:13.5px;color:var(--mut)}
+.prodwarn .prule b{color:var(--red)}
+.debugcase{background:var(--card);border:1px solid var(--violet);border-radius:14px;padding:24px;margin-top:20px}
+.debugcase .glbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);background:rgba(167,139,250,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.debugcase .evidence{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:'JetBrains Mono';font-size:12.5px;color:var(--mut);white-space:pre-wrap;line-height:1.7}
+.debugcase .gquestion{font-size:14.5px;font-weight:600;margin-top:14px;margin-bottom:10px}
+.debugcase .gopt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;font-size:14px;background:var(--bg2);color:var(--tx);font-family:'Space Grotesk',sans-serif}
+.debugcase .gopt:hover{border-color:var(--bd2)}
+.debugcase .gopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.debugcase .gopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.debugcase .gexplain{margin-top:12px;padding:14px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd);line-height:1.7}
+.connection{background:linear-gradient(135deg,rgba(198,244,50,.06),rgba(167,139,250,.05));border:1px solid var(--bd2);border-radius:12px;padding:20px 22px;margin-top:18px}
+.connection .clbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:10px}
 .interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
 .interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
 .interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
@@ -92,8 +119,8 @@ input[type=range]{width:100%;margin-top:8px;accent-color:var(--lime)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 .orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
 .orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
+.orient h2{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h2:first-of-type{margin-top:0}
 .orient p{font-size:14.5px;color:var(--mut)}
 .orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
 .orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
@@ -170,13 +197,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
   <div class="orient">
     <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module assumes</h3>
+    <h2 class="serif">What this module assumes</h2>
     <p>Module 2 solved "how do I fit content into a budget" with chunking. It didn't solve "which chunk is actually relevant to this specific question." Retrieval is that second problem: searching across many chunks and pulling only the ones worth spending tokens on.</p>
-    <h3 class="serif">What's new</h3>
+    <h2 class="serif">What's new</h2>
     <p>Vectors and cosine similarity, the actual math retrieval systems use to rank relevance. You'll compute it by hand conceptually, then implement it.</p>
-    <h3 class="serif">What's assumed</h3>
+    <h2 class="serif">What's assumed</h2>
     <div class="assume">Modules 1-2 completed. Arrays, loops, basic arithmetic. No linear algebra background needed, everything here is built from scratch.</div>
-    <h3 class="serif">How to work through it</h3>
+    <h2 class="serif">How to work through it</h2>
     <ol>
       <li>Read each definition, then run the matching interactive.</li>
       <li>Answer the practice check before revealing the answer.</li>
@@ -290,6 +317,20 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
         <div class="ans">It should return three: <span class="mono-inline">handleAuth</span> (0.9), <span class="mono-inline">validateAuth</span> (0.55), and <span class="mono-inline">refreshAuthToken</span> (0.5). Filtering after slicing throws away the slots that irrelevant matches occupied before the relevant ones further down the ranking ever get a chance, <span class="mono-inline">formatDate</span> and <span class="mono-inline">padString</span> took two of the three available slots despite being below threshold. The fix is the order used in the exercise: filter out everything below min_score first, across the entire scored set, then sort and slice to k. Filtering an already-sliced top-k instead of the full candidate set silently under-returns even when enough relevant results exist.</div>
       </details>
     </div>
+
+    <div class="debugcase" id="debugcase3">
+      <div class="glbl">🔎 Debug the AI system</div>
+      <p class="mut">A user asks a support bot: <b style="color:var(--tx)">"Can I cancel my subscription?"</b> The agent retrieves three chunks and confidently states the wrong cancellation policy.</p>
+      <div class="evidence">RETRIEVED CHUNKS (k=3, min_score=0.35)
+[1] score 0.81 · "pricing.md" (updated 2024-11) — "Monthly plans can be cancelled anytime from Billing > Subscription. Annual plans require 30 days' written notice before renewal."
+[2] score 0.74 · "terms-of-service.md" (updated 2023-02) — "Cancellation requests must be submitted in writing to legal@company.com and are processed within 5 business days."
+[3] score 0.52 · "support-faq-2023.md" (updated 2023-06, superseded by pricing.md in 2024) — "To cancel, email support and allow up to 2 weeks."
+
+MODEL'S ANSWER: "You can cancel anytime by emailing support and allowing up to two weeks for processing."</div>
+      <div class="gquestion">What is the most likely cause of the wrong answer?</div>
+      <div id="debugcase3opts"></div>
+      <div class="gexplain" id="debugcase3explain"></div>
+    </div>
   </section>
 
   <section>
@@ -350,9 +391,20 @@ def retrieve_top_k(query_vector, documents, k, min_score):
       <li>Explain why a minimum-relevance threshold matters even when top-k already limits results.</li>
       <li>Implement cosine similarity and threshold-aware top-k retrieval from scratch.</li>
     </ul>
-    <div class="practice">
-      <div class="lbl">Looking ahead</div>
-      <p>Retrieval gets relevant context in front of the model. Module 4 covers the other half of giving a model real capability, letting it call tools and take actions, and handling what happens when a tool call needs to be retried safely.</p>
+    <div class="prodwarn">
+      <div class="plbl">⚠ What would break in production?</div>
+      <ul>
+        <li><b>Stale documents with no recency signal.</b> A superseded FAQ page scores well on pure semantic similarity, embeddings don't know a newer page exists unless you tell them.</li>
+        <li><b>Duplicate or near-duplicate chunks.</b> The same fact indexed twice fills two of your k slots with the same information instead of two distinct, useful pieces of context.</li>
+        <li><b>Confident answers on thin evidence.</b> A 0.4-score chunk is still a chunk, and a model asked to answer from context will usually try, whether or not that context actually supports a confident claim.</li>
+        <li><b>No threshold at all.</b> Without a relevance floor, "nothing in the collection is actually relevant" and "the best match happens to be great" look identical to the retrieval step.</li>
+      </ul>
+      <div class="prule"><b>Rule of thumb:</b> a retrieval system should be able to say "I don't have relevant information for that." A system that always returns k results, no matter how weak, can't.</div>
+    </div>
+
+    <div class="connection">
+      <div class="clbl">The engineering connection</div>
+      <p>You can now decide what actually deserves a place in the prompt. But retrieval only gets information in front of the model, it doesn't let the model do anything with it. Module 4 covers the other half of giving a model real capability: letting it call tools and take actions, and handling what happens when a tool call needs to be retried safely.</p>
     </div>
   </section>
 
@@ -442,11 +494,47 @@ def retrieve_top_k(query_vector, documents, k, min_score):
   <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
 </div></div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="pyodide-sandbox-runner.js"></script>
 <script>
 const MODULE_ID = 3;
+if (!CourseProgress.isUnlocked(MODULE_ID)) {
+  window.location.href = "module-02.html";
+}
 CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Reusable: Debug the AI System component (ungraded judgment practice) ---------------- */
+function initDebugCase(containerId, opts){
+  const el = document.getElementById(containerId + "opts");
+  let answered = false;
+  opts.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "gopt";
+    btn.textContent = opt.t;
+    btn.addEventListener("click", () => {
+      if (answered) return;
+      answered = true;
+      Array.from(el.children).forEach((b, j) => {
+        if (opts[j].correct) b.classList.add("correct");
+        else if (j === i) b.classList.add("incorrect");
+      });
+      const ex = document.getElementById(containerId + "explain");
+      ex.style.display = "block";
+      ex.textContent = (opt.correct ? "Correct. " : "Not the primary cause here. ") + opt.why;
+    });
+    el.appendChild(btn);
+  });
+}
+initDebugCase("debugcase3", [
+  { t: "The model reasoned poorly and just picked the wrong policy from context it had access to", correct: false,
+    why: "The model's reasoning isn't actually the failure here, it answered fluently and confidently FROM the context it was given, that's exactly what a model does with retrieved text. The evidence points upstream, to what got retrieved in the first place." },
+  { t: "A stale, superseded document (support-faq-2023.md) was retrieved above the relevance threshold and blended into the answer, with no recency or supersession signal to exclude it", correct: true,
+    why: "Look at the evidence: chunk [3] is explicitly marked \"superseded by pricing.md in 2024\" in its own metadata, yet it still cleared the 0.35 threshold and made it into context, because cosine similarity only measures semantic closeness to the query, it has no idea one document replaced another. The model's answer (\"email support, up to two weeks\") matches chunk [3] almost verbatim, while chunk [1], the CURRENT, correct policy, scored higher but got blended with an outdated one instead of overriding it. The fix isn't a bigger model, it's a retrieval-layer signal: filter or down-rank superseded documents before they ever reach the prompt." },
+  { t: "The embedding model doesn't understand subscription cancellation as a concept", correct: false,
+    why: "The scores say otherwise, all three chunks scored well above the 0.35 threshold on a query about cancellation, the embeddings clearly captured the topic correctly. The problem isn't topic understanding, it's that relevance and currency are two different properties, and only one of them was checked." },
+  { t: "k was set too high, and a smaller k would have fixed it", correct: false,
+    why: "Lowering k to 1 or 2 might accidentally drop the stale chunk here, but that's luck, not a fix, it depends entirely on which chunk happens to score highest on a given query, and would just as easily drop the CORRECT current-policy chunk on a different phrasing. The real gap is that nothing in the system checks whether a retrieved document has been superseded, k doesn't address that at all." },
+]);
 
 /* ---------------- Section 3: cosine similarity angle slider ---------------- */
 function updateAngle(){
@@ -703,6 +791,12 @@ document.getElementById("btnRunRagTests").addEventListener("click", runRagTests)
 let score = 0;
 const answered = { q1:false, q2:false, q3:false, q4:false, q5:false };
 
+function renderQuizExplain(ex, opt, principle){
+  ex.innerHTML = opt.correct
+    ? `<b>Correct.</b> ${CourseProgress.escapeHtml(principle)}`
+    : `<b>Why this is wrong:</b> ${CourseProgress.escapeHtml(opt.reason)}<br><br><b>Engineering principle:</b> ${CourseProgress.escapeHtml(principle)}`;
+}
+
 function updateScore(){
   document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
   const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
@@ -714,6 +808,7 @@ function updateScore(){
 
 function checkQ1(){
   if (answered.q1) return;
+  if (!document.getElementById("q1input").value.trim()) return;
   const val = Number(document.getElementById("q1input").value);
   const ex = document.getElementById("q1explain");
   ex.style.display = "block";
@@ -727,6 +822,7 @@ document.getElementById("q1check").addEventListener("click", checkQ1);
 
 function checkQ2(){
   if (answered.q2) return;
+  if (!document.getElementById("q2input").value.trim()) return;
   const val = Number(document.getElementById("q2input").value);
   const ex = document.getElementById("q2explain");
   ex.style.display = "block";
@@ -758,8 +854,8 @@ q3Options.forEach((opt, i) => {
     });
     const ex = document.getElementById("q3explain");
     ex.style.display = "block";
-    if (opt.correct) { score++; ex.textContent = "Correct. Dividing out magnitude leaves a pure measure of direction, which is what corresponds to semantic similarity."; }
-    else { ex.textContent = "Not quite. " + opt.reason; }
+    if (opt.correct) score++;
+    renderQuizExplain(ex, opt, "Dividing out magnitude leaves a pure measure of direction, which is what corresponds to semantic similarity.");
     updateScore();
   });
   q3el.appendChild(div);
@@ -785,8 +881,8 @@ q4Options.forEach((opt, i) => {
     });
     const ex = document.getElementById("q4explain");
     ex.style.display = "block";
-    if (opt.correct) { score++; ex.textContent = "Correct. Without a minimum-relevance threshold, top-k always returns k results, whatever scored highest, relevant or not."; }
-    else { ex.textContent = "Not quite. " + opt.reason; }
+    if (opt.correct) score++;
+    renderQuizExplain(ex, opt, "Without a minimum-relevance threshold, top-k always returns k results, whatever scored highest, relevant or not.");
     updateScore();
   });
   q4el.appendChild(div);
@@ -812,8 +908,8 @@ q5Options.forEach((opt, i) => {
     });
     const ex = document.getElementById("q5explain");
     ex.style.display = "block";
-    if (opt.correct) { score++; ex.textContent = "Correct. 400 (chunks) + 50 (question) = 450 input tokens, against a 7000-token available budget, plenty of headroom."; }
-    else { ex.textContent = "Not quite. " + opt.reason; }
+    if (opt.correct) score++;
+    renderQuizExplain(ex, opt, "400 (chunks) + 50 (question) = 450 input tokens, against a 7000-token available budget, plenty of headroom.");
     updateScore();
   });
   q5el.appendChild(div);
@@ -831,6 +927,7 @@ function maybeShowRetry(){
   btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
 }
 document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModuleAnswers(MODULE_ID);
   score = 0;
   Object.keys(answered).forEach(k => answered[k] = false);
   document.querySelectorAll(".qexplain").forEach(el => { el.style.display = "none"; el.textContent = ""; });

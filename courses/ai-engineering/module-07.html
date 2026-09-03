@@ -52,6 +52,24 @@ p+p{margin-top:14px}
 code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
 .callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
 .callout b{color:var(--amber)}
+.decision{background:var(--card2);border:1px solid var(--amber);border-radius:12px;padding:20px 22px;margin-top:20px}
+.decision .dlbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);background:rgba(255,207,77,.1);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+.decision .dsit{font-size:14.5px;color:var(--tx);margin-bottom:14px;line-height:1.7}
+.decision .dsit b{color:var(--amber)}
+.decision .dopt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;font-size:14px;background:var(--bg2);color:var(--tx);font-family:'Space Grotesk',sans-serif}
+.decision .dopt:hover{border-color:var(--bd2)}
+.decision .dopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.decision .dopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.decision .dexplain{margin-top:12px;padding:14px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd);line-height:1.7}
+.prodwarn{border:1px solid rgba(255,107,107,.35);background:rgba(255,107,107,.05);border-radius:12px;padding:20px 22px;margin-top:20px}
+.prodwarn .plbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:12px}
+.prodwarn ul{list-style:none;display:grid;gap:8px;margin-top:4px}
+.prodwarn ul li{padding-left:20px;position:relative;font-size:14px;color:var(--tx)}
+.prodwarn ul li:before{content:"✗";position:absolute;left:0;color:var(--red);font-weight:700}
+.prodwarn .prule{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,107,107,.2);font-size:13.5px;color:var(--mut)}
+.prodwarn .prule b{color:var(--red)}
+.connection{background:linear-gradient(135deg,rgba(198,244,50,.06),rgba(167,139,250,.05));border:1px solid var(--bd2);border-radius:12px;padding:20px 22px;margin-top:18px}
+.connection .clbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:10px}
 .interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
 .interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
 .interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
@@ -92,8 +110,8 @@ input[type=range]{width:100%;margin-top:8px;accent-color:var(--lime)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 .orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
 .orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
+.orient h2{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h2:first-of-type{margin-top:0}
 .orient p{font-size:14.5px;color:var(--mut)}
 .orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
 .orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
@@ -171,13 +189,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
   <div class="orient">
     <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module assumes</h3>
+    <h2 class="serif">What this module assumes</h2>
     <p>Every module so far built a piece of a system: structured output, context management, retrieval, tools, an agent loop, reliability. None of them told you how to know, systematically, whether the whole thing is actually working, or whether your last change made it better or worse.</p>
-    <h3 class="serif">What's new</h3>
+    <h2 class="serif">What's new</h2>
     <p>Measurement as a first-class engineering activity, not an afterthought. An eval suite is code, tested and versioned like anything else, run every time something changes.</p>
-    <h3 class="serif">What's assumed</h3>
+    <h2 class="serif">What's assumed</h2>
     <div class="assume">Modules 1-6 completed. Arrays, functions as values, basic arithmetic (ratios and comparisons).</div>
-    <h3 class="serif">How to work through it</h3>
+    <h2 class="serif">How to work through it</h2>
     <ol>
       <li>Read each definition, then run the matching interactive.</li>
       <li>Answer the practice check before revealing the answer.</li>
@@ -289,6 +307,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
         <div class="ans">Engineer B's. Changing the provider and the threshold together and evaluating once produces a single score that reflects the combined effect of both, if it drops, there's no way to tell whether the new provider is worse, the tighter threshold is worse, or one is masking the other. Running the eval with only the provider changed, against the same baseline, isolates that one variable and gives a clean answer about the provider specifically, exactly the discipline this section describes, just applied to a provider swap instead of a prompt change.</div>
       </details>
     </div>
+
+    <div class="decision" id="decision7">
+      <div class="dlbl">⚖ AI Engineering Decision</div>
+      <div class="dsit">Your eval suite of 50 test cases reports 96% average accuracy for a new prompt version, up from 91% on the old one. Before shipping, someone points out: of the 50 cases, only 2 involve a user asking to cancel or dispute a charge, both types the old version also got right, but a manual spot-check of 5 CHARGE-DISPUTE conversations from real traffic (not in the eval set) shows the new prompt getting 4 of 5 wrong. Should you ship based on the 96% score?</div>
+      <div id="decision7opts"></div>
+      <div class="dexplain" id="decision7explain"></div>
+    </div>
   </section>
 
   <section>
@@ -355,9 +380,20 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
       <li>Explain when to prefer a deterministic check over LLM-as-judge, and why.</li>
       <li>Implement an eval harness that scores a test set and flags regressions against a baseline.</li>
     </ul>
-    <div class="practice">
-      <div class="lbl">Looking ahead</div>
-      <p>Every piece is now in place: structured outputs, context management, retrieval, tools, an agent loop, reliability, and evaluation. Module 8 is the capstone, combining all seven into one system, and a final competency assessment covering everything from Module 1 forward.</p>
+    <div class="prodwarn">
+      <div class="plbl">⚠ What would break in production?</div>
+      <ul>
+        <li><b>Benchmark overfitting.</b> A prompt tuned against the same 50 eval cases over and over starts memorizing those specific cases' quirks, not the underlying task, and the score stops predicting real-world performance.</li>
+        <li><b>Evaluation leakage.</b> Test cases that overlap with the model's training data, or with the few-shot examples in the prompt itself, produce a score that reflects memorization, not generalization.</li>
+        <li><b>A good average hiding a catastrophic slice.</b> 96% overall can still mean a specific, high-stakes category (refunds, cancellations, medical, legal) is failing badly, if that category is underrepresented in the eval set.</li>
+        <li><b>An eval set that never grows.</b> A static set of test cases stops catching new failure modes the moment real users start doing things the original cases didn't anticipate.</li>
+      </ul>
+      <div class="prule"><b>Rule of thumb:</b> a single average score is a summary, not evidence. Always check whether it holds up sliced by the categories that matter most, not just in aggregate.</div>
+    </div>
+
+    <div class="connection">
+      <div class="clbl">The engineering connection</div>
+      <p>You can now tell whether a change actually helped, with a number, not a feeling, and you know to check that number by slice, not just on average. Every piece is now in place: structured outputs, context management, retrieval, tools, an agent loop, reliability, and evaluation. Module 8 is the capstone, combining all seven into one system, and a final competency assessment covering everything from Module 1 forward.</p>
     </div>
   </section>
 
@@ -450,11 +486,47 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
   <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
 </div></div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="pyodide-sandbox-runner.js"></script>
 <script>
 const MODULE_ID = 7;
+if (!CourseProgress.isUnlocked(MODULE_ID)) {
+  window.location.href = "module-06.html";
+}
 CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Reusable: AI Engineering Decision component (ungraded judgment practice) ---------------- */
+function initDecision(containerId, opts){
+  const el = document.getElementById(containerId + "opts");
+  let answered = false;
+  opts.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "dopt";
+    btn.textContent = opt.t;
+    btn.addEventListener("click", () => {
+      if (answered) return;
+      answered = true;
+      Array.from(el.children).forEach((b, j) => {
+        if (opts[j].correct) b.classList.add("correct");
+        else if (j === i) b.classList.add("incorrect");
+      });
+      const ex = document.getElementById(containerId + "explain");
+      ex.style.display = "block";
+      ex.textContent = (opt.correct ? "Correct. " : "Not the strongest call here. ") + opt.why;
+    });
+    el.appendChild(btn);
+  });
+}
+initDecision("decision7", [
+  { t: "A. Ship it, 96% beats the 91% baseline, that's a measurable win", correct: false,
+    why: "The 96% is real, but it's an average across a set where charge-disputes are only 2 of 50 cases, barely enough to move the aggregate even if the new prompt fails them completely. The number went up while a specific, high-stakes category quietly got much worse, exactly the \"good average hides a catastrophic slice\" failure this module warns about." },
+  { t: "B. Don't ship yet. Add real charge-dispute cases to the eval set, re-run, and check that slice specifically before deciding", correct: true,
+    why: "This is the correct move: the spot-check surfaced a real signal (4 of 5 wrong on a high-stakes category) that the eval set was underrepresenting. Before shipping, expand the eval set with enough charge-dispute cases to measure that slice properly, then compare THAT number to baseline, not just the aggregate. A category tied to money and disputes is exactly the kind of failure an average can hide and a slice can catch." },
+  { t: "C. Trust the manual spot-check over the eval suite entirely, and abandon the eval process for this decision", correct: false,
+    why: "The spot-check is valuable because it's what CAUGHT the gap, but 5 cases is too small a sample to replace a systematic eval on its own. The right response is to fold that signal back into a bigger, more representative eval set, not to throw out systematic measurement in favor of an ad hoc check, that's the exact anti-pattern this module opened by rejecting." },
+  { t: "D. Ship it, but plan to monitor charge-dispute complaints after launch", correct: false,
+    why: "Charge disputes are exactly the category where \"monitor after shipping\" is the expensive way to find out, real users would experience the 4-in-5 failure rate the spot-check already revealed. The eval gap is fixable before shipping; waiting for complaints just moves the cost onto users." },
+]);
 
 /* ---------------- Section 2: spot the usable eval test case ---------------- */
 const SPOT_CASES = [
@@ -761,8 +833,13 @@ function buildMC(qkey, opts, elId){
       });
       const ex = document.getElementById(qkey + "explain");
       ex.style.display = "block";
-      if (opt.correct) { score++; ex.textContent = opt.correctText; }
-      else { ex.textContent = "Not quite. " + opt.reason; }
+      const principle = opts.find(o => o.correct).correctText.replace(/^Correct\.\s*/, "");
+      if (opt.correct) {
+        score++;
+        ex.innerHTML = `<b>Correct.</b> ${CourseProgress.escapeHtml(principle)}`;
+      } else {
+        ex.innerHTML = `<b>Why this is wrong:</b> ${CourseProgress.escapeHtml(opt.reason)}<br><br><b>Engineering principle:</b> ${CourseProgress.escapeHtml(principle)}`;
+      }
       updateScore();
     });
     el.appendChild(div);
@@ -789,6 +866,7 @@ buildMC("q3", [
 
 function checkQ4(){
   if (answered.q4) return;
+  if (!document.getElementById("q4input").value.trim()) return;
   const val = Number(document.getElementById("q4input").value);
   const ex = document.getElementById("q4explain");
   ex.style.display = "block";
@@ -818,6 +896,7 @@ function maybeShowRetry(){
   btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
 }
 document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModuleAnswers(MODULE_ID);
   score = 0;
   Object.keys(answered).forEach(k => answered[k] = false);
   document.querySelectorAll(".qexplain").forEach(el => { el.style.display = "none"; el.textContent = ""; });

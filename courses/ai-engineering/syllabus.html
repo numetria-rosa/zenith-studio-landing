@@ -43,6 +43,12 @@ p.lead{color:var(--mut);max-width:680px}
 .prereq{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 .prereq span{font-size:12px;background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:6px 12px;color:var(--mut)}
 .module{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:22px;margin-bottom:14px;position:relative}
+.stagetag{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);margin-bottom:8px}
+.stagetag:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--violet)}
+.progressline{display:flex;align-items:center;gap:4px;margin:32px 0 -6px;overflow-x:auto;padding-bottom:6px}
+.progressline .pstage{flex-shrink:0;font-family:'JetBrains Mono';font-size:10.5px;color:var(--mut2);padding:6px 10px;border:1px solid var(--bd);border-radius:99px;white-space:nowrap}
+.progressline .pstage.now{color:var(--limed);background:var(--lime);border-color:var(--lime);font-weight:700}
+.progressline .parrow{color:var(--bd2);flex-shrink:0}
 .module:hover{border-color:var(--bd2)}
 .module .mtop{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
 .module .mnum{font-family:'JetBrains Mono';font-size:12px;color:var(--lime);letter-spacing:.05em}
@@ -126,7 +132,18 @@ a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--lime);outline
 
   <section>
     <div class="kh"><span class="num">§</span><h2>Module sequence</h2></div>
-    <p class="lead" style="margin-bottom:20px">Each module pairs a concept with an interactive you manipulate directly, and closes with a graded checkpoint plus a real, Worker-sandboxed hands-on code exercise. Module 0 and Module 1 are both open for preview.</p>
+    <p class="lead">Each module pairs a concept with an interactive you manipulate directly, and closes with a graded checkpoint plus a real, Worker-sandboxed hands-on code exercise. Module 0 and Module 1 are both open for preview.</p>
+    <p class="lead" style="margin-top:10px">The sequence isn't seven unrelated topics, it's one system, built up in order: control what the model says, give it real knowledge, give it real actions, keep those actions bounded, keep the whole thing running when something breaks, and prove, with a number, that it actually works.</p>
+    <div class="progressline">
+      <span class="pstage">1 · Control the model</span><span class="parrow">→</span>
+      <span class="pstage">2 · Give it knowledge</span><span class="parrow">→</span>
+      <span class="pstage">3 · Give it tools</span><span class="parrow">→</span>
+      <span class="pstage">4 · Control the agent</span><span class="parrow">→</span>
+      <span class="pstage">5 · Make it reliable</span><span class="parrow">→</span>
+      <span class="pstage">6 · Prove it works</span><span class="parrow">→</span>
+      <span class="pstage">7 · Build the system</span>
+    </div>
+    <p class="lead" style="margin-bottom:20px"></p>
 
     <div class="module">
       <div class="mtop">
@@ -147,7 +164,7 @@ a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--lime);outline
 
     <div class="module">
       <div class="mtop">
-        <div><div class="mnum">MODULE 01</div><h3>Prompting &amp; Structured Outputs</h3></div>
+        <div><div class="stagetag">Stage 1 · Control the model</div><div class="mnum">MODULE 01</div><h3>Prompting &amp; Structured Outputs</h3></div>
         <div class="wk"><a href="module-01.html" class="badge-live" style="text-decoration:none">Preview open &rarr;</a></div>
       </div>
       <p class="desc">A model produces text, not guaranteed data. This module covers prompt anatomy, the repair-then-validate pattern for malformed JSON, and why "asked for a schema" isn't the same as "got the schema."</p>
@@ -163,7 +180,7 @@ a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--lime);outline
     </div>
 
     <div class="module">
-      <div class="mtop"><div><div class="mnum">MODULE 02</div><h3>Context Windows &amp; Token Economics</h3></div></div>
+      <div class="mtop"><div><div class="stagetag">Stage 1 · Control the model</div><div class="mnum">MODULE 02</div><h3>Context Windows &amp; Token Economics</h3></div></div>
       <p class="desc">Every prompt has a budget, measured in tokens. This module covers the token/character relationship, computing available input budget, why naive truncation is a silent-failure bug, and chunking with overlap.</p>
       <div class="obj"><div class="lbl">You will be able to</div><ul>
         <li>Compute available input budget from a context window and reserved output</li>
@@ -174,7 +191,7 @@ a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--lime);outline
     </div>
 
     <div class="module">
-      <div class="mtop"><div><div class="mnum">MODULE 03</div><h3>Retrieval-Augmented Generation</h3></div></div>
+      <div class="mtop"><div><div class="stagetag">Stage 2 · Give it knowledge</div><div class="mnum">MODULE 03</div><h3>Retrieval-Augmented Generation</h3></div></div>
       <p class="desc">A model only knows what's in its prompt. This module covers embeddings, cosine similarity, top-k retrieval, and why a minimum-relevance threshold is what stops "best available" from becoming "confidently wrong."</p>
       <div class="obj"><div class="lbl">You will be able to</div><ul>
         <li>Explain why cosine similarity ignores vector magnitude, and why that's correct</li>
@@ -185,7 +202,7 @@ a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--lime);outline
     </div>
 
     <div class="module">
-      <div class="mtop"><div><div class="mnum">MODULE 04</div><h3>Tool Use &amp; Function Calling</h3></div></div>
+      <div class="mtop"><div><div class="stagetag">Stage 3 · Give it tools</div><div class="mnum">MODULE 04</div><h3>Tool Use &amp; Function Calling</h3></div></div>
       <p class="desc">A tool call is a proposal from the model, not an action, until your code executes it. This module covers schema validation before execution and idempotent execution that survives a retried request.</p>
       <div class="obj"><div class="lbl">You will be able to</div><ul>
         <li>Validate a tool call's name and required arguments before the handler ever runs</li>
@@ -196,7 +213,7 @@ a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--lime);outline
     </div>
 
     <div class="module">
-      <div class="mtop"><div><div class="mnum">MODULE 05</div><h3>Agent Architectures &amp; Control Flow</h3></div></div>
+      <div class="mtop"><div><div class="stagetag">Stage 4 · Control the agent</div><div class="mnum">MODULE 05</div><h3>Agent Architectures &amp; Control Flow</h3></div></div>
       <p class="desc">An agent loop's stopping condition is not guaranteed by the model. This module covers the reason-act-observe cycle, hard step limits, and detecting a loop that's repeating itself without progress.</p>
       <div class="obj"><div class="lbl">You will be able to</div><ul>
         <li>Distinguish success, step-limit, and stuck as three separate loop endings</li>
@@ -207,7 +224,7 @@ a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--lime);outline
     </div>
 
     <div class="module">
-      <div class="mtop"><div><div class="mnum">MODULE 06</div><h3>Reliability for LLM Systems</h3></div></div>
+      <div class="mtop"><div><div class="stagetag">Stage 5 · Make it reliable</div><div class="mnum">MODULE 06</div><h3>Reliability for LLM Systems</h3></div></div>
       <p class="desc">Model APIs fail transiently and permanently, and the correct response differs. This module covers retryable-vs-not classification, exponential backoff with full jitter, and a single bounded fallback.</p>
       <div class="obj"><div class="lbl">You will be able to</div><ul>
         <li>Classify an error as retryable or non-retryable and explain why the distinction matters</li>
@@ -218,7 +235,7 @@ a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--lime);outline
     </div>
 
     <div class="module">
-      <div class="mtop"><div><div class="mnum">MODULE 07</div><h3>Evaluation, Testing &amp; Observability</h3></div></div>
+      <div class="mtop"><div><div class="stagetag">Stage 6 · Prove it works</div><div class="mnum">MODULE 07</div><h3>Evaluation, Testing &amp; Observability</h3></div></div>
       <p class="desc">"It looked fine" isn't evaluation. This module covers designing checkable test cases, deterministic checks versus LLM-as-judge, and regression detection against a recorded baseline.</p>
       <div class="obj"><div class="lbl">You will be able to</div><ul>
         <li>Design an eval test case with an explicit, checkable criterion</li>
@@ -229,7 +246,7 @@ a.cta:focus-visible,a.inline:focus-visible{outline:2px solid var(--lime);outline
     </div>
 
     <div class="module">
-      <div class="mtop"><div><div class="mnum">MODULE 08</div><h3>Capstone: A Production AI Agent</h3></div></div>
+      <div class="mtop"><div><div class="stagetag">Stage 7 · Build the system</div><div class="mnum">MODULE 08</div><h3>Capstone: A Production AI Agent</h3></div></div>
       <p class="desc">Synthesis. A client brief: a support bot that must answer from a knowledge base, act on tools safely, and survive a flaky model API. You submit a design document, a working implementation, and a debugging diagnosis, graded against a rubric, not vibes.</p>
       <div class="obj"><div class="lbl">Deliverable</div><ul>
         <li>A written design specification applying all seven prior modules</li>

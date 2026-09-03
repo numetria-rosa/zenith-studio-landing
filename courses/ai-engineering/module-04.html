@@ -52,6 +52,24 @@ p+p{margin-top:14px}
 code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
 .callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
 .callout b{color:var(--amber)}
+.decision{background:var(--card2);border:1px solid var(--amber);border-radius:12px;padding:20px 22px;margin-top:20px}
+.decision .dlbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);background:rgba(255,207,77,.1);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+.decision .dsit{font-size:14.5px;color:var(--tx);margin-bottom:14px;line-height:1.7}
+.decision .dsit b{color:var(--amber)}
+.decision .dopt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;font-size:14px;background:var(--bg2);color:var(--tx);font-family:'Space Grotesk',sans-serif}
+.decision .dopt:hover{border-color:var(--bd2)}
+.decision .dopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.decision .dopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.decision .dexplain{margin-top:12px;padding:14px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd);line-height:1.7}
+.prodwarn{border:1px solid rgba(255,107,107,.35);background:rgba(255,107,107,.05);border-radius:12px;padding:20px 22px;margin-top:20px}
+.prodwarn .plbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:12px}
+.prodwarn ul{list-style:none;display:grid;gap:8px;margin-top:4px}
+.prodwarn ul li{padding-left:20px;position:relative;font-size:14px;color:var(--tx)}
+.prodwarn ul li:before{content:"✗";position:absolute;left:0;color:var(--red);font-weight:700}
+.prodwarn .prule{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,107,107,.2);font-size:13.5px;color:var(--mut)}
+.prodwarn .prule b{color:var(--red)}
+.connection{background:linear-gradient(135deg,rgba(198,244,50,.06),rgba(167,139,250,.05));border:1px solid var(--bd2);border-radius:12px;padding:20px 22px;margin-top:18px}
+.connection .clbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:10px}
 .interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
 .interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
 .interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
@@ -92,8 +110,8 @@ input[type=range]{width:100%;margin-top:8px;accent-color:var(--lime)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 .orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
 .orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
+.orient h2{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h2:first-of-type{margin-top:0}
 .orient p{font-size:14.5px;color:var(--mut)}
 .orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
 .orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
@@ -171,13 +189,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
   <div class="orient">
     <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module assumes</h3>
+    <h2 class="serif">What this module assumes</h2>
     <p>Modules 1-3 were about getting good input into a model and good context alongside it. This module is about the model taking real action, calling a function, hitting an API, running a query, and everything that can go wrong once "the model decided to do something" becomes "code actually did it."</p>
-    <h3 class="serif">What's new</h3>
+    <h2 class="serif">What's new</h2>
     <p>The trust boundary flips. Modules 1-3 validated what came OUT of a model. This module validates what a model wants to DO before your code lets it happen, and handles what occurs when the same request arrives twice.</p>
-    <h3 class="serif">What's assumed</h3>
+    <h2 class="serif">What's assumed</h2>
     <div class="assume">Modules 1-3 completed. Comfort with objects, functions as values, and try/catch.</div>
-    <h3 class="serif">How to work through it</h3>
+    <h2 class="serif">How to work through it</h2>
     <ol>
       <li>Read each definition, then run the matching interactive.</li>
       <li>Answer the practice check before revealing the answer.</li>
@@ -336,6 +354,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
         <div class="ans">Caching before calling the handler means you'd have to cache something before you know if it succeeded, which either forces you to guess, or forces a second write to overwrite it after the fact, and if that second write is skipped on the error path, a failed attempt gets permanently marked as "done" anyway. The safe order is: try the handler, and only write to <span class="mono-inline">seen</span> inside the success path, after the handler has actually returned without raising.</div>
       </details>
     </div>
+
+    <div class="decision" id="decision4">
+      <div class="dlbl">⚖ AI Engineering Decision</div>
+      <div class="dsit">A model-generated tool call <span class="mono-inline">issue_refund(orderId: "ORD-991", amountCents: 4200000)</span> arrives. The schema requires both fields, both are present, both have the correct type, and the order genuinely exists. Nothing about the call is malformed. This order's total was $38.00. What should the executor do?</div>
+      <div id="decision4opts"></div>
+      <div class="dexplain" id="decision4explain"></div>
+    </div>
   </section>
 
   <section>
@@ -347,9 +372,20 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
       <li>Explain why idempotent execution matters specifically for tools with side effects.</li>
       <li>Implement an executor that caches successes but leaves failures retryable.</li>
     </ul>
-    <div class="practice">
-      <div class="lbl">Looking ahead</div>
-      <p>One validated, idempotent tool call is the base case. Module 5 is what happens when a model chains many tool calls together in a loop, reasoning about what to do next based on each result, and what stops that loop from running forever.</p>
+    <div class="prodwarn">
+      <div class="plbl">⚠ What would break in production?</div>
+      <ul>
+        <li><b>Argument-shape validation without bounds checking.</b> A refund amount, a date, or a quantity can be the right type and still be nonsense for this specific request.</li>
+        <li><b>Duplicated execution.</b> A retried call without a stable idempotency key re-runs a side effect that already happened, a double charge, a double email, a double ticket.</li>
+        <li><b>Dangerous permissions with no allowlist.</b> An object passed straight through to a handler lets any matching field ride along, including ones no legitimate caller should be able to set (this module's mass-assignment example).</li>
+        <li><b>Silent timeout handling.</b> A call that times out waiting for a response isn't automatically safe to mark "failed, retry freely", the side effect may have already happened server-side.</li>
+      </ul>
+      <div class="prule"><b>Rule of thumb:</b> schema validation proves the call is well-formed. It says nothing about whether the call is a good idea. Those are two different checks, and production tool executors need both.</div>
+    </div>
+
+    <div class="connection">
+      <div class="clbl">The engineering connection</div>
+      <p>You can now make a single tool call safe to execute, and safe to retry. But one validated, idempotent call is the base case. Module 5 is what happens when a model chains many tool calls together in a loop, reasoning about what to do next based on each result, and what stops that loop from running forever.</p>
     </div>
   </section>
 
@@ -447,11 +483,47 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
   <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
 </div></div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="pyodide-sandbox-runner.js"></script>
 <script>
 const MODULE_ID = 4;
+if (!CourseProgress.isUnlocked(MODULE_ID)) {
+  window.location.href = "module-03.html";
+}
 CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Reusable: AI Engineering Decision component (ungraded judgment practice) ---------------- */
+function initDecision(containerId, opts){
+  const el = document.getElementById(containerId + "opts");
+  let answered = false;
+  opts.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "dopt";
+    btn.textContent = opt.t;
+    btn.addEventListener("click", () => {
+      if (answered) return;
+      answered = true;
+      Array.from(el.children).forEach((b, j) => {
+        if (opts[j].correct) b.classList.add("correct");
+        else if (j === i) b.classList.add("incorrect");
+      });
+      const ex = document.getElementById(containerId + "explain");
+      ex.style.display = "block";
+      ex.textContent = (opt.correct ? "Correct. " : "Not the strongest call here. ") + opt.why;
+    });
+    el.appendChild(btn);
+  });
+}
+initDecision("decision4", [
+  { t: "A. Execute it, schema validation passed and that's the executor's job", correct: false,
+    why: "Schema validation only proves the call is well-FORMED, correct types, required fields present. It says nothing about whether $42,000 makes sense as a refund on a $38 order. Executing on shape-correctness alone is exactly the gap this module's mass-assignment scenario warned about." },
+  { t: "B. Reject it outright and never surface it to the model", correct: false,
+    why: "Silently dropping it denies the caller any way to correct course, and if this really is a legitimate edge case (a bulk adjustment, a different currency unit), a hard reject with no explanation just breaks the flow. The model needs a specific reason back, not silence." },
+  { t: "C. Reject it with a bounds-check error tied to the order's actual total, and report that reason back so the model (or a human) can react", correct: true,
+    why: "This is schema validation plus a business-rule check, exactly the two-layer pattern this module teaches: the shape is fine, but a refund over 100x the order total should never execute without a specific, named reason. Reporting the reason back (not just failing silently) gives the model a chance to self-correct, the same discipline as Module 1's repair-then-report pattern." },
+  { t: "D. Execute it, but flag the transaction for a human to review afterward", correct: false,
+    why: "\"Execute now, review later\" only works when the action is reversible and low-cost to undo. A $42,000 refund that already left the account isn't something a later review can cleanly undo, the check needs to happen BEFORE execution, not after." },
+]);
 
 /* ---------------- Section 2: spot the unsafe tool call ---------------- */
 const SPOT_CALLS = [
@@ -711,8 +783,13 @@ function buildMC(qkey, opts, elId){
       });
       const ex = document.getElementById(qkey + "explain");
       ex.style.display = "block";
-      if (opt.correct) { score++; ex.textContent = opt.correctText; }
-      else { ex.textContent = "Not quite. " + opt.reason; }
+      const principle = opts.find(o => o.correct).correctText.replace(/^Correct\.\s*/, "");
+      if (opt.correct) {
+        score++;
+        ex.innerHTML = `<b>Correct.</b> ${CourseProgress.escapeHtml(principle)}`;
+      } else {
+        ex.innerHTML = `<b>Why this is wrong:</b> ${CourseProgress.escapeHtml(opt.reason)}<br><br><b>Engineering principle:</b> ${CourseProgress.escapeHtml(principle)}`;
+      }
       updateScore();
     });
     el.appendChild(div);
@@ -761,6 +838,7 @@ function maybeShowRetry(){
   btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
 }
 document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModuleAnswers(MODULE_ID);
   score = 0;
   Object.keys(answered).forEach(k => answered[k] = false);
   document.querySelectorAll(".qexplain").forEach(el => { el.style.display = "none"; el.textContent = ""; });

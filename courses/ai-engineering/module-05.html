@@ -52,6 +52,24 @@ p+p{margin-top:14px}
 code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
 .callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
 .callout b{color:var(--amber)}
+.decision{background:var(--card2);border:1px solid var(--amber);border-radius:12px;padding:20px 22px;margin-top:20px}
+.decision .dlbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);background:rgba(255,207,77,.1);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+.decision .dsit{font-size:14.5px;color:var(--tx);margin-bottom:14px;line-height:1.7}
+.decision .dsit b{color:var(--amber)}
+.decision .dopt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;font-size:14px;background:var(--bg2);color:var(--tx);font-family:'Space Grotesk',sans-serif}
+.decision .dopt:hover{border-color:var(--bd2)}
+.decision .dopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.decision .dopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.decision .dexplain{margin-top:12px;padding:14px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd);line-height:1.7}
+.prodwarn{border:1px solid rgba(255,107,107,.35);background:rgba(255,107,107,.05);border-radius:12px;padding:20px 22px;margin-top:20px}
+.prodwarn .plbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:12px}
+.prodwarn ul{list-style:none;display:grid;gap:8px;margin-top:4px}
+.prodwarn ul li{padding-left:20px;position:relative;font-size:14px;color:var(--tx)}
+.prodwarn ul li:before{content:"✗";position:absolute;left:0;color:var(--red);font-weight:700}
+.prodwarn .prule{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,107,107,.2);font-size:13.5px;color:var(--mut)}
+.prodwarn .prule b{color:var(--red)}
+.connection{background:linear-gradient(135deg,rgba(198,244,50,.06),rgba(167,139,250,.05));border:1px solid var(--bd2);border-radius:12px;padding:20px 22px;margin-top:18px}
+.connection .clbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:10px}
 .interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
 .interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
 .interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
@@ -92,8 +110,8 @@ input[type=range]{width:100%;margin-top:8px;accent-color:var(--lime)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 .orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
 .orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
+.orient h2{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h2:first-of-type{margin-top:0}
 .orient p{font-size:14.5px;color:var(--mut)}
 .orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
 .orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
@@ -169,13 +187,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
   <div class="orient">
     <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module assumes</h3>
+    <h2 class="serif">What this module assumes</h2>
     <p>Module 4 made a single tool call safe to execute. This module is about what happens when a model doesn't stop after one call, it uses a tool's result to decide what to do next, calls another tool, and keeps going until it has an answer, or until something has to stop it.</p>
-    <h3 class="serif">What's new</h3>
+    <h2 class="serif">What's new</h2>
     <p>Control flow you don't fully control. The model decides how many steps it takes and what each one is, your code's job is to bound that process so it can't run forever or spin on a failure.</p>
-    <h3 class="serif">What's assumed</h3>
+    <h2 class="serif">What's assumed</h2>
     <div class="assume">Modules 1-4 completed. Comfort with loops, arrays, and functions that return different shapes depending on what happened.</div>
-    <h3 class="serif">How to work through it</h3>
+    <h2 class="serif">How to work through it</h2>
     <ol>
       <li>Read each definition, then run the matching interactive.</li>
       <li>Answer the practice check before revealing the answer.</li>
@@ -293,6 +311,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
         <div class="ans">No, not if it's matching on tool name alone. The stuck signal defined earlier in this module is exact repetition, same tool AND same arguments, not "the same tool got called again." A coding agent trying six different diffs is taking six different actions that happen to share a tool name, that's iterative debugging, not spinning. If the SAME diff (identical arguments) got submitted twice in a row, that would be the real signal, the model resubmitting a patch that already failed without changing anything. Matching on tool name only would falsely kill a lot of legitimate agent behavior.</div>
       </details>
     </div>
+
+    <div class="decision" id="decision5">
+      <div class="dlbl">⚖ AI Engineering Decision</div>
+      <div class="dsit">An agent with a <span class="mono-inline">web_search</span> tool and a 20-step budget is asked a genuinely hard, multi-part research question. By step 20 it has called <span class="mono-inline">web_search</span> 20 times, no two calls with the same query, and still hasn't emitted a final answer. What should the loop do?</div>
+      <div id="decision5opts"></div>
+      <div class="dexplain" id="decision5explain"></div>
+    </div>
   </section>
 
   <section>
@@ -360,9 +385,20 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
       <li>Distinguish success, step-limit, and stuck as three separate, differently-handled outcomes.</li>
       <li>Implement a loop that enforces a step limit and detects repeated-action stalls.</li>
     </ul>
-    <div class="practice">
-      <div class="lbl">Looking ahead</div>
-      <p>A bounded loop stops it from running forever. It says nothing about what happens when an individual model call inside that loop fails, times out, or comes back malformed. Module 6 covers making each call itself resilient: retries, backoff, and fallback.</p>
+    <div class="prodwarn">
+      <div class="plbl">⚠ What would break in production?</div>
+      <ul>
+        <li><b>No step limit.</b> "The model will know when to stop" is a hope, not a control mechanism, an unbounded loop is an unbounded bill, in tokens, tool calls, and time.</li>
+        <li><b>Tool abuse from an unconstrained loop.</b> A stuck agent doesn't just waste steps, if one of its tools has a real side effect, a stuck loop can repeat that side effect just as easily as it repeats a harmless search.</li>
+        <li><b>Incorrect task decomposition treated as success.</b> A loop that hits its step limit with plausible-looking partial reasoning can look done from the outside. Scraping the last reasoning text for something answer-shaped is not the same as the model actually finishing.</li>
+        <li><b>Runaway cost from a legitimate-looking loop.</b> Twenty different tool calls, no repeats, still hits the same bill as twenty repeated ones if nothing bounds the loop itself, distinct actions aren't automatically cheap actions.</li>
+      </ul>
+      <div class="prule"><b>Rule of thumb:</b> a loop needs a hard step limit AND stuck-detection, because they catch two different failures, running out of budget on a genuinely hard task, and spinning on a task that's actually broken.</div>
+    </div>
+
+    <div class="connection">
+      <div class="clbl">The engineering connection</div>
+      <p>You can now stop a loop from running forever, and tell a genuinely hard task apart from a stuck one. But a bounded loop says nothing about what happens when an individual model call inside it fails, times out, or comes back malformed. Module 6 covers making each call itself resilient: retries, backoff, and fallback.</p>
     </div>
   </section>
 
@@ -458,11 +494,47 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
   <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
 </div></div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="pyodide-sandbox-runner.js"></script>
 <script>
 const MODULE_ID = 5;
+if (!CourseProgress.isUnlocked(MODULE_ID)) {
+  window.location.href = "module-04.html";
+}
 CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Reusable: AI Engineering Decision component (ungraded judgment practice) ---------------- */
+function initDecision(containerId, opts){
+  const el = document.getElementById(containerId + "opts");
+  let answered = false;
+  opts.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "dopt";
+    btn.textContent = opt.t;
+    btn.addEventListener("click", () => {
+      if (answered) return;
+      answered = true;
+      Array.from(el.children).forEach((b, j) => {
+        if (opts[j].correct) b.classList.add("correct");
+        else if (j === i) b.classList.add("incorrect");
+      });
+      const ex = document.getElementById(containerId + "explain");
+      ex.style.display = "block";
+      ex.textContent = (opt.correct ? "Correct. " : "Not the strongest call here. ") + opt.why;
+    });
+    el.appendChild(btn);
+  });
+}
+initDecision("decision5", [
+  { t: "A. Keep going past 20 steps, the model is clearly making real progress with distinct searches", correct: false,
+    why: "A step limit that quietly extends itself whenever the model \"seems to be making progress\" isn't a limit at all, it's a suggestion, exactly what this module opened by rejecting. However legitimate the 20 searches were, the budget existed for a reason: bounded cost and bounded time." },
+  { t: "B. Treat it as a step-limit outcome, report that the loop ran out of budget before finishing, distinct from a stuck outcome", correct: true,
+    why: "This is exactly the trichotomy this module teaches: 20 distinct, non-repeating actions with no final-answer signal is a step-limit ending, not a stuck ending, and not a success. Reporting it as \"ran out of budget on a hard task\" (rather than silently returning nothing, or worse, fabricating an answer from partial reasoning) gives whoever's downstream real signal: this task may need a bigger budget, not that something is broken." },
+  { t: "C. Treat it as stuck, since 20 calls to the same tool is suspicious", correct: false,
+    why: "Stuck detection in this module is defined as the SAME action (same tool AND same arguments) repeating, not the same tool being reused with different arguments. 20 different queries to web_search is 20 different actions that happen to share a tool name, exactly the false-positive this module's coding-agent scenario warned against." },
+  { t: "D. Silently return whatever partial answer the model's last reasoning text implies", correct: false,
+    why: "Success is defined by the model emitting the explicit final-answer signal, not by an outside observer deciding the accumulated reasoning \"looks good enough.\" Fabricating a success from leftover reasoning text hides a real step-limit failure behind something that looks like it worked." },
+]);
 
 /* ---------------- Section 2: trace step-through ---------------- */
 const TRACE_STEPS = [
@@ -777,8 +849,13 @@ function buildMC(qkey, opts, elId){
       });
       const ex = document.getElementById(qkey + "explain");
       ex.style.display = "block";
-      if (opt.correct) { score++; ex.textContent = opt.correctText; }
-      else { ex.textContent = "Not quite. " + opt.reason; }
+      const principle = opts.find(o => o.correct).correctText.replace(/^Correct\.\s*/, "");
+      if (opt.correct) {
+        score++;
+        ex.innerHTML = `<b>Correct.</b> ${CourseProgress.escapeHtml(principle)}`;
+      } else {
+        ex.innerHTML = `<b>Why this is wrong:</b> ${CourseProgress.escapeHtml(opt.reason)}<br><br><b>Engineering principle:</b> ${CourseProgress.escapeHtml(principle)}`;
+      }
       updateScore();
     });
     el.appendChild(div);
@@ -827,6 +904,7 @@ function maybeShowRetry(){
   btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
 }
 document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModuleAnswers(MODULE_ID);
   score = 0;
   Object.keys(answered).forEach(k => answered[k] = false);
   document.querySelectorAll(".qexplain").forEach(el => { el.style.display = "none"; el.textContent = ""; });

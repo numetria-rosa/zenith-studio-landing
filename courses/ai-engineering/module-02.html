@@ -52,6 +52,28 @@ p+p{margin-top:14px}
 code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
 .callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
 .callout b{color:var(--amber)}
+.decision{background:var(--card2);border:1px solid var(--amber);border-radius:12px;padding:20px 22px;margin-top:20px}
+.decision .dlbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);background:rgba(255,207,77,.1);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+.decision .dsit{font-size:14.5px;color:var(--tx);margin-bottom:14px;line-height:1.7}
+.decision .dsit b{color:var(--amber)}
+.decision .dopt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;font-size:14px;background:var(--bg2);color:var(--tx);font-family:'Space Grotesk',sans-serif}
+.decision .dopt:hover{border-color:var(--bd2)}
+.decision .dopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.decision .dopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.decision .dexplain{margin-top:12px;padding:14px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd);line-height:1.7}
+.prodwarn{border:1px solid rgba(255,107,107,.35);background:rgba(255,107,107,.05);border-radius:12px;padding:20px 22px;margin-top:20px}
+.prodwarn .plbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:12px}
+.prodwarn ul{list-style:none;display:grid;gap:8px;margin-top:4px}
+.prodwarn ul li{padding-left:20px;position:relative;font-size:14px;color:var(--tx)}
+.prodwarn ul li:before{content:"✗";position:absolute;left:0;color:var(--red);font-weight:700}
+.prodwarn .prule{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,107,107,.2);font-size:13.5px;color:var(--mut)}
+.prodwarn .prule b{color:var(--red)}
+.debugcase{background:var(--card);border:1px solid var(--violet);border-radius:14px;padding:24px;margin-top:20px}
+.debugcase .glbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);background:rgba(167,139,250,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
+.debugcase .evidence{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:'JetBrains Mono';font-size:12.5px;color:var(--mut);white-space:pre-wrap;line-height:1.7}
+.debugcase .gquestion{font-size:14.5px;font-weight:600;margin-top:14px;margin-bottom:10px}
+.connection{background:linear-gradient(135deg,rgba(198,244,50,.06),rgba(167,139,250,.05));border:1px solid var(--bd2);border-radius:12px;padding:20px 22px;margin-top:18px}
+.connection .clbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:10px}
 .interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
 .interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
 .interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
@@ -92,8 +114,8 @@ input[type=range]{width:100%;margin-top:8px;accent-color:var(--lime)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 .orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
 .orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
+.orient h2{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h2:first-of-type{margin-top:0}
 .orient p{font-size:14.5px;color:var(--mut)}
 .orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
 .orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
@@ -161,13 +183,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
   <div class="orient">
     <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module assumes</h3>
+    <h2 class="serif">What this module assumes</h2>
     <p>Module 1 treated a single prompt/response pair as if it had unlimited room. It doesn't. Every model has a maximum context window, a hard ceiling on how many tokens of input plus output fit in one call, and every token has a cost.</p>
-    <h3 class="serif">What's new</h3>
+    <h2 class="serif">What's new</h2>
     <p>This is the first module with real arithmetic. You'll compute actual numbers: token estimates, budgets, and chunk boundaries, then implement a chunker that a real ingestion pipeline could use.</p>
-    <h3 class="serif">What's assumed</h3>
+    <h2 class="serif">What's assumed</h2>
     <div class="assume">Module 1 completed. Basic algebra, Python lists, and loops.</div>
-    <h3 class="serif">How to work through it</h3>
+    <h2 class="serif">How to work through it</h2>
     <ol>
       <li>Read each definition, then run the matching interactive.</li>
       <li>Answer the practice check before revealing the answer.</li>
@@ -237,6 +259,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
         <summary>Check your answer</summary>
         <div class="ans">The summary describes the chronological narrative and never mentions the actual complaint, because that paragraph was silently cut off before the model ever saw it. No exception was thrown, no log entry flagged it, the pipeline "worked" in the sense that it ran to completion and produced a plausible-looking summary. This is exactly the danger: a technically successful run that's functionally wrong, the kind of bug that survives testing because nothing in the execution path failed.</div>
       </details>
+    </div>
+
+    <div class="decision" id="decision2">
+      <div class="dlbl">⚖ AI Engineering Decision</div>
+      <div class="dsit">A legal-review pipeline sends whole contracts to a model with a 16,000-token context window. Most contracts fit fine. Once every couple hundred documents, a contract is long enough that the prompt would exceed the window entirely. What should the system do?</div>
+      <div id="decision2opts"></div>
+      <div class="dexplain" id="decision2explain"></div>
     </div>
   </section>
 
@@ -342,9 +371,20 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
       <li>Explain what overlap buys you at a chunk boundary, and that it isn't free.</li>
       <li>Implement a chunker that never silently drops content, even for an oversized single unit.</li>
     </ul>
-    <div class="practice">
-      <div class="lbl">Looking ahead</div>
-      <p>Chunking solves "how do I fit content." It doesn't solve "which chunk is actually relevant to this question." Module 3 is retrieval, the mechanism that searches across chunks instead of hoping the right one made it into the prompt.</p>
+    <div class="prodwarn">
+      <div class="plbl">⚠ What would break in production?</div>
+      <ul>
+        <li><b>Truncation with no strategy.</b> Cutting off at the limit silently discards whatever came after, no error, no warning, just a wrong answer that looks confident.</li>
+        <li><b>Fixed chunk sizes across document types.</b> A chunk size tuned for short support tickets splits a legal contract's clauses mid-sentence.</li>
+        <li><b>Overlap tuned to zero.</b> Saves tokens right up until the one fact you needed was split exactly across a boundary and appears in neither chunk intact.</li>
+        <li><b>Budget math that forgets reserved output.</b> Computing available input as the full context window, with no room saved for the response, produces a request that fails at generation time, not before it.</li>
+      </ul>
+      <div class="prule"><b>Rule of thumb:</b> a token budget is arithmetic you do before the call, not a limit you discover from an error message after it.</div>
+    </div>
+
+    <div class="connection">
+      <div class="clbl">The engineering connection</div>
+      <p>You can now fit content into a budget without silently losing any of it. But chunking solves "how do I fit content," not "which chunk is actually relevant to this specific question." Module 3 is retrieval, the mechanism that searches across chunks instead of hoping the right one made it into the prompt by luck.</p>
     </div>
   </section>
 
@@ -443,11 +483,47 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
   <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
 </div></div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="pyodide-sandbox-runner.js"></script>
 <script>
 const MODULE_ID = 2;
+if (!CourseProgress.isUnlocked(MODULE_ID)) {
+  window.location.href = "module-01.html";
+}
 CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Reusable: AI Engineering Decision component (ungraded judgment practice) ---------------- */
+function initDecision(containerId, opts){
+  const el = document.getElementById(containerId + "opts");
+  let answered = false;
+  opts.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "dopt";
+    btn.textContent = opt.t;
+    btn.addEventListener("click", () => {
+      if (answered) return;
+      answered = true;
+      Array.from(el.children).forEach((b, j) => {
+        if (opts[j].correct) b.classList.add("correct");
+        else if (j === i) b.classList.add("incorrect");
+      });
+      const ex = document.getElementById(containerId + "explain");
+      ex.style.display = "block";
+      ex.textContent = (opt.correct ? "Correct. " : "Not the strongest call here. ") + opt.why;
+    });
+    el.appendChild(btn);
+  });
+}
+initDecision("decision2", [
+  { t: "A. Truncate the contract at the window limit and summarize whatever made it in", correct: false,
+    why: "This is exactly the silent-failure bug this module opened with, the truncated tail (often the termination clause, liability terms, or signatures) disappears with no error, and a review that missed it looks identical to a review that caught everything." },
+  { t: "B. Reject the document outright as \"too long to process\"", correct: false,
+    why: "Rejecting throws away a document the system CAN handle, it just needs to be split first. That's a worse outcome for the rare-but-real long contract than solving the actual problem, chunking with overlap." },
+  { t: "C. Chunk the contract with overlap, sized to the available input budget, and process it in pieces", correct: true,
+    why: "This is the module's core lesson applied correctly: compute the available input budget (window minus reserved output), split the contract into chunks that fit it with overlap at the boundaries, and process every chunk, nothing gets silently dropped." },
+  { t: "D. Switch to a model with a bigger context window only for this document", correct: false,
+    why: "This can be a reasonable secondary lever, but on its own it doesn't scale, there's always a contract long enough to exceed whatever window you pick next, and it doesn't remove the need for a real chunking strategy for the documents that still won't fit." },
+]);
 
 /* ---------------- Section 2: context budget calculator ---------------- */
 function updateCtx(){
@@ -680,6 +756,12 @@ document.getElementById("btnRunChunkTests").addEventListener("click", runChunkTe
 let score = 0;
 const answered = { q1:false, q2:false, q3:false, q4:false, q5:false };
 
+function renderQuizExplain(ex, opt, principle){
+  ex.innerHTML = opt.correct
+    ? `<b>Correct.</b> ${CourseProgress.escapeHtml(principle)}`
+    : `<b>Why this is wrong:</b> ${CourseProgress.escapeHtml(opt.reason)}<br><br><b>Engineering principle:</b> ${CourseProgress.escapeHtml(principle)}`;
+}
+
 function updateScore(){
   document.getElementById("scoreDisplay").textContent = `Checkpoint score: ${score} / 5`;
   const allDone = answered.q1 && answered.q2 && answered.q3 && answered.q4 && answered.q5;
@@ -691,6 +773,7 @@ function updateScore(){
 
 function checkQ1(){
   if (answered.q1) return;
+  if (!document.getElementById("q1input").value.trim()) return;
   const val = Number(document.getElementById("q1input").value);
   const ex = document.getElementById("q1explain");
   ex.style.display = "block";
@@ -704,6 +787,7 @@ document.getElementById("q1check").addEventListener("click", checkQ1);
 
 function checkQ2(){
   if (answered.q2) return;
+  if (!document.getElementById("q2input").value.trim()) return;
   const val = Number(document.getElementById("q2input").value);
   const ex = document.getElementById("q2explain");
   ex.style.display = "block";
@@ -735,8 +819,8 @@ q3Options.forEach((opt, i) => {
     });
     const ex = document.getElementById("q3explain");
     ex.style.display = "block";
-    if (opt.correct) { score++; ex.textContent = "Correct. It runs to completion and produces plausible-looking output while quietly missing content."; }
-    else { ex.textContent = "Not quite. " + opt.reason; }
+    if (opt.correct) score++;
+    renderQuizExplain(ex, opt, "It runs to completion and produces plausible-looking output while quietly missing content.");
     updateScore();
   });
   q3el.appendChild(div);
@@ -762,8 +846,8 @@ q4Options.forEach((opt, i) => {
     });
     const ex = document.getElementById("q4explain");
     ex.style.display = "block";
-    if (opt.correct) { score++; ex.textContent = "Correct. Overlap trades cost for boundary continuity, it isn't free."; }
-    else { ex.textContent = "Not quite. " + opt.reason; }
+    if (opt.correct) score++;
+    renderQuizExplain(ex, opt, "Overlap trades cost for boundary continuity, it isn't free.");
     updateScore();
   });
   q4el.appendChild(div);
@@ -789,8 +873,8 @@ q5Options.forEach((opt, i) => {
     });
     const ex = document.getElementById("q5explain");
     ex.style.display = "block";
-    if (opt.correct) { score++; ex.textContent = "Correct. A failed-then-retried call costs roughly the sum of both attempts' tokens, not just one."; }
-    else { ex.textContent = "Not quite. " + opt.reason; }
+    if (opt.correct) score++;
+    renderQuizExplain(ex, opt, "A failed-then-retried call costs roughly the sum of both attempts' tokens, not just one.");
     updateScore();
   });
   q5el.appendChild(div);
@@ -808,7 +892,7 @@ function maybeShowRetry(){
   btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
 }
 document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
-  CourseProgress.resetModule(MODULE_ID);
+  CourseProgress.resetModuleAnswers(MODULE_ID);
   window.location.reload();
 });
 const _origUpdateScore = updateScore;

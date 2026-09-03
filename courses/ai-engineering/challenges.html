@@ -206,10 +206,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
 <div class="scoreboard"><div class="in">
   <span class="mono sc" id="scoreDisplay">Pass both challenges to unlock the capstone</span>
+  <button id="btnRetryChallenges" style="display:none">&#8635; Retry both challenges</button>
   <button class="primary nextbtn" id="btnNext" disabled>Continue to the capstone &rarr;</button>
 </div></div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script>
 function mkOpts(containerId, opts, onGraded){
   const el = document.getElementById(containerId);
@@ -350,9 +351,20 @@ function updateOverall(){
   document.getElementById("scoreDisplay").textContent =
     `RAG support bot: ${rag ? rag.passCount + "/" + rag.total : "not attempted"} · Failure investigation: ${inc ? inc.passCount + "/" + inc.total : "not attempted"}`;
   document.getElementById("btnNext").disabled = !(ragDone && incDone);
+  const ragAllAnswered = pQuestions.every(q => pAnswered[q.id]);
+  const incAllAnswered = iQuestions.every(q => iAnswered[q.id]);
+  const anyAnswered = ragAllAnswered || incAllAnswered;
+  const needsRetry = (ragAllAnswered && !ragDone) || (incAllAnswered && !incDone);
+  document.getElementById("btnRetryChallenges").style.display = (anyAnswered && needsRetry) ? "inline-flex" : "none";
 }
 document.getElementById("btnNext").addEventListener("click", () => {
   window.location.href = "module-08.html";
+});
+document.getElementById("btnRetryChallenges").addEventListener("click", () => {
+  CourseProgress.resetModule("cross");
+  CourseProgress.setExtra("crossRagBot", null);
+  CourseProgress.setExtra("crossFailureInvestigation", null);
+  window.location.reload();
 });
 updateOverall();
 

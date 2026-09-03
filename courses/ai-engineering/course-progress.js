@@ -340,12 +340,24 @@
     save(data);
   }
 
+  // Clears only the checkpoint quiz's answers/score, preserving `sections` (the
+  // Pyodide code-exercise pass state and hint-usage tracking). "Retry checkpoint"
+  // must not cost a student their already-passed hands-on exercise.
+  function resetModuleAnswers(id) {
+    const data = load();
+    const cur = cleanModuleRecord(data.modules[id]);
+    data.modules[id] = Object.assign({}, cur, {
+      answers: {}, score: 0, total: 0, completed: false, completedAt: undefined,
+    });
+    save(data);
+  }
+
   global.CourseProgress = {
     STORAGE_KEY, MODULES, STAGES, PASS_THRESHOLD, REQUIRED_SECTIONS, SECTION_LABELS, PROJECTS, RUBRIC_WEIGHTS,
     escapeHtml, safeHttpUrl,
     load, save, getModule, setModuleField, setAnswer, setSection, getExtra, setExtra,
     touchVisited, markComplete, isModuleComplete, isModuleDataComplete, completionRequirements,
-    overall, isUnlocked, statusOf, resetAll, resetModule, crossChallengesComplete,
+    overall, isUnlocked, statusOf, resetAll, resetModule, resetModuleAnswers, crossChallengesComplete,
     rubricForProject, getProject, setProject,
   };
 

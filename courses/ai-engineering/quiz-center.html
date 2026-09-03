@@ -121,7 +121,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
   <footer>Zenith Lab · AI Engineering · Quiz Center</footer>
 </div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="quiz-data.js"></script>
 <script>
 function quizKey(id){ return "quiz_" + id; }
@@ -249,12 +249,12 @@ function renderQuestions(){
         });
         const ex = document.getElementById(`qex_${qi}`);
         ex.style.display = "block";
+        const correctOpt = q.opts.find(o => o.correct);
         if (opt.correct) {
           currentQuiz.score++;
-          ex.innerHTML = `<b>Correct.</b> Learning objective: ${q.objective}`;
+          ex.innerHTML = `<b>Correct.</b> ${correctOpt.t}`;
         } else {
-          const correctOpt = q.opts.find(o => o.correct);
-          ex.innerHTML = `<b>Not quite.</b> ${opt.why} <br><br><b>Remember:</b> ${correctOpt.t} — this maps to: ${q.objective}`;
+          ex.innerHTML = `<b>Why this is wrong:</b> ${opt.why}<br><br><b>Engineering principle:</b> ${correctOpt.t}`;
         }
         checkQuizDone();
       });

@@ -80,8 +80,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 
 .orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
 .orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
+.orient h2{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h2:first-of-type{margin-top:0}
 .orient p{font-size:14.5px;color:var(--mut)}
 .orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
 .orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
@@ -138,6 +138,15 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 .finalscore .fstotal{font-size:18px;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd2);display:flex;justify-content:space-between}
 .finalscore .fstotal b{font-family:'JetBrains Mono';color:var(--lime);font-size:24px}
 .debugcode{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;font-family:'JetBrains Mono';font-size:12.5px;color:var(--mut);white-space:pre-wrap;overflow-x:auto;margin-top:14px;line-height:1.7}
+.reviewwrap{margin-top:16px;display:grid;gap:16px}
+.reviewq{background:var(--card2);border:1px solid var(--bd2);border-radius:12px;padding:20px 22px}
+.reviewq .rqnum{font-family:'JetBrains Mono';font-size:11px;color:var(--lime);font-weight:700;margin-bottom:8px}
+.reviewq .rqtext{font-size:15px;font-weight:600;margin-bottom:12px;color:var(--tx)}
+.reviewq textarea{width:100%;font-family:'Space Grotesk',sans-serif;font-size:14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 14px;color:var(--tx);resize:vertical;min-height:70px}
+.gradbanner{margin-top:28px;background:linear-gradient(135deg,rgba(198,244,50,.1),rgba(167,139,250,.08));border:1px solid var(--lime);border-radius:16px;padding:32px;text-align:center}
+.gradbanner .gbicon{font-size:32px}
+.gradbanner h3{font-size:22px;font-weight:700;font-family:'Source Serif 4',serif;margin-top:10px}
+.gradbanner p{color:var(--mut);font-size:14.5px;margin-top:10px;max-width:560px;margin-left:auto;margin-right:auto}
 .qopt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
 .qopt:hover{border-color:var(--bd2)}
 .qopt input{margin-top:3px}
@@ -187,11 +196,11 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
   <div class="orient">
     <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module is, and isn't</h3>
+    <h2 class="serif">What this module is, and isn't</h2>
     <p>Every prior module taught one idea in isolation. This one teaches nothing new, it asks whether you can put seven ideas together under one brief without dropping any of them, which is the actual job. There's no new theory here, just the same rigor applied to a single realistic scenario end to end.</p>
-    <h3 class="serif">How grading works here</h3>
+    <h2 class="serif">How grading works here</h2>
     <p>This module replaces the usual multiple-choice checkpoint with three real deliverables, graded from what you actually submit, not from boxes you tick yourself. Part 1 inspects the actual text of your design document for the specific technical content each section needs. Part 2 runs real automated tests against code you write, combining retrieval and idempotent tool execution. Part 3 checks your diagnosis of a real bug against the actual failure mode. Part 4 combines all three into one score.</p>
-    <h3 class="serif">How to work through it</h3>
+    <h2 class="serif">How to work through it</h2>
     <ol>
       <li>Read the brief carefully, twice, most real design failures come from missing a stated requirement, not from getting the theory wrong.</li>
       <li>Write your design document directly into Part 1's fields, then check it, and fix whatever comes back flagged.</li>
@@ -410,6 +419,49 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
     <div class="callout" style="margin-top:20px"><b>What this was actually for:</b> tutorials teach a specific API, and APIs change. Everything in this course, schema validation, context budgeting, relevance thresholds, idempotent execution, bounded loops, retry discipline, systematic evaluation, is the engineering judgment that doesn't expire when the next model ships. It's what separates a prompt-tinkerer from an AI engineer clients trust with production systems, and it's exactly what shows up, unlabeled, inside every brief like the one on this page.</div>
   </section>
 
+  <section>
+    <div class="kh"><span class="num">11</span><h2 class="serif">AI Engineering Design Review</h2></div>
+    <p class="mut">Ungraded, not checked against an answer key. Before a real engineer calls a system "done," they walk it component by component and ask what happens when that component fails. Do the same here, for the specific Meridian bot you built, not in the abstract.</p>
+    <div class="reviewwrap" id="reviewWrap">
+      <div class="reviewq">
+        <div class="rqnum">OUTPUT · MODULE 1</div>
+        <div class="rqtext">What happens in your implementation when the model returns invalid structure?</div>
+        <textarea id="review1" placeholder="Trace it through your actual handle_support_request code, not in general..."></textarea>
+      </div>
+      <div class="reviewq">
+        <div class="rqnum">RETRIEVAL · MODULE 3</div>
+        <div class="rqtext">What happens when the relevant information is not retrieved, or nothing clears your relevance threshold?</div>
+        <textarea id="review2" placeholder="What does the bot say to the user, and does it ever pretend to know something it doesn't..."></textarea>
+      </div>
+      <div class="reviewq">
+        <div class="rqnum">TOOLS · MODULE 4</div>
+        <div class="rqtext">What actions is the model allowed to perform, and what stops it from performing an action it shouldn't?</div>
+        <textarea id="review3" placeholder="Name the specific validation or permission check, and where in the pipeline it runs..."></textarea>
+      </div>
+      <div class="reviewq">
+        <div class="rqnum">RELIABILITY · MODULE 6</div>
+        <div class="rqtext">What happens when the same event, the same call ID, arrives twice?</div>
+        <textarea id="review4" placeholder="Walk through the cache check in your implementation, what's the actual outcome the second time..."></textarea>
+      </div>
+      <div class="reviewq">
+        <div class="rqnum">AGENTS · MODULE 5</div>
+        <div class="rqtext">What prevents this system from looping forever, or from repeating a failing action indefinitely?</div>
+        <textarea id="review5" placeholder="Name the specific bound, not just \"it's bounded\"..."></textarea>
+      </div>
+      <div class="reviewq">
+        <div class="rqnum">EVALUATION · MODULE 7</div>
+        <div class="rqtext">How would you know, with a number, whether a future change to this bot actually improved it?</div>
+        <textarea id="review6" placeholder="What's in the eval set, what's the baseline, what would count as a regression..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <div class="gradbanner" id="gradBanner" style="display:none">
+    <div class="gbicon">🎓</div>
+    <h2 class="serif">Capstone complete</h2>
+    <p>You designed, implemented, and debugged a production-shaped AI system end to end, and you can explain why every piece is there. That's the actual deliverable of this course, not the modules themselves, the judgment underneath them.</p>
+  </div>
+
   <footer>Zenith Lab · AI Engineering · Module 8 of 8 · Course complete</footer>
 </div>
 
@@ -418,42 +470,45 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
   <button class="primary nextbtn" id="btnNext" disabled>Score 80%+ to complete the course →</button>
 </div></div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="pyodide-sandbox-runner.js"></script>
 <script>
 const MODULE_ID = 8;
+if (!CourseProgress.isUnlocked(MODULE_ID)) {
+  window.location.href = "challenges.html";
+}
 CourseProgress.touchVisited(MODULE_ID);
 
 /* ================= PART 1: Design document ================= */
 const designFieldsSpec = [
   { id: "structured", label: "Structured output & validation strategy", mod: "Module 1",
     placeholder: "How do you keep model output trustworthy enough for the rest of the system to act on?",
-    minWords: 20,
-    required: ["schema","validat","repair","structured","parse"] },
+    minWords: 25,
+    groups: [["schema","valid"], ["repair","parse","fenc","comma"]], minGroups: 2 },
   { id: "context", label: "Context & token budget strategy", mod: "Module 2",
-    placeholder: "How do you keep retrieved content plus the conversation within the context window?",
-    minWords: 15,
-    required: ["token","budget","context window","chunk"] },
-  { id: "retrieval", label: "Retrieval & relevance strategy", mod: "Module 3",
-    placeholder: "How do you decide what's relevant, and what happens when nothing is?",
+    placeholder: "How do you keep retrieved content plus the conversation within the context window? Name an actual budget.",
     minWords: 20,
-    required: ["embedding","cosine","similarity","top-k","threshold","relevan"] },
+    groups: [["token","budget"], ["context window","window"], ["chunk","overlap","truncat"]], minGroups: 2, needsNumber: true },
+  { id: "retrieval", label: "Retrieval & relevance strategy", mod: "Module 3",
+    placeholder: "How do you decide what's relevant, and what happens when nothing is? Name an actual threshold and k.",
+    minWords: 25,
+    groups: [["embedding","cosine","similarity"], ["top-k","top k","rank"], ["threshold","relevan","min_score","min score"]], minGroups: 2, needsNumber: true },
   { id: "tools", label: "Tool execution & idempotency strategy", mod: "Module 4",
     placeholder: "How do you make a retried tool call safe, without duplicating its side effect?",
     minWords: 20,
-    required: ["idempoten","call id","cache","duplicate"] },
+    groups: [["idempoten","call id","stable id"], ["cache","cached","store"], ["duplicate","retry","re-run","rerun"]], minGroups: 2 },
   { id: "agent", label: "Agent control flow strategy", mod: "Module 5",
-    placeholder: "How is the agent's loop bounded? What stops it from running or repeating forever?",
-    minWords: 15,
-    required: ["step limit","stuck","loop","terminat","bound"] },
+    placeholder: "How is the agent's loop bounded? What stops it from running or repeating forever? Name an actual step limit.",
+    minWords: 20,
+    groups: [["step limit","max step","bound"], ["stuck","repeat"], ["terminat","stop","success"]], minGroups: 2, needsNumber: true },
   { id: "reliability", label: "Reliability strategy for the model API", mod: "Module 6",
-    placeholder: "How does the system handle a flaky model API? Retries, backoff, jitter, fallback?",
-    minWords: 15,
-    required: ["retry","backoff","jitter","fallback"] },
+    placeholder: "How does the system handle a flaky model API? Retries, backoff, jitter, fallback, with actual numbers.",
+    minWords: 20,
+    groups: [["retry","retries"], ["backoff","exponential"], ["jitter"], ["fallback"]], minGroups: 2, needsNumber: true },
   { id: "eval", label: "Evaluation & regression strategy", mod: "Module 7",
     placeholder: "How do you know a future change actually helped, before it ships?",
-    minWords: 15,
-    required: ["eval","baseline","regression","score"] },
+    minWords: 20,
+    groups: [["eval","test case","test set"], ["baseline"], ["regression","compare","before shipping"]], minGroups: 2 },
 ];
 
 function buildDesignFields(){
@@ -489,16 +544,25 @@ function validateDesign(){
     const statusEl = document.getElementById(`dfstatus-${f.id}`);
     const words = wordCount(val);
     const lower = val.toLowerCase();
-    const hasKeyword = f.required.some(kw => lower.includes(kw));
-    const pass = words >= f.minWords && hasKeyword;
+    // A "group" is one distinct sub-concept (e.g. "the metric" vs "the ranking rule" vs "the floor").
+    // Matching one keyword from a group counts that group as covered; this rewards covering several
+    // DIFFERENT ideas, not just repeating synonyms of the one idea that's easiest to keyword-stuff.
+    const groupsHit = f.groups.filter(group => group.some(kw => lower.includes(kw))).length;
+    const missingGroupCount = f.groups.length - groupsHit;
+    const hasNumber = !f.needsNumber || /\d/.test(val);
+    const enoughWords = words >= f.minWords;
+    const enoughGroups = groupsHit >= f.minGroups;
+    const pass = enoughWords && enoughGroups && hasNumber;
     if (pass) passCount++;
     statusEl.className = "dfstatus " + (pass ? "pass" : (val.trim() ? "fail" : "empty"));
     if (!val.trim()) {
       statusEl.textContent = "Not written yet";
-    } else if (words < f.minWords) {
+    } else if (!enoughWords) {
       statusEl.textContent = `Too brief (${words} words, needs ${f.minWords}+) — say more about the actual mechanism, not just that one exists`;
-    } else if (!hasKeyword) {
-      statusEl.textContent = `Missing the specific mechanism this section needs, mentions none of: ${f.required.slice(0,3).join(", ")}...`;
+    } else if (!enoughGroups) {
+      statusEl.textContent = `Only touches ${groupsHit} of ${f.groups.length} distinct ideas this section needs (${missingGroupCount} missing) — naming one concept repeatedly isn't the same as covering the mechanism end to end`;
+    } else if (!hasNumber) {
+      statusEl.textContent = `Names the mechanism but no concrete number, "we use a threshold" isn't a design, "0.4 cosine similarity" is — say what the actual value is`;
     } else {
       statusEl.textContent = "Looks complete";
     }
@@ -766,25 +830,61 @@ document.getElementById("btnRetryDebugQ1").addEventListener("click", () => {
 });
 
 let debugAnswerChecked = false;
+
+// Deterministic, keyword-spam-resistant rubric for the free-text diagnosis. A single
+// "mentions backoff" keyword check can be passed with a meaningless word list, so this
+// requires FOUR independent things at once: (1) naming what's actually broken (no
+// delay between attempts), (2) naming the specific fix (backoff/jitter/delay), (3)
+// enough distinct words to rule out repeating a couple of keywords to pad length, and
+// (4) actual explanatory sentence structure (connector words, e.g. "before", "which",
+// "so", or punctuation), which a bare word list ("no delay instant hammering backoff
+// jitter sleep wait immediately retry") reliably omits even when it hits every keyword,
+// because listing concepts doesn't require relating them to each other the way
+// describing a fix does.
+function gradeDebugAnswer(raw){
+  const val = raw.trim();
+  const lower = val.toLowerCase();
+  const words = val.split(/\s+/).filter(Boolean);
+  const uniqueWords = new Set(words.map(w => w.toLowerCase().replace(/[^a-z0-9]/g, ""))).size;
+
+  const namesProblem = /no delay|instant(ly)?|immediat|tight loop|hammer(s|ing)?|zero delay|right away|no wait|without (a |any )?delay|no backoff|as fast as possible|back.?to.?back|retries? too (fast|quickly)|calls? itself right away/.test(lower);
+  // "delay"/"wait" alone are ambiguous, "no delay" describes the PROBLEM, not a fix, so
+  // this only counts a fix as named when a delay is actually being proposed/added, or
+  // when the unambiguous backoff/jitter terms appear.
+  const namesFix = /backoff|jitter|\bsleep\b|add(ing|ed)?\s+(a |an |some )?delay|introduc(e|ing)\s+(a |an )?delay|increas(e|ing)\s+(the\s+)?delay|put\s+(a |an )?delay|insert\s+(a |an )?delay|with\s+a\s+delay|wait\s+before\s+(retry|retrying|each|the next)/.test(lower);
+  const enoughDistinctContent = words.length >= 10 && uniqueWords >= 8;
+  const connectorCount = (lower.match(/\b(the|a|an|to|so|because|since|which|that|this|before|each|every|between|instead|currently|right now|so that|causes?|means?|when|then)\b/g) || []).length;
+  const hasStructure = connectorCount >= 2 || /[,.;]/.test(val);
+
+  return { pass: namesProblem && namesFix && enoughDistinctContent && hasStructure, namesProblem, namesFix, enoughDistinctContent, hasStructure, uniqueWords, wordCount: words.length };
+}
+
 document.getElementById("btnCheckDebug").addEventListener("click", () => {
   const val = document.getElementById("debugAnswer").value.trim();
   const fb = document.getElementById("debugFeedback");
   fb.style.display = "block";
-  const lower = val.toLowerCase();
-  const mentionsBackoff = /backoff|delay|wait|jitter|sleep/.test(lower);
-  const tooShort = wordCount(val) < 8;
+  const grade = gradeDebugAnswer(val);
   debugAnswerChecked = true;
   CourseProgress.setSection(MODULE_ID, "debugAnswer", val);
-  CourseProgress.setSection(MODULE_ID, "debugAnswerOk", mentionsBackoff && !tooShort);
-  if (tooShort) {
-    fb.className = "feedback bad";
-    fb.textContent = "Say a bit more, what specifically would you add, and where in the function?";
-  } else if (mentionsBackoff) {
+  CourseProgress.setSection(MODULE_ID, "debugAnswerOk", grade.pass);
+  if (grade.pass) {
     fb.className = "feedback ok";
     fb.textContent = "Good, that's the fix: add an increasing delay (ideally with jitter) before each retry attempt, e.g. await sleep(baseDelay * 2 ** attempt) before the recursive call, so failed attempts spread out instead of hammering the model API instantly.";
-  } else {
+  } else if (!grade.enoughDistinctContent) {
+    fb.className = "feedback bad";
+    fb.textContent = "Say a bit more, and in your own words, not a repeated word or two. What specifically would you add, and where in the function?";
+  } else if (!grade.namesProblem && !grade.namesFix) {
     fb.className = "feedback bad";
     fb.textContent = "Not quite, look again at how quickly the function calls itself after a failure. Compare against Module 6's exponential backoff formula.";
+  } else if (!grade.namesProblem) {
+    fb.className = "feedback bad";
+    fb.textContent = "You named a fix, but not what's actually broken. Say specifically what the current code does wrong (how soon it retries after a failure), not just what you'd add.";
+  } else if (!grade.hasStructure) {
+    fb.className = "feedback bad";
+    fb.textContent = "You've got the right words, but write it as an actual explanation, not a list of terms. Say what's wrong, then what you'd change and why, the way you'd explain it to a teammate reading this code.";
+  } else {
+    fb.className = "feedback bad";
+    fb.textContent = "You've identified the problem, but not the specific fix. What would you add before the retry, and why does that solve it?";
   }
   checkDebugComplete();
 });
@@ -825,11 +925,22 @@ function recomputeFinal(){
   const ready = total >= 80;
   btn.disabled = !ready;
   btn.textContent = ready ? "Complete the course →" : "Score 80%+ across all 3 parts to complete the course →";
+  document.getElementById("gradBanner").style.display = ready ? "block" : "none";
 
   CourseProgress.markComplete(MODULE_ID, total, 100);
 }
 document.getElementById("btnRecomputeFinal").addEventListener("click", recomputeFinal);
 recomputeFinal();
+
+/* ---------------- AI Engineering Review (ungraded self-reflection, persisted) ---------------- */
+["review1","review2","review3","review4","review5","review6"].forEach(id => {
+  const ta = document.getElementById(id);
+  const stored = (CourseProgress.getModule(MODULE_ID).sections || {})[id];
+  if (stored) ta.value = stored;
+  ta.addEventListener("input", () => {
+    CourseProgress.setSection(MODULE_ID, id, ta.value);
+  });
+});
 
 document.getElementById("btnNext").addEventListener("click", () => {
   window.location.href = "dashboard.html";

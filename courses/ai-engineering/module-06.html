@@ -52,6 +52,24 @@ p+p{margin-top:14px}
 code, .mono-inline{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(198,244,50,.08);color:var(--lime);padding:1px 6px;border-radius:4px}
 .callout{border-left:3px solid var(--amber);background:rgba(255,207,77,.06);border-radius:0 10px 10px 0;padding:16px 20px;margin-top:18px}
 .callout b{color:var(--amber)}
+.decision{background:var(--card2);border:1px solid var(--amber);border-radius:12px;padding:20px 22px;margin-top:20px}
+.decision .dlbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);background:rgba(255,207,77,.1);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+.decision .dsit{font-size:14.5px;color:var(--tx);margin-bottom:14px;line-height:1.7}
+.decision .dsit b{color:var(--amber)}
+.decision .dopt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;cursor:pointer;font-size:14px;background:var(--bg2);color:var(--tx);font-family:'Space Grotesk',sans-serif}
+.decision .dopt:hover{border-color:var(--bd2)}
+.decision .dopt.correct{border-color:var(--emerald);background:rgba(52,229,160,.08)}
+.decision .dopt.incorrect{border-color:var(--red);background:rgba(255,107,107,.08)}
+.decision .dexplain{margin-top:12px;padding:14px 16px;border-radius:8px;font-size:13.5px;display:none;background:var(--bg2);border:1px solid var(--bd);line-height:1.7}
+.prodwarn{border:1px solid rgba(255,107,107,.35);background:rgba(255,107,107,.05);border-radius:12px;padding:20px 22px;margin-top:20px}
+.prodwarn .plbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:12px}
+.prodwarn ul{list-style:none;display:grid;gap:8px;margin-top:4px}
+.prodwarn ul li{padding-left:20px;position:relative;font-size:14px;color:var(--tx)}
+.prodwarn ul li:before{content:"✗";position:absolute;left:0;color:var(--red);font-weight:700}
+.prodwarn .prule{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,107,107,.2);font-size:13.5px;color:var(--mut)}
+.prodwarn .prule b{color:var(--red)}
+.connection{background:linear-gradient(135deg,rgba(198,244,50,.06),rgba(167,139,250,.05));border:1px solid var(--bd2);border-radius:12px;padding:20px 22px;margin-top:18px}
+.connection .clbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:10px}
 .interactive{background:var(--card);border:1px solid var(--bd2);border-radius:14px;padding:24px;margin-top:24px}
 .interactive .ilbl{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);background:rgba(198,244,50,.1);padding:5px 12px;border-radius:99px;margin-bottom:16px}
 .interactive .ilbl:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
@@ -92,8 +110,8 @@ input[type=range]{width:100%;margin-top:8px;accent-color:var(--lime)}
 footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 .orient{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 28px;margin:28px 0}
 .orient .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--lime);margin-bottom:12px}
-.orient h3{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
-.orient h3:first-of-type{margin-top:0}
+.orient h2{font-size:16px;font-weight:700;margin:18px 0 8px;color:var(--tx)}
+.orient h2:first-of-type{margin-top:0}
 .orient p{font-size:14.5px;color:var(--mut)}
 .orient ol{margin-top:8px;padding-left:20px;color:var(--mut);font-size:14px;line-height:1.9}
 .orient .assume{display:flex;gap:10px;align-items:flex-start;margin-top:6px;font-size:14px;color:var(--mut)}
@@ -166,13 +184,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
   <div class="orient">
     <div class="lbl">Before you start</div>
-    <h3 class="serif">What this module assumes</h3>
+    <h2 class="serif">What this module assumes</h2>
     <p>Every prior module assumed the model call itself succeeds. It won't always. Rate limits, timeouts, and transient server errors are a normal, expected part of calling any external API, model providers included, and a production system needs a deliberate strategy for them, not a bare try/catch that gives up on the first failure.</p>
-    <h3 class="serif">What's new</h3>
+    <h2 class="serif">What's new</h2>
     <p>This module isn't about the model's output anymore, it's about the reliability of getting a response at all. The logic here (retry, backoff, fallback) applies to the model call layer underneath everything Modules 1-5 built.</p>
-    <h3 class="serif">What's assumed</h3>
+    <h2 class="serif">What's assumed</h2>
     <div class="assume">Modules 1-5 completed. Comfort with Python's async/await, try/except, and loops.</div>
-    <h3 class="serif">How to work through it</h3>
+    <h2 class="serif">How to work through it</h2>
     <ol>
       <li>Read each definition, then run the matching interactive.</li>
       <li>Answer the practice check before revealing the answer.</li>
@@ -292,6 +310,13 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
         <div class="ans">The step COUNT stays bounded, the loop still only takes maxSteps iterations. But each individual step can now silently take far longer (and cost far more) than expected, since an unbounded retry-and-fallback wrapper inside one step defeats the purpose of bounding the number of steps. A step limit only actually bounds total cost and time if everything INSIDE each step is bounded too, which is exactly why this module's retry and fallback logic has its own hard limits.</div>
       </details>
     </div>
+
+    <div class="decision" id="decision6">
+      <div class="dlbl">⚖ AI Engineering Decision</div>
+      <div class="dsit">Your primary model provider starts returning 429s under load, roughly 1 in 6 requests. Your current code retries every 429 immediately, with no delay, up to 3 times. What's wrong with this, and what should change?</div>
+      <div id="decision6opts"></div>
+      <div class="dexplain" id="decision6explain"></div>
+    </div>
   </section>
 
   <section>
@@ -351,9 +376,20 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
       <li>Explain why fallback should be attempted once, not retried with the same budget as the primary.</li>
       <li>Implement a call wrapper with bounded retries and a single bounded fallback attempt.</li>
     </ul>
-    <div class="practice">
-      <div class="lbl">Looking ahead</div>
-      <p>A reliable call wrapper gets you a response. It doesn't tell you whether that response is actually GOOD. Module 7 covers evaluation, how to systematically measure whether your system's outputs are correct, before and after you change anything about it.</p>
+    <div class="prodwarn">
+      <div class="plbl">⚠ What would break in production?</div>
+      <ul>
+        <li><b>Retries causing duplicate actions.</b> A retried call without an idempotency key (Module 4) can re-run a side effect that already succeeded the first time.</li>
+        <li><b>Retry storms.</b> Every client retrying at the same fixed interval synchronizes into waves that hammer an already-struggling service right as it's trying to recover.</li>
+        <li><b>Backoff with no cap.</b> Doubling delay forever eventually means a "retry" that happens minutes after the request was actually useful, effectively a silent failure with extra steps.</li>
+        <li><b>Silent failures.</b> A fallback that also fails and gets swallowed instead of surfaced looks, from the outside, identical to a system that's working fine.</li>
+      </ul>
+      <div class="prule"><b>Rule of thumb:</b> retry logic is not "try again," it's a policy with four parts: what's retryable, how long to wait, how many times, and what happens when every attempt is exhausted. Missing any one part is a production incident waiting for the right kind of bad day.</div>
+    </div>
+
+    <div class="connection">
+      <div class="clbl">The engineering connection</div>
+      <p>You can now get a response out of a flaky model API without a retry storm or an unbounded bill. But a reliable call wrapper gets you a response, it doesn't tell you whether that response is actually GOOD. Module 7 covers evaluation, how to systematically measure whether your system's outputs are correct, before and after you change anything about it.</p>
     </div>
   </section>
 
@@ -451,11 +487,47 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
   <button class="primary nextbtn" id="btnNext" disabled>Complete all questions to continue →</button>
 </div></div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script src="pyodide-sandbox-runner.js"></script>
 <script>
 const MODULE_ID = 6;
+if (!CourseProgress.isUnlocked(MODULE_ID)) {
+  window.location.href = "module-05.html";
+}
 CourseProgress.touchVisited(MODULE_ID);
+
+/* ---------------- Reusable: AI Engineering Decision component (ungraded judgment practice) ---------------- */
+function initDecision(containerId, opts){
+  const el = document.getElementById(containerId + "opts");
+  let answered = false;
+  opts.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "dopt";
+    btn.textContent = opt.t;
+    btn.addEventListener("click", () => {
+      if (answered) return;
+      answered = true;
+      Array.from(el.children).forEach((b, j) => {
+        if (opts[j].correct) b.classList.add("correct");
+        else if (j === i) b.classList.add("incorrect");
+      });
+      const ex = document.getElementById(containerId + "explain");
+      ex.style.display = "block";
+      ex.textContent = (opt.correct ? "Correct. " : "Not the strongest call here. ") + opt.why;
+    });
+    el.appendChild(btn);
+  });
+}
+initDecision("decision6", [
+  { t: "A. Nothing, retrying is retrying, 3 attempts is 3 attempts regardless of timing", correct: false,
+    why: "Timing is exactly the problem. Immediate, undelayed retries under load are what turn a manageable 1-in-6 failure rate into a retry storm, every client hammers the already-struggling provider again within milliseconds, adding load right when it can least handle it." },
+  { t: "B. Retry with exponential backoff and full jitter, capped, still bounded to a fixed retry count", correct: true,
+    why: "This is the module's core fix: exponential backoff spaces out retry attempts instead of hammering immediately, and full jitter (randomizing within that window, not just the interval itself) prevents many clients from retrying in synchronized waves, which is what actually causes a retry storm. Keeping the count bounded (still 3, or whatever you set) means the fix doesn't trade one uncontrolled behavior for another." },
+  { t: "C. Increase the retry count from 3 to 10 to improve the odds of success", correct: false,
+    why: "More attempts at the same immediate, unspaced cadence just means MORE load added to a provider that's already returning 429s under load, worsening the retry-storm risk, not fixing it. The problem was never the count, it was the complete absence of delay between attempts." },
+  { t: "D. Switch to the fallback model immediately on the first 429, skip retrying the primary", correct: false,
+    why: "A single rate-limit response doesn't mean the primary is unavailable, it means the primary is busy right now. Jumping to fallback on the first 429 abandons a provider that a short, well-spaced retry would likely have succeeded against, and pushes all that traffic onto a fallback that wasn't sized for it." },
+]);
 
 /* ---------------- Section 2: backoff calculator ---------------- */
 const BACKOFF_BASE = 200, BACKOFF_CAP = 8000;
@@ -740,8 +812,13 @@ function buildMC(qkey, opts, elId){
       });
       const ex = document.getElementById(qkey + "explain");
       ex.style.display = "block";
-      if (opt.correct) { score++; ex.textContent = opt.correctText; }
-      else { ex.textContent = "Not quite. " + opt.reason; }
+      const principle = opts.find(o => o.correct).correctText.replace(/^Correct\.\s*/, "");
+      if (opt.correct) {
+        score++;
+        ex.innerHTML = `<b>Correct.</b> ${CourseProgress.escapeHtml(principle)}`;
+      } else {
+        ex.innerHTML = `<b>Why this is wrong:</b> ${CourseProgress.escapeHtml(opt.reason)}<br><br><b>Engineering principle:</b> ${CourseProgress.escapeHtml(principle)}`;
+      }
       updateScore();
     });
     el.appendChild(div);
@@ -762,6 +839,7 @@ buildMC("q2", [
 
 function checkQ3(){
   if (answered.q3) return;
+  if (!document.getElementById("q3input").value.trim()) return;
   const val = Number(document.getElementById("q3input").value);
   const ex = document.getElementById("q3explain");
   ex.style.display = "block";
@@ -797,6 +875,7 @@ function maybeShowRetry(){
   btn.style.display = (anyAnswered && (allDone ? score < 5 : true)) ? "inline-flex" : "none";
 }
 document.getElementById("btnRetryCheckpoint").addEventListener("click", () => {
+  CourseProgress.resetModuleAnswers(MODULE_ID);
   score = 0;
   Object.keys(answered).forEach(k => answered[k] = false);
   document.querySelectorAll(".qexplain").forEach(el => { el.style.display = "none"; el.textContent = ""; });

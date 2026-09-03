@@ -127,7 +127,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
 
     <div class="section">
       <h3>Submission</h3>
-      <div class="formrow"><label for="ghUrl">GitHub URL (optional)</label><input type="url" id="ghUrl" placeholder="https://github.com/you/project-name"></div>
+      <div class="formrow"><label for="ghUrl">GitHub URL (optional)</label><input type="url" id="ghUrl" placeholder="https://github.com/you/project-name"><div id="ghUrlPreview" style="margin-top:6px;font-size:12.5px"></div></div>
       <div class="formrow"><label for="projDesc">Short description</label><textarea id="projDesc" placeholder="One or two sentences describing what you built..."></textarea></div>
       <div class="formrow"><label for="projTech">Technologies used</label><input type="text" id="projTech" placeholder="e.g. Python, OpenAI SDK, pytest"></div>
       <div class="formrow"><label for="projTests">Tests passed (self-reported, e.g. 18/20)</label><input type="text" id="projTests" placeholder="18/20"></div>
@@ -139,7 +139,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
   <footer>Zenith Lab · AI Engineering · Projects</footer>
 </div>
 
-<script src="course-progress.js?v=1"></script>
+<script src="course-progress.js?v=2"></script>
 <script>
 const DETAILS = {
   1: {
@@ -234,10 +234,11 @@ function renderList(){
     let statusBadge = `<span class="badge notstarted">Not started</span>`;
     if (state.completed) statusBadge = `<span class="badge done">✓ Completed</span>`;
     else if (score > 0) statusBadge = `<span class="badge progress">In progress</span>`;
+    const safeGhUrl = state.githubUrl ? CourseProgress.safeHttpUrl(state.githubUrl) : null;
     card.innerHTML = `
       <div class="ptop"><div class="pt">Project ${p.id} — ${p.title}</div><span class="badge ${diffCls}">${p.difficulty}</span></div>
       <div class="pd">${p.summary}</div>
-      <div class="pmeta">${statusBadge}<span class="pscore">Modules ${p.modules.join(", ")}${score > 0 ? ` · Rubric: ${score}%` : ""}</span></div>
+      <div class="pmeta">${statusBadge}<span class="pscore">Modules ${p.modules.join(", ")}${score > 0 ? ` · Rubric: ${score}%` : ""}</span>${safeGhUrl ? '<span style="color:var(--lime)">⎘ Linked</span>' : ""}</div>
     `;
     card.addEventListener("click", () => openProject(p.id));
     grid.appendChild(card);
@@ -305,7 +306,20 @@ function openProject(id){
   document.getElementById("projTech").value = state.technologies || "";
   document.getElementById("projTests").value = state.testsPassed || "";
   document.getElementById("saveFb").className = "feedback";
+  updateGhUrlPreview();
 }
+
+function updateGhUrlPreview(){
+  const raw = document.getElementById("ghUrl").value.trim();
+  const preview = document.getElementById("ghUrlPreview");
+  const esc = CourseProgress.escapeHtml;
+  if (!raw) { preview.innerHTML = ""; return; }
+  const safeUrl = CourseProgress.safeHttpUrl(raw);
+  preview.innerHTML = safeUrl
+    ? `<a href="${esc(safeUrl)}" target="_blank" rel="noopener noreferrer" style="color:var(--lime)">${esc(raw)} ↗</a>`
+    : `<span style="color:var(--red)">Not a valid http/https URL, it won't render as a link in your portfolio</span>`;
+}
+document.getElementById("ghUrl").addEventListener("input", updateGhUrlPreview);
 
 document.getElementById("btnSaveProject").addEventListener("click", () => {
   const id = currentProjectId;
