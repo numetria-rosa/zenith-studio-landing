@@ -58,8 +58,10 @@ export async function generateMetadata({
 
 export default async function CourseDetailsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ courseId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { courseId } = await params;
   const course = findCourse(courseId);
@@ -69,6 +71,20 @@ export default async function CourseDetailsPage({
   const { url: checkoutUrl, isRealCheckout } = catalogCourse
     ? getCheckoutUrl(catalogCourse)
     : { url: WAITLIST_LINK, isRealCheckout: false };
+
+  // Forward whatever UTM params brought this visitor straight to a course's
+  // details page (an ad can link here directly, not just to /lab) into the
+  // checkout link, same as CourseCatalog.tsx does for the catalog page — see
+  // /api/go/[courseId] for why this goes through that route instead of
+  // appending the params directly to checkoutUrl.
+  const sp = await searchParams;
+  const utmParams = new URLSearchParams();
+  for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content"]) {
+    const value = sp[key];
+    if (typeof value === "string") utmParams.set(key, value);
+  }
+  const utmQueryString = utmParams.toString() ? `?${utmParams.toString()}` : "";
+  const trackedUrl = isRealCheckout ? `/api/go/${course.id}${utmQueryString}` : checkoutUrl;
 
   const accent = course.labBadgeColor ?? DEFAULT_ACCENT;
 
@@ -157,7 +173,7 @@ export default async function CourseDetailsPage({
             </span>
           </span>
           <a
-            href={checkoutUrl}
+            href={trackedUrl}
             target={isRealCheckout ? "_blank" : undefined}
             rel={isRealCheckout ? "noopener noreferrer" : undefined}
             className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition hover:scale-[1.02]"
@@ -258,7 +274,7 @@ export default async function CourseDetailsPage({
             )}
 
             <a
-              href={checkoutUrl}
+              href={trackedUrl}
               target={isRealCheckout ? "_blank" : undefined}
               rel={isRealCheckout ? "noopener noreferrer" : undefined}
               className="mt-4 flex items-center justify-center gap-1.5 rounded-full px-5 py-3 text-sm font-semibold transition hover:scale-[1.02]"
@@ -494,7 +510,7 @@ export default async function CourseDetailsPage({
                 : "Not open for enrollment yet. Join the waitlist."}
             </p>
             <a
-              href={checkoutUrl}
+              href={trackedUrl}
               target={isRealCheckout ? "_blank" : undefined}
               rel={isRealCheckout ? "noopener noreferrer" : undefined}
               className="inline-flex items-center justify-center gap-1.5 rounded-full px-7 py-3.5 text-sm font-semibold transition hover:scale-[1.02]"
