@@ -321,6 +321,16 @@ export function CourseCatalog({
           };
           const trackedUrl = isRealCheckout ? `/api/go/${course.id}${utmQueryString}` : url;
           const expanded = expandedId === course.id;
+          // A coarse (non-live-ticking) version of DiscountRibbon's own
+          // check, just to know whether to reserve room for it here — the
+          // ribbon sits in the same top-right corner as this row's content,
+          // and shrinking the ribbon to avoid the badge is fragile (breaks
+          // again the next time either one's size changes). Reserving space
+          // instead is robust regardless of the ribbon's exact dimensions.
+          const discountLive =
+            Boolean(course.discountPercent) &&
+            Boolean(course.discountDeadline) &&
+            Date.parse(course.discountDeadline!) > Date.now();
 
           return (
             <div
@@ -345,7 +355,9 @@ export function CourseCatalog({
 
               <DiscountRibbon course={course} />
 
-              <div className="relative flex items-center justify-between gap-4">
+              <div
+                className={`relative flex items-center justify-between gap-4 ${discountLive ? "pr-11" : ""}`}
+              >
                 <span className="rounded-full border border-white/12 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/55">
                   {course.categoryLabel}
                 </span>
@@ -553,9 +565,9 @@ function DiscountRibbon({ course }: { course: CourseCard }) {
   // fixed square window at the corner, with the rotated strip positioned
   // and sized so its full diagonal actually falls inside that window.
   return (
-    <div className="absolute right-0 top-0 z-10 h-20 w-20 overflow-hidden">
-      <div className="absolute right-[-32px] top-[16px] flex w-[130px] items-center justify-center gap-1 rotate-45 bg-gradient-to-r from-amber-400 to-orange-400 py-1 text-[10px] font-bold uppercase tracking-[0.06em] text-amber-950 shadow-[0_2px_12px_rgba(251,191,36,0.5)]">
-        <Flame className="h-2.5 w-2.5" aria-hidden />
+    <div className="absolute right-0 top-0 z-10 h-14 w-14 overflow-hidden">
+      <div className="absolute right-[-24px] top-[10px] flex w-[92px] items-center justify-center gap-1 rotate-45 bg-gradient-to-r from-amber-400 to-orange-400 py-[3px] text-[9px] font-bold uppercase tracking-[0.04em] text-amber-950 shadow-[0_2px_12px_rgba(251,191,36,0.5)]">
+        <Flame className="h-2 w-2" aria-hidden />
         {course.discountPercent}% off
       </div>
     </div>
