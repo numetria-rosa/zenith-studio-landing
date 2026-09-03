@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { Hammer, Briefcase, Rocket } from "lucide-react";
 import { GlowBackdrop } from "@/components/GlowBackdrop";
@@ -255,7 +256,9 @@ export default function ZenithLabPage() {
             </p>
           </div>
 
-          <CourseCatalog courses={courses} checkoutInfo={checkoutInfo} waitlistLink={WAITLIST_LINK} />
+          <Suspense fallback={null}>
+            <CourseCatalog courses={courses} checkoutInfo={checkoutInfo} waitlistLink={WAITLIST_LINK} />
+          </Suspense>
         </section>
 
         <section className="mx-auto max-w-7xl border-t border-white/10 py-14 pb-24">

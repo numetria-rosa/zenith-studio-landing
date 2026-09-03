@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Clock,
@@ -220,6 +221,22 @@ export function CourseCatalog({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
+  // Forward whatever UTM params brought this visitor to /lab into the
+  // checkout link, so a sale can actually be traced back to the ad/post
+  // that drove it (via /api/go/[courseId], not appended directly — see
+  // that route for why: it turns these into real Whop checkout metadata,
+  // not just a query string nobody reads).
+  const searchParams = useSearchParams();
+  const utmQueryString = useMemo(() => {
+    const params = new URLSearchParams();
+    for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content"]) {
+      const value = searchParams.get(key);
+      if (value) params.set(key, value);
+    }
+    const s = params.toString();
+    return s ? `?${s}` : "";
+  }, [searchParams]);
+
   const filtered = courses
     .filter((c) => filter === "all" || c.category === filter)
     .filter((c) => matchesSearch(c, search));
@@ -302,6 +319,7 @@ export function CourseCatalog({
             url: waitlistLink,
             isRealCheckout: false,
           };
+          const trackedUrl = isRealCheckout ? `/api/go/${course.id}${utmQueryString}` : url;
           const expanded = expandedId === course.id;
 
           return (
@@ -424,7 +442,7 @@ export function CourseCatalog({
 
                 {isRealCheckout && (
                   <a
-                    href={url}
+                    href={trackedUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 self-start rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-black transition hover:scale-[1.02]"
@@ -492,7 +510,7 @@ export function CourseCatalog({
                 <PriceRow course={course} />
 
                 <a
-                  href={url}
+                  href={trackedUrl}
                   target={isRealCheckout ? "_blank" : undefined}
                   rel={isRealCheckout ? "noopener noreferrer" : undefined}
                   className={`inline-flex items-center justify-center gap-1.5 rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
