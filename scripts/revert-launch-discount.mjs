@@ -1,4 +1,4 @@
-// Run this on or after September 5, 2026 to end the "75% off" launch
+// Run this on or after September 7, 2026 to end the "75% off" launch
 // discount: raises all 4 Zenith Lab plans in Whop back to their regular
 // price and restores each plan's normal title/description.
 //
@@ -25,7 +25,7 @@ if (!apiKey) {
 const client = new Whop({ apiKey });
 
 const PLANS = [
-  { name: "AI Engineering", id: "plan_VSU3hyAITNsNk", originalPrice: 99, title: "Founding Access", description: "Full course access. Lifetime updates." },
+  { name: "AI Engineering", id: "plan_VSU3hyAITNsNk", originalPrice: 115, title: "Founding Access", description: "Full course access. Lifetime updates." },
   { name: "Data Science & Analysis", id: "plan_ysRjmrPzOn9j1", originalPrice: 120, title: "Founding Access", description: "Full course access. Lifetime updates." },
   { name: "AI Automation", id: "plan_ED9yF9ehN2RIa", originalPrice: 149, title: "Lifetime Access", description: "Full course access. Lifetime updates." },
   { name: "AI-Assisted Software Engineering", id: "plan_ximKlnIKYO7Bx", originalPrice: 99, title: "Lifetime Access", description: "Full course access. Lifetime updates." },

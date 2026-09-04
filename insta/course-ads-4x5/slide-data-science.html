@@ -1,0 +1,275 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>DATA SCIENCE & ANALYSIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#070b14; --card2:#141b2c; --bd:rgba(148,163,184,.16); --bd2:rgba(148,163,184,.26);
+    --tx:#eef2ff; --mut:#9aa6c2; --mut2:#6b7690;
+    --accent:#f0b429; --accentd:#1a1200;
+    --good:#4ade95;
+  }
+  html,body{width:1080px;height:1350px;overflow:hidden}
+  body{ background:transparent; color:var(--tx); font-family:'IBM Plex Sans',sans-serif; }
+  /* The rounded card boundary is this wrapper, not body — body stays
+     transparent so the export (screenshot with omitBackground:true) leaves
+     the four corners outside this radius genuinely transparent instead of
+     showing a white or square-cornered background behind them. */
+  .canvas{
+    position:relative; width:100%; height:100%; overflow:hidden;
+    border-radius:40px; background:var(--bg);
+  }
+  .canvas::before{
+    content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 70% 34% at 10% -4%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 55%),
+      radial-gradient(ellipse 55% 28% at 100% 6%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 50%),
+      radial-gradient(ellipse 50% 30% at 80% 100%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 55%);
+  }
+  .frame{ position:relative; z-index:1; padding:52px 58px 36px; height:100%; display:flex; flex-direction:column; zoom:1.038; }
+
+  .topbar{ display:flex; align-items:flex-start; justify-content:space-between; }
+  .logo{ font-family:'Fraunces'; font-weight:700; font-size:21px; letter-spacing:-.01em; }
+  .logo b{ background:var(--accent); color:var(--accentd); padding:3px 10px; margin-left:4px; border-radius:6px; font-size:14px; }
+  .topright{ display:flex; flex-direction:column; align-items:flex-end; gap:9px; }
+  .tag{ font-family:'IBM Plex Mono'; font-size:13.5px; font-weight:600; color:var(--mut2); text-transform:uppercase; letter-spacing:.08em; max-width:360px; text-align:right; }
+  .pricerow{ display:flex; align-items:center; gap:8px; }
+  .offpill{ background:var(--accentd); border:1.5px solid var(--accent); color:var(--accent); font-family:'IBM Plex Mono'; font-weight:800; font-size:14px; letter-spacing:.03em; padding:5px 10px; border-radius:8px; }
+  .pricebox{ background:var(--accent); color:var(--accentd); border-radius:12px; padding:9px 16px 8px; display:flex; align-items:baseline; gap:9px; }
+  .pb-old{ font-family:'IBM Plex Mono'; font-size:15px; font-weight:600; text-decoration:line-through; opacity:.6; }
+  .pb-new{ font-family:'Fraunces'; font-weight:700; font-size:23px; letter-spacing:-.01em; }
+  .priceuntil{ font-family:'IBM Plex Mono'; font-size:15px; font-weight:800; letter-spacing:.06em; color:var(--accent); background:color-mix(in srgb, var(--accent) 16%, transparent); border:1.5px solid var(--accent); padding:6px 14px; border-radius:8px; }
+
+  .hero{ margin-top:30px; }
+  .eyebrow{ font-family:'IBM Plex Mono'; font-size:15px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); }
+  h1{ font-family:'Fraunces'; font-optical-sizing:none; font-variation-settings:"opsz" 144; font-weight:600;
+      font-size:52px; line-height:1.06; letter-spacing:-.02em; margin-top:12px; max-width:920px; }
+  .desc{ margin-top:14px; max-width:880px; font-size:19px; line-height:1.5; color:var(--mut); }
+
+  .sectlbl{ font-family:'IBM Plex Mono'; font-size:14px; font-weight:700; letter-spacing:.1em; color:var(--mut2); text-transform:uppercase; }
+
+  .fgrid{ margin-top:26px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .fcard{
+    background:var(--card2); border:1px solid var(--bd); border-radius:15px; padding:16px 16px 14px;
+    display:flex; flex-direction:column; gap:6px; min-height:104px;
+  }
+  .ficon{ width:26px; height:26px; color:var(--accent); }
+  .ficon svg{ width:100%; height:100%; }
+  .ftitle{ font-weight:700; font-size:16.5px; }
+  .fdesc{ font-size:14px; color:var(--mut); line-height:1.35; }
+
+  .topicwrap{ margin-top:26px; }
+  .tgrid{ margin-top:12px; display:flex; flex-wrap:wrap; gap:10px; }
+  .tchip{
+    background:var(--card2); border:1px solid var(--bd); border-radius:12px;
+    padding:11px 15px; display:flex; align-items:center; gap:10px;
+  }
+  .tichip{ width:21px; height:21px; color:var(--accent); flex-shrink:0; }
+  .tichip svg{ width:100%; height:100%; }
+  .tname{ font-size:15.5px; font-weight:600; }
+  .tnum{ font-family:'IBM Plex Mono'; font-size:14.5px; font-weight:700; color:var(--accent); margin-left:2px; }
+  .tnum i{ font-style:normal; font-size:11px; }
+  .tmore{ font-size:14px; font-weight:600; color:var(--mut); align-self:center; }
+
+  .modpanel{
+    margin-top:26px; background:var(--card2); border:1px solid var(--bd); border-radius:18px; padding:22px 24px 18px;
+  }
+  .modhead{ margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; }
+  .modcols{ display:grid; grid-template-columns:1fr 1fr; gap:0 26px; }
+  .stagelbl{ font-family:'IBM Plex Mono'; font-size:12.5px; font-weight:600; letter-spacing:.05em; color:var(--accent); text-transform:uppercase; margin:14px 0 7px; }
+  .stagelbl:first-child{ margin-top:0; }
+  .mrow{ display:flex; align-items:flex-start; gap:10px; padding:5px 0; }
+  .mdot{ width:7px; height:7px; border-radius:50%; background:var(--mut2); flex-shrink:0; margin-top:8px; }
+  .mtitle{ font-size:16px; font-weight:500; line-height:1.35; }
+
+  .stats{ margin-top:22px; display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .stile{ background:var(--card2); border:1px solid var(--bd); border-radius:14px; padding:16px 10px 14px; text-align:center; }
+  .snum{ font-family:'Fraunces'; font-weight:700; font-size:30px; color:var(--accent); letter-spacing:-.02em; }
+  .slbl{ margin-top:4px; font-size:13px; color:var(--mut); line-height:1.25; }
+
+  .footer{ margin-top:20px; padding-top:18px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--bd); }
+  .cta{ font-family:'Caveat'; font-weight:700; font-size:34px; color:var(--accent); transform:rotate(-2deg); }
+  .site{ font-family:'IBM Plex Mono'; font-size:14px; color:var(--mut2); letter-spacing:.04em; }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="frame">
+      <div class="topbar">
+        <div class="logo">ZENITH<b>LAB</b></div>
+        <div class="topright">
+          <div class="tag">DATA SCIENCE & ANALYSIS</div>
+          <div class="pricerow">
+            <div class="pricebox">
+              <span class="pb-old">$120</span>
+              <span class="pb-new">$30</span>
+            </div>
+            <div class="offpill">-75%</div>
+          </div>
+          <div class="priceuntil">UNTIL SEPT 7TH</div>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div class="eyebrow">12-WEEK PROGRAM</div>
+        <h1>Data Science &amp; Analysis</h1>
+        <div class="desc">Spreadsheets through a full capstone analysis. Real messy data, real statistics, real dashboards built in Python.</div>
+      </div>
+
+      <div class="fgrid">
+    <div class="fcard">
+      <span class="ficon"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.67 4.67 4 5.5 4H13v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z"/><path d="M20 5.5C20 4.67 19.33 4 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5v-13Z"/></svg></span>
+      <span class="ftitle">Syllabus</span>
+      <span class="fdesc">Full outline & tracks</span>
+    </div>
+    <div class="fcard">
+      <span class="ficon"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4Z"/><path d="M9 4v13"/><path d="M15 6.5v13"/></svg></span>
+      <span class="ftitle">Roadmap</span>
+      <span class="fdesc">The whole journey</span>
+    </div>
+    <div class="fcard">
+      <span class="ficon"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.7" fill="currentColor"/></svg></span>
+      <span class="ftitle">Quiz Center</span>
+      <span class="fdesc">Module & cumulative</span>
+    </div>
+    <div class="fcard">
+      <span class="ficon"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+      <span class="ftitle">Cheat Sheets</span>
+      <span class="fdesc">Excel, SQL, Python</span>
+    </div>
+    <div class="fcard">
+      <span class="ficon"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg></span>
+      <span class="ftitle">Desktop Labs</span>
+      <span class="fdesc">Tableau & Power BI</span>
+    </div>
+    <div class="fcard">
+      <span class="ficon"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18a4 4 0 0 0 5.4-5.4L14 8l3 3 2-2"/><circle cx="19" cy="7" r="2"/><circle cx="6" cy="18" r="2"/></svg></span>
+      <span class="ftitle">Career Path</span>
+      <span class="fdesc">Portfolio + 10 projects</span>
+    </div></div>
+
+      <div class="topicwrap">
+        <div class="sectlbl">GRADED PRACTICE, BY TOOL</div>
+        <div class="tgrid">
+    <div class="tchip">
+      <span class="tichip"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6c0-1.1 3.6-2 8-2s8 .9 8 2-3.6 2-8 2-8-.9-8-2Z"/><path d="M4 6v6c0 1.1 3.6 2 8 2s8-.9 8-2V6"/><path d="M4 12v6c0 1.1 3.6 2 8 2s8-.9 8-2v-6"/></svg></span>
+      <span class="tname">SQL:</span>
+      <span class="tnum">60 tasks</span>
+    </div>
+    <div class="tchip">
+      <span class="tichip"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 0-4 1-4 3v2h4v1H6c-2 0-3 1.4-3 4s1 4 3 4h2v-2.6c0-1.6 1-2.9 3-2.9h4c1.8 0 3-1.3 3-3V6c0-2-1-3-4-3h-2Z"/><path d="M12 21c3 0 4-1 4-3v-2h-4v-1h6c2 0 3-1.4 3-4s-1-4-3-4h-2v2.6c0 1.6-1 2.9-3 2.9H9c-1.8 0-3 1.3-3 3v2c0 2 1 3 4 3h2Z"/></svg></span>
+      <span class="tname">Python:</span>
+      <span class="tnum">50 tasks</span>
+    </div>
+    <div class="tchip">
+      <span class="tichip"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v7M22 20V13" transform="translate(-2,0)"/><path d="M3 20h18"/></svg></span>
+      <span class="tname">Statistics:</span>
+      <span class="tnum">40 tasks</span>
+    </div>
+    <div class="tchip">
+      <span class="tichip"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M4 8h16M4 16h16M7 4v4M17 4v4M7 16v4M17 16v4"/></svg></span>
+      <span class="tname">Tableau:</span>
+      <span class="tnum">40 tasks</span>
+    </div>
+    <div class="tchip">
+      <span class="tichip"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V10M12 20V4M18 20v9"/><path d="M3 20h18"/></svg></span>
+      <span class="tname">Power BI:</span>
+      <span class="tnum">40 tasks</span>
+    </div>
+    <div class="tchip">
+      <span class="tichip"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.3h16M4 14.6h16M9.3 4v16M14.6 4v16"/></svg></span>
+      <span class="tname">Excel:</span>
+      <span class="tnum">35 tasks</span>
+    </div><div class="tchip"><span class="tmore">+2 more</span></div></div>
+      </div>
+
+      <div class="modpanel">
+        <div class="modhead"><span class="sectlbl">Every module, every stage</span></div>
+        <div class="modcols">
+          <div class="modcol">
+      <div class="stagelbl">Stage 0 · Spreadsheets before code</div>
+      
+        <div class="mrow">
+          <span class="mdot"></span>
+          <span class="mtitle">Spreadsheet & Data Literacy Foundations</span>
+        </div>
+    
+      <div class="stagelbl">Stage 2 · Real-world data skills</div>
+      
+        <div class="mrow">
+          <span class="mdot"></span>
+          <span class="mtitle">Data Cleaning & Validation</span>
+        </div>
+        <div class="mrow">
+          <span class="mdot"></span>
+          <span class="mtitle">Exploratory Data Analysis & Statistics</span>
+        </div>
+    
+      <div class="stagelbl">Stage 4 · Capstone</div>
+      
+        <div class="mrow">
+          <span class="mdot"></span>
+          <span class="mtitle">Capstone Analysis Project</span>
+        </div>
+    </div>
+          <div class="modcol">
+      <div class="stagelbl">Stage 1 · Python foundations for data</div>
+      
+        <div class="mrow">
+          <span class="mdot"></span>
+          <span class="mtitle">Python Foundations for Data</span>
+        </div>
+        <div class="mrow">
+          <span class="mdot"></span>
+          <span class="mtitle">Pandas & NumPy Fundamentals</span>
+        </div>
+    
+      <div class="stagelbl">Stage 3 · Querying and communicating</div>
+      
+        <div class="mrow">
+          <span class="mdot"></span>
+          <span class="mtitle">SQL for Analysts</span>
+        </div>
+        <div class="mrow">
+          <span class="mdot"></span>
+          <span class="mtitle">Data Visualization & Storytelling</span>
+        </div>
+        <div class="mrow">
+          <span class="mdot"></span>
+          <span class="mtitle">Dashboards & Business Communication</span>
+        </div>
+    </div>
+        </div>
+      </div>
+
+      <div class="stats">
+    <div class="stile">
+      <div class="snum">9</div>
+      <div class="slbl">Modules</div>
+    </div>
+    <div class="stile">
+      <div class="snum">315+</div>
+      <div class="slbl">Practice tasks</div>
+    </div>
+    <div class="stile">
+      <div class="snum">10</div>
+      <div class="slbl">Portfolio projects</div>
+    </div>
+    <div class="stile">
+      <div class="snum">12wk</div>
+      <div class="slbl">Self-paced</div>
+    </div></div>
+
+      <div class="footer">
+        <div class="cta">link in bio &#8599;</div>
+        <div class="site">zenith-studio.site</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

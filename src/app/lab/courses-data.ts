@@ -88,7 +88,7 @@ export const courses: CourseCard[] = [
     price: "$30",
     originalPrice: "$120",
     discountPercent: 75,
-    discountDeadline: "2026-09-05T23:59:59-00:00",
+    discountDeadline: "2026-09-07T23:59:59-00:00",
     summary:
       "Spreadsheets through a full capstone analysis: clean real messy data, query it, analyze it in Python, validate it statistically, and ship a dashboard that answers an actual business question.",
     whatYoullDo: [
@@ -241,7 +241,7 @@ export const courses: CourseCard[] = [
     price: "$28.75",
     originalPrice: "$115",
     discountPercent: 75,
-    discountDeadline: "2026-09-05T23:59:59-00:00",
+    discountDeadline: "2026-09-07T23:59:59-00:00",
     summary:
       "The real stack behind production AI products: prompting, retrieval, agents, tool use, structured outputs, and evaluation, applied to a real shipped product, not a toy chatbot.",
     whatYoullDo: [
@@ -351,7 +351,7 @@ export const courses: CourseCard[] = [
     price: "$24.75",
     originalPrice: "$99",
     discountPercent: 75,
-    discountDeadline: "2026-09-05T23:59:59-00:00",
+    discountDeadline: "2026-09-07T23:59:59-00:00",
     summary:
       "Zero to a live Northline Digital web app: write HTML, CSS, and JavaScript yourself, then specify, inspect, test, and ship with an AI coding partner. This is not AI Engineering — that course builds LLM products (RAG, tools, eval) and assumes programming logic already.",
     whatYoullDo: [
@@ -524,7 +524,7 @@ export const courses: CourseCard[] = [
     price: "$37.25",
     originalPrice: "$149",
     discountPercent: 75,
-    discountDeadline: "2026-09-05T23:59:59-00:00",
+    discountDeadline: "2026-09-07T23:59:59-00:00",
     summary:
       "Build client-ready workflow judgment: map a real process, survive retries and replayed events in a simulated runtime, and put AI behind a schema and a human gate. n8n is the example, not the product.",
     whatYoullDo: [

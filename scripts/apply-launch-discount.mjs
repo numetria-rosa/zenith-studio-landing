@@ -1,6 +1,6 @@
-// Applies the "75% off until Sept 5" launch discount to all 4 published
+// Applies the "75% off until Sept 7" launch discount to all 4 published
 // Zenith Lab course plans in Whop. Companion to revert-launch-discount.mjs,
-// which must be run by hand on/after 2026-09-05 (Whop's Plans API has no
+// which must be run by hand on/after 2026-09-07 (Whop's Plans API has no
 // scheduled-price-change field, confirmed against the SDK's
 // PlanUpdateParams type — this can't be automated on the Whop side).
 //
@@ -46,7 +46,7 @@ async function main() {
       // Whop plan titles are capped at 30 characters — this is the exact
       // string data-science's plan already used successfully.
       title: "Founding Access, 75% Off",
-      description: `75% off through Sept 5. Full course access, lifetime updates. Regular price $${plan.originalPrice}.`,
+      description: `75% off through Sept 7. Full course access, lifetime updates. Regular price $${plan.originalPrice}.`,
       initial_price: plan.discountedPrice,
     });
     console.log(`  updated: "${updated.title}", initial_price=${updated.initial_price}\n`);
