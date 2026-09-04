@@ -444,6 +444,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
       <li>Beyond a single aggregate score, production eval suites often track per-category breakdowns (which KINDS of test cases are failing), a flat score can hide a specific, fixable weakness.</li>
       <li>"Golden datasets," curated, hand-labeled test sets that get updated carefully and deliberately over time, are a common foundation for eval suites, since the quality of an eval is bounded by the quality and coverage of its test cases.</li>
       <li>Observability in production (logging real inputs, outputs, and scores from live traffic, not just the offline eval set) closes the loop, it's how you discover the test cases your eval set is missing.</li>
+      <li>In practice, this is what tools like LangSmith, Langfuse, and Braintrust are for, capturing traces, scores, and regressions so the discipline in this module doesn't live only in a script you remember to run. OpenTelemetry-based tracing is the vendor-neutral version of the same idea. None of them replace the judgment (what to measure, what counts as a regression), they just make it operational at scale.</li>
     </ul>
   </section>
 

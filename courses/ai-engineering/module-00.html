@@ -571,9 +571,10 @@ const ECOSYSTEM = [
   { name: "Languages", why: "What you actually write the system in, Python dominates AI-specific tooling, JS/TS dominates the application layer.", ex: "e.g. Python, JavaScript, TypeScript, SQL" },
   { name: "AI Models / APIs", why: "The actual intelligence your system calls out to, swappable in principle if your code isn't tightly coupled to one vendor.", ex: "e.g. OpenAI, Anthropic, Google/Gemini, Hugging Face, open-source models" },
   { name: "Frameworks", why: "Pre-built orchestration for prompting, retrieval, and agent logic, useful, but everything they do is learnable from first principles (which is what this course teaches).", ex: "e.g. LangChain, LangGraph, LlamaIndex, and comparable alternatives" },
+  { name: "Tool connectivity", why: "The wire format a model-facing app uses to discover and call tools exposed by a separate server, standardizes the plumbing, not the validate-then-execute discipline Module 4 teaches, which still applies underneath it either way.", ex: "e.g. MCP (Model Context Protocol), and comparable emerging standards" },
   { name: "Data", why: "Where your system's persistent knowledge and state actually live.", ex: "e.g. PostgreSQL, a vector database, Redis for caching" },
   { name: "Infrastructure", why: "How your system gets packaged, deployed, and kept running at scale.", ex: "e.g. Docker, a cloud platform, Linux, CI/CD" },
-  { name: "Evaluation / Observability", why: "How you know whether the system is actually working, and where it's failing, in production.", ex: "e.g. structured logging, tracing, an eval framework, monitoring dashboards" },
+  { name: "Evaluation / Observability", why: "How you know whether the system is actually working, and where it's failing, in production.", ex: "e.g. LangSmith, Langfuse, OpenTelemetry-based tracing, an eval framework, monitoring dashboards" },
 ];
 function renderEcosystem(){
   const grid = document.getElementById("ecoGrid");

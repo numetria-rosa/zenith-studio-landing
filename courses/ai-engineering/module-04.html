@@ -433,6 +433,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
     <div class="kh"><span class="num">9</span><h2 class="serif">Further reading</h2></div>
     <p class="mut">If you want to go deeper than the browser can take you:</p>
     <ul style="margin-top:10px;padding-left:20px;color:var(--mut2);line-height:1.9">
+      <li><b class="mono-inline" style="color:var(--tx)">MCP (Model Context Protocol)</b> is the name for this: an open standard, introduced by Anthropic, for how a model-facing application discovers and calls tools exposed by a separate server. It doesn't replace anything in this module, an MCP server still declares a schema, a client still has to validate a call before running it, and the same idempotency problem exists the moment a network retry is possible. What MCP standardizes is the wire format and discovery mechanism across that boundary, not the validate-then-execute discipline itself, that's still yours to implement correctly regardless of which protocol carries the call.</li>
       <li>Most model providers' tool/function-calling APIs let you supply a JSON Schema per tool directly, letting the model see the exact shape expected often reduces malformed calls before validation even runs, though it never eliminates the need for it.</li>
       <li>Idempotency keys are a standard pattern in payment APIs (Stripe, for example) for exactly this reason, client-generated unique IDs that let a server safely deduplicate retried requests.</li>
       <li>Beyond schema and business-rule validation, production tool executors often add permission checks (can this caller invoke this tool at all) and rate limits, both are extensions of the same "validate before executing" principle.</li>
@@ -447,6 +448,7 @@ footer{padding:40px 0;text-align:center;color:var(--mut2);font-size:13px}
       <div><b class="mono-inline">idempotent execution</b><span style="color:var(--mut);font-size:14px"> — guaranteeing a repeated call (same ID) produces the same result as the first, without re-running its side effects.</span></div>
       <div><b class="mono-inline">idempotency key</b><span style="color:var(--mut);font-size:14px"> — a stable identifier used to detect and deduplicate repeated executions of the same logical request.</span></div>
       <div><b class="mono-inline">business-rule validation</b><span style="color:var(--mut);font-size:14px"> — domain-specific checks (limits, permissions) applied after schema validation, since a structurally valid call can still be unsafe to execute.</span></div>
+      <div><b class="mono-inline">MCP (Model Context Protocol)</b><span style="color:var(--mut);font-size:14px"> — an open standard for how a model-facing app discovers and calls tools exposed by a separate server; standardizes the wire format, not the validate-then-execute discipline this module teaches.</span></div>
     </div>
   </section>
 
