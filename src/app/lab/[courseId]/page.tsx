@@ -462,7 +462,7 @@ export default async function CourseDetailsPage({
                               className="text-[11px]"
                               style={{ color: "var(--mut2)", fontFamily: "var(--font-course-mono), monospace" }}
                             >
-                              {group.items.length} pages
+                              {group.items.length} {group.items.length === 1 ? "page" : "pages"}
                             </span>
                           </span>
                           {meta.description && (

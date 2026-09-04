@@ -356,7 +356,7 @@ export function CourseCatalog({
               <DiscountRibbon course={course} />
 
               <div
-                className={`relative flex items-center justify-between gap-4 ${discountLive ? "pr-11" : ""}`}
+                className={`relative flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 ${discountLive ? "pr-11" : ""}`}
               >
                 <span className="rounded-full border border-white/12 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/55">
                   {course.categoryLabel}
