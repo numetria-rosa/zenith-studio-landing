@@ -24,10 +24,20 @@ export type Course = {
   whopPlanId: string;
   /** Real Whop purchase_url (checkout link) for this course, once created. Empty string until then. */
   checkoutUrl: string;
-  /** Where content actually lives on disk, served only through the guarded route. */
-  contentDir: string;
-  /** First page inside contentDir a newly-entitled user should land on. */
-  firstLessonPath: string;
+  /** Where content actually lives on disk, served only through the guarded route.
+      Optional when renderMode is "react" — a React course has no static contentDir. */
+  contentDir?: string;
+  /** First page inside contentDir a newly-entitled user should land on.
+      Optional when renderMode is "react". */
+  firstLessonPath?: string;
+  /** "static" (default, omit the field) = the existing static-HTML-per-module
+      courses, served by the guarded contentDir route. "react" = real Next.js/
+      React lesson pages under /lab/[courseId]/learn, gated by that route's own
+      layout instead. See the "if we work on a new course" architecture plan. */
+  renderMode?: "static" | "react";
+  /** Path (relative to repo root) to the ordered lesson manifest module for a
+      "react" course. Only used when renderMode === "react". */
+  lessonManifest?: string;
   /** Fallback when no purchase_url is configured yet — never show a dead button. */
   waitlistUrl: string;
   /** False = not for sale yet; hidden from "Available courses" purchase CTAs. */
@@ -116,6 +126,27 @@ export const COURSES: Course[] = [
     // (prod_rW17sq9hKeXYN / plan_ximKlnIKYO7Bx).
     published: true,
   },
+  {
+    id: "math-for-ml",
+    slug: "math-for-ml",
+    title: "Mathematics for Machine Learning",
+    description:
+      "From mathematical foundations to understanding how modern machine learning actually works: vectors, transformations, PCA, calculus and optimization, probability, information theory, and the math behind neural networks and attention. Built as a real interactive computational lab, not a video series. No prior calculus or linear algebra required.",
+    thumbnail: "/lab/math-for-ml.webp",
+    whopAccessPassId: "",
+    whopPlanId: "",
+    checkoutUrl: "",
+    renderMode: "react",
+    lessonManifest: "content/react-courses/math-for-ml/lessons.ts",
+    waitlistUrl:
+      "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20Mathematics%20for%20Machine%20Learning%0A",
+    // Built as the flagship pilot of the "react" render mode (see
+    // if-we-work-on-adaptive-raccoon.md and MATH_FOR_ML_CURRICULUM_RESEARCH.md).
+    // Only Module 1 ("Thinking in Vectors") is real content so far — kept
+    // unpublished and without Whop ids until the course is actually ready to
+    // sell. Do not flip published:true or add real Whop ids until then.
+    published: false,
+  },
 ];
 
 export function getCourse(id: string): Course | undefined {
@@ -124,6 +155,13 @@ export function getCourse(id: string): Course | undefined {
 
 export function getCourseBySlug(slug: string): Course | undefined {
   return COURSES.find((c) => c.slug === slug);
+}
+
+/** Where an entitled student should land: the guarded static contentDir route
+    for a "static" course, or the guarded /learn route for a "react" course. */
+export function courseHomeUrl(course: Course): string {
+  if (course.renderMode === "react") return `/lab/${course.id}/learn`;
+  return `/courses/${course.id}/${course.firstLessonPath}`;
 }
 
 /** Real purchase_url if configured, else the waitlist fallback — a button is never dead. */

@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { getCourse, getCheckoutUrl } from "@/lib/courses";
+import { getCourse, getCheckoutUrl, courseHomeUrl } from "@/lib/courses";
 import { hasCourseAccess } from "@/lib/entitlements";
 
 export async function generateMetadata({
@@ -44,7 +44,7 @@ export default async function CourseLandingPage({
   const session = await auth();
   if (session?.user?.id) {
     const owns = await hasCourseAccess(session.user.id, courseId);
-    if (owns) redirect(`/courses/${course.id}/${course.firstLessonPath}`);
+    if (owns) redirect(courseHomeUrl(course));
   }
 
   const { url: checkoutUrl, isRealCheckout } = getCheckoutUrl(course);

@@ -1,0 +1,84 @@
+---
+title: "Probability Meets Machine Learning"
+eyebrow: "Module 8 of 11 · Stage 8: Probability Meets ML"
+minutes: 45
+---
+
+## Why you're learning this
+
+Every module so far has treated probability and optimization as separate
+subjects. This module fuses them: fitting a model to data is, very often,
+choosing the model parameters that make the observed data as plausible as
+possible under that model. That single idea — maximum likelihood
+estimation — is the reason many common loss functions (mean squared error,
+cross-entropy) exist and look the way they do.
+
+<Objectives items={["Explain what likelihood measures, in plain language", "Explain why log-likelihood is used instead of raw likelihood", "Explain what maximum likelihood estimation (MLE) is doing", "Connect MLE to the optimization ideas from Module 5"]} />
+
+## 8.1 — How plausible is this data, under this model?
+
+Given a family of candidate models (here, every possible Gaussian, defined
+by its mean and spread), likelihood asks: for a specific candidate model,
+how probable would it have been to see exactly the data you actually
+collected?
+
+<Callout tone="info" label="Definition">
+**Likelihood** is the probability of the observed data, treated as a
+function of the model's parameters (not of the data, which is fixed).
+**Maximum likelihood estimation (MLE)** picks the parameter values that
+make that probability as large as possible.
+</Callout>
+
+## 8.2 — The Likelihood Lab
+
+Below are 10 fixed data points and a candidate Gaussian model you control
+with two sliders.
+
+<Callout tone="predict" label="Before you touch the sliders — predict">
+Try dragging μ far to one side, away from where most of the red dots are
+clustered. Do you expect the log-likelihood number to barely change, or to
+drop sharply?
+</Callout>
+
+<LikelihoodLabSection />
+
+Try to find the μ and σ that make the log-likelihood as large (as close to
+zero, since log-likelihoods are negative) as you can, by hand. Then click
+"Reveal the MLE" — you were doing, by trial and error, exactly what that
+button computes analytically in one step.
+
+## 8.3 — The formal math
+
+<MathLevelsSection />
+
+## 8.4 — Where this shows up in real machine learning
+
+- **Mean squared error**, one of the most common loss functions in all of
+  ML, is exactly what you get from maximizing Gaussian likelihood — this
+  module's math, not a coincidence.
+- **Logistic regression and classification losses** (cross-entropy) come
+  from the same idea, applied to a Bernoulli probability model instead of
+  a Gaussian one — the general pattern is identical, only the assumed
+  distribution changes.
+- **Bayesian methods** extend this idea by combining the likelihood with a
+  prior belief about the parameters — a natural next step once likelihood
+  itself is solid.
+
+## 8.5 — A failure mode this prevents
+
+<Callout tone="warning" label="Common mistake: assuming a loss function is arbitrary">
+Loss functions can look like arbitrary engineering choices if you haven't
+seen where they come from. Mean squared error isn't an arbitrary
+"penalize big errors more" heuristic — it falls directly out of assuming
+your data has Gaussian noise and maximizing likelihood under that
+assumption. Knowing this lets you reason about when MSE is actually the
+right choice (when Gaussian noise is a reasonable assumption) and when a
+different loss (matching a different noise/error model) would be more
+honest.
+</Callout>
+
+## Checkpoint
+
+Five questions. Score 80% or higher to complete this module.
+
+<QuizSection />

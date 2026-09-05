@@ -1,0 +1,85 @@
+---
+title: "The Math Behind Attention"
+eyebrow: "Module 11 of 11 · Stage 11: Modern ML Connections"
+minutes: 45
+---
+
+## Why you're learning this
+
+This is the reward module. Every idea from this course — the dot product,
+softmax's roots in probability and information theory, even the intuition
+that a vector's direction is what matters, not just its raw numbers — comes
+together in one mechanism: **attention**, the core computation behind
+transformers and every large language model built on them. If you've
+followed the course this far, you already know every piece of the
+formula you're about to see.
+
+<Objectives items={["Trace the dot product → scale → softmax → weighted sum pipeline", "Explain what \"attention weight\" means, using Module 1's dot product", "Explain why scores are scaled by 1/√d before softmax", "Explain the connection between this course's early and late modules"]} />
+
+## 11.1 — Relevance, computed the same way as similarity
+
+Attention starts by asking, for a specific word (the "query"), how
+relevant every other word (each a "key") is. That relevance score is
+computed exactly the way you'd expect after Module 1: a dot product.
+Words whose vectors point in similar directions score higher.
+
+<Callout tone="info" label="Definition">
+**Attention** computes, for a query vector, a weighted combination of
+value vectors — where the weights come from how well the query's direction
+aligns (via dot product) with each corresponding key vector, normalized
+into proper probabilities via softmax.
+</Callout>
+
+## 11.2 — The Attention Lab
+
+Below are five words, each represented as a fixed 2D vector — "cat" and
+"dog" point in similar directions, as do "keyboard" and "mouse."
+
+<Callout tone="predict" label="Before you click — predict">
+Click "mouse" as the query. Before checking the bars, predict which other
+word will receive the most attention weight, and roughly guess whether it
+will get more or less than 50% of the total weight.
+</Callout>
+
+<AttentionLabSection />
+
+Try each of the five words as the query in turn. Notice that "cat" and
+"dog" mostly attend to each other, "keyboard" and "mouse" mostly attend to
+each other, and "queen" (pointing in a very different direction from all
+four) ends up fairly evenly spread or weakly connected to everything —
+this is cosine-similarity-style clustering, doing real work inside a
+mechanism that powers modern language models.
+
+## 11.3 — The formal math
+
+<MathLevelsSection />
+
+## 11.4 — Where this shows up in real machine learning
+
+- **Self-attention in transformers** is exactly this computation, applied
+  to every word attending to every other word in a sentence
+  simultaneously, with learned (not hand-placed) query/key/value vectors.
+- **Multi-head attention** runs several of these attention computations in
+  parallel, each potentially learning to focus on a different kind of
+  relationship between words.
+- **Retrieval systems** (like the semantic search from Module 1) and
+  attention are close mathematical cousins — both fundamentally rank
+  relevance using dot products, just applied at different stages of a
+  system.
+
+## 11.5 — Where this course leaves you
+
+You started this course able to say, at best, "I've heard neural networks
+use math." You can now trace a real neuron's gradient by hand, explain
+why a determinant of zero means a matrix can't be undone, run gradient
+descent into instability on purpose and explain why, and read the formula
+behind attention as a sequence of ideas you already understand rather than
+as a wall of unfamiliar symbols. That is the actual, checkable outcome
+this course set out to build.
+
+## Checkpoint
+
+Five questions. Score 80% or higher to complete this module — and the
+course.
+
+<QuizSection />

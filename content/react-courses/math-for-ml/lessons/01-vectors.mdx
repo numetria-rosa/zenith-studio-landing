@@ -1,0 +1,109 @@
+---
+title: "Thinking in Vectors"
+eyebrow: "Module 1 of 11 · Stage 1: Thinking in Vectors"
+minutes: 45
+---
+
+## Why you're learning this
+
+Open any machine learning system and you will find vectors everywhere: a
+row of a dataset, a word turned into an "embedding," an image flattened into
+pixels, the weights of a neural network layer. Before any of that makes
+sense, you need one very specific piece of intuition: **a vector is not a
+list of numbers, it's an arrow with a direction, and comparing two arrows'
+directions is how machines decide whether two things are "similar."**
+
+That single idea — comparing directions — is the mathematical foundation
+underneath search engines, recommendation systems, and how a language model
+decides which word is relevant to which. This module builds that idea from
+scratch and ends with you being able to say exactly why.
+
+<Objectives items={["Explain what a vector's magnitude and direction actually represent", "Compute a dot product by hand and explain what it measures", "Explain cosine similarity, and why it ignores magnitude on purpose", "Connect all three directly to how an embedding-based search actually works"]} />
+
+## 1.1 — A vector is an arrow, not a spreadsheet row
+
+Picture two arrows drawn from the same starting point. One points mostly
+right and a little up. The other points mostly up and a little right. Even
+before you measure anything, you can *see* that they point in roughly
+similar directions — nowhere near opposite, not perfectly aligned either.
+
+That visual comparison — "roughly similar direction" — is the entire idea
+this module turns into mathematics you can compute.
+
+<Callout tone="info" label="Definition">
+A **vector** in two dimensions is a pair of numbers $(x, y)$ that describes
+a displacement from the origin: how far to move right/left, and how far to
+move up/down. Its two properties are **magnitude** (how long the arrow is)
+and **direction** (which way it points). Neither number alone tells you
+both — $(x, y)$ together does.
+</Callout>
+
+In machine learning, a vector is almost never literally an arrow on a page —
+it's a **feature vector**: one number per measurable property of something.
+A product might be represented as `(price, rating, weight)`. A sentence,
+after being run through an embedding model, might be represented as 768 or
+1536 numbers, each one capturing some learned aspect of its meaning. The
+"arrow" framing still applies exactly the same way, just in a space with
+more than 2 dimensions than you can draw — the math doesn't care how many
+dimensions there are.
+
+## 1.2 — The Vector Lab: drag it, don't just read it
+
+Below are two vectors on the same 2D plane. **a** is fixed — think of it as
+a document your search engine already has, already turned into a vector.
+**b** is yours to move — think of it as a new query someone just typed.
+
+<Callout tone="predict" label="Before you drag anything — predict">
+If you drag **b** so it points in almost exactly the same direction as
+**a**, but you drag it further from the origin (make it *longer*, same
+direction), do you think the "cosine similarity" number will go up, go
+down, or stay the same? Form an actual guess before you touch it — you'll
+check it in a second.
+</Callout>
+
+<VectorLabSection />
+
+Did the number move when you only changed the *length*, keeping the
+direction the same? It shouldn't have — cosine similarity is built, on
+purpose, to measure direction only. That's the single most important thing
+this whole module is building toward, so hold onto it.
+
+## 1.3 — The formal math
+
+<MathLevelsSection />
+
+## 1.4 — Where this shows up in real machine learning
+
+- **Semantic search**: a search engine turns your query into an embedding
+  vector, then finds the stored documents whose embedding vectors have the
+  highest cosine similarity to it — literally the exact computation you just
+  ran in the lab above, just in hundreds of dimensions instead of 2.
+- **Recommendation systems**: "users who liked what you liked" is, under the
+  hood, "users whose preference vectors point in a similar direction to
+  yours."
+- **Attention in transformers** (you'll see this properly in Module 11, but
+  the seed is here): a transformer decides how much one word should "pay
+  attention to" another word by taking a dot product between vectors derived
+  from each word. Everything in this module is the prerequisite for that.
+
+## 1.5 — A failure mode this prevents
+
+<Callout tone="warning" label="Common mistake: confusing dot product with cosine similarity">
+The **dot product** ($\mathbf{a}\cdot\mathbf{b}$) is sensitive to
+magnitude — a very long vector pointing in almost the same direction can
+produce a *larger* dot product than a short vector pointing in an
+*identical* direction. If you use raw dot product to compare "how similar
+are these two things" without normalizing, a document that's simply longer
+(more words, bigger embedding norm) can look "more similar" purely because
+it's bigger, not because it's more relevant. Cosine similarity divides that
+out on purpose — dividing by $\|\mathbf{a}\|\|\mathbf{b}\|$ is exactly what
+removes magnitude from the comparison. This is a real, common bug in search
+systems built by people who understood the code but not the math underneath
+it.
+</Callout>
+
+## Checkpoint
+
+Five questions. Score 80% or higher to complete this module.
+
+<QuizSection />

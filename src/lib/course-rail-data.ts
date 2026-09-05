@@ -241,4 +241,64 @@ export const COURSE_RAIL_DATA: Record<string, CourseRailData> = {
       12: { id: "NL-012" }, 13: { id: "NL-013" },
     },
   },
+
+  /* A "react" course (see if-we-work-on-adaptive-raccoon.md): served by real
+     Next.js pages under /lab/math-for-ml/learn, not the static contentDir
+     route, but this data still backs both the marketing page's "Inside the
+     course" section and the real in-course sidebar (CourseRail.tsx) exactly
+     like every static course above. Only Module 1 is real content — this
+     list is only extended as modules are actually built, on purpose. */
+  "math-for-ml": {
+    title: "Mathematics for Machine Learning",
+    hasModuleZero: true,
+    navGroups: [
+      { id: "learn", label: "Learn", items: [
+        ["diagnostic", "Skill Diagnostic"],
+        ["cheatsheet", "Cheat Sheet"],
+      ] },
+      { id: "foundation", label: "Foundation Bridge (optional)", items: [
+        ["foundation-a-algebra", "A: Algebra for ML"],
+        ["foundation-b-graphs", "B: Graphs and Functions"],
+        ["foundation-c-notation", "C: Mathematical Notation"],
+      ] },
+      { id: "practice", label: "Practice", items: [
+        ["practice", "Practice Library"],
+        ["math-detective", "Math Detective"],
+      ] },
+      { id: "build", label: "Build", items: [
+        ["project-similarity-engine", "Project: Similarity Engine"],
+        ["project-pca-explorer", "Project: PCA Explorer"],
+        ["project-gradient-descent", "Project: Gradient Descent"],
+        ["project-probability-simulator", "Project: Probability Simulator"],
+        ["project-neural-network", "Project: Neural Network"],
+        ["capstone", "Capstone"],
+      ] },
+    ],
+    modules: [
+      { id: 1, file: "01-vectors", title: "Thinking in Vectors" },
+      { id: 2, file: "02-matrices", title: "Transforming Data" },
+      { id: 3, file: "03-pca", title: "Finding the Important Directions" },
+      { id: 4, file: "04-calculus", title: "Mathematics of Change" },
+      { id: 5, file: "05-optimization", title: "How Models Learn" },
+      { id: 6, file: "06-probability", title: "Reasoning Under Uncertainty" },
+      { id: 7, file: "07-statistics", title: "Learning From Data" },
+      { id: 8, file: "08-likelihood", title: "Probability Meets Machine Learning" },
+      { id: 9, file: "09-information", title: "Information and Loss" },
+      { id: 10, file: "10-neural-networks", title: "The Mathematics of a Neural Network" },
+      { id: 11, file: "11-attention", title: "The Math Behind Attention" },
+    ],
+    stages: [
+      { label: "Stage 1", title: "Thinking in vectors", modules: [1] },
+      { label: "Stage 2", title: "Transforming data", modules: [2] },
+      { label: "Stage 3", title: "Finding the important directions", modules: [3] },
+      { label: "Stage 4", title: "Mathematics of change", modules: [4] },
+      { label: "Stage 5", title: "Optimization", modules: [5] },
+      { label: "Stage 6", title: "Probability", modules: [6] },
+      { label: "Stage 7", title: "Statistics", modules: [7] },
+      { label: "Stage 8", title: "Probability meets ML", modules: [8] },
+      { label: "Stage 9", title: "Information and loss", modules: [9] },
+      { label: "Stage 10", title: "Deep learning mathematics", modules: [10] },
+      { label: "Stage 11", title: "Modern ML connections", modules: [11] },
+    ],
+  },
 };

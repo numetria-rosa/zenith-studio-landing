@@ -1,0 +1,94 @@
+---
+title: "Transforming Data"
+eyebrow: "Module 2 of 11 · Stage 2: Transforming Data"
+minutes: 50
+---
+
+## Why you're learning this
+
+Module 1 gave you a vector: an arrow, a point, a row of features. This
+module gives you the thing that *moves* vectors around — a matrix. Once you
+can see a matrix as "a machine that transforms every point in space the same
+way," you can look at a neural network layer and recognize exactly what it's
+doing: `y = Wx + b` is not a mysterious formula, it's a linear
+transformation (the `W` you're about to understand) plus a shift.
+
+<Objectives items={["Explain what a matrix does to a vector, geometrically", "Compute a matrix-vector product by hand", "Explain what the determinant measures and why zero is special", "Connect a matrix transformation directly to a neural network's linear layer"]} />
+
+## 2.1 — A matrix is a machine, not a grid
+
+Forget "rows and columns of numbers" for a moment. Think of a matrix as a
+function: you feed it a point, it hands back a new point. What makes it
+predictable — "linear" — is that it treats every point consistently: the
+origin never moves, straight lines stay straight, and evenly spaced points
+stay evenly spaced (just possibly stretched, squeezed, rotated, or
+flattened).
+
+<Callout tone="info" label="Definition">
+A matrix's **columns** tell you the whole story: the first column is where
+the point (1, 0) lands after the transformation, the second column is where
+(0, 1) lands. Every other point's new location is built from those two
+answers — specifically, point (x, y) lands at
+x·(column 1) + y·(column 2). Once you know where the two basis points go,
+you know where everything goes.
+</Callout>
+
+## 2.2 — The Matrix Transformation Lab
+
+Below, drag the four sliders (or hit a preset) and watch the whole grid warp
+in real time. The shaded parallelogram is what happens to a plain 1×1
+square sitting at the origin.
+
+<Callout tone="predict" label="Before you touch anything — predict">
+Click "Collapse" once you're looking at the lab. Before you do, guess: will
+the shaded parallelogram still have any area at all once that preset is
+applied? Say your guess out loud, then click it and check.
+</Callout>
+
+<MatrixLabSection />
+
+If you clicked Collapse, you should have seen the parallelogram flatten
+into a line with zero visible area. That's not a rendering glitch — it's
+the determinant hitting exactly zero, which you'll see the formula for
+next.
+
+## 2.3 — The formal math
+
+<MathLevelsSection />
+
+## 2.4 — Where this shows up in real machine learning
+
+- **Every linear/dense layer in a neural network** computes `y = Wx + b` —
+  `W` is a matrix that transforms the input vector `x` exactly the way the
+  lab's matrix transforms points, just usually in far more than 2
+  dimensions. Training a network is, in large part, learning better and
+  better entries for matrices like this one.
+- **Rank and information loss**: a matrix with `det = 0` in 2D (or more
+  generally, a matrix that isn't "full rank" in higher dimensions) throws
+  away information it can never get back. This is directly relevant to
+  designing network architectures — a layer that accidentally collapses too
+  much information is a real, diagnosable failure mode, not just a
+  theoretical curiosity.
+- **Rotations, in graphics and robotics**: the "Rotate 45°" preset in the
+  lab is a real rotation matrix — the exact building block used to rotate
+  camera views, robot arms, and 3D models.
+
+## 2.5 — A failure mode this prevents
+
+<Callout tone="warning" label="Common mistake: assuming every matrix can be undone">
+Not every transformation has an inverse. If a matrix's determinant is zero,
+no amount of clever algebra will find you a matrix that undoes it — the
+information needed to reverse it was destroyed the moment it was applied
+(two different starting points landed on the exact same output point, so
+there's no way to know which one it *was*). In practice, this shows up as
+a matrix inversion silently failing, or a system of equations having no
+unique solution, when a very slightly different matrix would have worked
+fine. Checking `det(M) ≈ 0` before you rely on inverting something is a
+real, practical habit this module is building.
+</Callout>
+
+## Checkpoint
+
+Five questions. Score 80% or higher to complete this module.
+
+<QuizSection />

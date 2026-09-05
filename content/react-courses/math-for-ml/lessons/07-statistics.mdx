@@ -1,0 +1,81 @@
+---
+title: "Learning From Data"
+eyebrow: "Module 7 of 11 · Stage 7: Statistics"
+minutes: 45
+---
+
+## Why you're learning this
+
+Module 6 showed that a single average settles down as you collect more
+data. This module asks a sharper question: if you drew a *different* sample
+of the same size, how different would that average likely have been? The
+answer — the Central Limit Theorem — is why averages computed from
+reasonably-sized samples can be trusted at all, and it's the mathematical
+foundation under confidence intervals, hypothesis tests, and every
+"statistically significant" claim you'll ever evaluate.
+
+<Objectives items={["Explain the difference between a population and a sample", "Explain the Central Limit Theorem in your own words", "Explain why correlation doesn't imply causation, with a real example", "Ask the right first question when someone reports a result from a small sample"]} />
+
+## 7.1 — Population vs. sample
+
+<Callout tone="info" label="Definition">
+A **population** is every possible item you could measure — every user,
+every transaction, every possible experiment outcome. A **sample** is the
+subset you actually collected data from. Almost everything in applied
+statistics exists because you can only ever see a sample, but you want to
+say something true about the whole population.
+</Callout>
+
+## 7.2 — The Sampling Distribution Lab
+
+The population below is deliberately skewed — nothing bell-shaped about
+it. Each click draws a random sample of size n and plots its *mean* as one
+bar in the growing histogram.
+
+<Callout tone="predict" label="Before you draw samples — predict">
+Set n to 1 and draw 50 "samples." Then set n to 30 and draw 50 more (after
+resetting). Will both histograms end up looking similarly skewed, or will
+one of them look noticeably more bell-shaped than the other?
+</Callout>
+
+<SamplingLabSection />
+
+At n=1, each "sample mean" is just a single skewed value, so the histogram
+looks like the population itself. At n=30, the histogram should look
+noticeably more symmetric and bell-shaped, centered on the true population
+mean — even though nothing about the underlying population changed.
+
+## 7.3 — The formal math
+
+<MathLevelsSection />
+
+## 7.4 — Where this shows up in real machine learning
+
+- **Confidence intervals on model metrics** (accuracy, AUC) are built
+  directly on the sampling-distribution idea: the reported number is a
+  sample mean, and the interval reflects how much it could plausibly move
+  if you re-measured on a different held-out set.
+- **A/B testing** for product changes relies on the same math to decide
+  whether an observed lift is larger than ordinary sampling variability
+  would produce, or is likely just noise.
+- **Correlation vs. causation** matters enormously in ML: a model can
+  learn a real, useful correlation (a feature that predicts an outcome)
+  without that feature causing the outcome — this distinction determines
+  whether an intervention based on the model's insight will actually work.
+
+## 7.5 — A failure mode this prevents
+
+<Callout tone="warning" label="Common mistake: treating a small-sample result as settled fact">
+A metric measured on a small holdout set (say, 30 examples) can look
+dramatically different from the same metric measured on a much larger set,
+purely from sampling variability — not because anything about the model
+changed. Reporting "our new model is better" from a small, noisy comparison
+without accounting for this is one of the most common and most avoidable
+mistakes in applied ML evaluation.
+</Callout>
+
+## Checkpoint
+
+Five questions. Score 80% or higher to complete this module.
+
+<QuizSection />

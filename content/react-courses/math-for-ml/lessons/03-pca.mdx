@@ -1,0 +1,96 @@
+---
+title: "Finding the Important Directions"
+eyebrow: "Module 3 of 11 · Stage 3: Finding the Important Directions"
+minutes: 55
+---
+
+## Why you're learning this
+
+Real data is almost never spread out evenly in every direction. Height and
+weight move together. So do "hours studied" and "exam score," or hundreds
+of the numbers inside a language model's embeddings. This module answers a
+concrete question: **given a cloud of correlated data, which direction
+actually matters most, and how much would you lose by keeping only that
+one?** The answer — eigenvectors and eigenvalues of the data's covariance
+matrix — is one of the most reused ideas in all of machine learning:
+dimensionality reduction, PCA, and (later, in Module 11) even part of how
+attention works all come back to this same question.
+
+<Objectives items={["Explain what an eigenvector and eigenvalue represent, geometrically", "Explain what a covariance matrix measures", "Compute PCA's principal directions conceptually from a covariance matrix", "Explain what \"variance explained\" means and why it justifies reducing dimensions"]} />
+
+## 3.1 — The direction that doesn't bend
+
+In Module 2, you saw a matrix bend a square into a slanted parallelogram.
+Almost every direction gets turned somewhere new. But for (almost) every
+matrix, a small number of special directions don't turn at all — a vector
+pointing that way just gets longer or shorter, still pointing exactly the
+same way (or exactly the opposite way).
+
+<Callout tone="info" label="Definition">
+An **eigenvector** of a matrix is a direction that transformation doesn't
+rotate — only scales. The amount it scales by is the matching
+**eigenvalue**. For a cloud of data, if the matrix is the data's
+**covariance matrix** (how much each pair of variables moves together),
+the eigenvectors point along the directions the data is actually spread
+out in, and the eigenvalues tell you exactly how much spread lives in each
+one.
+</Callout>
+
+## 3.2 — The PCA Laboratory
+
+Below is a cloud of correlated data — think "two measurements that tend to
+move together." The gold line (PC1) and green line (PC2) are the two
+eigenvector directions of this data's own covariance matrix, and their
+lengths are literally proportional to how much variance (spread) lives
+along each one.
+
+<Callout tone="predict" label="Before you touch the slider — predict">
+Drag the rotation slider to spin the data cloud around. Before you do,
+guess: will the PC1/PC2 lines rotate along with the data, or will they stay
+fixed in place no matter how the data spins?
+</Callout>
+
+<PCALabSection />
+
+If PC1 and PC2 rotated right along with the data, that's the whole point:
+eigenvectors are a property of the data's actual shape, not of whatever
+x/y axes happen to be drawn on the page. Now click "Project onto PC1" —
+every point gets collapsed onto that single gold line. The "variance
+explained" number above tells you exactly how much information survived
+that collapse from 2D down to 1D.
+
+## 3.3 — The formal math
+
+<MathLevelsSection />
+
+## 3.4 — Where this shows up in real machine learning
+
+- **Dimensionality reduction for visualization**: embeddings from a real
+  model can have hundreds of dimensions — PCA finds the 2 or 3 directions
+  that preserve the most real structure, so a scatter plot is as
+  informative as a flat plot can be.
+- **Noise reduction**: directions with very small eigenvalues often
+  represent measurement noise rather than real signal — dropping them can
+  make downstream models more robust, not just faster.
+- **Feature compression**: instead of feeding a model hundreds of raw,
+  correlated features, PCA can compress them into a much smaller number of
+  effectively independent (uncorrelated) directions that capture almost
+  all the same information.
+
+## 3.5 — A failure mode this prevents
+
+<Callout tone="warning" label="Common mistake: applying PCA and assuming nothing was lost">
+"Variance explained" is not "information preserved" in every sense that
+matters. A direction with tiny variance can still carry a rare but
+critical signal — a fraud-detection dataset where 99.9% of the variance is
+"normal transaction noise" and the fraud signal lives entirely in the last
+0.1% is a real, common failure mode: PCA would happily discard exactly the
+direction you needed most. Always ask what a discarded direction might
+represent before assuming smaller-variance means safe-to-drop.
+</Callout>
+
+## Checkpoint
+
+Five questions. Score 80% or higher to complete this module.
+
+<QuizSection />

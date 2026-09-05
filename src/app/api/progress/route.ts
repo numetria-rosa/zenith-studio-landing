@@ -4,7 +4,9 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { hasCourseAccess } from "@/lib/entitlements";
 import { validateProgressPayload } from "@/lib/progress-shape";
+import { validateReactCourseProgress } from "@/lib/progress-shape-v2";
 import { getCourse } from "@/lib/courses";
+import { COURSE_RAIL_DATA } from "@/lib/course-rail-data";
 
 /* Server-authoritative progress storage (Phase 10/11). The client's
    course-progress.js talks to this instead of localStorage directly once
@@ -51,7 +53,14 @@ export async function POST(request: NextRequest) {
     return new Response("forbidden", { status: 403 });
   }
 
-  const validated = validateProgressPayload(data);
+  // "react" courses use a separate, narrower validator (see
+  // progress-shape-v2.ts) rather than loosening validateProgressPayload,
+  // which stays exactly as strict as the 4 static courses' live data needs.
+  const course = getCourse(courseId)!;
+  const validated =
+    course.renderMode === "react"
+      ? validateReactCourseProgress(data, COURSE_RAIL_DATA[courseId]?.modules.length ?? 0)
+      : validateProgressPayload(data);
   if (!validated.ok) return new Response(validated.error, { status: 422 });
 
   const jsonData = validated.data as Prisma.InputJsonValue;

@@ -100,7 +100,9 @@ export default async function CourseDetailsPage({
   // Keyed by content directory, not course.id — course.id is "ai-automation"
   // in the catalog but the directory (and course-rail-data.ts's key) is
   // "automation-engineering", same mismatch route.ts already handles.
-  const railData = catalogCourse ? COURSE_RAIL_DATA[path.basename(catalogCourse.contentDir)] : undefined;
+  const railData = catalogCourse
+    ? COURSE_RAIL_DATA[catalogCourse.contentDir ? path.basename(catalogCourse.contentDir) : catalogCourse.id]
+    : undefined;
 
   // "By the numbers" — every figure here is a real count, not a marketing
   // round number: real modules from course.stages (excludes the ungrouped

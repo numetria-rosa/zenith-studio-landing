@@ -6,7 +6,7 @@ import { courseFontVars } from "@/lib/fonts";
 import { auth, signOut } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { COURSES } from "@/lib/courses";
-import { getCheckoutUrl } from "@/lib/courses";
+import { getCheckoutUrl, courseHomeUrl } from "@/lib/courses";
 import { summarizeProgress } from "@/lib/course-progress-math";
 import { getService, SERVICE_STATUSES, SERVICE_STATUS_LABELS } from "@/lib/services";
 import { FolderKanban, PhoneCall } from "lucide-react";
@@ -241,7 +241,7 @@ export default async function DashboardPage() {
                       </div>
                     </div>
                     <a
-                      href={`/courses/${course.id}/${course.firstLessonPath}`}
+                      href={courseHomeUrl(course)}
                       className="inline-flex flex-shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg bg-[#f0b429] px-4 py-2 text-[13px] font-bold text-[#1a1200] transition hover:brightness-110"
                     >
                       Continue course →

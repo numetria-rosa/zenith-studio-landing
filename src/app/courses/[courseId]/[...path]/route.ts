@@ -37,6 +37,12 @@ export async function GET(
   if (!course || !course.published) {
     return new NextResponse("Not found", { status: 404 });
   }
+  // A "react" course has no static contentDir — it's served by real Next.js
+  // pages under /lab/[courseId]/learn instead, gated by that route's own
+  // layout. Never let a react course's id resolve through the disk-read path.
+  if (course.renderMode === "react" || !course.contentDir || !course.firstLessonPath) {
+    return new NextResponse("Not found", { status: 404 });
+  }
 
   // Strip .html before auth so a bookmark like /dashboard.html signs the
   // student back into /dashboard, not a callback that still carries .html.
