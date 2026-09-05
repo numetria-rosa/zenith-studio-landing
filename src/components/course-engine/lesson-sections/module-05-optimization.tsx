@@ -221,8 +221,86 @@ const QUESTIONS: QuizQuestion[] = [
       },
     ],
   },
+  {
+    id: "q6",
+    text: "Starting at x = 5 with f(x) = x², learning rate η = 0.1: what is x after one gradient descent step?",
+    options: [
+      {
+        text: "4, since f'(5) = 10, the step is 0.1×10 = 1, and 5 − 1 = 4",
+        correct: true,
+        principle: "x_new = x − η·f'(x) = 5 − 0.1(2·5) = 5 − 1 = 4 - the same three-step arithmetic as the worked example, just with different starting numbers.",
+      },
+      {
+        text: "4.9, since the step size is just the learning rate itself (0.1)",
+        correct: false,
+        socratic: "The update rule is x − η·f'(x), a product of the learning rate AND the gradient - does the step size ever equal the learning rate alone, ignoring the gradient's own size?",
+        whyWrong: "The actual step is η times the GRADIENT (0.1 × 10 = 1), not just η by itself (0.1) - the gradient's magnitude matters too.",
+        misconception: "It's easy to treat the learning rate as the whole step size and forget it's multiplied by the gradient.",
+        principle: "Step size = η × f'(x), not η alone - here that's 0.1 × 10 = 1, not just 0.1.",
+      },
+      {
+        text: "0.5, since f'(5) is divided by the learning rate instead of multiplied",
+        correct: false,
+        whyWrong: "The update rule multiplies the gradient by the learning rate, it never divides by it - dividing would use the wrong operation entirely.",
+        misconception: "It's easy to invert an operation (multiply vs. divide) when recalling a formula from memory rather than rederiving it.",
+        principle: "x_new = x − η·f'(x) - always multiplication between η and the gradient, never division.",
+      },
+    ],
+  },
+  {
+    id: "q7",
+    text: "Two different directions of a loss surface have very different curvatures (one steep, one shallow). Using ONE shared learning rate for both, what's the likely outcome?",
+    options: [
+      {
+        text: "A rate safe for the steep direction will make painfully slow progress in the shallow direction, and a rate fast enough for the shallow direction will overshoot in the steep one",
+        correct: true,
+        principle: "This exact tension - one learning rate can't simultaneously be 'just right' for two very different curvatures - is precisely why adaptive optimizers (Adam, RMSProp) exist.",
+      },
+      {
+        text: "It has no effect - a single learning rate works equally well in every direction by design",
+        correct: false,
+        socratic: "In the lab, does an elongated (very uneven) loss surface behave the same under a fixed learning rate as a perfectly circular one?",
+        whyWrong: "A single shared learning rate interacts very differently with steep versus shallow directions - this uneven-curvature problem is real and directly observable in the lab's elongated loss surface.",
+        misconception: "It's easy to assume a single numeric setting must apply uniformly, when the underlying surface's shape can make it behave very differently per direction.",
+        principle: "The same η produces a large effective step in a shallow direction and a much more aggressive one in a steep direction - it isn't neutral across directions.",
+      },
+      {
+        text: "The optimizer will automatically detect this and pick a different rate for each direction on its own",
+        correct: false,
+        whyWrong: "Plain gradient descent has no such automatic mechanism - it always applies the exact same η to every direction, every step, with no adaptation.",
+        misconception: "It's easy to assume any 'smart-sounding' behavior is already built into the basic algorithm, when it specifically isn't.",
+        principle: "Plain gradient descent uses one fixed η everywhere - per-direction adaptation is exactly the extra feature that adaptive optimizers add on top.",
+      },
+    ],
+  },
+  {
+    id: "q8",
+    text: "You lower the learning rate a lot and training becomes extremely slow, but never diverges or oscillates. What does this suggest?",
+    options: [
+      {
+        text: "The learning rate is now safely inside the stable range, but small enough that convergence takes a very long time - a speed problem, not a stability problem",
+        correct: true,
+        principle: "This is the 'too small' end of the same dial this module studies: no oscillation or divergence, but each step barely moves, so reaching the minimum takes far more steps than necessary.",
+      },
+      {
+        text: "The model has stopped learning entirely and something is broken",
+        correct: false,
+        socratic: "Is loss still decreasing at all, even slowly? Does 'decreasing very slowly' mean the same thing as 'not decreasing, ever'?",
+        whyWrong: "Slow-but-steady progress is a real, working state of gradient descent, not a broken one - it's just an inefficient choice of learning rate, easily fixed by raising it.",
+        misconception: "It's easy to treat 'much slower than expected' as equivalent to 'completely stopped,' when they're different situations.",
+        principle: "A very small learning rate still converges, correctly, just slowly - it's inefficient, not broken.",
+      },
+      {
+        text: "This means the learning rate is now too large, not too small",
+        correct: false,
+        whyWrong: "Divergence and oscillation are the signatures of too LARGE a learning rate - this scenario describes the opposite symptom (extreme slowness with no instability), which points at too small a rate.",
+        misconception: "It's easy to associate 'something's wrong with training' generically with 'rate too high,' without checking which specific symptom is present.",
+        principle: "Oscillation/divergence → rate too large. Painfully slow, stable progress → rate too small. Different symptoms point in opposite directions.",
+      },
+    ],
+  },
 ];
 
 export function QuizSection() {
-  return <QuizBlock moduleId={5} courseId="math-for-ml" questions={QUESTIONS} />;
+  return <QuizBlock moduleId={5} courseId="math-for-ml" questions={QUESTIONS} sampleSize={5} />;
 }

@@ -33,6 +33,17 @@ x·(column 1) + y·(column 2). Once you know where the two basis points go,
 you know where everything goes.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+Before the lab, compute this by hand: matrix $M$ has columns $(2, 1)$ and
+$(0, 3)$. Where does the point $(4, 2)$ land?
+1. Scale column 1 by $x=4$: $4 \times (2, 1) = (8, 4)$
+2. Scale column 2 by $y=2$: $2 \times (0, 3) = (0, 6)$
+3. Add the two results: $(8, 4) + (0, 6) = (8, 10)$
+
+So $(4, 2)$ lands at $(8, 10)$. You can build exactly this matrix and
+point in the lab below to confirm.
+</Callout>
+
 ## 2.2 - The Matrix Transformation Lab
 
 Below, drag the four sliders (or hit a preset) and watch the whole grid warp
@@ -85,6 +96,17 @@ a matrix inversion silently failing, or a system of equations having no
 unique solution, when a very slightly different matrix would have worked
 fine. Checking `det(M) ≈ 0` before you rely on inverting something is a
 real, practical habit this module is building.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: reading a negative determinant as 'wrong' or 'broken'">
+A negative determinant doesn't mean a mistake was made - it means the
+transformation flips orientation (like a mirror reflection), while still
+being perfectly valid and, usually, still invertible. `det(M) = -3` and
+`det(M) = 3` both describe transformations that scale area by a factor of
+3 - the only difference is whether left-handedness and right-handedness
+got swapped in the process. Only a determinant of exactly zero signals an
+actual, irreversible problem (a genuine loss of information); a negative
+one is just a sign convention doing its job.
 </Callout>
 
 ## Checkpoint

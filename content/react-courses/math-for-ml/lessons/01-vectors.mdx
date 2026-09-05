@@ -47,6 +47,20 @@ after being run through an embedding model, might be represented as 768 or
 more than 2 dimensions than you can draw - the math doesn't care how many
 dimensions there are.
 
+<Callout tone="info" label="Worked example">
+Before touching the lab, compute this by hand: let $\mathbf{a} = (4, 3)$ and
+$\mathbf{b} = (2, -1)$.
+1. Dot product: $\mathbf{a}\cdot\mathbf{b} = (4)(2) + (3)(-1) = 8 - 3 = 5$
+2. Magnitudes: $\|\mathbf{a}\| = \sqrt{4^2+3^2} = \sqrt{25} = 5$,
+   $\|\mathbf{b}\| = \sqrt{2^2+(-1)^2} = \sqrt{5} \approx 2.24$
+3. Cosine similarity: $\cos\theta = \dfrac{5}{5 \times 2.24} \approx 0.447$
+
+A positive but not-close-to-1 cosine similarity like $0.447$ means these
+two vectors point in a broadly similar, but far from identical, direction
+- roughly a 63° angle apart. Keep these numbers in mind; you can
+reconstruct this exact pair in the lab below to confirm they match.
+</Callout>
+
 ## 1.2 - The Vector Lab: drag it, don't just read it
 
 Below are two vectors on the same 2D plane. **a** is fixed - think of it as
@@ -100,6 +114,18 @@ out on purpose - dividing by $\|\mathbf{a}\|\|\mathbf{b}\|$ is exactly what
 removes magnitude from the comparison. This is a real, common bug in search
 systems built by people who understood the code but not the math underneath
 it.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: assuming a dot product of 0 means 'no relationship'">
+A dot product (or cosine similarity) of exactly $0$ doesn't mean two
+things are unrelated in the everyday sense - it means their vectors are
+**perpendicular** in whatever feature space they were embedded into. Two
+documents about completely different topics might still have a small
+positive similarity (they share common words), while two vectors
+engineered to be deliberately orthogonal (a common trick in some
+embedding schemes) can score exactly 0 despite representing closely
+related concepts. Treat "0" as "no directional alignment in this specific
+vector space," not as a general verdict on real-world relatedness.
 </Callout>
 
 ## Checkpoint

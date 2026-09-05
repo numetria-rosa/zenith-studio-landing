@@ -32,6 +32,19 @@ minimum - sometimes landing further away each time, a failure called
 **divergence**.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+Take one gradient-descent step by hand. Start at $x = 3$, with
+$f(x) = x^2$ (so $f'(x) = 2x$), and learning rate $\eta = 0.1$:
+1. Compute the gradient at the current point: $f'(3) = 2(3) = 6$
+2. Scale it by the learning rate: $0.1 \times 6 = 0.6$
+3. Subtract from the current point: $x_{\text{new}} = 3 - 0.6 = 2.4$
+
+One step moved $x$ from $3$ to $2.4$, closer to the minimum at $x=0$.
+Repeating this same three-step process is the entire algorithm - the lab
+below just does this arithmetic for you, in two dimensions, every time you
+click "Step."
+</Callout>
+
 ## 5.2 - The Gradient Descent Lab
 
 This is the same loss surface from Module 4. Click anywhere to place a
@@ -79,6 +92,17 @@ is fundamentally wrong. Before redesigning a model in response to unstable
 training, checking (and often simply lowering) the learning rate is a
 fast, frequently correct first move - and this module is exactly why that
 diagnosis makes sense.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: assuming a lower loss always means training is going well">
+A steadily decreasing loss is a good sign, but it isn't the whole story:
+a model can be decreasing its *training* loss while its performance on
+new, unseen data quietly gets worse (a separate problem called
+overfitting, covered more once evaluation comes up later in the course).
+Gradient descent is guaranteed to decrease the loss it's actually
+computing on, step by step, in the region checked here - it says nothing
+about whether that loss is even the right thing to be minimizing for your
+actual goal.
 </Callout>
 
 ## Checkpoint

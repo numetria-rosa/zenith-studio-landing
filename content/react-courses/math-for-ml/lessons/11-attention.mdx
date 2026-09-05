@@ -30,6 +30,18 @@ aligns (via dot product) with each corresponding key vector, normalized
 into proper probabilities via softmax.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+Query vector $q=(2,0)$, key vector $k=(2,0)$ (same direction), in a
+2-dimensional space ($d=2$). Compute the scaled attention score:
+1. Dot product: $q \cdot k = (2)(2) + (0)(0) = 4$
+2. Scale by $1/\sqrt{d}$: $4 / \sqrt{2} \approx 2.83$
+
+This scaled score of about $2.83$ is what gets fed into softmax alongside
+every other key's score, to produce the final attention weights - the
+same $q \cdot k$ you computed by hand back in Module 1, just renamed and
+placed inside one more step.
+</Callout>
+
 ## 11.2 - The Attention Lab
 
 Below are five words, each represented as a fixed 2D vector - "cat" and
@@ -67,7 +79,21 @@ mechanism that powers modern language models.
   relevance using dot products, just applied at different stages of a
   system.
 
-## 11.5 - Where this course leaves you
+## 11.5 - A failure mode this prevents
+
+<Callout tone="warning" label="Common mistake: assuming attention weights mean the model 'understands' relevance the way a human would">
+A high attention weight between two words means their learned vectors
+happen to align well under a dot product - it does not automatically mean
+the model has captured the human-intuitive semantic reason those words
+are related. Two tokens can attend strongly to each other for reasons
+that have more to do with training-data statistics or positional patterns
+than with meaning in the way a person would explain it. Treating an
+attention weight as a transparent, human-readable "explanation" of a
+model's reasoning is a common overreach - it's a real, computed
+similarity in a learned space, not a guarantee of matching human logic.
+</Callout>
+
+## 11.6 - Where this course leaves you
 
 You started this course able to say, at best, "I've heard neural networks
 use math." You can now trace a real neuron's gradient by hand, explain

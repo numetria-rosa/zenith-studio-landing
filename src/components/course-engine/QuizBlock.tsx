@@ -39,11 +39,17 @@ export function QuizBlock({
   moduleId,
   courseId,
   questions,
+  sampleSize,
   onPassed,
 }: {
   moduleId: number;
   courseId: string;
   questions: QuizQuestion[];
+  /** When the bank is larger than what's shown per attempt, draws this many
+      at random each time - so "Retry with new questions" can mean actually
+      different questions, not just the same set reshuffled. Omit (or set
+      >= questions.length) to show the whole bank every attempt, as before. */
+  sampleSize?: number;
   onPassed?: (score: number, total: number) => void;
 }) {
   const [attempt, setAttempt] = useState(0);
@@ -55,14 +61,18 @@ export function QuizBlock({
   // frame later, same as the other courses' quiz-data.js pattern in spirit
   // (order is randomized "every attempt," it just can't be randomized
   // before the page has hydrated).
-  const [shuffled, setShuffled] = useState<QuizQuestion[]>(questions);
+  const [shuffled, setShuffled] = useState<QuizQuestion[]>(
+    sampleSize && sampleSize < questions.length ? questions.slice(0, sampleSize) : questions,
+  );
   useEffect(() => {
     // Deliberately client-only randomization to avoid a hydration mismatch
     // (see the comment above) - this is exactly the "value differs between
     // server and client" escape hatch, not state that belongs in render.
+    const pool = shuffle(questions);
+    const picked = sampleSize && sampleSize < pool.length ? pool.slice(0, sampleSize) : pool;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setShuffled(shuffle(questions).map((q) => ({ ...q, options: shuffle(q.options) })));
-  }, [questions, attempt]);
+    setShuffled(picked.map((q) => ({ ...q, options: shuffle(q.options) })));
+  }, [questions, sampleSize, attempt]);
   const [answered, setAnswered] = useState<Record<string, number>>({});
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [score, setScore] = useState(0);

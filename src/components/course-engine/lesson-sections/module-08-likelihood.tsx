@@ -215,8 +215,86 @@ const QUESTIONS: QuizQuestion[] = [
       },
     ],
   },
+  {
+    id: "q6",
+    text: "For the data points {2, 4, 9}, what is the MLE estimate μ̂ for a Gaussian's mean?",
+    options: [
+      {
+        text: "5, since (2+4+9)/3 = 15/3 = 5",
+        correct: true,
+        principle: "The Gaussian MLE for the mean is always the sample mean: sum the data, divide by the count. (2+4+9)/3 = 5.",
+      },
+      {
+        text: "4, the middle value of the three numbers",
+        correct: false,
+        socratic: "The MLE formula is the sample MEAN (sum divided by count), not the median (middle value). Are those the same computation?",
+        whyWrong: "4 is the median (middle value when sorted), not the mean - the Gaussian MLE specifically requires averaging all the data, not picking the middle one.",
+        misconception: "It's easy to confuse the mean and the median, especially since they can coincidentally be close for some datasets.",
+        principle: "μ̂ = sample mean = (sum of all data points) / (count of data points), always - not the median.",
+      },
+      {
+        text: "15, the sum of the data points",
+        correct: false,
+        whyWrong: "15 is just the sum - the MLE formula requires dividing that sum by the count (3) to get the actual mean, 5.",
+        misconception: "It's easy to stop halfway through the formula and report an intermediate result as the final answer.",
+        principle: "Always complete both steps: sum the data, THEN divide by how many points there are.",
+      },
+    ],
+  },
+  {
+    id: "q7",
+    text: "You fit two different models to the same dataset. Model A has a higher likelihood than Model B. What can you conclude?",
+    options: [
+      {
+        text: "Model A's parameters make the observed data more probable than Model B's parameters do - nothing more general than that",
+        correct: true,
+        principle: "Likelihood is a comparison of how well specific parameter choices explain the data actually observed - it doesn't by itself certify that Model A is 'the truth' or will generalize better to new data.",
+      },
+      {
+        text: "Model A is definitely the true underlying model that generated the data",
+        correct: false,
+        socratic: "Does a higher likelihood score guarantee a model is the one true process that generated the data, or does it just mean that model explains THIS specific data better than the alternative you compared it to?",
+        whyWrong: "Likelihood only ranks the specific models you compared against each other on this data - it doesn't certify that the winner is the actual true process, especially with limited data or overly flexible models.",
+        misconception: "It's easy to treat 'won the comparison' as equivalent to 'proven true,' when it's really a relative, data-dependent ranking.",
+        principle: "Likelihood comparisons are relative and data-dependent - not an absolute certificate of truth for the winning model.",
+      },
+      {
+        text: "Model A will definitely perform better on brand-new, unseen data",
+        correct: false,
+        whyWrong: "Likelihood is computed on the data you already have - a model that overfits that specific data can have very high likelihood on it while performing worse on new data, a distinct problem MLE alone doesn't protect against.",
+        misconception: "It's easy to assume 'better fit to the data I have' automatically transfers to 'better fit to data I don't have yet.'",
+        principle: "Likelihood measures fit to observed data specifically - generalization to new data is a related but separate question.",
+      },
+    ],
+  },
+  {
+    id: "q8",
+    text: "Why does maximizing likelihood for a Gaussian model produce the same result as minimizing mean squared error?",
+    options: [
+      {
+        text: "Because the Gaussian probability density has a squared-difference term in its exponent, so maximizing that probability is mathematically the same as minimizing that squared difference",
+        correct: true,
+        principle: "The Gaussian PDF's exponent contains -(x-μ)²/(2σ²) - maximizing a probability with a negative squared term inside is the same as minimizing that squared term, which is exactly mean squared error.",
+      },
+      {
+        text: "It's a coincidence that happens to work out for Gaussian data specifically",
+        correct: false,
+        socratic: "Does the connection come from a specific mathematical structure inside the Gaussian formula (its exponent), or does it appear with no explanation at all?",
+        whyWrong: "This connection is a direct algebraic consequence of the Gaussian PDF's specific mathematical form, not an unexplained coincidence.",
+        misconception: "It's easy to label a result 'coincidental' before tracing through the actual algebra that produces it.",
+        principle: "The Gaussian's own formula, expanded and maximized, produces MSE - it's derivable, not accidental.",
+      },
+      {
+        text: "Because MSE and likelihood are unrelated, and this module hasn't actually shown they connect",
+        correct: false,
+        whyWrong: "This module explicitly derives this exact connection - MSE is presented as a direct consequence of maximizing Gaussian likelihood, not as two separate topics.",
+        misconception: "It's easy to overlook a connection explicitly built into the material by assuming two familiar-sounding topics must be separate.",
+        principle: "Minimizing MSE and maximizing Gaussian likelihood are the same optimization problem, shown directly by this module's math.",
+      },
+    ],
+  },
 ];
 
 export function QuizSection() {
-  return <QuizBlock moduleId={8} courseId="math-for-ml" questions={QUESTIONS} />;
+  return <QuizBlock moduleId={8} courseId="math-for-ml" questions={QUESTIONS} sampleSize={5} />;
 }

@@ -225,8 +225,86 @@ const QUESTIONS: QuizQuestion[] = [
       },
     ],
   },
+  {
+    id: "q6",
+    text: "A distribution has 2 outcomes with probabilities 0.5 and 0.5. What is its entropy?",
+    options: [
+      {
+        text: "1 bit, since -log2(0.5) = 1 for each outcome, averaged over both",
+        correct: true,
+        principle: "H(p) = 0.5×(-log2(0.5)) + 0.5×(-log2(0.5)) = 0.5×1 + 0.5×1 = 1 bit - the maximum possible entropy for a 2-outcome distribution, matching a genuinely fair coin flip.",
+      },
+      {
+        text: "0.5 bits, matching the probability value itself",
+        correct: false,
+        socratic: "Entropy is computed from -log2(probability), not the probability value directly. Does -log2(0.5) actually equal 0.5?",
+        whyWrong: "-log2(0.5) = 1, not 0.5 - the entropy formula requires taking a logarithm of the probability, not just reporting the probability itself.",
+        misconception: "It's easy to skip the logarithm step and report the raw probability as if it were the answer.",
+        principle: "Always apply -log2(p) to each outcome's probability before averaging - never use the probability value directly as the answer.",
+      },
+      {
+        text: "2 bits, since there are 2 outcomes",
+        correct: false,
+        whyWrong: "Entropy isn't simply a count of outcomes - it depends on how probable each outcome actually is. 2 bits would require 4 equally likely outcomes, not 2.",
+        misconception: "It's easy to conflate 'number of possible outcomes' with 'entropy value,' when entropy depends on the actual probability distribution over them.",
+        principle: "Entropy is computed from the specific probabilities, not just a count of how many outcomes exist.",
+      },
+    ],
+  },
+  {
+    id: "q7",
+    text: "You compute H(p) = 1.5 bits and H(p,q) = 2.3 bits for the same true distribution p. What is D_KL(p‖q)?",
+    options: [
+      {
+        text: "0.8 bits, since D_KL(p‖q) = H(p,q) − H(p) = 2.3 − 1.5",
+        correct: true,
+        principle: "KL divergence is defined as cross-entropy minus entropy - a direct subtraction, giving the 'extra bits' q's mismatch costs beyond what p's own unpredictability already required.",
+      },
+      {
+        text: "3.8 bits, by adding the two numbers together",
+        correct: false,
+        socratic: "The relationship is D_KL(p‖q) = H(p,q) − H(p) - a subtraction. Does adding the two numbers instead compute the same thing?",
+        whyWrong: "KL divergence is cross-entropy MINUS entropy, not their sum - adding them computes an unrelated quantity.",
+        misconception: "It's easy to default to addition when combining two related numbers, without checking which operation the formula actually specifies.",
+        principle: "D_KL(p‖q) = H(p,q) − H(p), always a subtraction in that specific order.",
+      },
+      {
+        text: "1.53 bits, by dividing H(p,q) by H(p)",
+        correct: false,
+        whyWrong: "The relationship between these two quantities is a subtraction (H(p,q) − H(p)), not a ratio - dividing produces a different, unrelated number.",
+        misconception: "It's easy to reach for division as a way to 'compare' two numbers, when the actual defined relationship is additive/subtractive.",
+        principle: "Cross-entropy, entropy, and KL divergence relate through subtraction: H(p,q) = H(p) + D_KL(p‖q).",
+      },
+    ],
+  },
+  {
+    id: "q8",
+    text: "A model assigns q_i = 0.001 to a category where the true p_i = 1 (it's certain to happen). What happens to that term's contribution to cross-entropy?",
+    options: [
+      {
+        text: "It becomes very large, since -log2(0.001) ≈ 10 - a small predicted probability for a certain event is heavily penalized",
+        correct: true,
+        principle: "This is the exact mechanism behind 'don't be confidently wrong': -log2(q_i) grows rapidly as q_i shrinks toward 0, and here p_i=1 means this single term is the entire cross-entropy.",
+      },
+      {
+        text: "It becomes very small, since 0.001 is a small number",
+        correct: false,
+        socratic: "The formula involves -log2(q_i), not q_i directly. Does a small number INSIDE a negative logarithm produce a small or a large result?",
+        whyWrong: "-log2(q_i) grows LARGER as q_i shrinks toward 0 - a small q_i produces a large penalty, not a small one, because of the negative logarithm.",
+        misconception: "It's easy to assume 'small input' always means 'small output,' without accounting for the logarithm's specific behavior near zero.",
+        principle: "-log2(q_i) diverges toward infinity as q_i approaches 0 - small predicted probabilities for real events are punished severely, by design.",
+      },
+      {
+        text: "It has no effect, since p_i is what matters, not q_i",
+        correct: false,
+        whyWrong: "The formula H(p,q) = -Σ p_i log2(q_i) has q_i directly inside the logarithm - it very much affects the result, especially when it's extremely small.",
+        misconception: "It's easy to assume only the 'true' distribution p matters and forget q appears directly in the formula too.",
+        principle: "Cross-entropy depends on both p and q - q_i's value, especially when very small, has an outsized effect via the logarithm.",
+      },
+    ],
+  },
 ];
 
 export function QuizSection() {
-  return <QuizBlock moduleId={9} courseId="math-for-ml" questions={QUESTIONS} />;
+  return <QuizBlock moduleId={9} courseId="math-for-ml" questions={QUESTIONS} sampleSize={5} />;
 }

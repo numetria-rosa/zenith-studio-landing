@@ -213,8 +213,86 @@ const QUESTIONS: QuizQuestion[] = [
       },
     ],
   },
+  {
+    id: "q6",
+    text: "q = (3, 4) and k = (3, 4) (identical vectors), with d = 2. What is the scaled attention score q·k / √d?",
+    options: [
+      {
+        text: "About 17.68, since q·k = 25 and 25/√2 ≈ 17.68",
+        correct: true,
+        principle: "q·k = (3)(3)+(4)(4) = 9+16 = 25, then scaled: 25/√2 ≈ 17.68 - the same two-step process as the worked example, with larger numbers.",
+      },
+      {
+        text: "12.5, by dividing the dot product by d directly instead of √d",
+        correct: false,
+        socratic: "The scaling factor is 1/√d, using a SQUARE ROOT of the dimension - does dividing by d directly (without the square root) give the same result?",
+        whyWrong: "The formula scales by √d = √2 ≈ 1.41, not by d = 2 directly - skipping the square root gives a different (and incorrect) scaled score.",
+        misconception: "It's easy to drop the square root and use the dimension count directly, since both are 'related to size.'",
+        principle: "Always take √d before dividing, not d itself - here √2 ≈ 1.41, not 2.",
+      },
+      {
+        text: "7, by adding the components instead of multiplying them",
+        correct: false,
+        whyWrong: "The dot product multiplies matching components and sums those products (3×3 + 4×4 = 25) - it doesn't just add the raw numbers together (3+4=7).",
+        misconception: "It's easy to confuse the dot product with simple addition of the vectors' components.",
+        principle: "q·k = q1k1 + q2k2, always a sum of products, not a sum of raw values.",
+      },
+    ],
+  },
+  {
+    id: "q7",
+    text: "As the embedding dimension d grows very large (hundreds of dimensions), what happens to unscaled dot products, and why does this matter?",
+    options: [
+      {
+        text: "Their variance grows proportionally with d, and without the 1/√d scaling, softmax would behave almost like a hard maximum, hurting gradient flow during training",
+        correct: true,
+        principle: "This is exactly the Full Derivation's variance argument - more dimensions means more terms summed in the dot product, so unscaled scores grow larger and more extreme as d increases.",
+      },
+      {
+        text: "Dot products always stay within a fixed range regardless of dimension",
+        correct: false,
+        socratic: "The dot product sums one term per dimension (q1k1 + q2k2 + ... + qdkd). Does summing MORE terms tend to produce a wider range of possible totals, or the exact same range regardless of how many terms there are?",
+        whyWrong: "Summing more terms (more dimensions) generally produces larger-magnitude sums and greater variance - there's no fixed range that holds regardless of dimension.",
+        misconception: "It's easy to assume a formula's output range is fixed, without considering that it's a sum whose number of terms is changing.",
+        principle: "More dimensions means more terms in the dot product sum, which increases its typical magnitude and variance - this is precisely why scaling by 1/√d is needed.",
+      },
+      {
+        text: "This only matters for the visual 2D example in the lab, not for real transformers",
+        correct: false,
+        whyWrong: "This effect matters MORE at the hundreds-of-dimensions scale real transformers use, not less - the lab's 2D example is a simplified illustration of a real, standard component of production attention mechanisms.",
+        misconception: "It's easy to assume a small teaching example's lesson doesn't generalize, when this specific detail is exactly what production systems also rely on.",
+        principle: "√d scaling ('scaled dot-product attention') is a standard, documented part of real transformer architectures, not a lab-only simplification.",
+      },
+    ],
+  },
+  {
+    id: "q8",
+    text: "A query has identical raw dot-product scores with two different keys. After softmax, what will their attention weights look like?",
+    options: [
+      {
+        text: "Exactly equal to each other, since softmax assigns equal probability to inputs of equal value",
+        correct: true,
+        principle: "Softmax is a monotonic function of its input scores - equal scores in, equal weights out, regardless of what other keys are also being compared.",
+      },
+      {
+        text: "One will still be higher, since softmax always breaks ties toward the first-listed option",
+        correct: false,
+        socratic: "Does the softmax formula reference the ORDER of the inputs anywhere, or only their numeric values?",
+        whyWrong: "Softmax has no concept of 'first-listed' - it's a pure function of the numeric scores, and equal scores always produce exactly equal output weights.",
+        misconception: "It's easy to assume a tie-breaking rule exists somewhere in a formula, when the formula genuinely produces a true tie for true ties.",
+        principle: "softmax(x_i) depends only on the value of x_i relative to the other scores, never on list position.",
+      },
+      {
+        text: "Both will become exactly 0, since equal scores cancel out",
+        correct: false,
+        whyWrong: "Equal (nonzero) scores don't cancel to zero - they produce equal, generally nonzero weights, both sharing whatever total probability mass is left after all keys are considered.",
+        misconception: "It's easy to associate 'equal' with 'canceling out to nothing,' as if in a subtraction, when softmax doesn't work that way.",
+        principle: "Equal scores produce equal shares of the total probability (which sums to 1 across all keys), not zero.",
+      },
+    ],
+  },
 ];
 
 export function QuizSection() {
-  return <QuizBlock moduleId={11} courseId="math-for-ml" questions={QUESTIONS} />;
+  return <QuizBlock moduleId={11} courseId="math-for-ml" questions={QUESTIONS} sampleSize={5} />;
 }

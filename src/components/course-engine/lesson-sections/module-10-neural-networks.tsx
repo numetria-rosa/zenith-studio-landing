@@ -245,8 +245,86 @@ const QUESTIONS: QuizQuestion[] = [
       },
     ],
   },
+  {
+    id: "q6",
+    text: "A neuron has z = w1x1 + w2x2 + b = 2.0. Using σ(z) = 1/(1+e^-z), roughly what is the output a?",
+    options: [
+      {
+        text: "About 0.88 - a large positive z pushes the sigmoid output close to (but below) 1",
+        correct: true,
+        principle: "σ(2.0) = 1/(1+e^-2) ≈ 1/(1+0.135) ≈ 0.88 - positive z values push the sigmoid toward 1, never quite reaching it.",
+      },
+      {
+        text: "2.0 - the activation just passes the weighted sum through unchanged",
+        correct: false,
+        socratic: "The sigmoid function is specifically defined as 1/(1+e^-z), not as 'return z unchanged.' Does σ(z) = z hold for any nonzero z?",
+        whyWrong: "The sigmoid function always squashes its input into the range (0, 1) - it never simply returns the input value unchanged, regardless of what z is.",
+        misconception: "It's easy to forget an activation function does real work and treat it as if it were a placeholder.",
+        principle: "σ(z) always maps into (0, 1), no matter how large or small z is - it's never equal to z itself (except in the trivial sense that σ(0)=0.5≠0).",
+      },
+      {
+        text: "0, since large inputs saturate the sigmoid toward its minimum",
+        correct: false,
+        whyWrong: "Large POSITIVE z values push σ(z) toward 1, not 0 - saturation toward 0 happens for large NEGATIVE z instead.",
+        misconception: "It's easy to remember 'saturation happens at the extremes' without keeping track of which extreme corresponds to which sign of z.",
+        principle: "σ(z) → 1 as z → +∞, and σ(z) → 0 as z → −∞ - the sign of z determines which extreme it approaches.",
+      },
+    ],
+  },
+  {
+    id: "q7",
+    text: "You increase the magnitude of a weight w1 significantly. What's the direct effect on the gradient ∂Loss/∂w1 in a future step?",
+    options: [
+      {
+        text: "It depends on the resulting change in a and the loss - there's no rule that a larger weight directly produces a larger or smaller gradient on its own",
+        correct: true,
+        principle: "The gradient ∂Loss/∂w1 = 2(a-y)·a(1-a)·x1 depends on the current activation a and error (a-y), not directly on w1's own magnitude - a large weight can still produce a small gradient if the neuron has already converged near the target.",
+      },
+      {
+        text: "The gradient always increases proportionally with the weight's size",
+        correct: false,
+        socratic: "Look at the gradient formula: 2(a-y)·a(1-a)·x1. Does w1 appear directly as a factor in this expression at all?",
+        whyWrong: "w1 doesn't appear directly in the gradient formula itself - the gradient depends on the CURRENT activation and error, which are influenced by w1 indirectly through z, not by w1's raw magnitude.",
+        misconception: "It's easy to assume a parameter's own size must directly scale its own gradient, without checking the actual formula.",
+        principle: "The gradient formula's factors are the error (a-y), the sigmoid's local slope a(1-a), and the input x1 - not w1's magnitude directly.",
+      },
+      {
+        text: "The gradient becomes exactly zero once a weight gets large enough",
+        correct: false,
+        whyWrong: "There's no threshold at which a weight's own size forces its gradient to zero - the gradient depends on the resulting error and the sigmoid's local slope, which can stay nonzero even for large weights.",
+        misconception: "It's tempting to invent a 'saturation' rule about the WEIGHT itself, when saturation actually applies to the sigmoid's OUTPUT (a), not the weight.",
+        principle: "A very large weight can push the sigmoid's output toward saturation (making a(1-a) small), but the weight's magnitude itself doesn't directly zero out the gradient.",
+      },
+    ],
+  },
+  {
+    id: "q8",
+    text: "Why does this module's neuron use a smooth activation function (sigmoid) instead of a hard on/off step function?",
+    options: [
+      {
+        text: "A step function has a derivative of zero almost everywhere, which would make ∂Loss/∂w1 always zero and prevent gradient descent from ever updating the weights",
+        correct: true,
+        principle: "Backpropagation needs a nonzero, informative derivative at every step - a hard step function's flat derivative (zero everywhere except one undefined point) would break the entire chain-rule computation.",
+      },
+      {
+        text: "A step function would make the neuron compute faster",
+        correct: false,
+        socratic: "Does this module's core failure mode relate to computation SPEED, or to whether gradient descent can even function using the chain rule at all?",
+        whyWrong: "Speed isn't the reason - a step function is actually simple to compute, but its zero derivative would make gradient-based training entirely impossible, which is a correctness problem, not a performance one.",
+        misconception: "It's easy to reach for a speed-related explanation for a design choice that's actually about mathematical necessity.",
+        principle: "The real requirement is a smooth, differentiable function with a useful gradient - not raw computational speed.",
+      },
+      {
+        text: "Sigmoid and step functions produce identical outputs, so it doesn't matter which is used",
+        correct: false,
+        whyWrong: "Sigmoid produces a smooth range of values between 0 and 1, while a step function jumps abruptly between exactly 0 and exactly 1 - these are very different output behaviors, not identical ones.",
+        misconception: "It's easy to assume two functions that both 'end up near 0 or 1 eventually' must behave identically everywhere.",
+        principle: "Sigmoid's smooth, gradual transition (and nonzero derivative throughout) is precisely what a step function lacks.",
+      },
+    ],
+  },
 ];
 
 export function QuizSection() {
-  return <QuizBlock moduleId={10} courseId="math-for-ml" questions={QUESTIONS} />;
+  return <QuizBlock moduleId={10} courseId="math-for-ml" questions={QUESTIONS} sampleSize={5} />;
 }

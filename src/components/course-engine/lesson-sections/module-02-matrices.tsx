@@ -227,8 +227,88 @@ const QUESTIONS: QuizQuestion[] = [
       },
     ],
   },
+  {
+    id: "q6",
+    text: "A matrix has columns (0, 1) and (-1, 0). What is det(M), and what does the sign tell you?",
+    options: [
+      {
+        text: "det(M) = 1, and the positive sign means orientation is preserved (not flipped)",
+        correct: true,
+        principle: "det = (0)(0) - (-1)(1) = 0 + 1 = 1. This particular matrix is actually a 90° rotation - area-preserving and orientation-preserving.",
+      },
+      {
+        text: "det(M) = -1, since one of the entries is negative",
+        correct: false,
+        socratic: "The determinant formula is ad − bc, using all four entries in a specific combination - does simply having one negative number in the matrix automatically make the whole result negative?",
+        whyWrong: "det = ad - bc = (0)(0) - (-1)(1) = 1, a positive result - a single negative entry doesn't determine the sign of the whole determinant.",
+        misconception: "It's easy to assume the presence of a negative number anywhere in the matrix flips the final sign.",
+        principle: "Compute the full formula ad - bc term by term before concluding anything about the sign.",
+      },
+      {
+        text: "det(M) = 0, since a and d are both 0",
+        correct: false,
+        socratic: "The formula is ad − bc, not just ad. Does the bc term contribute anything here even when a and d are both 0?",
+        whyWrong: "ad = (0)(0) = 0, but bc = (-1)(1) = -1, so det = 0 - (-1) = 1, not 0 - the bc term still matters even when a and d vanish.",
+        misconception: "It's easy to stop after computing only the ad part of the formula and forget the bc part still needs subtracting.",
+        principle: "Always compute both ad and bc before subtracting - a zero in one part doesn't make the whole determinant zero.",
+      },
+    ],
+  },
+  {
+    id: "q7",
+    text: "A matrix has columns (1, 0) and (0, 2). Apply it to the point (3, 5). What's the result?",
+    options: [
+      {
+        text: "(3, 10)",
+        correct: true,
+        principle: "Mv = 3·(1,0) + 5·(0,2) = (3,0) + (0,10) = (3,10) - the x-coordinate is untouched, the y-coordinate doubles.",
+      },
+      {
+        text: "(6, 10)",
+        correct: false,
+        socratic: "Column 1 is (1, 0) - does multiplying x by column 1 change the x-coordinate at all, or leave it as-is?",
+        whyWrong: "Column 1 is (1, 0), so 3·(1,0) = (3,0) - the x-coordinate stays exactly 3, it doesn't also get doubled.",
+        misconception: "It's easy to assume every coordinate gets scaled by the 'biggest' number in the matrix.",
+        principle: "Each column only affects the output the way its own entries specify - column 1 here leaves x unchanged.",
+      },
+      {
+        text: "(3, 5)",
+        correct: false,
+        socratic: "Column 2 is (0, 2), meaning the y-output includes a factor of 2. Does multiplying 5 by that column really leave the y-coordinate unchanged?",
+        whyWrong: "This is just the original point, unchanged - but column 2's entry of 2 means the y-coordinate should double to 10, not stay at 5.",
+        misconception: "It's easy to assume a matrix with mostly familiar-looking entries (1s and 0s) does nothing at all.",
+        principle: "This matrix stretches the y-direction by a factor of 2 - check each column's actual entries, not just its overall 'shape.'",
+      },
+    ],
+  },
+  {
+    id: "q8",
+    text: "You're told a matrix M is invertible. What does that guarantee?",
+    options: [
+      {
+        text: "There exists another matrix M⁻¹ that undoes M's transformation exactly, and det(M) ≠ 0",
+        correct: true,
+        principle: "Invertibility and a nonzero determinant are the same condition - an invertible matrix has lost no information, so its exact transformation can be reversed.",
+      },
+      {
+        text: "M must be the identity matrix",
+        correct: false,
+        socratic: "The identity matrix is invertible (it's its own inverse), but are there many OTHER matrices with a nonzero determinant that also have inverses?",
+        whyWrong: "Invertibility is a much broader property than being the identity - any matrix with a nonzero determinant is invertible, not just the identity.",
+        misconception: "It's easy to think of the one special case (identity) as the only example of a well-behaved matrix.",
+        principle: "Invertible just means det(M) ≠ 0 - a huge family of matrices satisfies this, not just the identity.",
+      },
+      {
+        text: "Applying M twice in a row gives the same result as applying it once",
+        correct: false,
+        whyWrong: "That property (M applied twice equals M applied once) describes something else entirely (called idempotence) - it has no direct connection to invertibility.",
+        misconception: "It's easy to invent a plausible-sounding property and assume it's equivalent to a term you're less sure about.",
+        principle: "Invertibility specifically means 'has an inverse that undoes it,' not any property about repeating the transformation.",
+      },
+    ],
+  },
 ];
 
 export function QuizSection() {
-  return <QuizBlock moduleId={2} courseId="math-for-ml" questions={QUESTIONS} />;
+  return <QuizBlock moduleId={2} courseId="math-for-ml" questions={QUESTIONS} sampleSize={5} />;
 }

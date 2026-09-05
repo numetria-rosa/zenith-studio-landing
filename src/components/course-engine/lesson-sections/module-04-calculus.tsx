@@ -222,6 +222,88 @@ const QUESTIONS: QuizQuestion[] = [
   },
 ];
 
+const MORE_QUESTIONS: QuizQuestion[] = [
+  {
+    id: "q6",
+    text: "For f(x, y) = x² + 3y², what is ∇f at the point (2, 1)?",
+    options: [
+      {
+        text: "(4, 6)",
+        correct: true,
+        principle: "∇f = (2x, 6y). Substituting x=2, y=1: (2·2, 6·1) = (4, 6).",
+      },
+      {
+        text: "(2, 1)",
+        correct: false,
+        socratic: "∇f = (2x, 6y) is a formula involving the COEFFICIENTS from the original function, not just a copy of the input point. Does plugging x=2, y=1 into (2x, 6y) just give back (2, 1)?",
+        whyWrong: "This just repeats the input point rather than applying the gradient formula (2x, 6y) to it.",
+        misconception: "It's easy to forget to actually apply the derivative formula and just restate the input.",
+        principle: "Always apply ∇f = (2x, 6y) to the specific point - here that gives (4, 6), not the point itself.",
+      },
+      {
+        text: "(4, 3)",
+        correct: false,
+        socratic: "The y-component of ∇f is 6y, not 3y. Did you use the coefficient from the original function f(x,y) = x² + 3y² correctly for the y-partial?",
+        whyWrong: "The partial with respect to y is 6y (since the y² term has a coefficient of 3, and differentiating y² gives 2y, so 3·2y = 6y), not 3y.",
+        misconception: "It's easy to reuse the original coefficient (3) directly instead of completing the derivative (which doubles it to 6).",
+        principle: "∂f/∂y = 6y here because d/dy[3y²] = 3 · 2y = 6y - the coefficient and the exponent's derivative both contribute.",
+      },
+    ],
+  },
+  {
+    id: "q7",
+    text: "You're at the point where ∇f = (0, 3). Is this point a minimum of f?",
+    options: [
+      {
+        text: "Not necessarily - a zero gradient in only one direction isn't enough; you need ALL components to be zero",
+        correct: true,
+        principle: "A true minimum (or maximum, or flat point) requires ∇f = (0, 0) - every component zero. (0, 3) still has a nonzero y-component, meaning the surface is still sloped in the y-direction.",
+      },
+      {
+        text: "Yes, because one of the components is small enough to ignore",
+        correct: false,
+        socratic: "Is there a rule in this module that says a gradient component can be 'small enough to ignore'? What does ∇f = (0,0) actually require?",
+        whyWrong: "A minimum requires the FULL gradient vector to be exactly (0, 0) - a nonzero y-component of 3 means the surface is still climbing or falling in that direction, wherever you are.",
+        misconception: "It's easy to focus on the zero component and treat the nonzero one as negligible, when both must be zero.",
+        principle: "∇f = (0, 0) is the complete condition for a flat point - partial flatness in only one direction isn't the same thing.",
+      },
+      {
+        text: "Yes, because gradients only need to be zero in the x-direction to signal a minimum",
+        correct: false,
+        whyWrong: "There's no special priority given to the x-direction - both partial derivatives must be zero for a point to be a candidate minimum.",
+        misconception: "It's easy to arbitrarily treat one axis as more important than the other without a mathematical reason to do so.",
+        principle: "Every direction's partial derivative must vanish at a true minimum - x and y are treated identically by the condition ∇f = (0,0).",
+      },
+    ],
+  },
+  {
+    id: "q8",
+    text: "The chain rule says d/dx[g(h(x))] = g'(h(x)) · h'(x). If h(x) = 2x and g(u) = u², what is d/dx[g(h(x))] at x = 3?",
+    options: [
+      {
+        text: "24, since g'(h(x)) = 2h(x) = 12 and h'(x) = 2, so 12 × 2 = 24",
+        correct: true,
+        principle: "g(h(x)) = (2x)², so its derivative is 2(2x) · 2 = 8x, and 8(3) = 24 - matching the chain-rule computation exactly.",
+      },
+      {
+        text: "6, by just multiplying h(x) and h'(x) together",
+        correct: false,
+        socratic: "The chain rule specifically requires g'(h(x)) - the derivative of the OUTER function evaluated at h(x) - not h(x) itself. Did you use g' at all, or just h and h'?",
+        whyWrong: "This skips g' entirely and just uses h(x)=6 times h'(x)=2 - the outer function's own derivative g'(h(x))=2h(x)=12 is missing from the computation.",
+        misconception: "It's easy to forget the outer function's derivative entirely and only differentiate the inner one.",
+        principle: "The chain rule needs BOTH factors: the outer function's derivative at the inner value, AND the inner function's own derivative.",
+      },
+      {
+        text: "4, since h'(x) = 2 and that's squared to get 4",
+        correct: false,
+        whyWrong: "Squaring h'(x) isn't part of the chain rule at all - the rule multiplies g'(h(x)) by h'(x), it doesn't square either piece.",
+        misconception: "Since g(u)=u² involves squaring, it's easy to misapply that squaring operation to the wrong part of the chain-rule formula.",
+        principle: "The chain rule is a product of two specific derivatives, g'(h(x)) and h'(x) - no squaring operation belongs in the rule itself.",
+      },
+    ],
+  },
+];
+
 export function QuizSection() {
-  return <QuizBlock moduleId={4} courseId="math-for-ml" questions={QUESTIONS} />;
+  return <QuizBlock moduleId={4} courseId="math-for-ml" questions={[...QUESTIONS, ...MORE_QUESTIONS]} sampleSize={5} />;
 }

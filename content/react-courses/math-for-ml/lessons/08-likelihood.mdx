@@ -29,6 +29,17 @@ function of the model's parameters (not of the data, which is fixed).
 make that probability as large as possible.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+For 3 data points $\{4, 6, 8\}$, the MLE for a Gaussian's mean $\hat\mu$
+is simply the sample mean:
+1. Sum the data: $4 + 6 + 8 = 18$
+2. Divide by the count: $18 / 3 = 6$
+
+So $\hat\mu = 6$ - no calculus needed to use this result, even though
+Module 8's Full Derivation shows exactly why setting the derivative of
+log-likelihood to zero produces this same plain average.
+</Callout>
+
 ## 8.2 - The Likelihood Lab
 
 Below are 10 fixed data points and a candidate Gaussian model you control
@@ -75,6 +86,17 @@ assumption. Knowing this lets you reason about when MSE is actually the
 right choice (when Gaussian noise is a reasonable assumption) and when a
 different loss (matching a different noise/error model) would be more
 honest.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: confusing likelihood with probability of the model being true">
+"This model has high likelihood given the data" does not mean "this model
+is probably the correct/true one." Likelihood only measures how probable
+the observed DATA would be under a given model - it says nothing about
+how probable the MODEL itself is among all possible models, which would
+require a prior belief over models (exactly what Bayesian methods add on
+top of plain likelihood). Two very different models can each have
+reasonably high likelihood for the same data, especially with limited
+data - MLE picks the best one you compared, not a guaranteed "true" one.
 </Callout>
 
 ## Checkpoint

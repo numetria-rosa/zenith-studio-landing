@@ -34,6 +34,17 @@ change in just one direction. The **gradient** bundles all of a
 function's partial derivatives into a single vector.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+Compute $\nabla f$ by hand for $f(x, y) = x^2 + 3y^2$ at the point $(2, 1)$:
+1. Partial with respect to $x$: treat $y$ as a constant, so $\frac{\partial f}{\partial x} = 2x = 2(2) = 4$
+2. Partial with respect to $y$: treat $x$ as a constant, so $\frac{\partial f}{\partial y} = 6y = 6(1) = 6$
+3. Bundle them: $\nabla f = (4, 6)$
+
+That arrow, $(4, 6)$, points toward steepest increase from $(2, 1)$ -
+you can drag to that exact point in the lab below and check the reported
+gradient matches.
+</Callout>
+
 ## 4.2 - The Gradient Lab
 
 Below is a real function of two variables, drawn as a heatmap (cooler
@@ -81,6 +92,17 @@ hand - a single missing minus sign turns an optimizer that decreases loss
 into one that actively increases it, and the resulting "training curve
 going the wrong way" bug can be surprisingly hard to spot if you don't
 know exactly what to check first.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: stopping at a zero PARTIAL derivative instead of a zero GRADIENT">
+Finding one partial derivative equal to zero (say, $\partial f/\partial x = 0$)
+does not mean you're at a minimum - the OTHER partial derivative might
+still be nonzero, meaning the surface is still sloped in that direction.
+A genuine flat point requires every single component of $\nabla f$ to be
+zero simultaneously. Checking only one direction and declaring victory is
+a common shortcut that silently misses saddle points and still-sloped
+regions - exactly the kind of point an optimizer would keep moving from,
+correctly, because it isn't actually flat yet.
 </Callout>
 
 ## Checkpoint

@@ -212,8 +212,86 @@ const QUESTIONS: QuizQuestion[] = [
       },
     ],
   },
+  {
+    id: "q6",
+    text: "For a fair coin (p = 0.5), compute the standard error of the running average after n = 400 flips.",
+    options: [
+      {
+        text: "0.025, from √(0.25/400) = √0.000625",
+        correct: true,
+        principle: "SE = √(p(1-p)/n) = √(0.5×0.5/400) = √(0.25/400) = √0.000625 = 0.025 - the same three-step formula as the worked example, with n=400 instead of 100.",
+      },
+      {
+        text: "0.00125, from 0.5/400",
+        correct: false,
+        socratic: "The formula is √(p(1-p)/n) - a square root of a fraction, not the probability divided directly by n. Did you apply the square root at all?",
+        whyWrong: "This skips both the p(1-p) numerator and the square root entirely - it just divides p by n directly, which isn't the standard error formula.",
+        misconception: "It's easy to shortcut a multi-step formula by using only the most familiar-looking piece of it.",
+        principle: "SE requires computing p(1-p), dividing by n, THEN taking a square root - each step matters.",
+      },
+      {
+        text: "0.0625, from 0.25/4 by simplifying n=400 to 4",
+        correct: false,
+        whyWrong: "n=400 must be used as-is in the division (0.25/400), not simplified to a smaller number first - there's no valid step that turns 400 into 4 here.",
+        misconception: "It's easy to introduce an arbitrary simplification that isn't mathematically justified by the actual formula.",
+        principle: "Divide by the actual sample size, 400, not a simplified stand-in for it.",
+      },
+    ],
+  },
+  {
+    id: "q7",
+    text: "You compute SE at n=100 and get 0.05. Someone collects 4x more data (n=400). By what factor should SE shrink?",
+    options: [
+      {
+        text: "By a factor of 2 (from 0.05 to 0.025), since SE scales with 1/√n and √4 = 2",
+        correct: true,
+        principle: "Quadrupling n always halves SE, because of the square root in the formula - exactly matching the two worked SE computations above (0.05 at n=100, 0.025 at n=400).",
+      },
+      {
+        text: "By a factor of 4, matching the 4x increase in data directly",
+        correct: false,
+        socratic: "Does SE scale directly (linearly) with n, or with the square root of n? Compute √4 - is it 4, or 2?",
+        whyWrong: "SE scales with 1/√n, not 1/n - a 4x increase in data gives a √4 = 2x reduction in SE, not a 4x reduction.",
+        misconception: "It's natural to expect a direct, linear relationship when the actual one involves a square root.",
+        principle: "SE ∝ 1/√n - always take the square root of the data-multiplication factor to find the SE-reduction factor.",
+      },
+      {
+        text: "SE won't change, since both are 'large enough' sample sizes",
+        correct: false,
+        whyWrong: "SE keeps shrinking predictably with more data at any sample size - there's no threshold after which additional data stops helping, though the absolute improvement does get smaller in later doublings.",
+        misconception: "It's easy to assume there's some informal cutoff past which 'more data' stops mattering at all.",
+        principle: "SE = √(p(1-p)/n) keeps decreasing for every increase in n, without a special cutoff point.",
+      },
+    ],
+  },
+  {
+    id: "q8",
+    text: "A weighted coin has p = 0.9 (90% heads). Compared to a fair coin (p = 0.5), how does its standard error at the same n compare?",
+    options: [
+      {
+        text: "Smaller - because p(1-p) = 0.9×0.1 = 0.09 is less than 0.5×0.5 = 0.25",
+        correct: true,
+        principle: "p(1-p) is maximized at p=0.5 and shrinks as p moves toward 0 or 1 - a heavily biased coin's outcomes are inherently less variable than a fair coin's, so its running average settles faster at the same n.",
+      },
+      {
+        text: "Larger - a more 'extreme' probability should be noisier",
+        correct: false,
+        socratic: "Compute p(1-p) for p=0.9 and for p=0.5 directly - which one is actually bigger?",
+        whyWrong: "p(1-p) is 0.09 for p=0.9 but 0.25 for p=0.5 - the 'extreme' probability actually produces the SMALLER value, not larger.",
+        misconception: "It's easy to associate 'extreme-sounding' probabilities with 'more randomness,' when the opposite is true here.",
+        principle: "A coin close to always-heads or always-tails is more predictable (lower variance) than a perfectly balanced one.",
+      },
+      {
+        text: "Exactly the same - standard error only depends on n, not on p",
+        correct: false,
+        whyWrong: "The formula √(p(1-p)/n) has p explicitly inside it - different values of p genuinely change the standard error at the same n, they don't cancel out.",
+        misconception: "It's easy to assume a quantity depends on only one of several variables actually present in its own formula.",
+        principle: "SE depends on BOTH p and n - p(1-p) inside the square root is not a constant.",
+      },
+    ],
+  },
 ];
 
 export function QuizSection() {
-  return <QuizBlock moduleId={6} courseId="math-for-ml" questions={QUESTIONS} />;
+  return <QuizBlock moduleId={6} courseId="math-for-ml" questions={QUESTIONS} sampleSize={5} />;
 }

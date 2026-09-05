@@ -31,6 +31,18 @@ zero entropy. A distribution where every outcome is equally likely has the
 maximum possible entropy for that number of outcomes.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+Compute the entropy of a fair 4-sided die, where every outcome has
+probability $p_i = 0.25$:
+1. Surprise per outcome: $-\log_2(0.25) = -\log_2(2^{-2}) = 2$ bits
+2. Average over all 4 equally-likely outcomes: $H(p) = \sum_i p_i \cdot 2 = 4 \times (0.25 \times 2) = 2$ bits
+
+So a fair 4-sided die has entropy exactly $2$ bits - the maximum possible
+for 4 outcomes, since every one is equally unpredictable. A loaded die
+(one outcome far more likely than the others) would compute to a smaller
+number - try building one in the lab below and watch $H(p)$ drop.
+</Callout>
+
 ## 9.2 - The Entropy Lab
 
 Below are two distributions over 4 categories: the true distribution p,
@@ -78,6 +90,17 @@ correct) can have very different cross-entropy losses if one tends to be
 confidently wrong while the other is only mildly wrong - and cross-entropy,
 not accuracy, is usually the more honest signal for how well-calibrated
 a model's confidence actually is.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: forgetting KL divergence is asymmetric">
+$D_{KL}(p \| q)$ and $D_{KL}(q \| p)$ are generally different numbers, not
+interchangeable versions of "the distance between p and q." The first
+heavily penalizes q assigning low probability to something p considers
+likely; the second penalizes the reverse situation. Which one is
+appropriate depends on which distribution is "the truth" you're being
+scored against - swapping them silently changes what kind of mismatch
+gets punished hardest, a real source of subtle bugs when implementing
+anything that compares two distributions.
 </Callout>
 
 ## Checkpoint

@@ -229,8 +229,86 @@ const QUESTIONS: QuizQuestion[] = [
       },
     ],
   },
+  {
+    id: "q6",
+    text: "A covariance matrix is [[4, 0], [0, 1]] (already diagonal). What are its eigenvalues?",
+    options: [
+      {
+        text: "4 and 1 - read directly off the diagonal",
+        correct: true,
+        principle: "For a diagonal matrix, the eigenvalues are always exactly the diagonal entries themselves - no quadratic formula needed.",
+      },
+      {
+        text: "5 and -3, from adding and subtracting the two entries",
+        correct: false,
+        socratic: "For a diagonal matrix specifically (zero off-diagonal entries), does the characteristic equation det(M − λI) = 0 require any combining of the diagonal entries, or does it factor apart cleanly per entry?",
+        whyWrong: "A diagonal matrix's characteristic equation factors into (4-λ)(1-λ)=0 directly - the eigenvalues are simply 4 and 1, with no addition or subtraction between them.",
+        misconception: "It's easy to assume eigenvalues always require combining matrix entries through some formula, even in the simplest possible case.",
+        principle: "Diagonal matrices are the easiest case: eigenvalues are always just the diagonal entries themselves.",
+      },
+      {
+        text: "Both are 2.5, the average of the two diagonal entries",
+        correct: false,
+        whyWrong: "Averaging the diagonal gives the mean, not the eigenvalues - a diagonal matrix's two eigenvalues are the two distinct diagonal entries, not one shared average.",
+        misconception: "It's tempting to collapse two numbers into one 'representative' value rather than reporting both eigenvalues separately.",
+        principle: "Each diagonal entry of a diagonal matrix is its own eigenvalue - here, that's 4 and 1, two different numbers.",
+      },
+    ],
+  },
+  {
+    id: "q7",
+    text: "For the matrix in the previous question ([[4,0],[0,1]]), what fraction of the total variance does PC1 explain?",
+    options: [
+      {
+        text: "80%, since 4 / (4 + 1) = 0.8",
+        correct: true,
+        principle: "Variance explained is always λ1 / (λ1 + λ2) - here, the larger eigenvalue (4) divided by the sum of both (5) gives 0.8, or 80%.",
+      },
+      {
+        text: "40%, since 4 / 10 uses double the total",
+        correct: false,
+        socratic: "What is the actual sum of the two eigenvalues here - is it 10, or is it 4 + 1?",
+        whyWrong: "The total variance is λ1 + λ2 = 4 + 1 = 5, not 10 - there's no reason to double the sum of the two eigenvalues.",
+        misconception: "It's easy to introduce an extra factor that isn't part of the formula when a calculation feels like it needs one more step.",
+        principle: "Total variance is simply the sum of all eigenvalues - here, exactly 4 + 1 = 5.",
+      },
+      {
+        text: "100%, since PC1 always captures all the variance by definition",
+        correct: false,
+        whyWrong: "PC1 only captures 100% when the other eigenvalue is exactly 0 - here λ2 = 1 is nonzero, so real variance remains along PC2 too.",
+        misconception: "It's easy to assume 'the first/most important component' must automatically mean 'everything,' when it's usually a partial (if large) share.",
+        principle: "PC1 captures 100% of the variance only in the special case where every other eigenvalue is exactly zero.",
+      },
+    ],
+  },
+  {
+    id: "q8",
+    text: "You run PCA on a dataset and get eigenvalues λ1 = 3, λ2 = 3 (exactly equal). What does this tell you about the data's shape?",
+    options: [
+      {
+        text: "The data is spread out equally in every direction - roughly circular, with no single 'most important' direction",
+        correct: true,
+        principle: "Equal eigenvalues mean there's no preferred direction of spread - any two perpendicular directions would explain the variance equally well, which is exactly what a circular (isotropic) cloud looks like.",
+      },
+      {
+        text: "PCA has failed and needs to be re-run with different settings",
+        correct: false,
+        socratic: "Is there anything mathematically invalid about two eigenvalues being equal, or is this simply describing one particular, valid data shape (a circular cloud)?",
+        whyWrong: "Equal eigenvalues are a perfectly valid, meaningful result - they describe a real data shape (circular/isotropic spread), not a computational failure.",
+        misconception: "It's easy to assume any 'tied' or 'unremarkable-looking' result must mean something went wrong.",
+        principle: "PCA reports whatever eigenvalues the data's actual covariance matrix has - equal values are a legitimate outcome describing symmetric spread.",
+      },
+      {
+        text: "The data has no variance at all",
+        correct: false,
+        whyWrong: "λ1 = λ2 = 3 means substantial variance exists in every direction, not zero variance - zero variance would require both eigenvalues to be 0, not 3.",
+        misconception: "It's easy to confuse 'equal in both directions' with 'absent in both directions.'",
+        principle: "Nonzero equal eigenvalues mean real, symmetric spread - the opposite of no variance.",
+      },
+    ],
+  },
 ];
 
 export function QuizSection() {
-  return <QuizBlock moduleId={3} courseId="math-for-ml" questions={QUESTIONS} />;
+  return <QuizBlock moduleId={3} courseId="math-for-ml" questions={QUESTIONS} sampleSize={5} />;
 }

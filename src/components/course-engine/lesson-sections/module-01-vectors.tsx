@@ -237,8 +237,87 @@ const QUESTIONS: QuizQuestion[] = [
       },
     ],
   },
+  {
+    id: "q6",
+    text: "a = (1, 2, 2) and b = (2, 1, -2). What is a · b?",
+    options: [
+      {
+        text: "0 - the vectors are orthogonal",
+        correct: true,
+        principle: "(1)(2) + (2)(1) + (2)(-2) = 2 + 2 - 4 = 0. The formula extends to 3 dimensions exactly the same way it worked in 2D.",
+      },
+      {
+        text: "6, by adding all six numbers together",
+        correct: false,
+        socratic: "The dot product multiplies MATCHING components first, then adds those products - does adding every raw number in both vectors do that?",
+        whyWrong: "1+2+2+2+1-2 = 6 adds every raw coordinate together - that's not what a dot product computes.",
+        misconception: "It's easy to just add up everything in sight rather than pairing components first.",
+        principle: "a · b = a₁b₁ + a₂b₂ + a₃b₃ - multiply each matching pair, then sum those three products.",
+        tryThis: "Compute each product separately first: (1)(2), then (2)(1), then (2)(-2) - then add those three results.",
+      },
+      {
+        text: "-3, by multiplying the first components and adding the rest raw",
+        correct: false,
+        whyWrong: "Every component pair must be multiplied, not just the first one - this mixes multiplication and addition inconsistently across the three dimensions.",
+        misconception: "Partial-pattern errors like this are common when a formula has more terms than the 2D case a student first learned.",
+        principle: "Apply the exact same operation - multiply, then sum - to every coordinate pair, not just the first.",
+      },
+    ],
+  },
+  {
+    id: "q7",
+    text: "You divide a vector by its own magnitude (‖a‖). What is the magnitude of the result?",
+    options: [
+      {
+        text: "Exactly 1 - this is called normalizing a vector",
+        correct: true,
+        principle: "Dividing a vector by its own length always produces a unit vector (magnitude 1) pointing in the same direction - this is exactly what happens to both vectors, one at a time, inside the cosine similarity formula.",
+      },
+      {
+        text: "0, since dividing always shrinks a number toward zero",
+        correct: false,
+        socratic: "Is dividing a vector by its OWN length the same kind of operation as dividing it by some large arbitrary number? What happens if you divide any nonzero number by itself?",
+        whyWrong: "Dividing a nonzero number by itself gives exactly 1, not 0 - the same is true for a vector divided by its own magnitude.",
+        misconception: "It's easy to assume 'dividing' always shrinks toward zero, without checking what's actually being divided by what.",
+        principle: "v / ‖v‖ always has magnitude exactly 1, for any nonzero vector v.",
+      },
+      {
+        text: "It depends on which direction the original vector pointed",
+        correct: false,
+        whyWrong: "The resulting magnitude is always exactly 1 regardless of the original direction - direction is preserved, but magnitude always normalizes to 1.",
+        misconception: "It's easy to assume every property of the result depends on the input, when magnitude specifically does not here.",
+        principle: "Normalizing separates a vector's two properties: direction is kept, magnitude is forced to exactly 1, always.",
+      },
+    ],
+  },
+  {
+    id: "q8",
+    text: "Two vectors have a large POSITIVE dot product. Which of these could NOT also be true about them?",
+    options: [
+      {
+        text: "The vectors are perpendicular to each other",
+        correct: true,
+        principle: "Perpendicular vectors always have a dot product of exactly 0, by definition - never a large positive number.",
+      },
+      {
+        text: "The vectors point in similar directions",
+        correct: false,
+        socratic: "What does a large POSITIVE dot product tell you about the angle between two vectors - is a small angle (similar direction) consistent with that?",
+        whyWrong: "A large positive dot product is very consistent with similar-direction vectors - that's one of the most common ways to get one.",
+        misconception: "This confuses which options are ruled out by the premise versus which are perfectly consistent with it.",
+        principle: "Similar direction (small angle) tends to produce large positive dot products - it doesn't contradict the premise at all.",
+      },
+      {
+        text: "The vectors have large magnitudes",
+        correct: false,
+        whyWrong: "Large magnitudes make a large dot product MORE likely, not less - magnitude directly scales the dot product's size.",
+        misconception: "It's easy to mix up which properties are ruled out by a given fact versus which ones would help explain it.",
+        principle: "a · b = ‖a‖‖b‖cos(θ) - larger magnitudes directly produce a larger dot product for the same angle.",
+      },
+    ],
+  },
 ];
 
 export function QuizSection() {
-  return <QuizBlock moduleId={1} courseId="math-for-ml" questions={QUESTIONS} />;
+  return <QuizBlock moduleId={1} courseId="math-for-ml" questions={QUESTIONS} sampleSize={5} />;
 }

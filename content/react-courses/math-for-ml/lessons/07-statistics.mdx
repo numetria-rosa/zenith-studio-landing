@@ -26,6 +26,17 @@ statistics exists because you can only ever see a sample, but you want to
 say something true about the whole population.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+A population has standard deviation $\sigma = 12$. Compute the standard
+error of the sample mean for $n=9$ and for $n=36$:
+1. At $n=9$: $\text{SE} = \sigma/\sqrt{n} = 12/\sqrt{9} = 12/3 = 4$
+2. At $n=36$: $\text{SE} = 12/\sqrt{36} = 12/6 = 2$
+
+Quadrupling the sample size (9 to 36) exactly halved the standard error
+(4 to 2) - the same $1/\sqrt{n}$ relationship from Module 6, now applied
+to whole samples instead of single coin flips.
+</Callout>
+
 ## 7.2 - The Sampling Distribution Lab
 
 The population below is deliberately skewed - nothing bell-shaped about
@@ -72,6 +83,17 @@ purely from sampling variability - not because anything about the model
 changed. Reporting "our new model is better" from a small, noisy comparison
 without accounting for this is one of the most common and most avoidable
 mistakes in applied ML evaluation.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: p-hacking by checking results repeatedly">
+Repeatedly checking whether a result has become "statistically
+significant" as more data trickles in, and stopping the moment it crosses
+a threshold, inflates the chance of a false positive far above the
+threshold's stated rate - because you're effectively giving chance many
+separate opportunities to produce a fluke crossing. Deciding the sample
+size (or the stopping rule) in advance, before looking at the results,
+is the standard fix - a discipline this module's sampling-distribution
+math is exactly what justifies.
 </Callout>
 
 ## Checkpoint

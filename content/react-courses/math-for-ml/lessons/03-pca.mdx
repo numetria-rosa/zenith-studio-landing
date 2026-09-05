@@ -36,6 +36,19 @@ out in, and the eigenvalues tell you exactly how much spread lives in each
 one.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+A covariance matrix $S = \begin{pmatrix} 4 & 0 \\ 0 & 1 \end{pmatrix}$ is
+already diagonal - the easiest case to compute by hand.
+1. For a diagonal matrix, the eigenvalues are simply its diagonal entries: $\lambda_1 = 4$, $\lambda_2 = 1$
+2. Their eigenvectors are the plain axis directions $(1,0)$ and $(0,1)$ - no rotation needed
+3. Variance explained by PC1: $\dfrac{\lambda_1}{\lambda_1+\lambda_2} = \dfrac{4}{5} = 80\%$
+
+So this data is spread 4 times more along the x-axis than the y-axis, and
+keeping only PC1 would preserve 80% of its total variance. You'll see this
+exact case in the lab if you set the rotation to 0° with an elongated
+cloud.
+</Callout>
+
 ## 3.2 - The PCA Laboratory
 
 Below is a cloud of correlated data - think "two measurements that tend to
@@ -87,6 +100,18 @@ critical signal - a fraud-detection dataset where 99.9% of the variance is
 0.1% is a real, common failure mode: PCA would happily discard exactly the
 direction you needed most. Always ask what a discarded direction might
 represent before assuming smaller-variance means safe-to-drop.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: expecting PCA's directions to have an obvious meaning">
+Each principal direction is a mathematical combination of the original
+features (a mix of "how much x" and "how much y"), not automatically a
+meaningful, nameable concept on its own. In a real dataset with many
+features, PC1 might turn out to be "roughly 70% feature A plus 30%
+feature B" - a real, useful direction of maximum spread, but not
+something you should expect to always have a clean, human-readable label
+like "overall size" just because it happens to work out that way in
+textbook examples. Sometimes it does; often it takes real domain
+investigation to interpret what a given principal direction represents.
 </Callout>
 
 ## Checkpoint

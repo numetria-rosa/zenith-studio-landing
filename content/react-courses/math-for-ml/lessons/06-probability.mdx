@@ -32,6 +32,18 @@ grows - not because any individual trial "corrects" for previous ones, but
 because randomness averages out over a large enough sample.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+Compute the standard error of the running average for a fair coin
+($p=0.5$) after $n=100$ flips, using $\text{SE} = \sqrt{p(1-p)/n}$:
+1. Compute $p(1-p) = 0.5 \times 0.5 = 0.25$
+2. Divide by $n$: $0.25 / 100 = 0.0025$
+3. Take the square root: $\sqrt{0.0025} = 0.05$
+
+So after 100 flips, the running average typically sits within about
+$\pm 0.05$ of the true $0.5$ - a real, computable band of expected wobble,
+not a vague notion of "probably close."
+</Callout>
+
 ## 6.2 - The Probability Lab
 
 Set a coin's true probability, then flip it - once, ten times, or a
@@ -77,6 +89,18 @@ both often get reported with the same confident-sounding single number.
 Before trusting a reported metric, this module's math gives you a concrete
 way to ask "how much data was that computed from, and how much would that
 number plausibly move if I collected more?"
+</Callout>
+
+<Callout tone="warning" label="Common mistake: the gambler's fallacy in disguise">
+"This model has been wrong 5 times in a row, so it's due for a correct
+prediction" applies the exact same flawed reasoning as expecting tails
+after a streak of heads - if each prediction is genuinely independent,
+the model's per-example accuracy doesn't change based on its recent
+history. If accuracy genuinely IS correlated across nearby predictions
+(a real possibility in some ML settings, like when consecutive inputs are
+similar to each other), that's a different, specific claim that needs its
+own evidence, not something the law of large numbers guarantees on its
+own.
 </Callout>
 
 ## Checkpoint

@@ -32,6 +32,17 @@ gradient for every weight. **Gradient descent** then updates every weight
 using that gradient, exactly as in Module 5.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+Trace the forward pass by hand for a neuron with $x_1=1, x_2=2, w_1=0.5,
+w_2=-0.5, b=0.1$, using $\sigma(z) = 1/(1+e^{-z})$:
+1. Weighted sum: $z = w_1x_1 + w_2x_2 + b = (0.5)(1) + (-0.5)(2) + 0.1 = 0.5 - 1 + 0.1 = -0.4$
+2. Apply the activation: $a = \sigma(-0.4) = 1/(1+e^{0.4}) \approx 0.401$
+
+So this neuron outputs about $0.401$ for these inputs and weights - you
+can build this exact configuration in the lab below and confirm the
+displayed $a$ matches.
+</Callout>
+
 ## 10.2 - The Neural Network Math Lab
 
 Below is one real neuron with two inputs. Watch every number update as you
@@ -79,6 +90,18 @@ same forward/backward loop, repeated at scale. Knowing that means a
 training problem (loss not decreasing, gradients vanishing, weights
 exploding) is something you can reason about mechanically, not just a
 mysterious malfunction.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: expecting one gradient step to fix everything">
+A single call to "Step" nudges every weight a small amount in the
+locally-correct direction - it does not jump straight to the optimal
+weights, even for this one tiny neuron. Real training runs many thousands
+of these small updates, and expecting visible convergence after a
+handful of steps (then concluding "this isn't working" when the loss is
+still nonzero) is a common and avoidable source of premature
+troubleshooting - the lab's own loss history, tracked step by step, is
+exactly the right thing to watch instead of the raw loss at any one
+moment.
 </Callout>
 
 ## Checkpoint
