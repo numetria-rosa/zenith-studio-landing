@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ChevronDown, Check, X } from "lucide-react";
 import { DIAGNOSTIC_QUESTIONS, SKILL_AREA_LABEL, type SkillArea } from "./diagnostic-questions";
 
 /* The onboarding diagnostic (brief section 3). Produces a real per-area
@@ -18,6 +19,41 @@ const FOUNDATION_LINK: Record<SkillArea, { href: string; label: string }> = {
   vectors: { href: "01-vectors", label: "Module 1: Thinking in Vectors (go slowly through 1.1-1.2)" },
   probability: { href: "06-probability", label: "Module 6: Reasoning Under Uncertainty (go slowly through 6.1)" },
 };
+
+/* Per-question detail behind each area's dropdown — the actual answer the
+   student picked against the correct one, not just the aggregate score. */
+function AreaBreakdown({ area, answers }: { area: SkillArea; answers: Record<string, number> }) {
+  const qs = DIAGNOSTIC_QUESTIONS.filter((q) => q.area === area);
+  return (
+    <ul className="mt-2.5 flex flex-col gap-2 border-t border-[#232838] pt-2.5">
+      {qs.map((q) => {
+        const chosen = answers[q.id];
+        const wasCorrect = chosen === q.correctIndex;
+        return (
+          <li key={q.id} className="text-[13px]">
+            <div className="flex items-start gap-2 text-[#eeeee7]">
+              {wasCorrect ? (
+                <Check size={14} className="mt-0.5 flex-shrink-0 text-[#4ade95]" aria-hidden />
+              ) : (
+                <X size={14} className="mt-0.5 flex-shrink-0 text-[#ff8585]" aria-hidden />
+              )}
+              <span>{q.text}</span>
+            </div>
+            <div className="mt-1 pl-[22px] text-[12.5px] text-[#9aa0ae]">
+              Your answer: <span className={wasCorrect ? "text-[#4ade95]" : "text-[#ff8585]"}>{q.options[chosen]}</span>
+              {!wasCorrect && (
+                <>
+                  <br />
+                  Correct answer: <span className="text-[#4ade95]">{q.options[q.correctIndex]}</span>
+                </>
+              )}
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 export function Diagnostic({ courseId, basePath }: { courseId: string; basePath: string }) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
@@ -101,9 +137,17 @@ export function Diagnostic({ courseId, basePath }: { courseId: string; basePath:
             <div className="mb-2 text-[13px] font-bold text-[#4ade95]">Strong already</div>
             <ul className="flex flex-col gap-1.5">
               {strong.map((r) => (
-                <li key={r.area} className="flex items-center justify-between rounded-lg border border-[#4ade95]/30 bg-[#4ade95]/5 px-3.5 py-2 text-[13.5px] text-[#eeeee7]">
-                  {SKILL_AREA_LABEL[r.area]}
-                  <span className="font-[family-name:var(--font-course-mono)] text-[#4ade95]">{r.correct}/{r.total}</span>
+                <li key={r.area}>
+                  <details className="group rounded-lg border border-[#4ade95]/30 bg-[#4ade95]/5 px-3.5 py-2">
+                    <summary className="flex cursor-pointer list-none items-center justify-between text-[13.5px] text-[#eeeee7]">
+                      <span className="flex items-center gap-2">
+                        <ChevronDown size={14} className="text-[#4ade95] transition-transform group-open:rotate-180" aria-hidden />
+                        {SKILL_AREA_LABEL[r.area]}
+                      </span>
+                      <span className="font-[family-name:var(--font-course-mono)] text-[#4ade95]">{r.correct}/{r.total}</span>
+                    </summary>
+                    <AreaBreakdown area={r.area} answers={answers} />
+                  </details>
                 </li>
               ))}
             </ul>
@@ -115,14 +159,20 @@ export function Diagnostic({ courseId, basePath }: { courseId: string; basePath:
             <div className="mb-2 text-[13px] font-bold text-[#f0b429]">Needs refreshing</div>
             <ul className="flex flex-col gap-1.5">
               {needsRefresh.map((r) => (
-                <li key={r.area} className="rounded-lg border border-[#f0b429]/30 bg-[#f0b429]/5 px-3.5 py-2 text-[13.5px] text-[#eeeee7]">
-                  <div className="flex items-center justify-between">
-                    {SKILL_AREA_LABEL[r.area]}
-                    <span className="font-[family-name:var(--font-course-mono)] text-[#f0b429]">{r.correct}/{r.total}</span>
-                  </div>
-                  <a href={`${basePath}/${FOUNDATION_LINK[r.area].href}`} className="mt-1.5 inline-block text-[12.5px] text-[#5fc2e8] hover:underline">
-                    → {FOUNDATION_LINK[r.area].label}
-                  </a>
+                <li key={r.area}>
+                  <details className="group rounded-lg border border-[#f0b429]/30 bg-[#f0b429]/5 px-3.5 py-2">
+                    <summary className="flex cursor-pointer list-none items-center justify-between text-[13.5px] text-[#eeeee7]">
+                      <span className="flex items-center gap-2">
+                        <ChevronDown size={14} className="text-[#f0b429] transition-transform group-open:rotate-180" aria-hidden />
+                        {SKILL_AREA_LABEL[r.area]}
+                      </span>
+                      <span className="font-[family-name:var(--font-course-mono)] text-[#f0b429]">{r.correct}/{r.total}</span>
+                    </summary>
+                    <AreaBreakdown area={r.area} answers={answers} />
+                    <a href={`${basePath}/${FOUNDATION_LINK[r.area].href}`} className="mt-2.5 inline-block text-[12.5px] text-[#5fc2e8] hover:underline">
+                      → {FOUNDATION_LINK[r.area].label}
+                    </a>
+                  </details>
                 </li>
               ))}
             </ul>
