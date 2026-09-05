@@ -12,3 +12,15 @@ export function StatisticsDetectiveSection() {
 export function ProbabilityDetectiveSection() {
   return <MathDetective courseId={COURSE_ID} scenario={SCENARIOS[2]} />;
 }
+export function EmbeddingDetectiveSection() {
+  return <MathDetective courseId={COURSE_ID} scenario={SCENARIOS[3]} />;
+}
+export function PcaDetectiveSection() {
+  return <MathDetective courseId={COURSE_ID} scenario={SCENARIOS[4]} />;
+}
+export function InformationDetectiveSection() {
+  return <MathDetective courseId={COURSE_ID} scenario={SCENARIOS[5]} />;
+}
+export function AttentionDetectiveSection() {
+  return <MathDetective courseId={COURSE_ID} scenario={SCENARIOS[6]} />;
+}

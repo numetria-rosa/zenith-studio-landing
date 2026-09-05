@@ -61,4 +61,84 @@ export const SCENARIOS: DetectiveScenario[] = [
       { text: "Test accuracy is meaningless and tells you nothing about a positive result.", correct: false, feedback: "This overcorrects - accuracy is one of the two real inputs needed (along with the base rate) to correctly compute the answer via Bayes' theorem." },
     ],
   },
+  {
+    id: "embedding",
+    title: "The Embedding Detective",
+    claim: "Document B's embedding has a higher raw dot product with the query than Document A's, so Document B must be more relevant.",
+    claimSource: "- a code comment in a search-ranking pull request",
+    context:
+      "An engineer ranks search results by raw dot product between the query embedding and each document embedding, without normalizing. Before approving this, you need to check whether that ranking actually measures relevance.",
+    chargeSheet: [
+      { id: "e1", label: "A higher raw dot product always means a more semantically relevant document.", isTrue: false, why: "Dot product is sensitive to magnitude - a document with a larger-magnitude embedding can score higher purely for being 'bigger,' not more relevant." },
+      { id: "e2", label: "Cosine similarity removes the effect of embedding magnitude, leaving only direction.", isTrue: true, why: "Dividing by both magnitudes is specifically what makes cosine similarity a direction-only comparison, immune to this bias." },
+      { id: "e3", label: "Two embeddings pointing in the exact same direction always have the same dot product, regardless of their length.", isTrue: false, why: "Dot product scales directly with magnitude even when direction is unchanged - a longer version of the same-direction vector produces a larger dot product." },
+      { id: "e4", label: "If every document embedding happened to have exactly the same magnitude, ranking by raw dot product would give the same order as ranking by cosine similarity.", isTrue: true, why: "When magnitude is constant across all documents, cosine similarity is just dot product divided by the same constant every time - dividing by a shared constant never changes the relative ranking." },
+      { id: "e5", label: "Real embedding models always guarantee constant magnitude, so this issue never actually happens in practice.", isTrue: false, why: "Most embedding models make no such guarantee - embedding norms commonly vary by document length and content, which is exactly why this bug shows up for real." },
+    ],
+    fixOptions: [
+      { text: "Document B might simply have a larger-magnitude embedding, not a more relevant one - cosine similarity, not raw dot product, should be used when embeddings can have different magnitudes.", correct: true, feedback: "Correct - this identifies the real risk (magnitude bias) and names the standard fix (cosine similarity)." },
+      { text: "Document B is definitely more relevant, since its dot product is higher.", correct: false, feedback: "This is the original, unqualified claim - exactly what the charge sheet showed can be misleading." },
+      { text: "Dot product should never be used anywhere in a retrieval system.", correct: false, feedback: "This overcorrects - dot product is the core computation inside cosine similarity too; the fix is normalizing it, not discarding it entirely." },
+    ],
+  },
+  {
+    id: "pca",
+    title: "The Dimensionality Detective",
+    claim: "PC1 explains 95% of the variance, so we can safely drop everything else with no real loss.",
+    claimSource: "- a data science team's slide deck, justifying a feature-compression decision",
+    context:
+      "A team wants to compress a fraud-detection dataset down to just its first principal component before training a model. Before signing off, you need to check what \"95% variance explained\" actually promises.",
+    chargeSheet: [
+      { id: "pc1", label: "95% variance explained means 95% of the information relevant to the actual task is preserved.", isTrue: false, why: "Variance explained is a statement about total spread only - it says nothing about which specific direction a downstream task (like catching fraud) actually needs." },
+      { id: "pc2", label: "A direction with very small variance could still carry an important, rare signal.", isTrue: true, why: "This is exactly the fraud-detection failure mode from Module 3: a rare, critical signal can live entirely in a low-variance direction PCA would drop." },
+      { id: "pc3", label: "Rotating the data before running PCA changes the actual amount of variance along its principal directions.", isTrue: false, why: "Rotation is a rigid transformation - it changes which raw axes the eigenvectors point along, but not the eigenvalues (the actual variance amounts) themselves." },
+      { id: "pc4", label: "The eigenvalues of the covariance matrix directly give the amount of variance along each principal direction.", isTrue: true, why: "This is the direct definition used throughout Module 3 - each eigenvalue is literally the variance along its corresponding eigenvector." },
+      { id: "pc5", label: "PCA can identify which of the discarded directions are pure noise versus real signal.", isTrue: false, why: "PCA only ranks directions by variance - it has no concept of 'noise' versus 'signal relevant to my task,' that judgment requires domain knowledge PCA doesn't have." },
+    ],
+    fixOptions: [
+      { text: "High variance explained means most of the data's total spread is captured, not that all task-relevant information is preserved - a low-variance direction can still carry a rare, critical signal that a pure variance ranking would discard.", correct: true, feedback: "Correct - this keeps the real number (95%) while adding exactly the missing distinction between 'variance' and 'task-relevant information.'" },
+      { text: "95% variance explained means it's always completely safe to drop the rest.", correct: false, feedback: "This is the original claim - exactly what the fraud-detection failure mode shows can go wrong." },
+      { text: "PCA should never be used for dimensionality reduction under any circumstances.", correct: false, feedback: "This overcorrects - PCA is a legitimate, widely-used technique; the issue is checking what a discarded direction might represent, not avoiding PCA entirely." },
+    ],
+  },
+  {
+    id: "information",
+    title: "The Cross-Entropy Detective",
+    claim: "Model A and Model B both scored 90% accuracy on the test set, so they're equally good models.",
+    claimSource: "- a model comparison report shared before a deployment decision",
+    context:
+      "Two classifiers tied on accuracy, but one tends to be confidently wrong on its mistakes while the other is only mildly wrong. Before treating them as equivalent, you need to check what accuracy alone actually captures.",
+    chargeSheet: [
+      { id: "i1", label: "Two models with identical accuracy can have very different cross-entropy losses.", isTrue: true, why: "Cross-entropy also scores confidence, not just whether the top prediction was correct - two equally-accurate models can differ sharply here." },
+      { id: "i2", label: "A model that's confidently wrong is penalized the same amount as a model that's only mildly wrong, under cross-entropy.", isTrue: false, why: "Cross-entropy's logarithm specifically punishes confident wrong predictions far more heavily than mildly unsure ones - this is Module 9's central point." },
+      { id: "i3", label: "Accuracy alone captures whether a model's predicted probabilities are well-calibrated.", isTrue: false, why: "Accuracy only checks whether the top guess was correct - it says nothing about whether the STATED confidence behind that guess was honest." },
+      { id: "i4", label: "Cross-entropy loss can differ significantly between two models even when their accuracy is identical, because it also scores confidence, not just the top guess.", isTrue: true, why: "This is exactly why cross-entropy, not accuracy, is usually the more honest signal for comparing how well-calibrated two models are." },
+      { id: "i5", label: "A model with lower cross-entropy will always also have higher accuracy.", isTrue: false, why: "These are related but distinct metrics measuring different things - it's possible for them to disagree, since cross-entropy also weighs calibration, not just top-choice correctness." },
+    ],
+    fixOptions: [
+      { text: "Identical accuracy doesn't mean identical quality - cross-entropy also scores how well-calibrated each model's confidence is, and one could be far more confidently wrong on its mistakes than the other.", correct: true, feedback: "Correct - this names the real, separate dimension (calibration, via cross-entropy) that identical accuracy hides." },
+      { text: "Since both scored 90% accuracy, their cross-entropy losses must also be identical.", correct: false, feedback: "This assumes a link between the two metrics that doesn't actually hold - accuracy and cross-entropy can diverge for models with the same top-choice correctness." },
+      { text: "Accuracy is a completely useless metric and should never be reported.", correct: false, feedback: "This overcorrects - accuracy is a fine, simple summary; the issue is treating it as the WHOLE picture rather than pairing it with cross-entropy." },
+    ],
+  },
+  {
+    id: "attention",
+    title: "The Attention Detective",
+    claim: "The model attended most strongly to the word 'excellent,' so that's definitely the exact reason it classified this review as positive.",
+    claimSource: "- an interpretability report attached to a sentiment-classification model",
+    context:
+      "A report explains a model's decision by pointing to its single highest attention weight. Before accepting that as a complete explanation, you need to check what an attention weight actually is and isn't.",
+    chargeSheet: [
+      { id: "a1", label: "A high attention weight between two tokens definitely means the model captured a human-intuitive semantic reason for their relationship.", isTrue: false, why: "A high weight means the learned query/key vectors aligned well under a dot product - a real, computed similarity in a learned space, not a guarantee of matching human logic." },
+      { id: "a2", label: "Attention weights come from a dot product between learned query and key vectors, scaled and normalized by softmax.", isTrue: true, why: "This is the exact pipeline Module 11 builds up: dot product, scale by 1/√d, then softmax." },
+      { id: "a3", label: "A real model has many layers and attention heads, so one single attention weight rarely tells the whole story of a decision.", isTrue: true, why: "Multi-head, multi-layer attention means many separate computations contribute to a final decision - one highlighted weight is a small piece of a much larger computation." },
+      { id: "a4", label: "Because attention weights are computed mathematically, they are automatically a complete and transparent explanation of a model's reasoning.", isTrue: false, why: "Being a real, precisely-computed number doesn't make something an automatically complete explanation - the same is true of any single number pulled from a large computation." },
+      { id: "a5", label: "The 1/√d scaling factor exists to keep softmax numerically well-behaved as dimension grows, not to make attention more human-interpretable.", isTrue: true, why: "This is Module 11's Full Derivation point exactly: the scaling compensates for variance growth, an engineering fix, not an interpretability feature." },
+    ],
+    fixOptions: [
+      { text: "A high attention weight on 'excellent' is a real, computed signal that the model's learned vectors aligned there, but it isn't automatically a complete, human-legible explanation of the whole decision, especially across multiple layers and heads.", correct: true, feedback: "Correct - this keeps the real observation (the weight is genuine) while correcting the overclaim (that it fully explains the decision)." },
+      { text: "The single highest attention weight is always the complete and correct explanation for a model's decision.", correct: false, feedback: "This is the original claim - exactly the overreach the charge sheet identified." },
+      { text: "Attention weights are meaningless and reveal nothing about a model's computation.", correct: false, feedback: "This overcorrects - attention weights are a real, precisely-defined quantity; the issue is treating one of them as a complete explanation, not that they carry no information at all." },
+    ],
+  },
 ];
