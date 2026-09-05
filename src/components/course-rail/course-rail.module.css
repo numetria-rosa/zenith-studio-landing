@@ -165,7 +165,7 @@
 }
 /* Stage headers carry this course's accent, at reduced weight, so the rail
    reads as this course's own color instead of the same neutral gray used
-   for every label — the one deliberate deviation from the static rail's
+   for every label - the one deliberate deviation from the static rail's
    all-gray stage headers. */
 .railStage {
   font-family: var(--font-course-mono);

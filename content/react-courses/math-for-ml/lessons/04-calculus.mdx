@@ -6,41 +6,41 @@ minutes: 50
 
 ## Why you're learning this
 
-Everything so far has described *what* things are — vectors, matrices,
+Everything so far has described *what* things are - vectors, matrices,
 directions that don't bend. This module introduces the mathematics of
 *change*: how fast something is increasing or decreasing right now, at this
-exact point. That single idea — the derivative, and its multivariable
-cousin the gradient — is the entire mechanism behind how a machine learning
+exact point. That single idea - the derivative, and its multivariable
+cousin the gradient - is the entire mechanism behind how a machine learning
 model learns anything at all. "Training a model" is, almost without
 exception, "repeatedly asking a gradient which way is uphill, and stepping
 the other way."
 
 <Objectives items={["Explain what a derivative measures, as a slope", "Explain what a partial derivative and a gradient are for a multivariable function", "Compute a gradient for a simple function by hand", "Explain why the chain rule is the mathematical basis of backpropagation"]} />
 
-## 4.1 — A derivative is a slope, nothing more mysterious
+## 4.1 - A derivative is a slope, nothing more mysterious
 
 If you zoom in far enough on any smooth curve, it starts to look like a
-straight line. The slope of that line — how much the curve rises for a
-tiny step to the right — is the derivative at that point. Positive slope
+straight line. The slope of that line - how much the curve rises for a
+tiny step to the right - is the derivative at that point. Positive slope
 means the function is increasing there; negative means decreasing; exactly
 zero means you're at a peak, a valley, or a flat spot.
 
 <Callout tone="info" label="Definition">
 The **derivative** of $f(x)$ at a point is the instantaneous rate of
-change of $f$ there — how much $f$ changes per tiny unit of change in $x$.
+change of $f$ there - how much $f$ changes per tiny unit of change in $x$.
 For a function of two variables, a **partial derivative** does the same
 thing but holds every other variable fixed while measuring the rate of
 change in just one direction. The **gradient** bundles all of a
 function's partial derivatives into a single vector.
 </Callout>
 
-## 4.2 — The Gradient Lab
+## 4.2 - The Gradient Lab
 
 Below is a real function of two variables, drawn as a heatmap (cooler
-colors are lower values — the basin in the middle is the minimum). Drag
+colors are lower values - the basin in the middle is the minimum). Drag
 anywhere to move the point, and watch the arrow update.
 
-<Callout tone="predict" label="Before you drag — predict">
+<Callout tone="predict" label="Before you drag - predict">
 The default arrow points toward the steepest *increase* in the function.
 If you wanted to move toward the minimum (the cool basin) as fast as
 possible from wherever you are, would you walk in the direction the arrow
@@ -49,35 +49,35 @@ points, or exactly the opposite direction?
 
 <GradientLabSection />
 
-If your instinct was "the opposite direction," that's exactly right — and
+If your instinct was "the opposite direction," that's exactly right - and
 it's exactly what the toggle button demonstrates. The gradient always
 points uphill. Every gradient-descent optimizer works by computing this
 exact arrow, then stepping the other way.
 
-## 4.3 — The formal math
+## 4.3 - The formal math
 
 <MathLevelsSection />
 
-## 4.4 — Where this shows up in real machine learning
+## 4.4 - Where this shows up in real machine learning
 
 - **Every optimizer** (plain gradient descent, SGD, Adam, all of them)
-  works by computing a gradient and stepping opposite to it — the entire
+  works by computing a gradient and stepping opposite to it - the entire
   subject of Module 5.
 - **Backpropagation** is the multivariable chain rule, applied
   systematically through every layer of a network, to compute the
   gradient of the loss with respect to every single weight.
-- **Learning rate** controls how big a step to take along `−∇f` each time —
+- **Learning rate** controls how big a step to take along `−∇f` each time -
   too large, and you can overshoot the minimum; too small, and training
   crawls. You'll get to actually cause both failure modes in Module 5's
   lab.
 
-## 4.5 — A failure mode this prevents
+## 4.5 - A failure mode this prevents
 
 <Callout tone="warning" label="Common mistake: gradient descent means following the gradient">
 The name is misleading if you don't know the math: gradient *descent*
 follows the <b>negative</b> gradient, not the gradient itself. This is a
 genuinely common source of sign errors when implementing optimization by
-hand — a single missing minus sign turns an optimizer that decreases loss
+hand - a single missing minus sign turns an optimizer that decreases loss
 into one that actively increases it, and the resulting "training curve
 going the wrong way" bug can be surprisingly hard to spot if you don't
 know exactly what to check first.

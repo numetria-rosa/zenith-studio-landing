@@ -4,7 +4,7 @@ import { COURSE_RAIL_DATA } from "@/lib/course-rail-data";
 import { LearnShell } from "@/components/course-rail/LearnShell";
 import { PracticeLibrary } from "@/components/course-engine/practice/PracticeLibrary";
 
-/* UNAUTHENTICATED PREVIEW ONLY — mirrors src/app/lab/[courseId]/learn/practice/page.tsx.
+/* UNAUTHENTICATED PREVIEW ONLY - mirrors src/app/lab/[courseId]/learn/practice/page.tsx.
    Remove before shipping, same as the rest of this preview tree. */
 
 const COURSE_ID = "math-for-ml";
@@ -27,7 +27,7 @@ export default async function PreviewPracticePage() {
             Practice Library
           </h1>
           <p className="mt-3 max-w-[560px] text-[15px] text-[#9aa0ae]">
-            Extra calculation, interpretation, debugging, and decision tasks for every module — separate from
+            Extra calculation, interpretation, debugging, and decision tasks for every module - separate from
             the checkpoint quizzes, untimed, and retriable.
           </p>
         </header>

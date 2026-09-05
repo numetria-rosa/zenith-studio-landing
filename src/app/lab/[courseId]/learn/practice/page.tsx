@@ -32,7 +32,7 @@ export default async function PracticePage({
             Practice Library
           </h1>
           <p className="mt-3 max-w-[560px] text-[15px] text-[#9aa0ae]">
-            Extra calculation, interpretation, debugging, and decision tasks for every module — separate from
+            Extra calculation, interpretation, debugging, and decision tasks for every module - separate from
             the checkpoint quizzes, untimed, and retriable.
           </p>
         </header>

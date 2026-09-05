@@ -4,7 +4,7 @@ import { QuizBlock, type QuizQuestion } from "@/components/course-engine/QuizBlo
 import { InlineMath, BlockMath } from "@/components/course-engine/Math";
 import { ProgressiveHint } from "@/components/course-engine/tour/ProgressiveHint";
 
-/* Module-4-specific MDX section components — "Mathematics of Change"
+/* Module-4-specific MDX section components - "Mathematics of Change"
    (derivatives, partial derivatives, gradients, chain rule). Same shared
    engine pattern as modules 1-3. */
 
@@ -18,9 +18,9 @@ export function GradientLabSection() {
       <GradientLab />
       <ProgressiveHint
         hints={[
-          "Drag the point close to the center of the bowl and watch both arrows shrink — what does that tell you about the gradient right at the minimum?",
+          "Drag the point close to the center of the bowl and watch both arrows shrink - what does that tell you about the gradient right at the minimum?",
           "Toggle between showing ∇f and −∇f. Which one actually points toward the bottom of the bowl?",
-          "Try a point where the surface is steep in one direction and shallow in the other — do the two partial derivatives (∂f/∂x and ∂f/∂y) come out equal, or very different?",
+          "Try a point where the surface is steep in one direction and shallow in the other - do the two partial derivatives (∂f/∂x and ∂f/∂y) come out equal, or very different?",
         ]}
       />
     </div>
@@ -32,10 +32,10 @@ export function MathLevelsSection() {
     <MathLevels
       intuition={
         <p>
-          A derivative is just a slope — how steep a function is at one exact point. On a curve with hills and
+          A derivative is just a slope - how steep a function is at one exact point. On a curve with hills and
           valleys, the slope is positive going uphill, negative going downhill, and exactly zero at the very
           top or bottom. Once a function takes two inputs instead of one (like the surface in the lab above),
-          there isn&apos;t one slope anymore — there&apos;s a slope in the x-direction and a separate slope in
+          there isn&apos;t one slope anymore - there&apos;s a slope in the x-direction and a separate slope in
           the y-direction. Bundling those two slopes together into one arrow gives you the <b>gradient</b>: an
           arrow that always points toward the steepest way uphill from wherever you&apos;re standing.
         </p>
@@ -53,7 +53,7 @@ export function MathLevelsSection() {
           <p className="text-[#9aa0ae]">
             Every symbol: <InlineMath tex="x, y" /> are the coordinates you dragged the point to.{" "}
             <InlineMath tex="\nabla f" /> (read &quot;grad f&quot;) always points toward the steepest{" "}
-            <i>increase</i> — the direction a gradient-descent optimizer moves is <InlineMath tex="-\nabla f" />, the
+            <i>increase</i> - the direction a gradient-descent optimizer moves is <InlineMath tex="-\nabla f" />, the
             exact opposite arrow, which is why the lab&apos;s toggle flips the sign to show it.
           </p>
         </div>
@@ -67,13 +67,13 @@ export function MathLevelsSection() {
           </p>
           <BlockMath tex="df \approx \frac{\partial f}{\partial x}\,dx + \frac{\partial f}{\partial y}\,dy = \nabla f \cdot \mathbf{d}" />
           <p>
-            This is exactly a dot product — the same one from Module 1. Recall that{" "}
+            This is exactly a dot product - the same one from Module 1. Recall that{" "}
             <InlineMath tex="\mathbf{a}\cdot\mathbf{b} = \|\mathbf{a}\|\|\mathbf{b}\|\cos\theta" />, which is
-            largest exactly when <InlineMath tex="\theta = 0" /> — that is, when the step{" "}
+            largest exactly when <InlineMath tex="\theta = 0" /> - that is, when the step{" "}
             <InlineMath tex="\mathbf{d}" /> points in the <i>same direction</i> as{" "}
             <InlineMath tex="\nabla f" /> itself. So among every direction you could step, the one that
             increases <InlineMath tex="f" /> the most, for a given step size, is the direction of{" "}
-            <InlineMath tex="\nabla f" /> — not by definition, but as a direct consequence of the dot-product
+            <InlineMath tex="\nabla f" /> - not by definition, but as a direct consequence of the dot-product
             identity from Module 1.
           </p>
         </div>
@@ -88,15 +88,15 @@ const QUESTIONS: QuizQuestion[] = [
     text: "At the exact center of the bowl in the lab (x=0, y=0), what is the gradient?",
     options: [
       {
-        text: "(0, 0) — the zero vector",
+        text: "(0, 0) - the zero vector",
         correct: true,
-        principle: "∇f = (2x, 6y) = (0, 0) at the origin. A gradient of zero marks a flat point — here, the minimum of the whole surface.",
+        principle: "∇f = (2x, 6y) = (0, 0) at the origin. A gradient of zero marks a flat point - here, the minimum of the whole surface.",
       },
       {
         text: "It's undefined, because there's no single direction to point at the exact minimum",
         correct: false,
         socratic: "The formula ∇f = (2x, 6y) can be evaluated at any (x, y) you plug in, including (0, 0). Does plugging in x=0, y=0 produce an error, or a valid pair of numbers?",
-        whyWrong: "The gradient is a well-defined vector everywhere on this smooth surface, including exactly at the minimum — it's simply the zero vector there, not an undefined one.",
+        whyWrong: "The gradient is a well-defined vector everywhere on this smooth surface, including exactly at the minimum - it's simply the zero vector there, not an undefined one.",
         misconception: "It's easy to confuse 'no preferred direction' with 'undefined,' when zero is itself a perfectly valid, meaningful answer.",
         principle: "∇f = (2x, 6y) is a formula that can be evaluated at any (x, y), including (0, 0), giving exactly (0, 0).",
         tryThis: "In the lab, drag the point as close to the center as you can and watch both partial derivatives shrink toward 0.",
@@ -105,7 +105,7 @@ const QUESTIONS: QuizQuestion[] = [
         text: "(1, 1), since that's a 'neutral' direction",
         correct: false,
         socratic: "∇f = (2x, 6y) is a formula, not a guess. What do you get when you actually substitute x=0 and y=0 into (2x, 6y)?",
-        whyWrong: "There's no reason for the gradient to default to (1,1) — it's computed directly from the formula (2x, 6y), which gives (0,0) when x=0 and y=0.",
+        whyWrong: "There's no reason for the gradient to default to (1,1) - it's computed directly from the formula (2x, 6y), which gives (0,0) when x=0 and y=0.",
         misconception: "It's tempting to guess a 'default-looking' vector rather than actually applying the formula.",
         principle: "Always compute ∇f = (∂f/∂x, ∂f/∂y) from the actual coordinates, not from intuition about what 'should' be neutral.",
       },
@@ -116,24 +116,24 @@ const QUESTIONS: QuizQuestion[] = [
     text: "You're standing at a point where ∇f = (4, 0). Which direction should a gradient-descent step move, to decrease f as fast as possible?",
     options: [
       {
-        text: "In the direction (−4, 0) — straight in the negative x direction",
+        text: "In the direction (−4, 0) - straight in the negative x direction",
         correct: true,
         principle: "Gradient descent moves along −∇f. If ∇f = (4, 0), then −∇f = (−4, 0): pure movement in the negative x direction.",
       },
       {
-        text: "In the direction (4, 0) — straight in the positive x direction",
+        text: "In the direction (4, 0) - straight in the positive x direction",
         correct: false,
-        socratic: "(4, 0) is ∇f itself — the direction of steepest INCREASE. If you want to decrease f as fast as possible, should you move with the gradient, or against it?",
-        whyWrong: "(4, 0) is ∇f itself, which points toward the steepest INCREASE, not decrease — moving that way would make f larger, the opposite of what training wants.",
+        socratic: "(4, 0) is ∇f itself - the direction of steepest INCREASE. If you want to decrease f as fast as possible, should you move with the gradient, or against it?",
+        whyWrong: "(4, 0) is ∇f itself, which points toward the steepest INCREASE, not decrease - moving that way would make f larger, the opposite of what training wants.",
         misconception: "It's a very common mix-up to move along the gradient itself rather than its negative.",
         principle: "The gradient always points uphill. Decreasing a loss function requires moving along −∇f, not ∇f.",
-        tryThis: "In the lab, leave the toggle off (showing ∇f itself) and check which way the arrow points relative to the basin — it points away from the minimum, not toward it.",
+        tryThis: "In the lab, leave the toggle off (showing ∇f itself) and check which way the arrow points relative to the basin - it points away from the minimum, not toward it.",
       },
       {
-        text: "In the direction (0, 4) — perpendicular to the gradient",
+        text: "In the direction (0, 4) - perpendicular to the gradient",
         correct: false,
         socratic: "The dot product identity says the change in f from a step d is approximately ∇f · d. What is ∇f · d when d is perpendicular to ∇f?",
-        whyWrong: "Moving perpendicular to the gradient doesn't change f at all, to first order — it's neither the fastest increase nor the fastest decrease.",
+        whyWrong: "Moving perpendicular to the gradient doesn't change f at all, to first order - it's neither the fastest increase nor the fastest decrease.",
         misconception: "It's easy to assume 'the other direction' means perpendicular rather than exactly reversed.",
         principle: "The steepest decrease direction is exactly −∇f, the gradient rotated 180°, not 90°.",
       },
@@ -146,21 +146,21 @@ const QUESTIONS: QuizQuestion[] = [
       {
         text: "The gradient of the loss function with respect to every weight in the network, using the chain rule",
         correct: true,
-        principle: "Backpropagation is the chain rule applied systematically, layer by layer, to compute ∂loss/∂weight for every single weight — exactly the object this module studies, just at a much larger scale.",
+        principle: "Backpropagation is the chain rule applied systematically, layer by layer, to compute ∂loss/∂weight for every single weight - exactly the object this module studies, just at a much larger scale.",
       },
       {
         text: "The final predicted output of the network",
         correct: false,
-        socratic: "Producing an output from an input is the forward pass. Backpropagation runs AFTER the loss is known, moving backward — what would it even need to compute at that point, if the output is already done?",
-        whyWrong: "Computing the output is the forward pass, a separate, earlier step — backpropagation specifically computes gradients, running backward from the loss.",
+        socratic: "Producing an output from an input is the forward pass. Backpropagation runs AFTER the loss is known, moving backward - what would it even need to compute at that point, if the output is already done?",
+        whyWrong: "Computing the output is the forward pass, a separate, earlier step - backpropagation specifically computes gradients, running backward from the loss.",
         misconception: "It's easy to conflate 'what the network does with an input' (forward pass) with 'how the network learns from a mistake' (backpropagation).",
         principle: "Forward pass: input → output. Backpropagation: loss → gradients for every weight, via the chain rule, moving backward through the network.",
       },
       {
         text: "The accuracy of the model on a test set",
         correct: false,
-        socratic: "Accuracy is measured by comparing predictions to labels on data — it needs no gradients at all. Does that sound like what a chain-rule computation over network weights would produce?",
-        whyWrong: "Accuracy is a separate evaluation metric computed after training or on held-out data — it has nothing to do with what backpropagation itself calculates.",
+        socratic: "Accuracy is measured by comparing predictions to labels on data - it needs no gradients at all. Does that sound like what a chain-rule computation over network weights would produce?",
+        whyWrong: "Accuracy is a separate evaluation metric computed after training or on held-out data - it has nothing to do with what backpropagation itself calculates.",
         misconception: "It's common to bundle 'everything related to how good a model is' into one mental category.",
         principle: "Backpropagation's job is strictly computing gradients so an optimizer knows which way to adjust each weight.",
       },
@@ -171,12 +171,12 @@ const QUESTIONS: QuizQuestion[] = [
     text: "Why does ‖∇f‖ (the gradient's magnitude) matter, not just its direction?",
     options: [
       {
-        text: "It tells you how steep the surface is at that point — near a minimum it shrinks toward zero, which is a real, usable signal for when training is converging",
+        text: "It tells you how steep the surface is at that point - near a minimum it shrinks toward zero, which is a real, usable signal for when training is converging",
         correct: true,
         principle: "A small gradient magnitude near a minimum is exactly why many training loops monitor gradient norm as a stopping/convergence signal.",
       },
       {
-        text: "It doesn't matter — only the direction is ever used in any optimization algorithm",
+        text: "It doesn't matter - only the direction is ever used in any optimization algorithm",
         correct: false,
         socratic: "The gradient-descent update is w − learning_rate × gradient. If the gradient's magnitude were bigger or smaller, would the SIZE of the step actually change?",
         whyWrong: "Magnitude directly affects step size in most optimizers (a larger gradient, all else equal, produces a larger update before any learning-rate scaling), and its shrinking near a minimum is diagnostically useful.",
@@ -187,9 +187,9 @@ const QUESTIONS: QuizQuestion[] = [
         text: "It always equals exactly the loss value itself",
         correct: false,
         socratic: "f(x,y) tells you the height of the surface at a point; ‖∇f‖ tells you how fast that height is changing nearby. Are 'how high' and 'how steep' the same measurement?",
-        whyWrong: "The gradient's magnitude and the function's value are two different numbers computed by two different formulas — nothing forces them to be equal.",
+        whyWrong: "The gradient's magnitude and the function's value are two different numbers computed by two different formulas - nothing forces them to be equal.",
         misconception: "It's tempting to assume any two important numbers coming from the same function must be the same number.",
-        principle: "f(x,y) is the function's value; ‖∇f‖ is how fast that value changes nearby — related concepts, but numerically independent.",
+        principle: "f(x,y) is the function's value; ‖∇f‖ is how fast that value changes nearby - related concepts, but numerically independent.",
       },
     ],
   },
@@ -198,23 +198,23 @@ const QUESTIONS: QuizQuestion[] = [
     text: "The lab's function is steeper along y than along x (coefficient 3 vs 1). What does that predict about gradient descent's behavior if the learning rate is the same in both directions?",
     options: [
       {
-        text: "Steps will tend to overshoot back and forth in the steep (y) direction while crawling slowly in the shallow (x) direction — a real, common training instability",
+        text: "Steps will tend to overshoot back and forth in the steep (y) direction while crawling slowly in the shallow (x) direction - a real, common training instability",
         correct: true,
         principle: "Uneven steepness across directions is a textbook cause of oscillating/zig-zagging training, which Module 5's optimization lab lets you actually trigger and observe.",
       },
       {
-        text: "Nothing — gradient descent always converges at the same rate regardless of the function's shape",
+        text: "Nothing - gradient descent always converges at the same rate regardless of the function's shape",
         correct: false,
-        socratic: "A learning rate tuned to be safe for the steep y-direction — how large or small would that same rate then be for the much shallower x-direction?",
-        whyWrong: "The function's curvature (how steep it is in different directions) has a large, well-documented effect on convergence speed and stability — it's not shape-independent.",
+        socratic: "A learning rate tuned to be safe for the steep y-direction - how large or small would that same rate then be for the much shallower x-direction?",
+        whyWrong: "The function's curvature (how steep it is in different directions) has a large, well-documented effect on convergence speed and stability - it's not shape-independent.",
         misconception: "It's easy to assume an algorithm 'just works' the same way regardless of the specific problem it's applied to.",
-        principle: "A single learning rate that's well-tuned for a steep direction is often far too large for a shallow one, and vice versa — this mismatch is a real, diagnosable training problem.",
+        principle: "A single learning rate that's well-tuned for a steep direction is often far too large for a shallow one, and vice versa - this mismatch is a real, diagnosable training problem.",
       },
       {
         text: "It means the function has no minimum",
         correct: false,
         socratic: "An elliptical bowl (steeper one way, shallower the other) still has a single lowest point at its center. Does uneven steepness change WHETHER a minimum exists, or just how easy it is to reach with a fixed learning rate?",
-        whyWrong: "An elliptical bowl like this one has exactly one minimum (at the origin) regardless of how uneven its steepness is in different directions — uneven steepness affects HOW you get there, not WHETHER a minimum exists.",
+        whyWrong: "An elliptical bowl like this one has exactly one minimum (at the origin) regardless of how uneven its steepness is in different directions - uneven steepness affects HOW you get there, not WHETHER a minimum exists.",
         misconception: "It's easy to conflate 'harder to optimize' with 'doesn't have a solution.'",
         principle: "Existence of a minimum and difficulty of reaching it via gradient descent are separate questions.",
       },

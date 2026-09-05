@@ -1,6 +1,6 @@
 /* The Practice Library's task data model. Two real formats, matching the
    course brief's "Calculation" and "Interpretation/Debugging/Decision"
-   practice types (section 14) — no "Coding" tasks yet since there's no
+   practice types (section 14) - no "Coding" tasks yet since there's no
    Pyodide wiring for the "react" render mode (see the curriculum research
    doc's honest gaps list), and no fabricated task count: every task here
    is graded by real arithmetic or a real correct/incorrect answer, nothing

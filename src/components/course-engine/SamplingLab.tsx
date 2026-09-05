@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/* Module 7's lab — a real demonstration of the Central Limit Theorem. The
+/* Module 7's lab - a real demonstration of the Central Limit Theorem. The
    POPULATION below is deliberately skewed (nothing bell-shaped about it),
    generated once with a seeded PRNG so server and client always agree (no
    hydration risk). Every "draw a sample" click genuinely samples n values
-   from that population (with replacement) and computes their real mean —
+   from that population (with replacement) and computes their real mean -
    the histogram is built from real numbers, not a pre-rendered bell curve.
    The point the module is building toward: no matter how skewed the
    population is, the distribution of SAMPLE MEANS becomes bell-shaped and
@@ -27,7 +27,7 @@ const POPULATION: number[] = (() => {
   const rng = mulberry32(20260906);
   const pop: number[] = [];
   // A deliberately skewed "income-like" population: mostly small values,
-  // a long right tail of large ones — nothing close to a bell curve.
+  // a long right tail of large ones - nothing close to a bell curve.
   for (let i = 0; i < 2000; i++) {
     pop.push(Math.round(-Math.log(1 - rng()) * 30 + 10));
   }
@@ -177,17 +177,17 @@ export function SamplingLab() {
             </button>
           </div>
           <p className="text-[12px] text-[#676e7d]">
-            The population itself is heavily right-skewed (most values small, a long tail of large ones) — each
+            The population itself is heavily right-skewed (most values small, a long tail of large ones) - each
             bar above is the mean of one random sample of size n drawn from it.
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:w-[220px]">
           <Stat label="Sample means collected" value={sampleMeans.length} mono />
           <Stat label="Population mean (true)" value={round(POP_MEAN)} mono />
-          <Stat label="Mean of sample means" value={sampleMeans.length > 0 ? round(mean(sampleMeans)) : "—"} mono emphasis />
+          <Stat label="Mean of sample means" value={sampleMeans.length > 0 ? round(mean(sampleMeans)) : "-"} mono emphasis />
           <Stat
             label="Spread (SD) of sample means"
-            value={observedSd !== null ? round(observedSd) : "—"}
+            value={observedSd !== null ? round(observedSd) : "-"}
             mono
             hint={`Predicted by theory: population SD / √n = ${round(predictedSd)}. Compare the two as you collect more samples.`}
           />

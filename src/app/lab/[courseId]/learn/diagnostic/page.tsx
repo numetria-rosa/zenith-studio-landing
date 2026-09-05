@@ -5,7 +5,7 @@ import { LearnShell } from "@/components/course-rail/LearnShell";
 import { Diagnostic } from "@/components/course-engine/diagnostic/Diagnostic";
 
 /* Literal "diagnostic" segment, same priority-over-catch-all trick as
-   /learn/practice — inherits the guarded learn/layout.tsx automatically. */
+   /learn/practice - inherits the guarded learn/layout.tsx automatically. */
 
 export default async function DiagnosticPage({
   params,
@@ -31,7 +31,7 @@ export default async function DiagnosticPage({
           </h1>
           <p className="mt-3 max-w-[560px] text-[15px] text-[#9aa0ae]">
             12 questions across the 5 areas this course actually needs before Module 1. This never gates
-            anything — every module and the whole Foundation Bridge stay open no matter the result.
+            anything - every module and the whole Foundation Bridge stay open no matter the result.
           </p>
         </header>
 

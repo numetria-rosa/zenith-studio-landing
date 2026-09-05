@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /* Module 2's flagship lab. A 2x2 matrix is not an abstract grid of numbers
-   here — it's a function that moves every point in the plane, and this lets
+   here - it's a function that moves every point in the plane, and this lets
    a student watch it do that to a whole grid and a unit square in real
    time. Same "real computation, not decoration" discipline as VectorLab:
    every transformed point on screen is genuinely M * v for the student's
@@ -72,7 +72,7 @@ export function MatrixLab() {
       ctx.stroke();
     }
 
-    // transformed grid — every line segment run through the matrix
+    // transformed grid - every line segment run through the matrix
     ctx.strokeStyle = "#5fc2e855";
     ctx.lineWidth = 1.25;
     const steps = 12;
@@ -195,15 +195,15 @@ export function MatrixLab() {
         <Stat label="M · e2 (where (0,1) lands)" value={`(${round(m.b)}, ${round(m.d)})`} color="#4ade95" />
         <Stat
           tourId="matrix-det"
-          label="det(M) — the unit square's new area"
+          label="det(M) - the unit square's new area"
           value={determinant}
           mono
           emphasis
           hint={
             !invertible
-              ? "det(M) = 0 — the whole plane just got flattened onto a line. This matrix has no inverse: information was permanently destroyed, and no matrix could undo this transformation."
+              ? "det(M) = 0 - the whole plane just got flattened onto a line. This matrix has no inverse: information was permanently destroyed, and no matrix could undo this transformation."
               : determinant < 0
-                ? "Negative determinant — the transformation also flips orientation (like a mirror), in addition to scaling area by the size of this number."
+                ? "Negative determinant - the transformation also flips orientation (like a mirror), in addition to scaling area by the size of this number."
                 : "The shaded parallelogram is exactly this many times the area of the original unit square."
           }
         />

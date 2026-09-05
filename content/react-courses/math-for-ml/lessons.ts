@@ -1,7 +1,7 @@
 /* Ordered lesson manifest for the "react"-render-mode Mathematics for Machine
    Learning course (see src/lib/courses.ts's lessonManifest field). Drives
    routing (/lab/math-for-ml/learn/[slug]), the sidebar's active-state, and
-   next/prev links. Only Module 1 is real content — extended as later
+   next/prev links. Only Module 1 is real content - extended as later
    modules are actually written, not pre-populated with placeholders. */
 
 export type Lesson = {

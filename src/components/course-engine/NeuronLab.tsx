@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/* Module 10's lab — the course's major synthesis. A genuinely tiny neural
+/* Module 10's lab - the course's major synthesis. A genuinely tiny neural
    network (2 inputs, 1 neuron, sigmoid activation) but every number is
    real: the forward pass, the loss, and the backward pass (the chain rule,
    computed by hand in code exactly as Module 4/5 described it) are all
@@ -142,7 +142,7 @@ export function NeuronLab() {
         className="rounded-lg border border-[#333a4c] bg-[#0a0c10]"
       />
       <p className="text-[12px] text-[#676e7d]">
-        Green edges are positive weights, red are negative — thickness is magnitude. Forward pass:
+        Green edges are positive weights, red are negative - thickness is magnitude. Forward pass:
         x1·w1 + x2·w2 + b = z, then σ(z) = a (the output). Target is {TARGET}.
       </p>
 
@@ -170,7 +170,7 @@ export function NeuronLab() {
         </button>
         {lossHistory.length > 0 && (
           <span className="self-center font-[family-name:var(--font-course-mono)] text-[12px] text-[#676e7d]">
-            {lossHistory.length} step{lossHistory.length === 1 ? "" : "s"} taken — loss went from {round(lossHistory[0])} to {round(loss)}
+            {lossHistory.length} step{lossHistory.length === 1 ? "" : "s"} taken - loss went from {round(lossHistory[0])} to {round(loss)}
           </span>
         )}
       </div>

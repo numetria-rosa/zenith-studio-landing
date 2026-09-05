@@ -9,7 +9,7 @@ type ProgressData = { modules?: Record<string, ModuleRecord> };
 
 /* Client wrapper: CourseRail itself is a stateless presentational shell, this
    is the piece that knows progress. Reads the same /api/progress GET the
-   static courses' course-progress.js already calls — no new endpoint. */
+   static courses' course-progress.js already calls - no new endpoint. */
 export function CourseRailClient({
   data,
   courseId,
@@ -40,7 +40,7 @@ export function CourseRailClient({
     const rec = progress?.modules?.[String(moduleId)];
     if (rec?.completed) return "completed";
     if (moduleId === activeModuleId) return "current";
-    // Locked until the previous module is complete — first module is always open.
+    // Locked until the previous module is complete - first module is always open.
     if (moduleId > 1) {
       const prev = progress?.modules?.[String(moduleId - 1)];
       if (!prev?.completed) return "locked";

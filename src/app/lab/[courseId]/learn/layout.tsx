@@ -16,7 +16,7 @@ const plexSans = IBM_Plex_Sans({ variable: "--font-course-sans", weight: ["400",
 const plexMono = IBM_Plex_Mono({ variable: "--font-course-mono", weight: ["400", "500", "600"], subsets: ["latin"] });
 
 /* The "react" render mode's equivalent of the guard in
-   src/app/courses/[courseId]/[...path]/route.ts — one checkpoint above every
+   src/app/courses/[courseId]/[...path]/route.ts - one checkpoint above every
    lesson page instead of re-checking per page. Reuses decideCourseAccess()
    and the same 20s session-access cache verbatim; only the serving mechanism
    below this point (real React pages vs. reading a file off disk) differs. */

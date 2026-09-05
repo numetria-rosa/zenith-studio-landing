@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 /* Module 4's lab. A real scalar function of two variables, f(x,y), rendered
    as a heatmap (every pixel's color is a real evaluation of f, not a
    decorative gradient fill), with a draggable point whose gradient vector
-   — both partial derivatives, computed analytically — is drawn live. This
+   - both partial derivatives, computed analytically - is drawn live. This
    is deliberately the direct visual predecessor to Module 5's gradient
    descent lab: "which way is uphill from here" is the exact question that
    module's optimizer answers by repeatedly asking. */
@@ -15,7 +15,7 @@ type Vec = { x: number; y: number };
 const SIZE = 360;
 const SCALE = 55; // px per unit
 const ORIGIN: Vec = { x: SIZE / 2, y: SIZE / 2 };
-const A = 1; // f(x,y) = A*x^2 + B*y^2 — an elliptical bowl, steeper along y
+const A = 1; // f(x,y) = A*x^2 + B*y^2 - an elliptical bowl, steeper along y
 const B = 3;
 
 function f(x: number, y: number): number {
@@ -38,7 +38,7 @@ function clamp(n: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, n));
 }
 
-// A small, fixed blue->purple->gold ramp — low values (the basin) read cool,
+// A small, fixed blue->purple->gold ramp - low values (the basin) read cool,
 // high values (the walls of the bowl) read hot, so "downhill" reads visually
 // as "toward the cooler color" without needing a legend.
 function heatColor(t: number): [number, number, number] {
@@ -82,7 +82,7 @@ export function GradientLab({ onInteract }: { onInteract?: () => void }) {
     canvas.height = SIZE * dpr;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-    // heatmap — computed at a coarser resolution then upscaled, still a
+    // heatmap - computed at a coarser resolution then upscaled, still a
     // real per-cell evaluation of f, not a canned gradient fill
     const cell = 6;
     for (let py = 0; py < SIZE; py += cell) {
@@ -193,7 +193,7 @@ export function GradientLab({ onInteract }: { onInteract?: () => void }) {
           onPointerLeave={onPointerUp}
         />
         <p className="mt-2 text-[12.5px] text-[#676e7d]">
-          Drag anywhere on the surface — cooler colors are lower values of f(x, y), the basin in the middle
+          Drag anywhere on the surface - cooler colors are lower values of f(x, y), the basin in the middle
           is the minimum.
         </p>
         <button
@@ -222,8 +222,8 @@ export function GradientLab({ onInteract }: { onInteract?: () => void }) {
           emphasis
           hint={
             showDescent
-              ? "The green arrow is −∇f — the single direction that decreases f fastest from this exact point. This is what a gradient-descent optimizer follows."
-              : "The red arrow is ∇f itself — it points toward the steepest INCREASE, not decrease. Toggle the button to see the direction training actually moves in."
+              ? "The green arrow is −∇f - the single direction that decreases f fastest from this exact point. This is what a gradient-descent optimizer follows."
+              : "The red arrow is ∇f itself - it points toward the steepest INCREASE, not decrease. Toggle the button to see the direction training actually moves in."
           }
         />
         <Stat label="‖∇f‖ (how steep it is here)" value={round(gradMag)} mono />

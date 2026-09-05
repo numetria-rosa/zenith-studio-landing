@@ -2,18 +2,18 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/* The capstone workspace — the synthesis the brief asks for: data
+/* The capstone workspace - the synthesis the brief asks for: data
    representation (points as vectors), a model transformation (the same
    weighted-sum + sigmoid neuron from Module 10), a real loss (binary
-   cross-entropy, from Module 9 — not MSE, deliberately, to use the
+   cross-entropy, from Module 9 - not MSE, deliberately, to use the
    information-theory module too), optimization (batch gradient descent,
    Module 5), a probability interpretation of each output (Module 6), and
    an evaluation metric (accuracy). Every number is computed live from the
-   current weights — nothing is precomputed or animated. */
+   current weights - nothing is precomputed or animated. */
 
 type Point = { x1: number; x2: number; y: 0 | 1 };
 
-// A small, fixed, linearly-separable-ish 2-class dataset — real coordinates,
+// A small, fixed, linearly-separable-ish 2-class dataset - real coordinates,
 // not randomly generated, so the same dataset is identical every session.
 const DATASET: Point[] = [
   { x1: 1.2, x2: 1.5, y: 1 },
@@ -47,7 +47,7 @@ function avgLoss(w1: number, w2: number, b: number): number {
   }, 0);
   return total / DATASET.length;
 }
-// Gradient of average BCE loss w.r.t. w1, w2, b — the (a-y)*x simplification
+// Gradient of average BCE loss w.r.t. w1, w2, b - the (a-y)*x simplification
 // that falls out of combining sigmoid activation with cross-entropy loss.
 function batchGradient(w1: number, w2: number, b: number) {
   let gw1 = 0, gw2 = 0, gb = 0;
@@ -75,7 +75,7 @@ function toScreen(x1: number, x2: number) {
 
 export function CapstoneWorkspace() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // Deliberately a BAD starting point (misclassifies half the dataset) —
+  // Deliberately a BAD starting point (misclassifies half the dataset) -
   // (0.1, 0.1) would already separate this dataset perfectly at z=0, making
   // "train it" a no-op. w1=1, w2=-1 draws the boundary along the wrong
   // diagonal (x1-x2=0) instead of the actual separating one (x1+x2=0), so
@@ -193,7 +193,7 @@ export function CapstoneWorkspace() {
           <Stat label="w1, w2, b" value={`${round(w1, 2)}, ${round(w2, 2)}, ${round(b, 2)}`} />
         </div>
         <p className="text-[12px] text-[#676e7d]">
-          Keep clicking Step — watch the loss fall, the accuracy rise to 100%, and the violet line rotate until it
+          Keep clicking Step - watch the loss fall, the accuracy rise to 100%, and the violet line rotate until it
           actually separates the two classes.
         </p>
       </div>

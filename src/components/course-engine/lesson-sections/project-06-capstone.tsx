@@ -25,10 +25,10 @@ export function MathSection() {
       <p>For binary cross-entropy loss instead, the same derivative simplifies dramatically:</p>
       <BlockMath tex="\frac{\partial L_{BCE}}{\partial w_1} = (a-y)\cdot x_1" />
       <p>
-        The <InlineMath tex="a(1-a)" /> term — the sigmoid&apos;s own derivative — cancels out completely when you
+        The <InlineMath tex="a(1-a)" /> term - the sigmoid&apos;s own derivative - cancels out completely when you
         differentiate cross-entropy loss through a sigmoid. This is a real, well-known simplification, not an
         approximation: it&apos;s why classification networks almost always pair a sigmoid (or softmax) output with
-        cross-entropy loss rather than MSE — the combination produces a cleaner, better-behaved gradient.
+        cross-entropy loss rather than MSE - the combination produces a cleaner, better-behaved gradient.
       </p>
     </div>
   );
@@ -39,18 +39,18 @@ export function BriefSection() {
     <ProjectBrief
       courseId="math-for-ml"
       projectId="capstone"
-      objective="Build, train, and evaluate the mathematics behind a genuine (if tiny) machine learning system end to end — data representation, a model transformation, a real loss, optimization, a probability interpretation, and an evaluation metric — and be able to explain every stage."
+      objective="Build, train, and evaluate the mathematics behind a genuine (if tiny) machine learning system end to end - data representation, a model transformation, a real loss, optimization, a probability interpretation, and an evaluation metric - and be able to explain every stage."
       requirements={[
         "Reset the workspace, then train it (Step repeatedly) until accuracy reaches 100% and every point's red 'misclassified' ring disappears",
         "Record the loss and accuracy every 5 steps until convergence, and note how many steps it took",
         "Pick one data point and interpret its final predicted probability: does a value like 0.92 mean 'the model is 92% likely to be right,' or something more precise? Explain the distinction",
         "Identify which of the two weights (w1 or w2) ended up larger in magnitude, and connect that to which input dimension the boundary line is more sensitive to",
-        "Write a short summary connecting every stage — data → transformation → loss → optimization → probability → evaluation — to the specific module in this course that taught it",
+        "Write a short summary connecting every stage - data → transformation → loss → optimization → probability → evaluation - to the specific module in this course that taught it",
       ]}
       hints={[
-        "The decision boundary is where z=0 exactly — once it visually separates blue from gold, accuracy should be 100%.",
-        "A predicted probability is the model's output for THIS specific point given ITS current weights — not a guarantee, and not the same as measured accuracy across the whole dataset (that distinction is Module 6's territory).",
-        "The weight with larger magnitude has more influence on z for a one-unit change in its matching input — look at the boundary line's slope for a visual check.",
+        "The decision boundary is where z=0 exactly - once it visually separates blue from gold, accuracy should be 100%.",
+        "A predicted probability is the model's output for THIS specific point given ITS current weights - not a guarantee, and not the same as measured accuracy across the whole dataset (that distinction is Module 6's territory).",
+        "The weight with larger magnitude has more influence on z for a one-unit change in its matching input - look at the boundary line's slope for a visual check.",
       ]}
       rubric={[
         { key: "trainedTo100", label: "Trained the model to 100% accuracy on this dataset" },

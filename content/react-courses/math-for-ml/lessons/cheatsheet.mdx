@@ -7,58 +7,58 @@ minutes: 5
 ## Every formula in this course, in one place
 
 Meant to be useful after you finish the course, not just during it. Each
-entry links back conceptually to the module that built it — if a formula
+entry links back conceptually to the module that built it - if a formula
 here doesn't immediately make sense, that module is where it came from.
 
-### Stage 1 — Vectors
+### Stage 1 - Vectors
 
 $$\mathbf{a}\cdot\mathbf{b} = a_1b_1 + a_2b_2 \qquad \|\mathbf{a}\| = \sqrt{a_1^2+a_2^2} \qquad \cos\theta = \frac{\mathbf{a}\cdot\mathbf{b}}{\|\mathbf{a}\|\|\mathbf{b}\|}$$
 
-Dot product, magnitude, and cosine similarity — direction-only comparison
+Dot product, magnitude, and cosine similarity - direction-only comparison
 between two vectors.
 
-### Stage 2 — Matrices
+### Stage 2 - Matrices
 
 $$M\mathbf{v} = \begin{pmatrix} a & b \\ c & d \end{pmatrix}\begin{pmatrix} x \\ y \end{pmatrix} \qquad \det(M) = ad-bc$$
 
 A matrix as a linear transformation; its determinant as the area-scaling
 factor, and the test for invertibility ($\det=0$ means no inverse).
 
-### Stage 3 — Eigenvectors and PCA
+### Stage 3 - Eigenvectors and PCA
 
 $$M\mathbf{v} = \lambda\mathbf{v} \qquad \det(M-\lambda I) = 0 \qquad \lambda = \frac{\operatorname{tr}(M)}{2}\pm\sqrt{\left(\frac{\operatorname{tr}(M)}{2}\right)^2-\det(M)}$$
 
 Eigenvectors are directions a transformation only scales, never rotates;
 for PCA, they're the principal directions of a covariance matrix.
 
-### Stage 4 — Calculus and Gradients
+### Stage 4 - Calculus and Gradients
 
 $$\nabla f = \left(\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}\right)$$
 
 The gradient always points toward the steepest increase.
 
-### Stage 5 — Optimization
+### Stage 5 - Optimization
 
 $$\mathbf{x}_{n+1} = \mathbf{x}_n - \eta\nabla f(\mathbf{x}_n)$$
 
 Gradient descent: step opposite the gradient, scaled by the learning rate
 $\eta$. Too large an $\eta$ causes oscillation or divergence.
 
-### Stage 6 — Probability
+### Stage 6 - Probability
 
 $$\mathbb{E}[X] = p \qquad \operatorname{Var}(X) = p(1-p) \qquad \operatorname{SE} = \sqrt{\operatorname{Var}(X)/n}$$
 
-Expectation, variance, and standard error — why averages stabilize as $n$
+Expectation, variance, and standard error - why averages stabilize as $n$
 grows (the law of large numbers).
 
-### Stage 7 — Statistics
+### Stage 7 - Statistics
 
 $$\bar{X}_n \sim \mathcal{N}\!\left(\mu, \frac{\sigma^2}{n}\right)\ \text{as } n\to\infty$$
 
 The Central Limit Theorem: sample means trend toward a normal distribution
 regardless of the population's own shape.
 
-### Stage 8 — Likelihood
+### Stage 8 - Likelihood
 
 $$\log\mathcal{L}(\mu,\sigma) = \sum_{i=1}^n \log p(x_i\mid\mu,\sigma)$$
 
@@ -66,21 +66,21 @@ Maximum likelihood estimation: choose parameters that make the observed
 data most plausible. For a Gaussian, the MLE is the sample mean and
 sample standard deviation.
 
-### Stage 9 — Information and Loss
+### Stage 9 - Information and Loss
 
 $$H(p) = -\sum_i p_i\log_2 p_i \qquad H(p,q) = -\sum_i p_i\log_2 q_i \qquad D_{KL}(p\|q) = H(p,q)-H(p)$$
 
-Entropy, cross-entropy, and KL divergence — the mathematical basis of most
+Entropy, cross-entropy, and KL divergence - the mathematical basis of most
 classifier loss functions.
 
-### Stage 10 — Neural Network Mathematics
+### Stage 10 - Neural Network Mathematics
 
 $$z = w_1x_1+w_2x_2+b \qquad a=\sigma(z) \qquad \frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial a}\cdot\frac{\partial a}{\partial z}\cdot\frac{\partial z}{\partial w_1}$$
 
-Forward pass, then the chain rule backward through it — backpropagation in
+Forward pass, then the chain rule backward through it - backpropagation in
 miniature.
 
-### Stage 11 — Attention
+### Stage 11 - Attention
 
 $$\text{weight}_i = \frac{e^{(q\cdot k_i)/\sqrt{d}}}{\sum_j e^{(q\cdot k_j)/\sqrt{d}}} \qquad \text{output} = \sum_i \text{weight}_i\cdot v_i$$
 

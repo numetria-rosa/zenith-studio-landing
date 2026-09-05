@@ -4,7 +4,7 @@ import { COURSE_RAIL_DATA } from "@/lib/course-rail-data";
 import { LearnShell } from "@/components/course-rail/LearnShell";
 import { Diagnostic } from "@/components/course-engine/diagnostic/Diagnostic";
 
-/* UNAUTHENTICATED PREVIEW ONLY — mirrors src/app/lab/[courseId]/learn/diagnostic/page.tsx. */
+/* UNAUTHENTICATED PREVIEW ONLY - mirrors src/app/lab/[courseId]/learn/diagnostic/page.tsx. */
 
 const COURSE_ID = "math-for-ml";
 
@@ -27,7 +27,7 @@ export default async function PreviewDiagnosticPage() {
           </h1>
           <p className="mt-3 max-w-[560px] text-[15px] text-[#9aa0ae]">
             12 questions across the 5 areas this course actually needs before Module 1. This never gates
-            anything — every module and the whole Foundation Bridge stay open no matter the result.
+            anything - every module and the whole Foundation Bridge stay open no matter the result.
           </p>
         </header>
 

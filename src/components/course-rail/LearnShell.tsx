@@ -7,7 +7,7 @@ import type { CourseRailData } from "@/lib/course-rail-data";
 import styles from "./course-rail.module.css";
 
 /* Shared page shell for every "react" render-mode course page (lesson,
-   practice, diagnostic — real and preview alike): the sticky glass sidebar,
+   practice, diagnostic - real and preview alike): the sticky glass sidebar,
    its off-canvas mobile drawer, and the topbar that carries the hamburger
    toggle for it. Replaces 6 near-identical copies of this same structure
    (learn + preview, x lesson/practice/diagnostic) with one component, and
@@ -27,7 +27,7 @@ export function LearnShell({
   courseId: string;
   activeModuleId: number;
   basePath?: string;
-  /** Text shown at the right of the topbar — course title, optionally with " · Module N". */
+  /** Text shown at the right of the topbar - course title, optionally with " · Module N". */
   courseLabel: string;
   children: React.ReactNode;
 }) {

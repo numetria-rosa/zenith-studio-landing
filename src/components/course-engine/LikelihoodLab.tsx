@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /* Module 8's lab. A fixed dataset (assumed drawn from an unknown Gaussian),
-   and two sliders — mean and standard deviation — controlling a CANDIDATE
+   and two sliders - mean and standard deviation - controlling a CANDIDATE
    Gaussian model. The log-likelihood shown is a real computation (the sum
    of log-PDF values at every data point for the current slider settings),
    recomputed every render. Maximizing it by hand with the sliders is
-   literally doing maximum likelihood estimation — the "Reveal MLE" button
+   literally doing maximum likelihood estimation - the "Reveal MLE" button
    then shows the closed-form answer (sample mean/SD) for comparison. */
 
 const DATA = [23, 25, 22, 30, 27, 24, 26, 29, 21, 28];
@@ -160,7 +160,7 @@ export function LikelihoodLab() {
             label="Log-likelihood at the true MLE"
             value={round(llAtMle)}
             mono
-            hint={`The MLE is μ=${MLE_MU}, σ=${MLE_SIGMA} — no other values of μ and σ produce a higher log-likelihood for this exact data.`}
+            hint={`The MLE is μ=${MLE_MU}, σ=${MLE_SIGMA} - no other values of μ and σ produce a higher log-likelihood for this exact data.`}
           />
         </div>
       </div>

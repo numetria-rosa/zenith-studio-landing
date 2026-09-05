@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/* Module 5's lab — the direct payoff of Module 4's gradient. Same loss
+/* Module 5's lab - the direct payoff of Module 4's gradient. Same loss
    surface f(x,y) = x^2 + 3y^2, but now the student actually RUNS gradient
    descent on it: pick a learning rate, step (or take 10 steps at once), and
-   watch the real path — including, if the learning rate is too big,
+   watch the real path - including, if the learning rate is too big,
    genuine oscillation and divergence, not a scripted "bad" animation. The
    update rule below is the literal textbook gradient-descent step, nothing
    simplified for effect. */
@@ -206,12 +206,12 @@ export function GradientDescentLab() {
           emphasis
           hint={
             diverged
-              ? "The learning rate is too large for this surface's curvature — each step overshoots further than the last, and the loss is growing without bound instead of shrinking. Lower the learning rate and reset."
+              ? "The learning rate is too large for this surface's curvature - each step overshoots further than the last, and the loss is growing without bound instead of shrinking. Lower the learning rate and reset."
               : isOscillating
-                ? "The point is bouncing back and forth across the valley instead of settling into it — the learning rate is too large for how steep this direction is, even though it hasn't fully diverged yet."
+                ? "The point is bouncing back and forth across the valley instead of settling into it - the learning rate is too large for how steep this direction is, even though it hasn't fully diverged yet."
                 : path.length > 15 && Math.abs(current.x) < 0.05 && Math.abs(current.y) < 0.05
-                  ? "Converged — the point has settled essentially at the minimum, (0, 0)."
-                  : "Keep stepping — each step moves opposite to the gradient at the current point."
+                  ? "Converged - the point has settled essentially at the minimum, (0, 0)."
+                  : "Keep stepping - each step moves opposite to the gradient at the current point."
           }
         />
       </div>

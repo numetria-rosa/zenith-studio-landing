@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 export type QuizOption = {
   text: string;
   correct: boolean;
-  /** Only for wrong options — the mistake-driven feedback system (course
+  /** Only for wrong options - the mistake-driven feedback system (course
       brief section 11): why it's wrong, what reasoning likely produced it,
       the durable rule, and a targeted correction. */
   whyWrong?: string;
@@ -13,7 +13,7 @@ export type QuizOption = {
   principle?: string;
   tryThis?: string;
   /** Optional Socratic follow-up: a guiding question shown FIRST on a wrong
-      answer, before the full explanation — nudging the student to find
+      answer, before the full explanation - nudging the student to find
       their own mistake rather than reading the answer immediately. Falls
       back to showing the explanation directly when not authored, so this
       is additive and doesn't require touching every existing question. */
@@ -32,7 +32,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 /* Checkpoint quiz for a "react" course module. Same pedagogy as the other
    4 courses' quiz-data.js pattern (question AND option order shuffled every
-   attempt — see quiz-data.js's Fisher-Yates), same 80% pass threshold, but
+   attempt - see quiz-data.js's Fisher-Yates), same 80% pass threshold, but
    feeding /api/progress directly via the courseId-aware validator instead of
    going through course-progress.js's localStorage-first flow. */
 export function QuizBlock({
@@ -47,7 +47,7 @@ export function QuizBlock({
   onPassed?: (score: number, total: number) => void;
 }) {
   const [attempt, setAttempt] = useState(0);
-  // Renders in the same unshuffled order the server rendered, on purpose —
+  // Renders in the same unshuffled order the server rendered, on purpose -
   // Math.random() during the initial render would make the server's HTML
   // and the client's first hydration pass disagree (a hydration error).
   // Reshuffling only inside this effect, which never runs during SSR, keeps
@@ -58,7 +58,7 @@ export function QuizBlock({
   const [shuffled, setShuffled] = useState<QuizQuestion[]>(questions);
   useEffect(() => {
     // Deliberately client-only randomization to avoid a hydration mismatch
-    // (see the comment above) — this is exactly the "value differs between
+    // (see the comment above) - this is exactly the "value differs between
     // server and client" escape hatch, not state that belongs in render.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setShuffled(shuffle(questions).map((q) => ({ ...q, options: shuffle(q.options) })));
@@ -136,7 +136,7 @@ export function QuizBlock({
                 ) : q.options[chosen].socratic && !revealed[q.id] ? (
                   <div className="flex flex-col gap-2.5 text-[#eeeee7]">
                     <p>
-                      <span className="font-semibold text-[#f0b429]">Before the answer — think about this: </span>
+                      <span className="font-semibold text-[#f0b429]">Before the answer - think about this: </span>
                       {q.options[chosen].socratic}
                     </p>
                     <button
@@ -174,8 +174,8 @@ export function QuizBlock({
           }`}
         >
           {passed
-            ? `Passed — ${score}/${total}. This module is complete.`
-            : `${score}/${total} — you need 80% to pass. Reread the sections above and try again.`}
+            ? `Passed - ${score}/${total}. This module is complete.`
+            : `${score}/${total} - you need 80% to pass. Reread the sections above and try again.`}
           {!passed && (
             <button
               type="button"

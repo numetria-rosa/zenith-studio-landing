@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 /* Project completion state, synced through the same /api/progress endpoint
-   as checkpoint quizzes and the Practice Library — stored under
+   as checkpoint quizzes and the Practice Library - stored under
    extra.projects, mirroring the shape the static courses use for their own
    projects (getProject/setProject in course-progress.js: checklist,
    reflection/description, completed).

@@ -6,39 +6,39 @@ minutes: 45
 
 ## Why you're learning this
 
-Module 4 gave you the gradient — the direction that's uphill from any
+Module 4 gave you the gradient - the direction that's uphill from any
 point. This module turns that into an algorithm: start somewhere, take a
 step downhill, repeat. That algorithm, gradient descent, is what "training"
 means for essentially every model you'll ever touch. But the algorithm has
-a dial — the learning rate — and this module is about what happens when
+a dial - the learning rate - and this module is about what happens when
 that dial is set wrong, because you will see this exact failure in real
 training runs.
 
 <Objectives items={["Explain the gradient descent update rule", "Explain what the learning rate controls, and what happens at both extremes", "Recognize convergence, oscillation, and divergence from a loss curve or a path", "Explain why different loss-surface directions can need different learning rates"]} />
 
-## 5.1 — An algorithm made of one repeated step
+## 5.1 - An algorithm made of one repeated step
 
 Gradient descent has no clever tricks in its basic form: compute the
 gradient at your current point, step a small amount in the opposite
 direction, and do it again. The only real decision is how big a step to
-take — the learning rate.
+take - the learning rate.
 
 <Callout tone="info" label="Definition">
 **Gradient descent** repeatedly applies
 $\mathbf{x}_{n+1} = \mathbf{x}_n - \eta \nabla f(\mathbf{x}_n)$, where
 $\eta$ (the **learning rate**) controls step size. Too small, and
 convergence is correct but slow. Too large, and steps can overshoot the
-minimum — sometimes landing further away each time, a failure called
+minimum - sometimes landing further away each time, a failure called
 **divergence**.
 </Callout>
 
-## 5.2 — The Gradient Descent Lab
+## 5.2 - The Gradient Descent Lab
 
 This is the same loss surface from Module 4. Click anywhere to place a
 starting point, then step through gradient descent yourself.
 
-<Callout tone="predict" label="Before you touch the learning rate — predict">
-Start with a small learning rate and click "Step ×10" a few times — you
+<Callout tone="predict" label="Before you touch the learning rate - predict">
+Start with a small learning rate and click "Step ×10" a few times - you
 should see the path smoothly spiral into the center. Now guess: if you
 raise the learning rate a lot and repeat, will the path still reach the
 center, just faster, or something else entirely?
@@ -47,29 +47,29 @@ center, just faster, or something else entirely?
 <GradientDescentLabSection />
 
 Push the learning rate slider high enough and you should see the path
-start bouncing between the two sides of the valley instead of settling —
+start bouncing between the two sides of the valley instead of settling -
 and past a certain point, growing further from the center with every step.
 That's not a bug in the lab. That's the real, mathematical failure mode
 called divergence, and you just caused it on purpose.
 
-## 5.3 — The formal math
+## 5.3 - The formal math
 
 <MathLevelsSection />
 
-## 5.4 — Where this shows up in real machine learning
+## 5.4 - Where this shows up in real machine learning
 
 - **Every training run's learning rate hyperparameter** is exactly this
-  dial — too high causes loss curves that spike or oscillate; too low
+  dial - too high causes loss curves that spike or oscillate; too low
   causes training that barely moves within a reasonable time budget.
 - **Learning rate schedules** (starting high, decreasing over time) exist
   precisely because the ideal learning rate can change as training
   progresses and the loss landscape's local curvature changes.
 - **Adaptive optimizers** (Adam, RMSProp) exist to solve exactly the
-  x-vs-y instability gap you saw in the lab — different parameters often
+  x-vs-y instability gap you saw in the lab - different parameters often
   need different effective step sizes, and these optimizers estimate that
   automatically instead of using one shared learning rate for everything.
 
-## 5.5 — A failure mode this prevents
+## 5.5 - A failure mode this prevents
 
 <Callout tone="warning" label="Common mistake: reading a spiking loss curve as “the model is broken”">
 A loss curve that suddenly spikes after training smoothly is very often an
@@ -77,7 +77,7 @@ optimization-stability problem (learning rate too large for the current
 region of the loss landscape), not evidence the model architecture or data
 is fundamentally wrong. Before redesigning a model in response to unstable
 training, checking (and often simply lowering) the learning rate is a
-fast, frequently correct first move — and this module is exactly why that
+fast, frequently correct first move - and this module is exactly why that
 diagnosis makes sense.
 </Callout>
 

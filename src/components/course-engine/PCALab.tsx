@@ -3,17 +3,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 /* Module 3's signature lab. A fixed, seeded point cloud (never Math.random()
-   at render time — see the mulberry32 PRNG below — so server and client
+   at render time - see the mulberry32 PRNG below - so server and client
    always agree, no hydration mismatch) is rotated by a slider, and PCA is
    recomputed from scratch on every frame: real mean-centering, a real 2x2
    covariance matrix, and a real closed-form eigen-decomposition. Rotating
    the data and watching the principal directions rotate to match is the
-   whole point — it's the most direct possible demonstration that
+   whole point - it's the most direct possible demonstration that
    eigenvectors are a property of the data, not of the coordinate axes. */
 
 type Vec = { x: number; y: number };
 
-// mulberry32 — a small, deterministic PRNG. Same seed -> same sequence,
+// mulberry32 - a small, deterministic PRNG. Same seed -> same sequence,
 // every time, on server and client alike.
 function mulberry32(seed: number) {
   let a = seed;
@@ -26,7 +26,7 @@ function mulberry32(seed: number) {
   };
 }
 function gaussian(rng: () => number): number {
-  // Box-Muller transform — turns two uniform randoms into one normal one.
+  // Box-Muller transform - turns two uniform randoms into one normal one.
   const u1 = Math.max(rng(), 1e-9);
   const u2 = rng();
   return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
@@ -37,7 +37,7 @@ const BASE_POINTS: Vec[] = (() => {
   const rng = mulberry32(20260905);
   const pts: Vec[] = [];
   for (let i = 0; i < N_POINTS; i++) {
-    // Elongated along x (variance 2.6) vs y (variance 0.35) — a strongly
+    // Elongated along x (variance 2.6) vs y (variance 0.35) - a strongly
     // correlated, elliptical cloud before any rotation is applied.
     pts.push({ x: gaussian(rng) * 1.6, y: gaussian(rng) * 0.6 });
   }
@@ -173,7 +173,7 @@ export function PCALab() {
       }
     }
 
-    // principal axes, length proportional to sqrt(eigenvalue) — a real
+    // principal axes, length proportional to sqrt(eigenvalue) - a real
     // encoding of "how much variance lives in this direction," not decoration
     function drawAxis(dir: Vec, lambda: number, color: string, label: string) {
       const len = Math.sqrt(Math.max(lambda, 0)) * 1.8;
@@ -259,10 +259,10 @@ export function PCALab() {
           emphasis
           hint={
             pc1Pct > 90
-              ? "Almost all the information in this 2D cloud lives along one direction — reducing it to 1D (just each point's position along PC1) would lose very little."
+              ? "Almost all the information in this 2D cloud lives along one direction - reducing it to 1D (just each point's position along PC1) would lose very little."
               : pc1Pct > 60
                 ? "Most of the spread is along PC1, but PC2 still carries a real, non-trivial amount of information."
-                : "The two directions carry comparably useful information — collapsing to 1D here would lose a lot."
+                : "The two directions carry comparably useful information - collapsing to 1D here would lose a lot."
           }
         />
       </div>

@@ -8,7 +8,7 @@ import { useProjectProgress } from "./useProjectProgress";
    possible, clearly label the evidence as student-reported. Never pretend
    something is independently verified when it is not." There is no code
    execution environment wired for this course, so a project's rubric here
-   is a self-assessed checklist, not an automatically graded one — labeled
+   is a self-assessed checklist, not an automatically graded one - labeled
    as such in the UI, not disguised as verified grading. */
 
 export type RubricItem = { key: string; label: string };
@@ -87,7 +87,7 @@ export function ProjectBrief({
           </span>
         </div>
         <p className="mb-3 text-[12px] text-[#676e7d]">
-          Student-reported, not automatically graded — there&apos;s no code execution behind this course to verify
+          Student-reported, not automatically graded - there&apos;s no code execution behind this course to verify
           it independently. Check off each item honestly once you&apos;ve actually done it.
         </p>
         <ul className="flex flex-col gap-2">
@@ -109,13 +109,13 @@ export function ProjectBrief({
 
       <div>
         <label className="mb-2 block font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.08em] text-[#9aa0ae]">
-          Reflection — what did you learn, and where did you get stuck?
+          Reflection - what did you learn, and where did you get stuck?
         </label>
         <textarea
           value={record.reflection}
           onChange={(e) => setReflection(e.target.value)}
           rows={4}
-          placeholder="Write a few sentences — this is for you, not graded."
+          placeholder="Write a few sentences - this is for you, not graded."
           className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] p-3 text-[13.5px] text-[#eeeee7] outline-none focus:border-[#8b7cf6]"
         />
       </div>

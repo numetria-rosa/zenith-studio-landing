@@ -1,10 +1,10 @@
-/* Zenith Lab — central course catalog.
+/* Zenith Lab - central course catalog.
    The single authoritative place a course is defined: what it's called, where
    its content lives, and how it maps to a real Whop product. Nothing else
    (checkout buttons, the dashboard, the webhook handler) should hardcode a
-   checkout link or a product ID — they all read through this file.
+   checkout link or a product ID - they all read through this file.
 
-   Whop IDs are literal values, not env vars — they're not secrets (only
+   Whop IDs are literal values, not env vars - they're not secrets (only
    WHOP_API_KEY and WHOP_WEBHOOK_SECRET are), and hardcoding them here means
    one file to update instead of keeping .env and Vercel's env vars in sync.
    Created via scripts/create-whop-products.mjs on 2026-08-21.
@@ -13,7 +13,7 @@
    access-control system. */
 
 export type Course = {
-  id: string; // stable internal id — also the courseId stored on CourseEntitlement/CourseProgress rows
+  id: string; // stable internal id - also the courseId stored on CourseEntitlement/CourseProgress rows
   slug: string;
   title: string;
   description: string;
@@ -25,7 +25,7 @@ export type Course = {
   /** Real Whop purchase_url (checkout link) for this course, once created. Empty string until then. */
   checkoutUrl: string;
   /** Where content actually lives on disk, served only through the guarded route.
-      Optional when renderMode is "react" — a React course has no static contentDir. */
+      Optional when renderMode is "react" - a React course has no static contentDir. */
   contentDir?: string;
   /** First page inside contentDir a newly-entitled user should land on.
       Optional when renderMode is "react". */
@@ -38,7 +38,7 @@ export type Course = {
   /** Path (relative to repo root) to the ordered lesson manifest module for a
       "react" course. Only used when renderMode === "react". */
   lessonManifest?: string;
-  /** Fallback when no purchase_url is configured yet — never show a dead button. */
+  /** Fallback when no purchase_url is configured yet - never show a dead button. */
   waitlistUrl: string;
   /** False = not for sale yet; hidden from "Available courses" purchase CTAs. */
   published: boolean;
@@ -109,7 +109,7 @@ export const COURSES: Course[] = [
     slug: "ai-assisted-software-engineering",
     title: "AI-Assisted Software Engineering",
     description:
-      "Software engineering with AI as your pair programmer, for people who have never shipped code. Fourteen Northline Digital tickets: you write the spec, write engineering prompts for an AI coding assistant, inspect what an agent produced, run it, test it, review it, and ship it. Graded practice across HTML, CSS, JavaScript, specs, Git, review, testing, Python, and AI Code Detective — plus a real Cursor session, a real GitHub repo, and a live URL that is not the repo itself. Not AI Engineering (that course builds LLM products). No job guarantee.",
+      "Software engineering with AI as your pair programmer, for people who have never shipped code. Fourteen Northline Digital tickets: you write the spec, write engineering prompts for an AI coding assistant, inspect what an agent produced, run it, test it, review it, and ship it. Graded practice across HTML, CSS, JavaScript, specs, Git, review, testing, Python, and AI Code Detective - plus a real Cursor session, a real GitHub repo, and a live URL that is not the repo itself. Not AI Engineering (that course builds LLM products). No job guarantee.",
     thumbnail: "/lab/ai-assisted-software-engineering.webp",
     whopAccessPassId: "prod_rW17sq9hKeXYN",
     whopPlanId: "plan_ximKlnIKYO7Bx",
@@ -166,7 +166,7 @@ export function courseHomeUrl(course: Course): string {
   return `/courses/${course.id}/${course.firstLessonPath}`;
 }
 
-/** Real purchase_url if configured, else the waitlist fallback — a button is never dead. */
+/** Real purchase_url if configured, else the waitlist fallback - a button is never dead. */
 export function getCheckoutUrl(course: Course): { url: string; isRealCheckout: boolean } {
   if (course.checkoutUrl) return { url: course.checkoutUrl, isRealCheckout: true };
   return { url: course.waitlistUrl, isRealCheckout: false };

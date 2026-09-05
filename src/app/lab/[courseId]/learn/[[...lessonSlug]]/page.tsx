@@ -32,14 +32,14 @@ import * as Project04 from "@/components/course-engine/lesson-sections/project-0
 import * as Project05 from "@/components/course-engine/lesson-sections/project-05-neural-network";
 import * as Project06 from "@/components/course-engine/lesson-sections/project-06-capstone";
 
-/* Only math-for-ml exists as a "react" course right now — this page is not
+/* Only math-for-ml exists as a "react" course right now - this page is not
    generic across arbitrary react courses yet (see the architecture plan's
    phased build order: "prove the pattern on one course first"). Extending
    to a second react course means parameterizing the lesson-manifest import
    and this per-lesson component map below, not redesigning this file.
 
    Each module's lesson-sections file exports the same three names
-   (*LabSection, MathLevelsSection, QuizSection) with different content —
+   (*LabSection, MathLevelsSection, QuizSection) with different content -
    keyed here by lesson id so a new module means adding one entry, not
    touching the lesson page's rendering logic. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- MDXRemote's own `components` prop is this loosely typed

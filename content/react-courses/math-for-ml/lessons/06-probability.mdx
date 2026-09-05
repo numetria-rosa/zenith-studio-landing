@@ -6,7 +6,7 @@ minutes: 45
 
 ## Why you're learning this
 
-Machine learning isn't just pattern recognition — a huge part of it is
+Machine learning isn't just pattern recognition - a huge part of it is
 reasoning honestly about uncertainty. A model's "87% confidence" is a
 probability statement, and probability statements only mean something once
 you understand what they promise (and, just as important, what they
@@ -15,9 +15,9 @@ example: a biased coin.
 
 <Objectives items={["Explain what expectation and variance measure", "Explain the law of large numbers in your own words", "Explain why standard error shrinks with more data, and by how much", "Explain what a stated probability does and doesn't guarantee about a single outcome"]} />
 
-## 6.1 — One flip tells you almost nothing
+## 6.1 - One flip tells you almost nothing
 
-Flip a coin once and you learn almost nothing about its true bias — heads
+Flip a coin once and you learn almost nothing about its true bias - heads
 or tails, either outcome is compatible with almost any underlying
 probability. Flip it a thousand times, and the fraction of heads has to
 converge toward the coin's real probability, because lucky and unlucky
@@ -28,16 +28,16 @@ stretches statistically cancel out over a long enough run.
 **Variance** measures how spread out individual outcomes are around that
 average. The **law of large numbers** says the average of many independent
 trials converges toward the true expectation as the number of trials
-grows — not because any individual trial "corrects" for previous ones, but
+grows - not because any individual trial "corrects" for previous ones, but
 because randomness averages out over a large enough sample.
 </Callout>
 
-## 6.2 — The Probability Lab
+## 6.2 - The Probability Lab
 
-Set a coin's true probability, then flip it — once, ten times, or a
-hundred at once — and watch the running average.
+Set a coin's true probability, then flip it - once, ten times, or a
+hundred at once - and watch the running average.
 
-<Callout tone="predict" label="Before you flip — predict">
+<Callout tone="predict" label="Before you flip - predict">
 Set the slider to somewhere far from 0.5 (like 0.85), then click "Flip
 ×1" a handful of times. Do you expect the running average to be close to
 0.85 after just 3-4 flips, or do you expect it to look almost random at
@@ -46,33 +46,33 @@ first?
 
 <ProbabilityLabSection />
 
-At small n, the running average bounces around — sometimes wildly, even
+At small n, the running average bounces around - sometimes wildly, even
 hitting 0 or 1 after just one or two flips. Keep clicking "Flip ×100," and
 watch it settle down toward the gold reference line. That settling is the
 law of large numbers happening in real time, not a scripted animation.
 
-## 6.3 — The formal math
+## 6.3 - The formal math
 
 <MathLevelsSection />
 
-## 6.4 — Where this shows up in real machine learning
+## 6.4 - Where this shows up in real machine learning
 
 - **Model confidence scores** are themselves probabilities, and are only
-  meaningfully calibrated in aggregate, across many predictions — not as a
+  meaningfully calibrated in aggregate, across many predictions - not as a
   guarantee about any one specific case.
 - **Evaluation metrics computed on a test set** (accuracy, precision,
-  recall) are themselves estimates with their own standard error — a
+  recall) are themselves estimates with their own standard error - a
   metric measured on 50 examples is far noisier than the same metric
   measured on 50,000.
 - **A/B testing and experiment design** in ML products rely directly on
   this module's math to decide how much data is actually needed before a
   measured difference can be trusted as real rather than noise.
 
-## 6.5 — A failure mode this prevents
+## 6.5 - A failure mode this prevents
 
 <Callout tone="warning" label="Common mistake: trusting a metric from too little data">
 A validation accuracy of "92%" measured on only 40 examples carries a much
-larger standard error than the same 92% measured on 4,000 examples — but
+larger standard error than the same 92% measured on 4,000 examples - but
 both often get reported with the same confident-sounding single number.
 Before trusting a reported metric, this module's math gives you a concrete
 way to ask "how much data was that computed from, and how much would that

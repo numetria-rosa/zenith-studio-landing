@@ -3,7 +3,7 @@
    progress-shape.ts rather than a loosened version of it: that validator's
    VALID_MODULE_IDS ("1".."9") and quiz-style shape are load-bearing for the
    4 existing static courses' data already in the DB, and one shared function
-   gates all of them — widening it in place risks silently accepting
+   gates all of them - widening it in place risks silently accepting
    malformed data for those courses too. This validator is scoped to the
    simpler per-lesson shape a react course's MDX pages actually write:
    { modules: { [lessonId]: { completed, score?, total?, answers? } }, extra }.

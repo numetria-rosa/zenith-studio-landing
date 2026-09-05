@@ -3,12 +3,12 @@ import { ChevronDown, Lock } from "lucide-react";
 import type { CourseRailData } from "@/lib/course-rail-data";
 import styles from "./course-rail.module.css";
 
-/* The "react" render mode's sidebar content — same CourseRailData shape
+/* The "react" render mode's sidebar content - same CourseRailData shape
    every static course's rail (course-rail-template.ts, string-templated
    HTML) already reads from, rendered as JSX using the same class-per-role
    structure and CSS custom properties (course-rail.module.css) as the 4
    static courses' zenith-lab.css, instead of a from-scratch Tailwind
-   approximation. Renders only the rail's *inner* content — the
+   approximation. Renders only the rail's *inner* content - the
    <aside class="courserail"> wrapper itself lives in LearnShell, matching
    how the static courses' buildRailInnerHtml() only builds what goes
    inside the <aside> shell-splicing already provides. */
@@ -24,7 +24,7 @@ export function CourseRail({
   activeModuleId: number;
   moduleStatus: (moduleId: number) => "completed" | "current" | "upcoming" | "locked";
   /** Link prefix for each module, before "/[file]". Defaults to the real
-      guarded route — only overridden by the unauthenticated local preview. */
+      guarded route - only overridden by the unauthenticated local preview. */
   basePath?: string;
 }) {
   const base = basePath ?? `/lab/${courseId}/learn`;

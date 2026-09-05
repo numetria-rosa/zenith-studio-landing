@@ -6,7 +6,7 @@ export function WorkspaceSection() {
     <div className="mt-5 rounded-xl border border-[#333a4c] bg-[#151920] p-6">
       <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#5fc2e8]/10 px-3 py-1 font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.1em] text-[#5fc2e8]">
         <span className="h-1.5 w-1.5 rounded-full bg-[#5fc2e8] shadow-[0_0_8px_#5fc2e8]" />
-        Workspace — reusing Module 6&apos;s Probability Lab
+        Workspace - reusing Module 6&apos;s Probability Lab
       </span>
       <ProbabilityLab />
     </div>
@@ -26,9 +26,9 @@ export function BriefSection() {
         "Explain, using your own numbers, why n=1000 trials produced a more reliable estimate than n=10",
       ]}
       hints={[
-        "The lab's own 'standard error of the mean' stat is the theoretical prediction — you're checking it against what actually happened.",
-        "A single n=10 trial being off from p by a lot isn't a bug — that's exactly the high-variance behavior small samples are expected to show.",
-        "Try an extreme p (like 0.9) as well as p=0.5 — does the standard error formula's behavior match what you'd predict for both?",
+        "The lab's own 'standard error of the mean' stat is the theoretical prediction - you're checking it against what actually happened.",
+        "A single n=10 trial being off from p by a lot isn't a bug - that's exactly the high-variance behavior small samples are expected to show.",
+        "Try an extreme p (like 0.9) as well as p=0.5 - does the standard error formula's behavior match what you'd predict for both?",
       ]}
       rubric={[
         { key: "recorded3n", label: "Recorded empirical probability at n=10, 100, and 1000 for the same p" },

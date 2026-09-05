@@ -17,7 +17,7 @@ export type DiagnosticQuestion = {
 };
 
 /* 12 questions, evenly spread across the 5 areas this course actually
-   needs before Module 1 — not a generic math-aptitude test. Real questions
+   needs before Module 1 - not a generic math-aptitude test. Real questions
    with one real correct answer each; scoring below is a real tally, not a
    canned percentage. */
 export const DIAGNOSTIC_QUESTIONS: DiagnosticQuestion[] = [

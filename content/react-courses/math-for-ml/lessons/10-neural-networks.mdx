@@ -11,12 +11,12 @@ neuron's weighted sum is Module 1's dot product. Its transformation of
 inputs is Module 2's linear map. Training it is Module 5's gradient
 descent, computed via Module 4's calculus. Comparing its output to a
 target uses ideas from Modules 8 and 9. There is no new mathematical
-object introduced here — only the moment where you watch all of it work
+object introduced here - only the moment where you watch all of it work
 together, on a network small enough to compute by hand.
 
 <Objectives items={["Trace a single neuron's forward pass from inputs to loss", "Explain what the chain rule computes in backpropagation", "Compute a weight's gradient for a simple neuron by hand", "Explain what a bias term does and why it's needed"]} />
 
-## 10.1 — One neuron, traced completely
+## 10.1 - One neuron, traced completely
 
 A neuron takes inputs, multiplies each by a weight, adds them up (plus a
 bias), and passes the result through an activation function. That's the
@@ -32,12 +32,12 @@ gradient for every weight. **Gradient descent** then updates every weight
 using that gradient, exactly as in Module 5.
 </Callout>
 
-## 10.2 — The Neural Network Math Lab
+## 10.2 - The Neural Network Math Lab
 
 Below is one real neuron with two inputs. Watch every number update as you
 change the weights, and use "Step" to run one real gradient-descent update.
 
-<Callout tone="predict" label="Before you click Step — predict">
+<Callout tone="predict" label="Before you click Step - predict">
 Look at the current loss and the sign of ∂Loss/∂w1. If you click "Step,"
 do you expect w1 to increase or decrease? Check your answer against what
 actually happens.
@@ -46,15 +46,15 @@ actually happens.
 <NeuronLabSection />
 
 Click "Step" repeatedly (five or six times) and watch the loss number
-trend downward — not instantly to zero, but steadily, exactly the way
+trend downward - not instantly to zero, but steadily, exactly the way
 Module 5's gradient descent behaved on the loss surface, just now applied
 to real neural network weights instead of an abstract x/y point.
 
-## 10.3 — The formal math
+## 10.3 - The formal math
 
 <MathLevelsSection />
 
-## 10.4 — Where this shows up in real machine learning
+## 10.4 - Where this shows up in real machine learning
 
 - **This is literally what training is.** A real network repeats this
   forward-pass/backward-pass/update cycle across every neuron, every
@@ -65,16 +65,16 @@ to real neural network weights instead of an abstract x/y point.
   nobody has to hand-derive gradients for a billion-parameter model.
 - **Vanishing/exploding gradients**, a real and important training
   problem in deep networks, comes directly from chaining together many
-  multiplicative terms (as in this module's chain rule) — if each term is
+  multiplicative terms (as in this module's chain rule) - if each term is
   consistently a bit less than 1, the product shrinks toward zero across
   many layers; if consistently more than 1, it grows explosively.
 
-## 10.5 — A failure mode this prevents
+## 10.5 - A failure mode this prevents
 
 <Callout tone="warning" label="Common mistake: treating a neural network as an unknowable black box">
 "Neural networks are black boxes" is a common claim, but the mathematics
 inside one neuron is fully traceable, as this lab just demonstrated. A
-large network is not a different KIND of mathematics — it's this exact
+large network is not a different KIND of mathematics - it's this exact
 same forward/backward loop, repeated at scale. Knowing that means a
 training problem (loss not decreasing, gradients vanishing, weights
 exploding) is something you can reason about mechanically, not just a

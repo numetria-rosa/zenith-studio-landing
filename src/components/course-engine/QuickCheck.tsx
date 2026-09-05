@@ -12,11 +12,11 @@ function shuffle<T>(arr: T[]): T[] {
   return out;
 }
 
-/* A lighter QuizBlock for the Foundation Bridge — same shuffled-question,
+/* A lighter QuizBlock for the Foundation Bridge - same shuffled-question,
    mistake-driven-feedback UI, but with no server sync and no pass/fail
    gate. The Bridge is explicitly optional and self-paced (see the
    Orientation page), so there's no "module" for this to complete, and
-   nothing here should be posted to /api/progress — module ids there are
+   nothing here should be posted to /api/progress - module ids there are
    validated against the real course's module count (11), and a Foundation
    quiz isn't one of those modules. */
 export function QuickCheck({ questions }: { questions: QuizQuestion[] }) {
@@ -93,7 +93,7 @@ export function QuickCheck({ questions }: { questions: QuizQuestion[] }) {
 
       {allDone && (
         <div className="rounded-xl border border-[#333a4c] bg-[#151920] p-4 text-[14px] font-semibold text-[#eeeee7]">
-          {score}/{total} — this is a self-check, not a gate. {score === total ? "Move on whenever you're ready." : "Reread anything that tripped you up, or move on and come back later."}
+          {score}/{total} - this is a self-check, not a gate. {score === total ? "Move on whenever you're ready." : "Reread anything that tripped you up, or move on and come back later."}
         </div>
       )}
     </div>

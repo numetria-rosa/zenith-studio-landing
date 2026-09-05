@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 
 /* Practice-task completion, synced through the same /api/progress endpoint
-   every module's checkpoint quiz already uses — stored under
+   every module's checkpoint quiz already uses - stored under
    extra.practiceTasks, exactly the {passed, attempts, lastAttemptAt} shape
    the static courses' course-progress.js uses for its own practice
    libraries (see mergePracticeTasks in courses/data-science/course-progress.js),
    so this is a consistent pattern, not a new one invented for this course.
 
-   IMPORTANT: POST /api/progress replaces the whole `data` field — it does
+   IMPORTANT: POST /api/progress replaces the whole `data` field - it does
    not deep-merge server-side. Every write here must include the current
    `modules` value alongside the updated `extra`, or a practice-task save
    would silently erase checkpoint-quiz completion recorded in `modules`. */

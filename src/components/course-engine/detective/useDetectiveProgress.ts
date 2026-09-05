@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-/* Same replace-not-merge care as the Practice Library and Projects hooks —
+/* Same replace-not-merge care as the Practice Library and Projects hooks -
    stored under extra.mathDetective, not modules (a detective scenario isn't
    one of the 11 real course modules, so it must stay out of the
    module-id-bounded validator). */

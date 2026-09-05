@@ -5,10 +5,10 @@ import { ChevronDown, Check, X } from "lucide-react";
 import { DIAGNOSTIC_QUESTIONS, SKILL_AREA_LABEL, type SkillArea } from "./diagnostic-questions";
 
 /* The onboarding diagnostic (brief section 3). Produces a real per-area
-   breakdown from real answers — never gatekeeps (there is no "you must
+   breakdown from real answers - never gatekeeps (there is no "you must
    score X to continue" branch anywhere here), and never collapses the
    result to a single misleading percentage. Result is saved to
-   extra.diagnostic, not modules — this isn't a course module, so it must
+   extra.diagnostic, not modules - this isn't a course module, so it must
    not go through the modules-id-bounded validator every checkpoint quiz
    uses. */
 
@@ -20,7 +20,7 @@ const FOUNDATION_LINK: Record<SkillArea, { href: string; label: string }> = {
   probability: { href: "06-probability", label: "Module 6: Reasoning Under Uncertainty (go slowly through 6.1)" },
 };
 
-/* Per-question detail behind each area's dropdown — the actual answer the
+/* Per-question detail behind each area's dropdown - the actual answer the
    student picked against the correct one, not just the aggregate score. */
 function AreaBreakdown({ area, answers }: { area: SkillArea; answers: Record<string, number> }) {
   const qs = DIAGNOSTIC_QUESTIONS.filter((q) => q.area === area);
@@ -127,7 +127,7 @@ export function Diagnostic({ courseId, basePath }: { courseId: string; basePath:
             Your mathematical starting point
           </div>
           <p className="text-[13.5px] text-[#9aa0ae]">
-            This is a snapshot, not a gate — every module and the whole Foundation Bridge stay open regardless of
+            This is a snapshot, not a gate - every module and the whole Foundation Bridge stay open regardless of
             these results.
           </p>
         </div>
@@ -183,8 +183,8 @@ export function Diagnostic({ courseId, basePath }: { courseId: string; basePath:
           <div className="mb-1 text-[13px] font-bold text-[#8b7cf6]">Recommended path</div>
           <p className="text-[13.5px] text-[#eeeee7]">
             {needsRefresh.length === 0
-              ? "Every area looks solid — head straight into Module 1."
-              : `Skim ${needsRefresh.length === 1 ? "the lesson" : "the lessons"} linked above before or alongside Module 1 — not required, just efficient.`}
+              ? "Every area looks solid - head straight into Module 1."
+              : `Skim ${needsRefresh.length === 1 ? "the lesson" : "the lessons"} linked above before or alongside Module 1 - not required, just efficient.`}
           </p>
           <a href={`${basePath}/01-vectors`} className="mt-3 inline-block rounded-full border border-[#8b7cf6] bg-[#8b7cf6]/10 px-4 py-2 text-[13px] font-semibold text-[#8b7cf6] hover:bg-[#8b7cf6]/20">
             Begin Module 1 →

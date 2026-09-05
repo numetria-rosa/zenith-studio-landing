@@ -1,6 +1,6 @@
 import katex from "katex";
 
-/* Server-safe KaTeX rendering — katex.renderToString needs no DOM, so these
+/* Server-safe KaTeX rendering - katex.renderToString needs no DOM, so these
    work fine as plain (non-"use client") components inside MDXRemote's
    server-rendered output. katex.min.css is imported once in the learn
    layout. */

@@ -32,7 +32,7 @@ import * as Project04 from "@/components/course-engine/lesson-sections/project-0
 import * as Project05 from "@/components/course-engine/lesson-sections/project-05-neural-network";
 import * as Project06 from "@/components/course-engine/lesson-sections/project-06-capstone";
 
-/* UNAUTHENTICATED PREVIEW ONLY — a byte-for-byte content mirror of
+/* UNAUTHENTICATED PREVIEW ONLY - a byte-for-byte content mirror of
    src/app/lab/[courseId]/learn/[[...lessonSlug]]/page.tsx, minus the auth
    gate, with links pointing at this /preview/math-for-ml/... tree instead
    of /lab/math-for-ml/learn/.... Remove before shipping. */
@@ -147,7 +147,7 @@ export default async function PreviewLessonPage({
             {next.title} →
           </a>
         ) : (
-          <span className="text-[13px] text-[#676e7d]">That was the last module — end of course.</span>
+          <span className="text-[13px] text-[#676e7d]">That was the last module - end of course.</span>
         )}
       </footer>
     </div>

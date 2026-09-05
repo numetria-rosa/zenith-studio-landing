@@ -4,11 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
-/* An animated, spotlight-style walkthrough — like a product tour, not a
+/* An animated, spotlight-style walkthrough - like a product tour, not a
    chat. Each step targets a real DOM element already on the page (found by
    a `data-tour="<id>"` attribute the lab itself sets on its own canvas,
    sliders, and stat panels), dims everything else, and walks through them
-   in sequence with a moving highlight. No LLM, no server call — this is
+   in sequence with a moving highlight. No LLM, no server call - this is
    pure client-side UI, driven entirely by a fixed array of steps authored
    for the specific lab it's attached to. */
 

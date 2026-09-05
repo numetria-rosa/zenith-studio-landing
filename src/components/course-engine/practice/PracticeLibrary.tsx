@@ -27,7 +27,7 @@ export function PracticeLibrary({ courseId, railData }: { courseId: string; rail
           />
         </div>
         <p className="mt-3 text-[12.5px] text-[#676e7d]">
-          Every task here is separate from each module&apos;s checkpoint quiz — untimed, retriable, and not required to
+          Every task here is separate from each module&apos;s checkpoint quiz - untimed, retriable, and not required to
           unlock the next module. Progress is saved to your account, the same way checkpoint quizzes are.
         </p>
       </div>

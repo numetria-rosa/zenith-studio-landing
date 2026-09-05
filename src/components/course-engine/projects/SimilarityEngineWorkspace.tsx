@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/* Project 1 workspace — a real (if tiny) similarity search engine. 8 fixed
-   "documents," each a 2D embedding vector (real coordinates, not random —
+/* Project 1 workspace - a real (if tiny) similarity search engine. 8 fixed
+   "documents," each a 2D embedding vector (real coordinates, not random -
    see the comment on DOCS), ranked against a chosen query by real cosine
    similarity (Module 1's exact formula), live-recomputed on every click. */
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-/* Escalating hints for a lab or practice task — a gentle nudge first, then
+/* Escalating hints for a lab or practice task - a gentle nudge first, then
    a more specific pointer, then a near-answer, revealed one at a time on
    request rather than dumped all at once. This is authored guidance (real
    hints written for this specific lab), not a live/generated response. */

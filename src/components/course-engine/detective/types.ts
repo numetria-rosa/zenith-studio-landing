@@ -1,10 +1,10 @@
-/* Math Detective's data model — a math-flavored adaptation of the two-phase
+/* Math Detective's data model - a math-flavored adaptation of the two-phase
    "charge sheet then fix" pattern from courses/ai-assisted-software-engineering/
    detective-kit.js. That original grades a mix of real defects and plausible-
    but-wrong ones (over-selecting fails exactly like under-selecting) and only
    unlocks a fix step once the charge sheet is exactly right. There's no code
    to run here, so "the fix" becomes picking the correctly-qualified version
-   of the original flawed claim, rather than passing a hidden test suite —
+   of the original flawed claim, rather than passing a hidden test suite -
    but the rigor (all-or-nothing charge sheet, then a separate proof step) is
    the same discipline, not a simplified multiple-choice quiz in disguise. */
 

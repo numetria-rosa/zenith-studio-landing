@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/* Module 9's lab. Two categorical distributions over the same 4 categories —
-   a "true" distribution p and a "predicted" distribution q — each controlled
+/* Module 9's lab. Two categorical distributions over the same 4 categories -
+   a "true" distribution p and a "predicted" distribution q - each controlled
    by 4 independent weight sliders, normalized to sum to 1 so they're always
    valid probability distributions. Entropy, cross-entropy, and KL divergence
-   are all computed directly from the normalized values on every render —
+   are all computed directly from the normalized values on every render -
    real information theory, not a lookup table. */
 
 const CATEGORIES = ["Cat", "Dog", "Bird", "Fish"];
@@ -119,14 +119,14 @@ export function EntropyLab() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Stat label="H(p) — entropy of the true distribution" value={`${round(hP)} bits`} mono />
-        <Stat label="H(p, q) — cross-entropy" value={`${round(hPQ)} bits`} mono emphasis />
+        <Stat label="H(p) - entropy of the true distribution" value={`${round(hP)} bits`} mono />
+        <Stat label="H(p, q) - cross-entropy" value={`${round(hPQ)} bits`} mono emphasis />
         <Stat
           tourId="entropy-kl"
-          label="D_KL(p ‖ q) — KL divergence"
+          label="D_KL(p ‖ q) - KL divergence"
           value={`${round(kl)} bits`}
           mono
-          hint={kl < 0.01 ? "p and q are (almost) identical — the model's predictions match reality." : "This is exactly the extra bits 'wasted' by predicting q when the truth is p — make q match p perfectly and this drops to 0."}
+          hint={kl < 0.01 ? "p and q are (almost) identical - the model's predictions match reality." : "This is exactly the extra bits 'wasted' by predicting q when the truth is p - make q match p perfectly and this drops to 0."}
         />
       </div>
     </div>

@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-/* Module 11's lab — the "reward" module's centerpiece. A tiny, fixed
+/* Module 11's lab - the "reward" module's centerpiece. A tiny, fixed
    vocabulary of 2D "embeddings" (deliberately 2D so the vectors can be
    drawn directly, tying back to Module 1's VectorLab) walked through the
    exact real computation behind attention: dot product against every key,
    scale by 1/sqrt(d), softmax, then a weighted sum of values. Nothing here
-   is precomputed or faked — click a different query and every number
+   is precomputed or faked - click a different query and every number
    recomputes from the same four lines of real math a transformer actually
    runs. */
 
@@ -15,7 +15,7 @@ type Token = { label: string; vec: [number, number] };
 
 // Fixed, hand-placed so cat/dog are close together and keyboard/mouse are
 // close together (real semantic clusters), exactly the cosine-similarity
-// intuition from Module 1 — not random placement.
+// intuition from Module 1 - not random placement.
 const TOKENS: Token[] = [
   { label: "cat", vec: [3, 1] },
   { label: "dog", vec: [2.6, 1.4] },
@@ -97,7 +97,7 @@ export function AttentionLab() {
       ctx.fillText(t.label, tip.x + 6, tip.y - 6);
     });
 
-    // output vector — the weighted combination
+    // output vector - the weighted combination
     const outTip = toScreen(outputVec);
     ctx.strokeStyle = "#4ade95";
     ctx.lineWidth = 2.5;

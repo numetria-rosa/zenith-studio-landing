@@ -6,8 +6,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
    animation: every number below (magnitude, angle, dot product, cosine
    similarity) is computed from the actual dragged coordinates on every
    frame, the same arithmetic a real embedding-similarity search performs.
-   Framed as "how similar are these two feature vectors" — the ML connection
-   the lesson text builds toward — rather than an abstract grid-drag toy. */
+   Framed as "how similar are these two feature vectors" - the ML connection
+   the lesson text builds toward - rather than an abstract grid-drag toy. */
 
 type Vec = { x: number; y: number };
 
@@ -38,14 +38,14 @@ function round(n: number, dp = 2): number {
 export function VectorLab({
   onInteract,
 }: {
-  /** Called once the student has actually dragged the vector at least once —
+  /** Called once the student has actually dragged the vector at least once -
       the module's graded "prediction" exercise (see the MDX lesson) unlocks
       only after real interaction, not just page-load. */
   onInteract?: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [a] = useState<Vec>({ x: 4, y: 1 }); // fixed reference vector — "a stored document embedding"
-  const [b, setB] = useState<Vec>({ x: 2, y: 3 }); // draggable — "a new query embedding"
+  const [a] = useState<Vec>({ x: 4, y: 1 }); // fixed reference vector - "a stored document embedding"
+  const [b, setB] = useState<Vec>({ x: 2, y: 3 }); // draggable - "a new query embedding"
   const draggingRef = useRef(false);
   const interactedRef = useRef(false);
 
@@ -199,8 +199,8 @@ export function VectorLab({
       </div>
 
       <div className="flex flex-col gap-3" aria-live="polite">
-        <Stat label="a (fixed — a stored document embedding)" value={`(${a.x}, ${a.y})`} color="#5fc2e8" />
-        <Stat label="b (yours — a new query embedding)" value={`(${b.x}, ${b.y})`} color="#8b7cf6" />
+        <Stat label="a (fixed - a stored document embedding)" value={`(${a.x}, ${a.y})`} color="#5fc2e8" />
+        <Stat label="b (yours - a new query embedding)" value={`(${b.x}, ${b.y})`} color="#8b7cf6" />
         <div className="my-1 h-px bg-[#232838]" />
         <Stat label="‖a‖ (magnitude of a)" value={round(magA)} mono />
         <Stat label="‖b‖ (magnitude of b)" value={round(magB)} mono />
@@ -214,12 +214,12 @@ export function VectorLab({
           emphasis
           hint={
             cosSim > 0.9
-              ? "Nearly identical direction — a search engine would call these a strong match."
+              ? "Nearly identical direction - a search engine would call these a strong match."
               : cosSim > 0.5
-                ? "Same general direction — a moderate match."
+                ? "Same general direction - a moderate match."
                 : cosSim > 0
-                  ? "Only loosely related — a weak match."
-                  : "Pointing away from each other — not a match at all."
+                  ? "Only loosely related - a weak match."
+                  : "Pointing away from each other - not a match at all."
           }
         />
       </div>

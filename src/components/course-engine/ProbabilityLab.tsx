@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/* Module 6's lab — a real Bernoulli-trial simulator. Every flip is a genuine
+/* Module 6's lab - a real Bernoulli-trial simulator. Every flip is a genuine
    Math.random() draw, generated only inside a click handler (never during
    render), so there's no hydration risk: the server and the first client
    render both show zero flips, and randomness only enters once a real user
@@ -150,12 +150,12 @@ export function ProbabilityLab() {
         <div className="flex flex-col gap-2 sm:w-[220px]">
           <Stat label="Flips (n)" value={n} mono />
           <Stat label="Heads" value={heads} mono />
-          <Stat label="Empirical probability" value={n > 0 ? round(empirical) : "—"} mono emphasis />
+          <Stat label="Empirical probability" value={n > 0 ? round(empirical) : "-"} mono emphasis />
           <Stat
             label="Standard error of the mean"
-            value={standardError !== null ? round(standardError) : "—"}
+            value={standardError !== null ? round(standardError) : "-"}
             mono
-            hint="Shrinks as 1/√n — this is exactly why the blue line's wobble calms down as n grows, not because of any special rule beyond more data averaging out noise."
+            hint="Shrinks as 1/√n - this is exactly why the blue line's wobble calms down as n grows, not because of any special rule beyond more data averaging out noise."
           />
         </div>
       </div>

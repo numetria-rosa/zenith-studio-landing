@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 
 /* The "Show Me the Math" signature feature (course brief section 9): one
    concept, three depths, so a beginner and an advanced student can both use
-   the same page. Level defaults to Intuition — nobody is forced into
+   the same page. Level defaults to Intuition - nobody is forced into
    notation before they've opted in. */
 
 const LEVELS = [

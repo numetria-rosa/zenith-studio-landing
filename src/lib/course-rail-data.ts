@@ -1,7 +1,7 @@
 /* Canonical per-course rail data, mirroring what each course's own
    course-rail.js / course-progress.js define client-side. This is the single
    place route.ts and course-rail-template.ts read from to server-render the
-   sidebar shell — the alternative (duplicating rendered markup into every
+   sidebar shell - the alternative (duplicating rendered markup into every
    HTML file) was rejected because a nav or module change would then require
    editing ~150 files instead of one. The module id/title/file list is
    necessarily duplicated (once here, once in each course's own

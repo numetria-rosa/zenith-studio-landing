@@ -54,11 +54,11 @@ export function MathDetective({ courseId, scenario }: { courseId: string; scenar
 
       <div className="mt-5">
         <div className="mb-2 font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.08em] text-[#5fc2e8]">
-          Phase 1 — The charge sheet
+          Phase 1 - The charge sheet
         </div>
         <p className="mb-3 text-[13px] text-[#9aa0ae]">
           Check every statement below that is actually TRUE. Leave the false ones unchecked. You need every true
-          statement checked and no false ones checked — partial credit isn&apos;t how this works, same as a real
+          statement checked and no false ones checked - partial credit isn&apos;t how this works, same as a real
           investigation.
         </p>
         <div className="flex flex-col gap-2">
@@ -103,8 +103,8 @@ export function MathDetective({ courseId, scenario }: { courseId: string; scenar
         ) : (
           <div className={`mt-3 rounded-lg border p-3 text-[13.5px] font-semibold ${phase1Correct ? "border-[#4ade95]/40 bg-[#4ade95]/5 text-[#4ade95]" : "border-[#ff8585]/40 bg-[#ff8585]/5 text-[#ff8585]"}`}>
             {phase1Correct
-              ? "Exactly right — every true statement flagged, no false ones. Phase 2 is unlocked below."
-              : "Not quite — check the per-item feedback above, then try again. Every true statement must be checked, with none of the false ones."}
+              ? "Exactly right - every true statement flagged, no false ones. Phase 2 is unlocked below."
+              : "Not quite - check the per-item feedback above, then try again. Every true statement must be checked, with none of the false ones."}
             {!phase1Correct && (
               <button type="button" onClick={retryPhase1} className="ml-3 rounded-lg border border-[#ff8585] px-3 py-1 text-[12px] hover:bg-[#ff8585]/10">
                 ↺ Retry
@@ -117,10 +117,10 @@ export function MathDetective({ courseId, scenario }: { courseId: string; scenar
       {phase1Unlocked && (
         <div className="mt-6 border-t border-[#232838] pt-5">
           <div className="mb-2 font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.08em] text-[#4ade95]">
-            Phase 2 — The fix
+            Phase 2 - The fix
           </div>
           <p className="mb-3 text-[13px] text-[#9aa0ae]">
-            Pick the version of the original claim that&apos;s actually correct — not a flat denial, not an
+            Pick the version of the original claim that&apos;s actually correct - not a flat denial, not an
             overcorrection, the accurately-qualified version.
           </p>
           <div className="flex flex-col gap-2">

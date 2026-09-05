@@ -8,20 +8,20 @@ minutes: 45
 
 Every classifier you've ever used was almost certainly trained by
 minimizing cross-entropy loss. This module builds up to that formula
-piece by piece — starting from "how surprising is an outcome," through
+piece by piece - starting from "how surprising is an outcome," through
 entropy, to why a confident wrong prediction gets punished so much harder
 than an unsure wrong one. By the end, `H(p, q) = -Σ p(x) log q(x)` will be
 something you built up to, not something thrown at you.
 
 <Objectives items={["Explain what entropy measures, intuitively", "Explain what cross-entropy adds on top of entropy", "Explain why KL divergence is always non-negative", "Explain why cross-entropy loss punishes confident wrong predictions so heavily"]} />
 
-## 9.1 — Surprise, quantified
+## 9.1 - Surprise, quantified
 
-If someone tells you a fair coin landed heads, that's mildly surprising —
+If someone tells you a fair coin landed heads, that's mildly surprising -
 it could easily have been tails. If someone tells you a coin you already
 know is rigged to almost always land heads landed heads, that's barely
 surprising at all. Entropy is the *average* surprise across all possible
-outcomes of a distribution — and it turns out "surprise" has an exact
+outcomes of a distribution - and it turns out "surprise" has an exact
 mathematical form: `-log2(probability)`.
 
 <Callout tone="info" label="Definition">
@@ -31,12 +31,12 @@ zero entropy. A distribution where every outcome is equally likely has the
 maximum possible entropy for that number of outcomes.
 </Callout>
 
-## 9.2 — The Entropy Lab
+## 9.2 - The Entropy Lab
 
 Below are two distributions over 4 categories: the true distribution p,
 and a predicted distribution q you also control.
 
-<Callout tone="predict" label="Before you touch q's sliders — predict">
+<Callout tone="predict" label="Before you touch q's sliders - predict">
 Set q to closely match p. Note the KL divergence. Now drag one of q's
 sliders for a category where p is large all the way down toward its
 minimum. Will KL divergence barely move, or increase sharply?
@@ -46,28 +46,28 @@ minimum. Will KL divergence barely move, or increase sharply?
 
 If you saw KL divergence spike, that's the mathematical content of "don't
 be confidently wrong." A prediction that assigns near-zero probability to
-something that's actually likely gets punished disproportionately — not
+something that's actually likely gets punished disproportionately - not
 by design choice, but as a direct consequence of the logarithm in the
 formula.
 
-## 9.3 — The formal math
+## 9.3 - The formal math
 
 <MathLevelsSection />
 
-## 9.4 — Where this shows up in real machine learning
+## 9.4 - Where this shows up in real machine learning
 
 - **Cross-entropy loss**, used to train the overwhelming majority of
-  classifiers, is exactly `H(p, q)` from this module — p is the true
+  classifiers, is exactly `H(p, q)` from this module - p is the true
   label (as a distribution), q is the model's predicted probabilities.
 - **KL divergence** shows up directly in variational inference, in
   regularizing generative models (like VAEs), and any time two probability
   distributions need to be compared.
 - **Model calibration**: a well-calibrated model's predicted probabilities
-  should genuinely reflect real-world frequencies — this module's math is
+  should genuinely reflect real-world frequencies - this module's math is
   exactly what's being measured when someone checks "is this model
   overconfident?"
 
-## 9.5 — A failure mode this prevents
+## 9.5 - A failure mode this prevents
 
 <Callout tone="warning" label="Common mistake: treating all wrong predictions as equally bad">
 A model that says "60% dog" when the answer was cat is wrong, but only
@@ -75,7 +75,7 @@ mildly surprised by it. A model that says "99.9% dog" when the answer was
 cat is dramatically more wrong, in the specific information-theoretic
 sense this module quantifies. Two models with the same "accuracy" (percent
 correct) can have very different cross-entropy losses if one tends to be
-confidently wrong while the other is only mildly wrong — and cross-entropy,
+confidently wrong while the other is only mildly wrong - and cross-entropy,
 not accuracy, is usually the more honest signal for how well-calibrated
 a model's confidence actually is.
 </Callout>
