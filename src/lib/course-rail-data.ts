@@ -246,8 +246,8 @@ export const COURSE_RAIL_DATA: Record<string, CourseRailData> = {
      Next.js pages under /lab/math-for-ml/learn, not the static contentDir
      route, but this data still backs both the marketing page's "Inside the
      course" section and the real in-course sidebar (CourseRail.tsx) exactly
-     like every static course above. Only Module 1 is real content — this
-     list is only extended as modules are actually built, on purpose. */
+     like every static course above. All 11 modules, Foundation Bridge,
+     diagnostic, practice library, projects, and capstone are real content. */
   "math-for-ml": {
     title: "Mathematics for Machine Learning",
     hasModuleZero: true,

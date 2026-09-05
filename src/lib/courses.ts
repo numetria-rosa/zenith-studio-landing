@@ -133,19 +133,21 @@ export const COURSES: Course[] = [
     description:
       "From mathematical foundations to understanding how modern machine learning actually works: vectors, transformations, PCA, calculus and optimization, probability, information theory, and the math behind neural networks and attention. Built as a real interactive computational lab, not a video series. No prior calculus or linear algebra required.",
     thumbnail: "/lab/math-for-ml.webp",
-    whopAccessPassId: "",
-    whopPlanId: "",
-    checkoutUrl: "",
+    whopAccessPassId: "prod_OKFbmWkhFm7rS",
+    whopPlanId: "plan_3kAXjmfXopjpa",
+    checkoutUrl: "https://whop.com/checkout/plan_3kAXjmfXopjpa",
     renderMode: "react",
     lessonManifest: "content/react-courses/math-for-ml/lessons.ts",
     waitlistUrl:
       "mailto:zenith.studio.s@outlook.com?subject=Zenith%20Lab%20Waitlist&body=Hi%20Zenith%20Studio%2C%0A%0AI'd%20like%20to%20join%20the%20waitlist%20for%3A%20Mathematics%20for%20Machine%20Learning%0A",
     // Built as the flagship pilot of the "react" render mode (see
     // if-we-work-on-adaptive-raccoon.md and MATH_FOR_ML_CURRICULUM_RESEARCH.md).
-    // Only Module 1 ("Thinking in Vectors") is real content so far — kept
-    // unpublished and without Whop ids until the course is actually ready to
-    // sell. Do not flip published:true or add real Whop ids until then.
-    published: false,
+    // All 11 modules, Foundation Bridge, diagnostic, practice library,
+    // projects, and capstone are real content. Real Whop product/plan
+    // created 2026-09-05 (prod_OKFbmWkhFm7rS / plan_3kAXjmfXopjpa),
+    // $21.25 (75% off $85) through Sept 7, matching the other 4 courses'
+    // launch-sale deadline. See scripts/create-math-for-ml-whop-product.mjs.
+    published: true,
   },
 ];
 

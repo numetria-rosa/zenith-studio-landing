@@ -509,6 +509,158 @@ export const courses: CourseCard[] = [
     ],
   },
   {
+    id: "math-for-ml",
+    name: "Mathematics for Machine Learning",
+    category: "ai",
+    categoryLabel: "Math for Machine Learning",
+    hook: "The linear algebra, calculus, probability, and information theory behind every ML model, built up from a slider you can drag, not a proof you're told to trust.",
+    available: true,
+    level: "Beginner, no prior calculus or linear algebra required",
+    duration: "11 modules, self-paced",
+    practiceTasks: 35,
+    portfolioProjects: 5,
+    hasCapstone: true,
+    price: "$21.25",
+    originalPrice: "$85",
+    discountPercent: 75,
+    discountDeadline: "2026-09-07T23:59:59-00:00",
+    summary:
+      "From vectors to attention: build the real mathematical foundations behind machine learning in a computational lab, not a video series — drag a slider and watch entropy, gradients, and attention weights actually change.",
+    whatYoullDo: [
+      "See a vector as a direction, not just a list of numbers, and use that to measure similarity",
+      "Watch a matrix transform space and recognize it as a neural network layer",
+      "Find the directions that matter most in correlated data with PCA",
+      "Compute a gradient and use it to train a model with gradient descent",
+      "Reason honestly about probability, sampling, and confidence",
+      "Derive why cross-entropy loss looks the way it does, from maximum likelihood",
+      "Build a real neuron's forward and backward pass by hand",
+      "Compute scaled dot-product attention, the mechanism behind every transformer",
+    ],
+    topics: [
+      "Linear Algebra",
+      "Calculus",
+      "Optimization",
+      "Probability",
+      "Statistics",
+      "Information Theory",
+      "Neural Networks",
+      "Attention",
+    ],
+    facts: [
+      "A vector's direction, not its raw numbers, is what most ML similarity measures actually compare.",
+      "\"Training a model\" is almost always \"repeatedly asking a gradient which way is uphill, and stepping the other way.\"",
+      "Cross-entropy loss, used to train most classifiers, is the same formula this course builds up from scratch.",
+      "Scaled dot-product attention, the core of every transformer, is the same dot product from Module 1.",
+      "PCA, dimensionality reduction, and part of how attention works all come back to the same eigenvector question.",
+    ],
+    careerPath:
+      "The math fluency to read a paper, a training curve, or a model architecture and actually reason about it, whether you're headed into ML engineering, data science, or research. Not a certification, no job guarantee.",
+    curriculum: [
+      {
+        title: "Orientation",
+        description:
+          "No calculus, linear algebra, or statistics required going in — just curiosity and a willingness to drag a slider before worrying about the formula underneath it.",
+      },
+      {
+        title: "Thinking in Vectors",
+        description:
+          "A vector is not a list of numbers, it's an arrow with a direction — and comparing two arrows' directions is how machines decide whether two things are similar.",
+      },
+      {
+        title: "Transforming Data",
+        description:
+          "A matrix is a machine that transforms every point in space the same way — once you see that, y = Wx + b in a neural network layer stops being mysterious.",
+      },
+      {
+        title: "Finding the Important Directions",
+        description:
+          "Given a cloud of correlated data, which direction actually matters most? Eigenvectors and eigenvalues answer that, and the answer reappears everywhere from PCA to attention.",
+      },
+      {
+        title: "Mathematics of Change",
+        description:
+          "The derivative and its multivariable cousin, the gradient, are the entire mechanism behind how a model learns anything at all.",
+      },
+      {
+        title: "How Models Learn",
+        description:
+          "Gradient descent turns the gradient into an algorithm: start somewhere, take a step downhill, repeat — and this module shows exactly what happens when the learning-rate dial is set wrong.",
+      },
+      {
+        title: "Reasoning Under Uncertainty",
+        description:
+          "A model's \"87% confidence\" is a probability statement — this module builds what that actually promises (and doesn't) from the simplest possible example, a biased coin.",
+      },
+      {
+        title: "Learning From Data",
+        description:
+          "If you drew a different sample of the same size, how different would the average likely be? The Central Limit Theorem is why sample averages can be trusted at all.",
+      },
+      {
+        title: "Probability Meets Machine Learning",
+        description:
+          "Fitting a model to data is choosing the parameters that make the observed data most plausible — maximum likelihood estimation, the reason common loss functions look the way they do.",
+      },
+      {
+        title: "Information and Loss",
+        description:
+          "Built up piece by piece from \"how surprising is an outcome\" to cross-entropy loss, the exact formula behind almost every classifier you've ever used.",
+      },
+      {
+        title: "The Mathematics of a Neural Network",
+        description:
+          "Every previous module fuses into one working system: a real neuron's forward pass, loss, and backward pass, small enough to compute by hand.",
+      },
+      {
+        title: "The Math Behind Attention",
+        description:
+          "The reward module — the dot product, softmax, and everything before it come together in scaled dot-product attention, the core computation behind every large language model.",
+      },
+    ],
+    stages: [
+      { label: "Stage 1", title: "Thinking in vectors", moduleTitles: ["Thinking in Vectors"] },
+      { label: "Stage 2", title: "Transforming data", moduleTitles: ["Transforming Data"] },
+      { label: "Stage 3", title: "Finding the important directions", moduleTitles: ["Finding the Important Directions"] },
+      { label: "Stage 4", title: "Mathematics of change", moduleTitles: ["Mathematics of Change"] },
+      { label: "Stage 5", title: "Optimization", moduleTitles: ["How Models Learn"] },
+      { label: "Stage 6", title: "Probability", moduleTitles: ["Reasoning Under Uncertainty"] },
+      { label: "Stage 7", title: "Statistics", moduleTitles: ["Learning From Data"] },
+      { label: "Stage 8", title: "Probability meets ML", moduleTitles: ["Probability Meets Machine Learning"] },
+      { label: "Stage 9", title: "Information and loss", moduleTitles: ["Information and Loss"] },
+      { label: "Stage 10", title: "Deep learning mathematics", moduleTitles: ["The Mathematics of a Neural Network"] },
+      { label: "Stage 11", title: "Modern ML connections", moduleTitles: ["The Math Behind Attention"] },
+    ],
+    moduleMinutes: {
+      "Thinking in Vectors": 45,
+      "Transforming Data": 50,
+      "Finding the Important Directions": 55,
+      "Mathematics of Change": 50,
+      "How Models Learn": 45,
+      "Reasoning Under Uncertainty": 45,
+      "Learning From Data": 45,
+      "Probability Meets Machine Learning": 45,
+      "Information and Loss": 45,
+      "The Mathematics of a Neural Network": 55,
+      "The Math Behind Attention": 45,
+    },
+    labBadgeColor: { bg: "#8b7cf6", text: "#17102e" },
+    projectSamples: [
+      { title: "Similarity Engine", tag: "Vectors & dot products" },
+      { title: "PCA Explorer", tag: "Eigenvectors & dimensionality reduction" },
+      { title: "Gradient Descent From Scratch", tag: "Calculus & optimization" },
+      { title: "Probability Simulator", tag: "Probability & sampling" },
+      { title: "Neural Network From Scratch", tag: "Forward & backward pass" },
+    ],
+    includes: [
+      "Orientation plus 11 sequential modules, each with a real computational lab (real math, not precomputed animations)",
+      "A Foundation Bridge (optional): algebra, graphs, and notation for anyone rusty on the prerequisites",
+      "A non-gating Skill Diagnostic that links weak areas straight to the relevant Foundation lesson",
+      "A 35-task Practice Library and Math Detective (investigate a flawed ML claim, two-phase grading)",
+      "5 projects plus a capstone that synthesizes the whole course into one small ML system",
+      "Animated guided tours, progressive hints, and Socratic quiz follow-ups on the modules that need them most",
+    ],
+  },
+  {
     id: "ai-automation",
     name: "AI Automation",
     category: "automation",

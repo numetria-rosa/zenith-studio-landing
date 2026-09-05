@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 2000px;
+    height: 1125px;
+    background: #0a0b0f;
+    overflow: hidden;
+  }
+
+  .card {
+    position: relative;
+    width: 2000px;
+    height: 1125px;
+    background: #0a0b0f;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: #eef0f5;
+  }
+
+  /* faint grid */
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  /* accent glow, bottom-left */
+  .glow {
+    position: absolute;
+    left: -200px;
+    bottom: -300px;
+    width: 900px;
+    height: 900px;
+    background: radial-gradient(circle, rgba(139,124,246,0.22) 0%, rgba(139,124,246,0.07) 40%, transparent 70%);
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    padding: 92px 100px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-zenith {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: 0.02em;
+    color: #eef0f5;
+  }
+  .brand-lab {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: 0.02em;
+    background: #8b7cf6;
+    color: #17102e;
+    padding: 2px 14px;
+    border-radius: 6px;
+  }
+
+  .eyebrow {
+    margin-top: 44px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8b7cf6;
+  }
+
+  .title {
+    margin-top: 18px;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 108px;
+    line-height: 1.05;
+    letter-spacing: -0.005em;
+    color: #f7f8fa;
+  }
+
+  .subhead {
+    margin-top: 34px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 30px;
+    color: #9aa3b2;
+  }
+
+  .tags {
+    margin-top: 56px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .tag {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 24px;
+    color: #c7cbd6;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 16px 30px;
+    line-height: 1.25;
+    max-width: 260px;
+    text-align: left;
+  }
+  .tag.highlight {
+    color: #8b7cf6;
+    font-weight: 700;
+    background: rgba(139,124,246,0.12);
+    border-color: rgba(139,124,246,0.55);
+    max-width: 300px;
+  }
+
+  .bottom-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 10px;
+    background: #8b7cf6;
+  }
+
+  /* --- vectors -> matrix -> neuron graphic --- */
+  .graphic {
+    position: absolute;
+    right: 90px;
+    top: 300px;
+    width: 780px;
+    height: 560px;
+  }
+  .node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 999px;
+    background: #11151c;
+    border: 2px solid rgba(255,255,255,0.16);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    color: #d7dbe4;
+  }
+  .node .sub { font-size: 15px; font-weight: 400; color: #8b93a6; margin-top: 2px; }
+  .node.vector { width: 150px; height: 150px; font-size: 24px; left: 0; top: 30px; }
+  .node.matrix { width: 140px; height: 140px; font-size: 22px; left: 210px; top: 220px; }
+  .node.neuron { width: 200px; height: 200px; font-size: 30px; left: 460px; top: 130px; border-color: #8b7cf6; box-shadow: 0 0 0 1px rgba(139,124,246,0.3), 0 0 60px rgba(139,124,246,0.18); color: #8b7cf6; }
+  .node.attn { width: 140px; height: 140px; font-size: 20px; left: 350px; top: 400px; }
+
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .matrix-grid span {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    background: rgba(139,124,246,0.35);
+  }
+  .matrix-grid span:nth-child(2) { background: rgba(255,255,255,0.12); }
+  .matrix-grid span:nth-child(3) { background: rgba(255,255,255,0.12); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="grid"></div>
+    <div class="glow"></div>
+    <div class="content">
+      <div class="brand-row">
+        <span class="brand-zenith">ZENITH</span>
+        <span class="brand-lab">LAB</span>
+      </div>
+
+      <div class="eyebrow">ZENITH LAB &middot; 11 MODULE COURSE</div>
+      <div class="title">Mathematics for<br />Machine Learning</div>
+      <div class="subhead">Vectors to attention &middot; a real interactive lab</div>
+
+      <div class="tags">
+        <div class="tag">Linear Algebra</div>
+        <div class="tag">Calculus</div>
+        <div class="tag">Probability</div>
+        <div class="tag highlight">Built for zero background</div>
+      </div>
+    </div>
+
+    <div class="graphic">
+      <svg width="780" height="560" style="position:absolute;left:0;top:0;overflow:visible;">
+        <line x1="150" y1="105" x2="255" y2="255" stroke="rgba(255,255,255,0.28)" stroke-width="2" />
+        <line x1="350" y1="290" x2="465" y2="235" stroke="#8b7cf6" stroke-width="2.5" />
+        <line x1="490" y1="330" x2="420" y2="400" stroke="rgba(255,255,255,0.28)" stroke-width="2" />
+        <path d="M 560 130 C 650 40, 720 90, 700 220" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-dasharray="6 8" />
+        <text x="590" y="60" font-family="IBM Plex Mono, monospace" font-size="16" fill="#8b93a6">gradient descent</text>
+      </svg>
+      <div class="node vector">v<span class="sub">vector</span></div>
+      <div class="node matrix">
+        <div class="matrix-grid"><span></span><span></span><span></span><span></span></div>
+        <span class="sub" style="margin-top:0;">matrix</span>
+      </div>
+      <div class="node neuron">&sigma;(z)<span class="sub" style="color:#8b7cf6;">neuron</span></div>
+      <div class="node attn">softmax<span class="sub">attention</span></div>
+    </div>
+
+    <div class="bottom-bar"></div>
+  </div>
+</body>
+</html>
