@@ -1,6 +1,6 @@
 import type { PracticeTask } from "./types";
 
-/* 35 real practice tasks across all 11 modules - distinct from each
+/* 57 real practice tasks across all 11 modules - distinct from each
    module's checkpoint quiz (different questions, different framing),
    giving students repeated exposure beyond the one pass/fail gate.
    Calculation tasks are graded by real arithmetic (a numeric answer plus
@@ -56,6 +56,30 @@ export const PRACTICE_TASKS: PracticeTask[] = [
     ],
   },
 
+  {
+    id: "m1-calc-cossim",
+    moduleId: 1,
+    type: "calculation",
+    given: "a = (1, 0), b = (1, 1)",
+    prompt: "Compute cos(θ) between a and b, rounded to 4 decimal places.",
+    answer: 0.7071,
+    tolerance: 0.001,
+    hint: "cos(θ) = (a·b) / (‖a‖‖b‖).",
+    explanation: "a·b = 1. ‖a‖=1, ‖b‖=√2. cos(θ) = 1/√2 ≈ 0.7071.",
+  },
+  {
+    id: "m1-decision-search",
+    moduleId: 1,
+    type: "decision",
+    given: "You're building a document search engine and deciding between ranking by raw dot product or by cosine similarity.",
+    prompt: "Which should you pick, and why?",
+    options: [
+      { text: "Cosine similarity - it removes the bias where longer documents (bigger embedding magnitude) would otherwise rank higher purely for being long", correct: true, feedback: "Correct. This is the exact motivating example from Module 1: raw dot product confounds relevance with magnitude." },
+      { text: "Raw dot product - it's a more complete measurement since it uses more information", correct: false, feedback: "Using more raw information isn't the goal here - dot product's extra sensitivity to magnitude is specifically a bias, not useful signal, for a relevance ranking." },
+      { text: "It doesn't matter - both always produce the same ranking", correct: false, feedback: "They produce the same ranking only when every document embedding has equal magnitude - in general, dot product and cosine similarity can rank documents differently." },
+    ],
+  },
+
   // ---------------- Module 2: Matrices ----------------
   {
     id: "m2-calc-matvec",
@@ -103,6 +127,29 @@ export const PRACTICE_TASKS: PracticeTask[] = [
     ],
   },
 
+  {
+    id: "m2-calc-matvec2",
+    moduleId: 2,
+    type: "calculation",
+    given: "M = [[0, -1], [1, 0]], v = (3, 5)",
+    prompt: "Compute the x-component (first entry) of Mv.",
+    answer: -5,
+    tolerance: 0.01,
+    hint: "The first row of M gives the x-component: (row 1) · v.",
+    explanation: "x-component = (0)(3) + (-1)(5) = -5. (This matrix is a 90° rotation.)",
+  },
+  {
+    id: "m2-interp-columns",
+    moduleId: 2,
+    type: "interpretation",
+    prompt: "A matrix's two columns are (1, 0) and (0, 1) - the identity matrix. What does it do to any input vector?",
+    options: [
+      { text: "Leaves it completely unchanged - every point maps to itself", correct: true, feedback: "Correct. Mv = x·(1,0) + y·(0,1) = (x, y), the original point exactly." },
+      { text: "Reflects it across the origin", correct: false, feedback: "A reflection would require negative entries somewhere - the identity matrix's columns produce no change at all." },
+      { text: "Scales it by the number of dimensions", correct: false, feedback: "There's no scaling here - each column has a single 1 and a single 0, which reconstructs the input exactly, not a scaled version of it." },
+    ],
+  },
+
   // ---------------- Module 3: PCA ----------------
   {
     id: "m3-interp-varexplained",
@@ -139,6 +186,30 @@ export const PRACTICE_TASKS: PracticeTask[] = [
     ],
   },
 
+  {
+    id: "m3-calc-varexplained",
+    moduleId: 3,
+    type: "calculation",
+    given: "A covariance matrix has eigenvalues λ1 = 9 and λ2 = 1",
+    prompt: "What percentage of variance does PC1 explain? (Enter as a number, e.g. 50 for 50%.)",
+    answer: 90,
+    tolerance: 0.5,
+    hint: "Variance explained by PC1 = λ1 / (λ1 + λ2), then convert to a percentage.",
+    explanation: "9 / (9+1) = 0.9 = 90%.",
+  },
+  {
+    id: "m3-debug-eigenvector",
+    moduleId: 3,
+    type: "debugging",
+    given: "A student claims: \"Rotating the data cloud by 45° will change the eigenvalues, since the data now looks different.\"",
+    prompt: "What's wrong with this claim?",
+    options: [
+      { text: "Eigenvalues measure the data's own spread, which doesn't change under rotation - only the eigenvectors' directions rotate along with the data", correct: true, feedback: "Correct. Rotation is a rigid transformation - it preserves all distances and variances, changing only orientation." },
+      { text: "Nothing - rotating data always changes its eigenvalues", correct: false, feedback: "Rotation is exactly the one transformation that leaves eigenvalues unchanged - it only relabels which raw axis the spread lines up with." },
+      { text: "Eigenvalues would change, but eigenvectors would stay fixed", correct: false, feedback: "It's the opposite: the eigenVECTORS rotate along with the data (since they track the data's own directions), while the eigenVALUES (the amount of spread) stay the same." },
+    ],
+  },
+
   // ---------------- Module 4: Calculus ----------------
   {
     id: "m4-calc-partial",
@@ -171,6 +242,30 @@ export const PRACTICE_TASKS: PracticeTask[] = [
       { text: "You're at a flat point - a local minimum, maximum, or saddle point of f", correct: true, feedback: "Correct. A zero gradient means no direction increases f - that's the defining condition of a critical point." },
       { text: "The function is undefined there", correct: false, feedback: "A zero gradient is a perfectly well-defined value - it marks a flat point, not an undefined one." },
       { text: "You made a calculation error, since gradients are never exactly zero", correct: false, feedback: "Gradients are exactly zero at genuine critical points - for example, the origin for f(x,y)=x²+y²." },
+    ],
+  },
+
+  {
+    id: "m4-calc-partialy",
+    moduleId: 4,
+    type: "calculation",
+    given: "f(x, y) = x² + 3y², at the point y = 2",
+    prompt: "Compute ∂f/∂y at that point.",
+    answer: 12,
+    tolerance: 0.01,
+    hint: "∂f/∂y = 6y, holding x fixed.",
+    explanation: "∂f/∂y = 6y = 6(2) = 12.",
+  },
+  {
+    id: "m4-decision-onepartial",
+    moduleId: 4,
+    type: "decision",
+    given: "You compute ∂f/∂x = 0 at a point, but haven't checked ∂f/∂y yet.",
+    prompt: "Can you already conclude this point is a flat point (local min/max) of f?",
+    options: [
+      { text: "No - a true flat point requires the FULL gradient (0,0), so ∂f/∂y must also be checked before concluding anything", correct: true, feedback: "Correct. One zero partial derivative alone doesn't guarantee flatness in every direction." },
+      { text: "Yes - one zero partial derivative is enough to guarantee a flat point", correct: false, feedback: "This is a common shortcut error - the surface could still be sloped in the y-direction even with ∂f/∂x = 0." },
+      { text: "It depends on whether f is a polynomial", correct: false, feedback: "The requirement (both partials must be zero) applies to any differentiable multivariable function, not just polynomials." },
     ],
   },
 
@@ -211,6 +306,29 @@ export const PRACTICE_TASKS: PracticeTask[] = [
     ],
   },
 
+  {
+    id: "m5-calc-step2",
+    moduleId: 5,
+    type: "calculation",
+    given: "x = 10, ∂L/∂x = 4, learning rate η = 0.25",
+    prompt: "Compute x_new after one gradient descent step.",
+    answer: 9,
+    tolerance: 0.01,
+    hint: "x_new = x − η · (∂L/∂x).",
+    explanation: "x_new = 10 − (0.25)(4) = 10 − 1 = 9.",
+  },
+  {
+    id: "m5-interp-toosmall",
+    moduleId: 5,
+    type: "interpretation",
+    prompt: "You lower the learning rate a lot, and training becomes extremely slow but never oscillates or diverges. What does this indicate?",
+    options: [
+      { text: "The learning rate is now safely stable, but small enough that convergence just takes a very long time - a speed issue, not a stability one", correct: true, feedback: "Correct. Stable-but-slow and unstable-but-fast are the two opposite failure directions of this same dial." },
+      { text: "Training has completely stopped and something is broken", correct: false, feedback: "Slow, steady progress is a real working state of gradient descent - just an inefficient choice of learning rate, not a malfunction." },
+      { text: "The learning rate must actually be too large, not too small", correct: false, feedback: "Oscillation and divergence are the signatures of too LARGE a rate - painfully slow, stable progress points the opposite way, toward too small a rate." },
+    ],
+  },
+
   // ---------------- Module 6: Probability ----------------
   {
     id: "m6-calc-expectation",
@@ -244,6 +362,30 @@ export const PRACTICE_TASKS: PracticeTask[] = [
       { text: "Each flip is independent - the coin has no memory, so the next flip is still exactly 50/50 regardless of the streak", correct: true, feedback: "Correct - this is the gambler's fallacy, a very common and specifically named reasoning error." },
       { text: "Nothing is wrong - the student is applying the law of large numbers correctly", correct: false, feedback: "The law of large numbers describes long-run averages over MANY flips, not a correction on the very next flip - it doesn't imply any single flip 'owes' a different outcome." },
       { text: "Tails is actually less likely now, not more", correct: false, feedback: "Independence means the next flip's probability doesn't change in either direction based on the streak - it stays exactly 50/50." },
+    ],
+  },
+
+  {
+    id: "m6-calc-se",
+    moduleId: 6,
+    type: "calculation",
+    given: "A fair coin, p = 0.5, flipped n = 64 times",
+    prompt: "Compute the standard error of the running average, √(p(1-p)/n).",
+    answer: 0.0625,
+    tolerance: 0.001,
+    hint: "First compute p(1-p), then divide by n, then take the square root.",
+    explanation: "√(0.25/64) = √0.00390625 = 0.0625.",
+  },
+  {
+    id: "m6-decision-confidence",
+    moduleId: 6,
+    type: "decision",
+    given: "A single model prediction is reported as \"87% confident.\"",
+    prompt: "What's the most honest way to interpret this number for THIS one prediction?",
+    options: [
+      { text: "It describes long-run behavior across many similar predictions - it isn't a guarantee that this specific case is 87% likely to be correct in some checkable sense", correct: true, feedback: "Correct. Confidence scores are calibrated in aggregate, not as a per-instance certainty guarantee." },
+      { text: "It means the model will be correct exactly 87% of the time on every future input, forever", correct: false, feedback: "A single confidence score says nothing about overall future accuracy across a different distribution of future inputs." },
+      { text: "It's meaningless since it's just one prediction", correct: false, feedback: "It's not meaningless - it's a real probability statement, just one that only fully cashes out in aggregate across many predictions, not as a single-case guarantee." },
     ],
   },
 
@@ -283,6 +425,30 @@ export const PRACTICE_TASKS: PracticeTask[] = [
     ],
   },
 
+  {
+    id: "m7-calc-se2",
+    moduleId: 7,
+    type: "calculation",
+    given: "Population standard deviation σ = 15, sample size n = 9",
+    prompt: "Compute the standard error of the sample mean.",
+    answer: 5,
+    tolerance: 0.01,
+    hint: "SE = σ / √n.",
+    explanation: "SE = 15 / √9 = 15 / 3 = 5.",
+  },
+  {
+    id: "m7-debug-causation",
+    moduleId: 7,
+    type: "debugging",
+    given: "A report states: \"Cities with more fire trucks have more fire damage, so fire trucks must be causing the damage.\"",
+    prompt: "What's the flaw in this conclusion?",
+    options: [
+      { text: "A confounding variable (fire severity/city size) likely drives both the number of fire trucks dispatched AND the damage - correlation alone doesn't establish that trucks cause damage", correct: true, feedback: "Correct - the classic confounding-variable pattern: bigger fires need more trucks AND cause more damage." },
+      { text: "The conclusion is correct - fire trucks clearly cause the damage they respond to", correct: false, feedback: "This reverses the more plausible causal direction - the fire's severity is a shared cause of both more trucks being sent and more damage occurring." },
+      { text: "There's no way to explain this correlation at all", correct: false, feedback: "There's a very plausible confounding explanation (fire severity) - it isn't an unexplainable coincidence." },
+    ],
+  },
+
   // ---------------- Module 8: Likelihood ----------------
   {
     id: "m8-calc-mle-mean",
@@ -319,6 +485,30 @@ export const PRACTICE_TASKS: PracticeTask[] = [
     ],
   },
 
+  {
+    id: "m8-calc-mle-mean2",
+    moduleId: 8,
+    type: "calculation",
+    given: "Data: 10, 12, 14 (assumed drawn from a Gaussian)",
+    prompt: "What is the maximum likelihood estimate for μ?",
+    answer: 12,
+    tolerance: 0.01,
+    hint: "For a Gaussian, the MLE for μ is just the sample mean.",
+    explanation: "Sample mean = (10+12+14)/3 = 36/3 = 12.",
+  },
+  {
+    id: "m8-debug-truth",
+    moduleId: 8,
+    type: "debugging",
+    given: "A student says: \"Model A has higher likelihood than Model B, so Model A must be the actual true model that generated this data.\"",
+    prompt: "What's wrong with this claim?",
+    options: [
+      { text: "Higher likelihood only means Model A's parameters make the observed data more probable than Model B's do - it doesn't certify that Model A is the true underlying process", correct: true, feedback: "Correct. Likelihood is a relative, data-dependent comparison between the specific models tested, not an absolute proof of truth." },
+      { text: "Nothing is wrong - the highest-likelihood model is always the true one", correct: false, feedback: "This overstates what likelihood proves - it ranks candidate models against each other on this data, without guaranteeing either one is the actual generating process." },
+      { text: "Likelihood can't be used to compare models at all", correct: false, feedback: "Comparing likelihoods between models is a valid and common practice - the error is specifically claiming this proves 'truth,' not that comparison itself is invalid." },
+    ],
+  },
+
   // ---------------- Module 9: Information ----------------
   {
     id: "m9-calc-entropy-fair",
@@ -351,6 +541,30 @@ export const PRACTICE_TASKS: PracticeTask[] = [
       { text: "You can never predict better than the truth's own inherent unpredictability - only match it exactly (when q=p) or do worse", correct: true, feedback: "Correct - this follows from Jensen's inequality, and is exactly why cross-entropy loss has a natural floor at the true entropy." },
       { text: "It isn't always true - H(p,q) can be smaller than H(p) if q is a good enough predictor", correct: false, feedback: "H(p,q) ≥ H(p) is a mathematical guarantee for any q, not something a sufficiently good prediction can break." },
       { text: "H(p,q) and H(p) are unrelated quantities that just happen to look similar", correct: false, feedback: "They're directly related - H(p,q) - H(p) is exactly the KL divergence, a non-negative quantity by construction." },
+    ],
+  },
+
+  {
+    id: "m9-calc-entropy-loaded",
+    moduleId: 9,
+    type: "calculation",
+    given: "A loaded coin: p = 0.9, 0.1",
+    prompt: "Compute H(p) in bits (round to 2 decimal places).",
+    answer: 0.47,
+    tolerance: 0.02,
+    hint: "H(p) = -Σ pᵢ log₂ pᵢ. Compute each term separately, then add.",
+    explanation: "H(p) = -(0.9·log₂0.9 + 0.1·log₂0.1) ≈ -(0.9·(-0.152) + 0.1·(-3.32)) ≈ 0.137 + 0.332 ≈ 0.47 bits - much less than the fair coin's 1 bit, since this coin is far more predictable.",
+  },
+  {
+    id: "m9-decision-asymmetric",
+    moduleId: 9,
+    type: "decision",
+    given: "You need to score how far a model's predicted distribution q is from the true label distribution p.",
+    prompt: "Should D_KL(p‖q) and D_KL(q‖p) be expected to give the same number?",
+    options: [
+      { text: "No - KL divergence is asymmetric; the two versions penalize different kinds of mismatch and generally give different values", correct: true, feedback: "Correct. D_KL(p‖q) heavily penalizes q assigning low probability where p is large; D_KL(q‖p) penalizes the reverse case." },
+      { text: "Yes - KL divergence is always symmetric, like a true distance", correct: false, feedback: "KL divergence is specifically NOT symmetric - that's exactly why it's called a 'divergence' rather than a 'distance.'" },
+      { text: "They're always exactly opposite in sign", correct: false, feedback: "Both D_KL(p‖q) and D_KL(q‖p) are always non-negative - they're just generally different positive numbers, not opposite-signed." },
     ],
   },
 
@@ -390,6 +604,29 @@ export const PRACTICE_TASKS: PracticeTask[] = [
     ],
   },
 
+  {
+    id: "m10-calc-forward2",
+    moduleId: 10,
+    type: "calculation",
+    given: "x1 = 1, x2 = 3, w1 = 1, w2 = -1, b = 0.5",
+    prompt: "Compute z = w1·x1 + w2·x2 + b.",
+    answer: -1.5,
+    tolerance: 0.01,
+    hint: "Plug directly into the weighted-sum formula.",
+    explanation: "z = (1)(1) + (-1)(3) + 0.5 = 1 - 3 + 0.5 = -1.5.",
+  },
+  {
+    id: "m10-interp-bias",
+    moduleId: 10,
+    type: "interpretation",
+    prompt: "What would happen to a neuron's outputs across all inputs if it had no bias term at all?",
+    options: [
+      { text: "Whenever every input is exactly 0, z would always be forced to exactly 0 too, regardless of the weights - the bias is what lets the neuron activate (or not) independent of the inputs", correct: true, feedback: "Correct. Without b, z = w1x1 + w2x2 always equals 0 when x1=x2=0, no matter what the weights are." },
+      { text: "The neuron would compute the exact same outputs either way - bias has no real effect", correct: false, feedback: "Bias directly shifts z up or down for every input - removing it measurably changes the neuron's output, especially near an all-zero input." },
+      { text: "The neuron would only be able to output negative numbers", correct: false, feedback: "Removing the bias doesn't restrict the sign of z - it just removes one specific constant shift from the weighted sum." },
+    ],
+  },
+
   // ---------------- Module 11: Attention ----------------
   {
     id: "m11-calc-score",
@@ -423,6 +660,30 @@ export const PRACTICE_TASKS: PracticeTask[] = [
       { text: "Yes - and it matters MORE at high dimensions, since unscaled dot-product variance grows with d, pushing softmax toward an unstable near-one-hot distribution", correct: true, feedback: "Correct - √d scaling is a real fix for a problem that gets worse, not better, as dimension increases." },
       { text: "No - scaling was only needed for the small 2D teaching example", correct: false, feedback: "The opposite is true: scaling matters more, not less, at realistic (high) dimensions, which is exactly why production transformers use it." },
       { text: "It doesn't matter either way", correct: false, feedback: "Skipping the scaling at high dimensions can make softmax nearly all-or-nothing and gradients vanish - a real, documented training problem." },
+    ],
+  },
+
+  {
+    id: "m11-calc-score2",
+    moduleId: 11,
+    type: "calculation",
+    given: "query q = (0, 2), key k = (1, 1), dimension d = 4",
+    prompt: "Compute the scaled attention score, (q · k) / √d.",
+    answer: 1,
+    tolerance: 0.02,
+    hint: "First compute the dot product, then divide by √d.",
+    explanation: "q · k = (0)(1) + (2)(1) = 2. Scaled: 2 / √4 = 2 / 2 = 1.",
+  },
+  {
+    id: "m11-debug-equalscores",
+    moduleId: 11,
+    type: "debugging",
+    given: "A student says: \"Two keys with identical dot-product scores against the same query will end up with different attention weights after softmax, since softmax always favors whichever score it sees first.\"",
+    prompt: "What's wrong with this claim?",
+    options: [
+      { text: "Softmax has no concept of input order - equal scores always produce exactly equal output weights, with no first-seen advantage", correct: true, feedback: "Correct. softmax(x_i) depends only on the numeric value of x_i relative to the others, never on list position." },
+      { text: "Nothing is wrong - softmax does favor earlier-listed scores", correct: false, feedback: "There is no such tie-breaking rule in the softmax formula - it's a pure function of the numeric scores." },
+      { text: "Equal scores actually produce weights of exactly 0 for both", correct: false, feedback: "Equal nonzero scores produce equal, generally nonzero shares of the total probability - they don't cancel to zero." },
     ],
   },
 ];
