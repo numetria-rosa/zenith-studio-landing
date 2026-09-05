@@ -40,6 +40,12 @@ export function BriefSection() {
       courseId="math-for-ml"
       projectId="capstone"
       objective="Build, train, and evaluate the mathematics behind a genuine (if tiny) machine learning system end to end - data representation, a model transformation, a real loss, optimization, a probability interpretation, and an evaluation metric - and be able to explain every stage."
+      buildSteps={[
+        "Before training, look at the reset (untrained) state and note the starting accuracy - it should be around 50%, not 100%, since the reset weights are deliberately chosen to start the model wrong.",
+        "Train to 100% accuracy, tracking loss and accuracy every 5 steps as you go, rather than only checking at the very end.",
+        "Once trained, work through the probability-interpretation and weight-magnitude questions using the final, converged state.",
+        "Write the cross-module synthesis last, once every other piece is fresh from having just worked through it.",
+      ]}
       requirements={[
         "Reset the workspace, then train it (Step repeatedly) until accuracy reaches 100% and every point's red 'misclassified' ring disappears",
         "Record the loss and accuracy every 5 steps until convergence, and note how many steps it took",
@@ -66,6 +72,13 @@ export function BriefSection() {
         "Gradient descent",
         "Probability interpretation",
         "Evaluation (accuracy)",
+      ]}
+      walkthrough={[
+        "The starting accuracy near 50% is deliberate, not a bug - it means training actually has real work to do, unlike a lucky starting point that's already correct by coincidence.",
+        "Watch loss and accuracy together, not just one: loss can keep decreasing smoothly even after accuracy already hit 100%, since the model can keep becoming more CONFIDENT in already-correct predictions.",
+        "A single point's predicted probability (like 0.92) describes THIS model's confidence on THIS input given its current weights - it is not the same claim as 'the model is right 92% of the time,' which is an aggregate statement across many predictions (Module 6's distinction).",
+        "The weight with larger magnitude moves z more per unit change in its matching input - visually, the decision boundary tilts more steeply away from the axis belonging to the smaller-magnitude weight.",
+        "A strong synthesis names the specific module for each stage explicitly (e.g. 'the loss function is Module 9's cross-entropy, applied through Module 10's forward pass') rather than describing the pipeline only in general terms.",
       ]}
     />
   );

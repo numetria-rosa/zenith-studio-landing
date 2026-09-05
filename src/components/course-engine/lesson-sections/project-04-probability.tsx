@@ -19,6 +19,12 @@ export function BriefSection() {
       courseId="math-for-ml"
       projectId="probability-simulator"
       objective="Directly compare theoretical predictions (the standard error formula) against real simulated results, and quantify how good the match actually is."
+      buildSteps={[
+        "Before flipping anything, compute the theoretical standard error by hand for n=10, n=100, and n=1000 at your chosen p.",
+        "Then run each n and record the actual empirical probability - resist the urge to peek ahead at larger n before finishing the smaller ones.",
+        "Compare your three actual results to your three theoretical predictions side by side.",
+        "Only after that comparison, run the three repeated n=10 trials to see the variability directly.",
+      ]}
       requirements={[
         "Pick a true probability p, then flip to n=10, n=100, and n=1000, recording the empirical probability at each",
         "At each n, compute the theoretical standard error (σ = √(p(1-p)/n)) by hand and compare it to how far your empirical probability actually was from p",
@@ -37,6 +43,12 @@ export function BriefSection() {
         { key: "explainedReliability", label: "Explained in their own words why more flips gave a more reliable estimate" },
       ]}
       expectedConcepts={["Law of large numbers", "Standard error", "Sampling variability", "Bernoulli trials"]}
+      walkthrough={[
+        "Computing the theoretical prediction BEFORE running the simulation is what makes this a real test rather than a post-hoc story - commit to the number first.",
+        "Don't expect an exact match every time - the standard error is a typical size of deviation, not a guarantee; a single n=10 trial landing outside one SE of p is normal, not a contradiction.",
+        "The three repeated n=10 trials are the most informative part: seeing genuinely different empirical probabilities from the identical setup is the clearest possible demonstration that small-sample noise is real, not a flaw in the simulation.",
+        "A strong reliability explanation names the actual mechanism (SE shrinking with 1/√n), not just 'more data is better' as an unexplained rule of thumb.",
+      ]}
     />
   );
 }

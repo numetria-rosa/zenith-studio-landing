@@ -19,6 +19,12 @@ export function BriefSection() {
       courseId="math-for-ml"
       projectId="pca-explorer"
       objective="Use PCA to make a real, defensible decision: how many dimensions do you actually need to keep, and how do you justify that choice with numbers instead of a guess?"
+      buildSteps={[
+        "At rotation 0°, write down λ1, λ2, and variance-explained before touching the slider further.",
+        "Predict, in writing, whether those three numbers will change at 45° and 90° - then rotate and check.",
+        "Only after confirming what does and doesn't change with rotation, move to picking your variance-explained threshold and writing the justification.",
+        "Save the real-dataset example for last - it's the hardest part, and easier to write well once the numeric parts are settled.",
+      ]}
       requirements={[
         "Set the rotation to 0°, 45°, and 90° and record λ1, λ2, and variance-explained at each",
         "Decide on a variance-explained threshold you'd consider 'safe' to reduce to 1D, and justify your threshold in the reflection",
@@ -37,6 +43,12 @@ export function BriefSection() {
         { key: "realExample", label: "Described a realistic case where PCA's ranking could discard something that matters" },
       ]}
       expectedConcepts={["Eigenvalues", "Variance explained", "Dimensionality reduction", "Rotation invariance"]}
+      walkthrough={[
+        "Rotation invariance is the anchor fact: λ1 and λ2 belong to the data's own shape, not to whichever raw axes happen to be drawn - if your numbers changed across 0°/45°/90°, that's worth double-checking before moving on.",
+        "A defensible threshold isn't a single 'correct' number - it's whatever percentage you can justify against the actual cost of losing that remaining variance for your specific use case.",
+        "The strongest real-dataset example is one where you can name the SPECIFIC low-variance direction and what it represents (like the fraud module's 0.1%-variance signal), not just a vague 'something might get lost.'",
+        "A practitioner writes the justification in terms of consequences ('losing X% variance risks discarding Y'), not just the percentage itself.",
+      ]}
     />
   );
 }

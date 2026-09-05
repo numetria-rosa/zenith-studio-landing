@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ArrowRight, ChevronDown } from "lucide-react";
 import { useProjectProgress } from "./useProjectProgress";
 
 /* Per the brief's own rule (section 18): "Where verification is not
@@ -17,21 +17,33 @@ export function ProjectBrief({
   courseId,
   projectId,
   objective,
+  buildSteps,
   requirements,
   hints,
   rubric,
   expectedConcepts,
+  walkthrough,
 }: {
   courseId: string;
   projectId: string;
   objective: string;
+  /** Optional numbered "do this, then this" sequence shown before the open-
+      ended requirements - a starting path for students who don't yet know
+      where to begin, not a replacement for the requirements themselves. */
+  buildSteps?: string[];
   requirements: string[];
   hints: string[];
   rubric: RubricItem[];
   expectedConcepts: string[];
+  /** Optional "how an experienced practitioner would approach this"
+      reference, revealed on demand after the student has already worked
+      through the project - explicitly not a graded answer key, same
+      student-reported spirit as the rubric above it. */
+  walkthrough?: string[];
 }) {
   const { record, toggleChecklistItem, setReflection, setCompleted } = useProjectProgress(courseId, projectId);
   const [showHints, setShowHints] = useState(false);
+  const [showWalkthrough, setShowWalkthrough] = useState(false);
   const checkedCount = rubric.filter((r) => record.checklist[r.key]).length;
 
   return (
@@ -42,6 +54,22 @@ export function ProjectBrief({
         </div>
         <p className="text-[14.5px] text-[#eeeee7]">{objective}</p>
       </div>
+
+      {buildSteps && buildSteps.length > 0 && (
+        <div>
+          <div className="mb-2 font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.08em] text-[#9aa0ae]">
+            Suggested approach
+          </div>
+          <ol className="flex flex-col gap-1.5">
+            {buildSteps.map((s, i) => (
+              <li key={i} className="relative pl-6 text-[14px] text-[#eeeee7]">
+                <span className="absolute left-0 font-[family-name:var(--font-course-mono)] text-[12px] text-[#8b7cf6]">{i + 1}.</span>
+                {s}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
 
       <div>
         <div className="mb-2 font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.08em] text-[#9aa0ae]">
@@ -119,6 +147,35 @@ export function ProjectBrief({
           className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] p-3 text-[13.5px] text-[#eeeee7] outline-none focus:border-[#8b7cf6]"
         />
       </div>
+
+      {walkthrough && walkthrough.length > 0 && (
+        <div className="rounded-xl border border-[#5fc2e8]/30 bg-[#5fc2e8]/5 p-5">
+          <button
+            type="button"
+            onClick={() => setShowWalkthrough((v) => !v)}
+            className="flex w-full items-center justify-between font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.08em] text-[#5fc2e8]"
+          >
+            Expert walkthrough (read after you&apos;ve tried the project)
+            <ChevronDown size={14} className={`transition-transform ${showWalkthrough ? "rotate-180" : ""}`} aria-hidden />
+          </button>
+          {showWalkthrough && (
+            <>
+              <p className="mb-2 mt-3 text-[12px] text-[#676e7d]">
+                Not a graded answer key - a reference showing how an experienced practitioner would reason through
+                this project, to compare against your own approach.
+              </p>
+              <ol className="flex flex-col gap-1.5">
+                {walkthrough.map((s, i) => (
+                  <li key={i} className="relative pl-6 text-[13.5px] text-[#eeeee7]">
+                    <span className="absolute left-0 font-[family-name:var(--font-course-mono)] text-[12px] text-[#5fc2e8]">{i + 1}.</span>
+                    {s}
+                  </li>
+                ))}
+              </ol>
+            </>
+          )}
+        </div>
+      )}
 
       <div>
         <div className="mb-2 font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.08em] text-[#9aa0ae]">
