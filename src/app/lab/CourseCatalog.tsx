@@ -565,8 +565,8 @@ function DiscountRibbon({ course }: { course: CourseCard }) {
   // fixed square window at the corner, with the rotated strip positioned
   // and sized so its full diagonal actually falls inside that window.
   return (
-    <div className="absolute right-0 top-0 z-10 h-14 w-14 overflow-hidden">
-      <div className="absolute right-[-24px] top-[10px] flex w-[92px] items-center justify-center gap-1 rotate-45 bg-gradient-to-r from-amber-400 to-orange-400 py-[3px] text-[9px] font-bold uppercase tracking-[0.04em] text-amber-950 shadow-[0_2px_12px_rgba(251,191,36,0.5)]">
+    <div className="absolute right-0 top-0 z-10 h-20 w-20 overflow-hidden">
+      <div className="absolute right-[-24px] top-[10px] flex w-[92px] items-center justify-center gap-1 rotate-45 bg-gradient-to-r from-amber-400 to-orange-400 py-[3px] text-[9px] font-bold uppercase tracking-[0.04em] text-amber-950 shadow-[0_1px_2px_rgba(0,0,0,0.3),0_4px_10px_-2px_rgba(0,0,0,0.35),0_0_16px_-4px_rgba(251,191,36,0.4)]">
         <Flame className="h-2 w-2" aria-hidden />
         {course.discountPercent}% off
       </div>
