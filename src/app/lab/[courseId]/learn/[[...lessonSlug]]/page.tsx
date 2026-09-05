@@ -7,7 +7,7 @@ import rehypeKatex from "rehype-katex";
 import { getCourse } from "@/lib/courses";
 import { getLessonBySlug, firstLesson, nextLesson, prevLesson } from "@content/react-courses/math-for-ml/lessons";
 import { COURSE_RAIL_DATA } from "@/lib/course-rail-data";
-import { CourseRailClient } from "@/components/course-rail/CourseRailClient";
+import { LearnShell } from "@/components/course-rail/LearnShell";
 import { Objectives } from "@/components/course-engine/Objectives";
 import { Callout } from "@/components/course-engine/Callout";
 import * as FoundationA from "@/components/course-engine/lesson-sections/foundation-a-algebra";
@@ -173,79 +173,66 @@ export default async function LessonPage({
   const stage = railData?.stages.find((s) => s.modules.includes(lesson.id));
   const mdxComponents = LESSON_COMPONENTS[lesson.id] ?? { Objectives, Callout };
 
-  return (
-    <div className="flex min-h-screen bg-[#0d0f14] text-[#eeeee7]">
-      {railData && (
-        <div className="hidden w-[260px] flex-shrink-0 lg:block">
-          <div className="fixed h-screen w-[260px]">
-            <CourseRailClient data={railData} courseId={courseId} activeModuleId={lesson.id} />
-          </div>
-        </div>
-      )}
+  const courseLabel = `${course.title}${lesson.id >= 1 && lesson.id <= 11 ? ` · Module ${lesson.id}` : ""}`;
 
-      <div className="min-w-0 flex-1">
-        <div className="sticky top-0 z-10 border-b-[3px] border-[#8b7cf6] bg-[#0d0f14]/92 backdrop-blur">
-          <div className="mx-auto flex max-w-[820px] items-center gap-3.5 px-6 py-3.5">
-            <span className="font-[family-name:var(--font-course-serif)] text-[16px] font-extrabold tracking-[-0.02em]">
-              ZENITH<b className="ml-0.5 rounded-[2px] bg-[#8b7cf6] px-1.5 py-px text-[#120f24]">LAB</b>
-            </span>
-            <span className="ml-auto font-[family-name:var(--font-course-mono)] text-[12px] uppercase tracking-[0.08em] text-[#676e7d]">
-              {course.title}{lesson.id >= 1 && lesson.id <= 11 ? ` · Module ${lesson.id}` : ""}
-            </span>
-          </div>
-        </div>
+  const body = (
+    <div className="mx-auto max-w-[820px] px-6 pb-24">
+      <header className="border-b border-[#232838] py-10">
+        <span className="font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.14em] text-[#8b7cf6]">
+          {lesson.id === 0
+            ? "Start here"
+            : lesson.id === 60
+              ? "Practice · Reasoning"
+              : lesson.id === 100
+                ? "Reference"
+                : lesson.id === 205
+                  ? "Capstone"
+                  : lesson.id >= 200
+                    ? "Project"
+                    : lesson.id >= 50 && lesson.id <= 59
+                      ? "Foundation Bridge · Optional"
+                      : `Module ${lesson.id} of 11${stage ? ` · ${stage.label}: ${stage.title}` : ""}`}
+        </span>
+        <h1 className="mt-3 font-[family-name:var(--font-course-serif)] text-[clamp(30px,5vw,44px)] font-semibold leading-[1.08] tracking-[-0.02em]">
+          {lesson.title}
+        </h1>
+      </header>
 
-        <div className="mx-auto max-w-[820px] px-6 pb-24">
-          <header className="border-b border-[#232838] py-10">
-            <span className="font-[family-name:var(--font-course-mono)] text-[11px] font-bold uppercase tracking-[0.14em] text-[#8b7cf6]">
-              {lesson.id === 0
-                ? "Start here"
-                : lesson.id === 60
-                  ? "Practice · Reasoning"
-                  : lesson.id === 100
-                    ? "Reference"
-                    : lesson.id === 205
-                      ? "Capstone"
-                      : lesson.id >= 200
-                        ? "Project"
-                        : lesson.id >= 50 && lesson.id <= 59
-                          ? "Foundation Bridge · Optional"
-                          : `Module ${lesson.id} of 11${stage ? ` · ${stage.label}: ${stage.title}` : ""}`}
-            </span>
-            <h1 className="mt-3 font-[family-name:var(--font-course-serif)] text-[clamp(30px,5vw,44px)] font-semibold leading-[1.08] tracking-[-0.02em]">
-              {lesson.title}
-            </h1>
-          </header>
+      <article className="prose-lesson py-8 [&_h2]:mt-10 [&_h2]:mb-4 [&_h2]:font-[family-name:var(--font-course-serif)] [&_h2]:text-[21px] [&_h2]:font-semibold [&_h2]:tracking-[-0.01em] [&_h3]:mt-7 [&_h3]:mb-2.5 [&_h3]:font-[family-name:var(--font-course-serif)] [&_h3]:text-[16px] [&_h3]:font-semibold [&_h3]:text-[#8b7cf6] [&_p]:mt-3.5 [&_p]:text-[15.5px] [&_p]:leading-[1.7] [&_p]:text-[#eeeee7] [&_strong]:text-[#eeeee7] [&_ol]:mt-3.5 [&_ol]:flex [&_ol]:flex-col [&_ol]:gap-2.5 [&_ol]:pl-5 [&_ol]:list-decimal [&_ul]:mt-3.5 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-2.5 [&_ul]:pl-5 [&_ul]:list-disc [&_li]:text-[15px] [&_li]:leading-[1.65] [&_li]:text-[#eeeee7] [&_li_strong]:text-[#8b7cf6] [&_code]:rounded [&_code]:bg-[#8b7cf6]/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-[family-name:var(--font-course-mono)] [&_code]:text-[13px] [&_code]:text-[#8b7cf6]">
+        <MDXRemote
+          source={source}
+          components={mdxComponents}
+          options={{
+            parseFrontmatter: true,
+            mdxOptions: { remarkPlugins: [remarkMath], rehypePlugins: [[rehypeKatex, {}]] },
+          }}
+        />
+      </article>
 
-          <article className="prose-lesson py-8 [&_h2]:mt-10 [&_h2]:mb-4 [&_h2]:font-[family-name:var(--font-course-serif)] [&_h2]:text-[21px] [&_h2]:font-semibold [&_h2]:tracking-[-0.01em] [&_h3]:mt-7 [&_h3]:mb-2.5 [&_h3]:font-[family-name:var(--font-course-serif)] [&_h3]:text-[16px] [&_h3]:font-semibold [&_h3]:text-[#8b7cf6] [&_p]:mt-3.5 [&_p]:text-[15.5px] [&_p]:leading-[1.7] [&_p]:text-[#eeeee7] [&_strong]:text-[#eeeee7] [&_ol]:mt-3.5 [&_ol]:flex [&_ol]:flex-col [&_ol]:gap-2.5 [&_ol]:pl-5 [&_ol]:list-decimal [&_ul]:mt-3.5 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-2.5 [&_ul]:pl-5 [&_ul]:list-disc [&_li]:text-[15px] [&_li]:leading-[1.65] [&_li]:text-[#eeeee7] [&_li_strong]:text-[#8b7cf6] [&_code]:rounded [&_code]:bg-[#8b7cf6]/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-[family-name:var(--font-course-mono)] [&_code]:text-[13px] [&_code]:text-[#8b7cf6]">
-            <MDXRemote
-              source={source}
-              components={mdxComponents}
-              options={{
-                parseFrontmatter: true,
-                mdxOptions: { remarkPlugins: [remarkMath], rehypePlugins: [[rehypeKatex, {}]] },
-              }}
-            />
-          </article>
-
-          <footer className="flex items-center justify-between border-t border-[#232838] py-8">
-            {prev ? (
-              <a href={`/lab/${courseId}/learn/${prev.slug}`} className="text-[13px] text-[#9aa0ae] hover:text-[#8b7cf6]">
-                ← {prev.title}
-              </a>
-            ) : (
-              <span />
-            )}
-            {next ? (
-              <a href={`/lab/${courseId}/learn/${next.slug}`} className="text-[13px] font-semibold text-[#8b7cf6]">
-                {next.title} →
-              </a>
-            ) : (
-              <span className="text-[13px] text-[#676e7d]">More modules coming soon</span>
-            )}
-          </footer>
-        </div>
-      </div>
+      <footer className="flex items-center justify-between border-t border-[#232838] py-8">
+        {prev ? (
+          <a href={`/lab/${courseId}/learn/${prev.slug}`} className="text-[13px] text-[#9aa0ae] hover:text-[#8b7cf6]">
+            ← {prev.title}
+          </a>
+        ) : (
+          <span />
+        )}
+        {next ? (
+          <a href={`/lab/${courseId}/learn/${next.slug}`} className="text-[13px] font-semibold text-[#8b7cf6]">
+            {next.title} →
+          </a>
+        ) : (
+          <span className="text-[13px] text-[#676e7d]">More modules coming soon</span>
+        )}
+      </footer>
     </div>
+  );
+
+  if (!railData) return body;
+
+  return (
+    <LearnShell data={railData} courseId={courseId} activeModuleId={lesson.id} courseLabel={courseLabel}>
+      {body}
+    </LearnShell>
   );
 }

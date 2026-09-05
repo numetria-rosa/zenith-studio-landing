@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles } from "lucide-react";
 
 /* An animated, spotlight-style walkthrough — like a product tour, not a
    chat. Each step targets a real DOM element already on the page (found by
@@ -90,7 +91,7 @@ export function GuidedTour({ steps, label = "Walk through this with me" }: { ste
         onClick={start}
         className="inline-flex items-center gap-1.5 rounded-full border border-[#f0b429] bg-[#f0b429]/10 px-3.5 py-1.5 text-[12.5px] font-semibold text-[#f0b429] hover:bg-[#f0b429]/20"
       >
-        <span aria-hidden>✦</span> {label}
+        <Sparkles size={13} aria-hidden /> {label}
       </button>
 
       <AnimatePresence>

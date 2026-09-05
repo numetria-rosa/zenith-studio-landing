@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check, ArrowRight } from "lucide-react";
 import { useProjectProgress } from "./useProjectProgress";
 
 /* Per the brief's own rule (section 18): "Where verification is not
@@ -135,13 +136,21 @@ export function ProjectBrief({
       <button
         type="button"
         onClick={() => setCompleted(!record.completed)}
-        className={`self-start rounded-full border px-4 py-2 text-[13px] font-semibold transition ${
+        className={`inline-flex items-center gap-1.5 self-start rounded-full border px-4 py-2 text-[13px] font-semibold transition ${
           record.completed
             ? "border-[#4ade95] bg-[#4ade95]/10 text-[#4ade95]"
             : "border-[#8b7cf6] bg-[#8b7cf6]/10 text-[#8b7cf6] hover:bg-[#8b7cf6]/20"
         }`}
       >
-        {record.completed ? "✓ Marked complete (student-reported)" : "Mark this project complete →"}
+        {record.completed ? (
+          <>
+            <Check size={14} aria-hidden /> Marked complete (student-reported)
+          </>
+        ) : (
+          <>
+            Mark this project complete <ArrowRight size={14} aria-hidden />
+          </>
+        )}
       </button>
     </div>
   );

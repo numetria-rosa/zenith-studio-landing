@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check } from "lucide-react";
 import type { PracticeTask } from "./types";
 
 const TYPE_LABEL: Record<PracticeTask["type"], string> = {
@@ -66,7 +67,11 @@ export function PracticeTaskCard({
         >
           {TYPE_LABEL[task.type]}
         </span>
-        {passed && <span className="font-[family-name:var(--font-course-mono)] text-[11px] font-bold text-[#4ade95]">✓ passed</span>}
+        {passed && (
+          <span className="inline-flex items-center gap-1 font-[family-name:var(--font-course-mono)] text-[11px] font-bold text-[#4ade95]">
+            <Check size={12} aria-hidden /> passed
+          </span>
+        )}
       </div>
 
       {task.given && (
