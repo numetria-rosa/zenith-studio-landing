@@ -9,6 +9,7 @@ import { serviceKindForWhopPlanId, getService } from "@/lib/services";
 import { generateStrongPassword, encryptPassword } from "@/lib/password";
 import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 import { resolveProposalByWhopPlanId, classifyProposalPaymentLeg } from "@/lib/proposal-payments";
+import { sendMetaPurchaseEvent } from "@/lib/meta-capi";
 
 /* Zenith Lab — Whop webhook handler.
    Implements whop-checkout-links-and-webhooks.md §3.3/§3.7 exactly:
@@ -38,19 +39,29 @@ export async function POST(request: NextRequest) {
     // If business logic throws, the WHOLE transaction rolls back — including
     // the WebhookEvent row — so a genuine Whop retry can actually reprocess it,
     // rather than silently no-op'ing on a delivery we never actually handled.
-    await db.$transaction(async (tx) => {
+    // The transaction's return value (course-purchase info for Meta, or
+    // null) is used AFTER it commits, not inside it — a Meta API call has
+    // no business holding a DB transaction open, and firing it only on the
+    // success path (never inside the P2002-duplicate catch below) is what
+    // keeps a retried webhook delivery from reporting the same sale twice.
+    const purchaseForMeta = await db.$transaction(async (tx) => {
       await tx.webhookEvent.create({
         data: { id: event.id, type: event.type, payload: event as unknown as Prisma.InputJsonValue },
       });
 
       if (event.type === "payment.succeeded") {
-        await handlePaymentSucceeded(tx, event.data);
+        return await handlePaymentSucceeded(tx, event.data);
       } else if (event.type === "membership.deactivated") {
         await handleMembershipDeactivated(tx, event.data);
       }
       // Every other subscribed-or-not event type is accepted and ignored —
       // the WebhookEvent row is still recorded for audit/debug visibility.
+      return null;
     });
+
+    if (purchaseForMeta) {
+      await sendMetaPurchaseEvent(purchaseForMeta);
+    }
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       // Unique constraint on WebhookEvent.id -> this exact delivery was already
@@ -68,7 +79,9 @@ export async function POST(request: NextRequest) {
 
 type Tx = Prisma.TransactionClient;
 
-async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
+type MetaPurchaseInfo = Parameters<typeof sendMetaPurchaseEvent>[0];
+
+async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPurchaseInfo | null> {
   const productId = payment.product?.id;
   const courseId = productId ? courseIdForWhopProductId(productId) : null;
   // A bundle is its own Whop product (see src/lib/bundles.ts) — resolved
@@ -90,7 +103,7 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
       `[whop webhook] payment.succeeded for unmapped product "${productId ?? "unknown"}" / plan "${payment.plan?.id ?? "unknown"}" ` +
         `— no entitlement or service request created. Check the WHOP_*_ID env vars against courses.ts / services.ts.`
     );
-    return;
+    return null;
   }
 
   if (proposalMatch) {
@@ -128,7 +141,7 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
         data: { monthlyPaidAt: now, monthlyWhopPaymentId: payment.id },
       });
     }
-    return;
+    return null; // a proposal payment isn't a course sale — outside the ad campaign's Meta tracking scope
   }
 
   const whopUserId = payment.user?.id ?? null;
@@ -137,11 +150,27 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
 
   if (!email && !whopUserId) {
     console.error("[whop webhook] payment.succeeded has no user id or email — cannot resolve an account", payment.id);
-    return;
+    return null;
   }
 
   const user = await findOrCreateUser(tx, whopUserId, email, name);
   await createPurchaseClaim(tx, user.id, payment.id);
+
+  // Built once, reused by both the single-course and bundle branches below —
+  // only course purchases report to Meta (the ad campaign sells courses,
+  // not services/proposals), and only when there's an email to hash for
+  // user_data.em, Meta's Conversions API requires at least one identifier.
+  const metaPurchaseInfo = (contentIds: string[]): MetaPurchaseInfo | null =>
+    user.email
+      ? {
+          email: user.email,
+          name: user.name,
+          value: payment.subtotal ?? payment.total ?? 0,
+          currency: payment.currency ?? "usd",
+          contentIds,
+          eventId: payment.id,
+        }
+      : null;
 
   if (courseId) {
     await tx.courseEntitlement.upsert({
@@ -161,7 +190,7 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
         whopPaymentId: payment.id,
       },
     });
-    return;
+    return metaPurchaseInfo([courseId]);
   }
 
   if (bundleCourseIds) {
@@ -188,7 +217,7 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
         },
       });
     }
-    return;
+    return metaPurchaseInfo(bundleCourseIds);
   }
 
   // serviceMatch is non-null here (the !courseId && !serviceMatch check above returned already otherwise)
@@ -251,6 +280,8 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment) {
       });
     }
   }
+
+  return null; // service purchase — not a course sale, outside Meta tracking scope
 }
 
 async function handleMembershipDeactivated(tx: Tx, membership: Membership) {

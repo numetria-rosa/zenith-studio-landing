@@ -28,11 +28,11 @@ async function main() {
     const payload = event.payload;
     const payment = payload?.data ?? payload;
     const metadata = payment?.metadata ?? null;
-    const amount = payment?.final_amount ?? payment?.amount ?? "?";
-    const planTitle = payment?.plan?.title ?? "?";
+    const amount = payment?.subtotal ?? payment?.total ?? "?";
+    const productTitle = payment?.product?.title ?? "?";
     const when = event.receivedAt.toISOString();
 
-    console.log(`[${when}] $${amount} — plan "${planTitle}"`);
+    console.log(`[${when}] $${amount} — "${productTitle}"`);
     if (metadata && Object.keys(metadata).length > 0) {
       console.log(`  source: ${metadata.utm_source ?? "-"} / medium: ${metadata.utm_medium ?? "-"} / campaign: ${metadata.utm_campaign ?? "-"} / content: ${metadata.utm_content ?? "-"}`);
     } else {
