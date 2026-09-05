@@ -24,6 +24,25 @@ right. A slope of 3 means: move 1 unit right, the line rises 3 units. A
 slope of -2 means: move 1 unit right, the line falls 2 units.
 </Callout>
 
+<Callout tone="info" label="Worked example">
+Find the slope of the line through the points $(1, 2)$ and $(4, 11)$:
+1. Rise = change in output = $11 - 2 = 9$
+2. Run = change in input = $4 - 1 = 3$
+3. Slope = rise / run = $9 / 3 = 3$
+
+So this line rises 3 units for every 1 unit it moves right - a slope of 3,
+constant everywhere along a straight line.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: dividing run by rise instead of rise by run">
+Slope is $\frac{\text{rise}}{\text{run}}$ - change in output over change in
+input - not the other way around. Flipping the fraction for the example
+above would give $3/9 = 0.33$ instead of the correct $3$: a very different
+number describing a very different steepness. When in doubt, remember
+which axis is "output" (vertical, on top of the fraction) and which is
+"input" (horizontal, on the bottom).
+</Callout>
+
 Straight lines have one constant slope everywhere. Curves don't - their
 steepness changes from point to point, which is exactly the idea Module 4
 turns into the derivative: the slope at one exact point, not averaged
@@ -36,6 +55,16 @@ increasing. A curve flattening out means its rate of change is shrinking
 toward zero. A perfectly flat point - a peak, a valley, or a plateau - has
 a slope of exactly zero. All three of these readings come back directly
 in Module 4 and 5's language around gradients and optimization.
+
+<Callout tone="warning" label="Common mistake: confusing height with steepness">
+A curve can be very *high up* on the graph while being perfectly *flat*
+right at that point (think of the very top of a hill) - height and slope
+are two separate readings. Conversely, a curve can cross through zero
+height while still being very steep there. Always ask "how steep is it
+here" and "how high up is it here" as two separate questions, since
+Module 4's whole point is that the interesting quantity for optimization
+is the steepness (the gradient), not the height (the loss value) alone.
+</Callout>
 
 ## Quick check
 

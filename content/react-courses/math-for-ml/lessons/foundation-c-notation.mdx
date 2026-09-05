@@ -31,12 +31,31 @@ $x^2$) is an exponent - "raised to what power." These look similar and
 mean completely different things - mixing them up is one of the most
 common notation mistakes.
 
+<Callout tone="info" label="Worked example">
+Given $x = (5, 8, 2)$, read off $x_2$ and $x_1^2$:
+- $x_2$ is "the 2nd entry of $x$" - that's $8$
+- $x_1^2$ is "the 1st entry of $x$, squared" - that's $5^2 = 25$
+
+The subscript picks *which* entry; the superscript, if present, then
+operates on that entry. They stack (one picks, the other computes) rather
+than competing for the same job.
+</Callout>
+
 ## Vectors and matrices
 
 A vector written $\mathbf{v} = (v_1, v_2)$ is a list of components, each
 labeled by a subscript - not a product, not separate unrelated variables,
 just an ordered list belonging to one object called $v$. A matrix extends
 this to a full grid, indexed by both a row and a column subscript.
+
+<Callout tone="info" label="Worked example">
+$M_{2,1}$ in a matrix $M$ means "the entry in row 2, column 1" - always
+row first, then column, by convention. For
+$M = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}$, $M_{2,1} = 3$ (second
+row, first column) - not $2$, which would be $M_{1,2}$ (first row, second
+column) instead. Getting row/column order backwards is a very common
+matrix-notation slip, and Module 2 relies on this convention constantly.
+</Callout>
 
 ## Function and derivative notation
 
@@ -45,6 +64,22 @@ of x") is standard notation for the derivative of $f$ - its rate of
 change - which Module 4 will define properly. It is not related to prime
 numbers, and it is not the same as $f^{-1}(x)$, which denotes a function's
 inverse.
+
+<Callout tone="info" label="Worked example">
+Given $f(x) = x^2$, here's how three related-looking pieces of notation
+differ in meaning (not value - this is about reading the symbols, the
+actual derivative and inverse formulas come later):
+- $f(x)$: the function's rule itself, "square the input"
+- $f'(x)$: the *derivative* of $f$ - a different function describing $f$'s
+  rate of change at each $x$ (Module 4 shows this equals $2x$ for this $f$)
+- $f^{-1}(x)$: the *inverse* of $f$ - a function that undoes $f$ (for this
+  $f$, that's $\sqrt{x}$, since squaring then square-rooting returns the
+  original input)
+
+Three completely different objects, distinguished only by a small mark
+placed differently - exactly why this notation trips people up until it's
+made explicit once, like here.
+</Callout>
 
 ## Quick check
 

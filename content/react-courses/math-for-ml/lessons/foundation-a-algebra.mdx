@@ -34,6 +34,25 @@ counts how many times the base multiplies itself. This shows up
 constantly once vectors and magnitudes enter the picture in Module 1 -
 $\|v\| = \sqrt{v_1^2 + v_2^2}$ uses exactly this idea.
 
+<Callout tone="info" label="Worked example">
+Compute the magnitude of the vector $(3, 4)$ using $\|v\| = \sqrt{v_1^2 + v_2^2}$:
+1. Square each component: $3^2 = 9$, $4^2 = 16$
+2. Add them: $9 + 16 = 25$
+3. Take the square root: $\sqrt{25} = 5$
+
+So $\|(3, 4)\| = 5$. Every step is just exponents and one square root -
+nothing about vectors is required to follow the arithmetic itself.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: squaring a sum instead of each term">
+$(3 + 4)^2$ is **not** the same as $3^2 + 4^2$: the first is $7^2 = 49$,
+the second is $9 + 16 = 25$. The magnitude formula above squares each
+component *separately* before adding - mixing this up is one of the most
+common arithmetic slips once vector formulas show up, because the
+notation $v_1^2 + v_2^2$ looks similar to $(v_1+v_2)^2$ at a glance but
+means something completely different.
+</Callout>
+
 ## Logarithms
 
 A logarithm answers one specific question: "what power do I raise this
@@ -41,11 +60,49 @@ base to, to get this number?" $\log_2(8) = 3$ because $2^3 = 8$.
 Logarithms will matter directly once entropy and likelihood show up in
 Modules 8-9 - both are built from logarithms.
 
+<Callout tone="info" label="Worked example">
+Find $\log_2(32)$:
+1. Ask the question a logarithm always asks: "2 raised to what power gives 32?"
+2. Try powers of 2: $2^4 = 16$, $2^5 = 32$
+3. So $\log_2(32) = 5$
+
+The fastest way to compute a logarithm by hand is exactly this: guess and
+check powers of the base until one matches.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: splitting a log across addition">
+$\log_2(a + b)$ is **not** $\log_2(a) + \log_2(b)$. For example,
+$\log_2(4+4) = \log_2(8) = 3$, but $\log_2(4) + \log_2(4) = 2 + 2 = 4$ -
+different answers. Logarithms turn *multiplication* into addition
+($\log_2(a \times b) = \log_2(a) + \log_2(b)$), not addition into
+addition. This distinction matters directly in Module 9, where entropy's
+formula relies on exactly this multiplication-to-addition property.
+</Callout>
+
 ## Functions
 
 A function is a rule that takes an input and produces an output. Writing
 $f(x) = 2x + 1$ defines a rule; writing $f(3)$ means "apply that rule to
 the input 3," giving $2(3) + 1 = 7$.
+
+<Callout tone="info" label="Worked example">
+Given $f(x) = x^2 - 1$, find $f(3)$ and $f(-2)$:
+- $f(3) = 3^2 - 1 = 9 - 1 = 8$
+- $f(-2) = (-2)^2 - 1 = 4 - 1 = 3$
+
+Notice $f(-2)$ used $(-2)^2 = 4$, not $-2^2 = -4$ - squaring a negative
+number first removes its sign, since it's the *whole* negative number
+being multiplied by itself.
+</Callout>
+
+<Callout tone="warning" label="Common mistake: treating f(x) as multiplication">
+$f(3)$ does not mean "$f$ times 3." It means "apply the rule $f$ to the
+input 3." If $f(x) = x^2 - 1$, then $f(3)$ requires substituting 3 for
+every $x$ in the formula - it is not $f \times 3$, even though the
+notation places them right next to each other the way multiplication
+does. This is one of the most common notation confusions for anyone
+coming from a purely arithmetic background.
+</Callout>
 
 ## Quick check
 
