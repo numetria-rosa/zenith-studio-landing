@@ -217,7 +217,6 @@
          lower half of the canvas -->
     <div class="glyph" style="left:1660px; top:960px; font-size:120px;">&sum;</div>
     <div class="glyph" style="left:270px; top:820px; font-size:90px;">&part;</div>
-    <div class="glyph" style="left:1480px; top:120px; font-size:70px;">&nabla;</div>
     <div class="glyph" style="left:80px; top:980px; font-size:60px;">&pi;</div>
     <div class="glyph" style="left:1780px; top:660px; font-size:80px;">&infin;</div>
 
@@ -241,15 +240,41 @@
 
     <div class="graphic">
       <svg width="860" height="900" style="position:absolute;left:0;top:0;overflow:visible;">
-        <!-- vector -> matrix -->
-        <line x1="165" y1="140" x2="345" y2="235" stroke="rgba(255,255,255,0.26)" stroke-width="2" />
-        <!-- matrix -> neuron (the training step) -->
-        <line x1="360" y1="325" x2="220" y2="450" stroke="#8b7cf6" stroke-width="2.5" />
-        <!-- neuron -> attention (the payoff) -->
-        <line x1="270" y1="600" x2="440" y2="660" stroke="#8b7cf6" stroke-width="2.5" />
-        <!-- iterative gradient-descent loop, orbiting the neuron it trains -->
-        <path d="M 130 430 C 40 340, 40 250, 120 210" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-dasharray="6 8" />
-        <text x="0" y="330" font-family="IBM Plex Mono, monospace" font-size="16" fill="#8b93a6">gradient descent</text>
+        <defs>
+          <marker id="arrow-neutral" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,0.45)" />
+          </marker>
+          <marker id="arrow-accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b7cf6" />
+          </marker>
+        </defs>
+
+        <!-- vector -> matrix: y = Wx, trimmed exactly to each circle's edge -->
+        <line x1="169.8" y1="112.8" x2="333.2" y2="204.9" stroke="rgba(255,255,255,0.32)" stroke-width="2" marker-end="url(#arrow-neutral)" />
+        <text x="200" y="150" font-family="IBM Plex Mono, monospace" font-size="17" fill="#9aa3b2">Wx</text>
+
+        <!-- matrix -> neuron: + b, then squashed by sigma — the training step -->
+        <line x1="359.3" y1="309.5" x2="258.7" y2="443.3" stroke="#8b7cf6" stroke-width="2.5" marker-end="url(#arrow-accent)" />
+        <text x="325" y="405" font-family="IBM Plex Mono, monospace" font-size="17" fill="#b3a6fb">+b, &sigma;</text>
+
+        <!-- neuron -> attention: the dot-product score behind every attention weight -->
+        <line x1="272.6" y1="586.4" x2="409.2" y2="681.4" stroke="#8b7cf6" stroke-width="2.5" marker-end="url(#arrow-accent)" />
+        <text x="325" y="640" font-family="IBM Plex Mono, monospace" font-size="17" fill="#b3a6fb">q&middot;k / &radic;d</text>
+
+        <!-- iterative gradient-descent loop, hugging the neuron it trains -->
+        <path d="M 96 458 C 8 478, 8 588, 96 606" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="2" stroke-dasharray="6 8" marker-end="url(#arrow-neutral)" />
+        <text x="0" y="440" font-family="IBM Plex Mono, monospace" font-size="16" fill="#8b93a6">gradient</text>
+        <text x="0" y="462" font-family="IBM Plex Mono, monospace" font-size="16" fill="#8b93a6">descent</text>
+
+        <!-- decorative loss curve, filling the empty upper-right corner -->
+        <g transform="translate(650,90)">
+          <line x1="0" y1="0" x2="0" y2="150" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" />
+          <line x1="0" y1="150" x2="180" y2="150" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" />
+          <path d="M 6 18 C 50 30, 90 95, 172 138" fill="none" stroke="#8b7cf6" stroke-width="2.5" />
+          <circle cx="172" cy="138" r="5" fill="#8b7cf6" />
+          <text x="0" y="-12" font-family="IBM Plex Mono, monospace" font-size="15" fill="#8b93a6">loss</text>
+          <text x="130" y="172" font-family="IBM Plex Mono, monospace" font-size="15" fill="#8b93a6">steps</text>
+        </g>
       </svg>
       <div class="node vector">v<span class="sub">vector</span></div>
       <div class="node matrix">
