@@ -119,6 +119,7 @@
     line-height: 1.25;
     max-width: 260px;
     text-align: left;
+    white-space: nowrap;
   }
   .tag.highlight {
     color: #8b7cf6;
@@ -137,13 +138,27 @@
     background: #8b7cf6;
   }
 
-  /* --- vectors -> matrix -> neuron graphic --- */
+  /* faint scattered math glyphs — texture for the otherwise-empty lower
+     canvas, echoing the subject without competing with the graphic */
+  .glyph {
+    position: absolute;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: rgba(139,124,246,0.10);
+    font-weight: 500;
+    z-index: 1;
+    user-select: none;
+  }
+
+  /* --- vector -> matrix -> neuron -> attention pipeline, spanning most
+     of the card's height so the graphic reads as one continuous idea
+     instead of a small cluster floating in empty space --- */
   .graphic {
     position: absolute;
-    right: 90px;
-    top: 300px;
-    width: 780px;
-    height: 560px;
+    right: 100px;
+    top: 130px;
+    width: 860px;
+    height: 900px;
   }
   .node {
     position: absolute;
@@ -159,11 +174,23 @@
     font-weight: 600;
     color: #d7dbe4;
   }
-  .node .sub { font-size: 15px; font-weight: 400; color: #8b93a6; margin-top: 2px; }
-  .node.vector { width: 150px; height: 150px; font-size: 24px; left: 0; top: 30px; }
-  .node.matrix { width: 140px; height: 140px; font-size: 22px; left: 210px; top: 220px; }
-  .node.neuron { width: 200px; height: 200px; font-size: 30px; left: 460px; top: 130px; border-color: #8b7cf6; box-shadow: 0 0 0 1px rgba(139,124,246,0.3), 0 0 60px rgba(139,124,246,0.18); color: #8b7cf6; }
-  .node.attn { width: 140px; height: 140px; font-size: 20px; left: 350px; top: 400px; }
+  .node .sub { font-size: 15px; font-weight: 400; color: #8b93a6; margin-top: 3px; }
+  .node.vector { width: 150px; height: 150px; font-size: 26px; left: 30px; top: 0; }
+  .node.matrix { width: 150px; height: 150px; font-size: 22px; left: 330px; top: 175px; }
+  .node.neuron {
+    width: 200px; height: 200px; font-size: 32px; left: 90px; top: 430px;
+    border-color: rgba(139,124,246,0.6);
+    box-shadow: 0 0 0 1px rgba(139,124,246,0.2), 0 0 50px rgba(139,124,246,0.14);
+    color: #b3a6fb;
+  }
+  .node.attn {
+    width: 250px; height: 250px; font-size: 34px; left: 380px; top: 620px;
+    border-color: #8b7cf6;
+    background: radial-gradient(circle at 35% 30%, rgba(139,124,246,0.16), #11151c 65%);
+    box-shadow: 0 0 0 1px rgba(139,124,246,0.4), 0 0 90px rgba(139,124,246,0.28);
+    color: #c9bfff;
+  }
+  .node.attn .sub { color: #8b7cf6; font-size: 17px; font-weight: 600; }
 
   .matrix-grid {
     display: grid;
@@ -185,6 +212,15 @@
   <div class="card">
     <div class="grid"></div>
     <div class="glow"></div>
+
+    <!-- background texture: faint math glyphs filling the otherwise-empty
+         lower half of the canvas -->
+    <div class="glyph" style="left:1660px; top:960px; font-size:120px;">&sum;</div>
+    <div class="glyph" style="left:270px; top:820px; font-size:90px;">&part;</div>
+    <div class="glyph" style="left:1480px; top:120px; font-size:70px;">&nabla;</div>
+    <div class="glyph" style="left:80px; top:980px; font-size:60px;">&pi;</div>
+    <div class="glyph" style="left:1780px; top:660px; font-size:80px;">&infin;</div>
+
     <div class="content">
       <div class="brand-row">
         <span class="brand-zenith">ZENITH</span>
@@ -199,24 +235,28 @@
         <div class="tag">Linear Algebra</div>
         <div class="tag">Calculus</div>
         <div class="tag">Probability</div>
-        <div class="tag highlight">Built for zero background</div>
+        <div class="tag highlight">No background needed</div>
       </div>
     </div>
 
     <div class="graphic">
-      <svg width="780" height="560" style="position:absolute;left:0;top:0;overflow:visible;">
-        <line x1="150" y1="105" x2="255" y2="255" stroke="rgba(255,255,255,0.28)" stroke-width="2" />
-        <line x1="350" y1="290" x2="465" y2="235" stroke="#8b7cf6" stroke-width="2.5" />
-        <line x1="490" y1="330" x2="420" y2="400" stroke="rgba(255,255,255,0.28)" stroke-width="2" />
-        <path d="M 560 130 C 650 40, 720 90, 700 220" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-dasharray="6 8" />
-        <text x="590" y="60" font-family="IBM Plex Mono, monospace" font-size="16" fill="#8b93a6">gradient descent</text>
+      <svg width="860" height="900" style="position:absolute;left:0;top:0;overflow:visible;">
+        <!-- vector -> matrix -->
+        <line x1="165" y1="140" x2="345" y2="235" stroke="rgba(255,255,255,0.26)" stroke-width="2" />
+        <!-- matrix -> neuron (the training step) -->
+        <line x1="360" y1="325" x2="220" y2="450" stroke="#8b7cf6" stroke-width="2.5" />
+        <!-- neuron -> attention (the payoff) -->
+        <line x1="270" y1="600" x2="440" y2="660" stroke="#8b7cf6" stroke-width="2.5" />
+        <!-- iterative gradient-descent loop, orbiting the neuron it trains -->
+        <path d="M 130 430 C 40 340, 40 250, 120 210" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-dasharray="6 8" />
+        <text x="0" y="330" font-family="IBM Plex Mono, monospace" font-size="16" fill="#8b93a6">gradient descent</text>
       </svg>
       <div class="node vector">v<span class="sub">vector</span></div>
       <div class="node matrix">
         <div class="matrix-grid"><span></span><span></span><span></span><span></span></div>
         <span class="sub" style="margin-top:0;">matrix</span>
       </div>
-      <div class="node neuron">&sigma;(z)<span class="sub" style="color:#8b7cf6;">neuron</span></div>
+      <div class="node neuron">&sigma;(z)<span class="sub">neuron</span></div>
       <div class="node attn">softmax<span class="sub">attention</span></div>
     </div>
 
