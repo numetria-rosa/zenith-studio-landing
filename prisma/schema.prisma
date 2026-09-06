@@ -145,6 +145,25 @@ model WebhookEvent {
   payload    Json
 }
 
+// One row per hit on /api/go/[courseId] — every real "Get access" click on
+// /lab or a course details page, whether or not it goes on to complete
+// checkout. Exists because Whop only ever tells us about a *submitted*
+// payment (succeeded or failed); someone who clicks through to checkout and
+// then closes the tab without entering payment info leaves no trace on
+// Whop's side at all. This is the only way to see that drop-off.
+model CheckoutAttempt {
+  id         String   @id @default(cuid())
+  courseId   String
+  utmSource  String?
+  utmMedium  String?
+  utmCampaign String?
+  utmContent String?
+  createdAt  DateTime @default(now())
+
+  @@index([courseId])
+  @@index([createdAt])
+}
+
 // Mirrors course-progress.js's existing localStorage shape exactly:
 // { modules: { [id]: {answers,score,total,completed,sections,...} }, extra: {...} }
 // Server-stored per (user, course) so it syncs across devices. This is
