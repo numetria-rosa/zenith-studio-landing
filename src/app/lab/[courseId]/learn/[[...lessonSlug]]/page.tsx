@@ -10,6 +10,7 @@ import { COURSE_RAIL_DATA } from "@/lib/course-rail-data";
 import { LearnShell } from "@/components/course-rail/LearnShell";
 import { Objectives } from "@/components/course-engine/Objectives";
 import { Callout } from "@/components/course-engine/Callout";
+import { PrintButton } from "@/components/course-engine/PrintButton";
 import * as FoundationA from "@/components/course-engine/lesson-sections/foundation-a-algebra";
 import * as FoundationB from "@/components/course-engine/lesson-sections/foundation-b-graphs";
 import * as FoundationC from "@/components/course-engine/lesson-sections/foundation-c-notation";
@@ -59,7 +60,7 @@ const LESSON_COMPONENTS: Record<number, Record<string, React.ComponentType<any>>
     InformationDetectiveSection: MathDetectiveSections.InformationDetectiveSection,
     AttentionDetectiveSection: MathDetectiveSections.AttentionDetectiveSection,
   },
-  100: { Objectives, Callout },
+  100: { Objectives, Callout, PrintButton },
   1: {
     Objectives,
     Callout,

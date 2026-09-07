@@ -10,79 +10,94 @@ Meant to be useful after you finish the course, not just during it. Each
 entry links back conceptually to the module that built it - if a formula
 here doesn't immediately make sense, that module is where it came from.
 
+<PrintButton />
+
 ### Stage 1 - Vectors
 
 $$\mathbf{a}\cdot\mathbf{b} = a_1b_1 + a_2b_2 \qquad \|\mathbf{a}\| = \sqrt{a_1^2+a_2^2} \qquad \cos\theta = \frac{\mathbf{a}\cdot\mathbf{b}}{\|\mathbf{a}\|\|\mathbf{b}\|}$$
 
 Dot product, magnitude, and cosine similarity - direction-only comparison
-between two vectors.
+between two vectors. $a_1, a_2, b_1, b_2$ are raw coordinates; $\theta$ is
+the angle between the vectors; $\cos\theta$ always lands in $[-1, 1]$.
 
 ### Stage 2 - Matrices
 
 $$M\mathbf{v} = \begin{pmatrix} a & b \\ c & d \end{pmatrix}\begin{pmatrix} x \\ y \end{pmatrix} \qquad \det(M) = ad-bc$$
 
 A matrix as a linear transformation; its determinant as the area-scaling
-factor, and the test for invertibility ($\det=0$ means no inverse).
+factor, and the test for invertibility ($\det=0$ means no inverse). The
+matrix's columns $(a,c)$ and $(b,d)$ are where $(1,0)$ and $(0,1)$ land.
 
 ### Stage 3 - Eigenvectors and PCA
 
 $$M\mathbf{v} = \lambda\mathbf{v} \qquad \det(M-\lambda I) = 0 \qquad \lambda = \frac{\operatorname{tr}(M)}{2}\pm\sqrt{\left(\frac{\operatorname{tr}(M)}{2}\right)^2-\det(M)}$$
 
 Eigenvectors are directions a transformation only scales, never rotates;
-for PCA, they're the principal directions of a covariance matrix.
+for PCA, they're the principal directions of a covariance matrix, and
+each eigenvalue $\lambda$ is the variance along its own eigenvector.
 
 ### Stage 4 - Calculus and Gradients
 
 $$\nabla f = \left(\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}\right)$$
 
-The gradient always points toward the steepest increase.
+The gradient always points toward the steepest increase; each
+$\partial f/\partial x_i$ holds every other variable fixed while
+measuring the rate of change in just that one direction.
 
 ### Stage 5 - Optimization
 
 $$\mathbf{x}_{n+1} = \mathbf{x}_n - \eta\nabla f(\mathbf{x}_n)$$
 
 Gradient descent: step opposite the gradient, scaled by the learning rate
-$\eta$. Too large an $\eta$ causes oscillation or divergence.
+$\eta$. Too large an $\eta$ causes oscillation or divergence; too small
+converges correctly but slowly.
 
 ### Stage 6 - Probability
 
 $$\mathbb{E}[X] = p \qquad \operatorname{Var}(X) = p(1-p) \qquad \operatorname{SE} = \sqrt{\operatorname{Var}(X)/n}$$
 
 Expectation, variance, and standard error - why averages stabilize as $n$
-grows (the law of large numbers).
+grows (the law of large numbers). SE shrinks with $1/\sqrt{n}$, so
+quadrupling $n$ halves it.
 
 ### Stage 7 - Statistics
 
 $$\bar{X}_n \sim \mathcal{N}\!\left(\mu, \frac{\sigma^2}{n}\right)\ \text{as } n\to\infty$$
 
 The Central Limit Theorem: sample means trend toward a normal distribution
-regardless of the population's own shape.
+regardless of the population's own shape. $\mu$ is the population mean,
+$\sigma$ its standard deviation.
 
 ### Stage 8 - Likelihood
 
 $$\log\mathcal{L}(\mu,\sigma) = \sum_{i=1}^n \log p(x_i\mid\mu,\sigma)$$
 
 Maximum likelihood estimation: choose parameters that make the observed
-data most plausible. For a Gaussian, the MLE is the sample mean and
-sample standard deviation.
+data most plausible. For a Gaussian, the MLE for $\mu$ is the sample mean;
+the MLE for $\sigma$ is the sample standard deviation.
 
 ### Stage 9 - Information and Loss
 
 $$H(p) = -\sum_i p_i\log_2 p_i \qquad H(p,q) = -\sum_i p_i\log_2 q_i \qquad D_{KL}(p\|q) = H(p,q)-H(p)$$
 
 Entropy, cross-entropy, and KL divergence - the mathematical basis of most
-classifier loss functions.
+classifier loss functions. $H(p,q) \ge H(p)$ always; $D_{KL}$ is the
+"extra bits" wasted by predicting $q$ when the truth is $p$.
 
 ### Stage 10 - Neural Network Mathematics
 
 $$z = w_1x_1+w_2x_2+b \qquad a=\sigma(z) \qquad \frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial a}\cdot\frac{\partial a}{\partial z}\cdot\frac{\partial z}{\partial w_1}$$
 
 Forward pass, then the chain rule backward through it - backpropagation in
-miniature.
+miniature. $\sigma$ is the sigmoid activation; its own derivative is the
+clean form $\sigma(z)(1-\sigma(z))$.
 
 ### Stage 11 - Attention
 
 $$\text{weight}_i = \frac{e^{(q\cdot k_i)/\sqrt{d}}}{\sum_j e^{(q\cdot k_j)/\sqrt{d}}} \qquad \text{output} = \sum_i \text{weight}_i\cdot v_i$$
 
 Scaled dot-product attention: relevance via dot product, normalized by
-softmax, combined as a weighted sum of values.
+softmax, combined as a weighted sum of values. $d$ is the vector
+dimension; the $1/\sqrt{d}$ scaling keeps softmax stable as $d$ grows.
+
+<PrintButton />

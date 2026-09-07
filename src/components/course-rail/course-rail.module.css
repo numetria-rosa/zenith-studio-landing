@@ -295,3 +295,16 @@ a.railMod:hover { background: rgba(255, 255, 255, 0.04); color: var(--tx); }
   .courserail.open { transform: translateX(0); }
   .railScrim.open { display: block; }
 }
+
+/* ---- print: hide chrome, force black-on-white regardless of each
+   element's own dark-theme Tailwind color/background utility ---- */
+@media print {
+  .courserail, .railToggle, .railScrim, .topbar { display: none !important; }
+  .scope, .scope * {
+    color: #000 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-color: #ccc !important;
+  }
+  .scope { background: #fff !important; }
+}
