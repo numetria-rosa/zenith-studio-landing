@@ -563,11 +563,46 @@ model ServiceProject {
   messages        ServiceMessage[]
   supportRequests SupportRequest[]
   tasks           Task[]
+  leads           Lead[]
 
   @@index([userId])
   @@index([proposalId])
   @@index([sourceServiceId])
   @@index([assigneeUserId])
+}
+
+enum LeadStatus {
+  NEW
+  IN_SEQUENCE
+  RETAINED
+  LOST
+}
+
+// The AI Follow-Up Clerk role (law-firms vertical) — leads that reached the
+// firm but weren't retained on first contact. v1 is SMS-only: the only lead
+// source today (missed-call-text-back) captures a phone number, never an
+// email, so an email channel would sit unused — add one only once a lead
+// source that actually has emails exists. See follow-up-clerk.ts.
+model Lead {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String?
+  phone     String?
+  email     String?
+  source    String // e.g. "missed-call-text-back", "manual"
+
+  status             LeadStatus @default(NEW)
+  sequenceStep       Int        @default(0)
+  lastOutreachAt     DateTime?
+  sequenceStoppedAt  DateTime?
+  sequenceStopReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, status])
 }
 
 model ProjectMilestone {

@@ -36,7 +36,8 @@ export async function provisionTextBackIfNeeded(projectId: string): Promise<Resu
   const businessName = requirement.detail.trim();
 
   const voiceUrl = `${getSiteUrl()}/api/webhooks/text-back/voice`;
-  const purchaseResult = await purchaseTwilioNumber({ areaCode: "213", voiceUrl });
+  const smsUrl = `${getSiteUrl()}/api/webhooks/text-back/sms`;
+  const purchaseResult = await purchaseTwilioNumber({ areaCode: "213", voiceUrl, smsUrl });
   if (!purchaseResult.ok) return { ok: false, error: `Twilio number purchase: ${purchaseResult.error}` };
 
   await db.integration.create({

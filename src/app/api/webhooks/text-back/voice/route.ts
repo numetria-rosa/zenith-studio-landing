@@ -71,5 +71,16 @@ export async function POST(request: NextRequest): Promise<Response> {
     },
   });
 
+  // Feeds the Follow-Up Clerk: every missed call that isn't already being
+  // worked becomes a lead. Don't duplicate one still in progress.
+  const existingLead = await db.lead.findFirst({
+    where: { projectId: integration.projectId, phone: callerNumber, status: { in: ["NEW", "IN_SEQUENCE"] } },
+  });
+  if (!existingLead) {
+    await db.lead.create({
+      data: { projectId: integration.projectId, phone: callerNumber, source: "missed-call-text-back" },
+    });
+  }
+
   return twiml(buildMissedCallSpokenMessage(businessName));
 }

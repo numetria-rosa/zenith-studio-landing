@@ -56,14 +56,20 @@ export function verifyTwilioSignature(
 }
 
 export type PurchaseNumberResult =
-  | { ok: true; phoneNumber: string; voiceUrl: string }
+  | { ok: true; phoneNumber: string }
   | { ok: false; error: string };
 
-/** Buys one US local Twilio number and points its Voice webhook at our
-    missed-call route — the one-time onboarding step per law-firm client.
-    Costs a real, small monthly fee (unlike the receptionist's free Vapi
-    numbers), which is negligible against the $1,200/mo package price. */
-export async function purchaseTwilioNumber(input: { areaCode: string; voiceUrl: string }): Promise<PurchaseNumberResult> {
+/** Buys one US local Twilio number and points its Voice and SMS webhooks at
+    our routes — the one-time onboarding step per law-firm client. The same
+    number serves both roles that share it: Missed Call Text-Back (voice)
+    and the Follow-Up Clerk's reply detection (sms). Costs a real, small
+    monthly fee (unlike the receptionist's free Vapi numbers), negligible
+    against the $1,200/mo package price. */
+export async function purchaseTwilioNumber(input: {
+  areaCode: string;
+  voiceUrl: string;
+  smsUrl: string;
+}): Promise<PurchaseNumberResult> {
   try {
     const client = twilioClient();
     const available = await client
@@ -76,8 +82,10 @@ export async function purchaseTwilioNumber(input: { areaCode: string; voiceUrl: 
       phoneNumber: candidate.phoneNumber,
       voiceUrl: input.voiceUrl,
       voiceMethod: "POST",
+      smsUrl: input.smsUrl,
+      smsMethod: "POST",
     });
-    return { ok: true, phoneNumber: purchased.phoneNumber, voiceUrl: input.voiceUrl };
+    return { ok: true, phoneNumber: purchased.phoneNumber };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "unknown Twilio error" };
   }
