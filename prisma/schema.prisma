@@ -630,9 +630,10 @@ enum IntegrationStatus {
 model Integration {
   id          String             @id @default(cuid())
   projectId   String
-  provider    String // e.g. "gmail", "twilio", "crm"
+  provider    String // e.g. "gmail", "twilio", "crm", "vapi", "cal"
   status      IntegrationStatus  @default(NOT_CONNECTED)
   externalRef String? // opaque reference/id ONLY — never a raw secret, credential, API key, or token
+  config      Json? // non-secret runtime config for this provider (business name, FAQ, hours, event type id) — read by the service's runtime engine to build behavior per client without hardcoding it
   connectedAt DateTime?
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt

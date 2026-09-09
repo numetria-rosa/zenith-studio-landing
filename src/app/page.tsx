@@ -107,7 +107,7 @@ export default function ZenithStudioLandingPage() {
       accentBtn: "border-amber-300/30 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20",
       glow: "from-amber-300/[0.07] via-orange-400/[0.04] to-transparent",
       monthly: "$1,200/mo",
-      monthlyNote: "For the Intake Coordinator + Follow-Up Clerk, as one team. The Billing Clerk is priced on what it recovers, not a flat fee.",
+      monthlyNote: "For the Missed Call Text-Back + Follow-Up Clerk, as one team. The Billing Clerk is priced on what it recovers, not a flat fee.",
       stats: [
         ["38%", "average attorney utilization"],
         ["88%", "average realization rate"],
@@ -120,9 +120,9 @@ export default function ZenithStudioLandingPage() {
           anchor: "Priced on what it recovers.",
         },
         {
-          role: "AI Intake Coordinator",
-          text: "Answers every call and enquiry around the clock, qualifies against your case criteria, runs a conflicts pre-check, books the consult, and opens the matter.",
-          anchor: "A human intake coordinator costs $58,000 to $88,000 a year.",
+          role: "AI Missed Call Text-Back",
+          text: "The moment a call goes unanswered, the caller gets a text back in seconds, qualifies against your case criteria, and books the consult, so a missed call never turns into a call to the firm down the street.",
+          anchor: "34% of callers who reach voicemail never call your firm again.",
         },
         {
           role: "AI Follow-Up Clerk",

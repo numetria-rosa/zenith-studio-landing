@@ -83,7 +83,7 @@ export const SERVICES: Service[] = [
     title: "Law Firm AI Team",
     pitch: "Your firm works 49 hours a week and bills 37.",
     description:
-      "An AI Intake Coordinator, Follow-Up Clerk, and Billing Clerk as one team: answers and qualifies every enquiry, works the leads that didn't retain, and reconstructs billable time before the write-down window closes.",
+      "An AI Missed Call Text-Back, Follow-Up Clerk, and Billing Clerk as one team: texts back every unanswered call in seconds, works the leads that didn't retain, and reconstructs billable time before the write-down window closes.",
     setupPriceDisplay: "",
     monthlyPriceDisplay: "$1,200/mo",
     whopSetupPlanId: "",
