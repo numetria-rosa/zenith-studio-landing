@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { getService } from "@/lib/services";
 import { computeApprovedTotals, createDeferredMonthlyCheckout } from "@/lib/proposal-payments";
+import { provisionReceptionistIfNeeded } from "@/lib/receptionist-provisioning";
 import type { ProjectStage, ProposalItemKind, RequirementStatus, SupportStatus } from "@prisma/client";
 
 /* Admin-side ServiceProject operations (Slice 4 of the business command
@@ -192,7 +193,13 @@ type WriteResult = { ok: true } | { ok: false; error: string };
     project LIVE. Whop runs BEFORE the stage write so a flaky API leaves
     the project not-yet-LIVE and "Update stage → LIVE" is a clean retry.
     Also heals the prior partial-failure case (already LIVE,
-    whopMonthlyPlanId still null) when LIVE is submitted again. */
+    whopMonthlyPlanId still null) when LIVE is submitted again.
+
+    Also the trigger point for ai-receptionist onboarding automation
+    (provisionReceptionistIfNeeded): provisions the client's Vapi phone
+    number and Cal.com event type from their approved requirement answers.
+    Runs before the stage write for the same clean-retry reason, and no-ops
+    for every other service or once already provisioned. */
 export async function updateProjectStage(id: string, stage: string): Promise<WriteResult> {
   if (!isProjectStage(stage)) return { ok: false, error: `invalid stage "${stage}"` };
   const existing = await db.serviceProject.findUnique({
@@ -216,6 +223,9 @@ export async function updateProjectStage(id: string, stage: string): Promise<Wri
   if (stage === "LIVE") {
     const monthlyResult = await ensureSplitMonthlyCheckoutForProject(id, existing.proposal);
     if (!monthlyResult.ok) return monthlyResult;
+
+    const receptionistResult = await provisionReceptionistIfNeeded(id);
+    if (!receptionistResult.ok) return receptionistResult;
   }
 
   await db.serviceProject.update({ where: { id }, data: { stage } });

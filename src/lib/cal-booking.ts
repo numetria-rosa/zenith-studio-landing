@@ -77,3 +77,36 @@ export async function createBooking(input: CreateBookingInput): Promise<CreateBo
   if (!uid) return { ok: false, error: "booking created but no uid in response" };
   return { ok: true, bookingUid: uid };
 }
+
+export type CreateEventTypeResult =
+  | { ok: true; eventTypeId: number }
+  | { ok: false; error: string };
+
+/** Creates one Cal.com event type under Zenith's own account for a new
+    receptionist client — this is what onboarding provisions automatically
+    so no admin ever clicks through the Cal.com dashboard per client. */
+export async function createEventType(input: {
+  title: string;
+  slug: string;
+  lengthMinutes: number;
+}): Promise<CreateEventTypeResult> {
+  const res = await fetch(`${CAL_API_BASE}/event-types`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${calApiKey()}`,
+      "Content-Type": "application/json",
+      "cal-api-version": "2024-06-14",
+    },
+    body: JSON.stringify({
+      title: input.title,
+      slug: input.slug,
+      lengthInMinutes: input.lengthMinutes,
+    }),
+  });
+
+  if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}` };
+  const body = (await res.json()) as { data?: { id?: number } };
+  const id = body.data?.id;
+  if (typeof id !== "number") return { ok: false, error: "event type created but no id in response" };
+  return { ok: true, eventTypeId: id };
+}
