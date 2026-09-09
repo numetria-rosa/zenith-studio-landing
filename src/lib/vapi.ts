@@ -50,14 +50,22 @@ export function buildSystemPrompt(config: ReceptionistConfig): string {
   ].join("\n\n");
 }
 
-export function buildAssistantPayload(projectId: string, config: ReceptionistConfig) {
+export function buildAssistantPayload(
+  projectId: string,
+  config: ReceptionistConfig,
+  opts?: { serverUrl?: string }
+) {
   return {
     name: `Receptionist — ${config.businessName}`,
     firstMessage: `Thanks for calling ${config.businessName}, how can I help?`,
+    // Phone-number calls get their server URL from the number's own config
+    // (set in the Vapi dashboard); web calls have no such fallback, so the
+    // demo path passes one explicitly here.
+    ...(opts?.serverUrl ? { server: { url: opts.serverUrl } } : {}),
     model: {
       provider: "openai",
       model: "gpt-4o",
-      systemPrompt: buildSystemPrompt(config),
+      messages: [{ role: "system", content: buildSystemPrompt(config) }],
       tools: [
         {
           type: "function",
@@ -95,6 +103,51 @@ export async function lookupReceptionistByPhoneNumberId(
   });
   if (!integration || !isReceptionistConfig(integration.config)) return null;
   return { projectId: integration.projectId, config: integration.config };
+}
+
+/** Demo assistant for a prospect link (/demo/[slug]) — a web call, not a
+    phone number, so there's no Integration row and no real Cal.com booking.
+    Sent to the browser as-is for the Vapi Web SDK, so it must never carry a
+    secret (see the demo route for why). */
+export function buildDemoAssistantPayload(prospectId: string, businessName: string, niche: string, serverUrl: string) {
+  return {
+    name: `Demo Receptionist — ${businessName}`,
+    firstMessage: `Hi, thanks for calling ${businessName}, how can I help?`,
+    server: { url: serverUrl },
+    model: {
+      provider: "openai",
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: [
+            `You are a demo of Zenith Studio's AI receptionist, playing the receptionist for ${businessName}, a ${niche} business.`,
+            `Answer general questions the way a friendly front-desk person at a business like this would.`,
+            `If the caller wants to book an appointment, use the book_appointment tool and then confirm warmly — this is a demo, so nothing is really booked.`,
+            `Keep the call short and let the caller know at the end that this is exactly what their own callers would experience.`,
+          ].join("\n\n"),
+        },
+      ],
+      tools: [
+        {
+          type: "function",
+          function: {
+            name: "book_appointment",
+            description: "Acknowledge booking a demo appointment.",
+            parameters: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                preferredTime: { type: "string" },
+              },
+              required: ["name", "preferredTime"],
+            },
+          },
+        },
+      ],
+    },
+    metadata: { prospectId },
+  };
 }
 
 export type BookAppointmentArgs = {
