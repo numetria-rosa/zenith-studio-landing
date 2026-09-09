@@ -41,6 +41,15 @@ export const RECEPTIONIST_REQUIREMENTS: { label: string; detail: string }[] = [
   },
 ];
 
+// Extra requirement for law-firms (AI Missed Call Text-Back role) —
+// deliberately just one field, since this feature's whole value is being
+// the scaled-down, config-driven slice of the vertical package (see
+// twilio-text-back.ts). Matched by exact label the same way as
+// RECEPTIONIST_REQUIREMENTS above.
+export const TEXT_BACK_REQUIREMENTS: { label: string; detail: string }[] = [
+  { label: "Text-Back: business name", detail: "The exact name used in the missed-call message and text." },
+];
+
 export const KICKOFF_MESSAGE_BODY = `Welcome. Your project workspace is ready.
 
 Please work through the Requirements checklist on this page (upload or confirm each item). Once those are in, we'll move into build.
@@ -79,10 +88,13 @@ export async function createServiceProjectWithDefaults(tx: Tx, params: CreateSer
     })),
   });
 
-  const requirements =
+  const extraRequirements =
     params.sourceServiceId === "ai-receptionist"
-      ? [...DEFAULT_REQUIREMENTS, ...RECEPTIONIST_REQUIREMENTS]
-      : DEFAULT_REQUIREMENTS;
+      ? RECEPTIONIST_REQUIREMENTS
+      : params.sourceServiceId === "law-firms"
+        ? TEXT_BACK_REQUIREMENTS
+        : [];
+  const requirements = [...DEFAULT_REQUIREMENTS, ...extraRequirements];
 
   await tx.clientRequirement.createMany({
     data: requirements.map((r, i) => ({
