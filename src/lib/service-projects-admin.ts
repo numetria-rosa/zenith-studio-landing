@@ -168,6 +168,8 @@ export async function getServiceProjectForAdmin(id: string) {
       integrations: { orderBy: { createdAt: "asc" } },
       messages: { orderBy: { createdAt: "asc" }, include: { sender: { select: { name: true, email: true } } } },
       supportRequests: { orderBy: { createdAt: "desc" } },
+      oauthConnections: { orderBy: { createdAt: "asc" } },
+      timeEntries: { where: { status: "DRAFT" }, orderBy: { entryDate: "desc" } },
     },
   });
 }

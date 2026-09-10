@@ -29,6 +29,7 @@ import {
   TASK_PRIORITIES,
   TASK_PRIORITY_LABELS,
 } from "@/lib/tasks-admin";
+import { approveTimeEntry, rejectTimeEntry } from "@/lib/billing-clerk";
 
 /* Admin operations view for a single ServiceProject (Slice 4 of the
    business command center, 2026-08-28: /admin/projects/[id]). Every write
@@ -172,6 +173,24 @@ export default async function AdminProjectDetailPage({
     await postAdminMessage(id, session.user.id, body);
     revalidatePath(path);
     revalidatePath(`/lab/dashboard/services/${id}`);
+  }
+
+  async function approveEntry(formData: FormData) {
+    "use server";
+    const session = await requireAdmin();
+    if (!session?.user?.id) return;
+    const entryId = String(formData.get("entryId") || "");
+    await approveTimeEntry(entryId, session.user.id);
+    revalidatePath(path);
+  }
+
+  async function rejectEntry(formData: FormData) {
+    "use server";
+    const session = await requireAdmin();
+    if (!session?.user?.id) return;
+    const entryId = String(formData.get("entryId") || "");
+    await rejectTimeEntry(entryId, session.user.id);
+    revalidatePath(path);
   }
 
   async function changeSupportStatus(formData: FormData) {
@@ -507,6 +526,90 @@ export default async function AdminProjectDetailPage({
               </div>
             </div>
           ))}
+        </SectionCard>
+
+        {/* AI Billing Clerk — law-firms vertical only, but harmless to show
+            (empty) for any other project since it's just connections + drafts. */}
+        <SectionCard title={`Billing Clerk — drafts awaiting review (${project.timeEntries.length})`}>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href={`/api/oauth/google/authorize?projectId=${id}`}
+              className="rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-white/80 hover:bg-white/10"
+            >
+              Connect Google (Calendar + Gmail)
+            </a>
+            <a
+              href={`/api/oauth/microsoft/authorize?projectId=${id}`}
+              className="rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-white/80 hover:bg-white/10"
+            >
+              Connect Microsoft 365
+            </a>
+            <a
+              href={`/api/admin/projects/${id}/billing-export`}
+              className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-semibold text-emerald-200 hover:bg-emerald-400/20"
+            >
+              Export approved entries (CSV)
+            </a>
+          </div>
+
+          {project.oauthConnections.length > 0 && (
+            <div className="mt-4 space-y-2">
+              {project.oauthConnections.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4"
+                >
+                  <span className="text-sm font-semibold">
+                    {c.provider === "GOOGLE" ? "Google" : "Microsoft"} · {c.accountEmail}
+                  </span>
+                  <span
+                    className={`text-xs ${c.status === "CONNECTED" ? "text-emerald-300" : "text-amber-300"}`}
+                  >
+                    {c.status === "CONNECTED" ? "Connected" : c.status === "EXPIRED" ? "Needs reconnect" : "Revoked"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-4 space-y-3">
+            {project.timeEntries.length === 0 && (
+              <p className="text-sm text-white/50">No drafts waiting — nothing new since the last sync, or no calendar/email connected yet.</p>
+            )}
+            {project.timeEntries.map((entry) => (
+              <div key={entry.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="text-sm font-semibold">
+                    {entry.matterName} · {(entry.durationMinutes / 60).toFixed(1)}h
+                  </p>
+                  <span className="text-xs text-white/40">
+                    {formatDate(entry.entryDate)} · {entry.attorneyEmail} · {entry.sourceType}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-white/75">{entry.narrative}</p>
+                <div className="mt-3 flex gap-2">
+                  <form action={approveEntry}>
+                    <input type="hidden" name="entryId" value={entry.id} />
+                    <button
+                      type="submit"
+                      className="rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-black hover:scale-[1.02]"
+                    >
+                      Approve
+                    </button>
+                  </form>
+                  <form action={rejectEntry}>
+                    <input type="hidden" name="entryId" value={entry.id} />
+                    <button
+                      type="submit"
+                      className="rounded-full border border-white/15 px-4 py-1.5 text-xs font-semibold text-white/70 hover:bg-white/10"
+                    >
+                      Reject
+                    </button>
+                  </form>
+                </div>
+              </div>
+            ))}
+          </div>
         </SectionCard>
 
         {/* Messages */}

@@ -564,11 +564,82 @@ model ServiceProject {
   supportRequests SupportRequest[]
   tasks           Task[]
   leads           Lead[]
+  oauthConnections OAuthConnection[]
+  timeEntries      TimeEntry[]
 
   @@index([userId])
   @@index([proposalId])
   @@index([sourceServiceId])
   @@index([assigneeUserId])
+}
+
+enum OAuthProvider {
+  GOOGLE
+  MICROSOFT
+}
+
+enum OAuthConnectionStatus {
+  CONNECTED
+  EXPIRED
+  REVOKED
+}
+
+// The AI Billing Clerk role (law-firms vertical) needs read access to an
+// attorney's own calendar + email — a genuine per-client secret (a refresh
+// token), unlike every other Integration in this file which explicitly
+// forbids storing one. Encrypted at rest the same way User.passwordEnc is
+// (AES-256-GCM, key only in server env — see lib/secrets.ts), so a DB leak
+// alone still doesn't hand out live access to a firm's inbox.
+model OAuthConnection {
+  id                    String                 @id @default(cuid())
+  projectId             String
+  provider              OAuthProvider
+  accountEmail          String // whose mailbox/calendar this is
+  encryptedRefreshToken String                 @db.Text
+  scope                 String
+  status                OAuthConnectionStatus  @default(CONNECTED)
+  connectedAt           DateTime               @default(now())
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, provider, accountEmail])
+  @@index([projectId])
+}
+
+enum TimeEntryStatus {
+  DRAFT
+  APPROVED
+  REJECTED
+}
+
+// One AI-drafted billable-time line, reconstructed from a calendar event or
+// email thread. Never auto-sent — "You approve every entry" is enforced
+// here as a real status gate, not just marketing copy: nothing counts
+// toward an invoice until an admin/attorney flips it to APPROVED (see
+// billing-clerk.ts). sourceRef + the unique constraint below make re-running
+// a sync idempotent — the same calendar event never becomes two entries.
+model TimeEntry {
+  id              String          @id @default(cuid())
+  projectId       String
+  attorneyEmail   String
+  matterName      String
+  entryDate       DateTime
+  durationMinutes Int
+  narrative       String          @db.Text
+  sourceType      String // "calendar" | "email"
+  sourceRef       String // external event/message id
+  status          TimeEntryStatus @default(DRAFT)
+  reviewedByUserId String?
+  reviewedAt      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, sourceType, sourceRef])
+  @@index([projectId, status])
 }
 
 enum LeadStatus {
