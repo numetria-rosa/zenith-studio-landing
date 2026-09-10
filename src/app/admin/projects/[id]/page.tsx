@@ -530,7 +530,7 @@ export default async function AdminProjectDetailPage({
 
         {/* AI Billing Clerk — law-firms vertical only, but harmless to show
             (empty) for any other project since it's just connections + drafts. */}
-        <SectionCard title={`Billing Clerk — drafts awaiting review (${project.timeEntries.length})`}>
+        <SectionCard title={`Billing Clerk: drafts awaiting review (${project.timeEntries.length})`}>
           <div className="flex flex-wrap gap-3">
             <a
               href={`/api/oauth/google/authorize?projectId=${id}`}
@@ -574,7 +574,7 @@ export default async function AdminProjectDetailPage({
 
           <div className="mt-4 space-y-3">
             {project.timeEntries.length === 0 && (
-              <p className="text-sm text-white/50">No drafts waiting — nothing new since the last sync, or no calendar/email connected yet.</p>
+              <p className="text-sm text-white/50">No drafts waiting. Nothing new since the last sync, or no calendar/email connected yet.</p>
             )}
             {project.timeEntries.map((entry) => (
               <div key={entry.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">

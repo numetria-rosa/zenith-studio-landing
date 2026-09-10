@@ -97,6 +97,16 @@ export async function sendOutreachEmail(input: {
   return { ok: true, resendId: data?.id ?? null };
 }
 
+/** A plain transactional email to an arbitrary recipient — e.g. notifying a
+    client's own business inbox of a new lead, not a Zenith admin alert and
+    not a marketing send, so no unsubscribe link is forced (unlike
+    sendOutreachEmail's required unsubscribeUrl). */
+export async function sendPlainEmail(to: string, subject: string, text: string): Promise<void> {
+  const client = getResendClient();
+  if (!client) return;
+  await client.emails.send({ from: FROM_ADDRESS, to, subject, text });
+}
+
 export async function sendAdminAlert(subject: string, text: string): Promise<void> {
   const client = getResendClient();
   if (!client) return;

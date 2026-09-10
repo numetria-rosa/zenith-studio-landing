@@ -660,7 +660,14 @@ model Lead {
   name      String?
   phone     String?
   email     String?
-  source    String // e.g. "missed-call-text-back", "manual"
+  message   String?    @db.Text // the enquiry text itself, for web-form leads
+  source    String // e.g. "missed-call-text-back", "web-form", "manual"
+
+  // AI Lead Capture & Follow-Up only — null for every other source. Never
+  // gates the follow-up sequence itself (a "not qualified" lead still gets
+  // worked; this is visibility for the business, not an auto-reject).
+  qualified         Boolean?
+  qualificationNote String?    @db.Text
 
   status             LeadStatus @default(NEW)
   sequenceStep       Int        @default(0)

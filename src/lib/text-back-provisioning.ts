@@ -52,7 +52,7 @@ export async function provisionTextBackIfNeeded(projectId: string): Promise<Resu
   });
 
   await sendAdminAlert(
-    `Missed Call Text-Back live — ${businessName}`,
+    `Missed Call Text-Back live for ${businessName}`,
     `SignalWire number ${purchaseResult.phoneNumber} is live for ${businessName}. Tell them to forward-on-no-answer to this number.`
   );
 

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   const tokenResult = await exchangeMicrosoftCode(code);
   if (!tokenResult.ok) return new Response(`token exchange failed: ${tokenResult.error}`, { status: 502 });
   if (!tokenResult.refreshToken) {
-    return new Response("Microsoft did not return a refresh token — check that offline_access is in the requested scope.", {
+    return new Response("Microsoft did not return a refresh token. Check that offline_access is in the requested scope.", {
       status: 502,
     });
   }

@@ -34,10 +34,10 @@ export const DEFAULT_REQUIREMENTS: { label: string; detail: string }[] = [
 // label string is the contract between this file and that one.
 export const RECEPTIONIST_REQUIREMENTS: { label: string; detail: string }[] = [
   { label: "Receptionist: business name", detail: "The exact name the AI should use when it answers the phone." },
-  { label: "Receptionist: business hours", detail: "e.g. Mon-Fri 9am-6pm — used to answer 'are you open' questions." },
+  { label: "Receptionist: business hours", detail: "e.g. Mon-Fri 9am-6pm, used to answer 'are you open' questions." },
   {
     label: "Receptionist: FAQ / common questions",
-    detail: "Anything the AI should be able to answer on its own — services, pricing, location, policies.",
+    detail: "Anything the AI should be able to answer on its own: services, pricing, location, policies.",
   },
 ];
 
@@ -48,6 +48,17 @@ export const RECEPTIONIST_REQUIREMENTS: { label: string; detail: string }[] = [
 // RECEPTIONIST_REQUIREMENTS above.
 export const TEXT_BACK_REQUIREMENTS: { label: string; detail: string }[] = [
   { label: "Text-Back: business name", detail: "The exact name used in the missed-call message and text." },
+];
+
+// Extra requirements for ai-lead-capture — matched by exact label in
+// lead-capture-provisioning.ts.
+export const LEAD_CAPTURE_REQUIREMENTS: { label: string; detail: string }[] = [
+  { label: "Lead Capture: business name", detail: "The name used when replying to a new enquiry." },
+  {
+    label: "Lead Capture: qualification rules",
+    detail: "In plain language, what makes an enquiry worth pursuing (e.g. service area, budget, timing).",
+  },
+  { label: "Lead Capture: notify email", detail: "Where we send you a copy of every new enquiry." },
 ];
 
 export const KICKOFF_MESSAGE_BODY = `Welcome. Your project workspace is ready.
@@ -93,7 +104,9 @@ export async function createServiceProjectWithDefaults(tx: Tx, params: CreateSer
       ? RECEPTIONIST_REQUIREMENTS
       : params.sourceServiceId === "law-firms"
         ? TEXT_BACK_REQUIREMENTS
-        : [];
+        : params.sourceServiceId === "ai-lead-capture"
+          ? LEAD_CAPTURE_REQUIREMENTS
+          : [];
   const requirements = [...DEFAULT_REQUIREMENTS, ...extraRequirements];
 
   await tx.clientRequirement.createMany({

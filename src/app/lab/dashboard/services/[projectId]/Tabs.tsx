@@ -14,6 +14,7 @@ const TABS = [
   { id: "requirements", label: "Requirements" },
   { id: "integrations", label: "Integrations" },
   { id: "billing", label: "Billing" },
+  { id: "leads", label: "Leads" },
   { id: "files", label: "Files" },
   { id: "messages", label: "Messages" },
   { id: "performance", label: "Performance" },

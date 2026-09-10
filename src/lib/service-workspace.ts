@@ -27,6 +27,7 @@ export async function getOwnedServiceProject(projectId: string, userId: string) 
       supportRequests: { orderBy: { createdAt: "desc" } },
       oauthConnections: { orderBy: { createdAt: "asc" } },
       timeEntries: { orderBy: { entryDate: "desc" } },
+      leads: { orderBy: { createdAt: "desc" } },
     },
   });
 }

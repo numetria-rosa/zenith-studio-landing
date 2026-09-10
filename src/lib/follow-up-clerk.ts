@@ -79,7 +79,7 @@ export async function stopSequenceOnReply(leadId: string, replyBody: string, bus
     data: { sequenceStoppedAt: new Date(), sequenceStopReason: "replied" },
   });
   await sendAdminAlert(
-    `Lead replied — ${businessName}`,
-    `A lead replied: "${replyBody}". Their follow-up sequence has been stopped — please respond directly.`
+    `Lead replied for ${businessName}`,
+    `A lead replied: "${replyBody}". Their follow-up sequence has been stopped, please respond directly.`
   );
 }

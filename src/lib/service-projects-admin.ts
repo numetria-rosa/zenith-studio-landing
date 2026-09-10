@@ -3,6 +3,7 @@ import { getService } from "@/lib/services";
 import { computeApprovedTotals, createDeferredMonthlyCheckout } from "@/lib/proposal-payments";
 import { provisionReceptionistIfNeeded } from "@/lib/receptionist-provisioning";
 import { provisionTextBackIfNeeded } from "@/lib/text-back-provisioning";
+import { provisionLeadCaptureIfNeeded } from "@/lib/lead-capture-provisioning";
 import type { ProjectStage, ProposalItemKind, RequirementStatus, SupportStatus } from "@prisma/client";
 
 /* Admin-side ServiceProject operations (Slice 4 of the business command
@@ -232,6 +233,9 @@ export async function updateProjectStage(id: string, stage: string): Promise<Wri
 
     const textBackResult = await provisionTextBackIfNeeded(id);
     if (!textBackResult.ok) return textBackResult;
+
+    const leadCaptureResult = await provisionLeadCaptureIfNeeded(id);
+    if (!leadCaptureResult.ok) return leadCaptureResult;
   }
 
   await db.serviceProject.update({ where: { id }, data: { stage } });

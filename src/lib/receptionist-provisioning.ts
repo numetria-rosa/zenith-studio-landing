@@ -67,7 +67,7 @@ export async function provisionReceptionistIfNeeded(projectId: string): Promise<
   if (!phoneResult.ok) return { ok: false, error: `Vapi phone number: ${phoneResult.error}` };
 
   const eventTypeResult = await createEventType({
-    title: `${businessName} — Consultation`,
+    title: `${businessName} Consultation`,
     slug: `${slugify(businessName)}-${project.id.slice(-6)}`,
     lengthMinutes: 30,
   });
@@ -90,7 +90,7 @@ export async function provisionReceptionistIfNeeded(projectId: string): Promise<
   });
 
   await sendAdminAlert(
-    `Receptionist live — ${businessName}`,
+    `Receptionist live for ${businessName}`,
     `Phone number ${phoneResult.number} is live for ${businessName}. Cal.com event type ${eventTypeResult.eventTypeId} created.`
   );
 

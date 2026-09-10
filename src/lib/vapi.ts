@@ -56,7 +56,7 @@ export function buildAssistantPayload(
   opts?: { serverUrl?: string }
 ) {
   return {
-    name: `Receptionist — ${config.businessName}`,
+    name: `Receptionist for ${config.businessName}`,
     firstMessage: `Thanks for calling ${config.businessName}, how can I help?`,
     // Phone-number calls get their server URL from the number's own config
     // (set in the Vapi dashboard); web calls have no such fallback, so the
@@ -111,7 +111,7 @@ export async function lookupReceptionistByPhoneNumberId(
     secret (see the demo route for why). */
 export function buildDemoAssistantPayload(prospectId: string, businessName: string, niche: string, serverUrl: string) {
   return {
-    name: `Demo Receptionist — ${businessName}`,
+    name: `Demo Receptionist for ${businessName}`,
     firstMessage: `Hi, thanks for calling ${businessName}, how can I help?`,
     server: { url: serverUrl },
     model: {
@@ -175,7 +175,7 @@ export async function runBookAppointment(
   rawArgs: unknown
 ): Promise<{ ok: boolean; message: string }> {
   if (!isBookAppointmentArgs(rawArgs)) {
-    return { ok: false, message: "I didn't get complete booking details — could you repeat those?" };
+    return { ok: false, message: "I didn't get complete booking details, could you repeat those?" };
   }
 
   const integration = await db.integration.findFirst({
@@ -189,7 +189,7 @@ export async function runBookAppointment(
 
   const requested = new Date(rawArgs.preferredStartISO);
   if (Number.isNaN(requested.getTime())) {
-    return { ok: false, message: "That date and time didn't parse — could you say it again?" };
+    return { ok: false, message: "That date and time didn't parse, could you say it again?" };
   }
 
   const dayStart = new Date(requested);
@@ -202,7 +202,7 @@ export async function runBookAppointment(
   const chosen = exact ?? slots.find((s) => new Date(s.start) >= requested) ?? slots[0];
 
   if (!chosen) {
-    return { ok: false, message: "There's nothing open that day — want to try another day?" };
+    return { ok: false, message: "There's nothing open that day, want to try another day?" };
   }
 
   const result = await createBooking({
@@ -214,7 +214,7 @@ export async function runBookAppointment(
   });
 
   if (!result.ok) {
-    return { ok: false, message: "Something went wrong booking that — a team member will follow up to confirm." };
+    return { ok: false, message: "Something went wrong booking that, a team member will follow up to confirm." };
   }
 
   await recordBookingMetric(projectId);

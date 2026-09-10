@@ -17,6 +17,7 @@ import {
   rejectOwnedTimeEntry,
 } from "@/lib/service-workspace";
 import { ProjectTabs } from "./Tabs";
+import { getSiteUrl } from "@/lib/site";
 
 /* Client-facing service project workspace (Slice 7 of the service-platform
    build, 2026-08-28). Loaded from /lab/dashboard's "My projects" list.
@@ -271,7 +272,7 @@ export default async function ServiceProjectPage({
                 <div>
                   <p className="text-[13px] text-[#9aa0ae]">
                     Connect the calendar and email of the attorney whose billable time should be tracked. Nothing
-                    is ever sent or invoiced automatically — every entry below waits for you to approve it.
+                    is ever sent or invoiced automatically. Every entry below waits for you to approve it.
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     <a
@@ -326,7 +327,7 @@ export default async function ServiceProjectPage({
                   <div className="mt-3 flex flex-col gap-3">
                     {project.timeEntries.filter((e) => e.status === "DRAFT").length === 0 && (
                       <p className="text-sm text-[#9aa0ae]">
-                        Nothing to review right now — connect a calendar/email above if you haven&apos;t yet.
+                        Nothing to review right now. Connect a calendar/email above if you haven&apos;t yet.
                       </p>
                     )}
                     {project.timeEntries
@@ -392,6 +393,58 @@ export default async function ServiceProjectPage({
                     </div>
                   </div>
                 )}
+              </div>
+            ),
+
+            leads: (
+              <div className="flex flex-col gap-6">
+                <div className="rounded-xl border border-[#333a4c] bg-[#191d26] p-5">
+                  <p className="text-[13.5px] text-[#9aa0ae]">
+                    Point your existing website form at this address to capture enquiries automatically. It
+                    accepts a normal form POST with <code className="text-[#f0b429]">name</code>,{" "}
+                    <code className="text-[#f0b429]">email</code>, <code className="text-[#f0b429]">phone</code>,
+                    and <code className="text-[#f0b429]">message</code> fields.
+                  </p>
+                  <p className="mt-3 break-all font-[family-name:var(--font-course-mono)] text-[12px] text-[#f0b429]">
+                    {getSiteUrl()}/api/leads/capture/{projectId}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  {project.leads.length === 0 && (
+                    <p className="text-sm text-[#9aa0ae]">
+                      No enquiries yet. They&apos;ll appear here the moment your form (or a missed call) sends one
+                      in.
+                    </p>
+                  )}
+                  {project.leads.map((lead) => (
+                    <div key={lead.id} className="rounded-xl border border-[#232838] bg-[#0d1016] p-5">
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <span className="text-[14.5px] font-bold">
+                          {lead.name || lead.email || lead.phone || "Unknown"}
+                        </span>
+                        <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
+                          {lead.status} &middot; {lead.createdAt.toISOString().slice(0, 10)}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-[12px] text-[#676e7d]">
+                        {[lead.email, lead.phone].filter(Boolean).join(" · ") || "No contact info"} &middot; source:{" "}
+                        {lead.source}
+                      </p>
+                      {lead.message && <p className="mt-2 text-[13.5px] text-[#9aa0ae]">{lead.message}</p>}
+                      {lead.qualified !== null && (
+                        <p
+                          className={`mt-2 text-[12px] font-semibold ${
+                            lead.qualified ? "text-[#4ade95]" : "text-[#f0b429]"
+                          }`}
+                        >
+                          {lead.qualified ? "Qualified" : "Not qualified"}
+                          {lead.qualificationNote ? `: ${lead.qualificationNote}` : ""}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             ),
 

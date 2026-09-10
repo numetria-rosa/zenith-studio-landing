@@ -26,8 +26,8 @@ export default function DemoCallButton({ assistant }: { assistant: Record<string
     idle: "Talk to it now",
     connecting: "Connecting...",
     active: "On the call...",
-    ended: "Call ended — talk again",
-    error: "Something went wrong — refresh and try again",
+    ended: "Call ended, talk again",
+    error: "Something went wrong, refresh and try again",
   };
 
   return (

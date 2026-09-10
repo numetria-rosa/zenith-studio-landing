@@ -21,7 +21,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   if (!tokenResult.ok) return new Response(`token exchange failed: ${tokenResult.error}`, { status: 502 });
   if (!tokenResult.refreshToken) {
     return new Response(
-      "Google did not return a refresh token. This usually means the account already granted consent once before — revoke access at myaccount.google.com/permissions and try connecting again.",
+      "Google did not return a refresh token. This usually means the account already granted consent once before. Revoke access at myaccount.google.com/permissions and try connecting again.",
       { status: 502 }
     );
   }

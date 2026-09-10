@@ -83,7 +83,7 @@ export type PurchaseNumberResult =
     failure rather than assuming success. */
 export async function purchaseSignalwireNumber(input: {
   areaCode: string;
-  voiceUrl: string;
+  voiceUrl?: string;
   smsUrl: string;
 }): Promise<PurchaseNumberResult> {
   try {
@@ -96,8 +96,10 @@ export async function purchaseSignalwireNumber(input: {
 
     const purchased = await client.incomingPhoneNumbers.create({
       phoneNumber: candidate.phoneNumber,
-      voiceUrl: input.voiceUrl,
-      voiceMethod: "POST",
+      // voiceUrl omitted entirely (not an empty string) when a number is
+      // SMS-only, e.g. Lead Capture's number — some phone APIs reject an
+      // empty-string URL param as invalid rather than treating it as "none".
+      ...(input.voiceUrl ? { voiceUrl: input.voiceUrl, voiceMethod: "POST" } : {}),
       smsUrl: input.smsUrl,
       smsMethod: "POST",
     });
