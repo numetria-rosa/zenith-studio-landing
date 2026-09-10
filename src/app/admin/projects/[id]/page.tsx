@@ -32,6 +32,7 @@ import {
 } from "@/lib/tasks-admin";
 import { approveTimeEntry, rejectTimeEntry } from "@/lib/billing-clerk";
 import { LAW_FIRM_SPECIALTIES, LEGAL_SPECIALTY_PROFILES } from "@/lib/legal-specialties";
+import { getMonthlyCostCents, resolveMonthlyBudgetCents } from "@/lib/usage-costs";
 
 /* Admin operations view for a single ServiceProject (Slice 4 of the
    business command center, 2026-08-28: /admin/projects/[id]). Every write
@@ -96,6 +97,12 @@ export default async function AdminProjectDetailPage({
     listTasksForProject(id),
   ]);
   if (!project) notFound();
+
+  const [monthlySpentCents, monthlyBudgetCents] = await Promise.all([
+    getMonthlyCostCents(id),
+    resolveMonthlyBudgetCents(id),
+  ]);
+  const usagePct = monthlyBudgetCents > 0 ? Math.round((monthlySpentCents / monthlyBudgetCents) * 100) : 0;
 
   const path = `/admin/projects/${id}`;
 
@@ -395,6 +402,34 @@ export default async function AdminProjectDetailPage({
               Update stage
             </button>
           </form>
+        </SectionCard>
+
+        {/* Usage/margin health, see usage-costs.ts. Budget is 30% of this
+            project's monthly price, targeting 70% net margin. */}
+        <SectionCard title="Monthly API usage">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-white/70">
+              ${(monthlySpentCents / 100).toFixed(2)} spent of ${(monthlyBudgetCents / 100).toFixed(2)} budget this
+              month ({usagePct}%)
+            </p>
+            <span
+              className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+                usagePct >= 100
+                  ? "border-red-400/40 bg-red-400/10 text-red-300"
+                  : usagePct >= 90
+                    ? "border-amber-400/40 bg-amber-400/10 text-amber-300"
+                    : "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+              }`}
+            >
+              {usagePct >= 100 ? "Over budget" : usagePct >= 90 ? "Near limit" : "Healthy"}
+            </span>
+          </div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+            <div
+              className={`h-full ${usagePct >= 100 ? "bg-red-400" : usagePct >= 90 ? "bg-amber-400" : "bg-emerald-400"}`}
+              style={{ width: `${Math.min(usagePct, 100)}%` }}
+            />
+          </div>
         </SectionCard>
 
         {/* Assignee / target launch */}

@@ -9,6 +9,7 @@ import {
   recordCallEndMetrics,
 } from "@/lib/vapi";
 import { sendAdminAlert } from "@/lib/outreach-mail";
+import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 
 /* Vapi → Zenith webhook. One server URL handles every event in a call's
    lifecycle, discriminated by message.type. Verify the shared secret
@@ -27,6 +28,7 @@ type VapiMessage = {
   durationSeconds?: number;
   startedAt?: string;
   endedAt?: string;
+  cost?: number; // Vapi's real per-call cost in USD, when present in the payload
 };
 
 function parseArguments(raw: unknown): unknown {
@@ -119,6 +121,14 @@ export async function POST(request: NextRequest): Promise<Response> {
         `A call on project ${projectId} ended with reason "${message.endedReason}" and may need follow-up.`
       );
     }
+
+    // Real cost when Vapi includes one, otherwise a duration-based
+    // estimate, see usage-costs.ts for why neither is exact accounting.
+    const costCents =
+      typeof message.cost === "number" && message.cost > 0
+        ? Math.round(message.cost * 100)
+        : Math.round((duration / 60) * ESTIMATED_COST_CENTS.VAPI_PER_MINUTE_FALLBACK);
+    await recordUsageCost(projectId, costCents, "vapi call");
 
     return new Response("OK", { status: 200 });
   }

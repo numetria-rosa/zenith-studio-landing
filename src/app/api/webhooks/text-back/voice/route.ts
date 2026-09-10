@@ -7,6 +7,7 @@ import {
   sendSms,
   isTextBackConfig,
 } from "@/lib/signalwire-text-back";
+import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 
 /* SignalWire Voice webhook for one client's AI Missed Call Text-Back number.
    The firm's own carrier has already forwarded-on-no-answer to this number
@@ -71,6 +72,12 @@ export async function POST(request: NextRequest): Promise<Response> {
       value: 1,
     },
   });
+
+  await recordUsageCost(
+    integration.projectId,
+    ESTIMATED_COST_CENTS.SIGNALWIRE_VOICE_TRIGGER + (smsResult.ok ? ESTIMATED_COST_CENTS.SIGNALWIRE_SMS : 0),
+    "missed-call text-back"
+  );
 
   // Feeds the Follow-Up Clerk: every missed call that isn't already being
   // worked becomes a lead. Don't duplicate one still in progress.

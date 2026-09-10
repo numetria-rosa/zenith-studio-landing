@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { sendSms, isTextBackConfig } from "@/lib/signalwire-text-back";
 import { sendAdminAlert } from "@/lib/outreach-mail";
+import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 
 /* The AI Follow-Up Clerk role (law-firms vertical), works leads that
    didn't retain on first contact until they book, reply, or the sequence
@@ -64,7 +65,10 @@ export async function processFollowUps(): Promise<{ processed: number; lost: num
       },
     });
 
-    if (result.ok) sent++;
+    if (result.ok) {
+      sent++;
+      await recordUsageCost(lead.projectId, ESTIMATED_COST_CENTS.SIGNALWIRE_SMS, "follow-up clerk sms");
+    }
     if (isLastStep) lost++;
   }
 

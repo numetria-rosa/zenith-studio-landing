@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { groqChatCompletion } from "@/lib/groq";
 import { sendSms } from "@/lib/signalwire-text-back";
 import { sendPlainEmail } from "@/lib/outreach-mail";
+import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 
 /* AI Lead Capture & Follow-Up runtime. Reuses the same Lead model and the
    same day-1/3/7 SMS sequence engine (follow-up-clerk.ts's processFollowUps
@@ -66,6 +67,7 @@ export async function captureLead(projectId: string, input: CaptureInput): Promi
   const { businessName, qualificationRules, notifyEmail } = integration.config;
 
   const qualification = await qualifyLead(qualificationRules, input);
+  await recordUsageCost(projectId, ESTIMATED_COST_CENTS.GROQ_CALL, "lead capture qualification");
 
   const lead = await db.lead.create({
     data: {
@@ -89,6 +91,7 @@ export async function captureLead(projectId: string, input: CaptureInput): Promi
       from: integration.externalRef,
       body: `Thanks for reaching out to ${businessName}! We received your message and will be in touch shortly.`,
     });
+    await recordUsageCost(projectId, ESTIMATED_COST_CENTS.SIGNALWIRE_SMS, "lead capture confirmation sms");
   } else if (input.email) {
     await sendPlainEmail(
       input.email,

@@ -10,6 +10,7 @@ import { fetchMicrosoftCalendarEvents, fetchMicrosoftRecentEmails } from "@/lib/
 import { groqChatCompletion } from "@/lib/groq";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import { specialtyProfile, type LegalSpecialtyProfile } from "@/lib/legal-specialties";
+import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 import type { OAuthConnection } from "@prisma/client";
 
 /* AI Billing Clerk, reconstructs billable time (or, for contingency
@@ -132,6 +133,7 @@ export async function syncAndDraftTimeEntriesForConnection(
       `Calendar meeting titled "${event.summary}" with attendees: ${event.attendeeEmails.join(", ") || "none listed"}.`,
       realDurationMinutes
     );
+    await recordUsageCost(connection.projectId, ESTIMATED_COST_CENTS.GROQ_CALL, "billing clerk draft");
     await db.timeEntry.create({
       data: {
         projectId: connection.projectId,
@@ -157,6 +159,7 @@ export async function syncAndDraftTimeEntriesForConnection(
       `Email from ${email.fromEmail}, subject "${email.subject}": ${email.snippet}`,
       12
     );
+    await recordUsageCost(connection.projectId, ESTIMATED_COST_CENTS.GROQ_CALL, "billing clerk draft");
     await db.timeEntry.create({
       data: {
         projectId: connection.projectId,
