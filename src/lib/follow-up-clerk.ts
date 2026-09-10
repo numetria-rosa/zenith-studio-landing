@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { sendSms, isTextBackConfig } from "@/lib/twilio-text-back";
+import { sendSms, isTextBackConfig } from "@/lib/signalwire-text-back";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 
 /* The AI Follow-Up Clerk role (law-firms vertical) — works leads that
@@ -33,7 +33,7 @@ function daysSince(date: Date): number {
 export async function processFollowUps(): Promise<{ processed: number; lost: number; sent: number }> {
   const leads = await db.lead.findMany({
     where: { status: { in: ["NEW", "IN_SEQUENCE"] }, sequenceStoppedAt: null },
-    include: { project: { include: { integrations: { where: { provider: "twilio" } } } } },
+    include: { project: { include: { integrations: { where: { provider: "signalwire" } } } } },
   });
 
   let sent = 0;

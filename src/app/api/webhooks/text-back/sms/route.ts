@@ -1,9 +1,9 @@
 import type { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { verifyTwilioSignature, isTextBackConfig } from "@/lib/twilio-text-back";
+import { verifySignalwireSignature, isTextBackConfig } from "@/lib/signalwire-text-back";
 import { stopSequenceOnReply } from "@/lib/follow-up-clerk";
 
-/* Twilio inbound SMS webhook, shared by the same number Missed Call
+/* SignalWire inbound SMS webhook, shared by the same number Missed Call
    Text-Back provisions. Its only job is detecting a reply so the Follow-Up
    Clerk's sequence stops and a human takes over — no AI conversation here
    (that's a separate, not-yet-built layer). */
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest): Promise<Response> {
   const params: Record<string, string> = {};
   for (const [key, value] of formData.entries()) params[key] = String(value);
 
-  if (!verifyTwilioSignature(request.url, params, request.headers.get("x-twilio-signature"))) {
+  if (!verifySignalwireSignature(request.url, params, request.headers.get("x-signalwire-signature"))) {
     return new Response("invalid signature", { status: 400 });
   }
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (!toNumber || !fromNumber) return new Response("missing To/From", { status: 400 });
 
   const integration = await db.integration.findFirst({
-    where: { provider: "twilio", externalRef: toNumber },
+    where: { provider: "signalwire", externalRef: toNumber },
     select: { projectId: true, config: true },
   });
   if (!integration || !isTextBackConfig(integration.config)) return emptyTwiml();

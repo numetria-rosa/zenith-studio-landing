@@ -1,20 +1,20 @@
 import type { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import {
-  verifyTwilioSignature,
+  verifySignalwireSignature,
   buildMissedCallSpokenMessage,
   buildMissedCallSmsBody,
   sendSms,
   isTextBackConfig,
-} from "@/lib/twilio-text-back";
+} from "@/lib/signalwire-text-back";
 
-/* Twilio Voice webhook for one client's AI Missed Call Text-Back number.
-   The firm's own carrier has already forwarded-on-no-answer to this Twilio
-   number by the time this fires, so there is nothing to "answer" — this
-   route's only jobs are: identify which client owns the dialed number,
-   text the caller back immediately, and speak one short line before the
-   call ends. No AI voice conversation, no Vapi involvement, no per-minute
-   AI cost for a call nobody was going to have anyway. */
+/* SignalWire Voice webhook for one client's AI Missed Call Text-Back number.
+   The firm's own carrier has already forwarded-on-no-answer to this number
+   by the time this fires, so there is nothing to "answer" — this route's
+   only jobs are: identify which client owns the dialed number, text the
+   caller back immediately, and speak one short line before the call ends.
+   No AI voice conversation, no Vapi involvement, no per-minute AI cost for
+   a call nobody was going to have anyway. */
 
 function xmlEscape(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -30,26 +30,27 @@ export async function POST(request: NextRequest): Promise<Response> {
   const params: Record<string, string> = {};
   for (const [key, value] of formData.entries()) params[key] = String(value);
 
-  // Twilio requires validation against the exact public URL it called —
+  // SignalWire requires validation against the exact public URL it called —
   // request.url is correct for a directly-hosted Vercel deployment (no
   // reverse proxy rewriting the host in front of this app).
-  if (!verifyTwilioSignature(request.url, params, request.headers.get("x-twilio-signature"))) {
+  if (!verifySignalwireSignature(request.url, params, request.headers.get("x-signalwire-signature"))) {
     return new Response("invalid signature", { status: 400 });
   }
 
   const toNumber = params.To;
-  // Forwarded calls carry the original caller's number in From; Twilio adds
-  // ForwardedFrom for genuinely forwarded legs, which takes precedence when
-  // present since From can sometimes be the forwarding carrier's own number.
+  // Forwarded calls carry the original caller's number in From; SignalWire
+  // adds ForwardedFrom for genuinely forwarded legs (Twilio-compatible
+  // field name), which takes precedence when present since From can
+  // sometimes be the forwarding carrier's own number.
   const callerNumber = params.ForwardedFrom || params.From;
   if (!toNumber || !callerNumber) return new Response("missing To/From", { status: 400 });
 
   const integration = await db.integration.findFirst({
-    where: { provider: "twilio", externalRef: toNumber },
+    where: { provider: "signalwire", externalRef: toNumber },
     select: { projectId: true, config: true },
   });
   if (!integration || !isTextBackConfig(integration.config)) {
-    console.error(`[text-back voice webhook] no client configured for Twilio number ${toNumber}`);
+    console.error(`[text-back voice webhook] no client configured for number ${toNumber}`);
     return twiml("We are unable to take your call right now. Please try again later.");
   }
 

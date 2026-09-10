@@ -51,7 +51,7 @@ export default function PrivacyPage() {
         <h2 className="mt-10 text-lg font-semibold">Third-party services</h2>
         <p className="mt-4 text-[15px] leading-7 text-white/75">
           We use trusted third-party providers to deliver our services, including Google and Microsoft (for
-          calendar/email access you explicitly authorize), Twilio (for phone and SMS), Vapi (for AI voice
+          calendar/email access you explicitly authorize), SignalWire (for phone and SMS), Vapi (for AI voice
           calls), Cal.com (for appointment booking), Groq (for AI text drafting), Resend (for email delivery),
           and Whop (for payments). Each provider only receives the data necessary to perform its function.
         </p>

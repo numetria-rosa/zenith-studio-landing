@@ -44,7 +44,7 @@ export const RECEPTIONIST_REQUIREMENTS: { label: string; detail: string }[] = [
 // Extra requirement for law-firms (AI Missed Call Text-Back role) —
 // deliberately just one field, since this feature's whole value is being
 // the scaled-down, config-driven slice of the vertical package (see
-// twilio-text-back.ts). Matched by exact label the same way as
+// signalwire-text-back.ts). Matched by exact label the same way as
 // RECEPTIONIST_REQUIREMENTS above.
 export const TEXT_BACK_REQUIREMENTS: { label: string; detail: string }[] = [
   { label: "Text-Back: business name", detail: "The exact name used in the missed-call message and text." },
