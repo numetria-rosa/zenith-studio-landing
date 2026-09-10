@@ -25,6 +25,8 @@ export async function getOwnedServiceProject(projectId: string, userId: string) 
       documents: { orderBy: { createdAt: "desc" } },
       messages: { orderBy: { createdAt: "asc" } },
       supportRequests: { orderBy: { createdAt: "desc" } },
+      oauthConnections: { orderBy: { createdAt: "asc" } },
+      timeEntries: { orderBy: { entryDate: "desc" } },
     },
   });
 }
@@ -97,6 +99,38 @@ export async function submitClientRequirement(
   await db.clientRequirement.update({
     where: { id: requirement.id },
     data: { detail: trimmed, status: "SUBMITTED" },
+  });
+  return { ok: true };
+}
+
+/** The Billing Clerk's "you approve every entry" promise, enforced here:
+    only the project's own owner (the attorney/partner) can approve or
+    reject a draft, re-verified independently in one scoped query — the
+    same IDOR-safe pattern as every other action in this file. Refuses
+    anything not currently DRAFT (already-reviewed entries aren't
+    re-reviewable from here). */
+export async function approveOwnedTimeEntry(projectId: string, userId: string, entryId: string): Promise<RequirementSubmitResult> {
+  const entry = await db.timeEntry.findFirst({
+    where: { id: entryId, projectId, status: "DRAFT", project: { userId } },
+    select: { id: true },
+  });
+  if (!entry) return { ok: false, error: "not_found" };
+  await db.timeEntry.update({
+    where: { id: entry.id },
+    data: { status: "APPROVED", reviewedByUserId: userId, reviewedAt: new Date() },
+  });
+  return { ok: true };
+}
+
+export async function rejectOwnedTimeEntry(projectId: string, userId: string, entryId: string): Promise<RequirementSubmitResult> {
+  const entry = await db.timeEntry.findFirst({
+    where: { id: entryId, projectId, status: "DRAFT", project: { userId } },
+    select: { id: true },
+  });
+  if (!entry) return { ok: false, error: "not_found" };
+  await db.timeEntry.update({
+    where: { id: entry.id },
+    data: { status: "REJECTED", reviewedByUserId: userId, reviewedAt: new Date() },
   });
   return { ok: true };
 }

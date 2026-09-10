@@ -13,6 +13,8 @@ import {
   submitClientRequirement,
   postClientMessage,
   createClientSupportRequest,
+  approveOwnedTimeEntry,
+  rejectOwnedTimeEntry,
 } from "@/lib/service-workspace";
 import { ProjectTabs } from "./Tabs";
 
@@ -83,6 +85,24 @@ export default async function ServiceProjectPage({
     const body = String(formData.get("body") || "");
     const priority = String(formData.get("priority") || "MEDIUM");
     await createClientSupportRequest(projectId, session2.user.id, subject, body, priority);
+    revalidatePath(`/lab/dashboard/services/${projectId}`);
+  }
+
+  async function approveEntry(formData: FormData) {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) return;
+    const entryId = String(formData.get("entryId") || "");
+    await approveOwnedTimeEntry(projectId, session2.user.id, entryId);
+    revalidatePath(`/lab/dashboard/services/${projectId}`);
+  }
+
+  async function rejectEntry(formData: FormData) {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) return;
+    const entryId = String(formData.get("entryId") || "");
+    await rejectOwnedTimeEntry(projectId, session2.user.id, entryId);
     revalidatePath(`/lab/dashboard/services/${projectId}`);
   }
 
@@ -243,6 +263,135 @@ export default async function ServiceProjectPage({
                     </span>
                   </div>
                 ))}
+              </div>
+            ),
+
+            billing: (
+              <div className="flex flex-col gap-6">
+                <div>
+                  <p className="text-[13px] text-[#9aa0ae]">
+                    Connect the calendar and email of the attorney whose billable time should be tracked. Nothing
+                    is ever sent or invoiced automatically — every entry below waits for you to approve it.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <a
+                      href={`/api/oauth/google/authorize?projectId=${projectId}`}
+                      className="rounded-lg border border-[#333a4c] px-4 py-2 text-[12.5px] font-bold text-[#eeeee7] hover:bg-[#191d26]"
+                    >
+                      Connect Google
+                    </a>
+                    <a
+                      href={`/api/oauth/microsoft/authorize?projectId=${projectId}`}
+                      className="rounded-lg border border-[#333a4c] px-4 py-2 text-[12.5px] font-bold text-[#eeeee7] hover:bg-[#191d26]"
+                    >
+                      Connect Microsoft 365
+                    </a>
+                    {project.timeEntries.some((e) => e.status === "APPROVED") && (
+                      <a
+                        href={`/api/billing/${projectId}/export`}
+                        className="rounded-lg border border-[#4ade95]/40 bg-[#4ade95]/10 px-4 py-2 text-[12.5px] font-bold text-[#4ade95] hover:bg-[#4ade95]/20"
+                      >
+                        Export approved entries (CSV)
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {project.oauthConnections.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    {project.oauthConnections.map((c) => (
+                      <div
+                        key={c.id}
+                        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#232838] bg-[#0d1016] p-4"
+                      >
+                        <span className="text-[13.5px] font-bold">
+                          {c.provider === "GOOGLE" ? "Google" : "Microsoft 365"} &middot; {c.accountEmail}
+                        </span>
+                        <span
+                          className={`font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] ${
+                            c.status === "CONNECTED" ? "text-[#4ade95]" : "text-[#f0b429]"
+                          }`}
+                        >
+                          {c.status === "CONNECTED" ? "Connected" : c.status === "EXPIRED" ? "Needs reconnect" : "Revoked"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div>
+                  <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
+                    Awaiting your review
+                  </div>
+                  <div className="mt-3 flex flex-col gap-3">
+                    {project.timeEntries.filter((e) => e.status === "DRAFT").length === 0 && (
+                      <p className="text-sm text-[#9aa0ae]">
+                        Nothing to review right now — connect a calendar/email above if you haven&apos;t yet.
+                      </p>
+                    )}
+                    {project.timeEntries
+                      .filter((e) => e.status === "DRAFT")
+                      .map((entry) => (
+                        <div key={entry.id} className="rounded-xl border border-[#232838] bg-[#0d1016] p-5">
+                          <div className="flex flex-wrap items-baseline justify-between gap-2">
+                            <span className="text-[14.5px] font-bold">
+                              {entry.matterName} &middot; {(entry.durationMinutes / 60).toFixed(1)}h
+                            </span>
+                            <span className="text-[11px] text-[#676e7d]">
+                              {entry.entryDate.toISOString().slice(0, 10)} &middot; {entry.attorneyEmail}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-[13.5px] text-[#9aa0ae]">{entry.narrative}</p>
+                          <div className="mt-3 flex gap-2">
+                            <form action={approveEntry}>
+                              <input type="hidden" name="entryId" value={entry.id} />
+                              <button
+                                type="submit"
+                                className="rounded-lg bg-[#f0b429] px-4 py-1.5 text-[12px] font-bold text-[#1a1200] hover:brightness-110"
+                              >
+                                Approve
+                              </button>
+                            </form>
+                            <form action={rejectEntry}>
+                              <input type="hidden" name="entryId" value={entry.id} />
+                              <button
+                                type="submit"
+                                className="rounded-lg border border-[#333a4c] px-4 py-1.5 text-[12px] font-bold text-[#9aa0ae] hover:bg-[#191d26]"
+                              >
+                                Reject
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {project.timeEntries.some((e) => e.status === "APPROVED") && (
+                  <div>
+                    <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
+                      Approved
+                    </div>
+                    <div className="mt-3 flex flex-col gap-2">
+                      {project.timeEntries
+                        .filter((e) => e.status === "APPROVED")
+                        .map((entry) => (
+                          <div
+                            key={entry.id}
+                            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#232838] bg-[#0d1016] p-4"
+                          >
+                            <span className="text-[13px]">
+                              {entry.entryDate.toISOString().slice(0, 10)} &middot; {entry.matterName} &middot;{" "}
+                              {(entry.durationMinutes / 60).toFixed(1)}h
+                            </span>
+                            <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#4ade95]">
+                              Approved
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ),
 

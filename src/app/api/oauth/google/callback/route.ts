@@ -1,20 +1,18 @@
 import type { NextRequest } from "next/server";
-import { requireAdmin } from "@/lib/admin";
 import { exchangeGoogleCode } from "@/lib/oauth-google";
 import { verifyOAuthState } from "@/lib/oauth-state";
-import { saveOAuthConnection } from "@/lib/oauth-connections";
+import { saveOAuthConnection, canManageOAuthForProject } from "@/lib/oauth-connections";
 import { db } from "@/lib/db";
 
 export async function GET(request: NextRequest): Promise<Response> {
-  const admin = await requireAdmin();
-  if (!admin) return new Response("forbidden", { status: 403 });
-
   const code = request.nextUrl.searchParams.get("code");
   const state = request.nextUrl.searchParams.get("state");
   if (!code || !state) return new Response("missing code or state", { status: 400 });
 
   const verifiedState = verifyOAuthState(state);
   if (!verifiedState.ok) return new Response("invalid or expired state", { status: 400 });
+
+  if (!(await canManageOAuthForProject(verifiedState.projectId))) return new Response("forbidden", { status: 403 });
 
   const project = await db.serviceProject.findUnique({ where: { id: verifiedState.projectId }, select: { id: true } });
   if (!project) return new Response("project not found", { status: 404 });
@@ -36,5 +34,5 @@ export async function GET(request: NextRequest): Promise<Response> {
     scope: "calendar.readonly gmail.readonly",
   });
 
-  return Response.redirect(new URL(`/admin/projects/${project.id}`, request.url));
+  return Response.redirect(new URL(`/lab/dashboard/services/${project.id}`, request.url));
 }

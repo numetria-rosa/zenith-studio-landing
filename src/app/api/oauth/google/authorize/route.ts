@@ -1,18 +1,17 @@
 import type { NextRequest } from "next/server";
-import { requireAdmin } from "@/lib/admin";
 import { buildGoogleAuthorizeUrl } from "@/lib/oauth-google";
 import { signOAuthState } from "@/lib/oauth-state";
+import { canManageOAuthForProject } from "@/lib/oauth-connections";
 
-/* Admin-initiated: from a project's admin page, "Connect Google" links here
-   with ?projectId=X. Only an admin can start this flow — the attorney
-   authorizes access on Google's own consent screen, but it's the admin who
-   decides which project a connection belongs to. */
+/* The attorney whose calendar/email this connects should be the one
+   clicking this — reached from the client's own project dashboard
+   ("Connect Google" in the Billing tab). Admin can also trigger it as a
+   fallback for hands-on onboarding help. */
 export async function GET(request: NextRequest): Promise<Response> {
-  const admin = await requireAdmin();
-  if (!admin) return new Response("forbidden", { status: 403 });
-
   const projectId = request.nextUrl.searchParams.get("projectId");
   if (!projectId) return new Response("missing projectId", { status: 400 });
+
+  if (!(await canManageOAuthForProject(projectId))) return new Response("forbidden", { status: 403 });
 
   const state = signOAuthState(projectId);
   return Response.redirect(buildGoogleAuthorizeUrl(state));
