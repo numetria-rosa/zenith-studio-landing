@@ -5,6 +5,7 @@ import BookButton from "@/app/BookButton";
 import { getService } from "@/lib/services";
 import { allServicePageSlugs, getServicePage, PAID_AUDIT_BOOKING_URL } from "@/lib/service-pages";
 import ServiceHeroVisual from "./ServiceHeroVisual";
+import ReceptionistFlowDiagram from "./ReceptionistFlowDiagram";
 
 export function generateStaticParams() {
   return allServicePageSlugs().map((slug) => ({ slug }));
@@ -156,6 +157,12 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
             </ol>
           </div>
         </section>
+
+        {page.serviceId === "ai-receptionist" && (
+          <section className="mx-auto mt-6 max-w-7xl px-4 sm:px-8 lg:px-12">
+            <ReceptionistFlowDiagram />
+          </section>
+        )}
 
         <section className="mx-auto mt-6 grid max-w-7xl gap-6 px-4 sm:px-8 lg:grid-cols-2 lg:px-12">
           <div className="rounded-[28px] border border-white/10 bg-white/[0.05] p-7 backdrop-blur-xl">
