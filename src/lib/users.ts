@@ -12,9 +12,10 @@ import type { Prisma } from "@prisma/client";
 export async function findOrCreateUserByEmail(
   tx: Prisma.TransactionClient,
   email: string,
-  name?: string | null
+  name?: string | null,
+  source?: string
 ) {
   const existing = await tx.user.findUnique({ where: { email } });
   if (existing) return existing;
-  return tx.user.create({ data: { email, name: name ?? undefined } });
+  return tx.user.create({ data: { email, name: name ?? undefined, source } });
 }

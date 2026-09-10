@@ -107,6 +107,11 @@ export default async function AdminClientProfilePage({
                   No account yet
                 </span>
               )}
+              {profile.source?.startsWith("demo") && (
+                <span className="inline-block rounded-full border border-emerald-400/30 bg-emerald-400/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-wide text-emerald-300">
+                  Demo lead · {profile.stage === "AUDIT_PROSPECT" ? "tried demo only" : "bought"}
+                </span>
+              )}
             </div>
           </div>
           <div className="shrink-0 text-right">

@@ -35,6 +35,13 @@ model User {
   // matching once known, since email can be legitimately reused/changed.
   whopUserId String? @unique
 
+  // How this account first came to exist — "demo" (public /demo signup),
+  // "demo:<prospectId>" (personalized outreach demo link), or null (every
+  // other path: Whop purchase, proposal approval, admin-created). Set once
+  // at creation only, never overwritten, so admins can tell a demo lead that
+  // went on to buy apart from a lead that only ever tried the demo.
+  source String?
+
   // AES-256-GCM ciphertext (see src/lib/password.ts), decryptable only with
   // PASSWORD_ENCRYPTION_KEY — a server-only secret never stored in this
   // database. Set automatically by the webhook the moment a purchase

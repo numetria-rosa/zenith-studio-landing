@@ -30,19 +30,22 @@ const STAGE_ORDER: ClientStage[] = ["ACTIVE_SERVICE", "APPROVED_PENDING", "PROPO
 export default async function AdminClientsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; stage?: string }>;
+  searchParams: Promise<{ q?: string; stage?: string; demo?: string }>;
 }) {
   const admin = await requireAdmin();
   if (!admin) notFound();
 
-  const { q, stage } = await searchParams;
+  const { q, stage, demo } = await searchParams;
   const query = (q ?? "").trim().toLowerCase();
   const stageFilter = stage && STAGE_ORDER.includes(stage as ClientStage) ? (stage as ClientStage) : null;
+  const demoOnly = demo === "1";
 
   const allClients = await getClientDirectory();
+  const demoLeadCount = allClients.filter((c) => c.source?.startsWith("demo")).length;
 
   const filtered = allClients.filter((c) => {
     if (stageFilter && c.stage !== stageFilter) return false;
+    if (demoOnly && !c.source?.startsWith("demo")) return false;
     if (query) {
       const haystack = `${c.displayName} ${c.companyName ?? ""} ${c.email}`.toLowerCase();
       if (!haystack.includes(query)) return false;
@@ -92,13 +95,14 @@ export default async function AdminClientsPage({
             />
           </div>
           {stageFilter && <input type="hidden" name="stage" value={stageFilter} />}
+          {demoOnly && <input type="hidden" name="demo" value="1" />}
           <button
             type="submit"
             className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
           >
             Search
           </button>
-          {(query || stageFilter) && (
+          {(query || stageFilter || demoOnly) && (
             <Link href="/admin/clients" className="text-sm text-white/50 underline hover:text-white">
               Clear all
             </Link>
@@ -106,6 +110,20 @@ export default async function AdminClientsPage({
         </form>
 
         <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            href={
+              demoOnly
+                ? `/admin/clients${stageFilter ? `?stage=${stageFilter}` : ""}${query ? `${stageFilter ? "&" : "?"}q=${encodeURIComponent(query)}` : ""}`
+                : `/admin/clients?demo=1${stageFilter ? `&stage=${stageFilter}` : ""}${query ? `&q=${encodeURIComponent(query)}` : ""}`
+            }
+            className={`rounded-full border px-3 py-1.5 text-xs transition ${
+              demoOnly
+                ? "border-emerald-400 bg-emerald-400 text-black"
+                : "border-emerald-400/30 bg-emerald-400/[0.06] text-emerald-300 hover:border-emerald-400/60"
+            }`}
+          >
+            Demo leads ({demoLeadCount})
+          </Link>
           {STAGE_ORDER.map((s) => {
             const active = stageFilter === s;
             const href = active
@@ -143,7 +161,14 @@ export default async function AdminClientsPage({
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-lg font-semibold">{c.displayName}</h2>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-lg font-semibold">{c.displayName}</h2>
+                    {c.source?.startsWith("demo") && (
+                      <span className="rounded-full border border-emerald-400/30 bg-emerald-400/[0.06] px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-300">
+                        Demo lead · {c.stage === "AUDIT_PROSPECT" ? "tried demo only" : "bought"}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-white/50">{c.email}</p>
                   {c.services.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1.5">

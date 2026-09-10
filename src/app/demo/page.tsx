@@ -29,7 +29,7 @@ export default async function PublicDemoPage() {
     const name = String(formData.get("name") || "").trim();
     if (!email) return;
 
-    const user = await db.$transaction((tx) => findOrCreateUserByEmail(tx, email, name || null));
+    const user = await db.$transaction((tx) => findOrCreateUserByEmail(tx, email, name || null, "demo"));
     await createSessionForUser(user.id);
     redirect("/demo");
   }

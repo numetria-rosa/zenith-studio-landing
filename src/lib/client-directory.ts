@@ -50,7 +50,7 @@ function lc(email: string): string {
     both the batched directory listing and the single-identity profile page
     so the two never drift apart. */
 function deriveClientFacts(input: {
-  user: Pick<User, "id" | "email" | "name" | "role" | "createdAt"> | null;
+  user: Pick<User, "id" | "email" | "name" | "role" | "createdAt" | "source"> | null;
   audits: AuditRequest[];
   proposals: Proposal[];
   serviceRequests: ServiceRequest[];
@@ -164,6 +164,7 @@ export type ClientDirectoryEntry = {
   companyName: string | null;
   userId: string | null;
   role: "CLIENT" | "ADMIN" | null;
+  source: string | null;
   stage: ClientStage;
   stageLabel: string;
   services: string[];
@@ -179,7 +180,7 @@ export type ClientDirectoryEntry = {
     performance trade-off this makes at current scale. */
 export async function getClientDirectory(): Promise<ClientDirectoryEntry[]> {
   const [users, audits, proposals] = await Promise.all([
-    db.user.findMany({ select: { id: true, email: true, name: true, role: true, createdAt: true } }),
+    db.user.findMany({ select: { id: true, email: true, name: true, role: true, createdAt: true, source: true } }),
     db.auditRequest.findMany({ orderBy: { createdAt: "desc" } }),
     db.proposal.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
@@ -284,6 +285,7 @@ export async function getClientDirectory(): Promise<ClientDirectoryEntry[]> {
       companyName: facts.companyName,
       userId: user?.id ?? null,
       role: user?.role ?? null,
+      source: user?.source ?? null,
       stage: facts.stage,
       stageLabel: facts.stageLabel,
       services: facts.services,
@@ -331,6 +333,7 @@ export type ClientProfile = {
   companyName: string | null;
   userId: string | null;
   role: "CLIENT" | "ADMIN" | null;
+  source: string | null;
   userCreatedAt: Date | null;
   stage: ClientStage;
   stageLabel: string;
@@ -480,6 +483,7 @@ export async function getClientProfileByEmail(emailRaw: string): Promise<ClientP
     companyName: facts.companyName,
     userId: user?.id ?? null,
     role: user?.role ?? null,
+    source: user?.source ?? null,
     userCreatedAt: user?.createdAt ?? null,
     stage: facts.stage,
     stageLabel: facts.stageLabel,

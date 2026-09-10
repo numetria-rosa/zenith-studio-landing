@@ -35,7 +35,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
     const name = String(formData.get("name") || "").trim();
     if (!email) return;
 
-    const user = await db.$transaction((tx) => findOrCreateUserByEmail(tx, email, name || null));
+    const user = await db.$transaction((tx) => findOrCreateUserByEmail(tx, email, name || null, `demo:${slug}`));
     await createSessionForUser(user.id);
     redirect(`/demo/${slug}`);
   }
