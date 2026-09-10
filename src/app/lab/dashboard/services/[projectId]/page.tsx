@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { courseFontVars } from "@/lib/fonts";
@@ -15,6 +15,9 @@ import {
   createClientSupportRequest,
   approveOwnedTimeEntry,
   rejectOwnedTimeEntry,
+  connectMailbox,
+  approveOwnedInboxDraft,
+  rejectOwnedInboxDraft,
 } from "@/lib/service-workspace";
 import { ProjectTabs } from "./Tabs";
 import { getSiteUrl } from "@/lib/site";
@@ -82,13 +85,16 @@ function formatEntryAmount(entry: { durationMinutes: number | null; expenseAmoun
 
 export default async function ServiceProjectPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ projectId: string }>;
+  searchParams: Promise<{ mailError?: string }>;
 }) {
   const session = await auth();
   if (!session?.user?.id) notFound();
 
   const { projectId } = await params;
+  const { mailError } = await searchParams;
   const project = await getOwnedServiceProject(projectId, session.user.id);
   if (!project) notFound();
 
@@ -137,6 +143,38 @@ export default async function ServiceProjectPage({
     if (!session2?.user?.id) return;
     const entryId = String(formData.get("entryId") || "");
     await rejectOwnedTimeEntry(projectId, session2.user.id, entryId);
+    revalidatePath(`/lab/dashboard/services/${projectId}`);
+  }
+
+  async function connectMailboxAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) return;
+    const provider = String(formData.get("provider") || "");
+    const emailAddress = String(formData.get("emailAddress") || "");
+    const appPassword = String(formData.get("appPassword") || "");
+    const result = await connectMailbox(projectId, session2.user.id, provider, emailAddress, appPassword);
+    revalidatePath(`/lab/dashboard/services/${projectId}`);
+    if (!result.ok) {
+      redirect(`/lab/dashboard/services/${projectId}?mailError=${encodeURIComponent(result.error)}`);
+    }
+  }
+
+  async function approveDraft(formData: FormData) {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) return;
+    const draftId = String(formData.get("draftId") || "");
+    await approveOwnedInboxDraft(projectId, session2.user.id, draftId);
+    revalidatePath(`/lab/dashboard/services/${projectId}`);
+  }
+
+  async function rejectDraft(formData: FormData) {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) return;
+    const draftId = String(formData.get("draftId") || "");
+    await rejectOwnedInboxDraft(projectId, session2.user.id, draftId);
     revalidatePath(`/lab/dashboard/services/${projectId}`);
   }
 
@@ -492,6 +530,159 @@ export default async function ServiceProjectPage({
                     </div>
                   ))}
                 </div>
+              </div>
+            ),
+
+            inbox: (
+              <div className="flex flex-col gap-6">
+                <div className="rounded-xl border border-[#333a4c] bg-[#191d26] p-5">
+                  <p className="text-[13.5px] text-[#9aa0ae]">
+                    Connect your own <span className="font-semibold text-[#eeeee7]">Gmail (personal account)</span>{" "}
+                    or <span className="font-semibold text-[#eeeee7]">Yahoo Mail</span> using an app password, not
+                    your regular password. Outlook / Microsoft 365 isn&apos;t supported yet.{" "}
+                    <span className="text-[#676e7d]">
+                      Gmail: Google Account &rarr; Security &rarr; 2-Step Verification &rarr; App passwords. Yahoo:
+                      Account Info &rarr; Account Security &rarr; Generate app password.
+                    </span>
+                  </p>
+                  {mailError && (
+                    <p className="mt-3 rounded-lg border border-[#ff8585]/30 bg-[#ff8585]/10 px-3 py-2 text-[12.5px] text-[#ff8585]">
+                      Couldn&apos;t connect: {mailError}
+                    </p>
+                  )}
+                  <form action={connectMailboxAction} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Provider</label>
+                      <select
+                        name="provider"
+                        className="rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7]"
+                      >
+                        <option value="GMAIL">Gmail</option>
+                        <option value="YAHOO">Yahoo</option>
+                      </select>
+                    </div>
+                    <div className="flex flex-1 flex-col gap-1">
+                      <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Email address</label>
+                      <input
+                        name="emailAddress"
+                        type="email"
+                        required
+                        placeholder="you@gmail.com"
+                        className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                      />
+                    </div>
+                    <div className="flex flex-1 flex-col gap-1">
+                      <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">App password</label>
+                      <input
+                        name="appPassword"
+                        type="password"
+                        required
+                        placeholder="16-character app password"
+                        className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="rounded-lg bg-[#f0b429] px-4 py-2 text-[12.5px] font-bold text-[#1a1200] transition hover:brightness-110"
+                    >
+                      Connect
+                    </button>
+                  </form>
+                </div>
+
+                {project.mailConnections.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    {project.mailConnections.map((c) => (
+                      <div
+                        key={c.id}
+                        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#232838] bg-[#0d1016] p-4"
+                      >
+                        <span className="text-[13.5px] font-bold">
+                          {c.provider === "GMAIL" ? "Gmail" : "Yahoo"} &middot; {c.emailAddress}
+                        </span>
+                        <span
+                          className={`font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] ${
+                            c.status === "CONNECTED" ? "text-[#4ade95]" : "text-[#f0b429]"
+                          }`}
+                        >
+                          {c.status === "CONNECTED" ? "Connected" : "Connection issue"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div>
+                  <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
+                    Awaiting your review
+                  </div>
+                  <div className="mt-3 flex flex-col gap-3">
+                    {project.inboxDrafts.filter((d) => d.status === "DRAFT").length === 0 && (
+                      <p className="text-sm text-[#9aa0ae]">
+                        Nothing to review right now. Connect a mailbox above if you haven&apos;t yet.
+                      </p>
+                    )}
+                    {project.inboxDrafts
+                      .filter((d) => d.status === "DRAFT")
+                      .map((draft) => (
+                        <div key={draft.id} className="rounded-xl border border-[#232838] bg-[#0d1016] p-5">
+                          <div className="flex flex-wrap items-baseline justify-between gap-2">
+                            <span className="text-[14.5px] font-bold">{draft.subject}</span>
+                            <span className="text-[11px] text-[#676e7d]">{draft.fromEmail}</span>
+                          </div>
+                          <p className="mt-2 text-[12px] text-[#676e7d]">{draft.snippet}</p>
+                          <p className="mt-3 rounded-lg border border-[#232838] bg-[#191d26] p-3 text-[13.5px] text-[#eeeee7]">
+                            {draft.draftReply}
+                          </p>
+                          <div className="mt-3 flex gap-2">
+                            <form action={approveDraft}>
+                              <input type="hidden" name="draftId" value={draft.id} />
+                              <button
+                                type="submit"
+                                className="rounded-lg bg-[#f0b429] px-4 py-1.5 text-[12px] font-bold text-[#1a1200] hover:brightness-110"
+                              >
+                                Approve &amp; send
+                              </button>
+                            </form>
+                            <form action={rejectDraft}>
+                              <input type="hidden" name="draftId" value={draft.id} />
+                              <button
+                                type="submit"
+                                className="rounded-lg border border-[#333a4c] px-4 py-1.5 text-[12px] font-bold text-[#9aa0ae] hover:bg-[#191d26]"
+                              >
+                                Reject
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {project.inboxDrafts.some((d) => d.status === "APPROVED") && (
+                  <div>
+                    <div className="font-[family-name:var(--font-course-mono)] text-xs font-bold uppercase tracking-[0.08em] text-[#676e7d]">
+                      Sent
+                    </div>
+                    <div className="mt-3 flex flex-col gap-2">
+                      {project.inboxDrafts
+                        .filter((d) => d.status === "APPROVED")
+                        .map((draft) => (
+                          <div
+                            key={draft.id}
+                            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#232838] bg-[#0d1016] p-4"
+                          >
+                            <span className="text-[13px]">
+                              {draft.subject} &middot; {draft.fromEmail}
+                            </span>
+                            <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#4ade95]">
+                              Sent
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ),
 

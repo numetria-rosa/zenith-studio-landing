@@ -1,4 +1,8 @@
 import { db } from "@/lib/db";
+import { encryptPassword } from "@/lib/password";
+import { testMailConnection } from "@/lib/mail-imap";
+import { approveInboxDraft, rejectInboxDraft } from "@/lib/inbox-manager";
+import type { MailProvider } from "@prisma/client";
 
 /* Client-facing service project workspace (Slice 7 of the service-platform
    build, 2026-08-28). This is the first page in the build where one signed-in
@@ -28,6 +32,8 @@ export async function getOwnedServiceProject(projectId: string, userId: string) 
       oauthConnections: { orderBy: { createdAt: "asc" } },
       timeEntries: { orderBy: { entryDate: "desc" } },
       leads: { orderBy: { createdAt: "desc" } },
+      mailConnections: { orderBy: { createdAt: "asc" } },
+      inboxDrafts: { orderBy: { createdAt: "desc" } },
     },
   });
 }
@@ -179,4 +185,62 @@ export async function createClientSupportRequest(
     },
   });
   return { ok: true };
+}
+
+/** Connects a client's own Gmail (personal) or Yahoo mailbox for AI Inbox
+    Manager via an app password (see mail-imap.ts for why this, not OAuth).
+    Verifies the credential actually logs in BEFORE saving anything — never
+    store a password we haven't confirmed works. Re-verifies ownership
+    independently, same pattern as every other action here. */
+export async function connectMailbox(
+  projectId: string,
+  userId: string,
+  provider: string,
+  emailAddress: string,
+  appPassword: string
+): Promise<RequirementSubmitResult> {
+  const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
+  if (!project) return { ok: false, error: "not_found" };
+
+  if (provider !== "GMAIL" && provider !== "YAHOO") return { ok: false, error: "unsupported_provider" };
+  const email = emailAddress.trim().toLowerCase();
+  const password = appPassword.trim();
+  if (!email || !password) return { ok: false, error: "empty" };
+
+  const testResult = await testMailConnection({ provider, emailAddress: email, appPassword: password });
+  if (!testResult.ok) return { ok: false, error: testResult.error };
+
+  await db.mailConnection.upsert({
+    where: { projectId_provider_emailAddress: { projectId: project.id, provider: provider as MailProvider, emailAddress: email } },
+    update: { encryptedAppPassword: encryptPassword(password), status: "CONNECTED", lastError: null },
+    create: {
+      projectId: project.id,
+      provider: provider as MailProvider,
+      emailAddress: email,
+      encryptedAppPassword: encryptPassword(password),
+    },
+  });
+  return { ok: true };
+}
+
+/** The Inbox Manager's "you approve every reply" promise: only the
+    project's own owner can approve or reject a draft, re-verified
+    independently before handing off to inbox-manager.ts, which does the
+    actual SMTP send. */
+export async function approveOwnedInboxDraft(projectId: string, userId: string, draftId: string): Promise<RequirementSubmitResult> {
+  const draft = await db.inboxDraft.findFirst({
+    where: { id: draftId, projectId, status: "DRAFT", project: { userId } },
+    select: { id: true },
+  });
+  if (!draft) return { ok: false, error: "not_found" };
+  return approveInboxDraft(draft.id, userId);
+}
+
+export async function rejectOwnedInboxDraft(projectId: string, userId: string, draftId: string): Promise<RequirementSubmitResult> {
+  const draft = await db.inboxDraft.findFirst({
+    where: { id: draftId, projectId, status: "DRAFT", project: { userId } },
+    select: { id: true },
+  });
+  if (!draft) return { ok: false, error: "not_found" };
+  return rejectInboxDraft(draft.id, userId);
 }

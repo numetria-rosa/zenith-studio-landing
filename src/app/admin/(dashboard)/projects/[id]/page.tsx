@@ -636,6 +636,43 @@ export default async function AdminProjectDetailPage({
           ))}
         </SectionCard>
 
+        {/* AI Inbox Manager: client-connected (Gmail/Yahoo app password, not
+            OAuth, see mail-imap.ts), so nothing for the admin to initiate
+            here — read-only visibility only, harmless to show empty for any
+            other project. */}
+        {(project.mailConnections.length > 0 || project.inboxDrafts.length > 0) && (
+          <SectionCard title={`Inbox Manager: drafts awaiting client review (${project.inboxDrafts.length})`}>
+            {project.mailConnections.length > 0 && (
+              <div className="space-y-2">
+                {project.mailConnections.map((c) => (
+                  <div
+                    key={c.id}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4"
+                  >
+                    <span className="text-sm font-semibold">
+                      {c.provider === "GMAIL" ? "Gmail" : "Yahoo"} · {c.emailAddress}
+                    </span>
+                    <span className={`text-xs ${c.status === "CONNECTED" ? "text-emerald-300" : "text-amber-300"}`}>
+                      {c.status === "CONNECTED" ? "Connected" : `Connection issue${c.lastError ? `: ${c.lastError}` : ""}`}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="mt-4 space-y-3">
+              {project.inboxDrafts.map((draft) => (
+                <div key={draft.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="text-sm font-semibold">{draft.subject}</p>
+                    <span className="text-xs text-white/40">{draft.fromEmail}</span>
+                  </div>
+                  <p className="mt-2 text-sm text-white/75">{draft.draftReply}</p>
+                </div>
+              ))}
+            </div>
+          </SectionCard>
+        )}
+
         {/* AI Billing Clerk: law-firms vertical only, but harmless to show
             (empty) for any other project since it's just connections + drafts. */}
         <SectionCard title={`Billing Clerk: drafts awaiting review (${project.timeEntries.length})`}>

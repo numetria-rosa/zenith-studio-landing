@@ -580,6 +580,8 @@ model ServiceProject {
   leads           Lead[]
   oauthConnections OAuthConnection[]
   timeEntries      TimeEntry[]
+  mailConnections  MailConnection[]
+  inboxDrafts      InboxDraft[]
 
   @@index([userId])
   @@index([proposalId])
@@ -674,6 +676,77 @@ model TimeEntry {
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, sourceType, sourceRef])
+  @@index([projectId, status])
+}
+
+// AI Inbox Manager's mailbox connection. Deliberately NOT an OAuthConnection
+// row: there is no OAuth flow, no scope negotiation, and no refresh-token
+// lifecycle here at all, a Gmail/Yahoo app password is a static credential
+// the client generates once in their own account settings and hands over
+// directly (see inbox-manager.ts's file header for why this is the
+// launch-scope connection method instead of full Gmail/Microsoft OAuth).
+// Reusing OAuthConnection's shape for a fundamentally different auth
+// mechanism would misrepresent what this actually is.
+enum MailProvider {
+  GMAIL
+  YAHOO
+}
+
+enum MailConnectionStatus {
+  CONNECTED
+  ERROR
+}
+
+model MailConnection {
+  id                    String                @id @default(cuid())
+  projectId             String
+  provider              MailProvider
+  emailAddress          String
+  // AES-256-GCM ciphertext via src/lib/password.ts, same mechanism and key
+  // already used for client login passwords — never stored in plaintext.
+  encryptedAppPassword  String                @db.Text
+  status                MailConnectionStatus  @default(CONNECTED)
+  lastError             String?
+  connectedAt           DateTime              @default(now())
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, provider, emailAddress])
+  @@index([projectId])
+}
+
+enum InboxDraftStatus {
+  DRAFT
+  APPROVED
+  REJECTED
+}
+
+// One AI-drafted reply to one real inbound email, reconstructed by
+// inbox-manager.ts from a MailConnection's mailbox. Never auto-sent: the
+// same "you approve every entry" gate TimeEntry already uses for Billing
+// Clerk, applied here — nothing goes out until approveInboxDraft actually
+// sends it over SMTP. sourceRef is the source message's Message-ID header,
+// the unique constraint below is what makes re-polling the same mailbox
+// idempotent rather than drafting the same email twice.
+model InboxDraft {
+  id               String           @id @default(cuid())
+  projectId        String
+  fromEmail        String
+  subject          String
+  snippet          String           @db.Text
+  draftReply       String           @db.Text
+  sourceRef        String // the source email's Message-ID header
+  status           InboxDraftStatus @default(DRAFT)
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, sourceRef])
   @@index([projectId, status])
 }
 

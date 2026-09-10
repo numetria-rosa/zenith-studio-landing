@@ -52,7 +52,7 @@ export default function ZenithStudioLandingPage() {
       features: [
         "Email sorting and prioritization",
         "AI drafted replies for routine mail",
-        "Works with Gmail and Outlook",
+        "Works with Gmail (personal) and Yahoo Mail",
       ],
       featured: false,
     },

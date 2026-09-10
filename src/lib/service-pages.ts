@@ -52,15 +52,15 @@ export const SERVICE_PAGES: ServicePageContent[] = [
     problem:
       "Routine email (document requests, scheduling, ‘did you get this?’) crowds out the work you actually bill for. Nothing is broken. It is just repetitive.",
     howItWorks: [
-      "We connect to the inbox you already use (Gmail or Outlook).",
+      "We connect to Gmail (personal accounts) or Yahoo Mail using a secure app password, not your regular login.",
       "Incoming mail is sorted and tagged by type.",
-      "Routine replies are drafted for you to send or auto-send on rules you approve.",
+      "Routine replies are drafted; you review and approve before anything sends.",
       "Anything unusual is left for a human.",
     ],
     features: [
       "Email sorting and prioritization",
-      "Drafts for routine replies",
-      "Works with Gmail and Outlook",
+      "Drafts for routine replies, approved before sending",
+      "Works with Gmail (personal) and Yahoo Mail — Outlook/Microsoft 365 not yet supported",
       "Escalation rules you control",
     ],
     afterSetup: [

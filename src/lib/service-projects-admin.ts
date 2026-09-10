@@ -161,6 +161,8 @@ export async function getServiceProjectForAdmin(id: string) {
       supportRequests: { orderBy: { createdAt: "desc" } },
       oauthConnections: { orderBy: { createdAt: "asc" } },
       timeEntries: { where: { status: "DRAFT" }, orderBy: { entryDate: "desc" } },
+      mailConnections: { orderBy: { createdAt: "asc" } },
+      inboxDrafts: { where: { status: "DRAFT" }, orderBy: { createdAt: "desc" } },
     },
   });
 }

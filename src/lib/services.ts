@@ -33,7 +33,7 @@ export const SERVICES: Service[] = [
     title: "AI Inbox Manager",
     pitch: "Wake up to an inbox that is already handled.",
     description:
-      "Sorts and prioritizes email, then drafts replies to the routine ones so your day starts with decisions, not admin.",
+      "Sorts and prioritizes email, then drafts replies to the routine ones so your day starts with decisions, not admin. Connects to Gmail (personal accounts) or Yahoo Mail via a secure app password; Outlook/Microsoft 365 isn't supported yet.",
     setupPriceDisplay: "$190",
     monthlyPriceDisplay: "$150/mo",
     whopSetupPlanId: "plan_AUhS9tvz8KrJC",

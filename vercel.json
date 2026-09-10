@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/billing-clerk",
       "schedule": "0 16 * * *"
+    },
+    {
+      "path": "/api/cron/inbox-manager",
+      "schedule": "0 17 * * *"
     }
   ],
   "rewrites": [
