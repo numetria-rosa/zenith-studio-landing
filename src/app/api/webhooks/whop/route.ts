@@ -5,7 +5,7 @@ import { getWhopClient } from "@/lib/whop";
 import { db } from "@/lib/db";
 import { courseIdForWhopProductId } from "@/lib/courses";
 import { courseIdsForWhopBundleProductId } from "@/lib/bundles";
-import { serviceKindForWhopPlanId, getService } from "@/lib/services";
+import { serviceKindForWhopPlanId, getService, SERVICES } from "@/lib/services";
 import { generateStrongPassword, encryptPassword } from "@/lib/password";
 import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 import { resolveProposalByWhopPlanId, classifyProposalPaymentLeg } from "@/lib/proposal-payments";
@@ -257,16 +257,19 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPur
     });
   }
 
-  // ---- Slice 6 addition (2026-08-28), purely additive, nothing above this
-  // line changed. The two vertical-offer services ("law-firms",
-  // "brokerages" — NOT the 3 generic AI Systems services, which keep
-  // writing to ServiceRequest only, unmodified) also get a ServiceProject
-  // delivery workspace alongside the ServiceRequest row just upserted
-  // above. findFirst-then-create instead of a DB-level upsert, since
-  // ServiceProject has no @@unique([userId, sourceServiceId]) constraint —
-  // this keeps a re-buy idempotent in spirit, matching the existing
-  // ServiceRequest upsert pattern above.
-  if (serviceId === "law-firms" || serviceId === "brokerages") {
+  // Every catalog service gets a real ServiceProject delivery workspace on
+  // purchase, not just the two vertical offers, this used to be
+  // law-firms/brokerages only (Slice 6, 2026-08-28), leaving the 3 core AI
+  // Systems services stuck on ServiceRequest alone with no automatic
+  // onboarding until an admin manually built them a Proposal. Checking
+  // against SERVICES (not a second hardcoded id list) means a future
+  // service added there gets this automatically too, no second place to
+  // remember to update. Fires on either "setup" or "monthly" kind,
+  // whichever purchase happens first, same as before, findFirst-then-
+  // create instead of a DB-level upsert since ServiceProject has no
+  // @@unique([userId, sourceServiceId]) constraint, keeps a re-buy
+  // idempotent in spirit, matching the ServiceRequest upsert pattern above.
+  if (SERVICES.some((s) => s.id === serviceId)) {
     const existingProject = await tx.serviceProject.findFirst({
       where: { userId: user.id, sourceServiceId: serviceId },
     });
