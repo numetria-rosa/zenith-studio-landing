@@ -5,7 +5,7 @@
    "one row per event" into one aggregated total per metric, a client with
    real call volume would otherwise scroll a list with one row per call. */
 
-const INTERNAL_METRIC_PREFIXES = ["api_cost_cents", "budget_alert_"];
+const INTERNAL_METRIC_PREFIXES = ["api_cost_cents", "budget_alert_", "dead_man_alert_"];
 
 export function isInternalMetricKey(key: string): boolean {
   return INTERNAL_METRIC_PREFIXES.some((prefix) => key === prefix || key.startsWith(prefix));
