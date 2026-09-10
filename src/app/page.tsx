@@ -976,6 +976,14 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                           See how the AI team works
                         </Link>
                       ) : null}
+                      {v.id === "law-firms" && (
+                        <Link
+                          href="/demo/law-firm-ai-team"
+                          className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${v.accentBtn}`}
+                        >
+                          Watch the firm leak demo
+                        </Link>
+                      )}
                       {v.whopCheckoutUrl && (
                         <a
                           href={v.whopCheckoutUrl}
