@@ -528,7 +528,7 @@ export default async function AdminProjectDetailPage({
           ))}
         </SectionCard>
 
-        {/* AI Billing Clerk — law-firms vertical only, but harmless to show
+        {/* AI Billing Clerk: law-firms vertical only, but harmless to show
             (empty) for any other project since it's just connections + drafts. */}
         <SectionCard title={`Billing Clerk: drafts awaiting review (${project.timeEntries.length})`}>
           <div className="flex flex-wrap gap-3">

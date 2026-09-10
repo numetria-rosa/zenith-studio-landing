@@ -30,7 +30,7 @@ export const DEFAULT_REQUIREMENTS: { label: string; detail: string }[] = [
 ];
 
 // Extra requirements appended for ai-receptionist projects only, matched by
-// exact label in receptionist-provisioning.ts's onboarding automation — that
+// exact label in receptionist-provisioning.ts's onboarding automation: that
 // label string is the contract between this file and that one.
 export const RECEPTIONIST_REQUIREMENTS: { label: string; detail: string }[] = [
   { label: "Receptionist: business name", detail: "The exact name the AI should use when it answers the phone." },
@@ -41,7 +41,7 @@ export const RECEPTIONIST_REQUIREMENTS: { label: string; detail: string }[] = [
   },
 ];
 
-// Extra requirement for law-firms (AI Missed Call Text-Back role) —
+// Extra requirement for law-firms (AI Missed Call Text-Back role),
 // deliberately just one field, since this feature's whole value is being
 // the scaled-down, config-driven slice of the vertical package (see
 // signalwire-text-back.ts). Matched by exact label the same way as
@@ -50,7 +50,7 @@ export const TEXT_BACK_REQUIREMENTS: { label: string; detail: string }[] = [
   { label: "Text-Back: business name", detail: "The exact name used in the missed-call message and text." },
 ];
 
-// Extra requirements for ai-lead-capture — matched by exact label in
+// Extra requirements for ai-lead-capture, matched by exact label in
 // lead-capture-provisioning.ts.
 export const LEAD_CAPTURE_REQUIREMENTS: { label: string; detail: string }[] = [
   { label: "Lead Capture: business name", detail: "The name used when replying to a new enquiry." },

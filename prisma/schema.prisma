@@ -585,10 +585,10 @@ enum OAuthConnectionStatus {
 }
 
 // The AI Billing Clerk role (law-firms vertical) needs read access to an
-// attorney's own calendar + email — a genuine per-client secret (a refresh
+// attorney's own calendar + email, a genuine per-client secret (a refresh
 // token), unlike every other Integration in this file which explicitly
 // forbids storing one. Encrypted at rest the same way User.passwordEnc is
-// (AES-256-GCM, key only in server env — see lib/secrets.ts), so a DB leak
+// (AES-256-GCM, key only in server env, see lib/secrets.ts), so a DB leak
 // alone still doesn't hand out live access to a firm's inbox.
 model OAuthConnection {
   id                    String                 @id @default(cuid())
@@ -615,11 +615,11 @@ enum TimeEntryStatus {
 }
 
 // One AI-drafted billable-time line, reconstructed from a calendar event or
-// email thread. Never auto-sent — "You approve every entry" is enforced
+// email thread. Never auto-sent: "You approve every entry" is enforced
 // here as a real status gate, not just marketing copy: nothing counts
 // toward an invoice until an admin/attorney flips it to APPROVED (see
 // billing-clerk.ts). sourceRef + the unique constraint below make re-running
-// a sync idempotent — the same calendar event never becomes two entries.
+// a sync idempotent, the same calendar event never becomes two entries.
 model TimeEntry {
   id              String          @id @default(cuid())
   projectId       String
@@ -649,10 +649,10 @@ enum LeadStatus {
   LOST
 }
 
-// The AI Follow-Up Clerk role (law-firms vertical) — leads that reached the
+// The AI Follow-Up Clerk role (law-firms vertical): leads that reached the
 // firm but weren't retained on first contact. v1 is SMS-only: the only lead
 // source today (missed-call-text-back) captures a phone number, never an
-// email, so an email channel would sit unused — add one only once a lead
+// email, so an email channel would sit unused, add one only once a lead
 // source that actually has emails exists. See follow-up-clerk.ts.
 model Lead {
   id        String   @id @default(cuid())
@@ -663,7 +663,7 @@ model Lead {
   message   String?    @db.Text // the enquiry text itself, for web-form leads
   source    String // e.g. "missed-call-text-back", "web-form", "manual"
 
-  // AI Lead Capture & Follow-Up only — null for every other source. Never
+  // AI Lead Capture & Follow-Up only, null for every other source. Never
   // gates the follow-up sequence itself (a "not qualified" lead still gets
   // worked; this is visibility for the business, not an auto-reject).
   qualified         Boolean?
@@ -746,7 +746,7 @@ model Integration {
   provider    String // e.g. "gmail", "twilio", "crm", "vapi", "cal"
   status      IntegrationStatus  @default(NOT_CONNECTED)
   externalRef String? // opaque reference/id ONLY — never a raw secret, credential, API key, or token
-  config      Json? // non-secret runtime config for this provider (business name, FAQ, hours, event type id) — read by the service's runtime engine to build behavior per client without hardcoding it
+  config      Json? // non-secret runtime config for this provider (business name, FAQ, hours, event type id), read by the service's runtime engine to build behavior per client without hardcoding it
   connectedAt DateTime?
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt

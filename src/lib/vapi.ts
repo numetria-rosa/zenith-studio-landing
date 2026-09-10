@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { getAvailableSlots, createBooking } from "@/lib/cal-booking";
 
 /* AI Receptionist & Booking runtime engine.
-   One Vapi assistant "template" for every client — behavior comes entirely
+   One Vapi assistant "template" for every client, behavior comes entirely
    from the client's Integration row (provider "vapi", externalRef = the
    Vapi phone number id they were assigned, config = their business data).
    Vapi hits a single server URL for every event during a call
@@ -37,7 +37,7 @@ export function verifyVapiSecret(headerValue: string | null): boolean {
   return timingSafeEqual(a, b);
 }
 
-/** The one master prompt template — never edited per client. Every client's
+/** The one master prompt template, never edited per client. Every client's
     voice is entirely a function of the config values interpolated in. */
 export function buildSystemPrompt(config: ReceptionistConfig): string {
   return [
@@ -45,8 +45,8 @@ export function buildSystemPrompt(config: ReceptionistConfig): string {
     `Business hours: ${config.hours}.`,
     `Answer caller questions using only this information about the business:`,
     config.faqText,
-    `If a caller wants to book an appointment, use the book_appointment tool — ask for their name, email, and a preferred date/time first.`,
-    `If a question is outside what you were given, or the caller is upset or asks for a human, say a team member will follow up and end the call politely — do not guess.`,
+    `If a caller wants to book an appointment, use the book_appointment tool, ask for their name, email, and a preferred date/time first.`,
+    `If a question is outside what you were given, or the caller is upset or asks for a human, say a team member will follow up and end the call politely, do not guess.`,
   ].join("\n\n");
 }
 
@@ -93,7 +93,7 @@ export function buildAssistantPayload(
 type ReceptionistIntegration = { projectId: string; config: ReceptionistConfig };
 
 /** Looks up which client this dialed-in number belongs to. Returns null for
-    an unknown/unconfigured number — the caller must decide how to fail. */
+    an unknown/unconfigured number, the caller must decide how to fail. */
 export async function lookupReceptionistByPhoneNumberId(
   phoneNumberId: string
 ): Promise<ReceptionistIntegration | null> {
@@ -105,7 +105,7 @@ export async function lookupReceptionistByPhoneNumberId(
   return { projectId: integration.projectId, config: integration.config };
 }
 
-/** Demo assistant for a prospect link (/demo/[slug]) — a web call, not a
+/** Demo assistant for a prospect link (/demo/[slug]), a web call, not a
     phone number, so there's no Integration row and no real Cal.com booking.
     Sent to the browser as-is for the Vapi Web SDK, so it must never carry a
     secret (see the demo route for why). */
@@ -123,7 +123,7 @@ export function buildDemoAssistantPayload(prospectId: string, businessName: stri
           content: [
             `You are a demo of Zenith Studio's AI receptionist, playing the receptionist for ${businessName}, a ${niche} business.`,
             `Answer general questions the way a friendly front-desk person at a business like this would.`,
-            `If the caller wants to book an appointment, use the book_appointment tool and then confirm warmly — this is a demo, so nothing is really booked.`,
+            `If the caller wants to book an appointment, use the book_appointment tool and then confirm warmly, this is a demo, so nothing is really booked.`,
             `Keep the call short and let the caller know at the end that this is exactly what their own callers would experience.`,
           ].join("\n\n"),
         },

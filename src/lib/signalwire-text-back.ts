@@ -1,14 +1,14 @@
 import { RestClient } from "@signalwire/compatibility-api";
 
-/* AI Missed Call Text-Back runtime — the scaled-down, config-driven slice
+/* AI Missed Call Text-Back runtime, the scaled-down, config-driven slice
    of the Law Firm AI Team's original "AI Coordinator" role. Deliberately
    NOT routed through Vapi's voice layer: a missed call has no conversation
    to bill AI minutes for, so a plain phone number handles it. The firm's
-   existing number stays theirs — they set up forward-on-no-answer to the
+   existing number stays theirs, they set up forward-on-no-answer to the
    number this file's onboarding automation provisions per client (see
    Integration provider "signalwire").
 
-   Runs on SignalWire, not Twilio — switched 2026-09-10 after Twilio's
+   Runs on SignalWire, not Twilio, switched 2026-09-10 after Twilio's
    account-signup 2FA got stuck rate-limiting. SignalWire's Compatibility
    API is a documented drop-in for Twilio's REST API/TwiML (same method
    names, same webhook payload field names), so this is a near-identical
@@ -27,7 +27,7 @@ function isTextBackConfig(value: unknown): value is TextBackConfig {
 
 export { isTextBackConfig };
 
-/** One message, used both spoken (cXML) and texted — kept short enough to
+/** One message, used both spoken (cXML) and texted, kept short enough to
     work as a voice announcement, warm enough to work as a text. */
 export function buildMissedCallSpokenMessage(businessName: string): string {
   return `Thank you for calling ${businessName}. We're unable to take your call right now, but we'll text you shortly to find out how we can help, and get a call scheduled for tomorrow.`;
@@ -72,14 +72,14 @@ export type PurchaseNumberResult =
   | { ok: false; error: string };
 
 /** Buys one US local number and points its Voice and SMS webhooks at our
-    routes — the one-time onboarding step per law-firm client. The same
+    routes, the one-time onboarding step per law-firm client. The same
     number serves both roles that share it: Missed Call Text-Back (voice)
     and the Follow-Up Clerk's reply detection (sms). Costs a real, small
     monthly fee (unlike the receptionist's free Vapi numbers), negligible
     against the $1,200/mo package price.
     ponytail: availablePhoneNumbers/incomingPhoneNumbers method shapes are
     SignalWire's documented Twilio-compatible surface, not independently
-    verified against a live account — read the real error text on first
+    verified against a live account, read the real error text on first
     failure rather than assuming success. */
 export async function purchaseSignalwireNumber(input: {
   areaCode: string;
@@ -97,7 +97,7 @@ export async function purchaseSignalwireNumber(input: {
     const purchased = await client.incomingPhoneNumbers.create({
       phoneNumber: candidate.phoneNumber,
       // voiceUrl omitted entirely (not an empty string) when a number is
-      // SMS-only, e.g. Lead Capture's number — some phone APIs reject an
+      // SMS-only, e.g. Lead Capture's number, some phone APIs reject an
       // empty-string URL param as invalid rather than treating it as "none".
       ...(input.voiceUrl ? { voiceUrl: input.voiceUrl, voiceMethod: "POST" } : {}),
       smsUrl: input.smsUrl,

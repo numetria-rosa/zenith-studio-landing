@@ -1,7 +1,7 @@
 import { randomBytes, createCipheriv, createDecipheriv } from "node:crypto";
 
 /* Generic AES-256-GCM encrypt/decrypt for secrets that must be stored
-   reversibly (not hashed) — same scheme as password.ts's buyer-password
+   reversibly (not hashed), same scheme as password.ts's buyer-password
    storage, generalized so a second secret class (OAuth refresh tokens for
    the Billing Clerk) can use its own key without touching that one.
    Stored format: "iv:authTag:ciphertext", all hex. */

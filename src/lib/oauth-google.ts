@@ -1,12 +1,12 @@
 import { getSiteUrl } from "@/lib/site";
 
-/* Google OAuth for the Billing Clerk's calendar + email access — this is a
+/* Google OAuth for the Billing Clerk's calendar + email access, this is a
    SEPARATE OAuth app/flow from Auth.js's user login, and needs offline
    access (a refresh token) since it runs unattended in a cron, not during
    a live session. Scopes are read-only by design; the Billing Clerk never
    needs to send mail or modify events.
    ponytail: endpoint URLs/scopes verified against Google's stable, long-
-   documented OAuth2/Calendar/Gmail API shape, not guessed — but Google's
+   documented OAuth2/Calendar/Gmail API shape, not guessed, but Google's
    *app verification* requirements for these scopes (restricted-scope
    review, ~1-6 weeks) can change; confirm current requirements in the
    Google Cloud Console before submitting for review. */
@@ -111,7 +111,7 @@ export type CalendarEventSummary = {
   attendeeEmails: string[];
 };
 
-/** Events in the last N days with at least one external attendee — a rough
+/** Events in the last N days with at least one external attendee, a rough
     "this looks like billable client work" filter. Attorneys review every
     draft anyway, so false positives cost a rejected draft, not a bad
     invoice. */

@@ -1,6 +1,6 @@
 // Minimal Cal.com API v2 client for booking appointments server-side, under
 // Zenith's own Cal.com account (same account already used for the paid
-// audit — see paid-audit.ts). Each receptionist client gets their own Cal.com
+// audit, see paid-audit.ts). Each receptionist client gets their own Cal.com
 // event type created once at onboarding; its id lives in
 // Integration.config.calEventTypeId (not a secret, just a number), so no
 // client ever needs their own Cal.com API key or OAuth connection.
@@ -83,7 +83,7 @@ export type CreateEventTypeResult =
   | { ok: false; error: string };
 
 /** Creates one Cal.com event type under Zenith's own account for a new
-    receptionist client — this is what onboarding provisions automatically
+    receptionist client, this is what onboarding provisions automatically
     so no admin ever clicks through the Cal.com dashboard per client. */
 export async function createEventType(input: {
   title: string;

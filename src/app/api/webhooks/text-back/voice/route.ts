@@ -10,7 +10,7 @@ import {
 
 /* SignalWire Voice webhook for one client's AI Missed Call Text-Back number.
    The firm's own carrier has already forwarded-on-no-answer to this number
-   by the time this fires, so there is nothing to "answer" — this route's
+   by the time this fires, so there is nothing to "answer", this route's
    only jobs are: identify which client owns the dialed number, text the
    caller back immediately, and speak one short line before the call ends.
    No AI voice conversation, no Vapi involvement, no per-minute AI cost for
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest): Promise<Response> {
   const params: Record<string, string> = {};
   for (const [key, value] of formData.entries()) params[key] = String(value);
 
-  // SignalWire requires validation against the exact public URL it called —
+  // SignalWire requires validation against the exact public URL it called,
   // request.url is correct for a directly-hosted Vercel deployment (no
   // reverse proxy rewriting the host in front of this app).
   if (!verifySignalwireSignature(request.url, params, request.headers.get("x-signalwire-signature"))) {

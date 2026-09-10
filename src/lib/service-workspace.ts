@@ -106,7 +106,7 @@ export async function submitClientRequirement(
 
 /** The Billing Clerk's "you approve every entry" promise, enforced here:
     only the project's own owner (the attorney/partner) can approve or
-    reject a draft, re-verified independently in one scoped query — the
+    reject a draft, re-verified independently in one scoped query: the
     same IDOR-safe pattern as every other action in this file. Refuses
     anything not currently DRAFT (already-reviewed entries aren't
     re-reviewable from here). */

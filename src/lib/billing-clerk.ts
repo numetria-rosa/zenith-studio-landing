@@ -11,10 +11,10 @@ import { groqChatCompletion } from "@/lib/groq";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import type { OAuthConnection } from "@prisma/client";
 
-/* AI Billing Clerk — reconstructs billable time from a firm's own calendar
+/* AI Billing Clerk, reconstructs billable time from a firm's own calendar
    and email, drafts a narrative for each, and stops there. Every entry is
    born as DRAFT; nothing becomes billable until approveTimeEntry runs
-   (attorney/admin action) — "You approve every entry" is a real status
+   (attorney/admin action), "You approve every entry" is a real status
    gate, not just marketing copy. Runs from /api/cron/billing-clerk. */
 
 const LOOKBACK_DAYS = 14; // matches the vertical's own "14 day write-down window" pitch
@@ -180,7 +180,7 @@ function csvEscape(value: string): string {
   return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
 }
 
-/** Approved entries as CSV — the actual "gets invoices out" step is
+/** Approved entries as CSV, the actual "gets invoices out" step is
     deliberately left to the firm's own invoicing/practice-management tool
     (Clio, etc.); building a bespoke invoicing system per firm is exactly
     the integration bottleneck this vertical should avoid. This export is

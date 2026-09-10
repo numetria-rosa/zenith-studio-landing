@@ -9,7 +9,7 @@ import type { OAuthProvider } from "@prisma/client";
 const OAUTH_SECRET_ENV = "OAUTH_ENCRYPTION_KEY";
 
 /** The attorney whose calendar/email this is should be the one clicking
-    Connect and granting consent — so the OAuth routes accept the project's
+    Connect and granting consent, so the OAuth routes accept the project's
     own owner, not just an admin. Admin stays allowed too, as a fallback for
     a client who needs hands-on help during onboarding. Re-checked
     independently in every route, never trusted from a prior page render. */
@@ -56,7 +56,7 @@ export async function saveOAuthConnection(input: {
 export type FreshTokenResult = { ok: true; accessToken: string } | { ok: false; error: string };
 
 /** Decrypts the stored refresh token and exchanges it for a live access
-    token — called fresh before every calendar/email fetch since access
+    token, called fresh before every calendar/email fetch since access
     tokens are short-lived (~1 hour) and this runs unattended from a cron. */
 export async function getFreshAccessToken(connection: { provider: OAuthProvider; encryptedRefreshToken: string }): Promise<FreshTokenResult> {
   const refreshToken = decryptSecret(connection.encryptedRefreshToken, OAUTH_SECRET_ENV);

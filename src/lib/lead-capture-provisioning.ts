@@ -9,7 +9,7 @@ import { LEAD_CAPTURE_REQUIREMENTS } from "@/lib/service-projects";
    functions: runs inside updateProjectStage when a project is marked LIVE.
    Provisions the same kind of SignalWire number as Missed Call Text-Back
    (needed here for the SMS confirmation + follow-up sequence), just with
-   this service's own config shape and no voice webhook — a lead-capture
+   this service's own config shape and no voice webhook, a lead-capture
    number never receives calls, only sends outbound SMS. */
 
 type Result = { ok: true; skipped?: boolean } | { ok: false; error: string };
@@ -41,7 +41,7 @@ export async function provisionLeadCaptureIfNeeded(projectId: string): Promise<R
   const qualificationRules = answers.get(labels[1])!.detail!.trim();
   const notifyEmail = answers.get(labels[2])!.detail!.trim();
 
-  // No voiceUrl — this number is outbound-SMS-only, unlike Missed Call
+  // No voiceUrl, this number is outbound-SMS-only, unlike Missed Call
   // Text-Back's number, which needs a voice webhook to detect the call.
   const smsUrl = `${getSiteUrl()}/api/webhooks/text-back/sms`;
   const purchaseResult = await purchaseSignalwireNumber({ areaCode: "213", smsUrl });

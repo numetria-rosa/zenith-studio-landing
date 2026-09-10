@@ -13,7 +13,7 @@ import { sendAdminAlert } from "@/lib/outreach-mail";
 /* Vapi → Zenith webhook. One server URL handles every event in a call's
    lifecycle, discriminated by message.type. Verify the shared secret
    (x-vapi-secret) matching what's configured on the Vapi assistant/phone
-   number. See src/lib/vapi.ts for the receptionist runtime logic itself —
+   number. See src/lib/vapi.ts for the receptionist runtime logic itself,
    this route only verifies, dedupes, and dispatches. */
 
 type VapiToolCall = { id: string; function: { name: string; arguments: unknown } };

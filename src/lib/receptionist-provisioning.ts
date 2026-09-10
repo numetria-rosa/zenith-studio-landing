@@ -5,7 +5,7 @@ import { createFreePhoneNumber } from "@/lib/vapi-provision";
 import { createEventType } from "@/lib/cal-booking";
 import { RECEPTIONIST_REQUIREMENTS } from "@/lib/service-projects";
 
-/* Onboarding automation for the AI Receptionist service — the piece that
+/* Onboarding automation for the AI Receptionist service, the piece that
    turns "admin marks project LIVE" into a fully working client with zero
    dashboard clicking. Called from updateProjectStage in
    service-projects-admin.ts, same pattern as ensureSplitMonthlyCheckoutForProject:

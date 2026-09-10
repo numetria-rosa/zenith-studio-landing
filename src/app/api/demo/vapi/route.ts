@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 
-/* Server URL for the /demo/[slug] web-call assistant only — see
+/* Server URL for the /demo/[slug] web-call assistant only, see
    buildDemoAssistantPayload in lib/vapi.ts. This config is sent to the
    browser for the Vapi Web SDK to use directly, so unlike
    /api/webhooks/vapi it CANNOT require a shared secret (there is nowhere
@@ -9,7 +9,7 @@ import { sendAdminAlert } from "@/lib/outreach-mail";
    open because it does nothing sensitive: no DB write, no real booking,
    just a canned reply and an email ping to let you know a prospect tried
    the demo.
-   ponytail: no rate limiting — fine while traffic is a handful of outreach
+   ponytail: no rate limiting, fine while traffic is a handful of outreach
    links; add it if this ever gets scraped/spammed. */
 
 type VapiToolCall = { id: string; function: { name: string } };

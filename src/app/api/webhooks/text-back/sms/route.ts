@@ -5,7 +5,7 @@ import { stopSequenceOnReply } from "@/lib/follow-up-clerk";
 
 /* SignalWire inbound SMS webhook, shared by the same number Missed Call
    Text-Back provisions. Its only job is detecting a reply so the Follow-Up
-   Clerk's sequence stops and a human takes over — no AI conversation here
+   Clerk's sequence stops and a human takes over, no AI conversation here
    (that's a separate, not-yet-built layer). */
 
 function emptyTwiml(): Response {

@@ -4,7 +4,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
    attacker's Google/Microsoft account to someone else's project (state is
    otherwise just an opaque string the provider echoes back unmodified).
    ponytail: reuses OAUTH_ENCRYPTION_KEY as the HMAC key rather than a
-   dedicated one — fine since AES-GCM and HMAC-SHA256 are different
+   dedicated one, fine since AES-GCM and HMAC-SHA256 are different
    algorithms, but split them if this key is ever rotated for one purpose
    and not the other. */
 
@@ -32,7 +32,7 @@ export function verifyOAuthState(state: string): { ok: true; projectId: string }
     const b = Buffer.from(signature, "hex");
     if (a.length !== b.length || !timingSafeEqual(a, b)) return { ok: false };
 
-    // 10-minute window — long enough for a real consent screen, short
+    // 10-minute window, long enough for a real consent screen, short
     // enough that a leaked/logged callback URL isn't useful for long.
     if (Date.now() - Number(timestamp) > 10 * 60 * 1000) return { ok: false };
 

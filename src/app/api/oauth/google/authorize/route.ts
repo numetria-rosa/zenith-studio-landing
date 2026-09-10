@@ -4,7 +4,7 @@ import { signOAuthState } from "@/lib/oauth-state";
 import { canManageOAuthForProject } from "@/lib/oauth-connections";
 
 /* The attorney whose calendar/email this connects should be the one
-   clicking this — reached from the client's own project dashboard
+   clicking this, reached from the client's own project dashboard
    ("Connect Google" in the Billing tab). Admin can also trigger it as a
    fallback for hands-on onboarding help. */
 export async function GET(request: NextRequest): Promise<Response> {

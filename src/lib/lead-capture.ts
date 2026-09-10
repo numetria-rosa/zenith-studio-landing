@@ -6,7 +6,7 @@ import { sendPlainEmail } from "@/lib/outreach-mail";
 /* AI Lead Capture & Follow-Up runtime. Reuses the same Lead model and the
    same day-1/3/7 SMS sequence engine (follow-up-clerk.ts's processFollowUps
    already queries every Lead regardless of which service its project
-   belongs to) — this file only adds the capture + qualify + instant-reply
+   belongs to), this file only adds the capture + qualify + instant-reply
    step that's unique to this service. Also reuses the same "signalwire"
    Integration/number infrastructure as Missed Call Text-Back, just with a
    different config shape (see LeadCaptureConfig vs TextBackConfig). */
@@ -27,7 +27,7 @@ export function isLeadCaptureConfig(value: unknown): value is LeadCaptureConfig 
   );
 }
 
-const QUALIFY_SYSTEM_PROMPT = `You screen incoming enquiries against a business's own stated rules. Respond ONLY with JSON: {"qualified": boolean, "reason": string}. "reason" is one short sentence explaining the call. This is visibility for the business, not an auto-reject — when in doubt, qualify it.`;
+const QUALIFY_SYSTEM_PROMPT = `You screen incoming enquiries against a business's own stated rules. Respond ONLY with JSON: {"qualified": boolean, "reason": string}. "reason" is one short sentence explaining the call. This is visibility for the business, not an auto-reject, when in doubt, qualify it.`;
 
 async function qualifyLead(rules: string, input: CaptureInput): Promise<{ qualified: boolean; reason: string }> {
   const userPrompt = `Business's qualification rules: ${rules}\n\nEnquiry:\nName: ${input.name ?? "(not given)"}\nEmail: ${input.email ?? "(not given)"}\nPhone: ${input.phone ?? "(not given)"}\nMessage: ${input.message ?? "(not given)"}`;
@@ -80,7 +80,7 @@ export async function captureLead(projectId: string, input: CaptureInput): Promi
     },
   });
 
-  // Every enquiry gets an immediate reply — the follow-up sequence
+  // Every enquiry gets an immediate reply, the follow-up sequence
   // (processFollowUps, day 1/3/7) picks up automatically from here if they
   // don't respond or book.
   if (input.phone && integration.externalRef) {

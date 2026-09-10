@@ -97,7 +97,7 @@ export async function sendOutreachEmail(input: {
   return { ok: true, resendId: data?.id ?? null };
 }
 
-/** A plain transactional email to an arbitrary recipient — e.g. notifying a
+/** A plain transactional email to an arbitrary recipient, e.g. notifying a
     client's own business inbox of a new lead, not a Zenith admin alert and
     not a marketing send, so no unsubscribe link is forced (unlike
     sendOutreachEmail's required unsubscribeUrl). */

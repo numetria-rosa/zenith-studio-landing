@@ -4,7 +4,7 @@ import { sendAdminAlert } from "@/lib/outreach-mail";
 import { purchaseSignalwireNumber } from "@/lib/signalwire-text-back";
 import { TEXT_BACK_REQUIREMENTS } from "@/lib/service-projects";
 
-/* Onboarding automation for AI Missed Call Text-Back — one role within the
+/* Onboarding automation for AI Missed Call Text-Back, one role within the
    law-firms vertical package. Same trigger point and clean-retry-before-
    stage-write pattern as provisionReceptionistIfNeeded and the SPLIT
    monthly checkout: runs inside updateProjectStage when a project is

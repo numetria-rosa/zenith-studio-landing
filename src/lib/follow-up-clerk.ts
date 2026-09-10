@@ -2,11 +2,11 @@ import { db } from "@/lib/db";
 import { sendSms, isTextBackConfig } from "@/lib/signalwire-text-back";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 
-/* The AI Follow-Up Clerk role (law-firms vertical) — works leads that
+/* The AI Follow-Up Clerk role (law-firms vertical), works leads that
    didn't retain on first contact until they book, reply, or the sequence
    runs out. v1 is SMS-only (see the Lead model's schema comment for why).
    Driven by a daily cron (/api/cron/follow-up), same shape as the existing
-   outreach cron. Stops the moment a lead replies — see the sms webhook —
+   outreach cron. Stops the moment a lead replies, see the sms webhook,
    since a real reply means a human should take the conversation from
    there, matching this vertical's "you approve every entry" pattern. */
 
@@ -40,7 +40,7 @@ export async function processFollowUps(): Promise<{ processed: number; lost: num
   let lost = 0;
 
   for (const lead of leads) {
-    if (!lead.phone) continue; // v1 is SMS-only — nothing to do without a phone number
+    if (!lead.phone) continue; // v1 is SMS-only, nothing to do without a phone number
     const step = FOLLOW_UP_STEPS[lead.sequenceStep];
     if (!step) continue; // already past the last step, waiting to be marked LOST below
 
@@ -71,7 +71,7 @@ export async function processFollowUps(): Promise<{ processed: number; lost: num
   return { processed: leads.length, lost, sent };
 }
 
-/** Called from the inbound SMS webhook when a lead replies — hands the
+/** Called from the inbound SMS webhook when a lead replies, hands the
     conversation to a human instead of continuing the sequence. */
 export async function stopSequenceOnReply(leadId: string, replyBody: string, businessName: string): Promise<void> {
   await db.lead.update({

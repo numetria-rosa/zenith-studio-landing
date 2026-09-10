@@ -1,11 +1,11 @@
-// One-time provisioning calls to Vapi's API — creating a phone number for a
+// One-time provisioning calls to Vapi's API, creating a phone number for a
 // new receptionist client. Separate from vapi.ts (the inbound call-time
 // runtime): this file only runs once per client, at onboarding, not on
 // every call.
 //
 // ponytail: field names below (numberDesiredAreaCode, the nested server
 // object) are Vapi's documented shape as of this writing but weren't fully
-// verifiable from their docs pages at build time — verify against
+// verifiable from their docs pages at build time, verify against
 // https://docs.vapi.ai/api-reference/phone-numbers/create before relying on
 // this against a real client, and read the returned error text on any
 // failure rather than assuming success.

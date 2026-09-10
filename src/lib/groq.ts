@@ -1,8 +1,8 @@
-/* Thin client for Groq's OpenAI-compatible chat completions endpoint —
+/* Thin client for Groq's OpenAI-compatible chat completions endpoint,
    used only to draft billing narratives (billing-clerk.ts). Chosen over
    OpenAI/Anthropic per the user's explicit "cheapest at scale" call.
    ponytail: model id below is Groq's current flagship general model as of
-   this writing — verify against console.groq.com/docs/models before
+   this writing, verify against console.groq.com/docs/models before
    relying on it, model availability on Groq changes faster than most
    providers. */
 

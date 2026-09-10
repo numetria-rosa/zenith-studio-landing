@@ -2,11 +2,11 @@ import { getSiteUrl } from "@/lib/site";
 import type { CalendarEventSummary, EmailThreadSummary } from "@/lib/oauth-google";
 
 /* Microsoft OAuth (Entra ID v2 endpoint) for firms on Microsoft 365/Outlook
-   instead of Google Workspace — mirrors oauth-google.ts's shape exactly so
+   instead of Google Workspace, mirrors oauth-google.ts's shape exactly so
    billing-clerk.ts can treat both providers identically. `common` tenant
    supports both personal and work/school Microsoft accounts.
    ponytail: endpoints/scopes verified against Microsoft's stable, long-
-   documented identity-platform + Graph API shape — but Microsoft's own app
+   documented identity-platform + Graph API shape, but Microsoft's own app
    consent/verification requirements can change; confirm current
    requirements in the Entra admin center before submitting for review. */
 
