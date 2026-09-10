@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import BookButton from "@/app/BookButton";
 import { getService } from "@/lib/services";
 import { allServicePageSlugs, getServicePage, PAID_AUDIT_BOOKING_URL } from "@/lib/service-pages";
 import ServiceHeroVisual from "./ServiceHeroVisual";
@@ -234,19 +233,15 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
                 >
                   $35 audit call
                 </a>
-                <BookButton className="inline-flex items-center justify-center rounded-xl border border-white/10 px-5 py-3 text-sm text-white/70">
-                  Free intro call
-                </BookButton>
-              </div>
-              {checkout ? (
-                <p className="mt-5 text-xs text-white/35">
-                  Checkout after a proposal is approved. Catalog:{" "}
-                  <a href={checkout} className="underline">
-                    Whop
+                {checkout && (
+                  <a
+                    href={checkout}
+                    className="inline-flex items-center justify-center rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-5 py-3 text-sm font-semibold text-emerald-300"
+                  >
+                    Get {page.title} now
                   </a>
-                  .
-                </p>
-              ) : null}
+                )}
+              </div>
             </div>
           </div>
         </section>

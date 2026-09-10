@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import BookButton from "../BookButton";
 import AuditForm from "./AuditForm";
+import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 
 export const metadata: Metadata = {
   title: "Get Your Free Automation Audit | Zenith Studio",
@@ -57,9 +57,12 @@ export default function AuditPage() {
 
           <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-white/50">
             <span>Prefer to talk it through instead?</span>
-            <BookButton className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10">
-              Book a live call instead
-            </BookButton>
+            <a
+              href={PAID_AUDIT_BOOKING_URL}
+              className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10"
+            >
+              Book the $35 audit call
+            </a>
           </div>
         </div>
 

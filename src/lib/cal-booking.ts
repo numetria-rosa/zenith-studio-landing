@@ -110,3 +110,33 @@ export async function createEventType(input: {
   if (typeof id !== "number") return { ok: false, error: "event type created but no id in response" };
   return { ok: true, eventTypeId: id };
 }
+
+export type RecentBooking = { uid: string; attendeeName: string; startISO: string };
+
+/** Recent bookings for one event type, newest first. Used to show a real,
+    live "someone just booked" feed, e.g. on the public demo page, so a
+    visitor watching after they book sees their own booking land instead of
+    taking a screenshot's word for it. */
+export async function listRecentBookings(eventTypeId: number, limit = 10): Promise<{ ok: true; bookings: RecentBooking[] } | { ok: false; error: string }> {
+  const url = new URL(`${CAL_API_BASE}/bookings`);
+  url.searchParams.set("eventTypeId", String(eventTypeId));
+  url.searchParams.set("status", "upcoming");
+  url.searchParams.set("take", String(limit));
+
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${calApiKey()}`,
+      "cal-api-version": "2024-08-13",
+    },
+  });
+  if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}` };
+  const body = (await res.json()) as {
+    data?: Array<{ uid: string; start: string; attendees?: Array<{ name?: string }> }>;
+  };
+  const bookings = (body.data ?? []).map((b) => ({
+    uid: b.uid,
+    attendeeName: b.attendees?.[0]?.name?.trim() || "A visitor",
+    startISO: b.start,
+  }));
+  return { ok: true, bookings };
+}

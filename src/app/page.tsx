@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Script from "next/script";
-import BookButton from "./BookButton";
 import { getService, getSetupCheckoutUrl, servicePagePath } from "@/lib/services";
+import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -415,9 +415,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               >
                 Sign in
               </Link>
-              <BookButton className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]">
-                Book a free audit
-              </BookButton>
+              <Link
+                href="/audit"
+                className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
+              >
+                Get a free audit
+              </Link>
             </div>
           </div>
         </div>
@@ -456,9 +459,9 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
             </div>
             <p className="mt-3 text-xs text-white/40">
               Prefer to talk it through?{" "}
-              <BookButton className="underline decoration-white/30 underline-offset-2 hover:text-white">
-                Book a free call instead
-              </BookButton>
+              <a href={PAID_AUDIT_BOOKING_URL} className="underline decoration-white/30 underline-offset-2 hover:text-white">
+                Book the $35 audit call
+              </a>
             </p>
 
             <div className="mt-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
@@ -846,18 +849,8 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       Try the live demo
                     </Link>
                   )}
-                  <BookButton
-                    className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
-                      system.featured
-                        ? "bg-white text-black"
-                        : "border border-white/15 bg-white/5 text-white hover:bg-white/10"
-                    }`}
-                  >
-                    Book a free audit
-                  </BookButton>
-
                   {(() => {
-                    // "Book a free audit" stays the primary CTA. This is a
+                    // The direct checkout link (below) is the primary CTA. This is a
                     // real button, not a footnote link, so clients who
                     // already know what they want don't have to hunt for it.
                     const catalogService = getService(system.id);
@@ -983,10 +976,6 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                           See how the AI team works
                         </Link>
                       ) : null}
-                      <BookButton className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10">
-                        Book a free audit
-                      </BookButton>
-
                       {v.whopCheckoutUrl && (
                         <a
                           href={v.whopCheckoutUrl}

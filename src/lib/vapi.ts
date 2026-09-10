@@ -123,7 +123,7 @@ export function buildDemoAssistantPayload(prospectId: string, businessName: stri
           content: [
             `You are a demo of Zenith Studio's AI receptionist, playing the receptionist for ${businessName}, a ${niche} business.`,
             `Answer general questions the way a friendly front-desk person at a business like this would.`,
-            `If the caller wants to book an appointment, use the book_appointment tool and then confirm warmly, this is a demo, so nothing is really booked.`,
+            `If the caller wants to book an appointment, use the book_appointment tool, ask for their name, email, a preferred date/time, and their timezone. This creates a REAL booking on our demo calendar, they will actually be able to see it appear, which is the whole point of the demo, so get real details rather than making something up.`,
             `Keep the call short and let the caller know at the end that this is exactly what their own callers would experience.`,
           ].join("\n\n"),
         },
@@ -133,14 +133,16 @@ export function buildDemoAssistantPayload(prospectId: string, businessName: stri
           type: "function",
           function: {
             name: "book_appointment",
-            description: "Acknowledge booking a demo appointment.",
+            description: "Book a real appointment on the demo calendar.",
             parameters: {
               type: "object",
               properties: {
                 name: { type: "string" },
-                preferredTime: { type: "string" },
+                email: { type: "string" },
+                preferredStartISO: { type: "string", description: "Requested start time, ISO 8601, UTC" },
+                timeZone: { type: "string" },
               },
-              required: ["name", "preferredTime"],
+              required: ["name", "email", "preferredStartISO", "timeZone"],
             },
           },
         },
