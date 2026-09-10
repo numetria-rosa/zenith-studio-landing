@@ -838,6 +838,14 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       See how it works
                     </Link>
                   ) : null}
+                  {system.id === "ai-receptionist" && (
+                    <Link
+                      href="/demo"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-6 py-3 text-sm font-semibold text-emerald-300 transition hover:scale-[1.02] hover:bg-emerald-400/20"
+                    >
+                      Try the live demo
+                    </Link>
+                  )}
                   <BookButton
                     className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${
                       system.featured

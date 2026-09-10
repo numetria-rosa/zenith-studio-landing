@@ -91,6 +91,14 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
               >
                 Learn more
               </a>
+              {page.serviceId === "ai-receptionist" && (
+                <Link
+                  href="/demo"
+                  className="inline-flex items-center justify-center rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-6 py-3 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-400/20"
+                >
+                  Try the live demo
+                </Link>
+              )}
             </div>
             <div className="mt-8 grid max-w-lg grid-cols-2 gap-3">
               {page.setupDisplay ? (
