@@ -306,6 +306,23 @@ export default async function AdminProjectDetailPage({
               {PROJECT_STAGE_LABELS[project.stage]}
             </span>
             <p className="mt-2 text-xs text-white/40">Created {formatDate(project.createdAt)}</p>
+            {/* Quick toggle, stops every runtime webhook/cron for this
+                project the moment it's clicked, see isProjectPaused in
+                project-pause.ts. Resume always targets LIVE, pausing a
+                project outside LIVE is not a real scenario in practice. */}
+            <form action={changeStage} className="mt-2">
+              <input type="hidden" name="stage" value={project.stage === "PAUSED" ? "LIVE" : "PAUSED"} />
+              <button
+                type="submit"
+                className={`rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
+                  project.stage === "PAUSED"
+                    ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20"
+                    : "border-red-400/30 bg-red-400/10 text-red-300 hover:bg-red-400/20"
+                }`}
+              >
+                {project.stage === "PAUSED" ? "Resume to Live" : "Pause"}
+              </button>
+            </form>
           </div>
         </div>
 

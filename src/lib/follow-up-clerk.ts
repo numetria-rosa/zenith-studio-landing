@@ -33,7 +33,7 @@ function daysSince(date: Date): number {
 
 export async function processFollowUps(): Promise<{ processed: number; lost: number; sent: number }> {
   const leads = await db.lead.findMany({
-    where: { status: { in: ["NEW", "IN_SEQUENCE"] }, sequenceStoppedAt: null },
+    where: { status: { in: ["NEW", "IN_SEQUENCE"] }, sequenceStoppedAt: null, project: { stage: { not: "PAUSED" } } },
     include: { project: { include: { integrations: { where: { provider: "signalwire" } } } } },
   });
 

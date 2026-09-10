@@ -8,6 +8,7 @@ import {
   isTextBackConfig,
 } from "@/lib/signalwire-text-back";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
+import { isProjectPaused } from "@/lib/project-pause";
 
 /* SignalWire Voice webhook for one client's AI Missed Call Text-Back number.
    The firm's own carrier has already forwarded-on-no-answer to this number
@@ -52,6 +53,9 @@ export async function POST(request: NextRequest): Promise<Response> {
   });
   if (!integration || !isTextBackConfig(integration.config)) {
     console.error(`[text-back voice webhook] no client configured for number ${toNumber}`);
+    return twiml("We are unable to take your call right now. Please try again later.");
+  }
+  if (await isProjectPaused(integration.projectId)) {
     return twiml("We are unable to take your call right now. Please try again later.");
   }
 

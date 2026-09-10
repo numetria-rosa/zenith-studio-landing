@@ -181,7 +181,7 @@ export async function syncAndDraftTimeEntriesForConnection(
 
 export async function runBillingClerkForAllProjects(): Promise<{ connectionsProcessed: number; entriesCreated: number }> {
   const connections = await db.oAuthConnection.findMany({
-    where: { status: "CONNECTED" },
+    where: { status: "CONNECTED", project: { stage: { not: "PAUSED" } } },
     include: { project: { select: { specialty: true } } },
   });
   let entriesCreated = 0;

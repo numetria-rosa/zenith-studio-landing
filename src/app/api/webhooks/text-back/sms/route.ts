@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { verifySignalwireSignature, isTextBackConfig } from "@/lib/signalwire-text-back";
 import { stopSequenceOnReply } from "@/lib/follow-up-clerk";
+import { isProjectPaused } from "@/lib/project-pause";
 
 /* SignalWire inbound SMS webhook, shared by the same number Missed Call
    Text-Back provisions. Its only job is detecting a reply so the Follow-Up
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     select: { projectId: true, config: true },
   });
   if (!integration || !isTextBackConfig(integration.config)) return emptyTwiml();
+  if (await isProjectPaused(integration.projectId)) return emptyTwiml();
 
   const lead = await db.lead.findFirst({
     where: { projectId: integration.projectId, phone: fromNumber, sequenceStoppedAt: null },

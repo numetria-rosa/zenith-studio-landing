@@ -10,6 +10,7 @@ import {
 } from "@/lib/vapi";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
+import { isProjectPaused } from "@/lib/project-pause";
 
 /* Vapi → Zenith webhook. One server URL handles every event in a call's
    lifecycle, discriminated by message.type. Verify the shared secret
@@ -62,8 +63,10 @@ export async function POST(request: NextRequest): Promise<Response> {
     if (!phoneNumberId) return new Response("missing phoneNumberId", { status: 400 });
 
     const receptionist = await lookupReceptionistByPhoneNumberId(phoneNumberId);
-    if (!receptionist) {
-      console.error(`[vapi webhook] no receptionist configured for phone number ${phoneNumberId}`);
+    if (!receptionist || (await isProjectPaused(receptionist.projectId))) {
+      // Same response whether unconfigured or paused, both fall through to
+      // whatever Fallback Destination is set on the Vapi number.
+      console.error(`[vapi webhook] no active receptionist for phone number ${phoneNumberId}`);
       return new Response("no assistant configured for this number", { status: 404 });
     }
 
@@ -74,6 +77,11 @@ export async function POST(request: NextRequest): Promise<Response> {
     const projectId = message.call?.metadata?.projectId;
     const toolCalls = message.toolCallList ?? message.toolCalls ?? [];
     if (!projectId) return new Response("missing call metadata.projectId", { status: 400 });
+    if (await isProjectPaused(projectId)) {
+      return Response.json({
+        results: toolCalls.map((call) => ({ toolCallId: call.id, result: "This service is temporarily unavailable." })),
+      });
+    }
 
     const results = await Promise.all(
       toolCalls.map(async (call) => {

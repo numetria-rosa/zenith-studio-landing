@@ -3,6 +3,7 @@ import { groqChatCompletion } from "@/lib/groq";
 import { sendSms } from "@/lib/signalwire-text-back";
 import { sendPlainEmail } from "@/lib/outreach-mail";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
+import { isProjectPaused } from "@/lib/project-pause";
 
 /* AI Lead Capture & Follow-Up runtime. Reuses the same Lead model and the
    same day-1/3/7 SMS sequence engine (follow-up-clerk.ts's processFollowUps
@@ -56,6 +57,7 @@ export type CaptureResult = { ok: true; leadId: string } | { ok: false; error: s
 
 export async function captureLead(projectId: string, input: CaptureInput): Promise<CaptureResult> {
   if (!input.email && !input.phone) return { ok: false, error: "an email or phone number is required" };
+  if (await isProjectPaused(projectId)) return { ok: false, error: "this service is temporarily unavailable" };
 
   const integration = await db.integration.findFirst({
     where: { projectId, provider: "signalwire" },
