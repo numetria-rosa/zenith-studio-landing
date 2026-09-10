@@ -762,12 +762,18 @@ enum IntegrationStatus {
 // Client-facing rendering of this model must NEVER show anything beyond
 // `provider` and a coarse status label (see the business brief's client-safe
 // label set: "Connected" / "Action required" / "Connection issue" /
-// "Not connected" / "Disconnected"). `externalRef` is an opaque
-// reference/id ONLY — e.g. a CRM object id or a webhook subscription id —
-// and must NEVER hold a raw secret, credential, API key, or OAuth token.
-// There is no secrets-storage infrastructure in this codebase; if a real
-// integration ever needs to persist a credential, that is its own dedicated
-// slice with a real secrets manager, not a field on this table.
+// "Not connected" / "Disconnected"), with one deliberate, narrow exception:
+// for provider "vapi" or "signalwire", externalRef IS the client's own
+// business phone number, not a sensitive backend reference, and a client
+// cannot actually use the receptionist/text-back service without being
+// told that number and what to do with it (forward their line to it). See
+// integrationInstructions/formatPhoneNumber in the client dashboard page.
+// Every other provider's externalRef is an opaque reference/id ONLY — e.g.
+// a CRM object id or a webhook subscription id — and must NEVER hold a raw
+// secret, credential, API key, or OAuth token. There is no secrets-storage
+// infrastructure in this codebase; if a real integration ever needs to
+// persist a credential, that is its own dedicated slice with a real
+// secrets manager, not a field on this table.
 model Integration {
   id          String             @id @default(cuid())
   projectId   String

@@ -48,6 +48,30 @@ const SUPPORT_STATUS_LABELS: Record<string, string> = {
   CLOSED: "Closed",
 };
 
+/** +12134514165 -> (213) 451-4165. Falls back to the raw value for
+    anything that doesn't match, never throws on an unexpected format. */
+function formatPhoneNumber(e164: string): string {
+  const match = e164.match(/^\+1(\d{3})(\d{3})(\d{4})$/);
+  return match ? `(${match[1]}) ${match[2]}-${match[3]}` : e164;
+}
+
+/** What a client actually needs to DO with a phone-number-shaped
+    integration, not just its connection status, a client cannot use this
+    service without being told this somewhere. Deliberately the one
+    exception to "never show more than provider + status for an
+    Integration" (see the schema comment on Integration.externalRef): a
+    phone number is the one externalRef shape that's actively useful and
+    not sensitive to show the person it belongs to. */
+function integrationInstructions(provider: string, sourceServiceId: string | null): string | null {
+  if (provider === "vapi") {
+    return "This is your AI Receptionist's number. Forward your business line to it, or give it out directly so every call reaches your AI receptionist.";
+  }
+  if (provider === "signalwire" && sourceServiceId === "law-firms") {
+    return "Set up call forwarding from your business line to this number for calls that go unanswered. The AI will text that caller back immediately. Ask your phone provider how to set up conditional call forwarding if you're not sure how.";
+  }
+  return null;
+}
+
 function formatEntryAmount(entry: { durationMinutes: number | null; expenseAmountCents: number | null }): string {
   if (entry.durationMinutes !== null) return `${(entry.durationMinutes / 60).toFixed(1)}h`;
   if (entry.expenseAmountCents !== null && entry.expenseAmountCents > 0) {
@@ -263,17 +287,30 @@ export default async function ServiceProjectPage({
                 {project.integrations.length === 0 && (
                   <p className="text-sm text-[#9aa0ae]">No integrations set up for this project yet.</p>
                 )}
-                {project.integrations.map((i) => (
-                  <div
-                    key={i.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#232838] bg-[#0d1016] p-5"
-                  >
-                    <span className="text-[14.5px] font-bold capitalize">{i.provider}</span>
-                    <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
-                      {INTEGRATION_STATUS_LABELS[i.status] ?? "Not connected"}
-                    </span>
-                  </div>
-                ))}
+                {project.integrations.map((i) => {
+                  const instructions = integrationInstructions(i.provider, project.sourceServiceId);
+                  const isPhoneNumber = (i.provider === "vapi" || i.provider === "signalwire") && i.externalRef;
+                  return (
+                    <div key={i.id} className="rounded-xl border border-[#232838] bg-[#0d1016] p-5">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <span className="text-[14.5px] font-bold capitalize">
+                          {i.provider === "vapi" ? "AI Receptionist number" : i.provider === "signalwire" ? "Phone number" : i.provider}
+                        </span>
+                        <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
+                          {INTEGRATION_STATUS_LABELS[i.status] ?? "Not connected"}
+                        </span>
+                      </div>
+                      {isPhoneNumber && i.status === "CONNECTED" && (
+                        <p className="mt-2 font-[family-name:var(--font-course-mono)] text-lg font-bold text-[#f0b429]">
+                          {formatPhoneNumber(i.externalRef!)}
+                        </p>
+                      )}
+                      {instructions && i.status === "CONNECTED" && (
+                        <p className="mt-2 text-[13px] leading-6 text-[#9aa0ae]">{instructions}</p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ),
 
