@@ -18,6 +18,7 @@ import {
 } from "@/lib/service-workspace";
 import { ProjectTabs } from "./Tabs";
 import { getSiteUrl } from "@/lib/site";
+import { aggregateClientMetrics } from "@/lib/metric-labels";
 
 /* Client-facing service project workspace (Slice 7 of the service-platform
    build, 2026-08-28). Loaded from /lab/dashboard's "My projects" list.
@@ -124,6 +125,7 @@ export default async function ServiceProjectPage({
   const stageIndex = PROJECT_STAGE_ORDER.indexOf(project.stage as (typeof PROJECT_STAGE_ORDER)[number]);
   const nextMilestone = project.milestones.find((m) => !m.completedAt);
   const outstandingCount = project.requirements.filter((r) => r.status === "MISSING" || r.status === "REJECTED").length;
+  const aggregatedMetrics = aggregateClientMetrics(project.metrics);
 
   return (
     <div
@@ -527,7 +529,7 @@ export default async function ServiceProjectPage({
 
             performance: (
               <div>
-                {project.metrics.length === 0 ? (
+                {aggregatedMetrics.length === 0 ? (
                   <div className="rounded-xl border border-[#333a4c] bg-[#191d26] p-5">
                     <p className="text-[13.5px] text-[#9aa0ae]">
                       Awaiting live data. Performance metrics will appear here once this project&apos;s systems are
@@ -536,14 +538,14 @@ export default async function ServiceProjectPage({
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {project.metrics.map((m) => (
+                    {aggregatedMetrics.map((m) => (
                       <div
-                        key={m.id}
+                        key={m.key}
                         className="flex items-center justify-between rounded-xl border border-[#232838] bg-[#0d1016] p-4"
                       >
-                        <span className="text-[13.5px] font-semibold">{m.key.replace(/_/g, " ")}</span>
+                        <span className="text-[13.5px] font-semibold capitalize">{m.label}</span>
                         <span className="font-[family-name:var(--font-course-mono)] text-[13px] text-[#f0b429]">
-                          {m.value}
+                          {m.display}
                         </span>
                       </div>
                     ))}
