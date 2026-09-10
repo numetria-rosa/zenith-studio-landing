@@ -106,9 +106,16 @@ export default async function AdminProjectsPage({
                     {p.clientName} · {p.clientEmail} · {p.serviceLabel}
                   </p>
                 </div>
-                <span className="inline-block rounded-full border border-cyan-400/30 bg-cyan-400/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-wide text-cyan-300">
-                  {PROJECT_STAGE_LABELS[p.stage]}
-                </span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {p.specialty && (
+                    <span className="inline-block rounded-full border border-amber-400/30 bg-amber-400/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-wide text-amber-300">
+                      {p.specialty}
+                    </span>
+                  )}
+                  <span className="inline-block rounded-full border border-cyan-400/30 bg-cyan-400/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-wide text-cyan-300">
+                    {PROJECT_STAGE_LABELS[p.stage]}
+                  </span>
+                </div>
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">

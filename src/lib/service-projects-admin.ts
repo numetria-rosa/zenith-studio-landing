@@ -4,6 +4,7 @@ import { computeApprovedTotals, createDeferredMonthlyCheckout } from "@/lib/prop
 import { provisionReceptionistIfNeeded } from "@/lib/receptionist-provisioning";
 import { provisionTextBackIfNeeded } from "@/lib/text-back-provisioning";
 import { provisionLeadCaptureIfNeeded } from "@/lib/lead-capture-provisioning";
+import { LAW_FIRM_SPECIALTIES, LEGAL_SPECIALTY_PROFILES } from "@/lib/legal-specialties";
 import type { ProjectStage, ProposalItemKind, RequirementStatus, SupportStatus } from "@prisma/client";
 
 /* Admin-side ServiceProject operations (Slice 4 of the business command
@@ -75,6 +76,7 @@ export type ProjectListRow = {
   id: string;
   title: string;
   stage: ProjectStage;
+  specialty: string | null;
   createdAt: Date;
   targetLaunchAt: Date | null;
   serviceLabel: string;
@@ -130,6 +132,7 @@ export async function listServiceProjectsForAdmin(stageFilter?: ProjectStage): P
       id: p.id,
       title: p.title,
       stage: p.stage,
+      specialty: p.specialty ? LEGAL_SPECIALTY_PROFILES[p.specialty].label : null,
       createdAt: p.createdAt,
       targetLaunchAt: p.targetLaunchAt,
       serviceLabel: projectServiceLabel(p),
@@ -299,6 +302,23 @@ export async function ensureSplitMonthlyCheckoutForProject(
     );
     return { ok: false, error: `Whop monthly checkout failed: ${message}` };
   }
+}
+
+/** Admin-set only, never client-submitted, see ServiceProject.specialty's
+    schema comment for why. Empty string clears it back to unset (Billing
+    Clerk falls back to GENERAL's hourly behavior). */
+export async function updateProjectSpecialty(id: string, specialty: string): Promise<WriteResult> {
+  const trimmed = specialty.trim();
+  if (trimmed && !LAW_FIRM_SPECIALTIES.includes(trimmed as (typeof LAW_FIRM_SPECIALTIES)[number])) {
+    return { ok: false, error: `invalid specialty "${trimmed}"` };
+  }
+  const existing = await db.serviceProject.findUnique({ where: { id }, select: { id: true } });
+  if (!existing) return { ok: false, error: "not_found" };
+  await db.serviceProject.update({
+    where: { id },
+    data: { specialty: trimmed ? (trimmed as (typeof LAW_FIRM_SPECIALTIES)[number]) : null },
+  });
+  return { ok: true };
 }
 
 export async function updateProjectAdminNote(id: string, adminNote: string): Promise<WriteResult> {

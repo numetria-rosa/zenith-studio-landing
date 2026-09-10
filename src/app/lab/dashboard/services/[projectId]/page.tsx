@@ -47,6 +47,14 @@ const SUPPORT_STATUS_LABELS: Record<string, string> = {
   CLOSED: "Closed",
 };
 
+function formatEntryAmount(entry: { durationMinutes: number | null; expenseAmountCents: number | null }): string {
+  if (entry.durationMinutes !== null) return `${(entry.durationMinutes / 60).toFixed(1)}h`;
+  if (entry.expenseAmountCents !== null && entry.expenseAmountCents > 0) {
+    return `$${(entry.expenseAmountCents / 100).toFixed(2)} expense`;
+  }
+  return "Case activity";
+}
+
 export default async function ServiceProjectPage({
   params,
 }: {
@@ -336,7 +344,7 @@ export default async function ServiceProjectPage({
                         <div key={entry.id} className="rounded-xl border border-[#232838] bg-[#0d1016] p-5">
                           <div className="flex flex-wrap items-baseline justify-between gap-2">
                             <span className="text-[14.5px] font-bold">
-                              {entry.matterName} &middot; {(entry.durationMinutes / 60).toFixed(1)}h
+                              {entry.matterName} &middot; {formatEntryAmount(entry)}
                             </span>
                             <span className="text-[11px] text-[#676e7d]">
                               {entry.entryDate.toISOString().slice(0, 10)} &middot; {entry.attorneyEmail}
@@ -383,7 +391,7 @@ export default async function ServiceProjectPage({
                           >
                             <span className="text-[13px]">
                               {entry.entryDate.toISOString().slice(0, 10)} &middot; {entry.matterName} &middot;{" "}
-                              {(entry.durationMinutes / 60).toFixed(1)}h
+                              {formatEntryAmount(entry)}
                             </span>
                             <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#4ade95]">
                               Approved

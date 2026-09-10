@@ -534,7 +534,14 @@ model ServiceProject {
   stage ProjectStage @default(NEW)
   title String
 
-  adminNote String? @db.Text // internal only — never shown to the client, matches ServiceRequest.adminNote's convention
+  // law-firms only, null everywhere else. Drives billing-clerk.ts's choice
+  // of narrative prompt and output shape per src/lib/legal-specialties.ts,
+  // instead of hardcoding per-client logic. Admin-set (see the admin
+  // project page), not client-submitted, since it is a categorization
+  // decision, not a business fact the client reports.
+  specialty LawFirmSpecialty?
+
+  adminNote String? @db.Text // internal only, never shown to the client, matches ServiceRequest.adminNote's convention
 
   // Operational fields added in Slice 4 (/admin/projects, 2026-08-28) —
   // purely additive, nullable, no default assignee/date implied for
@@ -614,27 +621,48 @@ enum TimeEntryStatus {
   REJECTED
 }
 
-// One AI-drafted billable-time line, reconstructed from a calendar event or
-// email thread. Never auto-sent: "You approve every entry" is enforced
-// here as a real status gate, not just marketing copy: nothing counts
-// toward an invoice until an admin/attorney flips it to APPROVED (see
-// billing-clerk.ts). sourceRef + the unique constraint below make re-running
-// a sync idempotent, the same calendar event never becomes two entries.
+// One specialty per law-firms client, admin-set on ServiceProject.specialty.
+// See src/lib/legal-specialties.ts for what each one actually changes
+// (billing model, Groq prompt, dashboard framing); this enum is only the
+// data side.
+enum LawFirmSpecialty {
+  PERSONAL_INJURY
+  FAMILY_LAW
+  CRIMINAL_DEFENSE
+  CORPORATE
+  GENERAL
+}
+
+// One AI-drafted billing/case-activity line, reconstructed from a calendar
+// event or email thread. Never auto-sent: "You approve every entry" is
+// enforced here as a real status gate, not just marketing copy, nothing
+// counts toward an invoice until an admin/attorney flips it to APPROVED
+// (see billing-clerk.ts). sourceRef + the unique constraint below make
+// re-running a sync idempotent, the same calendar event never becomes two
+// entries.
+//
+// durationMinutes/expenseAmountCents both nullable because which one
+// matters depends on the client's LawFirmSpecialty billing model: hourly
+// specialties populate durationMinutes and leave expenseAmountCents null,
+// contingency specialties (personal injury) populate expenseAmountCents
+// (a reimbursable case expense, if any) and leave durationMinutes null,
+// since contingency firms do not bill by the hour at all.
 model TimeEntry {
-  id              String          @id @default(cuid())
-  projectId       String
-  attorneyEmail   String
-  matterName      String
-  entryDate       DateTime
-  durationMinutes Int
-  narrative       String          @db.Text
-  sourceType      String // "calendar" | "email"
-  sourceRef       String // external event/message id
-  status          TimeEntryStatus @default(DRAFT)
-  reviewedByUserId String?
-  reviewedAt      DateTime?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  id                 String          @id @default(cuid())
+  projectId          String
+  attorneyEmail      String
+  matterName         String
+  entryDate          DateTime
+  durationMinutes    Int?
+  expenseAmountCents Int?
+  narrative          String          @db.Text
+  sourceType         String // "calendar" | "email"
+  sourceRef          String // external event/message id
+  status             TimeEntryStatus @default(DRAFT)
+  reviewedByUserId   String?
+  reviewedAt         DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 

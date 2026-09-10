@@ -12,6 +12,7 @@ import {
   updateRequirementStatusAsAdmin,
   updateProjectAdminNote,
   updateProjectOps,
+  updateProjectSpecialty,
   postAdminMessage,
   updateSupportRequestStatusForAdmin,
   PROJECT_STAGES,
@@ -30,6 +31,7 @@ import {
   TASK_PRIORITY_LABELS,
 } from "@/lib/tasks-admin";
 import { approveTimeEntry, rejectTimeEntry } from "@/lib/billing-clerk";
+import { LAW_FIRM_SPECIALTIES, LEGAL_SPECIALTY_PROFILES } from "@/lib/legal-specialties";
 
 /* Admin operations view for a single ServiceProject (Slice 4 of the
    business command center, 2026-08-28: /admin/projects/[id]). Every write
@@ -46,6 +48,17 @@ const REQUIREMENT_STATUS_LABELS: Record<string, string> = {
   APPROVED: "Approved",
   REJECTED: "Needs revision",
 };
+
+/** Hourly specialties populate durationMinutes; contingency specialties
+    (personal injury) populate expenseAmountCents instead, see
+    legal-specialties.ts. */
+function formatEntryAmount(entry: { durationMinutes: number | null; expenseAmountCents: number | null }): string {
+  if (entry.durationMinutes !== null) return `${(entry.durationMinutes / 60).toFixed(1)}h`;
+  if (entry.expenseAmountCents !== null && entry.expenseAmountCents > 0) {
+    return `$${(entry.expenseAmountCents / 100).toFixed(2)} expense`;
+  }
+  return "Case activity";
+}
 
 function formatDate(d: Date | null): string {
   if (!d) return "-";
@@ -161,6 +174,16 @@ export default async function AdminProjectDetailPage({
     const assigneeUserId = String(formData.get("assigneeUserId") || "");
     const targetLaunchAt = String(formData.get("targetLaunchAt") || "");
     await updateProjectOps(id, { assigneeUserId, targetLaunchAt });
+    revalidatePath(path);
+    revalidatePath("/admin/projects");
+  }
+
+  async function saveSpecialty(formData: FormData) {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    const specialty = String(formData.get("specialty") || "");
+    await updateProjectSpecialty(id, specialty);
     revalidatePath(path);
     revalidatePath("/admin/projects");
   }
@@ -418,6 +441,39 @@ export default async function AdminProjectDetailPage({
           </form>
         </SectionCard>
 
+        {/* Legal specialty (law-firms only), drives billing-clerk.ts's
+            choice of hourly vs contingency narrative per legal-specialties.ts */}
+        {project.sourceServiceId === "law-firms" && (
+          <SectionCard title="Legal specialty">
+            <p className="text-sm text-white/50">
+              Sets which billing model the Billing Clerk uses for this firm. Personal Injury drafts case-activity
+              and expense entries instead of hourly time, since PI firms bill on contingency.
+            </p>
+            <form action={saveSpecialty} className="mt-3 flex flex-wrap items-end gap-3">
+              <select
+                name="specialty"
+                defaultValue={project.specialty ?? ""}
+                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm"
+              >
+                <option value="" className="bg-[#05060a]">
+                  Not set (defaults to hourly)
+                </option>
+                {LAW_FIRM_SPECIALTIES.map((s) => (
+                  <option key={s} value={s} className="bg-[#05060a]">
+                    {LEGAL_SPECIALTY_PROFILES[s].label} ({LEGAL_SPECIALTY_PROFILES[s].billingModel.toLowerCase()})
+                  </option>
+                ))}
+              </select>
+              <button
+                type="submit"
+                className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
+              >
+                Save
+              </button>
+            </form>
+          </SectionCard>
+        )}
+
         {/* Internal note */}
         <SectionCard title="Internal note (never shown to the client)">
           <form action={saveNote} className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
@@ -580,7 +636,7 @@ export default async function AdminProjectDetailPage({
               <div key={entry.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <p className="text-sm font-semibold">
-                    {entry.matterName} · {(entry.durationMinutes / 60).toFixed(1)}h
+                    {entry.matterName} · {formatEntryAmount(entry)}
                   </p>
                   <span className="text-xs text-white/40">
                     {formatDate(entry.entryDate)} · {entry.attorneyEmail} · {entry.sourceType}

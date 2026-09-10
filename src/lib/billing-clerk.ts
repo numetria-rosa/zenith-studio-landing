@@ -9,37 +9,62 @@ import {
 import { fetchMicrosoftCalendarEvents, fetchMicrosoftRecentEmails } from "@/lib/oauth-microsoft";
 import { groqChatCompletion } from "@/lib/groq";
 import { sendAdminAlert } from "@/lib/outreach-mail";
+import { specialtyProfile, type LegalSpecialtyProfile } from "@/lib/legal-specialties";
 import type { OAuthConnection } from "@prisma/client";
 
-/* AI Billing Clerk, reconstructs billable time from a firm's own calendar
-   and email, drafts a narrative for each, and stops there. Every entry is
-   born as DRAFT; nothing becomes billable until approveTimeEntry runs
+/* AI Billing Clerk, reconstructs billable time (or, for contingency
+   specialties, case activity/expenses) from a firm's own calendar and
+   email, drafts a narrative for each, and stops there. Every entry is born
+   as DRAFT; nothing becomes billable until approveTimeEntry runs
    (attorney/admin action), "You approve every entry" is a real status
-   gate, not just marketing copy. Runs from /api/cron/billing-clerk. */
+   gate, not just marketing copy. Runs from /api/cron/billing-clerk.
+
+   Specialty-aware since 2026-09-10: a personal injury firm bills on
+   contingency, not by the hour, so its narratives and output shape differ
+   from every other specialty. See legal-specialties.ts for the registry
+   this reads from, one place to add a new specialty rather than branching
+   per client here. */
 
 const LOOKBACK_DAYS = 14; // matches the vertical's own "14 day write-down window" pitch
 const MIN_EVENT_MINUTES = 10; // filters out reminders/holds, not real meetings
 
-const NARRATIVE_SYSTEM_PROMPT = `You are a legal billing assistant. Given details of a calendar meeting or an email, write ONE professional billing narrative sentence in the style law firms use on invoices (e.g. "Telephone conference with opposing counsel regarding discovery schedule."). Identify a likely matter or client name from the available context; use "General" if none is evident. For emails only, also estimate minutes spent (a quick email is 6-12 minutes, a substantive one 15-30). Respond ONLY with JSON: {"matterName": string, "narrative": string, "estimatedMinutes": number}.`;
+type DraftResult = { matterName: string; narrative: string; durationMinutes: number | null; expenseAmountCents: number | null };
 
-type DraftResult = { matterName: string; narrative: string; estimatedMinutes: number };
+async function draftFromGroq(
+  profile: LegalSpecialtyProfile,
+  userPrompt: string,
+  fallbackMinutes: number
+): Promise<DraftResult> {
+  const fallback: DraftResult =
+    profile.billingModel === "HOURLY"
+      ? { matterName: "General", narrative: "Time entry pending review.", durationMinutes: fallbackMinutes, expenseAmountCents: null }
+      : { matterName: "General", narrative: "Case activity pending review.", durationMinutes: null, expenseAmountCents: 0 };
 
-async function draftFromGroq(userPrompt: string, fallbackMinutes: number): Promise<DraftResult> {
-  const result = await groqChatCompletion({ systemPrompt: NARRATIVE_SYSTEM_PROMPT, userPrompt, jsonMode: true });
-  if (!result.ok) return { matterName: "General", narrative: "Time entry pending review.", estimatedMinutes: fallbackMinutes };
+  const result = await groqChatCompletion({ systemPrompt: profile.narrativeSystemPrompt, userPrompt, jsonMode: true });
+  if (!result.ok) return fallback;
+
   try {
-    const parsed = JSON.parse(result.content) as Partial<DraftResult>;
-    return {
-      matterName: typeof parsed.matterName === "string" && parsed.matterName.trim() ? parsed.matterName.trim() : "General",
-      narrative:
-        typeof parsed.narrative === "string" && parsed.narrative.trim()
-          ? parsed.narrative.trim()
-          : "Time entry pending review.",
-      estimatedMinutes:
-        typeof parsed.estimatedMinutes === "number" ? Math.min(Math.max(parsed.estimatedMinutes, 6), 480) : fallbackMinutes,
-    };
+    const parsed = JSON.parse(result.content) as Partial<{
+      matterName: string;
+      narrative: string;
+      estimatedMinutes: number;
+      expenseAmountUsd: number;
+    }>;
+    const matterName = typeof parsed.matterName === "string" && parsed.matterName.trim() ? parsed.matterName.trim() : "General";
+    const narrative =
+      typeof parsed.narrative === "string" && parsed.narrative.trim() ? parsed.narrative.trim() : fallback.narrative;
+
+    if (profile.billingModel === "HOURLY") {
+      const estimatedMinutes =
+        typeof parsed.estimatedMinutes === "number" ? Math.min(Math.max(parsed.estimatedMinutes, 6), 480) : fallbackMinutes;
+      return { matterName, narrative, durationMinutes: estimatedMinutes, expenseAmountCents: null };
+    }
+
+    const expenseAmountCents =
+      typeof parsed.expenseAmountUsd === "number" ? Math.max(Math.round(parsed.expenseAmountUsd * 100), 0) : 0;
+    return { matterName, narrative, durationMinutes: null, expenseAmountCents };
   } catch {
-    return { matterName: "General", narrative: "Time entry pending review.", estimatedMinutes: fallbackMinutes };
+    return fallback;
   }
 }
 
@@ -67,7 +92,10 @@ async function fetchCalendarAndEmail(
   return { events, emails };
 }
 
-export async function syncAndDraftTimeEntriesForConnection(connection: OAuthConnection): Promise<{ created: number }> {
+export async function syncAndDraftTimeEntriesForConnection(
+  connection: OAuthConnection,
+  profile: LegalSpecialtyProfile
+): Promise<{ created: number }> {
   const tokenResult = await getFreshAccessToken(connection);
   if (!tokenResult.ok) {
     await db.oAuthConnection.update({ where: { id: connection.id }, data: { status: "EXPIRED" } });
@@ -98,10 +126,11 @@ export async function syncAndDraftTimeEntriesForConnection(connection: OAuthConn
 
   for (const event of candidateEvents) {
     if (existingRefs.has(event.id)) continue;
-    const durationMinutes = Math.round((new Date(event.end).getTime() - new Date(event.start).getTime()) / 60000);
+    const realDurationMinutes = Math.round((new Date(event.end).getTime() - new Date(event.start).getTime()) / 60000);
     const draft = await draftFromGroq(
+      profile,
       `Calendar meeting titled "${event.summary}" with attendees: ${event.attendeeEmails.join(", ") || "none listed"}.`,
-      durationMinutes
+      realDurationMinutes
     );
     await db.timeEntry.create({
       data: {
@@ -109,7 +138,10 @@ export async function syncAndDraftTimeEntriesForConnection(connection: OAuthConn
         attorneyEmail: connection.accountEmail,
         matterName: draft.matterName,
         entryDate: new Date(event.start),
-        durationMinutes, // real duration from the calendar, not Groq's guess
+        // Hourly specialties use the real calendar duration, not Groq's
+        // guess; contingency specialties never bill by duration at all.
+        durationMinutes: profile.billingModel === "HOURLY" ? realDurationMinutes : null,
+        expenseAmountCents: draft.expenseAmountCents,
         narrative: draft.narrative,
         sourceType: "calendar",
         sourceRef: event.id,
@@ -121,6 +153,7 @@ export async function syncAndDraftTimeEntriesForConnection(connection: OAuthConn
   for (const email of emails) {
     if (existingRefs.has(email.id)) continue;
     const draft = await draftFromGroq(
+      profile,
       `Email from ${email.fromEmail}, subject "${email.subject}": ${email.snippet}`,
       12
     );
@@ -130,7 +163,8 @@ export async function syncAndDraftTimeEntriesForConnection(connection: OAuthConn
         attorneyEmail: connection.accountEmail,
         matterName: draft.matterName,
         entryDate: email.date ? new Date(email.date) : new Date(),
-        durationMinutes: draft.estimatedMinutes,
+        durationMinutes: draft.durationMinutes,
+        expenseAmountCents: draft.expenseAmountCents,
         narrative: draft.narrative,
         sourceType: "email",
         sourceRef: email.id,
@@ -143,10 +177,14 @@ export async function syncAndDraftTimeEntriesForConnection(connection: OAuthConn
 }
 
 export async function runBillingClerkForAllProjects(): Promise<{ connectionsProcessed: number; entriesCreated: number }> {
-  const connections = await db.oAuthConnection.findMany({ where: { status: "CONNECTED" } });
+  const connections = await db.oAuthConnection.findMany({
+    where: { status: "CONNECTED" },
+    include: { project: { select: { specialty: true } } },
+  });
   let entriesCreated = 0;
   for (const connection of connections) {
-    const result = await syncAndDraftTimeEntriesForConnection(connection);
+    const profile = specialtyProfile(connection.project.specialty);
+    const result = await syncAndDraftTimeEntriesForConnection(connection, profile);
     entriesCreated += result.created;
   }
   return { connectionsProcessed: connections.length, entriesCreated };
@@ -190,13 +228,14 @@ export async function exportApprovedTimeEntriesCsv(projectId: string): Promise<s
     where: { projectId, status: "APPROVED" },
     orderBy: { entryDate: "asc" },
   });
-  const header = "Date,Attorney,Matter,Minutes,Narrative";
+  const header = "Date,Attorney,Matter,Minutes,Expense (USD),Narrative";
   const rows = entries.map((e) =>
     [
       e.entryDate.toISOString().slice(0, 10),
       csvEscape(e.attorneyEmail),
       csvEscape(e.matterName),
-      String(e.durationMinutes),
+      e.durationMinutes === null ? "" : String(e.durationMinutes),
+      e.expenseAmountCents === null ? "" : (e.expenseAmountCents / 100).toFixed(2),
       csvEscape(e.narrative),
     ].join(",")
   );
