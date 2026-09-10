@@ -47,17 +47,30 @@ export default function DemoBookingsFeed() {
           <p className="text-sm text-white/40">No bookings yet, book one above and it will show up here.</p>
         )}
         {bookings?.map((b) => (
-          <div key={b.uid} className="rounded-xl border border-white/10 bg-black/30 px-3 py-2.5">
-            <p className="text-sm font-semibold text-white">{b.attendeeName}</p>
-            <p className="text-xs text-white/50">
-              {new Date(b.startISO).toLocaleString(undefined, {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              })}
-            </p>
+          <div
+            key={b.uid}
+            className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/30 px-3 py-2.5"
+          >
+            <div>
+              <p className="text-sm font-semibold text-white">{b.attendeeName}</p>
+              <p className="text-xs text-white/50">
+                {new Date(b.startISO).toLocaleString(undefined, {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+            <a
+              href={`https://cal.com/booking/${b.uid}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 text-xs font-semibold text-emerald-300 underline decoration-emerald-300/40 underline-offset-2 hover:text-emerald-200"
+            >
+              View confirmation &nearr;
+            </a>
           </div>
         ))}
       </div>
