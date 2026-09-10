@@ -5,7 +5,6 @@ import { requireAdmin } from "@/lib/admin";
 import {
   getServiceProjectForAdmin,
   listAssignableAdmins,
-  projectServiceLabel,
   updateProjectStage,
   ensureSplitMonthlyCheckoutForProject,
   setMilestoneCompleted,
@@ -20,6 +19,7 @@ import {
   SUPPORT_STATUSES,
   SUPPORT_STATUS_LABELS,
 } from "@/lib/service-projects-admin";
+import { projectServiceLabel } from "@/lib/services";
 import { computeApprovedTotals, whopCheckoutUrl } from "@/lib/proposal-payments";
 import { INTEGRATION_STATUS_LABELS } from "@/lib/service-workspace";
 import {

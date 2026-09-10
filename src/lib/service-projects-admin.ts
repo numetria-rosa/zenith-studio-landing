@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { getService } from "@/lib/services";
+import { projectServiceLabel } from "@/lib/services";
 import { computeApprovedTotals, createDeferredMonthlyCheckout } from "@/lib/proposal-payments";
 import { provisionReceptionistIfNeeded } from "@/lib/receptionist-provisioning";
 import { provisionTextBackIfNeeded } from "@/lib/text-back-provisioning";
@@ -57,19 +57,6 @@ export const SUPPORT_STATUS_LABELS: Record<SupportStatus, string> = {
 
 export function isSupportStatus(value: string): value is SupportStatus {
   return (SUPPORT_STATUSES as string[]).includes(value);
-}
-
-/** Resolves the display label for a project's service, reusing the same
-    catalogService-title-first / sourceServiceId-fallback pattern already
-    used by the client-facing workspace page and client-directory.ts. */
-export function projectServiceLabel(project: {
-  title: string;
-  sourceServiceId: string | null;
-  catalogService?: { title: string } | null;
-}): string {
-  if (project.catalogService?.title) return project.catalogService.title;
-  if (project.sourceServiceId) return getService(project.sourceServiceId)?.title ?? project.sourceServiceId;
-  return project.title;
 }
 
 export type ProjectListRow = {

@@ -173,3 +173,22 @@ export function serviceKindForWhopPlanId(
   }
   return null;
 }
+
+/** Resolves the display label for a project's service, reusing the same
+    catalogService-title-first / sourceServiceId-fallback pattern used by
+    the client-facing workspace page and client-directory.ts.
+    Deliberately lives here, not in service-projects-admin.ts: this file
+    has no server-only dependencies, so a client component can safely
+    import it (directly, or transitively through admin-search.ts) without
+    dragging in provisioning code (Vapi/SignalWire/Groq clients) into a
+    browser bundle, which is exactly what broke every production build
+    from 2026-09-10's SignalWire switch onward, see git history. */
+export function projectServiceLabel(project: {
+  title: string;
+  sourceServiceId: string | null;
+  catalogService?: { title: string } | null;
+}): string {
+  if (project.catalogService?.title) return project.catalogService.title;
+  if (project.sourceServiceId) return getService(project.sourceServiceId)?.title ?? project.sourceServiceId;
+  return project.title;
+}

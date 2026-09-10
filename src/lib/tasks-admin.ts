@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { projectServiceLabel } from "@/lib/service-projects-admin";
+import { projectServiceLabel } from "@/lib/services";
 import type { TaskPriority, TaskStatus } from "@prisma/client";
 
 /* Internal admin Task CRUD (Slice 6 of the business command center,

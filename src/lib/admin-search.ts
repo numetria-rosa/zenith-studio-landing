@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/admin";
-import { projectServiceLabel } from "@/lib/service-projects-admin";
+import { projectServiceLabel } from "@/lib/services";
 
 /* Global admin search (Slice 7 of the business command center, 2026-08-28).
    A lighter-weight, purpose-built search across the handful of entity types
