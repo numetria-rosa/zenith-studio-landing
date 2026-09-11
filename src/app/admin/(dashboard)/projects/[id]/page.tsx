@@ -32,7 +32,7 @@ import {
 } from "@/lib/tasks-admin";
 import { approveTimeEntry, rejectTimeEntry } from "@/lib/billing-clerk";
 import { LAW_FIRM_SPECIALTIES, LEGAL_SPECIALTY_PROFILES } from "@/lib/legal-specialties";
-import { getMonthlyCostCents, resolveMonthlyBudgetCents } from "@/lib/usage-costs";
+import { getMonthlyCostCents, resolveMonthlyBudgetCents, isBudgetAutoPaused } from "@/lib/usage-costs";
 
 /* Admin operations view for a single ServiceProject (Slice 4 of the
    business command center, 2026-08-28: /admin/projects/[id]). Every write
@@ -98,9 +98,10 @@ export default async function AdminProjectDetailPage({
   ]);
   if (!project) notFound();
 
-  const [monthlySpentCents, monthlyBudgetCents] = await Promise.all([
+  const [monthlySpentCents, monthlyBudgetCents, budgetAutoPaused] = await Promise.all([
     getMonthlyCostCents(id),
     resolveMonthlyBudgetCents(id),
+    project.stage === "PAUSED" ? isBudgetAutoPaused(id) : Promise.resolve(false),
   ]);
   const usagePct = monthlyBudgetCents > 0 ? Math.round((monthlySpentCents / monthlyBudgetCents) * 100) : 0;
 
@@ -325,6 +326,16 @@ export default async function AdminProjectDetailPage({
             </form>
           </div>
         </div>
+
+        {budgetAutoPaused && (
+          <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/[0.06] p-4">
+            <p className="text-sm text-red-200">
+              Auto-paused: this project hit 100% of its monthly API budget, so every AI-driven call, text, and
+              follow-up is currently blocked. Resume to Live above if this is a false positive, or it stays paused
+              until next month&apos;s budget resets.
+            </p>
+          </div>
+        )}
 
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">

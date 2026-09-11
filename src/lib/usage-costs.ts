@@ -73,9 +73,31 @@ export async function resolveMonthlyBudgetCents(projectId: string): Promise<numb
   return Math.round(monthlyCents * 0.3);
 }
 
+function budgetAutoPauseMarkerKey(): string {
+  return `budget_auto_paused_${currentMonthKey()}`;
+}
+
+/** Whether this project's current PAUSED state was set by the hard cap
+    below (vs. an admin manually pausing it) - drives the admin page's
+    "why is this paused" messaging, since the Pause/Resume button itself
+    can't tell the two apart. */
+export async function isBudgetAutoPaused(projectId: string): Promise<boolean> {
+  const marker = await db.serviceMetric.findFirst({ where: { projectId, key: budgetAutoPauseMarkerKey() } });
+  return marker !== null;
+}
+
 /** Fires an admin alert exactly once per threshold per calendar month, not
     on every single event once past it, dedupe via a marker ServiceMetric
-    row so a restart/redeploy can't lose the "already alerted" state. */
+    row so a restart/redeploy can't lose the "already alerted" state.
+
+    At 100%, also auto-pauses the project (reusing the same PAUSED stage
+    and isProjectPaused gate the admin's manual Pause button already
+    enforces on every AI-driven webhook/cron), a hard stop rather than
+    just an alert. Previously left unenforced deliberately, to avoid
+    breaking a live client's phone/SMS over a soft cost estimate; the
+    dashboard's own usage bar and admin alert give enough warning at 90%
+    to catch a false positive before it bites, and an admin can resume to
+    LIVE in one click if this fires wrongly. */
 async function checkBudgetThresholds(projectId: string, source: string): Promise<void> {
   const [spentCents, budgetCents] = await Promise.all([
     getMonthlyCostCents(projectId),
@@ -93,11 +115,23 @@ async function checkBudgetThresholds(projectId: string, source: string): Promise
 
   await db.serviceMetric.create({ data: { projectId, key: markerKey, value: 1 } });
 
-  const project = await db.serviceProject.findUnique({ where: { id: projectId }, select: { title: true } });
+  const project = await db.serviceProject.findUnique({ where: { id: projectId }, select: { title: true, stage: true } });
+
+  let autoPaused = false;
+  if (threshold >= 100 && project?.stage !== "PAUSED") {
+    await db.serviceProject.update({ where: { id: projectId }, data: { stage: "PAUSED" } });
+    await db.serviceMetric.create({ data: { projectId, key: budgetAutoPauseMarkerKey(), value: 1 } });
+    autoPaused = true;
+  }
+
   await sendAdminAlert(
     threshold >= 100
-      ? `Usage over budget: ${project?.title ?? projectId}`
+      ? `Usage over budget${autoPaused ? " - project auto-paused" : ""}: ${project?.title ?? projectId}`
       : `Usage approaching budget (90%): ${project?.title ?? projectId}`,
-    `This month's API cost is $${(spentCents / 100).toFixed(2)} against a $${(budgetCents / 100).toFixed(2)} budget (30% of plan price, targeting 70% margin). Last event: ${source}.`
+    `This month's API cost is $${(spentCents / 100).toFixed(2)} against a $${(budgetCents / 100).toFixed(2)} budget (30% of plan price, targeting 70% margin). Last event: ${source}.${
+      autoPaused
+        ? " This project has been automatically paused - every AI-driven call, text, and follow-up is now blocked until you resume it from the admin project page. If this is a false positive, resume it there; otherwise it stays paused until next month's budget resets."
+        : ""
+    }`
   );
 }
