@@ -93,7 +93,7 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
               </a>
               {page.serviceId === "ai-receptionist" && (
                 <Link
-                  href="/demo"
+                  href="/demo/ai-receptionist"
                   className="inline-flex items-center justify-center rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-6 py-3 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-400/20"
                 >
                   Try the live demo
