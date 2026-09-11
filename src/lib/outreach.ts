@@ -206,22 +206,53 @@ function primarySignal(input: EligibilityInput): string {
   );
 }
 
+/** A second verified signal to fold into the observation sentence, only
+    when one is genuinely on file - makes the email read as specific to
+    this business rather than templated, without reaching past what's
+    actually verified. Deliberately never draws on `opportunity`: that
+    field is this app's own reasoning/inference about the prospect, stored
+    separately from `research.verified.observedSignals` for exactly this
+    reason (see the admin outreach detail page's "not emailed as fact"
+    note), so it must never be phrased as something we observed. */
+function secondarySignal(input: EligibilityInput, primary: string): string | null {
+  const signals = input.research.verified.observedSignals;
+  const extra = signals.find((s) => s.trim() && s.trim() !== primary.trim());
+  return extra ? extra.trim().replace(/\.$/, "") : null;
+}
+
+/** Drops a trailing "(legal/dba name)" parenthetical for anywhere the
+    business name reads out loud (subject line, greeting, CTA copy) - a few
+    seed rows carry the full registered name for identification purposes,
+    which looks templated in an email subject even though it's accurate. */
+function displayName(businessName: string): string {
+  return businessName.replace(/\s*\([^)]*\)\s*$/, "").trim() || businessName.trim();
+}
+
 export function generateOutreachEmail(input: EligibilityInput, path: OutreachPathId): GeneratedEmail {
-  const name = input.businessName.trim();
+  const name = displayName(input.businessName);
   const greeting = input.contactName?.trim()
     ? `Hi ${input.contactName.trim()},`
     : `Hi ${name} team,`;
   const signal = primarySignal(input);
+  const extra = secondarySignal(input, signal);
   const service = getService(input.recommendedServiceId);
   const serviceTitle = service?.title ?? "automation system";
   const observation = signal
-    ? `I was looking at your public site and noticed ${signal.replace(/\.$/, "")}.`
+    ? `I was looking at your public site and noticed ${signal.replace(/\.$/, "")}${
+        extra ? `, and that ${extra.charAt(0).toLowerCase()}${extra.slice(1)}` : ""
+      }.`
     : `I was looking at how ${name} takes new enquiries in ${input.city}.`;
 
+  // Prefer this prospect's own researched reasoning over the generic
+  // fallback line - it's our inference about their situation, not a claim
+  // about what we observed (that distinction is what factCheckEmail
+  // actually polices), so it's fine to state directly, and it's far more
+  // specific than one sentence shared by every prospect on this path.
   const opportunity =
-    path === "PAID_AUDIT_CALL"
+    input.opportunity.trim() ||
+    (path === "PAID_AUDIT_CALL"
       ? `That kind of workflow is usually easier to map on a short call than from the website alone.`
-      : `That usually creates repetitive first replies and follow-up until someone books.`;
+      : `That usually creates repetitive first replies and follow-up until someone books.`);
 
   const solution = `We build a done-for-you ${serviceTitle} for businesses in this situation. Setup and monthly pricing are listed on the service page, with no long contract.`;
 
@@ -250,7 +281,7 @@ Zenith Studio`;
     bodyText: bodyText.trim(),
     greeting,
     observation,
-    factsUsed: [name, input.city, signal].filter(Boolean),
+    factsUsed: [name, input.city, signal, extra ?? ""].filter(Boolean),
   };
 }
 
@@ -369,9 +400,16 @@ export type QualityBreakdown = {
 
 export function scoreEmailQuality(email: GeneratedEmail, input: EligibilityInput, fact: FactCheckResult): QualityBreakdown {
   const body = email.bodyText.toLowerCase();
+  // The email deliberately writes a trailing "(legal name)" parenthetical
+  // out of the visible business name (see displayName in
+  // generateOutreachEmail) - check for either form so that cleanup isn't
+  // scored as if the name were missing.
+  const nameVariant = displayName(input.businessName).toLowerCase();
   let personalization = 0;
-  if (body.includes(input.businessName.toLowerCase())) personalization += 15;
-  if (email.subject.toLowerCase().includes(input.businessName.toLowerCase())) personalization += 5;
+  if (body.includes(input.businessName.toLowerCase()) || body.includes(nameVariant)) personalization += 15;
+  if (email.subject.toLowerCase().includes(input.businessName.toLowerCase()) || email.subject.toLowerCase().includes(nameVariant)) {
+    personalization += 5;
+  }
   if (input.research.verified.observedSignals.some((s) => body.includes(s.toLowerCase().slice(0, 18)))) {
     personalization += 5;
   }
