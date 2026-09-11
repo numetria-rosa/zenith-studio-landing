@@ -2,217 +2,244 @@
 
 import { useState } from "react";
 
-/* Purely simulated - no real SignalWire number, Groq call, or Cal.com
-   booking fires here, on purpose (see demo-number-policy.md and the "never
-   demo against real client infra" principle in memory). Text-Back,
-   Follow-Up Clerk, and Billing Clerk are all real and live already
-   (signalwire-text-back.ts, follow-up-clerk.ts, billing-clerk.ts); this
-   page's only job is showing a prospect what those three already do,
-   without spinning up a real phone number or real Groq spend per demo
-   view. Every string below is illustrative example content, never live
-   data. */
+/* Purely simulated, "live ops console" treatment - no real SignalWire
+   number, Groq call, or Cal.com booking fires here, on purpose (see
+   demo-number-policy.md and the "never demo against real client infra"
+   principle in memory). Text-Back, Follow-Up Clerk, and Billing Clerk are
+   all real and live already (signalwire-text-back.ts, follow-up-clerk.ts,
+   billing-clerk.ts); this page's only job is showing a prospect what those
+   three already do, framed like watching the real admin console rather
+   than a marketing slideshow - every string below is illustrative example
+   content, never live data. */
 
-type StepId = "textback" | "followup" | "billing";
+type StepStatus = "pending" | "active" | "done";
+type Phase = "idle" | "running" | "done";
 
-function StepShell({
-  id,
-  active,
-  done,
-  index,
-  title,
-  subtitle,
-  children,
-}: {
-  id: StepId;
-  active: boolean;
-  done: boolean;
-  index: number;
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-}) {
+const STEPS = [
+  { id: "textback", label: "Text-back" },
+  { id: "followup", label: "Follow-up" },
+  { id: "billing", label: "Billing" },
+] as const;
+
+export default function FirmLeakDemo() {
+  const [current, setCurrent] = useState(0);
+  const [unlocked, setUnlocked] = useState(0);
+  const [phases, setPhases] = useState<[Phase, Phase, Phase]>(["idle", "idle", "idle"]);
+  const [logStep, setLogStep] = useState(0); // how many log lines are revealed for the current running step
+
+  function setPhaseAt(index: number, phase: Phase) {
+    setPhases((p) => {
+      const next = [...p] as [Phase, Phase, Phase];
+      next[index] = phase;
+      return next;
+    });
+  }
+
+  function runStep(index: number) {
+    setPhaseAt(index, "running");
+    setLogStep(0);
+    const lineDelay = 550;
+    for (let i = 1; i <= 3; i++) {
+      setTimeout(() => setLogStep(i), i * lineDelay);
+    }
+    setTimeout(() => {
+      setPhaseAt(index, "done");
+      if (index < 2) {
+        setUnlocked((u) => Math.max(u, index + 1));
+        setCurrent(index + 1);
+      }
+    }, 4 * lineDelay);
+  }
+
+  function statusFor(index: number): StepStatus {
+    if (phases[index] === "done") return "done";
+    if (index === current) return "active";
+    return "pending";
+  }
+
+  function selectStep(index: number) {
+    if (index <= unlocked) setCurrent(index);
+  }
+
+  const railColor = (status: StepStatus) =>
+    status === "done" ? "text-emerald-400" : status === "active" ? "text-amber-300" : "text-white/30";
+
   return (
-    <div
-      id={id}
-      className={`rounded-2xl border p-6 transition ${
-        active ? "border-amber-300/40 bg-amber-400/[0.04]" : "border-white/10 bg-white/[0.03]"
-      }`}
-    >
-      <div className="flex items-center gap-3">
-        <span
-          className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-            done ? "bg-amber-300 text-black" : "border border-white/20 text-white/50"
-          }`}
-        >
-          {done ? "✓" : index}
-        </span>
-        <div>
-          <h3 className="text-base font-bold text-white">{title}</h3>
-          <p className="text-xs text-white/50">{subtitle}</p>
+    <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0a0d0d] font-[family-name:var(--font-mono,monospace)]">
+      <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr]">
+        {/* Rail */}
+        <div className="border-b border-white/10 bg-[#0f1414] py-5 sm:border-b-0 sm:border-r">
+          <div className="px-5 pb-3 text-[10px] uppercase tracking-[0.1em] text-white/30">Pipeline</div>
+          <div className="flex gap-2 px-2 sm:flex-col sm:gap-0 sm:px-0">
+            {STEPS.map((step, i) => {
+              const status = statusFor(i);
+              const clickable = i <= unlocked;
+              return (
+                <button
+                  key={step.id}
+                  type="button"
+                  onClick={() => selectStep(i)}
+                  disabled={!clickable}
+                  className={`flex flex-1 items-center gap-2.5 border-l-2 px-4 py-3 text-left text-[11.5px] transition sm:flex-none ${
+                    status === "active" ? "border-amber-300 bg-amber-400/[0.06]" : "border-transparent"
+                  } ${clickable ? "cursor-pointer" : "cursor-not-allowed"}`}
+                >
+                  <span className={`h-1.5 w-1.5 flex-shrink-0 rounded-full bg-current ${railColor(status)}`} />
+                  <span className={railColor(status)}>{step.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Main panel */}
+        <div className="p-7 sm:p-9">
+          {current === 0 && (
+            <StepPanel
+              liveLabel="AI Missed Call Text-Back"
+              heading="A caller hangs up after one ring, unanswered."
+              sub={<>(614) 555-0148 &middot; Reeves &amp; Cole intake line</>}
+              phase={phases[0]}
+              logStep={logStep}
+              logLines={["Incoming call detected", "1 ring, no answer", "Drafting text-back"]}
+              onRun={() => runStep(0)}
+              runLabel="Simulate a missed call"
+              result={
+                <>
+                  &ldquo;Hi, this is Reeves &amp; Cole&apos;s AI assistant. Sorry we missed you - if this is about a
+                  recent accident, reply YES and I can get some quick details started.&rdquo;
+                  <div className="mt-2 text-[10px] uppercase tracking-[0.08em] text-emerald-400/80">
+                    Sent in 8 seconds
+                  </div>
+                </>
+              }
+            />
+          )}
+          {current === 1 && (
+            <StepPanel
+              liveLabel="AI Follow-Up Clerk"
+              heading="The lead replies once, then goes quiet."
+              sub={<>(614) 555-0148 &middot; last reply 24 hours ago</>}
+              phase={phases[1]}
+              logStep={logStep}
+              logLines={["Inbound reply received", "No response after 24h, flagged stale", "Moved to Stale Leads queue"]}
+              onRun={() => runStep(1)}
+              runLabel="Simulate the lead going quiet"
+              result={
+                <>
+                  &ldquo;Just checking back in - still want to talk through what happened? Totally fine either way,
+                  just say the word.&rdquo;
+                  <div className="mt-2 text-[10px] uppercase tracking-[0.08em] text-emerald-400/80">
+                    Day 2 follow-up, drafted
+                  </div>
+                </>
+              }
+            />
+          )}
+          {current === 2 && (
+            <StepPanel
+              liveLabel="AI Billing Clerk"
+              heading="A day's calendar, reconstructed into billable entries."
+              sub={<>Attorney: D. Tschantz &middot; today&apos;s calendar</>}
+              phase={phases[2]}
+              logStep={logStep}
+              logLines={[
+                "9:00 Client call - Smith v. Acme Freight",
+                "11:00 Deposition prep - Whitfield matter",
+                "2:00 Client meeting - Rodriguez intake",
+              ]}
+              onRun={() => runStep(2)}
+              runLabel="Run billing reconstruction"
+              result={
+                <>
+                  <div className="flex flex-col gap-2 font-sans">
+                    <div className="rounded-md border border-emerald-400/20 bg-emerald-400/[0.05] px-3 py-2 text-[12.5px] text-emerald-100/90">
+                      0.6h &middot; Smith v. Acme Freight - &ldquo;Client call regarding treatment status and
+                      outstanding medical records.&rdquo;
+                    </div>
+                    <div className="rounded-md border border-emerald-400/20 bg-emerald-400/[0.05] px-3 py-2 text-[12.5px] text-emerald-100/90">
+                      1.2h &middot; Whitfield matter - &ldquo;Prepared deposition outline and reviewed prior
+                      testimony.&rdquo;
+                    </div>
+                    <div className="rounded-md border border-emerald-400/20 bg-emerald-400/[0.05] px-3 py-2 text-[12.5px] text-emerald-100/90">
+                      0.8h &middot; Rodriguez intake - &ldquo;Initial client meeting, discussed case timeline and next
+                      steps.&rdquo;
+                    </div>
+                  </div>
+                  <div className="mt-3 rounded-md border border-amber-300/25 bg-amber-400/[0.06] px-3 py-2.5 font-sans text-[12px] text-amber-100/90">
+                    <strong>2.6 hours reconstructed</strong> from one day - every entry above still waits for a
+                    partner to approve before it counts toward anything.
+                  </div>
+                </>
+              }
+            />
+          )}
         </div>
       </div>
-      <div className="mt-5">{children}</div>
     </div>
   );
 }
 
-export default function FirmLeakDemo() {
-  const [unlocked, setUnlocked] = useState<Record<StepId, boolean>>({ textback: true, followup: false, billing: false });
-  const [textbackPhase, setTextbackPhase] = useState<"idle" | "ringing" | "sent">("idle");
-  const [followupPhase, setFollowupPhase] = useState<"idle" | "ghosted" | "queued">("idle");
-  const [billingPhase, setBillingPhase] = useState<"idle" | "drafting" | "done">("idle");
-
-  function simulateCall() {
-    setTextbackPhase("ringing");
-    setTimeout(() => setTextbackPhase("sent"), 1100);
-    setTimeout(() => setUnlocked((u) => ({ ...u, followup: true })), 1600);
-  }
-
-  function simulateGhost() {
-    setFollowupPhase("ghosted");
-    setTimeout(() => setFollowupPhase("queued"), 1300);
-    setTimeout(() => setUnlocked((u) => ({ ...u, billing: true })), 1900);
-  }
-
-  function simulateBilling() {
-    setBillingPhase("drafting");
-    setTimeout(() => setBillingPhase("done"), 1400);
-  }
-
+function StepPanel({
+  liveLabel,
+  heading,
+  sub,
+  phase,
+  logStep,
+  logLines,
+  onRun,
+  runLabel,
+  result,
+}: {
+  liveLabel: string;
+  heading: string;
+  sub: React.ReactNode;
+  phase: Phase;
+  logStep: number;
+  logLines: [string, string, string];
+  onRun: () => void;
+  runLabel: string;
+  result: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col gap-5">
-      <StepShell
-        id="textback"
-        index={1}
-        active={unlocked.textback && textbackPhase === "idle"}
-        done={textbackPhase === "sent"}
-        title="AI Missed Call Text-Back"
-        subtitle="A caller hangs up after one ring, unanswered."
-      >
-        {textbackPhase === "idle" && (
-          <button
-            type="button"
-            onClick={simulateCall}
-            className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-5 py-2.5 text-xs font-bold text-black transition hover:scale-[1.02]"
-          >
-            Simulate a missed call
-          </button>
-        )}
-        {textbackPhase !== "idle" && (
-          <div className="flex flex-col gap-2">
-            <div className="w-fit rounded-xl border border-white/10 bg-black/40 px-4 py-2 text-xs text-white/60">
-              Incoming call &middot; (614) 555-0148 &middot; 1 ring, no answer
-            </div>
-            {textbackPhase === "sent" && (
-              <div className="mt-1 w-fit max-w-sm rounded-xl rounded-tl-sm border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-                &ldquo;Hi, this is Reeves &amp; Cole&apos;s AI assistant. Sorry we missed you &mdash; if this is about
-                a recent accident, reply YES and I can get some quick details started.&rdquo;
-                <div className="mt-2 text-[10px] uppercase tracking-[0.08em] text-amber-300/70">Sent in 8 seconds</div>
-              </div>
-            )}
-          </div>
-        )}
-      </StepShell>
+    <div>
+      <div className="flex items-center gap-1.5 text-[10.5px] uppercase tracking-[0.08em] text-emerald-400">
+        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+        Live &middot; {liveLabel}
+      </div>
+      <h3 className="mt-2 font-sans text-lg font-semibold text-white">{heading}</h3>
+      <p className="mt-1 text-[12px] text-white/40">{sub}</p>
 
-      <StepShell
-        id="followup"
-        index={2}
-        active={unlocked.followup && followupPhase === "idle"}
-        done={followupPhase === "queued"}
-        title="AI Follow-Up Clerk"
-        subtitle="The lead replies once, then goes quiet."
-      >
-        {!unlocked.followup && <p className="text-xs text-white/40">Complete step 1 first.</p>}
-        {unlocked.followup && followupPhase === "idle" && (
-          <button
-            type="button"
-            onClick={simulateGhost}
-            className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-5 py-2.5 text-xs font-bold text-black transition hover:scale-[1.02]"
-          >
-            Simulate the lead going quiet
-          </button>
-        )}
-        {followupPhase !== "idle" && (
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-white/10 bg-black/40 p-3">
-              <div className="text-[10px] uppercase tracking-[0.08em] text-white/40">New</div>
-              <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] p-2.5 text-xs text-white/50 line-through decoration-white/20">
-                (614) 555-0148 &middot; replied once
-              </div>
-            </div>
-            <div className="rounded-xl border border-amber-300/30 bg-amber-400/[0.06] p-3">
-              <div className="text-[10px] uppercase tracking-[0.08em] text-amber-300/70">Stale leads &middot; follow-up queue</div>
-              {followupPhase === "ghosted" && (
-                <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.04] p-2.5 text-xs text-white/50">
-                  Moving lead&hellip;
-                </div>
-              )}
-              {followupPhase === "queued" && (
-                <div className="mt-2 rounded-lg border border-amber-300/20 bg-black/30 p-2.5 text-xs text-amber-100">
-                  &ldquo;Just checking back in &mdash; still want to talk through what happened? Totally fine either
-                  way, just say the word.&rdquo;
-                  <div className="mt-1.5 text-[10px] uppercase tracking-[0.08em] text-amber-300/70">
-                    Day 2 follow-up, drafted
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </StepShell>
+      {phase === "idle" && (
+        <button
+          type="button"
+          onClick={onRun}
+          className="mt-5 inline-flex items-center gap-2 rounded-full bg-amber-300 px-5 py-2.5 font-sans text-xs font-bold text-black transition hover:scale-[1.02]"
+        >
+          {runLabel}
+        </button>
+      )}
 
-      <StepShell
-        id="billing"
-        index={3}
-        active={unlocked.billing && billingPhase === "idle"}
-        done={billingPhase === "done"}
-        title="AI Billing Clerk"
-        subtitle="A day's calendar, reconstructed into billable entries."
-      >
-        {!unlocked.billing && <p className="text-xs text-white/40">Complete step 2 first.</p>}
-        {unlocked.billing && (
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1.5 rounded-xl border border-white/10 bg-black/40 p-3 text-xs text-white/60">
-              <div>9:00 &middot; Client call &mdash; Smith v. Acme Freight</div>
-              <div>11:00 &middot; Deposition prep &mdash; Whitfield matter</div>
-              <div>2:00 &middot; Client meeting &mdash; Rodriguez intake</div>
+      {phase !== "idle" && (
+        <div className="mt-5">
+          {logLines.map((line, i) => (
+            <div
+              key={line}
+              className={`flex gap-3 border-b border-white/5 py-2 text-[11.5px] transition-opacity duration-300 ${
+                i < logStep ? "opacity-100" : "opacity-0"
+              } ${i === logStep - 1 && phase === "running" ? "text-amber-300" : "text-white/50"}`}
+            >
+              <span className="text-white/25">{String(i * 4).padStart(2, "0")}:00</span>
+              <span>{line}</span>
             </div>
-            {billingPhase === "idle" && (
-              <button
-                type="button"
-                onClick={simulateBilling}
-                className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-300 px-5 py-2.5 text-xs font-bold text-black transition hover:scale-[1.02]"
-              >
-                Run billing reconstruction
-              </button>
-            )}
-            {billingPhase === "drafting" && <p className="text-xs text-white/50">Drafting entries&hellip;</p>}
-            {billingPhase === "done" && (
-              <>
-                <div className="flex flex-col gap-1.5">
-                  <div className="rounded-lg border border-amber-300/20 bg-black/30 p-2.5 text-xs text-amber-100">
-                    0.6h &middot; Smith v. Acme Freight &mdash; &ldquo;Client call regarding treatment status and
-                    outstanding medical records.&rdquo;
-                  </div>
-                  <div className="rounded-lg border border-amber-300/20 bg-black/30 p-2.5 text-xs text-amber-100">
-                    1.2h &middot; Whitfield matter &mdash; &ldquo;Prepared deposition outline and reviewed prior
-                    testimony.&rdquo;
-                  </div>
-                  <div className="rounded-lg border border-amber-300/20 bg-black/30 p-2.5 text-xs text-amber-100">
-                    0.8h &middot; Rodriguez intake &mdash; &ldquo;Initial client meeting, discussed case timeline and
-                    next steps.&rdquo;
-                  </div>
-                </div>
-                <div className="mt-1 rounded-xl border border-amber-300/30 bg-amber-400/10 p-3 text-xs text-amber-100">
-                  <strong>2.6 hours reconstructed</strong> from one day &middot; write-downs run 6% at 14 days vs 18%
-                  at 45 &mdash; every entry above still waits for a partner to approve before it counts toward
-                  anything.
-                </div>
-              </>
-            )}
-          </div>
-        )}
-      </StepShell>
+          ))}
+          {phase === "done" && (
+            <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-[13px] leading-6 text-white/80">
+              {result}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

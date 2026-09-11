@@ -5,6 +5,12 @@ import { getService, getMonthlyCheckoutUrl } from "@/lib/services";
 
 export const metadata: Metadata = { title: "The Firm Leak - Law Firm AI Team Demo" };
 
+const LEAK_STATS: { n: string; l: string }[] = [
+  { n: "$230K", l: "lost per attorney, per year" },
+  { n: "34%", l: "callers who never call back" },
+  { n: "6% vs 18%", l: "write-downs at 14 vs 45 days" },
+];
+
 export default function FirmLeakDemoPage() {
   const service = getService("law-firms");
   const checkoutUrl = service ? getMonthlyCheckoutUrl(service) : null;
@@ -16,13 +22,22 @@ export default function FirmLeakDemoPage() {
           Watch where the hours and the leads actually go.
         </h1>
         <p className="mt-3 text-sm leading-6 text-white/60">
-          Three simulated steps, one after another &mdash; a missed call, a lead going quiet, and a day of billable
-          time reconstructed. Nothing here calls a real phone or touches a real calendar; every number and message
-          below is an example. The three engines it&apos;s built on (Text-Back, Follow-Up Clerk, Billing Clerk) are
-          real and already live.
+          Three simulated steps, one after another: a missed call, a lead going quiet, and a day of billable time
+          reconstructed. Nothing here calls a real phone or touches a real calendar; every number and message below
+          is an example. The three engines it&apos;s built on (Text-Back, Follow-Up Clerk, Billing Clerk) are real
+          and already live.
         </p>
 
-        <div className="mt-10">
+        <div className="mt-8 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10">
+          {LEAK_STATS.map((s) => (
+            <div key={s.l} className="bg-black px-3 py-4 text-center sm:px-4">
+              <p className="text-lg font-extrabold tracking-tight text-white sm:text-xl">{s.n}</p>
+              <p className="mt-1 text-[10.5px] leading-tight text-white/45">{s.l}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8">
           <FirmLeakDemo />
         </div>
 
