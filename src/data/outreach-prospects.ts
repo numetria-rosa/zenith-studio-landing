@@ -363,24 +363,35 @@ function personalInjury(
     and DROPPED for exactly this reason), attorney headcount read off the
     firm's own team page where published.
 
-    Email follow-up pass, 2026-09-11: the Ohio Supreme Court's attorney
-    registry search (supremecourt.ohio.gov) was unreachable from this
-    environment, so instead every firm's own homepage, privacy policy page,
-    and (for Freking Myers & Reul) firm-overview page was checked directly
-    for a real `mailto:` link or plain-text address - deliberately NOT
-    third-party lead-scraping tools (RocketReach, ZoomInfo, LeadIQ) that
-    surfaced elsewhere in search results, since those guess emails from
-    patterns rather than confirming a real published one, and using an
-    unconfirmed guess would undermine the same public-email bar this file
-    already holds every other row to. Found 2 of 7: Erney Law
-    (leadcounsel@ohioinjurylaw.com, on their own privacy policy page) and
-    Oliver Law Office (info@oliverattorneys.com, a mailto: link on their own
-    site). Both are firm inboxes, not the named attorney's personal address.
-    The other 5 (Soroka, Gervelis, O'Connor Acciani & Levy, Moore, Freking
-    Myers & Reul) remain genuinely contact-form-only, no email found on
-    their own site - still RESEARCHED but outreach-blocked
-    (`runHardFilters` requires `isPublicEmail`), the same honest state
-    several Dallas dental rows above are already in.
+    Email follow-up pass, 2026-09-11 (two rounds): the Ohio Supreme Court's
+    attorney registry search (supremecourt.ohio.gov) was unreachable from
+    this environment both times, so instead every firm's own site was
+    checked directly for a real `mailto:` link or plain-text address -
+    first the homepage/privacy-policy/firm-overview pages, then a second,
+    deeper pass specifically on each named attorney's own bio page.
+    Deliberately did NOT use third-party lead-scraping tools (RocketReach,
+    ZoomInfo, LeadIQ) that surfaced in search results along the way, since
+    those guess emails from patterns rather than confirm a real published
+    one, and an unconfirmed guess would undermine the same public-email bar
+    this file already holds every other row to.
+
+    Found 3 of 7, all confirmed by an actual `mailto:` link or plain text on
+    the firm's or attorney's own domain: Erney Law
+    (leadcounsel@ohioinjurylaw.com, their privacy policy page - a firm
+    inbox, no personal address found on Robert Erney's own bio page),
+    Gervelis Law Firm (msg@gervelislaw.com, his own initials, a mailto: link
+    directly on Mark Gervelis's own bio page - personally his), and Oliver
+    Law Office (joliver@oliverattorneys.com, a mailto: link directly on Jami
+    Oliver's own bio page - personally hers, upgraded from the firm's
+    general info@ address the first pass had found).
+
+    The other 4 (Soroka & Associates, O'Connor Acciani & Levy, The Moore Law
+    Firm, Freking Myers & Reul) remain genuinely contact-form-only: checked
+    their homepage, privacy-policy page, and the named attorney's own bio
+    page (plus, for Freking, a linked PDF bio) with no email found anywhere.
+    Still RESEARCHED but outreach-blocked (`runHardFilters` requires
+    `isPublicEmail`), the same honest state several Dallas dental rows
+    above are already in.
 
     Google Business Profile review counts (the 20-200 filter from the
     original blueprint) were NOT independently verified here, no Places API
@@ -426,7 +437,7 @@ export const OHIO_PI_PROSPECTS: SeedProspect[] = [
     website: "https://gervelislaw.com/",
     city: "Columbus",
     area: "Dublin Rd / 43215",
-    email: NA,
+    email: "msg@gervelislaw.com", // his own initials, a mailto: link on his own attorney bio page (gervelislaw.com/our-attorneys/mark-s-gervelis-esq/), 2026-09-11 - Mark Gervelis personally
     phone: "866-965-8721",
     contactName: "Mark S. Gervelis",
     prospectScore: 80,
@@ -443,7 +454,7 @@ export const OHIO_PI_PROSPECTS: SeedProspect[] = [
     website: "https://jamioliver.com/",
     city: "Columbus",
     area: "Central Ohio",
-    email: "info@oliverattorneys.com", // published as a mailto: link on the firm's own site, 2026-09-11 - a firm inbox, not Jami Oliver personally
+    email: "joliver@oliverattorneys.com", // her own mailto: link on her own attorney bio page (jamioliver.com/jami-s-oliver/), 2026-09-11 - Jami Oliver personally, upgraded from the firm's general info@ inbox
     phone: "614.220.9100",
     contactName: "Jami S. Oliver",
     prospectScore: 76,
