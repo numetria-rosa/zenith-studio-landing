@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 
 /* Manually creating an Auth.js database session (bypassing signIn()) for two
    flows that don't fit its built-in providers: the post-checkout auto-claim
-   redirect (no credentials at all — proof is the Whop payment id), and
+   redirect (no credentials at all - proof is the Whop payment id), and
    password sign-in (Credentials provider requires JWT sessions; this app is
    database-session throughout for the Resend magic-link provider). Cookie
    name/flags mirror @auth/core/lib/utils/cookie.js defaultCookies() exactly,

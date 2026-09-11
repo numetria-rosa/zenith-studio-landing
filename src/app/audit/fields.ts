@@ -2,12 +2,12 @@
 // of the service-platform build, 2026-08-28). Content spec per the business
 // brief's Phase 2: BUSINESS, CURRENT OPERATIONS, PROBLEMS, GOALS, plus one
 // optional free-text field standing in for the (deferred) file-attachment
-// section — no file-storage infrastructure exists yet, see
+// section - no file-storage infrastructure exists yet, see
 // SERVICE_PLATFORM_ARCHITECTURE.md §8.
 //
 // Kept data-driven (one array the form renders from) rather than hand-writing
 // four separate JSX step components, so a future question tweak doesn't need
-// new step markup — this is also why formAnswers is stored as one JSON blob
+// new step markup - this is also why formAnswers is stored as one JSON blob
 // rather than a column per field on AuditRequest.
 
 export type FieldType = "text" | "email" | "tel" | "textarea" | "select";

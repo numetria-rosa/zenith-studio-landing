@@ -9,7 +9,7 @@ import { upsertPaidAuditFromCalWebhook, type CalBookingWebhookPayload } from "@/
    Verify X-Cal-Signature-256 (HMAC-SHA256 hex of the raw body) with
    CAL_WEBHOOK_SECRET. Payload version: prefer 2021-10-20 (stable nested
    { triggerEvent, payload } shape). Filters to the paid-audit event only
-   inside upsertPaidAuditFromCalWebhook — user-level Cal webhooks fire for
+   inside upsertPaidAuditFromCalWebhook - user-level Cal webhooks fire for
    every event type on the account. */
 
 function verifyCalSignature(rawBody: string, signature: string | null, secret: string): boolean {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest): Promise<Response> {
   const rawBody = await request.text();
   const signature = request.headers.get("x-cal-signature-256");
   if (!verifyCalSignature(rawBody, signature, secret)) {
-    console.error("[cal webhook] rejected — signature verification failed");
+    console.error("[cal webhook] rejected - signature verification failed");
     return new Response("invalid signature", { status: 400 });
   }
 
@@ -56,13 +56,13 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   // Nested booking events put fields under `payload`. MEETING_STARTED /
-  // MEETING_ENDED are flat at the root — we ignore those trigger types in
+  // MEETING_ENDED are flat at the root - we ignore those trigger types in
   // upsertPaidAuditFromCalWebhook anyway, but still need a payload object.
   const payload: CalBookingWebhookPayload = body.payload ?? {};
 
   // Idempotency key: same booking + same trigger must not re-run (Cal can
   // retry). BOOKING_CREATED and BOOKING_PAID for the same uid are distinct
-  // keys — both are safe; the PaidAudit upsert is itself idempotent on uid.
+  // keys - both are safe; the PaidAudit upsert is itself idempotent on uid.
   const uid = typeof payload.uid === "string" ? payload.uid.trim() : "";
   const eventId = uid
     ? `cal:${uid}:${triggerEvent}`

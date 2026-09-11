@@ -8,7 +8,7 @@ import { sendProposalEmail } from "@/lib/mail";
    /admin/proposals/[id]'s builder server actions (Slice 5 of the
    service-platform build, 2026-08-28). Matches audits-admin.ts's and
    service-requests-admin.ts's own convention: validate + write here,
-   callers are responsible for requireAdmin() first — none of these
+   callers are responsible for requireAdmin() first - none of these
    functions check authorization themselves. */
 
 export const PROPOSAL_ITEM_KINDS: ProposalItemKind[] = ["SETUP", "MONTHLY", "PER_UNIT", "CUSTOM", "DISCOUNT"];
@@ -25,7 +25,7 @@ export function isProposalItemKind(v: string): v is ProposalItemKind {
   return (PROPOSAL_ITEM_KINDS as readonly string[]).includes(v);
 }
 
-/** 24 random bytes, hex-encoded (48 chars) — the entire security mechanism
+/** 24 random bytes, hex-encoded (48 chars) - the entire security mechanism
     for the client-facing link, modeled directly on PurchaseClaim's
     token-based pattern (see src/app/api/auth/claim/route.ts). */
 export function generateAccessToken(): string {
@@ -61,7 +61,7 @@ export const PROPOSAL_SECTION_LABELS: Record<ProposalTextSectionKey, string> = {
   terms: "Terms",
 };
 
-/** Creates a new DRAFT Proposal from an existing AuditRequest — the only
+/** Creates a new DRAFT Proposal from an existing AuditRequest - the only
     entry point this slice's UI has. Backfills clientEmail/clientName/
     companyName from the audit, seeds narrative sections from findings/
     recommendations when present, and creates SETUP/MONTHLY line items
@@ -159,7 +159,7 @@ type AuditRecommendationLike = {
 };
 
 /** Builds editable starting copy for a proposal from audit review data.
-    Admin can rewrite every field afterward — this only kills the blank page. */
+    Admin can rewrite every field afterward - this only kills the blank page. */
 export function buildProposalSectionsFromAudit(input: {
   company: string;
   findings: AuditFindingLike[];
@@ -217,7 +217,7 @@ export type ProposalSectionsInput = Partial<Record<ProposalTextSectionKey, strin
   clientName?: string;
   companyName?: string;
   /** Date-only string (yyyy-mm-dd, from an <input type="date">) or "" to
-      clear. Added in Slice 5 of the admin command center (2026-08-28) —
+      clear. Added in Slice 5 of the admin command center (2026-08-28) -
       expiresAt existed on the schema and was already enforced by
       resolveProposalByToken in proposals-public.ts, but nothing in the
       admin UI could ever set it. This is the smallest addition that closes
@@ -339,11 +339,11 @@ async function buildProposalSnapshot(proposalId: string) {
   };
 }
 
-/** Requires at least an executive summary and one line item — basic sanity
+/** Requires at least an executive summary and one line item - basic sanity
     so an empty proposal can't be sent. Snapshots current state into a new
     ProposalVersion, sets status SENT + sentAt, before/alongside the update.
     Re-sending after edits (status already SENT/VIEWED/etc.) is allowed and
-    creates another version — that's the whole point of keeping history. */
+    creates another version - that's the whole point of keeping history. */
 export async function sendProposalAsAdmin(
   id: string
 ): Promise<{ ok: true } | { ok: false; error: string }> {
@@ -382,7 +382,7 @@ export async function sendProposalAsAdmin(
 /** Renders the current proposal to a PDF and emails it to the client via
     Resend, alongside the same client link the "Send to client" button
     already surfaces. Deliberately independent of sendProposalAsAdmin's
-    status transition — emailing the PDF doesn't itself change
+    status transition - emailing the PDF doesn't itself change
     DRAFT/SENT/etc., since an admin may want to re-send the PDF (e.g. after
     a client asks for another copy) without creating a new proposal
     version. Same emptiness guard as sendProposalAsAdmin so a blank
@@ -433,7 +433,7 @@ export function computeProposalTotals(items: { amountCents: number; isOptionalAd
     exact sign convention (DISCOUNT is stored already-negative, so summing
     amountCents directly subtracts it correctly) rather than computing
     totals a second, different way. Scoped to non-add-on items only, same
-    as coreCents above — optional add-ons are never counted here either.
+    as coreCents above - optional add-ons are never counted here either.
     DISCOUNT is folded into the one-time/setup bucket, per this slice's
     brief, since it's most often applied against a setup fee. */
 export function computeProposalAmountBreakdown(

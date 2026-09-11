@@ -2,8 +2,8 @@
    gating math (REQUIRED_SECTIONS, PASS_THRESHOLD, isModuleDataComplete,
    overall) so the server-rendered dashboard can show real progress without
    loading that browser-only script. Deliberately duplicated rather than
-   shared — one is a vanilla <script src> file for the static course pages,
-   this is server TS — but the numbers must stay in sync if that file's
+   shared - one is a vanilla <script src> file for the static course pages,
+   this is server TS - but the numbers must stay in sync if that file's
    gating rules ever change. */
 
 const PASS_THRESHOLD = 0.8;

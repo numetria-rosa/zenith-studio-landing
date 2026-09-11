@@ -12,17 +12,17 @@ import ResponseForm from "./ResponseForm";
 
 /* Token-secured, zero-account client-facing proposal view (Slice 5 of the
    service-platform build, 2026-08-28; redesigned 2026-08-28 to match the
-   proposal PDF's brand language — src/lib/proposal-pdf.tsx — bold display
+   proposal PDF's brand language - src/lib/proposal-pdf.tsx - bold display
    headline, gradient accent bar, Date/Valid-until/Reference meta row, so
    the emailed PDF and this live page read as the same document rather
-   than two different templates). No auth() call anywhere in this file —
+   than two different templates). No auth() call anywhere in this file -
    the accessToken in the URL is the entire access-control mechanism,
    exactly like /api/auth/claim's PurchaseClaim lookup. Renders one
    identical "invalid or expired" state for a garbage token, a
    well-formed-but-nonexistent token, an expired proposal, and a DRAFT
-   proposal's token — none of those four cases is distinguishable from the
+   proposal's token - none of those four cases is distinguishable from the
    outside. font-sans here pulls in Geist (globals.css's --font-sans theme
-   token) explicitly — the site's <body> falls back to Arial/Helvetica by
+   token) explicitly - the site's <body> falls back to Arial/Helvetica by
    default and nothing else opts into Geist, so this page has to ask for
    it directly to match the PDF's typeface. */
 
@@ -65,7 +65,7 @@ export default async function ProposalViewPage({
   const reference = proposal.id.slice(-8).toUpperCase();
 
   // Post-approval total: core items + whichever add-ons the client actually
-  // selected (proposal.selectedAddOnItemIds), split into setup/monthly —
+  // selected (proposal.selectedAddOnItemIds), split into setup/monthly -
   // the exact same computeApprovedTotals call recordClientResponse used
   // when it created the Whop plan(s), so this display can never drift from
   // what was actually charged.

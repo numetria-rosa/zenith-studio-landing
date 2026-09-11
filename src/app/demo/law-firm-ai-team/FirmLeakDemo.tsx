@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-/* Purely simulated — no real SignalWire number, Groq call, or Cal.com
+/* Purely simulated - no real SignalWire number, Groq call, or Cal.com
    booking fires here, on purpose (see demo-number-policy.md and the "never
    demo against real client infra" principle in memory). Text-Back,
    Follow-Up Clerk, and Billing Clerk are all real and live already

@@ -6,19 +6,19 @@ import {
   computeProposalTotals,
 } from "@/lib/proposals-admin";
 
-/* PDF rendering for a Proposal — shares no code with the client-facing
+/* PDF rendering for a Proposal - shares no code with the client-facing
    HTML view (src/app/proposals/view/[accessToken]/page.tsx), but is built
    from the exact same data (same Prisma query shape, same section labels,
    same computeProposalTotals) so the two can never disagree on numbers,
    only on layout. @react-pdf/renderer over a headless-Chrome/Puppeteer
-   route deliberately — it's pure JS (no Chromium binary to ship or keep
+   route deliberately - it's pure JS (no Chromium binary to ship or keep
    alive in a serverless function), which matters because this runs inside
    a Vercel API route, not a long-lived server.
 
    Dark theme, Geist typeface: mirrors the actual Studio site (src/app/
    layout.tsx uses next/font/google's Geist; #05060a background, cyan/
    fuchsia accents throughout page.tsx) rather than a generic light
-   business-document look — a proposal PDF should read as unmistakably
+   business-document look - a proposal PDF should read as unmistakably
    Zenith Studio, not as a template with a logo pasted on. Geist isn't a
    built-in PDF font, so it's registered from Google Fonts' static CDN at
    module load (same TTF files google Fonts serves the browser) rather
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     color: MUTED,
     marginBottom: 1.5,
   },
-  // Flat sections — a small caps label + body text separated by a hairline
+  // Flat sections - a small caps label + body text separated by a hairline
   // rule, no boxed/bordered card. Kept deliberately plain per explicit
   // feedback: the earlier boxed-card treatment (background fill, border,
   // border-radius, padding on every section) read as "exaggerated" next to
@@ -268,7 +268,7 @@ export type ProposalPdfData = {
 
 function formatCents(cents: number): string {
   const sign = cents < 0 ? "-" : "";
-  // Pinned to en-US explicitly — unlike the client-facing web view (which
+  // Pinned to en-US explicitly - unlike the client-facing web view (which
   // inherits the browser's own locale), this renders in a Node process
   // whose ICU locale isn't guaranteed to be en-US, and a stray
   // toLocaleString(undefined, ...) here silently produced "$270,00"

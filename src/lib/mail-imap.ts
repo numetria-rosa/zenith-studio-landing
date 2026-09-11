@@ -5,13 +5,13 @@ import type { MailProvider } from "@prisma/client";
 
 /* Server-only IMAP/SMTP access for AI Inbox Manager, launch scope: Gmail
    (personal accounts) and Yahoo Mail only, both connected via a static app
-   password the client generates in their own account settings — not
+   password the client generates in their own account settings - not
    Microsoft 365, which has broadly disabled basic-auth IMAP on modern
    tenants and would need real OAuth instead. See inbox-manager.ts for why
    this is the deliberate launch scope, not a temporary shortcut.
 
    Never import this from a "use client" component or anything it might
-   pull into the browser bundle — imapflow/nodemailer are Node-only, the
+   pull into the browser bundle - imapflow/nodemailer are Node-only, the
    same class of mistake that broke the production build earlier when a
    Node-only package leaked into client code (see AdminNav.tsx history). */
 
@@ -36,7 +36,7 @@ function openImapClient(creds: MailCredentials): ImapFlow {
 export type ConnectionTestResult = { ok: true } | { ok: false; error: string };
 
 /** Verifies the email + app password actually logs in before saving the
-    connection — never save a credential we haven't confirmed works,
+    connection - never save a credential we haven't confirmed works,
     the client would otherwise find out it's broken only when nothing
     ever gets drafted. */
 export async function testMailConnection(creds: MailCredentials): Promise<ConnectionTestResult> {
@@ -58,7 +58,7 @@ export type InboundEmail = {
 };
 
 /** Recent unseen messages in the inbox, newest first, capped to a small
-    batch per poll — this runs on a cron, not on demand, so it doesn't need
+    batch per poll - this runs on a cron, not on demand, so it doesn't need
     to catch up on a backlog in one pass. */
 export async function fetchUnseenEmails(creds: MailCredentials, limit = 15): Promise<InboundEmail[]> {
   const client = openImapClient(creds);
@@ -92,7 +92,7 @@ export type SendReplyResult = { ok: true } | { ok: false; error: string };
 
 /** Sends the approved draft as a real reply, from the client's own
     connected mailbox (their real address, via their own SMTP), not a
-    Zenith-controlled address — this is the point of connecting directly
+    Zenith-controlled address - this is the point of connecting directly
     instead of the forwarding-only approach. */
 export async function sendMailReply(
   creds: MailCredentials,

@@ -4,7 +4,7 @@ import { isInternalMetricKey } from "@/lib/metric-labels";
 
 /* Silent-failure detection ("dead man's switch"): nothing else in this
    codebase catches a live integration that just stops producing real
-   activity — a webhook silently breaking, a token quietly expiring in a
+   activity - a webhook silently breaking, a token quietly expiring in a
    way that doesn't throw, a provider-side outage. Compares a client's own
    recent activity against their own baseline rather than an absolute
    threshold, so a genuinely low-volume client (one call a week) never
@@ -12,7 +12,7 @@ import { isInternalMetricKey } from "@/lib/metric-labels";
    suddenly went to zero gets flagged.
 
    Runs from /api/cron/dead-man-switch, once daily. Only LIVE/MAINTENANCE
-   projects are checked — earlier stages haven't gone live yet, and this
+   projects are checked - earlier stages haven't gone live yet, and this
    isn't the readiness check that belongs there. */
 
 const RECENT_WINDOW_MS = 48 * 60 * 60 * 1000; // the window that should show fresh activity
@@ -23,7 +23,7 @@ function currentDayKey(): string {
 }
 
 /** One real activity row (any non-internal ServiceMetric key) is enough to
-    count a window as "active" — this isn't measuring volume, just whether
+    count a window as "active" - this isn't measuring volume, just whether
     anything happened at all. */
 async function hasActivityInWindow(projectId: string, sinceMs: number, untilMs: number): Promise<boolean> {
   const rows = await db.serviceMetric.findMany({
@@ -57,7 +57,7 @@ export async function checkForSilentIntegrations(): Promise<{ projectsChecked: n
     await db.serviceMetric.create({ data: { projectId: project.id, key: markerKey, value: 1 } });
     await sendAdminAlert(
       `Silent integration: ${project.title}`,
-      `This project had real activity in the last 14 days but nothing in the last 48 hours. Could be a genuinely quiet stretch, or a webhook/token silently broken — worth a manual check.`
+      `This project had real activity in the last 14 days but nothing in the last 48 hours. Could be a genuinely quiet stretch, or a webhook/token silently broken - worth a manual check.`
     );
     alertsFired++;
   }

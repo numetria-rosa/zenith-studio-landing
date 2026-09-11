@@ -1,5 +1,5 @@
 /* Validates the shape of a CourseProgress.data payload before it's ever
-   written to the DB. This is SHAPE validation, not completion verification —
+   written to the DB. This is SHAPE validation, not completion verification -
    it guards against garbage/malicious payloads (wrong types, absurd sizes,
    nonsense module ids), it does not and cannot prove a student genuinely
    did the work. Python exercises still grade entirely client-side via

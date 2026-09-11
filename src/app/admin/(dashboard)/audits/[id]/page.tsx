@@ -24,7 +24,7 @@ import { createProposalFromAudit } from "@/lib/proposals-admin";
    add form), a recommendations section (list + add form, optionally linked
    to a real ServiceCatalog row), and a status control. Matches
    admin/service-requests/page.tsx's convention: requireAdmin() -> 404 for
-   non-admins (not a redirect — the route's existence isn't confirmable to a
+   non-admins (not a redirect - the route's existence isn't confirmable to a
    logged-in-but-not-you visitor), and every server action re-checks
    requireAdmin() itself rather than trusting the page having rendered,
    since a server action is a POST-able RPC endpoint a determined attacker

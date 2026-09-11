@@ -7,11 +7,11 @@ function esc(s: string): string {
 
 /* Server-rendered rail content for one course page. Everything here is
    knowable at request time: nav structure, module list, the current page's
-   active/open state (the URL is already known server-side — no client-side
+   active/open state (the URL is already known server-side - no client-side
    currentFile() guess needed). Completion/lock state lives in localStorage
    only, so it can't be rendered here; course-rail.js hydrates those classes
    onto the elements this produces (by data-mod id) after load, patching
-   existing DOM instead of building it — a much smaller, non-layout-shifting
+   existing DOM instead of building it - a much smaller, non-layout-shifting
    step than the old full client-side construction. */
 export function buildRailInnerHtml(courseId: string, currentFile: string): string | null {
   const data = COURSE_RAIL_DATA[courseId];
@@ -50,7 +50,7 @@ export function buildRailInnerHtml(courseId: string, currentFile: string): strin
         `<span class="rmtitle">${esc(m.title)}</span>${tick}`;
       // Lock/completion state is client-only (localStorage); render as a plain,
       // clickable link by default and let hydration correct it (add locked/
-      // done/progress classes and swap the tick badge for a lock icon) — a
+      // done/progress classes and swap the tick badge for a lock icon) - a
       // subtler patch than reconstructing the whole element.
       modsHtml += `<a href="${esc(m.file)}" class="${cls.join(" ")}" title="${esc(m.title)}" data-mod="${m.id}">${inner}</a>`;
     });
@@ -97,7 +97,7 @@ export function wrapCoursePage(html: string, courseId: string, currentFile: stri
 }
 
 /* Best-effort "which nav/module entry is this" derivation from the resolved
-   file path — same normalization rule course-rail.js's old currentFile()
+   file path - same normalization rule course-rail.js's old currentFile()
    used, now run server-side where the URL is already authoritative. */
 export function fileNameFromPath(resolvedPath: string): string {
   const last = resolvedPath.split(/[\\/]/).pop() || "";

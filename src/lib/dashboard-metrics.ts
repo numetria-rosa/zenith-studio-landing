@@ -3,7 +3,7 @@ import { getService, SERVICES } from "@/lib/services";
 
 /* Read-only aggregate queries backing the /admin dashboard (Slice 2 of the
    service-platform build, 2026-08-28). No writes happen here. Every number
-   traces back to a real Prisma query — see the revenue methodology notes
+   traces back to a real Prisma query - see the revenue methodology notes
    inline below, which match the business brief's explicit rule against
    inventing/estimating revenue that isn't backed by a real payment. */
 
@@ -11,7 +11,7 @@ const ACTIVE_PROJECT_STAGES_EXCLUDED = ["COMPLETED", "CANCELLED"] as const;
 
 /** "$150/mo" / "$1,200/mo" / "$190" / "" -> cents. Empty string (a
     monthly-only vertical's setupPriceDisplay) parses to 0, which is
-    correct — those services never contribute setup revenue. */
+    correct - those services never contribute setup revenue. */
 export function parsePriceDisplayToCents(display: string | undefined): number {
   if (!display) return 0;
   const numeric = display.replace(/[^0-9.]/g, "");
@@ -83,7 +83,7 @@ export function summarizeRevenue(byService: RevenueByService[]): RevenueTotals {
   );
 }
 
-/** Pending/pipeline value — ProposalItem.amountCents (excluding optional
+/** Pending/pipeline value - ProposalItem.amountCents (excluding optional
     add-ons) across SENT/VIEWED proposals. Explicitly never blended into
     MRR: approval isn't payment, and even an unsent/undecided proposal's
     value is not confirmed revenue. */
@@ -140,7 +140,7 @@ export async function getTopMetrics(): Promise<TopMetrics> {
     db.supportRequest.count({ where: { status: { in: ["OPEN", "IN_PROGRESS", "WAITING_CLIENT"] } } }),
   ]);
 
-  // AuditRequest has no userId FK — only best-effort email matching against
+  // AuditRequest has no userId FK - only best-effort email matching against
   // any User row that happens to share that email.
   const auditUserRows = auditEmails.length
     ? await db.user.findMany({
@@ -215,9 +215,9 @@ export type AttentionItem = {
 
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
-/** Real, bounded, ordered queries only — no fabricated urgency. Each item
+/** Real, bounded, ordered queries only - no fabricated urgency. Each item
     traces to a real row. Also surfaces overdue internal tasks and open
-    HIGH/URGENT-priority tasks (Slice 6, 2026-08-28 — previously deferred
+    HIGH/URGENT-priority tasks (Slice 6, 2026-08-28 - previously deferred
     since no Task model existed). Still deliberately skips "client messages
     needing a reply" since no "last admin reply" concept exists yet. */
 export async function getNeedsAttention(): Promise<AttentionItem[]> {
@@ -388,7 +388,7 @@ export type ActivityEvent = {
 };
 
 /** Merges timestamps that already exist on real rows into one time-sorted
-    feed. Deliberately does NOT create an ActivityLog model — per the
+    feed. Deliberately does NOT create an ActivityLog model - per the
     brief's Phase D instruction, existing timestamps are enough for this
     slice. A future slice could add a real event log if richer activity
     (e.g. explicit stage-change history) is ever needed. */
@@ -518,7 +518,7 @@ export type ServicePerformanceRow = {
 /** One row per SERVICES entry. Pending-proposal traceability is
     best-effort: only ProposalItem rows explicitly linked to a
     ServiceCatalog row (via catalogServiceId) can be attributed to a
-    specific service — not every proposal item carries that link, which is
+    specific service - not every proposal item carries that link, which is
     a real gap, disclosed in the dashboard UI rather than silently
     undercounted. */
 export async function getServicePerformance(): Promise<ServicePerformanceRow[]> {
@@ -563,7 +563,7 @@ export async function getServicePerformance(): Promise<ServicePerformanceRow[]> 
 }
 
 /** True if there's essentially no traceable proposal/servicecatalog link
-    for pending-proposal attribution — used by the UI to disclose the gap
+    for pending-proposal attribution - used by the UI to disclose the gap
     honestly rather than implying every proposal item is attributable. */
 export async function hasUnlinkedProposalItems(): Promise<boolean> {
   const count = await db.proposalItem.count({

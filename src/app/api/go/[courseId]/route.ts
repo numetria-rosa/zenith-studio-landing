@@ -11,14 +11,14 @@ import { db } from "@/lib/db";
    static checkout link: Whop's hosted checkout page doesn't read or store
    arbitrary query params. checkoutConfigurations.create() with a metadata
    object, though, produces a real (single-use-style) checkout URL whose
-   metadata Whop copies onto the resulting payment AND membership — so it
+   metadata Whop copies onto the resulting payment AND membership - so it
    shows up on the payment.succeeded webhook automatically. That webhook
    already logs its full raw payload to WebhookEvent unconditionally (see
    src/app/api/webhooks/whop/route.ts), so no schema change was needed to
-   capture this — see scripts/check-utm-sales.mjs to query it back out.
+   capture this - see scripts/check-utm-sales.mjs to query it back out.
 
    If creating the tracked checkout fails for any reason (Whop API error,
-   missing plan, etc.), this falls back to the plain static checkout URL —
+   missing plan, etc.), this falls back to the plain static checkout URL -
    a tracking failure must never block an actual purchase. */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
@@ -35,12 +35,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   // Recorded here, not just in the payment.succeeded webhook, because Whop
-  // only ever hears about a *submitted* checkout — someone who clicks
+  // only ever hears about a *submitted* checkout - someone who clicks
   // "Get access" and abandons before entering payment info leaves no trace
   // on Whop's side. This is the only record of that step. Awaited (not
   // fire-and-forget) since a serverless function can be frozen the moment
   // its response is sent; failure is swallowed, same as the checkout
-  // tracking below — a DB hiccup must never block a real redirect.
+  // tracking below - a DB hiccup must never block a real redirect.
   try {
     await db.checkoutAttempt.create({
       data: {
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   if (Object.keys(utm).length === 0) {
-    // Nothing to attribute — skip the extra API round trip and go straight
+    // Nothing to attribute - skip the extra API round trip and go straight
     // to checkout, same as before this route existed.
     return NextResponse.redirect(fallbackUrl);
   }

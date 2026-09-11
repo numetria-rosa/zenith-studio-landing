@@ -1,5 +1,5 @@
-/* Zenith Lab — course bundles.
-   A bundle is its own Whop product/plan (a pure checkout vehicle — nobody
+/* Zenith Lab - course bundles.
+   A bundle is its own Whop product/plan (a pure checkout vehicle - nobody
    is ever granted content through it directly), sold at one fixed price.
    What it actually unlocks is decided entirely here: courseIds lists the
    real course ids from courses.ts that a successful bundle payment grants
@@ -8,7 +8,7 @@
 
    Created via scripts/create-whop-bundles.mjs on 2026-09-03. Prices are
    15% off the sum of the bundled courses' live per-course prices at
-   creation time — not automated, so if a course's individual price
+   creation time - not automated, so if a course's individual price
    changes later, a bundle's price does not silently follow it. */
 
 export type Bundle = {

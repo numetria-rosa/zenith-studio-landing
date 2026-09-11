@@ -22,9 +22,9 @@ import type { TaskPriority, TaskStatus } from "@prisma/client";
 /* Internal task list/board (Slice 6 of the business command center,
    2026-08-28: /admin/tasks). Matches every other admin route's pattern
    exactly: requireAdmin() -> notFound(), dark Studio card language. Every
-   write action below independently re-runs requireAdmin() — never trusts
+   write action below independently re-runs requireAdmin() - never trusts
    that reaching the action means this page's own render already checked
-   it — including the one-click "quick complete" action, which the brief
+   it - including the one-click "quick complete" action, which the brief
    explicitly calls out as easy to under-authorize. */
 
 function formatDate(d: Date | null): string {
@@ -86,7 +86,7 @@ export default async function AdminTasksPage({
 
   // Default view: hide DONE tasks unless a status filter was explicitly
   // requested (including explicitly asking for DONE). This is "however
-  // you've designed the default filter" per the brief — open tasks first.
+  // you've designed the default filter" per the brief - open tasks first.
   const tasks = statusFilter ? allTasks : allTasks.filter((t) => t.status !== "DONE");
 
   function buildHref(overrides: Record<string, string | undefined>) {

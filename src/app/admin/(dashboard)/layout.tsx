@@ -7,12 +7,12 @@ import { db } from "@/lib/db";
 import AdminNav, { type NavItem } from "./AdminNav";
 
 /* Shared /admin/** layout (Slice 7 of the business command center,
-   2026-08-28) — the first shared layout the admin area has had. Every
+   2026-08-28) - the first shared layout the admin area has had. Every
    existing admin page previously rendered its own full-page
    `<div className="min-h-screen bg-[#05060a] ...">` shell with no shared
    nav; this layout now owns that outer shell + a persistent sidebar
    (desktop) / drawer (mobile), and every page underneath was trimmed down
-   to just its own `mx-auto max-w-*` content div — a small mechanical
+   to just its own `mx-auto max-w-*` content div - a small mechanical
    change per page (see admin/page.tsx, tasks/page.tsx, etc.), no business
    logic/queries touched.
 
@@ -20,7 +20,7 @@ import AdminNav, { type NavItem } from "./AdminNav";
    individual page's own unchanged requireAdmin() check. Next.js layouts
    and pages can in principle be reached somewhat independently (e.g. a
    parallel/intercepted route, or a future refactor that forgets a page's
-   own check) — a shared layout is defense in depth, not a replacement for
+   own check) - a shared layout is defense in depth, not a replacement for
    each page's own gate. Every page below still calls requireAdmin() and
    notFound() itself, unchanged. */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -38,7 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ]);
   // Needs-action badge: rows still waiting on an admin to confirm payment or
   // booking. BOOKED/COMPLETED/FOLLOW_UP/CANCELLED/REFUNDED don't need
-  // action right now, so they're excluded — same "in-memory filter at low
+  // action right now, so they're excluded - same "in-memory filter at low
   // volume" shortcut as getOverdueTaskCount's sibling queries.
   const paidAuditsNeedingAttention = paidAudits.filter(
     (a) => a.status === "PAYMENT_PENDING" || a.status === "PAID" || a.status === "BOOKING_PENDING",

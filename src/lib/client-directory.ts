@@ -12,7 +12,7 @@ import type {
 } from "@prisma/client";
 
 /* Unified client directory (Slice 3 of the business command center,
-   2026-08-28). There is no single stable "client" id in the schema — a real
+   2026-08-28). There is no single stable "client" id in the schema - a real
    identity could be an email-only AuditRequest lead with no User row at
    all, a Proposal with a clientEmail but no account yet, or a real User
    with ServiceRequest/ServiceProject rows. Per the brief, this deliberately
@@ -24,7 +24,7 @@ import type {
 
    Performance note: given the current near-zero row counts across User /
    AuditRequest / Proposal, this fetches each source table in full (3 batched
-   queries) rather than paginating, then merges in memory — the brief
+   queries) rather than paginating, then merges in memory - the brief
    explicitly sanctions this trade-off at the current real scale. If any of
    these tables ever grows large (thousands+ rows), this needs to become a
    real paginated/indexed query path instead of a full-table merge. */
@@ -76,7 +76,7 @@ function deriveClientFacts(input: {
   else stage = "AUDIT_PROSPECT";
 
   // Revenue: exact same ServiceRequest-based methodology as
-  // dashboard-metrics.ts — never derived from Proposal or ServiceProject.
+  // dashboard-metrics.ts - never derived from Proposal or ServiceProject.
   let mrrCents = 0;
   let setupCents = 0;
   const serviceLabels = new Set<string>();
@@ -119,7 +119,7 @@ function deriveClientFacts(input: {
   if (user?.createdAt) timestamps.push(user.createdAt.getTime());
   const lastActivityAt = timestamps.length ? new Date(Math.max(...timestamps)) : null;
 
-  // Outstanding actions — same signals as dashboard-metrics.ts's Needs
+  // Outstanding actions - same signals as dashboard-metrics.ts's Needs
   // Attention, scoped to this one client.
   const outstandingActions: string[] = [];
   const staleThreshold = now - THREE_DAYS_MS;
@@ -176,7 +176,7 @@ export type ClientDirectoryEntry = {
 };
 
 /** The full merged directory. Three batched source-table fetches, then an
-    in-memory merge keyed on lowercased email — see file header for the
+    in-memory merge keyed on lowercased email - see file header for the
     performance trade-off this makes at current scale. */
 export async function getClientDirectory(): Promise<ClientDirectoryEntry[]> {
   const [users, audits, proposals] = await Promise.all([
@@ -231,7 +231,7 @@ export async function getClientDirectory(): Promise<ClientDirectoryEntry[]> {
     proposalsByEmail.get(key)!.push(p);
   }
   // A proposal's userId can point to a User whose email differs in casing
-  // (or, in theory, whose clientEmail was never updated) — fold those in too.
+  // (or, in theory, whose clientEmail was never updated) - fold those in too.
   for (const p of proposals) {
     if (!p.userId) continue;
     const owner = userById.get(p.userId);
@@ -353,7 +353,7 @@ export type ClientProfile = {
 
 /** Looks up one merged client identity by (already lowercased, already
     decoded) email. Returns null if the email resolves to zero rows across
-    all three source tables — callers should turn that into a 404. Every
+    all three source tables - callers should turn that into a 404. Every
     query here is independently scoped to this one email/userId; nothing is
     fetched more broadly and filtered client-side. */
 export async function getClientProfileByEmail(emailRaw: string): Promise<ClientProfile | null> {
@@ -439,7 +439,7 @@ export async function getClientProfileByEmail(emailRaw: string): Promise<ClientP
   }
   messages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-  // Per-client activity feed — a filtered slice of the same kind of
+  // Per-client activity feed - a filtered slice of the same kind of
   // merged-timestamp approach dashboard-metrics.ts's getRecentActivity
   // uses, built directly from rows already fetched above (no extra queries).
   const activity: ClientActivityEvent[] = [];

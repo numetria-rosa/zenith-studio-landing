@@ -11,7 +11,7 @@ import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 import { resolveProposalByWhopPlanId, classifyProposalPaymentLeg } from "@/lib/proposal-payments";
 import { sendMetaPurchaseEvent } from "@/lib/meta-capi";
 
-/* Zenith Lab — Whop webhook handler.
+/* Zenith Lab - Whop webhook handler.
    Implements whop-checkout-links-and-webhooks.md §3.3/§3.7 exactly:
      - raw body passed to unwrap() BEFORE any JSON parsing (parsing first
        breaks signature verification)
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   try {
     event = whop.webhooks.unwrap(rawBody, { headers });
   } catch (err) {
-    console.error("[whop webhook] rejected — signature verification failed:", err);
+    console.error("[whop webhook] rejected - signature verification failed:", err);
     return new Response("invalid signature", { status: 400 });
   }
 
@@ -35,12 +35,12 @@ export async function POST(request: NextRequest) {
     // Idempotency + correctness together, atomically: the WebhookEvent insert
     // and the business-logic writes commit or roll back as one unit. If this
     // event id already exists, the insert conflicts immediately and nothing
-    // below re-runs (a retried delivery reuses the same webhook-id — doc §3.7).
-    // If business logic throws, the WHOLE transaction rolls back — including
-    // the WebhookEvent row — so a genuine Whop retry can actually reprocess it,
+    // below re-runs (a retried delivery reuses the same webhook-id - doc §3.7).
+    // If business logic throws, the WHOLE transaction rolls back - including
+    // the WebhookEvent row - so a genuine Whop retry can actually reprocess it,
     // rather than silently no-op'ing on a delivery we never actually handled.
     // The transaction's return value (course-purchase info for Meta, or
-    // null) is used AFTER it commits, not inside it — a Meta API call has
+    // null) is used AFTER it commits, not inside it - a Meta API call has
     // no business holding a DB transaction open, and firing it only on the
     // success path (never inside the P2002-duplicate catch below) is what
     // keeps a retried webhook delivery from reporting the same sale twice.
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       } else if (event.type === "membership.deactivated") {
         await handleMembershipDeactivated(tx, event.data);
       }
-      // Every other subscribed-or-not event type is accepted and ignored —
+      // Every other subscribed-or-not event type is accepted and ignored -
       // the WebhookEvent row is still recorded for audit/debug visibility.
       return null;
     });
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       // Unique constraint on WebhookEvent.id -> this exact delivery was already
       // processed (or is currently being processed by a concurrent retry).
       // Per doc §3.7, that's the expected, correct outcome of at-least-once
-      // delivery — not an error.
+      // delivery - not an error.
       return new Response("OK", { status: 200 });
     }
     console.error("[whop webhook] processing failed, will let Whop retry:", err);
@@ -84,13 +84,13 @@ type MetaPurchaseInfo = Parameters<typeof sendMetaPurchaseEvent>[0];
 async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPurchaseInfo | null> {
   const productId = payment.product?.id;
   const courseId = productId ? courseIdForWhopProductId(productId) : null;
-  // A bundle is its own Whop product (see src/lib/bundles.ts) — resolved
+  // A bundle is its own Whop product (see src/lib/bundles.ts) - resolved
   // separately from courseId since one payment against it grants MULTIPLE
   // CourseEntitlement rows, not one.
   const bundleCourseIds = !courseId && productId ? courseIdsForWhopBundleProductId(productId) : null;
   const serviceMatch = courseId || bundleCourseIds ? null : serviceKindForWhopPlanId(payment.plan?.id);
   // Proposal plans are created dynamically per-approval (src/lib/
-  // proposal-payments.ts), never hardcoded like courses.ts/services.ts —
+  // proposal-payments.ts), never hardcoded like courses.ts/services.ts -
   // so they can only be resolved with a DB lookup, and only need to be
   // attempted once the static maps above have all already missed.
   const proposalMatch =
@@ -98,18 +98,18 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPur
 
   if (!courseId && !bundleCourseIds && !serviceMatch && !proposalMatch) {
     // Doc's "safely rejected/logged rather than granting random access"
-    // (Phase 14) — an unrecognized product/plan must never grant anything.
+    // (Phase 14) - an unrecognized product/plan must never grant anything.
     console.warn(
       `[whop webhook] payment.succeeded for unmapped product "${productId ?? "unknown"}" / plan "${payment.plan?.id ?? "unknown"}" ` +
-        `— no entitlement or service request created. Check the WHOP_*_ID env vars against courses.ts / services.ts.`
+        `- no entitlement or service request created. Check the WHOP_*_ID env vars against courses.ts / services.ts.`
     );
     return null;
   }
 
   if (proposalMatch) {
     // A proposal's client already has a real account (created at approval
-    // time in recordClientResponse) and never needs a PurchaseClaim — the
-    // approval flow, not a payment redirect, is how they got signed in —
+    // time in recordClientResponse) and never needs a PurchaseClaim - the
+    // approval flow, not a payment redirect, is how they got signed in -
     // so this branch skips findOrCreateUser/createPurchaseClaim entirely
     // and just records which leg (setup vs monthly) got paid.
     const leg = classifyProposalPaymentLeg(proposalMatch.leg, payment.billing_reason ?? null);
@@ -141,7 +141,7 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPur
         data: { monthlyPaidAt: now, monthlyWhopPaymentId: payment.id },
       });
     }
-    return null; // a proposal payment isn't a course sale — outside the ad campaign's Meta tracking scope
+    return null; // a proposal payment isn't a course sale - outside the ad campaign's Meta tracking scope
   }
 
   const whopUserId = payment.user?.id ?? null;
@@ -149,14 +149,14 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPur
   const name = payment.user?.name ?? null;
 
   if (!email && !whopUserId) {
-    console.error("[whop webhook] payment.succeeded has no user id or email — cannot resolve an account", payment.id);
+    console.error("[whop webhook] payment.succeeded has no user id or email - cannot resolve an account", payment.id);
     return null;
   }
 
   const user = await findOrCreateUser(tx, whopUserId, email, name);
   await createPurchaseClaim(tx, user.id, payment.id);
 
-  // Built once, reused by both the single-course and bundle branches below —
+  // Built once, reused by both the single-course and bundle branches below -
   // only course purchases report to Meta (the ad campaign sells courses,
   // not services/proposals), and only when there's an email to hash for
   // user_data.em, Meta's Conversions API requires at least one identifier.
@@ -195,7 +195,7 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPur
 
   if (bundleCourseIds) {
     // One payment, one membership id, but every bundled course gets its own
-    // real CourseEntitlement row — the dashboard/access-guard code reads
+    // real CourseEntitlement row - the dashboard/access-guard code reads
     // per-course rows and has no notion of a bundle, by design, so a bundle
     // buyer must look identical to someone who bought each course separately.
     for (const bundledCourseId of bundleCourseIds) {
@@ -225,7 +225,7 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPur
   if (kind === "setup") {
     // Create at "new" if this is the first purchase; if a request already
     // exists (re-purchase, or the monthly plan created it first), leave
-    // build `status` alone — a setup re-buy shouldn't reset progress.
+    // build `status` alone - a setup re-buy shouldn't reset progress.
     await tx.serviceRequest.upsert({
       where: { userId_serviceId: { userId: user.id, serviceId } },
       create: {
@@ -284,7 +284,7 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPur
     }
   }
 
-  return null; // service purchase — not a course sale, outside Meta tracking scope
+  return null; // service purchase - not a course sale, outside Meta tracking scope
 }
 
 async function handleMembershipDeactivated(tx: Tx, membership: Membership) {
@@ -295,7 +295,7 @@ async function handleMembershipDeactivated(tx: Tx, membership: Membership) {
 
   const serviceResult = await tx.serviceRequest.updateMany({
     where: { whopMonthlyMembershipId: membership.id, monthlyStatus: "active" },
-    data: { monthlyStatus: "canceled" }, // build `status` is untouched — a lapsed retainer doesn't erase what was built
+    data: { monthlyStatus: "canceled" }, // build `status` is untouched - a lapsed retainer doesn't erase what was built
   });
 
   if (courseResult.count === 0 && serviceResult.count === 0) {
@@ -330,7 +330,7 @@ async function findOrCreateUser(
 }
 
 /* Gives every buyer a real password the moment they pay (first purchase
-   only — later repeat purchases reuse the existing one, and a self-chosen
+   only - later repeat purchases reuse the existing one, and a self-chosen
    change on /profile is never overwritten) and drops a claim row keyed by
    this exact payment id. /api/auth/claim reads that row when the buyer's
    browser bounces back from Whop's checkout redirect, so they land on

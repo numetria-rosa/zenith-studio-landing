@@ -18,7 +18,7 @@ export default async function AdminAuditsPage({
   if (!admin) notFound();
 
   const { status } = await searchParams;
-  // Comma-separated status filter, e.g. ?status=SUBMITTED,IN_REVIEW — added
+  // Comma-separated status filter, e.g. ?status=SUBMITTED,IN_REVIEW - added
   // additively for the /admin dashboard's pipeline links (Slice 2). No
   // param at all keeps the original unfiltered list.
   const statusList = status

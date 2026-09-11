@@ -23,7 +23,7 @@ export type CourseCard = {
   category: CourseCategory;
   categoryLabel: string;
   /** A short, punchy outcome-framed line shown above the title on the
-      marketplace card — distinct from `summary` (which explains what the
+      marketplace card - distinct from `summary` (which explains what the
       course covers). Written around real search intent for this topic
       (what people actually type looking for this skill) and a genuine
       stat/outcome from this course, never a claim the course can't back up. */
@@ -52,11 +52,11 @@ export type CourseCard = {
   topics: string[];
   facts: string[];
   careerPath: string;
-  /** Real module list, in order, straight from the course's own course-progress.js MODULES array. `description` is the real module page's own "sub" copy, not invented. Only set for courses that are actually built and published — never invent a curriculum for a "Coming soon" course. */
+  /** Real module list, in order, straight from the course's own course-progress.js MODULES array. `description` is the real module page's own "sub" copy, not invented. Only set for courses that are actually built and published - never invent a curriculum for a "Coming soon" course. */
   curriculum?: { title: string; description: string }[];
   /** Groups curriculum entries into the same stages the real in-course
       sidebar (course-rail.js) shows, straight from each course's own
-      course-progress.js STAGES array — never invented. "Orientation" (when
+      course-progress.js STAGES array - never invented. "Orientation" (when
       curriculum has it) stays ungrouped above these, same as the sidebar. */
   stages?: { label: string; title: string; moduleTitles: string[] }[];
   /** Real per-module minutes, straight from course-progress.js's MODULES
@@ -66,9 +66,9 @@ export type CourseCard = {
   labBadgeColor?: { bg: string; text: string };
   /** Real per-tool practice task counts, straight from each practice library's real task count (confirmed against course-progress.js/skill-map.js). Should sum to practiceTasks. */
   practiceBreakdown?: { tool: string; tasks: number }[];
-  /** A sample of the real portfolio projects (title + one-line context), straight from course-progress.js's PROJECTS array — never invented placeholder project names. */
+  /** A sample of the real portfolio projects (title + one-line context), straight from course-progress.js's PROJECTS array - never invented placeholder project names. */
   projectSamples?: { title: string; tag: string }[];
-  /** What's actually built into the course beyond modules and practice tasks — real page names, not marketing fluff. */
+  /** What's actually built into the course beyond modules and practice tasks - real page names, not marketing fluff. */
   includes?: string[];
 };
 
@@ -353,7 +353,7 @@ export const courses: CourseCard[] = [
     discountPercent: 75,
     discountDeadline: "2026-09-07T23:59:59-00:00",
     summary:
-      "Zero to a live Northline Digital web app: write HTML, CSS, and JavaScript yourself, then specify, inspect, test, and ship with an AI coding partner. This is not AI Engineering — that course builds LLM products (RAG, tools, eval) and assumes programming logic already.",
+      "Zero to a live Northline Digital web app: write HTML, CSS, and JavaScript yourself, then specify, inspect, test, and ship with an AI coding partner. This is not AI Engineering - that course builds LLM products (RAG, tools, eval) and assumes programming logic already.",
     whatYoullDo: [
       "Build a real page from a brief in HTML, by hand",
       "Match a layout spec in CSS, including one responsive rule",
@@ -381,7 +381,7 @@ export const courses: CourseCard[] = [
       "AI will write most of the characters. You are paid to specify, reject, test, and ship.",
       "In-browser Spec, Git, and PR labs are labeled simulations. They never unlock the capstone.",
       "Both Desktop Labs are required: Cursor evidence and a GitHub repo you own. Pick-one is not enough.",
-      "This course does not teach RAG, tool-calling agents, or model eval — that is AI Engineering.",
+      "This course does not teach RAG, tool-calling agents, or model eval - that is AI Engineering.",
     ],
     careerPath:
       "A junior who can specify a small web feature, drive a coding agent, read the diff, write tests, open a PR, and deploy a live URL. Not a senior engineer. No job guarantee.",
@@ -426,7 +426,7 @@ export const courses: CourseCard[] = [
       {
         title: "JavaScript: logic you can defend",
         description:
-          "Ticket NL-005: hours, filters, greetings — written by you, because you will be reviewing this shape forever.",
+          "Ticket NL-005: hours, filters, greetings - written by you, because you will be reviewing this shape forever.",
       },
       {
         title: "The DOM, events, and data that arrives late",
@@ -471,7 +471,7 @@ export const courses: CourseCard[] = [
       {
         title: "Release: ship the application",
         description:
-          "Ticket NL-013: one live Northline product — tests, a repo, a release note, and a URL someone else can open. A github.com repo is not that URL.",
+          "Ticket NL-013: one live Northline product - tests, a repo, a release note, and a URL someone else can open. A github.com repo is not that URL.",
       },
     ],
     stages: [
@@ -525,7 +525,7 @@ export const courses: CourseCard[] = [
     discountPercent: 75,
     discountDeadline: "2026-09-07T23:59:59-00:00",
     summary:
-      "From vectors to attention: build the real mathematical foundations behind machine learning in a computational lab, not a video series — drag a slider and watch entropy, gradients, and attention weights actually change.",
+      "From vectors to attention: build the real mathematical foundations behind machine learning in a computational lab, not a video series - drag a slider and watch entropy, gradients, and attention weights actually change.",
     whatYoullDo: [
       "See a vector as a direction, not just a list of numbers, and use that to measure similarity",
       "Watch a matrix transform space and recognize it as a neural network layer",
@@ -559,17 +559,17 @@ export const courses: CourseCard[] = [
       {
         title: "Orientation",
         description:
-          "No calculus, linear algebra, or statistics required going in — just curiosity and a willingness to drag a slider before worrying about the formula underneath it.",
+          "No calculus, linear algebra, or statistics required going in - just curiosity and a willingness to drag a slider before worrying about the formula underneath it.",
       },
       {
         title: "Thinking in Vectors",
         description:
-          "A vector is not a list of numbers, it's an arrow with a direction — and comparing two arrows' directions is how machines decide whether two things are similar.",
+          "A vector is not a list of numbers, it's an arrow with a direction - and comparing two arrows' directions is how machines decide whether two things are similar.",
       },
       {
         title: "Transforming Data",
         description:
-          "A matrix is a machine that transforms every point in space the same way — once you see that, y = Wx + b in a neural network layer stops being mysterious.",
+          "A matrix is a machine that transforms every point in space the same way - once you see that, y = Wx + b in a neural network layer stops being mysterious.",
       },
       {
         title: "Finding the Important Directions",
@@ -584,12 +584,12 @@ export const courses: CourseCard[] = [
       {
         title: "How Models Learn",
         description:
-          "Gradient descent turns the gradient into an algorithm: start somewhere, take a step downhill, repeat — and this module shows exactly what happens when the learning-rate dial is set wrong.",
+          "Gradient descent turns the gradient into an algorithm: start somewhere, take a step downhill, repeat - and this module shows exactly what happens when the learning-rate dial is set wrong.",
       },
       {
         title: "Reasoning Under Uncertainty",
         description:
-          "A model's \"87% confidence\" is a probability statement — this module builds what that actually promises (and doesn't) from the simplest possible example, a biased coin.",
+          "A model's \"87% confidence\" is a probability statement - this module builds what that actually promises (and doesn't) from the simplest possible example, a biased coin.",
       },
       {
         title: "Learning From Data",
@@ -599,7 +599,7 @@ export const courses: CourseCard[] = [
       {
         title: "Probability Meets Machine Learning",
         description:
-          "Fitting a model to data is choosing the parameters that make the observed data most plausible — maximum likelihood estimation, the reason common loss functions look the way they do.",
+          "Fitting a model to data is choosing the parameters that make the observed data most plausible - maximum likelihood estimation, the reason common loss functions look the way they do.",
       },
       {
         title: "Information and Loss",
@@ -614,7 +614,7 @@ export const courses: CourseCard[] = [
       {
         title: "The Math Behind Attention",
         description:
-          "The reward module — the dot product, softmax, and everything before it come together in scaled dot-product attention, the core computation behind every large language model.",
+          "The reward module - the dot product, softmax, and everything before it come together in scaled dot-product attention, the core computation behind every large language model.",
       },
     ],
     stages: [

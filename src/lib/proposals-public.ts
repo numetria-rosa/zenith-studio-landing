@@ -9,14 +9,14 @@ import { syncProspectFromProposal } from "@/lib/outreach-admin";
 /* Token-secured client-facing proposal lookup (Slice 5 of the
    service-platform build, 2026-08-28). Modeled on PurchaseClaim's pattern
    (src/app/api/auth/claim/route.ts): the accessToken IS the entire security
-   mechanism, no session/signin required. Every caller — the page's own GET
-   render AND every one of the three response server actions — must call
+   mechanism, no session/signin required. Every caller - the page's own GET
+   render AND every one of the three response server actions - must call
    this function fresh; nothing here is ever cached or trusted from an
    earlier call in the same request lifecycle.
 
    A wrong/malformed token, a well-formed-but-nonexistent token, an expired
    proposal, and a not-yet-sent (DRAFT) proposal's token all resolve to the
-   exact same `null` here — the caller renders one identical "invalid or
+   exact same `null` here - the caller renders one identical "invalid or
    expired" state for all four cases, so none of them is distinguishable
    from outside. */
 export async function resolveProposalByToken(token: string | null | undefined) {
@@ -28,7 +28,7 @@ export async function resolveProposalByToken(token: string | null | undefined) {
   });
   if (!proposal) return null;
 
-  // DRAFT proposals were never sent — an admin may not have finished
+  // DRAFT proposals were never sent - an admin may not have finished
   // writing them, and a leaked draft-stage link should not be inspectable.
   if (proposal.status === "DRAFT") return null;
 
@@ -38,7 +38,7 @@ export async function resolveProposalByToken(token: string | null | undefined) {
 }
 
 /** Called once per GET of the public view. Only bumps SENT -> VIEWED and
-    only sets viewedAt the first time (viewedAt currently null) — never
+    only sets viewedAt the first time (viewedAt currently null) - never
     downgrades a proposal that's already APPROVED/CHANGES_REQUESTED/DECLINED
     back to VIEWED just because the client reloaded the page. */
 export async function markProposalViewed(id: string) {
@@ -58,7 +58,7 @@ export async function markProposalViewed(id: string) {
   }
 }
 
-/** Best-effort — never throws, never blocks the caller on failing to
+/** Best-effort - never throws, never blocks the caller on failing to
     obtain a real client IP. */
 export function getClientIp(headerBag: Headers): string | null {
   try {
@@ -78,13 +78,13 @@ const ACTION_TO_STATUS: Record<ClientResponseAction, Prisma.ProposalUpdateInput[
   REJECTED: "DECLINED",
 };
 
-/** Re-validates the token itself — never trusts that the caller already
+/** Re-validates the token itself - never trusts that the caller already
     validated it via a prior page render. Refuses to record a second
     decision once one of APPROVED/CHANGES_REQUESTED/DECLINED is already
     live on the proposal record.
 
     selectedAddOnItemIds/paymentMode only matter for action === "APPROVED"
-    — CHANGES_REQUESTED/REJECTED ignore them entirely. When the approved
+    - CHANGES_REQUESTED/REJECTED ignore them entirely. When the approved
     total has a recurring (MONTHLY-kind) component, paymentMode is
     required: the client is choosing, at the moment they approve, whether
     to pay setup now and the monthly plan later (SPLIT, surfaced once an
@@ -110,7 +110,7 @@ export async function recordClientResponse(
     return { ok: false, error: "a note is required when requesting changes" };
   }
 
-  // Only real, real add-on item ids on THIS proposal can be selected — a
+  // Only real, real add-on item ids on THIS proposal can be selected - a
   // tampered form submission naming another proposal's item id (or
   // anything else) is silently dropped rather than trusted.
   const realAddOnIds = new Set(proposal.items.filter((i) => i.isOptionalAddOn).map((i) => i.id));
@@ -150,7 +150,7 @@ export async function recordClientResponse(
     // Trigger 1 (Slice 6, 2026-08-28): an approved proposal automatically
     // creates the client's ServiceProject workspace, in the same
     // transaction as the approval itself. This does NOT require a real
-    // Whop payment to have occurred — today, the actual payment for a
+    // Whop payment to have occurred - today, the actual payment for a
     // proposal-driven engagement still happens by some other means (bank
     // transfer, invoice, a manually-shared Whop link); this only makes
     // approval create the workspace, not payment.
@@ -182,7 +182,7 @@ export async function recordClientResponse(
     await syncProspectFromProposal(proposal.id, "declined");
   }
 
-  // Kickoff email after the DB transaction commits — in-app message is
+  // Kickoff email after the DB transaction commits - in-app message is
   // already seeded inside createServiceProjectWithDefaults. Best-effort:
   // missing RESEND_API_KEY or a send failure must not undo approval.
   if (action === "APPROVED") {
@@ -206,7 +206,7 @@ export async function recordClientResponse(
     }
   }
 
-  // Whop plan creation is a real network call — deliberately outside the
+  // Whop plan creation is a real network call - deliberately outside the
   // DB transaction above so a slow/flaky Whop API response never holds a
   // Postgres transaction open. If it throws, the approval itself has
   // already committed; the client won't see a checkout link until an
@@ -220,7 +220,7 @@ export async function recordClientResponse(
       setupCheckoutUrl = result.setupCheckoutUrl;
     } catch (err) {
       console.error(
-        `[proposals-public] createProposalCheckout failed after approval for ${proposal.id} — admin can retry:`,
+        `[proposals-public] createProposalCheckout failed after approval for ${proposal.id} - admin can retry:`,
         err
       );
     }

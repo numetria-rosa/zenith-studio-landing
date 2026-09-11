@@ -8,7 +8,7 @@ import { getCourse } from "@/lib/courses";
 
 /* One-time import of a student's pre-existing localStorage progress
    (Phase 19). Only ever writes if no server row exists yet for this
-   user+course — a malicious or stale client payload can never overwrite
+   user+course - a malicious or stale client payload can never overwrite
    real server-side progress, it can only fill an empty slot. */
 export async function POST(request: NextRequest) {
   const session = await auth();

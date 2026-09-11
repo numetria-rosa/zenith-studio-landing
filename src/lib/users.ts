@@ -3,7 +3,7 @@ import type { Prisma } from "@prisma/client";
 /* Small, deliberately separate from the webhook's own findOrCreateUser in
    src/app/api/webhooks/whop/route.ts (Slice 6 of the service-platform
    build, 2026-08-28). That function resolves by whopUserId first, then
-   email — this one only ever has an email to go on (a proposal approval
+   email - this one only ever has an email to go on (a proposal approval
    has no Whop identity involved), so it isn't the same lookup shape. Kept
    here instead of duplicated inline in proposals-public.ts in case a third
    email-only flow needs it later; the webhook route itself is intentionally

@@ -7,7 +7,7 @@ import type { PaidAuditStatus, Prisma } from "@prisma/client";
      1. Automatically by /api/webhooks/cal (BOOKING_CREATED / BOOKING_PAID /
         BOOKING_RESCHEDULED / BOOKING_CANCELLED), and/or
      2. Manually by an admin at /admin/paid-audits (fallback / corrections).
-   Admin write helpers do not call requireAdmin themselves — every caller
+   Admin write helpers do not call requireAdmin themselves - every caller
    re-checks independently, matching tasks-admin.ts. */
 
 export const PAID_AUDIT_BOOKING_URL = "https://cal.com/zenith-studio-ai/paid-automation-audit";
@@ -44,7 +44,7 @@ export function isPaidAuditStatus(value: string): value is PaidAuditStatus {
   return (PAID_AUDIT_STATUSES as string[]).includes(value);
 }
 
-/** True when this Cal.com payload is for the paid audit event specifically —
+/** True when this Cal.com payload is for the paid audit event specifically -
     user-level webhooks fire for every event type on the account, so free
     audit bookings and anything else must be filtered out here. */
 export function isPaidAuditCalEvent(payload: {
@@ -65,7 +65,7 @@ export async function listPaidAuditsForAdmin() {
   });
 }
 
-/** Paid audits for one signed-in client's dashboard — scoped to their own
+/** Paid audits for one signed-in client's dashboard - scoped to their own
     userId only, never a client-supplied id. */
 export async function listPaidAuditsForUser(userId: string) {
   return db.paidAudit.findMany({
@@ -86,7 +86,7 @@ export type PaidAuditInput = {
   followUpNote?: string;
 };
 
-/** Resolves the email to a real User — admin manual create still requires an
+/** Resolves the email to a real User - admin manual create still requires an
     existing account so staff don't accidentally invent users. The Cal.com
     webhook path uses find-or-create instead (attendees may never have signed
     in). */
@@ -94,7 +94,7 @@ async function resolveUser(email: string): Promise<{ ok: true; userId: string } 
   const trimmed = email.trim().toLowerCase();
   if (!trimmed) return { ok: false, error: "email is required" };
   const user = await db.user.findUnique({ where: { email: trimmed }, select: { id: true } });
-  if (!user) return { ok: false, error: `no account found for ${trimmed} — the client must sign in at least once first` };
+  if (!user) return { ok: false, error: `no account found for ${trimmed} - the client must sign in at least once first` };
   return { ok: true, userId: user.id };
 }
 

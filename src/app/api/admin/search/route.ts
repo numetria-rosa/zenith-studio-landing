@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/admin";
 import { searchAdmin } from "@/lib/admin-search";
 
 /* Backs the global search box in the admin nav layout (Slice 7,
-   2026-08-28). GET /api/admin/search?q=... — independently re-checks
+   2026-08-28). GET /api/admin/search?q=... - independently re-checks
    requireAdmin() here (matching every other admin API route's convention,
    e.g. service-requests/[id]/route.ts) even though searchAdmin() itself
    also checks it, since this is a new network-reachable entry point into

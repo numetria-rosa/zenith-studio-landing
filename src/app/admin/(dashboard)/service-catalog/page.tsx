@@ -3,12 +3,12 @@ import { requireAdmin } from "@/lib/admin";
 import { db } from "@/lib/db";
 
 /* Read-only owner-facing view of the DB-backed ServiceCatalog table (Slice 2
-   of the service-platform build). This table is not load-bearing yet — it's
+   of the service-platform build). This table is not load-bearing yet - it's
    seeded from src/lib/services.ts's SERVICES array (scripts/seed-service-
    catalog.mjs) purely to prove the DB shape before anything depends on it.
    404s (not a redirect) for non-admins, matching admin/service-requests's
    own pattern: the route's existence isn't something to confirm to a
-   logged-in-but-not-you visitor. No create/edit here yet — that's a later
+   logged-in-but-not-you visitor. No create/edit here yet - that's a later
    slice once this table becomes load-bearing. */
 export default async function AdminServiceCatalogPage() {
   const admin = await requireAdmin();

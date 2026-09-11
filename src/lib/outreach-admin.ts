@@ -218,7 +218,7 @@ export async function prepareOutreach(prospectId: string, emailType: OutreachEma
       where: { id: prospectId },
       data: { status: "REJECTED", rejectionReasons: ["score below 70"], outreachScore: eligibility.outreachScore, priority: "SKIP" },
     });
-    return { ok: false as const, error: "score below 70 — will not contact" };
+    return { ok: false as const, error: "score below 70 - will not contact" };
   }
 
   const path = eligibility.path;
@@ -583,7 +583,7 @@ export async function syncProspectFromProposal(proposalId: string, event: "viewe
       data: { status: "HOT", sequenceStoppedAt: new Date(), sequenceStopReason: "proposal_accepted" },
     });
     await recordOutreachEvent(prospect.id, "proposal_accepted", { proposalId });
-    await sendAdminAlert(`Proposal accepted — ${prospect.businessName}`, `${prospect.businessName} approved a proposal.`);
+    await sendAdminAlert(`Proposal accepted - ${prospect.businessName}`, `${prospect.businessName} approved a proposal.`);
   } else if (event === "declined") {
     await stopSequence(prospect.id, "proposal_declined", "NOT_INTERESTED");
   } else if (event === "paid") {
@@ -592,7 +592,7 @@ export async function syncProspectFromProposal(proposalId: string, event: "viewe
       data: { status: "CUSTOMER", sequenceStoppedAt: new Date(), sequenceStopReason: "paid" },
     });
     await recordOutreachEvent(prospect.id, "payment_completed", { proposalId });
-    await sendAdminAlert(`Paid — ${prospect.businessName}`, `${prospect.businessName} is now a customer.`);
+    await sendAdminAlert(`Paid - ${prospect.businessName}`, `${prospect.businessName} is now a customer.`);
   }
 }
 

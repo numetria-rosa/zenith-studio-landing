@@ -5,14 +5,14 @@ import type { ProposalItem, ProposalItemKind } from "@prisma/client";
 /* Whop plan creation for approved Proposals. See the ProposalPaymentMode
    enum's own doc comment in prisma/schema.prisma for the SPLIT vs BUNDLED
    distinction. Every plan created here attaches to one shared, hidden Whop
-   product (created once via scripts/create-proposal-whop-product.mjs) —
+   product (created once via scripts/create-proposal-whop-product.mjs) -
    proposal amounts are per-client and custom, so unlike services.ts's
    per-service products there's nothing to browse; the product exists only
    as the required container Whop's API makes every plan belong to. */
 
 const PROPOSAL_WHOP_PRODUCT_ID = "prod_wSRdxsXN2isTC";
 
-/** Whop's checkout link is always this exact shape for any plan id —
+/** Whop's checkout link is always this exact shape for any plan id -
     confirmed against a real created plan's own purchase_url, both
     one_time and renewal. Deriving it from a stored plan id (rather than
     also persisting purchase_url) keeps the DB schema down to the one
@@ -26,7 +26,7 @@ export function whopCheckoutUrl(planId: string): string {
     selected into a one-time ("setup") bucket and a recurring ("monthly")
     bucket. Mirrors computeProposalAmountBreakdown's own bucketing (MONTHLY
     kind -> recurring, everything else -> one-time) but, unlike that
-    function, counts SELECTED add-ons too — computeProposalAmountBreakdown
+    function, counts SELECTED add-ons too - computeProposalAmountBreakdown
     skips all add-ons unconditionally because it backs the admin/public
     "core vs add-on" display, not an approved-and-paid-for total. */
 export function computeApprovedTotals(
@@ -55,7 +55,7 @@ type CheckoutResult = {
     ids on the Proposal row. Called from recordClientResponse's APPROVED
     branch, and again from ensureProposalSetupCheckout when Whop failed
     after approval left whopSetupPlanId null. Callers must check
-    whopSetupPlanId is still null first — never create a second plan for
+    whopSetupPlanId is still null first - never create a second plan for
     the same proposal. setupCents === 0 is not handled here. */
 export async function createProposalCheckout(
   proposalId: string,
@@ -67,12 +67,12 @@ export async function createProposalCheckout(
   const whop = getWhopClient();
 
   if (monthlyCents === 0) {
-    // No recurring component at all — a plain one-time plan regardless of
+    // No recurring component at all - a plain one-time plan regardless of
     // the client's chosen mode (the mode only matters when there's a
     // monthly amount to sequence).
     const plan = await whop.plans.create({
       product_id: PROPOSAL_WHOP_PRODUCT_ID,
-      title: `Proposal ZS-${reference}`, // 20 chars — Whop plan titles cap at 30
+      title: `Proposal ZS-${reference}`, // 20 chars - Whop plan titles cap at 30
       plan_type: "one_time",
       initial_price: setupCents / 100,
       visibility: "hidden",
@@ -84,11 +84,11 @@ export async function createProposalCheckout(
   if (paymentMode === "BUNDLED") {
     // One plan, one checkout: initial_price charges the setup amount right
     // away, renewal_price then bills the monthly amount every
-    // billing_period days starting from that same checkout — no second
+    // billing_period days starting from that same checkout - no second
     // checkout step for the client at all.
     const plan = await whop.plans.create({
       product_id: PROPOSAL_WHOP_PRODUCT_ID,
-      title: `Proposal ZS-${reference} Combo`, // 26 chars — Whop's 30-char plan title cap (confirmed live: "Title is too long" at 39 chars during verification)
+      title: `Proposal ZS-${reference} Combo`, // 26 chars - Whop's 30-char plan title cap (confirmed live: "Title is too long" at 39 chars during verification)
       plan_type: "renewal",
       initial_price: setupCents / 100,
       renewal_price: monthlyCents / 100,
@@ -113,7 +113,7 @@ export async function createProposalCheckout(
   return { setupCheckoutUrl: plan.purchase_url, monthlyCheckoutUrl: null };
 }
 
-/** Creates the deferred monthly plan for a SPLIT-mode proposal — called
+/** Creates the deferred monthly plan for a SPLIT-mode proposal - called
     from updateProjectStage when a project moves to LIVE. A real recurring
     plan (not a single charge): initial_price and renewal_price both equal
     the monthly amount, so the first charge happens at this checkout and it
@@ -139,7 +139,7 @@ export async function createDeferredMonthlyCheckout(
 
 /** Resolves an incoming Whop payment's plan id back to the Proposal it
     belongs to, for the webhook handler. Returns which leg (setup or
-    monthly) matched — for a BUNDLED plan, the SAME whopSetupPlanId can
+    monthly) matched - for a BUNDLED plan, the SAME whopSetupPlanId can
     match twice over the plan's lifetime (once for the initial charge, then
     again for every renewal); the caller distinguishes those via
     payment.billing_reason, not via which field matched here. */
@@ -189,7 +189,7 @@ type EnsureCheckoutResult =
 /** Admin retry when approval succeeded but Whop plan creation failed
     (recordClientResponse commits the DB first, then calls Whop outside
     the transaction). Safe to call only while whopSetupPlanId is still
-    null — refuses otherwise so we never mint duplicate plans. */
+    null - refuses otherwise so we never mint duplicate plans. */
 export async function ensureProposalSetupCheckout(proposalId: string): Promise<EnsureCheckoutResult> {
   const proposal = await db.proposal.findUnique({
     where: { id: proposalId },
@@ -222,11 +222,11 @@ export async function ensureProposalSetupCheckout(proposalId: string): Promise<E
 /** Which of a Proposal's two amounts a real incoming Whop payment actually
     represents, given which plan field matched (see
     resolveProposalByWhopPlanId) and Whop's own billing_reason. A
-    whopMonthlyPlanId match is always the monthly leg — that field only
+    whopMonthlyPlanId match is always the monthly leg - that field only
     ever holds SPLIT mode's deferred monthly-only plan. A whopSetupPlanId
     match needs billing_reason to disambiguate: for a BUNDLED plan, the
     SAME plan id is used for both the initial charge (billing_reason
-    "one_time" or "subscription_create" — setup + first month together)
+    "one_time" or "subscription_create" - setup + first month together)
     and every later recurring charge ("subscription_cycle"). The webhook
     handler marks both setupPaidAt and monthlyPaidAt on that first BUNDLED
     charge; later cycles only refresh monthlyPaidAt. */

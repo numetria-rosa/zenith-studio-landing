@@ -7,14 +7,14 @@ import type { MailProvider } from "@prisma/client";
 /* Client-facing service project workspace (Slice 7 of the service-platform
    build, 2026-08-28). This is the first page in the build where one signed-in
    client could plausibly try to view or write another client's data by
-   guessing/changing an id in the URL — every read AND every write below
+   guessing/changing an id in the URL - every read AND every write below
    scopes its query to `{ id: projectId, userId }` in a single query, never
    "fetch by id, then check ownership in application code" (the common IDOR
    bug pattern). A mismatch (wrong id, or someone else's project) always
-   resolves to the same "not found" outcome the caller turns into a 404 —
+   resolves to the same "not found" outcome the caller turns into a 404 -
    never a distinguishable "this belongs to someone else" response. */
 
-/** Single scoped query — used by the page's own render AND (independently,
+/** Single scoped query - used by the page's own render AND (independently,
     fresh) by every server action below. Never trust that reaching an action
     means the page's ownership check already passed. */
 export async function getOwnedServiceProject(projectId: string, userId: string) {
@@ -61,7 +61,7 @@ export const PROJECT_STAGE_LABELS: Record<string, string> = {
   CANCELLED: "Cancelled",
 };
 
-// Client-safe integration status labels only — literally the four/five words
+// Client-safe integration status labels only - literally the four/five words
 // the business brief specifies. Never render `provider` beyond its own name,
 // and never render `externalRef` (or anything credential-shaped) to the client.
 export const INTEGRATION_STATUS_LABELS: Record<string, string> = {
@@ -75,7 +75,7 @@ export const INTEGRATION_STATUS_LABELS: Record<string, string> = {
 export type RequirementSubmitResult = { ok: true } | { ok: false; error: string };
 
 /** Client submits detail text for a MISSING/REJECTED requirement, flipping it
-    to SUBMITTED. Re-verifies project ownership independently — never trusts
+    to SUBMITTED. Re-verifies project ownership independently - never trusts
     the caller's page render already checked it. Refuses to touch an
     APPROVED/UNDER_REVIEW/SUBMITTED requirement (those are not client-writable
     from this action). */
@@ -189,7 +189,7 @@ export async function createClientSupportRequest(
 
 /** Connects a client's own Gmail (personal) or Yahoo mailbox for AI Inbox
     Manager via an app password (see mail-imap.ts for why this, not OAuth).
-    Verifies the credential actually logs in BEFORE saving anything — never
+    Verifies the credential actually logs in BEFORE saving anything - never
     store a password we haven't confirmed works. Re-verifies ownership
     independently, same pattern as every other action here. */
 export async function connectMailbox(

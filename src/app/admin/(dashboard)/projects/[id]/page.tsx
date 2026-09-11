@@ -36,8 +36,8 @@ import { getMonthlyCostCents, resolveMonthlyBudgetCents } from "@/lib/usage-cost
 
 /* Admin operations view for a single ServiceProject (Slice 4 of the
    business command center, 2026-08-28: /admin/projects/[id]). Every write
-   action below independently re-runs requireAdmin() — never trusts that
-   reaching the action means this page's own render already checked it —
+   action below independently re-runs requireAdmin() - never trusts that
+   reaching the action means this page's own render already checked it -
    and validates every enum-typed input server-side against the real Prisma
    enum values before writing. A malformed/nonexistent id resolves to
    notFound() cleanly via getServiceProjectForAdmin returning null. */
@@ -638,7 +638,7 @@ export default async function AdminProjectDetailPage({
 
         {/* AI Inbox Manager: client-connected (Gmail/Yahoo app password, not
             OAuth, see mail-imap.ts), so nothing for the admin to initiate
-            here — read-only visibility only, harmless to show empty for any
+            here - read-only visibility only, harmless to show empty for any
             other project. */}
         {(project.mailConnections.length > 0 || project.inboxDrafts.length > 0) && (
           <SectionCard title={`Inbox Manager: drafts awaiting client review (${project.inboxDrafts.length})`}>

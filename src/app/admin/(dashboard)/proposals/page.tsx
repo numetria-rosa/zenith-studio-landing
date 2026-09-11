@@ -45,7 +45,7 @@ export default async function AdminProposalsPage({
 
   const { status, q, sort: sortRaw } = await searchParams;
 
-  // Comma-separated status filter, e.g. ?status=SENT,VIEWED — used by the
+  // Comma-separated status filter, e.g. ?status=SENT,VIEWED - used by the
   // /admin dashboard's pipeline links. No param at all keeps the
   // unfiltered list. Now supports all 7 statuses, not a partial set.
   const statusList = status
@@ -61,7 +61,7 @@ export default async function AdminProposalsPage({
   const proposals = await db.proposal.findMany({
     where: statusList.length ? { status: { in: statusList as never[] } } : undefined,
     // Sorting by amount is computed (items aren't a DB column), so we
-    // always fetch ordered by updatedAt and re-sort in memory below — the
+    // always fetch ordered by updatedAt and re-sort in memory below - the
     // row counts here are small (per client-directory.ts's own precedent
     // for in-application-code work at this scale).
     orderBy: { updatedAt: "desc" },
@@ -69,7 +69,7 @@ export default async function AdminProposalsPage({
   });
 
   // Search: case-insensitive substring across client name/email/company,
-  // in application code — matching client-directory.ts's own approach
+  // in application code - matching client-directory.ts's own approach
   // rather than a DB-level search feature at this data scale.
   const needle = search.toLowerCase();
   const filtered = needle
@@ -84,7 +84,7 @@ export default async function AdminProposalsPage({
     const breakdown = computeProposalAmountBreakdown(p.items);
     // Display-only "(expired)" badge: expiresAt in the past but status
     // hasn't been explicitly transitioned. This never mutates the stored
-    // row — resolveProposalByToken in proposals-public.ts already treats
+    // row - resolveProposalByToken in proposals-public.ts already treats
     // a past-expiresAt proposal as unreachable regardless of stored
     // status, so a read-only badge here matches that existing behavior
     // instead of racing a background job against it.

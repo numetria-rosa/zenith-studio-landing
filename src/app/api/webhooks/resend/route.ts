@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     return new Response("invalid signature", { status: 400 });
   }
   if (!secret) {
-    console.warn("[resend webhook] RESEND_WEBHOOK_SECRET is not set — accepting only in development");
+    console.warn("[resend webhook] RESEND_WEBHOOK_SECRET is not set - accepting only in development");
     if (process.env.NODE_ENV === "production") return new Response("misconfigured", { status: 500 });
   }
 

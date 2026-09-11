@@ -5,7 +5,7 @@ import { createSessionForUser } from "@/lib/session";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /* Whop's hosted checkout redirects the buyer's browser here with
-   ?status=success&payment_id=pay_XXX (confirmed against Whop's own docs —
+   ?status=success&payment_id=pay_XXX (confirmed against Whop's own docs -
    status is always present, payment_id only on success). This is the other
    half of the webhook's createPurchaseClaim(): the webhook is the trusted
    write path (signature-verified), this route only ever reads what it

@@ -2,7 +2,7 @@
    course's "Inside the course" nav groups (course-rail-data.ts), keyed by
    filename since the same filenames repeat across courses (dashboard.html,
    syllabus.html, etc. exist in all 4). Grounded in what these pages
-   actually do — read/verified against the real course content this
+   actually do - read/verified against the real course content this
    engagement, not generic marketing copy. Kept separate from
    course-rail-data.ts on purpose: that file feeds the real in-app sidebar
    render and shouldn't carry marketing-page-only content. */

@@ -10,7 +10,7 @@ import { COURSE_RAIL_DATA } from "@/lib/course-rail-data";
 
 /* Server-authoritative progress storage (Phase 10/11). The client's
    course-progress.js talks to this instead of localStorage directly once
-   authenticated. Never trusts a client-supplied userId — always derives it
+   authenticated. Never trusts a client-supplied userId - always derives it
    from the session. */
 
 export async function GET(request: NextRequest) {

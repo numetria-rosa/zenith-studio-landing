@@ -9,7 +9,7 @@ import type { ProjectStage } from "@prisma/client";
    center, 2026-08-28: /admin/projects). Matches every other admin route's
    pattern exactly: requireAdmin() -> notFound(), dark Studio card language.
    Supports ?stage=<ProjectStage> so /admin's pipeline section (and any
-   other future linker) can deep-link a filtered view — validated against
+   other future linker) can deep-link a filtered view - validated against
    the real enum before it drives any query. */
 
 function formatDate(d: Date | null): string {

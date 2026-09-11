@@ -7,7 +7,7 @@ import { getService, SERVICE_STATUSES, SERVICE_STATUS_LABELS, isServiceStatus } 
 import { updateServiceRequestAsAdmin } from "@/lib/service-requests-admin";
 
 /* Owner-facing view of every AI Systems purchase. 404s (not a redirect) for
-   non-admins — the route's existence isn't something to confirm to a
+   non-admins - the route's existence isn't something to confirm to a
    logged-in-but-not-you visitor. */
 export default async function AdminServiceRequestsPage({
   searchParams,
@@ -18,7 +18,7 @@ export default async function AdminServiceRequestsPage({
   if (!admin) notFound();
 
   const { service: serviceFilter } = await searchParams;
-  // ?service=<serviceId> filter — added additively for the /admin dashboard's
+  // ?service=<serviceId> filter - added additively for the /admin dashboard's
   // service-performance rows (Slice 2). No param at all keeps the original
   // unfiltered list.
   const requests = await db.serviceRequest.findMany({

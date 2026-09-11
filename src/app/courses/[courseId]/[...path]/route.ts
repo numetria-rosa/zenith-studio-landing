@@ -9,8 +9,8 @@ import { hasCourseAccess } from "@/lib/entitlements";
 import { fileNameFromPath, wrapCoursePage } from "@/lib/course-rail-template";
 import { SESSION_COOKIE_NAME } from "@/lib/session";
 
-/* THE GUARD (Phase 9). Every request for course content — module pages, the
-   in-course dashboard, course-progress.js, quiz-data.js, everything — comes
+/* THE GUARD (Phase 9). Every request for course content - module pages, the
+   in-course dashboard, course-progress.js, quiz-data.js, everything - comes
    through here instead of a static file Vercel would serve unconditionally.
    No session -> sign in. Session but not entitled -> the course landing
    page, never the content. Only once both checks pass does a byte of the
@@ -37,7 +37,7 @@ export async function GET(
   if (!course || !course.published) {
     return new NextResponse("Not found", { status: 404 });
   }
-  // A "react" course has no static contentDir — it's served by real Next.js
+  // A "react" course has no static contentDir - it's served by real Next.js
   // pages under /lab/[courseId]/learn instead, gated by that route's own
   // layout. Never let a react course's id resolve through the disk-read path.
   if (course.renderMode === "react" || !course.contentDir || !course.firstLessonPath) {
@@ -54,7 +54,7 @@ export async function GET(
     return NextResponse.redirect(canonicalUrl, 308);
   }
 
-  // This guard runs on every request for this course — not just each page
+  // This guard runs on every request for this course - not just each page
   // navigation, but every asset a page pulls (course-rail.js, css, images,
   // datasets), since they're all served through this same route. auth()
   // and hasCourseAccess() are both DB round trips; a short-lived cache
@@ -97,7 +97,7 @@ export async function GET(
     return new NextResponse("Not found", { status: 404 });
   }
 
-  // A page request has no extension on disk — every actual asset (.js,
+  // A page request has no extension on disk - every actual asset (.js,
   // .css, .json, images, datasets) is already requested with its real
   // extension and skips this.
   if (!path.extname(resolved)) {
@@ -116,8 +116,8 @@ export async function GET(
 
   // Server-render the sidebar shell into the page itself instead of letting
   // client JS tear down and rebuild the whole DOM on every navigation (the
-  // root cause of the old sidebar flicker). The rail's static parts — nav
-  // links, module list, which one is "active" — are fully knowable here:
+  // root cause of the old sidebar flicker). The rail's static parts - nav
+  // links, module list, which one is "active" - are fully knowable here:
   // the URL is already resolved. Only completion/lock state (localStorage)
   // still needs client hydration, patching classes onto elements that
   // already exist rather than constructing them.
@@ -132,13 +132,13 @@ export async function GET(
   // course-ui.js, zenith-lab.css, theme.css, datasets, images) is byte-
   // identical across every page of a course, but with no cache header at
   // all every single page navigation re-ran this route's full session +
-  // DB entitlement check AND re-downloaded all of it from scratch — a real
+  // DB entitlement check AND re-downloaded all of it from scratch - a real
   // contributor to page-to-page transitions feeling slow, on top of the
   // sidebar itself being torn down and rebuilt by JS on every load (this is
   // a static multi-page course, not a client-side-routed SPA, so a full
   // reload is inherent; this at least removes the redundant re-fetching).
   // "private" (never a shared/CDN cache, only the entitled student's own
-  // browser) since this route is auth-gated — a shared cache serving this
+  // browser) since this route is auth-gated - a shared cache serving this
   // response to a different, unauthenticated request would leak paid
   // content. HTML/JSON stay effectively uncached since they're the actual
   // lesson content, which changes as the course is edited.

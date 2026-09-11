@@ -60,7 +60,7 @@ export const SERVICE_PAGES: ServicePageContent[] = [
     features: [
       "Email sorting and prioritization",
       "Drafts for routine replies, approved before sending",
-      "Works with Gmail (personal) and Yahoo Mail — Outlook/Microsoft 365 not yet supported",
+      "Works with Gmail (personal) and Yahoo Mail - Outlook/Microsoft 365 not yet supported",
       "Escalation rules you control",
     ],
     afterSetup: [

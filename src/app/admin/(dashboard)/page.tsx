@@ -14,13 +14,13 @@ import {
 } from "@/lib/dashboard-metrics";
 
 /* Superadmin business command center index (Slice 2 of the service-platform
-   build, 2026-08-28). Replaces the previously-nonexistent /admin route —
+   build, 2026-08-28). Replaces the previously-nonexistent /admin route -
    there was no index page here before this slice, only its child routes
    (audits, proposals, service-requests, service-catalog). Matches every
    other admin page's pattern exactly: requireAdmin() -> notFound() for
    non-admins, dark #05060a / white-text Studio marketing aesthetic,
    rounded-2xl border border-white/10 bg-white/[0.04] cards. Every number on
-   this page is a real server-side Prisma query — no client-side fetching,
+   this page is a real server-side Prisma query - no client-side fetching,
    no client-provided input drives anything here. */
 
 function formatCents(cents: number): string {

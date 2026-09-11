@@ -5,7 +5,7 @@ import type { TaskPriority, TaskStatus } from "@prisma/client";
 /* Internal admin Task CRUD (Slice 6 of the business command center,
    2026-08-28: /admin/tasks). Every write here re-checks requireAdmin()
    independently in its own caller (this file does not call requireAdmin
-   itself — callers are responsible, matching service-projects-admin.ts's
+   itself - callers are responsible, matching service-projects-admin.ts's
    existing convention) and validates every enum-typed / FK-typed input
    before writing, never trusting a raw client-submitted string or id.
    Shared by both /admin/tasks and the "Internal tasks" section on
@@ -37,7 +37,7 @@ export function isTaskStatus(value: string): value is TaskStatus {
   return (TASK_STATUSES as string[]).includes(value);
 }
 
-/** Admins available for the assignee picker — role:ADMIN users only,
+/** Admins available for the assignee picker - role:ADMIN users only,
     reusing service-projects-admin.ts's listAssignableAdmins so the picker
     stays identical everywhere it appears. */
 export async function listAssignableAdmins() {
@@ -48,7 +48,7 @@ export async function listAssignableAdmins() {
   });
 }
 
-/** Lightweight project picker source for the task create/edit forms — id +
+/** Lightweight project picker source for the task create/edit forms - id +
     a human label, not the full admin project row shape. */
 export async function listProjectsForTaskPicker() {
   const projects = await db.serviceProject.findMany({
@@ -93,11 +93,11 @@ export type TaskFilters = {
 };
 
 /** List query backing /admin/tasks. All filters are applied as real Prisma
-    where clauses, not fetch-everything-and-filter-in-JS — sort is
+    where clauses, not fetch-everything-and-filter-in-JS - sort is
     overdue-first, then soonest-due, then newest-created, matching the
     brief's own "show overdue" emphasis. Given the current near-zero data
     volume, the overdue-first ordering below is computed by pulling once and
-    sorting in memory rather than a raw SQL CASE ordering — noted as a
+    sorting in memory rather than a raw SQL CASE ordering - noted as a
     shortcut, not a hard requirement at this scale. */
 export async function listTasksForAdmin(filters: TaskFilters = {}): Promise<TaskListRow[]> {
   const where: Record<string, unknown> = {};
@@ -117,7 +117,7 @@ export async function listTasksForAdmin(filters: TaskFilters = {}): Promise<Task
     where.dueAt = { lt: new Date() };
     where.status = { not: "DONE" };
     // overdueOnly overrides an explicit status filter (overdue is
-    // meaningless for a DONE task) — deliberate, not a bug.
+    // meaningless for a DONE task) - deliberate, not a bug.
     if (filters.status && filters.status !== "DONE") where.status = filters.status;
   }
 
@@ -166,7 +166,7 @@ export async function listTasksForAdmin(filters: TaskFilters = {}): Promise<Task
   });
 }
 
-/** Tasks for one project's detail page — same shape as the list rows minus
+/** Tasks for one project's detail page - same shape as the list rows minus
     the project/client fields, which are redundant on that page. */
 export async function listTasksForProject(projectId: string) {
   const tasks = await db.task.findMany({
@@ -190,7 +190,7 @@ export async function listTasksForProject(projectId: string) {
     });
 }
 
-/** Outstanding (non-DONE) task count per project — backs the "outstanding
+/** Outstanding (non-DONE) task count per project - backs the "outstanding
     tasks" column on /admin/projects, matching the existing
     "outstandingRequirements" pattern. */
 export async function getOutstandingTaskCountsByProject(projectIds: string[]): Promise<Map<string, number>> {
@@ -219,7 +219,7 @@ export type TaskInput = {
 };
 
 /** Validates projectId (must reference a real ServiceProject) and
-    assigneeUserId (must reference a real role:ADMIN user) before writing —
+    assigneeUserId (must reference a real role:ADMIN user) before writing -
     never silently creates an orphaned reference, matching
     service-projects-admin.ts's updateProjectOps discipline. */
 async function resolveWritableFields(input: TaskInput): Promise<
@@ -258,7 +258,7 @@ async function resolveWritableFields(input: TaskInput): Promise<
   return { ok: true, data: { projectId, assigneeUserId, priority, dueAt } };
 }
 
-/** Creates a new task. Only title is required — everything else is
+/** Creates a new task. Only title is required - everything else is
     optional at creation, per the brief. */
 export async function createTask(input: TaskInput): Promise<WriteResult> {
   const title = input.title.trim();
@@ -285,7 +285,7 @@ export async function createTask(input: TaskInput): Promise<WriteResult> {
 }
 
 /** Edits an existing task's title/description/project/assignee/priority/due
-    date. Does not touch status/completedAt — use setTaskStatus for that. */
+    date. Does not touch status/completedAt - use setTaskStatus for that. */
 export async function updateTask(id: string, input: TaskInput): Promise<WriteResult> {
   const existing = await db.task.findUnique({ where: { id }, select: { id: true } });
   if (!existing) return { ok: false, error: "not_found" };
@@ -331,7 +331,7 @@ export async function setTaskStatus(id: string, status: string): Promise<WriteRe
   return { ok: true };
 }
 
-/** One-click "quick complete" — sets status to DONE and completedAt to
+/** One-click "quick complete" - sets status to DONE and completedAt to
     now(). Distinct helper (rather than callers hand-rolling
     setTaskStatus(id, "DONE")) so its own requireAdmin discipline is
     unmistakable at every call site, per the brief's explicit warning that
@@ -340,13 +340,13 @@ export async function quickCompleteTask(id: string): Promise<WriteResult> {
   return setTaskStatus(id, "DONE");
 }
 
-/** One-click "reopen" — sets status back to TODO, clearing completedAt. */
+/** One-click "reopen" - sets status back to TODO, clearing completedAt. */
 export async function reopenTask(id: string): Promise<WriteResult> {
   return setTaskStatus(id, "TODO");
 }
 
 /** Overdue-task count for the admin nav's Tasks badge (Slice 7,
-    2026-08-28) — same exact criteria (status not DONE, dueAt in the past)
+    2026-08-28) - same exact criteria (status not DONE, dueAt in the past)
     as listTasksForAdmin's overdueOnly filter and getNeedsAttention's
     overdueTasks query in dashboard-metrics.ts, so the badge, the "Overdue
     only" filter, and the dashboard's Needs Attention list never disagree. */

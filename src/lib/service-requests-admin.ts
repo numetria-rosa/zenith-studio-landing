@@ -3,7 +3,7 @@ import { isServiceStatus } from "@/lib/services";
 
 /* Shared by the admin page's inline form (server action) and the
    PATCH /api/admin/service-requests/[id] route, so both validate and write
-   identically. Callers are responsible for requireAdmin() first — this
+   identically. Callers are responsible for requireAdmin() first - this
    function does not check authorization itself. */
 export async function updateServiceRequestAsAdmin(
   id: string,

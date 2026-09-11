@@ -27,9 +27,9 @@ import { aggregateClientMetrics } from "@/lib/metric-labels";
    build, 2026-08-28). Loaded from /lab/dashboard's "My projects" list.
 
    IDOR-critical: the page's ONLY data fetch is getOwnedServiceProject, which
-   scopes { id: projectId, userId } in a single query — never "fetch by id,
+   scopes { id: projectId, userId } in a single query - never "fetch by id,
    then check ownership after." A wrong id and someone else's real id both
-   produce notFound() (404) here, identically — never a message that would
+   produce notFound() (404) here, identically - never a message that would
    confirm the id is real. Every server action below independently re-runs
    the same ownership-scoped check inside src/lib/service-workspace.ts,
    never trusting that reaching the action means this page's own check

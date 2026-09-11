@@ -13,7 +13,7 @@ declare global {
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
 /* Fires a PageView on every client-side route change, not just the first
-   load — the App Router never does a full page reload between routes, so
+   load - the App Router never does a full page reload between routes, so
    without this every navigation after the first would go untracked. */
 function PixelPageviews() {
   const pathname = usePathname();

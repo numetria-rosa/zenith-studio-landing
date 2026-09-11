@@ -13,12 +13,12 @@ import { FolderKanban, PhoneCall } from "lucide-react";
 import { listPaidAuditsForUser, PAID_AUDIT_STATUS_LABELS } from "@/lib/paid-audit";
 import { computeApprovedTotals, whopCheckoutUrl } from "@/lib/proposal-payments";
 
-/* The Next.js Server Component entry point after sign-in — the role
+/* The Next.js Server Component entry point after sign-in - the role
    courses/ai-engineering/dashboard.html can't safely fill, since a static
    file can't read an HttpOnly session cookie or query Postgres. "Continue"
    drops the student into the guarded in-course dashboard. Styling matches
    the static course pages (Fraunces/IBM Plex, amber accent, card language)
-   rather than /lab's own marketing-page look — this is the page a paying
+   rather than /lab's own marketing-page look - this is the page a paying
    student actually lands on, so it should feel like the course product. */
 export default async function DashboardPage() {
   const session = await auth();
@@ -45,17 +45,17 @@ export default async function DashboardPage() {
     orderBy: { updatedAt: "desc" },
   });
 
-  // Slice 6 (2026-08-28) — minimal client-facing visibility for
+  // Slice 6 (2026-08-28) - minimal client-facing visibility for
   // ServiceProject. Scoped to the signed-in user only, never a
   // client-supplied id. A full per-project detail page (tabs, requirements
-  // detail, messages, etc.) is Slice 7 — this just proves the project is
+  // detail, messages, etc.) is Slice 7 - this just proves the project is
   // visible to the client who now owns it.
   const serviceProjects = await db.serviceProject.findMany({
     where: { userId: session.user.id },
     orderBy: { updatedAt: "desc" },
     include: {
       _count: { select: { requirements: { where: { status: "MISSING" } } } },
-      // Payment surfacing (2026-08-28 addition) — same fields
+      // Payment surfacing (2026-08-28 addition) - same fields
       // /proposals/view/[accessToken] uses to show "Complete your
       // payment", so a client sees the exact same deferred-monthly
       // checkout here without having to dig up their original proposal
@@ -73,12 +73,12 @@ export default async function DashboardPage() {
   });
 
   // Client-facing visibility for their own $35 paid audit call bookings
-  // (manually tracked by an admin — see src/lib/paid-audit.ts). Scoped to
+  // (manually tracked by an admin - see src/lib/paid-audit.ts). Scoped to
   // the signed-in user only, never a client-supplied id.
   const paidAudits = await listPaidAuditsForUser(session.user.id);
 
   // A signed-in user who owns no course but has bought an AI Systems service
-  // shouldn't land on a page that brands itself "Zenith Lab" — see CourseBar's
+  // shouldn't land on a page that brands itself "Zenith Lab" - see CourseBar's
   // own comment. Course owners (with or without services too) keep the Lab brand.
   const brand = owned.length > 0 ? "lab" : "studio";
 

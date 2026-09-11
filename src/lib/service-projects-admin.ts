@@ -10,7 +10,7 @@ import type { ProjectStage, ProposalItemKind, RequirementStatus, SupportStatus }
 /* Admin-side ServiceProject operations (Slice 4 of the business command
    center, 2026-08-28: /admin/projects). Every write here re-checks
    requireAdmin() independently in its own caller (this file does not call
-   requireAdmin itself — callers are responsible, matching
+   requireAdmin itself - callers are responsible, matching
    service-requests-admin.ts's existing convention) and validates every
    enum-typed input against the real Prisma enum values, never trusting a
    raw client-submitted string. */
@@ -78,7 +78,7 @@ export type ProjectListRow = {
 };
 
 /** List query backing /admin/projects. stageFilter, when given, must
-    already be a validated ProjectStage — this function does not re-validate
+    already be a validated ProjectStage - this function does not re-validate
     it (the page route validates the ?stage= query param before calling
     in). completionPct/outstandingRequirements/openSupportCount/last-activity
     are all derived from real included rows, never invented. */
@@ -136,7 +136,7 @@ export async function listServiceProjectsForAdmin(stageFilter?: ProjectStage): P
 }
 
 /** Full detail fetch backing /admin/projects/[id]. Returns null for a
-    nonexistent id — the page turns that into a 404. */
+    nonexistent id - the page turns that into a 404. */
 export async function getServiceProjectForAdmin(id: string) {
   return db.serviceProject.findUnique({
     where: { id },
@@ -167,7 +167,7 @@ export async function getServiceProjectForAdmin(id: string) {
   });
 }
 
-/** Admins available for the assignee picker — role:ADMIN users only, per
+/** Admins available for the assignee picker - role:ADMIN users only, per
     the brief ("in practice only role: ADMIN users would sensibly be
     assigned, but don't hard-constrain the FK itself"). */
 export async function listAssignableAdmins() {
@@ -181,7 +181,7 @@ export async function listAssignableAdmins() {
 type WriteResult = { ok: true } | { ok: false; error: string };
 
 /** Validates the new stage against the real ProjectStage enum before
-    writing — never trusts a raw client-submitted string. Caller must have
+    writing - never trusts a raw client-submitted string. Caller must have
     already re-checked requireAdmin().
 
     Also the trigger point for a SPLIT-mode proposal's deferred monthly
@@ -320,7 +320,7 @@ export async function updateProjectAdminNote(id: string, adminNote: string): Pro
   return { ok: true };
 }
 
-/** assigneeUserId/targetLaunchAt are both optional/nullable — an empty
+/** assigneeUserId/targetLaunchAt are both optional/nullable - an empty
     string clears the field. assigneeUserId, when non-empty, is checked
     against a real existing role:ADMIN user id before writing. */
 export async function updateProjectOps(
@@ -362,7 +362,7 @@ export async function updateProjectOps(
 
 /** Posts an admin reply into the same ServiceMessage thread the client sees
     at /lab/dashboard/services/[projectId]. senderUserId must be the calling
-    admin's own session.user.id — caller is responsible for that. */
+    admin's own session.user.id - caller is responsible for that. */
 export async function postAdminMessage(projectId: string, senderUserId: string, body: string): Promise<WriteResult> {
   const trimmed = body.trim();
   if (!trimmed) return { ok: false, error: "empty" };
@@ -407,7 +407,7 @@ export async function setMilestoneCompleted(
 }
 
 /** Admin review of a client requirement. Only statuses an admin sets
-    intentionally — clients still use service-workspace for SUBMITTED. */
+    intentionally - clients still use service-workspace for SUBMITTED. */
 export async function updateRequirementStatusAsAdmin(
   projectId: string,
   requirementId: string,

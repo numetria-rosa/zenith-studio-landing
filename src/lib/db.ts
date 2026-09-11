@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-// Standard Next.js dev-mode singleton — prevents exhausting DB connections
+// Standard Next.js dev-mode singleton - prevents exhausting DB connections
 // from hot-reload creating a new PrismaClient on every file save.
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 
-/* Simple client-side tab switcher — no routing/URL state needed for a
+/* Simple client-side tab switcher - no routing/URL state needed for a
    single-page workspace like this. Matches the dashboard's card language
    (Fraunces/IBM Plex, amber accent, dark cards) rather than the marketing
    site's aesthetic, since this page is reached from the Lab-branded

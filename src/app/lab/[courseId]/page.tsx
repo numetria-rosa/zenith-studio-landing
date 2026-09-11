@@ -35,7 +35,7 @@ const WAITLIST_LINK =
 
 const DEFAULT_ACCENT = { bg: "#f0b429", text: "#1a1200" };
 
-// Same 5 group ids every course's sidebar uses (course-rail-data.ts) — a
+// Same 5 group ids every course's sidebar uses (course-rail-data.ts) - a
 // short, honest description of what that category of page actually is,
 // generic enough to hold across all 4 courses (checked against every
 // course's real item list, not just one).
@@ -94,23 +94,23 @@ export default async function CourseDetailsPage({
     : { url: WAITLIST_LINK, isRealCheckout: false };
 
   // The real in-course sidebar's nav groups (LEARN/PRACTICE/DECIDE/BUILD/
-  // EVIDENCE) — reused directly from course-rail-data.ts (the same data
+  // EVIDENCE) - reused directly from course-rail-data.ts (the same data
   // route.ts server-renders the actual sidebar from) rather than re-typed
   // here, so this can never drift from what's really inside the course.
-  // Keyed by content directory, not course.id — course.id is "ai-automation"
+  // Keyed by content directory, not course.id - course.id is "ai-automation"
   // in the catalog but the directory (and course-rail-data.ts's key) is
   // "automation-engineering", same mismatch route.ts already handles.
   const railData = catalogCourse
     ? COURSE_RAIL_DATA[catalogCourse.contentDir ? path.basename(catalogCourse.contentDir) : catalogCourse.id]
     : undefined;
 
-  // "By the numbers" — every figure here is a real count, not a marketing
+  // "By the numbers" - every figure here is a real count, not a marketing
   // round number: real modules from course.stages (excludes the ungrouped
   // Orientation entry, matching how the sidebar itself counts "N modules"),
   // real pages from railData's own nav groups, real hours summed from the
   // same moduleMinutes course-progress.js provides for the time badges.
   // A prospective buyer skimming this page has no other way to tell how
-  // much is actually in here before paying — this is that signal.
+  // much is actually in here before paying - this is that signal.
   const totalRealModules = course.stages?.reduce((n, s) => n + s.moduleTitles.length, 0) ?? 0;
   const totalNavPages = railData ? railData.navGroups.reduce((n, g) => n + g.items.length, 0) : 0;
   const totalMinutes = course.moduleMinutes
@@ -127,7 +127,7 @@ export default async function CourseDetailsPage({
 
   // Forward whatever UTM params brought this visitor straight to a course's
   // details page (an ad can link here directly, not just to /lab) into the
-  // checkout link, same as CourseCatalog.tsx does for the catalog page — see
+  // checkout link, same as CourseCatalog.tsx does for the catalog page - see
   // /api/go/[courseId] for why this goes through that route instead of
   // appending the params directly to checkoutUrl.
   const sp = await searchParams;
@@ -164,7 +164,7 @@ export default async function CourseDetailsPage({
     : null;
 
   // The sidebar's jump-nav only lists sections this course actually has data
-  // for — never a link to an empty section.
+  // for - never a link to an empty section.
   const navItems: { href: string; label: string }[] = [
     { href: "#overview", label: "Overview" },
     ...(course.curriculum && course.curriculum.length > 0 ? [{ href: "#curriculum", label: "Curriculum" }] : []),
@@ -261,7 +261,7 @@ export default async function CourseDetailsPage({
       <div className="mx-auto flex max-w-6xl flex-col px-5 pb-24 pt-12 sm:px-7 lg:grid lg:grid-cols-[1fr_300px] lg:items-start lg:gap-12">
         {/* Sidebar: section nav + sticky price/purchase card. order-2 only
             reorders once flex/grid is active, so the wrapper above needs a
-            flex/grid display at every breakpoint — otherwise below lg (most
+            flex/grid display at every breakpoint - otherwise below lg (most
             visits: mobile, tablet, many laptop windows) this renders in DOM
             order, meaning the jump-nav and price card before the visitor
             ever sees the course title or what it teaches. */}
@@ -388,7 +388,7 @@ export default async function CourseDetailsPage({
             {course.summary}
           </p>
 
-          {/* By the numbers: real, computed totals up front — a buyer
+          {/* By the numbers: real, computed totals up front - a buyer
               shouldn't have to click through every section to tell how much
               is actually in here. */}
           {byTheNumbers.length > 0 && (

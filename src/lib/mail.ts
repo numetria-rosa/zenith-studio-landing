@@ -62,7 +62,7 @@ export type SendProjectKickoffEmailInput = {
 };
 
 /** Best-effort kickoff email after a ServiceProject is created. Skips
-    cleanly when RESEND_API_KEY is unset — the in-app kickoff message still
+    cleanly when RESEND_API_KEY is unset - the in-app kickoff message still
     lands either way. */
 export async function sendProjectKickoffEmail(
   input: SendProjectKickoffEmailInput

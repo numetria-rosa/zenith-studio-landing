@@ -4,7 +4,7 @@ import { AuditStatus, FindingSeverity, RecommendationPriority } from "@prisma/cl
 /* Shared by /admin/audits/[id]'s server actions (Slice 4 of the
    service-platform build, 2026-08-28). Matches service-requests-admin.ts's
    own convention: validate + write here, callers are responsible for
-   requireAdmin() first — none of these functions check authorization
+   requireAdmin() first - none of these functions check authorization
    themselves. */
 
 export const AUDIT_STATUSES: AuditStatus[] = [

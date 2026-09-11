@@ -3,8 +3,8 @@ import { randomBytes, createCipheriv, createDecipheriv } from "node:crypto";
 /* Reversible, not one-way: the profile page needs to show a buyer their
    actual current password on demand (no email flow exists to fall back on
    for a lost password), so a one-way hash can't work here. AES-256-GCM
-   keyed by PASSWORD_ENCRYPTION_KEY — a secret that lives only in server
-   env vars, never in the database — means a database leak alone still
+   keyed by PASSWORD_ENCRYPTION_KEY - a secret that lives only in server
+   env vars, never in the database - means a database leak alone still
    doesn't hand out every password; both the DB and the server environment
    would have to be compromised together. Stored format is "iv:authTag:ciphertext",
    all hex. */
@@ -31,7 +31,7 @@ export function decryptPassword(stored: string): string {
   return Buffer.concat([decipher.update(Buffer.from(ciphertextHex, "hex")), decipher.final()]).toString("utf8");
 }
 
-// 20 random base62-ish chars — no ambiguous-looking symbols, easy to read
+// 20 random base62-ish chars - no ambiguous-looking symbols, easy to read
 // off a screen, strong enough it's never worth brute-forcing.
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
 export function generateStrongPassword(length = 20): string {

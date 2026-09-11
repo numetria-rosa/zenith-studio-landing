@@ -193,7 +193,7 @@ export default function ZenithLabPage() {
             {/* Below lg, these two cards flow normally under the capsule
                 (display:contents at lg drops the wrapper so each card can
                 go back to being absolutely positioned over the image,
-                exactly as before — the wrapper only exists to stack them
+                exactly as before - the wrapper only exists to stack them
                 on narrower screens where the absolute coordinates tuned for
                 the desktop image size would otherwise overlap each other). */}
             <div className="relative z-10 mt-6 flex flex-col gap-3 lg:contents">

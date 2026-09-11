@@ -1,11 +1,11 @@
-/* AI Systems (done-for-you automation) service catalog — the equivalent of
+/* AI Systems (done-for-you automation) service catalog - the equivalent of
    courses.ts for the agency side of the business. Different shape on
    purpose: two checkout links per service (one-time setup, separate
    recurring monthly), because that's how these are actually sold, and
    there's no waitlist fallback since "Book a free audit" already is the
    working funnel entry point (see src/app/page.tsx).
 
-   Whop IDs are literal values, not env vars — they're not secrets (only
+   Whop IDs are literal values, not env vars - they're not secrets (only
    WHOP_API_KEY and WHOP_WEBHOOK_SECRET are), and hardcoding them here means
    one file to update instead of keeping .env and Vercel's env vars in sync.
    Created via scripts/create-whop-products.mjs on 2026-08-21. */
@@ -68,15 +68,15 @@ export const SERVICES: Service[] = [
     monthlyCheckoutUrl: "https://whop.com/checkout/plan_CJyNkObEaPquA",
   },
   // The two vertical/role offers from src/app/page.tsx's own `verticalSystems`
-  // array — monthly-only (no separate setup plan), which is why
+  // array - monthly-only (no separate setup plan), which is why
   // setupPriceDisplay/whopSetupPlanId/setupCheckoutUrl are empty, matching
   // this file's own "empty string until created" convention. Added here so
   // serviceKindForWhopPlanId can actually resolve their plan ids: before this,
   // a real purchase of either produced no CourseEntitlement/ServiceRequest at
-  // all — the webhook's handlePaymentSucceeded hit its unmapped-product branch
+  // all - the webhook's handlePaymentSucceeded hit its unmapped-product branch
   // and silently dropped the purchase (found during the 2026-08-27 service-
   // platform architecture audit). No webhook code changes were needed to fix
-  // this — handlePaymentSucceeded's existing `kind === "monthly"` branch
+  // this - handlePaymentSucceeded's existing `kind === "monthly"` branch
   // already creates a fresh ServiceRequest on first purchase.
   {
     id: "law-firms",
@@ -146,7 +146,7 @@ export function serviceIdForPageSlug(slug: string): string | null {
   return null;
 }
 
-/** null (not a fallback URL) — the page's job is to keep showing the
+/** null (not a fallback URL) - the page's job is to keep showing the
     working "Book a free audit" CTA until a real checkout link exists. */
 export function getSetupCheckoutUrl(service: Service): string | null {
   return service.setupCheckoutUrl || null;
@@ -158,7 +158,7 @@ export function getMonthlyCheckoutUrl(service: Service): string | null {
 
 /** Keyed on plan_id (not product_id) because a single service's setup and
     monthly checkout links are two different plans that can share one
-    underlying Whop product — see the plan's "why plan_id" note. */
+    underlying Whop product - see the plan's "why plan_id" note. */
 export function serviceKindForWhopPlanId(
   planId: string | null | undefined
 ): { serviceId: string; kind: "setup" | "monthly" } | null {

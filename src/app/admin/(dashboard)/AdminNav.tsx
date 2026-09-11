@@ -22,7 +22,7 @@ import type { SearchResult, SearchResultGroup } from "@/lib/admin-search";
 import { SEARCH_GROUP_LABELS } from "@/lib/admin-search";
 
 /* Server Components can't pass function/class values (like a lucide-react
-   icon component) as props to a Client Component — React serializes props
+   icon component) as props to a Client Component - React serializes props
    across that boundary and functions aren't serializable. So layout.tsx
    (server) passes each nav item's icon as a plain string key, and this
    client component resolves it to the real icon component itself. */
@@ -41,10 +41,10 @@ const ICONS = {
 
 export type NavIconName = keyof typeof ICONS;
 
-/* Persistent admin nav — desktop sidebar + mobile drawer + global search
+/* Persistent admin nav - desktop sidebar + mobile drawer + global search
    (Slice 7 of the business command center, 2026-08-28). Client component
    because it needs the current pathname (for highlighting) and interactive
-   state (drawer open/closed, search query/results) — matches this
+   state (drawer open/closed, search query/results) - matches this
    codebase's existing "use client" pattern for interactive UI
    (src/app/lab/CourseCatalog.tsx). Badge counts are computed server-side in
    layout.tsx and passed in as plain numbers; this component does no data

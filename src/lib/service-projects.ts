@@ -9,7 +9,7 @@ import type { Prisma } from "@prisma/client";
    Both callers pass their own already-open Prisma transaction client, so
    project + seeded milestones/requirements are created atomically with
    whatever triggered them (the ClientApproval write, or the ServiceRequest
-   upsert) — never as a separate, unguarded write. */
+   upsert) - never as a separate, unguarded write. */
 
 type Tx = Prisma.TransactionClient;
 

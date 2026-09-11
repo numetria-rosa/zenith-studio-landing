@@ -2,7 +2,7 @@ import Whop from "@whop/sdk";
 
 /* Lazy singleton, not a module-level instantiation. @whop/sdk's constructor
    throws if apiKey is missing/empty, and WHOP_API_KEY is unset until a real
-   Whop product exists — a module-level `new Whop(...)` would run during
+   Whop product exists - a module-level `new Whop(...)` would run during
    Next.js's build-time page-data collection (it did: it broke the Vercel
    build on this route) even though no request had come in yet. Constructing
    it lazily, only when a webhook actually arrives, defers that failure to

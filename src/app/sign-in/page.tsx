@@ -17,7 +17,7 @@ export default async function SignInPage({
   searchParams: Promise<{ callbackUrl?: string; error?: string }>;
 }) {
   const { callbackUrl, error } = await searchParams;
-  // Only ever redirect within this site — an absolute or protocol-relative
+  // Only ever redirect within this site - an absolute or protocol-relative
   // callbackUrl (e.g. "https://evil.example") must never be honored here.
   const redirectTo = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/lab/dashboard";
 

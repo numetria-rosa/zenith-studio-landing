@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 
-/* Admin identification via env var allowlist — the original, smallest
+/* Admin identification via env var allowlist - the original, smallest
    correct thing for a single operator. ADMIN_EMAILS="you@zenith-studio.site,other@x.com"
    Kept as a fallback alongside the real User.role column (added in the
    2026-08-27 service-platform migration) during the transition, so a
@@ -18,7 +18,7 @@ export function isAdminEmail(email: string | null | undefined): boolean {
 
 /** Returns the session if the signed-in user is an admin, else null.
     Callers should treat null the same as "not found" (404), not "forbidden"
-    — an admin route's existence shouldn't be discoverable to non-admins. */
+    - an admin route's existence shouldn't be discoverable to non-admins. */
 export async function requireAdmin() {
   const session = await auth();
   if (!session?.user?.id) return null;

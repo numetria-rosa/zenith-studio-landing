@@ -8,14 +8,14 @@ import { isProjectPaused } from "@/lib/project-pause";
 import type { MailConnection } from "@prisma/client";
 
 /* AI Inbox Manager runtime, launch scope: Gmail (personal accounts) and
-   Yahoo Mail, connected via a static app password (see mail-imap.ts) —
+   Yahoo Mail, connected via a static app password (see mail-imap.ts) -
    deliberately not full Gmail/Microsoft OAuth. That would need write
    scopes (gmail.modify / Mail.ReadWrite) that Billing Clerk's existing
    OAuth never requested, plus a fresh Google/Microsoft app-verification
    review (weeks, not days) before any client could use it. App-password
    IMAP/SMTP sidesteps that review entirely for Gmail and Yahoo; Outlook/
    Microsoft 365 has broadly disabled basic-auth IMAP on modern tenants and
-   isn't supported at this scope — sold and described as such, not quietly
+   isn't supported at this scope - sold and described as such, not quietly
    assumed to work.
 
    Same "never auto-send" gate as Billing Clerk's TimeEntry: every reply is
@@ -26,7 +26,7 @@ import type { MailConnection } from "@prisma/client";
 const DRAFT_SYSTEM_PROMPT = `You triage inbound business email and draft a short, professional reply. Given the sender, subject, and body of one email, decide if it's routine (a scheduling request, a document request, a simple question with an obvious answer) or something that needs a human's judgment (a complaint, a novel request, anything sensitive). Always draft a reasonable reply attempt either way, a human reviews everything before it sends. Respond ONLY with JSON: {"reply": string}.`;
 
 async function draftReplyFromGroq(fromEmail: string, subject: string, snippet: string): Promise<string> {
-  const fallback = "Thanks for your email — I'll take a look and get back to you shortly.";
+  const fallback = "Thanks for your email - I'll take a look and get back to you shortly.";
   const result = await groqChatCompletion({
     systemPrompt: DRAFT_SYSTEM_PROMPT,
     userPrompt: `From: ${fromEmail}\nSubject: ${subject}\n\n${snippet}`,

@@ -6,12 +6,12 @@ import { STEPS } from "./fields";
 export type SubmitAuditResult = { ok: true } | { ok: false; error: string };
 
 /* Writes one AuditRequest row per submission. Deliberately not tied to any
-   signed-in user — this is a public, no-account-needed intake form, keyed
+   signed-in user - this is a public, no-account-needed intake form, keyed
    by the email the visitor types in (see AuditRequest's own comment in
    prisma/schema.prisma: clientProfileId is intentionally omitted, no
    ClientProfile model exists yet).
 
-   Server-side validation here is defense in depth, not the primary UX —
+   Server-side validation here is defense in depth, not the primary UX -
    AuditForm.tsx already blocks advancing past a step with an empty required
    field. This still re-checks required fields and a plausible email shape
    before writing, since a client could bypass the UI entirely. */

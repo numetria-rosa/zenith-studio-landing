@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
-/* The sticky top bar from courses/data-science/{syllabus,dashboard}.html —
+/* The sticky top bar from courses/data-science/{syllabus,dashboard}.html -
    amber bottom border, "ZENITH" + amber-badge "LAB" logo, mono uppercase
-   tag — reused here so the account pages read as the same product. `brand`
+   tag - reused here so the account pages read as the same product. `brand`
    defaults to "lab" for every existing caller (in-course pages, where that
    wordmark is correct); the shared account dashboard passes "studio" for a
    signed-in user who owns no course, since "ZENITH LAB" is a confusing,

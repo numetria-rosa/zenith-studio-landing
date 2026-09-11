@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/admin";
 import { getClientProfileByEmail } from "@/lib/client-directory";
 
 /* Single merged client identity (Slice 3 of the business command center,
-   2026-08-28). Route param is the lowercased, URL-encoded email — the only
+   2026-08-28). Route param is the lowercased, URL-encoded email - the only
    key that spans a pre-account lead (audit-only), a proposal-only lead, and
    a real User account. 404s (not a redirect, matching every other admin
    route) both for non-admins and for an email param that resolves to zero

@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
    client component because the payment-mode question (SPLIT vs BUNDLED)
    only makes sense once a recurring (MONTHLY-kind) amount is actually in
    the approved total, and that depends on which optional add-ons the
-   client has ticked — has to react live, not just on submit. The actual
+   client has ticked - has to react live, not just on submit. The actual
    write (recordClientResponse) still happens server-side via the
    `respond` server action passed in as a prop; this component only owns
    the pre-submit UI state. */
@@ -70,7 +70,7 @@ export default function ResponseForm({
 
   return (
     <>
-      {/* Pricing, now interactive — add-ons have a cart toggle instead of
+      {/* Pricing, now interactive - add-ons have a cart toggle instead of
           just being listed, and the totals below react live. */}
       <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
         <h2 className="text-xs font-bold uppercase tracking-[0.1em] text-cyan-300">Pricing</h2>

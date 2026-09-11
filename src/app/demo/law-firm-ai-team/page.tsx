@@ -3,7 +3,7 @@ import Link from "next/link";
 import FirmLeakDemo from "./FirmLeakDemo";
 import { getService, getMonthlyCheckoutUrl } from "@/lib/services";
 
-export const metadata: Metadata = { title: "The Firm Leak — Law Firm AI Team Demo" };
+export const metadata: Metadata = { title: "The Firm Leak - Law Firm AI Team Demo" };
 
 export default function FirmLeakDemoPage() {
   const service = getService("law-firms");

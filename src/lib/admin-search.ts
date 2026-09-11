@@ -4,13 +4,13 @@ import { projectServiceLabel } from "@/lib/services";
 
 /* Global admin search (Slice 7 of the business command center, 2026-08-28).
    A lighter-weight, purpose-built search across the handful of entity types
-   an admin actually needs to jump to — deliberately NOT a call into
+   an admin actually needs to jump to - deliberately NOT a call into
    client-directory.ts's full merge-by-email logic, which builds a much
    richer (and much more expensive) per-identity profile than a live-search
    dropdown needs. This file only ever reads; it never writes.
 
    Security: independently calls requireAdmin() itself, exactly like every
-   other admin write/read path in this codebase — search is a new entry
+   other admin write/read path in this codebase - search is a new entry
    point into client emails, proposal amounts, and task details, and must
    not be reachable just because "it's just search." Returns an empty result
    set (not an error) for a non-admin caller, matching the rest of this
@@ -45,7 +45,7 @@ const RESULTS_PER_GROUP = 8;
 
 /** Searches across User/client identities, AuditRequest, Proposal,
     ServiceProject, ServiceCatalog, and Task. Case-insensitive substring
-    matching via Prisma's `contains`/`mode: "insensitive"` — cleaner than
+    matching via Prisma's `contains`/`mode: "insensitive"` - cleaner than
     hand-rolled JS filtering for these single-table queries (unlike
     client-directory.ts's cross-table merge, nothing here needs to be
     fetched in full and joined in memory). Returns [] for any non-admin

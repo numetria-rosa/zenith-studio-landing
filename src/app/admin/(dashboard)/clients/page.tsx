@@ -5,7 +5,7 @@ import { CLIENT_STAGE_LABELS, ClientStage, getClientDirectory } from "@/lib/clie
 
 /* Unified client directory (Slice 3 of the business command center,
    2026-08-28). Merges User / AuditRequest / Proposal / ServiceRequest /
-   ServiceProject identities on lowercased email — see
+   ServiceProject identities on lowercased email - see
    src/lib/client-directory.ts for the full merge approach. Matches every
    other admin page's pattern exactly: requireAdmin() -> notFound() for
    non-admins, dark #05060a Studio aesthetic, rounded-2xl border

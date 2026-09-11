@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 /* Landing spot right after /api/auth/claim signs the buyer in. The password
    itself lives encrypted on User.passwordEnc (see src/lib/password.ts) and
-   is also always viewable later from /profile — this page just surfaces it
+   is also always viewable later from /profile - this page just surfaces it
    the first time, right when it's most useful. */
 export default async function WelcomePage() {
   const session = await auth();

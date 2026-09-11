@@ -4,7 +4,7 @@ import { fraunces } from "@/lib/fonts";
 type Module = { title: string; description: string };
 type Stage = { label: string; title: string; moduleTitles: string[] };
 
-// Was an accordion (title only, description hidden behind a click) — a
+// Was an accordion (title only, description hidden behind a click) - a
 // prospective buyer skimming this page has no other way to judge how much
 // is actually in the course, so hiding the one thing that proves it was
 // working against the point of the page. Everything renders open, always;
@@ -57,7 +57,7 @@ export function CurriculumAccordion({
   moduleMinutes?: Record<string, number>;
 }) {
   // Number modules sequentially through the curriculum array (0 =
-  // Orientation when present) rather than by the in-app module id — the
+  // Orientation when present) rather than by the in-app module id - the
   // in-app id can jump around (AISE inserts its prompt-engineering module
   // between 6 and 7 in stage order, so its real id is 14), which would be
   // confusing outside the app. "The Nth thing you'll do" stays honest and

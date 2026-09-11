@@ -47,7 +47,7 @@ import type { CourseCard, CourseCategory } from "./courses-data";
 /** The exact wordmark used on each course's own static pages' topbar
     (course-rail.js): Fraunces "ZENITH" + a "LAB" badge in that course's own
     accent color (amber for Data Science, neon lime for AI Engineering, and
-    so on — straight from each course's real `.logo b` CSS). Placed on each
+    so on - straight from each course's real `.logo b` CSS). Placed on each
     catalog card so it visually matches the product the buyer is about to
     land in, not just the /lab marketplace's own emerald theme. */
 function ZenithLabWordmark({ color }: { color?: { bg: string; text: string } }) {
@@ -223,7 +223,7 @@ export function CourseCatalog({
 
   // Forward whatever UTM params brought this visitor to /lab into the
   // checkout link, so a sale can actually be traced back to the ad/post
-  // that drove it (via /api/go/[courseId], not appended directly — see
+  // that drove it (via /api/go/[courseId], not appended directly - see
   // that route for why: it turns these into real Whop checkout metadata,
   // not just a query string nobody reads).
   const searchParams = useSearchParams();
@@ -241,7 +241,7 @@ export function CourseCatalog({
     .filter((c) => filter === "all" || c.category === filter)
     .filter((c) => matchesSearch(c, search));
 
-  // Availability is always the primary sort key — "Coming soon" courses
+  // Availability is always the primary sort key - "Coming soon" courses
   // stay at the bottom no matter what sort is chosen, since sorting a
   // course with no price or task count to the top of "cheapest first"
   // would be a display bug, not a feature. The chosen sort only reorders
@@ -322,7 +322,7 @@ export function CourseCatalog({
           const trackedUrl = isRealCheckout ? `/api/go/${course.id}${utmQueryString}` : url;
           const expanded = expandedId === course.id;
           // A coarse (non-live-ticking) version of DiscountRibbon's own
-          // check, just to know whether to reserve room for it here — the
+          // check, just to know whether to reserve room for it here - the
           // ribbon sits in the same top-right corner as this row's content,
           // and shrinking the ribbon to avoid the badge is fragile (breaks
           // again the next time either one's size changes). Reserving space
@@ -549,7 +549,7 @@ export function CourseCatalog({
   );
 }
 
-/** Corner ribbon on the card itself, separate from PriceRow's inline badge —
+/** Corner ribbon on the card itself, separate from PriceRow's inline badge -
     a launch discount should be visible scanning the grid, not just after
     reading down to the price. Own component (not inline in the map) so its
     own useCountdown call is hooks-rule-safe per course card. */
@@ -559,7 +559,7 @@ function DiscountRibbon({ course }: { course: CourseCard }) {
   if (!discountLive) return null;
 
   // A ribbon needs its own small clipped box, not the card's overflow-
-  // hidden — relying on the card's rounded corner to clip a diagonal strip
+  // hidden - relying on the card's rounded corner to clip a diagonal strip
   // whose offset was tuned by eye clipped nearly the whole thing, leaving
   // only a sliver visible. This is the standard corner-ribbon recipe: a
   // fixed square window at the corner, with the rotated strip positioned
