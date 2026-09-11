@@ -107,6 +107,30 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
                   See it in action
                 </Link>
               )}
+              {page.serviceId === "ai-inbox-manager" && (
+                <Link
+                  href="/demo/ai-inbox-manager"
+                  className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-400/10 px-6 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/20"
+                >
+                  Try the live demo
+                </Link>
+              )}
+              {page.serviceId === "ai-lead-capture" && (
+                <Link
+                  href="/demo/ai-lead-capture-follow-up"
+                  className="inline-flex items-center justify-center rounded-xl border border-sky-400/40 bg-sky-400/10 px-6 py-3 text-sm font-semibold text-sky-200 transition hover:bg-sky-400/20"
+                >
+                  Try the live demo
+                </Link>
+              )}
+              {page.serviceId === "brokerages" && (
+                <Link
+                  href="/demo/brokerage-ai-team"
+                  className="inline-flex items-center justify-center rounded-xl border border-sky-400/40 bg-sky-400/10 px-6 py-3 text-sm font-semibold text-sky-200 transition hover:bg-sky-400/20"
+                >
+                  See it in action
+                </Link>
+              )}
             </div>
             <div className="mt-8 grid max-w-lg grid-cols-2 gap-3">
               {page.setupDisplay ? (

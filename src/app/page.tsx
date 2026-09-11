@@ -849,6 +849,22 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       Try the live demo
                     </Link>
                   )}
+                  {system.id === "ai-inbox-manager" && (
+                    <Link
+                      href="/demo/ai-inbox-manager"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-amber-300/30 bg-amber-400/10 px-6 py-3 text-sm font-semibold text-amber-200 transition hover:scale-[1.02] hover:bg-amber-400/20"
+                    >
+                      Try the live demo
+                    </Link>
+                  )}
+                  {system.id === "ai-lead-capture" && (
+                    <Link
+                      href="/demo/ai-lead-capture-follow-up"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-sky-400/30 bg-sky-400/10 px-6 py-3 text-sm font-semibold text-sky-200 transition hover:scale-[1.02] hover:bg-sky-400/20"
+                    >
+                      Try the live demo
+                    </Link>
+                  )}
                   {(() => {
                     // The direct checkout link (below) is the primary CTA. This is a
                     // real button, not a footnote link, so clients who
@@ -982,6 +998,14 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                           className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${v.accentBtn}`}
                         >
                           Watch the firm leak demo
+                        </Link>
+                      )}
+                      {v.id === "brokerages" && (
+                        <Link
+                          href="/demo/brokerage-ai-team"
+                          className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${v.accentBtn}`}
+                        >
+                          See the team in action
                         </Link>
                       )}
                       {v.whopCheckoutUrl && (
