@@ -22,6 +22,7 @@ import {
 import { ProjectTabs } from "./Tabs";
 import { getSiteUrl } from "@/lib/site";
 import { aggregateClientMetrics } from "@/lib/metric-labels";
+import CrispChat from "@/components/CrispChat";
 
 /* Client-facing service project workspace (Slice 7 of the service-platform
    build, 2026-08-28). Loaded from /lab/dashboard's "My projects" list.
@@ -193,6 +194,7 @@ export default async function ServiceProjectPage({
     <div
       className={`${courseFontVars} min-h-screen bg-[#0d0f14] font-[family-name:var(--font-course-sans)] text-[#eeeee7]`}
     >
+      <CrispChat />
       <CourseBar
         tag="Project"
         brand="lab"
