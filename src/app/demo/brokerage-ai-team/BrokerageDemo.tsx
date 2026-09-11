@@ -41,11 +41,12 @@ export default function BrokerageDemo() {
     }
     setTimeout(() => {
       setPhaseAt(index, "done");
-      if (index < 2) {
-        setUnlocked((u) => Math.max(u, index + 1));
-        setCurrent(index + 1);
-      }
+      if (index < 2) setUnlocked((u) => Math.max(u, index + 1));
     }, 4 * lineDelay);
+  }
+
+  function goToNextStep(index: number) {
+    setCurrent(index + 1);
   }
 
   function statusFor(index: number): StepStatus {
@@ -108,6 +109,8 @@ export default function BrokerageDemo() {
                   </div>
                 </>
               }
+              onContinue={() => goToNextStep(0)}
+              continueLabel="Continue to Transaction"
             />
           )}
           {current === 1 && (
@@ -129,6 +132,8 @@ export default function BrokerageDemo() {
                   </div>
                 </>
               }
+              onContinue={() => goToNextStep(1)}
+              continueLabel="Continue to Database"
             />
           )}
           {current === 2 && (
@@ -168,6 +173,8 @@ function StepPanel({
   onRun,
   runLabel,
   result,
+  onContinue,
+  continueLabel,
 }: {
   liveLabel: string;
   heading: string;
@@ -178,6 +185,8 @@ function StepPanel({
   onRun: () => void;
   runLabel: string;
   result: React.ReactNode;
+  onContinue?: () => void;
+  continueLabel?: string;
 }) {
   return (
     <div>
@@ -215,6 +224,15 @@ function StepPanel({
             <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-[13px] leading-6 text-white/80">
               {result}
             </div>
+          )}
+          {phase === "done" && onContinue && (
+            <button
+              type="button"
+              onClick={onContinue}
+              className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 font-sans text-xs font-bold text-black transition hover:scale-[1.02]"
+            >
+              {continueLabel} &rarr;
+            </button>
           )}
         </div>
       )}
