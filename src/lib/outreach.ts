@@ -1,5 +1,6 @@
-import { getService, servicePagePath } from "@/lib/services";
+import { getService, servicePagePath, demoPagePath } from "@/lib/services";
 import { catalogPricesForService } from "@/lib/service-pages";
+import { getSiteUrl } from "@/lib/site";
 
 export const NOT_PUBLICLY_FOUND = "Not publicly found";
 
@@ -228,7 +229,11 @@ function displayName(businessName: string): string {
   return businessName.replace(/\s*\([^)]*\)\s*$/, "").trim() || businessName.trim();
 }
 
-export function generateOutreachEmail(input: EligibilityInput, path: OutreachPathId): GeneratedEmail {
+export function generateOutreachEmail(
+  input: EligibilityInput,
+  path: OutreachPathId,
+  opts?: { proposalPath?: string; hasDiscount?: boolean }
+): GeneratedEmail {
   const name = displayName(input.businessName);
   const greeting = input.contactName?.trim()
     ? `Hi ${input.contactName.trim()},`
@@ -254,13 +259,21 @@ export function generateOutreachEmail(input: EligibilityInput, path: OutreachPat
       ? `That kind of workflow is usually easier to map on a short call than from the website alone.`
       : `That usually creates repetitive first replies and follow-up until someone books.`);
 
-  const solution = `We build a done-for-you ${serviceTitle} for businesses in this situation. Setup and monthly pricing are listed on the service page, with no long contract.`;
+  const site = getSiteUrl();
+  const servicePath = servicePagePath(input.recommendedServiceId);
+  const demoPath = demoPagePath(input.recommendedServiceId);
+
+  const solution = `We build a done-for-you ${serviceTitle} for businesses in this situation.${
+    demoPath ? ` You can try a live demo of it here, no signup: ${site}${demoPath}.` : ""
+  }${servicePath ? ` Full setup and monthly pricing is on the service page: ${site}${servicePath}.` : ""}`;
 
   const cta =
     path === "PAID_AUDIT_CALL"
       ? `If it would help, I can do a 20-minute paid audit call ($35) and map the actual intake path with you.`
       : path === "PROPOSAL"
-        ? `I put a short proposal together for ${name} based only on what is visible publicly. If it is off, ignore it.`
+        ? `I put together a proposal for ${name} based only on what is visible publicly${
+            opts?.hasDiscount ? ", including a discounted founding-client rate since you'd be one of our first" : ""
+          }${opts?.proposalPath ? `: ${site}${opts.proposalPath}` : ""}. If any of it is off, just reply and let me know.`
         : `If it would help, I can send a free written audit of the public enquiry path: findings and a quote, no call required.`;
 
   const bodyText = `${greeting}

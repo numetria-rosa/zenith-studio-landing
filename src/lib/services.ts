@@ -139,6 +139,21 @@ export function servicePagePath(serviceId: string): string | null {
   return SERVICE_PAGE_BY_ID[serviceId]?.path ?? null;
 }
 
+/** Same idea as SERVICE_PAGE_BY_ID but for the interactive /demo pages
+    (src/app/demo/*), so outbound email can link to actual proof instead of
+    only describing the service in prose. */
+export const DEMO_PATH_BY_SERVICE_ID: Record<string, string> = {
+  "ai-inbox-manager": "/demo/ai-inbox-manager",
+  "ai-lead-capture": "/demo/ai-lead-capture-follow-up",
+  "ai-receptionist": "/demo/ai-receptionist",
+  "law-firms": "/demo/law-firm-ai-team",
+  brokerages: "/demo/brokerage-ai-team",
+};
+
+export function demoPagePath(serviceId: string): string | null {
+  return DEMO_PATH_BY_SERVICE_ID[serviceId] ?? null;
+}
+
 export function serviceIdForPageSlug(slug: string): string | null {
   for (const [id, page] of Object.entries(SERVICE_PAGE_BY_ID)) {
     if (page.slug === slug) return id;

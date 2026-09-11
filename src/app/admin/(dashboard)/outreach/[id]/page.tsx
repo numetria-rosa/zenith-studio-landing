@@ -58,6 +58,18 @@ export default async function AdminOutreachDetailPage({
     redirect(`/admin/outreach/${id}`);
   }
 
+  async function prepareDesignPartner(formData: FormData) {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    const discountPercent = Number(formData.get("discountPercent") || 0);
+    await prepareOutreach(id, "INITIAL", {
+      forcePath: "PROPOSAL",
+      discountPercent: discountPercent > 0 ? discountPercent : undefined,
+    });
+    redirect(`/admin/outreach/${id}`);
+  }
+
   async function sendLive(formData: FormData) {
     "use server";
     const session = await requireAdmin();
@@ -193,6 +205,39 @@ export default async function AdminOutreachDetailPage({
       {latest && latest.status !== "SENT" && latest.status !== "DELIVERED" && (
         <form action={prepare} className="mt-3">
           <button className="text-sm text-white/50 underline">Regenerate draft</button>
+        </form>
+      )}
+
+      {(!latest || (latest.status !== "SENT" && latest.status !== "DELIVERED")) && (
+        <form action={prepareDesignPartner} className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.04] p-5">
+          <h2 className="text-sm font-semibold text-emerald-200">Generate as a design-partner proposal</h2>
+          <p className="mt-1 text-xs text-white/50">
+            Forces the proposal path regardless of score, and adds a real discount line item to whichever price
+            this service actually charges (setup, monthly, or both) so the email and the proposal page agree.
+            This discount is permanent on this proposal, not a limited-time intro rate - nothing in checkout can
+            auto-revert a plan's price after N months, so do not promise that in outreach copy. It also is not
+            reflected in this client's usage-cap budget yet (that still assumes full catalog price), worth a
+            manual check on margin for a heavily discounted client.
+          </p>
+          <div className="mt-3 flex items-end gap-3">
+            <div>
+              <label className="mb-1 block text-xs text-white/50" htmlFor="discountPercent">
+                Discount %
+              </label>
+              <input
+                id="discountPercent"
+                name="discountPercent"
+                type="number"
+                min={0}
+                max={100}
+                defaultValue={20}
+                className="w-24 rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm"
+              />
+            </div>
+            <button className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-semibold text-black">
+              Generate proposal + draft
+            </button>
+          </div>
         </form>
       )}
 

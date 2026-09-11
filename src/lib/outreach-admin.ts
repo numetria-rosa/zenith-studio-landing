@@ -8,6 +8,7 @@ import { getSiteUrl } from "@/lib/site";
 import { DALLAS_DENTAL_PROSPECTS, OHIO_PI_PROSPECTS, type SeedProspect } from "@/data/outreach-prospects";
 import {
   type EligibilityInput,
+  type OutreachPathId,
   type ProspectResearch,
   evaluateEligibility,
   factCheckEmail,
@@ -112,7 +113,10 @@ function toEligibilityInput(
   };
 }
 
-async function ensureProposal(prospectId: string): Promise<{ id: string; accessToken: string } | { error: string }> {
+async function ensureProposal(
+  prospectId: string,
+  opts?: { discountPercent?: number; discountLabel?: string }
+): Promise<{ id: string; accessToken: string } | { error: string }> {
   const prospect = await db.prospect.findUnique({ where: { id: prospectId } });
   if (!prospect) return { error: "prospect not found" };
   if (prospect.proposalId) {
@@ -162,6 +166,38 @@ async function ensureProposal(prospectId: string): Promise<{ id: string; accessT
   }
   if (items.length === 0) return { error: "catalog has no prices for this service" };
 
+  // Founding-client incentive: knocks a percentage off whichever price this
+  // service actually charges. Some services are setup+monthly, some (like
+  // law-firms) are monthly-only with a $0 setup, so discounting "setup"
+  // alone would do nothing for those - apply it to each nonzero bucket
+  // instead. Modeled as negative line items (DISCOUNT kind for the
+  // one-time bucket, MONTHLY kind for the recurring one, since
+  // computeApprovedTotals buckets everything that isn't MONTHLY as
+  // one-time), so computeApprovedTotals and the real Whop checkout amount
+  // both reflect it with no special-casing, and the public proposal page
+  // shows it as a real line the client can see, not just a promise in the
+  // email. A monthly discount here is permanent, not a limited-time
+  // promo, since nothing in the checkout flow can auto-revert a plan's
+  // price after N months - never phrase it in outreach copy as temporary.
+  if (opts?.discountPercent && opts.discountPercent > 0) {
+    if (setupCents > 0) {
+      items.push({
+        label: opts.discountLabel ?? `Founding-client discount (${opts.discountPercent}% off setup)`,
+        kind: "DISCOUNT",
+        amountCents: -Math.round((setupCents * opts.discountPercent) / 100),
+        order: order++,
+      });
+    }
+    if (monthlyCents > 0) {
+      items.push({
+        label: `Founding-client discount (${opts.discountPercent}% off monthly, ongoing)`,
+        kind: "MONTHLY",
+        amountCents: -Math.round((monthlyCents * opts.discountPercent) / 100),
+        order: order++,
+      });
+    }
+  }
+
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
   const proposal = await db.proposal.create({
     data: {
@@ -188,7 +224,11 @@ async function markProposalSent(proposalId: string) {
   }
 }
 
-export async function prepareOutreach(prospectId: string, emailType: OutreachEmailType = "INITIAL") {
+export async function prepareOutreach(
+  prospectId: string,
+  emailType: OutreachEmailType = "INITIAL",
+  opts?: { forcePath?: OutreachPathId; discountPercent?: number }
+) {
   const prospect = await db.prospect.findUnique({
     where: { id: prospectId },
     include: { messages: { select: { status: true, emailType: true } } },
@@ -221,10 +261,28 @@ export async function prepareOutreach(prospectId: string, emailType: OutreachEma
     return { ok: false as const, error: "score below 70 - will not contact" };
   }
 
-  const path = eligibility.path;
+  // A hand-picked lead (e.g. a strategic "design partner" pitch) can force
+  // the PROPOSAL path and a real discount even below the normal
+  // score/signal threshold chooseOutreachPath applies to every prospect -
+  // deliberately opt-in per call, never a change to that global gate.
+  const path = opts?.forcePath ?? eligibility.path;
+
+  let proposalPath: string | null = null;
+  if (path === "PROPOSAL" && emailType === "INITIAL") {
+    const proposal = await ensureProposal(
+      prospectId,
+      opts?.discountPercent ? { discountPercent: opts.discountPercent } : undefined
+    );
+    if ("error" in proposal) return { ok: false as const, error: proposal.error };
+    proposalPath = `/proposal/${proposal.accessToken}`;
+  }
+
   const generated =
     emailType === "INITIAL"
-      ? generateOutreachEmail(input, path)
+      ? generateOutreachEmail(input, path, {
+          proposalPath: proposalPath ?? undefined,
+          hasDiscount: Boolean(opts?.discountPercent),
+        })
       : (() => {
           const fu = generateFollowUp(
             emailType === "FOLLOW_UP_1" ? 1 : emailType === "FOLLOW_UP_2" ? 2 : 3,
@@ -246,13 +304,6 @@ export async function prepareOutreach(prospectId: string, emailType: OutreachEma
     input,
     fact
   );
-
-  let proposalPath: string | null = null;
-  if (path === "PROPOSAL" && emailType === "INITIAL") {
-    const proposal = await ensureProposal(prospectId);
-    if ("error" in proposal) return { ok: false as const, error: proposal.error };
-    proposalPath = `/proposal/${proposal.accessToken}`;
-  }
 
   const servicePath = servicePagePath(prospect.recommendedServiceId);
   if (!servicePath) return { ok: false as const, error: "no service page" };
