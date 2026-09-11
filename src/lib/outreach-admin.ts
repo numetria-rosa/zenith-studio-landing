@@ -672,6 +672,7 @@ function countBy(values: string[]): Record<string, number> {
 async function importSeedProspects(seeds: SeedProspect[]) {
   let created = 0;
   let skipped = 0;
+  let backfilled = 0;
   for (const seed of seeds) {
     const existing = await db.prospect.findFirst({
       where: {
@@ -680,9 +681,17 @@ async function importSeedProspects(seeds: SeedProspect[]) {
           ...(seed.email ? [{ email: seed.email }] : []),
         ],
       },
-      select: { id: true },
+      select: { id: true, email: true },
     });
     if (existing) {
+      // A later research pass can find a public email for a row imported
+      // earlier with none - backfill it in place rather than silently
+      // dropping the update, since importSeedProspects is otherwise
+      // insert-only and re-running the button would never pick this up.
+      if (!existing.email && seed.email) {
+        await db.prospect.update({ where: { id: existing.id }, data: { email: seed.email } });
+        backfilled += 1;
+      }
       skipped += 1;
       continue;
     }
@@ -714,7 +723,7 @@ async function importSeedProspects(seeds: SeedProspect[]) {
     });
     created += 1;
   }
-  return { created, skipped, total: seeds.length };
+  return { created, skipped, backfilled, total: seeds.length };
 }
 
 export async function importDallasDentalProspects() {
@@ -722,10 +731,13 @@ export async function importDallasDentalProspects() {
 }
 
 /** Columbus/Cincinnati OH personal injury firm research (meta-ai-advance-summary.md
-    action item 7). Every row is RESEARCHED but outreach-blocked until an
-    email is found (none of the seven have a confirmed public email), see
-    the header comment on OHIO_PI_PROSPECTS for how that research was done
-    and its limitations. */
+    action item 7). 2 of 7 now have a confirmed public email (Erney Law,
+    Oliver Law Office) and are outreach-eligible; the other 5 remain
+    RESEARCHED but outreach-blocked, contact-form-only sites with no email
+    found. Re-running this on a project that already has all 7 rows
+    backfills the 2 new emails onto the existing rows rather than skipping
+    them - see the header comment on OHIO_PI_PROSPECTS for how the research
+    was done and its limitations. */
 export async function importOhioPIProspects() {
   return importSeedProspects(OHIO_PI_PROSPECTS);
 }

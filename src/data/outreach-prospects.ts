@@ -361,14 +361,27 @@ function personalInjury(
     screened out for a visible chat/live-chat widget (two strong candidates,
     Young Reverman & Bolotin and Rittgers Rittgers & Nakajima, were found
     and DROPPED for exactly this reason), attorney headcount read off the
-    firm's own team page where published. No firm here has a confirmed
-    public email, a real, disclosed limitation, not a placeholder: none of
-    the sites checked publish one (contact-form-only is the norm for this
-    niche), and a quick check of Ohio's attorney-registry search tool for a
-    faster path to registered emails didn't resolve in the time budgeted for
-    this pass. Every row is therefore RESEARCHED but outreach-blocked
-    (`runHardFilters` requires `isPublicEmail`) until an email is found, the
-    same honest state several Dallas dental rows above are already in.
+    firm's own team page where published.
+
+    Email follow-up pass, 2026-09-11: the Ohio Supreme Court's attorney
+    registry search (supremecourt.ohio.gov) was unreachable from this
+    environment, so instead every firm's own homepage, privacy policy page,
+    and (for Freking Myers & Reul) firm-overview page was checked directly
+    for a real `mailto:` link or plain-text address - deliberately NOT
+    third-party lead-scraping tools (RocketReach, ZoomInfo, LeadIQ) that
+    surfaced elsewhere in search results, since those guess emails from
+    patterns rather than confirming a real published one, and using an
+    unconfirmed guess would undermine the same public-email bar this file
+    already holds every other row to. Found 2 of 7: Erney Law
+    (leadcounsel@ohioinjurylaw.com, on their own privacy policy page) and
+    Oliver Law Office (info@oliverattorneys.com, a mailto: link on their own
+    site). Both are firm inboxes, not the named attorney's personal address.
+    The other 5 (Soroka, Gervelis, O'Connor Acciani & Levy, Moore, Freking
+    Myers & Reul) remain genuinely contact-form-only, no email found on
+    their own site - still RESEARCHED but outreach-blocked
+    (`runHardFilters` requires `isPublicEmail`), the same honest state
+    several Dallas dental rows above are already in.
+
     Google Business Profile review counts (the 20-200 filter from the
     original blueprint) were NOT independently verified here, no Places API
     access in this pass, don't treat prospectScore below as including that
@@ -396,7 +409,7 @@ export const OHIO_PI_PROSPECTS: SeedProspect[] = [
     website: "https://ohioinjurylaw.com/",
     city: "Columbus",
     area: "Downtown / 43203",
-    email: NA,
+    email: "leadcounsel@ohioinjurylaw.com", // published in plain text on the firm's own privacy policy page, 2026-09-11 - a firm inbox, not Robert Erney personally
     phone: "(614) 258-6100",
     contactName: "Robert D. Erney",
     prospectScore: 84,
@@ -430,7 +443,7 @@ export const OHIO_PI_PROSPECTS: SeedProspect[] = [
     website: "https://jamioliver.com/",
     city: "Columbus",
     area: "Central Ohio",
-    email: NA,
+    email: "info@oliverattorneys.com", // published as a mailto: link on the firm's own site, 2026-09-11 - a firm inbox, not Jami Oliver personally
     phone: "614.220.9100",
     contactName: "Jami S. Oliver",
     prospectScore: 76,
