@@ -518,3 +518,151 @@ export const OHIO_PI_PROSPECTS: SeedProspect[] = [
     signals: ["12 attorneys", "employment + personal injury practice since 1990", "no visible chat widget"],
   }),
 ];
+
+/** Fort Worth, TX personal injury firm research from the 2026-09-12
+    prospecting pass (see meta-ai-advance-summary.md action item 7,
+    "next city" follow-up). City chosen over the other original alternates
+    (Jacksonville/Tampa FL) after real research, not a coin flip: Florida's
+    2023 tort reform (HB 837) cut the PI statute of limitations from 4
+    years to 2 and tightened the comparative-negligence bar, a real,
+    documented shrink to that state's case pipeline that Texas has not had
+    (a 2025 push for further restrictions, SB 30/HB 4806, did not pass).
+    Also checked for the same city-level agency saturation signal that
+    ruled out LA/NYC/Miami originally: a competitor ("Ansa") runs templated
+    AI-receptionist landing pages for San Antonio, Jacksonville, AND Tampa
+    specifically, found via search - Fort Worth has no equivalent page
+    found, so it's the one candidate that still fits "no major agency
+    saturation."
+
+    Every row below was individually checked the same way as the Ohio
+    batch: real site visited via browser, screened for a live chat widget
+    (Stephens Law Firm was found and DROPPED here for exactly that reason,
+    an "Intaker" chat script loaded on their site - same rule that caught
+    Young Reverman & Bolotin and Rittgers Rittgers & Nakajima in Ohio),
+    attorney headcount sourced from the firm's own site or a real search
+    result citing it. Email search used the same method that worked for
+    Ohio (mailto: links on the firm's own homepage/contact/privacy/attorney
+    bio pages, verified live via a script, never a third-party
+    lead-scraping guess) and found 4 of 7 right away, a better hit rate
+    than Ohio's initial pass. */
+export const FORT_WORTH_PI_PROSPECTS: SeedProspect[] = [
+  personalInjury({
+    businessName: "Patterson Law Group",
+    website: "https://pattersonpersonalinjury.com/",
+    city: "Fort Worth",
+    area: "Fort Worth, also Arlington and San Antonio offices",
+    email: "info@pattersonpersonalinjury.com", // mailto: link on their own homepage, 2026-09-12
+    phone: "(817) 904-8460",
+    contactName: "W. Travis Patterson",
+    prospectScore: 89,
+    tier: "HOT",
+    recommendedServiceId: LAW,
+    recommendedOffer: "PAID_AUDIT_CALL",
+    personalizationSignal: "9 attorneys, $100M+ recovered, 496+ Google reviews, highest reported wrongful death settlement in Texas for 2024",
+    buyingSignal: "9-attorney multi-office firm at real scale, no visible chat widget",
+    opportunity: "High enough call volume that an intake gap is a real, recurring cost, not a one-off.",
+    signals: ["9 attorneys across 3 offices", "496+ Google reviews", "highest reported wrongful death settlement in Texas, 2024", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Noteboom - The Law Firm",
+    website: "https://noteboom.com/",
+    city: "Fort Worth",
+    area: "Hurst / Fort Worth metro",
+    email: "lawyers@noteboom.com", // mailto: link on their own contact page, 2026-09-12
+    phone: "(817) 282-9700",
+    contactName: "Chuck Noteboom",
+    prospectScore: 85,
+    tier: "HOT",
+    recommendedServiceId: LAW,
+    recommendedOffer: "PAID_AUDIT_CALL",
+    personalizationSignal: "2 attorneys board-certified in personal injury law by the Texas Board of Legal Specialization, plus in-house investigators",
+    buyingSignal: "board-certified boutique with its own investigator staff, no visible chat widget",
+    opportunity: "A firm this specialized fields serious cases directly; a missed after-hours call is a lost case, not just a lost lead.",
+    signals: ["2 board-certified PI attorneys", "in-house investigator + assistant investigator", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Law Offices of Barry Martines",
+    website: "https://barrymartines.com/",
+    city: "Fort Worth",
+    area: "Fort Worth",
+    email: "info@barrymartines.com", // mailto: link on their own homepage, 2026-09-12
+    phone: "817-838-9900",
+    contactName: "Barry Martines",
+    prospectScore: 77,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "24+ years focused solely on bodily injury claims",
+    buyingSignal: "solo practitioner, single-focus practice, no visible chat widget",
+    opportunity: "Solo practice with no admin layer; the attorney is the intake line, and a missed call has nowhere else to land.",
+    signals: ["24+ years, bodily injury claims only", "solo practitioner", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Walters Law Office, PLLC",
+    website: "https://walterslawofficepllc.com/",
+    city: "Fort Worth",
+    area: "Fort Worth",
+    email: "jack@walterslawofficepllc.com", // his own mailto: link on the firm's homepage, 2026-09-12 - Jonathan Walters personally
+    phone: "682-747-6800",
+    contactName: "Jonathan \"Jack\" Walters",
+    prospectScore: 75,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "founded 2021, a Top 40 Under 40 trial lawyer who personally guarantees a response to every consultation",
+    buyingSignal: "young solo boutique built on personal responsiveness, no visible chat widget",
+    opportunity: "The founder's own pitch is personally answering every inquiry; an after-hours miss directly contradicts that promise.",
+    signals: ["founded 2021", "Top 40 Under 40 trial lawyer", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "The Cain Firm",
+    website: "https://cainfirm.com/",
+    city: "Fort Worth",
+    area: "Fort Worth, also Granbury and Dallas-by-appointment offices",
+    email: NA,
+    phone: "(817) 918-8638",
+    contactName: "Brett Cain",
+    prospectScore: 76,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "founded by a former prosecutor, now handling injury cases across 3 small Texas offices",
+    buyingSignal: "solo-founder boutique spread across multiple small offices, no visible chat widget",
+    opportunity: "Coverage across three offices from one founder means an after-hours call has no consistent backstop.",
+    signals: ["founded by a former prosecutor", "3-office footprint (Fort Worth, Granbury, Dallas by appointment)", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Parker Law Firm Injury Lawyers",
+    website: "https://parkerlawfirm.com/",
+    city: "Fort Worth",
+    area: "Bedford / Fort Worth",
+    email: NA,
+    phone: "(817) 503-9200",
+    contactName: "W. Bradley Parker",
+    prospectScore: 78,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "board-certified in personal injury trial law with 37+ years of practice",
+    buyingSignal: "board-certified boutique, no visible chat widget",
+    opportunity: "Long-tenured boutique built on the lead attorney's own reputation; an after-hours miss costs referral trust as much as the case itself.",
+    signals: ["board-certified in personal injury trial law", "37+ years practicing", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Barrow Law PLLC",
+    website: "https://www.barrow-law.com/",
+    city: "Fort Worth",
+    area: "Fort Worth",
+    email: NA,
+    phone: "817-962-2535",
+    contactName: "Wade Barrow",
+    prospectScore: 72,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a solo practice built on personally getting to know each client before crafting a strategy",
+    buyingSignal: "solo boutique, personal-attention pitch, no visible chat widget",
+    opportunity: "The firm's own pitch is personal attention to every client; a missed call is the opposite of that promise.",
+    signals: ["solo practitioner", "personal-attention client strategy pitch", "no visible chat widget"],
+  }),
+];

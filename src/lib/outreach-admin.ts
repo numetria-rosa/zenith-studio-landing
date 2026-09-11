@@ -5,7 +5,7 @@ import { getService, servicePagePath } from "@/lib/services";
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 import { catalogPricesForService } from "@/lib/service-pages";
 import { getSiteUrl } from "@/lib/site";
-import { DALLAS_DENTAL_PROSPECTS, OHIO_PI_PROSPECTS, type SeedProspect } from "@/data/outreach-prospects";
+import { DALLAS_DENTAL_PROSPECTS, OHIO_PI_PROSPECTS, FORT_WORTH_PI_PROSPECTS, type SeedProspect } from "@/data/outreach-prospects";
 import {
   type EligibilityInput,
   type OutreachPathId,
@@ -793,4 +793,19 @@ export async function importDallasDentalProspects() {
     limitations. */
 export async function importOhioPIProspects() {
   return importSeedProspects(OHIO_PI_PROSPECTS);
+}
+
+/** Fort Worth, TX personal injury firm research (meta-ai-advance-summary.md
+    action item 7, "next city" follow-up), chosen over Jacksonville/Tampa FL
+    after real research: Florida's 2023 tort reform (HB 837) shrank that
+    state's PI case pipeline in a documented way Texas hasn't had, and a
+    competitor already runs city-specific AI-receptionist landing pages for
+    San Antonio, Jacksonville, and Tampa but not Fort Worth. 4 of 7 have a
+    confirmed public email already (Patterson Law Group, Noteboom, Barry
+    Martines, and Walters - the last is Jonathan Walters's own address);
+    the other 3 remain RESEARCHED but outreach-blocked, contact-form-only.
+    See the header comment on FORT_WORTH_PI_PROSPECTS for the full research
+    method and a chat-widget drop (Stephens Law Firm). */
+export async function importFortWorthPIProspects() {
+  return importSeedProspects(FORT_WORTH_PI_PROSPECTS);
 }

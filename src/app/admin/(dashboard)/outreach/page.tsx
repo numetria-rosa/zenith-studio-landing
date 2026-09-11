@@ -7,6 +7,7 @@ import {
   getCampaignStats,
   importDallasDentalProspects,
   importOhioPIProspects,
+  importFortWorthPIProspects,
   prepareEligibleProspects,
   setAutoSendEnabled,
 } from "@/lib/outreach-admin";
@@ -49,6 +50,14 @@ export default async function AdminOutreachPage({
     const session = await requireAdmin();
     if (!session) return;
     await importOhioPIProspects();
+    redirect("/admin/outreach");
+  }
+
+  async function importFortWorthPI() {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    await importFortWorthPIProspects();
     redirect("/admin/outreach");
   }
 
@@ -102,6 +111,11 @@ export default async function AdminOutreachPage({
         <form action={importOhioPI}>
           <button className="rounded-full border border-amber-300/30 bg-amber-400/10 px-4 py-2 text-sm text-amber-200 hover:bg-amber-400/20">
             Load Columbus/Cincinnati PI research
+          </button>
+        </form>
+        <form action={importFortWorthPI}>
+          <button className="rounded-full border border-sky-300/30 bg-sky-400/10 px-4 py-2 text-sm text-sky-200 hover:bg-sky-400/20">
+            Load Fort Worth PI research
           </button>
         </form>
         <form action={prepareAll}>
