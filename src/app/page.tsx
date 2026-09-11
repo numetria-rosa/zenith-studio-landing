@@ -2,6 +2,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { getService, getSetupCheckoutUrl, servicePagePath } from "@/lib/services";
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
+import Reveal from "@/components/Reveal";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -631,7 +632,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
 
         {/* ── Portfolio / Our Products Section ── */}
         <section id="work" className="mx-auto max-w-7xl py-10 sm:py-16">
-          <div className="mb-8 max-w-3xl">
+          <Reveal className="mb-8 max-w-3xl">
             <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Division 01 · Ventures</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
               The studio behind the products
@@ -643,7 +644,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               <span className="text-white/85">SmartRevise</span> on the{" "}
               <span className="text-white/85">A+ Academy</span> platform.
             </p>
-          </div>
+          </Reveal>
 
           <div className="flex flex-col gap-3 sm:h-[460px] sm:flex-row lg:h-[500px]">
             {portfolio.map((item, index) => (
@@ -716,13 +717,13 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
 
         {/* ── Services Section ── */}
         <section id="services" className="mx-auto max-w-7xl py-10 sm:py-16">
-          <div className="mb-8 max-w-2xl">
+          <Reveal className="mb-8 max-w-2xl">
             <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Division 02 · Services</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">What Zenith Studio builds</h2>
             <p className="mt-4 text-white/62 leading-7">
               Systems designed to make businesses move faster, find better opportunities, and reduce repetitive work.
             </p>
-          </div>
+          </Reveal>
 
           <div className="grid gap-5 md:grid-cols-2">
             {services.map((service) => (
@@ -770,7 +771,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
 
         {/* ── Zenith AI Systems: priced offers ── */}
         <section id="systems" className="mx-auto max-w-7xl py-10 sm:py-16">
-          <div className="mb-10 max-w-3xl">
+          <Reveal className="mb-10 max-w-3xl">
             <div className="text-xs uppercase tracking-[0.3em] text-emerald-200/70">Zenith AI · Done for you</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
               Put your busywork on autopilot
@@ -780,7 +781,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               no lock-in, live in about a week. Not sure which you need? The free audit tells you
               exactly where to start.
             </p>
-          </div>
+          </Reveal>
 
           <div className="grid gap-5 lg:grid-cols-3">
             {aiSystems.map((system) => (
@@ -1147,7 +1148,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
         {/* ── Contact / Socials Section ── */}
           <section id="contact" className="mx-auto max-w-7xl py-10 sm:py-16 pb-24">
             <div className="overflow-hidden rounded-[38px] border border-white/10 bg-white/[0.05] p-8 sm:p-10 lg:p-12 backdrop-blur-2xl">
-              <div className="text-center max-w-2xl mx-auto">
+              <Reveal className="text-center max-w-2xl mx-auto">
                 <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Connect</div>
                 <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
                   Stay in the loop
@@ -1155,7 +1156,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 <p className="mt-4 text-white/62 leading-7">
                   Follow Zenith Studio for new product drops, workflow breakdowns, and behind-the-scenes builds.
                 </p>
-          
+
                 {/* Whop Shop CTA */}
                 <a
                   href="https://whop.com/zenithstudio"
@@ -1200,7 +1201,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                     </div>
                   </a>
                 </div>
-              </div>
+              </Reveal>
             </div>
           </section>
       </main>
