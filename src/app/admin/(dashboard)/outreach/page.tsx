@@ -6,6 +6,7 @@ import { getService } from "@/lib/services";
 import {
   getCampaignStats,
   importDallasDentalProspects,
+  importOhioPIProspects,
   prepareEligibleProspects,
   setAutoSendEnabled,
 } from "@/lib/outreach-admin";
@@ -40,6 +41,14 @@ export default async function AdminOutreachPage({
     const session = await requireAdmin();
     if (!session) return;
     await importDallasDentalProspects();
+    redirect("/admin/outreach");
+  }
+
+  async function importOhioPI() {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    await importOhioPIProspects();
     redirect("/admin/outreach");
   }
 
@@ -88,6 +97,11 @@ export default async function AdminOutreachPage({
         <form action={importResearch}>
           <button className="rounded-full border border-white/15 px-4 py-2 text-sm hover:bg-white/10">
             Load Dallas dental research
+          </button>
+        </form>
+        <form action={importOhioPI}>
+          <button className="rounded-full border border-amber-300/30 bg-amber-400/10 px-4 py-2 text-sm text-amber-200 hover:bg-amber-400/20">
+            Load Columbus/Cincinnati PI research
           </button>
         </form>
         <form action={prepareAll}>

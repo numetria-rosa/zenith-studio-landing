@@ -9,6 +9,7 @@ export type SeedProspect = {
   area: string;
   email: string | null;
   phone: string | null;
+  contactName?: string | null;
   prospectScore: number;
   tier: "HOT" | "GOOD" | "BACKUP";
   recommendedServiceId: string;
@@ -323,5 +324,173 @@ export const DALLAS_DENTAL_PROSPECTS: SeedProspect[] = [
     buyingSignal: "book online",
     opportunity: "Family practice with online scheduling; no public email found.",
     signals: ["book online"],
+  }),
+];
+
+const LAW = "law-firms";
+
+function personalInjury(
+  partial: Omit<SeedProspect, "country" | "niche" | "research"> & { city: string; signals: string[] }
+): SeedProspect {
+  const { signals, ...rest } = partial;
+  return {
+    ...rest,
+    country: "USA",
+    niche: "Personal injury law",
+    research: {
+      verified: {
+        name: rest.businessName,
+        city: rest.city,
+        country: "USA",
+        niche: "Personal injury law",
+        area: rest.area,
+        website: rest.website ?? undefined,
+        phone: rest.phone ?? undefined,
+        email: rest.email ?? undefined,
+        contactName: rest.contactName ?? undefined,
+        observedSignals: signals,
+      },
+      inferences: [rest.opportunity],
+    },
+  };
+}
+
+/** Columbus/Cincinnati OH personal injury firm research from the 2026-09-11
+    prospecting pass (see meta-ai-advance-summary.md action item 7). Every
+    row below was individually checked, not templated: real site visited,
+    screened out for a visible chat/live-chat widget (two strong candidates,
+    Young Reverman & Bolotin and Rittgers Rittgers & Nakajima, were found
+    and DROPPED for exactly this reason), attorney headcount read off the
+    firm's own team page where published. No firm here has a confirmed
+    public email, a real, disclosed limitation, not a placeholder: none of
+    the sites checked publish one (contact-form-only is the norm for this
+    niche), and a quick check of Ohio's attorney-registry search tool for a
+    faster path to registered emails didn't resolve in the time budgeted for
+    this pass. Every row is therefore RESEARCHED but outreach-blocked
+    (`runHardFilters` requires `isPublicEmail`) until an email is found, the
+    same honest state several Dallas dental rows above are already in.
+    Google Business Profile review counts (the 20-200 filter from the
+    original blueprint) were NOT independently verified here, no Places API
+    access in this pass, don't treat prospectScore below as including that
+    signal. */
+export const OHIO_PI_PROSPECTS: SeedProspect[] = [
+  personalInjury({
+    businessName: "Soroka & Associates, LLC",
+    website: "https://www.sorokalegal.com/",
+    city: "Columbus",
+    area: "Central Ohio",
+    email: NA,
+    phone: "(614) 918-4078",
+    contactName: "Roger R. Soroka",
+    prospectScore: 88,
+    tier: "HOT",
+    recommendedServiceId: LAW,
+    recommendedOffer: "PAID_AUDIT_CALL",
+    personalizationSignal: "a 5-attorney trial team that takes catastrophic-injury and trucking cases to jury rather than settling fast",
+    buyingSignal: "5-attorney boutique, no visible chat widget",
+    opportunity: "A firm this size fields every call itself; a missed call after hours is a real cost with no admin layer to catch it.",
+    signals: ["5 named attorneys", "handles complex trucking/catastrophic injury litigation", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Erney Law (Robert D. Erney & Associates)",
+    website: "https://ohioinjurylaw.com/",
+    city: "Columbus",
+    area: "Downtown / 43203",
+    email: NA,
+    phone: "(614) 258-6100",
+    contactName: "Robert D. Erney",
+    prospectScore: 84,
+    tier: "HOT",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a father-daughter practice (Robert and Mary Erney) that personally handles every client relationship",
+    buyingSignal: "small family practice, no visible chat widget",
+    opportunity: "Two-attorney practice with no admin layer; the managing partner is reachable directly, and a missed call has nowhere else to land.",
+    signals: ["father-daughter two-attorney practice", "reviews consistently name the attorneys personally", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Gervelis Law Firm",
+    website: "https://gervelislaw.com/",
+    city: "Columbus",
+    area: "Dublin Rd / 43215",
+    email: NA,
+    phone: "866-965-8721",
+    contactName: "Mark S. Gervelis",
+    prospectScore: 80,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a board-certified trial lawyer's firm built on being personally reachable to clients",
+    buyingSignal: "small boutique, no visible chat widget",
+    opportunity: "Community-reputation-driven boutique; after-hours intake gaps cost referral trust, not just one lead.",
+    signals: ["board-certified civil trial lawyer", "small named team", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Oliver Law Office",
+    website: "https://jamioliver.com/",
+    city: "Columbus",
+    area: "Central Ohio",
+    email: NA,
+    phone: "614.220.9100",
+    contactName: "Jami S. Oliver",
+    prospectScore: 76,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a woman-led boutique firm, 2024 \"Lawyer of the Year\" (Best Lawyers, Columbus)",
+    buyingSignal: "award-recognized boutique, no visible chat widget",
+    opportunity: "High-profile solo/boutique practice; intake volume from the recognition likely outpaces a small team's after-hours capacity.",
+    signals: ["2024 Best Lawyers \"Lawyer of the Year\"", "woman-led boutique", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "O'Connor, Acciani & Levy",
+    website: "https://www.oal-law.com/",
+    city: "Cincinnati",
+    area: "Also serves Columbus and Northern Kentucky",
+    email: NA,
+    phone: "(513) 548-3729",
+    contactName: "Henry D. Acciani",
+    prospectScore: 83,
+    tier: "HOT",
+    recommendedServiceId: LAW,
+    recommendedOffer: "PAID_AUDIT_CALL",
+    personalizationSignal: "13 attorneys across three offices (Cincinnati, Columbus, Northern Kentucky), free-unless-we-win intake",
+    buyingSignal: "multi-office boutique at the top of the target size range, no visible chat widget",
+    opportunity: "Three-office intake coordination is exactly the kind of thing a missed call slips through; largest firm in this batch, still under the 15-attorney ceiling.",
+    signals: ["13 attorneys", "three-office footprint (OH + KY)", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "The Moore Law Firm",
+    website: "https://www.moorelaw.com/",
+    city: "Cincinnati",
+    area: "1060 Nimitzview Dr, Cincinnati",
+    email: NA,
+    phone: "513-232-2000",
+    contactName: "Daniel N. Moore",
+    prospectScore: 87,
+    tier: "HOT",
+    recommendedServiceId: LAW,
+    recommendedOffer: "PAID_AUDIT_CALL",
+    personalizationSignal: "a 4-attorney firm built around \"a legacy of pursuing justice\"",
+    buyingSignal: "4-attorney boutique, no visible chat widget",
+    opportunity: "Tight, name-brand boutique; a missed after-hours call is a lost case, not just a lost lead.",
+    signals: ["4 named attorneys", "single-office boutique", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Freking Myers & Reul LLC",
+    website: "https://www.fmr.law/",
+    city: "Cincinnati",
+    area: "Central Cincinnati",
+    email: NA,
+    phone: "(513) 866-8816",
+    contactName: NA,
+    prospectScore: 74,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "\"Advocates for working people\" since 1990, 12 attorneys spanning employment and personal injury law",
+    buyingSignal: "12-attorney boutique, no visible chat widget",
+    opportunity: "Mixed employment/PI practice at the top of the size range; worth confirming PI is still a primary focus before outreach.",
+    signals: ["12 attorneys", "employment + personal injury practice since 1990", "no visible chat widget"],
   }),
 ];

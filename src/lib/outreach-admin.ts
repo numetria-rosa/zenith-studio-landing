@@ -5,7 +5,7 @@ import { getService, servicePagePath } from "@/lib/services";
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 import { catalogPricesForService } from "@/lib/service-pages";
 import { getSiteUrl } from "@/lib/site";
-import { DALLAS_DENTAL_PROSPECTS } from "@/data/outreach-prospects";
+import { DALLAS_DENTAL_PROSPECTS, OHIO_PI_PROSPECTS, type SeedProspect } from "@/data/outreach-prospects";
 import {
   type EligibilityInput,
   type ProspectResearch,
@@ -669,10 +669,10 @@ function countBy(values: string[]): Record<string, number> {
   return out;
 }
 
-export async function importDallasDentalProspects() {
+async function importSeedProspects(seeds: SeedProspect[]) {
   let created = 0;
   let skipped = 0;
-  for (const seed of DALLAS_DENTAL_PROSPECTS) {
+  for (const seed of seeds) {
     const existing = await db.prospect.findFirst({
       where: {
         OR: [
@@ -696,6 +696,7 @@ export async function importDallasDentalProspects() {
         area: seed.area,
         email: seed.email,
         phone: seed.phone,
+        contactName: seed.contactName ?? undefined,
         prospectScore: seed.prospectScore,
         outreachScore: seed.prospectScore,
         priority: outreachPriority(seed.prospectScore),
@@ -713,5 +714,18 @@ export async function importDallasDentalProspects() {
     });
     created += 1;
   }
-  return { created, skipped, total: DALLAS_DENTAL_PROSPECTS.length };
+  return { created, skipped, total: seeds.length };
+}
+
+export async function importDallasDentalProspects() {
+  return importSeedProspects(DALLAS_DENTAL_PROSPECTS);
+}
+
+/** Columbus/Cincinnati OH personal injury firm research (meta-ai-advance-summary.md
+    action item 7). Every row is RESEARCHED but outreach-blocked until an
+    email is found (none of the seven have a confirmed public email), see
+    the header comment on OHIO_PI_PROSPECTS for how that research was done
+    and its limitations. */
+export async function importOhioPIProspects() {
+  return importSeedProspects(OHIO_PI_PROSPECTS);
 }
