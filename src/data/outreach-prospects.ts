@@ -385,13 +385,28 @@ function personalInjury(
     Oliver's own bio page - personally hers, upgraded from the firm's
     general info@ address the first pass had found).
 
-    The other 4 (Soroka & Associates, O'Connor Acciani & Levy, The Moore Law
-    Firm, Freking Myers & Reul) remain genuinely contact-form-only: checked
-    their homepage, privacy-policy page, and the named attorney's own bio
-    page (plus, for Freking, a linked PDF bio) with no email found anywhere.
-    Still RESEARCHED but outreach-blocked (`runHardFilters` requires
-    `isPublicEmail`), the same honest state several Dallas dental rows
-    above are already in.
+    Third pass, 2026-09-12: widened the search to professional/peer-award
+    directories the attorney's own bio doesn't control but that carry a
+    real mailto: link for them specifically (National Association of
+    Distinguished Counsel member pages worked twice here), not just the
+    firm's own site. Found Soroka & Associates (roger@sorokalegal.com, on
+    his own distinguishedcounsel.org member page - nothing on
+    sorokalegal.com itself). Also surfaced a real correction while
+    checking Freking Myers & Reul: Randolph Freking, the firm's namesake
+    and the only name this file had for that row, retired at the end of
+    2020 - emailing him would reach the wrong person even if an address
+    existed. No email found for Freking Myers & Reul under any current
+    partner either (checked Kelly Mulloy Myers's bio PDF and the firm
+    overview page).
+
+    The remaining 3 (O'Connor Acciani & Levy, The Moore Law Firm, Freking
+    Myers & Reul) stay genuinely contact-form-only after three separate
+    passes: firm homepage, privacy-policy page, named attorney's own bio
+    page, a linked PDF bio, and now peer/professional directories
+    (National Trial Lawyers, Cornell LII, distinguishedcounsel.org) with no
+    email found anywhere for any of them. Still RESEARCHED but
+    outreach-blocked (`runHardFilters` requires `isPublicEmail`), the same
+    honest state several Dallas dental rows above are already in.
 
     Google Business Profile review counts (the 20-200 filter from the
     original blueprint) were NOT independently verified here, no Places API
@@ -403,7 +418,7 @@ export const OHIO_PI_PROSPECTS: SeedProspect[] = [
     website: "https://www.sorokalegal.com/",
     city: "Columbus",
     area: "Central Ohio",
-    email: NA,
+    email: "roger@sorokalegal.com", // his own mailto: link on his National Association of Distinguished Counsel member page, 2026-09-12 - Roger Soroka personally; nothing found on his own firm site directly
     phone: "(614) 918-4078",
     contactName: "Roger R. Soroka",
     prospectScore: 88,
@@ -544,7 +559,21 @@ export const OHIO_PI_PROSPECTS: SeedProspect[] = [
     Ohio (mailto: links on the firm's own homepage/contact/privacy/attorney
     bio pages, verified live via a script, never a third-party
     lead-scraping guess) and found 4 of 7 right away, a better hit rate
-    than Ohio's initial pass. */
+    than Ohio's initial pass.
+
+    Follow-up pass, 2026-09-12: widened the search to peer/professional
+    directories carrying a real mailto: link for the attorney specifically
+    (National Association of Distinguished Counsel worked here too),
+    found Parker Law Firm (brad@parkerlawfirm.com, on his own
+    distinguishedcounsel.org member page - nothing on parkerlawfirm.com
+    itself, checked twice including the privacy policy page). Also checked
+    Wade Barrow and Brett Cain against Texas Bar's directory, Super
+    Lawyers, LawLink, about.me, and Keenan Trial Institute's faculty page -
+    genuinely no email found for either after that additional pass. Texas
+    Bar's own "Find a Lawyer" tool doesn't publish a real address either,
+    only an internal "Email Now" contact-relay link, so it doesn't count
+    against the isPublicEmail bar. Barrow Law and The Cain Firm remain
+    RESEARCHED but outreach-blocked. */
 export const FORT_WORTH_PI_PROSPECTS: SeedProspect[] = [
   personalInjury({
     businessName: "Patterson Law Group",
@@ -636,7 +665,7 @@ export const FORT_WORTH_PI_PROSPECTS: SeedProspect[] = [
     website: "https://parkerlawfirm.com/",
     city: "Fort Worth",
     area: "Bedford / Fort Worth",
-    email: NA,
+    email: "brad@parkerlawfirm.com", // his own mailto: link on his National Association of Distinguished Counsel member page, 2026-09-12 - Brad Parker personally; nothing found on his own firm site directly
     phone: "(817) 503-9200",
     contactName: "W. Bradley Parker",
     prospectScore: 78,
