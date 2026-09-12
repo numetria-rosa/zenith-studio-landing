@@ -782,15 +782,14 @@ export async function importDallasDentalProspects() {
 }
 
 /** Columbus/Cincinnati OH personal injury firm research (meta-ai-advance-summary.md
-    action item 7). 3 of 7 now have a confirmed public email (Erney Law,
-    Gervelis Law Firm, Oliver Law Office - the latter two are the named
-    attorney's own personal address) and are outreach-eligible; the other 4
-    remain RESEARCHED but outreach-blocked, contact-form-only sites with no
-    email found anywhere including the attorney's own bio page. Re-running
-    this on a project that already has all 7 rows backfills the new emails
-    onto the existing rows rather than skipping them - see the header
-    comment on OHIO_PI_PROSPECTS for how the research was done and its
-    limitations. */
+    action item 7), expanded 2026-09-12 to 14 firms total, 10 outreach-eligible
+    with a confirmed public email; the other 4 remain RESEARCHED but
+    outreach-blocked, contact-form-only sites with no email found anywhere
+    including the attorney's own bio page and peer/professional directories.
+    Re-running this on a project that already has these rows backfills any
+    newly-found email onto the existing row rather than skipping it - see
+    the header comment on OHIO_PI_PROSPECTS for how the research was done,
+    exactly which email belongs to which firm, and its limitations. */
 export async function importOhioPIProspects() {
   return importSeedProspects(OHIO_PI_PROSPECTS);
 }
@@ -800,12 +799,12 @@ export async function importOhioPIProspects() {
     after real research: Florida's 2023 tort reform (HB 837) shrank that
     state's PI case pipeline in a documented way Texas hasn't had, and a
     competitor already runs city-specific AI-receptionist landing pages for
-    San Antonio, Jacksonville, and Tampa but not Fort Worth. 4 of 7 have a
-    confirmed public email already (Patterson Law Group, Noteboom, Barry
-    Martines, and Walters - the last is Jonathan Walters's own address);
-    the other 3 remain RESEARCHED but outreach-blocked, contact-form-only.
-    See the header comment on FORT_WORTH_PI_PROSPECTS for the full research
-    method and a chat-widget drop (Stephens Law Firm). */
+    San Antonio, Jacksonville, and Tampa but not Fort Worth. Expanded
+    2026-09-12 to 14 firms total, 10 outreach-eligible with a confirmed
+    public email; the other 4 remain RESEARCHED but outreach-blocked,
+    contact-form-only. See the header comment on FORT_WORTH_PI_PROSPECTS for
+    the full research method and several chat-widget/size/practice-focus
+    drops. */
 export async function importFortWorthPIProspects() {
   return importSeedProspects(FORT_WORTH_PI_PROSPECTS);
 }
