@@ -604,7 +604,7 @@ export const FORT_WORTH_PI_PROSPECTS: SeedProspect[] = [
     area: "Fort Worth",
     email: "jack@walterslawofficepllc.com", // his own mailto: link on the firm's homepage, 2026-09-12 - Jonathan Walters personally
     phone: "682-747-6800",
-    contactName: "Jonathan \"Jack\" Walters",
+    contactName: "Jack Walters", // greeting-safe form; his own site/bios use "Jonathan \"Jack\" Walters," fine in prose but not as a raw salutation name
     prospectScore: 75,
     tier: "GOOD",
     recommendedServiceId: LAW,
