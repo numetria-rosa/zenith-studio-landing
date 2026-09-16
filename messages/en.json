@@ -1,0 +1,183 @@
+{
+  "nav": {
+    "work": "Work",
+    "services": "Services",
+    "pricing": "Pricing",
+    "courses": "Courses",
+    "contact": "Contact",
+    "signIn": "Sign in",
+    "freeAudit": "Get a free audit"
+  },
+  "footer": {
+    "copyright": "© 2026 Zenith Studio. Custom automation, digital products, and intelligent systems.",
+    "work": "Work",
+    "services": "Services",
+    "pricing": "Pricing",
+    "courses": "Courses",
+    "connect": "Connect"
+  },
+  "hero": {
+    "badge": "Automation systems for ANY business",
+    "titleLine1": "Build faster.",
+    "titleLine2": "Scale sharper.",
+    "titleLine3": "Automate what matters.",
+    "ctaAudit": "Get Your Free Automation Audit",
+    "ctaPricing": "See pricing",
+    "bookCallPrefix": "Prefer to talk it through?",
+    "bookCallLink": "Book the $35 audit call",
+    "card1Title": "Ventures",
+    "card1Text": "Our own SaaS: VoyAI & SmartRevise",
+    "card2Title": "Services",
+    "card2Text": "AI automation & custom engineering",
+    "builtForLabel": "Built for",
+    "builtForText": "Real Estate · Travel · Ecommerce",
+    "outcomeLabel": "Core outcome",
+    "outcomeTitle": "Less manual work",
+    "outcomeText": "More visibility. More speed."
+  },
+  "auditOptions": {
+    "eyebrow": "Start here",
+    "title": "Two ways to get an audit",
+    "subtitle": "Pick whichever fits how you like to work. Both tell you exactly where automation would help and what it would cost, they just get you there differently.",
+    "free": {
+      "label": "Free Automation Audit",
+      "priceLabel": "written assessment",
+      "description": "Fill out a short form about your business. We review it and send back a written assessment: where your hours and leads are leaking, whether automation is worth it for you, and a rough timeline and cost if it is. No call required.",
+      "features": ["Async, done over email", "Written findings and a proposal", "No payment, no time commitment"],
+      "cta": "Get your free audit"
+    },
+    "paid": {
+      "badge": "Live call",
+      "label": "20-Minute Automation Audit Call",
+      "priceLabel": "one-time, paid at booking",
+      "description": "Skip the form. Book a real 20-minute call with us, we look at your business live, talk through what is worth automating, and you leave with a plan. Payment is collected when you book, and the call is confirmed straight away.",
+      "features": ["Live, on a call with us", "Instant booking, no waiting on a written reply", "Priced separately from the free audit, not a discount on it"],
+      "cta": "Book the $35 audit call"
+    }
+  },
+  "portfolio": {
+    "eyebrow": "Division 01 · Ventures",
+    "title": "The studio behind the products",
+    "description": "These aren't client logos. They're our own products. Zenith Studio designs, builds, and runs them end-to-end: <b1>VoyAI</b1> on the <b2>Atlas & Awe</b2> platform, and <b3>SmartRevise</b3> on the <b4>A+ Academy</b4> platform.",
+    "builtBy": "Built by Zenith",
+    "items": [
+      { "category": "AI Travel SaaS", "tagline": "Your entire trip, planned in 60 seconds.", "description": "An AI travel planner that turns a few prompts into real itineraries with live hotel prices, flights, and bookable tours. Powered by the Atlas & Awe platform." },
+      { "category": "AI Study SaaS", "tagline": "Notes into exam-ready knowledge.", "description": "Paste notes or a PDF and instantly get AI flashcards, spaced repetition, quizzes, mock exams, and a personal tutor. Powered by the A+ Academy platform." },
+      { "category": "Travel Platform", "tagline": "Travel, smartly.", "description": "An independent European travel publication and the audience platform behind VoyAI, with 120+ curated guides across 15+ countries." },
+      { "category": "EdTech Platform", "tagline": "Stop studying harder. Start studying like a system.", "description": "The engineer-built study OS behind SmartRevise: systems-thinking and cognitive science applied to how students learn." }
+    ]
+  },
+  "services": {
+    "eyebrow": "Division 02 · Services",
+    "title": "What Zenith Studio builds",
+    "subtitle": "Systems designed to make businesses move faster, find better opportunities, and reduce repetitive work.",
+    "browseCourses": "Browse the courses",
+    "comingSoon": "Coming Soon",
+    "items": [
+      { "title": "AI Automation Workflows", "description": "End-to-end intelligent automation: from lead routing and CRM syncing to multi-step AI agent chains that handle complex business logic without human intervention." },
+      { "title": "Advanced Coding & Scripting", "description": "Custom Python, Node.js, and API integrations that power the workflows no-code tools can't reach: data pipelines, web scrapers, internal tools, and backend systems built from scratch." },
+      { "title": "Zenith AI", "description": "Done-for-you automation systems that handle lead capture, customer communication, and bookings so companies grow faster with less manual effort. Plug-and-play installs like the AI Receptionist and the AI Lead Capture system, live in about a week. See pricing below." },
+      { "title": "Zenith Lab", "description": "Career-path courses in automation, AI, data, and Web3: the skills that won't be replaced by AI in 2026/2027. Each course includes a Career Path Edition, so you don't just learn, you know exactly where to apply it and how to get paid." }
+    ]
+  },
+  "systems": {
+    "eyebrow": "Zenith AI · Done for you",
+    "title": "Put your busywork on autopilot",
+    "subtitle": "Three systems we install for you, built once and tuned to your business. Fixed price, no lock-in, live in about a week. Not sure which you need? The free audit tells you exactly where to start.",
+    "setupLabel": "setup",
+    "mostPopular": "Most popular",
+    "seeHowItWorks": "See how it works",
+    "tryLiveDemo": "Try the live demo",
+    "buySetupDirectly": "Buy setup directly",
+    "aiTeamLabel": "for the AI team",
+    "items": [
+      {
+        "name": "AI Inbox Manager",
+        "pitch": "Wake up to an inbox that is already handled.",
+        "description": "Sorts and prioritizes email, then drafts replies to the routine ones so your day starts with decisions, not admin.",
+        "live": "Live in 2 to 4 days",
+        "features": ["Email sorting and prioritization", "AI drafted replies for routine mail", "Works with Gmail (personal) and Yahoo Mail"]
+      },
+      {
+        "name": "AI Lead Capture & Follow-Up",
+        "pitch": "Never lose a lead to a slow reply again.",
+        "description": "Captures every enquiry, qualifies it, and follows up by email and SMS until they book. The business that answers first wins the job.",
+        "live": "Live in 3 to 5 days",
+        "features": ["Captures leads from every source", "Auto qualifies and scores each one", "Email and SMS follow-up sequences", "Syncs to your CRM, with reporting"]
+      },
+      {
+        "name": "AI Receptionist & Booking",
+        "pitch": "Answers and books while you are on the job.",
+        "description": "Handles enquiries around the clock, books straight into your calendar, and sends the reminders that cut no-shows.",
+        "live": "Live in 5 to 7 days",
+        "features": ["24/7 enquiry handling", "Books into your existing calendar", "Automated reminders to cut no-shows", "Escalates anything it should not answer"]
+      }
+    ],
+    "steps": [
+      { "step": "01", "title": "Free 20 minute audit", "text": "We map where your hours and leads are leaking, and whether automation is even worth it for you." },
+      { "step": "02", "title": "We build it", "text": "You answer a few questions. We design, build, and connect the system to the tools you already use." },
+      { "step": "03", "title": "Go live and we maintain it", "text": "Live in days. Your monthly covers hosting, monitoring, and improvements as it runs." }
+    ]
+  },
+  "verticals": {
+    "eyebrow": "Built for one industry at a time",
+    "title": "Or hire a full AI team for your business",
+    "subtitle": "Same install, same maintenance, tuned to how your industry actually works and priced against the role it replaces, not against other software.",
+    "startHereLabel": "Start here, before you pay anything",
+    "seeHowTeamWorks": "See how the AI team works",
+    "watchFirmLeakDemo": "Watch the firm leak demo",
+    "seeTeamInAction": "See the team in action",
+    "subscribeDirectly": "Subscribe directly",
+    "items": [
+      {
+        "eyebrow": "For law firms",
+        "headline": "Your firm works 49 hours a week and bills 37.",
+        "lede": "That twelve hour gap is roughly $230,000 per attorney, per year. It is not lost to competitors or bad marketing. It is work you already did and never invoiced.",
+        "monthlyNote": "For the Missed Call Text-Back + Follow-Up Clerk, as one team. The Billing Clerk is priced on what it recovers, not a flat fee.",
+        "statsLabels": ["average attorney utilization", "average realization rate", "write-downs at 14 days vs 45"],
+        "roster": [
+          { "role": "AI Billing Clerk", "text": "Reconstructs billable time from your calendar, email, and documents, drafts entries with real narratives, and gets invoices out inside the 14 day window where write-downs run 6% instead of 18%.", "anchor": "Priced on what it recovers." },
+          { "role": "AI Missed Call Text-Back", "text": "The moment a call goes unanswered, the caller gets a text back in seconds, qualifies against your case criteria, and books the consult, so a missed call never turns into a call to the firm down the street.", "anchor": "34% of callers who reach voicemail never call your firm again." },
+          { "role": "AI Follow-Up Clerk", "text": "Works the leads that did not retain on the first call. You already paid for every one of them, and most firms never touch them again.", "anchor": "Legal leads average $131 each, the highest of any industry." }
+        ],
+        "guardrail": "You approve every entry. Nothing leaves the firm without a partner signing off.",
+        "offer": "We will reconstruct one past month of your unbilled time before you pay anything. You get a number. If it is not worth acting on, we are done."
+      },
+      {
+        "eyebrow": "For brokerages",
+        "headline": "Your agents are not leaving for a better split.",
+        "lede": "They are leaving because they are doing four jobs at once: prospecting, follow-up, paperwork, and a database nobody has touched in a year. Every agent who walks costs you $15,000 to $50,000.",
+        "monthlyNote": "For the Inside Sales Agent + Database Manager, as one team. Transaction Coordination is billed per file, $150 to $200.",
+        "statsLabels": ["average agent lead response time", "likelier to convert inside 5 minutes", "recruited agents still there in year five"],
+        "roster": [
+          { "role": "AI Inside Sales Agent", "text": "Answers new leads in seconds, qualifies motivation, timeline, and financing, then books the appointment before a competitor picks up the phone.", "anchor": "Coaches say you need 500 prospects to justify an ISA hire. This one makes sense at fifty." },
+          { "role": "AI Transaction Coordinator", "text": "Contract to close. Deadlines tracked, documents chased, and every party updated without anyone having to ask.", "anchor": "Outsourced coordinators run $350 to $450 a file." },
+          { "role": "AI Database Manager", "text": "Wakes up the dormant contacts and past clients already sitting in your CRM. Not new leads, the ones you already paid for.", "anchor": "Repeat and referral is most of an agent's business, and almost nobody works it." }
+        ],
+        "guardrail": "It is also the best recruiting pitch you have. A team on day one lands harder than another point of commission.",
+        "offer": "We will run your dormant database first. You pay out of what it produces."
+      }
+    ]
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Questions we get asked",
+    "items": [
+      { "q": "How much does AI automation cost for a small business?", "a": "The AI Inbox Manager is $190 setup plus $150 per month. The AI Lead Capture system is $270 setup plus $200 per month, and the AI Receptionist is $360 setup plus $300 per month. The monthly covers hosting, monitoring, and ongoing improvements, and there is no lock-in contract." },
+      { "q": "How long does it take to set up an AI automation system?", "a": "Most systems are live within 2 to 7 days depending on which one you choose. The free audit gives you an exact timeline before you commit to anything." },
+      { "q": "Do I need technical knowledge to use it?", "a": "None at all. We build, host, and maintain everything. You use the system and get the time back. If something breaks, we are alerted before you notice." },
+      { "q": "How is this different from hiring a virtual assistant?", "a": "A virtual assistant costs far more per month, works set hours, and needs managing. These systems run 24/7, answer in under a minute, never take a holiday, and cost a fraction of a salary. Most clients use both: the system handles the repetitive volume, the human handles the exceptions." },
+      { "q": "What tools does it integrate with?", "a": "The tools you already use. Gmail and Outlook, your CRM, Google Calendar and Cal.com, WhatsApp and SMS, Slack, and most platforms with an API. The system is built around your stack rather than asking you to switch." },
+      { "q": "Can I cancel the monthly plan?", "a": "Yes, anytime. There is no lock-in. The monthly fee covers hosting, monitoring, and improvements, and you keep everything that was built for you." },
+      { "q": "What is the difference between the free audit and the $35 audit call?", "a": "The free audit is a written assessment: you fill out a form, we review it, and send back findings and a proposal by email, at no cost. The $35 audit call is a separate, live 20-minute call with us, booked and paid for upfront through Cal.com. Neither is a discount or a preview of the other, they are two different ways to get an audit." }
+    ]
+  },
+  "contact": {
+    "eyebrow": "Connect",
+    "title": "Stay in the loop",
+    "subtitle": "Follow Zenith Studio for new product drops, workflow breakdowns, and behind-the-scenes builds.",
+    "shopCta": "Get Our Products & Services",
+    "emailLabel": "Email",
+    "youtubeLabel": "YouTube"
+  }
+}

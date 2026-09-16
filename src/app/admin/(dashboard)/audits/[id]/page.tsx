@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/admin";
 import { db } from "@/lib/db";
-import { STEPS } from "@/app/audit/fields";
+import { STEPS } from "@/app/[locale]/audit/fields";
 import {
   AUDIT_STATUSES,
   AUDIT_STATUS_LABELS,

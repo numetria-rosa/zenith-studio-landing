@@ -1,95 +1,59 @@
 import Link from "next/link";
+import { Link as LocaleLink } from "@/i18n/navigation";
 import Script from "next/script";
+import { useTranslations } from "next-intl";
 import { getService, getSetupCheckoutUrl, servicePagePath } from "@/lib/services";
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 import Reveal from "@/components/Reveal";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const SITE_URL = "https://zenith-studio.site";
 
-// Written to match how people actually phrase these in search. Each one is
-// eligible for a Google rich snippet via the FAQPage schema below.
-const faqs = [
-  {
-    q: "How much does AI automation cost for a small business?",
-    a: "The AI Inbox Manager is $190 setup plus $150 per month. The AI Lead Capture system is $270 setup plus $200 per month, and the AI Receptionist is $360 setup plus $300 per month. The monthly covers hosting, monitoring, and ongoing improvements, and there is no lock-in contract.",
-  },
-  {
-    q: "How long does it take to set up an AI automation system?",
-    a: "Most systems are live within 2 to 7 days depending on which one you choose. The free audit gives you an exact timeline before you commit to anything.",
-  },
-  {
-    q: "Do I need technical knowledge to use it?",
-    a: "None at all. We build, host, and maintain everything. You use the system and get the time back. If something breaks, we are alerted before you notice.",
-  },
-  {
-    q: "How is this different from hiring a virtual assistant?",
-    a: "A virtual assistant costs far more per month, works set hours, and needs managing. These systems run 24/7, answer in under a minute, never take a holiday, and cost a fraction of a salary. Most clients use both: the system handles the repetitive volume, the human handles the exceptions.",
-  },
-  {
-    q: "What tools does it integrate with?",
-    a: "The tools you already use. Gmail and Outlook, your CRM, Google Calendar and Cal.com, WhatsApp and SMS, Slack, and most platforms with an API. The system is built around your stack rather than asking you to switch.",
-  },
-  {
-    q: "Can I cancel the monthly plan?",
-    a: "Yes, anytime. There is no lock-in. The monthly fee covers hosting, monitoring, and improvements, and you keep everything that was built for you.",
-  },
-  {
-    q: "What is the difference between the free audit and the $35 audit call?",
-    a: "The free audit is a written assessment: you fill out a form, we review it, and send back findings and a proposal by email, at no cost. The $35 audit call is a separate, live 20-minute call with us, booked and paid for upfront through Cal.com. Neither is a discount or a preview of the other, they are two different ways to get an audit.",
-  },
-];
+type LocalizedText = { q: string; a: string };
+type SystemContent = { name: string; pitch: string; description: string; live: string; features: string[] };
+type RosterEntry = { role: string; text: string; anchor: string };
+type VerticalContent = {
+  eyebrow: string;
+  headline: string;
+  lede: string;
+  monthlyNote: string;
+  statsLabels: string[];
+  roster: RosterEntry[];
+  guardrail: string;
+  offer: string;
+};
+type PortfolioContent = { category: string; tagline: string; description: string };
+type ServiceContent = { title: string; description: string };
 
 export default function ZenithStudioLandingPage() {
+  const t = useTranslations();
+  const faqs = t.raw("faq.items") as LocalizedText[];
+  const systemsContent = t.raw("systems.items") as SystemContent[];
+  const verticalsContent = t.raw("verticals.items") as VerticalContent[];
+  const portfolioContent = t.raw("portfolio.items") as PortfolioContent[];
+  const servicesContent = t.raw("services.items") as ServiceContent[];
+
   const aiSystems = [
     {
       id: "ai-inbox-manager",
-      name: "AI Inbox Manager",
-      pitch: "Wake up to an inbox that is already handled.",
-      description:
-        "Sorts and prioritizes email, then drafts replies to the routine ones so your day starts with decisions, not admin.",
       setup: "$190",
       monthly: "$150/mo",
-      live: "Live in 2 to 4 days",
-      features: [
-        "Email sorting and prioritization",
-        "AI drafted replies for routine mail",
-        "Works with Gmail (personal) and Yahoo Mail",
-      ],
       featured: false,
+      ...systemsContent[0],
     },
     {
       id: "ai-lead-capture",
-      name: "AI Lead Capture & Follow-Up",
-      pitch: "Never lose a lead to a slow reply again.",
-      description:
-        "Captures every enquiry, qualifies it, and follows up by email and SMS until they book. The business that answers first wins the job.",
       setup: "$270",
       monthly: "$200/mo",
-      live: "Live in 3 to 5 days",
-      features: [
-        "Captures leads from every source",
-        "Auto qualifies and scores each one",
-        "Email and SMS follow-up sequences",
-        "Syncs to your CRM, with reporting",
-      ],
       featured: true,
+      ...systemsContent[1],
     },
     {
       id: "ai-receptionist",
-      name: "AI Receptionist & Booking",
-      pitch: "Answers and books while you are on the job.",
-      description:
-        "Handles enquiries around the clock, books straight into your calendar, and sends the reminders that cut no-shows.",
       setup: "$360",
       monthly: "$300/mo",
-      live: "Live in 5 to 7 days",
-      features: [
-        "24/7 enquiry handling",
-        "Books into your existing calendar",
-        "Automated reminders to cut no-shows",
-        "Escalates anything it should not answer",
-      ],
       featured: false,
+      ...systemsContent[2],
     },
   ];
 
@@ -100,157 +64,64 @@ export default function ZenithStudioLandingPage() {
     {
       id: "law-firms",
       whopCheckoutUrl: "https://whop.com/checkout/plan_kTlL5gBlJTsqy",
-      eyebrow: "For law firms",
-      headline: "Your firm works 49 hours a week and bills 37.",
-      lede: "That twelve hour gap is roughly $230,000 per attorney, per year. It is not lost to competitors or bad marketing. It is work you already did and never invoiced.",
       accent: "text-amber-200",
       accentSoft: "text-amber-200/70",
       accentBtn: "border-amber-300/30 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20",
       glow: "from-amber-300/[0.07] via-orange-400/[0.04] to-transparent",
       monthly: "$1,200/mo",
-      monthlyNote: "For the Missed Call Text-Back + Follow-Up Clerk, as one team. The Billing Clerk is priced on what it recovers, not a flat fee.",
-      stats: [
-        ["38%", "average attorney utilization"],
-        ["88%", "average realization rate"],
-        ["6% vs 18%", "write-downs at 14 days vs 45"],
-      ],
-      roster: [
-        {
-          role: "AI Billing Clerk",
-          text: "Reconstructs billable time from your calendar, email, and documents, drafts entries with real narratives, and gets invoices out inside the 14 day window where write-downs run 6% instead of 18%.",
-          anchor: "Priced on what it recovers.",
-        },
-        {
-          role: "AI Missed Call Text-Back",
-          text: "The moment a call goes unanswered, the caller gets a text back in seconds, qualifies against your case criteria, and books the consult, so a missed call never turns into a call to the firm down the street.",
-          anchor: "34% of callers who reach voicemail never call your firm again.",
-        },
-        {
-          role: "AI Follow-Up Clerk",
-          text: "Works the leads that did not retain on the first call. You already paid for every one of them, and most firms never touch them again.",
-          anchor: "Legal leads average $131 each, the highest of any industry.",
-        },
-      ],
-      guardrail:
-        "You approve every entry. Nothing leaves the firm without a partner signing off.",
-      offer:
-        "We will reconstruct one past month of your unbilled time before you pay anything. You get a number. If it is not worth acting on, we are done.",
+      statValues: ["38%", "88%", "6% vs 18%"],
+      ...verticalsContent[0],
     },
     {
       id: "brokerages",
       whopCheckoutUrl: "https://whop.com/checkout/plan_m3i6RwMYvMATE",
-      eyebrow: "For brokerages",
-      headline: "Your agents are not leaving for a better split.",
-      lede: "They are leaving because they are doing four jobs at once: prospecting, follow-up, paperwork, and a database nobody has touched in a year. Every agent who walks costs you $15,000 to $50,000.",
       accent: "text-sky-200",
       accentSoft: "text-sky-200/70",
       accentBtn: "border-sky-300/30 bg-sky-400/10 text-sky-200 hover:bg-sky-400/20",
       glow: "from-sky-300/[0.07] via-indigo-400/[0.04] to-transparent",
       monthly: "$1,200/mo",
-      monthlyNote: "For the Inside Sales Agent + Database Manager, as one team. Transaction Coordination is billed per file, $150 to $200.",
-      stats: [
-        ["917 min", "average agent lead response time"],
-        ["21x", "likelier to convert inside 5 minutes"],
-        ["1 in 10", "recruited agents still there in year five"],
-      ],
-      roster: [
-        {
-          role: "AI Inside Sales Agent",
-          text: "Answers new leads in seconds, qualifies motivation, timeline, and financing, then books the appointment before a competitor picks up the phone.",
-          anchor: "Coaches say you need 500 prospects to justify an ISA hire. This one makes sense at fifty.",
-        },
-        {
-          role: "AI Transaction Coordinator",
-          text: "Contract to close. Deadlines tracked, documents chased, and every party updated without anyone having to ask.",
-          anchor: "Outsourced coordinators run $350 to $450 a file.",
-        },
-        {
-          role: "AI Database Manager",
-          text: "Wakes up the dormant contacts and past clients already sitting in your CRM. Not new leads, the ones you already paid for.",
-          anchor: "Repeat and referral is most of an agent's business, and almost nobody works it.",
-        },
-      ],
-      guardrail:
-        "It is also the best recruiting pitch you have. A team on day one lands harder than another point of commission.",
-      offer:
-        "We will run your dormant database first. You pay out of what it produces.",
+      statValues: ["917 min", "21x", "1 in 10"],
+      ...verticalsContent[1],
     },
-  ];
+  ].map((v) => ({
+    ...v,
+    stats: v.statValues.map((value, i) => [value, v.statsLabels[i]] as [string, string]),
+  }));
 
   const services = [
     {
-      title: "AI Automation Workflows",
-      description:
-        "End-to-end intelligent automation: from lead routing and CRM syncing to multi-step AI agent chains that handle complex business logic without human intervention.",
       tag: "Core Service",
+      href: undefined as string | undefined,
       icon: <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />,
+      ...servicesContent[0],
     },
     {
-      title: "Advanced Coding & Scripting",
-      description:
-        "Custom Python, Node.js, and API integrations that power the workflows no-code tools can't reach: data pipelines, web scrapers, internal tools, and backend systems built from scratch.",
       tag: "Core Service",
+      href: undefined as string | undefined,
       icon: <path d="M17.25 6.75L22.5 12l-5.25 5.25M6.75 17.25L1.5 12l5.25-5.25M14.25 3.75l-4.5 16.5" />,
+      ...servicesContent[1],
     },
     {
-      title: "Zenith AI",
-      description:
-        "Done-for-you automation systems that handle lead capture, customer communication, and bookings so companies grow faster with less manual effort. Plug-and-play installs like the AI Receptionist and the AI Lead Capture system, live in about a week. See pricing below.",
       tag: "Core Service",
+      href: undefined as string | undefined,
       icon: (
         <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.456-2.456L14.25 6l1.035-.259a3.375 3.375 0 002.456-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
       ),
+      ...servicesContent[2],
     },
     {
-      title: "Zenith Lab",
-      description:
-        "Career-path courses in automation, AI, data, and Web3: the skills that won't be replaced by AI in 2026/2027. Each course includes a Career Path Edition, so you don't just learn, you know exactly where to apply it and how to get paid.",
       tag: "Core Service",
       href: "/lab",
       icon: (
         <path d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347M4.26 10.147a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814M4.26 10.147A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443" />
       ),
-    },
-  ];
-
-  const products = [
-    {
-      icon: "◈",
-      title: "Get Paid to Build Automation Workflows",
-      description:
-        "From $0 to $50/Hour with automation: a complete blueprint to turn workflow building into a paid skill, even if you're starting from zero.",
-      link: "https://whop.com/checkout/plan_aERQUZX70CcQ9",
-    },
-    {
-      icon: "▣",
-      title: "Build Your First $50 Workflow in 40 Minutes",
-      description:
-        "I made $50 in one afternoon with a workflow I built in 40 minutes: a step-by-step breakdown so you can replicate it the same day.",
-      link: "https://whop.com/checkout/plan_tSZGq70OEyzsn",
-    },
-    {
-      icon: "◉",
-      title: "The $0 AI Automation Playbook For ANY Business",
-      description:
-        "Replace a Full-Time Employee with Automated Workflows Without Spending a Dime. Proven templates and strategies that work across every industry.",
-      link: "https://whop.com/checkout/plan_5mDFoE473UAcH",
-    },
-    {
-      icon: "✦",
-      title: "AI Email Auto-Responder for Gmail",
-      description:
-        "This workflow literally replies to your emails while you sleep. Imagine waking up to a completely organized inbox with all your routine emails already answered. No more hours spent sorting through messages, drafting generic replies, or playing catch-up. Our plug-and-play Gmail system does the heavy lifting while you sleep.",
-      link: "https://whop.com/checkout/plan_uCuJmMtPlV4fp",
+      ...servicesContent[3],
     },
   ];
 
   const portfolio = [
     {
       name: "VoyAI",
-      category: "AI Travel SaaS",
-      tagline: "Your entire trip, planned in 60 seconds.",
-      description:
-        "An AI travel planner that turns a few prompts into real itineraries with live hotel prices, flights, and bookable tours. Powered by the Atlas & Awe platform.",
       href: "https://voyai.site",
       image: "/work/voyai.webp",
       accent: "from-sky-400/50 via-indigo-500/40 to-blue-600/50",
@@ -258,13 +129,10 @@ export default function ZenithStudioLandingPage() {
       icon: (
         <path d="M10.5 21l1.5-5 3.5-2 5.5 1.5a1.5 1.5 0 001-2.8L16 10l-1-6.5a1.3 1.3 0 00-2.4-.4L9.5 8 4 7a1.4 1.4 0 00-1 2.6L8 12l-1 4-3-.5a1.1 1.1 0 00-1 1.9L6 19l1.4 2.6a1.1 1.1 0 002-.2z" />
       ),
+      ...portfolioContent[0],
     },
     {
       name: "SmartRevise",
-      category: "AI Study SaaS",
-      tagline: "Notes into exam-ready knowledge.",
-      description:
-        "Paste notes or a PDF and instantly get AI flashcards, spaced repetition, quizzes, mock exams, and a personal tutor. Powered by the A+ Academy platform.",
       href: "https://smartrevise.site",
       image: "/work/smartrevise.webp",
       accent: "from-emerald-300/50 via-teal-500/40 to-green-600/50",
@@ -272,13 +140,10 @@ export default function ZenithStudioLandingPage() {
       icon: (
         <path d="M12 3a4 4 0 00-4 4 3.5 3.5 0 00-1.5 6.5A3 3 0 009 19a3 3 0 003 1 3 3 0 003-1 3 3 0 002.5-5.5A3.5 3.5 0 0016 7a4 4 0 00-4-4zM12 3v18" />
       ),
+      ...portfolioContent[1],
     },
     {
       name: "Atlas & Awe",
-      category: "Travel Platform",
-      tagline: "Travel, smartly.",
-      description:
-        "An independent European travel publication and the audience platform behind VoyAI, with 120+ curated guides across 15+ countries.",
       href: "https://atlasandawe.blog",
       image: "/work/atlasandawe.webp",
       accent: "from-amber-300/50 via-orange-500/40 to-rose-500/50",
@@ -289,13 +154,10 @@ export default function ZenithStudioLandingPage() {
           <path d="M15.5 8.5l-2 5-5 2 2-5z" />
         </>
       ),
+      ...portfolioContent[2],
     },
     {
       name: "A+ Academy",
-      category: "EdTech Platform",
-      tagline: "Stop studying harder. Start studying like a system.",
-      description:
-        "The engineer-built study OS behind SmartRevise: systems-thinking and cognitive science applied to how students learn.",
       href: "https://aplusacademy.site",
       image: "/work/aplusacademy.webp",
       accent: "from-fuchsia-400/50 via-purple-500/40 to-pink-600/50",
@@ -306,6 +168,7 @@ export default function ZenithStudioLandingPage() {
           <path d="M6 10.5V16c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5.5" />
         </>
       ),
+      ...portfolioContent[3],
     },
   ];
 
@@ -388,40 +251,41 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
 
       <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 pt-4">
         <div className="mx-auto max-w-7xl rounded-full border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(72,113,255,0.12)]">
-          <div className="flex items-center justify-between px-5 sm:px-7 py-4">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-2 px-3 sm:px-7 py-3 sm:py-4">
+            <div className="flex min-w-0 flex-shrink-0 items-center gap-2 sm:gap-3">
               <img
                 src="/icon.webp"
                 alt="Zenith Studio Icon"
-                className="h-9 w-9 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)]"
+                className="h-8 w-8 flex-shrink-0 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)] sm:h-9 sm:w-9"
               />
-              <div>
-                <div className="text-sm tracking-[0.35em] text-white/60 uppercase">Zenith</div>
-                <div className="text-base font-semibold -mt-0.5">Studio</div>
+              <div className="min-w-0">
+                <div className="truncate text-xs tracking-[0.3em] text-white/60 uppercase sm:text-sm sm:tracking-[0.35em]">Zenith</div>
+                <div className="truncate text-sm font-semibold -mt-0.5 sm:text-base">Studio</div>
               </div>
             </div>
 
-            <nav className="hidden md:flex items-center gap-8 text-sm text-white/70">
-              <a href="#work" className="hover:text-white transition-colors">Work</a>
-              <a href="#services" className="hover:text-white transition-colors">Services</a>
-              <a href="#systems" className="hover:text-white transition-colors">Pricing</a>
-              <Link href="/lab" className="hover:text-white transition-colors">Courses</Link>
-              <a href="#contact" className="hover:text-white transition-colors">Contact</a>
+            <nav className="hidden md:flex items-center gap-4 text-sm text-white/70 lg:gap-8">
+              <a href="#work" className="hover:text-white transition-colors">{t("nav.work")}</a>
+              <a href="#services" className="hover:text-white transition-colors">{t("nav.services")}</a>
+              <a href="#systems" className="hover:text-white transition-colors">{t("nav.pricing")}</a>
+              <Link href="/lab" className="hover:text-white transition-colors">{t("nav.courses")}</Link>
+              <a href="#contact" className="hover:text-white transition-colors">{t("nav.contact")}</a>
             </nav>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-shrink-0 items-center gap-1.5 sm:gap-3">
+              <LanguageSwitcher />
               <Link
                 href="/sign-in"
-                className="hidden text-sm text-white/60 transition-colors hover:text-white sm:inline"
+                className="hidden text-sm text-white/60 transition-colors hover:text-white lg:inline"
               >
-                Sign in
+                {t("nav.signIn")}
               </Link>
-              <Link
+              <LocaleLink
                 href="/audit"
-                className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
+                className="whitespace-nowrap rounded-full bg-white px-3 py-2 text-xs font-semibold text-black transition hover:scale-[1.02] sm:px-4 sm:text-sm"
               >
-                Get a free audit
-              </Link>
+                {t("nav.freeAudit")}
+              </LocaleLink>
             </div>
           </div>
         </div>
@@ -431,44 +295,44 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
         <section className="mx-auto grid max-w-7xl items-center gap-12 pb-20 pt-14 lg:grid-cols-[1.1fr_0.9fr] lg:pt-20 min-h-[calc(100vh-110px)]">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-xs uppercase tracking-[0.28em] text-cyan-200/90 backdrop-blur-xl">
-              Automation systems for ANY business
+              {t("hero.badge")}
             </div>
 
             <h1 className="mt-7 max-w-4xl text-5xl font-semibold leading-[0.95] tracking-[-0.05em] sm:text-6xl lg:text-8xl">
-              Build faster.
+              {t("hero.titleLine1")}
               <br />
-              Scale sharper.
+              {t("hero.titleLine2")}
               <br />
               <span className="bg-gradient-to-r from-cyan-200 via-blue-300 to-fuchsia-300 bg-clip-text text-transparent">
-                Automate what matters.
+                {t("hero.titleLine3")}
               </span>
             </h1>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <Link
+              <LocaleLink
                 href="/audit"
                 className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
               >
-                Get Your Free Automation Audit
-              </Link>
+                {t("hero.ctaAudit")}
+              </LocaleLink>
               <a
                 href="#systems"
                 className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-xl transition hover:bg-white/10"
               >
-                See pricing
+                {t("hero.ctaPricing")}
               </a>
             </div>
             <p className="mt-3 text-xs text-white/40">
-              Prefer to talk it through?{" "}
+              {t("hero.bookCallPrefix")}{" "}
               <a href={PAID_AUDIT_BOOKING_URL} className="underline decoration-white/30 underline-offset-2 hover:text-white">
-                Book the $35 audit call
+                {t("hero.bookCallLink")}
               </a>
             </p>
 
             <div className="mt-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
               {[
-                ["01", "Ventures", "Our own SaaS: VoyAI & SmartRevise", "#work"],
-                ["02", "Services", "AI automation & custom engineering", "#services"],
+                ["01", t("hero.card1Title"), t("hero.card1Text"), "#work"],
+                ["02", t("hero.card2Title"), t("hero.card2Text"), "#services"],
               ].map(([num, title, text, href]) => (
                 <a
                   key={title}
@@ -498,14 +362,14 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
             </div>
 
             <div className="absolute bottom-[30%] left-[0%] rounded-[28px] border border-white/12 bg-white/[0.04] px-4 py-4 backdrop-blur-2xl shadow-[0_0_40px_rgba(89,118,255,0.12)]">
-              <div className="text-xs uppercase tracking-[0.2em] text-white/45">Built for</div>
-              <div className="mt-2 text-sm font-medium text-white/85">Real Estate · Travel · Ecommerce</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-white/45">{t("hero.builtForLabel")}</div>
+              <div className="mt-2 text-sm font-medium text-white/85">{t("hero.builtForText")}</div>
             </div>
 
             <div className="absolute right-[2%] bottom-[30%] rounded-[26px] border border-white/12 bg-white/[0.05] px-4 py-4 backdrop-blur-2xl shadow-[0_0_30px_rgba(226,109,255,0.12)]">
-              <div className="text-xs uppercase tracking-[0.2em] text-white/45">Core outcome</div>
-              <div className="mt-2 text-2xl font-semibold tracking-[-0.04em]">Less manual work</div>
-              <div className="text-sm text-white/55">More visibility. More speed.</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-white/45">{t("hero.outcomeLabel")}</div>
+              <div className="mt-2 text-2xl font-semibold tracking-[-0.04em]">{t("hero.outcomeTitle")}</div>
+              <div className="text-sm text-white/55">{t("hero.outcomeText")}</div>
             </div>
 
             <style>{`
@@ -524,36 +388,29 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
             keep them visually equal rather than pushing one as an upsell. ── */}
         <section id="audit-options" className="mx-auto max-w-7xl py-10 sm:py-16">
           <div className="mb-10 max-w-3xl">
-            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Start here</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">{t("auditOptions.eyebrow")}</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
-              Two ways to get an audit
+              {t("auditOptions.title")}
             </h2>
             <p className="mt-4 text-white/62 leading-7">
-              Pick whichever fits how you like to work. Both tell you exactly where automation would
-              help and what it would cost, they just get you there differently.
+              {t("auditOptions.subtitle")}
             </p>
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
             <div className="flex flex-col rounded-[30px] border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl">
               <div className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                Free Automation Audit
+                {t("auditOptions.free.label")}
               </div>
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="text-4xl font-semibold tracking-[-0.04em]">$0</span>
-                <span className="text-sm text-white/55">written assessment</span>
+                <span className="text-sm text-white/55">{t("auditOptions.free.priceLabel")}</span>
               </div>
               <p className="mt-5 text-sm leading-7 text-white/60">
-                Fill out a short form about your business. We review it and send back a written
-                assessment: where your hours and leads are leaking, whether automation is worth it
-                for you, and a rough timeline and cost if it is. No call required.
+                {t("auditOptions.free.description")}
               </p>
               <ul className="mt-5 flex-1 space-y-2.5">
-                {[
-                  "Async, done over email",
-                  "Written findings and a proposal",
-                  "No payment, no time commitment",
-                ].map((feature) => (
+                {(t.raw("auditOptions.free.features") as string[]).map((feature) => (
                   <li key={feature} className="flex items-start gap-2.5 text-sm text-white/65">
                     <svg
                       viewBox="0 0 24 24"
@@ -571,36 +428,30 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                   </li>
                 ))}
               </ul>
-              <Link
+              <LocaleLink
                 href="/audit"
                 className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10"
               >
-                Get your free audit
-              </Link>
+                {t("auditOptions.free.cta")}
+              </LocaleLink>
             </div>
 
             <div className="relative flex flex-col rounded-[30px] border border-emerald-300/40 bg-emerald-400/[0.06] p-7 backdrop-blur-xl shadow-[0_0_50px_rgba(52,211,153,0.10)]">
               <span className="absolute -top-3 left-7 rounded-full bg-gradient-to-r from-emerald-300 to-teal-200 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-950">
-                Live call
+                {t("auditOptions.paid.badge")}
               </span>
               <div className="text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
-                20-Minute Automation Audit Call
+                {t("auditOptions.paid.label")}
               </div>
               <div className="mt-4 flex items-baseline gap-2">
                 <span className="text-4xl font-semibold tracking-[-0.04em]">$35</span>
-                <span className="text-sm text-white/55">one-time, paid at booking</span>
+                <span className="text-sm text-white/55">{t("auditOptions.paid.priceLabel")}</span>
               </div>
               <p className="mt-5 text-sm leading-7 text-white/60">
-                Skip the form. Book a real 20-minute call with us, we look at your business live,
-                talk through what is worth automating, and you leave with a plan. Payment is
-                collected when you book, and the call is confirmed straight away.
+                {t("auditOptions.paid.description")}
               </p>
               <ul className="mt-5 flex-1 space-y-2.5">
-                {[
-                  "Live, on a call with us",
-                  "Instant booking, no waiting on a written reply",
-                  "Priced separately from the free audit, not a discount on it",
-                ].map((feature) => (
+                {(t.raw("auditOptions.paid.features") as string[]).map((feature) => (
                   <li key={feature} className="flex items-start gap-2.5 text-sm text-white/65">
                     <svg
                       viewBox="0 0 24 24"
@@ -624,7 +475,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 rel="noopener noreferrer"
                 className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:scale-[1.02]"
               >
-                Book the $35 audit call
+                {t("auditOptions.paid.cta")}
               </a>
             </div>
           </div>
@@ -633,16 +484,17 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
         {/* ── Portfolio / Our Products Section ── */}
         <section id="work" className="mx-auto max-w-7xl py-10 sm:py-16">
           <Reveal className="mb-8 max-w-3xl">
-            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Division 01 · Ventures</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">{t("portfolio.eyebrow")}</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
-              The studio behind the products
+              {t("portfolio.title")}
             </h2>
             <p className="mt-4 text-white/62 leading-7">
-              These aren&apos;t client logos. They&apos;re our own products. Zenith Studio designs, builds,
-              and runs them end-to-end: <span className="text-white/85">VoyAI</span> on the{" "}
-              <span className="text-white/85">Atlas &amp; Awe</span> platform, and{" "}
-              <span className="text-white/85">SmartRevise</span> on the{" "}
-              <span className="text-white/85">A+ Academy</span> platform.
+              {t.rich("portfolio.description", {
+                b1: (chunks) => <span className="text-white/85">{chunks}</span>,
+                b2: (chunks) => <span className="text-white/85">{chunks}</span>,
+                b3: (chunks) => <span className="text-white/85">{chunks}</span>,
+                b4: (chunks) => <span className="text-white/85">{chunks}</span>,
+              })}
             </p>
           </Reveal>
 
@@ -699,7 +551,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-white/75 backdrop-blur-md">
                         {item.category}
                       </span>
-                      <span className="text-[11px] uppercase tracking-[0.25em] text-white/45">Built by Zenith</span>
+                      <span className="text-[11px] uppercase tracking-[0.25em] text-white/45">{t("portfolio.builtBy")}</span>
                     </div>
                     <h3 className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl">{item.name}</h3>
                     <p className="mt-1.5 text-base font-medium text-white/80">{item.tagline}</p>
@@ -718,10 +570,10 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
         {/* ── Services Section ── */}
         <section id="services" className="mx-auto max-w-7xl py-10 sm:py-16">
           <Reveal className="mb-8 max-w-2xl">
-            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Division 02 · Services</div>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">What Zenith Studio builds</h2>
+            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">{t("services.eyebrow")}</div>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">{t("services.title")}</h2>
             <p className="mt-4 text-white/62 leading-7">
-              Systems designed to make businesses move faster, find better opportunities, and reduce repetitive work.
+              {t("services.subtitle")}
             </p>
           </Reveal>
 
@@ -749,7 +601,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                   </div>
                   {service.tag === "Coming Soon" && (
                     <span className="rounded-full border border-fuchsia-400/25 bg-fuchsia-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-fuchsia-200/80">
-                      Coming Soon
+                      {t("services.comingSoon")}
                     </span>
                   )}
                 </div>
@@ -760,7 +612,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                     href={service.href}
                     className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-emerald-200 transition hover:gap-3"
                   >
-                    Browse the courses
+                    {t("services.browseCourses")}
                     <span aria-hidden>→</span>
                   </Link>
                 )}
@@ -772,14 +624,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
         {/* ── Zenith AI Systems: priced offers ── */}
         <section id="systems" className="mx-auto max-w-7xl py-10 sm:py-16">
           <Reveal className="mb-10 max-w-3xl">
-            <div className="text-xs uppercase tracking-[0.3em] text-emerald-200/70">Zenith AI · Done for you</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-emerald-200/70">{t("systems.eyebrow")}</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
-              Put your busywork on autopilot
+              {t("systems.title")}
             </h2>
             <p className="mt-4 text-white/62 leading-7">
-              Three systems we install for you, built once and tuned to your business. Fixed price,
-              no lock-in, live in about a week. Not sure which you need? The free audit tells you
-              exactly where to start.
+              {t("systems.subtitle")}
             </p>
           </Reveal>
 
@@ -795,7 +645,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               >
                 {system.featured && (
                   <span className="absolute -top-3 left-7 rounded-full bg-gradient-to-r from-emerald-300 to-teal-200 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-950">
-                    Most popular
+                    {t("systems.mostPopular")}
                   </span>
                 )}
 
@@ -804,7 +654,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
 
                 <div className="mt-5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
                   <span className="text-3xl font-semibold tracking-[-0.04em]">{system.setup}</span>
-                  <span className="text-sm text-white/55">setup</span>
+                  <span className="text-sm text-white/55">{t("systems.setupLabel")}</span>
                   <span className="text-sm font-medium text-emerald-200">+ {system.monthly}</span>
                 </div>
                 <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs uppercase tracking-[0.18em] text-white/40">
@@ -835,19 +685,19 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
 
                 <div className="mt-7 flex flex-col gap-3">
                   {servicePagePath(system.id) ? (
-                    <Link
+                    <LocaleLink
                       href={servicePagePath(system.id)!}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10"
                     >
-                      See how it works
-                    </Link>
+                      {t("systems.seeHowItWorks")}
+                    </LocaleLink>
                   ) : null}
                   {system.id === "ai-receptionist" && (
                     <Link
                       href="/demo/ai-receptionist"
                       className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-6 py-3 text-sm font-semibold text-emerald-300 transition hover:scale-[1.02] hover:bg-emerald-400/20"
                     >
-                      Try the live demo
+                      {t("systems.tryLiveDemo")}
                     </Link>
                   )}
                   {system.id === "ai-inbox-manager" && (
@@ -855,7 +705,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       href="/demo/ai-inbox-manager"
                       className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-amber-300/30 bg-amber-400/10 px-6 py-3 text-sm font-semibold text-amber-200 transition hover:scale-[1.02] hover:bg-amber-400/20"
                     >
-                      Try the live demo
+                      {t("systems.tryLiveDemo")}
                     </Link>
                   )}
                   {system.id === "ai-lead-capture" && (
@@ -863,7 +713,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       href="/demo/ai-lead-capture-follow-up"
                       className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-sky-400/30 bg-sky-400/10 px-6 py-3 text-sm font-semibold text-sky-200 transition hover:scale-[1.02] hover:bg-sky-400/20"
                     >
-                      Try the live demo
+                      {t("systems.tryLiveDemo")}
                     </Link>
                   )}
                   {(() => {
@@ -894,7 +744,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                           <circle cx="20" cy="21" r="1" />
                           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
                         </svg>
-                        Buy setup directly
+                        {t("systems.buySetupDirectly")}
                       </a>
                     );
                   })()}
@@ -904,11 +754,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
           </div>
 
           <div className="mt-10 grid gap-5 rounded-[30px] border border-white/10 bg-white/[0.03] p-7 backdrop-blur-xl sm:grid-cols-3">
-            {[
-              ["01", "Free 20 minute audit", "We map where your hours and leads are leaking, and whether automation is even worth it for you."],
-              ["02", "We build it", "You answer a few questions. We design, build, and connect the system to the tools you already use."],
-              ["03", "Go live and we maintain it", "Live in days. Your monthly covers hosting, monitoring, and improvements as it runs."],
-            ].map(([step, title, text]) => (
+            {(t.raw("systems.steps") as { step: string; title: string; text: string }[]).map(({ step, title, text }) => (
               <div key={step}>
                 <div className="text-[11px] font-medium tracking-[0.25em] text-emerald-200/70">{step}</div>
                 <div className="mt-2 text-base font-semibold text-white">{title}</div>
@@ -920,13 +766,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
           {/* ── Vertical offers: hire an AI team, priced against the human role it replaces ── */}
           <div className="mt-16">
             <div className="mb-8 max-w-2xl">
-              <div className="text-xs uppercase tracking-[0.3em] text-white/40">Built for one industry at a time</div>
+              <div className="text-xs uppercase tracking-[0.3em] text-white/40">{t("verticals.eyebrow")}</div>
               <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">
-                Or hire a full AI team for your business
+                {t("verticals.title")}
               </h3>
               <p className="mt-3 text-white/55 leading-7">
-                Same install, same maintenance, tuned to how your industry actually works and priced
-                against the role it replaces, not against other software.
+                {t("verticals.subtitle")}
               </p>
             </div>
 
@@ -950,7 +795,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
 
                     <div className="mt-6 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                       <span className={`text-3xl font-semibold tracking-[-0.04em] ${v.accent}`}>{v.monthly}</span>
-                      <span className="text-sm text-white/55">for the AI team</span>
+                      <span className="text-sm text-white/55">{t("systems.aiTeamLabel")}</span>
                     </div>
                     <p className="mt-1.5 text-xs leading-5 text-white/45">{v.monthlyNote}</p>
 
@@ -979,26 +824,26 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
 
                     <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-4">
                       <div className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${v.accentSoft}`}>
-                        Start here, before you pay anything
+                        {t("verticals.startHereLabel")}
                       </div>
                       <p className="mt-1.5 text-sm leading-6 text-white/72">{v.offer}</p>
                     </div>
 
                     <div className="mt-6 flex flex-col gap-3">
                       {servicePagePath(v.id) ? (
-                        <Link
+                        <LocaleLink
                           href={servicePagePath(v.id)!}
                           className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10"
                         >
-                          See how the AI team works
-                        </Link>
+                          {t("verticals.seeHowTeamWorks")}
+                        </LocaleLink>
                       ) : null}
                       {v.id === "law-firms" && (
                         <Link
                           href="/demo/law-firm-ai-team"
                           className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${v.accentBtn}`}
                         >
-                          Watch the firm leak demo
+                          {t("verticals.watchFirmLeakDemo")}
                         </Link>
                       )}
                       {v.id === "brokerages" && (
@@ -1006,7 +851,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                           href="/demo/brokerage-ai-team"
                           className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${v.accentBtn}`}
                         >
-                          See the team in action
+                          {t("verticals.seeTeamInAction")}
                         </Link>
                       )}
                       {v.whopCheckoutUrl && (
@@ -1030,7 +875,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                             <circle cx="20" cy="21" r="1" />
                             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
                           </svg>
-                          Subscribe directly
+                          {t("verticals.subscribeDirectly")}
                         </a>
                       )}
                     </div>
@@ -1113,9 +958,9 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
         {/* ── FAQ (also powers the FAQPage rich snippet) ── */}
         <section id="faq" className="mx-auto max-w-7xl py-10 sm:py-16">
           <div className="mb-8 max-w-3xl">
-            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">FAQ</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">{t("faq.eyebrow")}</div>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
-              Questions we get asked
+              {t("faq.title")}
             </h2>
           </div>
 
@@ -1149,12 +994,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
           <section id="contact" className="mx-auto max-w-7xl py-10 sm:py-16 pb-24">
             <div className="overflow-hidden rounded-[38px] border border-white/10 bg-white/[0.05] p-8 sm:p-10 lg:p-12 backdrop-blur-2xl">
               <Reveal className="text-center max-w-2xl mx-auto">
-                <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">Connect</div>
+                <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">{t("contact.eyebrow")}</div>
                 <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
-                  Stay in the loop
+                  {t("contact.title")}
                 </h2>
                 <p className="mt-4 text-white/62 leading-7">
-                  Follow Zenith Studio for new product drops, workflow breakdowns, and behind-the-scenes builds.
+                  {t("contact.subtitle")}
                 </p>
 
                 {/* Whop Shop CTA */}
@@ -1167,7 +1012,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                   </svg>
-                  Get Our Products & Services
+                  {t("contact.shopCta")}
                 </a>
           
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -1180,7 +1025,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                     </svg>
                     <div className="text-left">
-                      <div className="text-xs text-white/40 uppercase tracking-wider">Email</div>
+                      <div className="text-xs text-white/40 uppercase tracking-wider">{t("contact.emailLabel")}</div>
                       <div className="text-sm font-medium text-white/80">zenith.studio.s@outlook.com</div>
                     </div>
                   </a>
@@ -1196,7 +1041,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                       <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                     </svg>
                     <div className="text-left">
-                      <div className="text-xs text-white/40 uppercase tracking-wider">YouTube</div>
+                      <div className="text-xs text-white/40 uppercase tracking-wider">{t("contact.youtubeLabel")}</div>
                       <div className="text-sm font-medium text-white/80">Zenith Studio</div>
                     </div>
                   </a>
@@ -1208,13 +1053,13 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
 
       <footer className="relative z-10 border-t border-white/8 px-4 sm:px-6 lg:px-10 py-8 text-sm text-white/42">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>© 2026 Zenith Studio. Custom automation, digital products, and intelligent systems.</div>
+          <div>{t("footer.copyright")}</div>
           <div className="flex gap-5">
-            <a href="#work" className="hover:text-white/70">Work</a>
-            <a href="#services" className="hover:text-white/70">Services</a>
-            <a href="#systems" className="hover:text-white/70">Pricing</a>
-            <Link href="/lab" className="hover:text-white/70">Courses</Link>
-            <a href="#contact" className="hover:text-white/70">Connect</a>
+            <a href="#work" className="hover:text-white/70">{t("footer.work")}</a>
+            <a href="#services" className="hover:text-white/70">{t("footer.services")}</a>
+            <a href="#systems" className="hover:text-white/70">{t("footer.pricing")}</a>
+            <Link href="/lab" className="hover:text-white/70">{t("footer.courses")}</Link>
+            <a href="#contact" className="hover:text-white/70">{t("footer.connect")}</a>
           </div>
         </div>
       </footer>

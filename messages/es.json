@@ -1,0 +1,183 @@
+{
+  "nav": {
+    "work": "Trabajo",
+    "services": "Servicios",
+    "pricing": "Precios",
+    "courses": "Cursos",
+    "contact": "Contacto",
+    "signIn": "Iniciar sesión",
+    "freeAudit": "Obtén una auditoría gratis"
+  },
+  "footer": {
+    "copyright": "© 2026 Zenith Studio. Automatización a medida, productos digitales y sistemas inteligentes.",
+    "work": "Trabajo",
+    "services": "Servicios",
+    "pricing": "Precios",
+    "courses": "Cursos",
+    "connect": "Conecta"
+  },
+  "hero": {
+    "badge": "Sistemas de automatización para CUALQUIER negocio",
+    "titleLine1": "Construye más rápido.",
+    "titleLine2": "Escala con precisión.",
+    "titleLine3": "Automatiza lo que importa.",
+    "ctaAudit": "Obtén tu Auditoría de Automatización Gratis",
+    "ctaPricing": "Ver precios",
+    "bookCallPrefix": "¿Prefieres hablarlo en persona?",
+    "bookCallLink": "Reserva la llamada de auditoría de $35",
+    "card1Title": "Proyectos propios",
+    "card1Text": "Nuestro propio SaaS: VoyAI y SmartRevise",
+    "card2Title": "Servicios",
+    "card2Text": "Automatización con IA e ingeniería a medida",
+    "builtForLabel": "Diseñado para",
+    "builtForText": "Bienes raíces · Viajes · Ecommerce",
+    "outcomeLabel": "Resultado clave",
+    "outcomeTitle": "Menos trabajo manual",
+    "outcomeText": "Más visibilidad. Más velocidad."
+  },
+  "auditOptions": {
+    "eyebrow": "Empieza aquí",
+    "title": "Dos formas de obtener una auditoría",
+    "subtitle": "Elige la que mejor se adapte a tu forma de trabajar. Ambas te dicen exactamente dónde ayudaría la automatización y cuánto costaría, solo que de forma distinta.",
+    "free": {
+      "label": "Auditoría de Automatización Gratis",
+      "priceLabel": "evaluación escrita",
+      "description": "Completa un formulario breve sobre tu negocio. Lo revisamos y te enviamos una evaluación escrita: dónde se están perdiendo horas y leads, si la automatización vale la pena para ti, y un cálculo aproximado de tiempo y coste si es así. Sin llamada necesaria.",
+      "features": ["Asíncrono, por correo electrónico", "Hallazgos y propuesta por escrito", "Sin pago, sin compromiso de tiempo"],
+      "cta": "Obtén tu auditoría gratis"
+    },
+    "paid": {
+      "badge": "Llamada en directo",
+      "label": "Llamada de Auditoría de Automatización de 20 minutos",
+      "priceLabel": "pago único, al reservar",
+      "description": "Sáltate el formulario. Reserva una llamada real de 20 minutos con nosotros, analizamos tu negocio en directo, hablamos de qué vale la pena automatizar y te vas con un plan. El pago se cobra al reservar y la llamada se confirma al instante.",
+      "features": ["En directo, en llamada con nosotros", "Reserva instantánea, sin esperar una respuesta escrita", "Con un precio independiente de la auditoría gratis, no es un descuento sobre ella"],
+      "cta": "Reserva la llamada de auditoría de $35"
+    }
+  },
+  "portfolio": {
+    "eyebrow": "División 01 · Proyectos propios",
+    "title": "El estudio detrás de los productos",
+    "description": "Estos no son logos de clientes. Son nuestros propios productos. Zenith Studio los diseña, construye y opera de principio a fin: <b1>VoyAI</b1> en la plataforma <b2>Atlas & Awe</b2>, y <b3>SmartRevise</b3> en la plataforma <b4>A+ Academy</b4>.",
+    "builtBy": "Creado por Zenith",
+    "items": [
+      { "category": "SaaS de viajes con IA", "tagline": "Todo tu viaje, planificado en 60 segundos.", "description": "Un planificador de viajes con IA que convierte unas pocas indicaciones en itinerarios reales con precios de hoteles, vuelos y tours reservables en tiempo real. Impulsado por la plataforma Atlas & Awe." },
+      { "category": "SaaS de estudio con IA", "tagline": "Apuntes convertidos en conocimiento listo para el examen.", "description": "Pega tus apuntes o un PDF y obtén al instante tarjetas de estudio con IA, repetición espaciada, cuestionarios, exámenes simulados y un tutor personal. Impulsado por la plataforma A+ Academy." },
+      { "category": "Plataforma de viajes", "tagline": "Viaja con inteligencia.", "description": "Una publicación de viajes europea independiente y la plataforma de audiencia detrás de VoyAI, con más de 120 guías curadas en más de 15 países." },
+      { "category": "Plataforma EdTech", "tagline": "Deja de estudiar más duro. Empieza a estudiar como un sistema.", "description": "El sistema de estudio construido por ingenieros detrás de SmartRevise: pensamiento sistémico y ciencia cognitiva aplicados a cómo aprenden los estudiantes." }
+    ]
+  },
+  "services": {
+    "eyebrow": "División 02 · Servicios",
+    "title": "Lo que construye Zenith Studio",
+    "subtitle": "Sistemas diseñados para que los negocios se muevan más rápido, encuentren mejores oportunidades y reduzcan el trabajo repetitivo.",
+    "browseCourses": "Explora los cursos",
+    "comingSoon": "Próximamente",
+    "items": [
+      { "title": "Flujos de Automatización con IA", "description": "Automatización inteligente de principio a fin: desde el enrutamiento de leads y la sincronización con el CRM hasta cadenas de agentes de IA de varios pasos que gestionan lógica de negocio compleja sin intervención humana." },
+      { "title": "Programación y Scripting Avanzado", "description": "Integraciones a medida con Python, Node.js y APIs que impulsan los flujos que las herramientas sin código no alcanzan: pipelines de datos, web scrapers, herramientas internas y sistemas backend construidos desde cero." },
+      { "title": "Zenith AI", "description": "Sistemas de automatización llave en mano que gestionan la captación de leads, la comunicación con clientes y las reservas para que las empresas crezcan más rápido con menos esfuerzo manual. Instalaciones listas para usar como el AI Receptionist y el sistema de Captación de Leads, en marcha en aproximadamente una semana. Ver precios abajo." },
+      { "title": "Zenith Lab", "description": "Cursos orientados a la carrera en automatización, IA, datos y Web3: las habilidades que la IA no reemplazará en 2026/2027. Cada curso incluye una Edición de Ruta Profesional, así que no solo aprendes, sino que sabes exactamente dónde aplicarlo y cómo cobrar por ello." }
+    ]
+  },
+  "systems": {
+    "eyebrow": "Zenith AI · Llave en mano",
+    "title": "Pon tu trabajo repetitivo en piloto automático",
+    "subtitle": "Tres sistemas que instalamos por ti, construidos una vez y ajustados a tu negocio. Precio fijo, sin permanencia, en marcha en aproximadamente una semana. ¿No sabes cuál necesitas? La auditoría gratis te dice exactamente por dónde empezar.",
+    "setupLabel": "instalación",
+    "mostPopular": "Más popular",
+    "seeHowItWorks": "Ver cómo funciona",
+    "tryLiveDemo": "Probar la demo en vivo",
+    "buySetupDirectly": "Comprar la instalación directamente",
+    "aiTeamLabel": "por el equipo de IA",
+    "items": [
+      {
+        "name": "AI Inbox Manager",
+        "pitch": "Despierta con una bandeja de entrada ya gestionada.",
+        "description": "Clasifica y prioriza el correo, y redacta respuestas a los mensajes rutinarios para que tu día empiece con decisiones, no con tareas administrativas.",
+        "live": "En marcha en 2 a 4 días",
+        "features": ["Clasificación y priorización de correo", "Respuestas redactadas por IA para correo rutinario", "Compatible con Gmail (personal) y Yahoo Mail"]
+      },
+      {
+        "name": "AI Lead Capture & Follow-Up",
+        "pitch": "No vuelvas a perder un lead por una respuesta lenta.",
+        "description": "Captura cada consulta, la califica y hace seguimiento por correo y SMS hasta que reserve. El negocio que responde primero se queda con el trabajo.",
+        "live": "En marcha en 3 a 5 días",
+        "features": ["Captura leads de cada fuente", "Los califica y puntúa automáticamente", "Secuencias de seguimiento por correo y SMS", "Se sincroniza con tu CRM, con informes"]
+      },
+      {
+        "name": "AI Receptionist & Booking",
+        "pitch": "Responde y agenda mientras estás trabajando.",
+        "description": "Gestiona consultas las 24 horas, agenda directamente en tu calendario y envía los recordatorios que reducen las ausencias.",
+        "live": "En marcha en 5 a 7 días",
+        "features": ["Gestión de consultas 24/7", "Agenda en tu calendario existente", "Recordatorios automáticos para reducir ausencias", "Escala todo lo que no debería responder"]
+      }
+    ],
+    "steps": [
+      { "step": "01", "title": "Auditoría gratis de 20 minutos", "text": "Ubicamos dónde se están perdiendo tus horas y leads, y si la automatización realmente vale la pena para ti." },
+      { "step": "02", "title": "Lo construimos", "text": "Respondes unas preguntas. Diseñamos, construimos y conectamos el sistema a las herramientas que ya usas." },
+      { "step": "03", "title": "Lo lanzamos y lo mantenemos", "text": "En marcha en días. Tu cuota mensual cubre hosting, monitoreo y mejoras mientras funciona." }
+    ]
+  },
+  "verticals": {
+    "eyebrow": "Diseñado para un sector a la vez",
+    "title": "O contrata un equipo de IA completo para tu negocio",
+    "subtitle": "La misma instalación, el mismo mantenimiento, ajustado a cómo funciona realmente tu sector y con un precio frente al rol que reemplaza, no frente a otro software.",
+    "startHereLabel": "Empieza aquí, antes de pagar nada",
+    "seeHowTeamWorks": "Ver cómo funciona el equipo de IA",
+    "watchFirmLeakDemo": "Ver la demo de la fuga del bufete",
+    "seeTeamInAction": "Ver el equipo en acción",
+    "subscribeDirectly": "Suscribirse directamente",
+    "items": [
+      {
+        "eyebrow": "Para bufetes de abogados",
+        "headline": "Tu bufete trabaja 49 horas a la semana y factura 37.",
+        "lede": "Esa brecha de doce horas equivale a unos $230,000 por abogado, al año. No se pierde ante la competencia ni por mal marketing. Es trabajo que ya hiciste y nunca facturaste.",
+        "monthlyNote": "Por el Mensajero de Texto de Llamadas Perdidas + el Auxiliar de Seguimiento, como un solo equipo. El Auxiliar de Facturación se cobra según lo que recupera, no con una tarifa fija.",
+        "statsLabels": ["utilización media del abogado", "tasa media de realización", "castigos a 14 días frente a 45"],
+        "roster": [
+          { "role": "AI Billing Clerk (Auxiliar de Facturación)", "text": "Reconstruye el tiempo facturable a partir de tu calendario, correo y documentos, redacta entradas con narrativas reales, y saca las facturas dentro de la ventana de 14 días donde los castigos son del 6% en lugar del 18%.", "anchor": "Se cobra según lo que recupera." },
+          { "role": "AI Missed Call Text-Back (Respuesta a Llamadas Perdidas)", "text": "En el momento en que una llamada queda sin responder, quien llama recibe un mensaje de texto en segundos, se califica según tus criterios del caso, y se agenda la consulta, así que una llamada perdida nunca se convierte en una llamada al bufete de al lado.", "anchor": "El 34% de quienes llegan al buzón de voz nunca vuelve a llamar a tu bufete." },
+          { "role": "AI Follow-Up Clerk (Auxiliar de Seguimiento)", "text": "Trabaja los leads que no se convirtieron en la primera llamada. Ya pagaste por cada uno de ellos, y la mayoría de los bufetes nunca vuelve a tocarlos.", "anchor": "Los leads legales cuestan en promedio $131 cada uno, el más alto de cualquier sector." }
+        ],
+        "guardrail": "Apruebas cada entrada. Nada sale del bufete sin la aprobación de un socio.",
+        "offer": "Reconstruiremos un mes pasado de tu tiempo no facturado antes de que pagues nada. Obtienes una cifra. Si no vale la pena actuar sobre ella, hemos terminado."
+      },
+      {
+        "eyebrow": "Para inmobiliarias",
+        "headline": "Tus agentes no se van por una mejor comisión.",
+        "lede": "Se van porque hacen cuatro trabajos a la vez: prospección, seguimiento, papeleo y una base de datos que nadie ha tocado en un año. Cada agente que se va te cuesta entre $15,000 y $50,000.",
+        "monthlyNote": "Por el Agente de Ventas Interno + el Gestor de Base de Datos, como un solo equipo. La Coordinación de Transacciones se factura por expediente, entre $150 y $200.",
+        "statsLabels": ["tiempo medio de respuesta a leads del agente", "más probabilidad de conversión dentro de 5 minutos", "agentes reclutados que siguen ahí en el quinto año"],
+        "roster": [
+          { "role": "AI Inside Sales Agent (Agente de Ventas Interno)", "text": "Responde a nuevos leads en segundos, califica motivación, plazos y financiación, y agenda la cita antes de que un competidor conteste el teléfono.", "anchor": "Los coaches dicen que necesitas 500 prospectos para justificar contratar un ISA. Este tiene sentido con cincuenta." },
+          { "role": "AI Transaction Coordinator (Coordinador de Transacciones)", "text": "Del contrato al cierre. Plazos controlados, documentos gestionados y todas las partes informadas sin que nadie tenga que preguntar.", "anchor": "Los coordinadores externos cuestan entre $350 y $450 por expediente." },
+          { "role": "AI Database Manager (Gestor de Base de Datos)", "text": "Reactiva los contactos inactivos y antiguos clientes que ya están en tu CRM. No son leads nuevos, son los que ya pagaste.", "anchor": "Las referencias y la repetición son la mayor parte del negocio de un agente, y casi nadie las trabaja." }
+        ],
+        "guardrail": "También es el mejor argumento de reclutamiento que tienes. Un equipo desde el primer día pesa más que otro punto de comisión.",
+        "offer": "Primero activaremos tu base de datos inactiva. Pagas con lo que produce."
+      }
+    ]
+  },
+  "faq": {
+    "eyebrow": "Preguntas frecuentes",
+    "title": "Preguntas que nos hacen",
+    "items": [
+      { "q": "¿Cuánto cuesta la automatización con IA para una pequeña empresa?", "a": "El AI Inbox Manager cuesta $190 de instalación más $150 al mes. El sistema de Captación de Leads cuesta $270 de instalación más $200 al mes, y el AI Receptionist cuesta $360 de instalación más $300 al mes. La cuota mensual cubre hosting, monitoreo y mejoras continuas, y no hay contrato de permanencia." },
+      { "q": "¿Cuánto tiempo lleva configurar un sistema de automatización con IA?", "a": "La mayoría de los sistemas están en marcha entre 2 y 7 días, según cuál elijas. La auditoría gratis te da un plazo exacto antes de comprometerte a nada." },
+      { "q": "¿Necesito conocimientos técnicos para usarlo?", "a": "Ninguno en absoluto. Nosotros construimos, alojamos y mantenemos todo. Tú usas el sistema y recuperas el tiempo. Si algo falla, nos alertamos antes de que lo notes." },
+      { "q": "¿En qué se diferencia de contratar a un asistente virtual?", "a": "Un asistente virtual cuesta mucho más al mes, trabaja horarios fijos y necesita gestión. Estos sistemas funcionan 24/7, responden en menos de un minuto, nunca toman vacaciones y cuestan una fracción de un salario. La mayoría de los clientes usan ambos: el sistema gestiona el volumen repetitivo, la persona gestiona las excepciones." },
+      { "q": "¿Con qué herramientas se integra?", "a": "Con las herramientas que ya usas. Gmail y Outlook, tu CRM, Google Calendar y Cal.com, WhatsApp y SMS, Slack, y la mayoría de las plataformas con una API. El sistema se construye alrededor de tu stack en lugar de pedirte que cambies." },
+      { "q": "¿Puedo cancelar el plan mensual?", "a": "Sí, cuando quieras. No hay permanencia. La cuota mensual cubre hosting, monitoreo y mejoras, y conservas todo lo que se construyó para ti." },
+      { "q": "¿Cuál es la diferencia entre la auditoría gratis y la llamada de auditoría de $35?", "a": "La auditoría gratis es una evaluación escrita: completas un formulario, lo revisamos y te enviamos hallazgos y una propuesta por correo, sin coste. La llamada de auditoría de $35 es una llamada en directo de 20 minutos aparte, reservada y pagada por adelantado a través de Cal.com. Ninguna es un descuento ni una vista previa de la otra, son dos formas distintas de conseguir una auditoría." }
+    ]
+  },
+  "contact": {
+    "eyebrow": "Conecta",
+    "title": "Mantente al tanto",
+    "subtitle": "Sigue a Zenith Studio para nuevos lanzamientos de productos, desgloses de flujos de trabajo y contenido detrás de escenas.",
+    "shopCta": "Consigue Nuestros Productos y Servicios",
+    "emailLabel": "Correo",
+    "youtubeLabel": "YouTube"
+  }
+}

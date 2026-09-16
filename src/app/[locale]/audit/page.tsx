@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import AuditForm from "./AuditForm";
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 

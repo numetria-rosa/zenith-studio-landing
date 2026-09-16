@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import PlainLink from "next/link";
+import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
 import { getService } from "@/lib/services";
 import { allServicePageSlugs, getServicePage, PAID_AUDIT_BOOKING_URL } from "@/lib/service-pages";
 import ServiceHeroVisual from "./ServiceHeroVisual";
 import ReceptionistFlowDiagram from "./ReceptionistFlowDiagram";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export function generateStaticParams() {
   return allServicePageSlugs().map((slug) => ({ slug }));
@@ -58,12 +60,15 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
             <span className="px-2">/</span>
             <span className="text-white/80">{page.title}</span>
           </nav>
-          <Link
-            href="/audit"
-            className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
-          >
-            Free written audit
-          </Link>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <Link
+              href="/audit"
+              className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
+            >
+              Free written audit
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -92,44 +97,44 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
                 Learn more
               </a>
               {page.serviceId === "ai-receptionist" && (
-                <Link
+                <PlainLink
                   href="/demo/ai-receptionist"
                   className="inline-flex items-center justify-center rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-6 py-3 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-400/20"
                 >
                   Try the live demo
-                </Link>
+                </PlainLink>
               )}
               {page.serviceId === "law-firms" && (
-                <Link
+                <PlainLink
                   href="/demo/law-firm-ai-team"
                   className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-400/10 px-6 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/20"
                 >
                   See it in action
-                </Link>
+                </PlainLink>
               )}
               {page.serviceId === "ai-inbox-manager" && (
-                <Link
+                <PlainLink
                   href="/demo/ai-inbox-manager"
                   className="inline-flex items-center justify-center rounded-xl border border-amber-300/40 bg-amber-400/10 px-6 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/20"
                 >
                   Try the live demo
-                </Link>
+                </PlainLink>
               )}
               {page.serviceId === "ai-lead-capture" && (
-                <Link
+                <PlainLink
                   href="/demo/ai-lead-capture-follow-up"
                   className="inline-flex items-center justify-center rounded-xl border border-sky-400/40 bg-sky-400/10 px-6 py-3 text-sm font-semibold text-sky-200 transition hover:bg-sky-400/20"
                 >
                   Try the live demo
-                </Link>
+                </PlainLink>
               )}
               {page.serviceId === "brokerages" && (
-                <Link
+                <PlainLink
                   href="/demo/brokerage-ai-team"
                   className="inline-flex items-center justify-center rounded-xl border border-sky-400/40 bg-sky-400/10 px-6 py-3 text-sm font-semibold text-sky-200 transition hover:bg-sky-400/20"
                 >
                   See it in action
-                </Link>
+                </PlainLink>
               )}
             </div>
             <div className="mt-8 grid max-w-lg grid-cols-2 gap-3">
