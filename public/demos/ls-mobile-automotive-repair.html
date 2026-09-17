@@ -74,7 +74,7 @@
   .top-call{ font-size:.9rem; padding:.7em 1.2em; }
 
   /* ---- hero ---- */
-  .hero{ padding-block:56px 64px; position:relative; overflow:hidden; }
+  .hero{ padding-block:22px 44px; position:relative; overflow:hidden; }
   .hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:48px; align-items:center; }
   @media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } }
 
@@ -88,10 +88,15 @@
   @media (prefers-reduced-motion:reduce){ .eyebrow .dot{animation:none;} }
 
   h1{
-    font-family:var(--font-display); font-weight:700; line-height:1.02; letter-spacing:-.01em;
+    font-family:var(--font-display); font-weight:700; line-height:1.16; letter-spacing:-.01em;
     font-size:clamp(2.3rem,6vw,3.8rem); margin:0 0 22px; text-wrap:balance;
   }
-  h1 mark{ background:var(--lime-500); color:var(--lime-ink); padding:0 .12em; border-radius:4px; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+  h1 mark{
+    background-color:transparent; color:var(--ink-950);
+    background-image:linear-gradient(var(--lime-500),var(--lime-500));
+    background-repeat:no-repeat; background-size:100% .32em; background-position:0 92%;
+    padding:0 .04em; box-decoration-break:clone; -webkit-box-decoration-break:clone;
+  }
 
   .hero-sub{ max-width:46ch; color:var(--ink-600); font-size:clamp(1rem,2vw,1.15rem); line-height:1.6; margin:0 0 32px; }
 
@@ -116,6 +121,13 @@
   .hero-badge b{ font-family:var(--font-display); font-size:1.6rem; display:block; color:var(--lime-500); }
   .hero-badge span{ font-size:.74rem; color:var(--ink-400); text-transform:uppercase; letter-spacing:.06em; }
   @media (max-width:520px){ .hero-badge{ left:0; bottom:-14px; padding:12px 16px; } }
+
+  /* ---- marquee ---- */
+  .marquee{ overflow:hidden; border-top:2px solid var(--ink-950); border-bottom:2px solid var(--ink-950); background:var(--ink-950); }
+  .marquee-track{ display:flex; gap:16px; width:max-content; padding-block:16px; animation:marquee 32s linear infinite; }
+  @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+  @media (prefers-reduced-motion:reduce){ .marquee-track{ animation:none; } }
+  .marquee-track img{ height:110px; width:160px; object-fit:cover; border-radius:10px; border:2px solid var(--lime-500); flex:none; display:block; }
 
   /* ---- reveal ---- */
   .reveal{ opacity:1; transform:none; transition:opacity .6s ease, transform .6s ease; }
@@ -273,8 +285,8 @@
           <div><b>4.9&#9733; (62)</b><span>Google rating</span></div>
         </div>
         <div class="trust-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-          <div><b>No website</b><span>listed, you found us here first</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><b>We come to you</b><span>Driveway, office lot, wherever it's parked</span></div>
         </div>
         <div class="trust-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
@@ -293,6 +305,23 @@
     </div>
   </div>
 </section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <img src="https://images.unsplash.com/photo-1555140713-973b9f36cd1e?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1625047509248-ec889cbff17f?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1675462205897-1c2145b996fc?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1632733711679-529326f6db12?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1729792706191-08f3ed158650?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1555140713-973b9f36cd1e?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1625047509248-ec889cbff17f?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1675462205897-1c2145b996fc?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1632733711679-529326f6db12?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=500&q=80" alt="">
+    <img src="https://images.unsplash.com/photo-1729792706191-08f3ed158650?auto=format&fit=crop&w=500&q=80" alt="">
+  </div>
+</div>
 
 <section id="services">
   <div class="wrap">
