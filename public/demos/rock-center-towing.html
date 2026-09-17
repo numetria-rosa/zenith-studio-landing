@@ -399,33 +399,6 @@
     margin:0;
   }
 
-  /* ---- highway photo band ---- */
-  .photo-band{
-    position:relative;
-    height:clamp(220px,38vw,420px);
-    overflow:hidden;
-  }
-  .photo-band img{
-    width:100%;height:100%;object-fit:cover;display:block;
-  }
-  .photo-band::after{
-    content:"";
-    position:absolute;inset:0;
-    background:
-      linear-gradient(180deg, rgba(12,13,16,.25) 0%, var(--asphalt-950) 96%),
-      linear-gradient(90deg, rgba(12,13,16,.65) 0%, rgba(12,13,16,.1) 45%, transparent 70%);
-  }
-  .photo-band-label{
-    position:absolute;
-    left:clamp(20px,4.5vw,64px);
-    bottom:22px;
-    font-family:var(--font-mono);
-    font-size:.72rem;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-    color:var(--amber-400);
-  }
-
   /* ---- coverage ---- */
   .coverage-wrap{
     display:grid;
@@ -658,13 +631,6 @@
 
 <div class="lane"></div>
 
-<section class="photo-band">
-  <img src="https://images.unsplash.com/photo-1760127831098-6a75c69ee79c?auto=format&fit=crop&w=1600&q=80" alt="Tow truck headlights cutting through the dark on a highway at night" loading="lazy">
-  <span class="photo-band-label">On the road, day or night</span>
-</section>
-
-<div class="lane"></div>
-
 <section>
   <div class="wrap coverage-wrap">
     <div>
@@ -673,6 +639,7 @@
       <p class="reveal pre" style="color:var(--concrete-400);max-width:48ch;line-height:1.6;margin-bottom:24px;">
         Based out of Rockford and running Winnebago County roads every day. If you're near I-90, I-39 or US-20, we already know the fastest way to you.
       </p>
+      <p class="reveal pre" style="font-family:var(--font-mono);font-size:.82rem;color:var(--concrete-400);margin:0 0 24px;">6304 Grassridge Rd, Rockford, IL 61108</p>
       <div class="sign-row reveal pre">
         <span class="sign">Rockford</span>
         <span class="sign">Loves Park</span>
@@ -712,7 +679,7 @@
 <footer>
   <div class="wrap">
     <div class="foot-grid">
-      <div><b>Rock Center Towing</b><br>Rockford, IL</div>
+      <div><b>Rock Center Towing</b><br>6304 Grassridge Rd, Rockford, IL 61108</div>
       <div><b>Hours</b><br>Open 24 hours, every day</div>
       <div><b>Dispatch</b><br><a href="tel:+17792386231" style="color:var(--concrete-400)">(779) 238-6231</a></div>
     </div>
