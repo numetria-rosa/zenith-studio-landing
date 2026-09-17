@@ -62,6 +62,13 @@
   }
 
   /* ---- hero: single-column, no split widget ---- */
+
+  .brand-group{ display:flex; align-items:center; gap:28px; flex-wrap:wrap; min-width:0; }
+  .nav-links{ display:flex; gap:1.5em; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; }
+  .nav-links a{ text-decoration:none; color:var(--slate-400); transition:color .15s ease; }
+  .nav-links a:hover{ color:var(--cyan-400); }
+  @media (max-width:820px){ .nav-links{ display:none; } }
+
   .hero{ padding-block:72px 48px; position:relative; }
   .hero::before{
     content:""; position:absolute; inset:-10% -10% auto -10%; height:420px;
@@ -194,7 +201,15 @@
 
 <div class="wrap">
   <header class="top">
-    <div class="brand"><span class="blip"></span>Mal's Mobile Auto Repair</div>
+    <div class="brand-group">
+      <div class="brand"><span class="blip"></span>Mal's Mobile Auto Repair</div>
+      <nav class="nav-links">
+        <a href="#services">Services</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#coverage">Coverage</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
     <a class="top-call" href="tel:+18152622948">(815) 262-2948</a>
   </header>
 </div>
@@ -247,7 +262,7 @@
   </div>
 </section>
 
-<section>
+<section id="services">
   <div class="wrap">
     <p class="kicker reveal pre">What we fix</p>
     <h2 class="reveal pre">Full service, no shop needed</h2>
@@ -280,7 +295,7 @@
   </div>
 </section>
 
-<section>
+<section id="reviews">
   <div class="wrap quote-block">
     <p class="kicker reveal pre">From customers</p>
     <div class="quote-mark reveal pre">&#8220;</div>
@@ -293,7 +308,7 @@
   </div>
 </section>
 
-<section>
+<section id="coverage">
   <div class="wrap">
     <p class="kicker reveal pre">Details</p>
     <h2 class="reveal pre">Rockford &amp; the surrounding area</h2>
@@ -319,7 +334,7 @@
   </div>
 </section>
 
-<section class="final-cta">
+<section id="contact" class="final-cta">
   <div class="console">
     <a class="call" href="tel:+18152622948">
       <span class="label">

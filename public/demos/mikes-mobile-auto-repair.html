@@ -70,6 +70,12 @@
     padding:.5em .8em; white-space:nowrap; font-variant-numeric:tabular-nums; background:var(--graphite-900);
   }
 
+  .brand-group{ display:flex; align-items:center; gap:28px; flex-wrap:wrap; min-width:0; }
+  .nav-links{ display:flex; gap:1.5em; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; }
+  .nav-links a{ text-decoration:none; color:var(--khaki-400); transition:color .15s ease; }
+  .nav-links a:hover{ color:var(--yellow-400); }
+  @media (max-width:820px){ .nav-links{ display:none; } }
+
   .hero{ position:relative; padding-block:60px 52px; overflow:hidden; }
   .hero-grid{ display:grid; grid-template-columns:minmax(0,620px) 1fr; gap:32px; align-items:center; }
   @media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } .pegboard{ display:none; } }
@@ -186,7 +192,14 @@
 
 <div class="wrap">
   <header class="top">
-    <div class="brand"><span class="blip"></span>Mikes Mobile Auto Repair</div>
+    <div class="brand-group">
+      <div class="brand"><span class="blip"></span>Mikes Mobile Auto Repair</div>
+      <nav class="nav-links">
+        <a href="#services">Services</a>
+        <a href="#coverage">Coverage</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
     <a class="top-call" href="tel:+17792071528">(779) 207-1528</a>
   </header>
 </div>
@@ -228,7 +241,7 @@
 
 <div class="pegrow"></div>
 
-<section>
+<section id="services">
   <div class="wrap">
     <p class="kicker reveal pre">What we fix</p>
     <h2 class="reveal pre">Full service, zero shop visit</h2>
@@ -269,7 +282,7 @@
 
 <div class="pegrow"></div>
 
-<section>
+<section id="coverage">
   <div class="wrap coverage-wrap">
     <div>
       <p class="kicker reveal pre">Coverage</p>
@@ -299,7 +312,7 @@
   </div>
 </section>
 
-<section>
+<section id="contact">
   <div class="wrap">
     <div class="cta-banner reveal pre">
       <h2>Car acting up?</h2>
