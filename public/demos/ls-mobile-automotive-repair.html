@@ -141,7 +141,9 @@
   .section-note{ max-width:34ch; color:var(--ink-600); font-size:.94rem; line-height:1.55; }
 
   /* ---- services ---- */
-  .service-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:2px; background:var(--ink-950); border:2px solid var(--ink-950); border-radius:16px; overflow:hidden; }
+  .service-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:var(--ink-950); border:2px solid var(--ink-950); border-radius:16px; overflow:hidden; }
+  @media (max-width:820px){ .service-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px){ .service-grid{ grid-template-columns:1fr; } }
   .service-card{ background:var(--ivory-100); padding:26px 24px; }
   .service-card svg{ width:26px;height:26px; stroke:var(--ink-950); margin-bottom:14px; }
   .service-card h3{ font-family:var(--font-display); font-weight:700; font-size:1.05rem; margin:0 0 8px; }
