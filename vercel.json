@@ -37,6 +37,10 @@
     {
       "source": "/Web3",
       "destination": "/Web3/index.html"
+    },
+    {
+      "source": "/demos/:slug",
+      "destination": "/demos/:slug.html"
     }
   ]
 }

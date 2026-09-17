@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ken's Home Maintenance</title>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Nunito+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;700&display=swap');
+
+  :root{
+    --walnut-950:#1b1611;
+    --walnut-900:#231d17;
+    --walnut-800:#332a20;
+    --walnut-700:#4a3d2d;
+    --cream-100:#f7f1e4;
+    --tan-400:#c9b89a;
+    --tan-500:#a4916f;
+    --green-500:#5c7a4f;
+    --green-400:#7fa06e;
+
+    --font-display:'Zilla Slab',Georgia,serif;
+    --font-body:'Nunito Sans',system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--walnut-950);
+    color:var(--cream-100);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;}
+  [hidden]{display:none!important;}
+
+  .wrap{ max-width:1360px; margin:0 auto; padding-inline:clamp(20px,4.5vw,64px); }
+  a{color:inherit;}
+
+  .grain{ height:2px; width:100%; background:linear-gradient(90deg, transparent, var(--green-500), transparent); opacity:.4; }
+
+  header.top{ padding-block:18px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 12px; }
+  .brand{
+    font-family:var(--font-display); font-weight:700; letter-spacing:0;
+    font-size:clamp(1rem,4.2vw,1.3rem); display:flex; align-items:center; gap:.55em; min-width:0;
+  }
+  .brand .blip{ width:9px;height:9px;border-radius:50%; background:var(--green-500); box-shadow:0 0 0 0 rgba(92,122,79,.6); animation:pulse 2.2s ease-out infinite; flex:none; }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(92,122,79,.5);}
+    70%{box-shadow:0 0 0 9px rgba(92,122,79,0);}
+    100%{box-shadow:0 0 0 0 rgba(92,122,79,0);}
+  }
+  @media (prefers-reduced-motion:reduce){ .brand .blip{animation:none;} }
+
+  .top-call{
+    font-family:var(--font-mono); font-weight:700; font-size:clamp(.78rem,3.4vw,1.02rem);
+    text-decoration:none; color:var(--cream-100); border:1px solid var(--walnut-700);
+    padding:.5em .8em; border-radius:3px; white-space:nowrap; font-variant-numeric:tabular-nums; background:var(--walnut-900);
+  }
+
+  .hero{ position:relative; padding-block:60px 52px; overflow:hidden; }
+  .hero-grid{ display:grid; grid-template-columns:minmax(0,620px) 1fr; gap:32px; align-items:center; }
+  @media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } .checklist{ display:none; } }
+
+  .eyebrow{
+    font-family:var(--font-mono); font-size:.76rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--green-400); display:flex; align-items:center; gap:.6em; margin-bottom:18px;
+  }
+  .eyebrow::before{ content:""; width:22px;height:1px; background:var(--green-400); display:inline-block; }
+
+  h1{
+    font-family:var(--font-display); font-weight:700; line-height:1.05;
+    font-size:clamp(2rem,7.4vw,4.1rem); margin:0 0 20px; text-wrap:balance;
+  }
+  h1 em{ font-style:normal; color:var(--green-500); }
+
+  .hero p.sub{ max-width:48ch; color:var(--tan-400); font-size:clamp(1rem,2vw,1.12rem); line-height:1.6; margin:0 0 32px; }
+
+  .cta-row{ display:flex; flex-wrap:wrap; gap:14px; margin-bottom:38px; }
+  .btn{
+    display:inline-flex; align-items:center; gap:.6em; font-family:var(--font-body); font-weight:600; font-size:1rem;
+    padding:.95em 1.5em; border-radius:4px; text-decoration:none; transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+    border:1px solid transparent;
+  }
+  .btn-primary{ background:var(--green-500); color:var(--cream-100); }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 10px 24px -8px rgba(92,122,79,.55); background:var(--green-400); }
+  .btn-ghost{ border-color:var(--walnut-700); color:var(--cream-100); background:var(--walnut-900); }
+  .btn-ghost:hover{ transform:translateY(-2px); border-color:var(--tan-500); background:var(--walnut-800); }
+
+  .hero-stats{ display:flex; flex-wrap:wrap; gap:28px 40px; }
+  .stat b{ display:block; font-family:var(--font-mono); font-weight:700; font-size:1.5rem; color:var(--cream-100); font-variant-numeric:tabular-nums; }
+  .stat span{ display:block; font-size:.76rem; color:var(--tan-500); text-transform:uppercase; letter-spacing:.08em; margin-top:2px; }
+
+  /* ---- checklist card (hero visual) ---- */
+  .checklist{
+    position:relative; width:100%; max-width:320px; margin-inline:auto;
+    border:1px solid var(--walnut-700); background:var(--walnut-900); border-radius:8px; padding:24px;
+  }
+  .checklist-title{ font-family:var(--font-mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--green-400); margin-bottom:16px; }
+  .check-row{ display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--walnut-800); opacity:0; animation:appear .5s ease forwards; }
+  .check-row:nth-child(2){ animation-delay:.3s; }
+  .check-row:nth-child(3){ animation-delay:.6s; }
+  .check-row:nth-child(4){ animation-delay:.9s; border-bottom:none; }
+  @keyframes appear{ to{ opacity:1; } }
+  @media (prefers-reduced-motion:reduce){ .check-row{ opacity:1; animation:none; } }
+  .check-box{
+    width:18px;height:18px;border-radius:4px;border:2px solid var(--green-500);
+    display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .check-box svg{ width:12px;height:12px; stroke:var(--green-400); }
+  .check-row span{ font-size:.88rem; color:var(--cream-100); }
+
+  .reveal{ opacity:1; transform:none; transition:opacity .6s ease, transform .6s ease; }
+  .reveal.pre{ opacity:0; transform:translateY(22px); }
+  @media (prefers-reduced-motion:reduce){ .reveal.pre{opacity:1;transform:none;} }
+
+  section{ padding-block:60px; }
+  .kicker{ font-family:var(--font-mono); font-size:.76rem; letter-spacing:.14em; text-transform:uppercase; color:var(--green-400); margin:0 0 10px; }
+  h2{ font-family:var(--font-display); font-weight:700; font-size:clamp(1.6rem,3.4vw,2.3rem); margin:0 0 34px; max-width:24ch; text-wrap:balance; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
+  .card{ background:var(--walnut-900); border:1px solid var(--walnut-700); border-radius:6px; padding:26px 22px; transition:transform .2s ease, border-color .2s ease, background .2s ease; }
+  .card:hover{ transform:translateY(-4px); border-color:var(--green-500); background:var(--walnut-800); }
+  .card svg{ width:26px;height:26px; stroke:var(--green-500); margin-bottom:16px; }
+  .card h3{ font-family:var(--font-body); font-weight:600; font-size:1.03rem; margin:0 0 8px; }
+  .card p{ color:var(--tan-400); font-size:.92rem; line-height:1.55; margin:0; }
+
+  .photo-band{ position:relative; height:clamp(220px,38vw,420px); overflow:hidden; }
+  .photo-band img{ width:100%;height:100%;object-fit:cover;display:block; filter:sepia(.1); }
+  .photo-band::after{
+    content:""; position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, rgba(27,22,17,.25) 0%, var(--walnut-950) 96%),
+      linear-gradient(90deg, rgba(27,22,17,.65) 0%, rgba(27,22,17,.1) 45%, transparent 70%);
+  }
+  .photo-band-label{ position:absolute; left:clamp(20px,4.5vw,64px); bottom:22px; font-family:var(--font-mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--green-400); }
+
+  .coverage-wrap{ display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:start; }
+  @media (max-width:760px){ .coverage-wrap{grid-template-columns:1fr;} }
+
+  .why-list{ display:flex; flex-direction:column; gap:18px; }
+  .why-item{ display:flex; gap:14px; align-items:flex-start; padding-bottom:18px; border-bottom:1px solid var(--walnut-800); }
+  .why-item:last-child{border-bottom:none;padding-bottom:0;}
+  .why-item svg{ width:20px;height:20px;flex:none;margin-top:3px; stroke:var(--green-500); }
+  .why-item h4{ font-size:1rem; font-weight:600; margin:0 0 4px; }
+  .why-item p{ color:var(--tan-400); font-size:.9rem; margin:0; line-height:1.5; }
+
+  .info-card{ background:var(--walnut-900); border:1px solid var(--walnut-700); border-radius:6px; padding:22px; }
+  .info-card dl{ display:grid; grid-template-columns:auto 1fr; gap:8px 16px; margin:0; font-size:.92rem; }
+  .info-card dt{ color:var(--tan-500); text-transform:uppercase; letter-spacing:.06em; font-size:.72rem; font-family:var(--font-mono); align-self:start; padding-top:2px; }
+  .info-card dd{ margin:0; color:var(--cream-100); }
+
+  .review-quote{ font-style:italic; color:var(--cream-100); }
+  .review-quote cite{ display:block; font-style:normal; font-size:.78rem; color:var(--tan-500); margin-top:6px; }
+
+  .cta-banner{
+    position:relative; background:linear-gradient(150deg,var(--green-500),var(--green-400));
+    color:var(--walnut-950); border-radius:10px; padding:48px 20px; text-align:center; overflow:hidden;
+  }
+  .cta-banner h2{ color:var(--walnut-950); margin:0 0 6px; max-width:none; }
+  .cta-banner p{ margin:0 0 26px; font-family:var(--font-body); font-weight:500; opacity:.85; }
+  .big-phone{
+    position:relative; display:inline-flex; align-items:baseline; gap:.3em;
+    font-family:var(--font-mono); font-weight:700; font-size:clamp(1.4rem,7.5vw,2.8rem);
+    color:var(--walnut-950); text-decoration:none; font-variant-numeric:tabular-nums;
+    border-bottom:3px solid var(--walnut-950); padding-bottom:4px; max-width:100%;
+  }
+
+  footer{ padding-block:40px calc(96px + env(safe-area-inset-bottom,0px)); color:var(--tan-500); font-size:.85rem; }
+  .foot-grid{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:20px; padding-top:28px; border-top:1px solid var(--walnut-800); }
+  .foot-grid b{ color:var(--tan-400); }
+
+  .dispatch{ position:fixed; left:0;right:0;bottom:0; z-index:40; display:flex; gap:1px; background:var(--walnut-700); padding-bottom:env(safe-area-inset-bottom,0px); }
+  .dispatch a{ flex:1; text-align:center; padding:14px 8px; font-weight:600; font-size:.92rem; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:.5em; }
+  .dispatch a:first-child{ background:var(--green-500); color:var(--cream-100); }
+  .dispatch a:last-child{ background:var(--walnut-900); color:var(--cream-100); }
+  .dispatch svg{ width:16px;height:16px; }
+
+  @media (min-width:761px){ .dispatch{display:none;} }
+  @media (max-width:760px){ footer{padding-bottom:100px;} }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="blip"></span>Ken's Home Maintenance</div>
+    <a class="top-call" href="tel:+19206219035">(920) 621-9035</a>
+  </header>
+</div>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Green Bay, WI &middot; Veteran-owned</p>
+      <h1 class="reveal pre">The fix-it list<br>gets <em>done.</em></h1>
+      <p class="sub reveal pre">Repairs, painting, drywall and the small jobs that keep piling up. One call, one honest guy who shows up and does the work right.</p>
+      <div class="cta-row reveal pre">
+        <a class="btn btn-primary" href="tel:+19206219035">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Call now
+        </a>
+        <a class="btn btn-ghost" href="sms:+19206219035">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Text us
+        </a>
+      </div>
+      <div class="hero-stats reveal pre">
+        <div class="stat"><b>4.0&#9733;</b><span>Google rating</span></div>
+        <div class="stat"><b>Veteran</b><span>Owned &amp; operated</span></div>
+        <div class="stat"><b>University Ave</b><span>Green Bay, WI</span></div>
+      </div>
+    </div>
+    <div class="checklist reveal pre" aria-hidden="true">
+      <div class="checklist-title">Today's punch list</div>
+      <div class="check-row"><div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><span>Fix leaky faucet</span></div>
+      <div class="check-row"><div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><span>Patch drywall, hallway</span></div>
+      <div class="check-row"><div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><span>Rehang porch door</span></div>
+      <div class="check-row"><div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><span>Touch-up paint, trim</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="grain"></div>
+
+<section>
+  <div class="wrap">
+    <p class="kicker reveal pre">What we handle</p>
+    <h2 class="reveal pre">No job too small to call</h2>
+    <div class="grid">
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <h3>General repairs</h3>
+        <p>Doors, cabinets, fixtures, loose railings &mdash; the everyday things that need an extra hand.</p>
+      </div>
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/></svg>
+        <h3>Drywall &amp; patching</h3>
+        <p>Holes, cracks and water damage patched smooth and ready to paint.</p>
+      </div>
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4-14 14H4v-4z"/></svg>
+        <h3>Interior painting</h3>
+        <p>Rooms, trim and touch-ups done clean, with drop cloths and no shortcuts.</p>
+      </div>
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V9l7-6 7 6v13"/><path d="M10 22v-7h4v7"/></svg>
+        <h3>Home improvements</h3>
+        <p>Small remodels and upgrades, planned and finished without the runaround.</p>
+      </div>
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <h3>Minor plumbing &amp; electrical</h3>
+        <p>Faucets, fixtures, switches and outlets &mdash; fixed right the first time.</p>
+      </div>
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <h3>Debris &amp; cleanup removal</h3>
+        <p>Hauling out what's left over once the job's done, so you don't have to.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="grain"></div>
+
+<section class="photo-band">
+  <img src="https://images.unsplash.com/photo-1631396326838-de37e5f8bcbc?auto=format&fit=crop&w=1600&q=80" alt="Handyman working on a piece of wood in a home workshop" loading="lazy">
+  <span class="photo-band-label">Careful work, every time</span>
+</section>
+
+<div class="grain"></div>
+
+<section>
+  <div class="wrap coverage-wrap">
+    <div>
+      <p class="kicker reveal pre">Coverage</p>
+      <h2 class="reveal pre">Green Bay &amp; the surrounding area</h2>
+      <p class="reveal pre" style="color:var(--tan-400);max-width:48ch;line-height:1.6;margin-bottom:24px;">
+        Based on University Ave in Green Bay. Call ahead to confirm we can reach your exact location.
+      </p>
+      <div class="why-list">
+        <div class="why-item reveal pre">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <div><h4>&ldquo;Great guy! Best prices.&rdquo;</h4><p class="review-quote">&mdash; <cite>Jess S., Google review</cite></p></div>
+        </div>
+        <div class="why-item reveal pre">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <div><h4>&ldquo;Does great work!&rdquo;</h4><p class="review-quote">&mdash; <cite>Travis, Local Guide</cite></p></div>
+        </div>
+      </div>
+    </div>
+    <div class="info-card reveal pre">
+      <dl>
+        <dt>Address</dt><dd>2835 University Ave, Green Bay, WI 54311</dd>
+        <dt>Rating</dt><dd>4.0&#9733; (4 Google reviews)</dd>
+        <dt>Phone</dt><dd><a href="tel:+19206219035">(920) 621-9035</a></dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-banner reveal pre">
+      <h2>Got a list piling up?</h2>
+      <p>Call or text Ken directly.</p>
+      <a class="big-phone" href="tel:+19206219035">(920) 621-9035</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div><b>Ken's Home Maintenance</b><br>Green Bay, WI</div>
+      <div><b>Service</b><br>Veteran-owned &middot; call for scheduling</div>
+      <div><b>Contact</b><br><a href="tel:+19206219035" style="color:var(--tan-400)">(920) 621-9035</a></div>
+    </div>
+  </div>
+</footer>
+
+<div class="dispatch">
+  <a href="tel:+19206219035">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    Call Now
+  </a>
+  <a href="sms:+19206219035">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    Text
+  </a>
+</div>
+
+<script>
+(function(){
+  try{
+    var els = document.querySelectorAll('.reveal.pre');
+    if(!('IntersectionObserver' in window)){
+      els.forEach(function(el){ el.classList.remove('pre'); });
+      return;
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.remove('pre');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function(el){ io.observe(el); });
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>
