@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Harold Martin Handyman | Lakeland, FL Handyman</title>
+<style>
+
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Work+Sans:wght@400;500;600;700&display=swap');
+  @view-transition { navigation: auto; }
+  :root{
+    --ink-950:#161310; --ink-900:#211d18; --ink-800:#332c23; --ink-700:#4a4030;
+    --steel-400:#b3a690; --steel-500:#8a7d68; --paper-100:#f6f0e2;
+    --lime-500:#d98a4a; --lime-400:#f0b27e; --lime-ink:#2a1608;
+    --font-display:'Fraunces',Georgia,serif; --font-body:'Work Sans',system-ui,sans-serif;
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  *{{box-sizing:border-box;}}
+  html{{scroll-behavior:smooth;}}
+  html,body{{margin:0;}}
+  body{{ background:var(--ink-950); color:var(--paper-100); font-family:var(--font-body); -webkit-font-smoothing:antialiased; overflow-x:hidden; }}
+  img{{max-width:100%; display:block;}}
+  a{{color:inherit;}}
+  ::selection{{ background:var(--lime-500); color:var(--lime-ink); }}
+  .wrap{{ max-width:1240px; margin:0 auto; padding-inline:clamp(20px,5vw,64px); }}
+  header.top{{ position:fixed; top:0; left:0; right:0; z-index:100; padding-block:22px; display:flex; align-items:center; justify-content:space-between; gap:20px; transition:background .3s ease, padding .3s ease, border-color .3s ease; border-bottom:1px solid transparent; }}
+  header.top.scrolled{{ background:rgba(0,0,0,.86); backdrop-filter:blur(10px); padding-block:14px; border-bottom-color:var(--ink-700); }}
+  header.top .wrap{{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:20px; }}
+  .brand{{ font-family:var(--font-display); font-weight:600; font-size:1.05rem; letter-spacing:-.01em; display:flex; align-items:center; gap:.6em; }}
+  .brand .mark{{ width:9px;height:9px;border-radius:50%; background:var(--lime-500); box-shadow:0 0 0 0 rgba(198,241,53,.6); animation:pulse 2.4s ease-out infinite; }}
+  @keyframes pulse{{ 0%{{box-shadow:0 0 0 0 rgba(198,241,53,.5);}} 70%{{box-shadow:0 0 0 9px rgba(198,241,53,0);}} 100%{{box-shadow:0 0 0 0 rgba(198,241,53,0);}} }}
+  @media (prefers-reduced-motion:reduce){{ .brand .mark{{animation:none;}} }}
+  nav.main-nav{{ display:flex; align-items:center; gap:2.4em; font-size:.86rem; font-weight:500; }}
+  nav.main-nav a{{ text-decoration:none; color:var(--steel-400); transition:color .2s ease; position:relative; }}
+  nav.main-nav a:hover{{ color:var(--paper-100); }}
+  nav.main-nav a.active{{ color:var(--paper-100); }}
+  nav.main-nav a.active::after{{ content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:var(--lime-500); }}
+  @media (max-width:820px){{ nav.main-nav{{ display:none; }} }}
+  .nav-toggle{{ display:none; background:none; border:none; padding:6px; margin:0; color:var(--paper-100); cursor:pointer; }}
+  .nav-toggle svg{{ width:24px;height:24px; display:block; }}
+  @media (max-width:820px){{ .nav-toggle{{ display:flex; align-items:center; }} }}
+  .mobile-nav{{ display:none; position:fixed; inset:0; z-index:200; background:var(--ink-950); flex-direction:column; align-items:center; justify-content:center; gap:36px; }}
+  .mobile-nav.open{{ display:flex; }}
+  .mobile-nav a{{ font-family:var(--font-display); font-weight:600; font-size:1.7rem; color:var(--paper-100); text-decoration:none; }}
+  .mobile-nav a.active{{ color:var(--lime-500); }}
+  .mobile-nav-close{{ position:absolute; top:22px; right:22px; background:none; border:none; color:var(--paper-100); padding:8px; cursor:pointer; }}
+  .mobile-nav-close svg{{ width:24px;height:24px; display:block; }}
+  @media (min-width:821px){{ .mobile-nav{{ display:none !important; }} }}
+  .btn{{ display:inline-flex; align-items:center; gap:.6em; font-family:var(--font-body); font-weight:600; font-size:.92rem; padding:.85em 1.5em; border-radius:999px; text-decoration:none; border:1px solid transparent; white-space:nowrap; transition:transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease; }}
+  .btn-primary{{ background:var(--lime-500); color:var(--lime-ink); }}
+  .btn-primary:hover{{ transform:translateY(-2px); box-shadow:0 12px 28px -10px color-mix(in srgb, var(--lime-500) 60%, transparent); background:var(--lime-400); }}
+  .btn-ghost{{ border-color:var(--ink-700); color:var(--paper-100); }}
+  .btn-ghost:hover{{ border-color:var(--steel-500); background:var(--ink-800); }}
+  [data-reveal]{{ opacity:0; transform:translateY(28px); transition:opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); }}
+  [data-reveal].in{{ opacity:1; transform:none; }}
+  @media (prefers-reduced-motion:reduce){{ [data-reveal]{{opacity:1;transform:none;}} }}
+  section{{ padding-block:clamp(48px,6vw,88px); position:relative; }}
+  .kicker{{ font-family:var(--font-body); font-weight:600; font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--lime-500); margin:0 0 18px; display:flex; align-items:center; gap:.7em; text-shadow:0 1px 10px rgba(0,0,0,.5); }}
+  .kicker::before{{ content:""; width:26px;height:1px; background:var(--lime-500); }}
+  h1,h2,h3{{ font-family:var(--font-display); font-weight:600; letter-spacing:-.02em; margin:0; }}
+  h2{{ font-size:clamp(2rem,4.4vw,3.4rem); line-height:1.05; max-width:16ch; }}
+  .lede{{ color:var(--steel-400); font-size:clamp(1rem,1.6vw,1.2rem); line-height:1.65; max-width:56ch; margin-top:18px; }}
+  .rule{{ height:1px; background:var(--ink-700); border:none; margin:0; }}
+  footer{{ padding-block:56px calc(48px + env(safe-area-inset-bottom,0px)); border-top:1px solid var(--ink-800); color:var(--steel-500); font-size:.88rem; }}
+  .foot-grid{{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:24px; margin-bottom:28px; }}
+  .foot-grid b{{ color:var(--paper-100); display:block; margin-bottom:6px; font-family:var(--font-display); font-weight:600; }}
+  .foot-grid a{{ text-decoration:none; }}
+  .foot-grid a:hover{{ color:var(--lime-500); }}
+  .dispatch{{ position:fixed; left:0;right:0;bottom:0; z-index:100; display:flex; gap:1px; background:var(--ink-700); padding-bottom:env(safe-area-inset-bottom,0px); }}
+  .dispatch a{{ flex:1; text-align:center; padding:15px 8px; font-weight:600; font-size:.92rem; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:.5em; }}
+  .dispatch a:first-child{{ background:var(--lime-500); color:var(--lime-ink); }}
+  .dispatch a:last-child{{ background:var(--ink-900); color:var(--paper-100); }}
+  .dispatch svg{{ width:16px;height:16px; }}
+  @media (min-width:821px){{ .dispatch{{display:none;}} }}
+  @media (max-width:820px){{ footer{{padding-bottom:100px;}} }}
+  .hero{{ min-height:100vh; display:flex; align-items:flex-end; position:relative; overflow:hidden; padding-block:0 80px; }}
+  .hero-bg{{ position:absolute; inset:0; z-index:0; }}
+  .hero-bg img{{ width:100%;height:100%;object-fit:cover; transform:scale(1.08); animation:heroin 1.6s cubic-bezier(.16,1,.3,1) forwards; }}
+  @keyframes heroin{{ to{{ transform:scale(1); }} }}
+  @media (prefers-reduced-motion:reduce){{ .hero-bg img{{ animation:none; transform:none; }} }}
+  .hero-bg::after{{ content:""; position:absolute; inset:0; background:linear-gradient(0deg, var(--ink-950) 2%, rgba(0,0,0,.85) 38%, rgba(0,0,0,.6) 60%, rgba(0,0,0,.87) 100%); }}
+  .hero-content{{ position:relative; z-index:1; width:100%; padding-top:clamp(90px,14vh,140px); }}
+  .hero h1{{ font-size:clamp(2.6rem,7.6vw,6.2rem); line-height:.98; max-width:14ch; text-wrap:balance; text-shadow:0 2px 24px rgba(0,0,0,.6), 0 1px 4px rgba(0,0,0,.85); }}
+  .hero h1 em{{ font-style:normal; color:var(--lime-500); }}
+  .hero .lede{{ color:#dcdde0; margin-top:24px; }}
+  .hero .cta-row{{ display:flex; flex-wrap:wrap; gap:16px; margin-top:38px; }}
+  .hero-trust{{ display:flex; flex-wrap:wrap; gap:28px 40px; margin-top:56px; padding-top:32px; border-top:1px solid rgba(255,255,255,.14); }}
+  .hero-trust .item b{{ font-family:var(--font-display); font-size:1.3rem; display:block; }}
+  .hero-trust .item span{{ font-size:.78rem; color:#c9cace; text-transform:uppercase; letter-spacing:.06em; }}
+  .marquee-strip{{ overflow:hidden; border-block:1px solid var(--ink-800); background:var(--ink-900); }}
+  .marquee-track{{ display:flex; width:max-content; animation:marquee 34s linear infinite; }}
+  @keyframes marquee{{ from{{transform:translateX(0);}} to{{transform:translateX(-50%);}} }}
+  @media (prefers-reduced-motion:reduce){{ .marquee-track{{animation:none;}} }}
+  .marquee-track span{{ padding:18px 40px; font-family:var(--font-display); font-weight:500; font-size:1.05rem; color:var(--steel-500); white-space:nowrap; display:flex; align-items:center; gap:16px; }}
+  .marquee-track span b{{ color:var(--paper-100); font-weight:600; }}
+  .marquee-track svg{{ width:16px;height:16px; stroke:var(--lime-500); flex:none; }}
+  .services-preview, .service-grid-full{{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--ink-800); border:1px solid var(--ink-800); border-radius:20px; overflow:hidden; margin-top:56px; }}
+  @media (max-width:820px){{ .services-preview, .service-grid-full{{ grid-template-columns:1fr 1fr; }} }}
+  @media (max-width:560px){{ .services-preview, .service-grid-full{{ grid-template-columns:1fr; }} }}
+  .service-card{{ background:var(--ink-900); padding:34px 28px; transition:background .25s ease; }}
+  .service-card:hover{{ background:var(--ink-800); }}
+  .service-card svg{{ width:28px;height:28px; stroke:var(--lime-500); margin-bottom:20px; }}
+  .service-card h3{{ font-size:1.08rem; margin-bottom:8px; }}
+  .service-card p{{ color:var(--steel-400); font-size:.92rem; line-height:1.55; margin:0; }}
+  .split{{ display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }}
+  @media (max-width:900px){{ .split{{ grid-template-columns:1fr; gap:40px; }} }}
+  .split-media{{ position:relative; border-radius:20px; overflow:hidden; aspect-ratio:4/5; }}
+  .split-media img{{ width:100%;height:100%;object-fit:cover; }}
+  .split-badge{{ position:absolute; bottom:20px; left:20px; background:rgba(0,0,0,.75); backdrop-filter:blur(8px); border-radius:14px; padding:16px 20px; border:1px solid rgba(255,255,255,.14); }}
+  .split-badge b{{ font-family:var(--font-display); font-size:1.5rem; color:var(--lime-500); display:block; }}
+  .split-badge span{{ font-size:.74rem; color:var(--steel-400); text-transform:uppercase; letter-spacing:.06em; }}
+  .why-list{{ display:flex; flex-direction:column; gap:0; margin-top:28px; }}
+  .why-item{{ display:flex; gap:16px; padding-block:20px; border-top:1px solid var(--ink-800); }}
+  .why-item svg{{ width:20px;height:20px; stroke:var(--lime-500); flex:none; margin-top:3px; }}
+  .why-item h4{{ font-family:var(--font-body); font-weight:600; font-size:1rem; margin:0 0 4px; }}
+  .why-item p{{ color:var(--steel-400); font-size:.9rem; margin:0; line-height:1.55; }}
+  .cta-band, .contact-cta{{ background:var(--lime-500); color:var(--lime-ink); border-radius:28px; padding:clamp(48px,7vw,88px) clamp(28px,6vw,72px); text-align:center; position:relative; overflow:hidden; }}
+  .cta-band h2, .contact-cta h2{{ color:var(--lime-ink); max-width:none; }}
+  .cta-band p, .contact-cta p{{ color:rgba(0,0,0,.68); margin:16px 0 34px; font-size:1.05rem; }}
+  .cta-band .cta-row, .contact-cta .cta-row{{ display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }}
+  .cta-band .btn-primary, .contact-cta .btn-primary{{ background:var(--ink-950); color:var(--paper-100); }}
+  .cta-band .btn-primary:hover, .contact-cta .btn-primary:hover{{ background:var(--ink-800); box-shadow:0 12px 28px -10px rgba(0,0,0,.4); }}
+  .cta-band .btn-ghost, .contact-cta .btn-ghost{{ border-color:rgba(0,0,0,.3); color:var(--lime-ink); }}
+  .cta-band .btn-ghost:hover, .contact-cta .btn-ghost:hover{{ background:rgba(0,0,0,.08); }}
+  .inner-hero{{ padding-block:calc(120px + 3vw) 60px; position:relative; overflow:hidden; }}
+  .inner-hero-bg{{ position:absolute; inset:0; z-index:0; }}
+  .inner-hero-bg img{{ width:100%; height:100%; object-fit:cover; }}
+  .inner-hero-bg::after{{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(8,8,10,.4) 0%, var(--ink-950) 94%); }}
+  .inner-hero .wrap{{ position:relative; z-index:1; }}
+  .inner-hero h1{{ font-size:clamp(2.4rem,5.6vw,4.4rem); line-height:1.02; max-width:16ch; }}
+  .inner-hero .lede{{ margin-top:20px; }}
+  .price-rows{{ border:1px solid var(--ink-800); border-radius:20px; overflow:hidden; margin-top:48px; }}
+  .price-row{{ display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center; padding:26px 30px; border-bottom:1px solid var(--ink-800); }}
+  .price-row:last-child{{ border-bottom:none; }}
+  .price-row:nth-child(even){{ background:var(--ink-900); }}
+  .price-row h3{{ font-family:var(--font-body); font-weight:600; font-size:1.05rem; margin:0 0 6px; }}
+  .price-row p{{ color:var(--steel-400); font-size:.9rem; margin:0; max-width:46ch; }}
+  .price-tag{{ font-family:var(--font-display); font-weight:600; font-size:.85rem; text-transform:uppercase; background:var(--ink-800); color:var(--lime-500); padding:.6em 1.1em; border-radius:999px; white-space:nowrap; }}
+  .price-note{{ margin-top:20px; color:var(--steel-500); font-size:.88rem; max-width:60ch; }}
+  .process{{ display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:48px; }}
+  @media (max-width:860px){{ .process{{ grid-template-columns:1fr 1fr; }} }}
+  @media (max-width:520px){{ .process{{ grid-template-columns:1fr; }} }}
+  .process-step{{ padding-top:24px; border-top:1px solid var(--ink-800); }}
+  .process-num{{ font-family:var(--font-display); font-weight:600; font-size:2.4rem; color:var(--ink-700); line-height:1; margin-bottom:14px; }}
+  .process-step h3{{ font-family:var(--font-body); font-weight:600; font-size:1rem; margin:0 0 6px; }}
+  .process-step p{{ color:var(--steel-400); font-size:.88rem; line-height:1.55; margin:0; }}
+  .team-card{{ display:flex; gap:32px; align-items:center; flex-wrap:wrap; background:var(--ink-900); border:1px solid var(--ink-800); border-radius:24px; padding:40px; margin-top:48px; }}
+  .team-avatar{{ width:96px;height:96px;border-radius:20px; background:var(--lime-500); flex:none; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:600; font-size:2.2rem; color:var(--lime-ink); }}
+  .team-card h3{{ font-size:1.4rem; margin-bottom:4px; }}
+  .team-card .role{{ font-size:.82rem; color:var(--lime-500); font-weight:600; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px; }}
+  .team-card p{{ color:var(--steel-400); font-size:.98rem; line-height:1.65; margin:0; max-width:60ch; }}
+  .gallery-grid{{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:48px; }}
+  @media (max-width:820px){{ .gallery-grid{{ grid-template-columns:1fr 1fr; }} }}
+  @media (max-width:520px){{ .gallery-grid{{ grid-template-columns:1fr; }} }}
+  .gallery-grid img{{ width:100%; height:280px; object-fit:cover; border-radius:16px; transition:transform .4s ease; }}
+  .gallery-grid a{{ display:block; overflow:hidden; border-radius:16px; }}
+  .gallery-grid a:hover img{{ transform:scale(1.06); }}
+  .info-grid{{ display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--ink-800); border:1px solid var(--ink-800); border-radius:20px; overflow:hidden; margin-top:48px; }}
+  @media (max-width:640px){{ .info-grid{{ grid-template-columns:1fr; }} }}
+  .info-cell{{ background:var(--ink-900); padding:28px 30px; }}
+  .info-cell dt{{ font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--steel-500); margin:0 0 8px; font-weight:600; }}
+  .info-cell dd{{ margin:0; font-size:1.1rem; font-family:var(--font-display); }}
+  .info-cell a{{ text-decoration:none; }}
+  .info-cell a:hover{{ color:var(--lime-500); }}
+
+</style>
+</head>
+<body>
+
+  <header class="top">
+    <div class="wrap">
+      <div class="brand"><span class="mark"></span>Harold Martin Handyman</div>
+      <nav class="main-nav">
+        <a href="/sites/harold-martin-handyman" class="active">Home</a>
+        <a href="/sites/harold-martin-handyman/services">Services</a>
+        <a href="/sites/harold-martin-handyman/about">About</a>
+        <a href="/sites/harold-martin-handyman/contact">Contact</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <a class="btn btn-primary" href="tel:+18638126502">(863) 812-6502</a>
+    </div>
+  </header>
+  <div class="mobile-nav">
+    <button class="mobile-nav-close" aria-label="Close menu" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <a href="/sites/harold-martin-handyman" class="active">Home</a>
+        <a href="/sites/harold-martin-handyman/services">Services</a>
+        <a href="/sites/harold-martin-handyman/about">About</a>
+        <a href="/sites/harold-martin-handyman/contact">Contact</a>
+  </div>
+
+
+<section class="hero">
+  <div class="hero-bg"><img src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=1800&q=80" alt="Handyman in a vest holding a power tool on the job" loading="eager"></div>
+  <div class="wrap hero-content">
+    <p class="kicker" data-reveal style="color:var(--lime-400);">Lakeland, FL &middot; Handyman</p>
+    <h1 data-reveal>Solid work,<br><em>done right.</em></h1>
+    <p class="lede" data-reveal>Flooring, fences, drywall and painting, Harold Martin handles the job himself, on time and at a reasonable price, every time.</p>
+    <div class="cta-row" data-reveal>
+      <a class="btn btn-primary" href="tel:+18638126502">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Call (863) 812-6502
+      </a>
+      <a class="btn btn-ghost" href="/sites/harold-martin-handyman/services">See services</a>
+    </div>
+    <div class="hero-trust" data-reveal><div class="item"><b>4.4&#9733; (12)</b><span>Google rating</span></div><div class="item"><b>Dover Ln</b><span>Lakeland, FL</span></div><div class="item"><b>Weekdays</b><span>Closes around 5 PM*</span></div></div>
+  </div>
+</section>
+
+<div class="marquee-strip"><div class="marquee-track"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Flooring</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Fencing</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Drywall</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Painting</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Repairs</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Installs</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Trim Work</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Punch Lists</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Flooring</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Fencing</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Drywall</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Painting</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Repairs</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Installs</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Trim Work</b></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><b>Punch Lists</b></span></div></div>
+
+<section>
+  <div class="wrap">
+    <p class="kicker" data-reveal>What we handle</p>
+    <h2 data-reveal>Every kind of<br>home repair</h2>
+    <p class="lede" data-reveal>Rated 4.4&#9733; on Google (12 reviews).</p>
+    <div class="services-preview"><div class="service-card" data-reveal><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12 8.4 8.4a2.1 2.1 0 1 1-3 3L12 15"/><path d="M11 11 6 6"/><path d="m3 3 3 3"/><path d="M8.5 14.5 2 21"/><path d="M2 3h6l4 4-4 4H2V3z"/></svg><h3>Flooring installation</h3><p>Solid, sturdy floor installs, done right the first time.</p></div><div class="service-card" data-reveal><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><h3>Fence installation</h3><p>Fence panels installed clean and level.</p></div><div class="service-card" data-reveal><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/><path d="M14.5 17.5 4.5 15"/></svg><h3>Drywall &amp; painting</h3><p>Patching, drywall and paint work handled in the same visit.</p></div></div>
+    <p style="margin-top:28px;"><a class="btn btn-ghost" href="/sites/harold-martin-handyman/services">View all services</a></p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap split">
+    <div class="split-media" data-reveal>
+      <img src="https://images.unsplash.com/photo-1547609434-b732edfee020?auto=format&fit=crop&w=1400&q=80" alt="Man sawing wood in a room">
+      <div class="split-badge"><b>4.4&#9733;</b><span>On Google</span></div>
+    </div>
+    <div data-reveal>
+      <p class="kicker">Why Harold's</p>
+      <h2>Fast, fair,<br>and trustworthy.</h2>
+      <p class="lede">Customers describe Harold as professional, quick, and someone you can trust with the job.</p>
+      <div class="why-list"><div class="why-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><div><h4>On time and quick</h4><p>Jobs are jumped on right away and finished fast.</p></div></div><div class="why-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><div><h4>Reasonable pricing</h4><p>Fair rates on a wide range of repairs, called out again and again.</p></div></div><div class="why-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><div><h4>Trustworthy work</h4><p>"A trustworthy service place" is how customers describe it.</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-band" data-reveal>
+      <h2>Got a project?</h2>
+      <p>Call or text. We'll come take a look and quote it fair.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="tel:+18638126502">Call (863) 812-6502</a>
+        <a class="btn btn-ghost" href="/sites/harold-martin-handyman/contact">Get directions</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <div><b>Harold Martin Handyman</b><br>2927 Dover Ln, Lakeland, FL 33801</div>
+        <div><b>Contact</b><a href="tel:+18638126502">(863) 812-6502</a></div>
+        <div><b>Hours</b><br>Weekdays, call for today's availability*</div>
+      </div>
+      <hr class="rule">
+      <p style="margin-top:20px;">*Hours and rating as listed on Google. Call to confirm current availability. Site built as a free concept demo, not yet the business's official website.</p>
+    </div>
+  </footer>
+
+  <div class="dispatch">
+    <a href="tel:+18638126502">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Call Now
+    </a>
+    <a href="sms:+18638126502">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Text
+    </a>
+  </div>
+
+
+
+<script>
+(function(){
+  var header = document.querySelector('header.top');
+  function onScroll(){
+    if(window.scrollY > 24){ header.classList.add('scrolled'); }
+    else{ header.classList.remove('scrolled'); }
+  }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  onScroll();
+  var navToggle = document.querySelector('.nav-toggle');
+  var mobileNav = document.querySelector('.mobile-nav');
+  if(navToggle && mobileNav){
+    function closeMobileNav(){
+      mobileNav.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+    navToggle.addEventListener('click', function(){
+      var isOpen = mobileNav.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+    mobileNav.querySelectorAll('a, .mobile-nav-close').forEach(function(el){
+      el.addEventListener('click', closeMobileNav);
+    });
+  }
+  var els = document.querySelectorAll('[data-reveal]');
+  function revealAll(){ els.forEach(function(el){ el.classList.add('in'); }); }
+  try{
+    if(!('IntersectionObserver' in window)){ revealAll(); return; }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){ entry.target.classList.add('in'); io.unobserve(entry.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    els.forEach(function(el){ io.observe(el); });
+    setTimeout(revealAll, 1800);
+  }catch(e){ revealAll(); }
+})();
+</script>
+
+</body>
+</html>
