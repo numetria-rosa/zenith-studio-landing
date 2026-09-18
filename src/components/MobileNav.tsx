@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 type NavItem = { href: string; label: string };
 
 export default function MobileNav({ items, signInHref, signInLabel }: { items: NavItem[]; signInHref: string; signInLabel: string }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -28,39 +32,48 @@ export default function MobileNav({ items, signInHref, signInLabel }: { items: N
         </svg>
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-8 bg-[#05060a]">
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            aria-label="Close menu"
-            className="absolute right-5 top-5 rounded-full border border-white/15 bg-white/5 p-2 text-white/80"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-          </button>
-
-          {items.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
+      {/* Rendered via a portal to document.body: nesting a position:fixed
+          overlay inside the header's backdrop-blur-xl pill makes that pill
+          a containing block for it in this browser (backdrop-filter behaves
+          like filter here), so "fixed inset-0" only spanned the pill's own
+          small box instead of the viewport - confirmed live via
+          getBoundingClientRect() before this fix. Portaling out from under
+          any filter/backdrop-filter ancestor is the standard fix. */}
+      {mounted && open &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-8 bg-[#05060a]">
+            <button
+              type="button"
               onClick={() => setOpen(false)}
-              className="text-2xl font-semibold tracking-[-0.02em] text-white/90"
+              aria-label="Close menu"
+              className="absolute right-5 top-5 rounded-full border border-white/15 bg-white/5 p-2 text-white/80"
             >
-              {item.label}
-            </a>
-          ))}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
 
-          <a
-            href={signInHref}
-            onClick={() => setOpen(false)}
-            className="mt-4 text-base text-white/55"
-          >
-            {signInLabel}
-          </a>
-        </div>
-      )}
+            {items.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className="text-2xl font-semibold tracking-[-0.02em] text-white/90"
+              >
+                {item.label}
+              </a>
+            ))}
+
+            <a
+              href={signInHref}
+              onClick={() => setOpen(false)}
+              className="mt-4 text-base text-white/55"
+            >
+              {signInLabel}
+            </a>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
