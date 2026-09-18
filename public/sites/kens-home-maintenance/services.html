@@ -125,7 +125,11 @@
   .cta-band .btn-ghost, .contact-cta .btn-ghost{ border-color:rgba(0,0,0,.3); color:var(--lime-ink); }
   .cta-band .btn-ghost:hover, .contact-cta .btn-ghost:hover{ background:rgba(0,0,0,.08); }
 
-  .inner-hero{ padding-block:calc(120px + 3vw) 60px; }
+  .inner-hero{ padding-block:calc(120px + 3vw) 60px; position:relative; overflow:hidden; }
+  .inner-hero-bg{ position:absolute; inset:0; z-index:0; }
+  .inner-hero-bg img{ width:100%; height:100%; object-fit:cover; }
+  .inner-hero-bg::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(8,8,10,.4) 0%, var(--ink-950) 94%); }
+  .inner-hero .wrap{ position:relative; z-index:1; }
   .inner-hero h1{ font-size:clamp(2.4rem,5.6vw,4.4rem); line-height:1.02; max-width:16ch; }
   .inner-hero .lede{ margin-top:20px; }
 
@@ -185,6 +189,7 @@
 
 
 <section class="inner-hero" style="padding-block-end:0;">
+  <div class="inner-hero-bg"><img src="https://images.unsplash.com/photo-1631396326838-de37e5f8bcbc?auto=format&fit=crop&w=1800&q=80" alt="Handyman working on a piece of wood in a home workshop" loading="eager"></div>
   <div class="wrap">
     <p class="kicker" data-reveal>Services &amp; pricing</p>
     <h1 data-reveal>No job too<br>small to call.</h1>
