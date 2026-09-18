@@ -109,9 +109,13 @@
   @media (max-width:820px){ footer{padding-bottom:100px;} }
 
 
-  .inner-hero{ padding-block:calc(120px + 3vw) 60px; }
+  .inner-hero{ padding-block:calc(120px + 3vw) 60px; position:relative; overflow:hidden; }
   .inner-hero h1{ font-size:clamp(2.4rem,5.6vw,4.4rem); line-height:1.02; max-width:16ch; }
   .inner-hero .lede{ margin-top:20px; }
+  .inner-hero-bg{ position:absolute; inset:0; z-index:0; }
+  .inner-hero-bg img{ width:100%; height:100%; object-fit:cover; }
+  .inner-hero-bg::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(8,8,10,.4) 0%, var(--ink-950) 94%); }
+  .inner-hero .wrap{ position:relative; z-index:1; }
 
   .price-rows{ border:1px solid var(--ink-800); border-radius:20px; overflow:hidden; margin-top:48px; }
   .price-row{ display:grid; grid-template-columns:1fr auto; gap:20px; align-items:center; padding:26px 30px; border-bottom:1px solid var(--ink-800); }
@@ -188,6 +192,7 @@
 
 
 <section class="inner-hero" style="padding-block-end:0;">
+  <div class="inner-hero-bg"><img src="https://images.unsplash.com/photo-1596125099792-3917bf2d8095?auto=format&fit=crop&w=1800&q=80" alt="Dark blue-lit garage with a black BMW" loading="eager"></div>
   <div class="wrap">
     <p class="kicker" data-reveal>Services &amp; pricing</p>
     <h1 data-reveal>Everything short of<br>a full engine rebuild.</h1>
