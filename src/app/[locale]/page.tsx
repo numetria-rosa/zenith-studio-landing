@@ -6,6 +6,7 @@ import { getService, getSetupCheckoutUrl, servicePagePath } from "@/lib/services
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 import Reveal from "@/components/Reveal";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import MobileNav from "@/components/MobileNav";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -302,6 +303,17 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               >
                 {t("nav.freeAudit")}
               </LocaleLink>
+              <MobileNav
+                items={[
+                  { href: "#work", label: t("nav.work") },
+                  { href: "#services", label: t("nav.services") },
+                  { href: "#systems", label: t("nav.pricing") },
+                  { href: "/lab", label: t("nav.courses") },
+                  { href: "#contact", label: t("nav.contact") },
+                ]}
+                signInHref="/sign-in"
+                signInLabel={t("nav.signIn")}
+              />
             </div>
           </div>
         </div>
@@ -377,12 +389,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               />
             </div>
 
-            <div className="absolute bottom-[30%] left-[0%] rounded-[28px] border border-white/12 bg-white/[0.04] px-4 py-4 backdrop-blur-2xl shadow-[0_0_40px_rgba(89,118,255,0.12)]">
+            <div className="absolute bottom-36 left-2 max-w-[150px] rounded-[28px] border border-white/12 bg-white/[0.04] px-4 py-4 backdrop-blur-2xl shadow-[0_0_40px_rgba(89,118,255,0.12)] lg:bottom-[30%] lg:left-[0%] lg:max-w-none">
               <div className="text-xs uppercase tracking-[0.2em] text-white/45">{t("hero.builtForLabel")}</div>
               <div className="mt-2 text-sm font-medium text-white/85">{t("hero.builtForText")}</div>
             </div>
 
-            <div className="absolute right-[2%] bottom-[30%] rounded-[26px] border border-white/12 bg-white/[0.05] px-4 py-4 backdrop-blur-2xl shadow-[0_0_30px_rgba(226,109,255,0.12)]">
+            <div className="absolute right-2 bottom-6 max-w-[150px] rounded-[26px] border border-white/12 bg-white/[0.05] px-4 py-4 backdrop-blur-2xl shadow-[0_0_30px_rgba(226,109,255,0.12)] lg:right-[2%] lg:bottom-[30%] lg:max-w-none">
               <div className="text-xs uppercase tracking-[0.2em] text-white/45">{t("hero.outcomeLabel")}</div>
               <div className="mt-2 text-2xl font-semibold tracking-[-0.04em]">{t("hero.outcomeTitle")}</div>
               <div className="text-sm text-white/55">{t("hero.outcomeText")}</div>
@@ -521,7 +533,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative min-h-[230px] flex-1 overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0c14] transition-[flex] duration-500 ease-out sm:min-h-0 sm:hover:flex-[3.5]"
+                className="group relative min-h-[340px] flex-1 overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0c14] transition-[flex] duration-500 ease-out sm:min-h-0 sm:hover:flex-[3.5]"
               >
                 {/* Screenshot layer: shown on mobile, revealed on hover on desktop */}
                 <div className="absolute inset-0 opacity-100 transition-opacity duration-500 sm:opacity-0 sm:group-hover:opacity-100">
@@ -530,7 +542,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                     alt={`${item.name} website`}
                     className="absolute inset-0 h-full w-full object-cover object-top"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/80 to-black/45" />
                   {/* browser chrome */}
                   <div className="absolute inset-x-0 top-0 flex items-center gap-1.5 bg-black/45 px-3.5 py-2.5 backdrop-blur-md">
                     <span className="h-2.5 w-2.5 rounded-full bg-white/25" />
