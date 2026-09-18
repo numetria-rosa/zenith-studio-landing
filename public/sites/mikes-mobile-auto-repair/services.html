@@ -35,6 +35,16 @@
   nav.main-nav a.active{ color:var(--paper-100); }
   nav.main-nav a.active::after{ content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:var(--lime-500); }
   @media (max-width:820px){ nav.main-nav{ display:none; } }
+  .nav-toggle{ display:none; background:none; border:none; padding:6px; margin:0; color:var(--paper-100); cursor:pointer; }
+  .nav-toggle svg{ width:24px;height:24px; display:block; }
+  @media (max-width:820px){ .nav-toggle{ display:flex; align-items:center; } }
+  .mobile-nav{ display:none; position:fixed; inset:0; z-index:200; background:var(--ink-950); flex-direction:column; align-items:center; justify-content:center; gap:36px; }
+  .mobile-nav.open{ display:flex; }
+  .mobile-nav a{ font-family:var(--font-display); font-weight:600; font-size:1.7rem; color:var(--paper-100); text-decoration:none; }
+  .mobile-nav a.active{ color:var(--lime-500); }
+  .mobile-nav-close{ position:absolute; top:22px; right:22px; background:none; border:none; color:var(--paper-100); padding:8px; cursor:pointer; }
+  .mobile-nav-close svg{ width:24px;height:24px; display:block; }
+  @media (min-width:821px){ .mobile-nav{ display:none !important; } }
   .btn{ display:inline-flex; align-items:center; gap:.6em; font-family:var(--font-body); font-weight:600; font-size:.92rem; padding:.85em 1.5em; border-radius:999px; text-decoration:none; border:1px solid transparent; white-space:nowrap; transition:transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease; }
   .btn-primary{ background:var(--lime-500); color:var(--lime-ink); }
   .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 28px -10px color-mix(in srgb, var(--lime-500) 60%, transparent); background:var(--lime-400); }
@@ -183,9 +193,18 @@
         <a href="/sites/mikes-mobile-auto-repair/about">About</a>
         <a href="/sites/mikes-mobile-auto-repair/contact">Contact</a>
       </nav>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       <a class="btn btn-primary" href="tel:+17792071528">(779) 207-1528</a>
     </div>
   </header>
+  <div class="mobile-nav">
+    <button class="mobile-nav-close" aria-label="Close menu" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <a href="/sites/mikes-mobile-auto-repair">Home</a>
+        <a href="/sites/mikes-mobile-auto-repair/services" class="active">Services</a>
+        <a href="/sites/mikes-mobile-auto-repair/about">About</a>
+        <a href="/sites/mikes-mobile-auto-repair/contact">Contact</a>
+  </div>
+
 
 
 <section class="inner-hero" style="padding-block-end:0;">
@@ -268,6 +287,24 @@
   }
   window.addEventListener('scroll', onScroll, { passive:true });
   onScroll();
+
+  var navToggle = document.querySelector('.nav-toggle');
+  var mobileNav = document.querySelector('.mobile-nav');
+  if(navToggle && mobileNav){
+    function closeMobileNav(){
+      mobileNav.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+    navToggle.addEventListener('click', function(){
+      var isOpen = mobileNav.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+    mobileNav.querySelectorAll('a, .mobile-nav-close').forEach(function(el){
+      el.addEventListener('click', closeMobileNav);
+    });
+  }
   var els = document.querySelectorAll('[data-reveal]');
   function revealAll(){ els.forEach(function(el){ el.classList.add('in'); }); }
   try{
