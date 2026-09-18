@@ -712,10 +712,11 @@
 
 <script>
 (function(){
+  var els = document.querySelectorAll('.reveal.pre');
+  function revealAll(){ els.forEach(function(el){ el.classList.remove('pre'); }); }
   try{
-    var els = document.querySelectorAll('.reveal.pre');
     if(!('IntersectionObserver' in window)){
-      els.forEach(function(el){ el.classList.remove('pre'); });
+      revealAll();
       return;
     }
     var io = new IntersectionObserver(function(entries){
@@ -727,7 +728,13 @@
       });
     }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
     els.forEach(function(el){ io.observe(el); });
-  }catch(e){}
+    /* ponytail: safety net in case the observer never fires (throttled
+       background tab, slow device, unexpected error) so content is
+       never stuck permanently invisible */
+    setTimeout(revealAll, 1500);
+  }catch(e){
+    revealAll();
+  }
 })();
 </script>
 
