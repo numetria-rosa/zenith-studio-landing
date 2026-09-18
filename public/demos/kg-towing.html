@@ -103,10 +103,11 @@
 
   /* ---- hero ---- */
 
-  .brand-group{ display:flex; align-items:center; gap:28px; flex-wrap:wrap; min-width:0; }
-  .nav-links{ display:flex; gap:1.5em; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; }
-  .nav-links a{ text-decoration:none; color:var(--grey-400); transition:color .15s ease; }
+  .nav-links{ display:flex; align-items:center; gap:2.2em; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; }
+  .nav-links a{ text-decoration:none; color:var(--grey-400); padding:.5em 1em; border-radius:999px; transition:color .15s ease, background .15s ease; }
   .nav-links a:hover{ color:var(--orange-400); }
+  .nav-links a:first-child{ background:var(--orange-500); color:var(--steel-950); }
+  .nav-links a:first-child:hover{ color:var(--steel-950); }
   @media (max-width:820px){ .nav-links{ display:none; } }
 
   .hero{ position:relative; padding-block:60px 52px; overflow:hidden; }
@@ -114,7 +115,7 @@
     display:grid;
     grid-template-columns:minmax(0,620px) 1fr;
     gap:32px;
-    align-items:center;
+    align-items:start;
   }
   @media (max-width:900px){
     .hero-grid{ grid-template-columns:1fr; }
@@ -305,14 +306,12 @@
 
 <div class="wrap">
   <header class="top">
-    <div class="brand-group">
-      <div class="brand"><span class="blip"></span>K&amp;G Towing</div>
+    <div class="brand"><span class="blip"></span>K&amp;G Towing</div>
       <nav class="nav-links">
         <a href="#services">Services</a>
         <a href="#coverage">Coverage</a>
         <a href="#contact">Contact</a>
       </nav>
-    </div>
     <a class="top-call" href="tel:+12197435661">(219) 743-5661</a>
   </header>
 </div>

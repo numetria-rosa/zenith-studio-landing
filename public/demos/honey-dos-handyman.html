@@ -118,6 +118,14 @@
   }
 
   /* ---- hero ---- */
+
+  .nav-links{ display:flex; align-items:center; gap:2.2em; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; }
+  .nav-links a{ text-decoration:none; color:var(--ink-700); padding:.5em 1em; border-radius:999px; transition:color .15s ease, background .15s ease; }
+  .nav-links a:hover{ color:var(--mustard-600); }
+  .nav-links a:first-child{ background:var(--mustard-500); color:var(--ink-900); }
+  .nav-links a:first-child:hover{ color:var(--ink-900); }
+  @media (max-width:820px){ .nav-links{ display:none; } }
+
   .hero{
     position:relative;
     padding-block:56px 52px;
@@ -126,7 +134,7 @@
     display:grid;
     grid-template-columns:minmax(0,600px) 1fr;
     gap:36px;
-    align-items:center;
+    align-items:start;
   }
   @media (max-width:900px){
     .hero-grid{ grid-template-columns:1fr; }
@@ -488,6 +496,11 @@
 <div class="wrap">
   <header class="top">
     <div class="brand"><span class="dot"></span>Honey Do's Handyman</div>
+      <nav class="nav-links">
+        <a href="#services">Services</a>
+        <a href="#coverage">Coverage</a>
+        <a href="#contact">Contact</a>
+      </nav>
     <a class="top-call" href="tel:+18064108026">(806) 410-8026</a>
   </header>
 </div>
@@ -527,7 +540,7 @@
 
 <div class="ruler"><div class="ruler-mark" style="animation-delay:2s;"></div></div>
 
-<section>
+<section id="services">
   <div class="wrap">
     <p class="kicker reveal pre">What we handle</p>
     <h2 class="reveal pre">If it's on the list, we can fix it</h2>
@@ -568,7 +581,7 @@
 
 <div class="ruler"><div class="ruler-mark" style="animation-delay:4s;"></div></div>
 
-<section>
+<section id="coverage">
   <div class="wrap coverage-wrap">
     <div>
       <p class="kicker reveal pre">Coverage</p>
@@ -601,7 +614,7 @@
   </div>
 </section>
 
-<section>
+<section id="contact">
   <div class="wrap">
     <div class="cta-banner reveal pre">
       <h2>Ready to shrink the list?</h2>
