@@ -43,7 +43,11 @@
       "label": "Audit d'automatisation gratuit",
       "priceLabel": "évaluation écrite",
       "description": "Remplissez un court formulaire sur votre entreprise. Nous l'examinons et vous envoyons une évaluation écrite : où vos heures et vos leads se perdent, si l'automatisation en vaut la peine pour vous, et une estimation approximative du délai et du coût si c'est le cas. Aucun appel requis.",
-      "features": ["Asynchrone, par e-mail", "Conclusions et proposition écrites", "Aucun paiement, aucun engagement de temps"],
+      "features": [
+        "Asynchrone, par e-mail",
+        "Conclusions et proposition écrites",
+        "Aucun paiement, aucun engagement de temps"
+      ],
       "cta": "Obtenez votre audit gratuit"
     },
     "paid": {
@@ -51,7 +55,11 @@
       "label": "Appel d'audit d'automatisation de 20 minutes",
       "priceLabel": "paiement unique, à la réservation",
       "description": "Sautez le formulaire. Réservez un véritable appel de 20 minutes avec nous, nous examinons votre entreprise en direct, discutons de ce qui vaut la peine d'être automatisé, et vous repartez avec un plan. Le paiement est prélevé à la réservation, et l'appel est confirmé immédiatement.",
-      "features": ["En direct, en appel avec nous", "Réservation instantanée, sans attendre de réponse écrite", "Tarifé séparément de l'audit gratuit, pas une remise dessus"],
+      "features": [
+        "En direct, en appel avec nous",
+        "Réservation instantanée, sans attendre de réponse écrite",
+        "Tarifé séparément de l'audit gratuit, pas une remise dessus"
+      ],
       "cta": "Réservez l'appel d'audit à 35 $"
     }
   },
@@ -61,10 +69,26 @@
     "description": "Ce ne sont pas des logos de clients. Ce sont nos propres produits. Zenith Studio les conçoit, les développe et les exploite de bout en bout : <b1>VoyAI</b1> sur la plateforme <b2>Atlas & Awe</b2>, et <b3>SmartRevise</b3> sur la plateforme <b4>A+ Academy</b4>.",
     "builtBy": "Créé par Zenith",
     "items": [
-      { "category": "SaaS de voyage IA", "tagline": "Tout votre voyage, planifié en 60 secondes.", "description": "Un planificateur de voyage IA qui transforme quelques indications en itinéraires réels avec prix d'hôtels, vols et circuits réservables en temps réel. Propulsé par la plateforme Atlas & Awe." },
-      { "category": "SaaS de révision IA", "tagline": "Des notes à des connaissances prêtes pour l'examen.", "description": "Collez vos notes ou un PDF et obtenez instantanément des fiches de révision IA, de la répétition espacée, des quiz, des examens blancs et un tuteur personnel. Propulsé par la plateforme A+ Academy." },
-      { "category": "Plateforme de voyage", "tagline": "Voyagez intelligemment.", "description": "Une publication de voyage européenne indépendante et la plateforme d'audience derrière VoyAI, avec plus de 120 guides sélectionnés dans plus de 15 pays." },
-      { "category": "Plateforme EdTech", "tagline": "Arrêtez d'étudier plus dur. Commencez à étudier comme un système.", "description": "Le système d'étude conçu par des ingénieurs derrière SmartRevise : pensée systémique et sciences cognitives appliquées à la façon dont les étudiants apprennent." }
+      {
+        "category": "SaaS de voyage IA",
+        "tagline": "Tout votre voyage, planifié en 60 secondes.",
+        "description": "Un planificateur de voyage IA qui transforme quelques indications en itinéraires réels avec prix d'hôtels, vols et circuits réservables en temps réel. Propulsé par la plateforme Atlas & Awe."
+      },
+      {
+        "category": "SaaS de révision IA",
+        "tagline": "Des notes à des connaissances prêtes pour l'examen.",
+        "description": "Collez vos notes ou un PDF et obtenez instantanément des fiches de révision IA, de la répétition espacée, des quiz, des examens blancs et un tuteur personnel. Propulsé par la plateforme A+ Academy."
+      },
+      {
+        "category": "Plateforme de voyage",
+        "tagline": "Voyagez intelligemment.",
+        "description": "Une publication de voyage européenne indépendante et la plateforme d'audience derrière VoyAI, avec plus de 120 guides sélectionnés dans plus de 15 pays."
+      },
+      {
+        "category": "Plateforme EdTech",
+        "tagline": "Arrêtez d'étudier plus dur. Commencez à étudier comme un système.",
+        "description": "Le système d'étude conçu par des ingénieurs derrière SmartRevise : pensée systémique et sciences cognitives appliquées à la façon dont les étudiants apprennent."
+      }
     ]
   },
   "services": {
@@ -74,10 +98,30 @@
     "browseCourses": "Parcourir les cours",
     "comingSoon": "Bientôt disponible",
     "items": [
-      { "title": "Flux d'automatisation IA", "description": "Automatisation intelligente de bout en bout : du routage des leads et de la synchronisation CRM aux chaînes d'agents IA multi-étapes qui gèrent une logique métier complexe sans intervention humaine." },
-      { "title": "Programmation et scripts avancés", "description": "Intégrations sur mesure en Python, Node.js et API qui alimentent les flux que les outils no-code ne peuvent pas atteindre : pipelines de données, robots d'extraction, outils internes et systèmes backend construits sur mesure." },
-      { "title": "Zenith AI", "description": "Des systèmes d'automatisation clés en main qui gèrent la capture de leads, la communication client et les réservations pour que les entreprises croissent plus vite avec moins d'efforts manuels. Des installations prêtes à l'emploi comme l'AI Receptionist et le système de capture de leads, opérationnelles en environ une semaine. Voir les tarifs ci-dessous." },
-      { "title": "Zenith Lab", "description": "Des cours orientés carrière en automatisation, IA, données et Web3 : les compétences que l'IA ne remplacera pas en 2026/2027. Chaque cours inclut une édition parcours carrière, pour non seulement apprendre, mais savoir exactement où l'appliquer et comment être payé." }
+      {
+        "title": "Flux d'automatisation IA",
+        "description": "Automatisation intelligente de bout en bout : du routage des leads et de la synchronisation CRM aux chaînes d'agents IA multi-étapes qui gèrent une logique métier complexe sans intervention humaine."
+      },
+      {
+        "title": "Programmation et scripts avancés",
+        "description": "Intégrations sur mesure en Python, Node.js et API qui alimentent les flux que les outils no-code ne peuvent pas atteindre : pipelines de données, robots d'extraction, outils internes et systèmes backend construits sur mesure."
+      },
+      {
+        "title": "Zenith AI",
+        "description": "Des systèmes d'automatisation clés en main qui gèrent la capture de leads, la communication client et les réservations pour que les entreprises croissent plus vite avec moins d'efforts manuels. Des installations prêtes à l'emploi comme l'AI Receptionist et le système de capture de leads, opérationnelles en environ une semaine. Voir les tarifs ci-dessous."
+      },
+      {
+        "title": "Zenith Lab",
+        "description": "Des cours orientés carrière en automatisation, IA, données et Web3 : les compétences que l'IA ne remplacera pas en 2026/2027. Chaque cours inclut une édition parcours carrière, pour non seulement apprendre, mais savoir exactement où l'appliquer et comment être payé."
+      },
+      {
+        "title": "Sites Web Sur Mesure",
+        "description": "Des sites web d'entreprise rapides, modernes et codés sur mesure, conçus pour convertir, pas des modèles préfabriqués. D'une simple page de destination à un site complet multi-pages, déployé sur votre propre domaine."
+      },
+      {
+        "title": "Chatbots IA",
+        "description": "Des widgets de chat pour votre site qui répondent aux questions, qualifient les visiteurs et transmettent les prospects prêts, 24h/24, entraînés sur les données de votre entreprise pour des réponses fiables."
+      }
     ]
   },
   "systems": {
@@ -96,27 +140,53 @@
         "pitch": "Réveillez-vous avec une boîte mail déjà gérée.",
         "description": "Trie et hiérarchise les e-mails, puis rédige des réponses aux messages courants pour que votre journée commence par des décisions, pas de l'administratif.",
         "live": "Opérationnel en 2 à 4 jours",
-        "features": ["Tri et hiérarchisation des e-mails", "Réponses rédigées par IA pour le courrier courant", "Compatible avec Gmail (personnel) et Yahoo Mail"]
+        "features": [
+          "Tri et hiérarchisation des e-mails",
+          "Réponses rédigées par IA pour le courrier courant",
+          "Compatible avec Gmail (personnel) et Yahoo Mail"
+        ]
       },
       {
         "name": "AI Lead Capture & Follow-Up",
         "pitch": "Ne perdez plus jamais un lead à cause d'une réponse lente.",
         "description": "Capture chaque demande, la qualifie et relance par e-mail et SMS jusqu'à la réservation. L'entreprise qui répond en premier remporte l'affaire.",
         "live": "Opérationnel en 3 à 5 jours",
-        "features": ["Capture les leads de toutes les sources", "Les qualifie et les note automatiquement", "Séquences de relance par e-mail et SMS", "Se synchronise avec votre CRM, avec reporting"]
+        "features": [
+          "Capture les leads de toutes les sources",
+          "Les qualifie et les note automatiquement",
+          "Séquences de relance par e-mail et SMS",
+          "Se synchronise avec votre CRM, avec reporting"
+        ]
       },
       {
         "name": "AI Receptionist & Booking",
         "pitch": "Répond et réserve pendant que vous travaillez.",
         "description": "Gère les demandes en continu, réserve directement dans votre calendrier et envoie les rappels qui réduisent les absences.",
         "live": "Opérationnel en 5 à 7 jours",
-        "features": ["Gestion des demandes 24h/24 et 7j/7", "Réserve dans votre calendrier existant", "Rappels automatiques pour réduire les absences", "Transmet tout ce à quoi il ne devrait pas répondre"]
+        "features": [
+          "Gestion des demandes 24h/24 et 7j/7",
+          "Réserve dans votre calendrier existant",
+          "Rappels automatiques pour réduire les absences",
+          "Transmet tout ce à quoi il ne devrait pas répondre"
+        ]
       }
     ],
     "steps": [
-      { "step": "01", "title": "Audit gratuit de 20 minutes", "text": "Nous identifions où vos heures et vos leads se perdent, et si l'automatisation en vaut vraiment la peine pour vous." },
-      { "step": "02", "title": "Nous le construisons", "text": "Vous répondez à quelques questions. Nous concevons, construisons et connectons le système aux outils que vous utilisez déjà." },
-      { "step": "03", "title": "Mise en ligne et maintenance", "text": "Opérationnel en quelques jours. Votre abonnement mensuel couvre l'hébergement, la surveillance et les améliorations pendant son fonctionnement." }
+      {
+        "step": "01",
+        "title": "Audit gratuit de 20 minutes",
+        "text": "Nous identifions où vos heures et vos leads se perdent, et si l'automatisation en vaut vraiment la peine pour vous."
+      },
+      {
+        "step": "02",
+        "title": "Nous le construisons",
+        "text": "Vous répondez à quelques questions. Nous concevons, construisons et connectons le système aux outils que vous utilisez déjà."
+      },
+      {
+        "step": "03",
+        "title": "Mise en ligne et maintenance",
+        "text": "Opérationnel en quelques jours. Votre abonnement mensuel couvre l'hébergement, la surveillance et les améliorations pendant son fonctionnement."
+      }
     ]
   },
   "verticals": {
@@ -134,11 +204,27 @@
         "headline": "Votre cabinet travaille 49 heures par semaine et en facture 37.",
         "lede": "Cet écart de douze heures représente environ 230 000 $ par avocat et par an. Il n'est pas perdu à cause de la concurrence ou d'un mauvais marketing. C'est du travail que vous avez déjà fait et jamais facturé.",
         "monthlyNote": "Pour le SMS de rappel d'appels manqués + l'assistant de relance, en une seule équipe. L'assistant de facturation est tarifé sur ce qu'il récupère, pas au forfait.",
-        "statsLabels": ["taux d'utilisation moyen des avocats", "taux de réalisation moyen", "dépréciations à 14 jours contre 45"],
+        "statsLabels": [
+          "taux d'utilisation moyen des avocats",
+          "taux de réalisation moyen",
+          "dépréciations à 14 jours contre 45"
+        ],
         "roster": [
-          { "role": "AI Billing Clerk (assistant de facturation)", "text": "Reconstitue le temps facturable à partir de votre calendrier, de vos e-mails et de vos documents, rédige des entrées avec de vrais récits, et sort les factures dans la fenêtre de 14 jours où les dépréciations sont de 6 % au lieu de 18 %.", "anchor": "Tarifé sur ce qu'il récupère." },
-          { "role": "AI Missed Call Text-Back (SMS de rappel)", "text": "Dès qu'un appel reste sans réponse, l'appelant reçoit un SMS en quelques secondes, est qualifié selon vos critères de dossier, et la consultation est réservée, pour qu'un appel manqué ne se transforme jamais en appel au cabinet d'à côté.", "anchor": "34 % des appelants qui tombent sur la messagerie vocale ne rappellent jamais votre cabinet." },
-          { "role": "AI Follow-Up Clerk (assistant de relance)", "text": "Travaille les leads qui n'ont pas été retenus au premier appel. Vous les avez déjà tous payés, et la plupart des cabinets n'y touchent plus jamais.", "anchor": "Les leads juridiques coûtent en moyenne 131 $ chacun, le plus élevé de tous les secteurs." }
+          {
+            "role": "AI Billing Clerk (assistant de facturation)",
+            "text": "Reconstitue le temps facturable à partir de votre calendrier, de vos e-mails et de vos documents, rédige des entrées avec de vrais récits, et sort les factures dans la fenêtre de 14 jours où les dépréciations sont de 6 % au lieu de 18 %.",
+            "anchor": "Tarifé sur ce qu'il récupère."
+          },
+          {
+            "role": "AI Missed Call Text-Back (SMS de rappel)",
+            "text": "Dès qu'un appel reste sans réponse, l'appelant reçoit un SMS en quelques secondes, est qualifié selon vos critères de dossier, et la consultation est réservée, pour qu'un appel manqué ne se transforme jamais en appel au cabinet d'à côté.",
+            "anchor": "34 % des appelants qui tombent sur la messagerie vocale ne rappellent jamais votre cabinet."
+          },
+          {
+            "role": "AI Follow-Up Clerk (assistant de relance)",
+            "text": "Travaille les leads qui n'ont pas été retenus au premier appel. Vous les avez déjà tous payés, et la plupart des cabinets n'y touchent plus jamais.",
+            "anchor": "Les leads juridiques coûtent en moyenne 131 $ chacun, le plus élevé de tous les secteurs."
+          }
         ],
         "guardrail": "Vous approuvez chaque entrée. Rien ne sort du cabinet sans la validation d'un associé.",
         "offer": "Nous reconstituerons un mois passé de votre temps non facturé avant que vous ne payiez quoi que ce soit. Vous obtenez un chiffre. Si cela ne vaut pas la peine d'agir, nous en restons là."
@@ -148,11 +234,27 @@
         "headline": "Vos agents ne partent pas pour une meilleure commission.",
         "lede": "Ils partent parce qu'ils font quatre métiers à la fois : prospection, relance, paperasse et une base de données que personne n'a touchée depuis un an. Chaque agent qui part vous coûte entre 15 000 $ et 50 000 $.",
         "monthlyNote": "Pour l'agent commercial interne + le gestionnaire de base de données, en une seule équipe. La coordination des transactions est facturée par dossier, de 150 $ à 200 $.",
-        "statsLabels": ["temps de réponse moyen aux leads de l'agent", "plus de chances de convertir en moins de 5 minutes", "agents recrutés encore présents la cinquième année"],
+        "statsLabels": [
+          "temps de réponse moyen aux leads de l'agent",
+          "plus de chances de convertir en moins de 5 minutes",
+          "agents recrutés encore présents la cinquième année"
+        ],
         "roster": [
-          { "role": "AI Inside Sales Agent (agent commercial interne)", "text": "Répond aux nouveaux leads en quelques secondes, qualifie la motivation, le calendrier et le financement, puis réserve le rendez-vous avant qu'un concurrent ne décroche le téléphone.", "anchor": "Les coachs disent qu'il faut 500 prospects pour justifier l'embauche d'un ISA. Celui-ci se justifie dès cinquante." },
-          { "role": "AI Transaction Coordinator (coordinateur de transactions)", "text": "Du contrat à la signature. Délais suivis, documents relancés, et toutes les parties informées sans que personne n'ait à demander.", "anchor": "Les coordinateurs externalisés coûtent de 350 $ à 450 $ par dossier." },
-          { "role": "AI Database Manager (gestionnaire de base de données)", "text": "Réactive les contacts dormants et anciens clients déjà dans votre CRM. Pas de nouveaux leads, ceux que vous avez déjà payés.", "anchor": "La récurrence et le référencement représentent l'essentiel de l'activité d'un agent, et presque personne ne les travaille." }
+          {
+            "role": "AI Inside Sales Agent (agent commercial interne)",
+            "text": "Répond aux nouveaux leads en quelques secondes, qualifie la motivation, le calendrier et le financement, puis réserve le rendez-vous avant qu'un concurrent ne décroche le téléphone.",
+            "anchor": "Les coachs disent qu'il faut 500 prospects pour justifier l'embauche d'un ISA. Celui-ci se justifie dès cinquante."
+          },
+          {
+            "role": "AI Transaction Coordinator (coordinateur de transactions)",
+            "text": "Du contrat à la signature. Délais suivis, documents relancés, et toutes les parties informées sans que personne n'ait à demander.",
+            "anchor": "Les coordinateurs externalisés coûtent de 350 $ à 450 $ par dossier."
+          },
+          {
+            "role": "AI Database Manager (gestionnaire de base de données)",
+            "text": "Réactive les contacts dormants et anciens clients déjà dans votre CRM. Pas de nouveaux leads, ceux que vous avez déjà payés.",
+            "anchor": "La récurrence et le référencement représentent l'essentiel de l'activité d'un agent, et presque personne ne les travaille."
+          }
         ],
         "guardrail": "C'est aussi le meilleur argument de recrutement que vous ayez. Une équipe dès le premier jour pèse plus lourd qu'un point de commission supplémentaire.",
         "offer": "Nous activerons d'abord votre base de données dormante. Vous payez avec ce qu'elle produit."
@@ -163,13 +265,34 @@
     "eyebrow": "FAQ",
     "title": "Questions fréquentes",
     "items": [
-      { "q": "Combien coûte l'automatisation IA pour une petite entreprise ?", "a": "L'AI Inbox Manager coûte 190 $ d'installation plus 150 $ par mois. Le système de capture de leads coûte 270 $ d'installation plus 200 $ par mois, et l'AI Receptionist coûte 360 $ d'installation plus 300 $ par mois. L'abonnement mensuel couvre l'hébergement, la surveillance et les améliorations continues, et il n'y a aucun contrat d'engagement." },
-      { "q": "Combien de temps faut-il pour mettre en place un système d'automatisation IA ?", "a": "La plupart des systèmes sont opérationnels en 2 à 7 jours selon celui que vous choisissez. L'audit gratuit vous donne un délai exact avant tout engagement." },
-      { "q": "Ai-je besoin de connaissances techniques pour l'utiliser ?", "a": "Aucune. Nous construisons, hébergeons et maintenons tout. Vous utilisez le système et récupérez du temps. Si quelque chose casse, nous sommes alertés avant même que vous le remarquiez." },
-      { "q": "En quoi est-ce différent d'embaucher un assistant virtuel ?", "a": "Un assistant virtuel coûte bien plus par mois, travaille des horaires fixes et doit être encadré. Ces systèmes fonctionnent 24h/24 et 7j/7, répondent en moins d'une minute, ne prennent jamais de vacances et coûtent une fraction d'un salaire. La plupart des clients utilisent les deux : le système gère le volume répétitif, l'humain gère les exceptions." },
-      { "q": "Avec quels outils s'intègre-t-il ?", "a": "Avec les outils que vous utilisez déjà. Gmail et Outlook, votre CRM, Google Calendar et Cal.com, WhatsApp et SMS, Slack, et la plupart des plateformes dotées d'une API. Le système est construit autour de votre stack plutôt que de vous demander d'en changer." },
-      { "q": "Puis-je annuler l'abonnement mensuel ?", "a": "Oui, à tout moment. Il n'y a aucun engagement. L'abonnement mensuel couvre l'hébergement, la surveillance et les améliorations, et vous gardez tout ce qui a été construit pour vous." },
-      { "q": "Quelle est la différence entre l'audit gratuit et l'appel d'audit à 35 $ ?", "a": "L'audit gratuit est une évaluation écrite : vous remplissez un formulaire, nous l'examinons et vous envoyons des conclusions et une proposition par e-mail, sans frais. L'appel d'audit à 35 $ est un appel en direct de 20 minutes distinct, réservé et payé à l'avance via Cal.com. Ni l'un ni l'autre n'est une remise ou un aperçu de l'autre, ce sont deux façons différentes d'obtenir un audit." }
+      {
+        "q": "Combien coûte l'automatisation IA pour une petite entreprise ?",
+        "a": "L'AI Inbox Manager coûte 190 $ d'installation plus 150 $ par mois. Le système de capture de leads coûte 270 $ d'installation plus 200 $ par mois, et l'AI Receptionist coûte 360 $ d'installation plus 300 $ par mois. L'abonnement mensuel couvre l'hébergement, la surveillance et les améliorations continues, et il n'y a aucun contrat d'engagement."
+      },
+      {
+        "q": "Combien de temps faut-il pour mettre en place un système d'automatisation IA ?",
+        "a": "La plupart des systèmes sont opérationnels en 2 à 7 jours selon celui que vous choisissez. L'audit gratuit vous donne un délai exact avant tout engagement."
+      },
+      {
+        "q": "Ai-je besoin de connaissances techniques pour l'utiliser ?",
+        "a": "Aucune. Nous construisons, hébergeons et maintenons tout. Vous utilisez le système et récupérez du temps. Si quelque chose casse, nous sommes alertés avant même que vous le remarquiez."
+      },
+      {
+        "q": "En quoi est-ce différent d'embaucher un assistant virtuel ?",
+        "a": "Un assistant virtuel coûte bien plus par mois, travaille des horaires fixes et doit être encadré. Ces systèmes fonctionnent 24h/24 et 7j/7, répondent en moins d'une minute, ne prennent jamais de vacances et coûtent une fraction d'un salaire. La plupart des clients utilisent les deux : le système gère le volume répétitif, l'humain gère les exceptions."
+      },
+      {
+        "q": "Avec quels outils s'intègre-t-il ?",
+        "a": "Avec les outils que vous utilisez déjà. Gmail et Outlook, votre CRM, Google Calendar et Cal.com, WhatsApp et SMS, Slack, et la plupart des plateformes dotées d'une API. Le système est construit autour de votre stack plutôt que de vous demander d'en changer."
+      },
+      {
+        "q": "Puis-je annuler l'abonnement mensuel ?",
+        "a": "Oui, à tout moment. Il n'y a aucun engagement. L'abonnement mensuel couvre l'hébergement, la surveillance et les améliorations, et vous gardez tout ce qui a été construit pour vous."
+      },
+      {
+        "q": "Quelle est la différence entre l'audit gratuit et l'appel d'audit à 35 $ ?",
+        "a": "L'audit gratuit est une évaluation écrite : vous remplissez un formulaire, nous l'examinons et vous envoyons des conclusions et une proposition par e-mail, sans frais. L'appel d'audit à 35 $ est un appel en direct de 20 minutes distinct, réservé et payé à l'avance via Cal.com. Ni l'un ni l'autre n'est une remise ou un aperçu de l'autre, ce sont deux façons différentes d'obtenir un audit."
+      }
     ]
   },
   "contact": {
