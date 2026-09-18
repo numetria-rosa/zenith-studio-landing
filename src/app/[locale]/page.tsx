@@ -542,7 +542,8 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                     alt={`${item.name} website`}
                     className="absolute inset-0 h-full w-full object-cover object-top"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/80 to-black/45" />
+                  <div className="absolute inset-0 bg-black/80 sm:hidden" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/90 to-black/80" />
                   {/* browser chrome */}
                   <div className="absolute inset-x-0 top-0 flex items-center gap-1.5 bg-black/45 px-3.5 py-2.5 backdrop-blur-md">
                     <span className="h-2.5 w-2.5 rounded-full bg-white/25" />
