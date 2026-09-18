@@ -41,6 +41,14 @@
     {
       "source": "/demos/:slug",
       "destination": "/demos/:slug.html"
+    },
+    {
+      "source": "/sites/:site",
+      "destination": "/sites/:site/index.html"
+    },
+    {
+      "source": "/sites/:site/:page",
+      "destination": "/sites/:site/:page.html"
     }
   ]
 }
