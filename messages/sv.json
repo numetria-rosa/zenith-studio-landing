@@ -43,7 +43,11 @@
       "label": "Gratis automationsgenomgång",
       "priceLabel": "skriftlig bedömning",
       "description": "Fyll i ett kort formulär om ditt företag. Vi går igenom det och skickar tillbaka en skriftlig bedömning: var dina timmar och leads läcker, om automation är värt det för dig, och en ungefärlig tidsplan och kostnad om så är fallet. Inget samtal krävs.",
-      "features": ["Asynkront, via e-post", "Skriftliga resultat och förslag", "Ingen betalning, inget tidsåtagande"],
+      "features": [
+        "Asynkront, via e-post",
+        "Skriftliga resultat och förslag",
+        "Ingen betalning, inget tidsåtagande"
+      ],
       "cta": "Få din gratis genomgång"
     },
     "paid": {
@@ -51,7 +55,11 @@
       "label": "20-minuters automationsgenomgång per samtal",
       "priceLabel": "engångskostnad, betalas vid bokning",
       "description": "Hoppa över formuläret. Boka ett riktigt 20-minuterssamtal med oss, vi tittar på ditt företag live, går igenom vad som är värt att automatisera, och du går därifrån med en plan. Betalningen tas vid bokning, och samtalet bekräftas direkt.",
-      "features": ["Live, på samtal med oss", "Direktbokning, ingen väntan på skriftligt svar", "Prissatt separat från den gratis genomgången, ingen rabatt på den"],
+      "features": [
+        "Live, på samtal med oss",
+        "Direktbokning, ingen väntan på skriftligt svar",
+        "Prissatt separat från den gratis genomgången, ingen rabatt på den"
+      ],
       "cta": "Boka samtalet för $35"
     }
   },
@@ -61,10 +69,26 @@
     "description": "Det här är inte kundlogotyper. Det är våra egna produkter. Zenith Studio designar, bygger och driver dem från start till mål: <b1>VoyAI</b1> på plattformen <b2>Atlas & Awe</b2>, och <b3>SmartRevise</b3> på plattformen <b4>A+ Academy</b4>.",
     "builtBy": "Byggt av Zenith",
     "items": [
-      { "category": "AI-reseSaaS", "tagline": "Hela din resa, planerad på 60 sekunder.", "description": "En AI-reseplanerare som omvandlar några uppmaningar till riktiga reseplaner med aktuella hotellpriser, flyg och bokningsbara turer. Drivs av plattformen Atlas & Awe." },
-      { "category": "AI-studieSaaS", "tagline": "Anteckningar blir examensklar kunskap.", "description": "Klistra in anteckningar eller en PDF och få direkt AI-flashcards, spacerepetition, quiz, provtentor och en personlig handledare. Drivs av plattformen A+ Academy." },
-      { "category": "Reseplattform", "tagline": "Res smart.", "description": "En oberoende europeisk resepublikation och publikplattformen bakom VoyAI, med över 120 utvalda guider i fler än 15 länder." },
-      { "category": "EdTech-plattform", "tagline": "Sluta plugga hårdare. Börja plugga som ett system.", "description": "Ingenjörsbyggda studie-OS:et bakom SmartRevise: systemtänkande och kognitionsvetenskap tillämpat på hur studenter lär sig." }
+      {
+        "category": "AI-reseSaaS",
+        "tagline": "Hela din resa, planerad på 60 sekunder.",
+        "description": "En AI-reseplanerare som omvandlar några uppmaningar till riktiga reseplaner med aktuella hotellpriser, flyg och bokningsbara turer. Drivs av plattformen Atlas & Awe."
+      },
+      {
+        "category": "AI-studieSaaS",
+        "tagline": "Anteckningar blir examensklar kunskap.",
+        "description": "Klistra in anteckningar eller en PDF och få direkt AI-flashcards, spacerepetition, quiz, provtentor och en personlig handledare. Drivs av plattformen A+ Academy."
+      },
+      {
+        "category": "Reseplattform",
+        "tagline": "Res smart.",
+        "description": "En oberoende europeisk resepublikation och publikplattformen bakom VoyAI, med över 120 utvalda guider i fler än 15 länder."
+      },
+      {
+        "category": "EdTech-plattform",
+        "tagline": "Sluta plugga hårdare. Börja plugga som ett system.",
+        "description": "Ingenjörsbyggda studie-OS:et bakom SmartRevise: systemtänkande och kognitionsvetenskap tillämpat på hur studenter lär sig."
+      }
     ]
   },
   "services": {
@@ -74,10 +98,30 @@
     "browseCourses": "Bläddra bland kurserna",
     "comingSoon": "Kommer snart",
     "items": [
-      { "title": "AI-automationsflöden", "description": "Intelligent automation från start till mål: från leadrouting och CRM-synkning till fleragentskedjor med AI som hanterar komplex affärslogik utan mänsklig inblandning." },
-      { "title": "Avancerad kodning och skript", "description": "Skräddarsydda Python-, Node.js- och API-integrationer som driver de flöden som no-code-verktyg inte når: datapipelines, webbskrapare, interna verktyg och backend-system byggda från grunden." },
-      { "title": "Zenith AI", "description": "Nyckelfärdiga automationssystem som hanterar leadinsamling, kundkommunikation och bokningar så att företag växer snabbare med mindre manuellt arbete. Plug-and-play-installationer som AI Receptionist och AI-leadinsamlingssystemet, igång på ungefär en vecka. Se priser nedan." },
-      { "title": "Zenith Lab", "description": "Karriärinriktade kurser inom automation, AI, data och Web3: färdigheterna som inte ersätts av AI 2026/2027. Varje kurs inkluderar en Career Path Edition, så du lär dig inte bara, du vet exakt var du ska tillämpa det och hur du får betalt." }
+      {
+        "title": "AI-automationsflöden",
+        "description": "Intelligent automation från start till mål: från leadrouting och CRM-synkning till fleragentskedjor med AI som hanterar komplex affärslogik utan mänsklig inblandning."
+      },
+      {
+        "title": "Avancerad kodning och skript",
+        "description": "Skräddarsydda Python-, Node.js- och API-integrationer som driver de flöden som no-code-verktyg inte når: datapipelines, webbskrapare, interna verktyg och backend-system byggda från grunden."
+      },
+      {
+        "title": "Zenith AI",
+        "description": "Nyckelfärdiga automationssystem som hanterar leadinsamling, kundkommunikation och bokningar så att företag växer snabbare med mindre manuellt arbete. Plug-and-play-installationer som AI Receptionist och AI-leadinsamlingssystemet, igång på ungefär en vecka. Se priser nedan."
+      },
+      {
+        "title": "Zenith Lab",
+        "description": "Karriärinriktade kurser inom automation, AI, data och Web3: färdigheterna som inte ersätts av AI 2026/2027. Varje kurs inkluderar en Career Path Edition, så du lär dig inte bara, du vet exakt var du ska tillämpa det och hur du får betalt."
+      },
+      {
+        "title": "Skräddarsydda Webbplatser",
+        "description": "Snabba, moderna, skräddarsydda företagswebbplatser byggda för att konvertera, inte mallar. Från en enkel landningssida till en komplett flersidig webbplats, driftsatt på din egen domän."
+      },
+      {
+        "title": "AI-Chatbotar",
+        "description": "Chattwidgetar för din webbplats som svarar på frågor, kvalificerar besökare och lämnar över varma leads dygnet runt, tränade på din verksamhet så svaren faktiskt stämmer."
+      }
     ]
   },
   "systems": {
@@ -96,27 +140,53 @@
         "pitch": "Vakna till en inkorg som redan är hanterad.",
         "description": "Sorterar och prioriterar e-post, och skriver sedan svar på de rutinmässiga så att din dag börjar med beslut, inte administration.",
         "live": "Igång på 2 till 4 dagar",
-        "features": ["Sortering och prioritering av e-post", "AI-skrivna svar på rutinmejl", "Fungerar med Gmail (privat) och Yahoo Mail"]
+        "features": [
+          "Sortering och prioritering av e-post",
+          "AI-skrivna svar på rutinmejl",
+          "Fungerar med Gmail (privat) och Yahoo Mail"
+        ]
       },
       {
         "name": "AI Lead Capture & Follow-Up",
         "pitch": "Förlora aldrig en lead till ett långsamt svar igen.",
         "description": "Fångar varje förfrågan, kvalificerar den och följer upp via e-post och SMS tills de bokar. Företaget som svarar först får jobbet.",
         "live": "Igång på 3 till 5 dagar",
-        "features": ["Fångar leads från alla källor", "Kvalificerar och poängsätter varje lead automatiskt", "Uppföljningssekvenser via e-post och SMS", "Synkar med ditt CRM, med rapportering"]
+        "features": [
+          "Fångar leads från alla källor",
+          "Kvalificerar och poängsätter varje lead automatiskt",
+          "Uppföljningssekvenser via e-post och SMS",
+          "Synkar med ditt CRM, med rapportering"
+        ]
       },
       {
         "name": "AI Receptionist & Booking",
         "pitch": "Svarar och bokar medan du jobbar.",
         "description": "Hanterar förfrågningar dygnet runt, bokar direkt i din kalender och skickar de påminnelser som minskar uteblivna besök.",
         "live": "Igång på 5 till 7 dagar",
-        "features": ["Förfrågningshantering dygnet runt", "Bokar i din befintliga kalender", "Automatiska påminnelser som minskar uteblivna besök", "Eskalerar allt den inte bör svara på"]
+        "features": [
+          "Förfrågningshantering dygnet runt",
+          "Bokar i din befintliga kalender",
+          "Automatiska påminnelser som minskar uteblivna besök",
+          "Eskalerar allt den inte bör svara på"
+        ]
       }
     ],
     "steps": [
-      { "step": "01", "title": "Gratis 20-minuters genomgång", "text": "Vi kartlägger var dina timmar och leads läcker, och om automation ens är värt det för dig." },
-      { "step": "02", "title": "Vi bygger det", "text": "Du svarar på några frågor. Vi designar, bygger och kopplar systemet till verktygen du redan använder." },
-      { "step": "03", "title": "Vi lanserar och underhåller det", "text": "Igång på några dagar. Din månadskostnad täcker hosting, övervakning och förbättringar medan det körs." }
+      {
+        "step": "01",
+        "title": "Gratis 20-minuters genomgång",
+        "text": "Vi kartlägger var dina timmar och leads läcker, och om automation ens är värt det för dig."
+      },
+      {
+        "step": "02",
+        "title": "Vi bygger det",
+        "text": "Du svarar på några frågor. Vi designar, bygger och kopplar systemet till verktygen du redan använder."
+      },
+      {
+        "step": "03",
+        "title": "Vi lanserar och underhåller det",
+        "text": "Igång på några dagar. Din månadskostnad täcker hosting, övervakning och förbättringar medan det körs."
+      }
     ]
   },
   "verticals": {
@@ -134,11 +204,27 @@
         "headline": "Din byrå jobbar 49 timmar i veckan och fakturerar 37.",
         "lede": "Det tolv timmar stora gapet är ungefär $230 000 per advokat och år. Det går inte förlorat till konkurrenter eller dålig marknadsföring. Det är arbete ni redan gjort och aldrig fakturerat.",
         "monthlyNote": "För SMS-återkoppling vid missade samtal + uppföljningsassistenten, som ett team. Faktureringsassistenten prissätts efter vad den återvinner, inte en fast avgift.",
-        "statsLabels": ["genomsnittlig beläggning per advokat", "genomsnittlig realiseringsgrad", "nedskrivningar vid 14 dagar jämfört med 45"],
+        "statsLabels": [
+          "genomsnittlig beläggning per advokat",
+          "genomsnittlig realiseringsgrad",
+          "nedskrivningar vid 14 dagar jämfört med 45"
+        ],
         "roster": [
-          { "role": "AI Billing Clerk (faktureringsassistent)", "text": "Rekonstruerar fakturerbar tid från din kalender, e-post och dokument, skriver poster med verkliga beskrivningar, och skickar ut fakturor inom 14-dagarsfönstret där nedskrivningar ligger på 6 % istället för 18 %.", "anchor": "Prissatt efter vad den återvinner." },
-          { "role": "AI Missed Call Text-Back (SMS vid missat samtal)", "text": "I samma stund ett samtal går obesvarat får den som ringde ett SMS tillbaka inom några sekunder, kvalificeras mot era ärendekriterier, och bokar konsultationen, så ett missat samtal aldrig blir ett samtal till byrån nere på gatan.", "anchor": "34 % av dem som når röstbrevlådan ringer aldrig er byrå igen." },
-          { "role": "AI Follow-Up Clerk (uppföljningsassistent)", "text": "Arbetar med leads som inte blev kunder vid första samtalet. Ni har redan betalat för var och en av dem, och de flesta byråer rör dem aldrig igen.", "anchor": "Juridiska leads kostar i genomsnitt $131 styck, det högsta av alla branscher." }
+          {
+            "role": "AI Billing Clerk (faktureringsassistent)",
+            "text": "Rekonstruerar fakturerbar tid från din kalender, e-post och dokument, skriver poster med verkliga beskrivningar, och skickar ut fakturor inom 14-dagarsfönstret där nedskrivningar ligger på 6 % istället för 18 %.",
+            "anchor": "Prissatt efter vad den återvinner."
+          },
+          {
+            "role": "AI Missed Call Text-Back (SMS vid missat samtal)",
+            "text": "I samma stund ett samtal går obesvarat får den som ringde ett SMS tillbaka inom några sekunder, kvalificeras mot era ärendekriterier, och bokar konsultationen, så ett missat samtal aldrig blir ett samtal till byrån nere på gatan.",
+            "anchor": "34 % av dem som når röstbrevlådan ringer aldrig er byrå igen."
+          },
+          {
+            "role": "AI Follow-Up Clerk (uppföljningsassistent)",
+            "text": "Arbetar med leads som inte blev kunder vid första samtalet. Ni har redan betalat för var och en av dem, och de flesta byråer rör dem aldrig igen.",
+            "anchor": "Juridiska leads kostar i genomsnitt $131 styck, det högsta av alla branscher."
+          }
         ],
         "guardrail": "Ni godkänner varje post. Inget lämnar byrån utan att en delägare skriver under.",
         "offer": "Vi rekonstruerar en tidigare månad av er ofakturerade tid innan ni betalar något. Ni får en siffra. Om det inte är värt att agera på, är vi klara."
@@ -148,11 +234,27 @@
         "headline": "Era mäklare slutar inte för en bättre provisionsfördelning.",
         "lede": "De slutar för att de gör fyra jobb samtidigt: prospektering, uppföljning, pappersarbete och en databas ingen har rört på ett år. Varje mäklare som slutar kostar er $15 000 till $50 000.",
         "monthlyNote": "För Inside Sales-agenten + databashanteraren, som ett team. Transaktionskoordinering faktureras per ärende, $150 till $200.",
-        "statsLabels": ["genomsnittlig svarstid på leads per mäklare", "större sannolikhet att konvertera inom 5 minuter", "rekryterade mäklare som fortfarande är kvar år fem"],
+        "statsLabels": [
+          "genomsnittlig svarstid på leads per mäklare",
+          "större sannolikhet att konvertera inom 5 minuter",
+          "rekryterade mäklare som fortfarande är kvar år fem"
+        ],
         "roster": [
-          { "role": "AI Inside Sales Agent", "text": "Svarar på nya leads inom sekunder, kvalificerar motivation, tidsram och finansiering, och bokar sedan mötet innan en konkurrent hinner svara i telefon.", "anchor": "Coacher säger att man behöver 500 prospekt för att motivera en ISA-anställning. Den här är motiverad redan vid femtio." },
-          { "role": "AI Transaction Coordinator", "text": "Från kontrakt till avslut. Deadlines bevakas, dokument drivs på, och alla parter hålls uppdaterade utan att någon behöver fråga.", "anchor": "Utlagd koordinering kostar $350 till $450 per ärende." },
-          { "role": "AI Database Manager", "text": "Väcker liv i sovande kontakter och tidigare kunder som redan finns i ert CRM. Inte nya leads, de ni redan betalat för.", "anchor": "Återkommande affärer och rekommendationer är merparten av en mäklares affärer, och nästan ingen arbetar med dem." }
+          {
+            "role": "AI Inside Sales Agent",
+            "text": "Svarar på nya leads inom sekunder, kvalificerar motivation, tidsram och finansiering, och bokar sedan mötet innan en konkurrent hinner svara i telefon.",
+            "anchor": "Coacher säger att man behöver 500 prospekt för att motivera en ISA-anställning. Den här är motiverad redan vid femtio."
+          },
+          {
+            "role": "AI Transaction Coordinator",
+            "text": "Från kontrakt till avslut. Deadlines bevakas, dokument drivs på, och alla parter hålls uppdaterade utan att någon behöver fråga.",
+            "anchor": "Utlagd koordinering kostar $350 till $450 per ärende."
+          },
+          {
+            "role": "AI Database Manager",
+            "text": "Väcker liv i sovande kontakter och tidigare kunder som redan finns i ert CRM. Inte nya leads, de ni redan betalat för.",
+            "anchor": "Återkommande affärer och rekommendationer är merparten av en mäklares affärer, och nästan ingen arbetar med dem."
+          }
         ],
         "guardrail": "Det är också det bästa rekryteringsargument ni har. Ett team från dag ett väger tyngre än ytterligare en provisionspoäng.",
         "offer": "Vi kör igång er sovande databas först. Ni betalar av det den ger."
@@ -163,13 +265,34 @@
     "eyebrow": "Vanliga frågor",
     "title": "Frågor vi ofta får",
     "items": [
-      { "q": "Vad kostar AI-automation för ett litet företag?", "a": "AI Inbox Manager kostar $190 i installation plus $150 per månad. AI-leadinsamlingssystemet kostar $270 i installation plus $200 per månad, och AI Receptionist kostar $360 i installation plus $300 per månad. Månadskostnaden täcker hosting, övervakning och löpande förbättringar, och det finns inget bindande avtal." },
-      { "q": "Hur lång tid tar det att sätta upp ett AI-automationssystem?", "a": "De flesta system är igång inom 2 till 7 dagar beroende på vilket du väljer. Den gratis genomgången ger dig en exakt tidsplan innan du binder dig till något." },
-      { "q": "Behöver jag teknisk kunskap för att använda det?", "a": "Inte alls. Vi bygger, hostar och underhåller allt. Du använder systemet och får tillbaka tiden. Om något går sönder blir vi varnade innan du märker det." },
-      { "q": "Hur skiljer sig det här från att anställa en virtuell assistent?", "a": "En virtuell assistent kostar betydligt mer per månad, jobbar bestämda tider och behöver ledas. De här systemen körs dygnet runt, svarar på under en minut, tar aldrig semester och kostar en bråkdel av en lön. De flesta kunder använder båda: systemet hanterar den repetitiva volymen, människan hanterar undantagen." },
-      { "q": "Vilka verktyg integrerar det med?", "a": "Verktygen du redan använder. Gmail och Outlook, ditt CRM, Google Calendar och Cal.com, WhatsApp och SMS, Slack, och de flesta plattformar med ett API. Systemet byggs runt din nuvarande stack istället för att be dig byta." },
-      { "q": "Kan jag säga upp månadsabonnemanget?", "a": "Ja, när som helst. Det finns ingen bindningstid. Månadsavgiften täcker hosting, övervakning och förbättringar, och du behåller allt som byggdes åt dig." },
-      { "q": "Vad är skillnaden mellan den gratis genomgången och genomgångssamtalet för $35?", "a": "Den gratis genomgången är en skriftlig bedömning: du fyller i ett formulär, vi granskar det och skickar tillbaka resultat och ett förslag via e-post, helt kostnadsfritt. Genomgångssamtalet för $35 är ett separat, live 20-minuterssamtal med oss, bokat och betalat i förskott via Cal.com. Ingen av dem är en rabatt på eller förhandsvisning av den andra, det är två olika sätt att få en genomgång." }
+      {
+        "q": "Vad kostar AI-automation för ett litet företag?",
+        "a": "AI Inbox Manager kostar $190 i installation plus $150 per månad. AI-leadinsamlingssystemet kostar $270 i installation plus $200 per månad, och AI Receptionist kostar $360 i installation plus $300 per månad. Månadskostnaden täcker hosting, övervakning och löpande förbättringar, och det finns inget bindande avtal."
+      },
+      {
+        "q": "Hur lång tid tar det att sätta upp ett AI-automationssystem?",
+        "a": "De flesta system är igång inom 2 till 7 dagar beroende på vilket du väljer. Den gratis genomgången ger dig en exakt tidsplan innan du binder dig till något."
+      },
+      {
+        "q": "Behöver jag teknisk kunskap för att använda det?",
+        "a": "Inte alls. Vi bygger, hostar och underhåller allt. Du använder systemet och får tillbaka tiden. Om något går sönder blir vi varnade innan du märker det."
+      },
+      {
+        "q": "Hur skiljer sig det här från att anställa en virtuell assistent?",
+        "a": "En virtuell assistent kostar betydligt mer per månad, jobbar bestämda tider och behöver ledas. De här systemen körs dygnet runt, svarar på under en minut, tar aldrig semester och kostar en bråkdel av en lön. De flesta kunder använder båda: systemet hanterar den repetitiva volymen, människan hanterar undantagen."
+      },
+      {
+        "q": "Vilka verktyg integrerar det med?",
+        "a": "Verktygen du redan använder. Gmail och Outlook, ditt CRM, Google Calendar och Cal.com, WhatsApp och SMS, Slack, och de flesta plattformar med ett API. Systemet byggs runt din nuvarande stack istället för att be dig byta."
+      },
+      {
+        "q": "Kan jag säga upp månadsabonnemanget?",
+        "a": "Ja, när som helst. Det finns ingen bindningstid. Månadsavgiften täcker hosting, övervakning och förbättringar, och du behåller allt som byggdes åt dig."
+      },
+      {
+        "q": "Vad är skillnaden mellan den gratis genomgången och genomgångssamtalet för $35?",
+        "a": "Den gratis genomgången är en skriftlig bedömning: du fyller i ett formulär, vi granskar det och skickar tillbaka resultat och ett förslag via e-post, helt kostnadsfritt. Genomgångssamtalet för $35 är ett separat, live 20-minuterssamtal med oss, bokat och betalat i förskott via Cal.com. Ingen av dem är en rabatt på eller förhandsvisning av den andra, det är två olika sätt att få en genomgång."
+      }
     ]
   },
   "contact": {

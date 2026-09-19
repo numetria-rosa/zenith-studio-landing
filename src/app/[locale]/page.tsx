@@ -6,6 +6,7 @@ import { getService, getSetupCheckoutUrl, servicePagePath } from "@/lib/services
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 import Reveal from "@/components/Reveal";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import MobileNav from "@/components/MobileNav";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -116,6 +117,22 @@ export default function ZenithStudioLandingPage() {
         <path d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347M4.26 10.147a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814M4.26 10.147A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443" />
       ),
       ...servicesContent[3],
+    },
+    {
+      tag: "Core Service",
+      href: undefined as string | undefined,
+      icon: (
+        <path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+      ),
+      ...servicesContent[4],
+    },
+    {
+      tag: "Core Service",
+      href: undefined as string | undefined,
+      icon: (
+        <path d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+      ),
+      ...servicesContent[5],
     },
   ];
 
@@ -286,6 +303,17 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               >
                 {t("nav.freeAudit")}
               </LocaleLink>
+              <MobileNav
+                items={[
+                  { href: "#work", label: t("nav.work") },
+                  { href: "#services", label: t("nav.services") },
+                  { href: "#systems", label: t("nav.pricing") },
+                  { href: "/lab", label: t("nav.courses") },
+                  { href: "#contact", label: t("nav.contact") },
+                ]}
+                signInHref="/sign-in"
+                signInLabel={t("nav.signIn")}
+              />
             </div>
           </div>
         </div>
@@ -361,12 +389,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               />
             </div>
 
-            <div className="absolute bottom-[30%] left-[0%] rounded-[28px] border border-white/12 bg-white/[0.04] px-4 py-4 backdrop-blur-2xl shadow-[0_0_40px_rgba(89,118,255,0.12)]">
+            <div className="absolute bottom-36 left-2 max-w-[150px] rounded-[28px] border border-white/12 bg-white/[0.04] px-4 py-4 backdrop-blur-2xl shadow-[0_0_40px_rgba(89,118,255,0.12)] lg:bottom-[30%] lg:left-[0%] lg:max-w-none">
               <div className="text-xs uppercase tracking-[0.2em] text-white/45">{t("hero.builtForLabel")}</div>
               <div className="mt-2 text-sm font-medium text-white/85">{t("hero.builtForText")}</div>
             </div>
 
-            <div className="absolute right-[2%] bottom-[30%] rounded-[26px] border border-white/12 bg-white/[0.05] px-4 py-4 backdrop-blur-2xl shadow-[0_0_30px_rgba(226,109,255,0.12)]">
+            <div className="absolute right-2 bottom-6 max-w-[150px] rounded-[26px] border border-white/12 bg-white/[0.05] px-4 py-4 backdrop-blur-2xl shadow-[0_0_30px_rgba(226,109,255,0.12)] lg:right-[2%] lg:bottom-[30%] lg:max-w-none">
               <div className="text-xs uppercase tracking-[0.2em] text-white/45">{t("hero.outcomeLabel")}</div>
               <div className="mt-2 text-2xl font-semibold tracking-[-0.04em]">{t("hero.outcomeTitle")}</div>
               <div className="text-sm text-white/55">{t("hero.outcomeText")}</div>
@@ -505,7 +533,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative min-h-[230px] flex-1 overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0c14] transition-[flex] duration-500 ease-out sm:min-h-0 sm:hover:flex-[3.5]"
+                className="group relative min-h-[340px] flex-1 overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0c14] transition-[flex] duration-500 ease-out sm:min-h-0 sm:hover:flex-[3.5]"
               >
                 {/* Screenshot layer: shown on mobile, revealed on hover on desktop */}
                 <div className="absolute inset-0 opacity-100 transition-opacity duration-500 sm:opacity-0 sm:group-hover:opacity-100">
@@ -514,7 +542,8 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                     alt={`${item.name} website`}
                     className="absolute inset-0 h-full w-full object-cover object-top"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10" />
+                  <div className="absolute inset-0 bg-black/80 sm:hidden" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/90 to-black/80" />
                   {/* browser chrome */}
                   <div className="absolute inset-x-0 top-0 flex items-center gap-1.5 bg-black/45 px-3.5 py-2.5 backdrop-blur-md">
                     <span className="h-2.5 w-2.5 rounded-full bg-white/25" />
