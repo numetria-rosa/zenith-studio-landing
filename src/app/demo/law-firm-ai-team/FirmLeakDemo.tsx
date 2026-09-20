@@ -21,11 +21,15 @@ const STEPS = [
   { id: "billing", label: "Billing" },
 ] as const;
 
+const DEFAULT_FIRM_NAME = "Reeves & Cole";
+
 export default function FirmLeakDemo() {
   const [current, setCurrent] = useState(0);
   const [unlocked, setUnlocked] = useState(0);
   const [phases, setPhases] = useState<[Phase, Phase, Phase]>(["idle", "idle", "idle"]);
   const [logStep, setLogStep] = useState(0); // how many log lines are revealed for the current running step
+  const [firmNameInput, setFirmNameInput] = useState("");
+  const firmName = firmNameInput.trim() || DEFAULT_FIRM_NAME;
 
   function setPhaseAt(index: number, phase: Phase) {
     setPhases((p) => {
@@ -66,7 +70,21 @@ export default function FirmLeakDemo() {
     status === "done" ? "text-emerald-400" : status === "active" ? "text-amber-300" : "text-white/30";
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0a0d0d] font-[family-name:var(--font-mono,monospace)]">
+    <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0a0d0d] shadow-[0_24px_60px_-24px_rgba(0,0,0,.6)] font-[family-name:var(--font-mono,monospace)]">
+      <div className="border-b border-white/10 bg-[#0f1414] px-5 py-4 font-sans">
+        <label htmlFor="firm-name-input" className="text-[10px] uppercase tracking-[0.1em] text-white/30">
+          See it with your firm&apos;s name
+        </label>
+        <input
+          id="firm-name-input"
+          type="text"
+          value={firmNameInput}
+          onChange={(e) => setFirmNameInput(e.target.value)}
+          placeholder={DEFAULT_FIRM_NAME}
+          maxLength={60}
+          className="mt-1.5 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/25 outline-none focus:border-amber-300/50"
+        />
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr]">
         {/* Rail */}
         <div className="border-b border-white/10 bg-[#0f1414] py-5 sm:border-b-0 sm:border-r">
@@ -99,7 +117,7 @@ export default function FirmLeakDemo() {
             <StepPanel
               liveLabel="AI Missed Call Text-Back"
               heading="A caller hangs up after one ring, unanswered."
-              sub={<>(614) 555-0148 &middot; Reeves &amp; Cole intake line</>}
+              sub={<>(614) 555-0148 &middot; {firmName} intake line</>}
               phase={phases[0]}
               logStep={logStep}
               logLines={["Incoming call detected", "1 ring, no answer", "Drafting text-back"]}
@@ -107,7 +125,7 @@ export default function FirmLeakDemo() {
               runLabel="Simulate a missed call"
               result={
                 <>
-                  &ldquo;Hi, this is Reeves &amp; Cole&apos;s AI assistant. Sorry we missed you - if this is about a
+                  &ldquo;Hi, this is {firmName}&apos;s AI assistant. Sorry we missed you - if this is about a
                   recent accident, reply YES and I can get some quick details started.&rdquo;
                   <div className="mt-2 text-[10px] uppercase tracking-[0.08em] text-emerald-400/80">
                     Sent in 8 seconds
