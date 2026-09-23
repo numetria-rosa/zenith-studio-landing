@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 import type { Payment, Membership } from "@whop/sdk/resources.js";
 import { getWhopClient } from "@/lib/whop";
 import { db } from "@/lib/db";
-import { courseIdForWhopProductId } from "@/lib/courses";
+import { courseIdForWhopProductId, getCourse } from "@/lib/courses";
 import { courseIdsForWhopBundleProductId } from "@/lib/bundles";
 import { serviceKindForWhopPlanId, getService, SERVICES } from "@/lib/services";
 import { generateStrongPassword, encryptPassword } from "@/lib/password";
@@ -72,6 +72,10 @@ export async function POST(request: NextRequest) {
         `${email} just bought ${serviceName} directly (no audit, no call) and their workspace was created automatically. Details at ${process.env.NEXTAUTH_URL || ""}/admin/projects`
       ).catch(() => {});
     }
+    if (purchaseForMeta?.newCoursePurchase) {
+      const { email, courseNames } = purchaseForMeta.newCoursePurchase;
+      await sendAdminAlert(`New course sale: ${courseNames}`, `${email} just bought ${courseNames}.`).catch(() => {});
+    }
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       // Unique constraint on WebhookEvent.id -> this exact delivery was already
@@ -98,7 +102,11 @@ type MetaPurchaseInfo = Parameters<typeof sendMetaPurchaseEvent>[0];
    sales go to Meta, a brand-new service customer gets admin notified,
    never both since courseId/bundleCourseIds/serviceMatch are mutually
    exclusive branches. */
-type PostCommitInfo = { meta?: MetaPurchaseInfo | null; newServiceCustomer?: { email: string; serviceName: string } };
+type PostCommitInfo = {
+  meta?: MetaPurchaseInfo | null;
+  newServiceCustomer?: { email: string; serviceName: string };
+  newCoursePurchase?: { email: string; courseNames: string };
+};
 
 async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<PostCommitInfo | null> {
   const productId = payment.product?.id;
@@ -192,6 +200,10 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<PostCom
       : null;
 
   if (courseId) {
+    const existingEntitlement = await tx.courseEntitlement.findUnique({
+      where: { userId_courseId: { userId: user.id, courseId } },
+      select: { id: true },
+    });
     await tx.courseEntitlement.upsert({
       where: { userId_courseId: { userId: user.id, courseId } },
       create: {
@@ -209,7 +221,13 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<PostCom
         whopPaymentId: payment.id,
       },
     });
-    return { meta: metaPurchaseInfo([courseId]) };
+    return {
+      meta: metaPurchaseInfo([courseId]),
+      newCoursePurchase:
+        !existingEntitlement && user.email
+          ? { email: user.email, courseNames: getCourse(courseId)?.title ?? courseId }
+          : undefined,
+    };
   }
 
   if (bundleCourseIds) {
@@ -217,7 +235,13 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<PostCom
     // real CourseEntitlement row - the dashboard/access-guard code reads
     // per-course rows and has no notion of a bundle, by design, so a bundle
     // buyer must look identical to someone who bought each course separately.
+    let isNewBundlePurchase = false;
     for (const bundledCourseId of bundleCourseIds) {
+      const existingEntitlement = await tx.courseEntitlement.findUnique({
+        where: { userId_courseId: { userId: user.id, courseId: bundledCourseId } },
+        select: { id: true },
+      });
+      if (!existingEntitlement) isNewBundlePurchase = true;
       await tx.courseEntitlement.upsert({
         where: { userId_courseId: { userId: user.id, courseId: bundledCourseId } },
         create: {
@@ -236,7 +260,13 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<PostCom
         },
       });
     }
-    return { meta: metaPurchaseInfo(bundleCourseIds) };
+    return {
+      meta: metaPurchaseInfo(bundleCourseIds),
+      newCoursePurchase:
+        isNewBundlePurchase && user.email
+          ? { email: user.email, courseNames: bundleCourseIds.map((id) => getCourse(id)?.title ?? id).join(", ") }
+          : undefined,
+    };
   }
 
   // serviceMatch is non-null here (the !courseId && !serviceMatch check above returned already otherwise)

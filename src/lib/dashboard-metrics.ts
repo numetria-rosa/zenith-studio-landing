@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { getService, SERVICES } from "@/lib/services";
+import { getCourse } from "@/lib/courses";
 
 /* Read-only aggregate queries backing the /admin dashboard (Slice 2 of the
    service-platform build, 2026-08-28). No writes happen here. Every number
@@ -395,7 +396,8 @@ export type ActivityEvent = {
 export async function getRecentActivity(limit = 20): Promise<ActivityEvent[]> {
   const perSourceLimit = 8;
 
-  const [audits, proposalsSent, approvals, projects, messages, supportRequests] = await Promise.all([
+  const [audits, proposalsSent, approvals, projects, messages, supportRequests, paidAudits, courseGrants] =
+    await Promise.all([
     db.auditRequest.findMany({
       orderBy: { createdAt: "desc" },
       take: perSourceLimit,
@@ -424,6 +426,16 @@ export async function getRecentActivity(limit = 20): Promise<ActivityEvent[]> {
     }),
     db.supportRequest.findMany({
       orderBy: { createdAt: "desc" },
+      take: perSourceLimit,
+      include: { user: { select: { name: true, email: true } } },
+    }),
+    db.paidAudit.findMany({
+      orderBy: { createdAt: "desc" },
+      take: perSourceLimit,
+      select: { id: true, createdAt: true, email: true, companyName: true },
+    }),
+    db.courseEntitlement.findMany({
+      orderBy: { grantedAt: "desc" },
       take: perSourceLimit,
       include: { user: { select: { name: true, email: true } } },
     }),
@@ -495,6 +507,26 @@ export async function getRecentActivity(limit = 20): Promise<ActivityEvent[]> {
       detail: `${s.subject} · ${s.user.name || s.user.email}`,
       at: s.createdAt,
       href: `/admin/service-requests`,
+    });
+  }
+
+  for (const pa of paidAudits) {
+    events.push({
+      id: `paid-audit-${pa.id}`,
+      label: "$35 audit call booked",
+      detail: pa.companyName || pa.email,
+      at: pa.createdAt,
+      href: `/admin/paid-audits`,
+    });
+  }
+
+  for (const g of courseGrants) {
+    events.push({
+      id: `course-grant-${g.id}`,
+      label: "Course purchased",
+      detail: `${getCourse(g.courseId)?.title ?? g.courseId} · ${g.user.name || g.user.email}`,
+      at: g.grantedAt,
+      href: `/admin`,
     });
   }
 
