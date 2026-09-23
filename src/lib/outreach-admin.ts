@@ -5,7 +5,16 @@ import { getService, servicePagePath } from "@/lib/services";
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 import { catalogPricesForService } from "@/lib/service-pages";
 import { getSiteUrl } from "@/lib/site";
-import { DALLAS_DENTAL_PROSPECTS, OHIO_PI_PROSPECTS, FORT_WORTH_PI_PROSPECTS, type SeedProspect } from "@/data/outreach-prospects";
+import {
+  DALLAS_DENTAL_PROSPECTS,
+  OHIO_PI_PROSPECTS,
+  FORT_WORTH_PI_PROSPECTS,
+  TAMPA_PI_PROSPECTS,
+  JACKSONVILLE_PI_PROSPECTS,
+  COLUMBUS_INSURANCE_PROSPECTS,
+  CALGARY_INSURANCE_PROSPECTS,
+  type SeedProspect,
+} from "@/data/outreach-prospects";
 import {
   type EligibilityInput,
   type OutreachPathId,
@@ -807,4 +816,33 @@ export async function importOhioPIProspects() {
     drops. */
 export async function importFortWorthPIProspects() {
   return importSeedProspects(FORT_WORTH_PI_PROSPECTS);
+}
+
+/** Tampa, FL personal injury firm research, 2026-09-12 - see the header
+    comment on TAMPA_PI_PROSPECTS for method, the chat-widget/mixed-practice
+    drops, and which 3 rows are RESEARCHED but outreach-blocked (no email
+    found anywhere, contact-form only). */
+export async function importTampaPIProspects() {
+  return importSeedProspects(TAMPA_PI_PROSPECTS);
+}
+
+/** Jacksonville, FL personal injury firm research, 2026-09-12 - see the
+    header comment on JACKSONVILLE_PI_PROSPECTS for method and why every row
+    here is BACKUP tier (chat-tool-flagged and/or mixed-practice). */
+export async function importJacksonvillePIProspects() {
+  return importSeedProspects(JACKSONVILLE_PI_PROSPECTS);
+}
+
+/** Columbus, OH insurance agency research (AAA_Insurance_Leads_Columbus_Calgary.xlsx,
+    111 leads) - see the header comment on COLUMBUS_INSURANCE_PROSPECTS for the
+    fingerprinting method and which rows carry a verified AMS/rater mention. */
+export async function importColumbusInsuranceProspects() {
+  return importSeedProspects(COLUMBUS_INSURANCE_PROSPECTS);
+}
+
+/** Calgary, AB insurance agency research (AAA_Insurance_Leads_Columbus_Calgary.xlsx,
+    52 leads) - see the header comment on COLUMBUS_INSURANCE_PROSPECTS for the
+    fingerprinting method and which rows carry a verified AMS/rater mention. */
+export async function importCalgaryInsuranceProspects() {
+  return importSeedProspects(CALGARY_INSURANCE_PROSPECTS);
 }

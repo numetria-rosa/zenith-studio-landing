@@ -31,5 +31,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "zenith-ai-kit", ".claude"]
+  "exclude": ["node_modules", "zenith-ai-kit", "halo", ".claude"]
 }

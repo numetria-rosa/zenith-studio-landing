@@ -49,6 +49,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/clients", label: "Clients", icon: "Users" },
     { href: "/admin/audits", label: "Audits", icon: "ClipboardList", badge: topMetrics.openAudits },
     { href: "/admin/outreach", label: "Outreach", icon: "Send", badge: outreachReady },
+    { href: "/admin/insurance-ai-team", label: "Insurance AI team", icon: "Bot" },
     { href: "/admin/proposals", label: "Proposals", icon: "FileText", badge: topMetrics.pendingProposals },
     { href: "/admin/projects", label: "Projects", icon: "FolderKanban" },
     { href: "/admin/tasks", label: "Tasks", icon: "CheckSquare", badge: overdueTaskCount },

@@ -690,6 +690,7 @@ model TimeEntry {
 enum MailProvider {
   GMAIL
   YAHOO
+  ZOHO
 }
 
 enum MailConnectionStatus {
@@ -802,6 +803,40 @@ model ProjectMilestone {
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
+}
+
+// Standalone test-harness tables for the Insurance Account Manager Bundle
+// (2026-09-21). Not tied to ServiceProject/Integration on purpose - this is
+// a self-serve tool to try the 3 new agents (Document Audit, CRM Logging,
+// Renewal Reminders) before any client has signed, so it stays isolated and
+// easy to delete if the pitch doesn't land. Wire into the real provisioning
+// flow (Integration rows per project) once a client actually buys it.
+model InsurancePolicy {
+  id                 String    @id @default(cuid())
+  agencyName         String
+  clientName         String
+  phone              String?
+  email              String?
+  policyType         String?
+  renewalDate        DateTime
+  lastReminderSentAt DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([renewalDate])
+}
+
+model InsuranceCrmLogEntry {
+  id              String   @id @default(cuid())
+  agencyName      String
+  leadName        String
+  phone           String?
+  email           String?
+  notes           String?  @db.Text
+  forwardedToMake Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 enum RequirementStatus {

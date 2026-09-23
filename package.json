@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate"
@@ -28,6 +28,7 @@
     "next-intl": "^4.14.5",
     "next-mdx-remote": "^6.0.0",
     "nodemailer": "^8.0.11",
+    "pdf-parse": "^2.4.5",
     "prisma": "^6.19.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",

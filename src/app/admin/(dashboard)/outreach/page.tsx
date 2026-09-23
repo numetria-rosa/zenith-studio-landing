@@ -8,6 +8,10 @@ import {
   importDallasDentalProspects,
   importOhioPIProspects,
   importFortWorthPIProspects,
+  importTampaPIProspects,
+  importJacksonvillePIProspects,
+  importColumbusInsuranceProspects,
+  importCalgaryInsuranceProspects,
   prepareEligibleProspects,
   setAutoSendEnabled,
 } from "@/lib/outreach-admin";
@@ -58,6 +62,38 @@ export default async function AdminOutreachPage({
     const session = await requireAdmin();
     if (!session) return;
     await importFortWorthPIProspects();
+    redirect("/admin/outreach");
+  }
+
+  async function importTampaPI() {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    await importTampaPIProspects();
+    redirect("/admin/outreach");
+  }
+
+  async function importJacksonvillePI() {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    await importJacksonvillePIProspects();
+    redirect("/admin/outreach");
+  }
+
+  async function importColumbusInsurance() {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    await importColumbusInsuranceProspects();
+    redirect("/admin/outreach");
+  }
+
+  async function importCalgaryInsurance() {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    await importCalgaryInsuranceProspects();
     redirect("/admin/outreach");
   }
 
@@ -116,6 +152,26 @@ export default async function AdminOutreachPage({
         <form action={importFortWorthPI}>
           <button className="rounded-full border border-sky-300/30 bg-sky-400/10 px-4 py-2 text-sm text-sky-200 hover:bg-sky-400/20">
             Load Fort Worth PI research
+          </button>
+        </form>
+        <form action={importTampaPI}>
+          <button className="rounded-full border border-teal-300/30 bg-teal-400/10 px-4 py-2 text-sm text-teal-200 hover:bg-teal-400/20">
+            Load Tampa PI research
+          </button>
+        </form>
+        <form action={importJacksonvillePI}>
+          <button className="rounded-full border border-indigo-300/30 bg-indigo-400/10 px-4 py-2 text-sm text-indigo-200 hover:bg-indigo-400/20">
+            Load Jacksonville PI research (backup-tier)
+          </button>
+        </form>
+        <form action={importColumbusInsurance}>
+          <button className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200 hover:bg-emerald-400/20">
+            Load Columbus insurance research
+          </button>
+        </form>
+        <form action={importCalgaryInsurance}>
+          <button className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200 hover:bg-emerald-400/20">
+            Load Calgary insurance research
           </button>
         </form>
         <form action={prepareAll}>

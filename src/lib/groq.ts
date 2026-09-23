@@ -7,7 +7,17 @@
    providers. */
 
 const GROQ_API_BASE = "https://api.groq.com/openai/v1";
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+// llama-3.3-70b-versatile was retired from Groq's standard plan (404
+// model_not_found, found 2026-09-21 while wiring up the insurance Document
+// Audit agent - every Groq caller in this repo was silently falling back
+// to its generic fallback copy since whenever that happened). Swapped to
+// gpt-oss-20b over its 120b sibling: half the price ($0.075/$0.30 vs
+// $0.15/$0.60 per 1M tokens), 2x the throughput, same 131K context, and
+// tested equal output quality on this repo's structured-drafting prompts
+// (not deep multi-step reasoning, where 120b would matter more). Verify
+// against console.groq.com/docs/models before relying on it further -
+// model availability on Groq changes faster than most providers.
+const GROQ_MODEL = "openai/gpt-oss-20b";
 
 function groqApiKey(): string {
   const key = process.env.GROQ_API_KEY;

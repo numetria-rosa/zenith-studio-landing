@@ -17,6 +17,7 @@ import {
   Inbox,
   PhoneCall,
   Send,
+  Bot,
 } from "lucide-react";
 import type { SearchResult, SearchResultGroup } from "@/lib/admin-search";
 import { SEARCH_GROUP_LABELS } from "@/lib/admin-search";
@@ -37,6 +38,7 @@ const ICONS = {
   Inbox,
   PhoneCall,
   Send,
+  Bot,
 } as const;
 
 export type NavIconName = keyof typeof ICONS;
