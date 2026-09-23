@@ -553,20 +553,20 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
         <span class="eyebrow">Pricing</span>
         <h2 id="pricing-title">One price for the whole team.</h2>
       </div>
-      <p>All three agents in one bundle. Pay monthly, or pay quarterly and save 32%. Free setup and a 4&#8209;day free trial either way.</p>
+      <p>All three agents in one bundle. Save 24% paying monthly, or 32% paying quarterly. Free setup and a 4&#8209;day free trial either way.</p>
     </div>
     <div class="pricing">
       <div class="price-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
           <span style="font-size:22px;font-weight:500;letter-spacing:-.02em">The bundle</span>
           <div class="seg" role="group" aria-label="Billing period">
-            <button type="button" id="billMonthly" aria-pressed="true">Monthly</button>
+            <button type="button" id="billMonthly" aria-pressed="true">Monthly <span class="save">−24%</span></button>
             <button type="button" id="billYearly" aria-pressed="false">Quarterly <span class="save">−32%</span></button>
           </div>
         </div>
         <div>
-          <div class="price"><span class="amt" id="amt">$1,200</span><span class="per">/month</span></div>
-          <div class="was" style="margin-top:14px"><span class="tag" id="saveTag" style="display:none">Save $384/month</span></div>
+          <div class="price"><span class="amt" id="amt">$910</span><span class="per">/month</span></div>
+          <div class="was" style="margin-top:14px"><span>Originally <s>$1,200/month</s></span><span class="tag" id="saveTag">Save $290/month</span></div>
         </div>
         <p class="billing-note" id="billNote">Billed monthly. Switch to quarterly to save 32%.</p>
         <div class="offer">
@@ -578,7 +578,7 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
           </ul>
         </div>
         <div class="compare">
-          <div><b>$14,400</b><span>per year, billed monthly</span></div>
+          <div><b>$10,920</b><span>per year, billed monthly</span></div>
           <div><b>$9,792</b><span>per year, billed quarterly</span></div>
         </div>
         <a class="btn btn-primary" id="pricingCta" href="https://whop.com/checkout/ch_HKET2g6l0b9Jchp/" target="_blank" rel="noopener" style="align-self:stretch;margin-top:6px">Get started now</a>
@@ -635,7 +635,7 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
       </details>
       <details>
         <summary>How does quarterly billing work?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
-        <p>Pay every 3 months and save 32%: $816 a month, billed as $2,448 each quarter, instead of $3,600 a quarter on monthly billing.</p>
+        <p>Pay every 3 months and save 32% off list ($1,200): $816 a month, billed as $2,448 each quarter. Monthly billing is $910 a month (24% off list), or $2,730 a quarter.</p>
       </details>
       <details>
         <summary>What do you need from us to get started?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
@@ -1011,11 +1011,11 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
   function setBilling(quarterly) {
     bm.setAttribute('aria-pressed', String(!quarterly));
     by.setAttribute('aria-pressed', String(quarterly));
-    document.getElementById('amt').textContent = quarterly ? '$816' : '$1,200';
-    saveTag.style.display = quarterly ? '' : 'none';
+    document.getElementById('amt').textContent = quarterly ? '$816' : '$910';
+    saveTag.textContent = quarterly ? 'Save $384/month' : 'Save $290/month';
     document.getElementById('billNote').textContent = quarterly
       ? 'Billed $2,448 every 3 months. You save $1,152 per quarter compared with monthly billing.'
-      : 'Billed monthly. Switch to quarterly to save 32%.';
+      : 'Billed monthly. Switch to quarterly to save an extra 8% off.';
     if (cta) cta.href = quarterly ? QUARTERLY_CHECKOUT : MONTHLY_CHECKOUT;
   }
   bm.addEventListener('click', function () { setBilling(false); });

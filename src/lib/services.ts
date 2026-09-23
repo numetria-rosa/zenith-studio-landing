@@ -116,12 +116,17 @@ export const SERVICES: Service[] = [
     description:
       "An AI Inside Sales Agent, Transaction Coordinator, and Database Manager as one team: answers new leads in seconds, tracks every file to close, and wakes up the dormant contacts already sitting in your CRM.",
     setupPriceDisplay: "",
-    monthlyPriceDisplay: "$1,200/mo",
+    // Real charge is $910/mo (24% launch discount off $1,200, confirmed
+    // live on the plan via strike_through_renewal_price) - updated
+    // 2026-09-24 to match public/demos/brokerage-ai-team.html.
+    monthlyPriceDisplay: "$910/mo",
     whopSetupPlanId: "",
     whopMonthlyPlanId: "plan_m3i6RwMYvMATE",
     setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/ch_HKET2g6l0b9Jchp/",
-    // 32% off, not 25% like the other two - $1,200 x 3 x 0.75 = $2,700
+    // Quarterly is 32% off the $1,200 LIST price, not off the $910 monthly
+    // sale price - same "discount off list, independent of the other tier"
+    // convention as law-firms/insurance below. $1,200 x 3 x 0.75 = $2,700
     // would exceed Whop's $2,500 cap, so this bundle needs a deeper
     // discount just to clear the same ceiling. Not a value judgment, purely
     // mechanical - revisit once the cap is lifted and real annual billing
