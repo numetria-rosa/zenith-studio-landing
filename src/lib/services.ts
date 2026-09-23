@@ -25,6 +25,10 @@ export type Service = {
   setupCheckoutUrl: string;
   /** Real Whop purchase_url for the monthly plan. Empty string until created. */
   monthlyCheckoutUrl: string;
+  /** Real Whop plan_id for the recurring yearly charge. Empty string until created. */
+  whopYearlyPlanId?: string;
+  /** Real Whop purchase_url for the yearly plan. Empty string until created. */
+  yearlyCheckoutUrl?: string;
 };
 
 export const SERVICES: Service[] = [
@@ -38,8 +42,8 @@ export const SERVICES: Service[] = [
     monthlyPriceDisplay: "$150/mo",
     whopSetupPlanId: "plan_AUhS9tvz8KrJC",
     whopMonthlyPlanId: "plan_Qvl24MqIyHNfQ",
-    setupCheckoutUrl: "https://whop.com/checkout/plan_AUhS9tvz8KrJC",
-    monthlyCheckoutUrl: "https://whop.com/checkout/plan_Qvl24MqIyHNfQ",
+    setupCheckoutUrl: "https://whop.com/checkout/ch_eCiR8tjLkqVUe3L/",
+    monthlyCheckoutUrl: "https://whop.com/checkout/ch_phNxifgOlrStCAu/",
   },
   {
     id: "ai-lead-capture",
@@ -51,8 +55,8 @@ export const SERVICES: Service[] = [
     monthlyPriceDisplay: "$200/mo",
     whopSetupPlanId: "plan_l6f3sCRsCR2Em",
     whopMonthlyPlanId: "plan_EKCkv5lP6CSPP",
-    setupCheckoutUrl: "https://whop.com/checkout/plan_l6f3sCRsCR2Em",
-    monthlyCheckoutUrl: "https://whop.com/checkout/plan_EKCkv5lP6CSPP",
+    setupCheckoutUrl: "https://whop.com/checkout/ch_qeORXXxV8lkxl59/",
+    monthlyCheckoutUrl: "https://whop.com/checkout/ch_9NA0gyMpYqAE3dX/",
   },
   {
     id: "ai-receptionist",
@@ -64,8 +68,8 @@ export const SERVICES: Service[] = [
     monthlyPriceDisplay: "$300/mo",
     whopSetupPlanId: "plan_ts3JwXpFBKKMp",
     whopMonthlyPlanId: "plan_CJyNkObEaPquA",
-    setupCheckoutUrl: "https://whop.com/checkout/plan_ts3JwXpFBKKMp",
-    monthlyCheckoutUrl: "https://whop.com/checkout/plan_CJyNkObEaPquA",
+    setupCheckoutUrl: "https://whop.com/checkout/ch_4vQmstGbs1C4W50/",
+    monthlyCheckoutUrl: "https://whop.com/checkout/ch_ZvGXKYoanGI1eVn/",
   },
   // The two vertical/role offers from src/app/page.tsx's own `verticalSystems`
   // array - monthly-only (no separate setup plan), which is why
@@ -85,11 +89,19 @@ export const SERVICES: Service[] = [
     description:
       "An AI Missed Call Text-Back, Follow-Up Clerk, and Billing Clerk as one team: texts back every unanswered call in seconds, works the leads that didn't retain, and reconstructs billable time before the write-down window closes.",
     setupPriceDisplay: "",
-    monthlyPriceDisplay: "$1,200/mo",
+    // Real charge is $1,080/mo (10% launch discount off $1,200, confirmed
+    // live on the plan itself via strike_through_renewal_price) - updated
+    // 2026-09-23 to match public/demos/law-firm-ai-team.html, which was
+    // showing this discounted price while the actual Whop plan still
+    // charged $1,200. Yearly ($900/mo equiv., $10,800/yr) is blocked on
+    // Whop's $2,500/purchase cap for this account - not created yet.
+    monthlyPriceDisplay: "$1,080/mo",
     whopSetupPlanId: "",
     whopMonthlyPlanId: "plan_kTlL5gBlJTsqy",
     setupCheckoutUrl: "",
-    monthlyCheckoutUrl: "https://whop.com/checkout/plan_kTlL5gBlJTsqy",
+    monthlyCheckoutUrl: "https://whop.com/checkout/ch_we86QAB7NOpqcL1/",
+    whopYearlyPlanId: "",
+    yearlyCheckoutUrl: "",
   },
   {
     id: "brokerages",
@@ -102,7 +114,28 @@ export const SERVICES: Service[] = [
     whopSetupPlanId: "",
     whopMonthlyPlanId: "plan_m3i6RwMYvMATE",
     setupCheckoutUrl: "",
-    monthlyCheckoutUrl: "https://whop.com/checkout/plan_m3i6RwMYvMATE",
+    monthlyCheckoutUrl: "https://whop.com/checkout/ch_HKET2g6l0b9Jchp/",
+  },
+  // Real Whop product created 2026-09-23 to match public/demos/
+  // insurance-ai-team.html's pricing ($850/mo, $7,650/yr) - previously this
+  // niche's outreach/checkout reused ai-lead-capture's unrelated $200/mo
+  // plan, which didn't match what the details page promised. Yearly
+  // ($637.50/mo equiv., $7,650/yr) is blocked on Whop's $2,500/purchase cap
+  // for this account - not created yet, same as law-firms' yearly.
+  {
+    id: "insurance-ai-team",
+    title: "Insurance Account Manager Bundle",
+    pitch: "Your front office, on autopilot.",
+    description:
+      "An Intake Agent, Document Audit, CRM & Logging, and Renewal Reminders as one team: texts back every quote request, reads policy documents in seconds, logs every lead automatically, and reminds clients before their policy renews. No access to your AMS required.",
+    setupPriceDisplay: "",
+    monthlyPriceDisplay: "$850/mo",
+    whopSetupPlanId: "",
+    whopMonthlyPlanId: "plan_aW9AIh13BCZPV",
+    setupCheckoutUrl: "",
+    monthlyCheckoutUrl: "https://whop.com/checkout/plan_aW9AIh13BCZPV",
+    whopYearlyPlanId: "",
+    yearlyCheckoutUrl: "",
   },
 ];
 
@@ -183,6 +216,11 @@ export function serviceKindForWhopPlanId(
       return { serviceId: service.id, kind: "setup" };
     }
     if (service.whopMonthlyPlanId === planId) {
+      return { serviceId: service.id, kind: "monthly" };
+    }
+    // A yearly purchase grants the same access as monthly, just billed
+    // annually - ServiceRequest has no separate yearly status to set.
+    if (service.whopYearlyPlanId && service.whopYearlyPlanId === planId) {
       return { serviceId: service.id, kind: "monthly" };
     }
   }
