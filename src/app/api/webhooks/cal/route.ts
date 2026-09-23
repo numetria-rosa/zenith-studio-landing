@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { upsertPaidAuditFromCalWebhook, type CalBookingWebhookPayload } from "@/lib/paid-audit";
+import { sendAdminAlert } from "@/lib/outreach-mail";
 
 /* Cal.com → Zenith webhook.
    Subscriber URL: https://zenith-studio.site/api/webhooks/cal
@@ -68,6 +69,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     ? `cal:${uid}:${triggerEvent}`
     : `cal:body:${createHmac("sha256", secret).update(rawBody).digest("hex").slice(0, 40)}`;
 
+  let action: string = "ignored";
   try {
     await db.$transaction(async (tx) => {
       await tx.webhookEvent.create({
@@ -83,6 +85,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         // Roll back the WebhookEvent row so Cal's retry can reprocess.
         throw new Error(result.error);
       }
+      action = result.action;
       if (result.action !== "ignored") {
         console.log(`[cal webhook] ${triggerEvent} → PaidAudit ${result.action} ${result.id}`);
       }
@@ -93,6 +96,16 @@ export async function POST(request: NextRequest): Promise<Response> {
     }
     console.error("[cal webhook] processing failed, will let Cal retry:", err);
     return new Response("processing failed", { status: 500 });
+  }
+
+  if (action === "created") {
+    const attendee = payload.attendees?.[0];
+    const email = attendee?.email || payload.responses?.email?.value || "unknown";
+    const name = attendee?.name || payload.responses?.name?.value || "Someone";
+    await sendAdminAlert(
+      `Paid audit call booked: ${name}`,
+      `${name} (${email}) booked and paid for the $35 audit call. Details at ${process.env.NEXTAUTH_URL || ""}/admin/paid-audits`
+    ).catch(() => {});
   }
 
   return new Response("OK", { status: 200 });

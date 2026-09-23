@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { STEPS } from "./fields";
+import { sendAdminAlert } from "@/lib/outreach-mail";
 
 export type SubmitAuditResult = { ok: true } | { ok: false; error: string };
 
@@ -46,6 +47,14 @@ export async function submitAuditRequest(answers: Record<string, string>): Promi
       formAnswers: cleanAnswers,
     },
   });
+
+  // Best-effort - a free audit request is a real lead, admin should not
+  // have to remember to check /admin/audits to find out one came in.
+  // Never let a notification failure block the submission itself.
+  await sendAdminAlert(
+    `Free audit request: ${cleanAnswers.companyName || email}`,
+    `${cleanAnswers.contactName || "Someone"} (${email}${cleanAnswers.companyName ? `, ${cleanAnswers.companyName}` : ""}) requested a free audit. Review at ${process.env.NEXTAUTH_URL || ""}/admin/audits`
+  ).catch(() => {});
 
   return { ok: true };
 }

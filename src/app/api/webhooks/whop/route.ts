@@ -10,6 +10,7 @@ import { generateStrongPassword, encryptPassword } from "@/lib/password";
 import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 import { resolveProposalByWhopPlanId, classifyProposalPaymentLeg } from "@/lib/proposal-payments";
 import { sendMetaPurchaseEvent } from "@/lib/meta-capi";
+import { sendAdminAlert } from "@/lib/outreach-mail";
 
 /* Zenith Lab - Whop webhook handler.
    Implements whop-checkout-links-and-webhooks.md §3.3/§3.7 exactly:
@@ -51,6 +52,8 @@ export async function POST(request: NextRequest) {
 
       if (event.type === "payment.succeeded") {
         return await handlePaymentSucceeded(tx, event.data);
+      } else if (event.type === "membership.activated") {
+        await handleMembershipActivated(tx, event.data);
       } else if (event.type === "membership.deactivated") {
         await handleMembershipDeactivated(tx, event.data);
       }
@@ -59,8 +62,15 @@ export async function POST(request: NextRequest) {
       return null;
     });
 
-    if (purchaseForMeta) {
-      await sendMetaPurchaseEvent(purchaseForMeta);
+    if (purchaseForMeta?.meta) {
+      await sendMetaPurchaseEvent(purchaseForMeta.meta);
+    }
+    if (purchaseForMeta?.newServiceCustomer) {
+      const { email, serviceName } = purchaseForMeta.newServiceCustomer;
+      await sendAdminAlert(
+        `New customer: ${serviceName}`,
+        `${email} just bought ${serviceName} directly (no audit, no call) and their workspace was created automatically. Details at ${process.env.NEXTAUTH_URL || ""}/admin/projects`
+      ).catch(() => {});
     }
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
@@ -81,7 +91,16 @@ type Tx = Prisma.TransactionClient;
 
 type MetaPurchaseInfo = Parameters<typeof sendMetaPurchaseEvent>[0];
 
-async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPurchaseInfo | null> {
+/* What the transaction reports back for AFTER-commit side effects (Meta
+   CAPI call, admin alert email) - both are network calls with no business
+   holding the DB transaction open, same reasoning as the purchaseForMeta
+   comment above. A payment reports at most one of these: course/bundle
+   sales go to Meta, a brand-new service customer gets admin notified,
+   never both since courseId/bundleCourseIds/serviceMatch are mutually
+   exclusive branches. */
+type PostCommitInfo = { meta?: MetaPurchaseInfo | null; newServiceCustomer?: { email: string; serviceName: string } };
+
+async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<PostCommitInfo | null> {
   const productId = payment.product?.id;
   const courseId = productId ? courseIdForWhopProductId(productId) : null;
   // A bundle is its own Whop product (see src/lib/bundles.ts) - resolved
@@ -190,7 +209,7 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPur
         whopPaymentId: payment.id,
       },
     });
-    return metaPurchaseInfo([courseId]);
+    return { meta: metaPurchaseInfo([courseId]) };
   }
 
   if (bundleCourseIds) {
@@ -217,42 +236,78 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPur
         },
       });
     }
-    return metaPurchaseInfo(bundleCourseIds);
+    return { meta: metaPurchaseInfo(bundleCourseIds) };
   }
 
   // serviceMatch is non-null here (the !courseId && !serviceMatch check above returned already otherwise)
   const { serviceId, kind } = serviceMatch!;
+  const { isNewProject } = await grantServiceAccess(tx, {
+    userId: user.id,
+    serviceId,
+    kind,
+    whopMembershipId: payment.membership?.id ?? null,
+    whopSetupPaymentId: kind === "setup" ? payment.id : null,
+  });
+
+  if (isNewProject && user.email) {
+    return { newServiceCustomer: { email: user.email, serviceName: getService(serviceId)?.title ?? serviceId } };
+  }
+  return null;
+}
+
+/* Shared by handlePaymentSucceeded (the eventual real charge) and
+   handleMembershipActivated (trial start - Whop grants access via a
+   membership.activated event, whether or not that trial's $0 checkout also
+   produces a payment.succeeded). Both call sites are idempotent upserts, so
+   whichever event arrives first fully provisions the client and the second
+   is a no-op beyond bumping the membership id. */
+async function grantServiceAccess(
+  tx: Tx,
+  params: {
+    userId: string;
+    serviceId: string;
+    kind: "setup" | "monthly";
+    whopMembershipId: string | null;
+    whopSetupPaymentId?: string | null;
+  }
+): Promise<{ isNewProject: boolean }> {
+  const { userId, serviceId, kind, whopMembershipId, whopSetupPaymentId } = params;
+
   if (kind === "setup") {
     // Create at "new" if this is the first purchase; if a request already
     // exists (re-purchase, or the monthly plan created it first), leave
     // build `status` alone - a setup re-buy shouldn't reset progress.
     await tx.serviceRequest.upsert({
-      where: { userId_serviceId: { userId: user.id, serviceId } },
+      where: { userId_serviceId: { userId, serviceId } },
       create: {
-        userId: user.id,
+        userId,
         serviceId,
         status: "new",
-        whopSetupPaymentId: payment.id,
-        whopSetupMembershipId: payment.membership?.id ?? null,
+        whopSetupPaymentId: whopSetupPaymentId ?? undefined,
+        whopSetupMembershipId: whopMembershipId,
       },
       update: {
-        whopSetupPaymentId: payment.id,
-        whopSetupMembershipId: payment.membership?.id ?? undefined,
+        whopSetupPaymentId: whopSetupPaymentId ?? undefined,
+        whopSetupMembershipId: whopMembershipId ?? undefined,
       },
     });
   } else {
+    // "active" covers a trialing membership too - the client has real
+    // access during the trial, they just haven't been charged yet. Whop's
+    // own membership.status distinguishes trialing/active/etc if that ever
+    // needs surfacing separately; monthlyStatus here only means "has access".
     await tx.serviceRequest.upsert({
-      where: { userId_serviceId: { userId: user.id, serviceId } },
+      where: { userId_serviceId: { userId, serviceId } },
       create: {
-        userId: user.id,
+        userId,
         serviceId,
         status: "new",
         monthlyStatus: "active",
-        whopMonthlyMembershipId: payment.membership?.id ?? null,
+        whopMonthlyMembershipId: whopMembershipId,
       },
       update: {
         monthlyStatus: "active",
-        whopMonthlyMembershipId: payment.membership?.id ?? undefined,
+        whopMonthlyMembershipId: whopMembershipId ?? undefined,
       },
     });
   }
@@ -271,20 +326,49 @@ async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<MetaPur
   // idempotent in spirit, matching the ServiceRequest upsert pattern above.
   if (SERVICES.some((s) => s.id === serviceId)) {
     const existingProject = await tx.serviceProject.findFirst({
-      where: { userId: user.id, sourceServiceId: serviceId },
+      where: { userId, sourceServiceId: serviceId },
     });
     if (!existingProject) {
       const catalogEntry = getService(serviceId);
       await createServiceProjectWithDefaults(tx, {
-        userId: user.id,
+        userId,
         title: catalogEntry?.title ?? serviceId,
         sourceServiceId: serviceId,
-        whopMonthlyMembershipId: payment.membership?.id ?? null,
+        whopMonthlyMembershipId: whopMembershipId,
       });
+      return { isNewProject: true };
     }
   }
+  return { isNewProject: false };
+}
 
-  return null; // service purchase - not a course sale, outside Meta tracking scope
+/* Trial start: Whop grants access immediately (membership.status
+   "trialing") without necessarily billing a $0 payment through
+   payment.succeeded first - relying on payment.succeeded alone would leave
+   a trial signup with a paid-for-nothing membership and no provisioned
+   workspace until day 3. Only "monthly" (renewal) plans ever carry a
+   trial, so a setup-plan match here is ignored; course/bundle memberships
+   are also ignored (courses provision via CourseEntitlement on payment,
+   trials aren't offered on courses). */
+async function handleMembershipActivated(tx: Tx, membership: Membership) {
+  const serviceMatch = serviceKindForWhopPlanId(membership.plan?.id);
+  if (!serviceMatch || serviceMatch.kind !== "monthly") return;
+
+  const whopUserId = membership.user?.id ?? null;
+  const email = membership.user?.email ?? null;
+  const name = membership.user?.name ?? null;
+  if (!email && !whopUserId) {
+    console.error(`[whop webhook] membership.activated ${membership.id} has no user id or email - cannot resolve an account`);
+    return;
+  }
+
+  const user = await findOrCreateUser(tx, whopUserId, email, name);
+  await grantServiceAccess(tx, {
+    userId: user.id,
+    serviceId: serviceMatch.serviceId,
+    kind: "monthly",
+    whopMembershipId: membership.id,
+  });
 }
 
 async function handleMembershipDeactivated(tx: Tx, membership: Membership) {
