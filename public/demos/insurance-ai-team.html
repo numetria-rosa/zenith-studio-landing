@@ -542,7 +542,7 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
         <span class="eyebrow">Pricing</span>
         <h2 id="pricing-title">One price for the whole team.</h2>
       </div>
-      <p>All four agents in one bundle. Pay monthly, or pay yearly and save 25%.</p>
+      <p>All four agents in one bundle. Pay monthly, or pay quarterly and save 25%.</p>
     </div>
     <div class="pricing">
       <div class="price-card">
@@ -550,19 +550,19 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
           <span style="font-size:22px;font-weight:500;letter-spacing:-.02em">The bundle</span>
           <div class="seg" role="group" aria-label="Billing period">
             <button type="button" id="billMonthly" aria-pressed="true">Monthly</button>
-            <button type="button" id="billYearly" aria-pressed="false">Yearly <span class="save">−25%</span></button>
+            <button type="button" id="billYearly" aria-pressed="false">Quarterly <span class="save">−25%</span></button>
           </div>
         </div>
         <div>
           <div class="price"><span class="amt" id="amt">$850</span><span class="per">/month</span></div>
           <div class="was" style="margin-top:14px"><span>Originally <s>$1,200/month</s></span><span class="tag" id="saveTag">Save $350/month</span></div>
         </div>
-        <p class="billing-note" id="billNote">Billed monthly. Switch to yearly to save another 25%.</p>
+        <p class="billing-note" id="billNote">Billed monthly. Switch to quarterly to save another 25%.</p>
         <div class="compare">
           <div><b id="cmpA">$10,200</b><span id="cmpALabel">per year, billed monthly</span></div>
-          <div><b id="cmpB">$7,650</b><span>per year, billed yearly</span></div>
+          <div><b id="cmpB">$7,650</b><span>per year, billed quarterly</span></div>
         </div>
-        <a class="btn btn-primary" href="https://whop.com/checkout/plan_aW9AIh13BCZPV" target="_blank" rel="noopener" style="align-self:stretch;margin-top:6px">Get started now</a>
+        <a class="btn btn-primary" id="pricingCta" href="https://whop.com/checkout/plan_aW9AIh13BCZPV" target="_blank" rel="noopener" style="align-self:stretch;margin-top:6px">Get started now</a>
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
           <a class="btn btn-glass btn-sm" href="/audit" style="align-self:stretch">Get a free written audit first</a>
           <a class="btn btn-glass btn-sm" href="https://cal.com/zenith-studio-ai/paid-automation-audit" target="_blank" rel="noopener" style="align-self:stretch">Or book a $35 audit call (20 min)</a>
@@ -607,8 +607,8 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
         <p>The Intake Agent sends a real, conversational text that answers what the person asked, not a canned autoresponder. It keeps the conversation moving until your team takes over.</p>
       </details>
       <details>
-        <summary>How does yearly billing work?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
-        <p>Pay for the year up front and save 25%: $637.50 a month, billed as $7,650 once a year, instead of $10,200 on monthly billing.</p>
+        <summary>How does quarterly billing work?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
+        <p>Pay every 3 months and save 25%: $637.50 a month, billed as $1,912.50 each quarter, instead of $2,550 a quarter on monthly billing.</p>
       </details>
       <details>
         <summary>What do you need from us to get started?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
@@ -1090,15 +1090,24 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
   show(0);
 
   /* ---- Pricing toggle ---- */
+  // "Yearly" is really quarterly (billed every 3 months) - real annual
+  // billing is blocked by Whop's $2,500/purchase cap on this account
+  // ($7,650/yr would be rejected). See services.ts's whopQuarterlyPlanId
+  // comment. Variable/id names kept as "yearly"/"by" to minimize the diff;
+  // only the user-facing copy and the real checkout link changed.
   var bm = document.getElementById('billMonthly'), by = document.getElementById('billYearly');
-  function setBilling(yearly) {
-    bm.setAttribute('aria-pressed', String(!yearly));
-    by.setAttribute('aria-pressed', String(yearly));
-    document.getElementById('amt').textContent = yearly ? '$637.50' : '$850';
-    document.getElementById('saveTag').textContent = yearly ? 'Save $562.50/month' : 'Save $350/month';
-    document.getElementById('billNote').textContent = yearly
-      ? 'Billed $7,650 once a year. You save $2,550 compared with monthly billing.'
-      : 'Billed monthly. Switch to yearly to save another 25%.';
+  var cta = document.getElementById('pricingCta');
+  var MONTHLY_CHECKOUT = 'https://whop.com/checkout/plan_aW9AIh13BCZPV';
+  var QUARTERLY_CHECKOUT = 'https://whop.com/checkout/plan_LzUY3p0RRbU3N';
+  function setBilling(quarterly) {
+    bm.setAttribute('aria-pressed', String(!quarterly));
+    by.setAttribute('aria-pressed', String(quarterly));
+    document.getElementById('amt').textContent = quarterly ? '$637.50' : '$850';
+    document.getElementById('saveTag').textContent = quarterly ? 'Save $562.50/month' : 'Save $350/month';
+    document.getElementById('billNote').textContent = quarterly
+      ? 'Billed $1,912.50 every 3 months. You save $637.50 per quarter compared with monthly billing.'
+      : 'Billed monthly. Switch to quarterly to save another 25%.';
+    if (cta) cta.href = quarterly ? QUARTERLY_CHECKOUT : MONTHLY_CHECKOUT;
   }
   bm.addEventListener('click', function () { setBilling(false); });
   by.addEventListener('click', function () { setBilling(true); });

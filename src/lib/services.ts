@@ -25,10 +25,15 @@ export type Service = {
   setupCheckoutUrl: string;
   /** Real Whop purchase_url for the monthly plan. Empty string until created. */
   monthlyCheckoutUrl: string;
-  /** Real Whop plan_id for the recurring yearly charge. Empty string until created. */
-  whopYearlyPlanId?: string;
-  /** Real Whop purchase_url for the yearly plan. Empty string until created. */
-  yearlyCheckoutUrl?: string;
+  /** Real Whop plan_id for the discounted longer-cycle charge. Currently
+      quarterly (90 days), not yearly - Whop rejects any single charge over
+      $2,500 for this account, which blocks real annual billing on every
+      bundle here. Quarterly is the stand-in until that cap is raised; see
+      scripts/sync-details-page-pricing.mjs and create-quarterly-plans.mjs
+      for the exact numbers and how to switch back to yearly later. */
+  whopQuarterlyPlanId?: string;
+  /** Real Whop purchase_url for the quarterly plan. Empty string until created. */
+  quarterlyCheckoutUrl?: string;
 };
 
 export const SERVICES: Service[] = [
@@ -93,15 +98,16 @@ export const SERVICES: Service[] = [
     // live on the plan itself via strike_through_renewal_price) - updated
     // 2026-09-23 to match public/demos/law-firm-ai-team.html, which was
     // showing this discounted price while the actual Whop plan still
-    // charged $1,200. Yearly ($900/mo equiv., $10,800/yr) is blocked on
-    // Whop's $2,500/purchase cap for this account - not created yet.
+    // charged $1,200. A real annual plan is blocked on Whop's $2,500/
+    // purchase cap for this account - quarterly (25% off, $2,430/quarter)
+    // is the stand-in until that's raised.
     monthlyPriceDisplay: "$1,080/mo",
     whopSetupPlanId: "",
     whopMonthlyPlanId: "plan_kTlL5gBlJTsqy",
     setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/ch_we86QAB7NOpqcL1/",
-    whopYearlyPlanId: "",
-    yearlyCheckoutUrl: "",
+    whopQuarterlyPlanId: "plan_IY3eOH5sH5FD0",
+    quarterlyCheckoutUrl: "https://whop.com/checkout/plan_IY3eOH5sH5FD0",
   },
   {
     id: "brokerages",
@@ -115,13 +121,20 @@ export const SERVICES: Service[] = [
     whopMonthlyPlanId: "plan_m3i6RwMYvMATE",
     setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/ch_HKET2g6l0b9Jchp/",
+    // 32% off, not 25% like the other two - $1,200 x 3 x 0.75 = $2,700
+    // would exceed Whop's $2,500 cap, so this bundle needs a deeper
+    // discount just to clear the same ceiling. Not a value judgment, purely
+    // mechanical - revisit once the cap is lifted and real annual billing
+    // can restore a consistent ~25% across every bundle.
+    whopQuarterlyPlanId: "plan_apcRrrvFpvnWl",
+    quarterlyCheckoutUrl: "https://whop.com/checkout/plan_apcRrrvFpvnWl",
   },
   // Real Whop product created 2026-09-23 to match public/demos/
-  // insurance-ai-team.html's pricing ($850/mo, $7,650/yr) - previously this
-  // niche's outreach/checkout reused ai-lead-capture's unrelated $200/mo
-  // plan, which didn't match what the details page promised. Yearly
-  // ($637.50/mo equiv., $7,650/yr) is blocked on Whop's $2,500/purchase cap
-  // for this account - not created yet, same as law-firms' yearly.
+  // insurance-ai-team.html's pricing - previously this niche's outreach/
+  // checkout reused ai-lead-capture's unrelated $200/mo plan, which didn't
+  // match what the details page promised. A real annual plan is blocked on
+  // Whop's $2,500/purchase cap for this account - quarterly (25% off,
+  // $1,912.50/quarter) is the stand-in until that's raised.
   {
     id: "insurance-ai-team",
     title: "Insurance Account Manager Bundle",
@@ -134,8 +147,8 @@ export const SERVICES: Service[] = [
     whopMonthlyPlanId: "plan_aW9AIh13BCZPV",
     setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/plan_aW9AIh13BCZPV",
-    whopYearlyPlanId: "",
-    yearlyCheckoutUrl: "",
+    whopQuarterlyPlanId: "plan_LzUY3p0RRbU3N",
+    quarterlyCheckoutUrl: "https://whop.com/checkout/plan_LzUY3p0RRbU3N",
   },
 ];
 
@@ -218,9 +231,9 @@ export function serviceKindForWhopPlanId(
     if (service.whopMonthlyPlanId === planId) {
       return { serviceId: service.id, kind: "monthly" };
     }
-    // A yearly purchase grants the same access as monthly, just billed
-    // annually - ServiceRequest has no separate yearly status to set.
-    if (service.whopYearlyPlanId && service.whopYearlyPlanId === planId) {
+    // A quarterly purchase grants the same access as monthly, just billed
+    // on a longer cycle - ServiceRequest has no separate quarterly status.
+    if (service.whopQuarterlyPlanId && service.whopQuarterlyPlanId === planId) {
       return { serviceId: service.id, kind: "monthly" };
     }
   }

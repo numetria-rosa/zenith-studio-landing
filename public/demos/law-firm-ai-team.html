@@ -551,7 +551,7 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
         <span class="eyebrow">Pricing</span>
         <h2 id="pricing-title">One price for the whole team.</h2>
       </div>
-      <p>All three agents in one bundle. Save 10% paying monthly, or 25% paying yearly. Free setup and a 4&#8209;day free trial either way.</p>
+      <p>All three agents in one bundle. Save 10% paying monthly, or 25% paying quarterly. Free setup and a 4&#8209;day free trial either way.</p>
     </div>
     <div class="pricing">
       <div class="price-card">
@@ -559,14 +559,14 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
           <span style="font-size:22px;font-weight:500;letter-spacing:-.02em">The bundle</span>
           <div class="seg" role="group" aria-label="Billing period">
             <button type="button" id="billMonthly" aria-pressed="true">Monthly <span class="save">−10%</span></button>
-            <button type="button" id="billYearly" aria-pressed="false">Yearly <span class="save">−25%</span></button>
+            <button type="button" id="billYearly" aria-pressed="false">Quarterly <span class="save">−25%</span></button>
           </div>
         </div>
         <div>
           <div class="price"><span class="amt" id="amt">$1,080</span><span class="per">/month</span></div>
           <div class="was" style="margin-top:14px"><span>Originally <s>$1,200/month</s></span><span class="tag" id="saveTag">Save $120/month</span></div>
         </div>
-        <p class="billing-note" id="billNote">Billed monthly. Switch to yearly to save 25%.</p>
+        <p class="billing-note" id="billNote">Billed monthly. Switch to quarterly to save 25%.</p>
         <div class="offer">
           <div class="offer-head"><span class="eyebrow" style="color:var(--mint-text)">Launch offer</span><span class="excl">Only through Zenith AI</span></div>
           <ul>
@@ -577,9 +577,9 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
         </div>
         <div class="compare">
           <div><b>$12,960</b><span>per year, billed monthly</span></div>
-          <div><b>$10,800</b><span>per year, billed yearly</span></div>
+          <div><b>$9,720</b><span>per year, billed quarterly</span></div>
         </div>
-        <a class="btn btn-primary" href="https://whop.com/checkout/ch_we86QAB7NOpqcL1/" target="_blank" rel="noopener" style="align-self:stretch;margin-top:6px">Get started now</a>
+        <a class="btn btn-primary" id="pricingCta" href="https://whop.com/checkout/ch_we86QAB7NOpqcL1/" target="_blank" rel="noopener" style="align-self:stretch;margin-top:6px">Get started now</a>
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
           <a class="btn btn-glass btn-sm" href="/audit" style="align-self:stretch">Get a free written audit first</a>
           <a class="btn btn-glass btn-sm" href="https://cal.com/zenith-studio-ai/paid-automation-audit" target="_blank" rel="noopener" style="align-self:stretch">Or book a $35 audit call (20 min)</a>
@@ -632,8 +632,8 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
         <p>Your plan comes with a 4&#8209;day free trial. Setup takes up to the first 24 hours, which leaves you 72 full hours to test the AI team on your own work. This offer and this pricing are only available through Zenith AI.</p>
       </details>
       <details>
-        <summary>How does yearly billing work?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
-        <p>Pay for the year up front and save 25%: $900 a month, billed as $10,800 once a year. Monthly billing is $1,080 a month, 10% off the original $1,200.</p>
+        <summary>How does quarterly billing work?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
+        <p>Pay every 3 months and save 25%: $810 a month, billed as $2,430 each quarter. Monthly billing is $1,080 a month, 10% off the original $1,200.</p>
       </details>
       <details>
         <summary>What do you need from us to get started?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
@@ -1023,15 +1023,24 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
   show(0);
 
   /* ---- Pricing toggle ---- */
+  // "Yearly" is really quarterly (billed every 3 months) - real annual
+  // billing is blocked by Whop's $2,500/purchase cap on this account
+  // ($10,800/yr would be rejected). See services.ts's whopQuarterlyPlanId
+  // comment. Variable/id names kept as "yearly"/"by" to minimize the diff;
+  // only the user-facing copy and the real checkout link changed.
   var bm = document.getElementById('billMonthly'), by = document.getElementById('billYearly');
-  function setBilling(yearly) {
-    bm.setAttribute('aria-pressed', String(!yearly));
-    by.setAttribute('aria-pressed', String(yearly));
-    document.getElementById('amt').textContent = yearly ? '$900' : '$1,080';
-    document.getElementById('saveTag').textContent = yearly ? 'Save $300/month' : 'Save $120/month';
-    document.getElementById('billNote').textContent = yearly
-      ? 'Billed $10,800 once a year. You save $2,160 compared with monthly billing.'
-      : 'Billed monthly. Switch to yearly to save 25%.';
+  var cta = document.getElementById('pricingCta');
+  var MONTHLY_CHECKOUT = 'https://whop.com/checkout/ch_we86QAB7NOpqcL1/';
+  var QUARTERLY_CHECKOUT = 'https://whop.com/checkout/plan_IY3eOH5sH5FD0';
+  function setBilling(quarterly) {
+    bm.setAttribute('aria-pressed', String(!quarterly));
+    by.setAttribute('aria-pressed', String(quarterly));
+    document.getElementById('amt').textContent = quarterly ? '$810' : '$1,080';
+    document.getElementById('saveTag').textContent = quarterly ? 'Save $270/month' : 'Save $120/month';
+    document.getElementById('billNote').textContent = quarterly
+      ? 'Billed $2,430 every 3 months. You save $810 per quarter compared with monthly billing.'
+      : 'Billed monthly. Switch to quarterly to save 25%.';
+    if (cta) cta.href = quarterly ? QUARTERLY_CHECKOUT : MONTHLY_CHECKOUT;
   }
   bm.addEventListener('click', function () { setBilling(false); });
   by.addEventListener('click', function () { setBilling(true); });
