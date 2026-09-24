@@ -27,11 +27,12 @@ export type ImportPolicyInput = {
   renewalDate: Date;
 };
 
-export async function importPolicies(rows: ImportPolicyInput[]) {
+export async function importPolicies(rows: ImportPolicyInput[], projectId?: string | null) {
   let created = 0;
   for (const row of rows) {
     await db.insurancePolicy.create({
       data: {
+        projectId: projectId || null,
         agencyName: row.agencyName,
         clientName: row.clientName,
         phone: row.phone || null,
@@ -47,6 +48,10 @@ export async function importPolicies(rows: ImportPolicyInput[]) {
 
 export async function listPolicies() {
   return db.insurancePolicy.findMany({ orderBy: { renewalDate: "asc" } });
+}
+
+export async function listPoliciesForProject(projectId: string) {
+  return db.insurancePolicy.findMany({ where: { projectId }, orderBy: { renewalDate: "asc" } });
 }
 
 function daysUntil(date: Date): number {

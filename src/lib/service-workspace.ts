@@ -8,6 +8,8 @@ import { provisionReceptionistIfNeeded } from "@/lib/receptionist-provisioning";
 import { provisionTextBackIfNeeded } from "@/lib/text-back-provisioning";
 import { provisionLeadCaptureIfNeeded } from "@/lib/lead-capture-provisioning";
 import { auditPolicyDocument, auditPolicyPdf } from "@/lib/insurance-document-audit";
+import { importPolicies } from "@/lib/insurance-renewals";
+import { parseBookOfBusinessSpreadsheet, parseBookOfBusinessGoogleSheet, parseBookOfBusinessPdf } from "@/lib/insurance-book-import";
 import { RECEPTIONIST_REQUIREMENTS, TEXT_BACK_REQUIREMENTS, LEAD_CAPTURE_REQUIREMENTS, BROKERAGE_REQUIREMENTS } from "@/lib/service-projects";
 import type { MailProvider } from "@prisma/client";
 
@@ -41,6 +43,7 @@ export async function getOwnedServiceProject(projectId: string, userId: string) 
       leads: { orderBy: { createdAt: "desc" } },
       mailConnections: { orderBy: { createdAt: "asc" } },
       inboxDrafts: { orderBy: { createdAt: "desc" } },
+      insurancePolicies: { orderBy: { renewalDate: "asc" } },
     },
   });
 }
@@ -424,6 +427,43 @@ export async function runDocumentAudit(
   });
 
   return { ok: true };
+}
+
+export type BookImportResult = { ok: true; created: number } | { ok: false; error: string };
+
+/** Self-serve book-of-business import for Insurance Renewal Reminders.
+    Accepts whatever format the client actually has it in - a spreadsheet
+    (CSV/XLSX), a Google Sheets link, or a PDF export - rather than forcing
+    one format and making the client reformat their own data, the least-
+    manual-work path per the brief. One agencyName applies to every row in
+    a given import (it's not per-row data in a client's own file). */
+export async function importBookOfBusiness(
+  projectId: string,
+  userId: string,
+  input: { agencyName: string; googleSheetUrl?: string; fileBuffer?: Buffer; filename?: string; fileMimeType?: string }
+): Promise<BookImportResult> {
+  const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
+  if (!project) return { ok: false, error: "not_found" };
+
+  const agencyName = input.agencyName.trim();
+  if (!agencyName) return { ok: false, error: "Agency name is required." };
+
+  let parsed: Awaited<ReturnType<typeof parseBookOfBusinessSpreadsheet>>;
+  if (input.googleSheetUrl?.trim()) {
+    parsed = await parseBookOfBusinessGoogleSheet(input.googleSheetUrl.trim(), agencyName);
+  } else if (input.fileBuffer && input.filename) {
+    parsed =
+      input.fileMimeType === "application/pdf" || input.filename.toLowerCase().endsWith(".pdf")
+        ? await parseBookOfBusinessPdf(input.fileBuffer.toString("base64"), agencyName)
+        : await parseBookOfBusinessSpreadsheet(input.fileBuffer, input.filename, agencyName);
+  } else {
+    return { ok: false, error: "Upload a file or paste a Google Sheets link." };
+  }
+
+  if (!parsed.ok) return { ok: false, error: parsed.error };
+
+  const result = await importPolicies(parsed.rows, project.id);
+  return { ok: true, created: result.created };
 }
 
 export async function rejectOwnedInboxDraft(projectId: string, userId: string, draftId: string): Promise<RequirementSubmitResult> {

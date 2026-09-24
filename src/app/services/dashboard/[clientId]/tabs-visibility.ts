@@ -15,6 +15,7 @@ export const ALL_TABS = [
   { id: "leads", label: "Leads" },
   { id: "inbox", label: "Inbox" },
   { id: "audit", label: "Document Audit" },
+  { id: "renewals", label: "Renewals" },
   { id: "messages", label: "Messages" },
   { id: "performance", label: "Performance" },
   { id: "support", label: "Support" },
@@ -39,6 +40,7 @@ export function visibleTabIds(project: {
   mailConnections: unknown[];
   inboxDrafts: unknown[];
   documents: unknown[];
+  insurancePolicies: unknown[];
   sourceServiceId: string | null;
 }): TabId[] {
   const always: TabId[] = ["overview", "messages", "performance", "support"];
@@ -57,6 +59,7 @@ export function visibleTabIds(project: {
     ["leads", project.sourceServiceId === "ai-lead-capture" || project.sourceServiceId === "brokerages" || project.leads.length > 0],
     ["inbox", project.sourceServiceId === "ai-inbox-manager" || project.mailConnections.length > 0 || project.inboxDrafts.length > 0],
     ["audit", project.sourceServiceId === "insurance-ai-team" || project.documents.length > 0],
+    ["renewals", project.sourceServiceId === "insurance-ai-team" || project.insurancePolicies.length > 0],
   ];
   return ALL_TABS.map((t) => t.id).filter((id) => always.includes(id) || conditional.some(([tid, show]) => tid === id && show));
 }

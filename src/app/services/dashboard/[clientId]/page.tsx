@@ -24,6 +24,7 @@ import {
   activateLeadCapture,
   activateCrmWebhook,
   runDocumentAudit,
+  importBookOfBusiness,
 } from "@/lib/service-workspace";
 import { getMonthlyCostCents, resolveMonthlyBudgetCents } from "@/lib/usage-costs";
 import { ProjectTabs } from "./Tabs";
@@ -295,6 +296,35 @@ export default async function ServiceProjectPage({
       redirect(`/services/dashboard/${projectId}?tab=audit&activateError=${encodeURIComponent(result.error)}`);
     }
     redirect(flashUrl(projectId, "audit", "Audit complete - see the summary below."));
+  }
+
+  async function importBookOfBusinessAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) redirect(signInRedirect(projectId));
+
+    const file = formData.get("file");
+    let fileBuffer: Buffer | undefined;
+    let filename: string | undefined;
+    let fileMimeType: string | undefined;
+    if (file instanceof File && file.size > 0) {
+      filename = file.name;
+      fileMimeType = file.type;
+      fileBuffer = Buffer.from(await file.arrayBuffer());
+    }
+
+    const result = await importBookOfBusiness(projectId, session2.user.id, {
+      agencyName: String(formData.get("agencyName") || ""),
+      googleSheetUrl: String(formData.get("googleSheetUrl") || ""),
+      fileBuffer,
+      filename,
+      fileMimeType,
+    });
+    revalidatePath(`/services/dashboard/${projectId}`);
+    if (!result.ok) {
+      redirect(`/services/dashboard/${projectId}?tab=renewals&activateError=${encodeURIComponent(result.error)}`);
+    }
+    redirect(flashUrl(projectId, "renewals", `Imported ${result.created} ${result.created === 1 ? "client" : "clients"}. Renewal reminders are on.`));
   }
 
   async function cancelPlan(): Promise<void> {
@@ -1132,6 +1162,82 @@ export default async function ServiceProjectPage({
                           {d.summary}
                         </pre>
                       )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+
+            renewals: (
+              <div className="flex flex-col gap-6">
+                <div className="rounded-xl border border-[#333a4c] bg-[#191d26] p-5">
+                  <p className="text-[13.5px] font-bold">Import your book of business</p>
+                  <p className="mt-1 text-[12.5px] leading-5 text-[#9aa0ae]">
+                    One-time import - clients get a reminder before their policy renews, not after. Use whatever
+                    format you already have it in: a CSV or Excel export, a Google Sheets link (shared as
+                    &quot;Anyone with the link can view&quot;), or a PDF report.
+                  </p>
+                  {activateError && (
+                    <p className="mt-3 rounded-lg border border-[#ff8585]/30 bg-[#ff8585]/10 px-3 py-2 text-[12.5px] text-[#ff8585]">
+                      Couldn&apos;t import: {activateError}
+                    </p>
+                  )}
+                  <form action={importBookOfBusinessAction} className="mt-4 flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Agency name</label>
+                      <input
+                        name="agencyName"
+                        required
+                        placeholder="Used in the reminder emails your clients get"
+                        className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Upload a file (CSV, Excel, or PDF)</label>
+                      <input
+                        name="file"
+                        type="file"
+                        accept=".csv,.xlsx,.xls,application/pdf"
+                        className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7]"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Or paste a Google Sheets link instead</label>
+                      <input
+                        name="googleSheetUrl"
+                        type="url"
+                        placeholder="https://docs.google.com/spreadsheets/..."
+                        className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="self-start rounded-lg bg-[#f0b429] px-4 py-2 text-[12.5px] font-bold text-[#1a1200] transition hover:brightness-110"
+                    >
+                      Import
+                    </button>
+                  </form>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  {project.insurancePolicies.length === 0 && <p className="text-sm text-[#9aa0ae]">No clients imported yet.</p>}
+                  {project.insurancePolicies.map((p) => (
+                    <div
+                      key={p.id}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#232838] bg-[#0d1016] p-4"
+                    >
+                      <div>
+                        <span className="text-[13.5px] font-bold">{p.clientName}</span>
+                        {p.policyType && <span className="ml-2 text-[12px] text-[#676e7d]">{p.policyType}</span>}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[12px] text-[#9aa0ae]">Renews {p.renewalDate.toISOString().slice(0, 10)}</span>
+                        {p.lastReminderSentAt && (
+                          <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#4ade95]">
+                            Reminded
+                          </span>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

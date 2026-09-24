@@ -583,6 +583,7 @@ model ServiceProject {
   mailConnections  MailConnection[]
   inboxDrafts      InboxDraft[]
   insuranceCrmLogEntries InsuranceCrmLogEntry[]
+  insurancePolicies InsurancePolicy[]
 
   @@index([userId])
   @@index([proposalId])
@@ -814,6 +815,10 @@ model ProjectMilestone {
 // flow (Integration rows per project) once a client actually buys it.
 model InsurancePolicy {
   id                 String    @id @default(cuid())
+  // Nullable for the same reason as InsuranceCrmLogEntry.projectId: the
+  // internal /admin/insurance-ai-team sandbox test page still imports
+  // rows with no real project attached.
+  projectId          String?
   agencyName         String
   clientName         String
   phone              String?
@@ -824,7 +829,10 @@ model InsurancePolicy {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
+  project ServiceProject? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   @@index([renewalDate])
+  @@index([projectId])
 }
 
 model InsuranceCrmLogEntry {
