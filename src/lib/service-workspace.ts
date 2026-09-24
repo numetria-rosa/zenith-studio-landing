@@ -203,8 +203,8 @@ export async function createClientSupportRequest(
   return { ok: true };
 }
 
-/** Connects a client's own Gmail (personal) or Yahoo mailbox for AI Inbox
-    Manager via an app password (see mail-imap.ts for why this, not OAuth).
+/** Connects a client's own Gmail (personal), Yahoo, or Zoho mailbox for AI
+    Inbox Manager via an app password (see mail-imap.ts for why this, not OAuth).
     Verifies the credential actually logs in BEFORE saving anything - never
     store a password we haven't confirmed works. Re-verifies ownership
     independently, same pattern as every other action here. */

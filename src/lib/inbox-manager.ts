@@ -7,8 +7,9 @@ import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 import { isProjectPaused } from "@/lib/project-pause";
 import type { MailConnection } from "@prisma/client";
 
-/* AI Inbox Manager runtime, launch scope: Gmail (personal accounts) and
-   Yahoo Mail, connected via a static app password (see mail-imap.ts) -
+/* AI Inbox Manager runtime, launch scope: Gmail (personal accounts),
+   Yahoo Mail, and Zoho Mail, connected via a static app password (see
+   mail-imap.ts) -
    deliberately not full Gmail/Microsoft OAuth. That would need write
    scopes (gmail.modify / Mail.ReadWrite) that Billing Clerk's existing
    OAuth never requested, plus a fresh Google/Microsoft app-verification

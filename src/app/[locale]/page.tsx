@@ -730,7 +730,13 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 </ul>
 
                 <div className="mt-7 flex flex-col gap-3">
-                  {servicePagePath(system.id) ? (
+                  {/* ai-inbox-manager is deliberately excluded here - its /demo page is
+                      now the same all-in-one details+demo+pricing+FAQ HTML page as the
+                      AI team bundles (public/demos/ai-inbox-manager.html), so it gets
+                      one button below instead of two. servicePagePath(id) still
+                      resolves for it (kept for outreach.ts eligibility, same reasoning
+                      as SERVICE_PAGE_BY_ID's comment for law-firms/brokerages). */}
+                  {servicePagePath(system.id) && system.id !== "ai-inbox-manager" ? (
                     <LocaleLink
                       href={servicePagePath(system.id)!}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10"
