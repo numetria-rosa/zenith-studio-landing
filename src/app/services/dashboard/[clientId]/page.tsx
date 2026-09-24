@@ -19,8 +19,12 @@ import {
   approveOwnedInboxDraft,
   rejectOwnedInboxDraft,
   cancelOwnedMembership,
+  activateReceptionist,
+  activateTextBack,
 } from "@/lib/service-workspace";
-import { ProjectTabs, visibleTabIds, type ActionItem } from "./Tabs";
+import { getMonthlyCostCents, resolveMonthlyBudgetCents } from "@/lib/usage-costs";
+import { ProjectTabs } from "./Tabs";
+import { visibleTabIds, type ActionItem } from "./tabs-visibility";
 import { CancelPlanButton } from "./CancelPlanButton";
 import { getSiteUrl } from "@/lib/site";
 import { aggregateClientMetrics } from "@/lib/metric-labels";
@@ -107,13 +111,13 @@ export default async function ServiceProjectPage({
   searchParams,
 }: {
   params: Promise<{ clientId: string }>;
-  searchParams: Promise<{ mailError?: string; flash?: string; tab?: string }>;
+  searchParams: Promise<{ mailError?: string; activateError?: string; flash?: string; tab?: string }>;
 }) {
   const session = await auth();
   if (!session?.user?.id) notFound();
 
   const { clientId: projectId } = await params;
-  const { mailError, flash, tab: requestedTab } = await searchParams;
+  const { mailError, activateError, flash, tab: requestedTab } = await searchParams;
   const project = await getOwnedServiceProject(projectId, session.user.id);
   if (!project) notFound();
 
@@ -205,6 +209,37 @@ export default async function ServiceProjectPage({
     redirect(flashUrl(projectId, "inbox", "Reply rejected."));
   }
 
+  async function activateReceptionistAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) redirect(signInRedirect(projectId));
+    const result = await activateReceptionist(projectId, session2.user.id, {
+      businessName: String(formData.get("businessName") || ""),
+      hours: String(formData.get("hours") || ""),
+      faqText: String(formData.get("faqText") || ""),
+      fallbackNumber: String(formData.get("fallbackNumber") || ""),
+    });
+    revalidatePath(`/services/dashboard/${projectId}`);
+    if (!result.ok) {
+      redirect(`/services/dashboard/${projectId}?tab=integrations&activateError=${encodeURIComponent(result.error)}`);
+    }
+    redirect(flashUrl(projectId, "integrations", "Receptionist is live. Your number is ready below."));
+  }
+
+  async function activateTextBackAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) redirect(signInRedirect(projectId));
+    const result = await activateTextBack(projectId, session2.user.id, {
+      businessName: String(formData.get("businessName") || ""),
+    });
+    revalidatePath(`/services/dashboard/${projectId}`);
+    if (!result.ok) {
+      redirect(`/services/dashboard/${projectId}?tab=integrations&activateError=${encodeURIComponent(result.error)}`);
+    }
+    redirect(flashUrl(projectId, "integrations", "Text-Back is live. Your number is ready below."));
+  }
+
   async function cancelPlan(): Promise<void> {
     "use server";
     const session2 = await auth();
@@ -227,6 +262,19 @@ export default async function ServiceProjectPage({
   const nextMilestone = project.milestones.find((m) => !m.completedAt);
   const outstandingCount = project.requirements.filter((r) => r.status === "MISSING" || r.status === "REJECTED").length;
   const aggregatedMetrics = aggregateClientMetrics(project.metrics);
+
+  // Self-serve activation: a receptionist/text-back number is bought via
+  // its own API call (real money, real phone number), so it's only
+  // offered once and hidden the moment the matching Integration exists -
+  // never a re-submittable form sitting next to a live number.
+  const showReceptionistSetup =
+    (project.sourceServiceId === "ai-receptionist" || project.sourceServiceId === "law-firms") &&
+    !project.integrations.some((i) => i.provider === "vapi");
+  const showTextBackSetup =
+    project.sourceServiceId === "law-firms" && !project.integrations.some((i) => i.provider === "signalwire");
+
+  const [spentCents, budgetCents] = await Promise.all([getMonthlyCostCents(projectId), resolveMonthlyBudgetCents(projectId)]);
+  const usagePct = budgetCents > 0 ? Math.min(100, Math.round((spentCents / budgetCents) * 100)) : 0;
 
   const tabs = visibleTabIds(project);
   const initialTab = tabs.includes((requestedTab ?? "") as (typeof tabs)[number]) ? (requestedTab as (typeof tabs)[number]) : undefined;
@@ -410,7 +458,95 @@ export default async function ServiceProjectPage({
 
             integrations: (
               <div className="flex flex-col gap-3">
-                {project.integrations.length === 0 && (
+                {activateError && (
+                  <p className="rounded-lg border border-[#ff8585]/30 bg-[#ff8585]/10 px-3 py-2 text-[12.5px] text-[#ff8585]">
+                    Couldn&apos;t activate: {activateError}
+                  </p>
+                )}
+
+                {showReceptionistSetup && (
+                  <div className="rounded-xl border border-[#333a4c] bg-[#191d26] p-5">
+                    <p className="text-[13.5px] font-bold">Set up your AI Receptionist</p>
+                    <p className="mt-1 text-[12.5px] text-[#9aa0ae]">
+                      This buys a real phone number and turns the receptionist on immediately - no review, no
+                      waiting on us.
+                    </p>
+                    <form action={activateReceptionistAction} className="mt-4 flex flex-col gap-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Business name</label>
+                        <input
+                          name="businessName"
+                          required
+                          placeholder="The name the AI should use when it answers"
+                          className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Business hours</label>
+                        <input
+                          name="hours"
+                          required
+                          placeholder="e.g. Mon-Fri 9am-6pm"
+                          className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">FAQ / common questions</label>
+                        <textarea
+                          name="faqText"
+                          required
+                          rows={3}
+                          placeholder="Anything the AI should be able to answer on its own: services, pricing, location, policies"
+                          className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Fallback phone number</label>
+                        <input
+                          name="fallbackNumber"
+                          required
+                          placeholder="A real human line to ring if the AI can't help - not the number you forward from"
+                          className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="self-start rounded-lg bg-[#f0b429] px-4 py-2 text-[12.5px] font-bold text-[#1a1200] transition hover:brightness-110"
+                      >
+                        Activate Receptionist
+                      </button>
+                    </form>
+                  </div>
+                )}
+
+                {showTextBackSetup && (
+                  <div className="rounded-xl border border-[#333a4c] bg-[#191d26] p-5">
+                    <p className="text-[13.5px] font-bold">Set up your Missed Call Text-Back</p>
+                    <p className="mt-1 text-[12.5px] text-[#9aa0ae]">
+                      This buys a real phone number immediately. Once it&apos;s ready, forward your business line to
+                      it on no-answer.
+                    </p>
+                    <form action={activateTextBackAction} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+                      <div className="flex flex-1 flex-col gap-1">
+                        <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Business name</label>
+                        <input
+                          name="businessName"
+                          required
+                          placeholder="Used in the missed-call text"
+                          className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="rounded-lg bg-[#f0b429] px-4 py-2 text-[12.5px] font-bold text-[#1a1200] transition hover:brightness-110"
+                      >
+                        Activate Text-Back
+                      </button>
+                    </form>
+                  </div>
+                )}
+
+                {project.integrations.length === 0 && !showReceptionistSetup && !showTextBackSetup && (
                   <p className="text-sm text-[#9aa0ae]">No integrations set up for this project yet.</p>
                 )}
                 {project.integrations.map((i) => {
@@ -834,7 +970,29 @@ export default async function ServiceProjectPage({
             ),
 
             performance: (
-              <div>
+              <div className="flex flex-col gap-6">
+                {budgetCents > 0 && (
+                  <div className="rounded-xl border border-[#232838] bg-[#0d1016] p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[13.5px] font-bold">Usage this month</span>
+                      <span
+                        className={`font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] ${
+                          usagePct >= 100 ? "text-[#ff8585]" : usagePct >= 90 ? "text-[#f0b429]" : "text-[#4ade95]"
+                        }`}
+                      >
+                        {usagePct >= 100 ? "At your plan's limit" : usagePct >= 90 ? "Approaching your plan's limit" : "Normal usage"}
+                      </span>
+                    </div>
+                    <div className="mt-3 h-1.5 overflow-hidden rounded-full border border-[#232838] bg-[#0a0c10]">
+                      <div
+                        className={`h-full rounded-full ${usagePct >= 100 ? "bg-[#ff8585]" : usagePct >= 90 ? "bg-[#f0b429]" : "bg-[#4ade95]"}`}
+                        style={{ width: `${usagePct}%` }}
+                      />
+                    </div>
+                    <p className="mt-2 text-[12px] text-[#676e7d]">Resets at the start of each billing month.</p>
+                  </div>
+                )}
+
                 {aggregatedMetrics.length === 0 ? (
                   <div className="rounded-xl border border-[#333a4c] bg-[#191d26] p-5">
                     <p className="text-[13.5px] text-[#9aa0ae]">

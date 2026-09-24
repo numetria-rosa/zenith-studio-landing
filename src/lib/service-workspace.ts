@@ -3,6 +3,10 @@ import { encryptPassword } from "@/lib/password";
 import { testMailConnection } from "@/lib/mail-imap";
 import { approveInboxDraft, rejectInboxDraft } from "@/lib/inbox-manager";
 import { getWhopClient } from "@/lib/whop";
+import { toE164UsNumber } from "@/lib/vapi-provision";
+import { provisionReceptionistIfNeeded } from "@/lib/receptionist-provisioning";
+import { provisionTextBackIfNeeded } from "@/lib/text-back-provisioning";
+import { RECEPTIONIST_REQUIREMENTS, TEXT_BACK_REQUIREMENTS } from "@/lib/service-projects";
 import type { MailProvider } from "@prisma/client";
 
 /* Client-facing service project workspace (Slice 7 of the service-platform
@@ -258,6 +262,61 @@ export async function cancelOwnedMembership(projectId: string, userId: string): 
     return { ok: false, error: err instanceof Error ? err.message : "Cancellation failed." };
   }
   return { ok: true };
+}
+
+/** Self-serve activation: the client fills in real, validated fields
+    (instead of free-text ClientRequirement answers an admin has to
+    review) and provisioning fires immediately in the same request - no
+    admin approval click in between. Writes straight to APPROVED because
+    validation here (phone number shape, non-empty fields) replaces the
+    human review that free-text answers needed; provisionReceptionistIfNeeded
+    still re-checks everything itself and is idempotent (no-ops if a vapi
+    Integration already exists), so calling it from here is safe even if
+    the client submits twice. */
+export async function activateReceptionist(
+  projectId: string,
+  userId: string,
+  fields: { businessName: string; hours: string; faqText: string; fallbackNumber: string }
+): Promise<RequirementSubmitResult> {
+  const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
+  if (!project) return { ok: false, error: "not_found" };
+
+  const businessName = fields.businessName.trim();
+  const hours = fields.hours.trim();
+  const faqText = fields.faqText.trim();
+  if (!businessName || !hours || !faqText) return { ok: false, error: "All fields are required." };
+  const fallbackNumber = toE164UsNumber(fields.fallbackNumber);
+  if (!fallbackNumber) return { ok: false, error: "That fallback phone number doesn't look valid." };
+
+  const values: [string, string][] = [
+    [RECEPTIONIST_REQUIREMENTS[0].label, businessName],
+    [RECEPTIONIST_REQUIREMENTS[1].label, hours],
+    [RECEPTIONIST_REQUIREMENTS[2].label, faqText],
+    [RECEPTIONIST_REQUIREMENTS[3].label, fallbackNumber],
+  ];
+  for (const [label, detail] of values) {
+    await db.clientRequirement.updateMany({ where: { projectId: project.id, label }, data: { detail, status: "APPROVED" } });
+  }
+
+  return provisionReceptionistIfNeeded(project.id);
+}
+
+/** Same self-serve pattern as activateReceptionist, for the law-firms
+    bundle's Missed Call Text-Back role (its only field is a business
+    name - see TEXT_BACK_REQUIREMENTS). */
+export async function activateTextBack(projectId: string, userId: string, fields: { businessName: string }): Promise<RequirementSubmitResult> {
+  const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
+  if (!project) return { ok: false, error: "not_found" };
+
+  const businessName = fields.businessName.trim();
+  if (!businessName) return { ok: false, error: "Business name is required." };
+
+  await db.clientRequirement.updateMany({
+    where: { projectId: project.id, label: TEXT_BACK_REQUIREMENTS[0].label },
+    data: { detail: businessName, status: "APPROVED" },
+  });
+
+  return provisionTextBackIfNeeded(project.id);
 }
 
 export async function rejectOwnedInboxDraft(projectId: string, userId: string, draftId: string): Promise<RequirementSubmitResult> {
