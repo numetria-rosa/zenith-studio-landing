@@ -11,7 +11,8 @@ import { auditPolicyDocument, auditPolicyPdf } from "@/lib/insurance-document-au
 import { importPolicies } from "@/lib/insurance-renewals";
 import { parseBookOfBusinessSpreadsheet, parseBookOfBusinessGoogleSheet, parseBookOfBusinessPdf } from "@/lib/insurance-book-import";
 import { RECEPTIONIST_REQUIREMENTS, TEXT_BACK_REQUIREMENTS, LEAD_CAPTURE_REQUIREMENTS, BROKERAGE_REQUIREMENTS } from "@/lib/service-projects";
-import type { MailProvider } from "@prisma/client";
+import { LAW_FIRM_SPECIALTIES } from "@/lib/legal-specialties";
+import type { MailProvider, LawFirmSpecialty } from "@prisma/client";
 
 /* Client-facing service project workspace (Slice 7 of the service-platform
    build, 2026-08-28). This is the first page in the build where one signed-in
@@ -366,6 +367,25 @@ export async function activateLeadCapture(
   return provisionLeadCaptureIfNeeded(project.id);
 }
 
+/** Self-serve law-firm specialty selection - what the Billing Clerk was
+    previously only admin-set for (see the schema comment on
+    ServiceProject.specialty): whether a client bills hourly or works on
+    contingency changes the entire narrative style billing-clerk.ts
+    drafts, so leaving it unset silently defaults to GENERAL/hourly
+    behavior, which is wrong for a personal injury firm. Purely a
+    selection among a fixed enum, so unlike the categorization concern
+    the original comment raised, there's no real judgment call for the
+    client to get wrong here - they know what kind of firm they run. */
+export async function updateOwnedSpecialty(projectId: string, userId: string, specialty: string): Promise<RequirementSubmitResult> {
+  const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
+  if (!project) return { ok: false, error: "not_found" };
+
+  if (!LAW_FIRM_SPECIALTIES.includes(specialty as LawFirmSpecialty)) return { ok: false, error: "Not a valid specialty." };
+
+  await db.serviceProject.update({ where: { id: project.id }, data: { specialty: specialty as LawFirmSpecialty } });
+  return { ok: true };
+}
+
 /** Self-serve CRM connection for Insurance's CRM & Logging agent: the
     client pastes their own CRM's inbound webhook URL (most CRMs expose
     one under their own integrations/Zapier settings) instead of granting
@@ -374,7 +394,11 @@ export async function activateLeadCapture(
     insurance-crm-log.ts reads it back at forward-time. http:// is
     rejected, not just non-URLs, since a lead's name/phone/email would
     otherwise cross the wire in plaintext. */
-export async function activateCrmWebhook(projectId: string, userId: string, fields: { webhookUrl: string }): Promise<RequirementSubmitResult> {
+export async function activateCrmWebhook(
+  projectId: string,
+  userId: string,
+  fields: { webhookUrl: string; payloadFormat?: string }
+): Promise<RequirementSubmitResult> {
   const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
   if (!project) return { ok: false, error: "not_found" };
 
@@ -387,12 +411,16 @@ export async function activateCrmWebhook(projectId: string, userId: string, fiel
   }
   if (parsed.protocol !== "https:") return { ok: false, error: "The webhook URL must start with https://." };
 
+  const payloadFormat = fields.payloadFormat?.trim() || null;
+  const config: { webhookUrl: string; payloadFormat?: string } = { webhookUrl };
+  if (payloadFormat) config.payloadFormat = payloadFormat;
+
   const existing = await db.integration.findFirst({ where: { projectId: project.id, provider: "crm" }, select: { id: true } });
   if (existing) {
-    await db.integration.update({ where: { id: existing.id }, data: { status: "CONNECTED", connectedAt: new Date(), config: { webhookUrl } } });
+    await db.integration.update({ where: { id: existing.id }, data: { status: "CONNECTED", connectedAt: new Date(), config } });
   } else {
     await db.integration.create({
-      data: { projectId: project.id, provider: "crm", status: "CONNECTED", connectedAt: new Date(), config: { webhookUrl } },
+      data: { projectId: project.id, provider: "crm", status: "CONNECTED", connectedAt: new Date(), config },
     });
   }
 

@@ -25,11 +25,15 @@ import {
   activateCrmWebhook,
   runDocumentAudit,
   importBookOfBusiness,
+  updateOwnedSpecialty,
 } from "@/lib/service-workspace";
+import { LAW_FIRM_SPECIALTIES, LEGAL_SPECIALTY_PROFILES } from "@/lib/legal-specialties";
 import { getMonthlyCostCents, resolveMonthlyBudgetCents } from "@/lib/usage-costs";
 import { ProjectTabs } from "./Tabs";
 import { visibleTabIds, type ActionItem } from "./tabs-visibility";
 import { CancelPlanButton } from "./CancelPlanButton";
+import { GuidePicker, InlineGuide } from "./GuidePicker";
+import { CRM_SETUP_GUIDES, GOOGLE_SHEETS_SHARE_GUIDE } from "@/lib/setup-guides";
 import { getSiteUrl } from "@/lib/site";
 import { aggregateClientMetrics } from "@/lib/metric-labels";
 import CrispChat from "@/components/CrispChat";
@@ -266,6 +270,7 @@ export default async function ServiceProjectPage({
     if (!session2?.user?.id) redirect(signInRedirect(projectId));
     const result = await activateCrmWebhook(projectId, session2.user.id, {
       webhookUrl: String(formData.get("webhookUrl") || ""),
+      payloadFormat: String(formData.get("payloadFormat") || ""),
     });
     revalidatePath(`/services/dashboard/${projectId}`);
     if (!result.ok) {
@@ -325,6 +330,18 @@ export default async function ServiceProjectPage({
       redirect(`/services/dashboard/${projectId}?tab=renewals&activateError=${encodeURIComponent(result.error)}`);
     }
     redirect(flashUrl(projectId, "renewals", `Imported ${result.created} ${result.created === 1 ? "client" : "clients"}. Renewal reminders are on.`));
+  }
+
+  async function updateSpecialtyAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) redirect(signInRedirect(projectId));
+    const result = await updateOwnedSpecialty(projectId, session2.user.id, String(formData.get("specialty") || ""));
+    revalidatePath(`/services/dashboard/${projectId}`);
+    if (!result.ok) {
+      redirect(`/services/dashboard/${projectId}?tab=billing&activateError=${encodeURIComponent(result.error)}`);
+    }
+    redirect(flashUrl(projectId, "billing", "Practice area updated."));
   }
 
   async function cancelPlan(): Promise<void> {
@@ -700,8 +717,11 @@ export default async function ServiceProjectPage({
                       most CRMs (HubSpot, Zoho, AgencyZoom, monday.com, or a Zapier webhook) have one under their
                       own integrations settings. We never ask for a login to your CRM.
                     </p>
-                    <form action={activateCrmWebhookAction} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end">
-                      <div className="flex flex-1 flex-col gap-1">
+
+                    <GuidePicker guides={CRM_SETUP_GUIDES} label="Not sure how to get your webhook URL? Tell us what you use" />
+
+                    <form action={activateCrmWebhookAction} className="mt-4 flex flex-col gap-3">
+                      <div className="flex flex-col gap-1">
                         <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Webhook URL</label>
                         <input
                           name="webhookUrl"
@@ -711,9 +731,22 @@ export default async function ServiceProjectPage({
                           className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
                         />
                       </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
+                          Does your CRM expect specific field names? (optional)
+                        </label>
+                        <textarea
+                          name="payloadFormat"
+                          rows={3}
+                          placeholder={
+                            'Only fill this in if your CRM needs exact field names, e.g.: {"full_name": "...", "contact_phone": "...", "contact_email": "...", "source": "Zenith AI"}. Leave blank to use our default field names.'
+                          }
+                          className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                        />
+                      </div>
                       <button
                         type="submit"
-                        className="rounded-lg bg-[#f0b429] px-4 py-2 text-[12.5px] font-bold text-[#1a1200] transition hover:brightness-110"
+                        className="self-start rounded-lg bg-[#f0b429] px-4 py-2 text-[12.5px] font-bold text-[#1a1200] transition hover:brightness-110"
                       >
                         Connect
                       </button>
@@ -768,6 +801,42 @@ export default async function ServiceProjectPage({
                       </p>
                     </div>
                     <CancelPlanButton action={cancelPlan} />
+                  </div>
+                )}
+
+                {project.sourceServiceId === "law-firms" && (
+                  <div className="rounded-xl border border-[#232838] bg-gradient-to-br from-[#151a24] to-[#0d1016] p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[13.5px] font-bold">Practice area</p>
+                        <p className="mt-1 text-[12.5px] leading-5 text-[#9aa0ae]">
+                          Changes how the Billing Clerk writes your entries - hourly time narratives, or case-activity
+                          notes for contingency work.
+                        </p>
+                      </div>
+                      <span className="flex-shrink-0 rounded-full border border-[#f0b429]/30 bg-[#f0b429]/10 px-3 py-1 font-[family-name:var(--font-course-mono)] text-[10.5px] font-bold uppercase tracking-[0.08em] text-[#f0b429]">
+                        {project.specialty ? LEGAL_SPECIALTY_PROFILES[project.specialty].billingModel : "Hourly"}
+                      </span>
+                    </div>
+                    <form action={updateSpecialtyAction} className="mt-4 flex flex-wrap items-center gap-2">
+                      <select
+                        name="specialty"
+                        defaultValue={project.specialty ?? "GENERAL"}
+                        className="flex-1 rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2.5 text-[13px] text-[#eeeee7]"
+                      >
+                        {LAW_FIRM_SPECIALTIES.map((s) => (
+                          <option key={s} value={s}>
+                            {LEGAL_SPECIALTY_PROFILES[s].label}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="submit"
+                        className="rounded-lg bg-[#f0b429] px-4 py-2.5 text-[12.5px] font-bold text-[#1a1200] transition hover:brightness-110"
+                      >
+                        Save
+                      </button>
+                    </form>
                   </div>
                 )}
 
@@ -1209,6 +1278,7 @@ export default async function ServiceProjectPage({
                         placeholder="https://docs.google.com/spreadsheets/..."
                         className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
                       />
+                      <InlineGuide guide={GOOGLE_SHEETS_SHARE_GUIDE} />
                     </div>
                     <button
                       type="submit"
