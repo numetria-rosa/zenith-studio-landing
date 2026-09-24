@@ -6,7 +6,8 @@ import { getWhopClient } from "@/lib/whop";
 import { toE164UsNumber } from "@/lib/vapi-provision";
 import { provisionReceptionistIfNeeded } from "@/lib/receptionist-provisioning";
 import { provisionTextBackIfNeeded } from "@/lib/text-back-provisioning";
-import { RECEPTIONIST_REQUIREMENTS, TEXT_BACK_REQUIREMENTS } from "@/lib/service-projects";
+import { provisionLeadCaptureIfNeeded } from "@/lib/lead-capture-provisioning";
+import { RECEPTIONIST_REQUIREMENTS, TEXT_BACK_REQUIREMENTS, LEAD_CAPTURE_REQUIREMENTS, BROKERAGE_REQUIREMENTS } from "@/lib/service-projects";
 import type { MailProvider } from "@prisma/client";
 
 /* Client-facing service project workspace (Slice 7 of the service-platform
@@ -317,6 +318,48 @@ export async function activateTextBack(projectId: string, userId: string, fields
   });
 
   return provisionTextBackIfNeeded(project.id);
+}
+
+/** Same self-serve pattern as activateReceptionist/activateTextBack, for
+    AI Lead Capture and brokerages' Inside Sales Agent role - one function
+    for both, since provisionLeadCaptureIfNeeded itself already treats them
+    identically and only the requirement labels (client-facing wording)
+    differ per service, matching that file's own switch. */
+export async function activateLeadCapture(
+  projectId: string,
+  userId: string,
+  fields: { businessName: string; qualificationRules: string; notifyEmail: string }
+): Promise<RequirementSubmitResult> {
+  const project = await db.serviceProject.findFirst({
+    where: { id: projectId, userId },
+    select: { id: true, sourceServiceId: true },
+  });
+  if (!project) return { ok: false, error: "not_found" };
+
+  const requirementSet =
+    project.sourceServiceId === "ai-lead-capture"
+      ? LEAD_CAPTURE_REQUIREMENTS
+      : project.sourceServiceId === "brokerages"
+        ? BROKERAGE_REQUIREMENTS
+        : null;
+  if (!requirementSet) return { ok: false, error: "not_applicable" };
+
+  const businessName = fields.businessName.trim();
+  const qualificationRules = fields.qualificationRules.trim();
+  const notifyEmail = fields.notifyEmail.trim().toLowerCase();
+  if (!businessName || !qualificationRules) return { ok: false, error: "All fields are required." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(notifyEmail)) return { ok: false, error: "That notify email doesn't look valid." };
+
+  const values: [string, string][] = [
+    [requirementSet[0].label, businessName],
+    [requirementSet[1].label, qualificationRules],
+    [requirementSet[2].label, notifyEmail],
+  ];
+  for (const [label, detail] of values) {
+    await db.clientRequirement.updateMany({ where: { projectId: project.id, label }, data: { detail, status: "APPROVED" } });
+  }
+
+  return provisionLeadCaptureIfNeeded(project.id);
 }
 
 export async function rejectOwnedInboxDraft(projectId: string, userId: string, draftId: string): Promise<RequirementSubmitResult> {

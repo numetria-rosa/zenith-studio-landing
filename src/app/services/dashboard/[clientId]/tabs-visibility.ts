@@ -42,7 +42,14 @@ export function visibleTabIds(project: {
   const always: TabId[] = ["overview", "messages", "performance", "support"];
   const conditional: [TabId, boolean][] = [
     ["requirements", project.requirements.length > 0],
-    ["integrations", project.integrations.length > 0 || project.sourceServiceId === "ai-receptionist" || project.sourceServiceId === "law-firms"],
+    [
+      "integrations",
+      project.integrations.length > 0 ||
+        project.sourceServiceId === "ai-receptionist" ||
+        project.sourceServiceId === "law-firms" ||
+        project.sourceServiceId === "ai-lead-capture" ||
+        project.sourceServiceId === "brokerages",
+    ],
     ["billing", project.sourceServiceId === "law-firms" || project.timeEntries.length > 0 || project.oauthConnections.length > 0],
     ["leads", project.sourceServiceId === "ai-lead-capture" || project.sourceServiceId === "brokerages" || project.leads.length > 0],
     ["inbox", project.sourceServiceId === "ai-inbox-manager" || project.mailConnections.length > 0 || project.inboxDrafts.length > 0],
