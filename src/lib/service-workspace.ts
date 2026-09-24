@@ -362,6 +362,39 @@ export async function activateLeadCapture(
   return provisionLeadCaptureIfNeeded(project.id);
 }
 
+/** Self-serve CRM connection for Insurance's CRM & Logging agent: the
+    client pastes their own CRM's inbound webhook URL (most CRMs expose
+    one under their own integrations/Zapier settings) instead of granting
+    us any credential. No provisioning call needed here (unlike the
+    others) - this just saves the URL as a CONNECTED "crm" Integration;
+    insurance-crm-log.ts reads it back at forward-time. http:// is
+    rejected, not just non-URLs, since a lead's name/phone/email would
+    otherwise cross the wire in plaintext. */
+export async function activateCrmWebhook(projectId: string, userId: string, fields: { webhookUrl: string }): Promise<RequirementSubmitResult> {
+  const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
+  if (!project) return { ok: false, error: "not_found" };
+
+  const webhookUrl = fields.webhookUrl.trim();
+  let parsed: URL;
+  try {
+    parsed = new URL(webhookUrl);
+  } catch {
+    return { ok: false, error: "That doesn't look like a valid URL." };
+  }
+  if (parsed.protocol !== "https:") return { ok: false, error: "The webhook URL must start with https://." };
+
+  const existing = await db.integration.findFirst({ where: { projectId: project.id, provider: "crm" }, select: { id: true } });
+  if (existing) {
+    await db.integration.update({ where: { id: existing.id }, data: { status: "CONNECTED", connectedAt: new Date(), config: { webhookUrl } } });
+  } else {
+    await db.integration.create({
+      data: { projectId: project.id, provider: "crm", status: "CONNECTED", connectedAt: new Date(), config: { webhookUrl } },
+    });
+  }
+
+  return { ok: true };
+}
+
 export async function rejectOwnedInboxDraft(projectId: string, userId: string, draftId: string): Promise<RequirementSubmitResult> {
   const draft = await db.inboxDraft.findFirst({
     where: { id: draftId, projectId, status: "DRAFT", project: { userId } },

@@ -48,7 +48,8 @@ export function visibleTabIds(project: {
         project.sourceServiceId === "ai-receptionist" ||
         project.sourceServiceId === "law-firms" ||
         project.sourceServiceId === "ai-lead-capture" ||
-        project.sourceServiceId === "brokerages",
+        project.sourceServiceId === "brokerages" ||
+        project.sourceServiceId === "insurance-ai-team",
     ],
     ["billing", project.sourceServiceId === "law-firms" || project.timeEntries.length > 0 || project.oauthConnections.length > 0],
     ["leads", project.sourceServiceId === "ai-lead-capture" || project.sourceServiceId === "brokerages" || project.leads.length > 0],

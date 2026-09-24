@@ -582,6 +582,7 @@ model ServiceProject {
   timeEntries      TimeEntry[]
   mailConnections  MailConnection[]
   inboxDrafts      InboxDraft[]
+  insuranceCrmLogEntries InsuranceCrmLogEntry[]
 
   @@index([userId])
   @@index([proposalId])
@@ -827,16 +828,29 @@ model InsurancePolicy {
 }
 
 model InsuranceCrmLogEntry {
-  id              String   @id @default(cuid())
-  agencyName      String
-  leadName        String
-  phone           String?
-  email           String?
-  notes           String?  @db.Text
-  forwardedToMake Boolean  @default(false)
-  createdAt       DateTime @default(now())
+  id         String   @id @default(cuid())
+  // Nullable: the internal /admin/insurance-ai-team sandbox test page
+  // still calls logCrmEntry with no real project (see that route), and
+  // this table needs to keep serving that unscoped path alongside real,
+  // project-scoped entries added 2026-09-24 for the self-serve CRM
+  // webhook feature.
+  projectId  String?
+  agencyName String
+  leadName   String
+  phone      String?
+  email      String?
+  notes      String?  @db.Text
+  // Renamed from forwardedToMake: entries now forward straight to the
+  // client's own CRM webhook URL (see Integration provider "crm"), not
+  // through Make.com - Make's own Data Store scenario was a placeholder
+  // for this sandbox page, never a real per-client integration.
+  forwarded  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  project ServiceProject? @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
+  @@index([projectId])
 }
 
 enum RequirementStatus {

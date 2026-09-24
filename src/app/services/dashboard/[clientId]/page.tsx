@@ -22,6 +22,7 @@ import {
   activateReceptionist,
   activateTextBack,
   activateLeadCapture,
+  activateCrmWebhook,
 } from "@/lib/service-workspace";
 import { getMonthlyCostCents, resolveMonthlyBudgetCents } from "@/lib/usage-costs";
 import { ProjectTabs } from "./Tabs";
@@ -257,6 +258,20 @@ export default async function ServiceProjectPage({
     redirect(flashUrl(projectId, "integrations", "Lead Capture is live. Your number is ready below."));
   }
 
+  async function activateCrmWebhookAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) redirect(signInRedirect(projectId));
+    const result = await activateCrmWebhook(projectId, session2.user.id, {
+      webhookUrl: String(formData.get("webhookUrl") || ""),
+    });
+    revalidatePath(`/services/dashboard/${projectId}`);
+    if (!result.ok) {
+      redirect(`/services/dashboard/${projectId}?tab=integrations&activateError=${encodeURIComponent(result.error)}`);
+    }
+    redirect(flashUrl(projectId, "integrations", "Your CRM is connected. New leads will be sent there automatically."));
+  }
+
   async function cancelPlan(): Promise<void> {
     "use server";
     const session2 = await auth();
@@ -292,6 +307,8 @@ export default async function ServiceProjectPage({
   const showLeadCaptureSetup =
     (project.sourceServiceId === "ai-lead-capture" || project.sourceServiceId === "brokerages") &&
     !project.integrations.some((i) => i.provider === "signalwire");
+  const showCrmWebhookSetup =
+    project.sourceServiceId === "insurance-ai-team" && !project.integrations.some((i) => i.provider === "crm");
 
   const [spentCents, budgetCents] = await Promise.all([getMonthlyCostCents(projectId), resolveMonthlyBudgetCents(projectId)]);
   const usagePct = budgetCents > 0 ? Math.min(100, Math.round((spentCents / budgetCents) * 100)) : 0;
@@ -620,7 +637,36 @@ export default async function ServiceProjectPage({
                   </div>
                 )}
 
-                {project.integrations.length === 0 && !showReceptionistSetup && !showTextBackSetup && !showLeadCaptureSetup && (
+                {showCrmWebhookSetup && (
+                  <div className="rounded-xl border border-[#333a4c] bg-[#191d26] p-5">
+                    <p className="text-[13.5px] font-bold">Connect your CRM</p>
+                    <p className="mt-1 text-[12.5px] leading-5 text-[#9aa0ae]">
+                      Every new lead gets sent here automatically. Paste your CRM&apos;s own inbound webhook URL -
+                      most CRMs (HubSpot, Zoho, AgencyZoom, monday.com, or a Zapier webhook) have one under their
+                      own integrations settings. We never ask for a login to your CRM.
+                    </p>
+                    <form action={activateCrmWebhookAction} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end">
+                      <div className="flex flex-1 flex-col gap-1">
+                        <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Webhook URL</label>
+                        <input
+                          name="webhookUrl"
+                          type="url"
+                          required
+                          placeholder="https://..."
+                          className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="rounded-lg bg-[#f0b429] px-4 py-2 text-[12.5px] font-bold text-[#1a1200] transition hover:brightness-110"
+                      >
+                        Connect
+                      </button>
+                    </form>
+                  </div>
+                )}
+
+                {project.integrations.length === 0 && !showReceptionistSetup && !showTextBackSetup && !showLeadCaptureSetup && !showCrmWebhookSetup && (
                   <p className="text-sm text-[#9aa0ae]">No integrations set up for this project yet.</p>
                 )}
                 {project.integrations.map((i) => {
@@ -630,7 +676,13 @@ export default async function ServiceProjectPage({
                     <div key={i.id} className="rounded-xl border border-[#232838] bg-[#0d1016] p-5">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <span className="text-[14.5px] font-bold capitalize">
-                          {i.provider === "vapi" ? "AI Receptionist number" : i.provider === "signalwire" ? "Phone number" : i.provider}
+                          {i.provider === "vapi"
+                            ? "AI Receptionist number"
+                            : i.provider === "signalwire"
+                              ? "Phone number"
+                              : i.provider === "crm"
+                                ? "CRM webhook"
+                                : i.provider}
                         </span>
                         <span className="font-[family-name:var(--font-course-mono)] text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">
                           {INTEGRATION_STATUS_LABELS[i.status] ?? "Not connected"}

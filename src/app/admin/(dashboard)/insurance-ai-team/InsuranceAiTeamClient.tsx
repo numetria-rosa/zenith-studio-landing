@@ -9,7 +9,7 @@ type CrmEntry = {
   phone: string | null;
   email: string | null;
   notes: string | null;
-  forwardedToMake: boolean;
+  forwarded: boolean;
   createdAt: string;
 };
 
@@ -195,7 +195,7 @@ function CrmLogging() {
                 <td className="py-1.5 pr-4">{e.agencyName}</td>
                 <td className="py-1.5 pr-4">{e.leadName}</td>
                 <td className="py-1.5 pr-4 text-white/60">{[e.phone, e.email].filter(Boolean).join(" / ") || "-"}</td>
-                <td className="py-1.5 pr-4">{e.forwardedToMake ? "synced" : "-"}</td>
+                <td className="py-1.5 pr-4">{e.forwarded ? "synced" : "-"}</td>
                 <td className="py-1.5 pr-4 text-white/40">{new Date(e.createdAt).toLocaleString()}</td>
               </tr>
             ))}
