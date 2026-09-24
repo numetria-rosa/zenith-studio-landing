@@ -23,6 +23,7 @@ import {
   activateTextBack,
   activateLeadCapture,
   activateCrmWebhook,
+  runDocumentAudit,
 } from "@/lib/service-workspace";
 import { getMonthlyCostCents, resolveMonthlyBudgetCents } from "@/lib/usage-costs";
 import { ProjectTabs } from "./Tabs";
@@ -270,6 +271,30 @@ export default async function ServiceProjectPage({
       redirect(`/services/dashboard/${projectId}?tab=integrations&activateError=${encodeURIComponent(result.error)}`);
     }
     redirect(flashUrl(projectId, "integrations", "Your CRM is connected. New leads will be sent there automatically."));
+  }
+
+  async function runDocumentAuditAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) redirect(signInRedirect(projectId));
+
+    const file = formData.get("file");
+    const rawText = String(formData.get("rawText") || "");
+    let pdfBase64: string | undefined;
+    let filename = "Pasted text";
+    let sizeBytes: number | undefined;
+    if (file instanceof File && file.size > 0) {
+      filename = file.name;
+      sizeBytes = file.size;
+      pdfBase64 = Buffer.from(await file.arrayBuffer()).toString("base64");
+    }
+
+    const result = await runDocumentAudit(projectId, session2.user.id, { filename, pdfBase64, rawText, sizeBytes });
+    revalidatePath(`/services/dashboard/${projectId}`);
+    if (!result.ok) {
+      redirect(`/services/dashboard/${projectId}?tab=audit&activateError=${encodeURIComponent(result.error)}`);
+    }
+    redirect(flashUrl(projectId, "audit", "Audit complete - see the summary below."));
   }
 
   async function cancelPlan(): Promise<void> {
@@ -1049,6 +1074,67 @@ export default async function ServiceProjectPage({
                     </div>
                   </div>
                 )}
+              </div>
+            ),
+
+            audit: (
+              <div className="flex flex-col gap-6">
+                <div className="rounded-xl border border-[#333a4c] bg-[#191d26] p-5">
+                  <p className="text-[13.5px] font-bold">Run a document audit</p>
+                  <p className="mt-1 text-[12.5px] leading-5 text-[#9aa0ae]">
+                    Upload a policy document, ACORD form, or loss run as a PDF - we read it directly, no need to
+                    copy anything out first. Named insured, coverage limits, dates, and red flags, back in
+                    seconds.
+                  </p>
+                  {activateError && (
+                    <p className="mt-3 rounded-lg border border-[#ff8585]/30 bg-[#ff8585]/10 px-3 py-2 text-[12.5px] text-[#ff8585]">
+                      Couldn&apos;t run the audit: {activateError}
+                    </p>
+                  )}
+                  <form action={runDocumentAuditAction} className="mt-4 flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Upload a PDF</label>
+                      <input
+                        name="file"
+                        type="file"
+                        accept="application/pdf"
+                        className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7]"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] uppercase tracking-[0.06em] text-[#676e7d]">Or paste the text instead</label>
+                      <textarea
+                        name="rawText"
+                        rows={4}
+                        placeholder="Paste the document text here if you'd rather not upload a file"
+                        className="w-full rounded-lg border border-[#333a4c] bg-[#0a0c10] px-3 py-2 text-[13px] text-[#eeeee7] placeholder:text-[#676e7d]"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="self-start rounded-lg bg-[#f0b429] px-4 py-2 text-[12.5px] font-bold text-[#1a1200] transition hover:brightness-110"
+                    >
+                      Run audit
+                    </button>
+                  </form>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  {project.documents.length === 0 && <p className="text-sm text-[#9aa0ae]">No audits run yet.</p>}
+                  {project.documents.map((d) => (
+                    <div key={d.id} className="rounded-xl border border-[#232838] bg-[#0d1016] p-5">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-[14.5px] font-bold">{d.filename}</span>
+                        <span className="text-[11px] text-[#676e7d]">{d.createdAt.toISOString().slice(0, 10)}</span>
+                      </div>
+                      {d.summary && (
+                        <pre className="mt-3 whitespace-pre-wrap font-[family-name:var(--font-course-sans)] text-[13px] leading-6 text-[#eeeee7]">
+                          {d.summary}
+                        </pre>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             ),
 

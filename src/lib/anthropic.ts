@@ -15,11 +15,23 @@ function anthropicApiKey(): string {
 
 export type AnthropicResult = { ok: true; content: string } | { ok: false; error: string };
 
+/** Optional PDF attached as a native document content block (Claude reads
+    it directly - no pdf-parsing library needed on our side). Kept
+    separate from userPrompt so callers that only have text never pay for
+    the extra request-shape branching. */
 export async function anthropicComplete(input: {
   systemPrompt: string;
   userPrompt: string;
   maxTokens?: number;
+  pdfBase64?: string;
 }): Promise<AnthropicResult> {
+  const userContent = input.pdfBase64
+    ? [
+        { type: "document", source: { type: "base64", media_type: "application/pdf", data: input.pdfBase64 } },
+        { type: "text", text: input.userPrompt },
+      ]
+    : input.userPrompt;
+
   const res = await fetch(`${ANTHROPIC_API_BASE}/messages`, {
     method: "POST",
     headers: {
@@ -31,7 +43,7 @@ export async function anthropicComplete(input: {
       model: ANTHROPIC_MODEL,
       max_tokens: input.maxTokens ?? 800,
       system: input.systemPrompt,
-      messages: [{ role: "user", content: input.userPrompt }],
+      messages: [{ role: "user", content: userContent }],
     }),
   });
 

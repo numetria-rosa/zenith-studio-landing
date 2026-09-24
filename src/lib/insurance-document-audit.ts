@@ -44,3 +44,21 @@ export async function auditPolicyDocument(rawText: string): Promise<DocumentAudi
   if (!anthropicResult.ok) return { ok: false, error: `groq: ${groqResult.error}; anthropic: ${anthropicResult.error}` };
   return { ok: true, summary: anthropicResult.content.trim() };
 }
+
+/** Same summary, but for an uploaded PDF instead of pasted text - the
+    convenient path for a real client (no manual copy-paste out of a PDF
+    reader first). Goes straight to Claude: Groq's chat completion API has
+    no document/PDF content-block support, only Claude reads the file
+    natively. */
+export async function auditPolicyPdf(pdfBase64: string): Promise<DocumentAuditResult> {
+  if (!pdfBase64) return { ok: false, error: "no file provided" };
+
+  const result = await anthropicComplete({
+    systemPrompt: SYSTEM_PROMPT,
+    userPrompt: "Extract the summary from the attached document.",
+    maxTokens: 500,
+    pdfBase64,
+  });
+  if (!result.ok) return { ok: false, error: result.error };
+  return { ok: true, summary: result.content.trim() };
+}

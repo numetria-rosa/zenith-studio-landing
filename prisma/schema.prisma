@@ -961,6 +961,10 @@ model ClientDocument {
   storageKey String? // key into a future blob store — always null today, see model comment
   sizeBytes  Int?
   kind       DocumentKind @default(OTHER)
+  // Insurance Document Audit's extracted summary (Groq/Claude), added
+  // 2026-09-24 - doesn't touch the "no file storage" concern above at
+  // all, the PDF bytes are never persisted, only this derived text.
+  summary    String?      @db.Text
   createdAt  DateTime     @default(now())
 
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)

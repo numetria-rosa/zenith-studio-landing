@@ -7,6 +7,7 @@ import { toE164UsNumber } from "@/lib/vapi-provision";
 import { provisionReceptionistIfNeeded } from "@/lib/receptionist-provisioning";
 import { provisionTextBackIfNeeded } from "@/lib/text-back-provisioning";
 import { provisionLeadCaptureIfNeeded } from "@/lib/lead-capture-provisioning";
+import { auditPolicyDocument, auditPolicyPdf } from "@/lib/insurance-document-audit";
 import { RECEPTIONIST_REQUIREMENTS, TEXT_BACK_REQUIREMENTS, LEAD_CAPTURE_REQUIREMENTS, BROKERAGE_REQUIREMENTS } from "@/lib/service-projects";
 import type { MailProvider } from "@prisma/client";
 
@@ -391,6 +392,36 @@ export async function activateCrmWebhook(projectId: string, userId: string, fiel
       data: { projectId: project.id, provider: "crm", status: "CONNECTED", connectedAt: new Date(), config: { webhookUrl } },
     });
   }
+
+  return { ok: true };
+}
+
+/** Runs Insurance Document Audit for the client directly - no activation
+    step, this is a tool the client uses on demand each time they have a
+    document, not a one-time setup like the other agents. Accepts either a
+    pasted-text policy/ACORD form/loss run or an uploaded PDF (read
+    natively by Claude, see anthropic.ts - no manual copy-paste required,
+    the intentionally lowest-manual-work path for a real client). Only the
+    extracted summary is persisted, never the PDF bytes: file storage is a
+    real infra decision this project has explicitly deferred (see
+    ClientDocument's own schema comment). */
+export async function runDocumentAudit(
+  projectId: string,
+  userId: string,
+  input: { filename: string; pdfBase64?: string; rawText?: string; sizeBytes?: number }
+): Promise<RequirementSubmitResult> {
+  const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
+  if (!project) return { ok: false, error: "not_found" };
+
+  const filename = input.filename.trim() || "Untitled document";
+  const result = input.pdfBase64
+    ? await auditPolicyPdf(input.pdfBase64)
+    : await auditPolicyDocument(input.rawText ?? "");
+  if (!result.ok) return { ok: false, error: result.error };
+
+  await db.clientDocument.create({
+    data: { projectId: project.id, userId, filename, kind: "REPORT", sizeBytes: input.sizeBytes ?? null, summary: result.summary },
+  });
 
   return { ok: true };
 }
