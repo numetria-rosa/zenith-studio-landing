@@ -1,0 +1,231 @@
+/* Shared primitives for the client console, spec'd in
+   design-system/components.md. Pixel values/colors match that doc
+   exactly - see console.module.css for the token definitions. */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--zc-r-pill);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pillDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pillRun {
+  background: rgba(92, 200, 255, 0.12);
+  color: var(--zc-run-text);
+  border: 1px solid rgba(92, 200, 255, 0.3);
+}
+.pillRun .pillDot {
+  background: var(--zc-run);
+  box-shadow: 0 0 6px var(--zc-run);
+}
+.pillNeed {
+  background: rgba(245, 184, 61, 0.12);
+  color: var(--zc-need-text);
+  border: 1px solid rgba(245, 184, 61, 0.35);
+}
+.pillNeed .pillDot {
+  background: var(--zc-need);
+  box-shadow: 0 0 6px var(--zc-need);
+}
+.pillDone {
+  background: rgba(61, 220, 151, 0.12);
+  color: var(--zc-done-text);
+  border: 1px solid rgba(61, 220, 151, 0.3);
+}
+.pillDone .pillDot {
+  background: var(--zc-done);
+}
+.pillDim {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--zc-dim);
+  border: 1px dashed var(--zc-line-2);
+}
+.pillDim .pillDot {
+  background: var(--zc-dim);
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: var(--zc-r-pill);
+  background: var(--zc-action);
+  color: var(--zc-action-text);
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: var(--zc-glow-action);
+  transition: filter 0.15s;
+}
+.btnPrimary:hover {
+  filter: brightness(1.08);
+}
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--zc-r-pill);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--zc-line-2);
+  color: var(--zc-text);
+  font-weight: 500;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.btnGhost:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--zc-run);
+  font-size: 14px;
+  font-weight: 500;
+}
+.textLink:hover {
+  text-decoration: underline;
+}
+
+.eyebrow {
+  font-family: var(--zc-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--zc-muted);
+}
+
+.card {
+  border-radius: var(--zc-r-card);
+  background: var(--zc-panel-2);
+  border: 1px solid var(--zc-line);
+  box-shadow: var(--zc-card-hl);
+}
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--zc-gap);
+}
+@media (max-width: 1180px) {
+  .kpiRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.kpiTile {
+  border-radius: var(--zc-r-card);
+  padding: 20px 22px;
+  background: rgba(14, 16, 22, 0.8);
+  border: 1px solid var(--zc-line);
+}
+.kpiLabel {
+  font-size: 14px;
+  color: var(--zc-muted);
+}
+.kpiValue {
+  margin-top: 6px;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.kpiNeed {
+  border-color: rgba(245, 184, 61, 0.35);
+  background: linear-gradient(160deg, rgba(245, 184, 61, 0.08), rgba(14, 16, 22, 0.8));
+}
+.kpiNeed .kpiLabel {
+  color: var(--zc-need-text);
+}
+.kpiNeed .kpiValue {
+  color: var(--zc-need-text);
+}
+
+.needsYouCard {
+  border-radius: var(--zc-r-card);
+  padding: 22px;
+  border: 1px solid rgba(245, 184, 61, 0.35);
+  background: linear-gradient(160deg, rgba(245, 184, 61, 0.08), var(--zc-panel-2));
+}
+.needsYouCard.allClear {
+  border-color: rgba(61, 220, 151, 0.3);
+  background: linear-gradient(160deg, rgba(61, 220, 151, 0.08), var(--zc-panel-2));
+}
+.needsYouTitle {
+  font-size: 20px;
+  font-weight: 500;
+}
+.needsYouMeta {
+  margin-top: 4px;
+  font-size: 15px;
+  color: var(--zc-muted);
+}
+
+.activityItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--zc-line);
+}
+.activityItem:last-child {
+  border-bottom: none;
+}
+.activityDot {
+  margin-top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.activityText {
+  font-size: 15px;
+}
+.activityMeta {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--zc-muted);
+}
+
+.toggle {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  border-radius: var(--zc-r-pill);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--zc-line-2);
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--zc-text-2);
+  transition: transform 0.15s;
+}
+.toggleOn {
+  background: rgba(61, 220, 151, 0.25);
+  border-color: rgba(61, 220, 151, 0.5);
+}
+.toggleOn::after {
+  transform: translateX(20px);
+  background: var(--zc-done);
+}

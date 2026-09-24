@@ -1,0 +1,331 @@
+.breadcrumb {
+  font-size: 14px;
+  color: var(--zc-muted);
+}
+.breadcrumb a:hover {
+  color: var(--zc-text);
+}
+
+.header {
+  margin-top: 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.headerLeft {
+  display: flex;
+  gap: 18px;
+}
+.iconTile {
+  width: 78px;
+  height: 78px;
+  flex-shrink: 0;
+  border-radius: var(--zc-r-tile);
+  background: rgba(92, 200, 255, 0.08);
+  border: 1px solid rgba(92, 200, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.title {
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+.desc {
+  margin-top: 10px;
+  max-width: 62ch;
+  font-size: 15px;
+  color: var(--zc-muted);
+  line-height: 1.55;
+}
+.headerActions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.body {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--zc-rcol);
+  gap: var(--zc-gap);
+  align-items: start;
+}
+@media (max-width: 1180px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.workflowCard {
+  padding: 22px;
+}
+.workflowHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.stepCount {
+  font-family: var(--zc-mono);
+  font-size: 12px;
+  color: var(--zc-run-text);
+}
+.steps {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+}
+.stepRow {
+  display: flex;
+  gap: 14px;
+  position: relative;
+}
+.stepNum {
+  width: 30px;
+  flex-shrink: 0;
+  font-family: var(--zc-mono);
+  font-size: 13px;
+  color: var(--zc-dim);
+  padding-top: 16px;
+  text-align: center;
+}
+.stepLineWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+.stepLine {
+  width: 1px;
+  flex: 1;
+  background: var(--zc-line-2);
+  min-height: 20px;
+}
+.step {
+  flex: 1;
+  margin-bottom: 12px;
+  padding: 16px 20px;
+  border-radius: var(--zc-r-step);
+  background: var(--zc-step);
+  border: 1px solid var(--zc-line);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.stepDone {
+  opacity: 0.75;
+}
+.stepCurrent {
+  border-color: rgba(92, 200, 255, 0.4);
+  background: linear-gradient(140deg, rgba(139, 92, 246, 0.08), rgba(92, 200, 255, 0.06));
+  box-shadow: var(--zc-glow-run);
+}
+.stepHumanPending {
+  border: 1px dashed rgba(245, 184, 61, 0.45);
+}
+.stepHumanWaiting {
+  border: 1px solid rgba(245, 184, 61, 0.5);
+  background: rgba(245, 184, 61, 0.06);
+  box-shadow: var(--zc-glow-need);
+}
+.stepIcon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stepText {
+  flex: 1;
+  min-width: 0;
+}
+.stepTitle {
+  font-size: 16px;
+  font-weight: 500;
+}
+.stepMeta {
+  margin-top: 2px;
+  font-family: var(--zc-mono);
+  font-size: 12px;
+  color: var(--zc-muted);
+}
+.stepRight {
+  flex-shrink: 0;
+}
+.pulseDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--zc-run);
+  box-shadow: 0 0 8px var(--zc-run);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--zc-gap);
+}
+.runCard {
+  padding: 20px 22px;
+  background: linear-gradient(150deg, rgba(61, 220, 151, 0.06), var(--zc-panel-2));
+}
+.runTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.runTitle {
+  font-size: 19px;
+  font-weight: 500;
+}
+.runPct {
+  font-size: 40px;
+  font-weight: 500;
+}
+.runSub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--zc-muted);
+}
+.progress {
+  margin-top: 16px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--zc-line-2);
+  overflow: hidden;
+}
+.progressFill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--zc-progress);
+  transition: width 1.2s ease;
+}
+.runActions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+.detailsCard {
+  padding: 20px 22px;
+}
+.detailRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--zc-line);
+  font-size: 14px;
+}
+.detailRow:last-child {
+  border-bottom: none;
+}
+.detailKey {
+  color: var(--zc-muted);
+}
+.detailValue {
+  font-weight: 500;
+  text-align: right;
+}
+
+.recentCard {
+  padding: 20px 22px;
+}
+.recentHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.recentItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  font-size: 14px;
+}
+.recentDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--zc-done);
+  flex-shrink: 0;
+}
+.recentText {
+  flex: 1;
+}
+.recentTime {
+  color: var(--zc-dim);
+  font-size: 12px;
+}
+
+.setupCard {
+  padding: 24px;
+}
+.setupTitle {
+  font-size: 18px;
+  font-weight: 500;
+}
+.setupDesc {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--zc-muted);
+  line-height: 1.5;
+}
+.formRow {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.label {
+  font-family: var(--zc-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--zc-muted);
+}
+.input,
+.textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--zc-line-2);
+  color: var(--zc-text);
+  font: inherit;
+  font-size: 14px;
+}
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--zc-dim);
+}
+.submitBtn {
+  margin-top: 18px;
+}
+.errorBox {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 92, 122, 0.08);
+  border: 1px solid rgba(255, 92, 122, 0.3);
+  color: var(--zc-error-text);
+  font-size: 13px;
+}

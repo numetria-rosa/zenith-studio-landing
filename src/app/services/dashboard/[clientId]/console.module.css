@@ -1,0 +1,111 @@
+/* Zenith Client Console tokens, ported from
+   halo/client_dashboard_design_system/client-dashboard-frontend/design-system/tokens.css.
+   Scoped to .console (never :root) so nothing here can leak into the rest
+   of the site - same containment rule as every other design-system port
+   in this codebase. Geist/Geist Mono are already loaded site-wide
+   (src/app/layout.tsx sets --font-geist-sans/--font-geist-mono on
+   <body>), referenced here instead of loading the fonts a second time. */
+
+.console {
+  color-scheme: dark;
+  /* surfaces */
+  --zc-void: #05060a;
+  --zc-panel: #0a0b10;
+  --zc-panel-2: #0e1016;
+  --zc-raise: #13161e;
+  --zc-step: #0f1117;
+  --zc-node: #0c0e14;
+  --zc-line: rgba(255, 255, 255, 0.08);
+  --zc-line-2: rgba(255, 255, 255, 0.14);
+  /* text */
+  --zc-text: #f5f6f8;
+  --zc-text-2: #c9ccd4;
+  --zc-muted: #a9aeba;
+  --zc-dim: #7d8392;
+  /* status */
+  --zc-run: #5cc8ff;
+  --zc-run-text: #9bddff;
+  --zc-need: #f5b83d;
+  --zc-need-text: #ffd27a;
+  --zc-done: #3ddc97;
+  --zc-done-text: #7ff0bd;
+  --zc-error: #ff5c7a;
+  --zc-error-text: #ff9bae;
+  /* actions + accents */
+  --zc-action: #3ddc97;
+  --zc-action-text: #04140c;
+  --zc-orchestrator: #8b5cf6;
+  --zc-bubble-user: #2f6bff;
+  /* type */
+  --zc-sans: var(--font-geist-sans, "Geist", system-ui, -apple-system, "Segoe UI", sans-serif);
+  --zc-mono: var(--font-geist-mono, "Geist Mono", ui-monospace, Menlo, monospace);
+  /* shape */
+  --zc-r-pill: 999px;
+  --zc-r-card: 24px;
+  --zc-r-tile: 22px;
+  --zc-r-step: 18px;
+  --zc-r-icon: 13px;
+  --zc-r-chip: 8px;
+  /* layout */
+  --zc-sidebar: 260px;
+  --zc-rcol: 400px;
+  --zc-gap: 22px;
+  /* effects */
+  --zc-card-hl: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --zc-glow-run: 0 0 28px rgba(92, 200, 255, 0.25);
+  --zc-glow-need: 0 0 28px rgba(245, 184, 61, 0.2);
+  --zc-glow-orch: 0 0 44px rgba(139, 92, 246, 0.35);
+  --zc-glow-action: 0 10px 30px rgba(61, 220, 151, 0.25);
+  --zc-dots: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  --zc-progress: linear-gradient(90deg, #3ddc97, #5cc8ff);
+
+  min-height: 100vh;
+  background: var(--zc-void);
+  color: var(--zc-text);
+  font-family: var(--zc-sans);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.console * {
+  box-sizing: border-box;
+}
+
+.console button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.console a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dots {
+  background-image: var(--zc-dots);
+  background-size: 22px 22px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .console * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

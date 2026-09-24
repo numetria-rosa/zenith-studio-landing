@@ -1,0 +1,74 @@
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 4, 7, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.dialog {
+  width: 100%;
+  max-width: 640px;
+  border-radius: 26px;
+  padding: 22px;
+  background: var(--zc-panel-2);
+  border: 1px solid var(--zc-line-2);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.title {
+  font-size: 18px;
+  font-weight: 500;
+}
+.thread {
+  margin-top: 18px;
+}
+.bubbleTeam {
+  max-width: 90%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--zc-line);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--zc-text-2);
+}
+.suggestions {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  padding: 7px 12px;
+  border-radius: var(--zc-r-pill);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--zc-line-2);
+  font-size: 13px;
+  color: var(--zc-text-2);
+}
+.inputRow {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+}
+.input {
+  flex: 1;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: var(--zc-r-pill);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--zc-line);
+  color: var(--zc-text);
+  font: inherit;
+}
+.input::placeholder {
+  color: var(--zc-dim);
+}

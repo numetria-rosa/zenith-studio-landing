@@ -1,0 +1,172 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.greeting {
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+.subline {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 16px;
+  color: var(--zc-muted);
+}
+.trialChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--zc-r-pill);
+  background: rgba(61, 220, 151, 0.1);
+  border: 1px solid rgba(61, 220, 151, 0.3);
+  color: var(--zc-done-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+.trialDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--zc-done);
+}
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.searchBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 320px;
+  max-width: 60vw;
+  height: 50px;
+  padding: 0 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--zc-line);
+  color: var(--zc-muted);
+  font-size: 14px;
+  text-align: left;
+}
+.bellBtn {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--zc-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.bellDot {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--zc-need);
+}
+
+.kpis {
+  margin-top: 28px;
+}
+
+.body {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--zc-rcol);
+  gap: var(--zc-gap);
+  align-items: start;
+}
+@media (max-width: 1180px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mapCard {
+  padding: 22px;
+  min-height: 460px;
+  position: relative;
+  overflow: hidden;
+}
+.mapHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.liveTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--zc-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--zc-run-text);
+}
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--zc-run);
+  box-shadow: 0 0 6px var(--zc-run);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.mapSvg {
+  width: 100%;
+  height: auto;
+  margin-top: 8px;
+}
+.nodeBtn {
+  cursor: pointer;
+}
+.nodeTile {
+  fill: var(--zc-node);
+  stroke: var(--zc-line-2);
+  stroke-width: 1.5;
+}
+.nodeLabel {
+  font-family: var(--zc-sans);
+  font-size: 13px;
+  font-weight: 500;
+  fill: var(--zc-text);
+}
+.nodeState {
+  font-family: var(--zc-mono);
+  font-size: 11px;
+  fill: var(--zc-muted);
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--zc-gap);
+}
+
+.activityCard {
+  padding: 20px 22px;
+}
+.activityHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { db } from "@/lib/db";
 import { encryptPassword } from "@/lib/password";
 import { testMailConnection } from "@/lib/mail-imap";
@@ -26,8 +27,12 @@ import type { MailProvider, LawFirmSpecialty } from "@prisma/client";
 
 /** Single scoped query - used by the page's own render AND (independently,
     fresh) by every server action below. Never trust that reaching an action
-    means the page's ownership check already passed. */
-export async function getOwnedServiceProject(projectId: string, userId: string) {
+    means the page's ownership check already passed. Wrapped in React's
+    cache() so the client console's layout.tsx and each of its child
+    screens can all call this with the same args in one request without
+    N duplicate queries - still a fresh, independently-scoped query per
+    request, cache() only dedupes within a single render pass. */
+export const getOwnedServiceProject = cache(async function getOwnedServiceProject(projectId: string, userId: string) {
   return db.serviceProject.findFirst({
     where: { id: projectId, userId },
     include: {
@@ -47,7 +52,7 @@ export async function getOwnedServiceProject(projectId: string, userId: string) 
       insurancePolicies: { orderBy: { renewalDate: "asc" } },
     },
   });
-}
+});
 
 export const PROJECT_STAGE_ORDER = [
   "NEW",
