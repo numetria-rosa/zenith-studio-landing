@@ -7,9 +7,7 @@ import InsuranceDemoClient from "./InsuranceDemoClient";
    halo/demo_page_design_system Obsidian design system per the user's own
    files. Deliberately self-contained: no changes to src/app/globals.css,
    so nothing else on the site is affected by adopting this design
-   language. The underlying checkout still routes through the existing
-   ai-lead-capture-follow-up service (no new Whop SKU) - this page is the
-   pitch, not a new priced product. */
+   language. */
 
 export const metadata: Metadata = {
   title: "Insurance Account Manager Bundle Demo",

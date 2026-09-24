@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Zenith AI - POV Phone Chaos Reel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --cream:#f2e9d8; --dark:#18140f; --dark2:#221c14;
+    --ink:#221c12; --mut:rgba(34,28,18,.6); --mut2:rgba(34,28,18,.4);
+    --orange:#e2632c; --orange2:#f0895a; --danger:#e2432c; --danger-bg:rgba(226,67,44,.14);
+  }
+  html,body{width:1080px;height:1920px;overflow:hidden}
+  body{ background:var(--cream); color:var(--ink); font-family:'IBM Plex Sans',sans-serif; }
+  .canvas{ position:relative; width:100%; height:100%; overflow:hidden; background:var(--cream); }
+
+  .logo{ position:absolute; top:56px; left:56px; z-index:20; display:flex; align-items:center; gap:10px; background:rgba(24,20,15,.9); padding:13px 20px; border-radius:16px; }
+  .logo .lw{ font-family:'Fraunces'; font-weight:700; font-size:26px; color:#f2e9d8; letter-spacing:-.01em; line-height:1; display:flex; align-items:center; }
+  .logo .lai{ display:flex; align-items:center; justify-content:center; background:var(--orange); color:#18140f; font-family:'Fraunces'; font-weight:700; font-size:17px; line-height:1; padding:7px 11px 6px; border-radius:9px; letter-spacing:-.01em; }
+
+  .scene{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:2; padding-bottom:120px; }
+
+  .subtitle{ position:absolute; left:0; right:0; bottom:90px; z-index:30; display:flex; justify-content:center; padding:0 64px; pointer-events:none; }
+  .subtitle .box{ background:rgba(24,20,15,.92); border:1px solid rgba(255,255,255,.08); border-radius:22px; padding:26px 36px; max-width:980px; text-align:center; box-shadow:0 20px 60px -20px rgba(0,0,0,.6); }
+  .subtitle .box p{ font-family:'IBM Plex Sans'; font-weight:600; font-size:36px; line-height:1.35; color:#f2e9d8; }
+
+  .headline-wrap{ text-align:center; padding:0 84px; }
+  .headline{ font-family:'Fraunces'; font-style:italic; font-weight:600; font-size:76px; line-height:1.2; color:var(--ink); letter-spacing:-.01em; }
+  .headline b{ font-style:normal; font-weight:700; color:var(--orange); }
+  .eyebrow{ font-family:'IBM Plex Mono'; font-size:26px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--mut); margin-bottom:28px; }
+
+  /* Phone chaos scene - dark device on a cream stage */
+  .stagewrap{ text-align:center; }
+  .phone{ position:relative; width:520px; height:990px; margin:0 auto; padding:18px; border-radius:74px; background:linear-gradient(155deg,#4d5872 0%,#1c2334 45%,#05070d 100%); box-shadow:0 50px 100px -30px rgba(0,0,0,.5), inset 0 2px 0 rgba(255,255,255,.14), inset 0 -2px 0 rgba(0,0,0,.5); }
+  .phone .screen{ position:relative; width:100%; height:100%; background:#04060c; border-radius:58px; overflow:hidden; }
+  .phone-screen{ position:absolute; inset:0; padding:96px 30px 40px; display:flex; flex-direction:column; align-items:center; }
+  .ring-icon{ width:118px; height:118px; border-radius:50%; background:#1a1610; display:flex; align-items:center; justify-content:center; position:relative; }
+  .ring-icon svg{ width:52px; height:52px; color:var(--orange2); }
+  .ring-pulse{ position:absolute; inset:0; border-radius:50%; border:2px solid var(--orange2); opacity:0; }
+  .caller-label{ margin-top:26px; font-family:'IBM Plex Sans'; font-size:27px; font-weight:600; color:#f2e9d8; }
+  .caller-sub{ margin-top:7px; font-family:'IBM Plex Mono'; font-size:17px; color:rgba(242,233,216,.4); letter-spacing:.04em; }
+  .missed-banner{ margin-top:32px; background:var(--danger-bg); border:1.5px solid var(--danger); color:#ff8a75; font-family:'IBM Plex Mono'; font-weight:700; font-size:16px; letter-spacing:.08em; text-transform:uppercase; padding:9px 18px; border-radius:11px; }
+  .pillstack{ margin-top:38px; width:100%; display:flex; flex-direction:column; gap:13px; }
+  .pill{ background:#161310; border:1px solid rgba(255,255,255,.1); border-radius:15px; padding:15px 19px; display:flex; align-items:center; gap:13px; opacity:0; }
+  .pill .dot{ width:10px; height:10px; border-radius:50%; background:var(--danger); flex-shrink:0; }
+  .pill .txt{ font-family:'IBM Plex Sans'; font-size:18px; font-weight:600; color:#f2e9d8; }
+  .pill .time{ margin-left:auto; font-family:'IBM Plex Mono'; font-size:14px; color:rgba(242,233,216,.4); }
+
+  /* Resolve scene: single confirmation bubble */
+  #sceneResolve .headline{ font-size:60px; margin-bottom:50px; }
+  .resolvecard{ width:820px; margin:0 auto; background:var(--dark2); border-radius:28px; padding:38px 40px; text-align:left; box-shadow:0 40px 90px -30px rgba(0,0,0,.5); opacity:0; }
+  .resolvecard .tag{ display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono'; font-weight:700; font-size:16px; letter-spacing:.08em; text-transform:uppercase; color:#7ed99a; margin-bottom:20px; }
+  .resolvecard .tag .dot{ width:8px; height:8px; border-radius:50%; background:#7ed99a; }
+  .resolvecard .msg{ font-family:'IBM Plex Sans'; font-weight:600; font-size:32px; color:#f2e9d8; line-height:1.4; }
+  .resolvecard .msg2{ margin-top:18px; font-family:'IBM Plex Mono'; font-size:20px; color:var(--orange2); }
+
+  #sceneCta .headline{ font-size:70px; }
+  #sceneCta .comment{ margin-top:40px; display:inline-flex; align-items:center; gap:14px; background:var(--orange); padding:20px 38px; border-radius:20px; box-shadow:0 20px 44px -16px rgba(226,99,44,.55); font-family:'IBM Plex Sans'; font-weight:600; font-size:34px; color:var(--dark); }
+  #sceneCta .comment span{ font-family:'IBM Plex Mono'; font-weight:700; font-size:34px; color:var(--dark); letter-spacing:.02em; }
+  #sceneCta .pillsrow{ margin-top:42px; display:flex; flex-direction:column; gap:16px; align-items:center; }
+  #sceneCta .pillsrow p{ font-family:'IBM Plex Mono'; font-size:26px; color:var(--mut); letter-spacing:.02em; }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="logo"><span class="lw">ZENITH</span><span class="lai">AI</span></div>
+
+    <div class="subtitle"><div class="box" id="subtitleBox"><p id="subtitleText"></p></div></div>
+
+    <!-- Scene 0: POV phone chaos -->
+    <div class="scene" id="scenePhone">
+      <div class="stagewrap">
+        <div class="eyebrow">POV</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="phone-screen">
+              <div id="ringWrap" style="display:flex; flex-direction:column; align-items:center;">
+                <div class="ring-icon" id="ringIcon">
+                  <div class="ring-pulse" id="pulse1"></div>
+                  <div class="ring-pulse" id="pulse2"></div>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <div class="caller-label" id="callerLabel">Unknown Caller</div>
+                <div class="caller-sub" id="callerSub">Incoming&hellip;</div>
+                <div class="missed-banner" id="missedBanner" style="opacity:0;">Missed Call</div>
+              </div>
+              <div class="pillstack" id="pillstack">
+                <div class="pill" id="pill1"><span class="dot"></span><span class="txt">Missed call</span><span class="time">10:14 AM</span></div>
+                <div class="pill" id="pill2"><span class="dot"></span><span class="txt">Missed call</span><span class="time">10:22 AM</span></div>
+                <div class="pill" id="pill3"><span class="dot"></span><span class="txt">Missed call</span><span class="time">10:41 AM</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 1: resolved -->
+    <div class="scene" id="sceneResolve">
+      <div class="stagewrap">
+        <div class="headline">While you worked,<br>it <b>already replied.</b></div>
+        <div class="resolvecard" id="resolveCard">
+          <div class="tag"><span class="dot"></span>Handled automatically</div>
+          <div class="msg">"Hi! Sorry we missed you, want me to grab you a time this week?"</div>
+          <div class="msg2">Booked &middot; Thursday 2:00 PM</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 2: CTA -->
+    <div class="scene" id="sceneCta">
+      <div class="headline-wrap">
+        <div class="headline">Want this running<br>for <b>your</b> business?</div>
+        <div class="comment">Comment or DM <span>"LEADS"</span></div>
+        <div class="pillsrow">
+          <p>&rarr; Follow @_zenithstudio_</p>
+          <p>&rarr; We'll set it up for you</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="_reel-povchaos.js"></script>
+</body>
+</html>

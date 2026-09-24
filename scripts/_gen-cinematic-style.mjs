@@ -1,0 +1,71 @@
+// Dark cinematic-illustration style, in the register of kallawaymarketing's
+// Dc489B2DnPa (grainy black background, bold white subhead, huge glowing
+// italic headline, dramatic centerpiece illustration) — but with an original
+// illustration concept built from SVG/CSS, not a reproduction of theirs.
+// Concept here: a glowing circuit-line silhouette of a head with a terminal
+// cursor where the "mind" would be, for the AI Engineering course.
+import { writeFileSync, mkdirSync } from "node:fs";
+import path from "node:path";
+
+const OUT_DIR = path.resolve("insta/exact-recreations");
+mkdirSync(OUT_DIR, { recursive: true });
+
+const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=IBM+Plex+Sans:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap">`;
+const RESET = `<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body{width:1080px;height:1350px;overflow:hidden}</style>`;
+
+function render(ad) {
+  return `<!doctype html><html><head><meta charset="utf-8"><title>cinematic</title>${FONTS}${RESET}<style>
+  body{ font-family:'IBM Plex Sans',sans-serif; color:#fff; }
+  .canvas{ position:relative; width:1080px; height:1350px; overflow:hidden; background:#0a0a0a; }
+  .grain{ position:absolute; inset:0; opacity:.35; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .vignette{ position:absolute; inset:0; background:radial-gradient(ellipse 90% 70% at 50% 30%, transparent 40%, rgba(0,0,0,.75) 100%); }
+  .glow{ position:absolute; left:50%; top:52%; width:640px; height:640px; transform:translate(-50%,-50%); background:radial-gradient(circle, ${ad.accent}55 0%, transparent 65%); filter:blur(10px); }
+
+  .frame{ position:relative; z-index:1; height:100%; padding:80px 70px 60px; display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .sub{ font-weight:700; font-size:26px; letter-spacing:.05em; color:#f2f0ec; }
+  h1{ font-family:'Fraunces'; font-style:italic; font-weight:900; font-size:108px; line-height:.98; letter-spacing:-.02em; color:${ad.accent}; margin-top:6px; text-shadow:0 0 40px ${ad.accent}aa, 0 0 90px ${ad.accent}66; }
+
+  .art{ position:relative; width:520px; height:560px; margin-top:20px; }
+  .head{ position:absolute; left:50%; top:0; width:360px; height:440px; transform:translateX(-50%);
+    background:linear-gradient(180deg, #2a2a2a, #111 70%); border-radius:180px 180px 140px 140px;
+    box-shadow:0 40px 80px -20px rgba(0,0,0,.7); }
+  .circuit{ position:absolute; inset:0; opacity:.9; }
+  .term{ position:absolute; left:50%; top:150px; width:220px; height:120px; transform:translateX(-50%);
+    background:#000; border:2px solid ${ad.accent}; border-radius:10px; box-shadow:0 0 30px ${ad.accent}aa, inset 0 0 20px ${ad.accent}44; }
+  .term-line{ position:absolute; left:16px; height:3px; background:${ad.accent}; box-shadow:0 0 8px ${ad.accent}; border-radius:2px; }
+  .cursor{ position:absolute; width:10px; height:22px; background:${ad.accent}; box-shadow:0 0 12px ${ad.accent}; }
+
+  .cta{ margin-top:auto; padding-top:26px; border-top:1px solid rgba(255,255,255,.2); width:100%; display:flex; justify-content:space-between; align-items:center; font-family:'IBM Plex Mono'; font-size:16px; font-weight:600; }
+  .cta b{ background:${ad.accent}; color:#0a0a0a; padding:2px 12px; border-radius:6px; }
+  </style></head><body><div class="canvas">
+    <div class="glow"></div><div class="grain"></div><div class="vignette"></div>
+    <div class="frame">
+      <div class="sub">HOW TO BECOME AN</div>
+      <h1>AI Engineer</h1>
+      <div class="art">
+        <div class="head">
+          <svg class="circuit" viewBox="0 0 360 440" fill="none" stroke="${ad.accent}" stroke-width="1.4" opacity=".5">
+            <path d="M40 60 h80 v40 h60 M320 90 h-60 v50 M60 320 h70 v60 M300 300 h-50 v70 M40 200 h50 M320 220 h-50"/>
+            <circle cx="120" cy="60" r="4" fill="${ad.accent}"/><circle cx="260" cy="140" r="4" fill="${ad.accent}"/>
+            <circle cx="130" cy="380" r="4" fill="${ad.accent}"/><circle cx="250" cy="370" r="4" fill="${ad.accent}"/>
+          </svg>
+          <div class="term">
+            <div class="term-line" style="top:20px;width:150px"></div>
+            <div class="term-line" style="top:44px;width:110px"></div>
+            <div class="term-line" style="top:68px;width:130px"></div>
+            <div class="cursor" style="top:88px;left:16px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cta"><span>Comment "<b>${ad.ctaKeyword}</b>" and I'll send you the syllabus</span><span>zenith-studio.site</span></div>
+    </div>
+  </div></body></html>`;
+}
+
+writeFileSync(path.join(OUT_DIR, "slide-ai-engineering-cinematic.html"), render({
+  accent: "#e8422e",
+  ctaKeyword: "AI",
+}), "utf-8");
+
+console.log("wrote 1 cinematic-style slide");

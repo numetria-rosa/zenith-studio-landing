@@ -4,11 +4,17 @@ import nodemailer from "nodemailer";
 import type { MailProvider } from "@prisma/client";
 
 /* Server-only IMAP/SMTP access for AI Inbox Manager, launch scope: Gmail
-   (personal accounts) and Yahoo Mail only, both connected via a static app
-   password the client generates in their own account settings - not
-   Microsoft 365, which has broadly disabled basic-auth IMAP on modern
+   (personal accounts), Yahoo Mail, and Zoho Mail, all connected via a
+   static app password the client generates in their own account settings -
+   not Microsoft 365, which has broadly disabled basic-auth IMAP on modern
    tenants and would need real OAuth instead. See inbox-manager.ts for why
    this is the deliberate launch scope, not a temporary shortcut.
+
+   Zoho hosts assume the global/US data center (zoho.com) - a client whose
+   account was provisioned in the EU/India/Australia data centers needs the
+   regional host (imap.zoho.eu, etc.) instead, and this will fail auth for
+   them. Not handled: out of scope until an actual client hits it, matching
+   the US-only scope already baked into this niche (toE164UsNumber, etc.).
 
    Never import this from a "use client" component or anything it might
    pull into the browser bundle - imapflow/nodemailer are Node-only, the
@@ -18,6 +24,7 @@ import type { MailProvider } from "@prisma/client";
 const PROVIDER_HOSTS: Record<MailProvider, { imapHost: string; imapPort: number; smtpHost: string; smtpPort: number }> = {
   GMAIL: { imapHost: "imap.gmail.com", imapPort: 993, smtpHost: "smtp.gmail.com", smtpPort: 465 },
   YAHOO: { imapHost: "imap.mail.yahoo.com", imapPort: 993, smtpHost: "smtp.mail.yahoo.com", smtpPort: 465 },
+  ZOHO: { imapHost: "imap.zoho.com", imapPort: 993, smtpHost: "smtp.zoho.com", smtpPort: 465 },
 };
 
 type MailCredentials = { provider: MailProvider; emailAddress: string; appPassword: string };

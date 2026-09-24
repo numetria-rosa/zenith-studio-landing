@@ -1,0 +1,30 @@
+// Renders insta/textback-mini and insta/receptionist-mini slide-*.html to
+// PNG (plain-HTML + Puppeteer export method, see memory:
+// social-image-export-method).
+import puppeteer from "puppeteer";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+import fs from "node:fs";
+
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const dirs = ["textback-mini", "receptionist-mini"].map((d) => path.join(scriptDir, "..", "insta", d));
+
+const browser = await puppeteer.launch({
+  executablePath: "C:/Users/HP/.cache/puppeteer/chrome/win64-148.0.7778.97/chrome-win64/chrome.exe",
+});
+for (const dir of dirs) {
+  const slides = fs.readdirSync(dir).filter((f) => /^slide-.*\.html$/.test(f)).sort();
+  for (const slide of slides) {
+    const htmlPath = path.join(dir, slide);
+    const pngPath = htmlPath.replace(/\.html$/, ".png");
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1080, height: 1350, deviceScaleFactor: 4 });
+    await page.goto(`file://${htmlPath}`, { waitUntil: "networkidle0" });
+    await page.evaluate(() => document.fonts.ready);
+    await new Promise((r) => setTimeout(r, 400));
+    await page.screenshot({ path: pngPath, clip: { x: 0, y: 0, width: 1080, height: 1350 } });
+    console.log("exported", pngPath);
+    await page.close();
+  }
+}
+await browser.close();

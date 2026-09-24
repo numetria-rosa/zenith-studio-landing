@@ -1,0 +1,104 @@
+/* Team map: fixed 680x440 canvas, ported from halo/client_dashboard_design_
+   system/halo-web/components/TeamMap.module.css. Tile/wire classes are
+   identical to the source; only TeamMap.tsx's layout math changed, from 5
+   hand-placed coordinates to a formula that fits any agent count (the
+   "one dynamic template, not one page per niche" architecture). */
+.map {
+  position: relative;
+  width: 680px;
+  height: 440px;
+  margin: auto;
+}
+
+.wires {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.orchestrator {
+  position: absolute;
+  left: 300px;
+  top: 10px;
+  width: 80px;
+  height: 80px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: linear-gradient(var(--tile), var(--tile)) padding-box, var(--edge) border-box;
+  border: 1px solid transparent;
+  box-shadow: 0 0 44px rgba(168, 85, 247, 0.42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.orchestratorLabel {
+  position: absolute;
+  left: 394px;
+  top: 62px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.tile {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.tileActive {
+  background: linear-gradient(var(--tile), var(--tile)) padding-box, var(--edge) border-box;
+  border: 1px solid transparent;
+  box-shadow: 0 0 26px rgba(34, 211, 238, 0.25);
+}
+
+.tileIdle {
+  background: var(--tile-idle);
+  border: 1px solid var(--line-12);
+  color: var(--muted);
+}
+
+.tileAttention {
+  background: var(--tile-idle);
+  border: 1px solid rgba(251, 191, 36, 0.6);
+  box-shadow: 0 0 22px rgba(251, 191, 36, 0.18);
+}
+
+.tileDot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.tileActive .tileDot { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+.tileAttention .tileDot { background: var(--amber); }
+
+.label {
+  position: absolute;
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.labelName { font-size: 13px; font-weight: 600; }
+.labelStatus { font-family: var(--font-mono); font-size: 11px; }
+
+.labelActive .labelStatus { color: var(--cyan-soft); }
+.labelIdle .labelName { color: var(--text-2); }
+.labelIdle .labelStatus { color: var(--muted); }
+.labelAttention .labelStatus { color: var(--amber-soft); }
+
+.tile.tileActive:hover { color: var(--text); }

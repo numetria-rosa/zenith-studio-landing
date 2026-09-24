@@ -2,15 +2,21 @@ import { db } from "@/lib/db";
 import { getSiteUrl } from "@/lib/site";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import { purchaseSignalwireNumber } from "@/lib/signalwire-text-back";
-import { LEAD_CAPTURE_REQUIREMENTS } from "@/lib/service-projects";
+import { LEAD_CAPTURE_REQUIREMENTS, BROKERAGE_REQUIREMENTS } from "@/lib/service-projects";
 
-/* Onboarding automation for AI Lead Capture & Follow-Up. Same trigger point
-   and clean-retry-before-stage-write pattern as the other two provisioning
-   functions: runs inside updateProjectStage when a project is marked LIVE.
-   Provisions the same kind of SignalWire number as Missed Call Text-Back
-   (needed here for the SMS confirmation + follow-up sequence), just with
-   this service's own config shape and no voice webhook, a lead-capture
-   number never receives calls, only sends outbound SMS. */
+/* Onboarding automation for AI Lead Capture & Follow-Up, and also for
+   brokerages' "Inside Sales Agent" role (added 2026-09-13 - found missing
+   entirely during a provisioning audit: brokerages projects got a
+   ServiceProject shell and nothing else, no automation of any kind). Same
+   trigger point and clean-retry-before-stage-write pattern as the other two
+   provisioning functions: runs inside updateProjectStage when a project is
+   marked LIVE. Provisions the same kind of SignalWire number as Missed Call
+   Text-Back (needed here for the SMS confirmation + follow-up sequence),
+   just with this service's own config shape and no voice webhook - this
+   number never receives calls, only sends outbound SMS, for either
+   service. Requirement labels differ per service (ai-lead-capture vs
+   brokerages: see service-projects.ts) since they're client-facing text;
+   the provisioning logic itself is identical either way. */
 
 type Result = { ok: true; skipped?: boolean } | { ok: false; error: string };
 
@@ -26,10 +32,16 @@ export async function provisionLeadCaptureIfNeeded(projectId: string): Promise<R
   });
   if (!project) return { ok: false, error: "not_found" };
 
-  if (project.sourceServiceId !== "ai-lead-capture") return { ok: true, skipped: true };
+  const requirementSet =
+    project.sourceServiceId === "ai-lead-capture"
+      ? LEAD_CAPTURE_REQUIREMENTS
+      : project.sourceServiceId === "brokerages"
+        ? BROKERAGE_REQUIREMENTS
+        : null;
+  if (!requirementSet) return { ok: true, skipped: true };
   if (project.integrations.some((i) => i.provider === "signalwire")) return { ok: true, skipped: true };
 
-  const labels = LEAD_CAPTURE_REQUIREMENTS.map((r) => r.label);
+  const labels = requirementSet.map((r) => r.label);
   const answers = new Map(project.requirements.map((r) => [r.label, r]));
   const missing = labels.filter((label) => {
     const req = answers.get(label);
@@ -58,8 +70,9 @@ export async function provisionLeadCaptureIfNeeded(projectId: string): Promise<R
     },
   });
 
+  const serviceLabel = project.sourceServiceId === "brokerages" ? "Brokerage Inside Sales Agent" : "Lead Capture";
   await sendAdminAlert(
-    `Lead Capture live for ${businessName}`,
+    `${serviceLabel} live for ${businessName}`,
     `SignalWire number ${purchaseResult.phoneNumber} is live for ${businessName}. Capture endpoint: ${getSiteUrl()}/api/leads/capture/${project.id}`
   );
 

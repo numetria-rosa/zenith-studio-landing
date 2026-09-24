@@ -1,0 +1,4 @@
+reference only, not included by build — shared tokens for this design system:
+bg #070b14, card #141b2c, border rgba(148,163,184,.16/.26), text #eef2ff, mut #9aa6c2, mut2 #6b7690, accent amber #f0b429, accentd #1a1204
+fonts: Fraunces (italic accent/headline), IBM Plex Sans (body/headline), IBM Plex Mono (eyebrows/labels/stats), Caveat (handwritten CTA)
+canvas 1080x1350, radius 40px, radial amber glow top-left

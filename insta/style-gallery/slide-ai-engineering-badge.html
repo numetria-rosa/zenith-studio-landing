@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8"><title>badge</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;600;700;800&display=swap"><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body{width:1080px;height:1350px;overflow:hidden}</style><style>
+  body{ background:#f2ece0; color:#18140f; font-family:'IBM Plex Mono',monospace; }
+  .canvas{ position:relative; width:1080px; height:1350px; padding:50px; }
+  .crop{ position:absolute; width:24px; height:24px; opacity:.6; }
+  .crop::before,.crop::after{ content:""; position:absolute; background:#18140f; }
+  .crop::before{ width:100%; height:2px; top:50%; } .crop::after{ width:2px; height:100%; left:50%; }
+  .crop.tl{ top:26px; left:26px; } .crop.tr{ top:26px; right:26px; }
+  .crop.bl{ bottom:26px; left:26px; } .crop.br{ bottom:26px; right:26px; }
+  .frame{ height:100%; display:flex; flex-direction:column; align-items:center; text-align:center; padding:20px 30px; }
+  .eyebrow{ font-size:15px; font-weight:700; letter-spacing:.14em; color:#6b6255; }
+  h1{ font-family:'Fraunces'; font-optical-sizing:none; font-variation-settings:"opsz" 144; font-weight:700; font-size:58px; line-height:1.06; letter-spacing:-.015em; margin-top:18px; }
+  .accentbox{ display:block; margin:6px auto 0; background:#c6592e; color:#f2ece0; padding:2px 18px; border-radius:8px; }
+  .badgewrap{ position:relative; width:520px; height:520px; margin:38px auto 0; }
+  .ring{ position:absolute; inset:0; border:3px dashed #c6592e; border-radius:50%; opacity:.55; }
+  .ring2{ position:absolute; inset:50px; border:2px solid #c6592e; border-radius:50%; opacity:.35; }
+  .core{ position:absolute; inset:110px; background:#18140f; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 30px 50px -20px rgba(24,20,15,.45); }
+  .coreicon{ color:#c6592e; }
+  .ray{ position:absolute; width:3px; height:46px; background:#c6592e; border-radius:2px; left:50%; top:-30px; transform-origin:50% 285px; }
+  .ctabox{ margin-top:auto; border:2.5px solid #18140f; border-radius:16px; padding:20px 30px; max-width:640px; }
+  .ctabox .line1{ font-family:'Fraunces'; font-weight:700; font-size:24px; }
+  .ctabox .line1 b{ background:#c6592e; color:#f2ece0; padding:1px 10px; border-radius:5px; }
+  .ctabox .line2{ margin-top:6px; font-size:14px; color:#6b6255; }
+  .site{ margin-top:16px; font-size:13px; color:#6b6255; letter-spacing:.06em; }
+  </style></head><body><div class="canvas">
+    <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+    <div class="frame">
+      <div class="eyebrow">AI ENGINEERING · 8-WEEK PROGRAM</div>
+      <h1>Become an AI engineer with a<span class="accentbox">shipped product.</span></h1>
+      <div class="badgewrap">
+        <div class="ring"></div><div class="ring2"></div>
+        <div class="ray" style="transform:rotate(0deg)"></div><div class="ray" style="transform:rotate(30deg)"></div><div class="ray" style="transform:rotate(60deg)"></div><div class="ray" style="transform:rotate(90deg)"></div><div class="ray" style="transform:rotate(120deg)"></div><div class="ray" style="transform:rotate(150deg)"></div><div class="ray" style="transform:rotate(180deg)"></div><div class="ray" style="transform:rotate(210deg)"></div><div class="ray" style="transform:rotate(240deg)"></div><div class="ray" style="transform:rotate(270deg)"></div><div class="ray" style="transform:rotate(300deg)"></div><div class="ray" style="transform:rotate(330deg)"></div>
+        <div class="core"><span class="coreicon"><svg viewBox="0 0 24 24" width="150" height="150" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.8 2.8M16.2 16.2 19 19M19 5l-2.8 2.8M7.8 16.2 5 19"/><circle cx="12" cy="12" r="3"/></svg></span></div>
+      </div>
+      <div class="ctabox"><div class="line1">Comment "<b>AI</b>" and I'll send you the syllabus.</div><div class="line2">8 modules · ~10 hrs/week · 8 portfolio projects</div></div>
+      <div class="site">zenith-studio.site</div>
+    </div>
+  </div></body></html>

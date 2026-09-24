@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { getSiteUrl } from "@/lib/site";
 import { sendAdminAlert } from "@/lib/outreach-mail";
-import { createFreePhoneNumber } from "@/lib/vapi-provision";
+import { createFreePhoneNumber, toE164UsNumber } from "@/lib/vapi-provision";
 import { createEventType } from "@/lib/cal-booking";
 import { RECEPTIONIST_REQUIREMENTS } from "@/lib/service-projects";
 
@@ -11,7 +11,15 @@ import { RECEPTIONIST_REQUIREMENTS } from "@/lib/service-projects";
    service-projects-admin.ts, same pattern as ensureSplitMonthlyCheckoutForProject:
    runs BEFORE the stage write so a failure leaves the project retryable
    instead of stuck LIVE-but-broken. No-ops for every non-receptionist
-   project and once a vapi Integration already exists (idempotent). */
+   project and once a vapi Integration already exists (idempotent).
+
+   Also runs for law-firms projects: that vertical's "Intake Coordinator"
+   role IS this same Vapi voice receptionist (answers calls, books the
+   consult via Cal.com) - law-firms projects collect RECEPTIONIST_REQUIREMENTS
+   too (see service-projects.ts), so this needs no other change to serve
+   both. Found missing entirely during the 2026-09-13 provisioning audit -
+   before this, a law-firms client got the SignalWire text-back number but
+   no actual voice AI, despite that being half the product's own pitch. */
 
 type Result = { ok: true; skipped?: boolean } | { ok: false; error: string };
 
@@ -36,7 +44,9 @@ export async function provisionReceptionistIfNeeded(projectId: string): Promise<
   if (!project) return { ok: false, error: "not_found" };
 
   const isReceptionist =
-    project.sourceServiceId === "ai-receptionist" || project.catalogService?.slug === "ai-receptionist";
+    project.sourceServiceId === "ai-receptionist" ||
+    project.sourceServiceId === "law-firms" ||
+    project.catalogService?.slug === "ai-receptionist";
   if (!isReceptionist) return { ok: true, skipped: true };
 
   if (project.integrations.some((i) => i.provider === "vapi")) return { ok: true, skipped: true };
@@ -58,12 +68,17 @@ export async function provisionReceptionistIfNeeded(projectId: string): Promise<
   const businessName = answers.get(labels[0])!.detail!.trim();
   const hours = answers.get(labels[1])!.detail!.trim();
   const faqText = answers.get(labels[2])!.detail!.trim();
+  const fallbackNumberRaw = answers.get(labels[3])!.detail!.trim();
+  const fallbackNumber = toE164UsNumber(fallbackNumberRaw);
+  if (!fallbackNumber) {
+    return { ok: false, error: `fallback phone number doesn't look valid: "${fallbackNumberRaw}"` };
+  }
 
   const serverSecret = process.env.VAPI_SERVER_SECRET;
   if (!serverSecret) return { ok: false, error: "VAPI_SERVER_SECRET is not set" };
   const serverUrl = `${getSiteUrl()}/api/webhooks/vapi`;
 
-  const phoneResult = await createFreePhoneNumber({ areaCode: "213", serverUrl, serverSecret });
+  const phoneResult = await createFreePhoneNumber({ areaCode: "213", serverUrl, serverSecret, fallbackNumber });
   if (!phoneResult.ok) return { ok: false, error: `Vapi phone number: ${phoneResult.error}` };
 
   const eventTypeResult = await createEventType({
@@ -84,6 +99,7 @@ export async function provisionReceptionistIfNeeded(projectId: string): Promise<
         businessName,
         hours,
         faqText,
+        fallbackNumber,
         calEventTypeId: eventTypeResult.eventTypeId,
       },
     },

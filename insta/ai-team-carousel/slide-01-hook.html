@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>hook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&family=Caveat:wght@600;700&display=swap">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#070b14; --card:#141b2c; --bd:rgba(148,163,184,.16); --bd2:rgba(148,163,184,.26);
+    --tx:#eef2ff; --mut:#9aa6c2; --mut2:#6b7690;
+    --accent:#f0b429; --accentd:#1a1204;
+  }
+  html,body{width:1080px;height:1350px;overflow:hidden}
+  body{ background:var(--bg); color:var(--tx); font-family:'IBM Plex Sans',sans-serif; }
+  .canvas{ position:relative; width:100%; height:100%; overflow:hidden; border-radius:40px; background:var(--bg); }
+  .canvas::before{
+    content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 70% 34% at 8% -4%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 55%),
+      radial-gradient(ellipse 55% 28% at 100% 8%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 50%);
+  }
+  .frame{ position:relative; z-index:1; padding:70px 72px; height:100%; display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .topbar{ display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .logo{ font-family:'Fraunces'; font-weight:700; font-size:22px; letter-spacing:-.01em; }
+  .logo b{ color:var(--accent); }
+  .eyebrow{ font-family:'IBM Plex Mono'; font-size:15px; font-weight:700; letter-spacing:.14em; color:var(--mut2); text-transform:uppercase; border:1.5px solid var(--bd2); padding:6px 12px; border-radius:8px; }
+
+  .hero{ margin-top:auto; margin-bottom:auto; display:flex; flex-direction:column; align-items:center; }
+  .num{ font-family:'Fraunces'; font-style:italic; font-weight:700; font-size:280px; line-height:.85; color:var(--accent); letter-spacing:-.03em; }
+  .headline{ margin-top:18px; font-size:56px; font-weight:600; line-height:1.08; letter-spacing:-.02em; max-width:880px; }
+  .headline i{ font-family:'Fraunces'; font-style:italic; color:var(--accent); font-weight:600; }
+  .sub{ margin-top:24px; font-size:22px; line-height:1.5; color:var(--mut); max-width:760px; }
+
+  .footer{ width:100%; margin-top:40px; padding-top:24px; display:flex; flex-direction:column; align-items:center; gap:8px; border-top:1px solid var(--bd); }
+  .swipe{ font-family:'IBM Plex Mono'; font-size:15px; font-weight:700; letter-spacing:.08em; color:var(--accent); text-transform:uppercase; display:flex; align-items:center; gap:8px; }
+  .site{ font-family:'IBM Plex Mono'; font-size:15px; color:var(--mut2); letter-spacing:.04em; }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="frame">
+      <div class="topbar">
+        <div class="logo">ZENITH<b>.</b>STUDIO</div>
+        <div class="eyebrow">Proof of work</div>
+      </div>
+
+      <div class="hero">
+        <div class="num">47</div>
+        <div class="headline">calls answered. <i>Same second.</i></div>
+        <div class="sub">A human team needs shifts, breaks, and backup for that. This is one AI agent.</div>
+      </div>
+
+      <div class="footer">
+        <div class="swipe">Swipe &rarr;</div>
+        <div class="site">zenith-studio.site</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

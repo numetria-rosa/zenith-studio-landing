@@ -64,25 +64,42 @@ export default function ZenithStudioLandingPage() {
   const verticalSystems = [
     {
       id: "law-firms",
-      whopCheckoutUrl: "https://whop.com/checkout/plan_kTlL5gBlJTsqy",
+      demoHref: "/demo/law-firm-ai-team",
+      demoLabel: t("verticals.watchFirmLeakDemo"),
+      whopCheckoutUrl: getService("law-firms")?.monthlyCheckoutUrl,
       accent: "text-amber-200",
       accentSoft: "text-amber-200/70",
       accentBtn: "border-amber-300/30 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20",
       glow: "from-amber-300/[0.07] via-orange-400/[0.04] to-transparent",
-      monthly: "$1,200/mo",
+      monthly: getService("law-firms")?.monthlyPriceDisplay ?? "",
       statValues: ["38%", "88%", "6% vs 18%"],
       ...verticalsContent[0],
     },
     {
       id: "brokerages",
-      whopCheckoutUrl: "https://whop.com/checkout/plan_m3i6RwMYvMATE",
+      demoHref: "/demo/brokerage-ai-team",
+      demoLabel: t("verticals.seeTeamInAction"),
+      whopCheckoutUrl: getService("brokerages")?.monthlyCheckoutUrl,
       accent: "text-sky-200",
       accentSoft: "text-sky-200/70",
       accentBtn: "border-sky-300/30 bg-sky-400/10 text-sky-200 hover:bg-sky-400/20",
       glow: "from-sky-300/[0.07] via-indigo-400/[0.04] to-transparent",
-      monthly: "$1,200/mo",
+      monthly: getService("brokerages")?.monthlyPriceDisplay ?? "",
       statValues: ["917 min", "21x", "1 in 10"],
       ...verticalsContent[1],
+    },
+    {
+      id: "insurance-ai-team",
+      demoHref: "/demo/insurance-ai-team",
+      demoLabel: t("verticals.seeFrontOfficeDemo"),
+      whopCheckoutUrl: getService("insurance-ai-team")?.monthlyCheckoutUrl,
+      accent: "text-violet-200",
+      accentSoft: "text-violet-200/70",
+      accentBtn: "border-violet-300/30 bg-violet-400/10 text-violet-200 hover:bg-violet-400/20",
+      glow: "from-violet-300/[0.07] via-fuchsia-400/[0.04] to-transparent",
+      monthly: getService("insurance-ai-team")?.monthlyPriceDisplay ?? "",
+      statValues: ["4", "25%", "$2,550"],
+      ...verticalsContent[2],
     },
   ].map((v) => ({
     ...v,
@@ -859,28 +876,12 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                     </div>
 
                     <div className="mt-6 flex flex-col gap-3">
-                      {servicePagePath(v.id) ? (
-                        <LocaleLink
-                          href={servicePagePath(v.id)!}
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:bg-white/10"
-                        >
-                          {t("verticals.seeHowTeamWorks")}
-                        </LocaleLink>
-                      ) : null}
-                      {v.id === "law-firms" && (
+                      {v.demoHref && (
                         <Link
-                          href="/demo/law-firm-ai-team"
+                          href={v.demoHref}
                           className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${v.accentBtn}`}
                         >
-                          {t("verticals.watchFirmLeakDemo")}
-                        </Link>
-                      )}
-                      {v.id === "brokerages" && (
-                        <Link
-                          href="/demo/brokerage-ai-team"
-                          className={`inline-flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition hover:scale-[1.02] ${v.accentBtn}`}
-                        >
-                          {t("verticals.seeTeamInAction")}
+                          {v.demoLabel}
                         </Link>
                       )}
                       {v.whopCheckoutUrl && (

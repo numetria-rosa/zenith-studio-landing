@@ -197,13 +197,14 @@
     "seeHowTeamWorks": "See how the AI team works",
     "watchFirmLeakDemo": "Watch the firm leak demo",
     "seeTeamInAction": "See the team in action",
+    "seeFrontOfficeDemo": "Watch the front office demo",
     "subscribeDirectly": "Subscribe directly",
     "items": [
       {
         "eyebrow": "For law firms",
         "headline": "Your firm works 49 hours a week and bills 37.",
         "lede": "That twelve hour gap is roughly $230,000 per attorney, per year. It is not lost to competitors or bad marketing. It is work you already did and never invoiced.",
-        "monthlyNote": "For the Missed Call Text-Back + Follow-Up Clerk, as one team. The Billing Clerk is priced on what it recovers, not a flat fee.",
+        "monthlyNote": "All three roles, as one team. Save 10% paying monthly, or 25% paying quarterly.",
         "statsLabels": [
           "average attorney utilization",
           "average realization rate",
@@ -213,7 +214,7 @@
           {
             "role": "AI Billing Clerk",
             "text": "Reconstructs billable time from your calendar, email, and documents, drafts entries with real narratives, and gets invoices out inside the 14 day window where write-downs run 6% instead of 18%.",
-            "anchor": "Priced on what it recovers."
+            "anchor": "Write-downs run 6% inside 14 days, versus 18% after."
           },
           {
             "role": "AI Missed Call Text-Back",
@@ -233,7 +234,7 @@
         "eyebrow": "For brokerages",
         "headline": "Your agents are not leaving for a better split.",
         "lede": "They are leaving because they are doing four jobs at once: prospecting, follow-up, paperwork, and a database nobody has touched in a year. Every agent who walks costs you $15,000 to $50,000.",
-        "monthlyNote": "For the Inside Sales Agent + Database Manager, as one team. Transaction Coordination is billed per file, $150 to $200.",
+        "monthlyNote": "All three roles, as one team. Save 24% paying monthly, or 32% paying quarterly.",
         "statsLabels": [
           "average agent lead response time",
           "likelier to convert inside 5 minutes",
@@ -248,7 +249,7 @@
           {
             "role": "AI Transaction Coordinator",
             "text": "Contract to close. Deadlines tracked, documents chased, and every party updated without anyone having to ask.",
-            "anchor": "Outsourced coordinators run $350 to $450 a file."
+            "anchor": "Outsourced coordinators charge $350 to $450 a file for the same work."
           },
           {
             "role": "AI Database Manager",
@@ -258,6 +259,41 @@
         ],
         "guardrail": "It is also the best recruiting pitch you have. A team on day one lands harder than another point of commission.",
         "offer": "We will run your dormant database first. You pay out of what it produces."
+      },
+      {
+        "eyebrow": "For insurance agencies",
+        "headline": "Automate your front office.",
+        "lede": "Every unanswered quote request and every renewal that slips past is business you already had. Four AI agents cover the front office from the first question to the renewal, so nothing gets missed.",
+        "monthlyNote": "All four agents, as one team. Pay monthly, or save 25% paying quarterly.",
+        "statsLabels": [
+          "AI agents in the bundle",
+          "saved paying quarterly",
+          "saved per year vs. monthly"
+        ],
+        "roster": [
+          {
+            "role": "AI Intake Agent",
+            "text": "The moment someone asks for a quote, they get a real text back, not an autoresponder.",
+            "anchor": "Runs on your existing AI Lead Capture & Follow-Up service."
+          },
+          {
+            "role": "AI Document Audit",
+            "text": "Paste or upload a policy document, ACORD form, or loss run. Get named insured, coverage limits, dates, and red flags back in seconds, for you to copy into your AMS.",
+            "anchor": "No access to your AMS required."
+          },
+          {
+            "role": "AI CRM & Logging",
+            "text": "Every lead gets logged automatically, no manual data entry. Connects to whatever CRM you already use.",
+            "anchor": "Fits your existing CRM, nothing new to learn."
+          },
+          {
+            "role": "AI Renewal Reminders",
+            "text": "Import your book of business once. Clients get a reminder before their policy renews, not after it lapses.",
+            "anchor": "Reminded before renewal, not after it lapses."
+          }
+        ],
+        "guardrail": "Document Audit hands you the numbers, you copy them into your AMS. Nothing is filed or sent on your behalf.",
+        "offer": "Pick whichever fits how you make this kind of decision: a free audit, a $35 paid audit call, or subscribe directly. No wrong choice, and nothing here locks you in."
       }
     ]
   },

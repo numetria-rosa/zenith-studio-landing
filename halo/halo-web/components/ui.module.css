@@ -1,0 +1,115 @@
+/* Shared Halo primitives */
+
+/* Mono uppercase section label, e.g. "TEAM MAP" */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* Status chip */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.chipDot { width: 6px; height: 6px; border-radius: 50%; }
+
+.chipLive { background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.35); color: var(--cyan-soft); }
+.chipLive .chipDot { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+
+.chipDone { background: rgba(61, 220, 132, 0.1); border: 1px solid rgba(61, 220, 132, 0.35); color: var(--mint-soft); }
+.chipDone .chipDot { background: var(--mint); }
+
+.chipAttention { background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.35); color: var(--amber-soft); }
+.chipAttention .chipDot { background: var(--amber); }
+
+/* Pill buttons */
+.btnPrimary {
+  height: 44px;
+  border-radius: 999px;
+  border: none;
+  background: var(--mint);
+  color: var(--mint-ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 0 20px rgba(61, 220, 132, 0.35);
+}
+
+.btnGlass {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line-14);
+  background: var(--fill-05);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Brighter glass variant, used on the frosted run card */
+.btnFrost {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line-18);
+  background: var(--fill-06);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 44x44 glass icon button */
+.iconButton {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--line-10);
+  background: var(--fill-04);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.notifyDot {
+  position: absolute;
+  top: 10px;
+  right: 11px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+}
+
+/* Quiet glass card for lists */
+.listCard {
+  border-radius: 18px;
+  background: var(--fill-03);
+  border: 1px solid var(--line-08);
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.textLink {
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}

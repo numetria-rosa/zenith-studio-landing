@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { getWhopClient } from "@/lib/whop";
+import { getSiteUrl } from "@/lib/site";
 import type { ProposalItem, ProposalItemKind } from "@prisma/client";
 
 /* Whop plan creation for approved Proposals. See the ProposalPaymentMode
@@ -20,6 +21,31 @@ const PROPOSAL_WHOP_PRODUCT_ID = "prod_wSRdxsXN2isTC";
     ->checkout-URL convention. */
 export function whopCheckoutUrl(planId: string): string {
   return `https://whop.com/checkout/${planId}`;
+}
+
+/** Every proposal plan created below goes through this so the buyer's
+    browser lands on /api/auth/claim right after paying (see that route's
+    own comment) instead of Whop's generic receipt page - previously only
+    plans configured by hand in Whop's dashboard got this, so most proposal
+    checkouts silently had no redirect at all. A bare plan.purchase_url
+    never carries a redirect; only a Checkout Configuration does. Falls
+    back to the bare plan URL on failure - a Whop hiccup here should
+    degrade the post-payment redirect, not block a live purchase. */
+async function planCheckoutUrl(
+  whop: ReturnType<typeof getWhopClient>,
+  planId: string,
+  fallbackUrl: string
+): Promise<string> {
+  try {
+    const config = await whop.checkoutConfigurations.create({
+      plan_id: planId,
+      redirect_url: `${getSiteUrl()}/api/auth/claim`,
+    });
+    return config.purchase_url ?? fallbackUrl;
+  } catch (err) {
+    console.error(`[proposal-payments] checkout configuration failed for plan ${planId}, using bare plan URL:`, err);
+    return fallbackUrl;
+  }
 }
 
 /** Splits a proposal's core items + whichever add-ons the client actually
@@ -78,7 +104,7 @@ export async function createProposalCheckout(
       visibility: "hidden",
     });
     await db.proposal.update({ where: { id: proposalId }, data: { whopSetupPlanId: plan.id } });
-    return { setupCheckoutUrl: plan.purchase_url, monthlyCheckoutUrl: null };
+    return { setupCheckoutUrl: await planCheckoutUrl(whop, plan.id, plan.purchase_url), monthlyCheckoutUrl: null };
   }
 
   if (paymentMode === "BUNDLED") {
@@ -96,7 +122,7 @@ export async function createProposalCheckout(
       visibility: "hidden",
     });
     await db.proposal.update({ where: { id: proposalId }, data: { whopSetupPlanId: plan.id } });
-    return { setupCheckoutUrl: plan.purchase_url, monthlyCheckoutUrl: null };
+    return { setupCheckoutUrl: await planCheckoutUrl(whop, plan.id, plan.purchase_url), monthlyCheckoutUrl: null };
   }
 
   // SPLIT: only the setup plan is created now. The monthly plan is created
@@ -110,7 +136,7 @@ export async function createProposalCheckout(
     visibility: "hidden",
   });
   await db.proposal.update({ where: { id: proposalId }, data: { whopSetupPlanId: plan.id } });
-  return { setupCheckoutUrl: plan.purchase_url, monthlyCheckoutUrl: null };
+  return { setupCheckoutUrl: await planCheckoutUrl(whop, plan.id, plan.purchase_url), monthlyCheckoutUrl: null };
 }
 
 /** Creates the deferred monthly plan for a SPLIT-mode proposal - called
@@ -134,7 +160,7 @@ export async function createDeferredMonthlyCheckout(
     visibility: "hidden",
   });
   await db.proposal.update({ where: { id: proposalId }, data: { whopMonthlyPlanId: plan.id } });
-  return plan.purchase_url;
+  return planCheckoutUrl(whop, plan.id, plan.purchase_url);
 }
 
 /** Resolves an incoming Whop payment's plan id back to the Proposal it

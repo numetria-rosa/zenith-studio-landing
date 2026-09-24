@@ -1,0 +1,162 @@
+// Generates insta/firm-oneliner/slide-*.html — 3-slide IG post.
+// Contrarian one-liner hook pattern (vidIQ outlier pull: "AI automation is
+// cute until you send your clients to prison lol" 43x median, "95% of
+// Business Owners DO NOT Do This" 71x median). No listicle, no diagram,
+// just the line, then proof, then CTA. Black/amber law-firm brand (matches
+// insta/lawfirm-carousel and the real /demo/law-firm-ai-team page).
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import fs from "node:fs";
+
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const outDir = path.join(scriptDir, "..", "insta", "firm-oneliner");
+fs.mkdirSync(outDir, { recursive: true });
+
+const TOTAL = 3;
+
+const HEAD = `<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#000000;
+    --card:rgba(255,255,255,.05); --card-bd:rgba(255,255,255,.1);
+    --ink:#fdfaf3; --mut:rgba(253,250,243,.62); --mut2:rgba(253,250,243,.42);
+    --yellow:#fcd34d; --yellow2:#fde68a; --yellowSoft:rgba(252,211,77,.14); --yellowBd:rgba(252,211,77,.35);
+  }
+  html,body{width:1080px;height:1350px;overflow:hidden}
+  body{ background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',sans-serif; }
+  .canvas{ position:relative; width:100%; height:100%; overflow:hidden; background:var(--bg); }
+  .canvas::before{
+    content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 30% at 105% -8%, rgba(252,211,77,.18), transparent 55%),
+      radial-gradient(ellipse 50% 26% at -10% 108%, rgba(252,211,77,.08), transparent 60%);
+  }
+  .frame{ position:relative; z-index:1; padding:64px 68px; height:100%; display:flex; flex-direction:column; }
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; }
+  .topbar-left{ display:flex; align-items:center; gap:14px; }
+  .logo{ display:flex; align-items:center; gap:9px; background:rgba(255,255,255,.05); border:1px solid var(--card-bd); padding:11px 17px; border-radius:15px; }
+  .logo .lw{ font-family:'Fraunces'; font-weight:700; font-size:22px; color:var(--ink); letter-spacing:-.01em; line-height:1; }
+  .logo .lai{ display:flex; align-items:center; background:var(--yellow); color:#000; font-family:'Fraunces'; font-weight:700; font-size:14px; line-height:1; padding:6px 9px 5px; border-radius:8px; }
+  .handle{ font-family:'IBM Plex Mono'; font-weight:600; font-size:18px; color:var(--mut); letter-spacing:.01em; }
+  .counter{ font-family:'IBM Plex Mono'; font-weight:600; font-size:16px; color:var(--yellow2); background:var(--card); border:1px solid var(--card-bd); padding:9px 15px; border-radius:11px; }
+
+  .content{ flex:1; display:flex; flex-direction:column; justify-content:center; }
+
+  h1{ font-family:'Fraunces'; font-weight:700; font-size:92px; line-height:1.14; letter-spacing:-.01em; color:var(--ink); max-width:960px; }
+  h1 i{ font-style:italic; color:var(--yellow); font-weight:600; }
+  h1 .small{ font-size:.62em; display:block; margin-top:18px; }
+
+  .body{ margin-top:36px; font-family:'IBM Plex Sans'; font-weight:400; font-size:32px; line-height:1.5; color:var(--mut); max-width:860px; }
+
+  .proof{ margin-top:48px; display:flex; flex-direction:column; gap:16px; max-width:920px; }
+  .proofrow{ display:flex; align-items:center; gap:18px; border-radius:20px; padding:24px 28px; background:var(--card); border:1px solid var(--card-bd); }
+  .proofrow .dot{ width:12px; height:12px; border-radius:50%; background:var(--yellow); flex-shrink:0; }
+  .proofrow p{ font-family:'IBM Plex Sans'; font-weight:600; font-size:25px; color:var(--ink); }
+
+  .footer{ margin-top:32px; padding-top:26px; border-top:1px solid var(--card-bd); display:flex; align-items:center; justify-content:space-between; }
+  .dots{ display:flex; gap:8px; }
+  .dot2{ width:8px; height:8px; border-radius:50%; background:var(--card-bd); }
+  .dot2.on{ background:var(--yellow); width:20px; border-radius:5px; }
+  .swipe{ display:flex; align-items:center; gap:12px; }
+  .swipe span{ font-family:'IBM Plex Mono'; font-weight:700; font-size:18px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink); }
+  .swipe .btn{ width:44px; height:44px; border-radius:50%; background:var(--yellow); display:flex; align-items:center; justify-content:center; }
+  .swipe .btn svg{ width:19px; height:19px; }
+  .site{ font-family:'IBM Plex Mono'; font-weight:700; font-size:18px; color:var(--mut); }
+
+  .cta .pill{ margin-top:40px; display:inline-flex; align-items:center; gap:16px; background:var(--yellow); padding:26px 44px; border-radius:22px; box-shadow:0 20px 44px -16px rgba(252,211,77,.4); }
+  .cta .pill span{ font-family:'IBM Plex Sans'; font-weight:700; font-size:34px; color:#000; }
+  .cta .pill b{ font-family:'IBM Plex Mono'; font-weight:700; font-size:36px; color:#000; }
+</style>`;
+
+const ARROW_SVG = `<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#000" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+function shell(bodyHtml, extraClass = "") {
+  return `<!doctype html>
+<html>
+<head>${HEAD}</head>
+<body>
+  <div class="canvas ${extraClass}">
+    <div class="frame">
+${bodyHtml}
+    </div>
+  </div>
+</body>
+</html>
+`;
+}
+
+function dots(activeIdx) {
+  let out = `        <div class="dots">`;
+  for (let i = 0; i < TOTAL; i++) out += `<div class="dot2${i === activeIdx ? " on" : ""}"></div>`;
+  out += `</div>\n`;
+  return out;
+}
+
+const topbar = (idx) => `      <div class="topbar">
+        <div class="topbar-left">
+          <div class="logo"><span class="lw">ZENITH</span><span class="lai">AI</span></div>
+          <div class="handle">@_zenithstudio_</div>
+        </div>
+        <div class="counter">0${idx} / 0${TOTAL}</div>
+      </div>
+`;
+
+// ---- Slide 1: the line ----
+const s1 = shell(`
+${topbar(1)}
+      <div class="content">
+        <h1>That missed call isn't lost business.<span class="small"><i>It's your competitor's new client.</i></span></h1>
+      </div>
+      <div class="footer">
+${dots(0)}
+        <div class="swipe"><span>Swipe</span><div class="btn">${ARROW_SVG}</div></div>
+      </div>
+`);
+
+// ---- Slide 2: proof ----
+const s2 = shell(`
+${topbar(2)}
+      <div class="content">
+        <h1 style="font-size:64px;">We're not <i>guessing.</i></h1>
+        <div class="body">This is what actually happens after a call goes unanswered, every time, until something changes it.</div>
+        <div class="proof">
+          <div class="proofrow"><div class="dot"></div><p>1 in 3 callers who hit voicemail never call back.</p></div>
+          <div class="proofrow"><div class="dot"></div><p>They call the next business on the list instead.</p></div>
+          <div class="proofrow"><div class="dot"></div><p>A text-back agent replies before they've hung up on the idea of you.</p></div>
+        </div>
+      </div>
+      <div class="footer">
+${dots(1)}
+        <div class="swipe"><span>Swipe</span><div class="btn">${ARROW_SVG}</div></div>
+      </div>
+`);
+
+// ---- Slide 3: CTA ----
+const s3 = shell(`
+${topbar(3)}
+      <div class="content cta">
+        <h1 style="font-size:70px;">Stop losing them <i>to voicemail.</i></h1>
+        <div class="body">Comment or DM the word below and we'll show you exactly how it works for a firm like yours.</div>
+        <div class="pill"><span>Comment or DM</span> <b>"FIRM"</b></div>
+      </div>
+      <div class="footer">
+${dots(2)}
+        <div class="swipe"><span>zenith-studio.site</span></div>
+      </div>
+`, "cta");
+
+const files = [
+  ["slide-01-hook.html", s1],
+  ["slide-02-proof.html", s2],
+  ["slide-03-cta.html", s3],
+];
+
+for (const [name, html] of files) {
+  fs.writeFileSync(path.join(outDir, name), html);
+  console.log("wrote", name);
+}

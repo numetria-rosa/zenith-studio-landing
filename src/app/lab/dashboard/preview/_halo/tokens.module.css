@@ -1,0 +1,72 @@
+/* Halo design tokens, scoped to .haloShell instead of :root so this design
+   language can't leak onto any other page in the app. Every value here is
+   copied exactly from halo/client_dashboard_design_system/halo-web/app/
+   globals.css - see that file for the source of truth. */
+.haloShell {
+  --void: #07080b;
+  --sidebar: #0a0b10;
+  --canvas: #0b0d12;
+  --tile: #0e1016;
+  --tile-idle: #10121a;
+  --surface: #151821;
+  --avatar: #1c2030;
+
+  --text: #f2f4f8;
+  --text-2: #c9ced8;
+  --muted: #8b93a3;
+  --faint: #5f6778;
+
+  --cyan: #22d3ee;
+  --cyan-soft: #67e8f9;
+  --cyan-pale: #a5f3fc;
+  --violet: #a855f7;
+  --violet-pale: #d8b4fe;
+  --mint: #3ddc84;
+  --mint-soft: #86efac;
+  --mint-ink: #06210f;
+  --amber: #fbbf24;
+  --amber-soft: #fcd34d;
+  --amber-ink: #1f1500;
+
+  --line-06: rgba(255, 255, 255, 0.06);
+  --line-07: rgba(255, 255, 255, 0.07);
+  --line-08: rgba(255, 255, 255, 0.08);
+  --line-09: rgba(255, 255, 255, 0.09);
+  --line-10: rgba(255, 255, 255, 0.1);
+  --line-12: rgba(255, 255, 255, 0.12);
+  --line-14: rgba(255, 255, 255, 0.14);
+  --line-15: rgba(255, 255, 255, 0.15);
+  --line-18: rgba(255, 255, 255, 0.18);
+  --fill-03: rgba(255, 255, 255, 0.03);
+  --fill-04: rgba(255, 255, 255, 0.04);
+  --fill-05: rgba(255, 255, 255, 0.05);
+  --fill-06: rgba(255, 255, 255, 0.06);
+
+  --edge: linear-gradient(145deg, #a855f7, #22d3ee);
+
+  --font-display: var(--halo-font-display, "Sora", sans-serif);
+  --font-body: var(--halo-font-body, "Manrope", system-ui, sans-serif);
+  --font-mono: var(--halo-font-mono, "JetBrains Mono", monospace);
+
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+.haloShell a { color: var(--cyan); }
+.haloShell a:hover { color: var(--cyan-soft); }
+.haloShell button { cursor: pointer; }
+
+.dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}

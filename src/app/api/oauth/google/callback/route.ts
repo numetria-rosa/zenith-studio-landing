@@ -34,5 +34,5 @@ export async function GET(request: NextRequest): Promise<Response> {
     scope: "calendar.readonly gmail.readonly",
   });
 
-  return Response.redirect(new URL(`/lab/dashboard/services/${project.id}`, request.url));
+  return Response.redirect(new URL(`/services/dashboard/${project.id}`, request.url));
 }

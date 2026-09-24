@@ -1,0 +1,59 @@
+/* Obsidian for Tailwind v4. Import after tailwindcss in globals.css:
+   @import "tailwindcss";
+   @import "./tailwind-theme.css";
+   @import "./obsidian.css";   (recipes like .ob-glass, .ob-btn--primary)
+   Gives you classes like bg-void text-mist border-line rounded-card shadow-glow font-mono text-h1 */
+
+@theme {
+  --color-void: #05060A;
+  --color-ink: #0C0E14;
+  --color-ink-2: #0A0B10;
+  --color-graphite: #161922;
+  --color-steel: #2A2E3A;
+  --color-mist: #A9AEBA;
+  --color-dim: #7D8392;
+  --color-frost: #F5F6F8;
+
+  --color-cyan: #5CC8FF;
+  --color-cobalt: #3B6BFF;
+  --color-violet: #8B5CF6;
+  --color-orchid: #E052F0;
+  --color-mint: #3DDC97;
+  --color-ember: #FF5C7A;
+
+  --color-line: rgb(255 255 255 / 0.10);
+  --color-line-strong: rgb(255 255 255 / 0.20);
+  --color-glass: rgb(255 255 255 / 0.04);
+  --color-glass-2: rgb(255 255 255 / 0.08);
+
+  --font-sans: "Geist", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  --text-display: 96px;
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.05em;
+  --text-h1: 60px;
+  --text-h1--line-height: 1.02;
+  --text-h1--letter-spacing: -0.04em;
+  --text-h2: 36px;
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.03em;
+  --text-h3: 22px;
+  --text-h3--line-height: 1.25;
+  --text-h3--letter-spacing: -0.02em;
+  --text-caption: 12px;
+  --text-caption--letter-spacing: 0.14em;
+
+  --radius-chip: 8px;
+  --radius-input: 14px;
+  --radius-card: 22px;
+  --radius-panel: 32px;
+
+  --shadow-glow: 0 0 24px rgb(92 200 255 / 0.35);
+  --shadow-glow-violet: 0 0 30px rgb(139 92 246 / 0.4);
+  --shadow-float: 0 24px 60px rgb(0 0 0 / 0.45);
+  --shadow-highlight: inset 0 1px 0 rgb(255 255 255 / 0.10);
+
+  --blur-glass: 16px;
+  --blur-glass-2: 28px;
+}

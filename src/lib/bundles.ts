@@ -37,7 +37,7 @@ export const BUNDLES: Bundle[] = [
     price: "$56.10",
     whopAccessPassId: "prod_vTnpT739BU4eM",
     whopPlanId: "plan_NFGFagPrJyNM5",
-    checkoutUrl: "https://whop.com/checkout/plan_NFGFagPrJyNM5",
+    checkoutUrl: "https://whop.com/checkout/ch_clT6JZX5ajWpEVz/",
   },
   {
     id: "swe-ai-engineering",
@@ -48,7 +48,7 @@ export const BUNDLES: Bundle[] = [
     price: "$45.48",
     whopAccessPassId: "prod_WiyrjnVMppopW",
     whopPlanId: "plan_GnqESzu68VSrz",
-    checkoutUrl: "https://whop.com/checkout/plan_GnqESzu68VSrz",
+    checkoutUrl: "https://whop.com/checkout/ch_CVSTtl6itCjaBCA/",
   },
 ];
 

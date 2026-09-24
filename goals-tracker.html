@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10-Day Sprint · Goals Tracker</title>
+<style>
+  :root{
+    --bg:#0b0c10; --panel:#15171d; --panel-2:#1c1f27; --border:#2a2d38;
+    --text:#e9eaee; --muted:#8c90a0; --accent:#6ee7b7; --accent-2:#7dd3fc;
+    --warn:#fbbf24; --done:#22c55e; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 10% -10%, #1a1d27, var(--bg));
+    color:var(--text); padding:32px 20px 80px;
+  }
+  .wrap{max-width:960px; margin:0 auto}
+  header{margin-bottom:28px}
+  h1{font-size:26px; margin:0 0 6px; letter-spacing:-0.02em}
+  .sub{color:var(--muted); font-size:14px}
+  .overview{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;
+    margin:22px 0 30px;
+  }
+  .stat{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px;
+  }
+  .stat .label{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px}
+  .stat .value{font-size:22px; font-weight:600}
+  .stat .value small{font-size:13px; color:var(--muted); font-weight:400}
+
+  section{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:20px 22px; margin-bottom:18px;
+  }
+  section h2{
+    display:flex; align-items:center; gap:10px; font-size:16px; margin:0 0 4px;
+  }
+  section h2 .icon{
+    width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    background:var(--panel-2); border:1px solid var(--border); flex-shrink:0;
+  }
+  section h2 .icon svg{width:15px; height:15px; stroke:var(--accent); fill:none; stroke-width:2}
+  section .desc{color:var(--muted); font-size:13px; margin:0 0 16px}
+
+  .progress-bar{height:6px; border-radius:999px; background:var(--panel-2); overflow:hidden; margin:10px 0 16px}
+  .progress-bar > div{height:100%; background:linear-gradient(90deg,var(--accent-2),var(--accent)); width:0%; transition:width .2s}
+
+  .grid-days{display:grid; grid-template-columns:repeat(5,1fr); gap:8px}
+  @media(max-width:640px){.grid-days{grid-template-columns:repeat(2,1fr)}}
+  .day-card{
+    background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:10px;
+    font-size:12px;
+  }
+  .day-card .date{font-weight:600; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center}
+  .day-card .date .badge{font-size:10px; color:var(--muted); font-weight:400}
+  .day-card label{display:flex; align-items:center; gap:6px; margin:4px 0; cursor:pointer; color:var(--muted)}
+  .day-card label.checked{color:var(--text)}
+  .day-card input[type=checkbox]{accent-color:var(--accent); width:14px; height:14px; cursor:pointer}
+  .content-day{border-color:var(--warn)}
+  .content-day .date{color:var(--warn)}
+
+  .checklist label{
+    display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--border);
+    cursor:pointer; font-size:14px;
+  }
+  .checklist label:last-child{border-bottom:none}
+  .checklist input[type=checkbox]{accent-color:var(--accent); width:16px; height:16px; margin-top:2px; cursor:pointer; flex-shrink:0}
+  .checklist span.txt{transition:color .15s, opacity .15s}
+  .checklist label.checked span.txt{color:var(--muted); text-decoration:line-through; opacity:.7}
+
+  .revenue-input{
+    display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap;
+  }
+  .revenue-input input[type=number]{
+    background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    padding:8px 10px; border-radius:8px; width:120px; font-size:14px;
+  }
+  .revenue-input .of{color:var(--muted); font-size:13px}
+
+  footer{text-align:center; color:var(--muted); font-size:12px; margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>10-Day Sprint</h1>
+    <div class="sub">Sep 21 – Sep 30, 2026 · Leads, LinkedIn, Instagram, Revenue</div>
+  </header>
+
+  <div class="overview">
+    <div class="stat"><div class="label">Day</div><div class="value" id="dayCount">–</div></div>
+    <div class="stat"><div class="label">Website Leads</div><div class="value"><span id="leadWebProgress">0</span><small>/200</small></div></div>
+    <div class="stat"><div class="label">AI Service Leads</div><div class="value"><span id="leadAiProgress">0</span><small>/100</small></div></div>
+    <div class="stat"><div class="label">IG Posts Done</div><div class="value"><span id="igProgress">0</span><small>/30</small></div></div>
+  </div>
+
+  <section>
+    <h2><span class="icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Lead Outreach — 300 leads in 10 days</h2>
+    <div class="desc">20 website leads/day + 10 AI-service leads/day = 30 contacts/day. Check off each day as you hit both targets.</div>
+    <div class="progress-bar"><div id="leadBar"></div></div>
+    <div class="grid-days" id="leadDays"></div>
+  </section>
+
+  <section>
+    <h2><span class="icon"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></span>LinkedIn Presence</h2>
+    <div class="desc">Business page + Premium setup, then 10 days of planned content to attract leads/clients.</div>
+    <div class="progress-bar"><div id="liBar"></div></div>
+    <div class="checklist" id="liChecklist"></div>
+  </section>
+
+  <section>
+    <h2><span class="icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></span>Instagram — 3 posts/day, batch every 3 days</h2>
+    <div class="desc">Post 3x daily. Every 3rd day is a content-creation day: script + schedule the next 10 posts (highlighted below).</div>
+    <div class="progress-bar"><div id="igBar"></div></div>
+    <div class="grid-days" id="igDays"></div>
+  </section>
+
+  <section>
+    <h2><span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Revenue Goal — $2,000/month by Sep 30</h2>
+    <div class="desc">Update your running total as deals close this sprint.</div>
+    <div class="progress-bar"><div id="revBar"></div></div>
+    <div class="revenue-input">
+      <input type="number" id="revInput" min="0" step="1" placeholder="0">
+      <span class="of">of $2,000</span>
+    </div>
+  </section>
+
+  <footer>Saved automatically in this browser · Zenith sprint tracker</footer>
+</div>
+
+<script>
+const START = new Date(2026,8,21); // Sep 21 2026
+const DAYS = 10;
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v===null? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+
+function fmtDate(d){
+  return d.toLocaleDateString('en-US',{month:'short', day:'numeric'});
+}
+
+function buildDayGrid(containerId, keyPrefix, rowsFn, extraClassFn){
+  const el = document.getElementById(containerId);
+  for(let i=0;i<DAYS;i++){
+    const d = new Date(START); d.setDate(START.getDate()+i);
+    const card = document.createElement('div');
+    card.className = 'day-card' + (extraClassFn && extraClassFn(i) ? ' '+extraClassFn(i) : '');
+    const dateRow = document.createElement('div');
+    dateRow.className = 'date';
+    dateRow.innerHTML = `<span>Day ${i+1}</span><span class="badge">${fmtDate(d)}</span>`;
+    card.appendChild(dateRow);
+    rowsFn(i).forEach(row=>{
+      const key = `${keyPrefix}_${i}_${row.id}`;
+      const label = document.createElement('label');
+      const checked = store.get(key,false);
+      if(checked) label.classList.add('checked');
+      label.innerHTML = `<input type="checkbox" ${checked?'checked':''}><span class="txt">${row.label}</span>`;
+      label.querySelector('input').addEventListener('change', e=>{
+        store.set(key, e.target.checked);
+        label.classList.toggle('checked', e.target.checked);
+        recalc();
+      });
+      card.appendChild(label);
+    });
+    el.appendChild(card);
+  }
+}
+
+buildDayGrid('leadDays','lead',()=>[
+  {id:'web', label:'20 website leads'},
+  {id:'ai', label:'10 AI service leads'},
+]);
+
+buildDayGrid('igDays','ig',(i)=>{
+  const rows = [
+    {id:'p1', label:'Post 1'},
+    {id:'p2', label:'Post 2'},
+    {id:'p3', label:'Post 3'},
+  ];
+  if(i%3===0) rows.push({id:'batch', label:'Content day: script + schedule next 10'});
+  return rows;
+}, (i)=> i%3===0 ? 'content-day' : '');
+
+const liItems = [
+  'Create LinkedIn business page',
+  'Upgrade to LinkedIn Premium',
+  'Design & upload banner',
+  'Fill out services / About section for selling',
+  'Add featured section (offers, case studies, CTA)',
+  'Plan content calendar for the 10-day sprint',
+  'Post 1: intro / positioning',
+  'Post 2: proof / case study',
+  'Post 3: offer / CTA',
+  'Engage: comment on 10 relevant posts/day',
+];
+const liEl = document.getElementById('liChecklist');
+liItems.forEach((txt,i)=>{
+  const key = `li_${i}`;
+  const label = document.createElement('label');
+  const checked = store.get(key,false);
+  if(checked) label.classList.add('checked');
+  label.innerHTML = `<input type="checkbox" ${checked?'checked':''}><span class="txt">${txt}</span>`;
+  label.querySelector('input').addEventListener('change', e=>{
+    store.set(key, e.target.checked);
+    label.classList.toggle('checked', e.target.checked);
+    recalc();
+  });
+  liEl.appendChild(label);
+});
+
+const revInput = document.getElementById('revInput');
+revInput.value = store.get('revenue', 0);
+revInput.addEventListener('input', ()=>{
+  store.set('revenue', Number(revInput.value)||0);
+  recalc();
+});
+
+function countChecked(prefix, total){
+  let n=0;
+  for(let i=0;i<total;i++) if(store.get(`${prefix}${i}`,false)) n++;
+  return n;
+}
+
+function recalc(){
+  let webDone=0, aiDone=0;
+  for(let i=0;i<DAYS;i++){
+    if(store.get(`lead_${i}_web`,false)) webDone+=20;
+    if(store.get(`lead_${i}_ai`,false)) aiDone+=10;
+  }
+  document.getElementById('leadWebProgress').textContent = webDone;
+  document.getElementById('leadAiProgress').textContent = aiDone;
+  document.getElementById('leadBar').style.width = Math.min(100, ((webDone+aiDone)/300)*100)+'%';
+
+  let igDone=0, igTotal=0;
+  for(let i=0;i<DAYS;i++){
+    ['p1','p2','p3'].forEach(p=>{ igTotal++; if(store.get(`ig_${i}_${p}`,false)) igDone++; });
+  }
+  document.getElementById('igProgress').textContent = igDone;
+  document.getElementById('igBar').style.width = (igDone/igTotal*100)+'%';
+
+  let liDone=0;
+  for(let i=0;i<liItems.length;i++) if(store.get(`li_${i}`,false)) liDone++;
+  document.getElementById('liBar').style.width = (liDone/liItems.length*100)+'%';
+
+  const rev = store.get('revenue',0);
+  document.getElementById('revBar').style.width = Math.min(100, rev/2000*100)+'%';
+
+  const today = new Date();
+  const diff = Math.floor((today - START)/86400000)+1;
+  document.getElementById('dayCount').textContent = diff<1 ? 'Not started' : diff>DAYS ? `${DAYS}/${DAYS}` : `${diff}/${DAYS}`;
+}
+recalc();
+</script>
+</body>
+</html>

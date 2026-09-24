@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { encryptPassword } from "@/lib/password";
 import { testMailConnection } from "@/lib/mail-imap";
 import { approveInboxDraft, rejectInboxDraft } from "@/lib/inbox-manager";
+import { getWhopClient } from "@/lib/whop";
 import type { MailProvider } from "@prisma/client";
 
 /* Client-facing service project workspace (Slice 7 of the service-platform
@@ -202,7 +203,7 @@ export async function connectMailbox(
   const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
   if (!project) return { ok: false, error: "not_found" };
 
-  if (provider !== "GMAIL" && provider !== "YAHOO") return { ok: false, error: "unsupported_provider" };
+  if (provider !== "GMAIL" && provider !== "YAHOO" && provider !== "ZOHO") return { ok: false, error: "unsupported_provider" };
   const email = emailAddress.trim().toLowerCase();
   const password = appPassword.trim();
   if (!email || !password) return { ok: false, error: "empty" };
@@ -234,6 +235,29 @@ export async function approveOwnedInboxDraft(projectId: string, userId: string, 
   });
   if (!draft) return { ok: false, error: "not_found" };
   return approveInboxDraft(draft.id, userId);
+}
+
+/** Cancels the project's real Whop subscription at the end of the current
+    billing period (not immediately - the client keeps access through what
+    they already paid for, same as most SaaS "cancel plan" buttons).
+    whopMonthlyMembershipId is only set for webhook-sourced projects (see
+    the schema comment on ServiceProject) - a proposal-based/manually
+    invoiced project has nothing to cancel through this button, so it's
+    hidden entirely rather than shown disabled. */
+export async function cancelOwnedMembership(projectId: string, userId: string): Promise<RequirementSubmitResult> {
+  const project = await db.serviceProject.findFirst({
+    where: { id: projectId, userId },
+    select: { whopMonthlyMembershipId: true },
+  });
+  if (!project) return { ok: false, error: "not_found" };
+  if (!project.whopMonthlyMembershipId) return { ok: false, error: "No active subscription found to cancel." };
+
+  try {
+    await getWhopClient().memberships.cancel(project.whopMonthlyMembershipId, { cancellation_mode: "at_period_end" });
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Cancellation failed." };
+  }
+  return { ok: true };
 }
 
 export async function rejectOwnedInboxDraft(projectId: string, userId: string, draftId: string): Promise<RequirementSubmitResult> {

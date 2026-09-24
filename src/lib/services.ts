@@ -182,6 +182,13 @@ export const SERVICE_PAGE_BY_ID: Record<string, { slug: string; path: string }> 
   "ai-inbox-manager": { slug: "ai-inbox-manager", path: "/services/ai-inbox-manager" },
   "ai-lead-capture": { slug: "ai-lead-capture-follow-up", path: "/services/ai-lead-capture-follow-up" },
   "ai-receptionist": { slug: "ai-receptionist-booking", path: "/services/ai-receptionist-booking" },
+  // Kept for law-firms/brokerages even though the homepage verticals section
+  // no longer links to it (see [locale]/page.tsx) - outreach.ts's hard
+  // filter still requires servicePagePath() to resolve for every recommended
+  // service, so removing these would silently break cold-outreach
+  // eligibility for both niches. insurance-ai-team is deliberately absent:
+  // it has no matching SERVICE_PAGES entry in service-pages.ts, so adding it
+  // here would make outreach link to a 404 instead of correctly excluding it.
   "law-firms": { slug: "law-firm-ai-team", path: "/services/law-firm-ai-team" },
   brokerages: { slug: "brokerage-ai-team", path: "/services/brokerage-ai-team" },
 };
@@ -199,6 +206,7 @@ export const DEMO_PATH_BY_SERVICE_ID: Record<string, string> = {
   "ai-receptionist": "/demo/ai-receptionist",
   "law-firms": "/demo/law-firm-ai-team",
   brokerages: "/demo/brokerage-ai-team",
+  "insurance-ai-team": "/demo/insurance-ai-team",
 };
 
 export function demoPagePath(serviceId: string): string | null {

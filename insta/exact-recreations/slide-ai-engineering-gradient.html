@@ -1,0 +1,86 @@
+<!doctype html><html><head><meta charset="utf-8"><title>gradient</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700;800&family=Caveat:wght@600;700&display=swap"><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body{width:1080px;height:1350px;overflow:hidden}</style><style>
+  body{ font-family:'IBM Plex Sans',sans-serif; color:#141018; }
+  .canvas{ position:relative; width:1080px; height:1350px; overflow:hidden; background:#f8f6fa; }
+  .blob{ position:absolute; border-radius:50%; filter:blur(60px); }
+  .blob.b1{ width:560px; height:560px; left:-180px; bottom:-140px; background:rgba(180,150,255,.4); }
+  .blob.b2{ width:420px; height:420px; right:-120px; top:-90px; background:rgba(255,180,210,.35); }
+  .spark{ position:absolute; }
+  .frame{ position:relative; z-index:1; height:100%; padding:76px 66px 40px; display:flex; flex-direction:column; }
+
+  .tagbadge{ position:absolute; top:70px; right:64px; transform:rotate(7deg); background:#fff; border:2px dashed #6d4fd6; color:#6d4fd6; font-weight:800; font-size:15px; letter-spacing:.04em; padding:9px 16px; border-radius:999px; box-shadow:0 10px 20px -10px rgba(0,0,0,.25); }
+
+  .eyebrow{ font-size:26px; font-weight:400; color:#3a3450; }
+  .h{ font-weight:800; font-size:88px; line-height:1.04; letter-spacing:-.02em; color:#141018; }
+  .dotsrow{ display:flex; align-items:center; gap:11px; margin:10px 0 4px; }
+  .dotsrow .d{ width:11px; height:11px; border-radius:50%; background:#6d4fd6; }
+  .h2{ font-weight:800; font-size:68px; letter-spacing:-.015em; color:#141018; }
+  .subline{ margin-top:26px; font-size:28px; color:#3a3450; }
+  .subline b{ color:#6d4fd6; font-weight:800; }
+
+  .arrowwrap{ position:relative; height:70px; margin-top:6px; }
+  .arrownote{ position:absolute; left:8px; top:0; font-family:'Caveat'; font-weight:700; font-size:30px; color:#6d4fd6; transform:rotate(-3deg); }
+  .arrowsvg{ position:absolute; left:150px; top:6px; }
+
+  .card{ position:relative; margin-top:10px; background:#fff; border-radius:28px; padding:0 0 30px; box-shadow:0 26px 55px -26px rgba(58,52,80,.4); overflow:visible; }
+  .cardhead{ background:#6d4fd6; color:#fff; border-radius:28px 28px 0 0; padding:16px 26px; font-weight:800; font-size:16px; letter-spacing:.08em; }
+  .row{ display:flex; justify-content:space-between; gap:12px; padding:30px 24px 6px; }
+  .col{ flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; transform:rotate(var(--rot)); }
+  .tile{ position:relative; width:88px; height:88px; border-radius:20px; background:var(--bg); color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 14px 22px -10px rgba(0,0,0,.3); }
+  .num{ position:absolute; top:-8px; left:-8px; width:24px; height:24px; border-radius:50%; background:#fff; color:#141018; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 8px rgba(0,0,0,.2); }
+  .dot{ width:6px; height:6px; border-radius:50%; background:#6d4fd6; margin-top:16px; }
+  .lbl{ margin-top:8px; font-weight:800; font-size:19px; }
+  .cap{ margin-top:5px; font-size:13.5px; color:#8a8296; line-height:1.4; max-width:150px; }
+
+  .bubble{ position:absolute; right:-18px; bottom:-26px; background:#141018; color:#fff; font-family:'Caveat'; font-weight:700; font-size:24px; padding:12px 20px; border-radius:20px 20px 20px 4px; transform:rotate(4deg); box-shadow:0 14px 26px -12px rgba(0,0,0,.4); }
+
+  .carousel{ margin-top:auto; padding-top:34px; display:flex; justify-content:center; gap:8px; }
+  .cdot{ width:7px; height:7px; border-radius:50%; background:#d8d3e0; }
+  .cdot.on{ background:#6d4fd6; width:20px; border-radius:4px; }
+  </style></head><body><div class="canvas">
+    <div class="blob b1"></div><div class="blob b2"></div>
+    <div class="spark" style="left:60px;top:210px"><svg width="34" height="34" viewBox="0 0 24 24" fill="#6d4fd6"><path d="M12 1c.6 4.2 2 6.8 6 8-4 1.2-5.4 3.8-6 8-.6-4.2-2-6.8-6-8 4-1.2 5.4-3.8 6-8Z"/></svg></div>
+    <div class="spark" style="right:90px;top:340px;opacity:.6"><svg width="20" height="20" viewBox="0 0 24 24" fill="#6d4fd6"><path d="M12 1c.6 4.2 2 6.8 6 8-4 1.2-5.4 3.8-6 8-.6-4.2-2-6.8-6-8 4-1.2 5.4-3.8 6-8Z"/></svg></div>
+    <div class="spark" style="left:40px;bottom:180px;opacity:.5"><svg width="24" height="24" viewBox="0 0 24 24" fill="#6d4fd6"><path d="M12 1c.6 4.2 2 6.8 6 8-4 1.2-5.4 3.8-6 8-.6-4.2-2-6.8-6-8 4-1.2 5.4-3.8 6-8Z"/></svg></div>
+    <div class="tagbadge">8-WEEK PROGRAM</div>
+    <div class="frame">
+      <div class="eyebrow">If you're</div>
+      <div class="h">highly</div>
+      <div class="h">motivated</div>
+      <div class="dotsrow"><span class="d"></span><span class="d"></span><span class="d"></span><span class="h2" style="margin-left:8px">but stuck</span></div>
+      <div class="subline">get this <b>AI engineer roadmap</b> ASAP</div>
+      <div class="arrowwrap">
+        <div class="arrownote">steal this ↴</div>
+        <svg class="arrowsvg" width="140" height="60" viewBox="0 0 140 60" fill="none"><path d="M5 5c40 0 60 10 90 35" stroke="#6d4fd6" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 10"/><path d="M85 32l14 10-2-17" stroke="#6d4fd6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </div>
+      <div class="card">
+        <div class="cardhead">THE 4-MODULE STACK</div>
+        <div class="row">
+    <div class="col" style="--rot:-2deg">
+      <div class="tile" style="--bg:#18140f"><span class="num">1</span><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.8 2.8M16.2 16.2 19 19M19 5l-2.8 2.8M7.8 16.2 5 19"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <div class="dot"></div>
+      <div class="lbl">Prompting</div>
+      <div class="cap">Structured outputs</div>
+    </div>
+    <div class="col" style="--rot:2deg">
+      <div class="tile" style="--bg:#6d4fd6"><span class="num">2</span><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4Z"/><path d="M9 4v13"/><path d="M15 6.5v13"/></svg></div>
+      <div class="dot"></div>
+      <div class="lbl">RAG</div>
+      <div class="cap">Finds the truth</div>
+    </div>
+    <div class="col" style="--rot:-2deg">
+      <div class="tile" style="--bg:#c6592e"><span class="num">3</span><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="14" height="10" rx="2"/><circle cx="9" cy="14" r="1.3"/><circle cx="15" cy="14" r="1.3"/><path d="M12 9V5M8 5h8"/></svg></div>
+      <div class="dot"></div>
+      <div class="lbl">Agents</div>
+      <div class="cap">Ship on their own</div>
+    </div>
+    <div class="col" style="--rot:2deg">
+      <div class="tile" style="--bg:#2f6f5e"><span class="num">4</span><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6l-8-3Z"/></svg></div>
+      <div class="dot"></div>
+      <div class="lbl">Evals</div>
+      <div class="cap">Reliability built in</div>
+    </div></div>
+        <div class="bubble">start here!</div>
+      </div>
+      <div class="carousel"><span class="cdot on"></span><span class="cdot"></span><span class="cdot"></span><span class="cdot"></span><span class="cdot"></span><span class="cdot"></span><span class="cdot"></span></div>
+    </div>
+  </div></body></html>

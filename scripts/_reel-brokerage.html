@@ -1,0 +1,584 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Brokerage AI Team - Reel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#070b14; --card2:#141b2c; --card3:#1b2438; --bd:rgba(148,163,184,.16); --bd2:rgba(148,163,184,.26);
+    --tx:#eef2ff; --mut:#9aa6c2; --mut2:#6b7690;
+    --accent:#38bdf8; --accentd:#062233; --danger:#ff5d5d; --danger-bg:rgba(255,93,93,.14);
+  }
+  html,body{width:1080px;height:1920px;overflow:hidden}
+  body{ background:var(--bg); color:var(--tx); font-family:'IBM Plex Sans',sans-serif; }
+  .canvas{ position:relative; width:100%; height:100%; overflow:hidden; background:var(--bg); }
+  .canvas::before{
+    content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 70% 34% at 10% -4%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 55%),
+      radial-gradient(ellipse 55% 28% at 100% 6%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 50%),
+      radial-gradient(ellipse 50% 30% at 80% 100%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 55%);
+  }
+  .logo{ position:absolute; top:56px; left:56px; z-index:10; font-family:'Fraunces'; font-weight:700; font-size:29px; letter-spacing:-.01em; }
+  .logo b{ background:var(--accent); color:var(--accentd); padding:4px 11px; margin-left:5px; border-radius:8px; font-size:19px; }
+
+  .scene{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:1; padding-bottom:160px; }
+
+  /* Subtitle bar: one persistent element, text swapped per scene, synced to
+     that scene's own fade so voiceover, on-screen text and visuals move
+     together instead of three separately-timed things. */
+  .subtitle{ position:absolute; left:0; right:0; bottom:96px; z-index:20; display:flex; justify-content:center; padding:0 64px; pointer-events:none; }
+  .subtitle .box{ background:rgba(7,11,20,.72); backdrop-filter:blur(6px); border:1px solid var(--bd2); border-radius:20px; padding:22px 30px; max-width:960px; text-align:center; }
+  .subtitle .box p{ font-family:'IBM Plex Sans'; font-weight:600; font-size:30px; line-height:1.35; color:var(--tx); }
+
+  /* Phone mockup: modern titanium-style frame (thin uniform bezel, gradient
+     metal edge, Dynamic-Island-style pill, subtle screen sheen) rather than
+     a plain rounded rectangle with an old pill notch. */
+  .phone{
+    position:relative; width:580px; height:1100px; padding:18px; border-radius:82px;
+    background:linear-gradient(155deg, #4d5872 0%, #1c2334 45%, #05070d 100%);
+    box-shadow:0 55px 120px -22px rgba(0,0,0,.65), inset 0 2px 0 rgba(255,255,255,.14), inset 0 -2px 0 rgba(0,0,0,.5);
+  }
+  .phone .screen{ position:relative; width:100%; height:100%; background:#04060c; border-radius:66px; overflow:hidden; }
+  .phone .screen::after{ content:""; position:absolute; inset:0; z-index:6; pointer-events:none; background:linear-gradient(120deg, rgba(255,255,255,.07) 0%, transparent 26%); }
+  .phone::before{ content:""; position:absolute; top:38px; left:50%; transform:translateX(-50%); width:142px; height:40px; background:#000; border-radius:24px; z-index:7; box-shadow:inset 0 0 0 1px rgba(255,255,255,.05); }
+  .phone-screen{ position:absolute; inset:0; padding:108px 32px 44px; display:flex; flex-direction:column; align-items:center; z-index:1; }
+
+  .ring-icon{ width:132px; height:132px; border-radius:50%; background:var(--card2); display:flex; align-items:center; justify-content:center; position:relative; }
+  .ring-icon svg{ width:58px; height:58px; color:var(--accent); }
+  .ring-pulse{ position:absolute; inset:0; border-radius:50%; border:2px solid var(--accent); opacity:0; }
+  .caller-label{ margin-top:28px; font-family:'IBM Plex Sans'; font-size:30px; font-weight:600; color:var(--tx); }
+  .caller-sub{ margin-top:7px; font-family:'IBM Plex Mono'; font-size:18px; color:var(--mut2); letter-spacing:.04em; }
+  .missed-banner{ margin-top:36px; background:var(--danger-bg); border:1.5px solid var(--danger); color:var(--danger); font-family:'IBM Plex Mono'; font-weight:700; font-size:17px; letter-spacing:.08em; text-transform:uppercase; padding:10px 20px; border-radius:11px; }
+
+  .pillstack{ margin-top:42px; width:100%; display:flex; flex-direction:column; gap:14px; }
+  .pill{ background:var(--card2); border:1px solid var(--bd2); border-radius:15px; padding:16px 20px; display:flex; align-items:center; gap:13px; }
+  .pill .dot{ width:10px; height:10px; border-radius:50%; background:var(--danger); flex-shrink:0; }
+  .pill .txt{ font-size:19px; font-weight:600; }
+  .pill .time{ margin-left:auto; font-family:'IBM Plex Mono'; font-size:15px; color:var(--mut2); }
+
+  /* Chat transcript */
+  .chat{ width:100%; display:flex; flex-direction:column; gap:16px; margin-top:10px; }
+  .bubble{ max-width:82%; padding:16px 20px; border-radius:22px; font-size:20px; line-height:1.4; }
+  .bubble.ai{ align-self:flex-start; background:var(--card3); border-bottom-left-radius:6px; }
+  .bubble.client{ align-self:flex-end; background:var(--accent); color:var(--accentd); font-weight:600; border-bottom-right-radius:6px; }
+  .status-badge{ margin-top:22px; align-self:center; background:rgba(198,244,50,.14); border:1.5px solid var(--accent); color:var(--accent); font-family:'IBM Plex Mono'; font-weight:700; font-size:17px; letter-spacing:.06em; text-transform:uppercase; padding:11px 22px; border-radius:13px; display:flex; align-items:center; gap:9px; }
+  .status-badge svg{ width:20px; height:20px; }
+
+  /* Counter scene */
+  #sceneCounter .wrap{ text-align:center; }
+  #sceneCounter .leak-icon{ width:72px; height:72px; margin:0 auto 20px; color:var(--danger); }
+  #sceneCounter .amount{ font-family:'Fraunces'; font-weight:700; font-size:152px; color:var(--danger); letter-spacing:-.02em; }
+  #sceneCounter .cap2{ margin-top:16px; font-family:'IBM Plex Mono'; font-size:25px; color:var(--mut); letter-spacing:.02em; }
+
+  /* 24/7 scene: modern/futuristic but simple, plus the 3 team-role icons
+     connected to the clock so "meet your AI team" has faces, not just a
+     stat. Absolutely positioned like the sceneDiagram scene so connector
+     lines can be computed from real element rects (see onFontsReady). */
+  #sceneClock .wrap{ position:relative; width:100%; height:100%; }
+  #sceneClock .eyebrow{ position:absolute; top:290px; left:0; right:0; text-align:center; font-family:'IBM Plex Mono'; font-size:27px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); }
+  .clockwrap{ position:absolute; left:50%; top:650px; transform:translate(-50%,-50%); width:480px; height:480px; }
+  .clockwrap svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .clock-track{ fill:none; stroke:var(--bd2); stroke-width:3; }
+  .clock-sweep{ fill:none; stroke:var(--accent); stroke-width:5; stroke-linecap:round; filter:drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 70%, transparent)); }
+  .orbit-dot{ position:absolute; width:15px; height:15px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); transform:translate(-50%,-50%); }
+  .clock-num{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .clock-num .big{ font-family:'Fraunces'; font-weight:700; font-size:112px; letter-spacing:-.02em; color:var(--tx); text-shadow:0 0 40px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .clock-num .tag{ margin-top:10px; font-family:'IBM Plex Mono'; font-size:17px; letter-spacing:.08em; text-transform:uppercase; color:var(--mut); max-width:300px; text-align:center; }
+
+  #sceneClock svg.team-flow{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  #sceneClock .team-row{ position:absolute; left:0; right:0; top:1180px; display:flex; justify-content:center; gap:16px; padding:0 32px; }
+  .tnode{ background:var(--card2); border:1.5px solid var(--bd2); border-radius:22px; padding:24px 16px; width:320px; text-align:center; }
+  .tnode .ticon{ width:60px; height:60px; margin:0 auto 14px; border-radius:16px; background:var(--accent); color:var(--accentd); display:flex; align-items:center; justify-content:center; }
+  .tnode .ticon svg{ width:30px; height:30px; }
+  .tnode .trole{ font-family:'Fraunces'; font-weight:700; font-size:24px; letter-spacing:-.01em; }
+  .tnode .tdesc{ margin-top:6px; font-family:'IBM Plex Mono'; font-size:14px; color:var(--mut); letter-spacing:.02em; }
+
+  /* Vignette scene (follow-up + billing) */
+  #sceneVignette .wrap{ width:100%; padding:0 76px; display:flex; flex-direction:column; gap:30px; }
+  #sceneVignette .label{ font-family:'IBM Plex Mono'; font-size:25px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--mut2); text-align:center; margin-bottom:6px; }
+  .vig{ background:var(--card2); border:1.5px solid var(--bd2); border-radius:28px; padding:34px 36px; }
+  .vig .vhead{ display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+  .vig .vicon{ width:52px; height:52px; border-radius:13px; background:var(--accent); color:var(--accentd); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .vig .vicon svg{ width:27px; height:27px; }
+  .vig .vtitle{ font-family:'Fraunces'; font-weight:700; font-size:31px; }
+  .vig .vbubble{ background:var(--card3); border-radius:18px; padding:18px 20px; font-size:21px; line-height:1.4; }
+  .vig .vrow{ display:flex; align-items:center; justify-content:space-between; background:var(--card3); border-radius:15px; padding:16px 20px; font-family:'IBM Plex Mono'; font-size:18px; }
+  .vig .vrow .ok{ color:var(--accent); font-weight:700; }
+  .vig .checkline{ display:flex; align-items:center; gap:9px; margin-top:12px; font-family:'IBM Plex Mono'; font-size:16px; color:var(--accent); }
+  .vig .checkline svg{ width:18px; height:18px; }
+
+  /* Diagram scene */
+  #sceneDiagram .wrap{ position:relative; width:100%; height:100%; }
+  #sceneDiagram .eyebrow{ position:absolute; top:255px; left:0; right:0; text-align:center; font-family:'IBM Plex Mono'; font-size:27px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+  #sceneDiagram svg.flow{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .flow-line{ fill:none; stroke:var(--bd2); stroke-width:2.5; }
+  .flow-dot{ fill:var(--accent); filter:drop-shadow(0 0 6px var(--accent)); }
+  .dnode{ position:absolute; transform:translate(-50%,-50%); background:var(--card2); border:1.5px solid var(--bd2); border-radius:17px; padding:15px 16px; display:flex; align-items:center; gap:10px; width:300px; }
+  .dnode svg{ width:26px; height:26px; color:var(--mut); flex-shrink:0; }
+  .dnode span{ font-size:18px; font-weight:600; line-height:1.2; }
+  .dhub{ position:absolute; left:50%; top:815px; transform:translate(-50%,-50%); background:var(--accentd); border:2px solid var(--accent); border-radius:26px; padding:30px 34px; width:680px; text-align:center; }
+  .dhub .htitle{ font-family:'Fraunces'; font-weight:700; font-size:36px; color:var(--accent); letter-spacing:-.01em; }
+  .dhub .hsub{ margin-top:7px; font-family:'IBM Plex Mono'; font-size:17px; color:rgba(198,244,50,.72); letter-spacing:.04em; }
+  .dhub .hbadge{ position:absolute; top:-17px; right:24px; background:var(--accent); color:var(--accentd); font-family:'IBM Plex Mono'; font-weight:800; font-size:13px; letter-spacing:.08em; padding:6px 11px; border-radius:9px; }
+
+  /* Price + CTA (one combined scene) */
+  #scenePriceCta .wrap{ text-align:center; }
+  #scenePriceCta .tag{ font-family:'IBM Plex Mono'; font-size:25px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--mut2); margin-bottom:22px; }
+  #scenePriceCta h2{ font-family:'Fraunces'; font-weight:700; font-size:58px; letter-spacing:-.02em; margin-bottom:28px; }
+  #scenePriceCta .price{ font-family:'Fraunces'; font-weight:700; font-size:128px; color:var(--accent); letter-spacing:-.02em; }
+  #scenePriceCta .permo{ font-family:'IBM Plex Mono'; font-size:27px; color:var(--mut); margin-top:5px; }
+  #scenePriceCta .cta{ font-family:'Caveat'; font-weight:700; font-size:96px; color:var(--accent); transform:rotate(-2deg); margin-top:50px; }
+  #scenePriceCta .site{ font-family:'IBM Plex Mono'; font-size:29px; color:var(--mut2); letter-spacing:.05em; margin-top:24px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="logo">ZENITH<b>AI</b></div>
+
+  <div class="subtitle"><div class="box" id="subtitleBox"><p id="subtitleText"></p></div></div>
+
+  <!-- Scene 0: phone rings, goes to missed call, pills stack -->
+  <div class="scene" id="scenePhone">
+    <div class="phone">
+      <div class="screen">
+      <div class="phone-screen">
+        <div id="ringWrap" style="display:flex; flex-direction:column; align-items:center;">
+          <div class="ring-icon" id="ringIcon">
+            <div class="ring-pulse" id="pulse1"></div>
+            <div class="ring-pulse" id="pulse2"></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="caller-label" id="callerLabel">Unknown Caller</div>
+          <div class="caller-sub" id="callerSub">Incoming&hellip;</div>
+          <div class="missed-banner" id="missedBanner" style="opacity:0;">Missed Call</div>
+        </div>
+        <div class="pillstack" id="pillstack">
+          <div class="pill" id="pill1"><span class="dot"></span><span class="txt">Missed call</span><span class="time">9:47 PM</span></div>
+          <div class="pill" id="pill2"><span class="dot"></span><span class="txt">Missed call</span><span class="time">11:03 PM</span></div>
+          <div class="pill" id="pill3"><span class="dot"></span><span class="txt">Missed call</span><span class="time">8:15 AM</span></div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 1: leak counter -->
+  <div class="scene" id="sceneCounter">
+    <div class="wrap">
+      <svg class="leak-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4.4 0 7-2.7 7-6.5C19 11 12 3 12 3S5 11 5 15.5C5 19.3 7.6 22 12 22Z"/></svg>
+      <div class="amount" id="amount">$0</div>
+      <div class="cap2">in commission lost to a cold lead</div>
+    </div>
+  </div>
+
+  <!-- Scene 2: 24/7 + the three team members, shown as a small hub diagram
+       instead of a lone stat, so "meet your AI team" has faces to it. -->
+  <div class="scene" id="sceneClock">
+    <div class="wrap">
+      <div class="eyebrow">Never closed</div>
+      <div class="clockwrap">
+        <svg viewBox="0 0 200 200">
+          <circle class="clock-track" cx="100" cy="100" r="92"/>
+          <circle class="clock-sweep" id="clockSweep" cx="100" cy="100" r="92" pathLength="100" stroke-dasharray="18 82"/>
+        </svg>
+        <div class="orbit-dot" id="orbitDot1"></div>
+        <div class="orbit-dot" id="orbitDot2"></div>
+        <div class="clock-num">
+          <div class="big">24/7</div>
+          <div class="tag">Your AI Team never clocks out</div>
+        </div>
+      </div>
+
+      <svg class="team-flow">
+        <path class="flow-line" id="tline1" d="" />
+        <path class="flow-line" id="tline2" d="" />
+        <path class="flow-line" id="tline3" d="" />
+        <circle class="flow-dot" id="tdot1" r="6" />
+        <circle class="flow-dot" id="tdot2" r="6" />
+        <circle class="flow-dot" id="tdot3" r="6" />
+      </svg>
+
+      <div class="team-row">
+        <div class="tnode" id="tnIntake">
+          <div class="ticon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13a8 8 0 0 1 16 0"/><path d="M19 13v4a2 2 0 0 1-2 2h-1"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/></svg></div>
+          <div class="trole">Inside Sales Agent</div>
+          <div class="tdesc">Texts back every new lead</div>
+        </div>
+        <div class="tnode" id="tnFollow">
+          <div class="ticon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z"/><path d="M14 3v6h6"/><path d="m9 15 2 2 4-4"/></svg></div>
+          <div class="trole">Transaction Coordinator</div>
+          <div class="tdesc">Tracks every file to close</div>
+        </div>
+        <div class="tnode" id="tnBilling">
+          <div class="ticon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div>
+          <div class="trole">Database Manager</div>
+          <div class="tdesc">Wakes up dormant contacts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 3: missed-call text-back, SMS transcript -->
+  <div class="scene" id="sceneChat">
+    <div class="phone">
+      <div class="screen">
+      <div class="phone-screen">
+        <div class="caller-label" style="font-size:23px; opacity:.85;">New Lead Text-Back</div>
+        <div class="caller-sub" style="margin-bottom:24px;">Texted back in 8 seconds</div>
+        <div class="chat" id="chat">
+          <div class="bubble ai" id="b1">Hi! Thanks for your interest in 123 Oak Street. What's your budget and timeline?</div>
+          <div class="bubble client" id="b2">Looking to buy in the next 2 months, budget around 450k.</div>
+          <div class="bubble ai" id="b3">That listing is 439k. I can get you a private showing tomorrow at 4pm, does that work?</div>
+          <div class="bubble client" id="b4">Yes, that works!</div>
+        </div>
+        <div class="status-badge" id="statusBadge" style="opacity:0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          Showing booked
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 4: two more roles, shown working, not just labeled -->
+  <div class="scene" id="sceneVignette">
+    <div class="wrap">
+      <div class="label">The rest of the team</div>
+      <div class="vig" id="vigFollow">
+        <div class="vhead">
+          <div class="vicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z"/><path d="M14 3v6h6"/><path d="m9 15 2 2 4-4"/></svg></div>
+          <div class="vtitle">Transaction Coordinator</div>
+        </div>
+        <div class="vbubble">"Inspection contingency deadline in 3 days, reminder sent to all parties."</div>
+        <div class="checkline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tracked 14 milestones to closing</div>
+      </div>
+      <div class="vig" id="vigBilling">
+        <div class="vhead">
+          <div class="vicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div>
+          <div class="vtitle">Database Manager</div>
+        </div>
+        <div class="vrow"><span>The Andersons, dormant 180 days</span><span class="ok">Re-engaged</span></div>
+        <div class="checkline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Found 6 warm leads in your CRM</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 5: how it connects -->
+  <div class="scene" id="sceneDiagram">
+    <div class="wrap">
+      <div class="eyebrow">How it connects</div>
+
+      <svg class="flow" viewBox="0 0 1080 1920">
+        <path class="flow-line" id="line1" d="M210,560 C210,660 410,660 410,750" />
+        <path class="flow-line" id="line2" d="M540,560 C540,660 540,660 540,750" />
+        <path class="flow-line" id="line3" d="M870,560 C870,660 670,660 670,750" />
+        <path class="flow-line" id="line4" d="M410,890 C410,990 210,990 210,1080" />
+        <path class="flow-line" id="line5" d="M540,890 C540,990 540,990 540,1080" />
+        <path class="flow-line" id="line6" d="M670,890 C670,990 870,990 870,1080" />
+        <circle class="flow-dot" id="dot1" r="6" />
+        <circle class="flow-dot" id="dot2" r="6" />
+        <circle class="flow-dot" id="dot3" r="6" />
+        <circle class="flow-dot" id="dot4" r="6" />
+        <circle class="flow-dot" id="dot5" r="6" />
+        <circle class="flow-dot" id="dot6" r="6" />
+      </svg>
+
+      <div class="dnode" id="dnCalls" style="left:210px; top:520px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>Calls</span>
+      </div>
+      <div class="dnode" id="dnEmails" style="left:540px; top:520px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span>Emails</span>
+      </div>
+      <div class="dnode" id="dnWeb" style="left:870px; top:520px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>
+        <span>Web Leads</span>
+      </div>
+
+      <div class="dhub">
+        <div class="hbadge">Always on</div>
+        <div class="htitle">AI Team</div>
+        <div class="hsub">Sales &middot; Transactions &middot; Database</div>
+      </div>
+
+      <div class="dnode" id="dnCal" style="left:210px; top:1120px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span>Your Calendar</span>
+      </div>
+      <div class="dnode" id="dnCrm" style="left:540px; top:1120px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.67 4.67 4 5.5 4H13v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z"/><path d="M20 5.5C20 4.67 19.33 4 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5v-13Z"/></svg>
+        <span>Your CRM</span>
+      </div>
+      <div class="dnode" id="dnBill" style="left:870px; top:1120px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z"/><path d="M14 3v6h6"/><path d="m9 15 2 2 4-4"/></svg>
+        <span>Transaction Pipeline</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 6: price + CTA -->
+  <div class="scene" id="scenePriceCta">
+    <div class="wrap">
+      <div class="tag">Brokerage AI Team</div>
+      <div class="price" id="priceNum">$1,200</div>
+      <div class="permo">per month</div>
+      <div class="cta" id="ctaText" style="opacity:0;">link in bio &#8599;</div>
+      <div class="site" id="siteText" style="opacity:0;">zenith-studio.site</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+  function progress(t, a, b){ return clamp01((t - a) / (b - a)); }
+  function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
+  function easeOutBack(x){ var c1=1.70158, c3=c1+1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); }
+
+  // Scene schedule: each scene's "hold" duration is its voiceover line's
+  // real spoken length (measured from the generated audio) plus a short
+  // gap. Computing start times from this array (instead of hand-picked
+  // absolute timestamps) is what keeps picture, subtitle and voice in sync
+  // as the script changes — see scripts/_reel-law-firm-vo-lines.mjs for the
+  // source lines/durations, which must match this array.
+  var GAP = 0.4;
+  var LEAD_IN = 0.3;
+  var SCENE_DEFS = [
+    { id: 'scenePhone',    dur: 5.71, line: "It's 9:47 PM. A lead just called about your new listing." },
+    { id: 'sceneCounter',  dur: 4.06, line: "By morning, that lead has already called three other agents." },
+    { id: 'sceneClock',    dur: 7.03, line: "Meet your AI team. It doesn't work nine to five. It works around the clock." },
+    { id: 'sceneChat',     dur: 6.26, line: "It texts back every new lead in seconds, qualifies them, and books the showing, any hour of the day." },
+    { id: 'sceneVignette', dur: 5.95, line: "It follows up on leads you forgot about, and wakes up the dormant contacts sitting in your CRM." },
+    { id: 'sceneDiagram',  dur: 8.95, line: "It plugs straight into your calendar, your CRM, your transaction pipeline. No new software. Always on." },
+    { id: 'scenePriceCta', dur: 7.75, line: "One AI team. Twelve hundred a month. You'll never lose a lead to a faster agent again." },
+  ];
+
+  var cursor = LEAD_IN;
+  var SCENES = SCENE_DEFS.map(function(def){
+    var start = cursor;
+    var end = start + def.dur;
+    cursor = end + GAP;
+    return {
+      id: def.id, line: def.line, start: start, end: end,
+      el: document.getElementById(def.id),
+      in: [start, start + 0.3],
+      out: [end, end + 0.3],
+    };
+  });
+  var TOTAL_DURATION = cursor + 0.8;
+
+  function byId(id){ return SCENES.filter(function(s){ return s.id === id; })[0]; }
+
+  // Connector lines are computed from the real rendered position of the
+  // boxes they join (getBoundingClientRect), not hand-guessed coordinates —
+  // hand-guessed numbers were drifting from the actual box edges and
+  // leaving visible gaps. This must run after webfonts have loaded (see
+  // window.onFontsReady, called by the capture script) since Fraunces vs.
+  // the fallback serif changes box heights enough to matter here.
+  function rectMid(el){ var r = el.getBoundingClientRect(); return { x: (r.left+r.right)/2, top: r.top, bottom: r.bottom }; }
+  function smoothPath(x1,y1,x2,y2){
+    var ymid = (y1+y2)/2;
+    return 'M'+x1+','+y1+' C'+x1+','+ymid+' '+x2+','+ymid+' '+x2+','+y2;
+  }
+
+  var diagPaths = {}, diagDots = {}, diagLens = {};
+
+  window.onFontsReady = function(){
+    // "How it connects": 3 inputs -> hub -> 3 outputs
+    var inputs = ['dnCalls','dnEmails','dnWeb'].map(function(id){ return rectMid(document.getElementById(id)); });
+    var hub = rectMid(document.querySelector('#sceneDiagram .dhub'));
+    var outputs = ['dnCal','dnCrm','dnBill'].map(function(id){ return rectMid(document.getElementById(id)); });
+    var hubXs = [hub.x - 130, hub.x, hub.x + 130]; // fan the 3 lines across the hub's width instead of all meeting at one point
+    document.getElementById('line1').setAttribute('d', smoothPath(inputs[0].x, inputs[0].bottom, hubXs[0], hub.top));
+    document.getElementById('line2').setAttribute('d', smoothPath(inputs[1].x, inputs[1].bottom, hubXs[1], hub.top));
+    document.getElementById('line3').setAttribute('d', smoothPath(inputs[2].x, inputs[2].bottom, hubXs[2], hub.top));
+    document.getElementById('line4').setAttribute('d', smoothPath(hubXs[0], hub.bottom, outputs[0].x, outputs[0].top));
+    document.getElementById('line5').setAttribute('d', smoothPath(hubXs[1], hub.bottom, outputs[1].x, outputs[1].top));
+    document.getElementById('line6').setAttribute('d', smoothPath(hubXs[2], hub.bottom, outputs[2].x, outputs[2].top));
+
+    // "Meet your AI team": clock ring -> 3 role nodes
+    var clockRect = document.querySelector('.clockwrap').getBoundingClientRect();
+    var clockBottom = { x: (clockRect.left+clockRect.right)/2, y: clockRect.bottom - 30 };
+    var team = ['tnIntake','tnFollow','tnBilling'].map(function(id){ return rectMid(document.getElementById(id)); });
+    var clockXs = [clockBottom.x - 90, clockBottom.x, clockBottom.x + 90];
+    document.getElementById('tline1').setAttribute('d', smoothPath(clockXs[0], clockBottom.y, team[0].x, team[0].top));
+    document.getElementById('tline2').setAttribute('d', smoothPath(clockXs[1], clockBottom.y, team[1].x, team[1].top));
+    document.getElementById('tline3').setAttribute('d', smoothPath(clockXs[2], clockBottom.y, team[2].x, team[2].top));
+
+    var DIAG_LINE_IDS = ['line1','line2','line3','line4','line5','line6','tline1','tline2','tline3'];
+    DIAG_LINE_IDS.forEach(function(id, i){
+      var dotId = id.indexOf('tline') === 0 ? 'tdot' + (id.slice(5)) : 'dot' + id.slice(4);
+      diagPaths[id] = document.getElementById(id);
+      diagLens[id] = diagPaths[id].getTotalLength();
+      diagDots[id] = document.getElementById(dotId);
+    });
+    renderFrame(0);
+  };
+
+  function renderFrame(t){
+    document.querySelector('.logo').style.opacity = easeOutCubic(progress(t, 0, 0.4));
+
+    var subtitleVis = 0, subtitleLine = '';
+    SCENES.forEach(function(s){
+      var a = progress(t, s.in[0], s.in[1]);
+      var b = 1 - progress(t, s.out[0], s.out[1]);
+      var vis = Math.min(a, b);
+      s.el.style.opacity = vis;
+      s.el.style.transform = 'translateY(' + (1 - a) * 20 + 'px)';
+      if (vis > subtitleVis) { subtitleVis = vis; subtitleLine = s.line; }
+    });
+    document.getElementById('subtitleBox').style.opacity = subtitleVis;
+    if (document.getElementById('subtitleText').textContent !== subtitleLine) {
+      document.getElementById('subtitleText').textContent = subtitleLine;
+    }
+
+    // --- Scene 0: phone ringing -> missed -> pills (local time) ---
+    var s0 = byId('scenePhone'), lt0 = t - s0.start;
+    ['pulse1','pulse2'].forEach(function(id, i){
+      if (lt0 < 0.2 || lt0 > 1.1) { document.getElementById(id).style.opacity = 0; return; }
+      var local = ((lt0 - 0.2 - i*0.35) % 1.1 + 1.1) % 1.1 / 1.1;
+      document.getElementById(id).style.opacity = (1 - local) * 0.7;
+      document.getElementById(id).style.transform = 'scale(' + (1 + local * 0.9) + ')';
+    });
+    var missedP = progress(lt0, 1.0, 1.25);
+    document.getElementById('missedBanner').style.opacity = missedP;
+    document.getElementById('callerSub').style.opacity = 1 - missedP;
+    document.getElementById('callerSub').textContent = missedP > 0.5 ? '' : 'Incoming…';
+    document.getElementById('ringIcon').style.opacity = 1 - progress(lt0, 1.3, 1.7) * 0.4;
+    var pillGroupP = progress(lt0, 1.4, 1.7);
+    document.getElementById('ringWrap').style.transform = 'scale(' + (1 - pillGroupP * 0.22) + ') translateY(' + (-pillGroupP * 40) + 'px)';
+    [['pill1',1.55],['pill2',1.9],['pill3',2.25]].forEach(function(pair){
+      var el = document.getElementById(pair[0]);
+      var p = easeOutCubic(progress(lt0, pair[1], pair[1] + 0.3));
+      el.style.opacity = p;
+      el.style.transform = 'translateY(' + (1-p) * -16 + 'px)';
+    });
+
+    // --- Scene 1: counter (local time) ---
+    var s1 = byId('sceneCounter'), lt1 = t - s1.start;
+    var countP = easeOutCubic(progress(lt1, 0.2, 1.35));
+    var amount = Math.round(countP * 8400 / 50) * 50;
+    document.getElementById('amount').textContent = '$' + amount.toLocaleString('en-US');
+    document.getElementById('amount').style.transform = 'scale(' + (0.9 + countP * 0.1) + ')';
+
+    // --- Scene 2: 24/7 clock (continuous spin/orbit while scene is up) ---
+    var s2 = byId('sceneClock'), lt2 = t - s2.start;
+    var sweepDeg = (t * 70) % 360; // keeps spinning using absolute t so it never resets oddly
+    document.getElementById('clockSweep').style.transform = 'rotate(' + sweepDeg + 'deg)';
+    document.getElementById('clockSweep').style.transformOrigin = '100px 100px';
+    [ ['orbitDot1', 210, 1.1, 0], ['orbitDot2', 170, -0.8, 2.4] ].forEach(function(cfg){
+      var el = document.getElementById(cfg[0]);
+      var angle = t * cfg[2] + cfg[3];
+      var r = cfg[1];
+      el.style.left = (230 + Math.cos(angle) * r) + 'px';
+      el.style.top = (230 + Math.sin(angle) * r) + 'px';
+      el.style.opacity = clamp01(progress(lt2, 0.3, 0.7));
+    });
+    [['tnIntake',0.70],['tnFollow',0.85],['tnBilling',1.00]].forEach(function(pair){
+      var el = document.getElementById(pair[0]);
+      var lp = progress(lt2, pair[1], pair[1] + 0.4);
+      var p = easeOutBack(lp);
+      el.style.opacity = clamp01(lp * 1.5);
+      el.style.transform = 'translateY(' + (1-p) * 26 + 'px)';
+    });
+    var teamLineWindows = { tline1:[0.50,0.90], tline2:[0.55,0.95], tline3:[0.60,1.00] };
+    ['tline1','tline2','tline3'].forEach(function(id, i){
+      var w = teamLineWindows[id];
+      var len = diagLens[id];
+      if (len == null) return; // not yet computed (before onFontsReady)
+      var drawP = easeOutCubic(progress(lt2, w[0], w[1]));
+      diagPaths[id].style.strokeDasharray = len;
+      diagPaths[id].style.strokeDashoffset = len * (1 - drawP);
+      var loopStart = w[1] + 0.15;
+      var dot = diagDots[id];
+      if (lt2 < loopStart || t > s2.end) { dot.style.opacity = 0; return; }
+      var cycle = 1.1, stagger = i * 0.16;
+      var localT = ((lt2 - loopStart + stagger) % cycle + cycle) % cycle / cycle;
+      var pt = diagPaths[id].getPointAtLength(localT * len);
+      dot.style.opacity = 0.9;
+      dot.setAttribute('cx', pt.x);
+      dot.setAttribute('cy', pt.y);
+    });
+
+    // --- Scene 3: chat bubbles (local time) ---
+    var s3 = byId('sceneChat');
+    [['b1',0.4],['b2',1.2],['b3',2.0],['b4',2.8]].forEach(function(pair){
+      var el = document.getElementById(pair[0]);
+      var p = easeOutCubic(progress(t - s3.start, pair[1], pair[1] + 0.4));
+      el.style.opacity = p;
+      el.style.transform = 'translateY(' + (1-p) * 18 + 'px)';
+    });
+    var badgeProg = progress(t - s3.start, 3.5, 3.9);
+    var badgeP = easeOutBack(badgeProg);
+    document.getElementById('statusBadge').style.opacity = clamp01(badgeProg * 1.4);
+    document.getElementById('statusBadge').style.transform = 'scale(' + (0.8 + badgeP * 0.2) + ')';
+
+    // --- Scene 4: vignettes (local time) ---
+    var s4 = byId('sceneVignette');
+    [['vigFollow',0.4],['vigBilling',1.3]].forEach(function(pair){
+      var el = document.getElementById(pair[0]);
+      var lp = progress(t - s4.start, pair[1], pair[1] + 0.55);
+      var p = easeOutBack(lp);
+      el.style.opacity = clamp01(lp * 1.6);
+      el.style.transform = 'translateY(' + (1-p) * 40 + 'px)';
+    });
+
+    // --- Scene 5: diagram (local time) ---
+    var s5 = byId('sceneDiagram'), lt5 = t - s5.start;
+    [['dnCalls',0.30],['dnEmails',0.45],['dnWeb',0.60]].forEach(function(pair){
+      var el = document.getElementById(pair[0]);
+      var p = easeOutCubic(progress(lt5, pair[1], pair[1] + 0.3));
+      el.style.opacity = p;
+      el.style.transform = 'translate(-50%,-50%) translateY(' + (1-p) * -14 + 'px)';
+    });
+    var hubProg = progress(lt5, 0.75, 1.15);
+    document.querySelector('.dhub').style.opacity = clamp01(hubProg * 1.3);
+    var hubPop = easeOutBack(hubProg);
+    document.querySelector('.dhub').style.transform = 'translate(-50%,-50%) scale(' + (0.85 + hubPop * 0.15) + ')';
+    [['dnCal',1.25],['dnCrm',1.40],['dnBill',1.55]].forEach(function(pair){
+      var el = document.getElementById(pair[0]);
+      var p = easeOutCubic(progress(lt5, pair[1], pair[1] + 0.3));
+      el.style.opacity = p;
+      el.style.transform = 'translate(-50%,-50%) translateY(' + (1-p) * 14 + 'px)';
+    });
+    var lineWindows = { line1:[0.40,0.80], line2:[0.45,0.85], line3:[0.50,0.90],
+                         line4:[1.25,1.65], line5:[1.30,1.70], line6:[1.35,1.75] };
+    ['line1','line2','line3','line4','line5','line6'].forEach(function(id, i){
+      var w = lineWindows[id];
+      var len = diagLens[id];
+      if (len == null) return; // not yet computed (before onFontsReady)
+      var drawP = easeOutCubic(progress(lt5, w[0], w[1]));
+      diagPaths[id].style.strokeDasharray = len;
+      diagPaths[id].style.strokeDashoffset = len * (1 - drawP);
+      var loopStart = w[1] + 0.15;
+      var dot = diagDots[id];
+      if (lt5 < loopStart || t > s5.end) { dot.style.opacity = 0; return; }
+      var cycle = 1.15, stagger = i * 0.16;
+      var localT = ((lt5 - loopStart + stagger) % cycle + cycle) % cycle / cycle;
+      var pt = diagPaths[id].getPointAtLength(localT * len);
+      dot.style.opacity = 0.9;
+      dot.setAttribute('cx', pt.x);
+      dot.setAttribute('cy', pt.y);
+    });
+
+    // --- Scene 6: price then CTA, within one scene ---
+    var s6 = byId('scenePriceCta'), lt6 = t - s6.start;
+    var pricePop = easeOutBack(progress(lt6, 0.15, 0.55));
+    document.getElementById('priceNum').style.transform = 'scale(' + (0.7 + pricePop * 0.3) + ')';
+    var ctaP = easeOutCubic(progress(lt6, 3.6, 4.0));
+    document.getElementById('ctaText').style.opacity = ctaP;
+    document.getElementById('siteText').style.opacity = ctaP;
+  }
+
+  window.renderFrame = renderFrame;
+  window.TOTAL_DURATION = TOTAL_DURATION;
+  window.SCENES_DEBUG = SCENES;
+  renderFrame(0);
+</script>
+</body>
+</html>

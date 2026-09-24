@@ -10,6 +10,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { getService, getMonthlyCheckoutUrl } from "@/lib/services";
 
 const SANS = "var(--font-geist-sans, Geist, system-ui, sans-serif)";
 const MONO = "var(--font-geist-mono, 'Geist Mono', monospace)";
@@ -144,6 +145,8 @@ function IntakeSimulation() {
 }
 
 export default function InsuranceDemoClient() {
+  const service = getService("insurance-ai-team");
+  const checkoutUrl = service ? getMonthlyCheckoutUrl(service) : null;
   return (
     <div style={{ background: VOID, color: FROST, fontFamily: SANS }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "96px 24px" }}>
@@ -202,21 +205,23 @@ export default function InsuranceDemoClient() {
             Ready to stop losing quote requests?
           </h2>
           <p style={{ margin: "0 0 28px", fontSize: 16, color: MIST }}>Wires into what you already use. Live in 2 to 7 days.</p>
-          <Link
-            href="/services/ai-lead-capture-follow-up"
-            style={{
-              display: "inline-block",
-              padding: "14px 32px",
-              borderRadius: 999,
-              background: `linear-gradient(90deg, #5CC8FF, #3B6BFF, ${VIOLET})`,
-              color: VOID,
-              fontWeight: 500,
-              fontSize: 15,
-              textDecoration: "none",
-            }}
-          >
-            Get the Insurance Account Manager Bundle
-          </Link>
+          {checkoutUrl && (
+            <a
+              href={checkoutUrl}
+              style={{
+                display: "inline-block",
+                padding: "14px 32px",
+                borderRadius: 999,
+                background: `linear-gradient(90deg, #5CC8FF, #3B6BFF, ${VIOLET})`,
+                color: VOID,
+                fontWeight: 500,
+                fontSize: 15,
+                textDecoration: "none",
+              }}
+            >
+              Get the Insurance Account Manager Bundle
+            </a>
+          )}
           <div style={{ marginTop: 14 }}>
             <Link href="/" style={{ fontSize: 13, color: MIST, textDecoration: "underline" }}>
               &larr; Back to Zenith Studio

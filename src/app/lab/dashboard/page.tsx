@@ -308,7 +308,7 @@ export default async function DashboardPage() {
 
                 return (
                   <div key={p.id} className="rounded-xl border border-[#232838] bg-[#151920] p-5 transition hover:border-[#333a4c]">
-                    <Link href={`/lab/dashboard/services/${p.id}`} className="block">
+                    <Link href={`/services/dashboard/${p.id}`} className="block">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                           <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#333a4c] bg-[#191d26]">

@@ -152,7 +152,7 @@ export default async function AdminProjectDetailPage({
     const completed = String(formData.get("completed") || "") === "1";
     await setMilestoneCompleted(id, milestoneId, completed);
     revalidatePath(path);
-    revalidatePath(`/lab/dashboard/services/${id}`);
+    revalidatePath(`/services/dashboard/${id}`);
   }
 
   async function setRequirementStatus(formData: FormData) {
@@ -163,7 +163,7 @@ export default async function AdminProjectDetailPage({
     const status = String(formData.get("status") || "");
     await updateRequirementStatusAsAdmin(id, requirementId, status);
     revalidatePath(path);
-    revalidatePath(`/lab/dashboard/services/${id}`);
+    revalidatePath(`/services/dashboard/${id}`);
   }
 
   async function saveNote(formData: FormData) {
@@ -203,7 +203,7 @@ export default async function AdminProjectDetailPage({
     const body = String(formData.get("body") || "");
     await postAdminMessage(id, session.user.id, body);
     revalidatePath(path);
-    revalidatePath(`/lab/dashboard/services/${id}`);
+    revalidatePath(`/services/dashboard/${id}`);
   }
 
   async function approveEntry(formData: FormData) {
@@ -661,7 +661,7 @@ export default async function AdminProjectDetailPage({
                     className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4"
                   >
                     <span className="text-sm font-semibold">
-                      {c.provider === "GMAIL" ? "Gmail" : "Yahoo"} · {c.emailAddress}
+                      {c.provider === "GMAIL" ? "Gmail" : c.provider === "YAHOO" ? "Yahoo" : "Zoho Mail"} · {c.emailAddress}
                     </span>
                     <span className={`text-xs ${c.status === "CONNECTED" ? "text-emerald-300" : "text-amber-300"}`}>
                       {c.status === "CONNECTED" ? "Connected" : `Connection issue${c.lastError ? `: ${c.lastError}` : ""}`}

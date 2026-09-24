@@ -1,0 +1,287 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Zenith AI - Brand Reel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0b0b0f; --card2:rgba(255,255,255,.05); --bd2:rgba(255,255,255,.14);
+    --tx:#f3f2ff; --mut:#a8a4c8; --mut2:#6f6b93;
+    --accent:#8b7cff; --accent2:#43e6ff; --accentd:#0c0a1f; --neon:#22e07a;
+  }
+  html,body{width:1080px;height:1920px;overflow:hidden}
+  body{ background:var(--bg); color:var(--tx); font-family:'IBM Plex Sans',sans-serif; }
+  .canvas{ position:relative; width:100%; height:100%; overflow:hidden; background:var(--bg); }
+  #three-canvas{ position:absolute; inset:0; width:1080px; height:1920px; z-index:0; }
+  /* Dot-grid canvas/builder-tool backdrop, replacing the old nebula glow */
+  .canvas::before{
+    content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+    background-image: radial-gradient(rgba(255,255,255,.14) 1.6px, transparent 1.8px);
+    background-size: 34px 34px;
+    background-position: 0 0;
+  }
+  .logo{ position:absolute; top:56px; left:56px; z-index:10; font-family:'Fraunces'; font-weight:700; font-size:29px; letter-spacing:-.01em; }
+  .logo b{ background:linear-gradient(120deg,var(--accent),var(--accent2)); color:var(--accentd); padding:4px 11px; margin-left:5px; border-radius:8px; font-size:19px; }
+
+  .scene{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:2; padding-bottom:160px; }
+
+  .subtitle{ position:absolute; left:0; right:0; bottom:96px; z-index:20; display:flex; justify-content:center; padding:0 64px; pointer-events:none; }
+  .subtitle .box{ background:rgba(8,7,20,.65); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1px solid var(--bd2); border-radius:20px; padding:22px 30px; max-width:960px; text-align:center; box-shadow:0 20px 60px -20px rgba(0,0,0,.6); }
+  .subtitle .box p{ font-family:'IBM Plex Sans'; font-weight:600; font-size:30px; line-height:1.35; color:var(--tx); }
+
+  /* Hero */
+  #sceneHero .wrap{ text-align:center; }
+  #sceneHero .word{ font-family:'Fraunces'; font-weight:700; font-size:96px; letter-spacing:-.02em; }
+  #sceneHero .word b{ background:linear-gradient(120deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  #sceneHero .tag{ margin-top:18px; font-family:'IBM Plex Mono'; font-size:22px; letter-spacing:.06em; color:var(--mut); text-transform:uppercase; }
+
+  /* Team hub: a cascading fan of glass cards (CSS 3D), one lit neon green
+     as the "active automation" card, replacing the old orbiting satellites. */
+  #sceneTeamHub .fanstage{ position:absolute; inset:0; perspective:1600px; display:flex; align-items:center; justify-content:center; }
+  .fancard{
+    position:absolute; width:520px; height:300px; left:50%; top:50%;
+    background:rgba(255,255,255,.06); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border:1.5px solid rgba(255,255,255,.22); border-radius:30px;
+    box-shadow:0 30px 70px -24px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.2);
+    display:flex; flex-direction:column; justify-content:center; padding:0 42px;
+  }
+  .fancard.active{ background:rgba(34,224,122,.16); border-color:rgba(34,224,122,.65); box-shadow:0 0 70px rgba(34,224,122,.45), inset 0 1px 0 rgba(255,255,255,.25); }
+  .fancard .ficon{ width:54px; height:54px; border-radius:14px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+  .fancard.active .ficon{ background:linear-gradient(135deg,var(--neon),#7cffc4); }
+  .fancard .ficon svg{ width:26px; height:26px; color:var(--accentd); }
+  .fancard .fname{ font-family:'Fraunces'; font-weight:700; font-size:28px; letter-spacing:-.01em; }
+  .fancard .ftag{ margin-top:4px; font-family:'IBM Plex Mono'; font-size:14px; letter-spacing:.05em; text-transform:uppercase; color:var(--mut2); }
+  .fancard.active .ftag{ color:var(--neon); }
+
+  /* HTML labels docked to projected positions of the 3D glass nodes (hero
+     root node, integration nodes) — same projection technique as before,
+     just generalized past a single "hub" scene. */
+  .nodelabel{ position:absolute; transform:translate(-50%,-50%); text-align:center; width:230px; }
+  .nodelabel .hicon{ width:60px; height:60px; margin:0 auto 10px; border-radius:16px; background:rgba(255,255,255,.08); backdrop-filter:blur(10px); border:1.5px solid var(--bd2); display:flex; align-items:center; justify-content:center; box-shadow:0 10px 30px -10px rgba(0,0,0,.5); }
+  .nodelabel .hicon svg, .nodelabel .hicon img{ width:28px; height:28px; }
+  .nodelabel .hname{ font-family:'Fraunces'; font-weight:700; font-size:19px; letter-spacing:-.01em; }
+
+  /* Glass service card */
+  .gcard{ position:relative; width:880px; background:rgba(255,255,255,.055); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1.5px solid var(--bd2); border-radius:32px; padding:48px 52px; box-shadow:0 30px 80px -30px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.15); }
+  .gcard::before{ content:""; position:absolute; inset:0; border-radius:32px; padding:1.5px; background:linear-gradient(135deg, rgba(255,255,255,.4), transparent 40%); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+  .gcard .gicon{ width:88px; height:88px; border-radius:22px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; margin-bottom:30px; box-shadow:0 16px 40px -12px color-mix(in srgb, var(--accent) 60%, transparent); }
+  .gcard .gicon svg{ width:44px; height:44px; color:var(--accentd); }
+  .gcard .gtitle{ font-family:'Fraunces'; font-weight:700; font-size:44px; letter-spacing:-.02em; line-height:1.1; }
+  .gcard .gpitch{ margin-top:14px; font-size:23px; line-height:1.45; color:var(--mut); }
+  .gcard .gprice{ margin-top:28px; display:inline-flex; align-items:baseline; gap:8px; font-family:'IBM Plex Mono'; }
+  .gcard .gprice .amt{ font-size:34px; font-weight:700; background:linear-gradient(120deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .gcard .gprice .per{ font-size:18px; color:var(--mut2); }
+
+  /* Dual card (industry teams) */
+  .dualwrap{ display:flex; gap:24px; }
+  .dualwrap .gcard{ width:420px; padding:36px 34px; }
+  .dualwrap .gcard .gtitle{ font-size:30px; }
+  .dualwrap .gcard .gpitch{ font-size:18px; margin-top:10px; }
+  .dualwrap .gcard .gicon{ width:64px; height:64px; border-radius:17px; margin-bottom:20px; }
+  .dualwrap .gcard .gicon svg{ width:32px; height:32px; }
+
+  /* Integrations: real Three.js glass nodes + bezier pulse pipes now (see
+     _reel-brand.js) — this scene just needs the eyebrow and label docking. */
+  #sceneIntegrations .eyebrow{ position:absolute; top:300px; left:0; right:0; text-align:center; font-family:'IBM Plex Mono'; font-size:27px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; background:linear-gradient(120deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent; z-index:5; }
+
+  /* How it works: a real step-by-step pipeline diagram, connector lines
+     computed from real element rects (see onFontsReady) so they land
+     exactly on the cards regardless of font metrics. */
+  #sceneHowItWorks .wrap{ position:relative; width:100%; height:100%; }
+  #sceneHowItWorks .eyebrow{ position:absolute; top:270px; left:0; right:0; text-align:center; font-family:'IBM Plex Mono'; font-size:27px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; background:linear-gradient(120deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  #sceneHowItWorks svg.hwflow{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .flow-line{ fill:none; stroke:var(--bd2); stroke-width:2.5; }
+  .flow-dot{ fill:var(--accent2); filter:drop-shadow(0 0 7px var(--accent2)); }
+  .hwnode{ position:absolute; left:50%; transform:translate(-50%,-50%); width:820px; background:rgba(255,255,255,.055); backdrop-filter:blur(16px); border:1.5px solid var(--bd2); border-radius:26px; padding:26px 30px; display:flex; align-items:center; gap:22px; box-shadow:0 24px 50px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.14); }
+  .hwnode .hwicon{ width:64px; height:64px; border-radius:17px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 12px 30px -10px rgba(139,124,255,.5); }
+  .hwnode .hwicon svg{ width:32px; height:32px; color:var(--accentd); }
+  .hwnode .hwtext{ text-align:left; }
+  .hwnode .hwtitle{ font-family:'Fraunces'; font-weight:700; font-size:27px; letter-spacing:-.01em; }
+  .hwnode .hwdesc{ margin-top:5px; font-size:17px; line-height:1.35; color:var(--mut); }
+  .hwnode .hwstep{ position:absolute; top:-16px; left:-16px; width:36px; height:36px; border-radius:50%; background:var(--accentd); border:1.5px solid var(--accent); color:var(--accent); font-family:'IBM Plex Mono'; font-weight:700; font-size:16px; display:flex; align-items:center; justify-content:center; }
+
+  /* CTA (no pricing) */
+  #sceneCta .wrap{ text-align:center; }
+  #sceneCta .ctaword{ font-family:'Fraunces'; font-weight:700; font-size:80px; letter-spacing:-.02em; }
+  #sceneCta .ctaword b{ background:linear-gradient(120deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  #sceneCta .tag{ font-family:'IBM Plex Mono'; font-size:25px; color:var(--mut); letter-spacing:.03em; }
+  #sceneCta .cta{ font-family:'Caveat'; font-weight:700; font-size:96px; color:var(--tx); transform:rotate(-2deg); margin-top:50px; }
+  #sceneCta .site{ font-family:'IBM Plex Mono'; font-size:29px; color:var(--mut2); letter-spacing:.05em; margin-top:24px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <canvas id="three-canvas"></canvas>
+  <div class="logo">ZENITH<b>AI</b></div>
+  <div class="subtitle"><div class="box" id="subtitleBox"><p id="subtitleText"></p></div></div>
+
+  <!-- Scene 0: hero -->
+  <div class="scene" id="sceneHero">
+    <div class="wrap">
+      <div class="word">ZENITH <b>AI</b></div>
+      <div class="tag">Your business, always on</div>
+    </div>
+  </div>
+
+  <!-- Scene 1: team hub — a cascading fan of glass cards (one lit neon
+       green as "active automation"), replacing the old orbiting satellites -->
+  <div class="scene" id="sceneTeamHub">
+    <div class="fanstage" id="fanStage">
+      <div class="fancard" id="fan-inbox">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+        <div class="fname">Inbox Manager</div>
+        <div class="ftag">Email</div>
+      </div>
+      <div class="fancard" id="fan-lead">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></div>
+        <div class="fname">Lead Capture</div>
+        <div class="ftag">Text + Email</div>
+      </div>
+      <div class="fancard active" id="fan-receptionist">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13a8 8 0 0 1 16 0"/><path d="M19 13v4a2 2 0 0 1-2 2h-1"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/></svg></div>
+        <div class="fname">Receptionist</div>
+        <div class="ftag">Active now</div>
+      </div>
+      <div class="fancard" id="fan-law">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l-3 6a3.5 3.5 0 0 0 6 0Zm14 0-3 6a3.5 3.5 0 0 0 6 0ZM5 8h14M8 21h8"/></svg></div>
+        <div class="fname">Law Firm Team</div>
+        <div class="ftag">Bundle</div>
+      </div>
+      <div class="fancard" id="fan-brokerage">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg></div>
+        <div class="fname">Brokerage Team</div>
+        <div class="ftag">Bundle</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 2: How it works (a real pipeline diagram) -->
+  <div class="scene" id="sceneHowItWorks">
+    <div class="wrap">
+      <div class="eyebrow">How it works</div>
+      <svg class="hwflow">
+        <path class="flow-line" id="hw-line1" d="" />
+        <path class="flow-line" id="hw-line2" d="" />
+        <path class="flow-line" id="hw-line3" d="" />
+        <circle class="flow-dot" id="hw-dot1" r="7" />
+        <circle class="flow-dot" id="hw-dot2" r="7" />
+        <circle class="flow-dot" id="hw-dot3" r="7" />
+      </svg>
+      <div class="hwnode" id="hw-step1" style="top:480px;">
+        <div class="hwstep">1</div>
+        <div class="hwicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+        <div class="hwtext"><div class="hwtitle">A message comes in</div><div class="hwdesc">A call, a text, or an email, any hour of the day</div></div>
+      </div>
+      <div class="hwnode" id="hw-step2" style="top:800px;">
+        <div class="hwstep">2</div>
+        <div class="hwicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 0-5 5v1.1A4.5 4.5 0 0 0 5 12v3a4.5 4.5 0 0 0 2.5 4.03V21a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1v-1.97A4.5 4.5 0 0 0 19 15v-3a4.5 4.5 0 0 0-2-3.9V7a5 5 0 0 0-5-5Z"/><path d="M9 12h.01M15 12h.01"/></svg></div>
+        <div class="hwtext"><div class="hwtitle">Your AI agent reads it</div><div class="hwdesc">Pulls context from your calendar, CRM, and past messages</div></div>
+      </div>
+      <div class="hwnode" id="hw-step3" style="top:1120px;">
+        <div class="hwstep">3</div>
+        <div class="hwicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v12a3 3 0 0 0 3 3h9"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/></svg></div>
+        <div class="hwtext"><div class="hwtitle">Decides what to do</div><div class="hwdesc">Reply, book, follow up, or hand it to you</div></div>
+      </div>
+      <div class="hwnode" id="hw-step4" style="top:1440px;">
+        <div class="hwstep">4</div>
+        <div class="hwicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <div class="hwtext"><div class="hwtitle">Takes action, instantly</div><div class="hwdesc">No waiting for business hours to start</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 3: Inbox Manager -->
+  <div class="scene" id="sceneInbox">
+    <div class="gcard">
+      <div class="gicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+      <div class="gtitle">AI Inbox Manager</div>
+      <div class="gpitch">Wake up to an inbox that is already handled. Sorts and prioritizes email, then drafts replies to the routine ones.</div>
+    </div>
+  </div>
+
+  <!-- Scene 3: Lead Capture -->
+  <div class="scene" id="sceneLead">
+    <div class="gcard">
+      <div class="gicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></div>
+      <div class="gtitle">AI Lead Capture &amp; Follow-Up</div>
+      <div class="gpitch">Never lose a lead to a slow reply again. Captures every enquiry and follows up by email and SMS until they book.</div>
+    </div>
+  </div>
+
+  <!-- Scene 4: Receptionist -->
+  <div class="scene" id="sceneReceptionist">
+    <div class="gcard">
+      <div class="gicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13a8 8 0 0 1 16 0"/><path d="M19 13v4a2 2 0 0 1-2 2h-1"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/></svg></div>
+      <div class="gtitle">AI Receptionist &amp; Booking</div>
+      <div class="gpitch">Answers and books while you are on the job. Handles enquiries around the clock and cuts no-shows with reminders.</div>
+    </div>
+  </div>
+
+  <!-- Scene 5: Industry teams -->
+  <div class="scene" id="sceneTeams">
+    <div class="dualwrap">
+      <div class="gcard">
+        <div class="gicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l-3 6a3.5 3.5 0 0 0 6 0Zm14 0-3 6a3.5 3.5 0 0 0 6 0ZM5 8h14M8 21h8"/></svg></div>
+        <div class="gtitle">Law Firm AI Team</div>
+        <div class="gpitch">Text-back, follow-up, and billing, as one team.</div>
+      </div>
+      <div class="gcard">
+        <div class="gicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg></div>
+        <div class="gtitle">Brokerage AI Team</div>
+        <div class="gpitch">Sales, transactions, and database, as one team.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 6: Integrations -->
+  <div class="scene" id="sceneIntegrations">
+    <div class="wrap">
+      <div class="eyebrow">Connects to what you use</div>
+      <!-- Node labels dock to the projected screen position of each real
+           Three.js glass node (see _reel-brand.js) — the glass blocks and
+           the bezier pulse pipes between them are pure WebGL. -->
+      <div class="nodelabel" id="node-root">
+        <div class="hicon" style="width:70px;height:70px;"><span style="font-family:'Fraunces';font-weight:700;font-size:15px;">ZENITH<br>AI</span></div>
+      </div>
+      <div class="nodelabel" id="node-gmail">
+        <div class="hicon"><svg viewBox="0 0 48 48"><path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z"/><path fill="#1e88e5" d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z"/><path fill="#e53935" d="M35,11.2V23.7l-11,8.8l-11-8.8V11.2l11,8.8L35,11.2z"/><path fill="#c62828" d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z"/><path fill="#fbc02d" d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0C43.076,8,45,9.924,45,12.298z"/></svg></div>
+        <div class="hname">Gmail</div>
+      </div>
+      <div class="nodelabel" id="node-yahoo">
+        <div class="hicon"><svg viewBox="0 0 48 48"><path fill="#7c4dff" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z"/><path fill="#fff" d="M27.4 19.5L24.1 27.2 20.8 19.5 16.2 19.5 22.1 32.3 20 37 24.3 37 32.1 19.5zM28.9 25.3L33.8 14 29.3 14 26.4 21.3z"/></svg></div>
+        <div class="hname">Yahoo Mail</div>
+      </div>
+      <div class="nodelabel" id="node-zoho">
+        <div class="hicon"><svg viewBox="0 0 48 48"><rect width="48" height="48" rx="9" fill="#e2311d"/><text x="24" y="31" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#fff" text-anchor="middle">ZOHO</text></svg></div>
+        <div class="hname">Zoho Mail</div>
+      </div>
+      <div class="nodelabel" id="node-cal">
+        <div class="hicon"><svg viewBox="0 0 48 48"><rect x="4" y="8" width="40" height="36" rx="4" fill="#fff"/><rect x="4" y="8" width="40" height="10" rx="4" fill="#4285f4"/><rect x="10" y="22" width="8" height="8" fill="#4285f4"/><rect x="20" y="22" width="8" height="8" fill="#34a853"/><rect x="30" y="22" width="8" height="8" fill="#fbbc05"/><rect x="10" y="32" width="8" height="8" fill="#ea4335"/><rect x="20" y="32" width="8" height="8" fill="#4285f4"/></svg></div>
+        <div class="hname">Google Calendar</div>
+      </div>
+      <div class="nodelabel" id="node-phone">
+        <div class="hicon"><svg viewBox="0 0 24 24" fill="none" stroke="#43e6ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+        <div class="hname">Phone &amp; SMS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 8: CTA (no pricing) -->
+  <div class="scene" id="sceneCta">
+    <div class="wrap">
+      <div class="ctaword" id="ctaWord">ZENITH <b>AI</b></div>
+      <div class="tag" style="margin-top:14px;">Your AI team is ready when you are.</div>
+      <div class="cta" id="ctaText" style="opacity:0;">link in bio &#8599;</div>
+      <div class="site" id="siteText" style="opacity:0;">zenith-studio.site</div>
+    </div>
+  </div>
+</div>
+
+<script src="_reel-brand.js"></script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+/* App shell: 240px sidebar + fluid main. Designed at 1440x900. */
+.shell {
+  position: relative;
+  display: flex;
+  min-height: 100vh;
+  background: var(--void);
+  font-family: var(--font-body);
+  color: var(--text);
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 240px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 28px 16px;
+  border-right: 1px solid var(--line-07);
+  background: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+}
+
+.brandMark {
+  width: 36px;
+  height: 36px;
+  box-sizing: border-box;
+  border-radius: 11px;
+  background: linear-gradient(var(--tile), var(--tile)) padding-box, var(--edge) border-box;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.brandText { display: flex; flex-direction: column; }
+.brandName { font-family: var(--font-display); font-size: 15px; font-weight: 600; }
+.brandSub { font-size: 12px; color: var(--muted); }
+
+.nav { display: flex; flex-direction: column; gap: 4px; }
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+.navItem:hover { color: var(--text); }
+
+.navItemActive {
+  background: var(--fill-06);
+  border-color: var(--line-10);
+  color: var(--text);
+}
+
+.navLabel { flex-grow: 1; }
+
+.badge {
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--amber);
+  color: var(--amber-ink);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebarFooter {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.askButton {
+  height: 44px;
+  border-radius: 999px;
+  border: none;
+  background: var(--mint);
+  color: var(--mint-ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 0 20px rgba(61, 220, 132, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--fill-03);
+  border: 1px solid var(--line-07);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--avatar);
+  border: 1px solid var(--line-12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.userText { display: flex; flex-direction: column; }
+.userName { font-size: 13px; font-weight: 600; }
+.userRole { font-size: 11px; color: var(--muted); }
+
+/* ---------- Main ---------- */
+.main {
+  position: relative;
+  flex-grow: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow: hidden;
+}
+
+/* Soft color orb, top right of main */
+.orb {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  top: -220px;
+  right: -120px;
+  border-radius: 50%;
+  filter: blur(24px);
+  pointer-events: none;
+}
+.orbViolet { background: radial-gradient(circle, rgba(168, 85, 247, 0.28), rgba(168, 85, 247, 0) 70%); }
+.orbCyan { background: radial-gradient(circle, rgba(34, 211, 238, 0.2), rgba(34, 211, 238, 0) 70%); }

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mikes Mobile Auto Repair</title>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Source+Sans+3:wght@400;500;600&family=Roboto+Mono:wght@500;700&display=swap');
+
+  :root{
+    --graphite-950:#161512;
+    --graphite-900:#1e1c18;
+    --graphite-800:#2b2822;
+    --graphite-700:#3d382f;
+    --paper-100:#f5f1e8;
+    --khaki-400:#a89f8c;
+    --khaki-500:#7d7666;
+    --yellow-500:#ffd23f;
+    --yellow-400:#ffe083;
+
+    --font-display:'Teko',"Arial Narrow",sans-serif;
+    --font-body:'Source Sans 3',system-ui,sans-serif;
+    --font-mono:'Roboto Mono',ui-monospace,monospace;
+
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--graphite-950);
+    color:var(--paper-100);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;}
+  [hidden]{display:none!important;}
+
+  .wrap{ max-width:1360px; margin:0 auto; padding-inline:clamp(20px,4.5vw,64px); }
+  a{color:inherit;}
+
+  .pegrow{
+    height:2px; width:100%;
+    background-image:repeating-linear-gradient(90deg, var(--yellow-500) 0 8px, transparent 8px 26px);
+    opacity:.4;
+  }
+
+  header.top{
+    padding-block:18px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 12px;
+  }
+  .brand{
+    font-family:var(--font-display); font-weight:700; letter-spacing:.01em;
+    font-size:clamp(1.05rem,4.8vw,1.5rem); text-transform:uppercase;
+    display:flex; align-items:center; gap:.55em; min-width:0;
+  }
+  .brand .blip{ width:9px;height:9px;border-radius:2px; background:var(--yellow-500); box-shadow:0 0 0 0 rgba(255,210,63,.6); animation:pulse 2.2s ease-out infinite; flex:none; }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(255,210,63,.5);}
+    70%{box-shadow:0 0 0 9px rgba(255,210,63,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,210,63,0);}
+  }
+  @media (prefers-reduced-motion:reduce){ .brand .blip{animation:none;} }
+
+  .top-call{
+    font-family:var(--font-mono); font-weight:700; font-size:clamp(.78rem,3.4vw,1.02rem);
+    text-decoration:none; color:var(--paper-100); border:1px solid var(--graphite-700);
+    padding:.5em .8em; white-space:nowrap; font-variant-numeric:tabular-nums; background:var(--graphite-900);
+  }
+
+  .nav-links{ display:flex; align-items:center; gap:2.2em; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; }
+  .nav-links a{ text-decoration:none; color:var(--khaki-400); padding:.5em 1em; border-radius:999px; transition:color .15s ease, background .15s ease; }
+  .nav-links a:hover{ color:var(--yellow-400); }
+  .nav-links a:first-child{ background:var(--yellow-500); color:var(--graphite-950); }
+  .nav-links a:first-child:hover{ color:var(--graphite-950); }
+  @media (max-width:820px){ .nav-links{ display:none; } }
+
+  .hero{ position:relative; padding-block:60px 52px; overflow:hidden; }
+  .hero-grid{ display:grid; grid-template-columns:minmax(0,620px) 1fr; gap:32px; align-items:start; }
+  @media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } .pegboard{ display:none; } }
+
+  .eyebrow{
+    font-family:var(--font-mono); font-size:.76rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--yellow-400); display:flex; align-items:center; gap:.6em; margin-bottom:18px;
+  }
+  .eyebrow::before{ content:""; width:22px;height:1px; background:var(--yellow-400); display:inline-block; }
+
+  h1{
+    font-family:var(--font-display); text-transform:uppercase; font-weight:700; line-height:.92;
+    font-size:clamp(2.4rem,9.5vw,5.2rem); margin:0 0 20px; text-wrap:balance;
+  }
+  h1 em{ font-style:normal; color:var(--yellow-500); }
+
+  .hero p.sub{ max-width:48ch; color:var(--khaki-400); font-size:clamp(1rem,2vw,1.12rem); line-height:1.6; margin:0 0 32px; }
+
+  .cta-row{ display:flex; flex-wrap:wrap; gap:14px; margin-bottom:38px; }
+  .btn{
+    display:inline-flex; align-items:center; gap:.6em; font-family:var(--font-body); font-weight:600; font-size:1rem;
+    padding:.95em 1.5em; text-decoration:none; transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+    border:1px solid transparent; border-radius:2px;
+  }
+  .btn-primary{ background:var(--yellow-500); color:var(--graphite-950); }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 10px 24px -8px rgba(255,210,63,.5); background:var(--yellow-400); }
+  .btn-ghost{ border-color:var(--graphite-700); color:var(--paper-100); background:var(--graphite-900); }
+  .btn-ghost:hover{ transform:translateY(-2px); border-color:var(--khaki-500); background:var(--graphite-800); }
+
+  .hero-stats{ display:flex; flex-wrap:wrap; gap:28px 40px; }
+  .stat b{ display:block; font-family:var(--font-mono); font-weight:700; font-size:1.5rem; color:var(--paper-100); font-variant-numeric:tabular-nums; }
+  .stat span{ display:block; font-size:.76rem; color:var(--khaki-500); text-transform:uppercase; letter-spacing:.08em; margin-top:2px; }
+
+  /* ---- pegboard (hero visual) ---- */
+  .pegboard{
+    position:relative; width:100%; max-width:340px; aspect-ratio:1/1; margin-inline:auto;
+    border:1px solid var(--graphite-700); background:var(--graphite-900); overflow:hidden;
+  }
+  .pegboard-dots{
+    position:absolute; inset:0;
+    background-image: radial-gradient(var(--graphite-700) 1.5px, transparent 1.5px);
+    background-size:28px 28px;
+    background-position:14px 14px;
+  }
+  .tool{ position:absolute; stroke:var(--khaki-400); fill:none; stroke-width:1.6; opacity:.55; }
+  .tool.active{ stroke:var(--yellow-500); opacity:1; animation:pulse2 2.4s ease-out infinite; }
+  @keyframes pulse2{ 0%,100%{opacity:1;} 50%{opacity:.6;} }
+  @media (prefers-reduced-motion:reduce){ .tool.active{animation:none;} }
+  .pegboard-label{
+    position:absolute; left:50%; bottom:-30px; transform:translateX(-50%);
+    font-family:var(--font-mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--yellow-400); white-space:nowrap;
+  }
+
+  .reveal{ opacity:1; transform:none; transition:opacity .6s ease, transform .6s ease; }
+  .reveal.pre{ opacity:0; transform:translateY(22px); }
+  @media (prefers-reduced-motion:reduce){ .reveal.pre{opacity:1;transform:none;} }
+
+  section{ padding-block:60px; }
+  .kicker{ font-family:var(--font-mono); font-size:.76rem; letter-spacing:.14em; text-transform:uppercase; color:var(--yellow-400); margin:0 0 10px; }
+  h2{ font-family:var(--font-display); text-transform:uppercase; font-weight:700; font-size:clamp(1.9rem,4vw,2.6rem); margin:0 0 34px; max-width:24ch; text-wrap:balance; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
+  .card{ background:var(--graphite-900); border:1px solid var(--graphite-700); padding:26px 22px; transition:transform .2s ease, border-color .2s ease, background .2s ease; }
+  .card:hover{ transform:translateY(-4px); border-color:var(--yellow-500); background:var(--graphite-800); }
+  .card svg{ width:26px;height:26px; stroke:var(--yellow-500); margin-bottom:16px; }
+  .card h3{ font-family:var(--font-body); font-weight:600; font-size:1.03rem; margin:0 0 8px; }
+  .card p{ color:var(--khaki-400); font-size:.92rem; line-height:1.55; margin:0; }
+
+  .coverage-wrap{ display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:start; }
+  @media (max-width:760px){ .coverage-wrap{grid-template-columns:1fr;} }
+
+  .why-list{ display:flex; flex-direction:column; gap:18px; }
+  .why-item{ display:flex; gap:14px; align-items:flex-start; padding-bottom:18px; border-bottom:1px solid var(--graphite-800); }
+  .why-item:last-child{border-bottom:none;padding-bottom:0;}
+  .why-item svg{ width:20px;height:20px;flex:none;margin-top:3px; stroke:var(--yellow-500); }
+  .why-item h4{ font-size:1rem; font-weight:600; margin:0 0 4px; }
+  .why-item p{ color:var(--khaki-400); font-size:.9rem; margin:0; line-height:1.5; }
+
+  .info-card{ background:var(--graphite-900); border:1px solid var(--graphite-700); padding:22px; }
+  .info-card dl{ display:grid; grid-template-columns:auto 1fr; gap:8px 16px; margin:0; font-size:.92rem; }
+  .info-card dt{ color:var(--khaki-500); text-transform:uppercase; letter-spacing:.06em; font-size:.72rem; font-family:var(--font-mono); align-self:start; padding-top:2px; }
+  .info-card dd{ margin:0; color:var(--paper-100); }
+
+  .cta-banner{
+    position:relative; background:linear-gradient(150deg,var(--yellow-500),var(--yellow-400));
+    color:var(--graphite-950); padding:48px 20px; text-align:center; overflow:hidden;
+  }
+  .cta-banner h2{ color:var(--graphite-950); margin:0 0 6px; max-width:none; }
+  .cta-banner p{ margin:0 0 26px; font-family:var(--font-body); font-weight:500; opacity:.85; }
+  .big-phone{
+    position:relative; display:inline-flex; align-items:baseline; gap:.3em;
+    font-family:var(--font-mono); font-weight:700; font-size:clamp(1.4rem,7.5vw,2.8rem);
+    color:var(--graphite-950); text-decoration:none; font-variant-numeric:tabular-nums;
+    border-bottom:3px solid var(--graphite-950); padding-bottom:4px; max-width:100%;
+  }
+
+  footer{ padding-block:40px calc(96px + env(safe-area-inset-bottom,0px)); color:var(--khaki-500); font-size:.85rem; }
+  .foot-grid{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:20px; padding-top:28px; border-top:1px solid var(--graphite-800); }
+  .foot-grid b{ color:var(--khaki-400); }
+
+  .dispatch{ position:fixed; left:0;right:0;bottom:0; z-index:40; display:flex; gap:1px; background:var(--graphite-700); padding-bottom:env(safe-area-inset-bottom,0px); }
+  .dispatch a{ flex:1; text-align:center; padding:14px 8px; font-weight:600; font-size:.92rem; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:.5em; }
+  .dispatch a:first-child{ background:var(--yellow-500); color:var(--graphite-950); }
+  .dispatch a:last-child{ background:var(--graphite-900); color:var(--paper-100); }
+  .dispatch svg{ width:16px;height:16px; }
+
+  @media (min-width:761px){ .dispatch{display:none;} }
+  @media (max-width:760px){ footer{padding-bottom:100px;} }
+</style>
+</head>
+<body>
+
+<div class="pegrow"></div>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="blip"></span>Mikes Mobile Auto Repair</div>
+      <nav class="nav-links">
+        <a href="#services">Services</a>
+        <a href="#coverage">Coverage</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    <a class="top-call" href="tel:+17792071528">(779) 207-1528</a>
+  </header>
+</div>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Rockford, IL &middot; Mobile mechanic</p>
+      <h1 class="reveal pre">The shop comes<br>to <em>your driveway.</em></h1>
+      <p class="sub reveal pre">Diagnostics, brakes, batteries and more, done wherever your car already is. No tow, no waiting room, no ride home to arrange.</p>
+      <div class="cta-row reveal pre">
+        <a class="btn btn-primary" href="tel:+17792071528">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Call now
+        </a>
+        <a class="btn btn-ghost" href="sms:+17792071528">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Text us
+        </a>
+      </div>
+      <div class="hero-stats reveal pre">
+        <div class="stat"><b>5.0&#9733;</b><span>Google rating</span></div>
+        <div class="stat"><b>729 Furman</b><span>St, Rockford IL</span></div>
+        <div class="stat"><b>Weekdays</b><span>Closes 5 PM*</span></div>
+      </div>
+    </div>
+    <div class="pegboard reveal pre" aria-hidden="true">
+      <div class="pegboard-dots"></div>
+      <svg viewBox="0 0 340 340" width="100%" height="100%">
+        <g class="tool" transform="translate(80,70)"><circle cx="0" cy="0" r="10"/><path d="M8,8 L40,40"/></g>
+        <g class="tool active" transform="translate(190,90)"><path d="M0,0 L28,28 M0,28 L28,0"/><circle cx="14" cy="14" r="16"/></g>
+        <g class="tool" transform="translate(100,190)"><path d="M0,0 L0,40 M-10,0 L10,0"/></g>
+        <g class="tool" transform="translate(220,220)"><rect x="0" y="0" width="34" height="14" rx="2"/><path d="M34,7 L48,7"/></g>
+      </svg>
+      <div class="pegboard-label">Tools on the truck</div>
+    </div>
+  </div>
+</section>
+
+<div class="pegrow"></div>
+
+<section id="services">
+  <div class="wrap">
+    <p class="kicker reveal pre">What we fix</p>
+    <h2 class="reveal pre">Full service, zero shop visit</h2>
+    <div class="grid">
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <h3>Check engine diagnostics</h3>
+        <p>Light on? We scan the codes on-site and tell you exactly what's wrong before any work starts.</p>
+      </div>
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V9l3-5h9l3 5h3v8h-2"/></svg>
+        <h3>Brake repair &amp; replacement</h3>
+        <p>Pads, rotors and calipers replaced in your driveway, same-day in most cases.</p>
+      </div>
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>
+        <h3>Battery &amp; alternator</h3>
+        <p>Won't start or dying fast? We test, diagnose and swap the part on the spot.</p>
+      </div>
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+        <h3>Oil &amp; fluid service</h3>
+        <p>Oil, coolant, brake and transmission fluid changes without a shop appointment.</p>
+      </div>
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="M12 3v18"/><path d="M5.6 5.6l12.8 12.8"/><path d="M18.4 5.6 5.6 18.4"/></svg>
+        <h3>AC &amp; cooling repair</h3>
+        <p>Blowing warm or overheating? We diagnose the leak or fault and fix it in place.</p>
+      </div>
+      <div class="card reveal pre">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 4h3v4h-2l-2 8H9l-2-8H5V7h3z"/></svg>
+        <h3>Starter &amp; electrical</h3>
+        <p>Clicking, no-crank and wiring issues traced and repaired without a tow.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="pegrow"></div>
+
+<section id="coverage">
+  <div class="wrap coverage-wrap">
+    <div>
+      <p class="kicker reveal pre">Coverage</p>
+      <h2 class="reveal pre">Rockford &amp; the surrounding area</h2>
+      <p class="reveal pre" style="color:var(--khaki-400);max-width:48ch;line-height:1.6;margin-bottom:24px;">
+        Based in Rockford, working out of Furman St. If your car won't move, call ahead to confirm we can reach your exact location.
+      </p>
+      <div class="why-list">
+        <div class="why-item reveal pre">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <div><h4>Upfront pricing</h4><p>You get a quote before any tool touches your car. No surprise labor charges.</p></div>
+        </div>
+        <div class="why-item reveal pre">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <div><h4>No shop, no wait</h4><p>Skip the drop-off and the waiting room. We work while your car stays put.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="info-card reveal pre">
+      <dl>
+        <dt>Address</dt><dd>729 Furman St, Rockford, IL 61101</dd>
+        <dt>Rating</dt><dd>5.0&#9733; on Google (early reviews)</dd>
+        <dt>Hours</dt><dd>Weekdays &middot; closes around 5 PM*</dd>
+        <dt>Phone</dt><dd><a href="tel:+17792071528">(779) 207-1528</a></dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="cta-banner reveal pre">
+      <h2>Car acting up?</h2>
+      <p>Call or text. We'll come take a look, wherever you are.</p>
+      <a class="big-phone" href="tel:+17792071528">(779) 207-1528</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div><b>Mikes Mobile Auto Repair</b><br>Rockford, IL</div>
+      <div><b>Hours</b><br>Weekdays, call for today's availability*</div>
+      <div><b>Contact</b><br><a href="tel:+17792071528" style="color:var(--khaki-400)">(779) 207-1528</a></div>
+    </div>
+    <p style="margin-top:24px;font-size:.76rem;color:var(--khaki-500);">*Hours inferred from Google's live listing. Call to confirm.</p>
+  </div>
+</footer>
+
+<div class="dispatch">
+  <a href="tel:+17792071528">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    Call Now
+  </a>
+  <a href="sms:+17792071528">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    Text
+  </a>
+</div>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal.pre');
+  function revealAll(){ els.forEach(function(el){ el.classList.remove('pre'); }); }
+  try{
+    if(!('IntersectionObserver' in window)){
+      revealAll();
+      return;
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.remove('pre');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function(el){ io.observe(el); });
+    /* ponytail: safety net in case the observer never fires (throttled
+       background tab, slow device, unexpected error) so content is
+       never stuck permanently invisible */
+    setTimeout(revealAll, 1500);
+  }catch(e){
+    revealAll();
+  }
+})();
+</script>
+
+</body>
+</html>

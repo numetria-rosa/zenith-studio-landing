@@ -54,7 +54,7 @@ export const COURSES: Course[] = [
     thumbnail: "/lab/ai-engineering.webp",
     whopAccessPassId: "prod_CKyY55RfnSTlU",
     whopPlanId: "plan_VSU3hyAITNsNk",
-    checkoutUrl: "https://whop.com/checkout/plan_VSU3hyAITNsNk",
+    checkoutUrl: "https://whop.com/checkout/ch_ZP0FmXJ0AcayMbn/",
     contentDir: "courses/ai-engineering",
     firstLessonPath: "dashboard",
     waitlistUrl:
@@ -70,7 +70,7 @@ export const COURSES: Course[] = [
     thumbnail: "/lab/data-science.webp",
     whopAccessPassId: "prod_9eVAjfMpwcaX8",
     whopPlanId: "plan_ysRjmrPzOn9j1",
-    checkoutUrl: "https://whop.com/checkout/plan_ysRjmrPzOn9j1",
+    checkoutUrl: "https://whop.com/checkout/ch_o628ksh4SFQmx5v/",
     contentDir: "courses/data-science",
     firstLessonPath: "module-00",
     waitlistUrl:
@@ -95,7 +95,7 @@ export const COURSES: Course[] = [
     thumbnail: "/lab/ai-automation.webp",
     whopAccessPassId: "prod_2u2WQzQUio8kF",
     whopPlanId: "plan_ED9yF9ehN2RIa",
-    checkoutUrl: "https://whop.com/checkout/plan_ED9yF9ehN2RIa",
+    checkoutUrl: "https://whop.com/checkout/ch_j8lgZE10JHhrz6M/",
     contentDir: "courses/automation-engineering",
     firstLessonPath: "dashboard",
     waitlistUrl:
@@ -113,7 +113,7 @@ export const COURSES: Course[] = [
     thumbnail: "/lab/ai-assisted-software-engineering.webp",
     whopAccessPassId: "prod_rW17sq9hKeXYN",
     whopPlanId: "plan_ximKlnIKYO7Bx",
-    checkoutUrl: "https://whop.com/checkout/plan_ximKlnIKYO7Bx",
+    checkoutUrl: "https://whop.com/checkout/ch_WHejfyEWLZ6Vh15/",
     contentDir: "courses/ai-assisted-software-engineering",
     firstLessonPath: "module-00",
     waitlistUrl:
@@ -135,7 +135,7 @@ export const COURSES: Course[] = [
     thumbnail: "/lab/math-for-ml.webp",
     whopAccessPassId: "prod_OKFbmWkhFm7rS",
     whopPlanId: "plan_3kAXjmfXopjpa",
-    checkoutUrl: "https://whop.com/checkout/plan_3kAXjmfXopjpa",
+    checkoutUrl: "https://whop.com/checkout/ch_Q1wc1IFgjlW3HUk/",
     renderMode: "react",
     lessonManifest: "content/react-courses/math-for-ml/lessons.ts",
     waitlistUrl:

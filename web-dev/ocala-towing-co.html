@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ocala Towing Co</title>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+
+  :root{
+    --bg-0:#faf8ff;
+    --bg-1:#ffffff;
+    --ink-900:#171325;
+    --ink-600:#544f66;
+    --ink-400:#8b85a0;
+    --line:#eae6f7;
+    --violet-500:#7c3aed;
+    --violet-600:#6d28d9;
+    --fuchsia-500:#ec4899;
+    --blue-500:#3b82f6;
+    --grad-1:linear-gradient(135deg,#7c3aed 0%,#ec4899 55%,#f97362 100%);
+    --grad-2:linear-gradient(135deg,#3b82f6 0%,#7c3aed 100%);
+
+    --font-body:'Plus Jakarta Sans',system-ui,sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,monospace;
+
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--bg-0);
+    color:var(--ink-900);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    position:relative;
+  }
+  img{max-width:100%;}
+  [hidden]{display:none!important;}
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding-inline:clamp(20px,4.5vw,48px);
+  }
+  a{color:inherit;}
+
+  /* ---- ambient gradient blobs ---- */
+  .blob{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(70px);
+    opacity:.35;
+    pointer-events:none;
+    z-index:0;
+  }
+  .blob-1{ width:520px;height:520px; top:-180px; left:-160px; background:var(--violet-500); }
+  .blob-2{ width:480px;height:480px; top:60px; right:-200px; background:var(--fuchsia-500); }
+  .blob-3{ width:420px;height:420px; top:900px; left:40%; background:var(--blue-500); opacity:.22; }
+
+  /* ---- header ---- */
+  header.top{
+    position:sticky;
+    top:env(safe-area-inset-top,0px);
+    z-index:50;
+    background:rgba(250,248,255,.7);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  header.top .wrap{
+    padding-block:16px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px 14px;
+  }
+  .brand{
+    font-weight:800;
+    font-size:clamp(1rem,4vw,1.2rem);
+    display:flex;
+    align-items:center;
+    gap:.5em;
+    min-width:0;
+  }
+  .brand .mark{
+    width:30px;height:30px;
+    border-radius:9px;
+    background:var(--grad-1);
+    display:flex;align-items:center;justify-content:center;
+    flex:none;
+  }
+  .brand .mark svg{ width:16px;height:16px; stroke:#fff; }
+
+  .top-call{
+    font-weight:700;
+    font-size:clamp(.82rem,3.2vw,.95rem);
+    text-decoration:none;
+    color:#fff;
+    background:var(--grad-1);
+    padding:.65em 1.2em;
+    border-radius:999px;
+    white-space:nowrap;
+    box-shadow:0 6px 18px -6px rgba(124,58,237,.55);
+  }
+
+  /* ---- hero ---- */
+
+  .brand-group{ display:flex; align-items:center; gap:28px; flex-wrap:wrap; min-width:0; }
+  .nav-links{ display:flex; gap:1.5em; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; }
+  .nav-links a{ text-decoration:none; color:var(--ink-600); transition:color .15s ease; }
+  .nav-links a:hover{ color:var(--violet-500); }
+  @media (max-width:820px){ .nav-links{ display:none; } }
+
+  .hero{
+    position:relative;
+    padding-block:76px 60px;
+    text-align:center;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:.5em;
+    font-size:.82rem;
+    font-weight:600;
+    color:var(--violet-600);
+    background:#fff;
+    border:1px solid var(--line);
+    padding:.5em 1.1em;
+    border-radius:999px;
+    box-shadow:0 4px 16px -8px rgba(76,29,149,.25);
+    margin-bottom:26px;
+  }
+  .badge .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--fuchsia-500);
+    animation:pulse 2s ease-out infinite;
+    flex:none;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(236,72,153,.5);}
+    70%{box-shadow:0 0 0 8px rgba(236,72,153,0);}
+    100%{box-shadow:0 0 0 0 rgba(236,72,153,0);}
+  }
+  @media (prefers-reduced-motion:reduce){ .badge .dot{animation:none;} }
+
+  h1{
+    font-weight:800;
+    line-height:1.05;
+    letter-spacing:-.02em;
+    font-size:clamp(2.3rem,7vw,4rem);
+    margin:0 auto 22px;
+    max-width:16ch;
+    text-wrap:balance;
+  }
+  h1 .grad{
+    background:var(--grad-1);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .hero p.sub{
+    max-width:52ch;
+    margin:0 auto 34px;
+    color:var(--ink-600);
+    font-size:clamp(1rem,2vw,1.15rem);
+    line-height:1.6;
+  }
+
+  .cta-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:14px;
+    margin-bottom:52px;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:.6em;
+    font-weight:700;
+    font-size:1rem;
+    padding:1em 1.7em;
+    border-radius:999px;
+    text-decoration:none;
+    transition:transform .18s ease, box-shadow .18s ease;
+    border:1px solid transparent;
+  }
+  .btn-primary{
+    background:var(--grad-1);
+    color:#fff;
+    box-shadow:0 10px 28px -10px rgba(124,58,237,.55);
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 14px 32px -8px rgba(124,58,237,.65); }
+  .btn-ghost{
+    background:#fff;
+    color:var(--ink-900);
+    border-color:var(--line);
+  }
+  .btn-ghost:hover{ transform:translateY(-2px); box-shadow:0 8px 20px -10px rgba(23,19,37,.2); }
+
+  /* ---- stat cards ---- */
+  .stat-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    max-width:720px;
+    margin-inline:auto;
+  }
+  @media (max-width:640px){ .stat-row{ grid-template-columns:1fr; } }
+  .stat-card{
+    background:rgba(255,255,255,.7);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:20px 18px;
+    box-shadow:0 12px 30px -18px rgba(23,19,37,.25);
+  }
+  .stat-card b{
+    display:block;
+    font-size:1.4rem;
+    font-weight:800;
+    font-family:var(--font-mono);
+    background:var(--grad-2);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .stat-card span{
+    display:block;
+    font-size:.8rem;
+    color:var(--ink-400);
+    margin-top:2px;
+    font-weight:500;
+  }
+
+  /* ---- reveal ---- */
+  .reveal{
+    opacity:1;
+    transform:none;
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .reveal.pre{
+    opacity:0;
+    transform:translateY(22px);
+  }
+  @media (prefers-reduced-motion:reduce){
+    .reveal.pre{opacity:1;transform:none;}
+  }
+
+  section{ padding-block:64px; position:relative; }
+  .section-head{ text-align:center; max-width:640px; margin:0 auto 40px; }
+  .kicker{
+    display:inline-block;
+    font-size:.8rem;
+    font-weight:700;
+    color:var(--violet-600);
+    background:#f2ecff;
+    padding:.4em 1em;
+    border-radius:999px;
+    margin:0 0 14px;
+  }
+  h2{
+    font-weight:800;
+    letter-spacing:-.01em;
+    font-size:clamp(1.7rem,3.6vw,2.5rem);
+    margin:0;
+    text-wrap:balance;
+  }
+
+  /* ---- services grid (bento) ---- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:18px;
+  }
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:28px 24px;
+    transition:transform .2s ease, box-shadow .2s ease;
+    box-shadow:0 10px 30px -22px rgba(23,19,37,.3);
+  }
+  .card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 20px 40px -20px rgba(124,58,237,.35);
+  }
+  .card .icon{
+    width:44px;height:44px;
+    border-radius:13px;
+    background:var(--grad-1);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:18px;
+  }
+  .card .icon svg{ width:22px;height:22px; stroke:#fff; }
+  .card h3{
+    font-weight:700;
+    font-size:1.05rem;
+    margin:0 0 8px;
+  }
+  .card p{
+    color:var(--ink-600);
+    font-size:.92rem;
+    line-height:1.55;
+    margin:0;
+  }
+
+  /* ---- coverage ---- */
+  .coverage-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:44px 36px;
+    box-shadow:0 16px 40px -26px rgba(23,19,37,.3);
+    text-align:center;
+  }
+  .zone-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+    margin-top:22px;
+  }
+  .zone{
+    font-size:.85rem;
+    font-weight:600;
+    color:var(--violet-600);
+    background:#f2ecff;
+    border:1px solid #e3d6ff;
+    padding:.5em .9em;
+    border-radius:999px;
+  }
+
+  /* ---- final CTA ---- */
+  .cta-banner{
+    position:relative;
+    background:var(--grad-1);
+    color:#fff;
+    border-radius:28px;
+    padding:56px 24px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .cta-banner h2{ color:#fff; margin:0 0 10px; }
+  .cta-banner p{ margin:0 0 30px; opacity:.92; font-weight:500; }
+  .big-phone{
+    display:inline-flex;
+    align-items:baseline;
+    gap:.3em;
+    font-family:var(--font-mono);
+    font-weight:700;
+    font-size:clamp(1.5rem,7vw,2.6rem);
+    color:#fff;
+    text-decoration:none;
+    background:rgba(255,255,255,.16);
+    padding:.5em 1em;
+    border-radius:999px;
+    max-width:100%;
+  }
+
+  footer{
+    padding-block:40px calc(96px + env(safe-area-inset-bottom,0px));
+    color:var(--ink-400);
+    font-size:.85rem;
+    text-align:center;
+  }
+  .foot-brand{ font-weight:700; color:var(--ink-900); margin-bottom:4px; }
+
+  /* ---- sticky dispatch bar (mobile) ---- */
+  .dispatch{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:40;
+    display:flex;
+    gap:1px;
+    background:var(--line);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .dispatch a{
+    flex:1;
+    text-align:center;
+    padding:14px 8px;
+    font-weight:700;
+    font-size:.92rem;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:.5em;
+    color:#fff;
+  }
+  .dispatch a:first-child{ background:var(--grad-1); }
+  .dispatch a:last-child{ background:var(--ink-900); }
+  .dispatch svg{ width:16px;height:16px; }
+
+  @media (min-width:761px){ .dispatch{display:none;} }
+  @media (max-width:760px){ footer{padding-bottom:100px;} }
+</style>
+</head>
+<body>
+
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand-group">
+      <div class="brand">
+        <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h13V6H3z"/><path d="M16 10h3l3 3v4h-6"/><circle cx="7" cy="17" r="2"/><circle cx="17.5" cy="17" r="2"/></svg></span>
+        Ocala Towing Co
+      </div>
+      <nav class="nav-links">
+        <a href="#services">Services</a>
+        <a href="#coverage">Coverage</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+    <a class="top-call" href="tel:+13527906018">(352) 790-6018</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap" style="position:relative;">
+    <span class="badge"><span class="dot"></span>24/7 dispatch &middot; Ocala, FL</span>
+    <h1 class="reveal pre">Towing that shows up like it <span class="grad">actually cares.</span></h1>
+    <p class="sub reveal pre">Flatbed towing, roadside assistance and vehicle recovery across Marion County. One call, upfront pricing, a truck on the way, no corporate call center in between.</p>
+    <div class="cta-row reveal pre">
+      <a class="btn btn-primary" href="tel:+13527906018">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Call now
+      </a>
+      <a class="btn btn-ghost" href="sms:+13527906018">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        Text us
+      </a>
+    </div>
+    <div class="stat-row reveal pre">
+      <div class="stat-card"><b>24/7</b><span>Dispatch &amp; service</span></div>
+      <div class="stat-card"><b>$0</b><span>Estimate, always free</span></div>
+      <div class="stat-card"><b>1 call</b><span>To wheels moving</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="section-head reveal pre">
+      <span class="kicker">What we run</span>
+      <h2>Every kind of roadside emergency</h2>
+    </div>
+    <div class="grid">
+      <div class="card reveal pre">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h13V6H3z"/><path d="M16 10h3l3 3v4h-6"/><circle cx="7" cy="17" r="2"/><circle cx="17.5" cy="17" r="2"/></svg></div>
+        <h3>Flatbed towing</h3>
+        <p>Local and long-distance, cars to light trucks, loaded and secured properly every time.</p>
+      </div>
+      <div class="card reveal pre">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></div>
+        <h3>Winching &amp; recovery</h3>
+        <p>Stuck in a ditch, sand, or mud? We pull vehicles out clean without extra damage.</p>
+      </div>
+      <div class="card reveal pre">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg></div>
+        <h3>Battery jump start</h3>
+        <p>Dead battery on the road or in your driveway. We come to you, day or night.</p>
+      </div>
+      <div class="card reveal pre">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="1"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h3>Lockout service</h3>
+        <p>Keys locked inside? We get you back in without damaging your vehicle.</p>
+      </div>
+      <div class="card reveal pre">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V9l7-6 7 6v13"/><path d="M10 22v-7h4v7"/></svg></div>
+        <h3>Fuel delivery</h3>
+        <p>Ran out on the highway? We bring enough fuel to reach the nearest station.</p>
+      </div>
+      <div class="card reveal pre">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h3>Emergency response</h3>
+        <p>Accidents and breakdowns don't wait for business hours. Neither do we.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="coverage">
+  <div class="wrap">
+    <div class="coverage-card reveal pre">
+      <span class="kicker">Coverage</span>
+      <h2>Ocala &amp; Marion County</h2>
+      <p style="color:var(--ink-600);max-width:52ch;margin:14px auto 0;line-height:1.6;">
+        Based in Ocala and running Marion County roads daily. If you're near I-75 or US-441, help is closer than you think.
+      </p>
+      <div class="zone-row">
+        <span class="zone">Ocala</span>
+        <span class="zone">Belleview</span>
+        <span class="zone">Silver Springs Shores</span>
+        <span class="zone">Marion Oaks</span>
+        <span class="zone">Dunnellon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="cta-banner reveal pre">
+      <h2>Stuck right now?</h2>
+      <p>Call or text. A truck is already closer than you think.</p>
+      <a class="big-phone" href="tel:+13527906018">(352) 790-6018</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-brand">Ocala Towing Co</div>
+    <div>Ocala, FL &middot; Open 24 hours, every day</div>
+  </div>
+</footer>
+
+<div class="dispatch">
+  <a href="tel:+13527906018">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    Call Now
+  </a>
+  <a href="sms:+13527906018">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    Text
+  </a>
+</div>
+
+<script>
+(function(){
+  try{
+    var els = document.querySelectorAll('.reveal.pre');
+    if(!('IntersectionObserver' in window)){
+      els.forEach(function(el){ el.classList.remove('pre'); });
+      return;
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.remove('pre');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function(el){ io.observe(el); });
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>

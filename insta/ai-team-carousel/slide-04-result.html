@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>result</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#070b14; --card:#141b2c; --bd:rgba(148,163,184,.16); --bd2:rgba(148,163,184,.26);
+    --tx:#eef2ff; --mut:#9aa6c2; --mut2:#6b7690;
+    --accent:#f0b429; --accentd:#1a1204;
+  }
+  html,body{width:1080px;height:1350px;overflow:hidden}
+  body{ background:var(--bg); color:var(--tx); font-family:'IBM Plex Sans',sans-serif; }
+  .canvas{ position:relative; width:100%; height:100%; overflow:hidden; border-radius:40px; background:var(--bg); }
+  .canvas::before{
+    content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+    background: radial-gradient(ellipse 60% 26% at 100% 100%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 55%);
+  }
+  .frame{ position:relative; z-index:1; padding:70px 72px; height:100%; display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .center-block{ margin-top:auto; margin-bottom:auto; width:100%; display:flex; flex-direction:column; align-items:center; }
+  .eyebrow{ font-family:'IBM Plex Mono'; font-size:15px; font-weight:700; letter-spacing:.14em; color:var(--mut2); text-transform:uppercase; }
+  h1{ font-family:'Fraunces'; font-weight:600; font-size:46px; line-height:1.12; letter-spacing:-.02em; margin-top:14px; max-width:820px; }
+  h1 i{ font-style:italic; color:var(--accent); }
+
+  .stats{ margin-top:60px; width:100%; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .stile{ background:var(--card); border:1.5px solid var(--bd); border-radius:20px; padding:34px 26px; text-align:center; }
+  .snum{ font-family:'Fraunces'; font-style:italic; font-weight:700; font-size:58px; color:var(--accent); letter-spacing:-.02em; }
+  .slbl{ margin-top:10px; font-size:16px; color:var(--mut); line-height:1.3; }
+
+  .quote{ margin-top:40px; max-width:780px; padding:28px 30px; border-left:3px solid var(--accent); background:var(--card); border-radius:0 18px 18px 0; font-size:19px; line-height:1.5; color:var(--tx); text-align:left; }
+
+  .footer{ width:100%; margin-top:40px; padding-top:24px; display:flex; flex-direction:column; align-items:center; gap:8px; border-top:1px solid var(--bd); }
+  .swipe{ font-family:'IBM Plex Mono'; font-size:15px; font-weight:700; letter-spacing:.08em; color:var(--accent); text-transform:uppercase; }
+  .site{ font-family:'IBM Plex Mono'; font-size:15px; color:var(--mut2); letter-spacing:.04em; }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="frame">
+      <div class="center-block">
+        <div class="eyebrow">The result</div>
+        <h1>Zero missed calls. <i>Every hour, every day.</i></h1>
+
+        <div class="stats">
+          <div class="stile"><div class="snum">0</div><div class="slbl">Missed calls since launch</div></div>
+          <div class="stile"><div class="snum">24/7</div><div class="slbl">Coverage, no shifts to staff</div></div>
+          <div class="stile"><div class="snum">&lt;10s</div><div class="slbl">Average answer time</div></div>
+          <div class="stile"><div class="snum">1</div><div class="slbl">AI agent replacing the queue</div></div>
+        </div>
+
+        <div class="quote">"We stopped losing after-hours calls the week this went live."</div>
+      </div>
+
+      <div class="footer">
+        <div class="swipe">Swipe &rarr;</div>
+        <div class="site">zenith-studio.site</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

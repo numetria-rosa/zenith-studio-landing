@@ -258,8 +258,44 @@
         ],
         "guardrail": "Det är också det bästa rekryteringsargument ni har. Ett team från dag ett väger tyngre än ytterligare en provisionspoäng.",
         "offer": "Vi kör igång er sovande databas först. Ni betalar av det den ger."
+      },
+      {
+        "eyebrow": "For insurance agencies",
+        "headline": "Automate your front office.",
+        "lede": "Every unanswered quote request and every renewal that slips past is business you already had. Four AI agents cover the front office from the first question to the renewal, so nothing gets missed.",
+        "monthlyNote": "All four agents, as one team. Pay monthly, or save 25% paying quarterly.",
+        "statsLabels": [
+          "AI agents in the bundle",
+          "saved paying quarterly",
+          "saved per year vs. monthly"
+        ],
+        "roster": [
+          {
+            "role": "AI Intake Agent",
+            "text": "The moment someone asks for a quote, they get a real text back, not an autoresponder.",
+            "anchor": "Runs on your existing AI Lead Capture & Follow-Up service."
+          },
+          {
+            "role": "AI Document Audit",
+            "text": "Paste or upload a policy document, ACORD form, or loss run. Get named insured, coverage limits, dates, and red flags back in seconds, for you to copy into your AMS.",
+            "anchor": "No access to your AMS required."
+          },
+          {
+            "role": "AI CRM & Logging",
+            "text": "Every lead gets logged automatically, no manual data entry. Connects to whatever CRM you already use.",
+            "anchor": "Fits your existing CRM, nothing new to learn."
+          },
+          {
+            "role": "AI Renewal Reminders",
+            "text": "Import your book of business once. Clients get a reminder before their policy renews, not after it lapses.",
+            "anchor": "Reminded before renewal, not after it lapses."
+          }
+        ],
+        "guardrail": "Document Audit hands you the numbers, you copy them into your AMS. Nothing is filed or sent on your behalf.",
+        "offer": "Pick whichever fits how you make this kind of decision: a free audit, a $35 paid audit call, or subscribe directly. No wrong choice, and nothing here locks you in."
       }
-    ]
+    ],
+    "seeFrontOfficeDemo": "Watch the front office demo"
   },
   "faq": {
     "eyebrow": "Vanliga frågor",

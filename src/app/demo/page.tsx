@@ -59,6 +59,15 @@ const DEMOS: DemoCard[] = [
     glow: "bg-sky-300/10",
     tag: "Build preview",
   },
+  {
+    href: "/demo/insurance-ai-team",
+    eyebrow: "Insurance Agency AI Team",
+    title: "Automate your front office.",
+    description: "Intake, document audit, CRM logging, and renewal reminders, all running as one team.",
+    accent: "border-violet-300/30 hover:border-violet-300/60",
+    glow: "bg-violet-300/10",
+    tag: "Build preview",
+  },
 ];
 
 export default function DemoHubPage() {

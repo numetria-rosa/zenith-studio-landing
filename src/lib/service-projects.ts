@@ -39,6 +39,10 @@ export const RECEPTIONIST_REQUIREMENTS: { label: string; detail: string }[] = [
     label: "Receptionist: FAQ / common questions",
     detail: "Anything the AI should be able to answer on its own: services, pricing, location, policies.",
   },
+  {
+    label: "Receptionist: fallback phone number",
+    detail: "A real human line to ring if the AI can't help or something breaks - your cell or front desk, not the number you forward calls from.",
+  },
 ];
 
 // Extra requirement for law-firms (AI Missed Call Text-Back role),
@@ -59,6 +63,21 @@ export const LEAD_CAPTURE_REQUIREMENTS: { label: string; detail: string }[] = [
     detail: "In plain language, what makes an enquiry worth pursuing (e.g. service area, budget, timing).",
   },
   { label: "Lead Capture: notify email", detail: "Where we send you a copy of every new enquiry." },
+];
+
+// Extra requirements for brokerages (the "Inside Sales Agent" role within
+// the Brokerage AI Team bundle) - same shape and same provisioning
+// mechanism as LEAD_CAPTURE_REQUIREMENTS (an outbound-SMS-only SignalWire
+// number, see lead-capture-provisioning.ts), just reworded for the
+// brokerage/real-estate context since these labels are client-facing.
+// Matched by exact label in lead-capture-provisioning.ts.
+export const BROKERAGE_REQUIREMENTS: { label: string; detail: string }[] = [
+  { label: "Brokerage: business name", detail: "The name used when replying to a new lead." },
+  {
+    label: "Brokerage: qualification rules",
+    detail: "In plain language, what makes a lead worth pursuing (e.g. motivation, timeline, financing status).",
+  },
+  { label: "Brokerage: notify email", detail: "Where we send you a copy of every new lead." },
 ];
 
 export const KICKOFF_MESSAGE_BODY = `Welcome. Your project workspace is ready.
@@ -99,14 +118,21 @@ export async function createServiceProjectWithDefaults(tx: Tx, params: CreateSer
     })),
   });
 
+  // law-firms bundles two roles that each need their own provisioning
+  // (Missed Call Text-Back's SignalWire number AND the Intake Coordinator's
+  // Vapi voice receptionist - see text-back-provisioning.ts and
+  // receptionist-provisioning.ts), so it collects both requirement sets,
+  // not one or the other.
   const extraRequirements =
     params.sourceServiceId === "ai-receptionist"
       ? RECEPTIONIST_REQUIREMENTS
       : params.sourceServiceId === "law-firms"
-        ? TEXT_BACK_REQUIREMENTS
+        ? [...TEXT_BACK_REQUIREMENTS, ...RECEPTIONIST_REQUIREMENTS]
         : params.sourceServiceId === "ai-lead-capture"
           ? LEAD_CAPTURE_REQUIREMENTS
-          : [];
+          : params.sourceServiceId === "brokerages"
+            ? BROKERAGE_REQUIREMENTS
+            : [];
   const requirements = [...DEFAULT_REQUIREMENTS, ...extraRequirements];
 
   await tx.clientRequirement.createMany({

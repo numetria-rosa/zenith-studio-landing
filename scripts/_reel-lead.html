@@ -1,0 +1,216 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Zenith AI - Lead Capture Reel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600;1,9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --cream:#f2e9d8; --cream2:#ece0ca;
+    --dark:#18140f; --dark2:#221c14;
+    --ink:#221c12; --mut:rgba(34,28,18,.6); --mut2:rgba(34,28,18,.4);
+    --orange:#e2632c; --orange2:#f0895a; --green:#3fae63;
+    --card-mut:rgba(255,255,255,.55); --card-bd:rgba(255,255,255,.1);
+  }
+  html,body{width:1080px;height:1920px;overflow:hidden}
+  body{ background:var(--cream); color:var(--ink); font-family:'IBM Plex Sans',sans-serif; }
+  .canvas{ position:relative; width:100%; height:100%; overflow:hidden; }
+
+  .bg{ position:absolute; inset:0; z-index:0; transition:none; }
+  .bg.cream{ background:var(--cream); }
+  .bg.dark{ background:var(--dark); }
+
+  .logo{ position:absolute; top:56px; left:56px; z-index:20; display:flex; align-items:center; gap:10px; background:rgba(24,20,15,.9); padding:13px 20px; border-radius:16px; }
+  .logo .lw{ font-family:'Fraunces'; font-weight:700; font-size:26px; color:#f2e9d8; letter-spacing:-.01em; line-height:1; display:flex; align-items:center; }
+  .logo .lai{ display:flex; align-items:center; justify-content:center; background:var(--orange); color:#18140f; font-family:'Fraunces'; font-weight:700; font-size:17px; line-height:1; padding:7px 11px 6px; border-radius:9px; letter-spacing:-.01em; }
+
+  .scene{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:2; padding-bottom:120px; }
+
+  .subtitle{ position:absolute; left:0; right:0; bottom:90px; z-index:30; display:flex; justify-content:center; padding:0 64px; pointer-events:none; }
+  .subtitle .box{ background:rgba(24,20,15,.92); border:1px solid rgba(255,255,255,.08); border-radius:22px; padding:26px 36px; max-width:980px; text-align:center; box-shadow:0 20px 60px -20px rgba(0,0,0,.6); }
+  .subtitle .box p{ font-family:'IBM Plex Sans'; font-weight:600; font-size:36px; line-height:1.35; color:#f2e9d8; }
+
+  /* Scene 0/3/4/5: headline scenes */
+  .headline-wrap{ text-align:center; padding:0 84px; }
+  .headline{ font-family:'Fraunces'; font-style:italic; font-weight:600; font-size:76px; line-height:1.2; color:var(--ink); letter-spacing:-.01em; }
+  .headline b{ font-style:normal; font-weight:700; color:var(--orange); }
+  .eyebrow{ font-family:'IBM Plex Mono'; font-size:26px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--mut); margin-bottom:28px; }
+  .sub{ margin-top:30px; font-family:'IBM Plex Sans'; font-weight:500; font-size:36px; line-height:1.4; color:var(--mut); }
+
+  /* Scene 1: skill card mockup */
+  #sceneSkill .stagewrap{ text-align:center; }
+  #sceneSkill .headline{ font-size:60px; margin-bottom:58px; }
+  .card{ width:880px; background:var(--dark2); border-radius:30px; padding:42px 44px 38px; box-shadow:0 40px 90px -30px rgba(0,0,0,.5); text-align:left; }
+  .card .taghead{ display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+  .pill{ display:inline-flex; align-items:center; gap:9px; background:rgba(226,99,44,.16); border:1px solid rgba(226,99,44,.4); color:var(--orange2); font-family:'IBM Plex Mono'; font-size:21px; font-weight:600; padding:9px 18px; border-radius:11px; }
+  .pill .dot{ width:8px; height:8px; border-radius:50%; background:var(--orange2); }
+  .addedpill{ display:inline-flex; align-items:center; gap:7px; color:var(--green); font-family:'IBM Plex Mono'; font-size:20px; font-weight:600; opacity:0; }
+  .card .typedline{ font-family:'IBM Plex Sans'; font-weight:600; font-size:41px; color:#f2e9d8; line-height:1.4; min-height:116px; }
+  .card .typedline .cursor{ display:inline-block; width:4px; height:38px; background:var(--orange2); margin-left:3px; transform:translateY(6px); }
+  .card .cardfoot{ margin-top:32px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,.08); padding-top:24px; }
+  .card .plus{ width:44px; height:44px; border-radius:11px; border:1px solid rgba(255,255,255,.14); color:var(--card-mut); display:flex; align-items:center; justify-content:center; font-size:26px; }
+  .card .model{ font-family:'IBM Plex Mono'; font-size:23px; color:var(--card-mut); display:flex; align-items:center; gap:6px; }
+  .card .send{ width:54px; height:54px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 0 rgba(226,99,44,.5); }
+  .card .send svg{ width:24px; height:24px; }
+
+  /* Scene 2: phone SMS demo — realistic device chrome (titanium frame,
+     dynamic island, status bar, messages header, side buttons) */
+  #scenePhone .stagewrap{ text-align:center; }
+  #scenePhone .headline{ font-size:58px; margin-bottom:46px; }
+  .phoneframe{ position:relative; width:494px; height:1010px; margin:0 auto; }
+  .phonebody{ position:absolute; inset:0; background:linear-gradient(155deg,#3a3a3d,#1c1c1e 40%,#111112); border-radius:68px; box-shadow:0 50px 100px -30px rgba(0,0,0,.55), inset 0 0 0 2px rgba(255,255,255,.06); padding:14px; }
+  .screen{ position:relative; width:100%; height:100%; background:#050505; border-radius:56px; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(255,255,255,.04); }
+  .island{ position:absolute; top:20px; left:50%; transform:translateX(-50%); width:112px; height:34px; background:#000; border-radius:20px; z-index:5; }
+  .statusbar{ position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; padding:22px 34px 6px; font-family:'IBM Plex Sans'; font-weight:700; font-size:19px; color:#f5f2ea; }
+  .statusicons{ display:flex; align-items:center; gap:7px; }
+  .statusicons svg{ display:block; }
+  .msgheader{ display:flex; align-items:center; gap:12px; padding:14px 26px 16px; border-bottom:1px solid rgba(255,255,255,.08); }
+  .msgheader .back{ color:#e2632c; font-size:30px; line-height:1; }
+  .msgheader .avatar{ width:44px; height:44px; border-radius:50%; background:linear-gradient(145deg,var(--orange2),var(--orange)); display:flex; align-items:center; justify-content:center; }
+  .msgheader .avatar svg{ width:22px; height:22px; }
+  .msgheader .who{ text-align:left; }
+  .msgheader .who .nm{ font-family:'IBM Plex Sans'; font-weight:700; font-size:20px; color:#f5f2ea; }
+  .msgheader .who .num{ font-family:'IBM Plex Mono'; font-size:15px; color:rgba(245,242,234,.5); margin-top:2px; }
+  .bubblewrap{ display:flex; flex-direction:column; padding:22px 22px 0; }
+  .bubble{ max-width:80%; padding:15px 19px; border-radius:20px; font-family:'IBM Plex Sans'; font-size:23px; line-height:1.35; margin-bottom:14px; opacity:0; transform:translateY(14px); }
+  .bubble.in{ background:#232326; color:#f5f2ea; border-bottom-left-radius:6px; align-self:flex-start; }
+  .bubble.out{ background:var(--orange); color:#18140f; font-weight:600; border-bottom-right-radius:6px; margin-left:auto; }
+  .inputbar{ position:absolute; left:22px; right:22px; bottom:26px; display:flex; align-items:center; gap:12px; }
+  .inputbar .field{ flex:1; height:48px; border-radius:24px; border:1.4px solid rgba(255,255,255,.18); display:flex; align-items:center; padding:0 20px; font-family:'IBM Plex Sans'; font-size:18px; color:rgba(245,242,234,.35); }
+  .inputbar .mic{ width:34px; height:34px; color:rgba(245,242,234,.5); }
+  .sidebtn{ position:absolute; background:linear-gradient(90deg,#2a2a2c,#111112); border-radius:4px; z-index:-1; }
+  .sidebtn.mute{ left:-4px; top:150px; width:6px; height:44px; }
+  .sidebtn.volup{ left:-4px; top:220px; width:6px; height:72px; }
+  .sidebtn.voldown{ left:-4px; top:308px; width:6px; height:72px; }
+  .sidebtn.power{ right:-4px; top:230px; width:6px; height:100px; }
+
+  /* Scene 4: connect row */
+  #sceneConnect .headline{ font-size:60px; margin-bottom:66px; }
+  .connectrow{ display:flex; gap:40px; justify-content:center; margin-bottom:8px; }
+  .cicon{ width:130px; height:130px; border-radius:30px; background:var(--dark2); display:flex; align-items:center; justify-content:center; opacity:0; transform:translateY(24px) scale(.85); box-shadow:0 24px 50px -20px rgba(0,0,0,.35); }
+  .cicon svg{ width:62px; height:62px; }
+
+  /* Scene 5: CTA */
+  #sceneCta .headline{ font-size:70px; }
+  #sceneCta .comment{ margin-top:40px; display:inline-flex; align-items:center; gap:14px; background:var(--orange); padding:20px 38px; border-radius:20px; box-shadow:0 20px 44px -16px rgba(226,99,44,.55); }
+  #sceneCta .comment{ font-family:'IBM Plex Sans'; font-weight:600; font-size:34px; color:var(--dark); }
+  #sceneCta .comment span{ font-family:'IBM Plex Mono'; font-weight:700; font-size:34px; color:var(--dark); letter-spacing:.02em; }
+  #sceneCta .pillsrow{ margin-top:42px; display:flex; flex-direction:column; gap:16px; align-items:center; }
+  #sceneCta .pillsrow p{ font-family:'IBM Plex Mono'; font-size:26px; color:var(--mut); letter-spacing:.02em; }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="bg cream" id="bgLayer"></div>
+
+    <div class="logo"><span class="lw">ZENITH</span><span class="lai">AI</span></div>
+
+    <div class="subtitle"><div class="box" id="subtitleBox"><p id="subtitleText"></p></div></div>
+
+    <!-- Scene 0: hook -->
+    <div class="scene" id="sceneHook">
+      <div class="headline-wrap">
+        <div class="eyebrow">The 2027 playbook</div>
+        <div class="headline">The smartest way to close a lead?<br>Answer <b>before they go cold.</b></div>
+      </div>
+    </div>
+
+    <!-- Scene 1: skill card -->
+    <div class="scene" id="sceneSkill">
+      <div class="stagewrap">
+        <div class="headline">This is the <b>Lead Capture Agent.</b></div>
+        <div class="card" id="skillCard">
+          <div class="taghead">
+            <div class="pill"><span class="dot"></span>lead-capture.skill</div>
+            <div class="addedpill" id="addedPill">&#10003; added</div>
+          </div>
+          <div class="typedline"><span id="typedText"></span><span class="cursor" id="cursor"></span></div>
+          <div class="cardfoot">
+            <div class="plus">+</div>
+            <div class="model">Opus 5 &#9662;</div>
+            <div class="send" id="sendBtn"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#18140f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 2: phone demo -->
+    <div class="scene" id="scenePhone">
+      <div class="stagewrap">
+        <div class="headline">It texts and emails them back<br><b>instantly.</b></div>
+        <div class="phoneframe">
+          <div class="sidebtn mute"></div>
+          <div class="sidebtn volup"></div>
+          <div class="sidebtn voldown"></div>
+          <div class="sidebtn power"></div>
+          <div class="phonebody">
+            <div class="screen">
+              <div class="island"></div>
+              <div class="statusbar">
+                <span>9:41</span>
+                <div class="statusicons">
+                  <svg viewBox="0 0 18 12" width="18" height="12" fill="none"><rect x="0" y="7" width="3" height="5" rx="0.5" fill="#f5f2ea"/><rect x="5" y="5" width="3" height="7" rx="0.5" fill="#f5f2ea"/><rect x="10" y="3" width="3" height="9" rx="0.5" fill="#f5f2ea"/><rect x="15" y="0" width="3" height="12" rx="0.5" fill="#f5f2ea"/></svg>
+                  <svg viewBox="0 0 18 13" width="18" height="13" fill="none"><path d="M9 12.2c.6 0 1-.5 1-1.1 0-.6-.4-1.1-1-1.1s-1 .5-1 1.1c0 .6.4 1.1 1 1.1Z" fill="#f5f2ea"/><path d="M5.6 8.4a4.8 4.8 0 0 1 6.8 0" stroke="#f5f2ea" stroke-width="1.3" stroke-linecap="round"/><path d="M2.8 5.6a8.6 8.6 0 0 1 12.4 0" stroke="#f5f2ea" stroke-width="1.3" stroke-linecap="round"/></svg>
+                  <svg viewBox="0 0 26 13" width="26" height="13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="#f5f2ea" stroke-width="1.2"/><rect x="2.5" y="2.5" width="14" height="8" rx="1.8" fill="#f5f2ea"/><rect x="23" y="4" width="2" height="5" rx="1" fill="#f5f2ea"/></svg>
+                </div>
+              </div>
+              <div class="msgheader">
+                <span class="back">&#8249;</span>
+                <div class="avatar"><svg viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.4 21 3 13.6 3 4.5c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1l-2.3 2.2Z" fill="#18140f"/></svg></div>
+                <div class="who"><div class="nm">New Lead</div><div class="num">(213) 451-4165</div></div>
+              </div>
+              <div class="bubblewrap">
+                <div class="bubble in" id="b1">Hi, I saw your ad — do you have anything available this week?</div>
+                <div class="bubble out" id="b2">Yes! I can grab you a spot Thursday at 2pm or Friday at 10am, which works better?</div>
+                <div class="bubble in" id="b3">Thursday works</div>
+                <div class="bubble out" id="b4">Booked for Thursday 2pm. See you then!</div>
+              </div>
+              <div class="inputbar">
+                <div class="field">Text Message</div>
+                <svg class="mic" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 3: result -->
+    <div class="scene" id="sceneResult">
+      <div class="headline-wrap">
+        <div class="eyebrow">Our own agency</div>
+        <div class="headline">We haven't chased a lead<br>by hand <b>in months.</b></div>
+        <div class="sub">And our calendar has never been fuller.</div>
+      </div>
+    </div>
+
+    <!-- Scene 4: connect -->
+    <div class="scene" id="sceneConnect">
+      <div class="stagewrap">
+        <div class="headline">It connects to what<br>you <b>already use.</b></div>
+        <div class="connectrow">
+          <div class="cicon" id="ci1"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="#e2632c" stroke-width="1.8"/><path d="M4 7l8 6 8-6" stroke="#e2632c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="cicon" id="ci2"><svg viewBox="0 0 24 24" fill="none"><path d="M3 5.5C3 4.7 3.7 4 4.5 4h15c.8 0 1.5.7 1.5 1.5v13c0 .8-.7 1.5-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5v-13Z" stroke="#e2632c" stroke-width="1.8"/><path d="M7 2v4M17 2v4M3 10h18" stroke="#e2632c" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="cicon" id="ci3"><svg viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.4 21 3 13.6 3 4.5c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1l-2.3 2.2Z" stroke="#e2632c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene 5: CTA -->
+    <div class="scene" id="sceneCta">
+      <div class="headline-wrap">
+        <div class="headline">Want this running<br>for <b>your</b> business?</div>
+        <div class="comment">Comment or DM <span>"LEADS"</span></div>
+        <div class="pillsrow">
+          <p>&rarr; Follow @_zenithstudio_</p>
+          <p>&rarr; We'll set it up for you</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="_reel-lead.js"></script>
+</body>
+</html>

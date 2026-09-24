@@ -4,6 +4,7 @@ import { findOrCreateUserByEmail } from "@/lib/users";
 import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 import { computeApprovedTotals, createProposalCheckout, isProposalPaymentMode } from "@/lib/proposal-payments";
 import { sendProjectKickoffEmail } from "@/lib/mail";
+import { sendAdminAlert } from "@/lib/outreach-mail";
 import { syncProspectFromProposal } from "@/lib/outreach-admin";
 
 /* Token-secured client-facing proposal lookup (Slice 5 of the
@@ -182,6 +183,31 @@ export async function recordClientResponse(
     await syncProspectFromProposal(proposal.id, "declined");
   }
 
+  // Proposal decisions were previously only visible by checking
+  // /admin (getRecentActivity), unlike every other conversion event
+  // (free audit, paid audit call, course/bundle purchase), which proactively
+  // emails the admin. A client approving and paying is the highest-value
+  // event in the whole funnel, so it gets the same treatment. Best-effort,
+  // matches the kickoff email below: never blocks or undoes the recorded
+  // decision on a send failure.
+  const proposalLabel = proposal.companyName || proposal.clientName || proposal.clientEmail;
+  if (action === "APPROVED") {
+    void sendAdminAlert(
+      `Proposal approved: ${proposalLabel}`,
+      `${proposalLabel} approved their proposal and their project workspace was created. Review at ${process.env.NEXTAUTH_URL || ""}/admin/proposals/${proposal.id}`
+    ).catch(() => {});
+  } else if (action === "CHANGES_REQUESTED") {
+    void sendAdminAlert(
+      `Proposal changes requested: ${proposalLabel}`,
+      `${proposalLabel} requested changes${note?.trim() ? `: "${note.trim()}"` : "."} Review at ${process.env.NEXTAUTH_URL || ""}/admin/proposals/${proposal.id}`
+    ).catch(() => {});
+  } else if (action === "REJECTED") {
+    void sendAdminAlert(
+      `Proposal declined: ${proposalLabel}`,
+      `${proposalLabel} declined their proposal. Review at ${process.env.NEXTAUTH_URL || ""}/admin/proposals/${proposal.id}`
+    ).catch(() => {});
+  }
+
   // Kickoff email after the DB transaction commits - in-app message is
   // already seeded inside createServiceProjectWithDefaults. Best-effort:
   // missing RESEND_API_KEY or a send failure must not undo approval.
@@ -197,7 +223,7 @@ export async function recordClientResponse(
         to: project.user.email,
         clientName: project.user.name,
         projectTitle: project.title,
-        dashboardUrl: `${siteUrl}/lab/dashboard/services/${project.id}`,
+        dashboardUrl: `${siteUrl}/services/dashboard/${project.id}`,
       }).then((result) => {
         if (!result.ok) {
           console.warn(`[proposals-public] kickoff email skipped/failed for ${project.id}:`, result.error);

@@ -22,11 +22,28 @@ export type CreatePhoneNumberResult =
   | { ok: true; phoneNumberId: string; number: string }
   | { ok: false; error: string };
 
+/** Normalizes a client-typed US number to the E.164 shape Vapi's
+    fallbackDestination requires (e.g. "(213) 451-4165" -> "+12134514165").
+    Assumes US/Canada (matches the rest of this file's US-only scope) -
+    returns null if it doesn't look like a valid 10 or 11-digit number,
+    since sending Vapi a malformed fallback is worse than sending none. */
+export function toE164UsNumber(raw: string): string | null {
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return null;
+}
+
 export async function createFreePhoneNumber(input: {
   areaCode: string;
   serverUrl: string;
   serverSecret: string;
+  fallbackNumber?: string | null;
 }): Promise<CreatePhoneNumberResult> {
+  const fallbackDestination = input.fallbackNumber
+    ? { type: "number" as const, number: input.fallbackNumber, numberE164CheckEnabled: true }
+    : undefined;
+
   const res = await fetch(`${VAPI_API_BASE}/phone-number`, {
     method: "POST",
     headers: {
@@ -40,6 +57,7 @@ export async function createFreePhoneNumber(input: {
         url: input.serverUrl,
         headers: { "x-vapi-secret": input.serverSecret },
       },
+      ...(fallbackDestination ? { fallbackDestination } : {}),
     }),
   });
 

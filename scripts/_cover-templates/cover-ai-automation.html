@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 2000px;
+    height: 1125px;
+    background: #0a0b0f;
+    overflow: hidden;
+  }
+
+  .card {
+    position: relative;
+    width: 2000px;
+    height: 1125px;
+    background: #0a0b0f;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: #eef0f5;
+  }
+
+  /* faint grid */
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  /* accent glow, bottom-left */
+  .glow {
+    position: absolute;
+    left: -200px;
+    bottom: -300px;
+    width: 900px;
+    height: 900px;
+    background: radial-gradient(circle, rgba(34,211,238,0.22) 0%, rgba(34,211,238,0.07) 40%, transparent 70%);
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    padding: 92px 100px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-zenith {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: 0.02em;
+    color: #eef0f5;
+  }
+  .brand-lab {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: 0.02em;
+    background: #22d3ee;
+    color: #06222a;
+    padding: 2px 14px;
+    border-radius: 6px;
+  }
+
+  .eyebrow {
+    margin-top: 44px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #22d3ee;
+  }
+
+  .title {
+    margin-top: 18px;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 140px;
+    line-height: 1.0;
+    letter-spacing: -0.01em;
+    color: #f7f8fa;
+  }
+
+  .subhead {
+    margin-top: 34px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 30px;
+    color: #9aa3b2;
+  }
+
+  .tags {
+    margin-top: 56px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .tag {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 24px;
+    color: #c7cbd6;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 16px 30px;
+    line-height: 1.25;
+    max-width: 260px;
+    text-align: left;
+  }
+  .tag.highlight {
+    color: #22d3ee;
+    font-weight: 700;
+    background: rgba(34,211,238,0.10);
+    border-color: rgba(34,211,238,0.55);
+    max-width: 300px;
+  }
+
+  .bottom-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 10px;
+    background: #22d3ee;
+  }
+
+  /* --- workflow graphic --- */
+  .graphic {
+    position: absolute;
+    right: 110px;
+    top: 300px;
+    width: 760px;
+    height: 560px;
+  }
+  .node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 999px;
+    background: #11151c;
+    border: 2px solid rgba(255,255,255,0.16);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    color: #d7dbe4;
+  }
+  .node .sub { font-size: 15px; font-weight: 400; color: #8b93a6; margin-top: 2px; }
+  .node.trigger { width: 150px; height: 150px; font-size: 24px; left: 0; top: 40px; }
+  .node.transform { width: 190px; height: 190px; font-size: 28px; left: 220px; top: 170px; border-color: #22d3ee; box-shadow: 0 0 0 1px rgba(34,211,238,0.25); }
+  .node.retry { width: 140px; height: 140px; font-size: 22px; left: 210px; top: 20px; }
+  .node.action { width: 150px; height: 150px; font-size: 24px; color: #06222a; background: #22d3ee; border-color: #22d3ee; left: 560px; top: 250px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="grid"></div>
+    <div class="glow"></div>
+    <div class="content">
+      <div class="brand-row">
+        <span class="brand-zenith">ZENITH</span>
+        <span class="brand-lab">LAB</span>
+      </div>
+
+      <div class="eyebrow">ZENITH LAB &middot; 3&ndash;5 WEEK PROGRAM</div>
+      <div class="title">AI Automation</div>
+      <div class="subhead">3&ndash;5 weeks &middot; Client-ready workflow judgment</div>
+
+      <div class="tags">
+        <div class="tag">n8n</div>
+        <div class="tag">Webhooks</div>
+        <div class="tag">Retries</div>
+        <div class="tag highlight">Real client workflows</div>
+      </div>
+    </div>
+
+    <div class="graphic">
+      <svg width="760" height="560" style="position:absolute;left:0;top:0;overflow:visible;">
+        <line x1="75" y1="115" x2="280" y2="220" stroke="rgba(255,255,255,0.28)" stroke-width="2" />
+        <line x1="280" y1="90" x2="315" y2="220" stroke="rgba(255,255,255,0.28)" stroke-width="2" />
+        <line x1="410" y1="265" x2="635" y2="325" stroke="#22d3ee" stroke-width="2.5" />
+        <path d="M 405 175 C 500 90, 620 90, 635 240" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-dasharray="6 8" />
+        <text x="500" y="80" font-family="IBM Plex Mono, monospace" font-size="16" fill="#8b93a6">retries loop back</text>
+      </svg>
+      <div class="node trigger">Trigger<span class="sub">webhook</span></div>
+      <div class="node retry">Retry<span class="sub">idempotent</span></div>
+      <div class="node transform">Transform<span class="sub">bounded AI</span></div>
+      <div class="node action">Action</div>
+    </div>
+
+    <div class="bottom-bar"></div>
+  </div>
+</body>
+</html>

@@ -361,7 +361,7 @@ export async function updateProjectOps(
 }
 
 /** Posts an admin reply into the same ServiceMessage thread the client sees
-    at /lab/dashboard/services/[projectId]. senderUserId must be the calling
+    at /services/dashboard/[clientId]. senderUserId must be the calling
     admin's own session.user.id - caller is responsible for that. */
 export async function postAdminMessage(projectId: string, senderUserId: string, body: string): Promise<WriteResult> {
   const trimmed = body.trim();

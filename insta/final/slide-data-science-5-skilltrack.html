@@ -1,0 +1,50 @@
+<!doctype html><html><head><meta charset="utf-8"><title>skilltrack</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap"><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body{width:1080px;height:1350px;overflow:hidden}</style><style>
+  body{ background:#0c0c0c; color:#f2f2f0; font-family:'IBM Plex Mono',monospace; }
+  .canvas{ position:relative; width:1080px; height:1350px; padding:64px 72px; display:flex; flex-direction:column; }
+  .brand{ position:absolute; top:64px; left:72px; display:flex; align-items:center; }
+  .wm{ font-family:'Fraunces'; font-weight:700; font-size:24px; letter-spacing:-.01em; color:#f2f2f0; }
+  .wm b{ font-style:normal; padding:3px 11px; margin-left:6px; border-radius:6px; font-size:16px; }
+  .middle{ flex:1; display:flex; flex-direction:column; justify-content:center; }
+  .carousel{ position:absolute; left:72px; bottom:40px; display:flex; gap:9px; }
+  .cdot{ width:8px; height:8px; border-radius:50%; background:#3a3a38; }
+  .cdot.on{ background:#f0b429; }
+
+  .stagelbl{ font-weight:700; font-size:22px; color:#f0b429; letter-spacing:.05em; margin-bottom:20px; }
+  .headline{ font-weight:700; font-size:44px; line-height:1.2; max-width:820px; }
+  .desc{ margin-top:16px; font-size:21px; color:#a8a59c; max-width:720px; line-height:1.5; font-family:'IBM Plex Sans'; }
+  .cards{ margin-top:36px; display:flex; flex-direction:column; gap:20px; }
+  .skillcard{ background:#161613; border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:24px 26px; font-family:'IBM Plex Sans'; }
+  .sctop{ display:flex; align-items:center; gap:14px; }
+  .sctitle{ font-weight:700; font-size:22px; flex:1; }
+  .tierpill{ font-family:'IBM Plex Mono'; font-size:13px; text-transform:uppercase; letter-spacing:.04em; padding:5px 14px; border-radius:99px; font-weight:700; background:#f0b429; color:#1a1200; }
+  .scbar{ height:10px; background:#2a2a26; border-radius:99px; overflow:hidden; margin-top:16px; }
+  .fill{ height:100%; background:#f0b429; }
+  .subskillrow{ display:flex; align-items:center; gap:10px; font-size:16px; padding:8px 0 0; color:#a8a59c; }
+  .sslbl{ flex:1; }
+  .ssval{ font-family:'IBM Plex Mono'; color:#f2f2f0; flex-shrink:0; font-size:15px; }
+  </style></head><body><div class="canvas">
+    <div class="brand"><span class="wm">ZENITH<b style="background:#f0b429;color:#1a1200">LAB</b></span></div>
+    <div class="middle">
+      <div class="stagelbl">SKILL TRACKING</div>
+      <div class="headline">See exactly where you stand, not a vague percent.</div>
+      <div class="desc">Every skill tracks a real tier, sub-skill pass rates, and simulation-based evidence.</div>
+      <div class="cards">
+    <div class="skillcard">
+      <div class="sctop">
+        <span class="sctitle">SQL for Analysts</span>
+        <span class="tierpill">Proficient</span>
+      </div>
+      <div class="scbar"><div class="fill" style="width:72%"></div></div>
+      <div class="subskillrow"><span class="sslbl">Joins & subqueries</span><span class="ssval">8/10 passed</span></div><div class="subskillrow"><span class="sslbl">Window functions</span><span class="ssval">5/6 passed</span></div>
+    </div>
+    <div class="skillcard">
+      <div class="sctop">
+        <span class="sctitle">Data Visualization & Storytelling</span>
+        <span class="tierpill">Developing</span>
+      </div>
+      <div class="scbar"><div class="fill" style="width:45%"></div></div>
+      <div class="subskillrow"><span class="sslbl">Dashboard design</span><span class="ssval">3/6 passed</span></div>
+    </div></div>
+    </div>
+    <div class="carousel"><span class="cdot"></span><span class="cdot"></span><span class="cdot"></span><span class="cdot"></span><span class="cdot on"></span><span class="cdot"></span><span class="cdot"></span><span class="cdot"></span></div>
+  </div></body></html>

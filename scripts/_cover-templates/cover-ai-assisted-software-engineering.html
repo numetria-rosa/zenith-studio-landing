@@ -1,0 +1,256 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 2000px;
+    height: 1125px;
+    background: #0a0b0f;
+    overflow: hidden;
+  }
+
+  .card {
+    position: relative;
+    width: 2000px;
+    height: 1125px;
+    background: #0a0b0f;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: #eef0f5;
+  }
+
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  .glow {
+    position: absolute;
+    right: -260px;
+    top: -320px;
+    width: 950px;
+    height: 950px;
+    background: radial-gradient(circle, rgba(96,165,250,0.20) 0%, rgba(96,165,250,0.06) 42%, transparent 70%);
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    padding: 92px 100px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-zenith {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: 0.02em;
+    color: #eef0f5;
+  }
+  .brand-lab {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: 0.02em;
+    background: #60a5fa;
+    color: #0b1220;
+    padding: 2px 14px;
+    border-radius: 6px;
+  }
+
+  .eyebrow {
+    margin-top: 44px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #60a5fa;
+  }
+
+  .title {
+    margin-top: 18px;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 110px;
+    line-height: 1.05;
+    letter-spacing: -0.005em;
+    color: #f7f8fa;
+  }
+
+  .subhead {
+    margin-top: 30px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 30px;
+    color: #9aa3b2;
+  }
+
+  .tags {
+    margin-top: 50px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .tag {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 24px;
+    color: #c7cbd6;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 16px 30px;
+    line-height: 1.25;
+    max-width: 260px;
+    text-align: left;
+  }
+  .tag.highlight {
+    color: #60a5fa;
+    font-weight: 700;
+    background: rgba(96,165,250,0.10);
+    border-color: rgba(96,165,250,0.55);
+    max-width: 300px;
+  }
+
+  .bottom-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 10px;
+    background: #60a5fa;
+  }
+
+  /* --- code editor + ticket flow graphic --- */
+  .graphic {
+    position: absolute;
+    right: 110px;
+    top: 250px;
+    width: 780px;
+  }
+
+  .editor {
+    width: 780px;
+    border-radius: 16px;
+    background: #10131a;
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+  .editor-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.16); }
+  .editor-filename {
+    margin-left: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 16px;
+    color: #8b93a6;
+  }
+  .editor-body {
+    padding: 26px 30px 30px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    line-height: 1.8;
+  }
+  .l-muted { color: #8b93a6; }
+  .l-removed { color: #f28b82; background: rgba(242,139,130,0.08); display: block; padding: 2px 8px; margin: 0 -8px; }
+  .l-added { color: #7ee9c2; background: rgba(126,233,194,0.10); display: block; padding: 2px 8px; margin: 0 -8px; }
+  .l-key { color: #60a5fa; }
+
+  .flow {
+    margin-top: 34px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 90px;
+    border-radius: 14px;
+    background: #11151c;
+    border: 1px solid rgba(255,255,255,0.16);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 21px;
+    color: #d7dbe4;
+    text-align: center;
+  }
+  .flow-step.on { border-color: #60a5fa; color: #60a5fa; background: rgba(96,165,250,0.08); }
+  .flow-arrow { width: 36px; text-align: center; color: #5b6270; font-size: 24px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="grid"></div>
+    <div class="glow"></div>
+    <div class="content">
+      <div class="brand-row">
+        <span class="brand-zenith">ZENITH</span>
+        <span class="brand-lab">LAB</span>
+      </div>
+
+      <div class="eyebrow">ZENITH LAB &middot; 12-WEEK PROGRAM</div>
+      <div class="title">AI-Assisted<br />Software Engineering</div>
+      <div class="subhead">12 weeks &middot; Zero to a live GitHub repo</div>
+
+      <div class="tags">
+        <div class="tag">HTML</div>
+        <div class="tag">CSS</div>
+        <div class="tag">Git</div>
+        <div class="tag highlight">Real GitHub repo</div>
+      </div>
+    </div>
+
+    <div class="graphic">
+      <div class="editor">
+        <div class="editor-bar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="editor-filename">ticket-04.diff</span>
+        </div>
+        <div class="editor-body">
+          <span class="l-muted">// spec: sort tickets by priority</span><br />
+          <span class="l-removed">- tickets.sort((a,b) =&gt; a.id - b.id)</span>
+          <span class="l-added">+ tickets.sort((a,b) =&gt; b.priority - a.priority)</span>
+          <span class="l-muted"><span class="l-key">test</span>(&quot;sorts by priority&quot;) &rarr; pass</span>
+        </div>
+      </div>
+
+      <div class="flow">
+        <div class="flow-step">Spec</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">Build</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">Test</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step on">Ship</div>
+      </div>
+    </div>
+
+    <div class="bottom-bar"></div>
+  </div>
+</body>
+</html>

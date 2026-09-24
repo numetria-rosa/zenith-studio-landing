@@ -1,0 +1,13 @@
+{
+  "lawFirmMonthly": {
+    "id": "plan_kTlL5gBlJTsqy",
+    "checkoutUrl": "https://whop.com/checkout/ch_we86QAB7NOpqcL1/"
+  },
+  "lawFirmYearly": null,
+  "insuranceProductId": "prod_HdCmHgbriMWDk",
+  "insuranceMonthly": {
+    "id": "plan_aW9AIh13BCZPV",
+    "checkoutUrl": "https://whop.com/checkout/plan_aW9AIh13BCZPV"
+  },
+  "insuranceYearly": null
+}

@@ -49,6 +49,10 @@ public/favicon/favicon-master-1024.png
 # local-only working folders (never deploy or push)
 /playbook
 /zenith-ai-kit
+# Claude Code's own local tooling/skill cache, not app source
+/.agents
+/.claude/skills
+/skills-lock.json
 # internal sales material — not app code, and clients/ will hold real
 # client financial/contact data that shouldn't sit in a shared repo.
 /law-firm-client-scripts
