@@ -235,6 +235,11 @@ export default async function AgentDetailPage({
               <option value="new">Get a new number (recommended, instant)</option>
               <option value="twilio">Import a number I already own on Twilio</option>
             </select>
+            <p style={{ marginTop: 6, fontSize: 13, color: "var(--zc-muted)" }}>
+              Importing only works for a number already hosted on Twilio. If your existing number is with another
+              carrier or is a personal cell, pick &quot;Get a new number&quot; instead - you can forward your
+              existing line to it whenever you want calls answered.
+            </p>
           </div>
           <FormField label="Twilio Account SID (only if importing)" name="twilioAccountSid" placeholder="Starts with AC..., found in your Twilio Console" />
           <FormField label="Twilio Auth Token (only if importing)" name="twilioAuthToken" type="password" placeholder="Found in your Twilio Console" />
