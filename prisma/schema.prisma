@@ -201,6 +201,26 @@ model ServiceRequest {
   status        String @default("new")      // new | scoping | building | live | maintenance
   monthlyStatus String @default("inactive") // inactive | active | canceled
 
+  // Zenith HQ addition, 2026-09-25: which cycle this client is billed on.
+  // Real quarterly plans exist per service (services.ts's
+  // whopQuarterlyPlanId), not yearly - the prototype's "yearly" toggle is
+  // relabeled to "quarterly" to match. Nullable-free with a default since
+  // every existing row is effectively monthly (quarterly billing didn't
+  // exist as a concept before this field).
+  billingCycle String @default("monthly") // monthly | quarterly
+
+  // Zenith HQ addition, 2026-09-25: the webhook previously had no
+  // payment.failed handler at all - "Retry charge" had nothing real to
+  // retry and paymentOk was never anything but assumed-true. Set by
+  // payment.failed, cleared by the next payment.succeeded for the same
+  // plan (see api/webhooks/whop/route.ts). A failed payment also flips the
+  // linked ServiceProject to stage PAUSED - project-pause.ts's
+  // isProjectPaused() is what every runtime webhook already checks before
+  // doing anything AI-driven, so this is what makes "payment failed"
+  // actually stop the agents, not just change a label.
+  lastFailedPaymentId String?
+  paymentFailedAt     DateTime?
+
   whopSetupPaymentId      String?
   whopSetupMembershipId   String?
   whopMonthlyMembershipId String?
@@ -236,6 +256,25 @@ model ServiceCatalog {
   whopSetupPlanId   String?
   whopMonthlyPlanId String?
 
+  // Zenith HQ (admin command center) additions, 2026-09-25 - the Services
+  // page's price editor and toggles write here. This stays read-through for
+  // Whop plan ids/checkout URLs (services.ts is still the real source for
+  // those), but these fields are the source of truth for Zenith HQ's own
+  // MRR math and toggle state; they do not change what Whop actually
+  // charges an existing subscriber (see the Services page's own note).
+  // quarterlyPriceCentsPerMonth is the per-month price when billed
+  // quarterly (real business uses quarterly, not yearly - see
+  // ServiceRequest.billingCycle), null = quarterly not offered.
+  listPriceCents              Int?
+  quarterlyPriceCentsPerMonth Int?
+  whopQuarterlyPlanId         String?
+  quarterlyCheckoutUrl        String?
+  freeSetup                   Boolean @default(true)
+  trialEnabled                Boolean @default(true)
+  acceptingNewClients         Boolean @default(true)
+  slaHours                    Int     @default(24)
+  landingPageUrl              String?
+
   active Boolean @default(true)
 
   createdAt DateTime @default(now())
@@ -244,6 +283,30 @@ model ServiceCatalog {
   auditRecommendations AuditRecommendation[]
   proposalItems        ProposalItem[]
   serviceProjects      ServiceProject[]
+}
+
+// Zenith HQ addition, 2026-09-25: one row per (month, service) for the
+// Overview MRR chart's history - nothing else in the schema tracks MRR over
+// time. Written by a monthly snapshot job (scripts/snapshot-mrr.mjs); the
+// current month is never read from here, it's always recomputed live from
+// active ServiceProject/ServiceRequest rows so it can't go stale mid-month.
+// Zenith HQ Settings page - a real singleton row (id is always "singleton",
+// enforced in code, not a DB constraint - there is exactly one owner).
+model AdminSetting {
+  id                String  @id @default("singleton")
+  bookingLink       String?
+  notifySetupDue    Boolean @default(true)
+  notifyTrialEnding Boolean @default(true)
+  notifyNewRequest  Boolean @default(false)
+}
+
+model MrrSnapshot {
+  id          String   @id @default(cuid())
+  month       DateTime @db.Date // always the 1st of the month
+  serviceSlug String
+  mrrCents    Int
+
+  @@unique([month, serviceSlug])
 }
 
 enum AuditStatus {
@@ -560,6 +623,26 @@ model ServiceProject {
   targetLaunchAt DateTime?
 
   whopMonthlyMembershipId String? // only set for webhook-sourced projects
+
+  // Zenith HQ (admin command center) additions, 2026-09-25. setupReadyBy is
+  // the "ready by" deadline shown on the client dashboard while stage is
+  // pre-LIVE, adjustable +-1h by an admin (see hq/actions.ts adjustReadyBy).
+  // trialEndsAt is set once, when an admin marks setup ready and the
+  // service's free trial starts (72h for AI teams) - null for Inbox
+  // Manager, which has no trial, and null before setup is marked ready.
+  // Both nullable/additive, no default implied for existing rows.
+  setupReadyBy DateTime?
+  trialEndsAt  DateTime?
+
+  // Which pre-LIVE checklist step an admin has manually marked done: 0 =
+  // payment received only (the starting point - always true once a project
+  // exists), 1 = tools connected marked done, 2 = agents tuned and tested
+  // marked done. The 4th step ("Ready") has no stored value of its own -
+  // reaching it is stage leaving pre-LIVE entirely (see hq/actions.ts
+  // advanceSetup). "Tools connected" has a real auto-detectable signal
+  // (an active Integration) the UI checks directly; this field exists for
+  // the step after that, which has no automatic signal at all.
+  setupStepsCompleted Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

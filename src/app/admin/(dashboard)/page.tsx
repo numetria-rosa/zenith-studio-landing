@@ -2,273 +2,135 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import {
-  getTopMetrics,
-  getPipelineCounts,
-  getNeedsAttention,
-  getRecentActivity,
-  getRevenueByService,
-  summarizeRevenue,
-  getPendingProposalValueCents,
-  getServicePerformance,
-  hasUnlinkedProposalItems,
-} from "@/lib/dashboard-metrics";
+  getHqClients,
+  getMrrHistory,
+  getHqActivityFeed,
+  totalMrrCents,
+  mrrByService,
+  activeClientCountByService,
+  fmtMoney,
+  attentionQueue,
+  SERVICE_ORDER,
+  SERVICE_SHORT,
+  SERVICE_COLOR,
+} from "@/lib/hq";
+import { listSupportRequestsForHq } from "@/lib/hq/queries";
+import { HqTopbar } from "./HqTopbar";
+import { Kpi } from "./Kpi";
+import { MrrChart } from "./MrrChart";
+import { AttentionQueue } from "./AttentionQueue";
 
-/* Superadmin business command center index (Slice 2 of the service-platform
-   build, 2026-08-28). Replaces the previously-nonexistent /admin route -
-   there was no index page here before this slice, only its child routes
-   (audits, proposals, service-requests, service-catalog). Matches every
-   other admin page's pattern exactly: requireAdmin() -> notFound() for
-   non-admins, dark #05060a / white-text Studio marketing aesthetic,
-   rounded-2xl border border-white/10 bg-white/[0.04] cards. Every number on
-   this page is a real server-side Prisma query - no client-side fetching,
-   no client-provided input drives anything here. */
-
-function formatCents(cents: number): string {
-  return (cents / 100).toLocaleString(undefined, {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-}
-
-function formatAge(ms: number): string {
-  if (ms < 0) ms = 0;
-  const minutes = Math.floor(ms / 60000);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
-function MetricCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-      <p className="text-xs uppercase tracking-wide text-white/40">{label}</p>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
-      {sub && <p className="mt-1 text-xs text-white/40">{sub}</p>}
-    </div>
-  );
-}
-
-export default async function AdminDashboardPage() {
+/* Zenith HQ · Overview (DESIGN.md section 4.1). Every number here is a
+   real query - no client-provided input drives anything, matching every
+   other admin page's own convention. */
+export default async function HqOverviewPage() {
   const admin = await requireAdmin();
   if (!admin) notFound();
 
-  const [
-    topMetrics,
-    pipeline,
-    needsAttention,
-    recentActivity,
-    revenueByService,
-    pendingProposalValueCents,
-    servicePerformance,
-    hasUnlinkedItems,
-  ] = await Promise.all([
-    getTopMetrics(),
-    getPipelineCounts(),
-    getNeedsAttention(),
-    getRecentActivity(20),
-    getRevenueByService(),
-    getPendingProposalValueCents(),
-    getServicePerformance(),
-    hasUnlinkedProposalItems(),
-  ]);
+  const [clients, months, activity, supportRequests] = await Promise.all([getHqClients(), getMrrHistory(), getHqActivityFeed(5), listSupportRequestsForHq()]);
 
-  const revenueTotals = summarizeRevenue(revenueByService);
-  const hasAnyRevenue = revenueTotals.mrrCents > 0 || revenueTotals.setupCents > 0;
+  const mrr = totalMrrCents(clients);
+  const lastMonth = months.length > 1 ? months[months.length - 2].totalCents : mrr;
+  const delta = mrr - lastMonth;
 
-  const PIPELINE_STAGES: { label: string; count: number; href: string | null }[] = [
-    { label: "Audit (open)", count: pipeline.openAudits, href: "/admin/audits?status=SUBMITTED,IN_REVIEW" },
-    { label: "Proposal (sent/viewed)", count: pipeline.sentOrViewedProposals, href: "/admin/proposals?status=SENT,VIEWED" },
-    { label: "Approved", count: pipeline.approvedProposals, href: "/admin/proposals?status=APPROVED" },
-    { label: "Building", count: pipeline.building, href: "/admin/projects?stage=BUILDING" },
-    { label: "Live", count: pipeline.live, href: "/admin/projects?stage=LIVE" },
-    { label: "Maintenance", count: pipeline.maintenance, href: "/admin/projects?stage=MAINTENANCE" },
-  ];
+  const now = new Date();
+  const activeCount = clients.filter((c) => c.status === "active").length;
+  const trials = clients.filter((c) => c.status === "trial");
+  const pipelineCents = trials.reduce((sum, c) => sum + c.priceCents, 0);
+  const soonTrials = trials.filter((c) => c.trialEndsAt && c.trialEndsAt.getTime() - now.getTime() <= 24 * 3600_000).length;
+
+  const setups = clients.filter((c) => c.status === "setup");
+  const nextSetup = setups
+    .filter((c) => c.setupReadyBy)
+    .sort((a, b) => a.setupReadyBy!.getTime() - b.setupReadyBy!.getTime())[0];
+  const nextSetupHours = nextSetup ? Math.max(0, (nextSetup.setupReadyBy!.getTime() - now.getTime()) / 3600_000) : null;
+
+  const openRequests = supportRequests.filter((r) => r.status === "OPEN");
+  const queue = attentionQueue(
+    clients,
+    openRequests.map((r) => ({ id: r.id, clientId: r.projectId ?? "", clientName: r.project?.title ?? r.user.name ?? r.user.email, title: r.subject, ageLabel: "" })),
+    now
+  );
+
+  const mix = SERVICE_ORDER.map((s) => ({ slug: s, mrr: mrrByService(clients, s), count: activeClientCountByService(clients, s) }));
+  const maxMix = Math.max(1, ...mix.map((m) => m.mrr));
 
   return (
-    <div className="mx-auto max-w-6xl">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h1 className="text-2xl font-semibold">Business dashboard</h1>
-          <nav className="flex flex-wrap gap-4 text-sm text-white/50">
-            <Link href="/admin/clients" className="hover:text-white">Clients</Link>
-            <Link href="/admin/projects" className="hover:text-white">Projects</Link>
-            <Link href="/admin/tasks" className="hover:text-white">Tasks</Link>
-            <Link href="/admin/audits" className="hover:text-white">Audits</Link>
-            <Link href="/admin/proposals" className="hover:text-white">Proposals</Link>
-            <Link href="/admin/service-requests" className="hover:text-white">Service requests</Link>
-            <Link href="/admin/service-catalog" className="hover:text-white">Service catalog</Link>
-          </nav>
-        </div>
+    <>
+      <HqTopbar title={`Good morning, ${admin.user?.name?.split(" ")[0] || "there"}`} subtitle="Everything across every client, in one place." />
 
-        {/* A. Top metrics */}
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          <MetricCard label="Total clients" value={String(topMetrics.totalClients)} />
-          <MetricCard label="Active clients" value={String(topMetrics.activeClients)} />
-          <MetricCard label="Active service projects" value={String(topMetrics.activeServiceProjects)} />
-          <MetricCard label="MRR" value={formatCents(revenueTotals.mrrCents)} />
-          <MetricCard label="One-time revenue (all-time)" value={formatCents(revenueTotals.setupCents)} />
-          <MetricCard label="Pending proposals" value={String(topMetrics.pendingProposals)} />
-          <MetricCard label="Open audits" value={String(topMetrics.openAudits)} />
-          <MetricCard label="Open support requests" value={String(topMetrics.openSupportRequests)} />
-        </div>
+      <div className="kpis k6">
+        <Kpi href="/admin/billing" label="MRR" value={fmtMoney(mrr)} sub={<em style={delta < 0 ? { color: "var(--amber-t)" } : undefined}>{delta >= 0 ? "+" : "−"}{fmtMoney(Math.abs(delta))} vs last month</em>} />
+        <Kpi href="/admin/clients?status=active" label="Active clients" value={activeCount} sub={`of ${clients.length} total`} numeric={false} />
+        <Kpi href="/admin/clients?status=trial" label="In free trial" value={trials.length} sub={`${fmtMoney(pipelineCents)}/mo if they convert`} numeric={false} />
+        <Kpi href="/admin/onboarding" label="Setups running" value={setups.length} sub={nextSetupHours != null ? `next due in ${Math.round(nextSetupHours)}h` : "none"} warn={nextSetupHours != null && nextSetupHours <= 12} numeric={false} />
+        <Kpi href="/admin/agents" label="Agent runs today" value="—" sub="not tracked per-run yet" />
+        <Kpi href="#queue" label="Needs you" value={queue.length} sub={`${soonTrials} trial${soonTrials === 1 ? "" : "s"} end${soonTrials === 1 ? "s" : ""} within 24h`} need numeric={false} />
+      </div>
 
-        {/* B. Business pipeline */}
-        <section className="mt-10">
-          <h2 className="text-lg font-semibold">Pipeline</h2>
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            {PIPELINE_STAGES.map((stage, i) => {
-              const inner = (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 text-center sm:min-w-[140px]">
-                  <p className="text-xl font-semibold">{stage.count}</p>
-                  <p className="mt-1 text-xs text-white/40">{stage.label}</p>
-                </div>
-              );
-              return (
-                <div key={stage.label} className="flex items-center gap-3">
-                  {stage.href ? (
-                    <Link href={stage.href} className="block transition hover:opacity-80">
-                      {inner}
-                    </Link>
-                  ) : (
-                    inner
-                  )}
-                  {i < PIPELINE_STAGES.length - 1 && <span className="hidden text-white/20 sm:inline">&rarr;</span>}
-                </div>
-              );
-            })}
+      <div className="g2">
+        <MrrChart months={months} />
+        <section className="card pad">
+          <div className="ctop">
+            <h2>Revenue by service</h2>
+            <Link href="/admin/services" className="link">
+              Manage →
+            </Link>
           </div>
-          <p className="mt-3 text-xs text-white/40">
-            Every pipeline stage links to a filtered view. Audit/Proposal/Approved go to their own admin pages,
-            Building/Live/Maintenance to <code>/admin/projects</code> filtered by that ServiceProject stage.
-          </p>
-        </section>
-
-        {/* C. Needs attention */}
-        <section className="mt-10">
-          <h2 className="text-lg font-semibold">Needs attention</h2>
-          <p className="mt-1 text-xs text-white/40">
-            New audit submissions, proposals sent 3+ days ago with no response, approved proposals with no
-            workspace yet, projects with missing client requirements, open support requests, overdue internal
-            tasks, and open high/urgent-priority tasks. Does not include unanswered client messages. No
-            &quot;last admin reply&quot; concept exists yet.
-          </p>
-          <div className="mt-4 flex flex-col gap-3">
-            {needsAttention.length === 0 && (
-              <p className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-sm text-white/50">
-                Nothing needs attention right now.
-              </p>
-            )}
-            {needsAttention.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className="block rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition hover:border-white/25 hover:bg-white/[0.06]"
-              >
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-semibold">{item.clientLabel}</p>
-                    <p className="text-sm text-white/60">{item.label}</p>
-                  </div>
-                  <span className="text-xs text-white/40">{formatAge(item.ageMs)}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* E. Revenue overview */}
-        <section className="mt-10">
-          <h2 className="text-lg font-semibold">Revenue overview</h2>
-          {!hasAnyRevenue ? (
-            <p className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-sm text-white/50">
-              Not much revenue data yet. This is a very new system. MRR and one-time revenue will populate as real
-              Whop payments come in.
-            </p>
-          ) : (
-            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <MetricCard label="MRR" value={formatCents(revenueTotals.mrrCents)} />
-              <MetricCard label="One-time / setup revenue" value={formatCents(revenueTotals.setupCents)} />
-              <MetricCard label="Active recurring services" value={String(revenueTotals.activeRecurringCount)} />
-              <MetricCard label="Pending proposal value" value={formatCents(pendingProposalValueCents)} sub="pipeline, unconfirmed" />
-            </div>
-          )}
-          <p className="mt-3 text-xs text-white/40">
-            MRR and one-time revenue are shown separately and are never multiplied together or by a time period.
-            doing so would imply revenue that hasn&apos;t actually been collected. Proposal-driven service projects
-            with no matching ServiceRequest have genuinely unknown revenue (approval is not payment) and are
-            excluded from these totals.
-          </p>
-        </section>
-
-        {/* F. Service performance */}
-        <section className="mt-10">
-          <h2 className="text-lg font-semibold">Service performance</h2>
-          <div className="mt-4 overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.04]">
-            <table className="w-full min-w-[640px] text-sm">
-              <thead>
-                <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide text-white/40">
-                  <th className="px-4 py-3">Service</th>
-                  <th className="px-4 py-3">Active clients</th>
-                  <th className="px-4 py-3">Pending proposals</th>
-                  <th className="px-4 py-3">Active projects</th>
-                  <th className="px-4 py-3">MRR</th>
-                  <th className="px-4 py-3">Setup revenue</th>
-                </tr>
-              </thead>
-              <tbody>
-                {servicePerformance.map((row) => (
-                  <tr key={row.serviceId} className="border-b border-white/5 last:border-0">
-                    <td className="px-4 py-3">
-                      <Link href={`/admin/service-requests?service=${row.serviceId}`} className="hover:underline">
-                        {row.title}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3">{row.activeClients}</td>
-                    <td className="px-4 py-3">{row.pendingProposals}</td>
-                    <td className="px-4 py-3">{row.activeProjects}</td>
-                    <td className="px-4 py-3">{formatCents(row.mrrCents)}</td>
-                    <td className="px-4 py-3">{formatCents(row.setupCents)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {hasUnlinkedItems && (
-            <p className="mt-3 text-xs text-white/40">
-              Pending-proposal counts only include proposal line items explicitly linked to a service catalog
-              entry. Some sent/viewed proposals have unlinked line items, so this table may undercount pending
-              proposals for a given service. That is a real traceability gap, not a bug.
-            </p>
-          )}
-        </section>
-
-        {/* D. Recent activity */}
-        <section className="mt-10 mb-8">
-          <h2 className="text-lg font-semibold">Recent activity</h2>
-          <div className="mt-4 flex flex-col gap-2">
-            {recentActivity.length === 0 && (
-              <p className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-sm text-white/50">
-                No activity yet.
-              </p>
-            )}
-            {recentActivity.map((ev) => (
-              <Link
-                key={ev.id}
-                href={ev.href}
-                className="flex items-baseline justify-between gap-3 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-2.5 text-sm transition hover:border-white/20 hover:bg-white/[0.05]"
-              >
+          <div className="mix">
+            {mix.map((m) => (
+              <div className="row" key={m.slug}>
                 <span>
-                  <span className="text-white/90">{ev.label}</span>
-                  <span className="text-white/40"> · {ev.detail}</span>
+                  <i style={{ background: SERVICE_COLOR[m.slug] }} />
+                  {SERVICE_SHORT[m.slug]} <span className="muted">· {m.count}</span>
                 </span>
-                <span className="shrink-0 text-xs text-white/40">{ev.at.toISOString().slice(0, 16).replace("T", " ")}</span>
-              </Link>
+                <span className="track">
+                  <i style={{ width: `${(m.mrr / maxMix) * 100}%`, background: SERVICE_COLOR[m.slug] }} />
+                </span>
+                <b className="num">{fmtMoney(m.mrr)}</b>
+              </div>
             ))}
           </div>
+          <p className="muted" style={{ fontSize: 13, marginTop: 16 }}>
+            MRR from active clients. The number after each service is its client count, paused excluded.
+          </p>
         </section>
       </div>
+
+      <div className="g2">
+        <AttentionQueue items={queue} />
+        <section className="card feed">
+          <div className="feed-top">
+            <span className="eyebrow">Live across clients</span>
+            <Link href="/admin/agents" className="link">
+              Agents
+            </Link>
+          </div>
+          {activity.length === 0 && <p className="muted">Nothing yet.</p>}
+          {activity.map((a, i) => (
+            <div className="fi" key={i}>
+              <i className={a.tone === "need" ? "t-amber" : a.tone === "run" || a.tone === "done" ? "t-mint" : "t-cyan"} />
+              <div>
+                <b>
+                  {a.clientName} · {a.text}
+                </b>
+                <span>{timeAgo(a.at, now)}</span>
+              </div>
+            </div>
+          ))}
+        </section>
+      </div>
+    </>
   );
+}
+
+function timeAgo(d: Date, now: Date): string {
+  const ms = now.getTime() - d.getTime();
+  const min = Math.floor(ms / 60000);
+  if (min < 1) return "just now";
+  if (min < 60) return `${min} min ago`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `${h} h ago`;
+  const days = Math.floor(h / 24);
+  return days === 1 ? "Yesterday" : `${days}d ago`;
 }

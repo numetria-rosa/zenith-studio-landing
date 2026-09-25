@@ -1,67 +1,49 @@
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
-import { getTopMetrics } from "@/lib/dashboard-metrics";
-import { getOverdueTaskCount } from "@/lib/tasks-admin";
-import { listPaidAuditsForAdmin } from "@/lib/paid-audit";
-import { db } from "@/lib/db";
-import AdminNav, { type NavItem } from "./AdminNav";
+import { getHqClients, listSupportRequestsForHq, attentionQueue } from "@/lib/hq";
+import { HqSidebar } from "./HqSidebar";
+import "./hq.css";
 
-/* Shared /admin/** layout (Slice 7 of the business command center,
-   2026-08-28) - the first shared layout the admin area has had. Every
-   existing admin page previously rendered its own full-page
-   `<div className="min-h-screen bg-[#05060a] ...">` shell with no shared
-   nav; this layout now owns that outer shell + a persistent sidebar
-   (desktop) / drawer (mobile), and every page underneath was trimmed down
-   to just its own `mx-auto max-w-*` content div - a small mechanical
-   change per page (see admin/page.tsx, tasks/page.tsx, etc.), no business
-   logic/queries touched.
+/* Zenith HQ - the owner-only business command center, replacing the
+   previous plain-Tailwind /admin shell with the same Obsidian dark-glass
+   system the client dashboard uses (src/app/admin/(dashboard)/hq.css,
+   ported from halo/zenith-hq-admin/src/styles/*.css, scoped under .zhq
+   instead of :root so it can't leak into the rest of the site - see that
+   file's own header comment).
 
-   Security: independently re-checks requireAdmin() here, on top of every
-   individual page's own unchanged requireAdmin() check. Next.js layouts
-   and pages can in principle be reached somewhat independently (e.g. a
-   parallel/intercepted route, or a future refactor that forgets a page's
-   own check) - a shared layout is defense in depth, not a replacement for
-   each page's own gate. Every page below still calls requireAdmin() and
-   notFound() itself, unchanged. */
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+   Security: independently re-checks requireAdmin() here on top of every
+   page's own check (defense in depth), same pattern the previous layout
+   used. Every action in lib/hq/actions.ts re-checks it a third time. */
+export default async function HqLayout({ children }: { children: React.ReactNode }) {
   const admin = await requireAdmin();
   if (!admin) notFound();
 
-  // Badge counts reuse the exact same queries dashboard-metrics.ts and
-  // tasks-admin.ts already established, rather than writing new counting
-  // logic that could quietly drift from the numbers shown elsewhere.
-  const [topMetrics, overdueTaskCount, paidAudits, outreachReady] = await Promise.all([
-    getTopMetrics(),
-    getOverdueTaskCount(),
-    listPaidAuditsForAdmin(),
-    db.prospect.count({ where: { status: { in: ["READY_TO_SEND", "NEEDS_REVIEW"] } } }),
-  ]);
-  // Needs-action badge: rows still waiting on an admin to confirm payment or
-  // booking. BOOKED/COMPLETED/FOLLOW_UP/CANCELLED/REFUNDED don't need
-  // action right now, so they're excluded - same "in-memory filter at low
-  // volume" shortcut as getOverdueTaskCount's sibling queries.
-  const paidAuditsNeedingAttention = paidAudits.filter(
-    (a) => a.status === "PAYMENT_PENDING" || a.status === "PAID" || a.status === "BOOKING_PENDING",
-  ).length;
+  const [clients, requests] = await Promise.all([getHqClients(), listSupportRequestsForHq()]);
+  const openRequests = requests.filter((r) => r.status !== "RESOLVED" && r.status !== "CLOSED");
+  const queue = attentionQueue(
+    clients,
+    openRequests
+      .filter((r) => r.status === "OPEN")
+      .map((r) => ({ id: r.id, clientId: r.projectId ?? "", clientName: r.project?.title ?? r.user.name ?? r.user.email, title: r.subject, ageLabel: "" })),
+    new Date()
+  );
 
-  const items: NavItem[] = [
-    { href: "/admin", label: "Dashboard", icon: "LayoutDashboard" },
-    { href: "/admin/clients", label: "Clients", icon: "Users" },
-    { href: "/admin/audits", label: "Audits", icon: "ClipboardList", badge: topMetrics.openAudits },
-    { href: "/admin/outreach", label: "Outreach", icon: "Send", badge: outreachReady },
-    { href: "/admin/insurance-ai-team", label: "Insurance AI team", icon: "Bot" },
-    { href: "/admin/proposals", label: "Proposals", icon: "FileText", badge: topMetrics.pendingProposals },
-    { href: "/admin/projects", label: "Projects", icon: "FolderKanban" },
-    { href: "/admin/tasks", label: "Tasks", icon: "CheckSquare", badge: overdueTaskCount },
-    { href: "/admin/paid-audits", label: "Paid audit calls", icon: "PhoneCall", badge: paidAuditsNeedingAttention },
-    { href: "/admin/service-catalog", label: "Service catalog", icon: "LayoutGrid" },
-    { href: "/admin/service-requests", label: "Service requests", icon: "Inbox", badge: topMetrics.openSupportRequests },
-  ];
+  const badges = {
+    needsYou: queue.length,
+    setupsRunning: clients.filter((c) => c.status === "setup").length,
+    openRequests: openRequests.length,
+  };
+
+  const ownerName = admin.user?.name?.split(" ")[0] || "Owner";
 
   return (
-    <div className="min-h-screen bg-[#05060a] text-white md:flex">
-      <AdminNav items={items} />
-      <main className="min-w-0 flex-1 px-6 py-12">{children}</main>
+    <div className="zhq">
+      <div className="app">
+        <HqSidebar badges={badges} ownerName={ownerName} />
+        <main className="main">
+          <div className="view">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }

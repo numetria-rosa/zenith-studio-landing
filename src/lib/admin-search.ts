@@ -136,7 +136,10 @@ export async function searchAdmin(queryRaw: string): Promise<SearchResult[]> {
       id: u.id,
       label: u.name || u.email,
       sublabel: u.name ? u.email : null,
-      href: `/admin/clients/${encodeURIComponent(u.email.toLowerCase())}`,
+      // Zenith HQ's Clients page is keyed by ServiceProject id, not a
+      // merged-identity page keyed by email (retired 2026-09-25) - jump to
+      // the same filtered list the topbar's own search produces instead.
+      href: `/admin/clients?q=${encodeURIComponent(u.email.toLowerCase())}`,
     });
   }
 

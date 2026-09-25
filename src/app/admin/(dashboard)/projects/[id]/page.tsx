@@ -296,7 +296,7 @@ export default async function AdminProjectDetailPage({
             <h1 className="text-2xl font-semibold">{project.title}</h1>
             <p className="mt-1 text-sm text-white/50">{serviceLabel}</p>
             <p className="mt-1 text-sm text-white/50">
-              <Link href={`/admin/clients/${encodeURIComponent(project.user.email)}`} className="hover:underline">
+              <Link href={`/admin/clients/${project.id}`} className="hover:underline">
                 {project.user.name || project.user.email}
               </Link>{" "}
               · {project.user.email}

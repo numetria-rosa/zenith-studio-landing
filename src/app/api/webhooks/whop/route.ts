@@ -52,6 +52,8 @@ export async function POST(request: NextRequest) {
 
       if (event.type === "payment.succeeded") {
         return await handlePaymentSucceeded(tx, event.data);
+      } else if (event.type === "payment.failed") {
+        await handlePaymentFailed(tx, event.data);
       } else if (event.type === "membership.activated") {
         await handleMembershipActivated(tx, event.data);
       } else if (event.type === "membership.deactivated") {
@@ -326,6 +328,7 @@ async function grantServiceAccess(
     // access during the trial, they just haven't been charged yet. Whop's
     // own membership.status distinguishes trialing/active/etc if that ever
     // needs surfacing separately; monthlyStatus here only means "has access".
+    const existing = await tx.serviceRequest.findUnique({ where: { userId_serviceId: { userId, serviceId } }, select: { paymentFailedAt: true } });
     await tx.serviceRequest.upsert({
       where: { userId_serviceId: { userId, serviceId } },
       create: {
@@ -338,8 +341,21 @@ async function grantServiceAccess(
       update: {
         monthlyStatus: "active",
         whopMonthlyMembershipId: whopMembershipId ?? undefined,
+        // A real charge (or a fresh trial activation) for this plan clears
+        // any previously-recorded failure - see handlePaymentFailed.
+        lastFailedPaymentId: null,
+        paymentFailedAt: null,
       },
     });
+    // Only auto-resume a project this same failure paused, never a project
+    // an admin paused for some unrelated reason - paymentFailedAt being set
+    // is exactly that signal (see the ServiceRequest field's own comment).
+    if (existing?.paymentFailedAt) {
+      await tx.serviceProject.updateMany({
+        where: { userId, sourceServiceId: serviceId, stage: "PAUSED" },
+        data: { stage: "LIVE" },
+      });
+    }
   }
 
   // Every catalog service gets a real ServiceProject delivery workspace on
@@ -370,6 +386,41 @@ async function grantServiceAccess(
     }
   }
   return { isNewProject: false };
+}
+
+/* Zenith HQ addition, 2026-09-25: there was previously no payment.failed
+   handler at all - a declined renewal charge left monthlyStatus "active"
+   forever and nothing in the product noticed. Only monthly (renewal)
+   failures pause anything; a failed setup charge means the client was
+   never provisioned in the first place, there's nothing running yet to
+   pause. */
+async function handlePaymentFailed(tx: Tx, payment: Payment) {
+  const serviceMatch = serviceKindForWhopPlanId(payment.plan?.id);
+  if (!serviceMatch || serviceMatch.kind !== "monthly") return;
+
+  const whopUserId = payment.user?.id ?? null;
+  const email = payment.user?.email ?? null;
+  if (!email && !whopUserId) {
+    console.error("[whop webhook] payment.failed has no user id or email - cannot resolve an account", payment.id);
+    return;
+  }
+  const user = whopUserId ? await tx.user.findUnique({ where: { whopUserId } }) : email ? await tx.user.findUnique({ where: { email } }) : null;
+  if (!user) {
+    console.warn(`[whop webhook] payment.failed for an unrecognized user (payment ${payment.id}) - nothing to pause`);
+    return;
+  }
+
+  await tx.serviceRequest.updateMany({
+    where: { userId: user.id, serviceId: serviceMatch.serviceId },
+    data: { lastFailedPaymentId: payment.id, paymentFailedAt: new Date() },
+  });
+  // Pauses every runtime webhook's isProjectPaused() check (Vapi,
+  // SignalWire, lead capture) - not just a label. Never touches a project
+  // that's already PAUSED/COMPLETED/CANCELLED for its own reason.
+  await tx.serviceProject.updateMany({
+    where: { userId: user.id, sourceServiceId: serviceMatch.serviceId, stage: { in: ["LIVE", "MAINTENANCE"] } },
+    data: { stage: "PAUSED" },
+  });
 }
 
 /* Trial start: Whop grants access immediately (membership.status
