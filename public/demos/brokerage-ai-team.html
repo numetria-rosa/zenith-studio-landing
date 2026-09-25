@@ -905,7 +905,7 @@ function S(t, k, d, tm, st, ic) { return { t: t, k: k, d: d, tm: tm, st: st, ic:
 
 var B = {
   insurance: {
-    biz: '[Agency Name]', role: 'Agency owner', plan: 'Insurance bundle', price: '$850', note: 'Billed monthly · $637.50/mo if billed yearly', trial: true,
+    biz: '[Agency Name]', role: 'Agency owner', plan: 'Insurance bundle', price: '$850', note: 'Billed monthly, or save paying quarterly.', trial: true,
     kpis: [['Handled today', '48'], ['Avg. reply time', '14s'], ['Agents on shift', '4']],
     agents: [
       { id: 'intake', name: 'Intake Agent', ic: 'chat', st: 'run', desc: 'Texts every new quote request back with a real reply, not an autoresponder.', today: ['Leads answered', '18'],
@@ -938,7 +938,7 @@ var B = {
   },
 
   law: {
-    biz: '[Firm Name]', role: 'Managing partner', plan: 'Law firm bundle', price: '$1,080', note: 'Billed monthly · $900/mo if billed yearly', trial: true,
+    biz: '[Firm Name]', role: 'Managing partner', plan: 'Law firm bundle', price: '$1,080', note: 'Billed monthly, or save paying quarterly.', trial: true,
     kpis: [['Handled today', '31'], ['Avg. text-back time', '8s'], ['Agents on shift', '3']],
     agents: [
       { id: 'billing', name: 'AI Billing Clerk', ic: 'clock', st: 'wait', desc: 'Reconstructs billable time from your calendar, email and documents and drafts entries with real narratives.', today: ['Hours found', '6.4'],
@@ -966,7 +966,7 @@ var B = {
   },
 
   brokerage: {
-    biz: '[Brokerage Name]', role: 'Broker / owner', plan: 'Brokerage bundle', price: '$840', note: 'Billed monthly · $682.50/mo if billed yearly', trial: true,
+    biz: '[Brokerage Name]', role: 'Broker / owner', plan: 'Brokerage bundle', price: '$910', note: 'Billed monthly, or save paying quarterly.', trial: true,
     kpis: [['Handled today', '37'], ['Avg. lead reply', '9s'], ['Agents on shift', '3']],
     agents: [
       { id: 'isa', name: 'AI Inside Sales Agent', ic: 'chat', st: 'run', desc: 'Answers new leads in seconds, qualifies motivation, timeline and financing, and books the appointment.', today: ['Leads answered', '16'],
@@ -1035,7 +1035,7 @@ function vOverview() {
   var needs = first ? '<div class="needs"><span class="t"><i></i>Needs you</span><h3>' + first.t + '</h3><p>' + first.s + '</p><div class="row"><button class="link" type="button" data-go="approvals">Review now ' + I('arrow', 16) + '</button></div></div>'
     : '<div class="needs" style="border-color:rgba(61,220,151,.4);background:linear-gradient(160deg,rgba(61,220,151,.08),rgba(10,11,16,.8) 55%)"><span class="t" style="color:var(--mint-t)"><i style="background:var(--mint)"></i>All clear</span><h3>Nothing needs you right now</h3><p>Your team is handling everything.</p></div>';
   var onShift = d.agents.filter(function (a) { return stOf(a) !== 'pause'; }).length;
-  return '<div class="head"><div><h1>Good morning, [Name]</h1><div class="sub"><span>' + onShift + (onShift === 1 ? ' agent' : ' agents') + ' on shift · ' + ap.length + (ap.length === 1 ? ' item needs' : ' items need') + ' you</span>' + (d.trial ? '<span class="trial"><i></i>Free trial · 58h of testing left</span>' : '') + '</div></div>'
+  return '<div class="head"><div><h1>Good morning, [Name]</h1><div class="sub"><span>' + onShift + (onShift === 1 ? ' agent' : ' agents') + ' on shift · ' + ap.length + (ap.length === 1 ? ' item needs' : ' items need') + ' you</span>' + '' + '</div></div>'
     + '<div class="tools"><button class="search" type="button" data-ask>' + I('search') + 'Ask your team anything…</button><button class="bell" type="button" data-go="activity" aria-label="Notifications">' + I('bell', 20) + '<i></i></button></div></div>'
     + '<div class="kpis">' + k + '</div>'
     + '<div class="ov"><section class="card map dots" aria-label="Team map"><div class="map-top"><span class="eyebrow">Team map</span><span class="live"><i></i>Live</span></div>' + teamMap() + '</section>'
@@ -1104,17 +1104,13 @@ function vApprovals() {
 function vSettings() {
   var d = D();
   var tools = d.tools.map(function (t) { return '<div class="tr"><div><b>' + t[0] + '</b></div><span class="pill p-ok"><i></i>' + t[1] + '</span></div>'; }).join('');
-  var setup = d.trial
-    ? [['Plan started', 'Sep 23 · 10:04 AM'], ['Tools connected', 'Sep 23 · 6:40 PM'], ['Setup ready', 'Sep 24 · 9:30 AM · within 24 hours']]
-    : [['Plan started · setup paid', 'Sep 22 · 11:20 AM'], ['Inbox connected and tuned', 'Sep 23 · 4:00 PM'], ['Live', 'Sep 24 · 6:00 AM · day 2 of 2 to 4']];
-  var tl = setup.map(function (s) { return '<div class="s"><span class="d">' + I('check', 12, '#7FF0BD') + '</span><div><b>' + s[0] + '</b><span>' + s[1] + '</span></div></div>'; }).join('');
-  var trial = d.trial ? '<div class="tr" style="display:block"><div style="display:flex;justify-content:space-between"><b>Free trial</b><span>58h of 72h testing left</span></div><div class="meter"><i style="width:19%"></i></div><span>First charge after the 4-day trial ends.</span></div>' : '';
-  var notif = [['Email me when something needs approval', true], ['Daily summary at 8:00 AM', true], ['Text me for urgent items', false]].map(function (n, i) { return '<div class="tr"><b style="font-weight:400">' + n[0] + '</b><button class="tog" type="button" role="switch" aria-checked="' + n[1] + '" aria-label="' + n[0] + '" data-tog></button></div>'; }).join('');
+  var setup = [['Plan started'], ['Tools connected'], ['Setup ready']];
+  var tl = setup.map(function (s) { return '<div class="s"><span class="d">' + I('check', 12, '#7FF0BD') + '</span><div><b>' + s[0] + '</b></div></div>'; }).join('');
   return '<div class="ph"><div><h1>Settings</h1><p>Setup, connected tools, plan and notifications.</p></div></div><div class="sgrid">'
     + '<section class="card sc"><span class="eyebrow">Setup status</span><div class="tl">' + tl + '</div></section>'
     + '<section class="card sc"><span class="eyebrow">Connected tools</span>' + tools + '</section>'
-    + '<section class="card sc plan"><span class="eyebrow">Plan</span><div class="tr" style="border:none;padding-top:0"><div><b>' + d.plan + '</b><br><span>' + d.note + '</span></div><b class="big">' + d.price + '<span style="font-size:15px;color:var(--mist);font-weight:400">/mo</span></b></div>' + trial + '</section>'
-    + '<section class="card sc"><span class="eyebrow">Notifications</span>' + notif + '</section></div>';
+    + '<section class="card sc plan"><span class="eyebrow">Plan</span><div class="tr" style="border:none;padding-top:0"><div><b>' + d.plan + '</b><br><span>' + d.note + '</span></div><b class="big">' + d.price + '<span style="font-size:15px;color:var(--mist);font-weight:400">/mo</span></b></div></section>'
+    + '<section class="card sc"><span class="eyebrow">Notifications</span><p style="margin-top:12px;font-size:13px;color:var(--mist);line-height:1.6">Notification preferences aren’t configurable yet - you’ll always get an email the moment something needs you.</p></section></div>';
 }
 
 /* ---------- render + events ---------- */
@@ -1152,11 +1148,7 @@ document.addEventListener('click', function (e) {
 /* ---------- Ask your team ---------- */
 var dlg = document.getElementById('askDlg'), chat = document.getElementById('chat'), sugs = document.getElementById('sugs'), lastFocus = null;
 function answer(q) {
-  var d = D(), ap = liveApprovals(), ql = q.toLowerCase();
-  if (/wait|need|approv|me\b/.test(ql)) return ap.length ? 'You have ' + ap.length + ' item' + (ap.length > 1 ? 's' : '') + ' waiting: ' + ap.map(function (a) { return a.t.toLowerCase(); }).join('; ') + '. Open Approvals to handle them.' : 'Nothing is waiting on you right now.';
-  if (/today|did|done|handled/.test(ql)) return 'Today so far: ' + d.agents.map(function (a) { return a.name.replace(/^AI /, '') + ' (' + a.today[1] + ' ' + a.today[0].toLowerCase() + ')'; }).join(', ') + '.';
-  if (/pause|stop/.test(ql)) return 'Open any agent and use Pause agent. It finishes the current step safely and waits until you resume.';
-  return 'Good question. In the live product your team answers from your own data. In this preview, try asking what is waiting on you or what your agents did today.';
+  return 'For anything specific to this project, use Support in the meantime - live answers here are coming soon.';
 }
 function say(cls, txt) { var m = document.createElement('div'); m.className = 'msg ' + cls; m.textContent = txt; chat.appendChild(m); chat.scrollTop = chat.scrollHeight; }
 function openAsk() {
