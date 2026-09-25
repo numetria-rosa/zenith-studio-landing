@@ -302,6 +302,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
               <a href="#work" className="hover:text-white transition-colors">{t("nav.work")}</a>
               <a href="#services" className="hover:text-white transition-colors">{t("nav.services")}</a>
               <a href="#systems" className="hover:text-white transition-colors">{t("nav.pricing")}</a>
+              <Link href="/services" className="hover:text-white transition-colors">{t("nav.allServices")}</Link>
               <Link href="/lab" className="hover:text-white transition-colors">{t("nav.courses")}</Link>
               <a href="#contact" className="hover:text-white transition-colors">{t("nav.contact")}</a>
             </nav>
@@ -325,6 +326,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                   { href: "#work", label: t("nav.work") },
                   { href: "#services", label: t("nav.services") },
                   { href: "#systems", label: t("nav.pricing") },
+                  { href: "/services", label: t("nav.allServices") },
                   { href: "/lab", label: t("nav.courses") },
                   { href: "#contact", label: t("nav.contact") },
                 ]}
