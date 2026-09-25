@@ -995,7 +995,7 @@ h1,h2,h3,p{margin:0}
 .wire{fill:none;stroke:rgba(255,255,255,.14);stroke-width:1.5}
 .flow{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:70 900;animation:flow 3.2s linear infinite}
 @keyframes flow{from{stroke-dashoffset:970}to{stroke-dashoffset:0}}
-.node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;padding:0;color:inherit;text-align:center}
+.node{position:absolute;transform:translate(-50%,-39px);display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;padding:0;color:inherit;text-align:center}.node.orch{transform:translate(-50%,-50%)}
 .node .box{position:relative;width:78px;height:78px;border-radius:22px;border:1px solid var(--line-2);background:#0C0E14;display:flex;align-items:center;justify-content:center;transition:transform .2s}
 .node:hover .box{transform:translateY(-2px)}
 .node .box .st{position:absolute;right:-5px;top:-5px;width:12px;height:12px;border-radius:50%;border:2px solid var(--void)}
@@ -1167,7 +1167,7 @@ h1,h2,h3,p{margin:0}
   .tools{width:100%}
   .map{min-height:0}
 }
-@media (max-width:520px){.kpi b{font-size:30px}.node b{font-size:12px}.node .box{width:58px;height:58px;border-radius:16px}.orch .box{width:70px;height:70px}}
+@media (max-width:520px){.kpi b{font-size:30px}.node b{font-size:12px}.node .box{width:58px;height:58px;border-radius:16px}.node:not(.orch){transform:translate(-50%,-29px)}.orch .box{width:70px;height:70px}}
 @media (prefers-reduced-motion: reduce){.flow,.live i,.pulse{animation:none}.flow{stroke-dasharray:none;opacity:.5}}
 .pv{display:none!important}
 html.zt-lock,html.zt-lock body{overflow:hidden!important}
@@ -1401,8 +1401,8 @@ function teamMap() {
   var ox = 500, oy = 130, svg = '', html = '';
   var colors = { run: '#5CC8FF', wait: '#F5B83D', idle: 'rgba(255,255,255,0)', pause: 'rgba(255,255,255,0)' };
   nodes.forEach(function (n, i) {
-    var x = pos[i][0], y = pos[i][1], top = y - 45, midY = x === ox ? oy + 60 : (oy + 0);
-    var dpath = x === ox ? 'M' + ox + ' ' + (oy + 55) + ' V' + top : 'M' + (x < ox ? ox - 55 : ox + 55) + ' ' + oy + ' H' + x + ' V' + top;
+    var x = pos[i][0], y = pos[i][1];
+    var dpath = x === ox ? 'M' + ox + ' ' + oy + ' V' + y : 'M' + ox + ' ' + oy + ' H' + x + ' V' + y;
     svg += '<path class="wire" d="' + dpath + '"></path>';
     if (n.st === 'run' || n.st === 'wait') svg += '<path class="flow" d="' + dpath + '" stroke="' + colors[n.st] + '" style="animation-delay:-' + (i * 0.8) + 's;filter:drop-shadow(0 0 4px ' + colors[n.st] + ')"></path>';
     html += '<button type="button" class="node ' + n.st + '" data-agent="' + n.id + '" style="left:' + (x / 10) + '%;top:' + (y / 6.2) + '%"><span class="box">' + I(n.ic, 26) + '<span class="st"></span></span><b>' + n.name + '</b><small>' + n.lbl + '</small></button>';
