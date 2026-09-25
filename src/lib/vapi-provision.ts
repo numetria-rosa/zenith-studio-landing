@@ -66,3 +66,47 @@ export async function createFreePhoneNumber(input: {
   if (!body.id || !body.number) return { ok: false, error: "phone number created but response was incomplete" };
   return { ok: true, phoneNumberId: body.id, number: body.number };
 }
+
+/** For a client who wants to keep their own number instead of getting a new
+    one: imports a number they already host on Twilio into Vapi, same
+    ponytail caveat as createFreePhoneNumber above - verify the "twilio"
+    provider shape against
+    https://docs.vapi.ai/api-reference/phone-numbers/create before relying
+    on this against a real client. The client's Twilio credentials are only
+    ever passed through this one call, never persisted by this app. */
+export async function importTwilioPhoneNumber(input: {
+  twilioAccountSid: string;
+  twilioAuthToken: string;
+  twilioPhoneNumber: string;
+  serverUrl: string;
+  serverSecret: string;
+  fallbackNumber?: string | null;
+}): Promise<CreatePhoneNumberResult> {
+  const fallbackDestination = input.fallbackNumber
+    ? { type: "number" as const, number: input.fallbackNumber, numberE164CheckEnabled: true }
+    : undefined;
+
+  const res = await fetch(`${VAPI_API_BASE}/phone-number`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${vapiApiKey()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      provider: "twilio",
+      number: input.twilioPhoneNumber,
+      twilioAccountSid: input.twilioAccountSid,
+      twilioAuthToken: input.twilioAuthToken,
+      server: {
+        url: input.serverUrl,
+        headers: { "x-vapi-secret": input.serverSecret },
+      },
+      ...(fallbackDestination ? { fallbackDestination } : {}),
+    }),
+  });
+
+  if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}` };
+  const body = (await res.json()) as { id?: string; number?: string };
+  if (!body.id || !body.number) return { ok: false, error: "phone number imported but response was incomplete" };
+  return { ok: true, phoneNumberId: body.id, number: body.number };
+}

@@ -287,7 +287,16 @@ export async function cancelOwnedMembership(projectId: string, userId: string): 
 export async function activateReceptionist(
   projectId: string,
   userId: string,
-  fields: { businessName: string; hours: string; faqText: string; fallbackNumber: string }
+  fields: {
+    businessName: string;
+    hours: string;
+    faqText: string;
+    fallbackNumber: string;
+    numberSource?: "new" | "twilio";
+    twilioAccountSid?: string;
+    twilioAuthToken?: string;
+    twilioNumber?: string;
+  }
 ): Promise<RequirementSubmitResult> {
   const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
   if (!project) return { ok: false, error: "not_found" };
@@ -299,6 +308,16 @@ export async function activateReceptionist(
   const fallbackNumber = toE164UsNumber(fields.fallbackNumber);
   if (!fallbackNumber) return { ok: false, error: "That fallback phone number doesn't look valid." };
 
+  let twilioImport: { accountSid: string; authToken: string; number: string } | undefined;
+  if (fields.numberSource === "twilio") {
+    const accountSid = (fields.twilioAccountSid ?? "").trim();
+    const authToken = (fields.twilioAuthToken ?? "").trim();
+    const twilioNumber = toE164UsNumber(fields.twilioNumber ?? "");
+    if (!accountSid || !authToken) return { ok: false, error: "Twilio Account SID and Auth Token are required to import your number." };
+    if (!twilioNumber) return { ok: false, error: "That Twilio phone number doesn't look valid." };
+    twilioImport = { accountSid, authToken, number: twilioNumber };
+  }
+
   const values: [string, string][] = [
     [RECEPTIONIST_REQUIREMENTS[0].label, businessName],
     [RECEPTIONIST_REQUIREMENTS[1].label, hours],
@@ -309,7 +328,7 @@ export async function activateReceptionist(
     await db.clientRequirement.updateMany({ where: { projectId: project.id, label }, data: { detail, status: "APPROVED" } });
   }
 
-  return provisionReceptionistIfNeeded(project.id);
+  return provisionReceptionistIfNeeded(project.id, twilioImport);
 }
 
 /** Same self-serve pattern as activateReceptionist, for the law-firms

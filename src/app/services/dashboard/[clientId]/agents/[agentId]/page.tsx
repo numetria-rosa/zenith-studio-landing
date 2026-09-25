@@ -114,11 +114,16 @@ export default async function AgentDetailPage({
     "use server";
     const session2 = await auth();
     if (!session2?.user?.id) signIn();
+    const numberSource = String(formData.get("numberSource") || "new");
     const result = await activateReceptionist(clientId, session2!.user.id, {
       businessName: String(formData.get("businessName") || ""),
       hours: String(formData.get("hours") || ""),
       faqText: String(formData.get("faqText") || ""),
       fallbackNumber: String(formData.get("fallbackNumber") || ""),
+      numberSource: numberSource === "twilio" ? "twilio" : "new",
+      twilioAccountSid: String(formData.get("twilioAccountSid") || ""),
+      twilioAuthToken: String(formData.get("twilioAuthToken") || ""),
+      twilioNumber: String(formData.get("twilioNumber") || ""),
     });
     revalidatePath(dashboardBase);
     if (!result.ok) fail(result.error);
@@ -224,6 +229,16 @@ export default async function AgentDetailPage({
           <FormField label="Hours" name="hours" placeholder="e.g. Mon-Fri 9am-5pm" />
           <FormField label="FAQs" name="faqText" textarea placeholder="Common questions and answers the receptionist should know" />
           <FormField label="Fallback phone number" name="fallbackNumber" type="tel" placeholder="Where to transfer calls it can't handle" />
+          <div className={s.formRow}>
+            <label className={s.label}>Phone number</label>
+            <select name="numberSource" className={s.input} defaultValue="new">
+              <option value="new">Get a new number (recommended, instant)</option>
+              <option value="twilio">Import a number I already own on Twilio</option>
+            </select>
+          </div>
+          <FormField label="Twilio Account SID (only if importing)" name="twilioAccountSid" placeholder="Starts with AC..., found in your Twilio Console" />
+          <FormField label="Twilio Auth Token (only if importing)" name="twilioAuthToken" type="password" placeholder="Found in your Twilio Console" />
+          <FormField label="Twilio phone number to import (only if importing)" name="twilioNumber" type="tel" placeholder="The number already hosted on your Twilio account" />
           <button type="submit" className={u.btnPrimary}>
             Activate
           </button>

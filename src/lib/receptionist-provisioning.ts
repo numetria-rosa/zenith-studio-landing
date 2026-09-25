@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { getSiteUrl } from "@/lib/site";
 import { sendAdminAlert } from "@/lib/outreach-mail";
-import { createFreePhoneNumber, toE164UsNumber } from "@/lib/vapi-provision";
+import { createFreePhoneNumber, importTwilioPhoneNumber, toE164UsNumber } from "@/lib/vapi-provision";
 import { createEventType } from "@/lib/cal-booking";
 import { RECEPTIONIST_REQUIREMENTS } from "@/lib/service-projects";
 
@@ -30,7 +30,10 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export async function provisionReceptionistIfNeeded(projectId: string): Promise<Result> {
+export async function provisionReceptionistIfNeeded(
+  projectId: string,
+  twilioImport?: { accountSid: string; authToken: string; number: string }
+): Promise<Result> {
   const project = await db.serviceProject.findUnique({
     where: { id: projectId },
     select: {
@@ -78,7 +81,16 @@ export async function provisionReceptionistIfNeeded(projectId: string): Promise<
   if (!serverSecret) return { ok: false, error: "VAPI_SERVER_SECRET is not set" };
   const serverUrl = `${getSiteUrl()}/api/webhooks/vapi`;
 
-  const phoneResult = await createFreePhoneNumber({ areaCode: "213", serverUrl, serverSecret, fallbackNumber });
+  const phoneResult = twilioImport
+    ? await importTwilioPhoneNumber({
+        twilioAccountSid: twilioImport.accountSid,
+        twilioAuthToken: twilioImport.authToken,
+        twilioPhoneNumber: twilioImport.number,
+        serverUrl,
+        serverSecret,
+        fallbackNumber,
+      })
+    : await createFreePhoneNumber({ areaCode: "213", serverUrl, serverSecret, fallbackNumber });
   if (!phoneResult.ok) return { ok: false, error: `Vapi phone number: ${phoneResult.error}` };
 
   const eventTypeResult = await createEventType({
@@ -101,13 +113,14 @@ export async function provisionReceptionistIfNeeded(projectId: string): Promise<
         faqText,
         fallbackNumber,
         calEventTypeId: eventTypeResult.eventTypeId,
+        numberSource: twilioImport ? "twilio" : "new",
       },
     },
   });
 
   await sendAdminAlert(
     `Receptionist live for ${businessName}`,
-    `Phone number ${phoneResult.number} is live for ${businessName}. Cal.com event type ${eventTypeResult.eventTypeId} created.`
+    `Phone number ${phoneResult.number} is live for ${businessName} (${twilioImport ? "imported from their Twilio account" : "new Vapi number"}). Cal.com event type ${eventTypeResult.eventTypeId} created.`
   );
 
   return { ok: true };
