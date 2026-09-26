@@ -251,6 +251,13 @@ export function serviceKindForWhopPlanId(
   return null;
 }
 
+/** A direct purchase titles the project with the service's own name until
+    the client tells us their business name; that default doesn't count. */
+export function businessNameOf(project: { title: string; sourceServiceId: string | null }): string {
+  const defaultTitle = project.sourceServiceId ? getService(project.sourceServiceId)?.title : undefined;
+  return project.title === defaultTitle ? "" : project.title;
+}
+
 /** Resolves the display label for a project's service, reusing the same
     catalogService-title-first / sourceServiceId-fallback pattern used by
     the client-facing workspace page and client-directory.ts.

@@ -15,6 +15,7 @@ import {
 } from "@/lib/service-workspace";
 import { planAgents, planAgentStatus, planWorkflowSteps, isSupportedPlan, type WorkflowStep } from "@/lib/client-console-data";
 import { LAW_FIRM_SPECIALTIES, LEGAL_SPECIALTY_PROFILES } from "@/lib/legal-specialties";
+import { businessNameOf } from "@/lib/services";
 import { GuidePicker, InlineGuide } from "../../GuidePicker";
 import { CRM_SETUP_GUIDES, GOOGLE_SHEETS_SHARE_GUIDE } from "@/lib/setup-guides";
 import { Icon, type IconName } from "../../Icon";
@@ -54,6 +55,7 @@ export default async function AgentDetailPage({
   const agent = planAgents(project.sourceServiceId).find((a) => a.id === agentId);
   if (!agent) notFound();
 
+  const businessName = businessNameOf(project);
   const dashboardBase = `/services/dashboard/${clientId}`;
   const agentBase = `${dashboardBase}/agents/${agentId}`;
   function signIn() {
@@ -225,7 +227,7 @@ export default async function AgentDetailPage({
     return (
       <SetupShell clientId={clientId} agent={agent} status={status} title="Set up your AI Receptionist" desc="This buys a real phone number and turns the receptionist on immediately - no review, no waiting on us." error={activateError}>
         <form action={activateReceptionistAction} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <FormField label="Business name" name="businessName" placeholder="Used when greeting callers" />
+          <FormField label="Business name" name="businessName" defaultValue={businessName} placeholder="Used when greeting callers" />
           <FormField label="Hours" name="hours" placeholder="e.g. Mon-Fri 9am-5pm" />
           <FormField label="FAQs" name="faqText" textarea placeholder="Common questions and answers the receptionist should know" />
           <FormField label="Fallback phone number" name="fallbackNumber" type="tel" placeholder="Where to transfer calls it can't handle" />
@@ -256,7 +258,7 @@ export default async function AgentDetailPage({
     return (
       <SetupShell clientId={clientId} agent={agent} status={status} title="Set up Missed Call Text-Back" desc="This buys a real phone number and turns text-back on immediately - no review, no waiting on us." error={activateError}>
         <form action={activateTextBackAction}>
-          <FormField label="Business name" name="businessName" placeholder="Used in the missed-call text" />
+          <FormField label="Business name" name="businessName" defaultValue={businessName} placeholder="Used in the missed-call text" />
           <button type="submit" className={`${u.btnPrimary} ${s.submitBtn}`}>
             Activate
           </button>
@@ -294,7 +296,7 @@ export default async function AgentDetailPage({
     return (
       <SetupShell clientId={clientId} agent={agent} status={status} title={`Set up ${agent.name}`} desc="This buys a real phone number immediately and turns on lead follow-up - no review, no waiting on us." error={activateError}>
         <form action={activateLeadCaptureAction} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <FormField label="Business name" name="businessName" placeholder="Used when replying to a new lead" />
+          <FormField label="Business name" name="businessName" defaultValue={businessName} placeholder="Used when replying to a new lead" />
           <FormField label="Qualification rules" name="qualificationRules" textarea placeholder="What makes a lead worth pursuing (motivation, timeline, financing status)" />
           <FormField label="Notify email" name="notifyEmail" type="email" placeholder="Where we send you a copy of every new lead" />
           <button type="submit" className={u.btnPrimary}>
@@ -396,7 +398,7 @@ export default async function AgentDetailPage({
           <p className={s.setupDesc}>One-time import - clients get a reminder before their policy renews, not after. CSV, Excel, a Google Sheets link, or a PDF report.</p>
           {activateError && <p className={s.errorBox}>Couldn&apos;t import: {activateError}</p>}
           <form action={importBookOfBusinessAction} style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 14 }}>
-            <FormField label="Agency name" name="agencyName" placeholder="Used in the reminder emails your clients get" />
+            <FormField label="Agency name" name="agencyName" defaultValue={businessName} placeholder="Used in the reminder emails your clients get" />
             <div className={s.formRow}>
               <label className={s.label}>Upload a file (CSV, Excel, or PDF)</label>
               <input name="file" type="file" accept=".csv,.xlsx,.xls,application/pdf" className={s.input} />
@@ -581,14 +583,14 @@ function FlashBox({ text }: { text: string }) {
   );
 }
 
-function FormField({ label, name, placeholder, type = "text", textarea }: { label: string; name: string; placeholder?: string; type?: string; textarea?: boolean }) {
+function FormField({ label, name, placeholder, type = "text", textarea, defaultValue }: { label: string; name: string; placeholder?: string; type?: string; textarea?: boolean; defaultValue?: string }) {
   return (
     <div className={s.formRow}>
       <label className={s.label}>{label}</label>
       {textarea ? (
-        <textarea name={name} rows={3} placeholder={placeholder} className={s.textarea} />
+        <textarea name={name} rows={3} placeholder={placeholder} className={s.textarea} defaultValue={defaultValue} />
       ) : (
-        <input name={name} type={type} required placeholder={placeholder} className={s.input} />
+        <input name={name} type={type} required placeholder={placeholder} className={s.input} defaultValue={defaultValue} />
       )}
     </div>
   );

@@ -1,0 +1,121 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  background:
+    radial-gradient(60% 50% at 50% 0%, rgba(61, 220, 151, 0.08), transparent 70%),
+    var(--zc-void);
+  color: var(--zc-text);
+  font-family: var(--zc-sans);
+}
+
+.card {
+  width: 100%;
+  max-width: 460px;
+  padding: 36px 32px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--zc-r-pill);
+  border: 1px solid rgba(61, 220, 151, 0.3);
+  background: rgba(61, 220, 151, 0.08);
+  color: var(--zc-done-text);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--zc-done);
+  box-shadow: 0 0 10px var(--zc-done);
+}
+
+.title {
+  margin: 20px 0 0;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.sub {
+  margin: 8px 0 0;
+  color: var(--zc-muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.input {
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid var(--zc-line-2);
+  background: var(--zc-panel);
+  color: var(--zc-text);
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  border-color: var(--zc-action);
+}
+
+.hint {
+  margin: 0;
+  color: var(--zc-dim);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.submit {
+  margin-top: 8px;
+  width: 100%;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.password {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 28px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--zc-line);
+  background: var(--zc-panel);
+}
+
+.passwordValue {
+  margin: 0;
+  font-family: var(--zc-mono);
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  user-select: all;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 28px 20px;
+  }
+  .title {
+    font-size: 26px;
+  }
+}
