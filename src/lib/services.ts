@@ -1,4 +1,4 @@
-﻿/* AI Systems (done-for-you automation) service catalog - the equivalent of
+/* AI Systems (done-for-you automation) service catalog - the equivalent of
    courses.ts for the agency side of the business. Different shape on
    purpose: two checkout links per service (one-time setup, separate
    recurring monthly), because that's how these are actually sold, and
@@ -107,7 +107,7 @@ export const SERVICES: Service[] = [
     setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/ch_we86QAB7NOpqcL1/",
     whopQuarterlyPlanId: "plan_IY3eOH5sH5FD0",
-    quarterlyCheckoutUrl: "https://whop.com/checkout/plan_IY3eOH5sH5FD0",
+    quarterlyCheckoutUrl: "https://whop.com/checkout/ch_mgVS46D5e689xPN/",
   },
   {
     id: "brokerages",
@@ -132,7 +132,7 @@ export const SERVICES: Service[] = [
     // mechanical - revisit once the cap is lifted and real annual billing
     // can restore a consistent ~25% across every bundle.
     whopQuarterlyPlanId: "plan_apcRrrvFpvnWl",
-    quarterlyCheckoutUrl: "https://whop.com/checkout/plan_apcRrrvFpvnWl",
+    quarterlyCheckoutUrl: "https://whop.com/checkout/ch_T2QFf9XfrPwwSix/",
   },
   // Real Whop product created 2026-09-23 to match public/demos/
   // insurance-ai-team.html's pricing - previously this niche's outreach/
@@ -151,9 +151,9 @@ export const SERVICES: Service[] = [
     whopSetupPlanId: "",
     whopMonthlyPlanId: "plan_aW9AIh13BCZPV",
     setupCheckoutUrl: "",
-    monthlyCheckoutUrl: "https://whop.com/checkout/plan_aW9AIh13BCZPV",
+    monthlyCheckoutUrl: "https://whop.com/checkout/ch_bPuV2GJIvUr0VJF/",
     whopQuarterlyPlanId: "plan_LzUY3p0RRbU3N",
-    quarterlyCheckoutUrl: "https://whop.com/checkout/plan_LzUY3p0RRbU3N",
+    quarterlyCheckoutUrl: "https://whop.com/checkout/ch_ApWb13SXuHaPBKd/",
   },
 ];
 

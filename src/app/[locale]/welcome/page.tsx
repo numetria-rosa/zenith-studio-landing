@@ -21,6 +21,14 @@ export default async function WelcomePage() {
 
   const user = await db.user.findUniqueOrThrow({ where: { id: session.user.id } });
   const password = user.passwordEnc ? decryptPassword(user.passwordEnc) : null;
+  // Service buyers land in their client dashboard; the webhook creates the
+  // project in the same transaction as the purchase claim that signed them in.
+  const project = await db.serviceProject.findFirst({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    select: { id: true },
+  });
+  const dashboardHref = project ? `/services/dashboard/${project.id}` : "/lab/dashboard";
 
   return (
     <div
@@ -52,7 +60,7 @@ export default async function WelcomePage() {
           )}
 
           <a
-            href="/lab/dashboard"
+            href={dashboardHref}
             className="mt-6 block rounded-lg bg-[#f0b429] px-4 py-2.5 text-center text-sm font-bold text-[#1a1200] transition hover:brightness-110"
           >
             Continue to dashboard →
