@@ -62,7 +62,7 @@ export async function submitAuditRequest(answers: AuditAnswers): Promise<SubmitA
 
   await sendAdminAlert(
     `Free audit request: ${company}`,
-    `${name} (${email}, ${company}) submitted the audit form. ${detail} Review at ${process.env.NEXTAUTH_URL || ""}/admin/audits/${audit.id}`
+    `${name} (${email}, ${company}) submitted the audit form. ${detail} Review at ${process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://zenith-studio.site"}/admin/audits/${audit.id}`
   ).catch(() => {});
 
   return { ok: true, proposalSent, email };

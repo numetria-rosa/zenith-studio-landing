@@ -29,7 +29,19 @@ export async function sendProposalEmail(
   const greetingName = input.clientName?.trim() || "there";
   const forWhat = input.companyName ? ` for ${input.companyName}` : "";
 
-  const { error } = await client.emails.send({
+  // Resend occasionally answers 5xx "please try again later" (seen live on
+  // the auto-proposal path), so retry before giving up.
+  let error: { message: string } | null = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (attempt > 0) await new Promise((r) => setTimeout(r, 1500 * attempt));
+    ({ error } = await sendProposalOnce(client, input, greetingName, forWhat));
+    if (!error) return { ok: true };
+  }
+  return { ok: false, error: error!.message };
+}
+
+function sendProposalOnce(client: Resend, input: SendProposalEmailInput, greetingName: string, forWhat: string) {
+  return client.emails.send({
     from: FROM_ADDRESS,
     to: input.to,
     subject: `Your Zenith Studio proposal${input.companyName ? `: ${input.companyName}` : ""}`,
@@ -49,9 +61,6 @@ Zenith Studio`,
       },
     ],
   });
-
-  if (error) return { ok: false, error: error.message };
-  return { ok: true };
 }
 
 export type SendProjectKickoffEmailInput = {
