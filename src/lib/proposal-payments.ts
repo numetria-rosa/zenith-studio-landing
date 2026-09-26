@@ -140,10 +140,10 @@ export async function createProposalCheckout(
 }
 
 /** Creates the deferred monthly plan for a SPLIT-mode proposal - called
-    from updateProjectStage when a project moves to LIVE. A real recurring
-    plan (not a single charge): initial_price and renewal_price both equal
-    the monthly amount, so the first charge happens at this checkout and it
-    then recurs every 30 days, same as the BUNDLED path's renewal leg. */
+    from updateProjectStage when a project moves to LIVE. initial_price is 0
+    because Whop charges initial_price ON TOP of the first renewal_price (see
+    scripts/fix-whop-renewal-prices.mjs): 0 means checkout charges exactly
+    one month, then the same amount every 30 days. */
 export async function createDeferredMonthlyCheckout(
   proposalId: string,
   reference: string,
@@ -154,7 +154,7 @@ export async function createDeferredMonthlyCheckout(
     product_id: PROPOSAL_WHOP_PRODUCT_ID,
     title: `Proposal ZS-${reference} Mo`, // 23 chars
     plan_type: "renewal",
-    initial_price: monthlyCents / 100,
+    initial_price: 0,
     renewal_price: monthlyCents / 100,
     billing_period: 30,
     visibility: "hidden",

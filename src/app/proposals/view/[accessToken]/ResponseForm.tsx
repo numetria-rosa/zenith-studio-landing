@@ -155,7 +155,14 @@ export default function ResponseForm({
           We&apos;ll follow up either way.
         </p>
 
-        {totals.monthlyCents > 0 && (
+        {totals.monthlyCents > 0 && totals.setupCents === 0 && (
+          <p className="mt-5 rounded-xl border border-white/10 bg-white/[0.02] p-4 text-sm text-white/60">
+            Setup is included. Nothing is charged today: your {formatCents(totals.monthlyCents)}/mo plan is billed
+            once your system is built and live.
+          </p>
+        )}
+
+        {totals.monthlyCents > 0 && totals.setupCents > 0 && (
           <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.02] p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/50">How would you like to pay?</p>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">

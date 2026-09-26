@@ -194,7 +194,9 @@ export default async function AdminAuditDetailPage({ params }: { params: Promise
                     const display =
                       value === undefined || value === null || value === ""
                         ? "-"
-                        : String(value);
+                        : Array.isArray(value)
+                          ? value.join(", ") || "-"
+                          : String(value);
                     return (
                       <div key={f.key}>
                         <dt className="text-xs text-white/50">{f.label}</dt>

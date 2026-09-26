@@ -6,7 +6,7 @@ import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 export const metadata: Metadata = {
   title: "Get Your Free Automation Audit | Zenith Studio",
   description:
-    "Tell us how your business runs today and we'll map exactly where automation would save the most time and money. Free, no obligation.",
+    "Answer a few quick questions about how your business runs and get a personalized automation proposal with pricing in your inbox within a minute. Free, no obligation.",
 };
 
 export default function AuditPage() {
@@ -51,8 +51,8 @@ export default function AuditPage() {
             </span>
           </h1>
           <p className="mt-5 text-white/60 leading-7">
-            Answer a few questions about how your business runs today. We&apos;ll review it and follow up with where
-            automation would save you the most time and money, no obligation. Takes about 5 minutes.
+            Tap through a few questions about how your business runs today and get a personalized proposal with
+            pricing in your inbox within a minute. No typing essays, no obligation. Takes about 3 minutes.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-white/50">

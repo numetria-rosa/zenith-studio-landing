@@ -1,16 +1,10 @@
-// Field/step definitions for the free automation audit intake form (Slice 3
-// of the service-platform build, 2026-08-28). Content spec per the business
-// brief's Phase 2: BUSINESS, CURRENT OPERATIONS, PROBLEMS, GOALS, plus one
-// optional free-text field standing in for the (deferred) file-attachment
-// section - no file-storage infrastructure exists yet, see
-// SERVICE_PLATFORM_ARCHITECTURE.md §8.
-//
-// Kept data-driven (one array the form renders from) rather than hand-writing
-// four separate JSX step components, so a future question tweak doesn't need
-// new step markup - this is also why formAnswers is stored as one JSON blob
-// rather than a column per field on AuditRequest.
+// Field/step definitions for the free automation audit intake form. Every
+// question except contact details is a fixed choice, so audit-matcher.ts can
+// turn a submission straight into a priced proposal with no human review.
+// Option strings are matched verbatim by audit-matcher.ts: renaming one here
+// means updating it there too (audit-matcher.test.ts catches a mismatch).
 
-export type FieldType = "text" | "email" | "tel" | "textarea" | "select";
+export type FieldType = "text" | "email" | "tel" | "textarea" | "single" | "multi";
 
 export type FieldDef = {
   key: string;
@@ -28,6 +22,8 @@ export type StepDef = {
   fields: FieldDef[];
 };
 
+export type AuditAnswers = Record<string, string | string[]>;
+
 export const STEPS: StepDef[] = [
   {
     id: "business",
@@ -39,27 +35,35 @@ export const STEPS: StepDef[] = [
       {
         key: "industry",
         label: "Industry",
-        type: "select",
+        type: "single",
         required: true,
         options: [
           "Law firm",
+          "Insurance agency",
           "Real estate / brokerage",
+          "Dental / medical clinic",
+          "Med spa / aesthetics",
           "Home services (trades)",
-          "Healthcare / clinic",
-          "E-commerce",
+          "Accounting / bookkeeping",
           "Agency / consulting",
-          "SaaS / software",
           "Other",
         ],
       },
       {
         key: "teamSize",
         label: "Team size",
-        type: "select",
+        type: "single",
         required: true,
         options: ["Just me", "2-5", "6-15", "16-50", "50+"],
       },
-      { key: "location", label: "Location (city, country)", type: "text", required: true },
+      {
+        key: "country",
+        label: "Country",
+        type: "single",
+        required: true,
+        options: ["United States", "Canada", "United Kingdom", "Other"],
+      },
+      { key: "location", label: "City", type: "text", required: true },
       { key: "contactName", label: "Your name", type: "text", required: true },
       { key: "contactEmail", label: "Your email", type: "email", required: true },
       { key: "contactPhone", label: "Your phone (optional)", type: "tel" },
@@ -72,30 +76,83 @@ export const STEPS: StepDef[] = [
     fields: [
       {
         key: "leadSources",
-        label: "Where do your leads/enquiries come from?",
-        type: "textarea",
+        label: "Where do your leads and enquiries come from?",
+        type: "multi",
         required: true,
-        placeholder: "e.g. website form, phone calls, referrals, Instagram DMs",
+        options: [
+          "Phone calls",
+          "Website form",
+          "Google / Google Maps",
+          "Referrals",
+          "Social media DMs",
+          "Email",
+          "Paid ads",
+          "Walk-ins",
+        ],
       },
       {
         key: "leadVolume",
-        label: "Roughly how many leads/enquiries do you get per month?",
-        type: "select",
+        label: "Roughly how many leads or enquiries do you get per month?",
+        type: "single",
         required: true,
         options: ["Under 20", "20-50", "50-150", "150-500", "500+"],
       },
-      { key: "crm", label: "What CRM do you use, if any?", type: "text", required: true, placeholder: "e.g. HubSpot, Salesforce, spreadsheet, none" },
-      { key: "emailTools", label: "What email / inbox tools do you use?", type: "text", required: true, placeholder: "e.g. Gmail, Outlook" },
-      { key: "bookingSystem", label: "How do people book with you today?", type: "text", required: true, placeholder: "e.g. Calendly, phone, walk-in" },
-      { key: "phoneSystem", label: "What phone system do you use, if any?", type: "text" },
-      { key: "currentAutomation", label: "Any automation already in place?", type: "textarea" },
+      {
+        key: "crm",
+        label: "Where do you keep track of clients and leads?",
+        type: "single",
+        required: true,
+        options: [
+          "Nothing / a spreadsheet",
+          "HubSpot",
+          "Salesforce",
+          "Industry software (Clio, EZLynx, Follow Up Boss, etc.)",
+          "Another CRM",
+        ],
+      },
+      {
+        key: "emailTools",
+        label: "Which email do you use for work?",
+        type: "single",
+        required: true,
+        options: ["Gmail (personal account)", "Google Workspace", "Outlook / Microsoft 365", "Yahoo Mail", "Zoho Mail", "Other"],
+      },
+      {
+        key: "bookingSystem",
+        label: "How do people book with you today?",
+        type: "single",
+        required: true,
+        options: [
+          "By phone, booked by hand",
+          "Online booking tool (Calendly, Cal.com, etc.)",
+          "Email back-and-forth",
+          "No appointments / walk-ins",
+        ],
+      },
+      {
+        key: "currentAutomation",
+        label: "Any automation already in place?",
+        type: "single",
+        required: true,
+        options: ["None", "Basic auto-replies", "Some Zapier / Make workflows", "A chatbot on our website"],
+      },
       {
         key: "repetitiveTasks",
-        label: "What repetitive tasks eat the most time each week?",
-        type: "textarea",
+        label: "Which repetitive tasks eat the most time each week?",
+        type: "multi",
         required: true,
+        options: [
+          "Answering the same questions on calls",
+          "Replying to new enquiries",
+          "Chasing leads who went quiet",
+          "Booking and rescheduling appointments",
+          "Sending reminders",
+          "Sorting and replying to email",
+          "Chasing documents and paperwork",
+          "Typing data into our CRM",
+          "Tracking time and billing",
+        ],
       },
-      { key: "manualProcesses", label: "What manual processes would you most like off your plate?", type: "textarea", required: true },
     ],
   },
   {
@@ -103,12 +160,55 @@ export const STEPS: StepDef[] = [
     title: "Problems",
     description: "Where it actually hurts today.",
     fields: [
-      { key: "biggestBottleneck", label: "What's the single biggest bottleneck in your business right now?", type: "textarea", required: true },
-      { key: "timeLostWhere", label: "Where do you feel the most time is being lost?", type: "textarea", required: true },
-      { key: "responseTimeProblems", label: "Any problems with response time to leads/customers?", type: "textarea" },
-      { key: "followUpProblems", label: "Any problems with following up (leads going cold, no-shows)?", type: "textarea" },
-      { key: "bookingProblems", label: "Any problems with booking/scheduling?", type: "textarea" },
-      { key: "adminWorkload", label: "How would you describe the administrative workload right now?", type: "textarea", required: true },
+      {
+        key: "biggestBottleneck",
+        label: "What's the single biggest bottleneck right now?",
+        type: "single",
+        required: true,
+        options: [
+          "Missed calls and after-hours enquiries",
+          "Slow replies to new leads",
+          "Leads going cold without follow-up",
+          "Booking and scheduling back-and-forth",
+          "Too much email",
+          "Paperwork and admin",
+        ],
+      },
+      {
+        key: "responseTime",
+        label: "How fast do you usually reply to a new lead?",
+        type: "single",
+        required: true,
+        options: ["Under 5 minutes", "Within an hour", "Same day", "Next day or later", "Not sure"],
+      },
+      {
+        key: "afterHours",
+        label: "Do calls outside business hours get answered?",
+        type: "single",
+        required: true,
+        options: ["Yes, always", "Sometimes", "No, they go to voicemail"],
+      },
+      {
+        key: "followUpProblems",
+        label: "How often do leads go cold without a follow-up?",
+        type: "single",
+        required: true,
+        options: ["Rarely", "Sometimes", "Often", "Not sure"],
+      },
+      {
+        key: "noShows",
+        label: "Do no-shows or missed appointments cost you?",
+        type: "single",
+        required: true,
+        options: ["Not an issue", "Sometimes", "Often", "We don't book appointments"],
+      },
+      {
+        key: "adminWorkload",
+        label: "How would you describe the admin workload right now?",
+        type: "single",
+        required: true,
+        options: ["Manageable", "Heavy, but we cope", "Overwhelming, we need help now"],
+      },
     ],
   },
   {
@@ -116,27 +216,59 @@ export const STEPS: StepDef[] = [
     title: "Goals",
     description: "What a win looks like for you.",
     fields: [
-      { key: "whatToAutomate", label: "What would you most want automated?", type: "textarea", required: true },
-      { key: "desiredOutcomes", label: "What outcome are you hoping for?", type: "textarea", required: true, placeholder: "e.g. faster response times, fewer missed leads, hours back per week" },
+      {
+        key: "whatToAutomate",
+        label: "What would you most want handled for you?",
+        type: "multi",
+        required: true,
+        options: [
+          "Answering calls and booking appointments",
+          "Texting back missed calls",
+          "Replying to and following up with every lead",
+          "Appointment reminders",
+          "Sorting and drafting replies to email",
+          "Chasing documents and paperwork",
+          "Time tracking and billing",
+        ],
+      },
+      {
+        key: "desiredOutcomes",
+        label: "What outcomes matter most?",
+        type: "multi",
+        required: true,
+        options: [
+          "Faster replies to leads",
+          "Fewer missed calls",
+          "More booked appointments",
+          "Fewer no-shows",
+          "Hours back every week",
+          "Less time in email",
+        ],
+      },
       {
         key: "timeline",
-        label: "Expected timeline",
-        type: "select",
+        label: "When would you like this running?",
+        type: "single",
         required: true,
         options: ["ASAP", "Within 30 days", "1-3 months", "3-6 months", "Just exploring"],
       },
       {
         key: "budgetRange",
-        label: "Budget range",
-        type: "select",
+        label: "Monthly budget",
+        type: "single",
         required: true,
         options: ["Under $500/mo", "$500-1,500/mo", "$1,500-3,000/mo", "$3,000+/mo", "Not sure yet"],
       },
       {
         key: "anythingElse",
-        label: "Anything else: links to docs, workflows, or examples you can describe",
+        label: "Anything else we should know? (optional)",
         type: "textarea",
       },
     ],
   },
 ];
+
+export function answerList(value: string | string[] | undefined): string[] {
+  if (Array.isArray(value)) return value;
+  return value ? [value] : [];
+}

@@ -123,11 +123,19 @@ export async function recordClientResponse(
     const totals = computeApprovedTotals(proposal.items, validSelectedAddOnIds);
     setupCents = totals.setupCents;
     monthlyCents = totals.monthlyCents;
-    if (monthlyCents > 0 && !(paymentMode && isProposalPaymentMode(paymentMode))) {
+    if (monthlyCents > 0 && setupCents > 0 && !(paymentMode && isProposalPaymentMode(paymentMode))) {
       return { ok: false, error: "choose how you'd like to pay before approving" };
     }
   }
-  const resolvedPaymentMode = monthlyCents > 0 && paymentMode && isProposalPaymentMode(paymentMode) ? paymentMode : null;
+  // No setup fee means BUNDLED has nothing to bundle the monthly into: no
+  // checkout is created at approval, and the go-live step only creates the
+  // deferred monthly plan for SPLIT, so BUNDLED here would never bill.
+  const resolvedPaymentMode =
+    monthlyCents > 0 && setupCents === 0
+      ? "SPLIT"
+      : monthlyCents > 0 && paymentMode && isProposalPaymentMode(paymentMode)
+        ? paymentMode
+        : null;
 
   await db.$transaction(async (tx) => {
     await tx.clientApproval.create({

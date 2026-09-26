@@ -181,7 +181,8 @@ export function buildProposalSectionsFromAudit(input: {
     recommendations.length > 0
       ? recommendations
           .map((r) => {
-            const catalog = r.catalogService ? ` (via ${r.catalogService.title})` : "";
+            const catalog =
+              r.catalogService && r.catalogService.title !== r.title ? ` (via ${r.catalogService.title})` : "";
             return `• ${r.title}${catalog}\n${r.rationale.trim()}\nExpected outcome: ${r.expectedOutcome.trim()}\nEffort: ${r.estimatedEffort.trim()}`;
           })
           .join("\n\n")
