@@ -490,7 +490,7 @@ export function generateProposalCopy(input: EligibilityInput): ProposalCopy {
     scopeOfWork: `In scope:\n• Connect the public enquiry/booking path already advertised\n• First response + follow-up rules you approve\n• Handoff notes for your team\n• Hosting and monitoring under the monthly plan`,
     deliverables: `• Live ${title} connected to the channels we agree at kickoff\n• Short handoff of how to review and override\n• Project workspace for requests after go-live`,
     implementationPlan: `1. Kickoff and collect access\n2. Build against the observed public path\n3. QA on real enquiry examples you provide\n4. Go-live\n5. Monthly monitoring`,
-    timeline: `Typically 2–7 days from kickoff, depending on access.`,
+    timeline: `Live within 24 hours of starting your plan.`,
     assumptions: `• Public observations in this proposal are the starting point, not a full operations audit\n• You can provide access to the tools that receive enquiries\n• Scope matches the line items; extra work is quoted separately`,
     notIncluded: `• Replacing staff\n• Clinical or legal advice\n• Third-party SaaS fees\n• Work outside the listed service`,
     nextSteps: `Approve this proposal and complete payment to start. Or reply if you would rather begin with a free written audit or a $35 mapping call.`,

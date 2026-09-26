@@ -141,7 +141,7 @@
         "name": "AI Inbox Manager",
         "pitch": "Wake up to an inbox that is already handled.",
         "description": "Sorts and prioritizes email, then drafts replies to the routine ones so your day starts with decisions, not admin.",
-        "live": "Live in 2 to 4 days",
+        "live": "Live within 24 hours",
         "features": [
           "Email sorting and prioritization",
           "AI drafted replies for routine mail",
@@ -152,7 +152,7 @@
         "name": "AI Lead Capture & Follow-Up",
         "pitch": "Never lose a lead to a slow reply again.",
         "description": "Captures every enquiry, qualifies it, and follows up by email and SMS until they book. The business that answers first wins the job.",
-        "live": "Live in 3 to 5 days",
+        "live": "Live within 24 hours",
         "features": [
           "Captures leads from every source",
           "Auto qualifies and scores each one",
@@ -164,7 +164,7 @@
         "name": "AI Receptionist & Booking",
         "pitch": "Answers and books while you are on the job.",
         "description": "Handles enquiries around the clock, books straight into your calendar, and sends the reminders that cut no-shows.",
-        "live": "Live in 5 to 7 days",
+        "live": "Live within 24 hours",
         "features": [
           "24/7 enquiry handling",
           "Books into your existing calendar",
@@ -309,7 +309,7 @@
       },
       {
         "q": "How long does it take to set up an AI automation system?",
-        "a": "Most systems are live within 2 to 7 days depending on which one you choose. The free audit gives you an exact timeline before you commit to anything."
+        "a": "Every system is live within 24 hours of starting your plan: you connect your accounts in your dashboard and it switches on. The free audit gives you an exact timeline before you commit to anything."
       },
       {
         "q": "Do I need technical knowledge to use it?",

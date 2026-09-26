@@ -28,7 +28,7 @@ const SHARED_FAQS: ServicePageFaq[] = [
   },
   {
     q: "How long does setup take?",
-    a: "Most systems are live in 2–7 days after we have access and a short kickoff.",
+    a: "Every system is live within 24 hours of starting your plan: you connect your accounts in your dashboard and it switches on.",
   },
   {
     q: "Can I cancel?",

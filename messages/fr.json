@@ -141,7 +141,7 @@
         "name": "AI Inbox Manager",
         "pitch": "Réveillez-vous avec une boîte mail déjà gérée.",
         "description": "Trie et hiérarchise les e-mails, puis rédige des réponses aux messages courants pour que votre journée commence par des décisions, pas de l'administratif.",
-        "live": "Opérationnel en 2 à 4 jours",
+        "live": "Opérationnel en moins de 24 heures",
         "features": [
           "Tri et hiérarchisation des e-mails",
           "Réponses rédigées par IA pour le courrier courant",
@@ -152,7 +152,7 @@
         "name": "AI Lead Capture & Follow-Up",
         "pitch": "Ne perdez plus jamais un lead à cause d'une réponse lente.",
         "description": "Capture chaque demande, la qualifie et relance par e-mail et SMS jusqu'à la réservation. L'entreprise qui répond en premier remporte l'affaire.",
-        "live": "Opérationnel en 3 à 5 jours",
+        "live": "Opérationnel en moins de 24 heures",
         "features": [
           "Capture les leads de toutes les sources",
           "Les qualifie et les note automatiquement",
@@ -164,7 +164,7 @@
         "name": "AI Receptionist & Booking",
         "pitch": "Répond et réserve pendant que vous travaillez.",
         "description": "Gère les demandes en continu, réserve directement dans votre calendrier et envoie les rappels qui réduisent les absences.",
-        "live": "Opérationnel en 5 à 7 jours",
+        "live": "Opérationnel en moins de 24 heures",
         "features": [
           "Gestion des demandes 24h/24 et 7j/7",
           "Réserve dans votre calendrier existant",
@@ -309,7 +309,7 @@
       },
       {
         "q": "Combien de temps faut-il pour mettre en place un système d'automatisation IA ?",
-        "a": "La plupart des systèmes sont opérationnels en 2 à 7 jours selon celui que vous choisissez. L'audit gratuit vous donne un délai exact avant tout engagement."
+        "a": "Chaque système est opérationnel en moins de 24 heures après le début de votre abonnement : vous connectez vos comptes dans votre tableau de bord et il s'active. L'audit gratuit vous donne un délai exact avant tout engagement."
       },
       {
         "q": "Ai-je besoin de connaissances techniques pour l'utiliser ?",

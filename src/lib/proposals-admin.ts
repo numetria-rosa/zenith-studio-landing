@@ -205,7 +205,7 @@ export function buildProposalSectionsFromAudit(input: {
     scopeOfWork: `In scope for this engagement:\n${scopeLines}`,
     deliverables,
     implementationPlan: `1. Kickoff and collect access / brand / workflow details\n2. Build and connect integrations\n3. Internal QA against your real scenarios\n4. Go-live and handoff\n5. Monthly monitoring and improvements`,
-    timeline: `Typically 2–7 days from kickoff to live, depending on access turnaround and how many systems we need to connect.`,
+    timeline: `Live within 24 hours of approval: you connect your accounts in your dashboard and each system switches on.`,
     assumptions: `• You can provide timely access to the tools we need to connect\n• A single point of contact is available for questions during build\n• Scope matches the line items in this proposal; out-of-scope work is quoted separately`,
     notIncluded: `• Custom software products unrelated to the automations listed\n• Ongoing content creation or human VA work\n• Third-party SaaS subscription fees (billed by those vendors directly)`,
     nextSteps: `1. Approve this proposal (and choose payment mode if there is a monthly component)\n2. Complete payment for the setup fee\n3. Fill in the project requirements checklist so we can start build`,

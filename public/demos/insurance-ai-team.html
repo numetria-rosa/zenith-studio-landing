@@ -980,7 +980,7 @@ var B = {
   },
 
   inbox: {
-    biz: '[Your Name]', role: 'Inbox Manager plan', plan: 'AI Inbox Manager', price: '$150', note: 'Free setup · live in 2 to 4 days', trial: false,
+    biz: '[Your Name]', role: 'Inbox Manager plan', plan: 'AI Inbox Manager', price: '$150', note: 'Free setup · Live within 24 hours', trial: false,
     kpis: [['Emails sorted', '48'], ['Drafts ready', '11'], ['Filed for you', '33']],
     orch: 'Inbox Manager',
     agents: [
@@ -1585,7 +1585,7 @@ render();
           <div><b id="cmpA">$10,200</b><span id="cmpALabel">per year, billed monthly</span></div>
           <div><b id="cmpB">$7,650</b><span>per year, billed quarterly</span></div>
         </div>
-        <a class="btn btn-primary" id="pricingCta" href="https://whop.com/checkout/plan_aW9AIh13BCZPV" target="_blank" rel="noopener" style="align-self:stretch;margin-top:6px">Get started now</a>
+        <a class="btn btn-primary" id="pricingCta" href="https://whop.com/checkout/ch_bPuV2GJIvUr0VJF/" target="_blank" rel="noopener" style="align-self:stretch;margin-top:6px">Get started now</a>
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
           <a class="btn btn-glass btn-sm" href="/audit" style="align-self:stretch">Get a free written audit first</a>
           <a class="btn btn-glass btn-sm" href="https://cal.com/zenith-studio-ai/paid-automation-audit" target="_blank" rel="noopener" style="align-self:stretch">Or book a $35 audit call (20 min)</a>
@@ -1657,7 +1657,7 @@ render();
           <span style="font-weight:500;font-size:15px">$35 audit call (20 min)</span>
           <span style="font-weight:400;font-size:13px;color:var(--mist)">Book directly on our calendar. Paid, so it's a real working session, not a sales pitch.</span>
         </a>
-        <a class="btn btn-primary" href="https://whop.com/checkout/plan_aW9AIh13BCZPV" target="_blank" rel="noopener" style="flex:1;min-width:220px;flex-direction:column;align-items:flex-start;gap:4px;height:auto;padding:18px 20px;white-space:normal;text-align:left;border-radius:18px">
+        <a class="btn btn-primary" href="https://whop.com/checkout/ch_bPuV2GJIvUr0VJF/" target="_blank" rel="noopener" style="flex:1;min-width:220px;flex-direction:column;align-items:flex-start;gap:4px;height:auto;padding:18px 20px;white-space:normal;text-align:left;border-radius:18px">
           <span style="font-weight:500;font-size:15px">Get started now</span>
           <span style="font-weight:400;font-size:13px;color:rgba(5,6,10,.65)">Already sure? Check out directly and your workspace is ready right after.</span>
         </a>
@@ -2120,8 +2120,8 @@ render();
   // only the user-facing copy and the real checkout link changed.
   var bm = document.getElementById('billMonthly'), by = document.getElementById('billYearly');
   var cta = document.getElementById('pricingCta');
-  var MONTHLY_CHECKOUT = 'https://whop.com/checkout/plan_aW9AIh13BCZPV';
-  var QUARTERLY_CHECKOUT = 'https://whop.com/checkout/plan_LzUY3p0RRbU3N';
+  var MONTHLY_CHECKOUT = 'https://whop.com/checkout/ch_bPuV2GJIvUr0VJF/';
+  var QUARTERLY_CHECKOUT = 'https://whop.com/checkout/ch_ApWb13SXuHaPBKd/';
   function setBilling(quarterly) {
     bm.setAttribute('aria-pressed', String(!quarterly));
     by.setAttribute('aria-pressed', String(quarterly));

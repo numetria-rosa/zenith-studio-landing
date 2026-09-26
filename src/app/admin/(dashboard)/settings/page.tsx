@@ -72,7 +72,7 @@ export default async function HqSettingsPage() {
           </div>
           <div className="tr">
             <b>Inbox Manager go-live</b>
-            <span>2 to 4 days</span>
+            <span>within 24 hours</span>
           </div>
           <div className="tr">
             <b>Free testing</b>

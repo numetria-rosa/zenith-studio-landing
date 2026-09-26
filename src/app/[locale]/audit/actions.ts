@@ -95,7 +95,7 @@ async function buildAndSendProposal(
         priority: "HIGH",
         rationale: s.reasons.join(". ") + ".",
         expectedOutcome: outcomes ? `Directly targets what you said matters most: ${outcomes}.` : "Less manual work every week.",
-        estimatedEffort: "Live in 2-7 days",
+        estimatedEffort: "Live within 24 hours",
       },
     });
   }

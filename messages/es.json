@@ -141,7 +141,7 @@
         "name": "AI Inbox Manager",
         "pitch": "Despierta con una bandeja de entrada ya gestionada.",
         "description": "Clasifica y prioriza el correo, y redacta respuestas a los mensajes rutinarios para que tu día empiece con decisiones, no con tareas administrativas.",
-        "live": "En marcha en 2 a 4 días",
+        "live": "En marcha en menos de 24 horas",
         "features": [
           "Clasificación y priorización de correo",
           "Respuestas redactadas por IA para correo rutinario",
@@ -152,7 +152,7 @@
         "name": "AI Lead Capture & Follow-Up",
         "pitch": "No vuelvas a perder un lead por una respuesta lenta.",
         "description": "Captura cada consulta, la califica y hace seguimiento por correo y SMS hasta que reserve. El negocio que responde primero se queda con el trabajo.",
-        "live": "En marcha en 3 a 5 días",
+        "live": "En marcha en menos de 24 horas",
         "features": [
           "Captura leads de cada fuente",
           "Los califica y puntúa automáticamente",
@@ -164,7 +164,7 @@
         "name": "AI Receptionist & Booking",
         "pitch": "Responde y agenda mientras estás trabajando.",
         "description": "Gestiona consultas las 24 horas, agenda directamente en tu calendario y envía los recordatorios que reducen las ausencias.",
-        "live": "En marcha en 5 a 7 días",
+        "live": "En marcha en menos de 24 horas",
         "features": [
           "Gestión de consultas 24/7",
           "Agenda en tu calendario existente",
@@ -309,7 +309,7 @@
       },
       {
         "q": "¿Cuánto tiempo lleva configurar un sistema de automatización con IA?",
-        "a": "La mayoría de los sistemas están en marcha entre 2 y 7 días, según cuál elijas. La auditoría gratis te da un plazo exacto antes de comprometerte a nada."
+        "a": "Cada sistema está en marcha en menos de 24 horas desde que empiezas tu plan: conectas tus cuentas en tu panel y se activa. La auditoría gratis te da un plazo exacto antes de comprometerte a nada."
       },
       {
         "q": "¿Necesito conocimientos técnicos para usarlo?",

@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import PlainLink from "next/link";
 import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
@@ -161,7 +161,7 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
         <section className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-12">
           <div className="grid gap-4 sm:grid-cols-3">
             {[
-              ["Live in", "2–7 days"],
+              ["Live in", "Under 24 hours"],
               ["You keep", "Your tools"],
               ["Cancel", "Anytime"],
             ].map(([k, v]) => (

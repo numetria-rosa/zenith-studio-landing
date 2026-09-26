@@ -141,7 +141,7 @@
         "name": "AI Inbox Manager",
         "pitch": "Vakna till en inkorg som redan är hanterad.",
         "description": "Sorterar och prioriterar e-post, och skriver sedan svar på de rutinmässiga så att din dag börjar med beslut, inte administration.",
-        "live": "Igång på 2 till 4 dagar",
+        "live": "Igång inom 24 timmar",
         "features": [
           "Sortering och prioritering av e-post",
           "AI-skrivna svar på rutinmejl",
@@ -152,7 +152,7 @@
         "name": "AI Lead Capture & Follow-Up",
         "pitch": "Förlora aldrig en lead till ett långsamt svar igen.",
         "description": "Fångar varje förfrågan, kvalificerar den och följer upp via e-post och SMS tills de bokar. Företaget som svarar först får jobbet.",
-        "live": "Igång på 3 till 5 dagar",
+        "live": "Igång inom 24 timmar",
         "features": [
           "Fångar leads från alla källor",
           "Kvalificerar och poängsätter varje lead automatiskt",
@@ -164,7 +164,7 @@
         "name": "AI Receptionist & Booking",
         "pitch": "Svarar och bokar medan du jobbar.",
         "description": "Hanterar förfrågningar dygnet runt, bokar direkt i din kalender och skickar de påminnelser som minskar uteblivna besök.",
-        "live": "Igång på 5 till 7 dagar",
+        "live": "Igång inom 24 timmar",
         "features": [
           "Förfrågningshantering dygnet runt",
           "Bokar i din befintliga kalender",
@@ -309,7 +309,7 @@
       },
       {
         "q": "Hur lång tid tar det att sätta upp ett AI-automationssystem?",
-        "a": "De flesta system är igång inom 2 till 7 dagar beroende på vilket du väljer. Den gratis genomgången ger dig en exakt tidsplan innan du binder dig till något."
+        "a": "Varje system är igång inom 24 timmar från att du startar din plan: du kopplar dina konton i din instrumentpanel och det slås på. Den gratis genomgången ger dig en exakt tidsplan innan du binder dig till något."
       },
       {
         "q": "Behöver jag teknisk kunskap för att använda det?",

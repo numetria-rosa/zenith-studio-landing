@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -119,7 +119,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
           <div className="mt-8 rounded-2xl border border-emerald-400/30 bg-emerald-400/[0.06] p-6">
             <p className="text-sm font-semibold text-white">Ready for your own business?</p>
             <p className="mt-1 text-xs leading-5 text-white/55">
-              Set up in 2 to 7 days, your own number, your own calendar, your own FAQ.
+              Live within 24 hours: your own number, your own calendar, your own FAQ.
             </p>
             <a
               href={checkoutUrl}
