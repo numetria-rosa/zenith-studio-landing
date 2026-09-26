@@ -129,11 +129,12 @@
     "eyebrow": "Zenith AI · Llave en mano",
     "title": "Pon tu trabajo repetitivo en piloto automático",
     "subtitle": "Tres sistemas que instalamos por ti, construidos una vez y ajustados a tu negocio. Precio fijo, sin permanencia, en marcha en aproximadamente una semana. ¿No sabes cuál necesitas? La auditoría gratis te dice exactamente por dónde empezar.",
-    "setupLabel": "instalación",
+    "perMonth": "al mes",
+    "freeSetup": "Instalación gratis, cancela cuando quieras",
     "mostPopular": "Más popular",
     "seeHowItWorks": "Ver cómo funciona",
     "tryLiveDemo": "Probar la demo en vivo",
-    "buySetupDirectly": "Comprar la instalación directamente",
+    "startPlan": "Empieza tu plan",
     "aiTeamLabel": "por el equipo de IA",
     "items": [
       {
@@ -304,7 +305,7 @@
     "items": [
       {
         "q": "¿Cuánto cuesta la automatización con IA para una pequeña empresa?",
-        "a": "El AI Inbox Manager cuesta $190 de instalación más $150 al mes. El sistema de Captación de Leads cuesta $270 de instalación más $200 al mes, y el AI Receptionist cuesta $360 de instalación más $300 al mes. La cuota mensual cubre hosting, monitoreo y mejoras continuas, y no hay contrato de permanencia."
+        "a": "El AI Inbox Manager cuesta $150 al mes, el sistema de Captación de Leads cuesta $200 al mes y el AI Receptionist cuesta $300 al mes. La instalación es gratis en todos los planes y puedes cancelar cuando quieras. La cuota mensual cubre hosting, monitoreo y mejoras continuas, y no hay contrato de permanencia."
       },
       {
         "q": "¿Cuánto tiempo lleva configurar un sistema de automatización con IA?",
@@ -328,7 +329,7 @@
       },
       {
         "q": "¿Cuál es la diferencia entre la auditoría gratis y la llamada de auditoría de $35?",
-        "a": "La auditoría gratis es una evaluación escrita: completas un formulario, lo revisamos y te enviamos hallazgos y una propuesta por correo, sin coste. La llamada de auditoría de $35 es una llamada en directo de 20 minutos aparte, reservada y pagada por adelantado a través de Cal.com. Ninguna es un descuento ni una vista previa de la otra, son dos formas distintas de conseguir una auditoría."
+        "a": "La auditoría gratis es una evaluación escrita: respondes un formulario corto de opción múltiple y recibes tus hallazgos y una propuesta con precios por correo en aproximadamente un minuto, sin coste. La llamada de auditoría de $35 es una llamada en directo de 20 minutos aparte, reservada y pagada por adelantado a través de Cal.com. Ninguna es un descuento ni una vista previa de la otra, son dos formas distintas de conseguir una auditoría."
       }
     ]
   },

@@ -129,11 +129,12 @@
     "eyebrow": "Zenith AI · Clés en main",
     "title": "Mettez vos tâches répétitives sur pilote automatique",
     "subtitle": "Trois systèmes que nous installons pour vous, construits une fois et adaptés à votre entreprise. Prix fixe, sans engagement, opérationnels en environ une semaine. Pas sûr duquel vous avez besoin ? L'audit gratuit vous dit exactement par où commencer.",
-    "setupLabel": "installation",
+    "perMonth": "par mois",
+    "freeSetup": "Installation offerte, résiliable à tout moment",
     "mostPopular": "Le plus populaire",
     "seeHowItWorks": "Voir comment ça marche",
     "tryLiveDemo": "Essayer la démo en direct",
-    "buySetupDirectly": "Acheter l'installation directement",
+    "startPlan": "Démarrer votre abonnement",
     "aiTeamLabel": "pour l'équipe IA",
     "items": [
       {
@@ -304,7 +305,7 @@
     "items": [
       {
         "q": "Combien coûte l'automatisation IA pour une petite entreprise ?",
-        "a": "L'AI Inbox Manager coûte 190 $ d'installation plus 150 $ par mois. Le système de capture de leads coûte 270 $ d'installation plus 200 $ par mois, et l'AI Receptionist coûte 360 $ d'installation plus 300 $ par mois. L'abonnement mensuel couvre l'hébergement, la surveillance et les améliorations continues, et il n'y a aucun contrat d'engagement."
+        "a": "L'AI Inbox Manager coûte 150 $ par mois, le système de capture de leads 200 $ par mois et l'AI Receptionist 300 $ par mois. L'installation est offerte sur toutes les formules et vous pouvez résilier à tout moment. L'abonnement mensuel couvre l'hébergement, la surveillance et les améliorations continues, et il n'y a aucun contrat d'engagement."
       },
       {
         "q": "Combien de temps faut-il pour mettre en place un système d'automatisation IA ?",
@@ -328,7 +329,7 @@
       },
       {
         "q": "Quelle est la différence entre l'audit gratuit et l'appel d'audit à 35 $ ?",
-        "a": "L'audit gratuit est une évaluation écrite : vous remplissez un formulaire, nous l'examinons et vous envoyons des conclusions et une proposition par e-mail, sans frais. L'appel d'audit à 35 $ est un appel en direct de 20 minutes distinct, réservé et payé à l'avance via Cal.com. Ni l'un ni l'autre n'est une remise ou un aperçu de l'autre, ce sont deux façons différentes d'obtenir un audit."
+        "a": "L'audit gratuit est une évaluation écrite : vous répondez à un court formulaire à choix multiples et recevez vos conclusions et une proposition chiffrée par e-mail en une minute environ, sans frais. L'appel d'audit à 35 $ est un appel en direct de 20 minutes distinct, réservé et payé à l'avance via Cal.com. Ni l'un ni l'autre n'est une remise ou un aperçu de l'autre, ce sont deux façons différentes d'obtenir un audit."
       }
     ]
   },

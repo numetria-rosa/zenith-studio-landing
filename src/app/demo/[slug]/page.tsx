@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -7,7 +7,7 @@ import { getSiteUrl } from "@/lib/site";
 import { buildDemoAssistantPayload } from "@/lib/vapi";
 import { findOrCreateUserByEmail } from "@/lib/users";
 import { createSessionForUser } from "@/lib/session";
-import { getService, getSetupCheckoutUrl } from "@/lib/services";
+import { getService, getMonthlyCheckoutUrl } from "@/lib/services";
 import DemoCallButton from "./DemoCallButton";
 import DemoBookingsFeed from "../DemoBookingsFeed";
 
@@ -87,7 +87,7 @@ export default async function DemoPage({ params }: { params: Promise<{ slug: str
     `${getSiteUrl()}/api/demo/vapi`
   );
   const receptionistService = getService("ai-receptionist");
-  const checkoutUrl = receptionistService ? getSetupCheckoutUrl(receptionistService) : null;
+  const checkoutUrl = receptionistService ? getMonthlyCheckoutUrl(receptionistService) : null;
 
   return (
     <div className="min-h-screen bg-black px-4 py-16 text-white">

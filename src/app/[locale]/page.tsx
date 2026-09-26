@@ -1,8 +1,8 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Link as LocaleLink } from "@/i18n/navigation";
 import Script from "next/script";
 import { useTranslations } from "next-intl";
-import { getService, getSetupCheckoutUrl, servicePagePath } from "@/lib/services";
+import { getService, getMonthlyCheckoutUrl, servicePagePath } from "@/lib/services";
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 import Reveal from "@/components/Reveal";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -37,22 +37,19 @@ export default function ZenithStudioLandingPage() {
   const aiSystems = [
     {
       id: "ai-inbox-manager",
-      setup: "$190",
-      monthly: "$150/mo",
+      monthly: "$150",
       featured: false,
       ...systemsContent[0],
     },
     {
       id: "ai-lead-capture",
-      setup: "$270",
-      monthly: "$200/mo",
+      monthly: "$200",
       featured: true,
       ...systemsContent[1],
     },
     {
       id: "ai-receptionist",
-      setup: "$360",
-      monthly: "$300/mo",
+      monthly: "$300",
       featured: false,
       ...systemsContent[2],
     },
@@ -221,7 +218,7 @@ export default function ZenithStudioLandingPage() {
         description:
           "AI automation agency building done-for-you systems that capture leads, book appointments, and clear the inbox. AI receptionists, lead follow-up, and custom integrations.",
         email: "zenith.studio.s@outlook.com",
-        priceRange: "$190 - $5000",
+        priceRange: "$150 - $5000",
         areaServed: { "@type": "Place", name: "Worldwide" },
         sameAs: ["https://www.youtube.com/@ZenithStudio-26", "https://whop.com/zenithstudio"],
         knowsAbout: [
@@ -235,7 +232,7 @@ export default function ZenithStudioLandingPage() {
           "@type": "Offer",
           name: system.name,
           description: system.description,
-          price: system.setup.replace(/[$,]/g, ""),
+          price: system.monthly.replace(/[$,]/g, ""),
           priceCurrency: "USD",
           category: "AI automation system",
         })),
@@ -701,9 +698,9 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                 <p className="mt-2 text-sm font-medium text-white/80">{system.pitch}</p>
 
                 <div className="mt-5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span className="text-3xl font-semibold tracking-[-0.04em]">{system.setup}</span>
-                  <span className="text-sm text-white/55">{t("systems.setupLabel")}</span>
-                  <span className="text-sm font-medium text-emerald-200">+ {system.monthly}</span>
+                  <span className="text-3xl font-semibold tracking-[-0.04em]">{system.monthly}</span>
+                  <span className="text-sm text-white/55">{t("systems.perMonth")}</span>
+                  <span className="text-sm font-medium text-emerald-200">{t("systems.freeSetup")}</span>
                 </div>
                 <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs uppercase tracking-[0.18em] text-white/40">
                   <span>{system.live}</span>
@@ -779,11 +776,11 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                     // real button, not a footnote link, so clients who
                     // already know what they want don't have to hunt for it.
                     const catalogService = getService(system.id);
-                    const setupUrl = catalogService ? getSetupCheckoutUrl(catalogService) : null;
-                    if (!setupUrl) return null;
+                    const checkoutUrl = catalogService ? getMonthlyCheckoutUrl(catalogService) : null;
+                    if (!checkoutUrl) return null;
                     return (
                       <a
-                        href={setupUrl}
+                        href={checkoutUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-400/10 px-6 py-3 text-sm font-semibold text-emerald-200 transition hover:scale-[1.02] hover:bg-emerald-400/20"
@@ -802,7 +799,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                           <circle cx="20" cy="21" r="1" />
                           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
                         </svg>
-                        {t("systems.buySetupDirectly")}
+                        {t("systems.startPlan")}
                       </a>
                     );
                   })()}

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import PlainLink from "next/link";
 import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
@@ -27,7 +27,7 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
   const page = getServicePage(slug);
   if (!page) notFound();
   const service = getService(page.serviceId);
-  const checkout = service?.setupCheckoutUrl || service?.monthlyCheckoutUrl || null;
+  const checkout = service?.monthlyCheckoutUrl || null;
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-black text-white">

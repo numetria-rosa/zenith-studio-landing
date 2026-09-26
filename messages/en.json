@@ -129,11 +129,12 @@
     "eyebrow": "Zenith AI · Done for you",
     "title": "Put your busywork on autopilot",
     "subtitle": "Three systems we install for you, built once and tuned to your business. Fixed price, no lock-in, live in about a week. Not sure which you need? The free audit tells you exactly where to start.",
-    "setupLabel": "setup",
+    "perMonth": "per month",
+    "freeSetup": "Free setup, cancel anytime",
     "mostPopular": "Most popular",
     "seeHowItWorks": "See how it works",
     "tryLiveDemo": "Try the live demo",
-    "buySetupDirectly": "Buy setup directly",
+    "startPlan": "Start your plan",
     "aiTeamLabel": "for the AI team",
     "items": [
       {
@@ -304,7 +305,7 @@
     "items": [
       {
         "q": "How much does AI automation cost for a small business?",
-        "a": "The AI Inbox Manager is $190 setup plus $150 per month. The AI Lead Capture system is $270 setup plus $200 per month, and the AI Receptionist is $360 setup plus $300 per month. The monthly covers hosting, monitoring, and ongoing improvements, and there is no lock-in contract."
+        "a": "The AI Inbox Manager is $150 per month, the AI Lead Capture system is $200 per month, and the AI Receptionist is $300 per month. Setup is free on every plan, and you can cancel anytime. The monthly covers hosting, monitoring, and ongoing improvements, and there is no lock-in contract."
       },
       {
         "q": "How long does it take to set up an AI automation system?",
@@ -328,7 +329,7 @@
       },
       {
         "q": "What is the difference between the free audit and the $35 audit call?",
-        "a": "The free audit is a written assessment: you fill out a form, we review it, and send back findings and a proposal by email, at no cost. The $35 audit call is a separate, live 20-minute call with us, booked and paid for upfront through Cal.com. Neither is a discount or a preview of the other, they are two different ways to get an audit."
+        "a": "The free audit is a written assessment: you answer a short multiple-choice form and get your findings and a priced proposal by email within about a minute, at no cost. The $35 audit call is a separate, live 20-minute call with us, booked and paid for upfront through Cal.com. Neither is a discount or a preview of the other, they are two different ways to get an audit."
       }
     ]
   },

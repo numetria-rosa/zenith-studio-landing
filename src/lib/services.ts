@@ -1,4 +1,4 @@
-/* AI Systems (done-for-you automation) service catalog - the equivalent of
+﻿/* AI Systems (done-for-you automation) service catalog - the equivalent of
    courses.ts for the agency side of the business. Different shape on
    purpose: two checkout links per service (one-time setup, separate
    recurring monthly), because that's how these are actually sold, and
@@ -43,11 +43,11 @@ export const SERVICES: Service[] = [
     pitch: "Wake up to an inbox that is already handled.",
     description:
       "Sorts and prioritizes email, then drafts replies to the routine ones so your day starts with decisions, not admin. Connects to Gmail (personal accounts), Yahoo Mail, or Zoho Mail via a secure app password; Outlook/Microsoft 365 isn't supported yet.",
-    setupPriceDisplay: "$190",
+    setupPriceDisplay: "",
     monthlyPriceDisplay: "$150/mo",
     whopSetupPlanId: "plan_AUhS9tvz8KrJC",
     whopMonthlyPlanId: "plan_Qvl24MqIyHNfQ",
-    setupCheckoutUrl: "https://whop.com/checkout/ch_eCiR8tjLkqVUe3L/",
+    setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/ch_phNxifgOlrStCAu/",
   },
   {
@@ -56,11 +56,11 @@ export const SERVICES: Service[] = [
     pitch: "Never lose a lead to a slow reply again.",
     description:
       "Captures every enquiry, qualifies it, and follows up by email and SMS until they book. The business that answers first wins the job.",
-    setupPriceDisplay: "$270",
+    setupPriceDisplay: "",
     monthlyPriceDisplay: "$200/mo",
     whopSetupPlanId: "plan_l6f3sCRsCR2Em",
     whopMonthlyPlanId: "plan_EKCkv5lP6CSPP",
-    setupCheckoutUrl: "https://whop.com/checkout/ch_qeORXXxV8lkxl59/",
+    setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/ch_9NA0gyMpYqAE3dX/",
   },
   {
@@ -69,11 +69,11 @@ export const SERVICES: Service[] = [
     pitch: "Answers and books while you are on the job.",
     description:
       "Handles enquiries around the clock, books straight into your calendar, and sends the reminders that cut no-shows.",
-    setupPriceDisplay: "$360",
+    setupPriceDisplay: "",
     monthlyPriceDisplay: "$300/mo",
     whopSetupPlanId: "plan_ts3JwXpFBKKMp",
     whopMonthlyPlanId: "plan_CJyNkObEaPquA",
-    setupCheckoutUrl: "https://whop.com/checkout/ch_4vQmstGbs1C4W50/",
+    setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/ch_ZvGXKYoanGI1eVn/",
   },
   // The two vertical/role offers from src/app/page.tsx's own `verticalSystems`
@@ -221,11 +221,9 @@ export function serviceIdForPageSlug(slug: string): string | null {
 }
 
 /** null (not a fallback URL) - the page's job is to keep showing the
-    working "Book a free audit" CTA until a real checkout link exists. */
-export function getSetupCheckoutUrl(service: Service): string | null {
-  return service.setupCheckoutUrl || null;
-}
-
+    working "Book a free audit" CTA until a real checkout link exists.
+    Setup is free on every service, so this monthly plan is the only
+    checkout: its initial_price is 0, so day one charges exactly one month. */
 export function getMonthlyCheckoutUrl(service: Service): string | null {
   return service.monthlyCheckoutUrl || null;
 }

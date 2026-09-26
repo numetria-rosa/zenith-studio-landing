@@ -129,11 +129,12 @@
     "eyebrow": "Zenith AI · Nyckelfärdigt",
     "title": "Sätt ditt slitgöra på autopilot",
     "subtitle": "Tre system vi installerar åt dig, byggda en gång och anpassade efter ditt företag. Fast pris, ingen bindningstid, igång på ungefär en vecka. Osäker på vilket du behöver? Den gratis genomgången visar exakt var du ska börja.",
-    "setupLabel": "installation",
+    "perMonth": "per månad",
+    "freeSetup": "Gratis installation, avsluta när du vill",
     "mostPopular": "Mest populär",
     "seeHowItWorks": "Se hur det fungerar",
     "tryLiveDemo": "Prova live-demon",
-    "buySetupDirectly": "Köp installationen direkt",
+    "startPlan": "Starta din plan",
     "aiTeamLabel": "för AI-teamet",
     "items": [
       {
@@ -304,7 +305,7 @@
     "items": [
       {
         "q": "Vad kostar AI-automation för ett litet företag?",
-        "a": "AI Inbox Manager kostar $190 i installation plus $150 per månad. AI-leadinsamlingssystemet kostar $270 i installation plus $200 per månad, och AI Receptionist kostar $360 i installation plus $300 per månad. Månadskostnaden täcker hosting, övervakning och löpande förbättringar, och det finns inget bindande avtal."
+        "a": "AI Inbox Manager kostar $150 per månad, AI-leadinsamlingssystemet $200 per månad och AI Receptionist $300 per månad. Installationen är gratis på alla planer och du kan avsluta när du vill. Månadskostnaden täcker hosting, övervakning och löpande förbättringar, och det finns inget bindande avtal."
       },
       {
         "q": "Hur lång tid tar det att sätta upp ett AI-automationssystem?",
@@ -328,7 +329,7 @@
       },
       {
         "q": "Vad är skillnaden mellan den gratis genomgången och genomgångssamtalet för $35?",
-        "a": "Den gratis genomgången är en skriftlig bedömning: du fyller i ett formulär, vi granskar det och skickar tillbaka resultat och ett förslag via e-post, helt kostnadsfritt. Genomgångssamtalet för $35 är ett separat, live 20-minuterssamtal med oss, bokat och betalat i förskott via Cal.com. Ingen av dem är en rabatt på eller förhandsvisning av den andra, det är två olika sätt att få en genomgång."
+        "a": "Den gratis genomgången är en skriftlig bedömning: du svarar på ett kort flervalsformulär och får dina resultat och ett prissatt förslag via e-post inom ungefär en minut, helt kostnadsfritt. Genomgångssamtalet för $35 är ett separat, live 20-minuterssamtal med oss, bokat och betalat i förskott via Cal.com. Ingen av dem är en rabatt på eller förhandsvisning av den andra, det är två olika sätt att få en genomgång."
       }
     ]
   },

@@ -81,7 +81,7 @@ export const SERVICE_PAGES: ServicePageContent[] = [
       { step: "You decide", detail: "Send, edit, or ignore. You stay in control." },
     ],
     faqs: SHARED_FAQS,
-    setupDisplay: "$190",
+    setupDisplay: "Free",
     monthlyDisplay: "$150/month",
   },
   {
@@ -124,7 +124,7 @@ export const SERVICE_PAGES: ServicePageContent[] = [
       { step: "Booked or closed", detail: "The sequence stops when they schedule or ask to stop." },
     ],
     faqs: SHARED_FAQS,
-    setupDisplay: "$270",
+    setupDisplay: "Free",
     monthlyDisplay: "$200/month",
   },
   {
@@ -167,7 +167,7 @@ export const SERVICE_PAGES: ServicePageContent[] = [
       { step: "Remind", detail: "They get a reminder before the visit." },
     ],
     faqs: SHARED_FAQS,
-    setupDisplay: "$360",
+    setupDisplay: "Free",
     monthlyDisplay: "$300/month",
   },
   {
