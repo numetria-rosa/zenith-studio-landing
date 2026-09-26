@@ -5,6 +5,10 @@ import { getOwnedServiceProject } from "@/lib/service-workspace";
 import { planApprovalItems, planLabel, isSupportedPlan } from "@/lib/client-console-data";
 import { Sidebar } from "./Sidebar";
 import { AskYourTeamProvider } from "./AskYourTeam";
+import { OnboardingModal } from "./OnboardingModal";
+import { businessNameOf } from "@/lib/services";
+import { db } from "@/lib/db";
+import { decryptPassword } from "@/lib/password";
 import consoleStyles from "./console.module.css";
 import shell from "./sidebar.module.css";
 
@@ -38,6 +42,14 @@ export default async function ClientConsoleLayout({
 
   const approvalsCount = planApprovalItems(project, () => "").length;
 
+  // Direct buyers (no proposal) arrive without a business name on file.
+  const needsOnboarding = !businessNameOf(project);
+  let password: string | null = null;
+  if (needsOnboarding) {
+    const user = await db.user.findUnique({ where: { id: session.user.id }, select: { passwordEnc: true } });
+    password = user?.passwordEnc ? decryptPassword(user.passwordEnc) : null;
+  }
+
   return (
     <div className={consoleStyles.console}>
       <AskYourTeamProvider projectId={clientId}>
@@ -52,6 +64,15 @@ export default async function ClientConsoleLayout({
           />
           <main className={shell.main}>{children}</main>
         </div>
+        {needsOnboarding && (
+          <OnboardingModal
+            projectId={clientId}
+            planTitle={planLabel(project.sourceServiceId)}
+            yourName={session.user.name ?? ""}
+            email={session.user.email ?? ""}
+            password={password}
+          />
+        )}
       </AskYourTeamProvider>
     </div>
   );

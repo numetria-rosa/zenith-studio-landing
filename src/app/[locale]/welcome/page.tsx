@@ -5,8 +5,6 @@ import { courseFontVars } from "@/lib/fonts";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { decryptPassword } from "@/lib/password";
-import { businessNameOf, getService } from "@/lib/services";
-import { ServiceWelcome } from "./ServiceWelcome";
 
 export const metadata: Metadata = {
   title: "Welcome",
@@ -23,25 +21,14 @@ export default async function WelcomePage() {
 
   const user = await db.user.findUniqueOrThrow({ where: { id: session.user.id } });
   const password = user.passwordEnc ? decryptPassword(user.passwordEnc) : null;
-  // The webhook creates a service buyer's project in the same transaction as
-  // the purchase claim that just signed them in, so it already exists here.
+  // Service buyers belong in their client dashboard (its popup shows the
+  // password), even if they reach this page from an old link.
   const project = await db.serviceProject.findFirst({
     where: { userId: user.id },
     orderBy: { createdAt: "desc" },
-    select: { id: true, title: true, sourceServiceId: true },
+    select: { id: true },
   });
-  if (project) {
-    return (
-      <ServiceWelcome
-        projectId={project.id}
-        firstName={(session.user.name ?? "").split(" ")[0]}
-        email={session.user.email ?? ""}
-        password={password}
-        planTitle={project.sourceServiceId ? (getService(project.sourceServiceId)?.title ?? project.title) : project.title}
-        businessName={businessNameOf(project)}
-      />
-    );
-  }
+  if (project) redirect(`/services/dashboard/${project.id}`);
   const dashboardHref = "/lab/dashboard";
 
   return (

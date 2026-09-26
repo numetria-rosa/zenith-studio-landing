@@ -1,17 +1,17 @@
-.page {
-  min-height: 100vh;
+﻿.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 16px;
-  background:
-    radial-gradient(60% 50% at 50% 0%, rgba(61, 220, 151, 0.08), transparent 70%),
-    var(--zc-void);
-  color: var(--zc-text);
-  font-family: var(--zc-sans);
+  padding: 24px 16px;
+  overflow-y: auto;
+  background: rgba(5, 6, 10, 0.72);
+  backdrop-filter: blur(6px);
 }
 
-.card {
+.dialog {
   width: 100%;
   max-width: 460px;
   padding: 36px 32px;
@@ -50,6 +50,10 @@
   color: var(--zc-muted);
   font-size: 15px;
   line-height: 1.55;
+}
+
+.gap {
+  margin-top: 8px;
 }
 
 .form {
@@ -112,7 +116,7 @@
 }
 
 @media (max-width: 480px) {
-  .card {
+  .dialog {
     padding: 28px 20px;
   }
   .title {

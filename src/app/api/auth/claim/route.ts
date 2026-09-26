@@ -38,5 +38,14 @@ export async function GET(request: NextRequest) {
   }
 
   await createSessionForUser(claim.userId);
-  return NextResponse.redirect(new URL("/welcome", origin));
+
+  // Service buyers go straight to their dashboard (its first-visit popup
+  // asks for their details); the webhook created the project in the same
+  // transaction as this claim. Course buyers keep the /welcome page.
+  const project = await db.serviceProject.findFirst({
+    where: { userId: claim.userId },
+    orderBy: { createdAt: "desc" },
+    select: { id: true },
+  });
+  return NextResponse.redirect(new URL(project ? `/services/dashboard/${project.id}` : "/welcome", origin));
 }
