@@ -118,7 +118,7 @@ export async function sendAdminAlert(subject: string, text: string): Promise<voi
   await client.emails.send({
     from: FROM_ADDRESS,
     to,
-    subject: `[Zenith outreach] ${subject}`,
+    subject: `[Zenith] ${subject}`,
     text,
   });
 }
