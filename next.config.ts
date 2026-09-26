@@ -31,7 +31,9 @@ function dependencyTree(pkg: string): string[] {
     }
   };
   walk(path.join(process.cwd(), "node_modules", pkg));
-  return [`node_modules/${pkg}`, ...seen].map((dir) => `./${dir}/**/*`);
+  // The package itself is already traced; only its runtime-required deps
+  // are missing. Including the package too would add ~48 MB per function.
+  return [...seen].map((dir) => `./${dir}/**/*`);
 }
 
 const nextConfig: NextConfig = {
