@@ -24,9 +24,14 @@ export const { handlers, auth, signOut } = NextAuth({
     // Database session strategy hands back the DB `user` row (not a JWT
     // token) - attach its id so every server route can trust
     // `session.user.id` without re-deriving it from anything client-supplied.
+    // Returns only what the app reads: Auth.js's database `session` also
+    // carries the sessionToken and the whole user row (passwordEnc included),
+    // and /api/auth/session serves this object to any browser script.
     session({ session, user }) {
-      if (session.user) session.user.id = user.id;
-      return session;
+      return {
+        expires: session.expires,
+        user: { id: user.id, name: user.name, email: user.email, image: user.image },
+      } as typeof session;
     },
   },
 });
