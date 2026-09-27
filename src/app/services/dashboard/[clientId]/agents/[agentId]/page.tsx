@@ -22,6 +22,7 @@ import { importContacts, startReengagement, markContactReplied, isDormant } from
 import { getSiteUrl } from "@/lib/site";
 import { qualificationGroups, qualificationRulesText, readChoices, faqGroups, faqText, hoursText, DAYS, OPEN_TIMES, CLOSE_TIMES, CRM_FORMATS, type ChoiceGroup } from "@/lib/setup-options";
 import { CopyField, TestLeadForm } from "./ConnectForm";
+import { ENTITY_TYPES, readDetails, submitTextingRegistration, formConsentText } from "@/lib/texting-registration";
 import { GuidePicker, InlineGuide } from "../../GuidePicker";
 import { CRM_SETUP_GUIDES, GOOGLE_SHEETS_SHARE_GUIDE } from "@/lib/setup-guides";
 import { Icon, type IconName } from "../../Icon";
@@ -320,6 +321,18 @@ export default async function AgentDetailPage({
     await markContactReplied(clientId, session2!.user.id, String(formData.get("id") || ""));
     revalidatePath(dashboardBase, "layout");
     redirect(agentBase);
+  }
+
+  async function submitTextingAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const parsed = readDetails((k) => formData.get(k));
+    if (!parsed.ok) failTo(agentBase, parsed.error);
+    const result = await submitTextingRegistration(clientId, session2!.user.id, parsed.details);
+    revalidatePath(dashboardBase, "layout");
+    if (!result.ok) failTo(agentBase, result.error);
+    redirect(`${agentBase}?flash=${encodeURIComponent("Submitted. US carriers usually approve within a few business days, and we'll email you the moment texting is live.")}`);
   }
 
   // ---------- Setup-needed states, per real agent ----------
@@ -778,7 +791,17 @@ export default async function AgentDetailPage({
       <Breadcrumb clientId={clientId} agentName={agent.name} />
       <Header agent={agent} tone={status.tone} clientId={clientId} />
 
-      {isLeadAgent && leadNumber && <WebsiteFormCard clientId={clientId} number={leadNumber} firstLeadIn={project.leads.length > 0} />}
+      {flash && <FlashBox text={flash} />}
+      {(isLeadAgent || agentId === "text-back") && (
+        <TextingCard
+          registration={project.textingRegistration}
+          action={submitTextingAction}
+          error={activateError}
+          defaults={{ email: session.user.email ?? "" }}
+          missedCalls={agentId === "text-back"}
+        />
+      )}
+      {isLeadAgent && leadNumber && <WebsiteFormCard clientId={clientId} number={leadNumber} firstLeadIn={project.leads.length > 0} business={businessName} />}
 
       <div className={s.body}>
         <section className={`${u.card} ${s.workflowCard}`}>
@@ -854,13 +877,14 @@ function failTo(agentBase: string, error: string): never {
   redirect(`${agentBase}?activateError=${encodeURIComponent(error)}`);
 }
 
-function WebsiteFormCard({ clientId, number, firstLeadIn }: { clientId: string; number: string; firstLeadIn: boolean }) {
+function WebsiteFormCard({ clientId, number, firstLeadIn, business }: { clientId: string; number: string; firstLeadIn: boolean; business: string }) {
   const endpoint = `${getSiteUrl()}/api/leads/capture/${clientId}`;
   const snippet = `<form action="${endpoint}" method="POST">
   <input name="name" placeholder="Your name" required>
   <input name="phone" type="tel" placeholder="Mobile number" required>
   <input name="email" type="email" placeholder="Email">
   <textarea name="message" placeholder="How can we help?"></textarea>
+  <p>${formConsentText(business || "us")}</p>
   <button type="submit">Send</button>
 </form>`;
   return (
@@ -876,6 +900,67 @@ function WebsiteFormCard({ clientId, number, firstLeadIn }: { clientId: string; 
         <CopyField label="Or paste this form into your site" value={snippet} multiline />
         <TestLeadForm endpoint={endpoint} />
       </div>
+    </section>
+  );
+}
+
+function TextingCard({
+  registration,
+  action,
+  error,
+  defaults,
+  missedCalls,
+}: {
+  registration: { status: string; submittedAt: Date; lastError: string | null } | null;
+  action: (formData: FormData) => Promise<void>;
+  error?: string;
+  defaults: { email: string };
+  missedCalls: boolean;
+}) {
+  const status = registration?.status;
+  if (status === "ACTIVE") return null;
+  const pending = status && status !== "FAILED";
+  return (
+    <section className={`${u.card} ${s.setupCard}`} style={{ marginTop: 24, maxWidth: 720 }}>
+      <p className={s.setupTitle}>{pending ? "Texting: waiting on US carrier approval" : "Get texting approved by US carriers"}</p>
+      {pending ? (
+        <p className={s.setupDesc}>
+          Submitted {registration!.submittedAt.toISOString().slice(0, 10)}. Carriers usually approve within a few business days, and we&apos;ll email you
+          the moment texting is live.{" "}
+          {missedCalls ? "Until then, every missed call is emailed to you right away so you can call back." : "Until then, leads with an email get an email reply, and you get every lead by email."}
+        </p>
+      ) : (
+        <>
+          <p className={s.setupDesc}>
+            US carriers require every business that texts customers to register once, in its own name. We file it for you with the details below; it costs you
+            nothing extra. {status === "FAILED" && "Your last submission was rejected, usually because the legal name or EIN doesn't exactly match IRS records."}
+          </p>
+          {error && <p className={s.errorBox}>{error}</p>}
+          <form action={action} style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
+            <FormField label="Legal business name (as on your IRS paperwork)" name="legalName" placeholder="Harlow Insurance Group LLC" />
+            <FormField label="EIN (federal tax ID)" name="ein" placeholder="12-3456789" />
+            <div className={s.formRow}>
+              <label className={s.label}>Business type</label>
+              <select name="entityType" className={s.input} defaultValue="PRIVATE_PROFIT">
+                {ENTITY_TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <FormField label="Business address" name="address" placeholder="123 Main St, Nashville, TN 37203" />
+            <FormField label="Business website" name="website" placeholder="yourbusiness.com" />
+            <FormField label="Contact email" name="contactEmail" type="email" defaultValue={defaults.email} />
+            <FormField label="Contact phone" name="contactPhone" type="tel" placeholder="(615) 555-0142" />
+            <div style={{ gridColumn: "1 / -1" }}>
+              <button type="submit" className={u.btnPrimary}>
+                Submit for approval
+              </button>
+            </div>
+          </form>
+        </>
+      )}
     </section>
   );
 }

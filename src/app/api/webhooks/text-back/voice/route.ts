@@ -8,6 +8,8 @@ import {
 import { readSettings, missedCallSms, missedCallSpoken } from "@/lib/agent-settings";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 import { isProjectPaused } from "@/lib/project-pause";
+import { textingApproved, withOptOut } from "@/lib/texting-registration";
+import { sendPlainEmail } from "@/lib/outreach-mail";
 
 /* SignalWire Voice webhook for one client's AI Missed Call Text-Back number.
    The firm's own carrier has already forwarded-on-no-answer to this number
@@ -59,21 +61,29 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   const { businessName } = integration.config;
-  const project = await db.serviceProject.findUnique({ where: { id: integration.projectId }, select: { agentSettings: true } });
+  const project = await db.serviceProject.findUnique({ where: { id: integration.projectId }, select: { agentSettings: true, user: { select: { email: true } } } });
   const settings = readSettings(project?.agentSettings);
-  const smsResult = await sendSms({
-    to: callerNumber,
-    from: toNumber,
-    body: missedCallSms(settings, businessName),
-  });
-  if (!smsResult.ok) {
+
+  // Until US carriers approve this number, texts would be blocked: alert the
+  // owner instead so they can call back themselves.
+  const approved = await textingApproved(integration.projectId);
+  const smsResult = approved
+    ? await sendSms({ to: callerNumber, from: toNumber, body: withOptOut(missedCallSms(settings, businessName)) })
+    : ({ ok: false, error: "texting not approved yet" } as const);
+  if (!approved && project?.user.email) {
+    await sendPlainEmail(
+      project.user.email,
+      `Missed call from ${callerNumber}`,
+      `You missed a call from ${callerNumber}. Call them back as soon as you can.\n\nAutomatic text replies start as soon as US carriers approve your texting number. You can see the status in your dashboard.`
+    );
+  } else if (!smsResult.ok) {
     console.error(`[text-back voice webhook] SMS send failed for ${toNumber}:`, smsResult.error);
   }
 
   await db.serviceMetric.create({
     data: {
       projectId: integration.projectId,
-      key: smsResult.ok ? "missed_calls_texted" : "missed_calls_text_failed",
+      key: smsResult.ok ? "missed_calls_texted" : approved ? "missed_calls_text_failed" : "missed_calls_owner_alerted",
       value: 1,
     },
   });

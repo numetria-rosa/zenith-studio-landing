@@ -56,6 +56,7 @@ export const getOwnedServiceProject = cache(async function getOwnedServiceProjec
         include: { deadlines: { orderBy: { order: "asc" } }, documents: { orderBy: { order: "asc" } } },
       },
       dormantContacts: { orderBy: { createdAt: "desc" } },
+      textingRegistration: { select: { status: true, submittedAt: true, lastError: true } },
     },
   });
 });

@@ -77,6 +77,7 @@ export type ConsoleProject = {
     documents: { label: string; received: boolean; lastChasedAt: Date | null }[];
   }[];
   dormantContacts: { id: string; name: string; status: string; lastSentAt: Date | null; sequenceStep: number }[];
+  textingRegistration: { status: string; submittedAt: Date; lastError: string | null } | null;
 };
 
 function hasIntegration(project: ConsoleProject, provider: string): boolean {
@@ -672,11 +673,24 @@ function leadSetupItems(project: ConsoleProject, agentId: string, agentName: str
 
 /** What a client has to connect for their plan to run, in order. Drives
     the Overview checklist, the "Needs you" count, and Ask Your Team. */
+function textingItem(project: ConsoleProject, agentId: string): SetupItem {
+  const reg = project.textingRegistration;
+  const detail = !reg
+    ? "A one-time US carrier registration in your business name. Needs your EIN; we file it for you."
+    : reg.status === "FAILED"
+      ? "Carriers rejected the details. Check your legal name and EIN, then resubmit."
+      : reg.status === "ACTIVE"
+        ? "Approved. Texts go out automatically."
+        : "Submitted. Waiting on US carriers, usually a few business days.";
+  return { agentId, title: "Get texting approved by US carriers", detail, done: reg?.status === "ACTIVE" };
+}
+
 export function planSetupItems(project: ConsoleProject): SetupItem[] {
   switch (project.sourceServiceId) {
     case "insurance-ai-team":
       return [
         ...leadSetupItems(project, "intake", "the Intake Agent"),
+        textingItem(project, "intake"),
         { agentId: "crm", title: "Connect your CRM", detail: "Every quote request is logged into your own CRM automatically.", done: hasIntegration(project, "crm") },
         { agentId: "renewals", title: "Import your book of business", detail: "Upload a spreadsheet or report so renewal reminders go out on time.", done: project.insurancePolicies.length > 0 },
         { agentId: "document-audit", title: "Run your first document audit", detail: "Upload any policy, ACORD form, or loss run to see it read in seconds.", done: project.documents.length > 0 },
@@ -684,17 +698,19 @@ export function planSetupItems(project: ConsoleProject): SetupItem[] {
     case "law-firms":
       return [
         { agentId: "text-back", title: "Turn on Missed Call Text-Back", detail: "Get your number so every missed call is texted back in seconds.", done: hasIntegration(project, "signalwire") },
+        textingItem(project, "text-back"),
         { agentId: "billing-clerk", title: "Connect your calendar and email", detail: "Lets the Billing Clerk rebuild billable time from your day.", done: project.oauthConnections.some((c) => c.status === "CONNECTED") },
       ];
     case "brokerages":
       return [
         ...leadSetupItems(project, "isa", "your Inside Sales Agent"),
+        textingItem(project, "isa"),
         { agentId: "tc", title: "Add your first deal", detail: "Your Transaction Coordinator builds the deadline timeline and document checklist.", done: project.transactions.length > 0 },
         { agentId: "db", title: "Import your past clients and leads", detail: "A spreadsheet or Google Sheet with names and emails.", done: project.dormantContacts.length > 0 },
         { agentId: "db", title: "Start waking up dormant contacts", detail: "One click sends a short check-in sequence in your name.", done: project.dormantContacts.some((c) => c.status !== "DORMANT") },
       ];
     case "ai-lead-capture":
-      return leadSetupItems(project, "lead-capture", "Lead Capture");
+      return [...leadSetupItems(project, "lead-capture", "Lead Capture"), textingItem(project, "lead-capture")];
     case "ai-receptionist":
       return [{ agentId: "receptionist", title: "Turn on your AI Receptionist", detail: "Add your hours and FAQs and get your phone number.", done: hasIntegration(project, "vapi") }];
     case "ai-inbox-manager":

@@ -678,6 +678,7 @@ model ServiceProject {
   agentChanges      AgentChangeRequest[]
   transactions      Transaction[]
   dormantContacts   DormantContact[]
+  textingRegistration TextingRegistration?
 
   @@index([userId])
   @@index([proposalId])
@@ -1512,5 +1513,26 @@ model DormantContact {
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
+  @@index([status])
+}
+
+// US carrier (10DLC) texting registration for one client, filed on their
+// behalf through SignalWire's Campaign Registry API. Texts are held until
+// status is ACTIVE; see src/lib/texting-registration.ts.
+model TextingRegistration {
+  id          String   @id @default(cuid())
+  projectId   String   @unique
+  status      String   @default("BRAND_PENDING") // BRAND_PENDING | CAMPAIGN_PENDING | NUMBER_PENDING | ACTIVE | FAILED
+  brandId     String?
+  campaignId  String?
+  orderId     String?
+  details     Json // what the client submitted (legal name, EIN, address, ...)
+  lastError   String?
+  submittedAt DateTime @default(now())
+  activatedAt DateTime?
+  updatedAt   DateTime @updatedAt
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   @@index([status])
 }

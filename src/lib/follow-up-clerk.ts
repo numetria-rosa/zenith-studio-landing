@@ -22,7 +22,7 @@ function daysSince(date: Date): number {
 export async function processFollowUps(): Promise<{ processed: number; lost: number; sent: number }> {
   const leads = await db.lead.findMany({
     where: { status: { in: ["NEW", "IN_SEQUENCE"] }, sequenceStoppedAt: null, project: { stage: { not: "PAUSED" } } },
-    include: { project: { include: { integrations: { where: { provider: "signalwire" } } } } },
+    include: { project: { include: { integrations: { where: { provider: "signalwire" } }, textingRegistration: { select: { status: true, activatedAt: true } } } } },
   });
 
   let sent = 0;
@@ -30,6 +30,10 @@ export async function processFollowUps(): Promise<{ processed: number; lost: num
 
   for (const lead of leads) {
     if (!lead.phone) continue; // v1 is SMS-only, nothing to do without a phone number
+    // No texting until carriers approve the number, and no follow-ups to
+    // calls from before approval (they'd arrive days late, out of context).
+    const reg = lead.project.textingRegistration;
+    if (reg?.status !== "ACTIVE" || !reg.activatedAt || lead.createdAt < reg.activatedAt) continue;
     const settings = readSettings(lead.project.agentSettings);
     const gaps = followUpGaps(settings);
     if (gaps.length === 0) continue; // client turned follow-ups off

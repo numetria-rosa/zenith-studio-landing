@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { processFollowUps } from "@/lib/follow-up-clerk";
+import { advanceAllTextingRegistrations } from "@/lib/texting-registration";
 
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -10,6 +11,8 @@ export async function GET(request: NextRequest) {
   if (!authorized) {
     return new Response("unauthorized", { status: 401 });
   }
+  // Fallback for missed carrier-approval callbacks, before any texts go out.
+  const registrationsAdvanced = await advanceAllTextingRegistrations();
   const result = await processFollowUps();
-  return Response.json(result);
+  return Response.json({ ...result, registrationsAdvanced });
 }

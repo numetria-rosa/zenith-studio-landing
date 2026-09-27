@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { groqChatCompletion } from "@/lib/groq";
 import { sendSms } from "@/lib/signalwire-text-back";
 import { sendPlainEmail } from "@/lib/outreach-mail";
+import { textingApproved, withOptOut } from "@/lib/texting-registration";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 import { isProjectPaused } from "@/lib/project-pause";
 import { readSettings, instantReplySms, instantReplyEmail } from "@/lib/agent-settings";
@@ -90,11 +91,13 @@ export async function captureLead(projectId: string, input: CaptureInput): Promi
   // Every enquiry gets an immediate reply, the follow-up sequence
   // (processFollowUps, day 1/3/7) picks up automatically from here if they
   // don't respond or book.
-  if (input.phone && integration.externalRef) {
+  // Texts are blocked until US carriers approve this client's number, so
+  // before that an email reply is the only one that can arrive.
+  if (input.phone && integration.externalRef && (await textingApproved(projectId))) {
     await sendSms({
       to: input.phone,
       from: integration.externalRef,
-      body: instantReplySms(settings, businessName),
+      body: withOptOut(instantReplySms(settings, businessName)),
     });
     await recordUsageCost(projectId, ESTIMATED_COST_CENTS.SIGNALWIRE_SMS, "lead capture confirmation sms");
   } else if (input.email) {
