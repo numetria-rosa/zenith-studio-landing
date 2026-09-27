@@ -28,8 +28,9 @@ function isTextBackConfig(value: unknown): value is TextBackConfig {
 export { isTextBackConfig };
 
 function signalwireSpaceUrl(): string {
-  const url = process.env.SIGNALWIRE_SPACE_URL;
-  if (!url) throw new Error("SIGNALWIRE_SPACE_URL is not set");
+  // Vercel and .env carry it as SIGNALWIRE_SPACE; _URL kept for older setups.
+  const url = process.env.SIGNALWIRE_SPACE_URL || process.env.SIGNALWIRE_SPACE;
+  if (!url) throw new Error("SIGNALWIRE_SPACE is not set");
   return url;
 }
 

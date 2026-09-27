@@ -20,7 +20,7 @@ import { leadRequirementSet } from "@/lib/service-projects";
 
 type Result = { ok: true; skipped?: boolean } | { ok: false; error: string };
 
-export async function provisionLeadCaptureIfNeeded(projectId: string): Promise<Result> {
+export async function provisionLeadCaptureIfNeeded(projectId: string, areaCode = "213"): Promise<Result> {
   const project = await db.serviceProject.findUnique({
     where: { id: projectId },
     select: {
@@ -51,7 +51,7 @@ export async function provisionLeadCaptureIfNeeded(projectId: string): Promise<R
   // No voiceUrl, this number is outbound-SMS-only, unlike Missed Call
   // Text-Back's number, which needs a voice webhook to detect the call.
   const smsUrl = `${getSiteUrl()}/api/webhooks/text-back/sms`;
-  const purchaseResult = await purchaseSignalwireNumber({ areaCode: "213", smsUrl });
+  const purchaseResult = await purchaseSignalwireNumber({ areaCode, smsUrl });
   if (!purchaseResult.ok) return { ok: false, error: `SignalWire number purchase: ${purchaseResult.error}` };
 
   await db.integration.create({

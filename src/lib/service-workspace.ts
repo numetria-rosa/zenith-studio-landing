@@ -14,6 +14,7 @@ import { parseBookOfBusinessSpreadsheet, parseBookOfBusinessGoogleSheet, parseBo
 import { RECEPTIONIST_REQUIREMENTS, TEXT_BACK_REQUIREMENTS, leadRequirementSet } from "@/lib/service-projects";
 import { LAW_FIRM_SPECIALTIES } from "@/lib/legal-specialties";
 import type { MailProvider, LawFirmSpecialty } from "@prisma/client";
+import { areaCodeOf } from "@/lib/setup-options";
 
 /* Client-facing service project workspace (Slice 7 of the service-platform
    build, 2026-08-28). This is the first page in the build where one signed-in
@@ -339,19 +340,21 @@ export async function activateReceptionist(
 /** Same self-serve pattern as activateReceptionist, for the law-firms
     bundle's Missed Call Text-Back role (its only field is a business
     name - see TEXT_BACK_REQUIREMENTS). */
-export async function activateTextBack(projectId: string, userId: string, fields: { businessName: string }): Promise<RequirementSubmitResult> {
+export async function activateTextBack(projectId: string, userId: string, fields: { businessName: string; businessPhone: string }): Promise<RequirementSubmitResult> {
   const project = await db.serviceProject.findFirst({ where: { id: projectId, userId }, select: { id: true } });
   if (!project) return { ok: false, error: "not_found" };
 
   const businessName = fields.businessName.trim();
   if (!businessName) return { ok: false, error: "Business name is required." };
+  const areaCode = areaCodeOf(fields.businessPhone);
+  if (!areaCode) return { ok: false, error: "That business phone number doesn't look like a valid US number." };
 
   await db.clientRequirement.updateMany({
     where: { projectId: project.id, label: TEXT_BACK_REQUIREMENTS[0].label },
     data: { detail: businessName, status: "APPROVED" },
   });
 
-  return provisionTextBackIfNeeded(project.id);
+  return provisionTextBackIfNeeded(project.id, areaCode);
 }
 
 /** Same self-serve pattern as activateReceptionist/activateTextBack, for
@@ -362,7 +365,7 @@ export async function activateTextBack(projectId: string, userId: string, fields
 export async function activateLeadCapture(
   projectId: string,
   userId: string,
-  fields: { businessName: string; qualificationRules: string; notifyEmail: string }
+  fields: { businessName: string; businessPhone: string; qualificationRules: string; notifyEmail: string }
 ): Promise<RequirementSubmitResult> {
   const project = await db.serviceProject.findFirst({
     where: { id: projectId, userId },
@@ -378,6 +381,8 @@ export async function activateLeadCapture(
   const notifyEmail = fields.notifyEmail.trim().toLowerCase();
   if (!businessName || !qualificationRules) return { ok: false, error: "All fields are required." };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(notifyEmail)) return { ok: false, error: "That notify email doesn't look valid." };
+  const areaCode = areaCodeOf(fields.businessPhone);
+  if (!areaCode) return { ok: false, error: "That business phone number doesn't look like a valid US number." };
 
   const values: [string, string][] = [
     [requirementSet[0].label, businessName],
@@ -393,7 +398,7 @@ export async function activateLeadCapture(
     }
   }
 
-  return provisionLeadCaptureIfNeeded(project.id);
+  return provisionLeadCaptureIfNeeded(project.id, areaCode);
 }
 
 /** Self-serve law-firm specialty selection - what the Billing Clerk was

@@ -20,6 +20,7 @@ import { adjustableSettings, readSettings, dbDormantDays } from "@/lib/agent-set
 import { createTransaction, updateDeadline, setDocumentReceived, setTransactionStatus } from "@/lib/transaction-coordinator";
 import { importContacts, startReengagement, markContactReplied, isDormant } from "@/lib/database-manager";
 import { getSiteUrl } from "@/lib/site";
+import { qualificationGroups, qualificationRulesText, readChoices, faqGroups, faqText, hoursText, DAYS, OPEN_TIMES, CLOSE_TIMES, CRM_FORMATS, type ChoiceGroup } from "@/lib/setup-options";
 import { CopyField, TestLeadForm } from "./ConnectForm";
 import { GuidePicker, InlineGuide } from "../../GuidePicker";
 import { CRM_SETUP_GUIDES, GOOGLE_SHEETS_SHARE_GUIDE } from "@/lib/setup-guides";
@@ -27,6 +28,7 @@ import { Icon, type IconName } from "../../Icon";
 import { StatusPill, Eyebrow } from "../../ui";
 import u from "../../ui.module.css";
 import s from "./agent.module.css";
+import a from "./adjust/adjust.module.css";
 
 const STEP_ICON: Record<string, IconName> = {
   trigger: "phone",
@@ -63,6 +65,7 @@ export default async function AgentDetailPage({
   const businessName = businessNameOf(project);
   const dashboardBase = `/services/dashboard/${clientId}`;
   const agentBase = `${dashboardBase}/agents/${agentId}`;
+  const sourceServiceId = project.sourceServiceId;
 
   // ---------- Not-yet-built agents: honest state, no fake workflow ----------
   if (!agent.real) {
@@ -91,7 +94,10 @@ export default async function AgentDetailPage({
     "use server";
     const session2 = await auth();
     if (!session2?.user?.id) signInTo(agentBase);
-    const result = await activateTextBack(clientId, session2!.user.id, { businessName: String(formData.get("businessName") || "") });
+    const result = await activateTextBack(clientId, session2!.user.id, {
+      businessName: String(formData.get("businessName") || ""),
+      businessPhone: String(formData.get("businessPhone") || ""),
+    });
     revalidatePath(dashboardBase);
     if (!result.ok) failTo(agentBase, result.error);
     redirect(agentBase);
@@ -101,9 +107,12 @@ export default async function AgentDetailPage({
     "use server";
     const session2 = await auth();
     if (!session2?.user?.id) signInTo(agentBase);
+    const picks = readChoices(qualificationGroups(sourceServiceId), (n) => formData.getAll(n));
+    if (!picks.ok) failTo(agentBase, picks.error);
     const result = await activateLeadCapture(clientId, session2!.user.id, {
       businessName: String(formData.get("businessName") || ""),
-      qualificationRules: String(formData.get("qualificationRules") || ""),
+      businessPhone: String(formData.get("businessPhone") || ""),
+      qualificationRules: qualificationRulesText(picks.picks),
       notifyEmail: String(formData.get("notifyEmail") || ""),
     });
     revalidatePath(dashboardBase);
@@ -116,10 +125,19 @@ export default async function AgentDetailPage({
     const session2 = await auth();
     if (!session2?.user?.id) signInTo(agentBase);
     const numberSource = String(formData.get("numberSource") || "new");
+    const faq = readChoices(faqGroups(sourceServiceId), (n) => formData.getAll(n));
+    if (!faq.ok) failTo(agentBase, faq.error);
+    const hours = hoursText({
+      allDay: formData.get("allDay") === "yes",
+      days: formData.getAll("days").map(String),
+      open: String(formData.get("open") || ""),
+      close: String(formData.get("close") || ""),
+    });
+    if (!hours.ok) failTo(agentBase, hours.error);
     const result = await activateReceptionist(clientId, session2!.user.id, {
       businessName: String(formData.get("businessName") || ""),
-      hours: String(formData.get("hours") || ""),
-      faqText: String(formData.get("faqText") || ""),
+      hours: hours.text,
+      faqText: faqText(faq.picks),
       fallbackNumber: String(formData.get("fallbackNumber") || ""),
       numberSource: numberSource === "twilio" ? "twilio" : "new",
       twilioAccountSid: String(formData.get("twilioAccountSid") || ""),
@@ -137,7 +155,7 @@ export default async function AgentDetailPage({
     if (!session2?.user?.id) signInTo(agentBase);
     const result = await activateCrmWebhook(clientId, session2!.user.id, {
       webhookUrl: String(formData.get("webhookUrl") || ""),
-      payloadFormat: String(formData.get("payloadFormat") || ""),
+      payloadFormat: CRM_FORMATS.find((f) => f.value === formData.get("crmFormat"))?.format ?? "",
     });
     revalidatePath(dashboardBase);
     if (!result.ok) failTo(agentBase, result.error);
@@ -318,9 +336,9 @@ export default async function AgentDetailPage({
       <SetupShell clientId={clientId} agent={agent} status={status} title="Set up your AI Receptionist" desc="This buys a real phone number and turns the receptionist on immediately - no review, no waiting on us." error={activateError}>
         <form action={activateReceptionistAction} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <FormField label="Business name" name="businessName" defaultValue={businessName} placeholder="Used when greeting callers" />
-          <FormField label="Hours" name="hours" placeholder="e.g. Mon-Fri 9am-5pm" />
-          <FormField label="FAQs" name="faqText" textarea placeholder="Common questions and answers the receptionist should know" />
-          <FormField label="Fallback phone number" name="fallbackNumber" type="tel" placeholder="Where to transfer calls it can't handle" />
+          <HoursFields />
+          <ChoiceFields groups={faqGroups(sourceServiceId)} />
+          <FormField label="Fallback phone number" name="fallbackNumber" type="tel" placeholder="A real person's line for calls it can't handle" />
           <div className={s.formRow}>
             <label className={s.label}>Phone number</label>
             <select name="numberSource" className={s.input} defaultValue="new">
@@ -349,6 +367,8 @@ export default async function AgentDetailPage({
       <SetupShell clientId={clientId} agent={agent} status={status} title="Set up Missed Call Text-Back" desc="This buys a real phone number and turns text-back on immediately - no review, no waiting on us." error={activateError}>
         <form action={activateTextBackAction}>
           <FormField label="Business name" name="businessName" defaultValue={businessName} placeholder="Used in the missed-call text" />
+          <FormField label="Your business phone number" name="businessPhone" type="tel" placeholder="The number your customers call today" />
+          <NumberNote what="missed calls" />
           <button type="submit" className={`${u.btnPrimary} ${s.submitBtn}`}>
             Activate
           </button>
@@ -388,16 +408,9 @@ export default async function AgentDetailPage({
       <SetupShell clientId={clientId} agent={agent} status={status} title={`Set up ${agent.name}`} desc="Step 1 of 2. This gets your texting number and turns on instant replies right away, no waiting on us. Next you'll connect your website form." error={activateError}>
         <form action={activateLeadCaptureAction} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <FormField label="Business name" name="businessName" defaultValue={businessName} placeholder="Used when replying to a new lead" />
-          <FormField
-            label="Qualification rules"
-            name="qualificationRules"
-            textarea
-            placeholder={
-              agentId === "intake"
-                ? "What makes a quote request worth pursuing (lines of business, states you write in, renewal timing)"
-                : "What makes a lead worth pursuing (motivation, timeline, financing status)"
-            }
-          />
+          <FormField label="Your business phone number" name="businessPhone" type="tel" placeholder="The number your customers call today" />
+          <NumberNote what="lead replies" />
+          <ChoiceFields groups={qualificationGroups(sourceServiceId)} />
           <FormField label="Notify email" name="notifyEmail" type="email" defaultValue={session.user.email ?? ""} placeholder="Where we send you a copy of every new lead" />
           <button type="submit" className={u.btnPrimary}>
             Activate
@@ -413,12 +426,16 @@ export default async function AgentDetailPage({
         <GuidePicker guides={CRM_SETUP_GUIDES} label="Not sure how to get your webhook URL? Tell us what you use" />
         <form action={activateCrmWebhookAction} style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 14 }}>
           <FormField label="Webhook URL" name="webhookUrl" type="url" placeholder="https://..." />
-          <FormField
-            label="Does your CRM expect specific field names? (optional)"
-            name="payloadFormat"
-            textarea
-            placeholder='e.g.: {"full_name": "...", "contact_phone": "..."}. Leave blank to use our default field names.'
-          />
+          <div className={s.formRow}>
+            <label className={s.label}>Which CRM is it?</label>
+            <select name="crmFormat" className={s.input} defaultValue="default">
+              {CRM_FORMATS.map((f) => (
+                <option key={f.value} value={f.value}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <button type="submit" className={u.btnPrimary}>
             Connect
           </button>
@@ -934,6 +951,72 @@ function FlashBox({ text }: { text: string }) {
     <p style={{ marginTop: 16, padding: "12px 16px", borderRadius: 12, background: "rgba(61,220,151,.08)", border: "1px solid rgba(61,220,151,.3)", color: "var(--zc-done-text)", fontSize: 14 }}>
       {text}
     </p>
+  );
+}
+
+function NumberNote({ what }: { what: string }) {
+  return (
+    <p style={{ margin: "-4px 0 0", fontSize: 13, lineHeight: 1.5, color: "var(--zc-muted)" }}>
+      Your business number stays exactly as it is. Texts for {what} go out from a new local number with the same area code, because a
+      number can only text through one provider at a time. Every message carries your business name.
+    </p>
+  );
+}
+
+function ChoiceFields({ groups }: { groups: ChoiceGroup[] }) {
+  return (
+    <>
+      {groups.map((g) => (
+        <fieldset key={g.name} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+          <legend className={s.label}>{g.question}</legend>
+          {g.multi && <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "var(--zc-muted)" }}>Pick all that apply.</p>}
+          <div className={a.options} style={{ paddingTop: 10 }}>
+            {g.options.map((o) => (
+              <label key={o.value} className={a.option} style={{ padding: 12 }}>
+                <input type={g.multi ? "checkbox" : "radio"} name={g.name} value={o.value} className={a.radio} required={!g.multi && g.required} />
+                <span className={a.optionLabel}>{o.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ))}
+    </>
+  );
+}
+
+function HoursFields() {
+  return (
+    <fieldset style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+      <legend className={s.label}>Business hours</legend>
+      <div className={a.options} style={{ paddingTop: 10, gridTemplateColumns: "repeat(auto-fill, minmax(84px, 1fr))" }}>
+        {DAYS.map((d) => (
+          <label key={d.value} className={a.option} style={{ padding: 12 }}>
+            <input type="checkbox" name="days" value={d.value} className={a.radio} defaultChecked={!["Sat", "Sun"].includes(d.value)} />
+            <span className={a.optionLabel}>{d.label}</span>
+          </label>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap" }}>
+        <select name="open" className={s.input} defaultValue="9am" aria-label="Opens at" style={{ flex: 1, minWidth: 120 }}>
+          {OPEN_TIMES.map((t) => (
+            <option key={t.value} value={t.value}>
+              Opens {t.label}
+            </option>
+          ))}
+        </select>
+        <select name="close" className={s.input} defaultValue="5pm" aria-label="Closes at" style={{ flex: 1, minWidth: 120 }}>
+          {CLOSE_TIMES.map((t) => (
+            <option key={t.value} value={t.value}>
+              Closes {t.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <label className={a.option} style={{ padding: 12, marginTop: 10 }}>
+        <input type="checkbox" name="allDay" value="yes" className={a.radio} />
+        <span className={a.optionLabel}>We&apos;re open 24/7 (ignore the days and times above)</span>
+      </label>
+    </fieldset>
   );
 }
 

@@ -4,6 +4,7 @@ import { sendAdminAlert } from "@/lib/outreach-mail";
 import { createFreePhoneNumber, importTwilioPhoneNumber, toE164UsNumber } from "@/lib/vapi-provision";
 import { createEventType } from "@/lib/cal-booking";
 import { RECEPTIONIST_REQUIREMENTS } from "@/lib/service-projects";
+import { areaCodeOf } from "@/lib/setup-options";
 
 /* Onboarding automation for the AI Receptionist service, the piece that
    turns "admin marks project LIVE" into a fully working client with zero
@@ -90,7 +91,7 @@ export async function provisionReceptionistIfNeeded(
         serverSecret,
         fallbackNumber,
       })
-    : await createFreePhoneNumber({ areaCode: "213", serverUrl, serverSecret, fallbackNumber });
+    : await createFreePhoneNumber({ areaCode: areaCodeOf(fallbackNumber) ?? "213", serverUrl, serverSecret, fallbackNumber });
   if (!phoneResult.ok) return { ok: false, error: `Vapi phone number: ${phoneResult.error}` };
 
   const eventTypeResult = await createEventType({

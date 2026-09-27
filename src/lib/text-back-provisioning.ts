@@ -13,7 +13,7 @@ import { TEXT_BACK_REQUIREMENTS } from "@/lib/service-projects";
 
 type Result = { ok: true; skipped?: boolean } | { ok: false; error: string };
 
-export async function provisionTextBackIfNeeded(projectId: string): Promise<Result> {
+export async function provisionTextBackIfNeeded(projectId: string, areaCode = "213"): Promise<Result> {
   const project = await db.serviceProject.findUnique({
     where: { id: projectId },
     select: {
@@ -37,7 +37,7 @@ export async function provisionTextBackIfNeeded(projectId: string): Promise<Resu
 
   const voiceUrl = `${getSiteUrl()}/api/webhooks/text-back/voice`;
   const smsUrl = `${getSiteUrl()}/api/webhooks/text-back/sms`;
-  const purchaseResult = await purchaseSignalwireNumber({ areaCode: "213", voiceUrl, smsUrl });
+  const purchaseResult = await purchaseSignalwireNumber({ areaCode, voiceUrl, smsUrl });
   if (!purchaseResult.ok) return { ok: false, error: `SignalWire number purchase: ${purchaseResult.error}` };
 
   await db.integration.create({
