@@ -36,9 +36,19 @@ function matchColumn(headers: string[], aliases: string[]): number {
   return -1;
 }
 
+// Renewal dates are calendar days, so they're stored at 12:00 UTC: no
+// server or viewer time zone can shift them onto the neighbouring day.
 function parseDate(raw: string): Date | null {
-  const d = new Date(raw.trim());
-  return Number.isNaN(d.getTime()) ? null : d;
+  const s = raw.trim();
+  const iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (iso) return new Date(Date.UTC(+iso[1], +iso[2] - 1, +iso[3], 12));
+  const us = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (us) {
+    const year = us[3].length === 2 ? 2000 + +us[3] : +us[3];
+    return new Date(Date.UTC(year, +us[1] - 1, +us[2], 12));
+  }
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), 12));
 }
 
 function rowsFromSheet(headerRow: string[], dataRows: string[][], agencyName: string): ParseRowsResult {
@@ -84,7 +94,9 @@ export async function parseBookOfBusinessSpreadsheet(buffer: Buffer, filename: s
       await workbook.xlsx.load(buffer as unknown as Parameters<typeof workbook.xlsx.load>[0]);
       worksheet = workbook.worksheets[0];
     } else {
-      await workbook.csv.read(Readable.from(buffer));
+      // Identity map: keep CSV cells as text instead of letting exceljs turn
+      // dates into local-time Date objects.
+      await workbook.csv.read(Readable.from(buffer), { map: (value: unknown) => value });
       worksheet = workbook.worksheets[0];
     }
     if (!worksheet) return { ok: false, error: "The file has no readable sheet." };
@@ -93,7 +105,8 @@ export async function parseBookOfBusinessSpreadsheet(buffer: Buffer, filename: s
     worksheet.eachRow({ includeEmpty: false }, (row) => {
       const cells: string[] = [];
       row.eachCell({ includeEmpty: true }, (cell) => {
-        cells.push(cell.text ?? "");
+        // Excel date cells are UTC-midnight Dates; read their calendar day directly.
+        cells.push(cell.value instanceof Date ? cell.value.toISOString().slice(0, 10) : (cell.text ?? ""));
       });
       allRows.push(cells);
     });
