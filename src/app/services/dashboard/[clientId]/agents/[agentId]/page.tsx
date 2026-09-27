@@ -16,6 +16,8 @@ import {
 import { planAgents, planAgentStatus, planWorkflowSteps, isSupportedPlan, type WorkflowStep } from "@/lib/client-console-data";
 import { LAW_FIRM_SPECIALTIES, LEGAL_SPECIALTY_PROFILES } from "@/lib/legal-specialties";
 import { businessNameOf } from "@/lib/services";
+import { getSiteUrl } from "@/lib/site";
+import { CopyField, TestLeadForm } from "./ConnectForm";
 import { GuidePicker, InlineGuide } from "../../GuidePicker";
 import { CRM_SETUP_GUIDES, GOOGLE_SHEETS_SHARE_GUIDE } from "@/lib/setup-guides";
 import { Icon, type IconName } from "../../Icon";
@@ -58,12 +60,6 @@ export default async function AgentDetailPage({
   const businessName = businessNameOf(project);
   const dashboardBase = `/services/dashboard/${clientId}`;
   const agentBase = `${dashboardBase}/agents/${agentId}`;
-  function signIn() {
-    redirect(`/sign-in?callbackUrl=${encodeURIComponent(agentBase)}`);
-  }
-  function fail(error: string): never {
-    redirect(`${agentBase}?activateError=${encodeURIComponent(error)}`);
-  }
 
   // ---------- Not-yet-built agents: honest state, no fake workflow ----------
   if (!agent.real) {
@@ -72,10 +68,10 @@ export default async function AgentDetailPage({
         <Breadcrumb clientId={clientId} agentName={agent.name} />
         <Header agent={agent} tone="dim" clientId={clientId} />
         <div className={`${u.card} ${s.setupCard}`} style={{ marginTop: 28, maxWidth: 560 }}>
-          <p className={s.setupTitle}>Not set up yet</p>
+          <p className={s.setupTitle}>Coming soon</p>
           <p className={s.setupDesc}>
-            This role isn&apos;t automated for your account yet. Reach out from Support and we&apos;ll help get it
-            running.
+            This agent is still in development, so there&apos;s nothing to connect yet. We&apos;ll email you the
+            moment it&apos;s ready to switch on. Everything else on your team works today.
           </p>
           <Link href={`${dashboardBase}/settings`} className={`${u.btnGhost}`} style={{ marginTop: 16, display: "inline-flex" }}>
             Go to Settings
@@ -91,31 +87,31 @@ export default async function AgentDetailPage({
   async function activateTextBackAction(formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
-    if (!session2?.user?.id) signIn();
+    if (!session2?.user?.id) signInTo(agentBase);
     const result = await activateTextBack(clientId, session2!.user.id, { businessName: String(formData.get("businessName") || "") });
     revalidatePath(dashboardBase);
-    if (!result.ok) fail(result.error);
+    if (!result.ok) failTo(agentBase, result.error);
     redirect(agentBase);
   }
 
   async function activateLeadCaptureAction(formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
-    if (!session2?.user?.id) signIn();
+    if (!session2?.user?.id) signInTo(agentBase);
     const result = await activateLeadCapture(clientId, session2!.user.id, {
       businessName: String(formData.get("businessName") || ""),
       qualificationRules: String(formData.get("qualificationRules") || ""),
       notifyEmail: String(formData.get("notifyEmail") || ""),
     });
     revalidatePath(dashboardBase);
-    if (!result.ok) fail(result.error);
+    if (!result.ok) failTo(agentBase, result.error);
     redirect(agentBase);
   }
 
   async function activateReceptionistAction(formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
-    if (!session2?.user?.id) signIn();
+    if (!session2?.user?.id) signInTo(agentBase);
     const numberSource = String(formData.get("numberSource") || "new");
     const result = await activateReceptionist(clientId, session2!.user.id, {
       businessName: String(formData.get("businessName") || ""),
@@ -128,27 +124,27 @@ export default async function AgentDetailPage({
       twilioNumber: String(formData.get("twilioNumber") || ""),
     });
     revalidatePath(dashboardBase);
-    if (!result.ok) fail(result.error);
+    if (!result.ok) failTo(agentBase, result.error);
     redirect(agentBase);
   }
 
   async function activateCrmWebhookAction(formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
-    if (!session2?.user?.id) signIn();
+    if (!session2?.user?.id) signInTo(agentBase);
     const result = await activateCrmWebhook(clientId, session2!.user.id, {
       webhookUrl: String(formData.get("webhookUrl") || ""),
       payloadFormat: String(formData.get("payloadFormat") || ""),
     });
     revalidatePath(dashboardBase);
-    if (!result.ok) fail(result.error);
+    if (!result.ok) failTo(agentBase, result.error);
     redirect(agentBase);
   }
 
   async function runDocumentAuditAction(formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
-    if (!session2?.user?.id) signIn();
+    if (!session2?.user?.id) signInTo(agentBase);
     const file = formData.get("file");
     const rawText = String(formData.get("rawText") || "");
     let pdfBase64: string | undefined;
@@ -161,14 +157,14 @@ export default async function AgentDetailPage({
     }
     const result = await runDocumentAudit(clientId, session2!.user.id, { filename, pdfBase64, rawText, sizeBytes });
     revalidatePath(dashboardBase);
-    if (!result.ok) fail(result.error);
+    if (!result.ok) failTo(agentBase, result.error);
     redirect(`${agentBase}?flash=${encodeURIComponent("Audit complete - see the summary below.")}`);
   }
 
   async function importBookOfBusinessAction(formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
-    if (!session2?.user?.id) signIn();
+    if (!session2?.user?.id) signInTo(agentBase);
     const file = formData.get("file");
     let fileBuffer: Buffer | undefined;
     let filename: string | undefined;
@@ -186,14 +182,14 @@ export default async function AgentDetailPage({
       fileMimeType,
     });
     revalidatePath(dashboardBase);
-    if (!result.ok) fail(result.error);
+    if (!result.ok) failTo(agentBase, result.error);
     redirect(`${agentBase}?flash=${encodeURIComponent(`Imported ${result.created} clients. Renewal reminders are on.`)}`);
   }
 
   async function connectMailboxAction(formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
-    if (!session2?.user?.id) signIn();
+    if (!session2?.user?.id) signInTo(agentBase);
     const result = await connectMailbox(
       clientId,
       session2!.user.id,
@@ -202,14 +198,14 @@ export default async function AgentDetailPage({
       String(formData.get("appPassword") || "")
     );
     revalidatePath(dashboardBase);
-    if (!result.ok) fail(result.error);
+    if (!result.ok) failTo(agentBase, result.error);
     redirect(agentBase);
   }
 
   async function updateSpecialtyAction(formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
-    if (!session2?.user?.id) signIn();
+    if (!session2?.user?.id) signInTo(agentBase);
     await updateOwnedSpecialty(clientId, session2!.user.id, String(formData.get("specialty") || ""));
     revalidatePath(dashboardBase);
     redirect(agentBase);
@@ -222,6 +218,7 @@ export default async function AgentDetailPage({
   const crmConnected = project.integrations.some((i) => i.provider === "crm" && i.status === "CONNECTED");
   const mailConnected = project.mailConnections.some((c) => c.status === "CONNECTED");
   const receptionistConnected = project.integrations.some((i) => i.provider === "vapi" && i.status === "CONNECTED");
+  const leadNumber = project.integrations.find((i) => i.provider === "signalwire" && i.status === "CONNECTED")?.externalRef ?? null;
 
   if (agentId === "receptionist" && !receptionistConnected) {
     return (
@@ -292,13 +289,23 @@ export default async function AgentDetailPage({
     );
   }
 
-  if ((agentId === "isa" || agentId === "lead-capture") && !leadCaptureConnected) {
+  const isLeadAgent = agentId === "isa" || agentId === "lead-capture" || agentId === "intake";
+  if (isLeadAgent && !leadCaptureConnected) {
     return (
-      <SetupShell clientId={clientId} agent={agent} status={status} title={`Set up ${agent.name}`} desc="This buys a real phone number immediately and turns on lead follow-up - no review, no waiting on us." error={activateError}>
+      <SetupShell clientId={clientId} agent={agent} status={status} title={`Set up ${agent.name}`} desc="Step 1 of 2. This gets your texting number and turns on instant replies right away, no waiting on us. Next you'll connect your website form." error={activateError}>
         <form action={activateLeadCaptureAction} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <FormField label="Business name" name="businessName" defaultValue={businessName} placeholder="Used when replying to a new lead" />
-          <FormField label="Qualification rules" name="qualificationRules" textarea placeholder="What makes a lead worth pursuing (motivation, timeline, financing status)" />
-          <FormField label="Notify email" name="notifyEmail" type="email" placeholder="Where we send you a copy of every new lead" />
+          <FormField
+            label="Qualification rules"
+            name="qualificationRules"
+            textarea
+            placeholder={
+              agentId === "intake"
+                ? "What makes a quote request worth pursuing (lines of business, states you write in, renewal timing)"
+                : "What makes a lead worth pursuing (motivation, timeline, financing status)"
+            }
+          />
+          <FormField label="Notify email" name="notifyEmail" type="email" defaultValue={session.user.email ?? ""} placeholder="Where we send you a copy of every new lead" />
           <button type="submit" className={u.btnPrimary}>
             Activate
           </button>
@@ -438,7 +445,7 @@ export default async function AgentDetailPage({
   const recentRuns =
     agentId === "billing-clerk"
       ? project.timeEntries.slice(0, 5).map((e) => ({ text: `${e.matterName} · ${e.status.toLowerCase()}`, time: e.entryDate.toISOString().slice(0, 10) }))
-      : agentId === "isa" || agentId === "text-back" || agentId === "follow-up-clerk" || agentId === "lead-capture"
+      : isLeadAgent || agentId === "text-back" || agentId === "follow-up-clerk"
         ? project.leads.slice(0, 5).map((l) => ({ text: `${l.name ?? "Caller"} · ${l.status.toLowerCase().replace("_", " ")}`, time: l.createdAt.toISOString().slice(0, 10) }))
         : [];
 
@@ -446,6 +453,8 @@ export default async function AgentDetailPage({
     <div>
       <Breadcrumb clientId={clientId} agentName={agent.name} />
       <Header agent={agent} tone={status.tone} clientId={clientId} />
+
+      {isLeadAgent && leadNumber && <WebsiteFormCard clientId={clientId} number={leadNumber} firstLeadIn={project.leads.length > 0} />}
 
       <div className={s.body}>
         <section className={`${u.card} ${s.workflowCard}`}>
@@ -509,6 +518,41 @@ export default async function AgentDetailPage({
         </div>
       </div>
     </div>
+  );
+}
+
+// Module level on purpose: inline "use server" actions can only close over
+// serializable values, and a local helper function crashed every form save.
+function signInTo(agentBase: string): never {
+  redirect(`/sign-in?callbackUrl=${encodeURIComponent(agentBase)}`);
+}
+function failTo(agentBase: string, error: string): never {
+  redirect(`${agentBase}?activateError=${encodeURIComponent(error)}`);
+}
+
+function WebsiteFormCard({ clientId, number, firstLeadIn }: { clientId: string; number: string; firstLeadIn: boolean }) {
+  const endpoint = `${getSiteUrl()}/api/leads/capture/${clientId}`;
+  const snippet = `<form action="${endpoint}" method="POST">
+  <input name="name" placeholder="Your name" required>
+  <input name="phone" type="tel" placeholder="Mobile number" required>
+  <input name="email" type="email" placeholder="Email">
+  <textarea name="message" placeholder="How can we help?"></textarea>
+  <button type="submit">Send</button>
+</form>`;
+  return (
+    <section className={`${u.card} ${s.setupCard}`} style={{ marginTop: 24 }}>
+      <p className={s.setupTitle}>{firstLeadIn ? "Your website form is connected" : "Step 2 of 2: connect your website form"}</p>
+      <p className={s.setupDesc}>
+        Your agent texts from <b style={{ color: "var(--zc-text)" }}>{number}</b>. Send your website&apos;s enquiry form to the address
+        below and every new lead gets an instant reply. Using a form builder (Jotform, Typeform, Wix, WordPress)? Paste the address
+        into its &quot;send submissions to a webhook / URL&quot; setting. Fields it reads: name, phone, email, message.
+      </p>
+      <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 16 }}>
+        <CopyField label="Your form address" value={endpoint} />
+        <CopyField label="Or paste this form into your site" value={snippet} multiline />
+        <TestLeadForm endpoint={endpoint} />
+      </div>
+    </section>
   );
 }
 
