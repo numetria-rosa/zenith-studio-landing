@@ -24,15 +24,22 @@ const LAYOUT_4 = [
 ];
 
 const TONE_COLOR: Record<Tone, string> = { run: "var(--zc-run)", need: "var(--zc-need)", done: "var(--zc-done)", dim: "var(--zc-dim)" };
-const TONE_STATE: Record<Tone, string> = { run: "running", need: "waiting on you", done: "done", dim: "idle" };
+const TONE_TEXT: Record<Tone, string> = { run: "var(--zc-run-text)", need: "var(--zc-need-text)", done: "var(--zc-done-text)", dim: "var(--zc-dim)" };
+// Tile border + glow per state, same treatment as the demo pages' team map.
+const TONE_RGB: Record<Tone, string | null> = { run: "92,200,255", need: "245,184,61", done: "61,220,151", dim: null };
 
-export type MapAgent = { id: string; name: string; icon: IconName; tone: Tone };
+export type MapAgent = { id: string; name: string; icon: IconName; tone: Tone; state: string };
 
 export function TeamMap({ agents, agentHref }: { agents: MapAgent[]; agentHref: (id: string) => string }) {
   const positions = agents.length === 4 ? LAYOUT_4 : agents.length === 1 ? [{ x: 500, y: 420 }] : LAYOUT_3.slice(0, agents.length);
 
   return (
     <svg viewBox="0 0 1000 620" className={s.mapSvg} role="img" aria-label="Your AI team, current status">
+      <defs>
+        <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="10" />
+        </filter>
+      </defs>
       {agents.map((a, i) => {
         const p = positions[i];
         if (!p) return null;
@@ -42,14 +49,14 @@ export function TeamMap({ agents, agentHref }: { agents: MapAgent[]; agentHref: 
         return (
           <g key={a.id}>
             <path
-              d={`M${ORCH.x} ${ORCH.y + 44} V${midY} H${p.x} V${p.y - 39}`}
+              d={`M${ORCH.x} ${ORCH.y + 80} V${midY} H${p.x} V${p.y - 39}`}
               fill="none"
               stroke="rgba(255,255,255,.14)"
               strokeWidth={1.5}
             />
             {animated && (
               <path
-                d={`M${ORCH.x} ${ORCH.y + 44} V${midY} H${p.x} V${p.y - 39}`}
+                d={`M${ORCH.x} ${ORCH.y + 80} V${midY} H${p.x} V${p.y - 39}`}
                 fill="none"
                 stroke={color}
                 strokeWidth={2}
@@ -77,19 +84,31 @@ export function TeamMap({ agents, agentHref }: { agents: MapAgent[]; agentHref: 
       {agents.map((a, i) => {
         const p = positions[i];
         if (!p) return null;
+        const rgb = TONE_RGB[a.tone];
         return (
-          <Link key={a.id} href={agentHref(a.id)} aria-label={`${a.name}, ${TONE_STATE[a.tone]}`}>
+          <Link key={a.id} href={agentHref(a.id)} aria-label={`${a.name}, ${a.state}`}>
             <g className={s.nodeBtn}>
-              <rect x={p.x - 39} y={p.y - 39} width={78} height={78} rx={22} className={s.nodeTile} />
-              <circle cx={p.x + 30} cy={p.y - 30} r={6} fill={TONE_COLOR[a.tone]} />
-              <g transform={`translate(${p.x - 12}, ${p.y - 12})`} color="var(--zc-text)">
+              {rgb && <rect x={p.x - 47} y={p.y - 47} width={94} height={94} rx={28} fill={`rgba(${rgb},.1)`} filter="url(#nodeGlow)" />}
+              <rect
+                x={p.x - 39}
+                y={p.y - 39}
+                width={78}
+                height={78}
+                rx={22}
+                className={s.nodeTile}
+                stroke={rgb ? `rgba(${rgb},.65)` : undefined}
+                strokeDasharray={a.state === "coming soon" ? "5 5" : undefined}
+              />
+              <g transform={`translate(${p.x - 12}, ${p.y - 12})`} color={rgb ? TONE_TEXT[a.tone] : "var(--zc-muted)"}>
                 <Icon name={a.icon} size={24} strokeWidth={1.6} />
               </g>
-              <text x={p.x} y={p.y + 56} textAnchor="middle" className={s.nodeLabel}>
+              {/* Status dot sits exactly where the wire enters: top-center of the tile. */}
+              <circle cx={p.x} cy={p.y - 39} r={6.5} fill={TONE_COLOR[a.tone]} stroke="var(--zc-panel-2)" strokeWidth={3} />
+              <text x={p.x} y={p.y + 58} textAnchor="middle" className={s.nodeLabel}>
                 {a.name}
               </text>
-              <text x={p.x} y={p.y + 74} textAnchor="middle" className={s.nodeState} fill={TONE_COLOR[a.tone]}>
-                {TONE_STATE[a.tone]}
+              <text x={p.x} y={p.y + 77} textAnchor="middle" className={s.nodeState} fill={TONE_TEXT[a.tone]}>
+                {a.state}
               </text>
             </g>
           </Link>

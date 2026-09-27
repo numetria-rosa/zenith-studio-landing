@@ -25,3 +25,9 @@ export async function saveOnboarding(formData: FormData): Promise<void> {
   revalidatePath(`/services/dashboard/${project.id}`, "layout");
   redirect(`/services/dashboard/${project.id}`);
 }
+
+export async function markDashboardTourSeen(): Promise<void> {
+  const session = await auth();
+  if (!session?.user?.id) return;
+  await db.user.update({ where: { id: session.user.id }, data: { dashboardTourSeenAt: new Date() } });
+}

@@ -25,7 +25,7 @@ export default async function ClientConsoleAgents({ params }: { params: Promise<
 
       <div className={s.grid}>
         {agents.map((agent) => {
-          const status = agent.real ? planAgentStatus(project, agent.id) : { tone: "dim" as const, stateLabel: "not set up", todayLabel: "Status", todayValue: "coming soon" };
+          const status = agent.real ? planAgentStatus(project, agent.id) : { tone: "dim" as const, stateLabel: "coming soon", todayLabel: "Status", todayValue: "in development" };
           return (
             <Link key={agent.id} href={`/services/dashboard/${clientId}/agents/${agent.id}`} className={`${u.card} ${s.card}`}>
               <div className={s.cardHead}>

@@ -30,6 +30,10 @@ model User {
   // so this migration needs no backfill logic.
   role UserRole @default(CLIENT)
 
+  // Set when a client finishes or skips the client dashboard's first-visit
+  // tour, so it shows once per account rather than once per browser.
+  dashboardTourSeenAt DateTime?
+
   // The stronger, stable Whop identity (Phase 5) — populated the first time a
   // webhook resolves this email to a Whop user. Preferred over email for
   // matching once known, since email can be legitimately reused/changed.

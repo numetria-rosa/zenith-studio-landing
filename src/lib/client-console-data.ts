@@ -57,6 +57,7 @@ export type ConsoleProject = {
   id: string;
   sourceServiceId: string | null;
   integrations: { provider: string; status: string; config: unknown }[];
+  oauthConnections: { status: string }[];
   timeEntries: { id: string; status: string; matterName: string; narrative: string; entryDate: Date; durationMinutes: number | null }[];
   leads: { id: string; name: string | null; status: string; createdAt: Date; sequenceStep: number; sequenceStoppedAt: Date | null }[];
   requirements: { id: string; label: string; status: string }[];
@@ -81,7 +82,7 @@ function metricTotal(project: ConsoleProject, key: string): number {
 function leadResponseStatus(project: ConsoleProject): AgentStatus {
   const connected = hasIntegration(project, "signalwire");
   const leadsToday = project.leads.filter((l) => l.status !== "LOST").length;
-  if (!connected) return { tone: "dim", stateLabel: "idle", todayLabel: "Leads answered", todayValue: 0 };
+  if (!connected) return { tone: "need", stateLabel: "needs setup", todayLabel: "Leads answered", todayValue: 0 };
   return { tone: "run", stateLabel: "running", todayLabel: "Leads answered", todayValue: leadsToday };
 }
 
@@ -111,25 +112,25 @@ export const LAW_FIRM_AGENTS: AgentDefinition[] = [
 ];
 
 function billingClerkStatus(project: ConsoleProject): AgentStatus {
-  const connected = project.timeEntries.length > 0 || project.requirements.some((r) => r.label.includes("attorney"));
+  const connected = project.timeEntries.length > 0 || project.oauthConnections.some((c) => c.status === "CONNECTED");
   const drafts = project.timeEntries.filter((e) => e.status === "DRAFT").length;
   const approvedToday = project.timeEntries.filter((e) => e.status === "APPROVED").length;
   if (drafts > 0) return { tone: "need", stateLabel: "waiting on you", todayLabel: "Entries waiting", todayValue: drafts };
-  if (!connected) return { tone: "dim", stateLabel: "idle", todayLabel: "Entries drafted", todayValue: 0 };
+  if (!connected) return { tone: "need", stateLabel: "needs setup", todayLabel: "Entries drafted", todayValue: 0 };
   return { tone: "run", stateLabel: "running", todayLabel: "Entries approved", todayValue: approvedToday };
 }
 
 function textBackStatus(project: ConsoleProject): AgentStatus {
   const connected = hasIntegration(project, "signalwire");
   const leadsToday = project.leads.filter((l) => l.status !== "LOST").length;
-  if (!connected) return { tone: "dim", stateLabel: "idle", todayLabel: "Missed calls answered", todayValue: 0 };
+  if (!connected) return { tone: "need", stateLabel: "needs setup", todayLabel: "Missed calls answered", todayValue: 0 };
   return { tone: "run", stateLabel: "running", todayLabel: "Missed calls answered", todayValue: leadsToday };
 }
 
 function followUpClerkStatus(project: ConsoleProject): AgentStatus {
   const connected = hasIntegration(project, "signalwire");
   const inSequence = project.leads.filter((l) => l.status === "IN_SEQUENCE" && !l.sequenceStoppedAt).length;
-  if (!connected) return { tone: "dim", stateLabel: "idle", todayLabel: "Leads in sequence", todayValue: 0 };
+  if (!connected) return { tone: "need", stateLabel: "waiting on Text-Back", todayLabel: "Leads in sequence", todayValue: 0 };
   return { tone: "run", stateLabel: "running", todayLabel: "Leads in sequence", todayValue: inSequence };
 }
 
@@ -217,41 +218,42 @@ function lawFirmApprovalItems(project: ConsoleProject, agentHref: (agentId: stri
 // ---------- Insurance ----------
 
 export const INSURANCE_AGENTS: AgentDefinition[] = [
-  { id: "intake", name: "Intake Agent", icon: "phone", real: false, description: "Replies to every quote request with a real text, the moment it comes in." },
+  { id: "intake", name: "Intake Agent", icon: "phone", real: true, description: "Replies to every quote request with a real text, the moment it comes in." },
   { id: "document-audit", name: "Document Audit", icon: "file", real: true, description: "Reads a policy document, ACORD form, or loss run and pulls the key fields in seconds." },
   { id: "crm", name: "CRM & Logging", icon: "database", real: true, description: "Every lead touch gets logged straight into your own CRM." },
   { id: "renewals", name: "Renewal Reminders", icon: "calendar", real: true, description: "Tracks your whole book of business and reminds clients before their policy renews." },
 ];
 
 function insuranceAgentStatus(project: ConsoleProject, agentId: string): AgentStatus {
-  if (agentId === "intake") return { tone: "dim", stateLabel: "not set up", todayLabel: "Quote requests answered", todayValue: 0 };
+  if (agentId === "intake") return { ...leadResponseStatus(project), todayLabel: "Quote requests answered" };
   if (agentId === "document-audit") {
     const today = project.documents.filter((d) => d.summary).length;
-    return { tone: today > 0 ? "run" : "dim", stateLabel: today > 0 ? "running" : "idle", todayLabel: "Documents audited", todayValue: today };
+    return { tone: today > 0 ? "run" : "done", stateLabel: today > 0 ? "running" : "ready", todayLabel: "Documents audited", todayValue: today };
   }
   if (agentId === "crm") {
     const connected = hasIntegration(project, "crm");
     return connected
       ? { tone: "run", stateLabel: "running", todayLabel: "Leads logged", todayValue: "–" }
-      : { tone: "dim", stateLabel: "idle", todayLabel: "Leads logged", todayValue: 0 };
+      : { tone: "need", stateLabel: "needs setup", todayLabel: "Leads logged", todayValue: 0 };
   }
   const dueSoon = project.insurancePolicies.filter((p) => (p.renewalDate.getTime() - Date.now()) / 86400000 <= 30).length;
   return project.insurancePolicies.length > 0
-    ? { tone: dueSoon > 0 ? "run" : "done", stateLabel: "running", todayLabel: "Renewals due within 30 days", todayValue: dueSoon }
-    : { tone: "dim", stateLabel: "idle", todayLabel: "Book of business", todayValue: 0 };
+    ? { tone: dueSoon > 0 ? "run" : "done", stateLabel: dueSoon > 0 ? "running" : "on track", todayLabel: "Renewals due within 30 days", todayValue: dueSoon }
+    : { tone: "need", stateLabel: "needs setup", todayLabel: "Book of business", todayValue: 0 };
 }
 
 function insuranceKpiTiles(project: ConsoleProject): { label: string; value: string | number }[] {
-  const handledToday = project.documents.length;
+  const handledToday = project.documents.length + project.leads.length;
   const agentsOnShift = INSURANCE_AGENTS.filter((a) => a.real && insuranceAgentStatus(project, a.id).tone === "run").length;
   return [
     { label: "Handled today", value: handledToday },
-    { label: "Avg. reply time", value: hasIntegration(project, "crm") ? "< 1 min" : "–" },
+    { label: "Avg. reply time", value: hasIntegration(project, "signalwire") ? "< 1 min" : "–" },
     { label: "Agents on shift", value: agentsOnShift },
   ];
 }
 
 function insuranceWorkflowSteps(project: ConsoleProject, agentId: string): WorkflowStep[] {
+  if (agentId === "intake") return leadResponseWorkflowSteps(project);
   if (agentId === "document-audit") {
     const has = project.documents.length > 0;
     return [
@@ -284,7 +286,7 @@ function insuranceWorkflowSteps(project: ConsoleProject, agentId: string): Workf
 }
 
 function insuranceActivityFeed(project: ConsoleProject): ActivityEvent[] {
-  const events: ActivityEvent[] = [];
+  const events: ActivityEvent[] = leadResponseActivityFeed(project, "Intake Agent");
   for (const d of project.documents) {
     events.push({ tone: "done", text: `Audited a document: ${d.filename}`, meta: `Document Audit · ${d.createdAt.toISOString().slice(0, 10)}`, at: d.createdAt });
   }
@@ -320,7 +322,7 @@ export const BROKERAGE_AGENTS: AgentDefinition[] = [
 ];
 
 function brokerageAgentStatus(project: ConsoleProject, agentId: string): AgentStatus {
-  if (agentId !== "isa") return { tone: "dim", stateLabel: "not set up", todayLabel: "Status", todayValue: "coming soon" };
+  if (agentId !== "isa") return { tone: "dim", stateLabel: "coming soon", todayLabel: "Status", todayValue: "coming soon" };
   return leadResponseStatus(project);
 }
 
@@ -363,7 +365,7 @@ export const RECEPTIONIST_AGENTS: AgentDefinition[] = [
 function receptionistAgentStatus(project: ConsoleProject): AgentStatus {
   const connected = hasIntegration(project, "vapi");
   const callsHandled = metricTotal(project, "calls_received");
-  if (!connected) return { tone: "dim", stateLabel: "idle", todayLabel: "Calls handled", todayValue: 0 };
+  if (!connected) return { tone: "need", stateLabel: "needs setup", todayLabel: "Calls handled", todayValue: 0 };
   return { tone: "run", stateLabel: "running", todayLabel: "Calls handled", todayValue: callsHandled };
 }
 
@@ -425,7 +427,7 @@ function inboxManagerAgentStatus(project: ConsoleProject): AgentStatus {
   const connected = project.mailConnections.some((c) => c.status === "CONNECTED");
   const drafts = project.inboxDrafts.filter((d) => d.status === "DRAFT").length;
   if (drafts > 0) return { tone: "need", stateLabel: "waiting on you", todayLabel: "Drafts waiting", todayValue: drafts };
-  if (!connected) return { tone: "dim", stateLabel: "idle", todayLabel: "Emails sorted", todayValue: 0 };
+  if (!connected) return { tone: "need", stateLabel: "needs setup", todayLabel: "Emails sorted", todayValue: 0 };
   return { tone: "run", stateLabel: "running", todayLabel: "Emails sorted", todayValue: project.inboxDrafts.length };
 }
 
@@ -577,6 +579,93 @@ export function planApprovalItems(project: ConsoleProject, agentHref: (agentId: 
     default:
       return [];
   }
+}
+
+// ---------- Setup checklist ----------
+
+export type SetupItem = { agentId: string; title: string; detail: string; done: boolean };
+
+function leadSetupItems(project: ConsoleProject, agentId: string, agentName: string): SetupItem[] {
+  const connected = hasIntegration(project, "signalwire");
+  return [
+    { agentId, title: `Turn on ${agentName}`, detail: "Add your reply rules and get your texting number, in one step.", done: connected },
+    { agentId, title: "Connect your website form", detail: "Send your site's enquiry form to your agent so every new lead gets an instant reply.", done: project.leads.length > 0 },
+  ];
+}
+
+/** What a client has to connect for their plan to run, in order. Drives
+    the Overview checklist, the "Needs you" count, and Ask Your Team. */
+export function planSetupItems(project: ConsoleProject): SetupItem[] {
+  switch (project.sourceServiceId) {
+    case "insurance-ai-team":
+      return [
+        ...leadSetupItems(project, "intake", "the Intake Agent"),
+        { agentId: "crm", title: "Connect your CRM", detail: "Every quote request is logged into your own CRM automatically.", done: hasIntegration(project, "crm") },
+        { agentId: "renewals", title: "Import your book of business", detail: "Upload a spreadsheet or report so renewal reminders go out on time.", done: project.insurancePolicies.length > 0 },
+        { agentId: "document-audit", title: "Run your first document audit", detail: "Upload any policy, ACORD form, or loss run to see it read in seconds.", done: project.documents.length > 0 },
+      ];
+    case "law-firms":
+      return [
+        { agentId: "text-back", title: "Turn on Missed Call Text-Back", detail: "Get your number so every missed call is texted back in seconds.", done: hasIntegration(project, "signalwire") },
+        { agentId: "billing-clerk", title: "Connect your calendar and email", detail: "Lets the Billing Clerk rebuild billable time from your day.", done: project.oauthConnections.some((c) => c.status === "CONNECTED") },
+      ];
+    case "brokerages":
+      return leadSetupItems(project, "isa", "your Inside Sales Agent");
+    case "ai-lead-capture":
+      return leadSetupItems(project, "lead-capture", "Lead Capture");
+    case "ai-receptionist":
+      return [{ agentId: "receptionist", title: "Turn on your AI Receptionist", detail: "Add your hours and FAQs and get your phone number.", done: hasIntegration(project, "vapi") }];
+    case "ai-inbox-manager":
+      return [{ agentId: "inbox", title: "Connect your mailbox", detail: "Takes two minutes with an app password.", done: project.mailConnections.some((c) => c.status === "CONNECTED") }];
+    default:
+      return [];
+  }
+}
+
+// ---------- Ask your team (answers from live data, no AI yet) ----------
+
+export type QuickAnswer = { question: string; answer: string[] };
+
+export function planQuickAnswers(project: ConsoleProject, priceDisplay: string | null): QuickAnswer[] {
+  const agents = planAgents(project.sourceServiceId);
+  const setup = planSetupItems(project);
+  const todo = setup.filter((s) => !s.done);
+  const approvals = planApprovalItems(project, () => "");
+  const dayAgo = Date.now() - 86400000;
+  const today = planActivityFeed(project).filter((e) => e.at.getTime() >= dayAgo);
+
+  return [
+    {
+      question: "What needs me right now?",
+      answer:
+        todo.length + approvals.length === 0
+          ? ["Nothing. Everything is set up and nothing is waiting on you."]
+          : [...todo.map((s) => `Setup: ${s.title}`), ...approvals.map((a) => `${a.agentName}: ${a.title}`)],
+    },
+    {
+      question: "What did my team do in the last 24 hours?",
+      answer: today.length === 0 ? ["No activity in the last 24 hours yet."] : today.slice(0, 8).map((e) => e.text),
+    },
+    {
+      question: "Which agents are running?",
+      answer: agents.map((a) => `${a.name}: ${a.real ? planAgentStatus(project, a.id).stateLabel : "coming soon"}`),
+    },
+    {
+      question: "What's left to set up?",
+      answer: todo.length === 0 ? ["Nothing, your setup is complete."] : todo.map((s) => `${s.title}. ${s.detail}`),
+    },
+    {
+      question: "What am I paying?",
+      answer: [
+        priceDisplay ? `${priceDisplay}, setup included. No contract.` : "See Settings for your plan.",
+        "You can cancel anytime from Settings; you keep access until the end of the period you paid for.",
+      ],
+    },
+    {
+      question: "How do I cancel?",
+      answer: ["Open Settings and choose Cancel plan. Nothing else to do, and your agents stop at the end of your current billing period."],
+    },
+  ];
 }
 
 export function planLabel(sourceServiceId: string | null): string {

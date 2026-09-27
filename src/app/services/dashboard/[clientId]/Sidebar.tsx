@@ -56,7 +56,7 @@ export function Sidebar({
         {nav.map((item) => {
           const active = item.href === base ? pathname === base : pathname.startsWith(item.href);
           return (
-            <Link key={item.href} href={item.href} className={`${s.navItem} ${active ? s.navItemActive : ""}`}>
+            <Link key={item.href} href={item.href} className={`${s.navItem} ${active ? s.navItemActive : ""}`} data-tour={`nav-${item.label.toLowerCase()}`}>
               <Icon name={item.icon} size={18} strokeWidth={1.8} />
               <span className={s.navLabel}>{item.label}</span>
               {!!item.badge && <span className={s.navBadge}>{item.badge}</span>}
@@ -66,7 +66,7 @@ export function Sidebar({
       </nav>
 
       <div className={s.footer}>
-        <button type="button" className={s.askBtn} onClick={open}>
+        <button type="button" className={s.askBtn} onClick={() => open()} data-tour="ask-sidebar">
           <Icon name="message" size={16} />
           Ask your team
         </button>

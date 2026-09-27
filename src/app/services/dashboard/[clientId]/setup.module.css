@@ -1,0 +1,132 @@
+.card {
+  margin-top: var(--zc-gap);
+  padding: 22px 24px;
+  border-color: rgba(245, 184, 61, 0.28);
+  background:
+    radial-gradient(80% 120% at 0% 0%, rgba(245, 184, 61, 0.07), transparent 60%),
+    var(--zc-panel-2);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title {
+  margin: 8px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.count {
+  flex-shrink: 0;
+  font-family: var(--zc-mono);
+  font-size: 12px;
+  color: var(--zc-need-text);
+}
+
+.bar {
+  margin-top: 16px;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--zc-line);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--zc-need), var(--zc-done));
+  transition: width 0.4s ease;
+}
+
+.list {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 12px;
+  border-radius: 16px;
+}
+
+.row + .row {
+  border-top: 1px solid var(--zc-line);
+}
+
+.rowNext {
+  background: rgba(245, 184, 61, 0.06);
+  border-top-color: transparent !important;
+}
+
+.mark {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid rgba(245, 184, 61, 0.6);
+  color: var(--zc-need-text);
+  font-family: var(--zc-mono);
+  font-size: 12px;
+}
+
+.markDone {
+  border-color: var(--zc-done);
+  background: var(--zc-done);
+  color: var(--zc-action-text);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.rowTitleDone {
+  color: var(--zc-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--zc-dim);
+}
+
+.rowDetail {
+  margin: 3px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--zc-muted);
+}
+
+.doneTag {
+  font-family: var(--zc-mono);
+  font-size: 12px;
+  color: var(--zc-done-text);
+}
+
+@media (max-width: 640px) {
+  .head {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .row {
+    flex-wrap: wrap;
+  }
+  .row a {
+    margin-left: 42px;
+  }
+}

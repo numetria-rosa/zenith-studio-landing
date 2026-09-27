@@ -29,6 +29,33 @@
 }
 .thread {
   margin-top: 18px;
+  max-height: min(46vh, 420px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+}
+.exchange {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bubbleUser {
+  align-self: flex-end;
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 16px 16px 4px 16px;
+  background: var(--zc-bubble-user);
+  color: #fff;
+  font-size: 14px;
+}
+.answerList {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .bubbleTeam {
   max-width: 90%;
@@ -53,6 +80,15 @@
   border: 1px solid var(--zc-line-2);
   font-size: 13px;
   color: var(--zc-text-2);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.chip:hover,
+.chip:focus-visible {
+  border-color: var(--zc-action);
+  color: var(--zc-text);
+  outline: none;
 }
 .inputRow {
   margin-top: 18px;

@@ -1,20 +1,15 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import type { QuickAnswer } from "@/lib/client-console-data";
 import { Icon } from "./Icon";
-import { PrimaryButton } from "./ui";
 import s from "./ask-team.module.css";
 
-/* "Ask your team" dialog, opened from either the sidebar's own button or
-   the Overview header's search bar - a small context instead of prop
-   drilling since those two triggers live in different components with no
-   parent/child relationship to each other. Purely a canned-answer
-   demo today (SUGGESTED_ANSWERS below): real chat against this
-   project's live data is a separate, larger build (would need an LLM
-   call scoped to the project's own requirements/messages/integrations),
-   not something to fake with placeholder copy that looks live. */
+/* "Ask your team": everyday questions answered instantly from this
+   project's live data (computed server-side in planQuickAnswers). Free-text
+   AI answers are not built yet, so the input says so instead of pretending. */
 
-type AskTeamContextValue = { open: () => void };
+type AskTeamContextValue = { open: (question?: string) => void };
 const AskTeamContext = createContext<AskTeamContextValue | null>(null);
 
 export function useAskTeam(): AskTeamContextValue {
@@ -23,13 +18,33 @@ export function useAskTeam(): AskTeamContextValue {
   return ctx;
 }
 
-const SUGGESTIONS = ["What is waiting on me?", "What did my agents do today?", "How do I pause an agent?"];
-
-export function AskYourTeamProvider({ children, projectId }: { children: ReactNode; projectId: string }) {
+export function AskYourTeamProvider({ children, answers }: { children: ReactNode; answers: QuickAnswer[] }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [asked, setAsked] = useState<string[]>([]);
+  const threadRef = useRef<HTMLDivElement>(null);
+
+  function ask(question: string) {
+    setAsked((prev) => [...prev.filter((q) => q !== question), question]);
+  }
+
+  function open(question?: string) {
+    setIsOpen(true);
+    if (question) ask(question);
+  }
+
+  useEffect(() => {
+    threadRef.current?.scrollTo({ top: threadRef.current.scrollHeight, behavior: "smooth" });
+  }, [asked]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setIsOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen]);
 
   return (
-    <AskTeamContext.Provider value={{ open: () => setIsOpen(true) }}>
+    <AskTeamContext.Provider value={{ open }}>
       {children}
       {isOpen && (
         <div className={s.scrim} onClick={() => setIsOpen(false)}>
@@ -40,26 +55,38 @@ export function AskYourTeamProvider({ children, projectId }: { children: ReactNo
                 <Icon name="x" size={20} />
               </button>
             </div>
-            <div className={s.thread}>
-              <div className={s.bubbleTeam}>
-                Ask anything about your agents - what&apos;s running, what needs you, or how something works. For
-                anything specific to this project, use Support in the meantime; live answers here are coming soon.
-              </div>
+            <div className={s.thread} ref={threadRef} aria-live="polite">
+              <div className={s.bubbleTeam}>Pick a question below. Answers come straight from your team&apos;s live data.</div>
+              {asked.map((q) => {
+                const a = answers.find((x) => x.question === q);
+                if (!a) return null;
+                return (
+                  <div key={q} className={s.exchange}>
+                    <div className={s.bubbleUser}>{q}</div>
+                    <div className={s.bubbleTeam}>
+                      {a.answer.length === 1 ? (
+                        a.answer[0]
+                      ) : (
+                        <ul className={s.answerList}>
+                          {a.answer.map((line) => (
+                            <li key={line}>{line}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
             <div className={s.suggestions}>
-              {SUGGESTIONS.map((q) => (
-                <span key={q} className={s.chip}>
-                  {q}
-                </span>
+              {answers.map((a) => (
+                <button key={a.question} type="button" className={s.chip} onClick={() => ask(a.question)}>
+                  {a.question}
+                </button>
               ))}
             </div>
             <div className={s.inputRow}>
-              <input className={s.input} placeholder="Type a message... (coming soon)" disabled />
-              <a href={`/services/dashboard/${projectId}?tab=support`}>
-                <PrimaryButton type="button" onClick={() => setIsOpen(false)}>
-                  Go to Support
-                </PrimaryButton>
-              </a>
+              <input className={s.input} placeholder="Ask in your own words: coming soon" disabled aria-label="Custom questions coming soon" />
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { getSiteUrl } from "@/lib/site";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import { purchaseSignalwireNumber } from "@/lib/signalwire-text-back";
-import { LEAD_CAPTURE_REQUIREMENTS, BROKERAGE_REQUIREMENTS } from "@/lib/service-projects";
+import { leadRequirementSet } from "@/lib/service-projects";
 
 /* Onboarding automation for AI Lead Capture & Follow-Up, and also for
    brokerages' "Inside Sales Agent" role (added 2026-09-13 - found missing
@@ -32,12 +32,7 @@ export async function provisionLeadCaptureIfNeeded(projectId: string): Promise<R
   });
   if (!project) return { ok: false, error: "not_found" };
 
-  const requirementSet =
-    project.sourceServiceId === "ai-lead-capture"
-      ? LEAD_CAPTURE_REQUIREMENTS
-      : project.sourceServiceId === "brokerages"
-        ? BROKERAGE_REQUIREMENTS
-        : null;
+  const requirementSet = leadRequirementSet(project.sourceServiceId);
   if (!requirementSet) return { ok: true, skipped: true };
   if (project.integrations.some((i) => i.provider === "signalwire")) return { ok: true, skipped: true };
 

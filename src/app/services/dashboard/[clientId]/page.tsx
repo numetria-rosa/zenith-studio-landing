@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getOwnedServiceProject } from "@/lib/service-workspace";
-import { planAgents, planAgentStatus, planKpiTiles, planActivityFeed, planApprovalItems, isSupportedPlan } from "@/lib/client-console-data";
+import { planAgents, planAgentStatus, planKpiTiles, planActivityFeed, planApprovalItems, planSetupItems, isSupportedPlan } from "@/lib/client-console-data";
+import { SetupChecklist } from "./SetupChecklist";
 import { KpiTile, ActivityRow, Eyebrow } from "./ui";
 import { TeamMap, type MapAgent } from "./TeamMap";
 import { HeaderActions } from "./HeaderActions";
@@ -33,11 +34,20 @@ export default async function ClientConsoleOverview({ params }: { params: Promis
   const kpis = planKpiTiles(project);
   const activity = planActivityFeed(project);
   const approvals = planApprovalItems(project, (agentId) => `/services/dashboard/${clientId}/agents/${agentId}`);
+  const setup = planSetupItems(project);
+  const setupTodo = setup.filter((i) => !i.done);
+  const needsYou = approvals.length + setupTodo.length;
 
   const mapAgents: MapAgent[] =
     project.sourceServiceId === "ai-inbox-manager"
-      ? INBOX_MANAGER_MAP_STAGES.map((stage) => ({ id: stage.id, name: stage.name, icon: "mail", tone: planAgentStatus(project, "inbox").tone }))
-      : agents.map((a) => ({ id: a.id, name: a.name, icon: a.icon, tone: a.real ? planAgentStatus(project, a.id).tone : "dim" }));
+      ? INBOX_MANAGER_MAP_STAGES.map((stage) => {
+          const st = planAgentStatus(project, "inbox");
+          return { id: stage.id, name: stage.name, icon: "mail", tone: st.tone, state: st.stateLabel };
+        })
+      : agents.map((a) => {
+          const st = a.real ? planAgentStatus(project, a.id) : { tone: "dim" as const, stateLabel: "coming soon" };
+          return { id: a.id, name: a.name, icon: a.icon, tone: st.tone, state: st.stateLabel };
+        });
 
   const agentsOnShift = agents.filter((a) => a.real && planAgentStatus(project, a.id).tone === "run").length;
   const firstName = (session.user.name ?? "there").split(" ")[0];
@@ -48,7 +58,7 @@ export default async function ClientConsoleOverview({ params }: { params: Promis
         <div>
           <h1 className={s.greeting}>Good morning, {firstName}</h1>
           <p className={s.subline}>
-            {agentsOnShift} agent{agentsOnShift === 1 ? "" : "s"} on shift &middot; {approvals.length} item{approvals.length === 1 ? "" : "s"} need
+            {agentsOnShift} agent{agentsOnShift === 1 ? "" : "s"} on shift &middot; {needsYou} item{needsYou === 1 ? "" : "s"} need
             you
           </p>
         </div>
@@ -59,11 +69,15 @@ export default async function ClientConsoleOverview({ params }: { params: Promis
         {kpis.map((k) => (
           <KpiTile key={k.label} label={k.label} value={k.value} />
         ))}
-        <KpiTile label="Needs you" value={approvals.length} need />
+        <KpiTile label="Needs you" value={needsYou} need />
       </div>
 
+      {setupTodo.length > 0 && (
+        <SetupChecklist items={setup} agentHref={(id) => `/services/dashboard/${clientId}/agents/${id}`} />
+      )}
+
       <div className={s.body}>
-        <section className={`${u.card} ${s.mapCard}`}>
+        <section className={`${u.card} ${s.mapCard}`} data-tour="team-map">
           <div className={s.mapHead}>
             <Eyebrow>Team map</Eyebrow>
             <span className={s.liveTag}>
@@ -84,6 +98,15 @@ export default async function ClientConsoleOverview({ params }: { params: Promis
                 Review now &rarr;
               </span>
             </Link>
+          ) : setupTodo.length > 0 ? (
+            <Link href={`/services/dashboard/${clientId}/agents/${setupTodo[0].agentId}`} className={u.needsYouCard}>
+              <Eyebrow>Needs you</Eyebrow>
+              <p className={u.needsYouTitle}>{setupTodo[0].title}</p>
+              <p className={u.needsYouMeta}>{setupTodo[0].detail}</p>
+              <span className={u.textLink} style={{ marginTop: 12 }}>
+                Set it up &rarr;
+              </span>
+            </Link>
           ) : (
             <div className={`${u.needsYouCard} ${u.allClear}`}>
               <Eyebrow>Needs you</Eyebrow>
@@ -92,7 +115,7 @@ export default async function ClientConsoleOverview({ params }: { params: Promis
             </div>
           )}
 
-          <section className={`${u.card} ${s.activityCard}`}>
+          <section className={`${u.card} ${s.activityCard}`} data-tour="activity-card">
             <div className={s.activityHead}>
               <Eyebrow>Live activity</Eyebrow>
               <Link href={`/services/dashboard/${clientId}/activity`} className={u.textLink}>

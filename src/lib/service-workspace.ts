@@ -11,7 +11,7 @@ import { provisionLeadCaptureIfNeeded } from "@/lib/lead-capture-provisioning";
 import { auditPolicyDocument, auditPolicyPdf } from "@/lib/insurance-document-audit";
 import { importPolicies } from "@/lib/insurance-renewals";
 import { parseBookOfBusinessSpreadsheet, parseBookOfBusinessGoogleSheet, parseBookOfBusinessPdf } from "@/lib/insurance-book-import";
-import { RECEPTIONIST_REQUIREMENTS, TEXT_BACK_REQUIREMENTS, LEAD_CAPTURE_REQUIREMENTS, BROKERAGE_REQUIREMENTS } from "@/lib/service-projects";
+import { RECEPTIONIST_REQUIREMENTS, TEXT_BACK_REQUIREMENTS, leadRequirementSet } from "@/lib/service-projects";
 import { LAW_FIRM_SPECIALTIES } from "@/lib/legal-specialties";
 import type { MailProvider, LawFirmSpecialty } from "@prisma/client";
 
@@ -365,12 +365,7 @@ export async function activateLeadCapture(
   });
   if (!project) return { ok: false, error: "not_found" };
 
-  const requirementSet =
-    project.sourceServiceId === "ai-lead-capture"
-      ? LEAD_CAPTURE_REQUIREMENTS
-      : project.sourceServiceId === "brokerages"
-        ? BROKERAGE_REQUIREMENTS
-        : null;
+  const requirementSet = leadRequirementSet(project.sourceServiceId);
   if (!requirementSet) return { ok: false, error: "not_applicable" };
 
   const businessName = fields.businessName.trim();
@@ -385,7 +380,12 @@ export async function activateLeadCapture(
     [requirementSet[2].label, notifyEmail],
   ];
   for (const [label, detail] of values) {
-    await db.clientRequirement.updateMany({ where: { projectId: project.id, label }, data: { detail, status: "APPROVED" } });
+    const updated = await db.clientRequirement.updateMany({ where: { projectId: project.id, label }, data: { detail, status: "APPROVED" } });
+    // Projects created before this plan had these rows (e.g. Insurance)
+    // would otherwise never provision.
+    if (updated.count === 0) {
+      await db.clientRequirement.create({ data: { projectId: project.id, label, detail, status: "APPROVED", order: 100 } });
+    }
   }
 
   return provisionLeadCaptureIfNeeded(project.id);
