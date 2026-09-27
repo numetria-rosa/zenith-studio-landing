@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { db } from "@/lib/db";
+import { readSettings, renewalWindowDays, renewalRepeats, renewalEmail } from "@/lib/agent-settings";
 
 /* Active Renewal Agent: tracks renewal dates from a manually-uploaded CSV
    (no AMS access needed) and emails a reminder once a policy is inside the
@@ -9,7 +10,6 @@ import { db } from "@/lib/db";
    to test the agent end to end. */
 
 const FROM_ADDRESS = "Zenith Studio <hello@zenith-studio.site>";
-const REMINDER_WINDOW_DAYS = 30;
 const RESEND_COOLDOWN_DAYS = 7;
 
 function getResendClient(): Resend | null {
@@ -66,16 +66,18 @@ export async function sendDueRenewalReminders(opts: { force?: boolean } = {}) {
   const client = getResendClient();
   if (!client) return { ok: false as const, error: "RESEND_API_KEY is not configured" };
 
-  const policies = await db.insurancePolicy.findMany();
+  const policies = await db.insurancePolicy.findMany({ include: { project: { select: { agentSettings: true } } } });
   const now = Date.now();
   const results: { policyId: string; clientName: string; sent: boolean; reason?: string }[] = [];
 
   for (const policy of policies) {
-    const withinWindow = opts.force || daysUntil(policy.renewalDate) <= REMINDER_WINDOW_DAYS;
+    // Window, repeat rule and wording are the client's own settings (defaults: 30 days, weekly).
+    const settings = readSettings(policy.project?.agentSettings);
+    const withinWindow = opts.force || daysUntil(policy.renewalDate) <= renewalWindowDays(settings);
     const offCooldown =
       opts.force ||
       !policy.lastReminderSentAt ||
-      now - policy.lastReminderSentAt.getTime() > RESEND_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+      (renewalRepeats(settings) && now - policy.lastReminderSentAt.getTime() > RESEND_COOLDOWN_DAYS * 24 * 60 * 60 * 1000);
 
     if (!withinWindow || !offCooldown) {
       results.push({ policyId: policy.id, clientName: policy.clientName, sent: false, reason: !withinWindow ? "not due yet" : "reminded recently" });
@@ -90,11 +92,12 @@ export async function sendDueRenewalReminders(opts: { force?: boolean } = {}) {
       from: FROM_ADDRESS,
       to: policy.email,
       subject: `Your ${policy.policyType ?? "policy"} renewal is coming up`,
-      text: `Hi ${policy.clientName},
-
-This is a reminder from ${policy.agencyName}: your ${policy.policyType ?? "policy"} is due for renewal on ${policy.renewalDate.toDateString()}. Reply to this email or give us a call to review your coverage before it renews.
-
-${policy.agencyName}`,
+      text: renewalEmail(settings, {
+        clientName: policy.clientName,
+        agencyName: policy.agencyName,
+        policyType: policy.policyType ?? "policy",
+        date: policy.renewalDate.toDateString(),
+      }),
     });
 
     if (error) {

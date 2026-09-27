@@ -25,6 +25,10 @@
       "schedule": "0 19 * * *"
     },
     {
+      "path": "/api/cron/brokerage",
+      "schedule": "0 13 * * *"
+    },
+    {
       "path": "/api/cron/snapshot-mrr",
       "schedule": "0 6 1 * *"
     }

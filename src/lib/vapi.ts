@@ -1,6 +1,13 @@
 import { timingSafeEqual } from "crypto";
 import { db } from "@/lib/db";
 import { getAvailableSlots, createBooking } from "@/lib/cal-booking";
+import {
+  DEFAULT_SETTINGS,
+  receptionistBooks,
+  receptionistFirstMessage,
+  receptionistPromptLines,
+  type AgentSettings,
+} from "@/lib/agent-settings";
 
 /* AI Receptionist & Booking runtime engine.
    One Vapi assistant "template" for every client, behavior comes entirely
@@ -39,25 +46,29 @@ export function verifyVapiSecret(headerValue: string | null): boolean {
 
 /** The one master prompt template, never edited per client. Every client's
     voice is entirely a function of the config values interpolated in. */
-export function buildSystemPrompt(config: ReceptionistConfig): string {
+export function buildSystemPrompt(config: ReceptionistConfig, settings: AgentSettings = DEFAULT_SETTINGS): string {
   return [
     `You are the AI receptionist for ${config.businessName}.`,
     `Business hours: ${config.hours}.`,
     `Answer caller questions using only this information about the business:`,
     config.faqText,
-    `If a caller wants to book an appointment, use the book_appointment tool, ask for their name, email, and a preferred date/time first.`,
+    receptionistBooks(settings)
+      ? `If a caller wants to book an appointment, use the book_appointment tool, ask for their name, email, and a preferred date/time first.`
+      : `Do not book appointments yourself. If a caller wants one, take their name and phone number and say the team will call them to schedule.`,
     `If a question is outside what you were given, or the caller is upset or asks for a human, say a team member will follow up and end the call politely, do not guess.`,
+    ...receptionistPromptLines(settings),
   ].join("\n\n");
 }
 
 export function buildAssistantPayload(
   projectId: string,
   config: ReceptionistConfig,
-  opts?: { serverUrl?: string }
+  opts?: { serverUrl?: string; settings?: AgentSettings }
 ) {
+  const settings = opts?.settings ?? DEFAULT_SETTINGS;
   return {
     name: `Receptionist for ${config.businessName}`,
-    firstMessage: `Thanks for calling ${config.businessName}, how can I help?`,
+    firstMessage: receptionistFirstMessage(settings, config.businessName),
     // Phone-number calls get their server URL from the number's own config
     // (set in the Vapi dashboard); web calls have no such fallback, so the
     // demo path passes one explicitly here.
@@ -65,26 +76,29 @@ export function buildAssistantPayload(
     model: {
       provider: "openai",
       model: "gpt-4o",
-      messages: [{ role: "system", content: buildSystemPrompt(config) }],
-      tools: [
-        {
-          type: "function",
-          function: {
-            name: "book_appointment",
-            description: "Book an appointment on the business's calendar.",
-            parameters: {
-              type: "object",
-              properties: {
-                name: { type: "string" },
-                email: { type: "string" },
-                preferredStartISO: { type: "string", description: "Requested start time, ISO 8601, UTC" },
-                timeZone: { type: "string" },
+      messages: [{ role: "system", content: buildSystemPrompt(config, settings) }],
+      // No tool at all when the client turned booking off, so it can't book.
+      tools: receptionistBooks(settings)
+        ? [
+            {
+              type: "function",
+              function: {
+                name: "book_appointment",
+                description: "Book an appointment on the business's calendar.",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    email: { type: "string" },
+                    preferredStartISO: { type: "string", description: "Requested start time, ISO 8601, UTC" },
+                    timeZone: { type: "string" },
+                  },
+                  required: ["name", "email", "preferredStartISO", "timeZone"],
+                },
               },
-              required: ["name", "email", "preferredStartISO", "timeZone"],
             },
-          },
-        },
-      ],
+          ]
+        : [],
     },
     metadata: { projectId },
   };

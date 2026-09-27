@@ -50,6 +50,11 @@ export const getOwnedServiceProject = cache(async function getOwnedServiceProjec
       mailConnections: { orderBy: { createdAt: "asc" } },
       inboxDrafts: { orderBy: { createdAt: "desc" } },
       insurancePolicies: { orderBy: { renewalDate: "asc" } },
+      transactions: {
+        orderBy: { closingDate: "asc" },
+        include: { deadlines: { orderBy: { order: "asc" } }, documents: { orderBy: { order: "asc" } } },
+      },
+      dormantContacts: { orderBy: { createdAt: "desc" } },
     },
   });
 });

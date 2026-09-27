@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { sendSms, isTextBackConfig } from "@/lib/signalwire-text-back";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
+import { readSettings, followUpGaps, followUpMessage } from "@/lib/agent-settings";
 
 /* The AI Follow-Up Clerk role (law-firms vertical), works leads that
    didn't retain on first contact until they book, reply, or the sequence
@@ -11,21 +12,8 @@ import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
    since a real reply means a human should take the conversation from
    there, matching this vertical's "you approve every entry" pattern. */
 
-const FOLLOW_UP_STEPS: { afterDays: number; message: (businessName: string) => string }[] = [
-  {
-    afterDays: 1,
-    message: (b) => `Hi, this is ${b} again. Just checking in after your call, would you like us to schedule a consult?`,
-  },
-  {
-    afterDays: 3,
-    message: (b) => `Following up from ${b}. We'd still love to help, reply here or call us back when you get a chance.`,
-  },
-  {
-    afterDays: 7,
-    message: (b) =>
-      `This is ${b}'s last check-in. If you still need help, reply and we'll get you booked. Otherwise we won't reach out again.`,
-  },
-];
+// Schedule and wording come from the client's own settings (agent-settings.ts);
+// the defaults are the original 1/3/7-day sequence, word for word.
 
 function daysSince(date: Date): number {
   return (Date.now() - date.getTime()) / (1000 * 60 * 60 * 24);
@@ -42,18 +30,29 @@ export async function processFollowUps(): Promise<{ processed: number; lost: num
 
   for (const lead of leads) {
     if (!lead.phone) continue; // v1 is SMS-only, nothing to do without a phone number
-    const step = FOLLOW_UP_STEPS[lead.sequenceStep];
-    if (!step) continue; // already past the last step, waiting to be marked LOST below
+    const settings = readSettings(lead.project.agentSettings);
+    const gaps = followUpGaps(settings);
+    if (gaps.length === 0) continue; // client turned follow-ups off
+    if (lead.sequenceStep >= gaps.length) {
+      // Client shortened the schedule mid-sequence: this lead is already done.
+      await db.lead.update({
+        where: { id: lead.id },
+        data: { status: "LOST", sequenceStoppedAt: new Date(), sequenceStopReason: "follow-up schedule finished" },
+      });
+      lost++;
+      continue;
+    }
 
     const dueDate = lead.lastOutreachAt ?? lead.createdAt;
-    if (daysSince(dueDate) < step.afterDays) continue;
+    if (daysSince(dueDate) < gaps[lead.sequenceStep]) continue;
 
     const integration = lead.project.integrations[0];
     if (!integration || !isTextBackConfig(integration.config)) continue;
     const { businessName } = integration.config;
 
-    const result = await sendSms({ to: lead.phone, from: integration.externalRef ?? "", body: step.message(businessName) });
-    const isLastStep = lead.sequenceStep === FOLLOW_UP_STEPS.length - 1;
+    const body = followUpMessage(settings, businessName, lead.sequenceStep, gaps.length);
+    const result = await sendSms({ to: lead.phone, from: integration.externalRef ?? "", body });
+    const isLastStep = lead.sequenceStep === gaps.length - 1;
 
     await db.lead.update({
       where: { id: lead.id },

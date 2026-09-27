@@ -27,16 +27,6 @@ function isTextBackConfig(value: unknown): value is TextBackConfig {
 
 export { isTextBackConfig };
 
-/** One message, used both spoken (cXML) and texted, kept short enough to
-    work as a voice announcement, warm enough to work as a text. */
-export function buildMissedCallSpokenMessage(businessName: string): string {
-  return `Thank you for calling ${businessName}. We're unable to take your call right now, but we'll text you shortly to find out how we can help, and get a call scheduled for tomorrow.`;
-}
-
-export function buildMissedCallSmsBody(businessName: string): string {
-  return `Hi, this is ${businessName}. Sorry we missed your call. Reply and let us know what you need, we'll book a call for tomorrow so there's no delay.`;
-}
-
 function signalwireSpaceUrl(): string {
   const url = process.env.SIGNALWIRE_SPACE_URL;
   if (!url) throw new Error("SIGNALWIRE_SPACE_URL is not set");

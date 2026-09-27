@@ -2,11 +2,10 @@ import type { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import {
   verifySignalwireSignature,
-  buildMissedCallSpokenMessage,
-  buildMissedCallSmsBody,
   sendSms,
   isTextBackConfig,
 } from "@/lib/signalwire-text-back";
+import { readSettings, missedCallSms, missedCallSpoken } from "@/lib/agent-settings";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 import { isProjectPaused } from "@/lib/project-pause";
 
@@ -60,10 +59,12 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   const { businessName } = integration.config;
+  const project = await db.serviceProject.findUnique({ where: { id: integration.projectId }, select: { agentSettings: true } });
+  const settings = readSettings(project?.agentSettings);
   const smsResult = await sendSms({
     to: callerNumber,
     from: toNumber,
-    body: buildMissedCallSmsBody(businessName),
+    body: missedCallSms(settings, businessName),
   });
   if (!smsResult.ok) {
     console.error(`[text-back voice webhook] SMS send failed for ${toNumber}:`, smsResult.error);
@@ -94,5 +95,5 @@ export async function POST(request: NextRequest): Promise<Response> {
     });
   }
 
-  return twiml(buildMissedCallSpokenMessage(businessName));
+  return twiml(missedCallSpoken(settings, businessName));
 }

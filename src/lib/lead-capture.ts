@@ -4,6 +4,7 @@ import { sendSms } from "@/lib/signalwire-text-back";
 import { sendPlainEmail } from "@/lib/outreach-mail";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 import { isProjectPaused } from "@/lib/project-pause";
+import { readSettings, instantReplySms, instantReplyEmail } from "@/lib/agent-settings";
 
 /* AI Lead Capture & Follow-Up runtime. Reuses the same Lead model and the
    same day-1/3/7 SMS sequence engine (follow-up-clerk.ts's processFollowUps
@@ -67,6 +68,8 @@ export async function captureLead(projectId: string, input: CaptureInput): Promi
     return { ok: false, error: "lead capture is not set up for this business yet" };
   }
   const { businessName, qualificationRules, notifyEmail } = integration.config;
+  const project = await db.serviceProject.findUnique({ where: { id: projectId }, select: { agentSettings: true } });
+  const settings = readSettings(project?.agentSettings);
 
   const qualification = await qualifyLead(qualificationRules, input);
   await recordUsageCost(projectId, ESTIMATED_COST_CENTS.GROQ_CALL, "lead capture qualification");
@@ -91,16 +94,15 @@ export async function captureLead(projectId: string, input: CaptureInput): Promi
     await sendSms({
       to: input.phone,
       from: integration.externalRef,
-      body: `Thanks for reaching out to ${businessName}! We received your message and will be in touch shortly.`,
+      body: instantReplySms(settings, businessName),
     });
     await recordUsageCost(projectId, ESTIMATED_COST_CENTS.SIGNALWIRE_SMS, "lead capture confirmation sms");
   } else if (input.email) {
-    await sendPlainEmail(
-      input.email,
-      `Thanks for reaching out to ${businessName}`,
-      `Hi${input.name ? ` ${input.name}` : ""},\n\nWe received your message and will be in touch shortly.\n\n${businessName}`
-    );
+    const email = instantReplyEmail(settings, businessName, input.name);
+    await sendPlainEmail(input.email, email.subject, email.body);
   }
+
+  if (settings.leadNotifications === "qualified" && !qualification.qualified) return { ok: true, leadId: lead.id };
 
   await sendPlainEmail(
     notifyEmail,

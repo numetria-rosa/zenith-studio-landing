@@ -11,6 +11,7 @@ import {
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 import { isProjectPaused } from "@/lib/project-pause";
+import { readSettings } from "@/lib/agent-settings";
 
 /* Vapi → Zenith webhook. One server URL handles every event in a call's
    lifecycle, discriminated by message.type. Verify the shared secret
@@ -70,7 +71,10 @@ export async function POST(request: NextRequest): Promise<Response> {
       return new Response("no assistant configured for this number", { status: 404 });
     }
 
-    return Response.json({ assistant: buildAssistantPayload(receptionist.projectId, receptionist.config) });
+    // Built per call, so a client's "Request a change" applies from the next call.
+    const project = await db.serviceProject.findUnique({ where: { id: receptionist.projectId }, select: { agentSettings: true } });
+    const settings = readSettings(project?.agentSettings);
+    return Response.json({ assistant: buildAssistantPayload(receptionist.projectId, receptionist.config, { settings }) });
   }
 
   if (message.type === "tool-calls") {

@@ -14,6 +14,7 @@ const ITEMS: NavItem[] = [
   { href: "/admin/agents", label: "Agents", icon: "cpu" },
   { href: "/admin/billing", label: "Billing", icon: "card" },
   { href: "/admin/requests", label: "Requests", icon: "chat" },
+  { href: "/admin/changes", label: "Agent changes", icon: "refresh" },
   { href: "/admin/leads", label: "Leads", icon: "flag" },
   { href: "/admin/audits", label: "Audits", icon: "clipboard" as IconName },
   { href: "/admin/proposals", label: "Proposals", icon: "file" as IconName },

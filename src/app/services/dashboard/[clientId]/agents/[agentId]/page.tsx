@@ -16,6 +16,9 @@ import {
 import { planAgents, planAgentStatus, planWorkflowSteps, isSupportedPlan, type WorkflowStep } from "@/lib/client-console-data";
 import { LAW_FIRM_SPECIALTIES, LEGAL_SPECIALTY_PROFILES } from "@/lib/legal-specialties";
 import { businessNameOf } from "@/lib/services";
+import { adjustableSettings, readSettings, dbDormantDays } from "@/lib/agent-settings";
+import { createTransaction, updateDeadline, setDocumentReceived, setTransactionStatus } from "@/lib/transaction-coordinator";
+import { importContacts, startReengagement, markContactReplied, isDormant } from "@/lib/database-manager";
 import { getSiteUrl } from "@/lib/site";
 import { CopyField, TestLeadForm } from "./ConnectForm";
 import { GuidePicker, InlineGuide } from "../../GuidePicker";
@@ -208,6 +211,96 @@ export default async function AgentDetailPage({
     if (!session2?.user?.id) signInTo(agentBase);
     await updateOwnedSpecialty(clientId, session2!.user.id, String(formData.get("specialty") || ""));
     revalidatePath(dashboardBase);
+    redirect(agentBase);
+  }
+
+  // ---------- Transaction Coordinator ----------
+  async function addDealAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const result = await createTransaction(clientId, session2!.user.id, {
+      propertyAddress: String(formData.get("propertyAddress") || ""),
+      side: String(formData.get("side") || ""),
+      clientName: String(formData.get("clientName") || ""),
+      clientEmail: String(formData.get("clientEmail") || ""),
+      contractDate: String(formData.get("contractDate") || ""),
+      closingDate: String(formData.get("closingDate") || ""),
+    });
+    revalidatePath(dashboardBase, "layout");
+    if (!result.ok) failTo(agentBase, result.error);
+    redirect(`${agentBase}?flash=${encodeURIComponent("Deal added. Its deadlines and document checklist are ready below.")}`);
+  }
+
+  async function deadlineAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const dueDate = formData.get("dueDate");
+    const done = formData.get("done");
+    const result = await updateDeadline(clientId, session2!.user.id, String(formData.get("id") || ""), {
+      ...(typeof done === "string" ? { done: done === "true" } : {}),
+      ...(typeof dueDate === "string" ? { dueDate } : {}),
+    });
+    revalidatePath(dashboardBase, "layout");
+    if (!result.ok) failTo(agentBase, result.error);
+    redirect(agentBase);
+  }
+
+  async function documentAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const result = await setDocumentReceived(clientId, session2!.user.id, String(formData.get("id") || ""), formData.get("received") === "true");
+    revalidatePath(dashboardBase, "layout");
+    if (!result.ok) failTo(agentBase, result.error);
+    redirect(agentBase);
+  }
+
+  async function dealStatusAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const result = await setTransactionStatus(clientId, session2!.user.id, String(formData.get("id") || ""), String(formData.get("status") || ""));
+    revalidatePath(dashboardBase, "layout");
+    if (!result.ok) failTo(agentBase, result.error);
+    redirect(agentBase);
+  }
+
+  // ---------- Database Manager ----------
+  async function importContactsAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const file = formData.get("file");
+    const hasFile = file instanceof File && file.size > 0;
+    const result = await importContacts(clientId, session2!.user.id, {
+      fileBuffer: hasFile ? Buffer.from(await file.arrayBuffer()) : undefined,
+      filename: hasFile ? file.name : undefined,
+      googleSheetUrl: String(formData.get("googleSheetUrl") || ""),
+    });
+    revalidatePath(dashboardBase, "layout");
+    if (!result.ok) failTo(agentBase, result.error);
+    redirect(`${agentBase}?flash=${encodeURIComponent(`Imported ${result.imported} contacts.`)}`);
+  }
+
+  async function startDbAction(): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const result = await startReengagement(clientId, session2!.user.id);
+    revalidatePath(dashboardBase, "layout");
+    if (!result.ok) failTo(agentBase, result.error);
+    const n = result.started ?? 0;
+    redirect(`${agentBase}?flash=${encodeURIComponent(`Started. ${n} contact${n === 1 ? " gets its" : "s get their"} first check-in email in the next daily run.`)}`);
+  }
+
+  async function markRepliedAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    await markContactReplied(clientId, session2!.user.id, String(formData.get("id") || ""));
+    revalidatePath(dashboardBase, "layout");
     redirect(agentBase);
   }
 
@@ -436,6 +529,220 @@ export default async function AgentDetailPage({
     );
   }
 
+  // ---------- Brokerage: Transaction Coordinator ----------
+  if (agentId === "tc") {
+    const today = new Date().toISOString().slice(0, 10);
+    const deals = [...project.transactions].sort((a, b) => (a.status === "ACTIVE" ? 0 : 1) - (b.status === "ACTIVE" ? 0 : 1));
+    return (
+      <div>
+        <Breadcrumb clientId={clientId} agentName={agent.name} />
+        <Header agent={agent} tone={status.tone} clientId={clientId} />
+        {flash && <FlashBox text={flash} />}
+        <div className={`${u.card} ${s.setupCard}`} style={{ marginTop: 28, maxWidth: 720 }}>
+          <p className={s.setupTitle}>Add a deal</p>
+          <p className={s.setupDesc}>
+            We build the standard deadline timeline and the document checklist for your side, then remind you before every
+            deadline and chase your client for anything missing. You can move any date afterwards.
+          </p>
+          {activateError && <p className={s.errorBox}>Couldn&apos;t add the deal: {activateError}</p>}
+          <form action={addDealAction} style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14 }}>
+            <FormField label="Property address" name="propertyAddress" placeholder="123 Main St, Austin TX" />
+            <div className={s.formRow}>
+              <label className={s.label}>You represent the</label>
+              <select name="side" className={s.input} defaultValue="BUYER">
+                <option value="BUYER">Buyer</option>
+                <option value="SELLER">Seller</option>
+              </select>
+            </div>
+            <FormField label="Client name" name="clientName" placeholder="Jane Doe" />
+            <div className={s.formRow}>
+              <label className={s.label}>Client email (to chase documents)</label>
+              <input name="clientEmail" type="email" placeholder="jane@example.com" className={s.input} />
+            </div>
+            <FormField label="Contract date" name="contractDate" type="date" defaultValue={today} />
+            <FormField label="Closing date" name="closingDate" type="date" />
+            <div style={{ gridColumn: "1 / -1" }}>
+              <button type="submit" className={u.btnPrimary}>
+                Add deal
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16, maxWidth: 720 }}>
+          {deals.length === 0 && <p style={{ fontSize: 14, color: "var(--zc-muted)" }}>No deals yet.</p>}
+          {deals.map((t) => (
+            <section key={t.id} className={u.card} style={{ padding: 20, opacity: t.status === "ACTIVE" ? 1 : 0.6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                <div>
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: 16 }}>{t.propertyAddress}</p>
+                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--zc-muted)" }}>
+                    {t.side === "BUYER" ? "Buyer" : "Seller"} side · {t.clientName}
+                    {t.clientEmail ? ` · ${t.clientEmail}` : " · no client email, documents won't be chased"} · closes {t.closingDate.toISOString().slice(0, 10)}
+                    {t.status !== "ACTIVE" && ` · ${t.status.toLowerCase()}`}
+                  </p>
+                </div>
+                <form action={dealStatusAction} style={{ display: "flex", gap: 8 }}>
+                  <input type="hidden" name="id" value={t.id} />
+                  {t.status === "ACTIVE" ? (
+                    <>
+                      <button type="submit" name="status" value="CLOSED" className={u.btnGhost}>
+                        Mark closed
+                      </button>
+                      <button type="submit" name="status" value="CANCELLED" className={u.btnGhost}>
+                        Cancel deal
+                      </button>
+                    </>
+                  ) : (
+                    <button type="submit" name="status" value="ACTIVE" className={u.btnGhost}>
+                      Reopen
+                    </button>
+                  )}
+                </form>
+              </div>
+
+              <p className={s.label} style={{ marginTop: 16 }}>
+                Deadlines
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 6 }}>
+                {t.deadlines.map((d) => {
+                  const overdue = !d.done && d.dueDate.getTime() < Date.now();
+                  return (
+                    <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                      <form action={deadlineAction}>
+                        <input type="hidden" name="id" value={d.id} />
+                        <input type="hidden" name="done" value={d.done ? "false" : "true"} />
+                        <button type="submit" className={u.btnGhost} style={{ minHeight: 34, padding: "0 12px", fontSize: 12 }} aria-label={d.done ? `Mark ${d.label} not done` : `Mark ${d.label} done`}>
+                          {d.done ? <><Icon name="check" size={12} strokeWidth={2.4} /> Done</> : "Mark done"}
+                        </button>
+                      </form>
+                      <span style={{ flex: 1, minWidth: 150, fontSize: 14, textDecoration: d.done ? "line-through" : "none", color: overdue ? "var(--zc-error-text)" : d.done ? "var(--zc-muted)" : "var(--zc-text)" }}>
+                        {d.label}
+                        {overdue && " · overdue"}
+                      </span>
+                      <form action={deadlineAction} style={{ display: "flex", gap: 6 }}>
+                        <input type="hidden" name="id" value={d.id} />
+                        <input type="date" name="dueDate" defaultValue={d.dueDate.toISOString().slice(0, 10)} className={s.input} style={{ minHeight: 34, padding: "0 10px", fontSize: 13 }} aria-label={`${d.label} date`} />
+                        <button type="submit" className={u.btnGhost} style={{ minHeight: 34, padding: "0 12px", fontSize: 12 }}>
+                          Move
+                        </button>
+                      </form>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <p className={s.label} style={{ marginTop: 16 }}>
+                Documents
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 6 }}>
+                {t.documents.map((doc) => (
+                  <form key={doc.id} action={documentAction} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <input type="hidden" name="id" value={doc.id} />
+                    <input type="hidden" name="received" value={doc.received ? "false" : "true"} />
+                    <button type="submit" className={u.btnGhost} style={{ minHeight: 34, padding: "0 12px", fontSize: 12 }}>
+                      {doc.received ? <><Icon name="check" size={12} strokeWidth={2.4} /> Received</> : "Mark received"}
+                    </button>
+                    <span style={{ fontSize: 14, color: doc.received ? "var(--zc-muted)" : "var(--zc-text)" }}>
+                      {doc.label}
+                      {!doc.received && doc.chaseCount > 0 && <span style={{ color: "var(--zc-muted)" }}> · chased {doc.chaseCount}x</span>}
+                    </span>
+                  </form>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ---------- Brokerage: Database Manager ----------
+  if (agentId === "db") {
+    const contacts = project.dormantContacts;
+    const days = dbDormantDays(readSettings(project.agentSettings));
+    const eligible = contacts.filter((c) => c.status === "DORMANT" && isDormant(c.lastContactAt, days)).length;
+    const count = (st: string) => contacts.filter((c) => c.status === st).length;
+    return (
+      <div>
+        <Breadcrumb clientId={clientId} agentName={agent.name} />
+        <Header agent={agent} tone={status.tone} clientId={clientId} />
+        {flash && <FlashBox text={flash} />}
+        {activateError && <p className={s.errorBox} style={{ maxWidth: 720 }}>{activateError}</p>}
+
+        {eligible > 0 && (
+          <div className={`${u.card} ${s.setupCard}`} style={{ marginTop: 28, maxWidth: 720 }}>
+            <p className={s.setupTitle}>
+              {eligible} contact{eligible === 1 ? " hasn't" : "s haven't"} heard from you in {days >= 365 ? "12" : days >= 180 ? "6" : "3"}+ months
+            </p>
+            <p className={s.setupDesc}>
+              Start sends each one 3 short check-in emails in your business name (a week, then two weeks apart). Replies land in your own
+              inbox, and every email has an unsubscribe link.
+            </p>
+            <form action={startDbAction} style={{ marginTop: 14 }}>
+              <button type="submit" className={u.btnPrimary}>
+                Start waking them up
+              </button>
+            </form>
+          </div>
+        )}
+
+        <div className={`${u.card} ${s.setupCard}`} style={{ marginTop: 24, maxWidth: 720 }}>
+          <p className={s.setupTitle}>{contacts.length === 0 ? "Import your past clients and leads" : "Import more contacts"}</p>
+          <p className={s.setupDesc}>
+            A CSV, Excel file, or Google Sheets link with a name and email column. A &quot;last contact&quot; date column is optional; anyone
+            without one counts as dormant. Duplicates are skipped.
+          </p>
+          <form action={importContactsAction} style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 14 }}>
+            <div className={s.formRow}>
+              <label className={s.label}>Upload a file (CSV or Excel)</label>
+              <input name="file" type="file" accept=".csv,.xlsx,.xls" className={s.input} />
+            </div>
+            <div className={s.formRow}>
+              <label className={s.label}>Or paste a Google Sheets link</label>
+              <input name="googleSheetUrl" type="url" placeholder="https://docs.google.com/spreadsheets/..." className={s.input} />
+              <InlineGuide guide={GOOGLE_SHEETS_SHARE_GUIDE} />
+            </div>
+            <button type="submit" className={u.btnPrimary} style={{ alignSelf: "flex-start" }}>
+              Import
+            </button>
+          </form>
+        </div>
+
+        {contacts.length > 0 && (
+          <section className={u.card} style={{ marginTop: 24, maxWidth: 720, padding: 20 }}>
+            <p style={{ margin: 0, fontSize: 13, color: "var(--zc-muted)" }}>
+              {contacts.length} contacts · {count("DORMANT")} not started · {count("IN_SEQUENCE")} being woken up · {count("REPLIED")} replied ·{" "}
+              {count("DONE")} finished · {count("UNSUBSCRIBED")} unsubscribed
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
+              {contacts.slice(0, 100).map((c) => (
+                <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between", flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 14 }}>
+                    {c.name} <span style={{ color: "var(--zc-muted)" }}>· {c.email}</span>
+                  </span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: 12, fontFamily: "var(--zc-mono)", color: "var(--zc-muted)" }}>
+                      {c.status === "IN_SEQUENCE" ? `email ${c.sequenceStep} of 3 sent` : c.status.toLowerCase().replace("_", " ")}
+                    </span>
+                    {c.status === "IN_SEQUENCE" && (
+                      <form action={markRepliedAction}>
+                        <input type="hidden" name="id" value={c.id} />
+                        <button type="submit" className={u.btnGhost} style={{ minHeight: 30, padding: "0 10px", fontSize: 12 }}>
+                          They replied
+                        </button>
+                      </form>
+                    )}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    );
+  }
+
   // ---------- Everything else: real workflow view ----------
   const steps = planWorkflowSteps(project, agentId);
   const currentIndex = steps.findIndex((st) => st.state === "current" || st.state === "human-waiting");
@@ -564,7 +871,8 @@ function Breadcrumb({ clientId, agentName }: { clientId: string; agentName: stri
   );
 }
 
-function Header({ agent, tone, clientId }: { agent: { name: string; icon: IconName; description: string }; tone: "run" | "need" | "done" | "dim"; clientId: string }) {
+function Header({ agent, tone, clientId }: { agent: { id: string; name: string; icon: IconName; description: string; real: boolean }; tone: "run" | "need" | "done" | "dim"; clientId: string }) {
+  const canAdjust = agent.real && adjustableSettings(agent.id).length > 0;
   return (
     <div className={s.header}>
       <div className={s.headerLeft}>
@@ -579,11 +887,13 @@ function Header({ agent, tone, clientId }: { agent: { name: string; icon: IconNa
           <p className={s.desc}>{agent.description}</p>
         </div>
       </div>
-      <div className={s.headerActions}>
-        <Link href={`/services/dashboard/${clientId}/settings`} className={u.btnGhost}>
-          Request a change
-        </Link>
-      </div>
+      {canAdjust && (
+        <div className={s.headerActions}>
+          <Link href={`/services/dashboard/${clientId}/agents/${agent.id}/adjust`} className={u.btnGhost}>
+            Request a change
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
@@ -598,7 +908,7 @@ function SetupShell({
   children,
 }: {
   clientId: string;
-  agent: { name: string; icon: IconName; description: string };
+  agent: { id: string; name: string; icon: IconName; description: string; real: boolean };
   status: { tone: "run" | "need" | "done" | "dim" };
   title: string;
   desc: string;

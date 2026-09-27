@@ -5,6 +5,7 @@ import { groqChatCompletion } from "@/lib/groq";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
 import { isProjectPaused } from "@/lib/project-pause";
+import { readSettings, inboxReplyStyle, inboxSignOff } from "@/lib/agent-settings";
 import type { MailConnection } from "@prisma/client";
 
 /* AI Inbox Manager runtime, launch scope: Gmail (personal accounts),
@@ -24,12 +25,16 @@ import type { MailConnection } from "@prisma/client";
    service-workspace.ts actually sends it. Runs from
    /api/cron/inbox-manager. */
 
-const DRAFT_SYSTEM_PROMPT = `You triage inbound business email and draft a short, professional reply. Given the sender, subject, and body of one email, decide if it's routine (a scheduling request, a document request, a simple question with an obvious answer) or something that needs a human's judgment (a complaint, a novel request, anything sensitive). Always draft a reasonable reply attempt either way, a human reviews everything before it sends. Respond ONLY with JSON: {"reply": string}.`;
+// Reply style ("short, professional" by default) comes from the client's settings.
+function draftSystemPrompt(style: string, codeAddsSignOff: boolean): string {
+  const noSignature = codeAddsSignOff ? " Do not add a sign-off or signature." : "";
+  return `You triage inbound business email and draft a ${style} reply. Given the sender, subject, and body of one email, decide if it's routine (a scheduling request, a document request, a simple question with an obvious answer) or something that needs a human's judgment (a complaint, a novel request, anything sensitive). Always draft a reasonable reply attempt either way, a human reviews everything before it sends.${noSignature} Respond ONLY with JSON: {"reply": string}.`;
+}
 
-async function draftReplyFromGroq(fromEmail: string, subject: string, snippet: string): Promise<string> {
+async function draftReplyFromGroq(fromEmail: string, subject: string, snippet: string, style: string, codeAddsSignOff: boolean): Promise<string> {
   const fallback = "Thanks for your email - I'll take a look and get back to you shortly.";
   const result = await groqChatCompletion({
-    systemPrompt: DRAFT_SYSTEM_PROMPT,
+    systemPrompt: draftSystemPrompt(style, codeAddsSignOff),
     userPrompt: `From: ${fromEmail}\nSubject: ${subject}\n\n${snippet}`,
     jsonMode: true,
   });
@@ -74,10 +79,15 @@ export async function syncAndDraftForConnection(connection: MailConnection): Pro
   });
   const existingRefs = new Set(existing.map((e) => e.sourceRef));
 
+  const project = await db.serviceProject.findUnique({ where: { id: connection.projectId }, select: { agentSettings: true, title: true } });
+  const settings = readSettings(project?.agentSettings);
+  const style = inboxReplyStyle(settings);
+  const signOff = inboxSignOff(settings, project?.title ?? "");
+
   let created = 0;
   for (const email of emails) {
     if (existingRefs.has(email.messageId)) continue;
-    const reply = await draftReplyFromGroq(email.fromEmail, email.subject, email.snippet);
+    const reply = (await draftReplyFromGroq(email.fromEmail, email.subject, email.snippet, style, signOff !== "")) + signOff;
     await recordUsageCost(connection.projectId, ESTIMATED_COST_CENTS.GROQ_CALL, "inbox manager draft");
     await db.inboxDraft.create({
       data: {

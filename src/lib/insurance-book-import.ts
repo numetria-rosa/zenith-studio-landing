@@ -27,7 +27,7 @@ const HEADER_ALIASES: Record<keyof Omit<ImportPolicyInput, "agencyName" | "renew
   renewalDate: ["renewal date", "renewal", "expiration date", "expires", "expiry"],
 };
 
-function matchColumn(headers: string[], aliases: string[]): number {
+export function matchColumn(headers: string[], aliases: string[]): number {
   const normalized = headers.map((h) => h.trim().toLowerCase());
   for (const alias of aliases) {
     const i = normalized.indexOf(alias);
@@ -38,7 +38,7 @@ function matchColumn(headers: string[], aliases: string[]): number {
 
 // Renewal dates are calendar days, so they're stored at 12:00 UTC: no
 // server or viewer time zone can shift them onto the neighbouring day.
-function parseDate(raw: string): Date | null {
+export function parseDate(raw: string): Date | null {
   const s = raw.trim();
   const iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
   if (iso) return new Date(Date.UTC(+iso[1], +iso[2] - 1, +iso[3], 12));
@@ -83,6 +83,15 @@ function rowsFromSheet(headerRow: string[], dataRows: string[][], agencyName: st
 /** CSV or XLSX, detected by content rather than trusting the filename
     extension (exceljs's CSV reader accepts any text/delimited stream). */
 export async function parseBookOfBusinessSpreadsheet(buffer: Buffer, filename: string, agencyName: string): Promise<ParseRowsResult> {
+  const sheet = await readSheetRows(buffer, filename);
+  if (!sheet.ok) return sheet;
+  const [headerRow, ...dataRows] = sheet.rows;
+  return rowsFromSheet(headerRow, dataRows, agencyName);
+}
+
+/** Header row + data rows as text, from CSV or XLSX. Shared with the
+    Brokerage Database Manager's contact import. */
+export async function readSheetRows(buffer: Buffer, filename: string): Promise<{ ok: true; rows: string[][] } | { ok: false; error: string }> {
   const isXlsx = filename.toLowerCase().endsWith(".xlsx") || filename.toLowerCase().endsWith(".xls");
   try {
     const workbook = new ExcelJS.Workbook();
@@ -111,9 +120,7 @@ export async function parseBookOfBusinessSpreadsheet(buffer: Buffer, filename: s
       allRows.push(cells);
     });
     if (allRows.length < 2) return { ok: false, error: "The file needs a header row plus at least one data row." };
-
-    const [headerRow, ...dataRows] = allRows;
-    return rowsFromSheet(headerRow, dataRows, agencyName);
+    return { ok: true, rows: allRows };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "Couldn't read that file." };
   }
@@ -124,6 +131,12 @@ export async function parseBookOfBusinessSpreadsheet(buffer: Buffer, filename: s
     view" - no OAuth on our end, matching this feature's whole "least
     manual work, no credential handoff" design. */
 export async function parseBookOfBusinessGoogleSheet(shareUrl: string, agencyName: string): Promise<ParseRowsResult> {
+  const csv = await fetchGoogleSheetCsv(shareUrl);
+  if (!csv.ok) return csv;
+  return parseBookOfBusinessSpreadsheet(csv.buffer, "sheet.csv", agencyName);
+}
+
+export async function fetchGoogleSheetCsv(shareUrl: string): Promise<{ ok: true; buffer: Buffer } | { ok: false; error: string }> {
   const match = shareUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
   if (!match) return { ok: false, error: "That doesn't look like a Google Sheets link." };
   const gidMatch = shareUrl.match(/[?#&]gid=(\d+)/);
@@ -136,8 +149,7 @@ export async function parseBookOfBusinessGoogleSheet(shareUrl: string, agencyNam
     return { ok: false, error: "Couldn't reach that Google Sheet." };
   }
   if (!res.ok) return { ok: false, error: "Couldn't read that sheet - make sure it's shared as \"Anyone with the link can view\"." };
-  const csvText = await res.text();
-  return parseBookOfBusinessSpreadsheet(Buffer.from(csvText, "utf-8"), "sheet.csv", agencyName);
+  return { ok: true, buffer: Buffer.from(await res.text(), "utf-8") };
 }
 
 const PDF_EXTRACTION_PROMPT = `Extract every client/policy row from this document into a JSON array. Each item must have exactly these keys: "clientName" (string), "phone" (string or null), "email" (string or null), "policyType" (string or null), "renewalDate" (string, any recognizable date format). Respond with ONLY the JSON array, no other text. If a row is missing a client name or renewal date, skip it.`;

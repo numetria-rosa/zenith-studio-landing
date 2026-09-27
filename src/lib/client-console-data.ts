@@ -66,6 +66,17 @@ export type ConsoleProject = {
   documents: { id: string; filename: string; summary: string | null; createdAt: Date }[];
   insurancePolicies: { id: string; clientName: string; renewalDate: Date; lastReminderSentAt: Date | null }[];
   metrics: { key: string; value: number }[];
+  transactions: {
+    id: string;
+    propertyAddress: string;
+    clientName: string;
+    status: string;
+    closingDate: Date;
+    createdAt: Date;
+    deadlines: { label: string; dueDate: Date; done: boolean; remindedAt: Date | null }[];
+    documents: { label: string; received: boolean; lastChasedAt: Date | null }[];
+  }[];
+  dormantContacts: { id: string; name: string; status: string; lastSentAt: Date | null; sequenceStep: number }[];
 };
 
 function hasIntegration(project: ConsoleProject, provider: string): boolean {
@@ -317,18 +328,51 @@ function insuranceApprovalItems(project: ConsoleProject, agentHref: (agentId: st
 
 export const BROKERAGE_AGENTS: AgentDefinition[] = [
   { id: "isa", name: "AI Inside Sales Agent", icon: "phone", real: true, description: "Answers new leads in seconds, qualifies motivation, timeline, and financing, and books the appointment." },
-  { id: "tc", name: "AI Transaction Coordinator", icon: "file", real: false, description: "Contract to close - deadlines tracked, documents chased, every party updated." },
-  { id: "db", name: "AI Database Manager", icon: "database", real: false, description: "Wakes up the dormant contacts and past clients already sitting in your CRM." },
+  { id: "tc", name: "AI Transaction Coordinator", icon: "file", real: true, description: "Contract to close - deadlines tracked, documents chased, every party updated." },
+  { id: "db", name: "AI Database Manager", icon: "database", real: true, description: "Wakes up the dormant contacts and past clients already sitting in your CRM." },
 ];
 
+function activeTransactions(project: ConsoleProject) {
+  return project.transactions.filter((t) => t.status === "ACTIVE");
+}
+
+function overdueDeadlines(project: ConsoleProject): number {
+  const now = Date.now();
+  return activeTransactions(project).reduce((n, t) => n + t.deadlines.filter((d) => !d.done && d.dueDate.getTime() < now).length, 0);
+}
+
+function transactionCoordinatorStatus(project: ConsoleProject): AgentStatus {
+  const active = activeTransactions(project).length;
+  if (project.transactions.length === 0) return { tone: "need", stateLabel: "needs setup", todayLabel: "Active deals", todayValue: 0 };
+  const overdue = overdueDeadlines(project);
+  if (overdue > 0) return { tone: "need", stateLabel: "deadline overdue", todayLabel: "Overdue deadlines", todayValue: overdue };
+  return active > 0
+    ? { tone: "run", stateLabel: "running", todayLabel: "Active deals", todayValue: active }
+    : { tone: "done", stateLabel: "all closed", todayLabel: "Active deals", todayValue: 0 };
+}
+
+function databaseManagerStatus(project: ConsoleProject): AgentStatus {
+  const contacts = project.dormantContacts;
+  if (contacts.length === 0) return { tone: "need", stateLabel: "needs setup", todayLabel: "Contacts", todayValue: 0 };
+  const inSequence = contacts.filter((c) => c.status === "IN_SEQUENCE").length;
+  const replied = contacts.filter((c) => c.status === "REPLIED").length;
+  if (inSequence > 0) return { tone: "run", stateLabel: "running", todayLabel: "Being woken up", todayValue: inSequence };
+  if (contacts.every((c) => c.status === "DORMANT")) return { tone: "need", stateLabel: "ready to start", todayLabel: "Contacts imported", todayValue: contacts.length };
+  return { tone: "done", stateLabel: "sequence done", todayLabel: "Replied", todayValue: replied };
+}
+
 function brokerageAgentStatus(project: ConsoleProject, agentId: string): AgentStatus {
-  if (agentId !== "isa") return { tone: "dim", stateLabel: "coming soon", todayLabel: "Status", todayValue: "coming soon" };
+  if (agentId === "tc") return transactionCoordinatorStatus(project);
+  if (agentId === "db") return databaseManagerStatus(project);
   return leadResponseStatus(project);
 }
 
 function brokerageKpiTiles(project: ConsoleProject): { label: string; value: string | number }[] {
-  const handledToday = project.leads.length;
-  const agentsOnShift = brokerageAgentStatus(project, "isa").tone === "run" ? 1 : 0;
+  const dayAgo = Date.now() - 86400000;
+  const handledToday =
+    project.leads.filter((l) => l.createdAt.getTime() >= dayAgo).length +
+    project.dormantContacts.filter((c) => c.lastSentAt && c.lastSentAt.getTime() >= dayAgo).length;
+  const agentsOnShift = BROKERAGE_AGENTS.filter((a) => brokerageAgentStatus(project, a.id).tone === "run").length;
   return [
     { label: "Handled today", value: handledToday },
     { label: "Avg. lead reply", value: hasIntegration(project, "signalwire") ? "< 1 min" : "–" },
@@ -337,7 +381,28 @@ function brokerageKpiTiles(project: ConsoleProject): { label: string; value: str
 }
 
 function brokerageWorkflowSteps(project: ConsoleProject, agentId: string): WorkflowStep[] {
-  if (agentId !== "isa") return [];
+  if (agentId === "tc") {
+    const has = project.transactions.length > 0;
+    const overdue = overdueDeadlines(project);
+    return [
+      { title: "Deal added", kind: "trigger", detail: `${activeTransactions(project).length} active`, state: has ? "done" : "pending" },
+      { title: "Timeline built", kind: "match", detail: "6 standard deadlines", state: has ? "done" : "pending" },
+      { title: "Deadline reminders", kind: "notify", detail: "emailed to you ahead of time", state: has ? "current" : "pending" },
+      { title: "Documents chased", kind: "email", detail: "your client, up to 3 times", state: has ? "done" : "pending" },
+      { title: "You mark it done", kind: "human review", detail: overdue > 0 ? `${overdue} overdue` : "on track", state: overdue > 0 ? "human-waiting" : has ? "human-pending" : "pending" },
+    ];
+  }
+  if (agentId === "db") {
+    const has = project.dormantContacts.length > 0;
+    const started = project.dormantContacts.some((c) => c.status !== "DORMANT");
+    return [
+      { title: "Contacts imported", kind: "trigger", detail: `${project.dormantContacts.length} contacts`, state: has ? "done" : "pending" },
+      { title: "Find who's gone quiet", kind: "match", detail: "by last contact date", state: has ? "done" : "pending" },
+      { title: "You press Start", kind: "human review", detail: started ? "started" : "waiting on you", state: started ? "done" : has ? "human-waiting" : "pending" },
+      { title: "3 check-in emails", kind: "email", detail: "sent in your name", state: started ? "current" : "pending" },
+      { title: "Replies go to you", kind: "handoff", detail: "straight to your inbox", state: started ? "done" : "pending" },
+    ];
+  }
   const connected = hasIntegration(project, "signalwire");
   return [
     { title: "New lead", kind: "trigger", detail: "website or referral", state: connected ? "current" : "pending" },
@@ -349,7 +414,19 @@ function brokerageWorkflowSteps(project: ConsoleProject, agentId: string): Workf
 }
 
 function brokerageActivityFeed(project: ConsoleProject): ActivityEvent[] {
-  return leadResponseActivityFeed(project, "AI Inside Sales Agent");
+  const events = leadResponseActivityFeed(project, "AI Inside Sales Agent");
+  for (const t of project.transactions) {
+    events.push({ tone: "done", text: `New deal added: ${t.propertyAddress}`, meta: `AI Transaction Coordinator · ${t.createdAt.toISOString().slice(0, 10)}`, at: t.createdAt });
+    for (const d of t.deadlines) {
+      if (d.remindedAt) events.push({ tone: "run", text: `Reminded you: ${d.label}, ${t.propertyAddress}`, meta: `AI Transaction Coordinator · ${d.remindedAt.toISOString().slice(0, 10)}`, at: d.remindedAt });
+    }
+    const chased = t.documents.map((d) => d.lastChasedAt).filter((x): x is Date => !!x).sort((a, b) => b.getTime() - a.getTime())[0];
+    if (chased) events.push({ tone: "run", text: `Chased ${t.clientName} for documents`, meta: `AI Transaction Coordinator · ${chased.toISOString().slice(0, 10)}`, at: chased });
+  }
+  for (const c of project.dormantContacts) {
+    if (c.lastSentAt) events.push({ tone: "run", text: `Check-in email ${c.sequenceStep} of 3 sent to ${c.name}`, meta: `AI Database Manager · ${c.lastSentAt.toISOString().slice(0, 10)}`, at: c.lastSentAt });
+  }
+  return events.sort((a, b) => b.at.getTime() - a.at.getTime());
 }
 
 function brokerageApprovalItems(): ApprovalItem[] {
@@ -610,7 +687,12 @@ export function planSetupItems(project: ConsoleProject): SetupItem[] {
         { agentId: "billing-clerk", title: "Connect your calendar and email", detail: "Lets the Billing Clerk rebuild billable time from your day.", done: project.oauthConnections.some((c) => c.status === "CONNECTED") },
       ];
     case "brokerages":
-      return leadSetupItems(project, "isa", "your Inside Sales Agent");
+      return [
+        ...leadSetupItems(project, "isa", "your Inside Sales Agent"),
+        { agentId: "tc", title: "Add your first deal", detail: "Your Transaction Coordinator builds the deadline timeline and document checklist.", done: project.transactions.length > 0 },
+        { agentId: "db", title: "Import your past clients and leads", detail: "A spreadsheet or Google Sheet with names and emails.", done: project.dormantContacts.length > 0 },
+        { agentId: "db", title: "Start waking up dormant contacts", detail: "One click sends a short check-in sequence in your name.", done: project.dormantContacts.some((c) => c.status !== "DORMANT") },
+      ];
     case "ai-lead-capture":
       return leadSetupItems(project, "lead-capture", "Lead Capture");
     case "ai-receptionist":

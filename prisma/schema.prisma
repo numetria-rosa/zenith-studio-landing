@@ -648,6 +648,10 @@ model ServiceProject {
   // the step after that, which has no automatic signal at all.
   setupStepsCompleted Int @default(0)
 
+  // Client-chosen agent options ("Request a change"), see src/lib/agent-settings.ts.
+  // Fixed option values only, applied by code the moment they're saved.
+  agentSettings Json?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -671,6 +675,9 @@ model ServiceProject {
   inboxDrafts      InboxDraft[]
   insuranceCrmLogEntries InsuranceCrmLogEntry[]
   insurancePolicies InsurancePolicy[]
+  agentChanges      AgentChangeRequest[]
+  transactions      Transaction[]
+  dormantContacts   DormantContact[]
 
   @@index([userId])
   @@index([proposalId])
@@ -1419,4 +1426,91 @@ model OutreachSettings {
   followUp2Hours   Int      @default(168)
   followUp3Hours   Int      @default(336)
   updatedAt        DateTime @updatedAt
+}
+
+// A client's "Request a change" on an agent. Always applied by code on save
+// (status APPLIED); the row is the audit trail the admin sees.
+model AgentChangeRequest {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  agentId   String
+  changes   Json // [{ key, from, to }]
+  status    String   @default("APPLIED")
+  createdAt DateTime @default(now())
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+// Brokerage AI Transaction Coordinator: one deal from contract to close.
+model Transaction {
+  id              String   @id @default(cuid())
+  projectId       String
+  propertyAddress String
+  side            String // BUYER | SELLER
+  clientName      String
+  clientEmail     String?
+  contractDate    DateTime
+  closingDate     DateTime
+  status          String   @default("ACTIVE") // ACTIVE | CLOSED | CANCELLED
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  project   ServiceProject        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  deadlines TransactionDeadline[]
+  documents TransactionDocument[]
+
+  @@index([projectId])
+}
+
+model TransactionDeadline {
+  id            String    @id @default(cuid())
+  transactionId String
+  label         String
+  dueDate       DateTime
+  done          Boolean   @default(false)
+  remindedAt    DateTime?
+  order         Int       @default(0)
+
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([transactionId])
+}
+
+model TransactionDocument {
+  id            String    @id @default(cuid())
+  transactionId String
+  label         String
+  received      Boolean   @default(false)
+  lastChasedAt  DateTime?
+  chaseCount    Int       @default(0)
+  order         Int       @default(0)
+
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([transactionId])
+}
+
+// Brokerage AI Database Manager: an imported past client or old lead that
+// gets a short re-engagement email sequence once the client starts it.
+model DormantContact {
+  id               String    @id @default(cuid())
+  projectId        String
+  name             String
+  email            String
+  phone            String?
+  lastContactAt    DateTime?
+  status           String    @default("DORMANT") // DORMANT | IN_SEQUENCE | REPLIED | DONE | UNSUBSCRIBED
+  sequenceStep     Int       @default(0)
+  lastSentAt       DateTime?
+  unsubscribeToken String    @unique
+  createdAt        DateTime  @default(now())
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([status])
 }
