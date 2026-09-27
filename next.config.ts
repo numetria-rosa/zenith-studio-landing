@@ -40,6 +40,37 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/**": dependencyTree("@signalwire/compatibility-api"),
   },
+  // Functions sat right at Vercel's 250 MB limit. Nothing here is loaded at
+  // runtime: SignalWire only uses dist/index.node.(m)js (its maps are 24.5 MB,
+  // lib/ is 16 MB), and no dependency needs its source maps or type files.
+  outputFileTracingExcludes: {
+    // This route reads files via a runtime path (process.cwd() + contentDir),
+    // so the tracer bundled nearly the whole repo: marketing images, mockups,
+    // scripts, even a leads spreadsheet. It only ever serves from courses/.
+    "/courses/**": [
+      "./insta/**/*",
+      "./linkedin/**/*",
+      "./public/**/*",
+      "./halo/**/*",
+      "./scripts/**/*",
+      "./law-firm-client-scripts/**/*",
+      "./real-estate-client-scripts/**/*",
+      "./whop-product-images/**/*",
+      "./zenith-ai-kit/**/*",
+      "./web-dev/**/*",
+      "./playbook/**/*",
+      "./n8n_course_zenith_html/**/*",
+      "./*.xlsx",
+      "./*.md",
+    ],
+    "/**": [
+      "./node_modules/@signalwire/compatibility-api/lib/**/*",
+      "./node_modules/**/*.map",
+      "./node_modules/**/*.d.ts",
+      "./node_modules/**/*.d.mts",
+      "./node_modules/**/*.d.cts",
+    ],
+  },
   // Default (1mb) is too small for a real scanned policy/ACORD PDF upload
   // in Insurance Document Audit - Claude's own document limit is 32mb, 10mb
   // is a generous, safe ceiling well short of that.
