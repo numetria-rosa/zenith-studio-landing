@@ -59,8 +59,8 @@ export async function setProjectPaused(projectId: string, paused: boolean) {
 
 /* Advances the pre-LIVE checklist one step (see ServiceProject
    .setupStepsCompleted's own comment). The final step ("Ready") isn't a
-   stored step value - it moves the project to LIVE and, if the service
-   offers a trial, starts the real 72h clock. */
+   stored step value - it moves the project to LIVE. No free trials:
+   clients pay up front, so there is no trial clock to start. */
 export async function advanceSetup(projectId: string) {
   await assertAdmin();
   const project = await db.serviceProject.findUniqueOrThrow({ where: { id: projectId }, select: { setupStepsCompleted: true, sourceServiceId: true } });
@@ -68,11 +68,7 @@ export async function advanceSetup(projectId: string) {
     await db.serviceProject.update({ where: { id: projectId }, data: { setupStepsCompleted: project.setupStepsCompleted + 1 } });
     return;
   }
-  const catalog = project.sourceServiceId ? await db.serviceCatalog.findUnique({ where: { slug: project.sourceServiceId }, select: { trialEnabled: true } }) : null;
-  await db.serviceProject.update({
-    where: { id: projectId },
-    data: { stage: "LIVE", trialEndsAt: catalog?.trialEnabled ? new Date(Date.now() + 72 * 3600_000) : null },
-  });
+  await db.serviceProject.update({ where: { id: projectId }, data: { stage: "LIVE", trialEndsAt: null } });
 }
 
 export async function adjustReadyBy(projectId: string, deltaHours: number) {

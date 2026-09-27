@@ -539,7 +539,7 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
   <div class="zt-wrap">
     <div class="zt-head">
       <div><span class="zt-eyebrow">Your dashboard</span><h2 id="tour-title">Your dashboard, on a guided tour.</h2></div>
-      <div><p id="ztIntro">Every plan comes with a private client dashboard. Take the tour: live agents, one-click approvals, setup and trial status, and a team you can ask anything. Sample data shown.</p><span class="zt-inc"><i></i>Included in your plan</span></div>
+      <div><p id="ztIntro">Every plan comes with a private client dashboard. Take the tour: live agents, one-click approvals, setup status, and a team you can ask anything. Sample data shown.</p><span class="zt-inc"><i></i>Included in your plan</span></div>
     </div>
     <div class="zt-shell">
       <div class="zt-bg" aria-hidden="true"></div>
@@ -905,7 +905,7 @@ function S(t, k, d, tm, st, ic) { return { t: t, k: k, d: d, tm: tm, st: st, ic:
 
 var B = {
   insurance: {
-    biz: '[Agency Name]', role: 'Agency owner', plan: 'Insurance bundle', price: '$850', note: 'Billed monthly, or save paying quarterly.', trial: true,
+    biz: '[Agency Name]', role: 'Agency owner', plan: 'Insurance bundle', price: '$850', note: 'Billed monthly, or save paying quarterly.', trial: false,
     kpis: [['Handled today', '48'], ['Avg. reply time', '14s'], ['Agents on shift', '4']],
     agents: [
       { id: 'intake', name: 'Intake Agent', ic: 'chat', st: 'run', desc: 'Texts every new quote request back with a real reply, not an autoresponder.', today: ['Leads answered', '18'],
@@ -938,7 +938,7 @@ var B = {
   },
 
   law: {
-    biz: '[Firm Name]', role: 'Managing partner', plan: 'Law firm bundle', price: '$1,080', note: 'Billed monthly, or save paying quarterly.', trial: true,
+    biz: '[Firm Name]', role: 'Managing partner', plan: 'Law firm bundle', price: '$1,080', note: 'Billed monthly, or save paying quarterly.', trial: false,
     kpis: [['Handled today', '31'], ['Avg. text-back time', '8s'], ['Agents on shift', '3']],
     agents: [
       { id: 'billing', name: 'AI Billing Clerk', ic: 'clock', st: 'wait', desc: 'Reconstructs billable time from your calendar, email and documents and drafts entries with real narratives.', today: ['Hours found', '6.4'],
@@ -966,7 +966,7 @@ var B = {
   },
 
   brokerage: {
-    biz: '[Brokerage Name]', role: 'Broker / owner', plan: 'Brokerage bundle', price: '$910', note: 'Billed monthly, or save paying quarterly.', trial: true,
+    biz: '[Brokerage Name]', role: 'Broker / owner', plan: 'Brokerage bundle', price: '$910', note: 'Billed monthly, or save paying quarterly.', trial: false,
     kpis: [['Handled today', '37'], ['Avg. lead reply', '9s'], ['Agents on shift', '3']],
     agents: [
       { id: 'isa', name: 'AI Inside Sales Agent', ic: 'chat', st: 'run', desc: 'Answers new leads in seconds, qualifies motivation, timeline and financing, and books the appointment.', today: ['Leads answered', '16'],
@@ -1380,8 +1380,8 @@ render();
       ],
       [
         "Settings",
-        "Setup and trial, to the hour",
-        "See the exact time your setup is ready, your connected tools, your plan and your 72 hours of free testing."
+        "Setup, to the hour",
+        "See the exact time your setup is ready, your connected tools and your plan."
       ],
       [
         "Ask",
@@ -1558,8 +1558,8 @@ render();
         <p>We connect the AI agents to your calendar, email, documents and phone line, and load your case criteria so only the right callers get booked. Setup is free and done within 24 hours; your dashboard shows the exact time it will be ready.</p>
       </div>
       <div class="step">
-        <h3>Test it free, then go live</h3>
-        <p>Your 4&#8209;day free trial gives you 72 full hours to test the AI team on real work once setup is done. Missed calls get a text back, time entries get drafted for your review, and leads that did not retain get worked.</p>
+        <h3>Go live</h3>
+        <p>Once setup is done, your AI team works on real work from day one. Missed calls get a text back, time entries get drafted for your review, and leads that did not retain get worked.</p>
       </div>
     </div>
   </div>
@@ -1574,7 +1574,7 @@ render();
         <span class="eyebrow">Pricing</span>
         <h2 id="pricing-title">One price for the whole team.</h2>
       </div>
-      <p>All three agents in one bundle. Save 10% paying monthly, or 25% paying quarterly. Free setup and a 4&#8209;day free trial either way.</p>
+      <p>All three agents in one bundle. Save 10% paying monthly, or 25% paying quarterly. Free setup either way, and you can cancel anytime.</p>
     </div>
     <div class="pricing">
       <div class="price-card">
@@ -1594,7 +1594,7 @@ render();
           <div class="offer-head"><span class="eyebrow" style="color:var(--mint-text)">Launch offer</span><span class="excl">Only through Zenith AI</span></div>
           <ul>
             <li><span class="ochk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7FF0BD" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span><b>Free setup.</b> Connected to your tools within 24 hours.</span></li>
-            <li><span class="ochk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7FF0BD" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span><b>4&#8209;day free trial.</b> 72 full hours to test the AI team on real work once setup is done.</span></li>
+            <li><span class="ochk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7FF0BD" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span><b>Cancel anytime.</b> No contract. Stop your plan from your dashboard whenever you want.</span></li>
             <li><span class="ochk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7FF0BD" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span><b>Live setup status.</b> Your dashboard shows the exact time your setup will be ready.</span></li>
           </ul>
         </div>
@@ -1651,8 +1651,8 @@ render();
         <p>Setup is free, and we connect the AI team to your tools within 24 hours of you starting your plan. Your dashboard shows the exact time your setup will be ready, so you are never left guessing.</p>
       </details>
       <details>
-        <summary>How does the free trial work?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
-        <p>Your plan comes with a 4&#8209;day free trial. Setup takes up to the first 24 hours, which leaves you 72 full hours to test the AI team on your own work. This offer and this pricing are only available through Zenith AI.</p>
+        <summary>Can I cancel anytime?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
+        <p>Yes. There is no contract. Cancel from your dashboard whenever you want, and your plan stays active until the end of the period you already paid for. This offer and this pricing are only available through Zenith AI.</p>
       </details>
       <details>
         <summary>How does quarterly billing work?<span class="pm" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span></summary>
@@ -1672,7 +1672,7 @@ render();
       <div class="cta-glow"></div>
       <span class="eyebrow" style="position:relative">Next step</span>
       <h2 id="book-title">Three ways to start.</h2>
-      <p>Pick whichever fits how you make this kind of decision - no wrong choice, and nothing here locks you in. Setup is free either way, ready within 24 hours, with a 4-day free trial.</p>
+      <p>Pick whichever fits how you make this kind of decision - no wrong choice, and nothing here locks you in. Setup is free either way, ready within 24 hours, and you can cancel anytime.</p>
       <div class="row" style="flex-wrap:wrap;gap:14px;align-items:stretch">
         <a class="btn btn-glass" href="/audit" style="flex:1;min-width:220px;flex-direction:column;align-items:flex-start;gap:4px;height:auto;padding:18px 20px;white-space:normal;text-align:left;border-radius:18px">
           <span style="font-weight:500;font-size:15px">Free written audit</span>
@@ -1684,7 +1684,7 @@ render();
         </a>
         <a class="btn btn-primary" href="https://whop.com/checkout/ch_we86QAB7NOpqcL1/" target="_blank" rel="noopener" style="flex:1;min-width:220px;flex-direction:column;align-items:flex-start;gap:4px;height:auto;padding:18px 20px;white-space:normal;text-align:left;border-radius:18px">
           <span style="font-weight:500;font-size:15px">Get started now</span>
-          <span style="font-weight:400;font-size:13px;color:rgba(5,6,10,.65)">Already sure? Check out directly - free setup within 24 hours, 4-day free trial.</span>
+          <span style="font-weight:400;font-size:13px;color:rgba(5,6,10,.65)">Already sure? Check out directly - free setup within 24 hours, cancel anytime.</span>
         </a>
       </div>
       <div class="row" style="margin-top:16px">

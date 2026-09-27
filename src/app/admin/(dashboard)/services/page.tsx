@@ -111,7 +111,6 @@ export default async function HqServicesPage() {
 
               <div className="opts">
                 <ToggleRow slug={s.slug} flag="freeSetup" label="Free setup" desc="Setup at no cost" checked={s.freeSetup} action={toggleFlag} />
-                <ToggleRow slug={s.slug} flag="trialEnabled" label="Free trial" desc="72 hours of testing after setup" checked={s.trialEnabled} action={toggleFlag} />
                 <ToggleRow slug={s.slug} flag="acceptingNewClients" label="Accepting new clients" desc="Off hides booking on the landing page" checked={s.acceptingNewClients} action={toggleFlag} />
               </div>
 

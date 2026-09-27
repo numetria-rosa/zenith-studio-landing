@@ -1257,7 +1257,7 @@ function S(t, k, d, tm, st, ic) { return { t: t, k: k, d: d, tm: tm, st: st, ic:
 
 var B = {
   insurance: {
-    biz: '[Agency Name]', role: 'Agency owner', plan: 'Insurance bundle', price: '$850', note: 'Billed monthly, or save paying quarterly.', trial: true,
+    biz: '[Agency Name]', role: 'Agency owner', plan: 'Insurance bundle', price: '$850', note: 'Billed monthly, or save paying quarterly.', trial: false,
     kpis: [['Handled today', '48'], ['Avg. reply time', '14s'], ['Agents on shift', '4']],
     agents: [
       { id: 'intake', name: 'Intake Agent', ic: 'chat', st: 'run', desc: 'Texts every new quote request back with a real reply, not an autoresponder.', today: ['Leads answered', '18'],
@@ -1290,7 +1290,7 @@ var B = {
   },
 
   law: {
-    biz: '[Firm Name]', role: 'Managing partner', plan: 'Law firm bundle', price: '$1,080', note: 'Billed monthly, or save paying quarterly.', trial: true,
+    biz: '[Firm Name]', role: 'Managing partner', plan: 'Law firm bundle', price: '$1,080', note: 'Billed monthly, or save paying quarterly.', trial: false,
     kpis: [['Handled today', '31'], ['Avg. text-back time', '8s'], ['Agents on shift', '3']],
     agents: [
       { id: 'billing', name: 'AI Billing Clerk', ic: 'clock', st: 'wait', desc: 'Reconstructs billable time from your calendar, email and documents and drafts entries with real narratives.', today: ['Hours found', '6.4'],
@@ -1318,7 +1318,7 @@ var B = {
   },
 
   brokerage: {
-    biz: '[Brokerage Name]', role: 'Broker / owner', plan: 'Brokerage bundle', price: '$910', note: 'Billed monthly, or save paying quarterly.', trial: true,
+    biz: '[Brokerage Name]', role: 'Broker / owner', plan: 'Brokerage bundle', price: '$910', note: 'Billed monthly, or save paying quarterly.', trial: false,
     kpis: [['Handled today', '37'], ['Avg. lead reply', '9s'], ['Agents on shift', '3']],
     agents: [
       { id: 'isa', name: 'AI Inside Sales Agent', ic: 'chat', st: 'run', desc: 'Answers new leads in seconds, qualifies motivation, timeline and financing, and books the appointment.', today: ['Leads answered', '16'],

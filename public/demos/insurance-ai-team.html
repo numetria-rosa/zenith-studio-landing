@@ -526,7 +526,7 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
   <div class="zt-wrap">
     <div class="zt-head">
       <div><span class="zt-eyebrow">Your dashboard</span><h2 id="tour-title">Your dashboard, on a guided tour.</h2></div>
-      <div><p id="ztIntro">Every plan comes with a private client dashboard. Take the tour: live agents, one-click approvals, setup and trial status, and a team you can ask anything. Sample data shown.</p><span class="zt-inc"><i></i>Included in your plan</span></div>
+      <div><p id="ztIntro">Every plan comes with a private client dashboard. Take the tour: live agents, one-click approvals, setup status, and a team you can ask anything. Sample data shown.</p><span class="zt-inc"><i></i>Included in your plan</span></div>
     </div>
     <div class="zt-shell">
       <div class="zt-bg" aria-hidden="true"></div>
@@ -892,7 +892,7 @@ function S(t, k, d, tm, st, ic) { return { t: t, k: k, d: d, tm: tm, st: st, ic:
 
 var B = {
   insurance: {
-    biz: '[Agency Name]', role: 'Agency owner', plan: 'Insurance bundle', price: '$850', note: 'Billed monthly, or save paying quarterly.', trial: true,
+    biz: '[Agency Name]', role: 'Agency owner', plan: 'Insurance bundle', price: '$850', note: 'Billed monthly, or save paying quarterly.', trial: false,
     kpis: [['Handled today', '48'], ['Avg. reply time', '14s'], ['Agents on shift', '4']],
     agents: [
       { id: 'intake', name: 'Intake Agent', ic: 'chat', st: 'run', desc: 'Texts every new quote request back with a real reply, not an autoresponder.', today: ['Leads answered', '18'],
@@ -925,7 +925,7 @@ var B = {
   },
 
   law: {
-    biz: '[Firm Name]', role: 'Managing partner', plan: 'Law firm bundle', price: '$1,080', note: 'Billed monthly, or save paying quarterly.', trial: true,
+    biz: '[Firm Name]', role: 'Managing partner', plan: 'Law firm bundle', price: '$1,080', note: 'Billed monthly, or save paying quarterly.', trial: false,
     kpis: [['Handled today', '31'], ['Avg. text-back time', '8s'], ['Agents on shift', '3']],
     agents: [
       { id: 'billing', name: 'AI Billing Clerk', ic: 'clock', st: 'wait', desc: 'Reconstructs billable time from your calendar, email and documents and drafts entries with real narratives.', today: ['Hours found', '6.4'],
@@ -953,7 +953,7 @@ var B = {
   },
 
   brokerage: {
-    biz: '[Brokerage Name]', role: 'Broker / owner', plan: 'Brokerage bundle', price: '$910', note: 'Billed monthly, or save paying quarterly.', trial: true,
+    biz: '[Brokerage Name]', role: 'Broker / owner', plan: 'Brokerage bundle', price: '$910', note: 'Billed monthly, or save paying quarterly.', trial: false,
     kpis: [['Handled today', '37'], ['Avg. lead reply', '9s'], ['Agents on shift', '3']],
     agents: [
       { id: 'isa', name: 'AI Inside Sales Agent', ic: 'chat', st: 'run', desc: 'Answers new leads in seconds, qualifies motivation, timeline and financing, and books the appointment.', today: ['Leads answered', '16'],
@@ -1367,8 +1367,8 @@ render();
       ],
       [
         "Settings",
-        "Setup and trial, to the hour",
-        "See the exact time your setup is ready, your connected tools, your plan and your 72 hours of free testing."
+        "Setup, to the hour",
+        "See the exact time your setup is ready, your connected tools and your plan."
       ],
       [
         "Ask",
