@@ -70,6 +70,7 @@ model User {
   supportRequests SupportRequest[]
   assignedTasks   Task[]            @relation("TaskAssignee")
   paidAudits      PaidAudit[]
+  waMemberships   WaMembership[]
 }
 
 model Account {
@@ -1535,4 +1536,439 @@ model TextingRegistration {
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([status])
+}
+
+// =====================================================================
+// WhatsApp AI Agent for Umrah/Hajj agencies (separate product, same
+// Zenith Studio account/auth system). App-level tenant scoping: every
+// query on this domain filters by agencyId, matching every other
+// multi-tenant service in this schema - see CLAUDE.md's Stack section
+// for why (no DB-level RLS on this Neon/Prisma setup).
+// =====================================================================
+
+enum WaAgencyStatus {
+  ONBOARDING // signed up, not yet live (no WhatsApp connected or KB empty)
+  LIVE
+  PAUSED // plan cap hit, payment failed, or agency paused itself
+}
+
+enum WaMembershipRole {
+  OWNER
+  AGENT
+}
+
+model WaAgency {
+  id      String         @id @default(cuid())
+  name    String
+  slug    String         @unique
+  country String         @default("GB") // ISO 3166-1 alpha-2; more countries later, UK only at launch
+  status  WaAgencyStatus @default(ONBOARDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships   WaMembership[]
+  whatsapp      WaWhatsAppAccount?
+  kbDocuments   WaKbDocument[]
+  agentSettings WaAgentSettings?
+  contacts      WaContact[]
+  conversations WaConversation[]
+  leads         WaLead[]
+  handoffs      WaHandoff[]
+  subscription  WaSubscription?
+  usageCounters WaUsageCounter[]
+  auditLog      WaAuditLog[]
+  promptRuns    WaPromptRun[]
+
+  @@index([status])
+}
+
+// Links an existing Zenith Studio User to an agency workspace. One
+// account can own/staff multiple agencies (multi-branch on Pro) and can
+// separately be a regular service client - no relation to ServiceProject.
+model WaMembership {
+  id       String           @id @default(cuid())
+  agencyId String
+  userId   String
+  role     WaMembershipRole @default(OWNER)
+
+  createdAt DateTime @default(now())
+
+  agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([agencyId, userId])
+  @@index([userId])
+}
+
+enum WaProvider {
+  META
+  MOCK // tests / local dev only, never a real send
+}
+
+enum WaAccountStatus {
+  PENDING
+  CONNECTED
+  ERROR
+}
+
+// One number per agency at Starter/Growth (Pro allows up to 3 - enforced
+// by entitlement check, not a DB constraint, since the cap differs by plan).
+model WaWhatsAppAccount {
+  id                   String          @id @default(cuid())
+  agencyId             String          @unique
+  provider             WaProvider      @default(META)
+  wabaId               String?
+  phoneNumberId        String?         @unique
+  displayPhoneNumber   String?
+  encryptedAccessToken String? // see CLAUDE.md §7 - encryptSecret/decryptSecret, own env key
+  status               WaAccountStatus @default(PENDING)
+  lastError            String?
+  connectedAt          DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+enum WaKbDocumentKind {
+  PACKAGE // structured package form
+  TEXT // pasted free text
+  PDF
+  DOCX
+  CSV
+}
+
+model WaKbDocument {
+  id             String           @id @default(cuid())
+  agencyId       String
+  kind           WaKbDocumentKind
+  title          String
+  sourceFilename String?
+  rawText        String // extracted/pasted text, chunked into WaKbChunk below
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency WaAgency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  chunks WaKbChunk[]
+
+  @@index([agencyId])
+}
+
+// embedding dimension (1536) is a placeholder pending the embeddings
+// provider decision noted in CLAUDE.md - neither Groq nor Anthropic offers
+// text embeddings. Written/read via $executeRaw/$queryRaw, not the normal
+// Prisma client (Unsupported columns aren't selectable/writable normally).
+model WaKbChunk {
+  id         String                       @id @default(cuid())
+  agencyId   String
+  documentId String
+  content    String
+  embedding  Unsupported("vector(1536)")?
+  tokenCount Int?
+
+  createdAt DateTime @default(now())
+
+  document WaKbDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId])
+  @@index([documentId])
+}
+
+enum WaTone {
+  WARM
+  FORMAL
+}
+
+enum WaAwayMode {
+  AI_REPLIES // AI keeps answering outside business hours
+  AWAY_MESSAGE_ONLY
+}
+
+model WaAgentSettings {
+  id                    String     @id @default(cuid())
+  agencyId              String     @unique
+  agentName             String     @default("Assistant")
+  tone                  WaTone     @default(WARM)
+  emojiEnabled          Boolean    @default(true)
+  signOff               String?
+  languagesEnabled      String[]   @default(["en", "ur", "ur-Latn", "bn", "ar"]) // ur-Latn = Roman Urdu; gu (Gujarati) opt-in stretch
+  businessHours         Json? // per-day open/close, agency timezone
+  awayMode              WaAwayMode @default(AI_REPLIES)
+  awayMessage           String?
+  hotLeadRule           Json? // configurable: which captured fields / triggers count as "hot"
+  autoResumeIdleMinutes Int? // null = auto-resume off (default)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+model WaContact {
+  id       String  @id @default(cuid())
+  agencyId String
+  phone    String // E.164
+  name     String?
+  language String? // last-detected language code, not a fixed setting
+  optOut   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency        WaAgency         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  conversations WaConversation[]
+  leads         WaLead[]
+
+  @@unique([agencyId, phone])
+  @@index([agencyId])
+}
+
+enum WaConversationStatus {
+  AI
+  HUMAN
+  CLOSED
+}
+
+enum WaEntryPoint {
+  ORGANIC
+  CTWA_AD // Click-to-WhatsApp ad - 72h free window
+  FB_CTA // Facebook call-to-action button - 72h free window
+}
+
+model WaConversation {
+  id                    String               @id @default(cuid())
+  agencyId              String
+  contactId             String
+  status                WaConversationStatus @default(AI)
+  entryPoint            WaEntryPoint         @default(ORGANIC)
+  lastCustomerMessageAt DateTime?
+  aiPausedUntil         DateTime? // auto-resume timer, when autoResumeIdleMinutes is set
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency   WaAgency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  contact  WaContact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  messages WaMessage[]
+  leads    WaLead[]
+  handoffs WaHandoff[]
+
+  @@index([agencyId])
+  @@index([contactId])
+  @@index([status])
+}
+
+enum WaMessageDirection {
+  IN
+  OUT
+}
+
+enum WaMessageSender {
+  CUSTOMER
+  AI
+  HUMAN
+}
+
+enum WaMessageType {
+  TEXT
+  TEMPLATE
+  IMAGE
+  DOCUMENT
+  AUDIO
+  OTHER
+}
+
+model WaMessage {
+  id                String             @id @default(cuid())
+  conversationId    String
+  agencyId          String // denormalized for scoped queries without a join
+  direction         WaMessageDirection
+  sender            WaMessageSender
+  type              WaMessageType      @default(TEXT)
+  waMessageId       String?            @unique // Meta's message id - dedupe key on the inbound webhook
+  templateName      String?
+  body              String?
+  metaBillable      Boolean            @default(false) // counted separately from ai_replies in usage metering
+  costEstimateCents Int?
+
+  createdAt DateTime @default(now())
+
+  conversation WaConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId])
+  @@index([conversationId])
+}
+
+enum WaLeadStatus {
+  NEW
+  QUALIFIED
+  HOT
+  HANDED_OFF
+  WON
+  LOST
+}
+
+model WaLead {
+  id                String       @id @default(cuid())
+  agencyId          String
+  conversationId    String
+  contactId         String
+  status            WaLeadStatus @default(NEW)
+  travelDates       String?
+  travelers         Int?
+  budgetGbp         Int?
+  departureCity     String?
+  hotelTier         String?
+  packagePreference String?
+  notes             String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency       WaAgency       @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  conversation WaConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  contact      WaContact      @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  events       WaLeadEvent[]
+
+  @@index([agencyId])
+  @@index([status])
+}
+
+model WaLeadEvent {
+  id     String  @id @default(cuid())
+  leadId String
+  type   String // e.g. "status_changed", "note_added"
+  detail String?
+
+  createdAt DateTime @default(now())
+
+  lead WaLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+}
+
+enum WaHandoffTrigger {
+  AUTO
+  MANUAL
+}
+
+model WaHandoff {
+  id             String           @id @default(cuid())
+  agencyId       String
+  conversationId String
+  reason         String
+  triggeredBy    WaHandoffTrigger
+  takenByUserId  String?
+  startedAt      DateTime         @default(now())
+  resolvedAt     DateTime?
+
+  agency       WaAgency       @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  conversation WaConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId])
+  @@index([conversationId])
+}
+
+enum WaPlan {
+  STARTER
+  GROWTH
+  PRO
+}
+
+enum WaSubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
+model WaSubscription {
+  id               String               @id @default(cuid())
+  agencyId         String               @unique
+  whopMembershipId String?              @unique
+  whopPlanId       String?
+  plan             WaPlan               @default(STARTER)
+  status           WaSubscriptionStatus @default(ACTIVE)
+  currentPeriodEnd DateTime?
+  foundingOffer    Boolean              @default(false) // first 10 agencies, £9/mo locked
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+// One row per agency per billing period. "AI reply" = one free-form
+// message sent by the AI; owner alerts, template sends, and simulator
+// messages never increment this (see CLAUDE.md).
+model WaUsageCounter {
+  id               String   @id @default(cuid())
+  agencyId         String
+  periodStart      DateTime
+  periodEnd        DateTime
+  aiReplies        Int      @default(0)
+  templateMessages Int      @default(0)
+
+  agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@unique([agencyId, periodStart])
+  @@index([agencyId])
+}
+
+model WaAuditLog {
+  id          String  @id @default(cuid())
+  agencyId    String
+  actorUserId String?
+  action      String
+  detail      Json?
+
+  createdAt DateTime @default(now())
+
+  agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId])
+}
+
+enum WaPromptStage {
+  DRAFT
+  ESCALATION
+  GUARD
+}
+
+// Debug/cost log for every LLM call in the pipeline - what unit-economics.md
+// and the admin cost page are built from, not just for debugging.
+model WaPromptRun {
+  id                String        @id @default(cuid())
+  agencyId          String
+  conversationId    String?
+  messageId         String?
+  stage             WaPromptStage
+  model             String
+  promptVersion     String
+  inputTokens       Int?
+  outputTokens      Int?
+  latencyMs         Int?
+  costEstimateCents Int?
+  guardsTriggered   String[]      @default([])
+
+  createdAt DateTime @default(now())
+
+  agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId])
+  @@index([conversationId])
+}
+
+// Growth/Pro aren't launched yet - "Coming soon, join waitlist" on pricing.
+model WaWaitlistSignup {
+  id       String  @id @default(cuid())
+  email    String
+  plan     WaPlan
+  agencyId String?
+
+  createdAt DateTime @default(now())
+
+  @@index([plan])
 }
