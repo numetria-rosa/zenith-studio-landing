@@ -1,76 +1,92 @@
 # Unit economics — WhatsApp AI Agent for Umrah/Hajj agencies
 
-Numbers below are computed from verified provider pricing (2026-09-28),
-not the working assumption in the original spec. Re-run this calculation
-against real `WaPromptRun` data once agencies are live — this is a
-starting estimate, not a promise.
+Numbers below are computed from verified provider pricing (checked
+2026-09-28), not the original spec's working assumption. Re-run this
+calculation against real `WaPromptRun` data once agencies are live — this
+is a starting estimate, not a promise. FX used throughout: $1 ≈ £0.78,
+itself an estimate — use the real rate when this actually matters (e.g.
+setting prices), not for a rough monthly cost projection.
 
-## Per-reply LLM cost (Groq primary + Claude escalation)
+## Per-reply LLM cost (Groq draft + Claude escalation)
 
 Assumed shape of one reply: system prompt + retrieved KB chunks + recent
 conversation history ≈ 800 input tokens, ≈ 150 output tokens. Adjust once
 real `WaPromptRun.inputTokens`/`outputTokens` data exists.
 
-**Groq `openai/gpt-oss-20b`** (the draft step, handles the large majority
-of replies): $0.075/1M input, $0.30/1M output.
+**Every reply is drafted by Groq first.** Escalation to Claude is a
+*second* call on top of that draft, not a replacement for it — the
+earlier version of this document treated the two as mutually exclusive,
+which understated the true cost. Corrected:
 
 ```
-(800 / 1,000,000 * $0.075) + (150 / 1,000,000 * $0.30)
-= $0.00006 + $0.000045
-= $0.000105 per reply ≈ £0.00008 per reply
+Groq openai/gpt-oss-20b (every reply): $0.075/1M in, $0.30/1M out
+  = (800/1e6 * 0.075) + (150/1e6 * 0.30) = $0.000105
+
+Claude Haiku 4.5 (only the ~10% that escalate): $1/1M in, $5/1M out
+  = (800/1e6 * 1) + (150/1e6 * 5) = $0.00155
+
+Blended cost per reply = $0.000105 + (0.10 * $0.00155)
+                        = $0.000105 + $0.000155
+                        = $0.00026  (≈ £0.0002)
 ```
 
-**Claude Haiku 4.5** (escalation only, a minority of replies): $1/1M
-input, $5/1M output. Same token shape:
+The 90/10 draft/escalation split is a working assumption, not measured —
+tune it against real guard-failure/escalation rates once there's traffic.
 
-```
-(800 / 1,000,000 * $1) + (150 / 1,000,000 * $5)
-= $0.0008 + $0.00075
-= $0.00155 per escalated reply ≈ £0.0012
-```
+## Embeddings cost (Voyage AI)
 
-**Blended cost**, assuming (a working estimate, tune once real data
-exists) 90% draft-only / 10% escalated:
+`voyage-4-lite`, $0.02/1M tokens. **The first 200 million tokens are free
+for the whole account**, shared across every agency, not per-agency — so
+this cost is genuinely $0 until cumulative usage across all agencies
+crosses 200M tokens, which at the volumes below would take well over 100
+agency-months. Modelled here anyway, for when that changes:
 
-```
-0.9 * £0.00008 + 0.1 * £0.0012 = £0.00019 per reply
-```
+- KB content (ingestion + edits): ~20,000 tokens/agency/month, a
+  generous estimate for an agency actively updating packages.
+- Query embeddings: one short embed call per customer message that needs
+  KB retrieval, ~100 tokens each — roughly one per AI reply.
 
-This is roughly **10x cheaper than the original £0.002/reply planning
-assumption**, mostly because Groq's current gpt-oss pricing is well below
-what that assumption was likely modelled on (Llama models on Groq are no
-longer self-serve priced — see CLAUDE.md). Treat the original £0.002 as a
-conservative ceiling until real escalation-rate data replaces the 90/10
-assumption above.
+| Plan | Reply cap | Query tokens/mo | + KB tokens | Total tokens/mo | Cost (post-free-tier) |
+|---|---|---|---|---|---|
+| Starter | 1,000 | 100,000 | 20,000 | 120,000 | $0.0024 (£0.002) |
+| Growth | 4,000 | 400,000 | 20,000 | 420,000 | $0.0084 (£0.007) |
+| Pro | 10,000 | 1,000,000 | 20,000 | 1,020,000 | $0.0204 (£0.016) |
 
-## Margin at plan cap (LLM cost only — excludes Whop fees, see below)
+## Whop's fee — the real cost driver, not AI
 
-| Plan | Price/mo | AI reply cap | LLM cost at cap (blended) | Margin |
-|---|---|---|---|---|
-| Starter | £14 | 1,000 | £0.19 | 98.6% |
-| Growth | £29 | 4,000 | £0.76 | 97.4% |
-| Pro | £59 | 10,000 | £1.90 | 96.8% |
+Confirmed from Whop's own fee docs: base card processing is 2.7% + $0.30
+per transaction, +1.5% for a non-domestic card, +1% for currency
+conversion. **Not fully confirmed:** Whop's docs don't clearly separate a
+platform fee from the processing fee, and don't explicitly state whether
+these rates differ for recurring subscription charges vs. one-time
+charges, or whether the optional "tax & remittance" fee (2%, the service
+that makes Whop the UK VAT merchant of record) is mandatory once VAT
+collection is switched on for a product. **Verify the exact effective
+rate directly with Whop for a UK GBP recurring subscription before this
+number goes into real pricing decisions.**
 
-All three plans clear the spec's 50% margin floor by a very wide margin
-on LLM cost alone — this cost line is not the thing to worry about.
+Working estimate used below, until that's confirmed: **2.7% + 1.5%
+(non-domestic card) + 1% (currency conversion) + 2% (VAT remittance) =
+7.2%, plus a $0.30 (≈£0.23) fixed fee per charge.**
 
-## What actually eats into margin
+## All-in monthly cost and margin per client, at plan cap
 
-LLM inference is cheap enough here that it is not the binding cost.
-The real costs to model honestly:
+| Plan | Price/mo | AI cost (LLM+embed) | Whop fee (est.) | Total cost | Margin |
+|---|---|---|---|---|---|
+| Starter | £14.00 | £0.21 | £1.24 | £1.45 | **89.6%** |
+| Growth | £29.00 | £0.82 | £2.32 | £3.14 | **89.2%** |
+| Pro | £59.00 | £2.04 | £4.48 | £6.52 | **88.9%** |
+| Starter, founding offer | £9.00 | £0.21 | £0.88 | £1.09 | **87.9%** |
 
-- **Whop's payment processing fee** (percentage + fixed per transaction —
-  check Whop's current published rate before finalizing pricing copy; not
-  verified as part of this document).
-- **Embeddings** for KB ingestion and per-message retrieval — **no
-  provider chosen yet** (see CLAUDE.md's open decision). This is a
-  recurring cost with no verified number until that's settled; do not
-  assume it is negligible without checking.
-- **Support/ops time**, the real bottleneck for a solo founder at low
-  volume — not captured in a per-reply calculation at all.
+All comfortably clear the spec's 50% margin floor, even at the low end of
+the founding offer, and even using the higher, unverified Whop fee
+estimate. **The AI cost line barely matters** — Groq's current pricing is
+cheap enough that inference is a rounding error next to payment
+processing. The one number here worth nailing down before it's load-
+bearing for real pricing decisions is Whop's exact effective rate.
 
 ## Flag: any plan under 50% margin
 
-None currently are, on LLM cost. Re-run this whole document once the
-embeddings provider is chosen and once Whop's fee is factored in, and
-flag here explicitly if any plan drops under 50% at that point.
+None, at either the estimated or a conservative worse-case Whop fee.
+Re-run this once Whop's exact rate is confirmed and once real
+`WaPromptRun` data replaces the 90/10 escalation-rate assumption.
