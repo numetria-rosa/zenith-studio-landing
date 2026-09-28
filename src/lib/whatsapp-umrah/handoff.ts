@@ -4,11 +4,9 @@ import { db } from "@/lib/db";
    built in agent/pipeline.ts + inbound.ts; this is the manual side: the
    dashboard's "Take over"/"Resume AI" buttons, plus the idle auto-resume
    timer. Detecting a human reply sent from the agency's own WhatsApp
-   Business app (rather than through our dashboard) and auto-pausing on
-   that isn't built - Meta's message-echo webhook shape for this isn't
-   confirmed against their current docs yet (see CLAUDE.md: never guess).
-   Revisit once that's checked; "Take over" from the dashboard covers the
-   same outcome in the meantime. */
+   Business app is also built, separately, in
+   inbound.ts's processEchoedStaffMessage - confirmed against Meta's
+   smb_message_echoes webhook reference (2026-09-28), see CLAUDE.md. */
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 

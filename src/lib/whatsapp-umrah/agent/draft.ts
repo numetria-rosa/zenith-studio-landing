@@ -49,7 +49,7 @@ export type DraftInput = {
   conversationHistory: string; // formatted recent turns, may be empty
 };
 
-export type DraftResult = { ok: true; draft: AgentDraft; promptTokens?: number; completionTokens?: number } | { ok: false; error: string };
+export type DraftResult = { ok: true; draft: AgentDraft; promptTokens?: number; completionTokens?: number; latencyMs: number } | { ok: false; error: string; latencyMs: number };
 
 function apiKey(): string {
   const key = process.env.GROQ_API_KEY;
@@ -75,6 +75,7 @@ async function callGroq(userPrompt: string, model: string): Promise<Response> {
 
 export async function draftReply(input: DraftInput, model = DRAFT_MODEL): Promise<DraftResult> {
   const userPrompt = `KNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\nRECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}`;
+  const startedAt = Date.now();
 
   try {
     let res = await callGroq(userPrompt, model);
@@ -88,13 +89,13 @@ export async function draftReply(input: DraftInput, model = DRAFT_MODEL): Promis
       await new Promise((resolve) => setTimeout(resolve, waitMs));
       res = await callGroq(userPrompt, model);
     }
-    if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}` };
+    if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}`, latencyMs: Date.now() - startedAt };
     const body = (await res.json()) as { choices?: { message?: { content?: string } }[]; usage?: { prompt_tokens?: number; completion_tokens?: number } };
     const content = body.choices?.[0]?.message?.content;
-    if (!content) return { ok: false, error: "empty response from Groq" };
+    if (!content) return { ok: false, error: "empty response from Groq", latencyMs: Date.now() - startedAt };
     const parsed = JSON.parse(content) as AgentDraft;
-    return { ok: true, draft: parsed, promptTokens: body.usage?.prompt_tokens, completionTokens: body.usage?.completion_tokens };
+    return { ok: true, draft: parsed, promptTokens: body.usage?.prompt_tokens, completionTokens: body.usage?.completion_tokens, latencyMs: Date.now() - startedAt };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "Groq draft request failed" };
+    return { ok: false, error: err instanceof Error ? err.message : "Groq draft request failed", latencyMs: Date.now() - startedAt };
   }
 }

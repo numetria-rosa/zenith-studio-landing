@@ -111,6 +111,13 @@ infrastructure:
   fast, process async.
 - **Free entry points.** Customers arriving via a Click-to-WhatsApp ad get
   a 72h free window. Record `entry_point` on the conversation.
+- **`smb_message_echoes` webhook.** A separate subscribable field from
+  `messages` - fires when a staff member sends a message from the
+  agency's own WhatsApp Business app rather than through our API. Must
+  be subscribed on the WABA alongside `messages` for auto-pause-on-human-
+  reply to actually fire; confirmed shape at developers.facebook.com/
+  documentation/business-messaging/whatsapp/webhooks/reference/
+  smb_message_echoes.
 
 ## 3.1 Hard rules — in the system prompt AND enforced by a pre-send filter
 

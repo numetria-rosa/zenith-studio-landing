@@ -7,7 +7,7 @@ import { MetaCloudWhatsAppProvider } from "./provider/meta";
 import { withinCap, recordAiReply } from "./entitlements";
 import { isWithinBusinessHours } from "./hours";
 import type { WhatsAppProvider } from "./provider/types";
-import type { InboundTextMessage } from "./webhook";
+import type { EchoedStaffMessage, InboundTextMessage } from "./webhook";
 import type { Language } from "./agent/types";
 
 const META_TOKEN_ENV = "META_ACCESS_TOKEN_ENCRYPTION_KEY";
@@ -110,6 +110,23 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
 
   const result = await runAgentPipeline({ agencyId: agency.id, customerMessage: msg.body, conversationHistory });
 
+  if (result.promptRuns.length > 0) {
+    await db.waPromptRun.createMany({
+      data: result.promptRuns.map((run) => ({
+        agencyId: agency.id,
+        conversationId: conversation.id,
+        stage: run.stage,
+        model: run.model,
+        promptVersion: run.promptVersion,
+        inputTokens: run.inputTokens,
+        outputTokens: run.outputTokens,
+        latencyMs: run.latencyMs,
+        costEstimateCents: run.costEstimateCents,
+        guardsTriggered: run.guardsTriggered,
+      })),
+    });
+  }
+
   const accessToken = account.encryptedAccessToken ? decryptSecret(account.encryptedAccessToken, META_TOKEN_ENV) : null;
   const provider = providerOverride ?? (accessToken ? new MetaCloudWhatsAppProvider(accessToken) : null);
   const outboundText = result.action === "reply" ? result.text : result.holdingMessage;
@@ -156,5 +173,40 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
       customerPhone: msg.from,
       leadSummary: `Language: ${result.language as Language}`,
     });
+  }
+}
+
+/** A staff member replied to a customer from the agency's own WhatsApp
+    Business app (not our dashboard) - see webhook.ts's
+    extractEchoedStaffMessages. Stores the message in the thread (Meta's
+    own docs require digesting these into the conversation history) and
+    auto-pauses the AI, same outcome as clicking "Take over" but without
+    a userId, since Meta doesn't tell us which staff member sent it. */
+export async function processEchoedStaffMessage(echo: EchoedStaffMessage): Promise<void> {
+  const existing = await db.waMessage.findUnique({ where: { waMessageId: echo.waMessageId }, select: { id: true } });
+  if (existing) return;
+
+  const account = await db.waWhatsAppAccount.findFirst({ where: { phoneNumberId: echo.phoneNumberId, status: "CONNECTED" }, select: { agencyId: true } });
+  if (!account) return;
+
+  const contact = await db.waContact.findUnique({ where: { agencyId_phone: { agencyId: account.agencyId, phone: echo.to } }, select: { id: true } });
+  if (!contact) return; // a staff-initiated message to someone with no existing conversation - nothing here to pause
+
+  const conversation = await db.waConversation.findFirst({
+    where: { agencyId: account.agencyId, contactId: contact.id, status: { not: "CLOSED" } },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, status: true },
+  });
+  if (!conversation) return;
+
+  await db.waMessage.create({
+    data: { conversationId: conversation.id, agencyId: account.agencyId, direction: "OUT", sender: "HUMAN", type: "TEXT", waMessageId: echo.waMessageId, body: echo.body },
+  });
+
+  if (conversation.status === "AI") {
+    await db.$transaction([
+      db.waConversation.update({ where: { id: conversation.id }, data: { status: "HUMAN" } }),
+      db.waHandoff.create({ data: { agencyId: account.agencyId, conversationId: conversation.id, reason: "staff replied via the WhatsApp Business app", triggeredBy: "AUTO" } }),
+    ]);
   }
 }

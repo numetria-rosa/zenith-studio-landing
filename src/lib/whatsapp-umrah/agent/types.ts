@@ -62,6 +62,35 @@ export type AgentDraft = {
 
 export type GuardFailure = { guard: string; detail: string };
 
+/** One real LLM call worth logging to WaPromptRun - see pipeline.ts and
+    CLAUDE.md ("log everything needed to debug: prompt version, model,
+    tokens, latency, cost estimate, guards triggered"). Guard checks
+    themselves are pure functions with no LLM call, so only DRAFT
+    (Groq) and ESCALATION (Claude) stages ever appear here - there is no
+    separate GUARD-stage LLM call in this pipeline's design, despite
+    WaPromptStage having a GUARD value for a future guard that does call
+    an LLM (e.g. a dedicated fiqh/visa classifier). */
+export type PromptRunRecord = {
+  stage: "DRAFT" | "ESCALATION";
+  model: string;
+  promptVersion: string;
+  inputTokens?: number;
+  outputTokens?: number;
+  latencyMs?: number;
+  costEstimateCents?: number;
+  guardsTriggered: string[];
+  error?: string;
+};
+
 export type PipelineResult =
-  | { action: "reply"; text: string; language: Language; intent: Intent; leadFields: LeadFields | null; model: string; guardsTriggered: string[] }
-  | { action: "handoff"; reason: string; holdingMessage: string; language: Language; intent: Intent | null; leadFields: LeadFields | null; guardsTriggered: string[] };
+  | { action: "reply"; text: string; language: Language; intent: Intent; leadFields: LeadFields | null; model: string; guardsTriggered: string[]; promptRuns: PromptRunRecord[] }
+  | {
+      action: "handoff";
+      reason: string;
+      holdingMessage: string;
+      language: Language;
+      intent: Intent | null;
+      leadFields: LeadFields | null;
+      guardsTriggered: string[];
+      promptRuns: PromptRunRecord[];
+    };

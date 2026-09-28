@@ -5,6 +5,8 @@
    enforces the same rules again after the model responds, since a system
    prompt alone is not a safety mechanism. */
 
+export const DRAFT_SYSTEM_PROMPT_VERSION = "draft-system-v1";
+
 export const DRAFT_SYSTEM_PROMPT_V1 = `You are the virtual assistant for a UK Umrah/Hajj travel agency, replying to a customer on WhatsApp. You are not a general-purpose assistant.
 
 RULES, NO EXCEPTIONS:

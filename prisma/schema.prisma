@@ -1951,7 +1951,11 @@ model WaPromptRun {
   inputTokens       Int?
   outputTokens      Int?
   latencyMs         Int?
-  costEstimateCents Int?
+  // Float, not Int: a real call costs a fraction of a cent (see
+  // docs/unit-economics.md) - Int cents would round every row to 0,
+  // defeating this table's whole point of validating that document
+  // against real traffic.
+  costEstimateCents Float?
   guardsTriggered   String[]      @default([])
 
   createdAt DateTime @default(now())

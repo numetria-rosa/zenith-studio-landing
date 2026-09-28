@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createHmac } from "node:crypto";
-import { extractInboundTextMessages, verifyMetaSignature } from "./webhook";
+import { extractEchoedStaffMessages, extractInboundTextMessages, verifyMetaSignature } from "./webhook";
 
 const REAL_EXAMPLE_PAYLOAD = {
   object: "whatsapp_business_account",
@@ -75,5 +75,49 @@ describe("extractInboundTextMessages", () => {
   it("handles a contact with no matching profile gracefully", () => {
     const payload = { entry: [{ changes: [{ field: "messages", value: { metadata: { phone_number_id: "1" }, contacts: [], messages: [{ from: "1", id: "1", timestamp: "1", type: "text", text: { body: "hi" } }] } }] }] };
     expect(extractInboundTextMessages(payload)[0].contactName).toBeNull();
+  });
+});
+
+describe("extractEchoedStaffMessages", () => {
+  // Real example payload from developers.facebook.com's smb_message_echoes reference.
+  const REAL_ECHO_PAYLOAD = {
+    object: "whatsapp_business_account",
+    entry: [
+      {
+        id: "102290129340398",
+        changes: [
+          {
+            value: {
+              messaging_product: "whatsapp",
+              metadata: { display_phone_number: "15550783881", phone_number_id: "106540352242922" },
+              message_echoes: [{ from: "15550783881", to: "16505551234", id: "wamid.echo123", timestamp: "1739321024", type: "text", text: { body: "Here's the info you requested!" } }],
+            },
+            field: "smb_message_echoes",
+          },
+        ],
+      },
+    ],
+  };
+
+  it("parses a real staff-app echo payload", () => {
+    expect(extractEchoedStaffMessages(REAL_ECHO_PAYLOAD)).toEqual([
+      { phoneNumberId: "106540352242922", to: "16505551234", waMessageId: "wamid.echo123", timestamp: "1739321024", body: "Here's the info you requested!" },
+    ]);
+  });
+
+  it("does not pick up a staff echo from a regular inbound-message payload, or vice versa", () => {
+    const inboundOnly = { entry: [{ changes: [{ field: "messages", value: { metadata: { phone_number_id: "1" }, messages: [{ from: "1", id: "1", timestamp: "1", type: "text", text: { body: "hi" } }] } }] }] };
+    expect(extractEchoedStaffMessages(inboundOnly)).toEqual([]);
+    expect(extractInboundTextMessages(REAL_ECHO_PAYLOAD)).toEqual([]);
+  });
+
+  it("skips revoke/edit echo types (v1 handles text only)", () => {
+    const payload = { entry: [{ changes: [{ field: "smb_message_echoes", value: { metadata: { phone_number_id: "1" }, message_echoes: [{ from: "1", to: "2", id: "1", timestamp: "1", type: "revoke", revoke: { original_message_id: "x" } }] } }] }] };
+    expect(extractEchoedStaffMessages(payload)).toEqual([]);
+  });
+
+  it("never throws on malformed shapes", () => {
+    expect(extractEchoedStaffMessages(null)).toEqual([]);
+    expect(extractEchoedStaffMessages({})).toEqual([]);
   });
 });

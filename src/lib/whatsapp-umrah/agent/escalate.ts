@@ -55,6 +55,7 @@ const AGENT_DRAFT_TOOL = {
 export async function escalateDraft(input: DraftInput, previousFailures: GuardFailure[]): Promise<DraftResult> {
   const userPrompt = `KNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\nRECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}\n\nA FIRST ATTEMPT AT THIS FAILED THESE CHECKS - do not repeat the same mistake:\n${previousFailures.map((f) => `- ${f.guard}: ${f.detail}`).join("\n")}`;
 
+  const startedAt = Date.now();
   try {
     const res = await fetch(`${ANTHROPIC_API_BASE}/messages`, {
       method: "POST",
@@ -68,12 +69,12 @@ export async function escalateDraft(input: DraftInput, previousFailures: GuardFa
         messages: [{ role: "user", content: userPrompt }],
       }),
     });
-    if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}` };
+    if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}`, latencyMs: Date.now() - startedAt };
     const body = (await res.json()) as { content?: { type: string; input?: unknown }[]; usage?: { input_tokens?: number; output_tokens?: number } };
     const toolUse = body.content?.find((b) => b.type === "tool_use");
-    if (!toolUse?.input) return { ok: false, error: "Claude did not return a tool_use block" };
-    return { ok: true, draft: toolUse.input as AgentDraft, promptTokens: body.usage?.input_tokens, completionTokens: body.usage?.output_tokens };
+    if (!toolUse?.input) return { ok: false, error: "Claude did not return a tool_use block", latencyMs: Date.now() - startedAt };
+    return { ok: true, draft: toolUse.input as AgentDraft, promptTokens: body.usage?.input_tokens, completionTokens: body.usage?.output_tokens, latencyMs: Date.now() - startedAt };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "Claude escalation request failed" };
+    return { ok: false, error: err instanceof Error ? err.message : "Claude escalation request failed", latencyMs: Date.now() - startedAt };
   }
 }

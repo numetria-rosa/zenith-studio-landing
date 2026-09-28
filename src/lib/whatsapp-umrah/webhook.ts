@@ -65,3 +65,48 @@ export function extractInboundTextMessages(payload: unknown): InboundTextMessage
   }
   return out;
 }
+
+export type EchoedStaffMessage = {
+  phoneNumberId: string;
+  to: string; // the customer's WhatsApp number this staff reply went to
+  waMessageId: string;
+  timestamp: string;
+  body: string;
+};
+
+/** Pulls every TEXT message a staff member sent from the agency's own
+    WhatsApp Business app (or a linked device) out of one webhook POST -
+    the smb_message_echoes field, confirmed against developers.facebook.com/
+    documentation/business-messaging/whatsapp/webhooks/reference/
+    smb_message_echoes (2026-09-28). This is what lets the agent
+    auto-pause when a human replies outside our own dashboard - see
+    handoff.ts. Revoke/edit echo types and non-text types are skipped,
+    same "text only" MVP scope as extractInboundTextMessages. */
+export function extractEchoedStaffMessages(payload: unknown): EchoedStaffMessage[] {
+  const out: EchoedStaffMessage[] = [];
+  const entries = (payload as { entry?: unknown[] })?.entry;
+  if (!Array.isArray(entries)) return out;
+
+  for (const entry of entries) {
+    const changes = (entry as { changes?: unknown[] })?.changes;
+    if (!Array.isArray(changes)) continue;
+    for (const change of changes) {
+      const value = (change as { value?: Record<string, unknown> })?.value;
+      if (!value || (change as { field?: string }).field !== "smb_message_echoes") continue;
+      const phoneNumberId = (value.metadata as { phone_number_id?: string } | undefined)?.phone_number_id;
+      const echoes = value.message_echoes as Record<string, unknown>[] | undefined;
+      if (!phoneNumberId || !Array.isArray(echoes)) continue;
+
+      for (const echo of echoes) {
+        if (echo.type !== "text") continue;
+        const body = (echo.text as { body?: string } | undefined)?.body;
+        const to = echo.to as string | undefined;
+        const id = echo.id as string | undefined;
+        const timestamp = echo.timestamp as string | undefined;
+        if (!body || !to || !id || !timestamp) continue;
+        out.push({ phoneNumberId, to, waMessageId: id, timestamp, body });
+      }
+    }
+  }
+  return out;
+}
