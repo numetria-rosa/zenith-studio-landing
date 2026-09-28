@@ -1695,7 +1695,7 @@ model WaAgentSettings {
   tone                  WaTone     @default(WARM)
   emojiEnabled          Boolean    @default(true)
   signOff               String?
-  languagesEnabled      String[]   @default(["en", "ur", "ur-Latn", "bn", "ar"]) // ur-Latn = Roman Urdu; gu (Gujarati) opt-in stretch
+  languagesEnabled      String[]   @default(["en", "ar", "tr", "ur"]) // English, Arabic, Turkish, Urdu (standard script) - narrowed 2026-09-28, see CLAUDE.md
   businessHours         Json? // per-day open/close, agency timezone
   awayMode              WaAwayMode @default(AI_REPLIES)
   awayMessage           String?

@@ -9,8 +9,8 @@ const TOP_K = 6;
 /** Embeds the customer's message as a "query" (not "document" - see
     voyage.ts) and returns the closest KB chunks for this agency by
     cosine distance (pgvector's <=> operator). The message is normalized
-    toward English first - see normalize.ts - since retrieval quality for
-    Roman Urdu/Gujarati isn't well-established for any embedding model,
+    toward English first - see normalize.ts - since cross-lingual
+    retrieval quality isn't well-established for any embedding model,
     and this agency's KB is itself stored in whatever language it was
     written in (usually English), so aligning the query to that gives
     retrieval an easier job than hoping the embedding space aligns

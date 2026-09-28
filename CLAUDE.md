@@ -55,10 +55,11 @@ infrastructure:
 - Data protection is **UK GDPR**, not PDPL. PECR applies to marketing
   sends specifically (not to transactional/service replies inside an open
   WhatsApp conversation).
-- Customer languages: English, Urdu, **Roman Urdu** (Urdu typed in Latin
-  letters — this is what many customers actually type), Bengali, Arabic,
-  Gujarati as a stretch goal. Detect and reply in whatever the customer
-  used for *that message*, not a conversation-level setting.
+- Customer languages: English, Arabic, Turkish, Urdu (standard script —
+  no Roman Urdu, Bengali, or Gujarati; the user narrowed this list
+  2026-09-28, four languages is enough). Detect and reply in whatever
+  the customer used for *that message*, not a conversation-level
+  setting.
 - UK agencies are ATOL-protected. The agent may relay an agency's own ATOL
   number if it's in the knowledge base. It never claims protection itself
   and never states or implies ATOL coverage that isn't explicitly in the
