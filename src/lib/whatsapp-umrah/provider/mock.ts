@@ -11,7 +11,7 @@ export class MockWhatsAppProvider implements WhatsAppProvider {
     return { ok: true as const, waMessageId: `mock-${this.sent.length}` };
   }
 
-  async sendTemplate(input: { phoneNumberId: string; to: string; templateName: string }) {
+  async sendTemplate(input: { phoneNumberId: string; to: string; templateName: string; languageCode: string; params?: string[] }) {
     this.sent.push({ kind: "template", to: input.to, templateName: input.templateName });
     return { ok: true as const, waMessageId: `mock-${this.sent.length}` };
   }

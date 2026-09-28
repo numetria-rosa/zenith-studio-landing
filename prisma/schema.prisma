@@ -1657,16 +1657,17 @@ model WaKbDocument {
   @@index([agencyId])
 }
 
-// embedding dimension (1536) is a placeholder pending the embeddings
-// provider decision noted in CLAUDE.md - neither Groq nor Anthropic offers
-// text embeddings. Written/read via $executeRaw/$queryRaw, not the normal
-// Prisma client (Unsupported columns aren't selectable/writable normally).
+// 1024 dims = Voyage voyage-4-lite's actual output size (confirmed via a
+// real API call, not assumed - voyage-multilingual-2 also returns 1024,
+// so no change needed if we switch between the two). Written/read via
+// $executeRaw/$queryRaw, not the normal Prisma client (Unsupported
+// columns aren't selectable/writable through the generated client).
 model WaKbChunk {
   id         String                       @id @default(cuid())
   agencyId   String
   documentId String
   content    String
-  embedding  Unsupported("vector(1536)")?
+  embedding  Unsupported("vector(1024)")?
   tokenCount Int?
 
   createdAt DateTime @default(now())
