@@ -4,21 +4,19 @@ import { sendPlainEmail } from "@/lib/outreach-mail";
 import { runAgentPipeline } from "./agent/pipeline";
 import { upsertLeadFromDraft, notifyOwnerOfHotLead } from "./leads";
 import { MetaCloudWhatsAppProvider } from "./provider/meta";
+import { withinCap, recordAiReply } from "./entitlements";
+import { isWithinBusinessHours } from "./hours";
 import type { WhatsAppProvider } from "./provider/types";
 import type { InboundTextMessage } from "./webhook";
 import type { Language } from "./agent/types";
 
 const META_TOKEN_ENV = "META_ACCESS_TOKEN_ENCRYPTION_KEY";
 
-/* Only Starter is launched (see CLAUDE.md) - Growth/Pro are waitlist-only,
-   so there's no real cap to look up for them yet. Revisit as a per-plan
-   map once WaSubscription.plan can actually be GROWTH/PRO in practice. */
-const STARTER_MONTHLY_CAP = 1000;
-
-function billingPeriodStart(): Date {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-}
+// Every agency is UK-based today (see CLAUDE.md - UK-only launch). One
+// timezone assumption, not a per-agency setting yet: add
+// WaAgentSettings.timezone if/when agencies outside UK time are onboarded.
+const DEFAULT_TIMEZONE = "Europe/London";
+const DEFAULT_AWAY_MESSAGE = "Thanks for your message. We're outside our usual hours right now, but we'll reply as soon as we're back.";
 
 /** One inbound text message, start to finish: dedupe, opt-out, load
     everything, run the pipeline if the AI should speak, send, store,
@@ -37,7 +35,13 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
 
   const agency = await db.waAgency.findUnique({
     where: { id: account.agencyId },
-    select: { id: true, name: true, status: true, memberships: { where: { role: "OWNER" }, take: 1, select: { user: { select: { email: true } } } } },
+    select: {
+      id: true,
+      name: true,
+      status: true,
+      memberships: { where: { role: "OWNER" }, take: 1, select: { user: { select: { email: true } } } },
+      agentSettings: { select: { businessHours: true, awayMode: true, awayMessage: true } },
+    },
   });
   if (!agency || agency.status !== "LIVE") return; // onboarding/paused agencies don't get live replies yet
 
@@ -68,14 +72,29 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
 
   if (conversation.status === "HUMAN") return; // a person already took over - AI stays silent, per spec
 
-  const periodStart = billingPeriodStart();
-  const usage = await db.waUsageCounter.findUnique({ where: { agencyId_periodStart: { agencyId: agency.id, periodStart } }, select: { aiReplies: true } });
   const ownerEmail = agency.memberships[0]?.user.email;
-  if ((usage?.aiReplies ?? 0) >= STARTER_MONTHLY_CAP) {
+  const cap = await withinCap(agency.id);
+  if (!cap.withinCap) {
     if (ownerEmail) {
-      await sendPlainEmail(ownerEmail, `${agency.name}: monthly AI reply limit reached`, `Your WhatsApp agent has used its ${STARTER_MONTHLY_CAP} AI replies for this month, so it's paused until the new month starts. New messages are still saved to your dashboard.`);
+      await sendPlainEmail(ownerEmail, `${agency.name}: monthly AI reply limit reached`, `Your WhatsApp agent has used its ${cap.cap} AI replies for this month, so it's paused until the new month starts. New messages are still saved to your dashboard.`);
     }
     return;
+  }
+
+  const settings = agency.agentSettings;
+  const outsideHours = !isWithinBusinessHours(settings?.businessHours ?? null, DEFAULT_TIMEZONE);
+  if (outsideHours && settings?.awayMode === "AWAY_MESSAGE_ONLY") {
+    const awayText = settings.awayMessage?.trim() || DEFAULT_AWAY_MESSAGE;
+    const accessToken = account.encryptedAccessToken ? decryptSecret(account.encryptedAccessToken, META_TOKEN_ENV) : null;
+    const provider = providerOverride ?? (accessToken ? new MetaCloudWhatsAppProvider(accessToken) : null);
+    if (provider) {
+      const sendResult = await provider.sendText({ phoneNumberId: msg.phoneNumberId, to: msg.from, body: awayText });
+      await db.waMessage.create({
+        data: { conversationId: conversation.id, agencyId: agency.id, direction: "OUT", sender: "AI", type: "TEXT", waMessageId: sendResult.ok ? sendResult.waMessageId : null, body: awayText, metaBillable: sendResult.ok },
+      });
+      if (sendResult.ok) await recordAiReply(agency.id);
+    }
+    return; // away-message-only mode never runs the pipeline - saves the LLM call entirely, not just skips a reply
   }
 
   const history = await db.waMessage.findMany({
@@ -109,13 +128,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
         metaBillable: sendResult.ok, // billable service-message send from 1 Oct 2026, see CLAUDE.md
       },
     });
-    if (sendResult.ok) {
-      await db.waUsageCounter.upsert({
-        where: { agencyId_periodStart: { agencyId: agency.id, periodStart } },
-        create: { agencyId: agency.id, periodStart, periodEnd: new Date(Date.UTC(periodStart.getUTCFullYear(), periodStart.getUTCMonth() + 1, 0)), aiReplies: 1 },
-        update: { aiReplies: { increment: 1 } },
-      });
-    }
+    if (sendResult.ok) await recordAiReply(agency.id);
   }
 
   if (result.action === "handoff") {
