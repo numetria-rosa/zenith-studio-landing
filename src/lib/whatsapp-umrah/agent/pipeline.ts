@@ -43,13 +43,14 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
 
   // Pre-guards: cheap, no LLM.
   if (isOptOutMessage(input.customerMessage)) {
-    return { action: "handoff", reason: "customer opted out", holdingMessage: "", language: fallbackLanguage, guardsTriggered: ["opt_out"] };
+    return { action: "handoff", reason: "customer opted out", holdingMessage: "", language: fallbackLanguage, intent: null, leadFields: null, guardsTriggered: ["opt_out"] };
   }
   if (containsSensitiveData(input.customerMessage)) {
     return {
       action: "reply",
       text: SENSITIVE_DATA_REPLIES[fallbackLanguage],
       language: fallbackLanguage,
+      intent: "other",
       leadFields: null,
       model: "pre-guard",
       guardsTriggered: ["sensitive_data"],
@@ -62,7 +63,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
 
   const first = await draftReply(draftInput);
   if (!first.ok) {
-    return handoffResult("draft failed: " + first.error, fallbackLanguage, ["draft_error"]);
+    return handoffResult("draft failed: " + first.error, fallbackLanguage, ["draft_error"], null);
   }
   const firstFailures = runGuards(first.draft, kbContext);
   if (firstFailures.length === 0) {
@@ -71,7 +72,11 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
 
   const escalated = await escalateDraft(draftInput, firstFailures);
   if (!escalated.ok) {
-    return handoffResult("escalation failed: " + escalated.error, first.draft.language, guardNames(firstFailures));
+    // Groq's draft itself still carries real lead info even though it
+    // failed a guard (e.g. a booking request that correctly hands off but
+    // still stated the customer's budget/dates) - see leads.ts on why
+    // this must not be thrown away.
+    return handoffResult("escalation failed: " + escalated.error, first.draft.language, guardNames(firstFailures), first.draft);
   }
   const secondFailures = runGuards(escalated.draft, kbContext);
   if (secondFailures.length === 0) {
@@ -81,7 +86,8 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   return handoffResult(
     escalated.draft.handoffReason || secondFailures.map((f) => f.detail).join("; "),
     escalated.draft.language,
-    [...guardNames(firstFailures), ...guardNames(secondFailures)]
+    [...guardNames(firstFailures), ...guardNames(secondFailures)],
+    escalated.draft
   );
 }
 
@@ -90,9 +96,17 @@ function guardNames(failures: GuardFailure[]): string[] {
 }
 
 function replyResult(draft: AgentDraft, model: string, guardsTriggered: string[]): PipelineResult {
-  return { action: "reply", text: draft.reply, language: draft.language, leadFields: draft.leadFields, model, guardsTriggered };
+  return { action: "reply", text: draft.reply, language: draft.language, intent: draft.intent, leadFields: draft.leadFields, model, guardsTriggered };
 }
 
-function handoffResult(reason: string, language: Language, guardsTriggered: string[]): PipelineResult {
-  return { action: "handoff", reason, holdingMessage: HOLDING_MESSAGES[language], language, guardsTriggered };
+function handoffResult(reason: string, language: Language, guardsTriggered: string[], draft: AgentDraft | null): PipelineResult {
+  return {
+    action: "handoff",
+    reason,
+    holdingMessage: HOLDING_MESSAGES[language],
+    language,
+    intent: draft?.intent ?? null,
+    leadFields: draft?.leadFields ?? null,
+    guardsTriggered,
+  };
 }

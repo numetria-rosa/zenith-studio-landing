@@ -63,5 +63,5 @@ export type AgentDraft = {
 export type GuardFailure = { guard: string; detail: string };
 
 export type PipelineResult =
-  | { action: "reply"; text: string; language: Language; leadFields: LeadFields | null; model: string; guardsTriggered: string[] }
-  | { action: "handoff"; reason: string; holdingMessage: string; language: Language; guardsTriggered: string[] };
+  | { action: "reply"; text: string; language: Language; intent: Intent; leadFields: LeadFields | null; model: string; guardsTriggered: string[] }
+  | { action: "handoff"; reason: string; holdingMessage: string; language: Language; intent: Intent | null; leadFields: LeadFields | null; guardsTriggered: string[] };
