@@ -1,0 +1,363 @@
+/* WhatsApp Umrah dashboard tokens - same palette/shape/effect variables
+   as src/app/services/dashboard/[clientId]/console.module.css, scoped to
+   .waConsole rather than reusing that class directly since these are two
+   separate route trees. This is the intentional "reuse the design system,
+   not a literal port" split CLAUDE.md calls for: same tokens, same
+   Icon/ui.tsx components (imported directly, not copied), but this
+   product's own layout/screens. */
+
+.waConsole {
+  color-scheme: dark;
+  --zc-void: #05060a;
+  --zc-panel: #0a0b10;
+  --zc-panel-2: #0e1016;
+  --zc-raise: #13161e;
+  --zc-step: #0f1117;
+  --zc-node: #0c0e14;
+  --zc-line: rgba(255, 255, 255, 0.08);
+  --zc-line-2: rgba(255, 255, 255, 0.14);
+  --zc-text: #f5f6f8;
+  --zc-text-2: #c9ccd4;
+  --zc-muted: #a9aeba;
+  --zc-dim: #7d8392;
+  --zc-run: #5cc8ff;
+  --zc-run-text: #9bddff;
+  --zc-need: #f5b83d;
+  --zc-need-text: #ffd27a;
+  --zc-done: #3ddc97;
+  --zc-done-text: #7ff0bd;
+  --zc-error: #ff5c7a;
+  --zc-error-text: #ff9bae;
+  --zc-action: #3ddc97;
+  --zc-action-text: #04140c;
+  --zc-orchestrator: #8b5cf6;
+  --zc-bubble-user: #2f6bff;
+  --zc-sans: var(--font-geist-sans, "Geist", system-ui, -apple-system, "Segoe UI", sans-serif);
+  --zc-mono: var(--font-geist-mono, "Geist Mono", ui-monospace, Menlo, monospace);
+  --zc-r-pill: 999px;
+  --zc-r-card: 24px;
+  --zc-r-tile: 22px;
+  --zc-r-step: 18px;
+  --zc-r-icon: 13px;
+  --zc-r-chip: 8px;
+  --zc-sidebar: 240px;
+  --zc-gap: 20px;
+  --zc-card-hl: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --zc-glow-action: 0 10px 30px rgba(61, 220, 151, 0.25);
+
+  min-height: 100vh;
+  background: var(--zc-void);
+  color: var(--zc-text);
+  font-family: var(--zc-sans);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.waConsole * {
+  box-sizing: border-box;
+}
+.waConsole button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: var(--zc-sidebar) 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  border-right: 1px solid var(--zc-line);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.brand {
+  font-weight: 600;
+  font-size: 15px;
+  padding: 0 10px 20px;
+}
+.brandSub {
+  display: block;
+  font-size: 12px;
+  color: var(--zc-muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--zc-r-chip);
+  color: var(--zc-muted);
+  text-decoration: none;
+  font-size: 14px;
+}
+.navLink:hover {
+  color: var(--zc-text);
+  background: var(--zc-panel-2);
+}
+.navLinkActive {
+  color: var(--zc-text);
+  background: var(--zc-raise);
+}
+.navBadge {
+  margin-left: auto;
+  background: var(--zc-need);
+  color: var(--zc-action-text);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.main {
+  padding: 28px 32px 60px;
+  max-width: 1100px;
+}
+.pageTitle {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 4px;
+}
+.pageDesc {
+  color: var(--zc-muted);
+  font-size: 14px;
+  margin: 0 0 28px;
+}
+
+.card {
+  background: var(--zc-panel);
+  border: 1px solid var(--zc-line);
+  border-radius: var(--zc-r-card);
+  box-shadow: var(--zc-card-hl);
+  padding: 22px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--zc-gap);
+}
+
+.formRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--zc-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.input,
+.select,
+.textarea {
+  background: var(--zc-node);
+  border: 1px solid var(--zc-line-2);
+  border-radius: 10px;
+  color: var(--zc-text);
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 14px;
+  width: 100%;
+}
+.textarea {
+  min-height: 140px;
+  resize: vertical;
+  font-family: var(--zc-mono);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th {
+  text-align: left;
+  color: var(--zc-muted);
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--zc-line);
+}
+.table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--zc-line);
+}
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.badgeHot {
+  background: rgba(255, 92, 122, 0.12);
+  color: var(--zc-error-text);
+}
+.badgeQualified {
+  background: rgba(92, 200, 255, 0.12);
+  color: var(--zc-run-text);
+}
+.badgeNew {
+  background: rgba(169, 174, 186, 0.12);
+  color: var(--zc-muted);
+}
+.badgeAi {
+  background: rgba(61, 220, 151, 0.12);
+  color: var(--zc-done-text);
+}
+.badgeHuman {
+  background: rgba(139, 92, 246, 0.14);
+  color: #c7b0ff;
+}
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.kpi {
+  background: var(--zc-panel);
+  border: 1px solid var(--zc-line);
+  border-radius: var(--zc-r-tile);
+  padding: 16px;
+}
+.kpiLabel {
+  font-size: 12px;
+  color: var(--zc-muted);
+}
+.kpiValue {
+  font-size: 26px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.checklistItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--zc-line);
+}
+.checklistItem:last-child {
+  border-bottom: none;
+}
+.checkDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--zc-line-2);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.checkDotDone {
+  border-color: var(--zc-done);
+  background: rgba(61, 220, 151, 0.12);
+  color: var(--zc-done);
+}
+
+.chatWrap {
+  display: flex;
+  flex-direction: column;
+  height: 65vh;
+  background: var(--zc-node);
+  border: 1px solid var(--zc-line-2);
+  border-radius: var(--zc-r-card);
+  overflow: hidden;
+}
+.chatMessages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bubble {
+  max-width: 72%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.bubbleUser {
+  align-self: flex-end;
+  background: var(--zc-bubble-user);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.bubbleAi {
+  align-self: flex-start;
+  background: var(--zc-raise);
+  border-bottom-left-radius: 4px;
+}
+.bubbleMeta {
+  font-size: 11px;
+  color: var(--zc-dim);
+  margin-top: 4px;
+}
+.chatComposer {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--zc-line);
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: var(--zc-gap);
+  align-items: start;
+}
+.convList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.convItem {
+  display: block;
+  text-align: left;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+}
+.convItem:hover {
+  background: var(--zc-panel-2);
+}
+.convItemActive {
+  background: var(--zc-raise);
+  border-color: var(--zc-line-2);
+}
+.convName {
+  font-size: 14px;
+  font-weight: 500;
+}
+.convMeta {
+  font-size: 12px;
+  color: var(--zc-muted);
+  margin-top: 2px;
+}
