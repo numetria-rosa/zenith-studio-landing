@@ -28,6 +28,12 @@ export const HQ_INCLUDE = {
   mailConnections: { orderBy: { createdAt: "asc" as const } },
   inboxDrafts: { orderBy: { createdAt: "desc" as const } },
   insurancePolicies: { orderBy: { renewalDate: "asc" as const } },
+  transactions: {
+    orderBy: { closingDate: "asc" as const },
+    include: { deadlines: { orderBy: { order: "asc" as const } }, documents: { orderBy: { order: "asc" as const } } },
+  },
+  dormantContacts: { orderBy: { createdAt: "desc" as const } },
+  textingRegistration: { select: { status: true, submittedAt: true, lastError: true } },
 } as const;
 
 export type HqProjectRow = NonNullable<Awaited<ReturnType<typeof listServiceProjectsForHq>>>[number];
