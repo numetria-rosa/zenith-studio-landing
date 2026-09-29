@@ -39,6 +39,8 @@ function dependencyTree(pkg: string): string[] {
 const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/**": dependencyTree("@signalwire/compatibility-api"),
+    // The AI Engineering course app reads its content (lessons, the agent kit) from disk at request time.
+    "/lab/ai-engineering/**": ["./content/ai-engineering/**/*"],
   },
   // Functions sat right at Vercel's 250 MB limit. Nothing here is loaded at
   // runtime: SignalWire only uses dist/index.node.(m)js (its maps are 24.5 MB,

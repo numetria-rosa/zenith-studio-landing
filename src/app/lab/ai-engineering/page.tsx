@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
 import { Hero } from "@/components/course-details/Hero";
 import { Curriculum } from "@/components/course-details/Curriculum";
+import { FinalModule } from "@/components/course-details/FinalModule";
 import { Inside } from "@/components/course-details/Inside";
 import { Outcomes } from "@/components/course-details/Outcomes";
 import { courseContent } from "@/components/course-details/data";
@@ -56,6 +57,7 @@ export default async function AIEngineeringDetailsPage({
     <main className="min-h-screen bg-void font-sans text-frost antialiased [line-height:normal]">
       <Hero checkoutHref={checkoutHref} price={price} />
       <Curriculum />
+      <FinalModule />
       <Inside />
       <Outcomes checkoutHref={checkoutHref} price={price} />
     </main>

@@ -37,11 +37,29 @@ export const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   },
 ];
 
+export type FinalKey = "agents" | "clients" | "revenue" | "outreach" | "sell-plan";
+
+/** The Final module dropdown: the five sellable agents and the kit for selling them. */
+export const FINAL_ITEMS: { key: FinalKey; label: string; icon: IconName; href: string }[] = [
+  { key: "agents", label: "Agents", icon: "grid", href: `${LEARN_BASE}/final/agents` },
+  { key: "clients", label: "Clients", icon: "user", href: `${LEARN_BASE}/final/clients` },
+  { key: "revenue", label: "Revenue", icon: "trend", href: `${LEARN_BASE}/final/revenue` },
+  { key: "outreach", label: "Outreach", icon: "send", href: `${LEARN_BASE}/final/outreach` },
+  { key: "sell-plan", label: "Sell plan", icon: "file", href: `${LEARN_BASE}/final/sell-plan` },
+];
+
+/** The Final module sub-item a pathname belongs to, or null outside the module. */
+export function activeFinalKey(pathname: string): FinalKey | null {
+  const rest = pathname.replace(LEARN_BASE, "").replace(/^\/|\/$/g, "").split("/");
+  return rest[0] === "final" ? (FINAL_ITEMS.find((i) => i.key === rest[1])?.key ?? "agents") : null;
+}
+
 /** Which sidebar item a pathname belongs to. Module sub-pages light up the item for their content type. */
 export function activeNavKey(pathname: string): NavKey | null {
   const rest = pathname.replace(LEARN_BASE, "").replace(/^\/|\/$/g, "");
   if (rest === "") return "dashboard";
   const [head, , third] = rest.split("/");
+  if (head === "final") return null; // the Final module dropdown owns its own highlight
   if (head === "modules") {
     if (third === "quiz") return "quizzes";
     if (third === "project") return "projects";

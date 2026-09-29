@@ -2,9 +2,11 @@ import { Icon } from "@/components/obsidian/Icon";
 import { Pill } from "@/components/obsidian/Pill";
 import { SectionHead } from "@/components/obsidian/SectionHead";
 import { StageBadge } from "@/components/obsidian/StageBadge";
+import { getFinalModule } from "@/lib/aie/final-module";
 import { allModules, courseContent, type Module } from "./data";
 
 const MINT = "#3DDC97";
+const VIOLET = "#C7B0FF";
 
 function ModuleCard({ m, color, capstone }: { m: Module; color: string; capstone: boolean }) {
   return (
@@ -50,7 +52,8 @@ function ModuleCard({ m, color, capstone }: { m: Module; color: string; capstone
   );
 }
 
-export function Curriculum() {
+export async function Curriculum() {
+  const finalModule = await getFinalModule();
   const lastNumber = allModules[allModules.length - 1].number;
   return (
     <section id="curriculum" className="relative overflow-hidden bg-void">
@@ -92,6 +95,42 @@ export function Curriculum() {
               </div>
             </div>
           ))}
+          <div className="grid items-start gap-5 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
+            <div className="flex flex-col gap-2.5 lg:pt-2.5">
+              <span className="inline-flex items-center gap-2.5 font-mono text-[13px] uppercase tracking-[0.14em] text-mist">
+                <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: VIOLET }} />
+                Final module
+              </span>
+              <span className="text-[20px] font-medium tracking-[-0.01em]">Sell what you built</span>
+            </div>
+            <div
+              className="flex min-w-0 flex-1 flex-col gap-3.5 rounded-3xl p-[26px]"
+              style={{
+                border: "1px solid rgba(199,176,255,0.45)",
+                background: "linear-gradient(135deg, rgba(139,92,246,0.14), rgba(255,255,255,0.02))",
+                boxShadow: "0 0 60px rgba(139,92,246,0.14), inset 0 1px 0 rgba(255,255,255,0.08)",
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="flex h-[46px] w-[46px] items-center justify-center rounded-[13px] border" style={{ borderColor: VIOLET, color: VIOLET }}>
+                  <Icon name="star" size={20} />
+                </span>
+                <Pill>Ship it</Pill>
+              </div>
+              <h3 className="m-0 text-[23px] font-medium leading-[1.2] tracking-[-0.02em]">Final module: {finalModule.agents.length} AI agents you can sell</h3>
+              <p className="m-0 text-[15.5px] leading-[1.6] text-mist">
+                The organized code for each agent, the best model for each, who to sell it to and where, the cold emails to send, and a 30-day plan to your first paying client.
+              </p>
+              <ul className="m-0 mt-1 flex list-none flex-wrap gap-2 p-0">
+                {finalModule.agents.map((a) => (
+                  <li key={a.id} className="inline-flex items-center gap-2 rounded-full border border-[rgba(199,176,255,0.30)] bg-[rgba(139,92,246,0.10)] px-[13px] py-[7px] text-[13.5px] text-violet-soft">
+                    <Icon name={a.icon} size={14} color="#E2D6FF" />
+                    {a.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -9,6 +9,7 @@ import { PriceLockup, type Price } from "./PriceLockup";
 const NAV = [
   ["Overview", "#overview"],
   ["Curriculum", "#curriculum"],
+  ["Final module", "#final-module"],
   ["Inside", "#inside"],
   ["Outcomes", "#outcomes"],
   ["Career path", "#career-path"],

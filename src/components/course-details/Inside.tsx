@@ -16,13 +16,13 @@ export function Inside() {
           title={`${courseContent.appSections.length} sections, ${totalPages} real pages.`}
           intro="The course is an app, not a video playlist. Every page has one job, from where you left off to proof you can show."
         />
-        <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-5">
           {courseContent.appSections.map((section) => (
             <div key={section.name} className="glass flex min-w-0 flex-col gap-4 rounded-[26px] p-6">
-              <div className="flex items-baseline justify-between">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
                 <h3 className="m-0 text-[28px] font-medium tracking-[-0.03em]">{section.name}</h3>
                 <span
-                  className="font-mono text-[12px] uppercase tracking-[0.12em]"
+                  className="whitespace-nowrap font-mono text-[12px] uppercase tracking-[0.12em]"
                   style={{ color: section.color }}
                 >
                   {section.pages.length} {section.pages.length === 1 ? "page" : "pages"}

@@ -58,3 +58,7 @@ public/favicon/favicon-master-1024.png
 /law-firm-client-scripts
 /real-estate-client-scripts
 tests/visual/out/
+
+# agent kit (python)
+__pycache__/
+.pytest_cache/

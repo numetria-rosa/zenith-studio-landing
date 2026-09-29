@@ -61,6 +61,8 @@ model User {
   entitlements    CourseEntitlement[]
   progress        CourseProgress[]
   aieLessonProgress AieLessonProgress[]
+  aieClients      AieClient[]
+  aieSellPlanSteps AieSellPlanStep[]
   serviceRequests ServiceRequest[]
   purchaseClaims  PurchaseClaim[]
   proposals       Proposal[]
@@ -205,6 +207,36 @@ model AieLessonProgress {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, lessonId])
+}
+
+// Final module: the students' own clients (what they sell, to whom, for how much) and their sell-plan checklist.
+model AieClient {
+  id              String   @id @default(cuid())
+  userId          String
+  name            String
+  niche           String
+  city            String
+  agentId         String // an agent id from content/ai-engineering/final-module/agents.json
+  status          String   @default("draft") // draft | ready | live
+  setupFeeCents   Int      @default(0)
+  monthlyFeeCents Int      @default(0)
+  notes           String   @default("")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AieSellPlanStep {
+  userId String
+  stepId String
+  doneAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, stepId])
 }
 
 // AI Systems (done-for-you agency work) — a purchase here doesn't unlock a

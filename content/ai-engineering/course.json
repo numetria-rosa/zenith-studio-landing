@@ -199,6 +199,38 @@
           "description": "Career Path Edition: readiness and job-landing playbook"
         }
       ]
+    },
+    {
+      "name": "Final module",
+      "color": "#FFB6C8",
+      "description": "Five sellable agents, their code, and how to sell them",
+      "pages": [
+        {
+          "icon": "grid",
+          "name": "Agents",
+          "description": "The five agents: code, best model, niches and cities"
+        },
+        {
+          "icon": "user",
+          "name": "Clients",
+          "description": "Track who you sell to, what they pay, and what is live"
+        },
+        {
+          "icon": "trend",
+          "name": "Revenue",
+          "description": "Monthly revenue and a per-client profit calculator"
+        },
+        {
+          "icon": "send",
+          "name": "Outreach",
+          "description": "Cold email templates, lead maps and the rules to follow"
+        },
+        {
+          "icon": "file",
+          "name": "Sell plan",
+          "description": "A 30-day checklist from course to first paying client"
+        }
+      ]
     }
   ],
   "outcomes": [

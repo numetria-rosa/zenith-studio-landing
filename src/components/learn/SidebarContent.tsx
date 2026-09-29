@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Icon } from "@/components/obsidian/Icon";
 import { ProgressBar } from "@/components/obsidian/ProgressBar";
-import { NAV_GROUPS, activeNavKey } from "./nav";
+import { FINAL_ITEMS, NAV_GROUPS, activeFinalKey, activeNavKey } from "./nav";
 
 export type SidebarUser = { name: string; initials: string };
 
@@ -18,7 +19,10 @@ export function SidebarContent({
   percent: number;
   user: SidebarUser;
 }) {
-  const active = activeNavKey(usePathname());
+  const pathname = usePathname();
+  const active = activeNavKey(pathname);
+  const finalActive = activeFinalKey(pathname);
+  const [finalOpen, setFinalOpen] = useState(finalActive !== null);
   return (
     <>
       <div className="flex items-center gap-3 px-2">
@@ -49,6 +53,41 @@ export function SidebarContent({
           })}
         </nav>
       ))}
+      <div className="flex flex-col gap-0.5">
+        <button
+          type="button"
+          aria-expanded={finalOpen}
+          aria-controls="final-module-menu"
+          onClick={() => setFinalOpen((o) => !o)}
+          className={`flex min-h-10 items-center gap-3 rounded-xl px-3 text-left text-[14.5px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan ${
+            finalActive ? "bg-white/[0.05] text-frost" : "text-soft hover:bg-white/[0.04]"
+          }`}
+        >
+          <Icon name="star" size={17} color={finalActive ? "#5CC8FF" : "#A9AEBA"} />
+          <span className="flex-1">Final module</span>
+          <Icon name="chevron" size={16} color="#A9AEBA" className={`transition-transform motion-reduce:transition-none ${finalOpen ? "rotate-180" : ""}`} />
+        </button>
+        {finalOpen && (
+          <nav id="final-module-menu" aria-label="Final module" className="ml-[19px] flex flex-col gap-0.5 border-l border-white/10 pl-3">
+            {FINAL_ITEMS.map((item) => {
+              const on = finalActive === item.key;
+              return (
+                <Link
+                  key={item.key}
+                  href={item.href}
+                  aria-current={on ? "page" : undefined}
+                  className={`flex min-h-10 items-center gap-2.5 rounded-[10px] px-2.5 text-[14px] no-underline transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan ${
+                    on ? "bg-[rgba(92,200,255,0.10)] text-frost shadow-[inset_0_0_0_1px_rgba(92,200,255,0.30)]" : "text-soft hover:bg-white/[0.04]"
+                  }`}
+                >
+                  <Icon name={item.icon} size={15} color={on ? "#5CC8FF" : "#A9AEBA"} />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
+      </div>
       <div className="glass mt-auto flex flex-col gap-2.5 rounded-2xl p-3.5">
         <div className="flex justify-between text-[13px]">
           <span className="text-mist">Course progress</span>
