@@ -57,3 +57,4 @@ public/favicon/favicon-master-1024.png
 # client financial/contact data that shouldn't sit in a shared repo.
 /law-firm-client-scripts
 /real-estate-client-scripts
+tests/visual/out/
