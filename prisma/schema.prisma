@@ -1579,6 +1579,7 @@ model WaAgency {
   usageCounters WaUsageCounter[]
   auditLog      WaAuditLog[]
   promptRuns    WaPromptRun[]
+  manualConnectRequests WaManualConnectRequest[]
 
   @@index([status])
 }
@@ -1615,21 +1616,62 @@ enum WaAccountStatus {
 // One number per agency at Starter/Growth (Pro allows up to 3 - enforced
 // by entitlement check, not a DB constraint, since the cap differs by plan).
 model WaWhatsAppAccount {
-  id                   String          @id @default(cuid())
-  agencyId             String          @unique
-  provider             WaProvider      @default(META)
+  id                   String            @id @default(cuid())
+  agencyId             String            @unique
+  provider             WaProvider        @default(META)
   wabaId               String?
-  phoneNumberId        String?         @unique
+  phoneNumberId        String?           @unique
   displayPhoneNumber   String?
   encryptedAccessToken String? // see CLAUDE.md §7 - encryptSecret/decryptSecret, own env key
-  status               WaAccountStatus @default(PENDING)
+  status               WaAccountStatus   @default(PENDING)
   lastError            String?
   connectedAt          DateTime?
+  // Which path connected this number - the Embedded Signup weekly cap
+  // (see src/lib/whatsapp-umrah/embedded-signup.ts) only counts
+  // EMBEDDED_SIGNUP rows, matching Meta's own "new business customers"
+  // definition. Existing/manually-connected agencies default to MANUAL.
+  connectMethod        WaConnectMethod   @default(MANUAL)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+enum WaConnectMethod {
+  MANUAL
+  EMBEDDED_SIGNUP
+}
+
+enum WaManualConnectRequestStatus {
+  PENDING
+  RESOLVED
+}
+
+/* Fallback when Embedded Signup is off or its weekly cap is hit (CLAUDE.md's
+   onboarding path + the 2026-09-30 cap-tracking work): the agency owner
+   fills this in from their dashboard instead of self-connecting, an admin
+   sees it in Zenith HQ, and marks it resolved once they've manually
+   connected the number via the admin WABA page. No email - this table IS
+   the notification surface. */
+model WaManualConnectRequest {
+  id            String                       @id @default(cuid())
+  agencyId      String
+  businessName  String
+  contactEmail  String
+  contactPhone  String
+  wabaId        String?
+  phoneNumberId String?
+  notes         String?
+  status        WaManualConnectRequestStatus @default(PENDING)
+
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId])
+  @@index([status])
 }
 
 enum WaKbDocumentKind {

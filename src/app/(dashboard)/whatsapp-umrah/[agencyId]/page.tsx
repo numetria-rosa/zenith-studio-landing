@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency, getUsageSummary } from "@/lib/whatsapp-umrah/dashboard-data";
+import { isEmbeddedSignupCapReached, EMBEDDED_SIGNUP_ENABLED } from "@/lib/whatsapp-umrah/embedded-signup";
+import { requestManualConnectAction } from "./actions";
 import { Icon } from "@/app/services/dashboard/[clientId]/Icon";
 import waStyles from "./waConsole.module.css";
 
@@ -18,10 +20,12 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
   const kbHasContent = agency.kbDocuments.some((d) => d._count.chunks > 0);
   const whatsappConnected = agency.whatsapp?.status === "CONNECTED";
   const settingsConfigured = !!agency.agentSettings;
+  const pendingConnectRequest = agency.manualConnectRequests[0] ?? null;
+  const showEmbeddedSignupWidget = !whatsappConnected && !pendingConnectRequest && EMBEDDED_SIGNUP_ENABLED && !(await isEmbeddedSignupCapReached());
 
   const checklist = [
     { done: kbHasContent, label: "Add your packages and FAQs", detail: "Paste or upload your knowledge base so the agent has real facts to answer from.", href: `/whatsapp-umrah/${agencyId}/kb` },
-    { done: whatsappConnected, label: "Connect your WhatsApp number", detail: "We connect this for you - send your number to hello@zenith-studio.site and we'll link it, usually within a day.", href: null },
+    { done: whatsappConnected, label: "Connect your WhatsApp number", detail: "Connect it below.", href: whatsappConnected ? null : "#connect-whatsapp" },
     { done: settingsConfigured, label: "Set your tone, languages and hours", detail: "Configure how the agent sounds and when it's live.", href: `/whatsapp-umrah/${agencyId}/settings` },
     { done: kbHasContent, label: "Test it in the simulator", detail: "Chat with your agent exactly as a customer would, before anything is live.", href: `/whatsapp-umrah/${agencyId}/simulator` },
   ];
@@ -50,6 +54,69 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
           </div>
         ))}
       </div>
+
+      {!whatsappConnected && (
+        <div className={waStyles.card} style={{ marginTop: 20 }} id="connect-whatsapp">
+          <div className={waStyles.label} style={{ marginBottom: 8 }}>
+            Connect your WhatsApp number
+          </div>
+          {pendingConnectRequest ? (
+            <p style={{ fontSize: 14, color: "var(--zc-muted)" }}>
+              Request sent {pendingConnectRequest.createdAt.toISOString().slice(0, 10)} - our team will connect your number within 24 hours.
+            </p>
+          ) : showEmbeddedSignupWidget ? (
+            <p style={{ fontSize: 14, color: "var(--zc-muted)" }}>Connect with Meta - coming soon.</p>
+          ) : (
+            <>
+              <p style={{ fontSize: 13, color: "var(--zc-muted)", marginBottom: 12 }}>
+                Tell us about your WhatsApp Business number and our team will connect it for you, usually within 24 hours. If you
+                already have your WABA ID and phone number ID from Meta, add them too - it&apos;ll be faster.
+              </p>
+              <form action={requestManualConnectAction.bind(null, agencyId)}>
+                <div className={waStyles.formRow}>
+                  <label className={waStyles.label} htmlFor="businessName">
+                    Business name
+                  </label>
+                  <input id="businessName" name="businessName" defaultValue={agency.name} className={waStyles.input} required />
+                </div>
+                <div className={waStyles.formRow}>
+                  <label className={waStyles.label} htmlFor="contactEmail">
+                    Contact email
+                  </label>
+                  <input id="contactEmail" name="contactEmail" type="email" defaultValue={session.user.email ?? ""} className={waStyles.input} required />
+                </div>
+                <div className={waStyles.formRow}>
+                  <label className={waStyles.label} htmlFor="contactPhone">
+                    Contact phone
+                  </label>
+                  <input id="contactPhone" name="contactPhone" className={waStyles.input} placeholder="+44..." required />
+                </div>
+                <div className={waStyles.formRow}>
+                  <label className={waStyles.label} htmlFor="wabaId">
+                    WABA ID (optional)
+                  </label>
+                  <input id="wabaId" name="wabaId" className={waStyles.input} />
+                </div>
+                <div className={waStyles.formRow}>
+                  <label className={waStyles.label} htmlFor="phoneNumberId">
+                    Phone number ID (optional)
+                  </label>
+                  <input id="phoneNumberId" name="phoneNumberId" className={waStyles.input} />
+                </div>
+                <div className={waStyles.formRow}>
+                  <label className={waStyles.label} htmlFor="notes">
+                    Anything else we should know (optional)
+                  </label>
+                  <input id="notes" name="notes" className={waStyles.input} />
+                </div>
+                <button type="submit" className={waStyles.badgeAi} style={{ marginTop: 8, padding: "9px 18px", fontSize: 14, border: "1px solid var(--zc-done)" }}>
+                  Send request
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      )}
 
       <div className={waStyles.card} style={{ marginTop: 20 }}>
         <div className={waStyles.label} style={{ marginBottom: 8 }}>

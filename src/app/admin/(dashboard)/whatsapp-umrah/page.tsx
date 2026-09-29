@@ -24,6 +24,7 @@ export default async function AdminWhatsAppUmrahPage() {
       subscription: { select: { plan: true, status: true } },
       kbDocuments: { select: { _count: { select: { chunks: true } } } },
       agentSettings: { select: { id: true } },
+      manualConnectRequests: { where: { status: "PENDING" }, orderBy: { createdAt: "desc" }, take: 1 },
     },
   });
 
@@ -47,6 +48,9 @@ export default async function AdminWhatsAppUmrahPage() {
       create: { agencyId, provider: "META", wabaId, phoneNumberId, displayPhoneNumber, encryptedAccessToken, status: "CONNECTED", connectedAt: new Date() },
       update: { wabaId, phoneNumberId, displayPhoneNumber, encryptedAccessToken, status: "CONNECTED", lastError: null, connectedAt: new Date() },
     });
+    // Connecting the number is what a pending manual-connect request was
+    // asking for - resolve it automatically instead of a separate button.
+    await db.waManualConnectRequest.updateMany({ where: { agencyId, status: "PENDING" }, data: { status: "RESOLVED", resolvedAt: new Date() } });
 
     // Same checklist the Overview page shows the agency owner (kb content +
     // settings configured) - connecting WhatsApp is the last of the three,
@@ -73,6 +77,7 @@ export default async function AdminWhatsAppUmrahPage() {
         {agencies.length === 0 && <p className="muted">No agencies yet.</p>}
         {agencies.map((agency) => {
           const kbHasContent = agency.kbDocuments.some((d) => d._count.chunks > 0);
+          const pendingRequest = agency.manualConnectRequests[0] ?? null;
           return (
             <section className="card sc" key={agency.id}>
               <span className="eyebrow">
@@ -85,15 +90,24 @@ export default async function AdminWhatsAppUmrahPage() {
                   {agency.whatsapp?.status === "CONNECTED" ? `connected (${agency.whatsapp.displayPhoneNumber ?? agency.whatsapp.phoneNumberId})` : "not connected"}
                 </span>
               </div>
+              {pendingRequest && (
+                <div className="tr" style={{ background: "rgba(245, 184, 61, .08)", borderRadius: 8, padding: "8px 10px" }}>
+                  <b>Connect request</b>
+                  <span style={{ fontSize: 13, color: "var(--mist)" }}>
+                    {pendingRequest.businessName} · {pendingRequest.contactEmail} · {pendingRequest.contactPhone}
+                    {pendingRequest.notes ? ` · "${pendingRequest.notes}"` : ""} · requested {pendingRequest.createdAt.toISOString().slice(0, 10)}
+                  </span>
+                </div>
+              )}
               <form action={connectAction} className="fld">
                 <input type="hidden" name="agencyId" value={agency.id} />
                 <label htmlFor={`waba-${agency.id}`}>WABA ID</label>
                 <div className="in">
-                  <input id={`waba-${agency.id}`} name="wabaId" defaultValue={agency.whatsapp?.wabaId ?? ""} required />
+                  <input id={`waba-${agency.id}`} name="wabaId" defaultValue={agency.whatsapp?.wabaId ?? pendingRequest?.wabaId ?? ""} required />
                 </div>
                 <label htmlFor={`pnid-${agency.id}`}>Phone number ID</label>
                 <div className="in">
-                  <input id={`pnid-${agency.id}`} name="phoneNumberId" defaultValue={agency.whatsapp?.phoneNumberId ?? ""} required />
+                  <input id={`pnid-${agency.id}`} name="phoneNumberId" defaultValue={agency.whatsapp?.phoneNumberId ?? pendingRequest?.phoneNumberId ?? ""} required />
                 </div>
                 <label htmlFor={`disp-${agency.id}`}>Display phone number (optional)</label>
                 <div className="in">

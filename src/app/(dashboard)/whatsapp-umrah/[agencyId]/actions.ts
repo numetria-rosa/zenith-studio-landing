@@ -15,6 +15,7 @@ import { MetaCloudWhatsAppProvider } from "@/lib/whatsapp-umrah/provider/meta";
 import { deleteContactData } from "@/lib/whatsapp-umrah/gdpr";
 import type { BusinessHours } from "@/lib/whatsapp-umrah/hours";
 import { Prisma } from "@prisma/client";
+import { logWaAuditEvent } from "@/lib/whatsapp-umrah/audit";
 
 const HOURS_DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
@@ -207,6 +208,32 @@ export async function cancelSubscriptionAction(agencyId: string): Promise<void> 
   if (!subscription?.whopMembershipId) throw new Error("No active subscription found to cancel.");
   await getWhopClient().memberships.cancel(subscription.whopMembershipId, { cancellation_mode: "at_period_end" });
   revalidatePath(`/whatsapp-umrah/${agencyId}/settings`);
+}
+
+/** Fallback path when Embedded Signup is off or its weekly cap is hit (see
+    src/lib/whatsapp-umrah/embedded-signup.ts) - no email, this row IS the
+    notification: the admin sees it in Zenith HQ's WhatsApp Umrah page and
+    connects the number manually from there, same as every agency today. */
+export async function requestManualConnectAction(agencyId: string, formData: FormData): Promise<void> {
+  const { agency } = await requireOwnedAgency(agencyId);
+  const businessName = String(formData.get("businessName") || "").trim();
+  const contactEmail = String(formData.get("contactEmail") || "").trim();
+  const contactPhone = String(formData.get("contactPhone") || "").trim();
+  if (!businessName || !contactEmail || !contactPhone) throw new Error("Business name, email and phone are required.");
+
+  await db.waManualConnectRequest.create({
+    data: {
+      agencyId: agency.id,
+      businessName,
+      contactEmail,
+      contactPhone,
+      wabaId: String(formData.get("wabaId") || "").trim() || null,
+      phoneNumberId: String(formData.get("phoneNumberId") || "").trim() || null,
+      notes: String(formData.get("notes") || "").trim() || null,
+    },
+  });
+  await logWaAuditEvent(agency.id, null, "manual_connect_requested", { businessName, contactEmail });
+  revalidatePath(`/whatsapp-umrah/${agencyId}`);
 }
 
 export type SimulatorTurn = { role: "customer" | "ai"; text: string; language?: string; guardsTriggered?: string[] };

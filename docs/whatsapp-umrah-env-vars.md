@@ -16,3 +16,5 @@ re-documented here).
 | `GROQ_MODEL` | Default `openai/gpt-oss-20b`. Env-configurable per CLAUDE.md — verify current id/price at console.groq.com/docs/models before changing. |
 | `CLAUDE_MODEL` | Default `claude-haiku-4-5-20251001`. Single escalation model — verify at claude.com/pricing before changing. |
 | `WA_EMBEDDINGS_API_KEY` | **Not yet applicable — no embeddings provider chosen.** Do not set or read this until CLAUDE.md's open decision is resolved. |
+| `WHATSAPP_UMRAH_EMBEDDED_SIGNUP_ENABLED` | `"true"` to turn on Embedded Signup in the client dashboard. Leave unset (default off) until Business Verification + App Review are approved - see `src/lib/whatsapp-umrah/embedded-signup.ts`. The real Facebook Login for Business widget still isn't wired in as of 2026-09-30; flipping this on only changes which UI branch renders. |
+| `WHATSAPP_UMRAH_EMBEDDED_SIGNUP_WEEKLY_CAP` | Optional, default `10` — Meta's own rolling-7-day new-business-customer cap for unapproved Tech Providers. Raise to `200` once approved. |

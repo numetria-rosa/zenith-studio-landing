@@ -16,6 +16,7 @@ export const getOwnedAgency = cache(async function getOwnedAgency(agencyId: stri
       agentSettings: true,
       subscription: true,
       kbDocuments: { orderBy: { createdAt: "desc" }, include: { _count: { select: { chunks: true } } } },
+      manualConnectRequests: { where: { status: "PENDING" }, orderBy: { createdAt: "desc" }, take: 1 },
     },
   });
 });
