@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
+import { getOwnedAgency, getUsageSummary } from "@/lib/whatsapp-umrah/dashboard-data";
 import { Icon } from "@/app/services/dashboard/[clientId]/Icon";
 import waStyles from "./waConsole.module.css";
 
@@ -11,6 +11,9 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
   const { agencyId } = await params;
   const agency = await getOwnedAgency(agencyId, session.user.id);
   if (!agency) notFound();
+  const usage = await getUsageSummary(agencyId);
+  const usagePct = Math.min(100, Math.round((usage.used / usage.cap) * 100));
+  const nearCap = usagePct >= 80;
 
   const kbHasContent = agency.kbDocuments.some((d) => d._count.chunks > 0);
   const whatsappConnected = agency.whatsapp?.status === "CONNECTED";
@@ -46,6 +49,34 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
             )}
           </div>
         ))}
+      </div>
+
+      <div className={waStyles.card} style={{ marginTop: 20 }}>
+        <div className={waStyles.label} style={{ marginBottom: 8 }}>
+          AI replies this month
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+          <span style={{ fontSize: 20, fontWeight: 600 }}>
+            {usage.used} <span style={{ fontSize: 14, fontWeight: 400, color: "var(--zc-muted)" }}>/ {usage.cap}</span>
+          </span>
+          {usage.overagePacks > 0 && (
+            <span style={{ fontSize: 12, color: "var(--zc-muted)" }}>
+              +{usage.overagePacks} pack{usage.overagePacks === 1 ? "" : "s"} bought this period
+            </span>
+          )}
+        </div>
+        <div style={{ height: 6, borderRadius: 3, background: "var(--zc-line)", overflow: "hidden", marginBottom: 12 }}>
+          <div
+            style={{
+              height: "100%",
+              width: `${usagePct}%`,
+              background: nearCap ? "var(--zc-error-text)" : "var(--zc-done)",
+            }}
+          />
+        </div>
+        <Link href={`/whatsapp-umrah/${agencyId}/settings`} style={{ fontSize: 13, color: "var(--zc-run-text)" }}>
+          {usage.overagePacks > 0 || nearCap ? "Buy 1,000 more replies - £5 →" : "Turn on the extra replies add-on →"}
+        </Link>
       </div>
     </div>
   );

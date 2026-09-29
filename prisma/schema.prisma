@@ -1701,6 +1701,13 @@ model WaAgentSettings {
   awayMessage           String?
   hotLeadRule           Json? // configurable: which captured fields / triggers count as "hot"
   autoResumeIdleMinutes Int? // null = auto-resume off (default)
+  // Off by default, per spec: "Optional add-on pack: £5 per extra 1,000
+  // AI replies (off by default, one-click enable)". See
+  // src/lib/whatsapp-umrah/overage.ts.
+  overageEnabled        Boolean    @default(false)
+  // UK GDPR (CLAUDE.md §7): "a per-agency retention setting (default 12
+  // months) with a scheduled purge job." See src/lib/whatsapp-umrah/gdpr.ts.
+  retentionMonths       Int        @default(12)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1911,6 +1918,9 @@ model WaUsageCounter {
   periodEnd        DateTime
   aiReplies        Int      @default(0)
   templateMessages Int      @default(0)
+  // Each paid pack adds 1,000 to this period's effective cap - see
+  // entitlements.ts's withinCap and src/lib/whatsapp-umrah/overage.ts.
+  overagePacks     Int      @default(0)
 
   agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
 

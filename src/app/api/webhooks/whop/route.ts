@@ -11,6 +11,8 @@ import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 import { resolveProposalByWhopPlanId, classifyProposalPaymentLeg } from "@/lib/proposal-payments";
 import { sendMetaPurchaseEvent } from "@/lib/meta-capi";
 import { sendAdminAlert } from "@/lib/outreach-mail";
+import { creditOveragePack } from "@/lib/whatsapp-umrah/overage";
+import { waPlanForWhopPlanId, provisionWaAgency, pauseWaAgencyByMembership } from "@/lib/whatsapp-umrah/whop-plans";
 
 /* Zenith Lab - Whop webhook handler.
    Implements whop-checkout-links-and-webhooks.md §3.3/§3.7 exactly:
@@ -78,6 +80,13 @@ export async function POST(request: NextRequest) {
       const { email, courseNames } = purchaseForMeta.newCoursePurchase;
       await sendAdminAlert(`New course sale: ${courseNames}`, `${email} just bought ${courseNames}.`).catch(() => {});
     }
+    if (purchaseForMeta?.newWaAgencyCustomer) {
+      const { email, agencyId } = purchaseForMeta.newWaAgencyCustomer;
+      await sendAdminAlert(
+        "New WhatsApp Umrah agency",
+        `${email} just subscribed. Agency ${agencyId} needs its WhatsApp number connected - see CLAUDE.md's onboarding path (manual WABA connect until Embedded Signup is approved).`
+      ).catch(() => {});
+    }
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       // Unique constraint on WebhookEvent.id -> this exact delivery was already
@@ -108,9 +117,70 @@ type PostCommitInfo = {
   meta?: MetaPurchaseInfo | null;
   newServiceCustomer?: { email: string; serviceName: string };
   newCoursePurchase?: { email: string; courseNames: string };
+  newWaAgencyCustomer?: { email: string; agencyId: string };
 };
 
 async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<PostCommitInfo | null> {
+  // WhatsApp Umrah's £5 "extra 1,000 replies" add-on: bought from inside the
+  // client dashboard via Whop's embedded Checkout Element, which stamps
+  // metadata.agencyId on the payment (see docs.whop.com/developer/guides/
+  // embed-checkout - "Do not grant access from onComplete, use the
+  // payment.succeeded webhook"). Resolved by plan id first since this plan
+  // has no product/course/service mapping at all.
+  if (payment.plan?.id && payment.plan.id === process.env.WHATSAPP_UMRAH_OVERAGE_PLAN_ID) {
+    const agencyId = (payment.metadata as Record<string, unknown> | null)?.agencyId;
+    if (typeof agencyId !== "string" || !agencyId) {
+      console.error("[whop webhook] overage pack payment.succeeded missing metadata.agencyId", payment.id);
+      return null;
+    }
+    const agency = await tx.waAgency.findUnique({ where: { id: agencyId }, select: { id: true } });
+    if (!agency) {
+      console.error("[whop webhook] overage pack payment.succeeded - no such WaAgency", agencyId, payment.id);
+      return null;
+    }
+    await creditOveragePack(tx, agencyId);
+    return null;
+  }
+
+  // WhatsApp Umrah's Starter/Founding subscription (see
+  // scripts/create-whatsapp-umrah-whop-product.mjs) - also has no
+  // product/course/service mapping, resolved by plan id the same way as
+  // the overage plan above. membership.activated (below) provisions the
+  // same agency idempotently if that event arrives first.
+  const waPlanMatch = waPlanForWhopPlanId(payment.plan?.id);
+  if (waPlanMatch) {
+    const whopUserId = payment.user?.id ?? null;
+    const email = payment.user?.email ?? null;
+    const name = payment.user?.name ?? null;
+    if (!email && !whopUserId) {
+      console.error("[whop webhook] WA subscription payment.succeeded has no user id or email", payment.id);
+      return null;
+    }
+    const user = await findOrCreateUser(tx, whopUserId, email, name);
+    const membershipId = payment.membership?.id;
+    if (!membershipId) {
+      console.error("[whop webhook] WA subscription payment.succeeded has no membership id", payment.id);
+      return null;
+    }
+    const { isNew, agencyId } = await provisionWaAgency(tx, {
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      whopMembershipId: membershipId,
+      whopPlanId: payment.plan!.id!,
+      plan: waPlanMatch.plan,
+      foundingOffer: waPlanMatch.foundingOffer,
+    });
+    // Same claim mechanism every other paid product uses (see
+    // createPurchaseClaim's own comment) - without this, a buyer has no
+    // password and /api/auth/claim has nothing to read when their browser
+    // bounces back from Whop's checkout redirect (see
+    // scripts/add-whatsapp-umrah-checkout-redirects.mjs for that redirect
+    // itself). Found missing during the 2026-09-29 handoff audit.
+    await createPurchaseClaim(tx, user.id, payment.id);
+    return isNew && user.email ? { newWaAgencyCustomer: { email: user.email, agencyId } } : null;
+  }
+
   const productId = payment.product?.id;
   const courseId = productId ? courseIdForWhopProductId(productId) : null;
   // A bundle is its own Whop product (see src/lib/bundles.ts) - resolved
@@ -395,6 +465,12 @@ async function grantServiceAccess(
    never provisioned in the first place, there's nothing running yet to
    pause. */
 async function handlePaymentFailed(tx: Tx, payment: Payment) {
+  if (waPlanForWhopPlanId(payment.plan?.id)) {
+    const membershipId = payment.membership?.id;
+    if (membershipId) await pauseWaAgencyByMembership(tx, membershipId, "PAST_DUE");
+    return;
+  }
+
   const serviceMatch = serviceKindForWhopPlanId(payment.plan?.id);
   if (!serviceMatch || serviceMatch.kind !== "monthly") return;
 
@@ -432,6 +508,28 @@ async function handlePaymentFailed(tx: Tx, payment: Payment) {
    are also ignored (courses provision via CourseEntitlement on payment,
    trials aren't offered on courses). */
 async function handleMembershipActivated(tx: Tx, membership: Membership) {
+  const waPlanMatch = waPlanForWhopPlanId(membership.plan?.id);
+  if (waPlanMatch) {
+    const whopUserId = membership.user?.id ?? null;
+    const email = membership.user?.email ?? null;
+    const name = membership.user?.name ?? null;
+    if (!email && !whopUserId) {
+      console.error(`[whop webhook] WA membership.activated ${membership.id} has no user id or email`);
+      return;
+    }
+    const user = await findOrCreateUser(tx, whopUserId, email, name);
+    await provisionWaAgency(tx, {
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      whopMembershipId: membership.id,
+      whopPlanId: membership.plan!.id!,
+      plan: waPlanMatch.plan,
+      foundingOffer: waPlanMatch.foundingOffer,
+    });
+    return;
+  }
+
   const serviceMatch = serviceKindForWhopPlanId(membership.plan?.id);
   if (!serviceMatch || serviceMatch.kind !== "monthly") return;
 
@@ -453,6 +551,11 @@ async function handleMembershipActivated(tx: Tx, membership: Membership) {
 }
 
 async function handleMembershipDeactivated(tx: Tx, membership: Membership) {
+  if (waPlanForWhopPlanId(membership.plan?.id)) {
+    await pauseWaAgencyByMembership(tx, membership.id, "CANCELLED");
+    return;
+  }
+
   const courseResult = await tx.courseEntitlement.updateMany({
     where: { whopMembershipId: membership.id, status: "active" },
     data: { status: "revoked", revokedAt: new Date() },

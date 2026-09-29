@@ -22,6 +22,21 @@ export const getOwnedAgency = cache(async function getOwnedAgency(agencyId: stri
 
 export type OwnedAgency = NonNullable<Awaited<ReturnType<typeof getOwnedAgency>>>;
 
+/** This period's reply usage against the plan cap, plus how many overage
+    packs (see src/lib/whatsapp-umrah/overage.ts) are already bought - used
+    by the Overview page's usage card and its "buy more" CTA. */
+export async function getUsageSummary(agencyId: string) {
+  const { withinCap, currentBillingPeriodStart } = await import("./entitlements");
+  const [cap, usage] = await Promise.all([
+    withinCap(agencyId),
+    db.waUsageCounter.findUnique({
+      where: { agencyId_periodStart: { agencyId, periodStart: currentBillingPeriodStart() } },
+      select: { overagePacks: true },
+    }),
+  ]);
+  return { ...cap, overagePacks: usage?.overagePacks ?? 0 };
+}
+
 export async function listConversations(agencyId: string) {
   return db.waConversation.findMany({
     where: { agencyId },

@@ -41,11 +41,14 @@ export async function GET(request: NextRequest) {
 
   // Service buyers go straight to their dashboard (its first-visit popup
   // asks for their details); the webhook created the project in the same
-  // transaction as this claim. Course buyers keep the /welcome page.
-  const project = await db.serviceProject.findFirst({
-    where: { userId: claim.userId },
-    orderBy: { createdAt: "desc" },
-    select: { id: true },
-  });
-  return NextResponse.redirect(new URL(project ? `/services/dashboard/${project.id}` : "/welcome", origin));
+  // transaction as this claim. WhatsApp Umrah buyers go to their agency
+  // dashboard the same way (webhook's provisionWaAgency + this route's own
+  // createPurchaseClaim call, both in handlePaymentSucceeded's WA branch).
+  // Course buyers keep the /welcome page.
+  const [project, waMembership] = await Promise.all([
+    db.serviceProject.findFirst({ where: { userId: claim.userId }, orderBy: { createdAt: "desc" }, select: { id: true } }),
+    db.waMembership.findFirst({ where: { userId: claim.userId }, orderBy: { createdAt: "desc" }, select: { agencyId: true } }),
+  ]);
+  const destination = project ? `/services/dashboard/${project.id}` : waMembership ? `/whatsapp-umrah/${waMembership.agencyId}` : "/welcome";
+  return NextResponse.redirect(new URL(destination, origin));
 }

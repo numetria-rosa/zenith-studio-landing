@@ -18,6 +18,8 @@
     "@vapi-ai/web": "^2.7.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.8.0",
+    "@whop/elements": "^1.1.0",
+    "@whop/elements-react": "^1.1.0",
     "@whop/sdk": "^0.0.42",
     "exceljs": "^4.4.0",
     "framer-motion": "^12.36.0",

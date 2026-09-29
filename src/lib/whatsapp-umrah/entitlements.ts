@@ -63,9 +63,15 @@ export type CapCheck = { withinCap: true; used: number; cap: number } | { within
 export async function withinCap(agencyId: string): Promise<CapCheck> {
   const subscription = await db.waSubscription.findUnique({ where: { agencyId }, select: { plan: true } });
   const plan = subscription?.plan ?? "STARTER";
-  const cap = replyCapFor(plan);
   const periodStart = currentBillingPeriodStart();
-  const usage = await db.waUsageCounter.findUnique({ where: { agencyId_periodStart: { agencyId, periodStart } }, select: { aiReplies: true } });
+  const usage = await db.waUsageCounter.findUnique({
+    where: { agencyId_periodStart: { agencyId, periodStart } },
+    select: { aiReplies: true, overagePacks: true },
+  });
+  // Each paid £5 overage pack (WaUsageCounter.overagePacks, see
+  // src/lib/whatsapp-umrah/overage.ts) adds 1,000 replies to THIS period's
+  // cap on top of the plan's base allowance.
+  const cap = replyCapFor(plan) + (usage?.overagePacks ?? 0) * 1000;
   const used = usage?.aiReplies ?? 0;
   return used < cap ? { withinCap: true, used, cap } : { withinCap: false, used, cap };
 }

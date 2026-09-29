@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const metadata = { title: "Privacy Policy" };
 
 export default function PrivacyPage() {
@@ -36,6 +38,16 @@ export default function PrivacyPage() {
             <strong>Call and message data (AI Receptionist and AI Missed Call Text-Back clients only):</strong>{" "}
             caller phone numbers, call recordings/transcripts, and text message content, used to operate the
             phone/text system you have configured and to improve its accuracy for your business.
+          </li>
+          <li>
+            <strong>WhatsApp message data (WhatsApp AI Agent for Umrah Agencies clients only):</strong> for the
+            agency itself, we process your own knowledge base content and WhatsApp Business account credentials to
+            operate the agent. For the agency&apos;s own customers, the agency is the data controller and we are the
+            data processor - see the product&apos;s{" "}
+            <Link href="/whatsapp-umrah/dpa" className="underline">
+              Data Processing Agreement
+            </Link>{" "}
+            for what is processed and for how long.
           </li>
         </ul>
 

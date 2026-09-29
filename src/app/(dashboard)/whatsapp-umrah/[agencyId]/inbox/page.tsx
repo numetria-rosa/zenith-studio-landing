@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency, listConversations, getConversationThread } from "@/lib/whatsapp-umrah/dashboard-data";
-import { takeOverConversationAction, resumeAiAction, sendHumanReplyAction } from "../actions";
+import { takeOverConversationAction, resumeAiAction, sendHumanReplyAction, deleteContactAction } from "../actions";
+import { DeleteContactButton } from "./DeleteContactButton";
 import waStyles from "../waConsole.module.css";
 
 export default async function InboxPage({ params, searchParams }: { params: Promise<{ agencyId: string }>; searchParams: Promise<{ c?: string }> }) {
@@ -20,6 +21,7 @@ export default async function InboxPage({ params, searchParams }: { params: Prom
   const takeOver = activeId ? takeOverConversationAction.bind(null, agencyId, activeId) : null;
   const resume = activeId ? resumeAiAction.bind(null, agencyId, activeId) : null;
   const sendReply = activeId ? sendHumanReplyAction.bind(null, agencyId, activeId) : null;
+  const deleteContact = thread ? deleteContactAction.bind(null, agencyId, thread.contactId) : null;
 
   return (
     <div>
@@ -47,11 +49,17 @@ export default async function InboxPage({ params, searchParams }: { params: Prom
                 <div style={{ fontWeight: 600, fontSize: 16 }}>{thread.contact.name || thread.contact.phone}</div>
                 <span className={`${waStyles.badge} ${thread.status === "HUMAN" ? waStyles.badgeHuman : waStyles.badgeAi}`}>{thread.status === "HUMAN" ? "Human is handling this" : "AI is replying"}</span>
               </div>
-              <form action={thread.status === "HUMAN" ? resume! : takeOver!}>
-                <button type="submit" className={waStyles.badgeAi} style={{ padding: "8px 16px", border: "1px solid var(--zc-done)" }}>
-                  {thread.status === "HUMAN" ? "Resume AI" : "Take over"}
-                </button>
-              </form>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <a href={`/api/whatsapp-umrah/${agencyId}/contacts/${thread.contactId}/export`} style={{ fontSize: 12, color: "var(--zc-muted)" }}>
+                  Export data
+                </a>
+                <DeleteContactButton action={deleteContact!} />
+                <form action={thread.status === "HUMAN" ? resume! : takeOver!}>
+                  <button type="submit" className={waStyles.badgeAi} style={{ padding: "8px 16px", border: "1px solid var(--zc-done)" }}>
+                    {thread.status === "HUMAN" ? "Resume AI" : "Take over"}
+                  </button>
+                </form>
+              </div>
             </div>
 
             <div className={waStyles.chatWrap} style={{ height: "55vh" }}>

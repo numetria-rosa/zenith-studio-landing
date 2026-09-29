@@ -10,7 +10,7 @@ import type { WhatsAppProvider } from "./provider/types";
 import type { EchoedStaffMessage, InboundTextMessage } from "./webhook";
 import type { Language } from "./agent/types";
 
-const META_TOKEN_ENV = "META_ACCESS_TOKEN_ENCRYPTION_KEY";
+export const META_TOKEN_ENV = "META_ACCESS_TOKEN_ENCRYPTION_KEY";
 
 // Every agency is UK-based today (see CLAUDE.md - UK-only launch). One
 // timezone assumption, not a per-agency setting yet: add

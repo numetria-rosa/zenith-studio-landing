@@ -53,6 +53,25 @@ export default function ZenithStudioLandingPage() {
       featured: false,
       ...systemsContent[2],
     },
+    // UK-only, GBP-priced - deliberately not spread from systemsContent
+    // (English only for now, unlike the three above which are translated
+    // across messages/*.json) since this is its own product with its own
+    // marketing/demo page, not part of the US-facing AI Systems catalog.
+    {
+      id: "whatsapp-umrah",
+      monthly: "£14",
+      featured: false,
+      name: "WhatsApp AI Agent for Umrah Agencies",
+      pitch: "Every enquiry answered on WhatsApp, in the customer's own language.",
+      description:
+        "Answers from your own packages and FAQs - prices, dates, hotels, cancellation policy - in English, Arabic, Turkish or Urdu, and captures every lead. Never invents an answer; hands off cleanly for anything outside your knowledge base.",
+      live: "UK Umrah & Hajj agencies",
+      features: [
+        "English, Arabic, Turkish, Urdu",
+        "Captures and qualifies every lead",
+        "Hands off for fiqh, visa or payment questions",
+      ],
+    } satisfies SystemContent & { id: string; monthly: string; featured: boolean },
   ];
 
   // Vertical offers. Deliberately a different shape from aiSystems above:
@@ -767,6 +786,14 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
                     <Link
                       href="/demo/ai-lead-capture-follow-up"
                       className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-sky-400/30 bg-sky-400/10 px-6 py-3 text-sm font-semibold text-sky-200 transition hover:scale-[1.02] hover:bg-sky-400/20"
+                    >
+                      {t("systems.tryLiveDemo")}
+                    </Link>
+                  )}
+                  {system.id === "whatsapp-umrah" && (
+                    <Link
+                      href="/demo/uk/whatsapp-umrah-agent"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-violet-400/30 bg-violet-400/10 px-6 py-3 text-sm font-semibold text-violet-200 transition hover:scale-[1.02] hover:bg-violet-400/20"
                     >
                       {t("systems.tryLiveDemo")}
                     </Link>
