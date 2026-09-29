@@ -60,6 +60,7 @@ model User {
   sessions        Session[]
   entitlements    CourseEntitlement[]
   progress        CourseProgress[]
+  aieLessonProgress AieLessonProgress[]
   serviceRequests ServiceRequest[]
   purchaseClaims  PurchaseClaim[]
   proposals       Proposal[]
@@ -191,6 +192,19 @@ model CourseProgress {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
+}
+
+// AI Engineering course app (src/app/lab/ai-engineering/learn): one row per lesson a
+// student has completed. Lesson ids are the content numbers ("1.4"); course content
+// itself lives in the repo under content/ai-engineering, not in the database.
+model AieLessonProgress {
+  userId      String
+  lessonId    String
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lessonId])
 }
 
 // AI Systems (done-for-you agency work) — a purchase here doesn't unlock a
