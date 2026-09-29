@@ -1,0 +1,17 @@
+<Muted>Tool: `send_refund(orderId: string, amountCents: number)`, both fields required. For each model-generated call below, decide: safe to execute as-is, or should it be rejected before your handler ever runs?</Muted>
+
+
+
+
+
+<Practice>
+
+One of the calls above has a syntactically valid, correctly-typed `amountCents` that's still worth rejecting: a refund of $50,000 on an order that (per your system) never exceeds $500. Schema validation alone wouldn't catch this. What kind of check would?
+
+<Answer>
+
+A business-rule / bounds check, separate from schema validation. Schema validation confirms the SHAPE is right (a number is present where a number is expected), it says nothing about whether that number makes sense for this specific order. Production tool executors typically layer both: schema validation for structural correctness, then domain-specific checks (amount limits, permission checks, rate limits) before anything with real-world consequences actually runs.
+
+</Answer>
+
+</Practice>

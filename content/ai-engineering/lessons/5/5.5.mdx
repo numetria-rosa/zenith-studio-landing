@@ -1,0 +1,33 @@
+A well-bounded agent loop has exactly three possible endings, and your code needs to handle all three distinctly, not collapse them into one generic "done."
+
+<Def title={"Definition: termination conditions"}>
+
+**Success**: the model emits an explicit final-answer signal, distinct from an ordinary action. **Step limit**: the cap is reached with no final answer. **Stuck**: the loop detects it's repeating the same action without progress, and stops early rather than burning the rest of its step budget on a pattern that clearly isn't working.
+
+</Def>
+
+These three need different handling downstream. A success has an answer to return. A step-limit or stuck outcome doesn't, and pretending it does (returning a partial or fabricated answer as if it were complete) is worse than clearly reporting that the loop didn't finish.
+
+<Practice>
+
+Why distinguish "stuck" (repeated action) from "step limit" (ran out of budget) instead of just treating both as "didn't finish, same as each other"?
+
+<Answer>
+
+They point to different problems. Hitting the step limit on a genuinely hard, multi-step task suggests the budget itself might be too small. Getting stuck after 3 identical actions suggests something is actually broken, a tool returning an error the model doesn't know how to act on, or a reasoning dead-end, regardless of how large the step budget is. Logging and alerting on these separately gives you a much better signal for what to actually fix.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A research-assistant agent answering "what caused the 2024 CrowdStrike outage" calls web\_search with a different query each step, wire, patch, sensor, root cause, timeline, and by step 12 has gathered enough in its reasoning text to write a solid answer. But it never emits the loop's explicit final-answer signal, and step 12 is the configured step limit. Should your loop code treat this as a success, since the material for a good answer is clearly there?
+
+<Answer>
+
+No. Success is defined by the model emitting the explicit final-answer signal, not by whether an outside observer thinks the accumulated observations look sufficient. Your loop has no reliable way to judge "is this good enough" from the outside, that judgment is exactly what the final-answer signal is for. If the model never produces it, this is a step-limit ending: report it as such, don't fabricate a "success" by scraping the last reasoning text for something that looks like an answer.
+
+</Answer>
+
+</Practice>

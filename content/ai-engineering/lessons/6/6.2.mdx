@@ -1,0 +1,21 @@
+When a model API call fails, the error tells you something important: whether trying again could possibly help. A rate limit (429) or a server-side timeout is *transient*, the exact same request might succeed a second later. A malformed request or an authentication failure is *permanent*, retrying the identical request will fail identically, every time, forever.
+
+<Def title={"Definition: retryable vs. non-retryable error"}>
+
+A retryable error indicates a temporary condition (rate limiting, timeout, transient server fault) where an identical retry has a real chance of succeeding. A non-retryable error indicates the request itself is invalid or unauthorized, retrying without changing anything will not help.
+
+</Def>
+
+Getting this classification wrong in either direction is a real cost: retrying a non-retryable error burns time and budget on guaranteed failures, while failing fast on a retryable one throws away requests that a second attempt would have succeeded on.
+
+<Practice>
+
+You integrate with a payment processor to charge cards during a flash sale. In the same minute, two calls fail: one returns HTTP 429 ("too many requests", the processor is throttling your API key under the traffic spike), the other returns HTTP 402 ("card declined, insufficient funds"). Which should your wrapper retry, and what's the actual risk of retrying the wrong one here, beyond just wasted time?
+
+<Answer>
+
+The 429 is retryable, your API key got throttled, not rejected, the identical charge attempt has a real chance of succeeding once the window resets. The 402 is non-retryable, the card has insufficient funds right now, and retrying the identical charge won't change the customer's balance. Retrying the 402 doesn't just waste a retry slot, it delays the moment the customer learns they need a different card, and depending on the processor, repeated charge attempts against a declined card can itself look like suspicious activity. Classification here isn't just about efficiency, retrying the wrong kind of failure has a real user-facing cost.
+
+</Answer>
+
+</Practice>

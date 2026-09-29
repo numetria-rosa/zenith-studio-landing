@@ -1,0 +1,15 @@
+You've seen the metric (cosine similarity) and the ranking rule (top-k with a relevance floor). Now implement both, and five real tests run against your actual code.
+
+<ExerciseLink />
+
+<Practice>
+
+Test 5 feeds your function a document whose vector is `[0, 0]`. If your cosine similarity helper divides by the magnitude without checking for zero first, what happens, and why is a crash worse here than a wrong-but-valid score?
+
+<Answer>
+
+Dividing by a magnitude of 0 produces `NaN`, not an error necessarily, but a value that then breaks every downstream comparison silently, `NaN < minScore` is always false, so a broken score can slip past your filter instead of being caught. Guarding for a zero magnitude and returning a defined score of 0 keeps every later comparison well-behaved, this is the same "never let a bad value propagate silently" discipline from Module 1's structured-output repair.
+
+</Answer>
+
+</Practice>

@@ -1,0 +1,5 @@
+<Muted>If you want to go deeper than the browser can take you:</Muted>
+
+- Real embedding models (and the vector databases built around them) use approximate nearest-neighbor search (e.g. HNSW) to find top-k matches across millions of vectors without comparing against every single one, this course's exercise does a full linear scan, which is correct but doesn't scale past a small collection.
+- Hybrid search (combining vector similarity with keyword/BM25 scoring) is standard in production RAG systems specifically because embeddings can miss exact-term matches that keyword search catches easily.
+- Re-ranking, a second, more expensive relevance pass applied only to the top-k candidates from a cheap first pass, is a common way to improve precision without paying the cost of expensive scoring on the entire collection.

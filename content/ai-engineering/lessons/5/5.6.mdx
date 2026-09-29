@@ -1,0 +1,37 @@
+A model that gets an error back from a tool call doesn't always adjust, sometimes it retries the exact same action, gets the exact same error, and repeats that cycle indefinitely, never making progress but never explicitly failing either. Without a guard, this looks identical to normal operation from the outside: the loop is "running," it just isn't going anywhere.
+
+<Callout>
+
+**Detecting "stuck" is a pattern-match, not a guess.** The simplest reliable signal is exact repetition: if the model issues the same action (same tool, same arguments) some small number of times in a row, that's a strong signal it's not reasoning its way forward, and the loop should stop rather than let the step limit be the only backstop.
+
+</Callout>
+
+<Practice label={"Cross-module check"}>
+
+Module 4's idempotent executor would happily return the SAME cached result for a repeated call with the same ID. Does that make stuck-loop detection unnecessary?
+
+<Answer>
+
+No, they solve different problems, and a repeated call with a NEW call ID each time (which is realistic, an agent re-reasoning about the same action typically generates a fresh call) wouldn't even hit Module 4's cache, idempotency keys off the ID, not the semantic content of the call. Even if it did hit the cache every time, the loop would still be burning steps (and tokens) doing nothing productive. Idempotency protects individual calls from duplicate side effects. Stuck-loop detection protects the loop itself from spinning.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A coding agent loops run\_tests, observe a failure, apply\_patch, run\_tests again, six times in a row. Every step calls the tool apply\_patch, but the diff argument is different each time, it's genuinely trying a new fix on each iteration. Should stuck-detection flag this as a repeated action because the tool name apply\_patch keeps recurring?
+
+<Answer>
+
+No, not if it's matching on tool name alone. The stuck signal defined earlier in this module is exact repetition, same tool AND same arguments, not "the same tool got called again." A coding agent trying six different diffs is taking six different actions that happen to share a tool name, that's iterative debugging, not spinning. If the SAME diff (identical arguments) got submitted twice in a row, that would be the real signal, the model resubmitting a patch that already failed without changing anything. Matching on tool name only would falsely kill a lot of legitimate agent behavior.
+
+</Answer>
+
+</Practice>
+
+<Decision id={"m5"} label={"AI Engineering Decision"}>
+
+An agent with a `web_search` tool and a 20-step budget is asked a genuinely hard, multi-part research question. By step 20 it has called `web_search` 20 times, no two calls with the same query, and still hasn't emitted a final answer. What should the loop do?
+
+</Decision>

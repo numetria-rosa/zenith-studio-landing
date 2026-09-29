@@ -1,0 +1,27 @@
+<Muted>A short consolidation before you're graded on it.</Muted>
+
+- Explain why retrieval exists as a separate step from chunking.
+- Explain why cosine similarity ignores vector magnitude, and why that's the correct behavior.
+- Explain why a minimum-relevance threshold matters even when top-k already limits results.
+- Implement cosine similarity and threshold-aware top-k retrieval from scratch.
+
+<ProdWarn title={"What would break in production?"}>
+
+- **Stale documents with no recency signal.** A superseded FAQ page scores well on pure semantic similarity, embeddings don't know a newer page exists unless you tell them.
+- **Duplicate or near-duplicate chunks.** The same fact indexed twice fills two of your k slots with the same information instead of two distinct, useful pieces of context.
+- **Confident answers on thin evidence.** A 0.4-score chunk is still a chunk, and a model asked to answer from context will usually try, whether or not that context actually supports a confident claim.
+- **No threshold at all.** Without a relevance floor, "nothing in the collection is actually relevant" and "the best match happens to be great" look identical to the retrieval step.
+
+<Rule>
+
+**Rule of thumb:** a retrieval system should be able to say "I don't have relevant information for that." A system that always returns k results, no matter how weak, can't.
+
+</Rule>
+
+</ProdWarn>
+
+<Connection title={"The engineering connection"}>
+
+You can now decide what actually deserves a place in the prompt. But retrieval only gets information in front of the model, it doesn't let the model do anything with it. Module 4 covers the other half of giving a model real capability: letting it call tools and take actions, and handling what happens when a tool call needs to be retried safely.
+
+</Connection>

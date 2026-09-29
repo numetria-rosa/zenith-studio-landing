@@ -1,0 +1,33 @@
+A *deterministic* check, exact match, schema validation (Module 1), a numeric comparison against a known-correct value, produces the same result every time it's run against the same output. It costs nothing beyond running some code, and it's exactly reproducible, which makes it the strongest possible foundation for an eval suite wherever the task allows it.
+
+<Def title={"Definition: deterministic check"}>
+
+A pass/fail (or scored) criterion evaluated by fixed logic, not by another model call, producing identical results on identical input every time it runs.
+
+</Def>
+
+Most real eval suites are a mix: deterministic checks for anything with a defined correct answer or shape, LLM-as-judge only for what genuinely can't be checked any other way. Leaning as far as possible toward deterministic checks is the version of this module's discipline that costs the least and gives the most trustworthy numbers.
+
+<Practice label={"Cross-module check"}>
+
+Module 1's structured-output validator already IS a deterministic check (does the output parse and match the schema). Does that mean structured-output tasks don't need a separate eval suite?
+
+<Answer>
+
+They still need one, for a different reason: Module 1's validator checks a SINGLE output at the moment it's produced, in production, live. An eval suite runs that same kind of check (and others) across a whole labeled test set, repeatably, specifically to compare versions and catch regressions over time. Reusing the Module 1 validation logic AS one of the eval's deterministic checks is exactly the right move, but the eval suite is the thing that turns "this one output was valid" into "94% of our test set passes, versus 91% last week."
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A document-classification pipeline sorts inbound files into a fixed set of labels: invoice, contract, resume, other. Every test case in the eval set already has a known correct label attached. Should scoring this use a deterministic check or LLM-as-judge, and why?
+
+<Answer>
+
+Deterministic: exact-match the predicted label against the known correct label for each test case. There's nothing subjective to weigh here, the category set is fixed and each case already has a single correct answer, exactly the situation this section says to prefer fixed logic for. Reaching for LLM-as-judge would add cost and a new source of inconsistency to a question a one-line string comparison already answers exactly and for free.
+
+</Answer>
+
+</Practice>

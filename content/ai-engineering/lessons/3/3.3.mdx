@@ -1,0 +1,9 @@
+To search by *meaning* instead of exact keyword matches, text first gets converted into a list of numbers, a vector, called an *embedding*. Texts with similar meaning end up as vectors that point in similar directions. Distance and direction in that numeric space become a stand-in for semantic similarity.
+
+<Def title={"Definition: embedding"}>
+
+A vector (list of numbers) produced by a model that represents a piece of text's meaning, positioned so that semantically similar texts have similar vectors. This course treats embeddings as already-computed inputs, generating them is a separate model call this course doesn't need to cover to teach the retrieval logic itself.
+
+</Def>
+
+What matters for this module isn't how embeddings are produced, it's what you do with them once you have them: measure how similar two vectors are, and rank candidates by that score.

@@ -1,0 +1,9 @@
+Reading a handful of outputs and judging them by eye feels like evaluation, but it isn't systematic: it's not repeatable, it's biased toward whatever examples you happened to try, and it gives you no way to compare two versions objectively. If someone asks "is the new prompt better than the old one," a shrug and "seemed about the same" isn't an answer a production system can be built on.
+
+<Def title={"Definition: evaluation (eval)"}>
+
+A systematic, repeatable process for scoring a system's outputs against a fixed set of test cases with defined criteria, producing a number (or set of numbers) that can be compared across versions, prompts, or models.
+
+</Def>
+
+The point isn't to reach 100%, real tasks are often genuinely hard and some failure rate is expected. The point is having a number you trust enough to notice when it changes.

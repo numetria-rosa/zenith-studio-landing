@@ -1,0 +1,33 @@
+Sometimes the primary model is down, overloaded, or exhausted its retry budget, and no amount of waiting fixes it in time. A *fallback*, a secondary model or provider, gives the system a path to still return a result instead of failing the entire request.
+
+<Def title={"Definition: fallback"}>
+
+A secondary call path attempted after the primary path has failed (exhausted retries, or hit a non-retryable error), typically a different model or provider, used to still return a usable result when the primary is unavailable.
+
+</Def>
+
+Fallback isn't free, it's often a different (sometimes lower-capability, sometimes more expensive) model, and switching to it is itself a decision worth logging and monitoring, a system quietly falling back on every request is a signal something's wrong with the primary path that deserves attention, not just automatic compensation.
+
+<Practice>
+
+Should the fallback call itself be retried the same number of times as the primary, if it also fails?
+
+<Answer>
+
+No, not with the same generous budget. If both the primary AND the fallback need extensive retries, the underlying issue is probably broader than one provider's outage, and the request should fail clearly rather than spend a second full retry budget hoping the fallback behaves better. A single fallback attempt (or a much smaller retry budget than the primary got) keeps total latency and cost bounded, the same "don't let a safety net become another unbounded loop" principle from Module 5's step limits.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+Your customer-facing chatbot's primary LLM provider has a partial outage: primary calls fail with 503s, retries with backoff exhaust the retry budget, and the wrapper falls back to a smaller, cheaper backup model. But the outage is severe enough that most of your traffic is now hitting the backup model at once, and IT starts returning occasional 503s too. Should the wrapper retry the fallback call with backoff the same way it retried the primary?
+
+<Answer>
+
+No. Fallback still gets one bounded attempt, not a second retry cycle, even though the circumstances (a real, severe outage) make it tempting to fight harder for a result. Giving fallback the primary's full retry budget just moves the unbounded-cost risk from one path to the other, and if the fallback is now also under heavy load, retrying it aggressively adds MORE load to a system that's already struggling. The correct response to "even the backup is straining" isn't a bigger retry budget, it's returning a clear failure for that request and treating the fallback's own error rate as a signal (worth alerting on) that something bigger than one provider's outage is happening.
+
+</Answer>
+
+</Practice>

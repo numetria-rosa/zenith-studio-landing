@@ -1,0 +1,51 @@
+{
+  "MODULE_ID": 4,
+  "SPOT_CALLS": [
+    {
+      "id": "c1",
+      "code": "{ \"name\": \"send_refund\",\n  \"arguments\": { \"orderId\": \"ord_9\", \"amountCents\": 1200 } }",
+      "valid": true,
+      "explanation": "Correct tool name, both required arguments present with plausible types. Safe to pass through to execution (and any business-rule checks beyond schema)."
+    },
+    {
+      "id": "c2",
+      "code": "{ \"name\": \"send_refund\",\n  \"arguments\": { \"orderId\": \"ord_9\" } }",
+      "valid": false,
+      "explanation": "Missing the required amountCents argument entirely. Must be rejected before the handler runs, a missing field here isn't something the handler should have to guard against itself."
+    },
+    {
+      "id": "c3",
+      "code": "{ \"name\": \"issue_refund\",\n  \"arguments\": { \"orderId\": \"ord_9\", \"amountCents\": 1200 } }",
+      "valid": false,
+      "explanation": "The tool name is issue_refund, not send_refund, it doesn't match anything in the registry. This is a hallucinated or misremembered tool name, and must be rejected as unknown."
+    },
+    {
+      "id": "c4",
+      "code": "{ \"name\": \"send_refund\",\n  \"arguments\": { \"orderId\": \"ord_9\", \"amountCents\": \"1200\" } }",
+      "valid": false,
+      "explanation": "amountCents is a string, not a number. Depending on how strict your schema validation is, this should be rejected (or explicitly coerced with a clear rule) rather than silently passed to a handler expecting a number."
+    },
+    {
+      "id": "c5",
+      "code": "{ \"name\": \"send_refund\",\n  \"arguments\": { \"orderId\": \"ord_9\", \"amountCents\": 5000000 } }",
+      "valid": true,
+      "explanation": "Structurally valid, correct tool, both required fields present with correct types. Whether $50,000 SHOULD be refunded is a business-rule question, not a schema-validation one, see the practice check below."
+    }
+  ],
+  "toolHasAttempted": false,
+  "score": 0,
+  "answered": {
+    "q1": false,
+    "q2": false,
+    "q3": false,
+    "q4": false,
+    "q5": false
+  },
+  "IDEM_CALL_ID": "call_ops_2291",
+  "idemState": {
+    "stock": 120,
+    "seen": {},
+    "handlerCalls": 0,
+    "submitted": false
+  }
+}

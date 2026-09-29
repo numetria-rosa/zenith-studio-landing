@@ -1,0 +1,27 @@
+<Muted>A short consolidation before you're graded on it.</Muted>
+
+- Explain why an instruction to "output JSON" is a probabilistic nudge, not a contract.
+- Identify the three prompt roles and where a format instruction belongs.
+- Distinguish a repair-pass failure (syntax) from a validation failure (missing required data).
+- Implement a validator in Python that never raises, even on completely non-JSON input.
+
+<ProdWarn title={"What would break in production?"}>
+
+- **Missing optional fields.** A validator that only checks "the required keys are present" waves through an empty string or null where a real value belongs.
+- **Invalid enum values.** The model invents a category, status, or label that isn't in your allowed set, and a naive validator, which only checks presence and type, lets it through.
+- **Silent schema drift.** A prompt change six months from now adds a field nobody updates the validator for, and it starts silently passing incomplete data.
+- **Partial output on a long response.** The model gets cut off mid-JSON by a token limit, and the repair pass has nothing to strip, it's not malformed, it's incomplete.
+
+<Rule>
+
+**Rule of thumb:** if a model's output will trigger a database write, a payment, a permission change, or any other external action, "the JSON parsed" is not the same claim as "the data is safe to act on."
+
+</Rule>
+
+</ProdWarn>
+
+<Connection title={"The engineering connection"}>
+
+You can now turn a model's raw text into data your program can trust. But this module assumed the entire response fits in the prompt with room to spare, real prompts don't have unlimited room. Module 2 removes that assumption: every prompt has a token budget, and what you choose to cut when content doesn't fit is its own engineering decision, not an afterthought.
+
+</Connection>

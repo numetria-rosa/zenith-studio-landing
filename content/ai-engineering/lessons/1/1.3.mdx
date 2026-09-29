@@ -1,0 +1,15 @@
+A prompt sent to a model is usually structured in roles, not one blob of text:
+
+<Def title={"The three roles"}>
+
+**`system`** — standing instructions that apply to the whole conversation: tone, constraints, output format. **`user`** — the actual request or input for this turn. **`assistant`** — the model's prior responses, included when there's conversation history or when you're providing few-shot examples of the response style you want.
+
+</Def>
+
+Where the format instruction lives matters. Burying "respond only in JSON" in the middle of a long user message is far less reliable than stating it once, clearly, in the system role, and reinforcing it with an example.
+
+<Callout>
+
+**The instruction is not the guarantee.** Telling a model to output valid JSON measurably improves the odds. It does not make malformed output impossible. Anything that parses the response has to assume it might not parse.
+
+</Callout>

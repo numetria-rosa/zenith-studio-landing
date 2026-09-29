@@ -1,0 +1,238 @@
+{
+  "number": 7,
+  "slug": "evaluation-testing-and-observability",
+  "title": "Evaluation, Testing & Observability",
+  "stage": "Stage 2 · Agents in production",
+  "minutes": 40,
+  "summary": "\"I tried a few prompts and it looked good\" isn't evaluation, it's a vibe check on a handful of lucky examples. Every system this course has built needs a systematic way to measure whether it's actually working, and whether a change made it better or worse.",
+  "objectives": [
+    "Explain why an ad hoc \"looks good\" check doesn't substitute for a systematic eval",
+    "Design labeled eval test cases with an explicit, checkable criterion each",
+    "Explain the tradeoffs of LLM-as-judge scoring versus deterministic, rule-based checks",
+    "Implement an eval harness that scores outputs against test cases and flags regressions against a baseline"
+  ],
+  "lessons": [
+    {
+      "number": "7.1",
+      "title": "Before you start",
+      "minutes": 2
+    },
+    {
+      "number": "7.2",
+      "title": "\"It looked fine\" is not an evaluation",
+      "minutes": 3
+    },
+    {
+      "number": "7.3",
+      "title": "Interactive: spot the usable eval test case",
+      "minutes": 5
+    },
+    {
+      "number": "7.4",
+      "title": "LLM-as-judge: useful, but not free of the problem it's solving",
+      "minutes": 4
+    },
+    {
+      "number": "7.5",
+      "title": "Prefer deterministic checks wherever they apply",
+      "minutes": 7
+    },
+    {
+      "number": "7.6",
+      "title": "Catching regressions before they ship",
+      "minutes": 10
+    },
+    {
+      "number": "7.7",
+      "title": "Build it: a deterministic eval harness",
+      "minutes": 3
+    },
+    {
+      "number": "7.8",
+      "title": "Before the checkpoint: what you should now be able to do",
+      "minutes": 6
+    },
+    {
+      "number": "7.9",
+      "title": "Interactive: live regression detection",
+      "minutes": 2
+    }
+  ],
+  "exercise": {
+    "label": "Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)",
+    "instructions": "Complete `evaluate_model(test_cases, model_fn, baseline_score)`. `test_cases` is a list of `{\"id\":..., \"input\":..., \"check\":...}` dicts, where `check(actual)` returns True/False. For each case, call `model_fn(input)` to get the actual output (never let a raise from `model_fn` OR `check` crash your function, treat either as a failed case instead), then run `check(actual)`. Return `{\"score\":..., \"passCount\":..., \"total\":..., \"results\":..., \"regression\":...}`, where `results` is a list of `{\"id\":..., \"pass\":..., \"actual\":...}` in the same order as `test_cases`, `score` is `passCount / total`, and `regression` is `True` only when `baseline_score` is a real number AND `score` is lower than it.",
+    "functionName": "evaluate_model",
+    "fileName": "evaluate_model.py",
+    "starter": "def evaluate_model(test_cases, model_fn, baseline_score):\n    # test_cases: list of {\"id\":..., \"input\":..., \"check\": fn(actual) -> bool}\n    # For each case, call model_fn(input); never let a raise from model_fn OR\n    # check crash this function, treat either as a failed case instead.\n    # Return {\"score\":..., \"passCount\":..., \"total\":..., \"results\":..., \"regression\":...}\n    #   results: list of {\"id\":..., \"pass\":..., \"actual\":...}, same order as test_cases\n    #   score: passCount / total (guard against total == 0)\n    #   regression: True only if baseline_score is a real number AND score < baseline_score\n\n    # YOUR CODE HERE\n\n    pass",
+    "solution": "def evaluate_model(test_cases, model_fn, baseline_score):\n    results = []\n    for tc in test_cases:\n        try:\n            actual = model_fn(tc[\"input\"])\n        except Exception as e:\n            results.append({\"id\": tc[\"id\"], \"pass\": False, \"actual\": \"ERROR: \" + str(e)})\n            continue\n\n        try:\n            passed = bool(tc[\"check\"](actual))\n        except Exception:\n            passed = False\n\n        results.append({\"id\": tc[\"id\"], \"pass\": passed, \"actual\": actual})\n\n    total = len(results)\n    pass_count = sum(1 for r in results if r[\"pass\"])\n    score = pass_count / total if total > 0 else 0\n\n    has_baseline = baseline_score is not None\n    regression = has_baseline and score < baseline_score\n\n    return {\"score\": score, \"passCount\": pass_count, \"total\": total, \"results\": results, \"regression\": regression}",
+    "hints": [
+      {
+        "title": "Hint 1 — conceptual",
+        "mdx": "Loop over test\\_cases: for each one, get an actual output, check it, and record the result. Then reduce that list of results down to a score, a pass count, and a regression flag."
+      },
+      {
+        "title": "Hint 2 — specific",
+        "mdx": "Wrap the model\\_fn(tc\\[\"input\"\\]) call in its own try/except, if it raises, that case is a fail with actual set to something describing the error, and check() is never called for that case. Separately, wrap tc\\[\"check\"\\](actual) in try/except too, if IT raises, treat the case as a fail as well."
+      },
+      {
+        "title": "Hint 3 — near-solution",
+        "mdx": "After building the results list, total is len(results), passCount is how many have pass is True, score is passCount / total (guard against total being 0). regression is only True if baseline\\_score is not None AND score \\< baseline\\_score."
+      }
+    ],
+    "tests": [
+      {
+        "name": "All test cases pass: score is 1, regression is false with no baseline provided",
+        "hint": "Call model_fn(tc['input']) then tc['check'](actual) for each case. score should be passCount/total. With no baseline_score, regression must be False, not None-but-truthy."
+      },
+      {
+        "name": "Mixed pass/fail: score reflects the true pass rate, and results correctly flag exactly which cases failed",
+        "hint": "Each entry in results should have pass set individually per test case, based on that case's own check(actual) call, not a single shared pass/fail value."
+      },
+      {
+        "name": "A model_fn that raises for one case is caught and counted as a failure, without crashing the other cases",
+        "hint": "Wrap the model_fn(tc['input']) call in its own try/except. If it raises, that specific case is a fail, but keep processing the remaining test cases normally."
+      },
+      {
+        "name": "regression is true when score is below the baseline, and false when it meets or exceeds it",
+        "hint": "regression should be (baseline_score is not None) AND (score < baseline_score). A score equal to or above the baseline is NOT a regression."
+      },
+      {
+        "name": "A check() function that raises is treated as a failing check, not a crash of the whole evaluation",
+        "hint": "Wrap tc['check'](actual) in its own try/except too, separate from the model_fn try/except. If check() raises, that case is a fail, but every other case should still be evaluated normally."
+      }
+    ],
+    "harness": "exercises/7.py",
+    "id": "7.7"
+  },
+  "quiz": {
+    "passMark": 4,
+    "questions": [
+      {
+        "id": "m7-q1",
+        "question": "Why doesn't \"I read a few outputs and they looked fine\" substitute for a systematic eval?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "It's an unrepresentative sample judged by inconsistent, undocumented criteria, with no way to compare versions objectively",
+            "correct": true,
+            "why": "A few spot-checked examples, judged by feel, give neither coverage nor a repeatable number to compare against later."
+          },
+          {
+            "text": "It's fine for small projects, systematic eval is only needed once a system reaches production scale",
+            "correct": false,
+            "why": "The problem isn't scale, it's rigor, a small project with no systematic eval still can't reliably tell whether a change helped or hurt, it just has fewer users affected by not knowing."
+          },
+          {
+            "text": "It doesn't substitute for eval only when the outputs are structured (JSON), free-text outputs are fine to spot-check",
+            "correct": false,
+            "why": "The reasoning applies regardless of output format, structured or free-text, an unrepresentative sample judged inconsistently doesn't produce a trustworthy, comparable signal either way."
+          }
+        ],
+        "principle": "A few spot-checked examples, judged by feel, give neither coverage nor a repeatable number to compare against later."
+      },
+      {
+        "id": "m7-q2",
+        "question": "What specific risk does LLM-as-judge scoring introduce that a deterministic exact-match check doesn't have?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "The judge's own grading is itself an unverified model output, it can be inconsistent or biased, unlike a fixed-logic check that behaves identically every time",
+            "correct": true,
+            "why": "LLM-as-judge inherits the exact unreliability it's being used to measure, since the judge is itself a model call."
+          },
+          {
+            "text": "LLM-as-judge is always slower, that's its only real downside compared to deterministic checks",
+            "correct": false,
+            "why": "Speed and cost are real downsides, but not the core risk this module highlights, the deeper issue is that the judge's scoring itself isn't guaranteed consistent or correct."
+          },
+          {
+            "text": "There's no meaningful difference, both approaches carry identical reliability risk",
+            "correct": false,
+            "why": "There is a meaningful difference, a deterministic check (exact match, schema validation) produces the exact same result every time on the same input, an LLM judge is not guaranteed to."
+          }
+        ],
+        "principle": "LLM-as-judge inherits the exact unreliability it's being used to measure, since the judge is itself a model call."
+      },
+      {
+        "id": "m7-q3",
+        "question": "When a task's correctness CAN be checked with fixed logic (schema validation, exact match, a numeric comparison), which approach should be preferred?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "The deterministic check, it's consistent, cheap, and exactly reproducible",
+            "correct": true,
+            "why": "Wherever a fixed correct answer or shape exists, a deterministic check is strictly more trustworthy and cheaper than an LLM-as-judge call."
+          },
+          {
+            "text": "LLM-as-judge, it generalizes better even to cases with a known correct answer",
+            "correct": false,
+            "why": "When a fixed correct answer or shape already exists, there's nothing for an LLM judge to 'generalize' that a deterministic check doesn't already handle exactly and consistently."
+          },
+          {
+            "text": "Whichever is cheaper to run for this specific test case",
+            "correct": false,
+            "why": "Cost isn't the deciding factor here, deterministic checks are both cheaper AND more reliable when they apply, there's no tradeoff to weigh in that scenario."
+          }
+        ],
+        "principle": "Wherever a fixed correct answer or shape exists, a deterministic check is strictly more trustworthy and cheaper than an LLM-as-judge call."
+      },
+      {
+        "id": "m7-q4",
+        "question": "An eval run passes 7 of 10 test cases. The recorded baseline score is 0.75. Using this module's definition, is this a regression? (Enter 1 for yes, 0 for no.)",
+        "source": "checkpoint",
+        "numeric": {
+          "answer": 1,
+          "tolerance": 0,
+          "correct": "Correct. 7/10 = 0.70, which is below the 0.75 baseline, so this is a regression.",
+          "incorrect": "Not quite. 7/10 = 0.70, which is LOWER than the 0.75 baseline, so this does count as a regression (answer: 1)."
+        }
+      },
+      {
+        "id": "m7-q5",
+        "question": "A team changes their system prompt (Module 1) and their retrieval top-k (Module 3) in the same deploy, then runs the eval suite once and sees a score drop. What's the practical downside of evaluating both changes together instead of separately?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "They can't tell which change caused the drop, or whether one change improved things while the other hurt worse, isolating the cause now requires re-running the eval with each change separated",
+            "correct": true,
+            "why": "Evaluating both changes together conflates their effects, the score drop is real, but its cause is ambiguous until the changes are isolated and re-tested separately."
+          },
+          {
+            "text": "Nothing, the eval score is the same either way regardless of how many things changed at once",
+            "correct": false,
+            "why": "The score reflects the combined effect of both changes together, it can't distinguish which one, or how much of each, is responsible for the drop."
+          },
+          {
+            "text": "The eval suite itself becomes invalid once more than one variable changes between runs",
+            "correct": false,
+            "why": "The eval suite still produces a valid, meaningful score, the problem isn't the eval's validity, it's that the CAUSE of a score change becomes ambiguous when multiple variables change at once."
+          }
+        ],
+        "principle": "Evaluating both changes together conflates their effects, the score drop is real, but its cause is ambiguous until the changes are isolated and re-tested separately."
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "eval (evaluation)",
+      "definition": "a systematic, repeatable process for scoring outputs against test cases with defined criteria."
+    },
+    {
+      "term": "deterministic check",
+      "definition": "a pass/fail criterion evaluated by fixed logic, producing identical results on identical input every time."
+    },
+    {
+      "term": "LLM-as-judge",
+      "definition": "using a model call to score another model's output, useful for subjective criteria, but inherits model unreliability."
+    },
+    {
+      "term": "baseline",
+      "definition": "a previously recorded eval score used as the comparison point for detecting regressions."
+    },
+    {
+      "term": "regression",
+      "definition": "a measurable drop in eval score after a change, compared to the baseline."
+    }
+  ],
+  "furtherReading": true
+}

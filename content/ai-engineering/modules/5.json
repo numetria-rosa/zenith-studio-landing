@@ -1,0 +1,250 @@
+{
+  "number": 5,
+  "slug": "agent-architectures-and-control-flow",
+  "title": "Agent Architectures & Control Flow",
+  "stage": "Stage 2 · Agents in production",
+  "minutes": 45,
+  "summary": "One validated tool call is a single step. An agent is what happens when a model chains steps together, reasoning about each result before deciding the next action, in a loop it controls. That loop needs boundaries, or it doesn't stop on its own.",
+  "objectives": [
+    "Describe the reason-act-observe cycle and how it differs from a single prompt/response call",
+    "Explain why an agent loop needs a hard step limit, not just a \"the model will know when to stop\" assumption",
+    "Distinguish a legitimate termination condition from a stuck loop repeating the same failing action",
+    "Implement a bounded agent loop with step-limit and repeated-action guards"
+  ],
+  "lessons": [
+    {
+      "number": "5.1",
+      "title": "Before you start",
+      "minutes": 3
+    },
+    {
+      "number": "5.2",
+      "title": "From one call to a loop",
+      "minutes": 3
+    },
+    {
+      "number": "5.3",
+      "title": "Interactive: watch a trace unfold",
+      "minutes": 3
+    },
+    {
+      "number": "5.4",
+      "title": "Why a hard step limit is non-negotiable",
+      "minutes": 8
+    },
+    {
+      "number": "5.5",
+      "title": "Three ways a loop can end",
+      "minutes": 8
+    },
+    {
+      "number": "5.6",
+      "title": "The repeated-failure trap",
+      "minutes": 9
+    },
+    {
+      "number": "5.7",
+      "title": "Build it: a bounded agent loop",
+      "minutes": 3
+    },
+    {
+      "number": "5.8",
+      "title": "Before the checkpoint: what you should now be able to do",
+      "minutes": 6
+    },
+    {
+      "number": "5.9",
+      "title": "Interactive: tune the stuck threshold",
+      "minutes": 2
+    }
+  ],
+  "exercise": {
+    "label": "Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)",
+    "instructions": "Complete `run_agent_loop(initial_state, step, max_steps)`. Call `step(state)` each iteration, it returns either `{\"type\": \"final\", \"answer\": ...}` or `{\"type\": \"action\", \"action\": ..., \"nextState\": ...}`. Track actions taken in a `trace` list (append each `action` string). If `step` returns final, return `{\"status\": \"success\", \"answer\": ..., \"stepsUsed\": ..., \"trace\": trace}`. If the SAME action string repeats 3 times in a row, stop immediately and return `{\"status\": \"stuck\", \"stepsUsed\": ..., \"trace\": trace}`, don't wait for max\\_steps. If `max_steps` is reached with no final answer and no stuck detection, return `{\"status\": \"max_steps\", \"stepsUsed\": max_steps, \"trace\": trace}`.",
+    "functionName": "run_agent_loop",
+    "fileName": "run_agent_loop.py",
+    "starter": "def run_agent_loop(initial_state, step, max_steps):\n    # Call step(state) each iteration:\n    #   {\"type\": \"final\", \"answer\": ...}                     -> loop is done\n    #   {\"type\": \"action\", \"action\": ..., \"nextState\": ...}  -> record action, continue with nextState\n    # Append each action string to a trace list as it happens.\n    # If the SAME action string repeats 3 times in a row, stop immediately: \"stuck\".\n    # If max_steps is reached with no final answer and no stuck detection: \"max_steps\".\n    # Return {\"status\": ..., \"answer\"?: ..., \"stepsUsed\": ..., \"trace\": ...} matching whichever ending occurred.\n\n    # YOUR CODE HERE\n\n    pass",
+    "solution": "def run_agent_loop(initial_state, step, max_steps):\n    state = initial_state\n    trace = []\n    last_action = None\n    repeat_count = 0\n\n    for i in range(max_steps):\n        result = step(state)\n\n        if result[\"type\"] == \"final\":\n            return {\"status\": \"success\", \"answer\": result[\"answer\"], \"stepsUsed\": i + 1, \"trace\": trace}\n\n        trace.append(result[\"action\"])\n        if result[\"action\"] == last_action:\n            repeat_count += 1\n        else:\n            last_action = result[\"action\"]\n            repeat_count = 1\n\n        if repeat_count >= 3:\n            return {\"status\": \"stuck\", \"stepsUsed\": i + 1, \"trace\": trace}\n\n        state = result[\"nextState\"]\n\n    return {\"status\": \"max_steps\", \"stepsUsed\": max_steps, \"trace\": trace}",
+    "hints": [
+      {
+        "title": "Hint 1 — conceptual",
+        "mdx": "Loop up to max\\_steps times. Each iteration, call step(state) once. Check its type: if \"final,\" you're done. If \"action,\" record it and check whether it's a repeat of the last action before continuing."
+      },
+      {
+        "title": "Hint 2 — specific",
+        "mdx": "Keep two variables outside the loop: the last action seen, and how many times in a row it's repeated. Each \"action\" result, compare it to the last action, if equal increment the repeat counter, if different reset the counter to 1 and update \"last action.\""
+      },
+      {
+        "title": "Hint 3 — near-solution",
+        "mdx": "Check the repeat counter AFTER appending the current action to trace and updating the counter, if it reaches 3, return the stuck result right there, don't keep looping. If the loop finishes all max\\_steps iterations without returning, that's your max\\_steps case, return it after the loop."
+      }
+    ],
+    "tests": [
+      {
+        "name": "Loop terminates successfully when step returns a final answer",
+        "hint": "When step(state) returns {'type': 'final', 'answer': ...}, immediately return {'status': 'success', 'answer': ..., 'stepsUsed': ..., 'trace': trace}, stepsUsed should count this final call too."
+      },
+      {
+        "name": "Loop stops at max_steps when step never finishes and never repeats",
+        "hint": "If the loop runs max_steps times without hitting 'final' or a stuck condition, return {'status': 'max_steps', 'stepsUsed': max_steps, 'trace': trace} after the loop ends."
+      },
+      {
+        "name": "3 identical consecutive actions trigger 'stuck' well before max_steps is reached",
+        "hint": "Track the last action and a repeat counter. If the current action equals the last one, increment the counter; if it reaches 3, return {'status': 'stuck', 'stepsUsed': ..., 'trace': trace} immediately, don't keep looping to max_steps."
+      },
+      {
+        "name": "Alternating different actions reach success without falsely triggering stuck detection",
+        "hint": "Your repeat counter must reset to 1 whenever the current action differs from the last one, not just increment unconditionally. fetch, parse, fetch, parse never repeats 3 TIMES IN A ROW."
+      },
+      {
+        "name": "trace records the exact sequence of actions taken, in the order they occurred",
+        "hint": "Append result['action'] onto the trace list every time step returns an 'action' result, before continuing the loop. Don't append anything for the final result itself."
+      }
+    ],
+    "harness": "exercises/5.py",
+    "id": "5.7"
+  },
+  "quiz": {
+    "passMark": 4,
+    "questions": [
+      {
+        "id": "m5-q1",
+        "question": "What's the core risk of an agent loop with no maximum step count?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "It can keep running (and costing tokens, time, and possibly real-world side effects) indefinitely if the model never emits a clean final answer",
+            "correct": true,
+            "why": "Without an explicit, code-enforced cap, the loop's duration is entirely at the mercy of the model producing a stop signal, which isn't guaranteed."
+          },
+          {
+            "text": "It will crash the browser or server process automatically after a fixed number of iterations",
+            "correct": false,
+            "why": "There's no automatic crash, that's exactly the danger, a loop with no step limit just keeps calling the model and executing tools with no forced stopping point."
+          },
+          {
+            "text": "Nothing, models are trained to stop agent loops on their own reliably",
+            "correct": false,
+            "why": "Models are not guaranteed to reliably self-terminate, reasoning failures, ambiguous tasks, and edge cases can all lead to a model that keeps taking action instead of concluding."
+          }
+        ],
+        "principle": "Without an explicit, code-enforced cap, the loop's duration is entirely at the mercy of the model producing a stop signal, which isn't guaranteed."
+      },
+      {
+        "id": "m5-q2",
+        "question": "An agent issues the exact same tool call, same tool, same arguments, three times in a row. What should the loop do?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Stop the loop early and report a 'stuck' outcome, rather than letting it keep repeating up to the step limit",
+            "correct": true,
+            "why": "Three identical consecutive actions is a strong signal of no progress, stopping early conserves budget and gives a clearer diagnostic signal than waiting for the step limit."
+          },
+          {
+            "text": "Keep retrying, the model will eventually try something different on its own",
+            "correct": false,
+            "why": "That's exactly the trap this module warns about, an unguarded loop has no reason to assume the model will spontaneously change approach, and burns steps (and cost) waiting for something that may never happen."
+          },
+          {
+            "text": "Immediately raise the step limit so the loop has more room to try again",
+            "correct": false,
+            "why": "Raising the limit doesn't address the actual problem, repeating the identical action isn't a budget issue, more steps just means more identical failed attempts."
+          }
+        ],
+        "principle": "Three identical consecutive actions is a strong signal of no progress, stopping early conserves budget and gives a clearer diagnostic signal than waiting for the step limit."
+      },
+      {
+        "id": "m5-q3",
+        "question": "Module 4's idempotent executor prevents a repeated tool call (same ID) from re-running its side effect. Does that alone prevent an agent loop from spinning on the same failing action forever?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "No, idempotency prevents a repeat from causing a NEW side effect, it doesn't limit how many times the loop itself keeps trying",
+            "correct": true,
+            "why": "Idempotency and stuck-loop detection solve different problems, one protects individual call side effects, the other protects the loop's own progress and budget."
+          },
+          {
+            "text": "Yes, an idempotent executor automatically caps how many times a loop can call the same tool",
+            "correct": false,
+            "why": "Idempotency has no concept of a loop-wide call count or step limit, it only tracks whether a SPECIFIC call ID has already succeeded, which is a narrower guarantee."
+          },
+          {
+            "text": "Yes, because a cached result means the loop effectively stops making tool calls after the first one",
+            "correct": false,
+            "why": "The loop can still keep calling step() and issuing new tool-call attempts (often with new call IDs) indefinitely, a cached result for one specific ID doesn't stop the surrounding loop from continuing."
+          }
+        ],
+        "principle": "Idempotency and stuck-loop detection solve different problems, one protects individual call side effects, the other protects the loop's own progress and budget."
+      },
+      {
+        "id": "m5-q4",
+        "question": "Which of these are valid, distinct termination conditions for a well-bounded agent loop?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "All three: reaching the step limit, the model emitting a distinct final-answer signal, and detecting a repeated identical action",
+            "correct": true,
+            "why": "A well-bounded loop needs to recognize and handle all three endings distinctly, not just the happy path."
+          },
+          {
+            "text": "Only the model emitting a final answer, that's the only real way an agent loop should end",
+            "correct": false,
+            "why": "Relying on only one termination path is exactly the failure mode this module addresses, a model that never emits a clean final answer would leave the loop with no way to stop."
+          },
+          {
+            "text": "Only reaching the step limit, since that's the only condition guaranteed to actually trigger",
+            "correct": false,
+            "why": "Step limit alone is a valid backstop, but relying on it exclusively means every task runs to the maximum budget even when it's clearly stuck or clearly finished early, wasting cost either way."
+          }
+        ],
+        "principle": "A well-bounded loop needs to recognize and handle all three endings distinctly, not just the happy path."
+      },
+      {
+        "id": "m5-q5",
+        "question": "An agent loop with no step limit runs 40 steps, and each step re-sends the model the FULL growing trace history as context, not just the latest step. Using Module 2's terms, what compounds here beyond just \"it's taking a while\"?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "The input token cost compounds every step, since the full trace history gets resent each time, growing the prompt (and cost, and risk of exceeding the context window) with every additional step",
+            "correct": true,
+            "why": "Re-sending the growing trace each step means token cost isn't flat per step, it increases, an unbounded loop compounds both time AND the Module 2 token budget problem simultaneously."
+          },
+          {
+            "text": "Nothing beyond time, token cost stays flat per step regardless of how much history is included",
+            "correct": false,
+            "why": "Token cost is directly tied to how much text is in the prompt, resending a growing trace each step means each step's input tokens increase, it is not flat."
+          },
+          {
+            "text": "The context window issue only matters if the model provider bills per-request rather than per-token",
+            "correct": false,
+            "why": "The context window limit and per-token cost both apply regardless of billing model, a growing trace can hit the hard context window ceiling (Module 2) even setting cost aside entirely."
+          }
+        ],
+        "principle": "Re-sending the growing trace each step means token cost isn't flat per step, it increases, an unbounded loop compounds both time AND the Module 2 token budget problem simultaneously."
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "agent loop / ReAct",
+      "definition": "a cycle of reasoning, taking an action, and observing the result, repeated until a final answer or a stop condition."
+    },
+    {
+      "term": "step limit",
+      "definition": "a hard cap on how many loop iterations run before forcibly stopping."
+    },
+    {
+      "term": "termination condition",
+      "definition": "any of the defined ways a loop is allowed to end: success, step limit, or stuck."
+    },
+    {
+      "term": "stuck loop",
+      "definition": "a loop repeating the same action without progress, detected and stopped early rather than exhausting the step budget."
+    },
+    {
+      "term": "trace",
+      "definition": "the ordered record of actions (and often reasoning) an agent loop produced, used for debugging and for detecting repetition."
+    }
+  ],
+  "furtherReading": true
+}

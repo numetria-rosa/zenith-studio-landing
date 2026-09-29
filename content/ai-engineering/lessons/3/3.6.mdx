@@ -1,0 +1,45 @@
+Once every candidate has a similarity score, retrieval is: sort by score descending, take the top `k`. But top-k alone has a failure mode: if nothing in the collection is actually relevant, top-k still returns *something*, whatever scored highest among a set of bad matches. A *minimum-relevance threshold* fixes this, discard anything below a score cutoff, even if that leaves fewer than k results, or none at all.
+
+<Def title={"Definition: top-k retrieval"}>
+
+Ranking all candidates by similarity score and returning only the highest-scoring `k` of them.
+
+</Def>
+
+<Callout>
+
+**Returning zero results is sometimes the correct answer.** A system that always forces k results, even irrelevant ones, into the prompt produces confidently wrong answers grounded in context that doesn't actually apply. "I don't have relevant information for that" is a better outcome than a fluent answer built on a bad match.
+
+</Callout>
+
+Production systems often combine vector similarity with traditional keyword search, *hybrid search*, since exact terms (product codes, names, acronyms) can matter even when their embedding similarity to a paraphrased query is unremarkable. This course's exercise implements the vector half; the principle (score, filter, sort, limit) is the same either way.
+
+<Practice label={"Cross-module check"}>
+
+Module 2's chunker guarantees every word ends up in some chunk. Does retrieval guarantee every chunk ends up in some answer?
+
+<Answer>
+
+No, and it shouldn't. Chunking's job is completeness, don't silently lose content. Retrieval's job is selectivity, don't include irrelevant content just because it exists. Most chunks in a large collection are correctly never retrieved for any given query, that's the system working as intended, not a gap.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A codebase Q&amp;A tool retrieves from a large repo with k=3 and min\_score=0.5. Five functions come back scored against the query: `handleAuth` 0.9, `formatDate` 0.3, `padString` 0.28, `validateAuth` 0.55, `refreshAuthToken` 0.5. An engineer's implementation sorts by score, takes the top 3 (`handleAuth`, `formatDate`, `padString`), then filters that slice down to scores at or above 0.5. It returns one result. What went wrong, and how many results should the query actually return?
+
+<Answer>
+
+It should return three: `handleAuth` (0.9), `validateAuth` (0.55), and `refreshAuthToken` (0.5). Filtering after slicing throws away the slots that irrelevant matches occupied before the relevant ones further down the ranking ever get a chance, `formatDate` and `padString` took two of the three available slots despite being below threshold. The fix is the order used in the exercise: filter out everything below min\_score first, across the entire scored set, then sort and slice to k. Filtering an already-sliced top-k instead of the full candidate set silently under-returns even when enough relevant results exist.
+
+</Answer>
+
+</Practice>
+
+<DebugCase id={"m3"} label={"🔎 Debug the AI system"} evidence={"RETRIEVED CHUNKS (k=3, min_score=0.35)\n[1] score 0.81 · \"pricing.md\" (updated 2024-11) — \"Monthly plans can be cancelled anytime from Billing > Subscription. Annual plans require 30 days' written notice before renewal.\"\n[2] score 0.74 · \"terms-of-service.md\" (updated 2023-02) — \"Cancellation requests must be submitted in writing to legal@company.com and are processed within 5 business days.\"\n[3] score 0.52 · \"support-faq-2023.md\" (updated 2023-06, superseded by pricing.md in 2024) — \"To cancel, email support and allow up to 2 weeks.\"\n\nMODEL'S ANSWER: \"You can cancel anytime by emailing support and allowing up to two weeks for processing.\""} question={"What is the most likely cause of the wrong answer?"}>
+
+<Muted>A user asks a support bot: **"Can I cancel my subscription?"** The agent retrieves three chunks and confidently states the wrong cancellation policy.</Muted>
+
+</DebugCase>

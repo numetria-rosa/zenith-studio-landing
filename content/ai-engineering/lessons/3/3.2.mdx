@@ -1,0 +1,9 @@
+A model doesn't have access to your documents, your database, or last week's conversation unless those things are physically present in the prompt you send. It has no persistent memory of anything outside that call. If your system needs the model to answer a question about a specific document, that document, or the relevant part of it, has to be in the prompt.
+
+Module 2 assumed you already knew which chunk to include. Real systems don't, they have thousands of chunks and a few thousand tokens of budget. *Retrieval* is the search step that picks which chunks earn a place in that budget, before generation ever happens.
+
+<Callout>
+
+**Retrieval-Augmented Generation (RAG)** is exactly this pattern: retrieve the most relevant chunks for a query, then generate an answer using only those chunks as context. The model still only knows what's in the prompt, RAG just gets smarter about what goes in.
+
+</Callout>

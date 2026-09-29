@@ -1,0 +1,9 @@
+Every module so far has been a single request: send a prompt (with the right context, the right tools available), get a response. An *agent* changes the shape of the interaction, instead of one response, the model reasons about a goal, takes an action (usually a tool call), observes the result, and decides whether it's done or needs another step.
+
+<Def title={"Definition: ReAct loop (reason, act, observe)"}>
+
+A control pattern where a model alternates between reasoning about what to do next, taking an action (typically a tool call), and observing the result, repeating until it has enough information to produce a final answer.
+
+</Def>
+
+Nothing about this pattern is magic, it's a loop, with the model's own text as the thing that decides whether the loop continues. Which means your code, not the model, has to be the thing that guarantees the loop eventually stops.

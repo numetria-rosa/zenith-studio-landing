@@ -1,0 +1,29 @@
+<Muted>A test case needs a checkable criterion, not just an input. For each candidate test case for a support-ticket summarizer, decide: usable as-is, or missing something an eval needs?</Muted>
+
+
+
+
+
+<Practice>
+
+One of the cases above has an input but no defined pass/fail criterion at all, just an implicit "and then judge if it's good." Why can't that case be scored consistently, even by a careful human?
+
+<Answer>
+
+Without an explicit criterion, "good" is being redefined by whoever's looking at it in the moment, one reviewer might weight brevity, another might weight completeness, and the SAME reviewer might judge it differently on a different day. A usable eval case needs the criterion decided in advance and written down, exactly what Module 1's schema validation did for structured output, define correctness before you check it, not while you're checking it.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A team building a sales-email personalization agent writes this test case: input is a prospect's job title and company name, expected is left blank, and the criterion is "check that the email feels personalized instead of generic." Rewrite the criterion as something a script could actually check, without a second model call.
+
+<Answer>
+
+"Feels personalized" is exactly the implicit, undefined judgment call this section warns about, two reviewers (or the same one on two days) could disagree. A checkable version replaces the feeling with a fact: does the output CONTAIN the prospect's exact job title and company name from the input, AND does it NOT contain any phrase from a fixed list of generic openers ("I hope this finds you well", "I came across your profile"). Both halves are exact-match / substring checks a script can run identically every time, no judgment required.
+
+</Answer>
+
+</Practice>

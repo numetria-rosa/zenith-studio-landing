@@ -1,0 +1,16 @@
+{
+  "MODULE_ID": 6,
+  "BACKOFF_BASE": 200,
+  "BACKOFF_CAP": 8000,
+  "TH_CAP": 1600,
+  "TH_BUCKET_SIZE": 200,
+  "relHasAttempted": false,
+  "score": 0,
+  "answered": {
+    "q1": false,
+    "q2": false,
+    "q3": false,
+    "q4": false,
+    "q5": false
+  }
+}

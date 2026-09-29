@@ -1,0 +1,27 @@
+<Muted>A query and four candidate chunks, each with a real precomputed cosine similarity to the query. Click the one you think scores highest, then reveal all four.</Muted>
+
+<Interactive id={"m3-s4"} label={"Query: \"How do I reset a customer's password?\""} />
+
+<Practice>
+
+The chunk about "resetting a router's factory settings" scores noticeably above zero, even though it's about a completely different topic. Why doesn't a "wrong topic" chunk score exactly zero, and what does that imply about picking a similarity threshold?
+
+<Answer>
+
+Embeddings capture broad semantic and lexical overlap, not topic identity, "reset," "settings," and general troubleshooting phrasing overlap enough to produce a modest positive score even across unrelated domains. A score of exactly 0 (or negative) is rare for ordinary text pairs. This is exactly why top-k alone isn't enough, without a minimum-relevance threshold, a retrieval system will happily return its "least bad" match even when nothing in the collection is actually relevant, and hand the model confidently irrelevant context.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A legal case-law lookup assistant searches a small jurisdictional database for precedent on "employer liability when a subcontractor is injured by a third party's equipment on a shared job site." The highest-scoring case in the whole collection comes back at 0.38, well below the 0.6 minimum-relevance threshold the system normally applies. It's still the best match available. Should the assistant return it anyway, since something is better than nothing?
+
+<Answer>
+
+No. "Best available" and "relevant" are different claims, a score of 0.38 means even the top result only weakly resembles the query, likely sharing general negligence or liability language without addressing the actual fact pattern. Handing that case to the model as grounding context risks a fluent, confident answer built on precedent that doesn't really apply, which is worse for a legal-research tool than truthfully reporting that no close match exists. The threshold exists precisely to catch this: rank is not the same as relevance.
+
+</Answer>
+
+</Practice>

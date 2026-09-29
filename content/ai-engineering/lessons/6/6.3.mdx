@@ -1,0 +1,27 @@
+<Muted>Retrying immediately, over and over, can make a rate-limiting problem worse, especially with many concurrent callers. Backoff spaces retries out, growing the delay each attempt; jitter randomizes it so many callers don't all retry in lockstep.</Muted>
+
+<Interactive id={"m6-s2"} label={"Live calculation · base 200ms, cap 8000ms"} />
+
+<Practice>
+
+Two different users' requests both get rate-limited at the exact same moment. With NO jitter (fixed exponential delay only), what's likely to happen on their simultaneous retries? How does jitter change that outcome?
+
+<Answer>
+
+With no jitter, both requests compute the identical delay and retry at the identical moment, likely colliding with the rate limit again, and any other similarly-timed callers pile on too, a "retry storm" that can make the underlying rate-limit problem worse instead of better. Full jitter spreads retries across a random window instead of a single instant, so simultaneous failures don't produce simultaneous retries, smoothing out load on the API instead of concentrating it.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+An internal "pricing" microservice gets called by 500 instances of your checkout service. During a traffic spike, pricing starts returning 503s under load. All 500 checkout instances were deployed from the same image at the same time, and all implement exponential backoff with NO jitter. Walk through what happens over the next few retry rounds, and be specific about why "same code, same deploy time" makes this worse than if the 500 instances had staggered start times.
+
+<Answer>
+
+Because all 500 instances share the same code and the same clock-relative starting point, they compute the exact same backoff delay for attempt 1, and all 500 retry in the same instant, hitting the already-overloaded pricing service with another synchronized spike, which fails again, computes the same attempt-2 delay, and repeats, a predictable wave of 500 simultaneous requests at every backoff step instead of a chance for the service to drain its queue. Staggered start times would have accidentally spread the retries out somewhat, but you shouldn't have to rely on accidental staggering, full jitter randomizes each caller's delay independently every round, so even 500 perfectly identical, perfectly synchronized callers end up retrying at 500 different moments instead of one.
+
+</Answer>
+
+</Practice>

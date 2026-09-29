@@ -1,0 +1,238 @@
+{
+  "number": 6,
+  "slug": "reliability-for-llm-systems",
+  "title": "Reliability for LLM Systems",
+  "stage": "Stage 2 · Agents in production",
+  "minutes": 40,
+  "summary": "Model APIs fail: rate limits, timeouts, transient server errors. Some failures are worth retrying, some never will succeed no matter how many times you try, and treating them the same wastes time, money, and your users' patience.",
+  "objectives": [
+    "Distinguish retryable (transient) failures from non-retryable (permanent) ones",
+    "Explain exponential backoff with full jitter, and why naive fixed-delay retries make things worse under load",
+    "Explain when and why a system should fall back to a secondary model instead of retrying forever",
+    "Implement a call wrapper that retries transient failures, fails fast on permanent ones, and falls back exactly once"
+  ],
+  "lessons": [
+    {
+      "number": "6.1",
+      "title": "Before you start",
+      "minutes": 3
+    },
+    {
+      "number": "6.2",
+      "title": "Not every failure deserves the same response",
+      "minutes": 6
+    },
+    {
+      "number": "6.3",
+      "title": "Interactive: exponential backoff with full jitter",
+      "minutes": 6
+    },
+    {
+      "number": "6.4",
+      "title": "Fail fast on what retrying can't fix",
+      "minutes": 4
+    },
+    {
+      "number": "6.5",
+      "title": "When retries aren't enough: fallback",
+      "minutes": 8
+    },
+    {
+      "number": "6.6",
+      "title": "Retry, fallback, and bounded cost, together",
+      "minutes": 5
+    },
+    {
+      "number": "6.7",
+      "title": "Build it: retry with bounded fallback",
+      "minutes": 2
+    },
+    {
+      "number": "6.8",
+      "title": "Before the checkpoint: what you should now be able to do",
+      "minutes": 5
+    },
+    {
+      "number": "6.9",
+      "title": "Interactive: watch the retry storm form (and get spread out)",
+      "minutes": 2
+    }
+  ],
+  "exercise": {
+    "label": "Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)",
+    "instructions": "Complete `async def call_with_retry_fallback(primary_call, fallback_call, max_retries)`. Both `primary_call` and `fallback_call` are `async` functions, resolving on success or raising an `Exception` that may have a `.retryable` attribute set to `True`/`False` (treat missing/unset as retryable). Retry the primary on retryable failures up to `max_retries` times (so up to `max_retries + 1` total primary attempts). Stop retrying immediately on a non-retryable error. Once the primary path is exhausted or blocked, call `fallback_call` exactly once. Return `{\"ok\": True, \"result\": ..., \"source\": \"primary\"|\"fallback\"}` or `{\"ok\": False, \"error\": ..., \"source\": \"fallback\"}`. Never let this function raise.",
+    "functionName": "call_with_retry_fallback",
+    "fileName": "call_with_retry_fallback.py",
+    "starter": "async def call_with_retry_fallback(primary_call, fallback_call, max_retries):\n    # primary_call/fallback_call: async functions, resolve on success,\n    # raise an Exception that may have .retryable = True/False (unset = retryable).\n    # Retry primary_call on retryable failures up to max_retries times.\n    # Stop retrying immediately on a non-retryable error.\n    # Once the primary path is exhausted/blocked, call fallback_call exactly once.\n    # Return {\"ok\": True, \"result\": ..., \"source\": \"primary\"|\"fallback\"}\n    #     or {\"ok\": False, \"error\": ..., \"source\": \"fallback\"}. Never raise.\n\n    # YOUR CODE HERE\n\n    pass",
+    "solution": "async def call_with_retry_fallback(primary_call, fallback_call, max_retries):\n    attempt = 0\n    while True:\n        try:\n            result = await primary_call()\n            return {\"ok\": True, \"result\": result, \"source\": \"primary\"}\n        except Exception as e:\n            retryable = getattr(e, \"retryable\", True) is not False\n            if not retryable or attempt >= max_retries:\n                break\n            attempt += 1\n\n    try:\n        result = await fallback_call()\n        return {\"ok\": True, \"result\": result, \"source\": \"fallback\"}\n    except Exception as e:\n        return {\"ok\": False, \"error\": str(e), \"source\": \"fallback\"}",
+    "hints": [
+      {
+        "title": "Hint 1 — conceptual",
+        "mdx": "This is a loop, not a fixed sequence: try the primary, and if it fails with a retryable error and you haven't hit max\\_retries, try it again. The loop ends either in success, or by falling through to the fallback path."
+      },
+      {
+        "title": "Hint 2 — specific",
+        "mdx": "Track an attempt counter starting at 0. Wrap `await primary_call()` in try/except inside a loop. On success, return immediately. On failure, check `getattr(e, \"retryable\", True) is not False` (so unset counts as retryable) AND `attempt < max_retries`, if both hold, increment attempt and loop again, otherwise break out to the fallback step."
+      },
+      {
+        "title": "Hint 3 — near-solution",
+        "mdx": "After the primary loop ends (without having returned), wrap a single `await fallback_call()` attempt in its own try/except. On success return `{\"ok\": True, \"result\": ..., \"source\": \"fallback\"}`, on failure return `{\"ok\": False, \"error\": str(e), \"source\": \"fallback\"}`. Don't loop the fallback at all, it only ever gets one try."
+      }
+    ],
+    "tests": [
+      {
+        "name": "Primary succeeds on first try, fallback is never called",
+        "hint": "If primary_call() succeeds, return immediately with source: 'primary'. Don't call fallback_call at all in this case."
+      },
+      {
+        "name": "Retries a retryable failure and succeeds on a later primary attempt, without ever calling fallback",
+        "hint": "On a retryable error (getattr(e, 'retryable', True) is not False), if you haven't hit max_retries yet, increment your attempt counter and call primary_call again, don't fall back yet."
+      },
+      {
+        "name": "A non-retryable error stops retrying immediately (1 primary call) and goes straight to fallback, even with max_retries much higher",
+        "hint": "Check e.retryable first. If it's explicitly False, break out of the retry loop right away regardless of the attempt count or max_retries, don't wait for the retry budget to run out."
+      },
+      {
+        "name": "Exhausting max_retries on a retryable error still calls fallback exactly once (primary tried max_retries+1 times)",
+        "hint": "With max_retries=2, the primary should be attempted 3 total times (1 initial + 2 retries) before falling through to a SINGLE fallback attempt."
+      },
+      {
+        "name": "If both primary and fallback fail, returns a clear structured failure instead of raising",
+        "hint": "Wrap the single fallback attempt in its own try/except. If it also raises, return {'ok': False, 'error': str(e), 'source': 'fallback'} rather than letting the exception propagate out of your function."
+      }
+    ],
+    "harness": "exercises/6.py",
+    "id": "6.7"
+  },
+  "quiz": {
+    "passMark": 4,
+    "questions": [
+      {
+        "id": "m6-q1",
+        "question": "A model API call fails with a 429 (rate limited). Should this be retried?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Yes, a 429 is transient, the request itself is fine, retrying (with backoff) has a real chance of succeeding",
+            "correct": true,
+            "why": "Rate limiting is a textbook retryable condition, the request is valid, the timing just wasn't."
+          },
+          {
+            "text": "No, a 429 means the request was rejected and must be changed before trying again",
+            "correct": false,
+            "why": "A 429 doesn't mean the request was invalid, it means too many requests arrived too quickly. The identical request, sent again after a delay, is very likely to succeed."
+          },
+          {
+            "text": "It depends only on which model provider returned the error",
+            "correct": false,
+            "why": "429 has a consistent meaning (rate limiting) across virtually all HTTP APIs, provider identity doesn't change whether this specific error is transient."
+          }
+        ],
+        "principle": "Rate limiting is a textbook retryable condition, the request is valid, the timing just wasn't."
+      },
+      {
+        "id": "m6-q2",
+        "question": "A model API call fails with a 400 (your own request body was malformed). Should this be retried as-is?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "No, the request is malformed, retrying the exact same request will fail identically every time",
+            "correct": true,
+            "why": "A 400 from your own malformed request needs the request FIXED, not retried, retrying it as-is is a guaranteed repeat failure."
+          },
+          {
+            "text": "Yes, with enough retries and backoff it will eventually succeed",
+            "correct": false,
+            "why": "No amount of waiting fixes a structurally invalid request, backoff delays the failure without changing the outcome, it will fail on attempt 10 exactly as it failed on attempt 1."
+          },
+          {
+            "text": "Yes, but only if fallback is also configured",
+            "correct": false,
+            "why": "Fallback doesn't fix a malformed request either, if the request itself is invalid, the SAME malformed request sent to a fallback model has no reason to succeed there either."
+          }
+        ],
+        "principle": "A 400 from your own malformed request needs the request FIXED, not retried, retrying it as-is is a guaranteed repeat failure."
+      },
+      {
+        "id": "m6-q3",
+        "question": "With base delay 100ms, cap 1600ms, using this module's formula, what's the maximum possible delay (in ms) before retry attempt 5 (where the uncapped exponential value, 100 × 2⁴, already exceeds the cap)?",
+        "source": "checkpoint",
+        "numeric": {
+          "answer": 1600,
+          "tolerance": 0,
+          "correct": "Correct. 100 × 2⁴ = 1600, which equals the cap exactly, so the max possible delay is capped at 1600ms (full jitter picks uniformly between 0 and this value).",
+          "incorrect": "Not quite. 100 × 2⁴ (attempt 5, so exponent 4) = 1600, which is exactly at the cap, so the maximum possible delay is 1600ms, not the uncapped exponential value."
+        }
+      },
+      {
+        "id": "m6-q4",
+        "question": "After the primary model's retries are exhausted, what's the correct next step?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Attempt the fallback exactly once, not with the same retry budget as the primary",
+            "correct": true,
+            "why": "Fallback is a single bounded attempt, a last resort with its own tight limit, not a second full retry cycle."
+          },
+          {
+            "text": "Reset the retry counter and retry the primary again with a fresh budget",
+            "correct": false,
+            "why": "Resetting the counter defeats the entire purpose of having a bound, it turns a bounded retry policy into an effectively unbounded one."
+          },
+          {
+            "text": "Immediately return failure without attempting anything else",
+            "correct": false,
+            "why": "Giving up entirely skips the value fallback provides, a secondary model or provider can often still return a usable result when the primary is unavailable."
+          }
+        ],
+        "principle": "Fallback is a single bounded attempt, a last resort with its own tight limit, not a second full retry cycle."
+      },
+      {
+        "id": "m6-q5",
+        "question": "An agent loop (Module 5) has a step limit of 10. Each step's model call now uses this module's retry-and-fallback wrapper, but with an unbounded retry count. What actually breaks?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Each step can now take unpredictably long (or cost far more) internally, even though the loop's step COUNT stays capped at 10, an unbounded retry inside one step defeats the point of bounding the number of steps",
+            "correct": true,
+            "why": "A step limit only actually bounds total cost and time if everything inside each step is also bounded, an unbounded retry wrapper breaks that guarantee even while technically respecting the step count."
+          },
+          {
+            "text": "Nothing breaks, the step limit of 10 caps total retries across the whole loop automatically",
+            "correct": false,
+            "why": "The step limit counts LOOP iterations, it has no awareness of, or control over, how many times the retry wrapper retries WITHIN a single step, those are two separate, independent bounds."
+          },
+          {
+            "text": "The agent loop itself will throw an error once retries exceed the step limit",
+            "correct": false,
+            "why": "There's no automatic interaction between an internal retry count and the outer loop's step counter, they're unrelated mechanisms unless explicitly wired together, which an unbounded retry count specifically fails to do."
+          }
+        ],
+        "principle": "A step limit only actually bounds total cost and time if everything inside each step is also bounded, an unbounded retry wrapper breaks that guarantee even while technically respecting the step count."
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "retryable error",
+      "definition": "a failure where an identical retry has a real chance of succeeding (rate limits, timeouts, transient server faults)."
+    },
+    {
+      "term": "non-retryable error",
+      "definition": "a failure where retrying the identical request will fail identically every time (malformed requests, auth errors)."
+    },
+    {
+      "term": "exponential backoff",
+      "definition": "growing the delay between retries exponentially with each attempt, up to a cap."
+    },
+    {
+      "term": "full jitter",
+      "definition": "randomizing the actual delay uniformly between 0 and the backoff cap, to avoid synchronized retry storms."
+    },
+    {
+      "term": "fallback",
+      "definition": "a secondary call path (often a different model or provider) attempted once the primary path has failed."
+    }
+  ],
+  "furtherReading": true
+}

@@ -1,0 +1,21 @@
+## What this module assumes
+
+Module 1 treated a single prompt/response pair as if it had unlimited room. It doesn't. Every model has a maximum context window, a hard ceiling on how many tokens of input plus output fit in one call, and every token has a cost.
+
+## What's new
+
+This is the first module with real arithmetic. You'll compute actual numbers: token estimates, budgets, and chunk boundaries, then implement a chunker that a real ingestion pipeline could use.
+
+## What's assumed
+
+<Assume>
+
+Module 1 completed. Basic algebra, Python lists, and loops.
+
+</Assume>
+
+## How to work through it
+
+1. Read each definition, then run the matching interactive.
+2. Answer the practice check before revealing the answer.
+3. Finish with the graded checkpoint.

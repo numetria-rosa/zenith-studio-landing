@@ -1,0 +1,226 @@
+{
+  "number": 3,
+  "slug": "retrieval-augmented-generation",
+  "title": "Retrieval-Augmented Generation",
+  "stage": "Stage 1 · Retrieval and tools",
+  "minutes": 45,
+  "summary": "A model only knows what's in its prompt. Retrieval is the mechanism that decides, out of everything you could put there, which pieces actually get in, by searching, not by hoping the right chunk made the cut.",
+  "objectives": [
+    "Explain why retrieval exists: the gap between \"in the prompt\" and \"known by the model\"",
+    "Describe what an embedding is and why cosine similarity measures relevance, not magnitude",
+    "Explain the role of a minimum-relevance threshold, and why \"closest available\" isn't always \"relevant\"",
+    "Implement cosine similarity and top-k retrieval over a small in-memory document set"
+  ],
+  "lessons": [
+    {
+      "number": "3.1",
+      "title": "Before you start",
+      "minutes": 3
+    },
+    {
+      "number": "3.2",
+      "title": "The gap between \"in context\" and \"known\"",
+      "minutes": 3
+    },
+    {
+      "number": "3.3",
+      "title": "Embeddings turn meaning into geometry",
+      "minutes": 3
+    },
+    {
+      "number": "3.4",
+      "title": "Interactive: cosine similarity is about direction, not length",
+      "minutes": 7
+    },
+    {
+      "number": "3.5",
+      "title": "Interactive: which chunk actually gets retrieved",
+      "minutes": 7
+    },
+    {
+      "number": "3.6",
+      "title": "Top-k, and the threshold that stops junk from getting in",
+      "minutes": 12
+    },
+    {
+      "number": "3.7",
+      "title": "Build it: cosine similarity + top-k retrieval",
+      "minutes": 3
+    },
+    {
+      "number": "3.8",
+      "title": "Before the checkpoint: what you should now be able to do",
+      "minutes": 6
+    },
+    {
+      "number": "3.9",
+      "title": "Interactive: watch a threshold change what gets retrieved",
+      "minutes": 2
+    }
+  ],
+  "exercise": {
+    "label": "Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)",
+    "instructions": "Complete `retrieve_top_k(query_vector, documents, k, min_score)`. `documents` is a list of `{\"id\":..., \"vector\":...}` dicts. Return a list of `{\"id\":..., \"score\":...}` dicts, sorted by cosine similarity to `query_vector` descending, excluding anything with a score below `min_score`, limited to at most `k` results. A zero-length vector should score 0 against anything (never raise or produce NaN).",
+    "functionName": "retrieve_top_k",
+    "fileName": "retrieve_top_k.py",
+    "starter": "def retrieve_top_k(query_vector, documents, k, min_score):\n    # documents: list of {\"id\": ..., \"vector\": ...} dicts\n    # Return a list of {\"id\": ..., \"score\": ...} dicts, sorted by cosine similarity\n    # descending, excluding anything with score < min_score, limited to at most k results.\n    # A zero-length vector must score 0, never raise or produce NaN.\n\n    # YOUR CODE HERE\n\n    pass",
+    "solution": "import math\n\ndef cosine_similarity(a, b):\n    dot = sum(a[i] * b[i] for i in range(len(a)))\n    norm_a = math.sqrt(sum(x * x for x in a))\n    norm_b = math.sqrt(sum(x * x for x in b))\n    if norm_a == 0 or norm_b == 0:\n        return 0\n    return dot / (norm_a * norm_b)\n\ndef retrieve_top_k(query_vector, documents, k, min_score):\n    scored = [\n        {\"id\": doc[\"id\"], \"score\": cosine_similarity(query_vector, doc[\"vector\"])}\n        for doc in documents\n    ]\n    filtered = [d for d in scored if d[\"score\"] >= min_score]\n    filtered.sort(key=lambda d: d[\"score\"], reverse=True)\n    return filtered[:k]",
+    "hints": [
+      {
+        "title": "Hint 1 — conceptual",
+        "mdx": "Break it into two pieces: a helper that scores one query vector against one document vector, and a second step that scores every document, filters, sorts, and slices. Don't try to do all four at once in one loop."
+      },
+      {
+        "title": "Hint 2 — specific",
+        "mdx": "Cosine similarity of vectors a and b: dot product divided by (magnitude of a times magnitude of b). Dot product is the sum of `a[i] * b[i]` across matching indices. Magnitude is the square root of the sum of each vector's own squared components (Python's `math.sqrt`)."
+      },
+      {
+        "title": "Hint 3 — near-solution",
+        "mdx": "If either magnitude is 0 (a zero vector), return a score of 0 immediately for that pair, don't divide by zero. After scoring every document, filter out anything with `score < min_score`, sort the rest descending by score using `sorted(..., key=..., reverse=True)`, then slice with `[:k]`."
+      }
+    ],
+    "tests": [
+      {
+        "name": "Results are ranked by similarity, exact match scores highest and sorts first",
+        "hint": "Sort your scored documents descending by score. The document with vector [1,0] against query [1,0] should score 1.0 and come first."
+      },
+      {
+        "name": "Cosine similarity ignores vector magnitude (scale-invariant)",
+        "hint": "Divide the dot product by the product of both vectors' magnitudes. [1,0] and [5,0] point the same direction, they should both score ~1.0 against a [1,0] query, regardless of length."
+      },
+      {
+        "name": "min_score excludes low-relevance documents even when k allows more",
+        "hint": "Filter out any scored document with score < min_score BEFORE slicing to k. Document B (opposite direction, score -1) should be excluded when min_score is 0, even though k=5 would otherwise have room for it."
+      },
+      {
+        "name": "k limits output to the top-k highest scores, regardless of input order",
+        "hint": "Score every document first, then sort the FULL scored list descending, THEN slice to k. Slicing before sorting (or sorting the wrong direction) gives the wrong top-k."
+      },
+      {
+        "name": "A zero-length document vector scores 0 and never raises or produces NaN",
+        "hint": "Before dividing by the product of magnitudes, check if either magnitude is 0. If so, return a score of 0 for that pair instead of dividing by zero."
+      }
+    ],
+    "harness": "exercises/3.py",
+    "id": "3.7"
+  },
+  "quiz": {
+    "passMark": 4,
+    "questions": [
+      {
+        "id": "m3-q1",
+        "question": "Query vector \\[1, 0\\] compared against document vector \\[0, 5\\]. What's the cosine similarity?",
+        "source": "checkpoint",
+        "numeric": {
+          "answer": 0,
+          "tolerance": 0,
+          "correct": "Correct. [1,0] and [0,5] are perpendicular, cosine similarity is 0.",
+          "incorrect": "Not quite. [1,0] and [0,5] are perpendicular (90°), cosine similarity of perpendicular vectors is always 0."
+        }
+      },
+      {
+        "id": "m3-q2",
+        "question": "Query vector \\[3, 4\\] compared against document vector \\[6, 8\\] (same direction, double the length). What's the cosine similarity?",
+        "source": "checkpoint",
+        "numeric": {
+          "answer": 1,
+          "tolerance": 0,
+          "correct": "Correct. [6,8] is exactly [3,4] scaled by 2, same direction, so cosine similarity is 1, magnitude is irrelevant.",
+          "incorrect": "Not quite. [6,8] points in the exact same direction as [3,4] (it's just scaled by 2), so cosine similarity is 1."
+        }
+      },
+      {
+        "id": "m3-q3",
+        "question": "Why does cosine similarity divide out vector magnitude instead of just using raw dot product as the score?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Because magnitude reflects the vector's length, not how semantically related the underlying texts are",
+            "correct": true,
+            "why": "Dividing out magnitude leaves a pure measure of direction, which is what corresponds to semantic similarity."
+          },
+          {
+            "text": "Because dot product is too slow to compute for large vectors",
+            "correct": false,
+            "why": "That's not the reason, dot product is actually a component of cosine similarity itself, and isn't meaningfully slower. The issue is what raw dot product means, not how fast it runs."
+          },
+          {
+            "text": "Because raw dot product can never be negative",
+            "correct": false,
+            "why": "Raw dot product can absolutely be negative, for vectors pointing in opposing directions. That's not the reason magnitude gets divided out."
+          }
+        ],
+        "principle": "Dividing out magnitude leaves a pure measure of direction, which is what corresponds to semantic similarity."
+      },
+      {
+        "id": "m3-q4",
+        "question": "A retrieval system with k=5 and no minimum-score threshold is asked a question totally unrelated to anything in its document collection. What does it return?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Its 5 best-scoring documents anyway, even though none of them are actually relevant",
+            "correct": true,
+            "why": "Without a minimum-relevance threshold, top-k always returns k results, whatever scored highest, relevant or not."
+          },
+          {
+            "text": "An empty result set automatically, since nothing matches well",
+            "correct": false,
+            "why": "Not automatically, top-k without a threshold has no concept of 'not good enough,' it always returns exactly k results (or fewer if the collection has less than k documents), ranked by whatever scored highest, relevant or not."
+          },
+          {
+            "text": "An error, since no document scores above a reasonable relevance level",
+            "correct": false,
+            "why": "No error, similarity scoring doesn't know what 'reasonable' means without an explicit threshold, it just returns the mathematically highest-scoring k documents."
+          }
+        ],
+        "principle": "Without a minimum-relevance threshold, top-k always returns k results, whatever scored highest, relevant or not."
+      },
+      {
+        "id": "m3-q5",
+        "question": "A RAG system retrieves 3 chunks (400 tokens total) for a query, then sends them plus the user's question (50 tokens) to a model with an 8000-token context window and 1000 tokens reserved for output. Using Module 2's terms, is this call anywhere near the input budget limit?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "No, it's well under budget: 450 tokens used against a 7000-token available input budget (8000 window − 1000 output)",
+            "correct": true,
+            "why": "400 (chunks) + 50 (question) = 450 input tokens, against a 7000-token available budget, plenty of headroom."
+          },
+          {
+            "text": "Yes, it's already over budget since retrieval adds tokens on top of the question",
+            "correct": false,
+            "why": "450 total input tokens is far below the 7000-token available input budget, adding retrieved chunks does add tokens, but this specific call is nowhere near the limit."
+          },
+          {
+            "text": "It's impossible to tell without knowing the exact tokenizer used",
+            "correct": false,
+            "why": "This course's planning estimate (or any reasonable estimate) is precise enough here, 450 tokens against a 7000-token budget isn't a borderline case that needs exact tokenizer precision to evaluate."
+          }
+        ],
+        "principle": "400 (chunks) + 50 (question) = 450 input tokens, against a 7000-token available budget, plenty of headroom."
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "embedding",
+      "definition": "a vector representing a piece of text's meaning, positioned so similar meanings produce similar vectors."
+    },
+    {
+      "term": "cosine similarity",
+      "definition": "a score from -1 to 1 measuring the angle between two vectors, ignoring their length."
+    },
+    {
+      "term": "top-k retrieval",
+      "definition": "returning only the k highest-scoring candidates from a ranked search."
+    },
+    {
+      "term": "relevance threshold",
+      "definition": "a minimum similarity score below which a candidate is excluded, even if it would otherwise make the top-k."
+    },
+    {
+      "term": "hybrid search",
+      "definition": "combining vector similarity with keyword search to catch exact-term matches embeddings alone can miss."
+    }
+  ],
+  "furtherReading": true
+}

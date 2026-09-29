@@ -1,0 +1,27 @@
+<Muted>A short consolidation before you're graded on it.</Muted>
+
+- Distinguish retryable from non-retryable failures, and explain why the distinction matters.
+- Explain exponential backoff with full jitter and the retry-storm problem it solves.
+- Explain why fallback should be attempted once, not retried with the same budget as the primary.
+- Implement a call wrapper with bounded retries and a single bounded fallback attempt.
+
+<ProdWarn title={"What would break in production?"}>
+
+- **Retries causing duplicate actions.** A retried call without an idempotency key (Module 4) can re-run a side effect that already succeeded the first time.
+- **Retry storms.** Every client retrying at the same fixed interval synchronizes into waves that hammer an already-struggling service right as it's trying to recover.
+- **Backoff with no cap.** Doubling delay forever eventually means a "retry" that happens minutes after the request was actually useful, effectively a silent failure with extra steps.
+- **Silent failures.** A fallback that also fails and gets swallowed instead of surfaced looks, from the outside, identical to a system that's working fine.
+
+<Rule>
+
+**Rule of thumb:** retry logic is not "try again," it's a policy with four parts: what's retryable, how long to wait, how many times, and what happens when every attempt is exhausted. Missing any one part is a production incident waiting for the right kind of bad day.
+
+</Rule>
+
+</ProdWarn>
+
+<Connection title={"The engineering connection"}>
+
+You can now get a response out of a flaky model API without a retry storm or an unbounded bill. But a reliable call wrapper gets you a response, it doesn't tell you whether that response is actually GOOD. Module 7 covers evaluation, how to systematically measure whether your system's outputs are correct, before and after you change anything about it.
+
+</Connection>

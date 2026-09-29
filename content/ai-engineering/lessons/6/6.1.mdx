@@ -1,0 +1,21 @@
+## What this module assumes
+
+Every prior module assumed the model call itself succeeds. It won't always. Rate limits, timeouts, and transient server errors are a normal, expected part of calling any external API, model providers included, and a production system needs a deliberate strategy for them, not a bare try/catch that gives up on the first failure.
+
+## What's new
+
+This module isn't about the model's output anymore, it's about the reliability of getting a response at all. The logic here (retry, backoff, fallback) applies to the model call layer underneath everything Modules 1-5 built.
+
+## What's assumed
+
+<Assume>
+
+Modules 1-5 completed. Comfort with Python's async/await, try/except, and loops.
+
+</Assume>
+
+## How to work through it
+
+1. Read each definition, then run the matching interactive.
+2. Answer the practice check before revealing the answer.
+3. Finish with the graded checkpoint.

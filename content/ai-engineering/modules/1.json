@@ -1,0 +1,244 @@
+{
+  "number": 1,
+  "slug": "prompting-and-structured-outputs",
+  "title": "Prompting & Structured Outputs",
+  "stage": "Stage 0 · Prompting foundations",
+  "minutes": 45,
+  "summary": "A language model produces text. Your program needs data. This module is about closing that gap reliably, not with a nicer-sounding prompt, but with validation and repair logic that doesn't trust the model to behave.",
+  "objectives": [
+    "Explain why raw model output is not a data format, and where that assumption breaks production systems",
+    "Design a prompt with a clear role, instructions, and few-shot examples that reduce output variance",
+    "Detect and repair the most common malformed-output patterns (code fences, trailing commas, extra prose)",
+    "Implement a real validator that checks output against a schema before your program trusts it"
+  ],
+  "lessons": [
+    {
+      "number": "1.1",
+      "title": "Before you start",
+      "minutes": 4
+    },
+    {
+      "number": "1.2",
+      "title": "The gap between \"sounds right\" and \"is data\"",
+      "minutes": 3
+    },
+    {
+      "number": "1.3",
+      "title": "Prompt anatomy",
+      "minutes": 3
+    },
+    {
+      "number": "1.4",
+      "title": "Few-shot examples reduce variance, not risk to zero",
+      "minutes": 9
+    },
+    {
+      "number": "1.5",
+      "title": "Interactive: spot the malformed output",
+      "minutes": 2
+    },
+    {
+      "number": "1.6",
+      "title": "The repair pattern",
+      "minutes": 10
+    },
+    {
+      "number": "1.7",
+      "title": "Build it: implement the validator",
+      "minutes": 8
+    },
+    {
+      "number": "1.8",
+      "title": "Before the checkpoint: what you should now be able to do",
+      "minutes": 6
+    },
+    {
+      "number": "1.9",
+      "title": "Interactive: trace the repair pipeline",
+      "minutes": 2
+    }
+  ],
+  "exercise": {
+    "label": "Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)",
+    "instructions": "Complete `extract_structured_output(raw_text, schema)`. `schema` is a dict `{\"required\": [...]}`, the list of field names that must be present. Return `{\"ok\": True, \"data\": ...}` on success, or `{\"ok\": False, \"error\": ...}` on failure, where `error` is a short human-readable string. Handle: markdown code fences around the JSON, a trailing comma before `}` or `]`, and a missing required field. Never raise, always return one of the two shapes above, even for completely non-JSON input.",
+    "functionName": "extract_structured_output",
+    "fileName": "extract_structured_output.py",
+    "starter": "import json\nimport re\n\ndef extract_structured_output(raw_text, schema):\n    # Handle: markdown code fences, a trailing comma, and a missing required field.\n    # Return {\"ok\": True, \"data\": ...} or {\"ok\": False, \"error\": ...}. Never raise.\n\n    # YOUR CODE HERE\n\n    pass",
+    "solution": "import json\nimport re\n\ndef extract_structured_output(raw_text, schema):\n    text = str(raw_text).strip()\n    fenced = re.match(r\"^```(?:json)?\\s*([\\s\\S]*?)\\s*```$\", text)\n    if fenced:\n        text = fenced.group(1).strip()\n    text = re.sub(r\",\\s*([}\\]])\", r\"\\1\", text)\n\n    try:\n        data = json.loads(text)\n    except Exception as e:\n        return {\"ok\": False, \"error\": \"Could not parse JSON: \" + str(e)}\n\n    for field in schema.get(\"required\", []):\n        if not isinstance(data, dict) or field not in data:\n            return {\"ok\": False, \"error\": \"Missing required field: \" + field}\n    return {\"ok\": True, \"data\": data}",
+    "hints": [
+      {
+        "title": "Hint 1 — conceptual",
+        "mdx": "Think in three passes: (1) clean up formatting noise around the JSON, (2) try to parse it, (3) check the parsed dict actually has what you need. Each pass can fail independently, and each failure should produce a useful error, not a raised exception."
+      },
+      {
+        "title": "Hint 2 — specific",
+        "mdx": "Python's `re` module: ````re.match(r\"^```(?:json)?\\s*([\\s\\S]*?)\\s*```$\", text)```` captures the content between fences. For trailing commas, `re.sub(r\",\\s*([}\\]])\", r\"\\1\", text)` before parsing. Wrap `json.loads` in try/except, don't let it raise out of your function."
+      },
+      {
+        "title": "Hint 3 — near-solution",
+        "mdx": "After a successful parse, loop over `schema.get(\"required\", [])` and check `field in data` for each one. Return a specific error naming the missing field on the first one that's absent, don't just say \"invalid\"."
+      }
+    ],
+    "tests": [
+      {
+        "name": "Alice",
+        "hint": "A well-formed JSON string matching the schema should return {\"ok\": True, \"data\": ...} with the parsed values intact."
+      },
+      {
+        "name": "Priya",
+        "hint": "Strip a leading/trailing ``` (optionally ```json) fence before attempting json.loads."
+      },
+      {
+        "name": "Alex",
+        "hint": "Replace a comma immediately before a closing } or ] with nothing before parsing."
+      },
+      {
+        "name": "Sam",
+        "hint": "After parsing, check every field in schema[\"required\"] is present, and name the missing one in the error."
+      },
+      {
+        "name": "Non-JSON prose is rejected gracefully, not raised",
+        "hint": "Wrap json.loads in try/except, plain prose will raise json.JSONDecodeError, catch it and return {\"ok\": False, \"error\": ...}."
+      }
+    ],
+    "harness": "exercises/1.py",
+    "id": "1.7"
+  },
+  "quiz": {
+    "passMark": 4,
+    "questions": [
+      {
+        "id": "m1-q1",
+        "question": "A model is instructed \"respond only with valid JSON, no other text\" and given two examples. What should a production system still do with its response?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Validate and parse it before trusting it, exactly as if it came from any other untrusted external source",
+            "correct": true,
+            "why": "Treat model output like any other untrusted input, validate before use."
+          },
+          {
+            "text": "Trust it directly, the instruction plus examples make malformed output effectively impossible",
+            "correct": false,
+            "why": "Instructions and examples reduce the RATE of malformed output, they don't reduce it to zero, a production system still needs to validate."
+          },
+          {
+            "text": "Log a warning but proceed with whatever text came back",
+            "correct": false,
+            "why": "Logging a warning after already acting on unvalidated data doesn't prevent the corruption or crash that malformed data can cause, validation has to happen before use, not after."
+          }
+        ],
+        "principle": "Treat model output like any other untrusted input, validate before use."
+      },
+      {
+        "id": "m1-q2",
+        "question": "Where does a standing output-format instruction (e.g. \"always respond in JSON\") most reliably belong?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "The system role, stated once, reinforced with an example",
+            "correct": true,
+            "why": "The system role is for standing instructions that apply across the whole conversation."
+          },
+          {
+            "text": "Anywhere in the user message, position doesn't matter",
+            "correct": false,
+            "why": "Position does matter in practice, instructions buried mid-message compete with the actual request for the model's attention, a standing instruction belongs in the system role."
+          },
+          {
+            "text": "It should be repeated in every assistant turn instead of stated once",
+            "correct": false,
+            "why": "A standing instruction doesn't need to be repeated every turn if it's placed in the system role, that's exactly what the system role is for, persistent instructions that apply for the whole conversation."
+          }
+        ],
+        "principle": "The system role is for standing instructions that apply across the whole conversation."
+      },
+      {
+        "id": "m1-q3",
+        "question": "A response is `{\"name\": \"Sam\"}`, syntactically valid JSON, but your schema requires `age` too. Is this a repair-pass issue or a validation issue?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Validation, the JSON is syntactically fine, the repair pass has nothing to fix",
+            "correct": true,
+            "why": "Syntactically valid but semantically incomplete is a validation problem, not a repair-pass problem."
+          },
+          {
+            "text": "Repair pass, this is exactly what stripping trailing commas is for",
+            "correct": false,
+            "why": "There's no syntax problem here to repair, {\"name\": \"Sam\"} parses successfully, the issue is that the resulting DATA is incomplete, which is what validation checks for, not the repair pass."
+          },
+          {
+            "text": "Neither, this response should be accepted as-is",
+            "correct": false,
+            "why": "The response is missing a field your schema explicitly requires, accepting it as-is means your program later fails (or behaves wrong) when it tries to use the missing age field."
+          }
+        ],
+        "principle": "Syntactically valid but semantically incomplete is a validation problem, not a repair-pass problem."
+      },
+      {
+        "id": "m1-q4",
+        "question": "Why do few-shot examples typically improve output consistency more than a longer text description of the desired format?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "A concrete example removes ambiguity a prose description leaves open (nesting, extra fields, exact key names)",
+            "correct": true,
+            "why": "Concrete examples remove interpretive ambiguity that prose descriptions leave open."
+          },
+          {
+            "text": "Examples make the prompt longer, and longer prompts are always more reliable",
+            "correct": false,
+            "why": "Length itself isn't what helps, a long, vague description doesn't outperform a short, concrete example. It's the removal of ambiguity that matters, not the character count."
+          },
+          {
+            "text": "Examples let the model skip following the system instructions entirely",
+            "correct": false,
+            "why": "Examples work alongside the system instructions, reinforcing them concretely, they don't replace or let the model ignore those instructions."
+          }
+        ],
+        "principle": "Concrete examples remove interpretive ambiguity that prose descriptions leave open."
+      },
+      {
+        "id": "m1-q5",
+        "question": "A response comes back as: ```` ```json\\n{\"status\": \"ok\",}\\n``` ````. After stripping the code fence and the trailing comma, is the remaining text valid JSON?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Yes, it becomes valid JSON",
+            "correct": true,
+            "why": "Correct. After stripping the fence and the trailing comma, the remaining text is {\"status\": \"ok\"}, which is valid JSON."
+          },
+          {
+            "text": "No, it's still invalid",
+            "correct": false,
+            "why": "Not quite. After stripping the ``` fence and the trailing comma before }, what's left is {\"status\": \"ok\"}, which IS valid JSON, that's exactly why the repair pass runs before parsing."
+          }
+        ]
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "structured output",
+      "definition": "model output constrained to a predictable, parseable shape, typically JSON."
+    },
+    {
+      "term": "few-shot prompting",
+      "definition": "including example input/output pairs in the prompt to demonstrate the desired response shape."
+    },
+    {
+      "term": "system / user / assistant roles",
+      "definition": "the three message roles most model APIs use to separate standing instructions, the current request, and prior responses."
+    },
+    {
+      "term": "repair pass",
+      "definition": "deterministic cleanup (stripping fences, trailing commas) attempted before treating a response as unparseable."
+    },
+    {
+      "term": "schema validation",
+      "definition": "checking that successfully-parsed data actually contains the fields a consumer requires."
+    }
+  ],
+  "furtherReading": true
+}

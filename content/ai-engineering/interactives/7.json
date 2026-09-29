@@ -1,0 +1,39 @@
+{
+  "MODULE_ID": 7,
+  "SPOT_CASES": [
+    {
+      "id": "c1",
+      "code": "{ input: \"Ticket: \\\"App crashes on login since v4.2\\\"\",\n  expected: \"App crashes on login (regression, v4.2)\",\n  check: (actual) => actual.includes(\"crash\") && actual.includes(\"login\") }",
+      "valid": true,
+      "explanation": "Has an input, a defined expected reference, AND an explicit, checkable criterion (specific keywords the summary must contain). Fully usable as-is."
+    },
+    {
+      "id": "c2",
+      "code": "{ input: \"Ticket: \\\"Billing page shows wrong currency for EU customers\\\"\",\n  expected: \"(judge if the summary is good)\" }",
+      "valid": false,
+      "explanation": "Has an input but no explicit, checkable criterion, just an implicit request to judge quality. Different reviewers (or the same reviewer on different days) would score this inconsistently. Needs a defined check before it's usable."
+    },
+    {
+      "id": "c3",
+      "code": "{ input: \"Ticket: \\\"Feature request: dark mode\\\"\",\n  expected: \"Feature request: dark mode\",\n  check: (actual) => actual.trim() === \"Feature request: dark mode\" }",
+      "valid": true,
+      "explanation": "Exact-match criterion, appropriate here since a short ticket summary has a clear, narrow correct form. Fully usable and fully deterministic."
+    },
+    {
+      "id": "c4",
+      "code": "{ input: \"Ticket: \\\"Password reset email never arrives, tried 3 times\\\"\" }",
+      "valid": false,
+      "explanation": "No expected output and no check function at all, there's nothing here to score against. This is just an input with no criterion, not a usable test case yet."
+    }
+  ],
+  "evalHasAttempted": false,
+  "REG_DEMO_BASELINE": 0.82,
+  "score": 0,
+  "answered": {
+    "q1": false,
+    "q2": false,
+    "q3": false,
+    "q4": false,
+    "q5": false
+  }
+}

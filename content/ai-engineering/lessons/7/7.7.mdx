@@ -1,0 +1,15 @@
+You've seen the pieces: labeled test cases with explicit criteria, deterministic scoring, and regression detection against a baseline. Now implement an eval harness that ties them together, and five real tests run against your actual code.
+
+<ExerciseLink />
+
+<Practice>
+
+Test 5 uses a `check` function that raises for one specific test case. If your code only wraps `model_fn` in try/except but not `check` itself, what happens?
+
+<Answer>
+
+An exception from check() would propagate up out of your loop and crash the entire evaluate\_model call, losing every result, not just the one problematic case. A single bad checker (a bug in the test case's own criterion) shouldn't be able to take down evaluation of every other test case, the same "one bad input shouldn't crash the whole batch" discipline that's shown up since Module 4's tool executor.
+
+</Answer>
+
+</Practice>

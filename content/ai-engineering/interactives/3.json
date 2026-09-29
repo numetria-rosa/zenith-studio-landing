@@ -1,0 +1,112 @@
+{
+  "MODULE_ID": 3,
+  "RANK_CANDIDATES": [
+    {
+      "id": "a",
+      "text": "To reset a customer's password, go to Account > Security, click Reset Password, and send them the emailed link.",
+      "score": 0.91
+    },
+    {
+      "id": "b",
+      "text": "Password policies require at least 12 characters, one number, and one symbol for all customer accounts.",
+      "score": 0.58
+    },
+    {
+      "id": "c",
+      "text": "To reset a router to factory settings, hold the reset button for 10 seconds until the lights flash.",
+      "score": 0.34
+    },
+    {
+      "id": "d",
+      "text": "Our refund policy allows returns within 30 days of purchase with a valid receipt.",
+      "score": 0.07
+    }
+  ],
+  "rankPicked": null,
+  "rankRevealed": false,
+  "HR_CHUNKS": [
+    {
+      "id": "sick",
+      "text": "Full-time employees accrue 1 sick day per month during their first year, up to 12 days annually.",
+      "score": 0.88
+    },
+    {
+      "id": "submit",
+      "text": "Sick leave requests should be submitted through the HR portal at least 24 hours in advance when possible.",
+      "score": 0.72
+    },
+    {
+      "id": "parental",
+      "text": "Parental leave for new employees begins after 90 days of continuous employment.",
+      "score": 0.41
+    },
+    {
+      "id": "personal",
+      "text": "Employees may request unpaid personal leave with manager approval.",
+      "score": 0.33
+    },
+    {
+      "id": "holidays",
+      "text": "The office is closed on all federally recognized holidays.",
+      "score": 0.09
+    }
+  ],
+  "HR_K": 3,
+  "ragHasAttempted": false,
+  "score": 0,
+  "answered": {
+    "q1": false,
+    "q2": false,
+    "q3": false,
+    "q4": false,
+    "q5": false
+  },
+  "q3Options": [
+    {
+      "text": "Because magnitude reflects the vector's length, not how semantically related the underlying texts are",
+      "correct": true
+    },
+    {
+      "text": "Because dot product is too slow to compute for large vectors",
+      "correct": false,
+      "reason": "That's not the reason, dot product is actually a component of cosine similarity itself, and isn't meaningfully slower. The issue is what raw dot product means, not how fast it runs."
+    },
+    {
+      "text": "Because raw dot product can never be negative",
+      "correct": false,
+      "reason": "Raw dot product can absolutely be negative, for vectors pointing in opposing directions. That's not the reason magnitude gets divided out."
+    }
+  ],
+  "q4Options": [
+    {
+      "text": "Its 5 best-scoring documents anyway, even though none of them are actually relevant",
+      "correct": true
+    },
+    {
+      "text": "An empty result set automatically, since nothing matches well",
+      "correct": false,
+      "reason": "Not automatically, top-k without a threshold has no concept of 'not good enough,' it always returns exactly k results (or fewer if the collection has less than k documents), ranked by whatever scored highest, relevant or not."
+    },
+    {
+      "text": "An error, since no document scores above a reasonable relevance level",
+      "correct": false,
+      "reason": "No error, similarity scoring doesn't know what 'reasonable' means without an explicit threshold, it just returns the mathematically highest-scoring k documents."
+    }
+  ],
+  "q5Options": [
+    {
+      "text": "No, it's well under budget: 450 tokens used against a 7000-token available input budget (8000 window − 1000 output)",
+      "correct": true
+    },
+    {
+      "text": "Yes, it's already over budget since retrieval adds tokens on top of the question",
+      "correct": false,
+      "reason": "450 total input tokens is far below the 7000-token available input budget, adding retrieved chunks does add tokens, but this specific call is nowhere near the limit."
+    },
+    {
+      "text": "It's impossible to tell without knowing the exact tokenizer used",
+      "correct": false,
+      "reason": "This course's planning estimate (or any reasonable estimate) is precise enough here, 450 tokens against a 7000-token budget isn't a borderline case that needs exact tokenizer precision to evaluate."
+    }
+  ]
+}

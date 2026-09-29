@@ -1,0 +1,226 @@
+{
+  "number": 2,
+  "slug": "context-windows-and-token-economics",
+  "title": "Context Windows & Token Economics",
+  "stage": "Stage 0 · Prompting foundations",
+  "minutes": 40,
+  "summary": "Every prompt has a budget, measured in tokens, not characters or \"how much text feels reasonable.\" This module gives you the actual arithmetic for what fits, what it costs, and what to do when your content doesn't fit.",
+  "objectives": [
+    "Distinguish tokens from characters and words, and estimate token counts for planning purposes",
+    "Compute how much input fits in a context window given a reserved output budget",
+    "Explain why naive truncation silently drops information, and what a chunking strategy does instead",
+    "Implement a token-budget-aware chunker that preserves context across chunk boundaries"
+  ],
+  "lessons": [
+    {
+      "number": "2.1",
+      "title": "Before you start",
+      "minutes": 2
+    },
+    {
+      "number": "2.2",
+      "title": "A token is not a word, and not a character",
+      "minutes": 6
+    },
+    {
+      "number": "2.3",
+      "title": "Interactive: how much actually fits",
+      "minutes": 3
+    },
+    {
+      "number": "2.4",
+      "title": "Naive truncation silently destroys information",
+      "minutes": 6
+    },
+    {
+      "number": "2.5",
+      "title": "Why chunks overlap",
+      "minutes": 6
+    },
+    {
+      "number": "2.6",
+      "title": "Cost and latency both scale with tokens",
+      "minutes": 7
+    },
+    {
+      "number": "2.7",
+      "title": "Build it: a token-budget-aware chunker",
+      "minutes": 3
+    },
+    {
+      "number": "2.8",
+      "title": "Before the checkpoint: what you should now be able to do",
+      "minutes": 5
+    },
+    {
+      "number": "2.9",
+      "title": "Interactive: sizing a RAG ingestion run",
+      "minutes": 2
+    }
+  ],
+  "exercise": {
+    "label": "Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)",
+    "instructions": "Complete `chunk_text(words, max_tokens_per_chunk, overlap_words, estimate_tokens)`. `words` is a list of word strings (already split, don't split further). `estimate_tokens(word)` is a function returning the token count for one word, call it per word. Return a list of chunks, each chunk a list of words. No chunk's total estimated tokens may exceed `max_tokens_per_chunk`, UNLESS a single word alone exceeds the budget, in which case it still gets its own chunk, never silently dropped. Each chunk (except the last) should end with the same `overlap_words` words that the next chunk starts with.",
+    "functionName": "chunk_text",
+    "fileName": "chunk_text.py",
+    "starter": "def chunk_text(words, max_tokens_per_chunk, overlap_words, estimate_tokens):\n    # Never silently drop a word, even one that alone exceeds max_tokens_per_chunk.\n    # Each chunk (except the last) should end with the same overlap_words words\n    # that the next chunk starts with.\n\n    # YOUR CODE HERE\n\n    pass",
+    "solution": "def chunk_text(words, max_tokens_per_chunk, overlap_words, estimate_tokens):\n    chunks = []\n    i = 0\n    while i < len(words):\n        chunk = []\n        tokens = 0\n        j = i\n        while j < len(words):\n            t = estimate_tokens(words[j])\n            if tokens + t > max_tokens_per_chunk and len(chunk) > 0:\n                break\n            chunk.append(words[j])\n            tokens += t\n            j += 1\n        chunks.append(chunk)\n        if j >= len(words):\n            break\n        i = max(i + 1, j - overlap_words)\n    return chunks",
+    "hints": [
+      {
+        "title": "Hint 1 — conceptual",
+        "mdx": "Walk through the words with two pointers: build the current chunk word-by-word until adding the next word would exceed the budget, then start the next chunk a few words BACK from where you stopped, that's the overlap."
+      },
+      {
+        "title": "Hint 2 — specific",
+        "mdx": "Track a running token total for the current chunk. Before adding a word, check if `running_total + estimate_tokens(word) > max_tokens_per_chunk`. If so, and the chunk already has at least one word, stop this chunk here. If the chunk is still empty, add the word anyway (that's the oversized-single-word case)."
+      },
+      {
+        "title": "Hint 3 — near-solution",
+        "mdx": "After finishing a chunk ending at word index `j` (exclusive), start the next chunk at index `j - overlap_words` (clamped to not go below 0, and not below where the current chunk started). Stop the outer loop once a chunk reaches the end of the words list."
+      }
+    ],
+    "tests": [
+      {
+        "name": "Generous budget produces a single chunk with everything",
+        "hint": "If the whole input fits under max_tokens_per_chunk, you should end up with exactly one chunk containing all the words."
+      },
+      {
+        "name": "Multi-chunk split respects the token budget and overlaps correctly",
+        "hint": "With max_tokens_per_chunk=3 and 1 token/word, each chunk should hold at most 3 words, and each chunk's last word should equal the next chunk's first word (overlap_words=1)."
+      },
+      {
+        "name": "A single word exceeding the budget alone still gets its own chunk",
+        "hint": "Never drop content. If a chunk is still empty, add the word even if it alone exceeds max_tokens_per_chunk, that is the only way to guarantee no word is silently lost."
+      },
+      {
+        "name": "Every word appears in at least one chunk (nothing silently dropped)",
+        "hint": "Walk through your loop's termination condition carefully, a longer input is where an off-by-one in the overlap math tends to drop the last few words."
+      },
+      {
+        "name": "Zero overlap produces a clean, non-repeating partition",
+        "hint": "With overlap_words=0, chunk boundaries shouldn't repeat any word, [w1,w2,w3] then [w4,w5,w6], nothing shared between them."
+      }
+    ],
+    "harness": "exercises/2.py",
+    "id": "2.7"
+  },
+  "quiz": {
+    "passMark": 4,
+    "questions": [
+      {
+        "id": "m2-q1",
+        "question": "Using this course's estimate of tokens ≈ characters / 4, roughly how many tokens is a 400-character prompt?",
+        "source": "checkpoint",
+        "numeric": {
+          "answer": 100,
+          "tolerance": 0,
+          "correct": "Correct. 400 / 4 = 100 tokens, using this course's estimate.",
+          "incorrect": "Not quite. 400 characters ÷ 4 chars/token = 100 tokens."
+        }
+      },
+      {
+        "id": "m2-q2",
+        "question": "A context window is 4000 tokens, and 800 tokens are reserved for output. What's the available input budget?",
+        "source": "checkpoint",
+        "numeric": {
+          "answer": 3200,
+          "tolerance": 0,
+          "correct": "Correct. 4000 − 800 = 3200 tokens available for input.",
+          "incorrect": "Not quite. Available input = context window − reserved output = 4000 − 800 = 3200."
+        }
+      },
+      {
+        "id": "m2-q3",
+        "question": "Why is naive truncation described as a \"silent\" failure mode specifically?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "It succeeds without error while discarding whatever content came after the cut point",
+            "correct": true,
+            "why": "It runs to completion and produces plausible-looking output while quietly missing content."
+          },
+          {
+            "text": "It raises a visible exception every time content is too long",
+            "correct": false,
+            "why": "That's the opposite of what makes it dangerous, if it raised a visible exception, it would be a loud, easy-to-catch bug, not a silent one."
+          },
+          {
+            "text": "It only affects performance, not correctness",
+            "correct": false,
+            "why": "It affects correctness directly, whatever content was cut off is simply unavailable to the model, that's a correctness problem, not a performance one."
+          }
+        ],
+        "principle": "It runs to completion and produces plausible-looking output while quietly missing content."
+      },
+      {
+        "id": "m2-q4",
+        "question": "What does increasing chunk overlap cost you?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "More total tokens processed across the whole document, since boundary content is repeated, which raises cost and total latency",
+            "correct": true,
+            "why": "Overlap trades cost for boundary continuity, it isn't free."
+          },
+          {
+            "text": "Nothing, overlap is free since it reuses content that was already fetched",
+            "correct": false,
+            "why": "'Already fetched' doesn't mean free to process, the model still has to read those repeated tokens again in the next chunk, that's real additional token cost, not a free reuse."
+          },
+          {
+            "text": "It reduces the number of chunks needed",
+            "correct": false,
+            "why": "Overlap doesn't reduce chunk count, if anything, more overlap per chunk boundary means slightly MORE total chunks are needed to cover the same content, not fewer."
+          }
+        ],
+        "principle": "Overlap trades cost for boundary continuity, it isn't free."
+      },
+      {
+        "id": "m2-q5",
+        "question": "A model call that failed validation (Module 1) gets retried with the original prompt (600 tokens) plus an error explanation (150 tokens) plus a new response (200 tokens). Roughly how many total tokens did that one failed-then-retried request actually cost, across both attempts, compared to a single successful call of the same size?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Roughly 950 tokens total (600 + 150 + 200), noticeably more than a single successful ~800-token call (600 prompt + 200 response)",
+            "correct": true,
+            "why": "A failed-then-retried call costs roughly the sum of both attempts' tokens, not just one."
+          },
+          {
+            "text": "The same as a single call, retries don't add token cost, only latency",
+            "correct": false,
+            "why": "Retries absolutely add token cost, the original prompt is sent again (plus new error context), and a new response is generated, that's real additional tokens billed, not just extra wait time."
+          },
+          {
+            "text": "Less than a single call, since the second attempt is shorter",
+            "correct": false,
+            "why": "The second attempt isn't a replacement for the first, both attempts' tokens count, the original 600-token prompt was already sent (and paid for) on the first, failed attempt."
+          }
+        ],
+        "principle": "A failed-then-retried call costs roughly the sum of both attempts' tokens, not just one."
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "token",
+      "definition": "the atomic unit a model processes text as, roughly 4 characters in English."
+    },
+    {
+      "term": "context window",
+      "definition": "the maximum total tokens (input + output) a single model call can hold."
+    },
+    {
+      "term": "truncation",
+      "definition": "cutting content off at a limit; naive truncation silently discards whatever comes after the cut."
+    },
+    {
+      "term": "chunking",
+      "definition": "splitting content into budget-sized pieces instead of discarding what doesn't fit."
+    },
+    {
+      "term": "chunk overlap",
+      "definition": "repeating boundary content between adjacent chunks so no idea is split with zero context."
+    }
+  ],
+  "furtherReading": true
+}
