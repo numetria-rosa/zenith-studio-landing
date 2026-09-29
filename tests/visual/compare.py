@@ -9,9 +9,14 @@ from PIL import Image
 root = Path(__file__).resolve().parents[2]
 ref_dir = root / "halo/ai-engineering-course-handoff/reference/screenshots"
 out_dir = root / "tests/visual/out"
+# Regions that show live data in the build but a placeholder in the design (sidebar progress card, avatar).
+MASKS = {"default": [(0, 1130, 260, 1320)]}
 for name in sys.argv[1:]:
     a = Image.open(ref_dir / f"{name}.png").convert("RGB")
     b = Image.open(out_dir / f"{name}.png").convert("RGB")
+    for (x0, y0, x1, y1) in MASKS["default"] if name.startswith("Chapter") else []:
+        for im in (a, b):
+            im.paste((0, 0, 0), (x0, y0, x1, y1))
     h = min(a.height, b.height)
     A = np.asarray(a.crop((0, 0, a.width, h))).astype(int)
     B = np.asarray(b.crop((0, 0, b.width, h))).astype(int)

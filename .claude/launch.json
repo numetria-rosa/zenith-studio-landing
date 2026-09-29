@@ -4,15 +4,32 @@
     {
       "name": "zenith-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 3000,
       "autoPort": true
     },
     {
       "name": "ai-engineering-course",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8791", "--directory", "courses/ai-engineering"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8791",
+        "--directory",
+        "courses/ai-engineering"
+      ],
       "port": 8791
+    },
+    {
+      "name": "aie-visual",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "tests/visual/dev-server.mjs"
+      ],
+      "port": 3100
     }
   ]
 }
