@@ -36,6 +36,11 @@ const PATHS = {
   menu: "M4 6h16M4 12h16M4 18h16",
   close: "M6 6l12 12M18 6L6 18",
   path: "M5 19a2 2 0 100-4 2 2 0 000 4zM19 9a2 2 0 100-4 2 2 0 000 4zM7 17h6a4 4 0 000-8h-2a4 4 0 010-8h6",
+  play: "M7 5v14l11-7z",
+  stop: "M7 7h10v10H7z",
+  eye: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 100-6 3 3 0 000 6z",
+  reset: "M4 12a8 8 0 108-8H8M8 1L5 4l3 3",
+  terminal: "M4 17l6-5-6-5M12 19h8",
 } as const;
 
 export type IconName = keyof typeof PATHS;

@@ -51,3 +51,9 @@ export async function getInteractiveData(module: number): Promise<Record<string,
   const [data, text, common] = await Promise.all([read(`${module}.json`), read(`${module}.text.json`), read("common.text.json")]);
   return { ...data, text, common };
 }
+
+/** Python source of a module's exercise harness (content/ai-engineering/<exercise.harness>). */
+export async function getExerciseHarness(harness: string): Promise<string> {
+  if (!/^exercises\/\d+\.py$/.test(harness)) throw new Error(`Bad harness path: ${harness}`);
+  return readFile(path.join(contentDir(), harness), "utf8");
+}

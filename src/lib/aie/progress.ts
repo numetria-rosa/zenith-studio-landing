@@ -30,3 +30,23 @@ export function courseProgress(modules: ModuleContent[], done: Set<string>) {
 export function currentModuleNumber(modules: ModuleContent[], done: Set<string>) {
   return (modules.find((m) => m.lessons.some((l) => !done.has(l.number))) ?? modules[0])?.number ?? 1;
 }
+
+export type ExerciseProgress = { code: string; attempted: boolean; passed: number; total: number };
+
+export async function getExerciseProgress(userId: string, module: number): Promise<ExerciseProgress | null> {
+  return db.aieExerciseProgress.findUnique({
+    where: { userId_module: { userId, module } },
+    select: { code: true, attempted: true, passed: true, total: true },
+  });
+}
+
+/** Saves a run. `passed` keeps the best score so a later worse attempt never un-completes the exercise. */
+export async function saveExerciseRun(userId: string, module: number, code: string, passed: number, total: number): Promise<void> {
+  const prev = await db.aieExerciseProgress.findUnique({ where: { userId_module: { userId, module } }, select: { passed: true } });
+  const best = Math.max(prev?.passed ?? 0, passed);
+  await db.aieExerciseProgress.upsert({
+    where: { userId_module: { userId, module } },
+    create: { userId, module, code, attempted: true, passed: best, total },
+    update: { code, attempted: true, passed: best, total },
+  });
+}

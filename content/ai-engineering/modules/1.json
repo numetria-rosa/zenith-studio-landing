@@ -81,19 +81,19 @@
     ],
     "tests": [
       {
-        "name": "Alice",
+        "name": "Clean JSON parses correctly",
         "hint": "A well-formed JSON string matching the schema should return {\"ok\": True, \"data\": ...} with the parsed values intact."
       },
       {
-        "name": "Priya",
+        "name": "Markdown code fence is stripped before parsing",
         "hint": "Strip a leading/trailing ``` (optionally ```json) fence before attempting json.loads."
       },
       {
-        "name": "Alex",
+        "name": "Trailing comma is repaired before parsing",
         "hint": "Replace a comma immediately before a closing } or ] with nothing before parsing."
       },
       {
-        "name": "Sam",
+        "name": "Missing required field is rejected with a specific error",
         "hint": "After parsing, check every field in schema[\"required\"] is present, and name the missing one in the error."
       },
       {

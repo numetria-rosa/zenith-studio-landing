@@ -81,23 +81,23 @@
     ],
     "tests": [
       {
-        "name": "nonexistent",
+        "name": "Unknown tool name returns a structured error instead of raising",
         "hint": "Look up the tool by call[\"name\"] in the registry first. If it is not there, return {\"ok\": False, \"error\": ...} immediately, do not let a missing lookup crash anything."
       },
       {
-        "name": "greet",
+        "name": "Missing required argument is rejected before the handler ever runs",
         "hint": "Check every field in schema[\"required\"] exists in call[\"arguments\"] BEFORE calling the handler. If any is missing, return an error and do not call the handler at all."
       },
       {
-        "name": "inc",
+        "name": "Calling the same call[\"id\"] twice only executes the handler once",
         "hint": "Before calling the handler, check if seen[call[\"id\"]] already has a value. If so, return that cached value directly instead of calling the handler again."
       },
       {
-        "name": "inc",
+        "name": "Different call[\"id\"]s for the same tool execute independently",
         "hint": "Your idempotency check must be keyed by call[\"id\"] specifically, not by tool name. Two different IDs calling the same tool should both run the handler."
       },
       {
-        "name": "flaky",
+        "name": "A raised error is not cached, so a retry with the same call[\"id\"] gets a real second attempt",
         "hint": "Only write to seen[call[\"id\"]] inside the success path, after the handler returns without raising. On except, return the error WITHOUT touching seen, so the next call with the same id calls the handler again."
       }
     ],

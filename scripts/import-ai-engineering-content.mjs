@@ -201,7 +201,7 @@ function parseHarness(py) {
   const fn = (py.match(/ns\.get\('([A-Za-z_]\w*)'\)/) || [])[1];
   const tests = [];
   const pyStr = `('(?:[^'\\\\]|\\\\.)*'|"(?:[^"\\\\]|\\\\.)*")`;
-  const re = new RegExp(`['"]name['"]:\\s*${pyStr}[\\s\\S]*?['"]hint['"]:\\s*${pyStr}`, "g");
+  const re = new RegExp(`results\\.append\\(\\{\\s*['"]name['"]:\\s*${pyStr}[\\s\\S]*?['"]hint['"]:\\s*${pyStr}`, "g");
   for (const m of py.matchAll(re)) tests.push({ name: pyUnquote(m[1]), hint: pyUnquote(m[2]) });
   const declared = (py.match(/results\.append\(/g) || []).length;
   if (declared !== tests.length) throw new Error(`harness: found ${tests.length} test name/hint pairs but ${declared} results.append calls`);

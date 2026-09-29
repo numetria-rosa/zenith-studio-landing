@@ -61,6 +61,7 @@ model User {
   entitlements    CourseEntitlement[]
   progress        CourseProgress[]
   aieLessonProgress AieLessonProgress[]
+  aieExerciseProgress AieExerciseProgress[]
   aieClients      AieClient[]
   aieSellPlanSteps AieSellPlanStep[]
   serviceRequests ServiceRequest[]
@@ -207,6 +208,22 @@ model AieLessonProgress {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, lessonId])
+}
+
+// One row per (student, module) code exercise: the last code they ran, whether they have run it
+// at all (that unlocks "Watch solution"), and the best pass count.
+model AieExerciseProgress {
+  userId    String
+  module    Int
+  code      String   @default("")
+  attempted Boolean  @default(false)
+  passed    Int      @default(0)
+  total     Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, module])
 }
 
 // Final module: the students' own clients (what they sell, to whom, for how much) and their sell-plan checklist.
