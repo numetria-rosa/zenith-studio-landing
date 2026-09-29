@@ -25,8 +25,7 @@ const client = new Whop({ apiKey });
 
 // 75% off, exact math (not rounded) — the "75% off" badge stays literally
 // true. originalPrice/discountedPrice must match src/app/lab/courses-data.ts.
-const PLANS = [
-  { name: "AI Engineering", id: "plan_VSU3hyAITNsNk", originalPrice: 99, discountedPrice: 24.75 },
+const PLANS = [ // AI Engineering is deliberately absent: its plan is managed by _update-ai-engineering-price.mjs
   { name: "Data Science & Analysis", id: "plan_ysRjmrPzOn9j1", originalPrice: 120, discountedPrice: 30 },
   { name: "AI Automation", id: "plan_ED9yF9ehN2RIa", originalPrice: 149, discountedPrice: 37.25 },
   { name: "AI-Assisted Software Engineering", id: "plan_ximKlnIKYO7Bx", originalPrice: 99, discountedPrice: 24.75 },

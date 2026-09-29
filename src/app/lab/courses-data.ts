@@ -238,10 +238,11 @@ export const courses: CourseCard[] = [
     level: "Basic programming logic required, no prior Python needed",
     duration: "8 weeks",
     weeklyTime: "~10 hrs/week",
-    price: "$28.75",
-    originalPrice: "$115",
-    discountPercent: 75,
-    discountDeadline: "2026-09-07T23:59:59-00:00",
+    // $36 = 70% off $120, limited time, no end date set. Whop plan plan_VSU3hyAITNsNk
+    // is set to match (scripts/_update-ai-engineering-price.mjs).
+    price: "$36",
+    originalPrice: "$120",
+    discountPercent: 70,
     summary:
       "The real stack behind production AI products: prompting, retrieval, agents, tool use, structured outputs, and evaluation, applied to a real shipped product, not a toy chatbot.",
     whatYoullDo: [

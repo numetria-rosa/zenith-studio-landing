@@ -329,8 +329,7 @@ export function CourseCatalog({
           // instead is robust regardless of the ribbon's exact dimensions.
           const discountLive =
             Boolean(course.discountPercent) &&
-            Boolean(course.discountDeadline) &&
-            Date.parse(course.discountDeadline!) > Date.now();
+            (!course.discountDeadline || Date.parse(course.discountDeadline) > Date.now());
 
           return (
             <div
@@ -606,7 +605,7 @@ function PriceRow({ course }: { course: CourseCard }) {
       )}
       {discountLive && typeof course.discountPercent === "number" && (
         <span className="rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2.5 py-1 text-xs font-semibold text-emerald-200">
-          {course.discountPercent}% off{deadlineLabel ? ` until ${deadlineLabel}` : ""}
+          {course.discountPercent}% off{deadlineLabel ? ` until ${deadlineLabel}` : ", limited time"}
         </span>
       )}
       {discountLive && countdown && (
