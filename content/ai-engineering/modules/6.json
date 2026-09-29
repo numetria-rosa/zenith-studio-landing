@@ -67,15 +67,15 @@
     "solution": "async def call_with_retry_fallback(primary_call, fallback_call, max_retries):\n    attempt = 0\n    while True:\n        try:\n            result = await primary_call()\n            return {\"ok\": True, \"result\": result, \"source\": \"primary\"}\n        except Exception as e:\n            retryable = getattr(e, \"retryable\", True) is not False\n            if not retryable or attempt >= max_retries:\n                break\n            attempt += 1\n\n    try:\n        result = await fallback_call()\n        return {\"ok\": True, \"result\": result, \"source\": \"fallback\"}\n    except Exception as e:\n        return {\"ok\": False, \"error\": str(e), \"source\": \"fallback\"}",
     "hints": [
       {
-        "title": "Hint 1 — conceptual",
+        "title": "Hint 1: conceptual",
         "mdx": "This is a loop, not a fixed sequence: try the primary, and if it fails with a retryable error and you haven't hit max\\_retries, try it again. The loop ends either in success, or by falling through to the fallback path."
       },
       {
-        "title": "Hint 2 — specific",
+        "title": "Hint 2: specific",
         "mdx": "Track an attempt counter starting at 0. Wrap `await primary_call()` in try/except inside a loop. On success, return immediately. On failure, check `getattr(e, \"retryable\", True) is not False` (so unset counts as retryable) AND `attempt < max_retries`, if both hold, increment attempt and loop again, otherwise break out to the fallback step."
       },
       {
-        "title": "Hint 3 — near-solution",
+        "title": "Hint 3: near-solution",
         "mdx": "After the primary loop ends (without having returned), wrap a single `await fallback_call()` attempt in its own try/except. On success return `{\"ok\": True, \"result\": ..., \"source\": \"fallback\"}`, on failure return `{\"ok\": False, \"error\": str(e), \"source\": \"fallback\"}`. Don't loop the fallback at all, it only ever gets one try."
       }
     ],

@@ -1,0 +1,21 @@
+{
+  "ctx": {
+    "winLabel": "Context window",
+    "winUnit": "tokens",
+    "outLabel": "Reserved for output",
+    "outUnit": "tokens",
+    "availLabel": "available input budget (tokens)",
+    "wordsLabel": "≈ input words (÷ 4 chars/token × ~5.3 chars/word)",
+    "pctLabel": "% of window reserved for output"
+  },
+  "rag": {
+    "docLabel": "Total collection size",
+    "docUnit": "characters",
+    "chunkLabel": "Chunk size",
+    "chunkUnit": "tokens",
+    "overlapLabel": "Overlap",
+    "chunksLabel": "chunks produced",
+    "totalLabel": "total tokens processed across all chunks",
+    "overheadLabel": "of that is pure overlap overhead"
+  }
+}

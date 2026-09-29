@@ -1,0 +1,26 @@
+{
+  "spot": {
+    "usableBtn": "Usable as-is",
+    "missingBtn": "Missing something",
+    "summary": "{correct} / {total} correctly classified. ",
+    "summaryOk": "You correctly identified which cases have a real, checkable criterion.",
+    "summaryBad": "Review the ones marked wrong above, a usable eval case needs both an input AND an explicit way to check the output, not just one or the other."
+  },
+  "reg": {
+    "scoreLabel": "Candidate run score:",
+    "baseline": "Baseline score",
+    "candidate": "Candidate score",
+    "delta": "Delta vs. baseline",
+    "flag": "regression flag",
+    "pass": "PASS",
+    "regression": "REGRESSION",
+    "okA": "Candidate meets the baseline.",
+    "okB": "is",
+    "okC": ", this candidate is safe to isolate-test against baseline as the next release.",
+    "badA": "Below baseline.",
+    "badB": "is",
+    "badC": "(score {score} < baseline {baseline}), this candidate should not ship as-is, isolate what changed since the last release and re-run before deciding what to do with it.",
+    "true": "True",
+    "false": "False"
+  }
+}

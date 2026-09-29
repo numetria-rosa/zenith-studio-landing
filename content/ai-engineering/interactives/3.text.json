@@ -1,0 +1,27 @@
+{
+  "angle": {
+    "label": "Angle between query vector and document vector:",
+    "cosLabel": "cosine similarity",
+    "readLabel": "plain-language read",
+    "reads": [
+      "near-identical direction",
+      "strongly related",
+      "weakly related",
+      "unrelated (perpendicular)",
+      "opposing direction"
+    ]
+  },
+  "rank": {
+    "chunk": "Chunk",
+    "score": "cosine similarity:",
+    "ok": "Correct. Chunk about resetting a customer's password scores highest ({score}), it directly answers the query, not just shares a keyword like \"reset.\"",
+    "bad": "Not quite. The password-reset chunk scores highest ({score}), it directly answers the query. The router-reset chunk shares the word \"reset\" but is about an unrelated topic, and still scores well above zero, exactly the false-positive risk a relevance threshold guards against."
+  },
+  "hr": {
+    "label": "Minimum-relevance threshold:",
+    "retrieved": "Retrieved",
+    "excluded": "Excluded",
+    "score": "cosine similarity:",
+    "countLabel": "chunks returned (of k=3)"
+  }
+}

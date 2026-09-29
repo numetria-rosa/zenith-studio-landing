@@ -1,0 +1,23 @@
+{
+  "m6-s2": [
+    "Live calculation · base 200ms, cap 8000ms",
+    "Retry attempt number:",
+    "1",
+    "max possible delay before this attempt (ms)",
+    "Full jitter picks a delay uniformly between 0 and this cap, not the cap itself, so two callers hitting the same limit at the same time don't retry at the same moment.",
+    "attempt 1",
+    "attempt 3",
+    "attempt 6"
+  ],
+  "m6-s11": [
+    "Live simulation · cap 1600ms, 200ms buckets",
+    "Simultaneous callers retrying:",
+    "30",
+    "↻ Re-roll jitter",
+    "busiest 200ms window, fixed delay (no jitter)",
+    "busiest 200ms window, full jitter",
+    "Fixed delay: every caller computes the same backoff value, so they all land in one bucket, a synchronized spike hitting the already-struggling shipping API at once. Full jitter: each caller picks independently from 0-1600ms, spreading the same number of retries across every bucket instead.",
+    "Fixed delay (no jitter)",
+    "Full jitter"
+  ]
+}

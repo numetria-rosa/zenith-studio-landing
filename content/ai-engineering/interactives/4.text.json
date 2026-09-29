@@ -1,0 +1,25 @@
+{
+  "spot": {
+    "safeBtn": "Safe to execute",
+    "rejectBtn": "Should be rejected",
+    "summary": "{correct} / {total} correctly classified. ",
+    "summaryOk": "You correctly separated structural validity from execution safety.",
+    "summaryBad": "Review the ones marked wrong above, some errors are structural (missing field, wrong type, unknown tool), others need business-rule checks beyond the schema."
+  },
+  "idem": {
+    "callId": "Call ID:",
+    "toggle": "Idempotency cache enabled (tracks call IDs that already executed)",
+    "stock": "Units in stock",
+    "handler": "Times handler actually ran",
+    "submit": "Submit call (attempt 1)",
+    "retry": "Retry same call ID (attempt 2)",
+    "reset": "Reset",
+    "attempt1": "Attempt 1: handler executed. Stock {before} → {after}.",
+    "lost": "Response lost in transit before the ops bot received confirmation.",
+    "cached": "Retry: {id} already recorded as executed. Cached result returned, stock unchanged at {stock}.",
+    "again": "Retry: handler executed again. Stock {before} → {after}.",
+    "verdictOk": "Idempotency cache worked: one logical call produced exactly one decrement, even though the network made it look like two separate requests.",
+    "verdictBad": "No cache, no protection: the same logical call decremented stock twice. In production this is a real inventory bug, phantom shortage caused entirely by a retried request, not an actual second order.",
+    "callSignature": "adjust_inventory(sku: \"SKU-2291\", delta: -5)"
+  }
+}

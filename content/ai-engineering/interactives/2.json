@@ -1,60 +1,24 @@
 {
-  "MODULE_ID": 2,
-  "chunkHasAttempted": false,
-  "score": 0,
-  "answered": {
-    "q1": false,
-    "q2": false,
-    "q3": false,
-    "q4": false,
-    "q5": false
-  },
-  "q3Options": [
+  "decision": [
     {
-      "text": "It succeeds without error while discarding whatever content came after the cut point",
-      "correct": true
+      "t": "A. Truncate the contract at the window limit and summarize whatever made it in",
+      "correct": false,
+      "why": "This is exactly the silent-failure bug this module opened with, the truncated tail (often the termination clause, liability terms, or signatures) disappears with no error, and a review that missed it looks identical to a review that caught everything."
     },
     {
-      "text": "It raises a visible exception every time content is too long",
+      "t": "B. Reject the document outright as \"too long to process\"",
       "correct": false,
-      "reason": "That's the opposite of what makes it dangerous, if it raised a visible exception, it would be a loud, easy-to-catch bug, not a silent one."
+      "why": "Rejecting throws away a document the system CAN handle, it just needs to be split first. That's a worse outcome for the rare-but-real long contract than solving the actual problem, chunking with overlap."
     },
     {
-      "text": "It only affects performance, not correctness",
-      "correct": false,
-      "reason": "It affects correctness directly, whatever content was cut off is simply unavailable to the model, that's a correctness problem, not a performance one."
-    }
-  ],
-  "q4Options": [
-    {
-      "text": "More total tokens processed across the whole document, since boundary content is repeated, which raises cost and total latency",
-      "correct": true
+      "t": "C. Chunk the contract with overlap, sized to the available input budget, and process it in pieces",
+      "correct": true,
+      "why": "This is the module's core lesson applied correctly: compute the available input budget (window minus reserved output), split the contract into chunks that fit it with overlap at the boundaries, and process every chunk, nothing gets silently dropped."
     },
     {
-      "text": "Nothing, overlap is free since it reuses content that was already fetched",
+      "t": "D. Switch to a model with a bigger context window only for this document",
       "correct": false,
-      "reason": "'Already fetched' doesn't mean free to process, the model still has to read those repeated tokens again in the next chunk, that's real additional token cost, not a free reuse."
-    },
-    {
-      "text": "It reduces the number of chunks needed",
-      "correct": false,
-      "reason": "Overlap doesn't reduce chunk count, if anything, more overlap per chunk boundary means slightly MORE total chunks are needed to cover the same content, not fewer."
-    }
-  ],
-  "q5Options": [
-    {
-      "text": "Roughly 950 tokens total (600 + 150 + 200), noticeably more than a single successful ~800-token call (600 prompt + 200 response)",
-      "correct": true
-    },
-    {
-      "text": "The same as a single call, retries don't add token cost, only latency",
-      "correct": false,
-      "reason": "Retries absolutely add token cost, the original prompt is sent again (plus new error context), and a new response is generated, that's real additional tokens billed, not just extra wait time."
-    },
-    {
-      "text": "Less than a single call, since the second attempt is shorter",
-      "correct": false,
-      "reason": "The second attempt isn't a replacement for the first, both attempts' tokens count, the original 600-token prompt was already sent (and paid for) on the first, failed attempt."
+      "why": "This can be a reasonable secondary lever, but on its own it doesn't scale, there's always a contract long enough to exceed whatever window you pick next, and it doesn't remove the need for a real chunking strategy for the documents that still won't fit."
     }
   ]
 }

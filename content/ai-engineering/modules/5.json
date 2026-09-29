@@ -67,15 +67,15 @@
     "solution": "def run_agent_loop(initial_state, step, max_steps):\n    state = initial_state\n    trace = []\n    last_action = None\n    repeat_count = 0\n\n    for i in range(max_steps):\n        result = step(state)\n\n        if result[\"type\"] == \"final\":\n            return {\"status\": \"success\", \"answer\": result[\"answer\"], \"stepsUsed\": i + 1, \"trace\": trace}\n\n        trace.append(result[\"action\"])\n        if result[\"action\"] == last_action:\n            repeat_count += 1\n        else:\n            last_action = result[\"action\"]\n            repeat_count = 1\n\n        if repeat_count >= 3:\n            return {\"status\": \"stuck\", \"stepsUsed\": i + 1, \"trace\": trace}\n\n        state = result[\"nextState\"]\n\n    return {\"status\": \"max_steps\", \"stepsUsed\": max_steps, \"trace\": trace}",
     "hints": [
       {
-        "title": "Hint 1 — conceptual",
+        "title": "Hint 1: conceptual",
         "mdx": "Loop up to max\\_steps times. Each iteration, call step(state) once. Check its type: if \"final,\" you're done. If \"action,\" record it and check whether it's a repeat of the last action before continuing."
       },
       {
-        "title": "Hint 2 — specific",
+        "title": "Hint 2: specific",
         "mdx": "Keep two variables outside the loop: the last action seen, and how many times in a row it's repeated. Each \"action\" result, compare it to the last action, if equal increment the repeat counter, if different reset the counter to 1 and update \"last action.\""
       },
       {
-        "title": "Hint 3 — near-solution",
+        "title": "Hint 3: near-solution",
         "mdx": "Check the repeat counter AFTER appending the current action to trace and updating the counter, if it reaches 3, return the stuck result right there, don't keep looping. If the loop finishes all max\\_steps iterations without returning, that's your max\\_steps case, return it after the loop."
       }
     ],

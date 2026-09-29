@@ -1,5 +1,4 @@
 {
-  "MODULE_ID": 7,
   "SPOT_CASES": [
     {
       "id": "c1",
@@ -26,14 +25,27 @@
       "explanation": "No expected output and no check function at all, there's nothing here to score against. This is just an input with no criterion, not a usable test case yet."
     }
   ],
-  "evalHasAttempted": false,
   "REG_DEMO_BASELINE": 0.82,
-  "score": 0,
-  "answered": {
-    "q1": false,
-    "q2": false,
-    "q3": false,
-    "q4": false,
-    "q5": false
-  }
+  "decision": [
+    {
+      "t": "A. Ship it, 96% beats the 91% baseline, that's a measurable win",
+      "correct": false,
+      "why": "The 96% is real, but it's an average across a set where charge-disputes are only 2 of 50 cases, barely enough to move the aggregate even if the new prompt fails them completely. The number went up while a specific, high-stakes category quietly got much worse, exactly the \"good average hides a catastrophic slice\" failure this module warns about."
+    },
+    {
+      "t": "B. Don't ship yet. Add real charge-dispute cases to the eval set, re-run, and check that slice specifically before deciding",
+      "correct": true,
+      "why": "This is the correct move: the spot-check surfaced a real signal (4 of 5 wrong on a high-stakes category) that the eval set was underrepresenting. Before shipping, expand the eval set with enough charge-dispute cases to measure that slice properly, then compare THAT number to baseline, not just the aggregate. A category tied to money and disputes is exactly the kind of failure an average can hide and a slice can catch."
+    },
+    {
+      "t": "C. Trust the manual spot-check over the eval suite entirely, and abandon the eval process for this decision",
+      "correct": false,
+      "why": "The spot-check is valuable because it's what CAUGHT the gap, but 5 cases is too small a sample to replace a systematic eval on its own. The right response is to fold that signal back into a bigger, more representative eval set, not to throw out systematic measurement in favor of an ad hoc check, that's the exact anti-pattern this module opened by rejecting."
+    },
+    {
+      "t": "D. Ship it, but plan to monitor charge-dispute complaints after launch",
+      "correct": false,
+      "why": "Charge disputes are exactly the category where \"monitor after shipping\" is the expensive way to find out, real users would experience the 4-in-5 failure rate the spot-check already revealed. The eval gap is fixable before shipping; waiting for complaints just moves the cost onto users."
+    }
+  ]
 }

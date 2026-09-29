@@ -67,15 +67,15 @@
     "solution": "import math\n\ndef cosine_similarity(a, b):\n    dot = sum(a[i] * b[i] for i in range(len(a)))\n    norm_a = math.sqrt(sum(x * x for x in a))\n    norm_b = math.sqrt(sum(x * x for x in b))\n    if norm_a == 0 or norm_b == 0:\n        return 0\n    return dot / (norm_a * norm_b)\n\ndef retrieve_top_k(query_vector, documents, k, min_score):\n    scored = [\n        {\"id\": doc[\"id\"], \"score\": cosine_similarity(query_vector, doc[\"vector\"])}\n        for doc in documents\n    ]\n    filtered = [d for d in scored if d[\"score\"] >= min_score]\n    filtered.sort(key=lambda d: d[\"score\"], reverse=True)\n    return filtered[:k]",
     "hints": [
       {
-        "title": "Hint 1 — conceptual",
+        "title": "Hint 1: conceptual",
         "mdx": "Break it into two pieces: a helper that scores one query vector against one document vector, and a second step that scores every document, filters, sorts, and slices. Don't try to do all four at once in one loop."
       },
       {
-        "title": "Hint 2 — specific",
+        "title": "Hint 2: specific",
         "mdx": "Cosine similarity of vectors a and b: dot product divided by (magnitude of a times magnitude of b). Dot product is the sum of `a[i] * b[i]` across matching indices. Magnitude is the square root of the sum of each vector's own squared components (Python's `math.sqrt`)."
       },
       {
-        "title": "Hint 3 — near-solution",
+        "title": "Hint 3: near-solution",
         "mdx": "If either magnitude is 0 (a zero vector), return a score of 0 immediately for that pair, don't divide by zero. After scoring every document, filter out anything with `score < min_score`, sort the rest descending by score using `sorted(..., key=..., reverse=True)`, then slice with `[:k]`."
       }
     ],

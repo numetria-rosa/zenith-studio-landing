@@ -1,5 +1,4 @@
 {
-  "MODULE_ID": 1,
   "SAMPLES": [
     {
       "id": "s1",
@@ -54,7 +53,6 @@
       "why": "A stronger instruction can lower the RATE (this module's few-shot lesson), it can't lower it to zero, and it does nothing for the two specific failure modes you've already measured. You have real data on how this model behaves; engineer around the data, don't just ask nicer."
     }
   ],
-  "structHasAttempted": false,
   "PIPE_SAMPLES": [
     {
       "id": "p1",
@@ -81,78 +79,6 @@
     "category",
     "priority",
     "ticket_id"
-  ],
-  "score": 0,
-  "answered": {
-    "q1": false,
-    "q2": false,
-    "q3": false,
-    "q4": false,
-    "q5": false
-  },
-  "q1Options": [
-    {
-      "text": "Validate and parse it before trusting it, exactly as if it came from any other untrusted external source",
-      "correct": true
-    },
-    {
-      "text": "Trust it directly, the instruction plus examples make malformed output effectively impossible",
-      "correct": false,
-      "reason": "Instructions and examples reduce the RATE of malformed output, they don't reduce it to zero, a production system still needs to validate."
-    },
-    {
-      "text": "Log a warning but proceed with whatever text came back",
-      "correct": false,
-      "reason": "Logging a warning after already acting on unvalidated data doesn't prevent the corruption or crash that malformed data can cause, validation has to happen before use, not after."
-    }
-  ],
-  "q2Options": [
-    {
-      "text": "The system role, stated once, reinforced with an example",
-      "correct": true
-    },
-    {
-      "text": "Anywhere in the user message, position doesn't matter",
-      "correct": false,
-      "reason": "Position does matter in practice, instructions buried mid-message compete with the actual request for the model's attention, a standing instruction belongs in the system role."
-    },
-    {
-      "text": "It should be repeated in every assistant turn instead of stated once",
-      "correct": false,
-      "reason": "A standing instruction doesn't need to be repeated every turn if it's placed in the system role, that's exactly what the system role is for, persistent instructions that apply for the whole conversation."
-    }
-  ],
-  "q3Options": [
-    {
-      "text": "Validation, the JSON is syntactically fine, the repair pass has nothing to fix",
-      "correct": true
-    },
-    {
-      "text": "Repair pass, this is exactly what stripping trailing commas is for",
-      "correct": false,
-      "reason": "There's no syntax problem here to repair, {\"name\": \"Sam\"} parses successfully, the issue is that the resulting DATA is incomplete, which is what validation checks for, not the repair pass."
-    },
-    {
-      "text": "Neither, this response should be accepted as-is",
-      "correct": false,
-      "reason": "The response is missing a field your schema explicitly requires, accepting it as-is means your program later fails (or behaves wrong) when it tries to use the missing age field."
-    }
-  ],
-  "q4Options": [
-    {
-      "text": "A concrete example removes ambiguity a prose description leaves open (nesting, extra fields, exact key names)",
-      "correct": true
-    },
-    {
-      "text": "Examples make the prompt longer, and longer prompts are always more reliable",
-      "correct": false,
-      "reason": "Length itself isn't what helps, a long, vague description doesn't outperform a short, concrete example. It's the removal of ambiguity that matters, not the character count."
-    },
-    {
-      "text": "Examples let the model skip following the system instructions entirely",
-      "correct": false,
-      "reason": "Examples work alongside the system instructions, reinforcing them concretely, they don't replace or let the model ignore those instructions."
-    }
   ],
   "decision": [
     {

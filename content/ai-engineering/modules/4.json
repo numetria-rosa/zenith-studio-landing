@@ -67,15 +67,15 @@
     "solution": "def execute_tool(call, registry, seen):\n    tool = registry.get(call[\"name\"])\n    if not tool:\n        return {\"ok\": False, \"error\": \"Unknown tool: \" + call[\"name\"]}\n\n    required = (tool.get(\"schema\") or {}).get(\"required\", [])\n    for field in required:\n        if not call.get(\"arguments\") or field not in call[\"arguments\"]:\n            return {\"ok\": False, \"error\": \"Missing required argument: \" + field}\n\n    if seen.get(call[\"id\"]):\n        return seen[call[\"id\"]]\n\n    try:\n        outcome = {\"ok\": True, \"result\": tool[\"handler\"](call[\"arguments\"])}\n    except Exception as e:\n        return {\"ok\": False, \"error\": str(e)}\n\n    seen[call[\"id\"]] = outcome\n    return outcome",
     "hints": [
       {
-        "title": "Hint 1 — conceptual",
+        "title": "Hint 1: conceptual",
         "mdx": "There are three gates a call has to pass, in order: does the tool exist, are all required arguments present, has this exact call ID already succeeded. Only after all three does the handler actually run."
       },
       {
-        "title": "Hint 2 — specific",
+        "title": "Hint 2: specific",
         "mdx": "Look up `registry[call[\"name\"]]` first, if missing, return an error immediately. Then loop over `tool[\"schema\"][\"required\"]` and check each field exists in `call[\"arguments\"]`. Then check `seen[call[\"id\"]]`, if it's already set, return it directly without calling the handler."
       },
       {
-        "title": "Hint 3 — near-solution",
+        "title": "Hint 3: near-solution",
         "mdx": "Wrap the handler call in try/except. On success, build `{\"ok\": True, \"result\": ...}`, store it in `seen[call[\"id\"]]`, then return it. On except, return `{\"ok\": False, \"error\": str(e)}` WITHOUT touching `seen`, that's what keeps a failed attempt retryable."
       }
     ],

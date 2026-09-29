@@ -1,0 +1,19 @@
+{
+  "m3-s3": [
+    "Live calculation",
+    "Angle between query vector and document vector:",
+    "45",
+    "°",
+    "cosine similarity",
+    "plain-language read"
+  ],
+  "m3-s4": [
+    "Query: \"How do I reset a customer's password?\""
+  ],
+  "m3-s11": [
+    "Live top-k + threshold",
+    "Minimum-relevance threshold:",
+    "0.30",
+    "chunks returned (of k=3)"
+  ]
+}

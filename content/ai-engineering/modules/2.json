@@ -67,15 +67,15 @@
     "solution": "def chunk_text(words, max_tokens_per_chunk, overlap_words, estimate_tokens):\n    chunks = []\n    i = 0\n    while i < len(words):\n        chunk = []\n        tokens = 0\n        j = i\n        while j < len(words):\n            t = estimate_tokens(words[j])\n            if tokens + t > max_tokens_per_chunk and len(chunk) > 0:\n                break\n            chunk.append(words[j])\n            tokens += t\n            j += 1\n        chunks.append(chunk)\n        if j >= len(words):\n            break\n        i = max(i + 1, j - overlap_words)\n    return chunks",
     "hints": [
       {
-        "title": "Hint 1 — conceptual",
+        "title": "Hint 1: conceptual",
         "mdx": "Walk through the words with two pointers: build the current chunk word-by-word until adding the next word would exceed the budget, then start the next chunk a few words BACK from where you stopped, that's the overlap."
       },
       {
-        "title": "Hint 2 — specific",
+        "title": "Hint 2: specific",
         "mdx": "Track a running token total for the current chunk. Before adding a word, check if `running_total + estimate_tokens(word) > max_tokens_per_chunk`. If so, and the chunk already has at least one word, stop this chunk here. If the chunk is still empty, add the word anyway (that's the oversized-single-word case)."
       },
       {
-        "title": "Hint 3 — near-solution",
+        "title": "Hint 3: near-solution",
         "mdx": "After finishing a chunk ending at word index `j` (exclusive), start the next chunk at index `j - overlap_words` (clamped to not go below 0, and not below where the current chunk started). Stop the outer loop once a chunk reaches the end of the words list."
       }
     ],

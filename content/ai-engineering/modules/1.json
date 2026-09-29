@@ -67,15 +67,15 @@
     "solution": "import json\nimport re\n\ndef extract_structured_output(raw_text, schema):\n    text = str(raw_text).strip()\n    fenced = re.match(r\"^```(?:json)?\\s*([\\s\\S]*?)\\s*```$\", text)\n    if fenced:\n        text = fenced.group(1).strip()\n    text = re.sub(r\",\\s*([}\\]])\", r\"\\1\", text)\n\n    try:\n        data = json.loads(text)\n    except Exception as e:\n        return {\"ok\": False, \"error\": \"Could not parse JSON: \" + str(e)}\n\n    for field in schema.get(\"required\", []):\n        if not isinstance(data, dict) or field not in data:\n            return {\"ok\": False, \"error\": \"Missing required field: \" + field}\n    return {\"ok\": True, \"data\": data}",
     "hints": [
       {
-        "title": "Hint 1 — conceptual",
+        "title": "Hint 1: conceptual",
         "mdx": "Think in three passes: (1) clean up formatting noise around the JSON, (2) try to parse it, (3) check the parsed dict actually has what you need. Each pass can fail independently, and each failure should produce a useful error, not a raised exception."
       },
       {
-        "title": "Hint 2 — specific",
+        "title": "Hint 2: specific",
         "mdx": "Python's `re` module: ````re.match(r\"^```(?:json)?\\s*([\\s\\S]*?)\\s*```$\", text)```` captures the content between fences. For trailing commas, `re.sub(r\",\\s*([}\\]])\", r\"\\1\", text)` before parsing. Wrap `json.loads` in try/except, don't let it raise out of your function."
       },
       {
-        "title": "Hint 3 — near-solution",
+        "title": "Hint 3: near-solution",
         "mdx": "After a successful parse, loop over `schema.get(\"required\", [])` and check `field in data` for each one. Return a specific error naming the missing field on the first one that's absent, don't just say \"invalid\"."
       }
     ],

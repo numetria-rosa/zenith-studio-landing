@@ -67,15 +67,15 @@
     "solution": "def evaluate_model(test_cases, model_fn, baseline_score):\n    results = []\n    for tc in test_cases:\n        try:\n            actual = model_fn(tc[\"input\"])\n        except Exception as e:\n            results.append({\"id\": tc[\"id\"], \"pass\": False, \"actual\": \"ERROR: \" + str(e)})\n            continue\n\n        try:\n            passed = bool(tc[\"check\"](actual))\n        except Exception:\n            passed = False\n\n        results.append({\"id\": tc[\"id\"], \"pass\": passed, \"actual\": actual})\n\n    total = len(results)\n    pass_count = sum(1 for r in results if r[\"pass\"])\n    score = pass_count / total if total > 0 else 0\n\n    has_baseline = baseline_score is not None\n    regression = has_baseline and score < baseline_score\n\n    return {\"score\": score, \"passCount\": pass_count, \"total\": total, \"results\": results, \"regression\": regression}",
     "hints": [
       {
-        "title": "Hint 1 — conceptual",
+        "title": "Hint 1: conceptual",
         "mdx": "Loop over test\\_cases: for each one, get an actual output, check it, and record the result. Then reduce that list of results down to a score, a pass count, and a regression flag."
       },
       {
-        "title": "Hint 2 — specific",
+        "title": "Hint 2: specific",
         "mdx": "Wrap the model\\_fn(tc\\[\"input\"\\]) call in its own try/except, if it raises, that case is a fail with actual set to something describing the error, and check() is never called for that case. Separately, wrap tc\\[\"check\"\\](actual) in try/except too, if IT raises, treat the case as a fail as well."
       },
       {
-        "title": "Hint 3 — near-solution",
+        "title": "Hint 3: near-solution",
         "mdx": "After building the results list, total is len(results), passCount is how many have pass is True, score is passCount / total (guard against total being 0). regression is only True if baseline\\_score is not None AND score \\< baseline\\_score."
       }
     ],

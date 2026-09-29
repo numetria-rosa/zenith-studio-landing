@@ -1,16 +1,28 @@
 {
-  "MODULE_ID": 6,
   "BACKOFF_BASE": 200,
   "BACKOFF_CAP": 8000,
   "TH_CAP": 1600,
   "TH_BUCKET_SIZE": 200,
-  "relHasAttempted": false,
-  "score": 0,
-  "answered": {
-    "q1": false,
-    "q2": false,
-    "q3": false,
-    "q4": false,
-    "q5": false
-  }
+  "decision": [
+    {
+      "t": "A. Nothing, retrying is retrying, 3 attempts is 3 attempts regardless of timing",
+      "correct": false,
+      "why": "Timing is exactly the problem. Immediate, undelayed retries under load are what turn a manageable 1-in-6 failure rate into a retry storm, every client hammers the already-struggling provider again within milliseconds, adding load right when it can least handle it."
+    },
+    {
+      "t": "B. Retry with exponential backoff and full jitter, capped, still bounded to a fixed retry count",
+      "correct": true,
+      "why": "This is the module's core fix: exponential backoff spaces out retry attempts instead of hammering immediately, and full jitter (randomizing within that window, not just the interval itself) prevents many clients from retrying in synchronized waves, which is what actually causes a retry storm. Keeping the count bounded (still 3, or whatever you set) means the fix doesn't trade one uncontrolled behavior for another."
+    },
+    {
+      "t": "C. Increase the retry count from 3 to 10 to improve the odds of success",
+      "correct": false,
+      "why": "More attempts at the same immediate, unspaced cadence just means MORE load added to a provider that's already returning 429s under load, worsening the retry-storm risk, not fixing it. The problem was never the count, it was the complete absence of delay between attempts."
+    },
+    {
+      "t": "D. Switch to the fallback model immediately on the first 429, skip retrying the primary",
+      "correct": false,
+      "why": "A single rate-limit response doesn't mean the primary is unavailable, it means the primary is busy right now. Jumping to fallback on the first 429 abandons a provider that a short, well-spaced retry would likely have succeeded against, and pushes all that traffic onto a fallback that wasn't sized for it."
+    }
+  ]
 }

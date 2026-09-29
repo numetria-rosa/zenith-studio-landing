@@ -1,0 +1,21 @@
+{
+  "spot": {
+    "validBtn": "Valid JSON as-is",
+    "invalidBtn": "Invalid as-is"
+  },
+  "pipe": {
+    "original": "Original input",
+    "fenceName": "Step 1: strip markdown fence",
+    "fenceFound": "Fence found and removed. Remaining: {text}",
+    "fenceNone": "No fence found, text unchanged.",
+    "commaName": "Step 2: strip trailing comma",
+    "commaFound": "Trailing comma found and removed. Remaining: {text}",
+    "commaNone": "No trailing comma found, text unchanged.",
+    "parseName": "Step 3: parse",
+    "parseOk": "json.loads() succeeds.",
+    "parseFail": "json.loads() raises: {error}. Repair pass exhausted its options, this is a real failure, not something more regex fixes. Correct move: retry the model or reject, not more repair.",
+    "validName": "Step 4: validate required fields",
+    "validOk": "All required fields present: {fields}. Accepted.",
+    "validMissing": "Parsed successfully, but missing: {missing}. This is a validation failure, not a repair-pass failure, the JSON was syntactically fine the whole time."
+  }
+}

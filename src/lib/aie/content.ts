@@ -39,11 +39,15 @@ export async function getFurtherReadingMdx(module: number): Promise<string | nul
   return getLessonMdx(module, "further-reading");
 }
 
-/** Every top-level data constant the old page's interactives used (samples, options, traces), by module. */
+/** What a module's ported widgets need: the old page's data constants plus the widgets' own wording. */
 export async function getInteractiveData(module: number): Promise<Record<string, unknown>> {
-  try {
-    return JSON.parse(await readFile(path.join(contentDir(), "interactives", `${module}.json`), "utf8"));
-  } catch {
-    return {};
-  }
+  const read = async (name: string) => {
+    try {
+      return JSON.parse(await readFile(path.join(contentDir(), "interactives", name), "utf8"));
+    } catch {
+      return {};
+    }
+  };
+  const [data, text, common] = await Promise.all([read(`${module}.json`), read(`${module}.text.json`), read("common.text.json")]);
+  return { ...data, text, common };
 }

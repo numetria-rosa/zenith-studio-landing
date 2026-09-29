@@ -1,0 +1,20 @@
+{
+  "m5-s2": [
+    "Agent trace · step through",
+    "▶ Show next step",
+    "Restart trace"
+  ],
+  "m5-s11": [
+    "Trace player · adjustable stuck threshold",
+    "Consecutive identical actions required to trigger \"stuck\":",
+    "3",
+    "▶ Show next step",
+    "Restart trace",
+    "0 / 8",
+    "Steps used / max",
+    "0",
+    "Current repeat streak",
+    "Not started",
+    "Loop status"
+  ]
+}

@@ -36,7 +36,10 @@ const text = (n) => DomUtils.textContent(n).replace(/\s+/g, " ").trim();
 const find = (n, pred) => DomUtils.findOne(pred, n.children || [], true);
 const findAll = (n, pred) => DomUtils.findAll(pred, n.children || []);
 const byClass = (n, c) => find(n, (x) => hasClass(x, c));
-const stripGlyph = (s) => s.replace(/^[\u2696\u26A0\u2713\u25B6\u21BA]\uFE0F?\s*/u, "").trim();
+const stripGlyph = (s) => s.replace(/^[^\p{L}\p{N}]+/u, "").trim();
+// House style: no em dashes anywhere in the course copy. " \u2014 " becomes ": " (a definition or a label), a bare one becomes a hyphen.
+const noEmDash = (s) => s.replace(/ \u2014 /g, ": ").replace(/\u2014/g, "-");
+const writeClean = (file, content) => writeFileSync(file, noEmDash(content));
 
 // ---------------------------------------------------------------- HTML -> MDX
 const esc = (s) => s.replace(/[\\`*_{}[\]<>#~|]/g, "\\$&").replace(/&/g, "&amp;").replace(/^(\d+)\./, "$1\\.").replace(/^-/, "\\-");
@@ -84,6 +87,8 @@ function list(n, ordered) {
 }
 
 const uiLabels = new Set();
+// static text of each script-driven widget (labels, captions, buttons), by widget id: the ported component must show all of it
+export const widgetText = {};
 function blocks(nodes, ctx) {
   const out = [];
   for (const n of nodes) {
@@ -135,7 +140,26 @@ function blocks(nodes, ctx) {
       const label = text(byClass(n, "ilbl"));
       uiLabels.add(label);
       if (byClass(n, "hintbox")) out.push(`<ExerciseLink />`);
-      else out.push(`<Interactive id=${attr(`m${ctx.module}-s${ctx.section}`)} label=${attr(label)} />`);
+      else {
+        const id = `m${ctx.module}-s${ctx.section}`;
+        const strings = [];
+        const collect = (x) => {
+          if (x.type === "text" && x.data.trim()) strings.push(x.data.replace(/\s+/g, " ").trim());
+          (x.children || []).forEach(collect);
+        };
+        collect(n);
+        widgetText[id] = strings.filter((t) => t !== "–");
+        out.push(`<Interactive id=${attr(id)} label=${attr(label)} />`);
+      }
+    } else if (n.name === "div" && n.attribs.id === "spotCards") {
+      // script-built "spot the ..." cards that sit outside an .interactive frame (modules 4 and 7)
+      const id = `m${ctx.module}-s${ctx.section}`;
+      widgetText[id] = [];
+      out.push(`<Interactive id=${attr(id)} label="Live check" />`);
+    } else if (n.name === "div" && n.attribs.id === "spotSummary") {
+      // filled in by the spotCards widget
+    } else if (n.name === "div" && n.attribs.id) {
+      throw new Error(`unhandled script-built container #${n.attribs.id}`);
     } else if (n.name === "div" && kids(n).every((c) => c.name === "div" && kids(c).length)) {
       out.push(blocks(kids(n), ctx).join("\n\n"));
     } else throw new Error(`unhandled block <${n.name} class="${n.attribs.class || ""}">: ${text(n).slice(0, 70)}`);
@@ -315,7 +339,7 @@ function importModule(number) {
           harness: `exercises/${number}.py`,
         };
         mkdirSync(path.join(OUT, "exercises"), { recursive: true });
-        writeFileSync(path.join(OUT, "exercises", `${number}.py`), consts[harnessKey] + "\n");
+        writeClean(path.join(OUT, "exercises", `${number}.py`), consts[harnessKey] + "\n");
       }
     }
   }
@@ -331,8 +355,8 @@ function importModule(number) {
   // write
   const lessonDir = path.join(OUT, "lessons", String(number));
   mkdirSync(lessonDir, { recursive: true });
-  for (const l of lessons) writeFileSync(path.join(lessonDir, `${l.number}.mdx`), `${l.mdx}\n`);
-  if (furtherReading) writeFileSync(path.join(lessonDir, "further-reading.mdx"), `${furtherReading}\n`);
+  for (const l of lessons) writeClean(path.join(lessonDir, `${l.number}.mdx`), `${l.mdx}\n`);
+  if (furtherReading) writeClean(path.join(lessonDir, "further-reading.mdx"), `${furtherReading}\n`);
 
   const moduleJson = {
     ...meta,
@@ -343,14 +367,21 @@ function importModule(number) {
     ...(furtherReading ? { furtherReading: true } : {}),
   };
   mkdirSync(path.join(OUT, "modules"), { recursive: true });
-  writeFileSync(path.join(OUT, "modules", `${number}.json`), JSON.stringify(moduleJson, null, 2) + "\n");
+  writeClean(path.join(OUT, "modules", `${number}.json`), JSON.stringify(moduleJson, null, 2) + "\n");
 
   const data = { ...consts };
-  for (const k of Object.keys(data)) if (/_HARNESS_PY$|_STARTER$/.test(k)) delete data[k];
+  // the exercise, the quiz and page state live elsewhere; what is left is the widgets' own data
+  for (const k of Object.keys(data)) if (/_HARNESS_PY$|_STARTER$|^MODULE_ID$|^score$|^answered$|HasAttempted$|^q\d+Options$|^(rankPicked|rankRevealed|traceIdx|travelIdx|travelLastAction|travelStreak|travelEnded)$/.test(k)) delete data[k];
   const decisionKey = Object.keys(data).find((k) => /^DECISION\d*_OPTS$/.test(k));
+  const decisionCall = calls.find((c) => c.fn === "initDecision");
   if (decisionKey) data.decision = data[decisionKey];
+  else if (decisionCall) data.decision = decisionCall.args[1];
+  const debugCall = calls.find((c) => c.fn === "initDebugCase");
+  if (debugCall) data.debugCase = debugCall.args[1];
   mkdirSync(path.join(OUT, "interactives"), { recursive: true });
-  writeFileSync(path.join(OUT, "interactives", `${number}.json`), JSON.stringify(data, null, 2) + "\n");
+  writeClean(path.join(OUT, "interactives", `${number}.json`), JSON.stringify(data, null, 2) + "\n");
+  const own = Object.fromEntries(Object.entries(widgetText).filter(([k]) => k.startsWith(`m${number}-`)));
+  writeClean(path.join(OUT, "interactives", `${number}.static.json`), JSON.stringify(own, null, 2) + "\n");
 
   // verbatim check: every word of the source sections (minus UI labels and script-built widgets) is in the MDX
   verify(number, wrap, lessons, furtherReading, quiz, glossary, meta, exercise);
