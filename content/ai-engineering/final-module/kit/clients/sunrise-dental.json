@@ -1,0 +1,24 @@
+{
+  "client_id": "sunrise-dental",
+  "business_name": "Sunrise Dental",
+  "niche": "dental clinic",
+  "languages": ["en", "es"],
+  "tone": "warm, calm and reassuring",
+  "escalation_email": "frontdesk@sunrise-dental.example",
+  "hours": {
+    "timezone": "America/New_York",
+    "weekly": {
+      "mon": ["08:00", "17:00"],
+      "tue": ["08:00", "17:00"],
+      "wed": ["08:00", "17:00"],
+      "thu": ["08:00", "17:00"],
+      "fri": ["08:00", "13:00"]
+    }
+  },
+  "kb_dir": "sunrise-dental-kb",
+  "never_promise": ["prices that are not in the knowledge base", "diagnoses or medical advice", "insurance coverage amounts"],
+  "forbidden_phrases": ["guaranteed", "painless", "we accept all insurance"],
+  "booking_event_type_id": 123456,
+  "whatsapp_phone_number_id": null,
+  "whatsapp_reopen_template": "appointment_followup"
+}

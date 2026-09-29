@@ -1,0 +1,74 @@
+{
+  "verified": "2026-09-29",
+  "sources": {
+    "claude_models": "https://platform.claude.com/docs/en/about-claude/models/overview",
+    "claude_structured_outputs": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+    "claude_pdf": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
+    "groq_models": "https://console.groq.com/docs/models",
+    "groq_structured_outputs": "https://console.groq.com/docs/structured-outputs"
+  },
+  "models": {
+    "claude-haiku-4-5": {
+      "provider": "anthropic",
+      "id": "claude-haiku-4-5-20251001",
+      "label": "Claude Haiku 4.5",
+      "price_in": 1.0,
+      "price_out": 5.0,
+      "context": "200K tokens",
+      "effort": null,
+      "note": "Fastest Claude model. Supports structured outputs and PDFs (100 pages per request at 200K context). Does not accept the effort parameter."
+    },
+    "claude-sonnet-5-5": {
+      "provider": "anthropic",
+      "id": "claude-sonnet-5-5",
+      "label": "Claude Sonnet 5.5",
+      "price_in": 2.0,
+      "price_out": 10.0,
+      "context": "1M tokens",
+      "effort": "medium",
+      "note": "Best speed and intelligence mix. Thinking cannot be sent as disabled (400). Forced tool_choice any/tool returns a 400, so tools run with tool_choice auto and strict tool schemas."
+    },
+    "groq-gpt-oss-20b": {
+      "provider": "groq",
+      "id": "openai/gpt-oss-20b",
+      "label": "GPT-OSS 20B on Groq",
+      "price_in": 0.075,
+      "price_out": 0.3,
+      "context": "131K tokens",
+      "effort": null,
+      "note": "Cheapest drafting option. Strict JSON schema outputs are supported, but structured outputs cannot be combined with tool use or streaming on Groq. Re-check price and availability before quoting it to a client."
+    }
+  },
+  "agents": {
+    "support_agent": {
+      "primary": "claude-haiku-4-5",
+      "budget": "groq-gpt-oss-20b",
+      "escalation": "claude-sonnet-5-5",
+      "why": "Answers are short and grounded in retrieved text, so speed and cost matter more than deep reasoning. Escalate complaints and ambiguous policy questions to Sonnet."
+    },
+    "whatsapp_lead_agent": {
+      "primary": "claude-haiku-4-5",
+      "budget": "groq-gpt-oss-20b",
+      "escalation": "claude-sonnet-5-5",
+      "why": "Replies must arrive in seconds and stay short, and leads write in several languages. Haiku handles both. Use Sonnet when a lead's message is long or the qualification is unclear."
+    },
+    "inbox_manager": {
+      "primary": "claude-haiku-4-5",
+      "budget": "groq-gpt-oss-20b",
+      "escalation": "claude-sonnet-5-5",
+      "why": "Triage is classification, which Haiku does with a strict schema. Drafts that a person will send under their own name use Sonnet. Backlogs can go through the Batch API at half price."
+    },
+    "booking_agent": {
+      "primary": "claude-sonnet-5-5",
+      "budget": "claude-haiku-4-5",
+      "escalation": "claude-sonnet-5-5",
+      "why": "Booking is a multi-step tool loop where a wrong argument creates a real appointment. Sonnet 5.5 with strict tool schemas is the safe default. Haiku 4.5 is the budget option for simple one-service calendars."
+    },
+    "document_extractor": {
+      "primary": "claude-sonnet-5-5",
+      "budget": "claude-haiku-4-5",
+      "escalation": "claude-sonnet-5-5",
+      "why": "Scanned and messy PDFs need the stronger model. Clean, digital PDFs of under 100 pages can go to Haiku at half the input price."
+    }
+  }
+}

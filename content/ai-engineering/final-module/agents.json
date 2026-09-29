@@ -1,0 +1,244 @@
+{
+  "title": "Final module",
+  "eyebrow": "The AI Engineering course",
+  "headline": "Finish the course with 5 AI agents you can start selling.",
+  "lede": "The final module hands you their organized code, plus who to sell each one to and how.",
+  "kitRoot": "kit",
+  "modelPricingVerified": "2026-09-29",
+  "agents": [
+    {
+      "id": "support-agent",
+      "kitDir": "agents/support_agent",
+      "modelKey": "support_agent",
+      "name": "Support Agent",
+      "icon": "chat",
+      "color": "#5CC8FF",
+      "tagline": "Answers customer questions from the client's own knowledge base, or hands off.",
+      "what": "A website or messaging assistant that only says what is written in the client's knowledge base. Every price, date and number in a draft has to appear in the retrieved text, or the draft is not sent and a person takes over.",
+      "channels": ["Website chat widget (HTTP endpoint)", "Any channel that can call POST /support/{client}/ask"],
+      "integrations": [
+        { "name": "Claude Messages API", "docs": "https://platform.claude.com/docs/en/about-claude/models/overview", "note": "Drafts and the stronger-model retry." },
+        { "name": "Groq chat completions (optional budget model)", "docs": "https://console.groq.com/docs/models", "note": "OpenAI-compatible endpoint; used when a client picks the budget tier." }
+      ],
+      "niches": [
+        { "name": "Dental clinics", "why": "The same ten questions (hours, prices, insurance, new patients) fill the front desk phone every day.", "pain": "Front desk staff answering repeat questions instead of patients in the chair.", "offer": "Answers price, hours and policy questions at any hour and hands anything else to the front desk." },
+        { "name": "Accounting and tax firms", "why": "Clients ask which documents to bring and what the deadlines are, in bursts around filing dates.", "pain": "Peak-season email and phone overload for the same document and deadline questions.", "offer": "Answers from the firm's own checklist and deadline pages and passes anything advisory to a person." },
+        { "name": "Med spas and wellness clinics", "why": "Treatment questions, prep instructions and pricing are asked repeatedly and live in one menu page.", "pain": "Inquiries arriving after hours go cold before staff reply.", "offer": "Instant, accurate menu and prep answers with clear handoff for anything medical." }
+      ],
+      "cities": [
+        { "region": "United States, mid-size metros", "cities": ["Columbus, OH", "Cincinnati, OH", "Tampa, FL", "Jacksonville, FL", "San Antonio, TX"], "why": "Large local-business counts without the agency saturation of Los Angeles, New York or Miami." },
+        { "region": "Canada", "cities": ["Calgary, AB", "Edmonton, AB"], "why": "English-speaking, similar small-business profile, less crowded by AI agencies." },
+        { "region": "United Kingdom", "cities": ["Manchester", "Leeds", "Birmingham"], "why": "Many independent clinics and firms. Check PECR before emailing sole traders." }
+      ],
+      "pricing": { "setupUsd": 500, "monthlyUsd": 150, "note": "A starting point to test, not a benchmark. Price against the hours of front desk time saved, and raise it after the first three clients." },
+      "email": {
+        "subjectOptions": ["Quick question about {business}'s website questions", "{first_name}, a demo built on {business}'s own info"],
+        "body": "Hi {first_name},\n\nI'm {your_name} from {your_company}. I noticed {business} in {city} gets a lot of the same questions (hours, prices, what to bring). I built a small demo assistant that answers those from {business}'s public information and passes everything else to your team, so nothing gets a wrong answer.\n\nWould you like me to send you the link? It takes two minutes to try, and there is no obligation.\n\n{your_name}\n{your_company}\n{address}\nIf you'd rather not hear from me, reply \"stop\" and I won't email again.",
+        "followUp": "Hi {first_name}, following up on my note about a demo assistant for {business}. If it would be useful I can send the link today. If not, no problem and I won't email again.\n\n{your_name}\n{your_company}\n{address}\nReply \"stop\" to opt out."
+      },
+      "deploy": [
+        "Copy clients/sunrise-dental.json to clients/<client-id>.json and fill in the business facts, tone and escalation email.",
+        "Write the client's real facts into clients/<client-id>-kb/*.md: one paragraph per fact. If it is not written there, the agent will not say it.",
+        "Run pytest, then python -m evals.run support_agent <client-id> and read every failure before going further.",
+        "Deploy the FastAPI app to any host that gives you a public HTTPS URL, with ANTHROPIC_API_KEY set as an environment variable.",
+        "Embed the widget: call POST /support/<client-id>/ask with {question, history} and show the reply. When handoff is true, show the escalation contact.",
+        "Watch the first 50 conversations, add every wrong answer as an eval case, and only then send the client the invoice for month two."
+      ],
+      "evals": ["Grounded answer is sent", "Invented price is retried, then handed off", "Card number never reaches the model", "Nothing relevant hands off without a model call", "Forbidden phrase blocks the draft", "Injection attempt hands off", "Off-topic request hands off"]
+    },
+    {
+      "id": "whatsapp-lead-agent",
+      "kitDir": "agents/whatsapp_lead_agent",
+      "modelKey": "whatsapp_lead_agent",
+      "name": "WhatsApp Lead Agent",
+      "icon": "phone",
+      "color": "#3DDC97",
+      "tagline": "Replies to new enquiries in seconds, qualifies them, and passes hot leads to a person.",
+      "what": "A WhatsApp Cloud API webhook that welcomes each enquiry, answers from the knowledge base, and learns the lead's need, budget and timeline one question at a time. The lead score is computed in code, and a fully qualified lead, a complaint or a request for a human goes straight to the owner.",
+      "channels": ["WhatsApp Cloud API (webhook + send)"],
+      "integrations": [
+        { "name": "WhatsApp Cloud API: send messages", "docs": "https://developers.facebook.com/docs/whatsapp/cloud-api/guides/send-messages", "note": "POST /{version}/{phone_number_id}/messages. Graph API v26.0 is the latest." },
+        { "name": "WhatsApp webhooks", "docs": "https://developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/create-webhook-endpoint", "note": "GET handshake plus X-Hub-Signature-256 on every POST." },
+        { "name": "Graph API changelog", "docs": "https://developers.facebook.com/docs/graph-api/changelog", "note": "v26.0 released July 29, 2026; v25.0 valid until July 29, 2028." }
+      ],
+      "niches": [
+        { "name": "Umrah and Hajj travel agencies", "why": "Enquiries arrive on WhatsApp in several languages, at all hours, and prices and dates are the first question.", "pain": "Slow replies lose the booking to the next agency who answers first.", "offer": "Instant multilingual replies from the agency's own package sheet, with hot leads passed to a consultant." },
+        { "name": "Study-abroad and language-school consultancies", "why": "Prospective students message on WhatsApp first and compare several consultancies at once.", "pain": "Counsellors spend the day on first-contact questions instead of qualified students.", "offer": "Qualifies country, course and timeline, then books the counsellor call." },
+        { "name": "Real estate agents outside the US", "why": "In many markets buyers and renters contact agents on WhatsApp, not by form or phone.", "pain": "Listings enquiries arrive out of hours and go cold before the agent replies.", "offer": "Answers listing questions from the agent's own listings and captures budget and move-in date." }
+      ],
+      "cities": [
+        { "region": "United Kingdom", "cities": ["Birmingham", "Bradford", "Leicester", "Manchester", "London"], "why": "Cities with large Umrah and Hajj travel-agency communities. Confirm each prospect really takes enquiries on WhatsApp before you email them." },
+        { "region": "Gulf states", "cities": ["Dubai", "Sharjah", "Abu Dhabi"], "why": "WhatsApp is widely used for business enquiries here. Confirm it per prospect." },
+        { "region": "Latin America", "cities": ["Mexico City", "Sao Paulo", "Bogota"], "why": "WhatsApp is widely used for business enquiries here. Write outreach in the local language." }
+      ],
+      "pricing": { "setupUsd": 600, "monthlyUsd": 200, "note": "The client pays Meta directly for WhatsApp conversations on their own account. Say this plainly when you quote so the software fee is never confused with Meta's charges." },
+      "email": {
+        "subjectOptions": ["How fast does {business} reply on WhatsApp?", "{first_name}, WhatsApp enquiries after hours at {business}"],
+        "body": "Hi {first_name},\n\nI'm {your_name} from {your_company}. Most people who message a business on WhatsApp expect an answer within minutes. I build WhatsApp assistants that reply to new enquiries at {business} instantly, answer from your own price and package information, ask for the details your team needs, and hand the serious ones to you.\n\nI can set up a demo on a test number using only your public information, so you can message it yourself. Shall I send it over?\n\n{your_name}\n{your_company}\n{address}\nReply \"stop\" and I won't contact you again.",
+        "followUp": "Hi {first_name}, a quick follow-up on the WhatsApp demo for {business}. If instant replies at night and weekends would help, I can send the test number today. Otherwise I'll leave you in peace.\n\n{your_name}\n{your_company}\n{address}\nReply \"stop\" to opt out."
+      },
+      "deploy": [
+        "In Meta for Developers create an app, add the WhatsApp product, and note the phone number id and app secret. Use the client's own WhatsApp Business Account so Meta bills the client directly.",
+        "Create a system user access token for the WhatsApp Business Account and store it as WHATSAPP_TOKEN. Store the app secret as WHATSAPP_APP_SECRET, and choose a random WHATSAPP_VERIFY_TOKEN.",
+        "Put the phone number id in clients/<client-id>.json (whatsapp_phone_number_id) and write the knowledge base.",
+        "Deploy the app to a public HTTPS URL. In the app's WhatsApp configuration set the callback URL to https://<host>/whatsapp/webhook with your verify token, and subscribe to the messages field.",
+        "Message the test number. Confirm the reply, the lead fields and a handoff. Never test by messaging real customers.",
+        "Create and get approved a template for re-opening conversations after 24 hours, and set whatsapp_reopen_template. Free-form sends outside the window fail on purpose."
+      ],
+      "evals": ["Webhook handshake", "Bad signature rejected, retries handled once", "24-hour window enforced, template allowed", "Lead fields merge across turns", "Hot lead and complaint hand off", "Invented price replaced", "Card number never reaches the model"]
+    },
+    {
+      "id": "inbox-manager",
+      "kitDir": "agents/inbox_manager",
+      "modelKey": "inbox_manager",
+      "name": "Inbox Manager",
+      "icon": "mail",
+      "color": "#C7B0FF",
+      "tagline": "Triages email and prepares reply drafts for a human to review. It never sends.",
+      "what": "Reads unread mail in Gmail or Microsoft 365, classifies and prioritises it with a strict schema, and saves a threaded reply draft for anything that needs an answer. The owner reviews and sends. Email content is treated as untrusted data.",
+      "channels": ["Gmail API", "Microsoft Graph (Outlook / Microsoft 365)"],
+      "integrations": [
+        { "name": "Gmail: users.messages.list", "docs": "https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages/list", "note": "Scopes: gmail.readonly to read, gmail.compose to create drafts." },
+        { "name": "Gmail: users.drafts.create", "docs": "https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.drafts/create", "note": "Base64url RFC 2822 message with In-Reply-To and References to stay in the thread." },
+        { "name": "Gmail push notifications", "docs": "https://developers.google.com/workspace/gmail/api/guides/push", "note": "users.watch expires; renew at least every 7 days, daily is recommended." },
+        { "name": "Microsoft Graph: list messages", "docs": "https://learn.microsoft.com/en-us/graph/api/user-list-messages?view=graph-rest-1.0", "note": "Mail.ReadWrite is the least-privileged permission for createReply and covers reading the message too." },
+        { "name": "Microsoft Graph: createReply", "docs": "https://learn.microsoft.com/en-us/graph/api/message-createreply?view=graph-rest-1.0", "note": "Returns a draft; update its body, then a person sends it." }
+      ],
+      "niches": [
+        { "name": "Personal injury and other law firms", "why": "Intake emails from new clients are time-critical and mixed in with noise.", "pain": "A hot lead sits unanswered for hours because the inbox is full.", "offer": "Flags urgent intake emails first and has a reviewed reply ready to send." },
+        { "name": "Real estate teams and property managers", "why": "Tenants, owners, vendors and leads all share one inbox.", "pain": "Maintenance requests and lead enquiries get mixed together.", "offer": "Sorts by type and priority and drafts replies from the team's own policies." },
+        { "name": "Accountants and bookkeepers", "why": "Clients email documents and questions in bursts around deadlines.", "pain": "Peak-season backlog and repeat questions.", "offer": "Triage plus draft replies for the repeat questions, with anything advisory left to a person." }
+      ],
+      "cities": [
+        { "region": "United States, high-litigation mid-size metros", "cities": ["Columbus, OH", "Cincinnati, OH", "Jacksonville, FL", "Tampa, FL", "San Antonio, TX", "Fort Worth, TX"], "why": "Boutique firms with real advertising budgets, no internal IT team, and the managing partner as the buyer." },
+        { "region": "Canada", "cities": ["Calgary, AB", "Ottawa, ON"], "why": "Professional-services clusters with the same profile and less agency competition." }
+      ],
+      "pricing": { "setupUsd": 400, "monthlyUsd": 250, "note": "Priced per inbox. A busy owner's time is the value; quote against the hours the inbox takes each week." },
+      "email": {
+        "subjectOptions": ["{first_name}, how long do new enquiries wait in {business}'s inbox?", "A reply already drafted for every enquiry at {business}"],
+        "body": "Hi {first_name},\n\nI'm {your_name} from {your_company}. Inboxes like {business}'s get a mix of urgent enquiries and noise, and the urgent ones are the easiest to miss. I set up an assistant that reads incoming mail, puts the urgent ones first, and writes a reply draft in your voice from your own information. It never sends anything: you review and click send.\n\nI'd be glad to show you what it does with a sample inbox. Would a 15-minute call this week suit you?\n\n{your_name}\n{your_company}\n{address}\nReply \"stop\" and I won't email again.",
+        "followUp": "Hi {first_name}, one more note on the inbox assistant for {business}. The demo uses a sample inbox, never yours. If a 15-minute look would help, tell me a day that works. If not, I won't follow up again.\n\n{your_name}\n{your_company}\n{address}\nReply \"stop\" to opt out."
+      },
+      "deploy": [
+        "Decide with the client whether they use Gmail or Microsoft 365, and get written permission for the assistant to read the inbox and create drafts.",
+        "Gmail: create a Google Cloud project, enable the Gmail API, configure the OAuth consent screen, and request only gmail.readonly and gmail.compose. Microsoft 365: register an app in Microsoft Entra with the Mail.ReadWrite permission.",
+        "Store the refresh token for the client's mailbox in your secrets manager and give GmailMailbox or GraphMailbox a function that returns a fresh access token.",
+        "For near-real-time Gmail, create a Cloud Pub/Sub topic, follow Google's push guide to let Gmail publish to it, call users.watch, and renew the watch daily. Otherwise poll with run_once() every few minutes.",
+        "Run the triage on a copy of last week's mail first. Read every draft, and tune the knowledge base until you would send them yourself.",
+        "Turn it on for new mail only. Review the first week of drafts with the owner and keep the never-sends rule permanently."
+      ],
+      "evals": ["Gmail parsing prefers plain text", "Reply draft keeps thread headers", "Gmail calls documented endpoints", "Graph createReply then PATCH", "Newsletters skipped, replies drafted", "Invented number stops the draft", "Email content labelled untrusted"]
+    },
+    {
+      "id": "booking-agent",
+      "kitDir": "agents/booking_agent",
+      "modelKey": "booking_agent",
+      "name": "Booking Agent",
+      "icon": "calendar",
+      "color": "#FFD27A",
+      "tagline": "A bounded tool loop that finds a slot and books it once.",
+      "what": "A conversational agent over Cal.com. It can only book a time that the availability tool returned in the same conversation, creates one booking even if the model repeats itself, and stops after a fixed number of steps.",
+      "channels": ["Website chat", "WhatsApp (pair with the WhatsApp Lead Agent)", "Any channel that passes conversation history"],
+      "integrations": [
+        { "name": "Cal.com API v2: create a booking", "docs": "https://cal.com/docs/api-reference/v2/bookings/create-a-booking", "note": "POST /v2/bookings with cal-api-version 2026-02-25." },
+        { "name": "Cal.com API v2: get available slots", "docs": "https://cal.com/docs/api-reference/v2/slots/get-available-time-slots-for-an-event-type", "note": "GET /v2/slots with cal-api-version 2024-09-04. Each endpoint pins its own version." },
+        { "name": "Claude tool use with strict schemas", "docs": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs", "note": "Sonnet 5.5 rejects forced tool_choice, so tools run with auto and strict schemas." }
+      ],
+      "niches": [
+        { "name": "Dental, chiropractic and physiotherapy clinics", "why": "Recurring appointments with one clear calendar and many after-hours enquiries.", "pain": "Phone tag and missed calls that never become appointments.", "offer": "Books and confirms appointments 24 hours a day against the live calendar." },
+        { "name": "Salons, barbers and med spas", "why": "Appointment-based, high no-show cost, customers message when the shop is busy.", "pain": "Staff cannot answer messages while with a customer.", "offer": "Offers three real slots and books the chosen one." },
+        { "name": "Driving schools and personal trainers", "why": "Small operators who do the work themselves and cannot answer the phone during it.", "pain": "Enquiries lost while they are teaching or training.", "offer": "Books trial lessons and sessions straight into their calendar." }
+      ],
+      "cities": [
+        { "region": "United States, mid-size metros", "cities": ["Columbus, OH", "Cincinnati, OH", "Tampa, FL", "Jacksonville, FL", "Fort Worth, TX"], "why": "Dense independent clinic and salon markets with low AI-agency saturation." },
+        { "region": "Canada", "cities": ["Calgary, AB", "Edmonton, AB"], "why": "Same profile, and Cal.com works for any timezone." }
+      ],
+      "pricing": { "setupUsd": 400, "monthlyUsd": 175, "note": "Quote against the value of one recovered appointment per month. If a single booking pays for the fee, the price sells itself." },
+      "email": {
+        "subjectOptions": ["How many calls does {business} miss while you're with a patient or client?", "{first_name}, bookings at 11pm for {business}"],
+        "body": "Hi {first_name},\n\nI'm {your_name} from {your_company}. When someone messages {business} after hours, or while you're busy with a client, the next business they contact usually gets the booking. I build a booking assistant that offers real open times from your calendar and books the one they choose, confirmed straight away.\n\nI can show you a demo on a sample calendar. Would you like the link?\n\n{your_name}\n{your_company}\n{address}\nReply \"stop\" and I won't email again.",
+        "followUp": "Hi {first_name}, following up on the booking assistant for {business} in {city}. The demo runs on a sample calendar, so there is nothing to connect. Happy to send it, or I'll leave it there.\n\n{your_name}\n{your_company}\n{address}\nReply \"stop\" to opt out."
+      },
+      "deploy": [
+        "Create a Cal.com account for the client, connect their calendar, and create the event type the agent should book (name, duration, buffers, availability).",
+        "Create an API key in Cal.com and store it as CALCOM_API_KEY. Look up the numeric event type id and put it in clients/<client-id>.json as booking_event_type_id.",
+        "Run pytest, then try a full conversation in a test calendar: ask for a time, confirm, book, and check the booking in Cal.com.",
+        "Decide where conversations start (website chat or WhatsApp) and pass the running message history to BookingAgent.reply() on every turn.",
+        "Ask the client to check the first ten real bookings against their diary and confirm the timezone shown to customers is right.",
+        "Keep max_steps at its default. Raising it makes a confused conversation more expensive, not more successful."
+      ],
+      "evals": ["Cannot book a time that was never offered", "A double tool call creates one booking", "Tool schemas are strict", "Cal.com versions and body shape", "Tool results returned in one message", "Loop stops at max steps", "A failing tool is reported to the model"]
+    },
+    {
+      "id": "document-extractor",
+      "kitDir": "agents/document_extractor",
+      "modelKey": "document_extractor",
+      "name": "Document Extractor",
+      "icon": "file",
+      "color": "#FF9BB0",
+      "tagline": "PDF in, validated JSON out, flagged for review when the numbers do not add up.",
+      "what": "Sends a PDF to Claude as a native document, gets a schema-validated object back, then checks the arithmetic and dates in code. Anything inconsistent is marked for a human. Identity documents are deliberately not supported.",
+      "channels": ["Upload endpoint", "Email attachment pipeline (pair with the Inbox Manager)", "Batch folder"],
+      "integrations": [
+        { "name": "Claude PDF support", "docs": "https://platform.claude.com/docs/en/build-with-claude/pdf-support", "note": "32 MB per request; 600 pages, or 100 pages on models with under 1M context (Haiku 4.5)." },
+        { "name": "Claude structured outputs", "docs": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs", "note": "messages.parse with a pydantic model; numeric constraints are enforced locally after parsing." }
+      ],
+      "niches": [
+        { "name": "Insurance brokers", "why": "Certificates of insurance and policy documents arrive as PDFs and are re-typed into a system.", "pain": "Hours of data entry and errors in expiry dates.", "offer": "Extracts insured, policy number, carrier, dates and coverage lines and flags anything unusual." },
+        { "name": "Bookkeepers and accounting firms", "why": "Supplier invoices arrive as PDFs every week.", "pain": "Manual keying into accounting software.", "offer": "Extracts invoices to a clean structure with arithmetic checks before anything is posted." },
+        { "name": "Property managers", "why": "Vendor invoices and compliance certificates for many properties.", "pain": "Chasing expired certificates and re-typing invoices.", "offer": "Extracts both and highlights expiring certificates." }
+      ],
+      "cities": [
+        { "region": "United States, mid-size metros", "cities": ["Columbus, OH", "Cincinnati, OH", "Tampa, FL", "Jacksonville, FL", "San Antonio, TX"], "why": "Dense clusters of independent insurance agencies and small accounting practices, with fewer AI agencies chasing them than in the coastal cities." },
+        { "region": "Canada and United Kingdom", "cities": ["Calgary, AB", "Manchester", "Leeds"], "why": "Broker and bookkeeping clusters; check local data-protection rules before processing client documents." }
+      ],
+      "pricing": { "setupUsd": 700, "monthlyUsd": 200, "note": "Quote per document volume as well as a monthly fee, and show the client the model cost per document so the margin is honest. Under UK GDPR or GDPR you are usually the client's processor: sign a data processing agreement." },
+      "email": {
+        "subjectOptions": ["Hours of retyping invoices and certificates at {business}?", "{first_name}, PDFs into clean data at {business}"],
+        "body": "Hi {first_name},\n\nI'm {your_name} from {your_company}. If your team at {business} retypes details from PDFs (invoices, certificates, forms), I build a tool that reads them and returns clean, checked data, with anything that doesn't add up flagged for a person. It never guesses a missing field.\n\nIf you send me one sample document with the sensitive details removed, I'll show you the result. Would that be useful?\n\n{your_name}\n{your_company}\n{address}\nReply \"stop\" and I won't email again.",
+        "followUp": "Hi {first_name}, following up on the PDF extraction demo for {business}. A single anonymised sample is all I need. If the timing isn't right, I won't email again.\n\n{your_name}\n{your_company}\n{address}\nReply \"stop\" to opt out."
+      },
+      "deploy": [
+        "Agree the document types with the client and add a pydantic model for each to schemas.py (invoice and insurance certificate are included). Do not add identity documents.",
+        "Get a data processing agreement in place before any real client documents are processed, and decide how long files are kept (the kit stores nothing by default).",
+        "Run pytest, then extract ten real, anonymised documents and compare every field by eye.",
+        "Choose the model: Sonnet 5.5 for scans and messy layouts, Haiku 4.5 for clean digital PDFs under 100 pages.",
+        "Connect the intake: an upload endpoint, an email attachment step, or a watched folder. Send anything with needs_review to a human queue.",
+        "Measure the review rate weekly. If it climbs, add the failing documents to your evals before changing the prompt."
+      ],
+      "evals": ["Consistent invoice passes review", "Wrong total and subtotal flagged", "Date checks", "PDF sent before the instruction", "Identity documents refused", "Oversized PDF refused before any model call"]
+    }
+  ],
+  "findClients": [
+    { "title": "Pick one niche and one city", "detail": "Choose one agent, one niche from its list and one city from its lead map. Selling to one narrow group lets you reuse the same knowledge base, demo and email for every client." },
+    { "title": "Build a list of 50 businesses", "detail": "Search Google Maps for the niche in the city. Keep businesses with an active listing and roughly 20 to 200 reviews (real volume, not too large to need a committee). Note the website, phone number and owner name from their own pages." },
+    { "title": "Find a business email", "detail": "Use the address published on their website or Google listing. Prefer an owner or manager name. Do not scrape personal emails or buy lists." },
+    { "title": "Check their gap", "detail": "Call after hours, fill in their contact form, and message their WhatsApp. Note how long each takes. A measured gap makes the first email specific." },
+    { "title": "Build a demo from public information", "detail": "Use only what the business publishes. Never use another client's data, and never demo with a real customer's inbox or calendar." },
+    { "title": "Send the first email", "detail": "Use the template for your agent. Send 10 to 20 a day from your own domain, and keep the address, the opt-out line and a truthful subject." },
+    { "title": "Follow up once", "detail": "Send the follow-up after four days. If there is no reply, stop. Honour every opt-out immediately." },
+    { "title": "Run a pilot", "detail": "Offer a two-week pilot at a reduced setup fee in exchange for feedback. Agree the success measure in writing before you start." },
+    { "title": "Onboard and monitor", "detail": "Write the knowledge base with the client, run the evals, launch, and review the first 50 conversations together." },
+    { "title": "Ask for the next client", "detail": "When the pilot works, ask for one introduction in the same niche. Referrals in a niche you already serve close faster than cold email." }
+  ],
+  "compliance": [
+    { "region": "United States", "rule": "CAN-SPAM applies to all commercial email, including business to business. Use accurate From, To and Reply-To details, a truthful subject line, a clear advertisement disclosure where the message is an ad, your valid postal address, and a clear opt-out that you honour within 10 business days. You stay responsible even if a tool sends for you. Penalties are up to $53,088 per violating email.", "source": "https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business" },
+    { "region": "United Kingdom", "rule": "Under PECR you may email corporate subscribers (companies, limited liability partnerships, government bodies) without prior consent, but you must identify yourself, give a valid contact address and an opt-out. Sole traders and ordinary partnerships are individual subscribers: you need their consent, or the soft opt-in for existing customers. Do not use bought lists.", "source": "https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guide-to-pecr/electronic-and-telephone-marketing/electronic-mail-marketing/" },
+    { "region": "Deliverability (Gmail)", "rule": "Google requires SPF or DKIM for every sender, valid forward and reverse DNS, TLS, and spam complaints below 0.30%. Senders of 5,000 or more messages a day also need SPF, DKIM and DMARC and one-click unsubscribe. Stay well below that volume and warm up a new domain slowly.", "source": "https://support.google.com/a/answer/81126" },
+    { "region": "WhatsApp", "rule": "Message only people who have opted in to hear from the business, send free-form messages only inside the 24-hour customer service window, and use approved templates outside it. The assistant must stay a business-scoped assistant for one business; Meta's terms restrict general-purpose AI chat. Check Meta's current WhatsApp Business messaging policy before launch.", "source": "https://developers.facebook.com/docs/whatsapp/cloud-api/guides/send-messages" }
+  ],
+  "sellPlan": [
+    { "id": "s1", "week": 1, "title": "Choose your first agent, niche and city", "detail": "Use the agent pages. Write your choice in one sentence: 'I help [niche] in [city] with [agent].'" },
+    { "id": "s2", "week": 1, "title": "Run the kit locally", "detail": "Install it, run pytest, and start the app. All tests should pass before you build anything on it." },
+    { "id": "s3", "week": 1, "title": "Build your demo from public information", "detail": "Write a knowledge base for a fictional or real business using only public facts. Record a two-minute screen video of it working." },
+    { "id": "s4", "week": 2, "title": "Build a list of 50 prospects", "detail": "Follow the finding-clients steps. Record name, city, website, review count and the gap you measured." },
+    { "id": "s5", "week": 2, "title": "Set up your sending domain", "detail": "Send from your own domain with SPF and DKIM configured. Add your postal address and the opt-out line to your signature." },
+    { "id": "s6", "week": 2, "title": "Send your first 20 emails", "detail": "Use the template for your agent and personalise the first line with the gap you measured." },
+    { "id": "s7", "week": 3, "title": "Send follow-ups and the next 30 emails", "detail": "Follow up once after four days. Honour every opt-out the same day." },
+    { "id": "s8", "week": 3, "title": "Hold discovery calls", "detail": "Ask what happens today when an enquiry arrives after hours. Quote against the cost of a missed enquiry, not against hours of your time." },
+    { "id": "s9", "week": 3, "title": "Agree a paid pilot in writing", "detail": "Two weeks, one agent, one success measure, and a data processing agreement if personal data is involved." },
+    { "id": "s10", "week": 4, "title": "Onboard your first client", "detail": "Add them on the Clients page, write their knowledge base together, run the evals, and go live." },
+    { "id": "s11", "week": 4, "title": "Review the first 50 conversations", "detail": "Add every wrong answer as an eval case. Send the client a one-page summary of what the agent handled." },
+    { "id": "s12", "week": 4, "title": "Ask for one introduction", "detail": "Ask the pilot client for a single referral in the same niche and city." }
+  ]
+}
