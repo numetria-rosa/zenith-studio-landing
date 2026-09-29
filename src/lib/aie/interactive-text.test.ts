@@ -10,7 +10,7 @@ const OLD = path.join(process.cwd(), "courses/ai-engineering");
 const norm = (s: string) => s.toLowerCase().replace(/&[a-z]+;/g, " ").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 const strings = (v: unknown): string[] => (typeof v === "string" ? [v] : Array.isArray(v) ? v.flatMap(strings) : v && typeof v === "object" ? Object.values(v).flatMap(strings) : []);
 
-describe.each([1, 2, 3, 4, 5, 6, 7])("module %i widget text", (n) => {
+describe.each([0, 1, 2, 3, 4, 5, 6, 7])("module %i widget text", (n) => {
   const file = path.join(ROOT, `${n}.text.json`);
   const dataFile = path.join(ROOT, `${n}.json`);
   const own = norm([...strings(JSON.parse(readFileSync(file, "utf8"))), ...strings(JSON.parse(readFileSync(dataFile, "utf8")))].join(" "));

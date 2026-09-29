@@ -89,6 +89,15 @@ function list(n, ordered) {
 const uiLabels = new Set();
 // static text of each script-driven widget (labels, captions, buttons), by widget id: the ported component must show all of it
 export const widgetText = {};
+// Module 0's widgets, by the container id the old script fills.
+const M0_BARE = { roleGrid: "roles", ecoGrid: "eco", roadmapCol: "roadmap" };
+const M0_FRAMED = { classifyGrid: "classify", flowCol: "flow", pTable: "priority", pathQuizArea: "path" };
+function m0WidgetFor(n) {
+  const hit = findAll(n, (x) => x.attribs && M0_FRAMED[x.attribs.id])[0];
+  if (!hit) throw new Error(`module 0: unknown interactive: ${text(n).slice(0, 60)}`);
+  return M0_FRAMED[hit.attribs.id];
+}
+
 function blocks(nodes, ctx) {
   const out = [];
   for (const n of nodes) {
@@ -141,7 +150,7 @@ function blocks(nodes, ctx) {
       uiLabels.add(label);
       if (byClass(n, "hintbox")) out.push(`<ExerciseLink />`);
       else {
-        const id = `m${ctx.module}-s${ctx.section}`;
+        const id = ctx.module === 0 ? `m0-${m0WidgetFor(n)}` : `m${ctx.module}-s${ctx.section}`;
         const strings = [];
         const collect = (x) => {
           if (x.type === "text" && x.data.trim()) strings.push(x.data.replace(/\s+/g, " ").trim());
@@ -151,6 +160,17 @@ function blocks(nodes, ctx) {
         widgetText[id] = strings.filter((t) => t !== "–");
         out.push(`<Interactive id=${attr(id)} label=${attr(label)} />`);
       }
+    } else if (ctx.module === 0 && n.name === "div" && M0_BARE[n.attribs.id]) {
+      // grids the script fills in (role cards, toolbox, roadmap): no frame, the component draws its own cards
+      const id = `m0-${M0_BARE[n.attribs.id]}`;
+      widgetText[id] = [];
+      out.push(`<Interactive id=${attr(id)} label="" />`);
+    } else if (hasClass(n, "orient")) {
+      const l = text(byClass(n, "lbl"));
+      uiLabels.add(l);
+      out.push(`<Def title=${attr(l)}>\n\n${blocks(kids(n).filter((c) => !hasClass(c, "lbl")), ctx).join("\n\n")}\n\n</Def>`);
+    } else if (ctx.module === 0 && (hasClass(n, "selfcheck-part") || hasClass(n, "finalscore") || hasClass(n, "optnote"))) {
+      // the self-check is one widget; its parts are read from the HTML in importModule
     } else if (n.name === "div" && n.attribs.id === "spotCards") {
       // script-built "spot the ..." cards that sit outside an .interactive frame (modules 4 and 7)
       const id = `m${ctx.module}-s${ctx.section}`;
@@ -262,6 +282,20 @@ function buildQuiz(module, section, consts, calls, scriptText) {
 // ---------------------------------------------------------------- sections
 const words = (s) => (s.match(/\S+/g) || []).length;
 
+/** Module 0's self-check: five parts read from the HTML, the choice options from the script's buildSC() calls. */
+function buildSelfCheck(section, calls) {
+  const parts = findAll(section, (x) => hasClass(x, "selfcheck-part")).map((part) => {
+    const label = text(byClass(part, "sclbl"));
+    const area = find(part, (x) => x.name === "textarea");
+    if (area) return { kind: "text", label, placeholder: area.attribs.placeholder };
+    const id = find(part, (x) => /^sc\d+opts$/.test((x.attribs && x.attribs.id) || "")).attribs.id.replace("opts", "");
+    const call = calls.find((c) => c.fn === "buildSC" && c.args[0] === id);
+    if (!call) throw new Error(`self-check ${id}: buildSC call not found`);
+    return { kind: "choice", id, label, question: text(byClass(part, "qtext")), options: call.args[1] };
+  });
+  return { parts, scoreLabel: text(byClass(section, "fslbl")), note: text(byClass(section, "optnote")) };
+}
+
 function importModule(number) {
   const file = path.join(SRC, `module-0${number}.html`);
   const doc = parseDocument(readFileSync(file, "utf8"));
@@ -289,9 +323,10 @@ function importModule(number) {
   let quiz = null;
   let glossary = [];
   let furtherReading = null;
+  let selfCheck = null;
   const ctxBase = { module: number };
 
-  const orient = byClass(wrap, "orient");
+  const orient = kids(wrap).find((c) => hasClass(c, "orient"));
   if (orient) {
     uiLabels.add(text(byClass(orient, "lbl")));
     lessons.push({ title: "Before you start", section: 0, mdx: blocks(kids(orient).filter((c) => !hasClass(c, "lbl")), { ...ctxBase, section: 0 }).join("\n\n") });
@@ -299,7 +334,8 @@ function importModule(number) {
 
   for (const section of kids(wrap).filter((n) => n.name === "section")) {
     const kh = byClass(section, "kh");
-    const num = Number(text(byClass(kh, "num")));
+    const numText = text(byClass(kh, "num"));
+    const num = Number(numText);
     const title = text(find(kh, (x) => x.name === "h2"));
     const body = kids(section).filter((c) => c !== kh);
     if (/^Checkpoint/.test(title)) {
@@ -312,6 +348,16 @@ function importModule(number) {
       });
     } else if (/^Further reading/.test(title)) {
       furtherReading = blocks(body, { ...ctxBase, section: num }).join("\n\n");
+    } else if (number === 0) {
+      // Orientation: sections keep their printed numbers (0.1 appears twice: the text and its interactive), so equal numbers merge into one lesson
+      let mdx = blocks(body, { ...ctxBase, section: numText }).join("\n\n");
+      if (/^Can you explain/.test(title)) {
+        selfCheck = buildSelfCheck(section, calls);
+        mdx += `\n\n<Interactive id="m0-selfcheck" label="" />`;
+      }
+      const prev = lessons[lessons.length - 1];
+      if (prev && prev.numText === numText) prev.mdx += `\n\n## ${title}\n\n${mdx}`;
+      else lessons.push({ title, section: num, numText, mdx });
     } else {
       const mdx = blocks(body, { ...ctxBase, section: num }).join("\n\n");
       lessons.push({ title, section: num, mdx });
@@ -348,7 +394,8 @@ function importModule(number) {
   const totalWords = lessons.reduce((n, l) => n + words(l.mdx), 0);
   lessons.forEach((l, i) => {
     l.number = `${number}.${i + 1}`;
-    l.minutes = Math.max(2, Math.round((courseModule.minutes * words(l.mdx)) / totalWords));
+    // modules with no stated length (orientation) get plain reading time, 200 words a minute
+    l.minutes = Math.max(2, Math.round(courseModule.minutes ? (courseModule.minutes * words(l.mdx)) / totalWords : words(l.mdx) / 200));
   });
   if (exercise) exercise.id = lessons.find((l) => /^Build it/.test(l.title)).number;
 
@@ -370,8 +417,9 @@ function importModule(number) {
   writeClean(path.join(OUT, "modules", `${number}.json`), JSON.stringify(moduleJson, null, 2) + "\n");
 
   const data = { ...consts };
+  if (selfCheck) data.selfCheck = selfCheck;
   // the exercise, the quiz and page state live elsewhere; what is left is the widgets' own data
-  for (const k of Object.keys(data)) if (/_HARNESS_PY$|_STARTER$|^MODULE_ID$|^score$|^answered$|HasAttempted$|^q\d+Options$|^(rankPicked|rankRevealed|traceIdx|travelIdx|travelLastAction|travelStreak|travelEnded)$/.test(k)) delete data[k];
+  for (const k of Object.keys(data)) if (/_HARNESS_PY$|_STARTER$|^MODULE_ID$|^score$|^answered$|HasAttempted$|^q\d+Options$|^(pathAnswers|sc1Checked|scAnswered|scScore|activePFilter)$|^(rankPicked|rankRevealed|traceIdx|travelIdx|travelLastAction|travelStreak|travelEnded)$/.test(k)) delete data[k];
   const decisionKey = Object.keys(data).find((k) => /^DECISION\d*_OPTS$/.test(k));
   const decisionCall = calls.find((c) => c.fn === "initDecision");
   if (decisionKey) data.decision = data[decisionKey];
@@ -414,14 +462,15 @@ function verify(number, wrap, lessons, furtherReading, quiz, glossary, meta, exe
   const normalise = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
   const have = new Set(normalise(produced).split(" "));
   const sourceTexts = [];
-  const orient = byClass(wrap, "orient");
+  const orient = kids(wrap).find((c) => hasClass(c, "orient"));
   if (orient) sourceTexts.push(text(orient));
   for (const section of kids(wrap).filter((n) => n.name === "section")) {
     const kh = byClass(section, "kh");
     const title = text(find(kh, (x) => x.name === "h2"));
     if (/^(Checkpoint|Glossary)/.test(title)) continue;
     // widgets built by script have no text in the HTML; the exercise box moves to the Exercise tab
-    const clone = { ...section, children: section.children.filter((c) => !hasClass(c, "interactive") && !hasClass(c, "kh")) };
+    const skip = (c) => hasClass(c, "interactive") || hasClass(c, "kh") || hasClass(c, "selfcheck-part") || hasClass(c, "finalscore") || hasClass(c, "optnote");
+    const clone = { ...section, children: section.children.filter((c) => !skip(c)) };
     sourceTexts.push(text(clone));
   }
   const missing = [];

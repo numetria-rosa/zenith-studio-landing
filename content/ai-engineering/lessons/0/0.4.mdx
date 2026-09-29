@@ -1,0 +1,29 @@
+You do not need to master every language on this page before you start. Most working AI engineers lean heavily on one or two languages and pick up the rest as specific projects require it. Here's the practical priority order.
+
+<Interactive id={"m0-priority"} label={"Priority table"} />
+
+<Def title={"What programming languages should an AI engineer learn?"}>
+
+**Python: Priority \#1.** The AI/ML ecosystem is built on it: virtually every model provider's SDK, every retrieval and agent framework, every eval library ships Python-first. This is the language this course's exercises, projects, and capstone are built in.
+
+**SQL: Priority \#2.** Retrieval, logging, and evaluation results all end up persisted somewhere. Databases and data retrieval are a constant in real RAG and analytics work.
+
+**JavaScript / TypeScript: Priority \#3.** Essential once you're building the user-facing side of an AI product: Node.js backends, frontends, full-stack AI SaaS. Not needed to start, genuinely useful once you are shipping a product.
+
+**Bash / Linux: Important supporting skill.** Most AI infrastructure runs on Linux; comfort with a shell speeds up servers, environments, deployment, and automation.
+
+**C++ and other specialized languages.** Relevant only for specific paths (high-throughput inference engines, systems-level tooling), depending on which specialization you eventually lean into. Not required for the typical AI application engineering path, and not something you need to master everything else on this list before starting.
+
+</Def>
+
+<Practice>
+
+SQL is marked "Need to know now" even though this course's exercises don't use a database at all. Why?
+
+<Answer>
+
+Because almost every real AI system this course's concepts get applied to sits on top of some kind of persistent storage, a document store for retrieval, a table logging tool calls for idempotency, an eval-results table. This course teaches the LOGIC (retrieval, idempotent execution, evaluation) using Python and in-memory data so the concepts stay isolated and testable, real projects will need SQL to actually persist that logic's data.
+
+</Answer>
+
+</Practice>
