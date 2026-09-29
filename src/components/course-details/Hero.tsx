@@ -40,7 +40,7 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
         <div aria-hidden className="grid-bg pointer-events-none absolute inset-0" />
 
         {/* top bar */}
-        <div className="absolute inset-x-5 top-8 z-10 flex items-center justify-between lg:inset-x-20">
+        <div className="absolute inset-x-5 top-8 z-10 flex items-center justify-between lg:inset-x-12 xl:inset-x-20">
           <Link href="/lab" className="flex min-h-11 items-center gap-3 text-frost no-underline">
             <Image src="/course/zenith-logo.png" alt="Zenith Studio logo" width={34} height={34} className="h-[34px] w-[34px] object-contain" />
             <span className="text-[18px] font-semibold tracking-[-0.01em]">Zenith Studio</span>
@@ -64,13 +64,13 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
         </div>
 
         {/* content */}
-        <div className="relative flex flex-col gap-14 lg:gap-0 px-5 pb-16 pt-[128px] lg:flex-row lg:items-start lg:justify-between lg:px-20 lg:pb-0 lg:pt-[178px]">
-          <div className="flex w-full flex-col gap-7 lg:w-[640px] lg:shrink-0">
+        <div className="relative flex flex-col gap-14 px-5 pb-16 pt-[128px] min-[1100px]:flex-row min-[1100px]:items-start min-[1100px]:justify-between min-[1100px]:gap-10 min-[1100px]:px-12 xl:px-20 min-[1100px]:pb-0 min-[1100px]:pt-[178px]">
+          <div className="flex w-full flex-col gap-7 min-[1100px]:min-w-0 min-[1100px]:flex-[0_1_640px]">
             <span className="glass inline-flex items-center gap-2.5 self-start rounded-full py-2 pl-3 pr-4 font-mono text-[12.5px] uppercase tracking-[0.14em] text-soft">
               <span className="h-2 w-2 rounded-[4px] bg-violet shadow-[0_0_12px_#8B5CF6]" />
               {courseContent.kicker}
             </span>
-            <h1 className="m-0 text-[64px] font-medium leading-[0.95] tracking-[-0.055em] sm:text-[112px]">
+            <h1 className="m-0 text-[64px] font-medium leading-[0.95] tracking-[-0.055em] sm:text-[clamp(64px,7.78vw,112px)]">
               AI
               <br />
               <span className="bg-[linear-gradient(100deg,#F5F6F8_0%,#C7B0FF_45%,#9BDDFF_100%)] bg-clip-text text-transparent">
@@ -92,7 +92,7 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
 
           {/* stack card */}
           <div
-            className="flex w-full flex-col gap-1.5 rounded-[30px] p-[26px] lg:mt-[18px] lg:w-[594px] lg:shrink-0"
+            className="flex w-full flex-col gap-1.5 rounded-[30px] p-[26px] min-[1100px]:mt-[18px] min-[1100px]:min-w-[440px] min-[1100px]:flex-[0_1_594px]"
             style={{
               background: "rgba(12,13,20,0.78)",
               border: "1px solid rgba(199,176,255,0.28)",
@@ -114,7 +114,7 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
               return (
                 <div
                   key={m.number}
-                  className={`grid grid-cols-[34px_minmax(0,1fr)_72px_44px] items-center gap-3.5 rounded-[14px] px-4 sm:grid-cols-[34px_minmax(0,1fr)_120px_44px] ${
+                  className={`grid grid-cols-[34px_minmax(0,1fr)_72px_44px] items-center gap-3.5 rounded-[14px] px-4 xl:grid-cols-[34px_minmax(0,1fr)_120px_44px] ${
                     capstone ? "border border-[rgba(61,220,151,0.40)] bg-[rgba(61,220,151,0.08)] py-3.5" : "py-[11px]"
                   }`}
                 >
