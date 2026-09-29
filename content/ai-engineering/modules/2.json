@@ -222,5 +222,10 @@
       "definition": "repeating boundary content between adjacent chunks so no idea is split with zero context."
     }
   ],
-  "furtherReading": true
+  "furtherReading": true,
+  "project": {
+    "title": "Token-Budget-Aware Chunker",
+    "brief": "Build a text chunker that respects a token budget, adds configurable overlap, and never silently truncates mid-sentence.",
+    "projectId": 2
+  }
 }

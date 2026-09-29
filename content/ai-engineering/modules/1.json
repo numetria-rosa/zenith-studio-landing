@@ -240,5 +240,10 @@
       "definition": "checking that successfully-parsed data actually contains the fields a consumer requires."
     }
   ],
-  "furtherReading": true
+  "furtherReading": true,
+  "project": {
+    "title": "Structured Output Validator",
+    "brief": "Build a tool that validates and repairs raw model output against a JSON schema: strips markdown fences, fixes trailing commas, reports what it couldn't fix.",
+    "projectId": 1
+  }
 }

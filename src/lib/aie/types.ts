@@ -43,7 +43,32 @@ export type QuizContent = {
   cardNote?: string;
 };
 
-export type ProjectContent = { title: string; brief: string; passMark: number };
+/** The module's pointer to its portfolio project (details live in content/ai-engineering/projects/<projectId>.json). */
+export type ProjectContent = { title: string; brief: string; projectId: number };
+
+export type ProjectDetail = {
+  id: number;
+  title: string;
+  difficulty: string;
+  /** Modules the project draws on. */
+  modules: number[];
+  summary: string;
+  requirements: string[];
+  start: string;
+  acceptance: string[];
+  tests: string[];
+  mistakes: string[];
+  solution: string[];
+  rubric: { key: string; label: string; weight: number }[];
+};
+
+/** Levels a student can pick per rubric row (the old page's Not attempted / Partial / Good / Excellent). */
+export const RUBRIC_LEVELS = [
+  { value: 0, label: "Not attempted" },
+  { value: 50, label: "Partial" },
+  { value: 80, label: "Good" },
+  { value: 100, label: "Excellent" },
+] as const;
 
 export type CheatSheetContent = { title: string };
 

@@ -1,6 +1,6 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import type { CourseIndex, ModuleContent } from "./types";
+import type { CourseIndex, ModuleContent, ProjectDetail } from "./types";
 
 /* Course content lives in the repo (content/ai-engineering). AIE_CONTENT_DIR points the
    loader at a different directory (the visual tests use tests/visual/fixtures). */
@@ -56,4 +56,12 @@ export async function getInteractiveData(module: number): Promise<Record<string,
 export async function getExerciseHarness(harness: string): Promise<string> {
   if (!/^exercises\/\d+\.py$/.test(harness)) throw new Error(`Bad harness path: ${harness}`);
   return readFile(path.join(contentDir(), harness), "utf8");
+}
+
+export async function getProject(id: number): Promise<ProjectDetail | null> {
+  try {
+    return JSON.parse(await readFile(path.join(contentDir(), "projects", `${id}.json`), "utf8"));
+  } catch {
+    return null;
+  }
 }

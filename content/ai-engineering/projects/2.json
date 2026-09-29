@@ -1,0 +1,58 @@
+{
+  "id": 2,
+  "title": "Token-Budget-Aware Chunker",
+  "difficulty": "Beginner",
+  "modules": [
+    2
+  ],
+  "summary": "Build a text chunker that respects a token budget, adds configurable overlap, and never silently truncates mid-sentence.",
+  "requirements": [
+    "Accept an array of words, a max-tokens-per-chunk budget, an overlap size, and a token estimator function.",
+    "Never drop a word, even one that alone exceeds the budget.",
+    "Apply overlap consistently at every chunk boundary except the last.",
+    "Return an array of chunks (each an array of words)."
+  ],
+  "start": "Start from Module 2's exercise function and add a real token estimator (characters/4, or a real tokenizer library if you want to go further) instead of the 1-token-per-word test mock.",
+  "acceptance": [
+    "A generous budget produces one chunk containing everything.",
+    "A tight budget produces multiple chunks, each respecting the token limit.",
+    "An oversized single word still gets its own chunk, never dropped.",
+    "Overlap words appear at the end of one chunk AND the start of the next, consistently.",
+    "Every word from the input appears in at least one output chunk (full coverage, verified programmatically, not just visually)."
+  ],
+  "tests": [
+    "20-word input, generous budget → 1 chunk, all 20 words.",
+    "20-word input, tight budget → multiple chunks, verify total unique words covered equals 20.",
+    "A single word with an estimated token count far exceeding the budget → its own chunk, not dropped.",
+    "Zero overlap → chunks partition cleanly with no repeated words.",
+    "Overlap=2 → verify the last 2 words of chunk N equal the first 2 words of chunk N+1."
+  ],
+  "mistakes": [
+    "Enforcing the budget check even on an empty chunk, silently dropping an oversized word.",
+    "Off-by-one in the overlap math causing the last few words to be dropped on longer inputs.",
+    "Testing only with tiny inputs where an overlap bug wouldn't surface."
+  ],
+  "solution": [
+    "Walk words with two pointers, building the current chunk until adding the next word would exceed budget (only enforced once the chunk is non-empty).",
+    "Start the next chunk at `max(current chunk start + 1, end - overlap)`.",
+    "Stop when a chunk reaches the end of the input.",
+    "Verify full coverage by collecting all words across all output chunks into a Python `set` and comparing its length against the input length."
+  ],
+  "rubric": [
+    {
+      "key": "implementation",
+      "label": "Implementation",
+      "weight": 63
+    },
+    {
+      "key": "testing",
+      "label": "Testing",
+      "weight": 25
+    },
+    {
+      "key": "documentation",
+      "label": "Documentation",
+      "weight": 13
+    }
+  ]
+}

@@ -50,3 +50,61 @@ export async function saveExerciseRun(userId: string, module: number, code: stri
     update: { code, attempted: true, passed: best, total },
   });
 }
+
+export async function saveQuizAttempt(userId: string, module: number, score: number, total: number, passed: boolean): Promise<void> {
+  await db.aieQuizAttempt.create({ data: { userId, module, score, total, passed } });
+}
+
+/** Modules whose quiz the student has passed at least once. */
+export async function getPassedQuizzes(userId: string): Promise<Set<number>> {
+  const rows = await db.aieQuizAttempt.findMany({ where: { userId, passed: true }, select: { module: true }, distinct: ["module"] });
+  return new Set(rows.map((r) => r.module));
+}
+
+export type ProjectProgress = {
+  checklist: boolean[];
+  rubric: Record<string, number>;
+  githubUrl: string;
+  description: string;
+  technologies: string;
+  testsPassed: string;
+  score: number;
+  completed: boolean;
+};
+
+const projectSelect = { checklist: true, rubric: true, githubUrl: true, description: true, technologies: true, testsPassed: true, score: true, completedAt: true } as const;
+
+function toProjectProgress(row: { checklist: unknown; rubric: unknown; githubUrl: string; description: string; technologies: string; testsPassed: string; score: number; completedAt: Date | null }): ProjectProgress {
+  const { completedAt, ...rest } = row;
+  return { ...rest, checklist: Array.isArray(row.checklist) ? row.checklist.map(Boolean) : [], rubric: (row.rubric ?? {}) as Record<string, number>, completed: completedAt !== null };
+}
+
+export async function getProjectProgress(userId: string, projectId: number): Promise<ProjectProgress | null> {
+  const row = await db.aieProjectProgress.findUnique({ where: { userId_projectId: { userId, projectId } }, select: projectSelect });
+  return row && toProjectProgress(row);
+}
+
+export async function getAllProjectProgress(userId: string): Promise<Map<number, ProjectProgress>> {
+  const rows = await db.aieProjectProgress.findMany({ where: { userId }, select: { projectId: true, ...projectSelect } });
+  return new Map(rows.map((r) => [r.projectId, toProjectProgress(r)]));
+}
+
+type ProjectSave = { checklist: boolean[]; rubric: Record<string, number>; score: number };
+
+/** Autosave of the checklist and rubric (does not complete the project). */
+export async function saveProjectDraft(userId: string, projectId: number, data: ProjectSave): Promise<void> {
+  await db.aieProjectProgress.upsert({ where: { userId_projectId: { userId, projectId } }, create: { userId, projectId, ...data }, update: data });
+}
+
+/** "Save project": stores the submission fields and marks it completed (into My Portfolio). */
+export async function submitProject(
+  userId: string,
+  projectId: number,
+  data: ProjectSave & { githubUrl: string; description: string; technologies: string; testsPassed: string },
+): Promise<void> {
+  await db.aieProjectProgress.upsert({
+    where: { userId_projectId: { userId, projectId } },
+    create: { userId, projectId, ...data, completedAt: new Date() },
+    update: { ...data, completedAt: new Date() },
+  });
+}

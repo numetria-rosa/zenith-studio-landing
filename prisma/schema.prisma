@@ -62,6 +62,8 @@ model User {
   progress        CourseProgress[]
   aieLessonProgress AieLessonProgress[]
   aieExerciseProgress AieExerciseProgress[]
+  aieQuizAttempts AieQuizAttempt[]
+  aieProjectProgress AieProjectProgress[]
   aieClients      AieClient[]
   aieSellPlanSteps AieSellPlanStep[]
   serviceRequests ServiceRequest[]
@@ -224,6 +226,41 @@ model AieExerciseProgress {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, module])
+}
+
+// One row per finished module quiz. The server grades the answers, so score is never taken from the client.
+model AieQuizAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  module    Int
+  score     Int
+  total     Int
+  passed    Boolean
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, module])
+}
+
+// A student's work on one portfolio project: acceptance checklist ticks, rubric self-assessment
+// (0/50/80/100 per rubric key), and the submission fields. completedAt is set when they save it.
+model AieProjectProgress {
+  userId       String
+  projectId    Int
+  checklist    Json     @default("[]")
+  rubric       Json     @default("{}")
+  githubUrl    String   @default("")
+  description  String   @default("")
+  technologies String   @default("")
+  testsPassed  String   @default("")
+  score        Int      @default(0)
+  completedAt  DateTime?
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, projectId])
 }
 
 // Final module: the students' own clients (what they sell, to whom, for how much) and their sell-plan checklist.

@@ -246,5 +246,10 @@
       "definition": "the ordered record of actions (and often reasoning) an agent loop produced, used for debugging and for detecting repetition."
     }
   ],
-  "furtherReading": true
+  "furtherReading": true,
+  "project": {
+    "title": "Bounded ReAct Agent Loop",
+    "brief": "Build a reason-act-observe agent loop with a hard step limit, explicit termination conditions, and protection against repeating the same failing action forever.",
+    "projectId": 5
+  }
 }

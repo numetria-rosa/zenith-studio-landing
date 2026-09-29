@@ -1,0 +1,64 @@
+{
+  "id": 1,
+  "title": "Structured Output Validator",
+  "difficulty": "Beginner",
+  "modules": [
+    1
+  ],
+  "summary": "Build a tool that validates and repairs raw model output against a JSON schema: strips markdown fences, fixes trailing commas, reports what it couldn't fix.",
+  "requirements": [
+    "Accept raw model output text and a target JSON schema (required fields at minimum).",
+    "Strip markdown code fences if present.",
+    "Strip trailing commas before parsing.",
+    "Parse the repaired text as JSON.",
+    "Validate the parsed object against the schema, reporting the SPECIFIC missing/wrong-typed field."
+  ],
+  "start": "Start from Module 1's exercise function signature and generalize it: accept an arbitrary schema object instead of a hardcoded one, so the same validator works across different response shapes.",
+  "acceptance": [
+    "A response wrapped in a markdown fence is correctly repaired and validated.",
+    "A response with a trailing comma is correctly repaired and validated.",
+    "A response missing a required field is rejected with that field named specifically, not a generic error.",
+    "Prose with no JSON structure at all is rejected gracefully, never raises uncaught.",
+    "A wrong-typed field (string where number expected) is caught and reported."
+  ],
+  "tests": [
+    "Clean, valid JSON matching schema → passes.",
+    "Fenced JSON (```json ... ```) → repaired and passes.",
+    "Trailing comma before closing brace → repaired and passes.",
+    "Missing required field → fails, names the field.",
+    "Pure prose, no JSON at all → fails gracefully, no exception escapes."
+  ],
+  "mistakes": [
+    "Stripping the trailing comma AFTER attempting json.loads() instead of before.",
+    "A generic 'validation failed' error instead of naming the specific field.",
+    "Letting a json.loads() exception propagate uncaught instead of catching and returning a structured failure."
+  ],
+  "solution": [
+    "Strip a leading/trailing markdown fence via regex.",
+    "Strip trailing commas before `}`/`]` via regex.",
+    "`json.loads()` the result, catching failures.",
+    "Walk the schema's required fields, checking presence and type, collecting every violation, not just the first."
+  ],
+  "rubric": [
+    {
+      "key": "architecture",
+      "label": "Architecture",
+      "weight": 33
+    },
+    {
+      "key": "implementation",
+      "label": "Implementation",
+      "weight": 42
+    },
+    {
+      "key": "testing",
+      "label": "Testing",
+      "weight": 17
+    },
+    {
+      "key": "documentation",
+      "label": "Documentation",
+      "weight": 8
+    }
+  ]
+}

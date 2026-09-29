@@ -234,5 +234,10 @@
       "definition": "a measurable drop in eval score after a change, compared to the baseline."
     }
   ],
-  "furtherReading": true
+  "furtherReading": true,
+  "project": {
+    "title": "Prompt Evaluation Harness",
+    "brief": "Build a deterministic eval harness that scores model outputs against a labeled test set using multiple criteria, and flags regressions between two prompt versions.",
+    "projectId": 7
+  }
 }

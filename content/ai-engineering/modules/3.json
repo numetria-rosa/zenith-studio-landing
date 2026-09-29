@@ -222,5 +222,10 @@
       "definition": "combining vector similarity with keyword search to catch exact-term matches embeddings alone can miss."
     }
   ],
-  "furtherReading": true
+  "furtherReading": true,
+  "project": {
+    "title": "Vector Similarity Search Engine",
+    "brief": "Build a small in-memory vector search engine: cosine similarity, top-k retrieval, and a relevance-threshold cutoff.",
+    "projectId": 3
+  }
 }

@@ -18,9 +18,13 @@ const WORKER_SRC = [
   '    pyodide.globals.set("__student_code__", studentCode);',
   "    const tail = [",
   '      "import json, asyncio",',
-  '      "__harness_result__ = " + harnessName + "(__student_code__)",',
-  '      "if asyncio.iscoroutine(__harness_result__):",',
-  '      "    __harness_result__ = await __harness_result__",',
+  '      "try:",',
+  '      "    __harness_result__ = " + harnessName + "(__student_code__)",',
+  '      "    if asyncio.iscoroutine(__harness_result__):",',
+  '      "        __harness_result__ = await __harness_result__",',
+  // The harnesses are unchanged and assume a sane return value; if a wrong one (say None) makes a harness raise, report it as failing tests.
+  '      "except Exception as __e:",',
+  '      "    __harness_result__ = {\'ranOk\': True, \'results\': [], \'harnessError\': type(__e).__name__ + \': \' + str(__e)}",',
   '      "__result_json__ = json.dumps(__harness_result__)",',
   '    ].join("\\n");',
   '    await pyodide.runPythonAsync(harnessSource + "\\n" + tail + "\\n");',
@@ -33,7 +37,7 @@ const WORKER_SRC = [
 
 export type TestResult = { name: string; pass: boolean; hint: string; errorMessage: string | null };
 export type RunOutcome =
-  | { kind: "results"; results: TestResult[] }
+  | { kind: "results"; results: TestResult[]; harnessError?: string }
   | { kind: "code-error"; error: string }
   | { kind: "timeout" | "stopped" | "sandbox"; error: string };
 
@@ -81,8 +85,8 @@ export function runHarness(harnessSource: string, harnessName: string, studentCo
       return;
     }
     if (!ev.data.ok) return end({ kind: "sandbox", error: String(ev.data.error) });
-    const r = ev.data.result as { ranOk: boolean; error?: string; results?: TestResult[] };
-    end(r.ranOk ? { kind: "results", results: r.results ?? [] } : { kind: "code-error", error: r.error ?? "Your code did not run." });
+    const r = ev.data.result as { ranOk: boolean; error?: string; results?: TestResult[]; harnessError?: string };
+    end(r.ranOk ? { kind: "results", results: r.results ?? [], harnessError: r.harnessError } : { kind: "code-error", error: r.error ?? "Your code did not run." });
   };
   worker.onerror = (ev) => end({ kind: "sandbox", error: ev.message || "The Python sandbox crashed unexpectedly." });
   worker.postMessage({ harnessSource, harnessName, studentCode });

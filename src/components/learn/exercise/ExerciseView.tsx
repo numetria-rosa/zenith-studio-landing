@@ -117,7 +117,10 @@ export function ExerciseView(p: ExerciseViewProps) {
     }
 
     setBusy("reveal");
-    const { results } = outcome;
+    // The harness could not read what the student's function returned: every test fails, with the reason.
+    const results = outcome.results.length
+      ? outcome.results
+      : p.tests.map((t) => ({ ...t, pass: false, errorMessage: null, hint: `The tests could not read what your function returned (${outcome.harnessError ?? "no results"}). Return exactly the shape the brief describes. ${t.hint}` }));
     let passed = 0;
     results.forEach((r, i) => {
       later(() => setTests((t) => t.map((s, j) => (j === i ? "run" : s))), 380 + i * 620);

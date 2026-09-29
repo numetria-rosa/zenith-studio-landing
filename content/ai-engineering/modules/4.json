@@ -250,5 +250,10 @@
       "definition": "an open standard for how a model-facing app discovers and calls tools exposed by a separate server; standardizes the wire format, not the validate-then-execute discipline this module teaches."
     }
   ],
-  "furtherReading": true
+  "furtherReading": true,
+  "project": {
+    "title": "Idempotent Tool-Calling Executor",
+    "brief": "Build a tool executor that safely handles a model retrying the same tool call, validates arguments against a schema, and surfaces errors the model can act on.",
+    "projectId": 4
+  }
 }

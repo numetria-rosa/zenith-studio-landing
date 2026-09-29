@@ -234,5 +234,10 @@
       "definition": "a secondary call path (often a different model or provider) attempted once the primary path has failed."
     }
   ],
-  "furtherReading": true
+  "furtherReading": true,
+  "project": {
+    "title": "Resilient LLM API Client",
+    "brief": "Build a client that retries transient failures with backoff and jitter, falls back to a secondary model on persistent failure, and fails fast on non-retryable errors.",
+    "projectId": 6
+  }
 }

@@ -1,0 +1,68 @@
+{
+  "id": 5,
+  "title": "Bounded ReAct Agent Loop",
+  "difficulty": "Intermediate",
+  "modules": [
+    5
+  ],
+  "summary": "Build a reason-act-observe agent loop with a hard step limit, explicit termination conditions, and protection against repeating the same failing action forever.",
+  "requirements": [
+    "Implement a loop calling a step function repeatedly, tracking a trace of actions taken.",
+    "Enforce a hard maximum step count.",
+    "Detect 3 identical consecutive actions and stop early as 'stuck', before exhausting the step budget.",
+    "Correctly distinguish success, step-limit, and stuck as three separate outcomes."
+  ],
+  "start": "Start from Module 5's exercise function and wire it to a small set of mock 'tools' the step function can call (e.g. a fake search and a fake calculator), so you can construct real multi-step traces, not just single-action test cases.",
+  "acceptance": [
+    "A loop that reaches a final answer within the step budget returns success with the correct step count.",
+    "A loop that never reaches a final answer and never repeats hits the step limit and returns that outcome, with a full trace.",
+    "A loop that repeats the exact same action 3 times in a row stops immediately as stuck, well before the step limit.",
+    "Alternating different actions never falsely triggers stuck-detection, even across many steps.",
+    "The trace array accurately records every action taken, in order."
+  ],
+  "tests": [
+    "3 varied actions then a final answer → success, stepsUsed=4, trace has 3 entries.",
+    "10 varied, never-repeating actions, max_steps=10 → max_steps outcome, trace has 10 entries.",
+    "Same action 5 times in a row, max_steps=20 → stuck outcome, stepsUsed=3, far under 20.",
+    "4 alternating actions (A,B,A,B) then final → success, no false stuck trigger.",
+    "Trace order exactly matches the sequence of actions returned by the mock step function."
+  ],
+  "mistakes": [
+    "Not resetting the repeat counter when the action changes, causing false stuck triggers on alternating sequences.",
+    "Continuing to loop after detecting stuck instead of returning immediately.",
+    "Off-by-one in stepsUsed when the loop ends on a 'final' result."
+  ],
+  "solution": [
+    "Loop up to max_steps times, calling step(state) each iteration.",
+    "On 'final', return success immediately with the current step count.",
+    "On 'action', append to trace, compare to the last action, increment or reset the repeat counter, return stuck if it hits 3.",
+    "If the loop completes without returning, report max_steps."
+  ],
+  "rubric": [
+    {
+      "key": "architecture",
+      "label": "Architecture",
+      "weight": 27
+    },
+    {
+      "key": "implementation",
+      "label": "Implementation",
+      "weight": 33
+    },
+    {
+      "key": "reliability",
+      "label": "Reliability",
+      "weight": 20
+    },
+    {
+      "key": "testing",
+      "label": "Testing",
+      "weight": 13
+    },
+    {
+      "key": "documentation",
+      "label": "Documentation",
+      "weight": 7
+    }
+  ]
+}

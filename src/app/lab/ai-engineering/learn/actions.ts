@@ -3,8 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { LEARN_BASE } from "@/components/learn/nav";
-import { getModule } from "@/lib/aie/content";
-import { markLessonComplete, saveExerciseRun } from "@/lib/aie/progress";
+import { getModule, getProject } from "@/lib/aie/content";
+import { markLessonComplete, saveExerciseRun, saveProjectDraft, saveQuizAttempt, submitProject } from "@/lib/aie/progress";
+import { cleanProjectInput, type ProjectInput } from "@/lib/aie/project";
+import { gradeQuiz, type QuizAnswer } from "@/lib/aie/quiz";
 import { requireEnrollment } from "@/lib/require-enrollment";
 
 /** Marks a lesson done and moves on. `next` must stay inside the course app. */
@@ -26,4 +28,27 @@ export async function saveExerciseRunAction(module: number, code: string, passed
   if (!mod?.exercise || code.length > 20000 || !Number.isInteger(passed) || passed < 0 || passed > mod.exercise.tests.length) throw new Error("Invalid run");
   await saveExerciseRun(userId, module, code, passed, mod.exercise.tests.length);
   revalidatePath(`${LEARN_BASE}/modules/${module}`, "layout");
+}
+
+/** Grades a finished quiz on the server and stores the attempt. Returns the score so the client shows the server's number. */
+export async function submitQuizAction(module: number, answers: Record<string, QuizAnswer>): Promise<{ score: number; total: number; passed: boolean }> {
+  const { userId } = await requireEnrollment("ai-engineering", LEARN_BASE);
+  const mod = await getModule(module);
+  if (!mod?.quiz) throw new Error("No quiz");
+  const result = gradeQuiz(mod.quiz, answers);
+  await saveQuizAttempt(userId, module, result.score, result.total, result.passed);
+  revalidatePath(`${LEARN_BASE}/modules/${module}`, "layout");
+  return result;
+}
+
+/** Saves a project's checklist and rubric (submit=false, autosave) or the whole submission (submit=true, completes it). */
+export async function saveProjectAction(projectId: number, input: ProjectInput, submit: boolean): Promise<{ score: number }> {
+  const { userId } = await requireEnrollment("ai-engineering", LEARN_BASE);
+  const project = await getProject(projectId);
+  if (!project) throw new Error("Unknown project");
+  const clean = cleanProjectInput(project, input);
+  if (submit) await submitProject(userId, projectId, clean);
+  else await saveProjectDraft(userId, projectId, { checklist: clean.checklist, rubric: clean.rubric, score: clean.score });
+  revalidatePath(LEARN_BASE, "layout");
+  return { score: clean.score };
 }

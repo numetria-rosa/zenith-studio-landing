@@ -1,0 +1,63 @@
+{
+  "id": 7,
+  "title": "Prompt Evaluation Harness",
+  "difficulty": "Intermediate",
+  "modules": [
+    7
+  ],
+  "summary": "Build a deterministic eval harness that scores model outputs against a labeled test set using multiple criteria, and flags regressions between two prompt versions.",
+  "requirements": [
+    "Accept a labeled test set (input + a per-case checkable criterion function).",
+    "Run each case against a model function, catching failures from both the model call AND the checker.",
+    "Compute an aggregate score and compare against an optional recorded baseline.",
+    "Flag a regression when the new score is below the baseline."
+  ],
+  "start": "Start from Module 7's exercise function and wire it to a small real labeled test set for a task you care about (e.g. 5-10 hand-written prompt/expected-output pairs), instead of the synthetic mock functions used in the exercise.",
+  "acceptance": [
+    "All test cases passing produces a score of 1.0 and no regression (with no baseline).",
+    "A mix of pass/fail cases produces the correct score and correctly identifies exactly which cases failed.",
+    "A model_fn that raises for one case is caught and counted as a failure without crashing the other cases.",
+    "A check() function that raises for one case is caught and counted as a failure without crashing the other cases.",
+    "A score below a provided baseline is correctly flagged as a regression; a score at or above baseline is not."
+  ],
+  "tests": [
+    "5/5 cases pass → score 1.0, regression false (no baseline).",
+    "2/4 cases pass → score 0.5, results list correctly flags which 2 failed.",
+    "model_fn raises for 1 of 3 cases → that case fails, the other 2 are evaluated normally.",
+    "check() raises for 1 of 2 cases → that case fails, the other case is evaluated normally.",
+    "Score 0.6 vs baseline 0.75 → regression true. Score 0.8 vs baseline 0.75 → regression false."
+  ],
+  "mistakes": [
+    "Not wrapping the check() call in its own try/except, letting one bad checker crash the whole run.",
+    "Computing score as pass_count/total without guarding total=0 (division by zero).",
+    "Treating an unchanged score as a regression instead of using a strict less-than comparison."
+  ],
+  "solution": [
+    "Loop over test cases: try the model_fn call in a try/except, mark failed if it raises.",
+    "Separately try the check() call in its own try/except, mark failed if it raises.",
+    "Aggregate pass_count/total into a score.",
+    "Compare against baseline (if provided) using strict less-than for the regression flag."
+  ],
+  "rubric": [
+    {
+      "key": "implementation",
+      "label": "Implementation",
+      "weight": 50
+    },
+    {
+      "key": "observability",
+      "label": "Observability",
+      "weight": 20
+    },
+    {
+      "key": "testing",
+      "label": "Testing",
+      "weight": 20
+    },
+    {
+      "key": "documentation",
+      "label": "Documentation",
+      "weight": 10
+    }
+  ]
+}

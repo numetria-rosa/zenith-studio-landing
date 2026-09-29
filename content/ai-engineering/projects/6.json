@@ -1,0 +1,63 @@
+{
+  "id": 6,
+  "title": "Resilient LLM API Client",
+  "difficulty": "Intermediate",
+  "modules": [
+    6
+  ],
+  "summary": "Build a client that retries transient failures with backoff and jitter, falls back to a secondary model on persistent failure, and fails fast on non-retryable errors.",
+  "requirements": [
+    "Classify errors as retryable or non-retryable based on a status code or explicit flag.",
+    "Implement exponential backoff with full jitter, with a configurable base delay and cap.",
+    "Retry only retryable failures, up to a fixed maximum.",
+    "Fall back to a secondary function exactly once after the primary is exhausted or blocked."
+  ],
+  "start": "Start from Module 6's exercise function and wire real (or realistically mocked) delay timing using an injected sleep function, so your tests can run fast with a fake clock instead of actually waiting.",
+  "acceptance": [
+    "A primary call that succeeds immediately never touches the fallback.",
+    "A retryable failure is retried up to the configured max, with delay growing per the full-jitter formula.",
+    "A non-retryable failure stops retrying immediately, regardless of how high the max retry count is set.",
+    "Exhausting retries on the primary triggers exactly one fallback attempt, not a second full retry cycle.",
+    "Both primary and fallback failing returns a clear structured failure, never an uncaught rejection."
+  ],
+  "tests": [
+    "Primary succeeds on the first call → fallback never invoked.",
+    "Primary fails twice (retryable) then succeeds → primary invoked 3 times, fallback never invoked.",
+    "Primary fails once with a non-retryable error, max_retries=5 → primary invoked exactly once, fallback invoked once.",
+    "Primary always fails (retryable), max_retries=2 → primary invoked 3 times, fallback invoked exactly once.",
+    "Both primary and fallback fail → function returns normally (doesn't raise) with a structured failure object."
+  ],
+  "mistakes": [
+    "Checking the retry count before checking retryability, wasting the whole budget on a guaranteed-permanent failure.",
+    "Giving fallback the same retry budget as the primary instead of a single bounded attempt.",
+    "Using a real asyncio.sleep() in tests instead of an injected fake, making the suite slow."
+  ],
+  "solution": [
+    "Loop: `await` primary, on success return immediately.",
+    "On exception, check `getattr(e, 'retryable', True) is not False`; if non-retryable or out of retries, break to fallback.",
+    "Otherwise increment attempt and retry (with a jittered delay in a real system, injected/mocked in tests).",
+    "After the loop, try fallback exactly once, returning its result or a structured failure."
+  ],
+  "rubric": [
+    {
+      "key": "implementation",
+      "label": "Implementation",
+      "weight": 45
+    },
+    {
+      "key": "reliability",
+      "label": "Reliability",
+      "weight": 27
+    },
+    {
+      "key": "testing",
+      "label": "Testing",
+      "weight": 18
+    },
+    {
+      "key": "documentation",
+      "label": "Documentation",
+      "weight": 9
+    }
+  ]
+}
