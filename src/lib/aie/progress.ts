@@ -3,12 +3,16 @@ import type { ModuleContent } from "./types";
 
 /** Lesson ids ("1.4") the student has completed. */
 export async function getCompletedLessons(userId: string): Promise<Set<string>> {
-  // Visual tests only: fixed progress instead of the database. Never active in production.
-  if (process.env.NODE_ENV !== "production" && process.env.AIE_FIXTURE_DONE !== undefined) {
-    return new Set(process.env.AIE_FIXTURE_DONE.split(",").filter(Boolean));
-  }
   const rows = await db.aieLessonProgress.findMany({ where: { userId }, select: { lessonId: true } });
   return new Set(rows.map((r) => r.lessonId));
+}
+
+export async function markLessonComplete(userId: string, lessonId: string): Promise<void> {
+  await db.aieLessonProgress.upsert({
+    where: { userId_lessonId: { userId, lessonId } },
+    create: { userId, lessonId },
+    update: {},
+  });
 }
 
 /** The lesson to resume: first incomplete in the module, else the first one. */

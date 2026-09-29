@@ -12,19 +12,22 @@ export function LessonRow({
   title,
   minutes,
   state,
+  compact = false,
 }: {
   href: string;
   number: string;
   title: string;
   minutes: number;
   state: LessonState;
+  /** Right-rail size: tighter padding and 14px title. */
+  compact?: boolean;
 }) {
   const current = state === "current";
   return (
     <Link
       href={href}
       aria-current={current ? "step" : undefined}
-      className={`flex min-h-11 items-center gap-3.5 rounded-[14px] px-4 py-3.5 no-underline transition-colors hover:bg-white/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus,#5CC8FF)] ${
+      className={`flex min-h-11 items-center gap-3.5 rounded-[14px] no-underline ${compact ? "px-3 py-2.5" : "px-4 py-3.5"} transition-colors hover:bg-white/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus,#5CC8FF)] ${
         current ? "bg-[rgba(92,200,255,0.08)] text-frost shadow-[inset_0_0_0_1px_rgba(92,200,255,0.28)]" : state === "done" ? "text-frost" : "text-soft"
       }`}
     >
@@ -40,7 +43,7 @@ export function LessonRow({
       )}
       {state === "next" && <span className="h-[30px] w-[30px] shrink-0 rounded-full border border-white/[0.18]" />}
       <span className={`w-[30px] font-mono text-[12px] ${current ? "text-cyan" : "text-dim"}`}>{number}</span>
-      <span className="flex-1 text-[16px] leading-[1.35]">
+      <span className={`flex-1 leading-[1.35] ${compact ? "text-[14px]" : "text-[16px]"}`}>
         {title}
         <span className="sr-only"> ({STATE_TEXT[state]})</span>
       </span>

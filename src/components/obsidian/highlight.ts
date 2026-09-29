@@ -36,9 +36,10 @@ export function highlight(code: string, language: string): Token[] {
       else if (str) push(text, C.string);
       else if (num) push(text, C.number);
       else if (word) {
+        const next = code[(m.index ?? 0) + word.length];
         if (PY_KEYWORDS.has(word)) push(text, C.keyword);
-        else if (prevWord === "def" || prevWord === "class") push(text, prevWord === "class" ? C.type : C.fn);
-        else if (PY_TYPES.has(word)) push(text, C.type);
+        else if (prevWord === "class" || PY_TYPES.has(word) || /^[A-Z]/.test(word)) push(text, C.type);
+        else if (prevWord === "def" || next === "(") push(text, C.fn);
         else push(text, C.base);
         prevWord = word;
         continue;
@@ -68,4 +69,17 @@ export function languageFor(file: string): string {
   if (file.endsWith(".py")) return "python";
   if (file.endsWith(".json") || file.endsWith(".jsonl")) return "json";
   return "text";
+}
+
+/** Tokens grouped per source line, for code cards with line numbers. */
+export function highlightLines(code: string, language: string): Token[][] {
+  const lines: Token[][] = [[]];
+  for (const t of highlight(code, language)) {
+    const parts = t.text.split("\n");
+    parts.forEach((part, i) => {
+      if (i > 0) lines.push([]);
+      if (part) lines[lines.length - 1]!.push({ text: part, color: t.color });
+    });
+  }
+  return lines;
 }

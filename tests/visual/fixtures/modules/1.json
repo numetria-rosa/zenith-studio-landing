@@ -47,33 +47,38 @@
   ],
   "exercise": {
     "id": "1.4",
-    "title": "Make parse_ticket() safe",
-    "language": "python",
-    "file": "parse_ticket.py",
-    "testFile": "test_parse_ticket.py",
-    "prompt": "The model returns a ticket as text. Turn it into a validated Ticket, and when it can’t be trusted, raise a clear ValueError instead of crashing somewhere downstream.",
+    "label": "Code exercise",
+    "instructions": "The model returns a ticket as text. Turn it into a validated Ticket, and when it can’t be trusted, raise a clear ValueError instead of crashing somewhere downstream.",
+    "functionName": "parse_ticket",
+    "fileName": "parse_ticket.py",
     "header": "import json\nfrom typing import Literal\nfrom pydantic import BaseModel, ValidationError\n\nclass Ticket(BaseModel):\n    intent: Literal[\"refund\", \"billing\", \"bug\", \"other\"]\n    order_id: int | None\n    urgency: Literal[\"low\", \"medium\", \"high\"]\n",
     "starter": "def parse_ticket(raw: str) -> Ticket:\n    # TODO: strip code fences, validate against\n    # Ticket, raise ValueError(\"invalid ticket: ...\")\n    return Ticket(**json.loads(raw))",
     "solution": "def parse_ticket(raw: str) -> Ticket:\n    text = raw.strip()\n    if text.startswith(\"```\"):\n        text = text.split(\"\\n\", 1)[1].rsplit(\"```\", 1)[0]\n    try:\n        return Ticket.model_validate_json(text)\n    except ValidationError as err:\n        raise ValueError(f\"invalid ticket: {err}\") from err",
+    "hints": [
+      {
+        "title": "Hint 1",
+        "mdx": "Models often wrap JSON in ```json fences. Strip them first, then use Ticket.model_validate_json() and convert ValidationError into the ValueError your caller expects."
+      }
+    ],
     "tests": [
       {
         "name": "parses clean JSON",
-        "failureMessage": ""
+        "hint": ""
       },
       {
         "name": "strips ```json code fences",
-        "failureMessage": "JSONDecodeError: Expecting value: line 1 column 1"
+        "hint": "JSONDecodeError: Expecting value: line 1 column 1"
       },
       {
         "name": "bad intent raises ValueError(\"invalid ticket\")",
-        "failureMessage": "got pydantic ValidationError, expected \"invalid ticket: …\""
+        "hint": "got pydantic ValidationError, expected \"invalid ticket: …\""
       },
       {
         "name": "missing urgency raises ValueError(\"invalid ticket\")",
-        "failureMessage": "got pydantic ValidationError, expected \"invalid ticket: …\""
+        "hint": "got pydantic ValidationError, expected \"invalid ticket: …\""
       }
     ],
-    "hint": "Models often wrap JSON in ```json fences. Strip them first, then use Ticket.model_validate_json() and convert ValidationError into the ValueError your caller expects.",
+    "harness": "exercises/1.py",
     "cardTitle": "parse_ticket(): strip, parse, validate"
   },
   "quiz": {
@@ -146,5 +151,11 @@
   },
   "cheatSheet": {
     "title": "Structured outputs on one page"
-  }
+  },
+  "glossary": [
+    {
+      "term": "structured output",
+      "definition": "model output constrained to a predictable, parseable shape, typically JSON."
+    }
+  ]
 }
