@@ -65,7 +65,7 @@ export function QuizView({ module, title, bank, passMark, seed, stuck, next }: P
     setSaving(true);
     setError(null);
     try {
-      setResult(await submitQuizAction(module, all));
+      setResult(await submitQuizAction({ module }, all));
     } catch {
       // Not saved: still show the score the student earned, and say so.
       const s = questions.filter((x) => isCorrect(x, all[x.id]!)).length;
