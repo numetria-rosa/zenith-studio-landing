@@ -1,0 +1,48 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Inside</title><link rel="stylesheet" href="base.css">
+<style>
+.eyebrow{margin-top:76px;color:var(--cyan)}
+h1{margin-top:26px;max-width:900px}h1 em{font-style:normal;color:#9BDDFF}
+.chips{position:relative;display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.chip{display:inline-flex;align-items:center;gap:10px;padding:11px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);font-size:24px;color:var(--soft)}
+.chip.g{border-color:rgba(61,220,151,.5);background:rgba(61,220,151,.1);color:var(--mint-text)}
+.win{position:relative;margin-top:36px;border:1px solid rgba(255,255,255,.12);border-radius:26px;background:#0a0b10;overflow:hidden;height:556px}
+.bar{display:flex;align-items:center;gap:10px;padding:18px 24px;border-bottom:1px solid rgba(255,255,255,.08)}
+.d{width:16px;height:16px;border-radius:50%}.url{margin:0 0 0 70px;font-family:"Geist Mono";font-size:18px;color:var(--mist);padding:8px 28px;border-radius:12px;background:rgba(255,255,255,.05)}
+.body{display:grid;grid-template-columns:236px minmax(0,1fr);height:calc(100% - 62px)}
+.side{border-right:1px solid rgba(255,255,255,.08);padding:22px 18px;display:flex;flex-direction:column;gap:4px;font-size:19px;color:var(--soft)}
+.side .lg{display:flex;align-items:center;gap:10px;font-weight:600;font-size:20px;margin-bottom:8px;color:var(--frost)}
+.side .lg img{width:30px}
+.si{padding:8px 14px;border-radius:12px;white-space:nowrap}.si.on{background:rgba(139,92,246,.22);border:1px solid rgba(199,176,255,.45);color:var(--frost)}
+.si.lock{margin-top:10px;display:flex;justify-content:space-between;color:var(--violet-text)}
+.main{padding:22px 24px;min-width:0}.main h3{font-size:30px;font-weight:500;letter-spacing:-.03em}.main p{font-size:20px;color:var(--mist);margin-top:4px}
+.cols{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;margin-top:18px}
+.card{overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:#0d0f15;padding:16px 18px}
+.code{font-family:"Geist Mono";font-size:14px;line-height:1.7;color:var(--soft);white-space:pre}
+.code .k{color:#C7B0FF}.code .f{color:#9BDDFF}.code .s{color:#7FF0BD}
+.tk{font-family:"Geist Mono";font-size:15px;letter-spacing:.14em;color:var(--dim)}
+.bar2{height:8px;border-radius:5px;background:var(--mint);margin:14px 0}
+.t{display:flex;align-items:center;gap:10px;font-size:17px;color:var(--soft);margin:10px 0;white-space:nowrap}.t i{flex:none;width:20px;height:20px;border-radius:50%;border:2px solid var(--mint);display:inline-block}
+.pass{margin-top:14px;border:1px solid rgba(61,220,151,.5);background:rgba(61,220,151,.1);color:var(--mint-text);border-radius:12px;padding:12px 16px;font-size:19px}
+.ill{font-size:15px;color:var(--dim);margin-left:auto}
+</style></head><body><div class="canvas">
+<div class="glow" style="left:-300px;top:-200px;width:900px;height:900px;background:radial-gradient(circle,rgba(92,200,255,.16),rgba(5,6,10,0) 62%)"></div><div class="grid"></div>
+<div class="top"><div class="brand"><img src="logo.png" alt="">Zenith Studio</div><div class="tag">AI Engineering</div></div>
+<div class="eyebrow">Everything inside</div>
+<h1>Learn to build <em>AI agents,</em> step by step.</h1>
+<div class="chips"><span class="chip">8 modules · 6.5h</span><span class="chip">Code exercises</span><span class="chip">Quizzes</span><span class="chip">Cheat sheets</span><span class="chip">Capstone</span><span class="chip g">5 sellable agents</span></div>
+<div class="win"><div class="bar"><span class="d" style="background:#FF5F57"></span><span class="d" style="background:#FEBC2E"></span><span class="d" style="background:#28C840"></span><span class="url">zenith-studio.site/course</span><span class="ill">Illustrative</span></div>
+<div class="body"><div class="side"><div class="lg"><img src="logo.png" alt="">AI Engineering</div>
+<div class="si">Dashboard</div><div class="si">Syllabus</div><div class="si">Cheat Sheets</div><div class="si on">Python Foundations</div><div class="si">Quiz Center</div><div class="si">Projects</div><div class="si lock"><span>Final module</span><span>★</span></div></div>
+<div class="main"><h3>Code exercise</h3><p>Write it, run it, watch the tests pass</p>
+<div class="cols"><div class="card"><div class="tk">PARSE_TICKET.PY</div><div class="code"><span class="k">def</span> <span class="f">parse_ticket</span>(raw: str) -> Ticket:
+    t = raw.strip()
+    <span class="k">if</span> t.startswith(<span class="s">"```"</span>):
+        t = t.split(<span class="s">"\n"</span>, 1)[1]
+    <span class="k">try</span>:
+        <span class="k">return</span> Ticket(**json.loads(t))
+    <span class="k">except</span> ValidationError:
+        <span class="k">raise</span> ValueError(<span class="s">"bad ticket"</span>)</div></div>
+<div class="card"><div class="tk">TESTS</div><div class="bar2"></div><div class="t"><i></i>parses clean JSON</div><div class="t"><i></i>strips code fences</div><div class="t"><i></i>bad intent raises</div><div class="t"><i></i>missing field raises</div><div class="pass">4 / 4 passing</div></div></div></div></div>
+</div>
+<div class="foot"><div class="dots"><i></i><i class="on"></i><i></i><i></i><i></i><i></i></div><div class="swipe">Swipe →</div></div>
+</div></body></html>
