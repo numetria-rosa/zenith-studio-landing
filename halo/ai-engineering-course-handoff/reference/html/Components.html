@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Obsidian — Components</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#05060A;font-family:'Geist',system-ui,sans-serif;color:#F5F6F8}
+a{color:#5CC8FF}a:hover{color:#A6E1FF}
+button{font-family:inherit;cursor:pointer}
+input::placeholder{color:#7D8392}
+</style>
+<script src="../runtime/dc-lite.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<template id="tpl">
+<div style="width: 1440px; height: 1640px; box-sizing: border-box; padding: 88px 80px; background: #05060A; font-family: 'Geist', system-ui, sans-serif; color: #F5F6F8; display: flex; flex-direction: column; gap: 24px; position: relative; overflow: hidden;">
+
+<div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 48px; padding-bottom: 40px;">
+<div style="display: flex; flex-direction: column; gap: 16px;">
+<div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #5CC8FF;">02 — Components</div>
+<h1 style="margin: 0px; font-size: 64px; line-height: 1; font-weight: 500; letter-spacing: -0.04em;">The working parts</h1>
+</div>
+<p style="margin: 0px; width: 420px; font-size: 16px; line-height: 1.6; color: #A9AEBA;">Primary actions are solid Frost pills. Everything else is glass. Glow only marks what is live, selected or featured. Controls on this board work in Play.</p>
+</div>
+
+<section style="border-radius: 28px; border: 1px solid rgba(255,255,255,0.10); background: #0A0B10; padding: 32px; display: flex; flex-direction: column; gap: 24px;">
+<div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #A9AEBA;">Navigation</div>
+<div style="display: flex; align-items: center; justify-content: space-between;">
+<a href="#" aria-label="Home" style="display: flex; align-items: center; gap: 10px; color: #F5F6F8; text-decoration: none; font-weight: 600; font-size: 17px;">
+<svg width="28" height="28" viewBox="0 0 32 32" fill="none" stroke="#F5F6F8" stroke-width="3.2" stroke-linecap="square"><path d="M16 3 L29 16 L22 23"></path><path d="M16 29 L3 16 L10 9"></path></svg>
+Brand
+</a>
+<div style="display: flex; align-items: center; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);">
+<button type="button" aria-label="Close menu" style="width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; padding: 0px;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>
+</button>
+<a href="#" style="padding: 10px 18px; font-size: 14px; color: #A9AEBA; text-decoration: none;">Home</a>
+<a href="#" style="position: relative; padding: 10px 18px; font-size: 14px; color: #F5F6F8; text-decoration: none;">Pricing<span style="position: absolute; left: 50%; bottom: 2px; width: 18px; height: 2px; margin-left: -9px; border-radius: 2px; background: #5CC8FF; box-shadow: 0 0 10px #5CC8FF;"></span></a>
+<a href="#" style="padding: 10px 18px; font-size: 14px; color: #A9AEBA; text-decoration: none;">FAQ</a>
+<a href="#" style="padding: 10px 18px; font-size: 14px; color: #A9AEBA; text-decoration: none;">Contact</a>
+<a href="#" style="padding: 10px 20px; border-radius: 999px; background: #F5F6F8; color: #05060A; font-size: 14px; font-weight: 500; text-decoration: none;">Download</a>
+</div>
+<div style="display: flex; gap: 10px;">
+<a href="#" style="padding: 11px 20px; border-radius: 999px; font-size: 14px; color: #F5F6F8; text-decoration: none; border: 1px solid rgba(255,255,255,0.16);">Sign in</a>
+</div>
+</div>
+</section>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+<section style="border-radius: 28px; border: 1px solid rgba(255,255,255,0.10); background: #0A0B10; padding: 32px; display: flex; flex-direction: column; gap: 24px;">
+<div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #A9AEBA;">Buttons</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px;">
+<button type="button" style="padding: 14px 26px; border-radius: 999px; border: none; background: #F5F6F8; color: #05060A; font-size: 15px; font-weight: 500;">Choose plan</button>
+<button type="button" style="padding: 14px 26px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.05); box-shadow: inset 0 1px 0 rgba(255,255,255,0.10); color: #F5F6F8; font-size: 15px; font-weight: 500;">Glass</button>
+<button type="button" style="padding: 14px 26px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.24); background: transparent; color: #F5F6F8; font-size: 15px; font-weight: 500;">Outline</button>
+<button type="button" style="padding: 14px 26px; border-radius: 999px; border: 1px solid rgba(92,200,255,0.7); background: rgba(92,200,255,0.08); box-shadow: 0 0 24px rgba(92,200,255,0.35); color: #F5F6F8; font-size: 15px; font-weight: 500;">Glow</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px;">
+<button type="button" style="display: flex; align-items: center; gap: 10px; padding: 14px 22px 14px 26px; border-radius: 999px; border: none; background: linear-gradient(135deg, #5CC8FF 0%, #3B6BFF 55%, #8B5CF6 100%); color: #05060A; font-size: 15px; font-weight: 600; box-shadow: 0 8px 30px rgba(59,107,255,0.45);">Start automating
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#05060A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+</button>
+<button type="button" aria-label="Play" style="width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; padding: 0px;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="#F5F6F8"><path d="M8 5v14l11-7z"></path></svg>
+</button>
+<button type="button" style="padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.05); color: #F5F6F8; font-size: 13px; font-weight: 500;">Small</button>
+<button type="button" disabled="disabled" style="padding: 14px 26px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #7D8392; font-size: 15px; font-weight: 500; cursor: not-allowed;">Disabled</button>
+</div>
+</section>
+
+<section style="border-radius: 28px; border: 1px solid rgba(255,255,255,0.10); background: #0A0B10; padding: 32px; display: flex; flex-direction: column; gap: 24px;">
+<div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #A9AEBA;">Controls</div>
+<div style="display: flex; align-items: center; gap: 40px;">
+<div style="display: flex; align-items: center; gap: 14px;">
+<button type="button" role="switch" aria-checked="{{toggleOn}}" aria-label="Yearly billing" onClick="{{flipToggle}}" style="position: relative; width: 56px; height: 32px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); padding: 0px; background: {{trackBg}}; box-shadow: {{trackShadow}};">
+<span style="position: absolute; top: 3px; left: {{knobLeft}}; width: 24px; height: 24px; border-radius: 50%; background: #F5F6F8; box-shadow: 0 2px 8px rgba(0,0,0,0.4);"></span>
+</button>
+<span style="font-size: 16px;">Yearly</span>
+</div>
+<div role="group" aria-label="Billing period" style="display: flex; gap: 4px; padding: 5px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14);">
+<button type="button" aria-pressed="{{isMonthly}}" onClick="{{pickMonthly}}" style="padding: 9px 18px; border-radius: 999px; border: none; font-size: 14px; font-weight: 500; background: {{segMBg}}; color: {{segMColor}};">Monthly</button>
+<button type="button" aria-pressed="{{isYearly}}" onClick="{{pickYearly}}" style="padding: 9px 18px; border-radius: 999px; border: none; font-size: 14px; font-weight: 500; background: {{segYBg}}; color: {{segYColor}};">Yearly</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 14px;">
+<sc-for list="{{checks}}" as="c" hint-placeholder-count="3">
+<button type="button" role="checkbox" aria-checked="{{c.on}}" onClick="{{c.flip}}" style="display: flex; align-items: center; gap: 14px; padding: 0px; border: none; background: transparent; color: #F5F6F8; font-size: 15px; text-align: left;">
+<span style="width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: {{c.bg}}; border: 1px solid {{c.border}};">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="{{c.tick}}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</span>
+{{c.label}}
+</button>
+</sc-for>
+</div>
+</section>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+<section style="border-radius: 28px; border: 1px solid rgba(255,255,255,0.10); background: #0A0B10; padding: 32px; display: flex; flex-direction: column; gap: 20px;">
+<div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #A9AEBA;">Inputs</div>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #A9AEBA;">Workspace name
+<input type="text" placeholder="e.g. Zenith Studio" style="height: 48px; box-sizing: border-box; padding: 0px 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04); color: #F5F6F8; font-family: 'Geist', sans-serif; font-size: 15px; outline: none;">
+</label>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #A9AEBA;">Email · focused
+<input type="email" value="team@company.com" style="height: 48px; box-sizing: border-box; padding: 0px 16px; border-radius: 14px; border: 1px solid rgba(92,200,255,0.8); background: rgba(92,200,255,0.05); box-shadow: 0 0 0 4px rgba(92,200,255,0.14), 0 0 24px rgba(92,200,255,0.25); color: #F5F6F8; font-family: 'Geist', sans-serif; font-size: 15px; outline: none;">
+</label>
+<div style="display: flex; align-items: center; gap: 12px; height: 48px; padding: 0px 8px 0px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04);">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A9AEBA" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+<input type="search" aria-label="Search workflows" placeholder="Search workflows" style="flex-grow: 1; height: 44px; border: none; background: transparent; color: #F5F6F8; font-family: 'Geist', sans-serif; font-size: 15px; outline: none;">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #A9AEBA; padding: 5px 9px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.14);">⌘K</span>
+</div>
+</section>
+
+<section style="border-radius: 28px; border: 1px solid rgba(255,255,255,0.10); background: #0A0B10; padding: 32px; display: flex; flex-direction: column; gap: 24px;">
+<div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #A9AEBA;">Badges and chips</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+<span style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 8px; background: rgba(61,220,151,0.10); border: 1px solid rgba(61,220,151,0.35); color: #7FF0BD; font-size: 13px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #3DDC97; box-shadow: 0 0 8px #3DDC97;"></span>Active</span>
+<span style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 8px; background: rgba(92,200,255,0.10); border: 1px solid rgba(92,200,255,0.35); color: #9BDDFF; font-size: 13px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #5CC8FF; box-shadow: 0 0 8px #5CC8FF;"></span>Running</span>
+<span style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 8px; background: rgba(255,92,122,0.10); border: 1px solid rgba(255,92,122,0.35); color: #FF9BAE; font-size: 13px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #FF5C7A;"></span>Failed</span>
+<span style="padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); color: #A9AEBA; font-size: 13px;">Paused</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+<span style="padding: 7px 14px; border-radius: 999px; background: rgba(139,92,246,0.14); border: 1px solid rgba(139,92,246,0.45); color: #C7B0FF; font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;">Beta</span>
+<span style="padding: 7px 14px; border-radius: 999px; background: #F5F6F8; color: #05060A; font-size: 13px; font-weight: 600;">−20%</span>
+<span style="display: flex; align-items: center; gap: 8px; padding: 7px 14px 7px 8px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); font-size: 13px;"><span style="width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #5CC8FF, #8B5CF6);"></span>AI Brain</span>
+<span style="min-width: 22px; height: 22px; box-sizing: border-box; padding: 0px 7px; border-radius: 999px; background: #3B6BFF; color: #F5F6F8; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center;">24</span>
+</div>
+<div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 18px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16); box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 20px 50px rgba(0,0,0,0.5);">
+<span style="width: 36px; height: 36px; border-radius: 12px; background: rgba(61,220,151,0.14); border: 1px solid rgba(61,220,151,0.4); display: flex; align-items: center; justify-content: center;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3DDC97" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+</span>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
+<span style="font-size: 14px; font-weight: 500;">Workflow deployed</span>
+<span style="font-size: 13px; color: #A9AEBA;">Lead intake is live on 3 channels</span>
+</div>
+<button type="button" style="padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.16); background: transparent; color: #F5F6F8; font-size: 13px;">View</button>
+</div>
+</section>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;">
+<section style="border-radius: 28px; border: 1px solid rgba(255,255,255,0.10); background: #0A0B10; padding: 32px; display: flex; flex-direction: column; gap: 20px;">
+<div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #A9AEBA;">Stat tile</div>
+<div style="border-radius: 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<span style="font-size: 13px; color: #A9AEBA;">Tasks completed</span>
+<span style="font-size: 12px; color: #7FF0BD; font-family: 'Geist Mono', monospace;">+12%</span>
+</div>
+<div style="font-size: 40px; font-weight: 500; letter-spacing: -0.03em;">1,250</div>
+<svg width="100%" height="56" viewBox="0 0 280 56" preserveAspectRatio="none" fill="none">
+<path d="M0 44 C30 40, 40 20, 70 26 S120 48, 150 30 S200 8, 230 18 S265 12, 280 6" stroke="#8B5CF6" stroke-width="6" stroke-opacity="0.25" stroke-linecap="round"></path>
+<path d="M0 44 C30 40, 40 20, 70 26 S120 48, 150 30 S200 8, 230 18 S265 12, 280 6" stroke="#C7B0FF" stroke-width="2" stroke-linecap="round"></path>
+</svg>
+</div>
+</section>
+
+<section style="border-radius: 28px; border: 1px solid rgba(255,255,255,0.10); background: #0A0B10; padding: 32px; display: flex; flex-direction: column; gap: 20px; position: relative; overflow: hidden;">
+<div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #A9AEBA;">Workflow node</div>
+<div style="position: absolute; left: 60px; top: 60px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(139,92,246,0.35), rgba(139,92,246,0) 65%);"></div>
+<div style="position: relative; align-self: center; width: 240px; margin-top: 8px;">
+<span style="position: absolute; left: 50%; top: -6px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #F5F6F8; box-shadow: 0 0 0 4px rgba(224,82,240,0.35), 0 0 14px #E052F0;"></span>
+<div style="border-radius: 20px; padding: 1px; background: linear-gradient(160deg, rgba(255,255,255,0.45), rgba(139,92,246,0.35) 50%, rgba(255,255,255,0.08));">
+<div style="border-radius: 19px; background: rgba(16,14,30,0.9); padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<span style="width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, #3B6BFF, #8B5CF6); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(139,92,246,0.6);">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F6F8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg>
+</span>
+<span style="font-size: 17px; font-weight: 500;">Email</span>
+</div>
+<span style="font-size: 13px; line-height: 1.45; color: #A9AEBA;">Send and manage messages</span>
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 8px; background: rgba(61,220,151,0.10); border: 1px solid rgba(61,220,151,0.35); color: #7FF0BD; font-size: 12px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: #3DDC97;"></span>Active</span>
+</div>
+</div>
+<span style="position: absolute; left: 50%; bottom: -6px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #F5F6F8; box-shadow: 0 0 0 4px rgba(224,82,240,0.35), 0 0 14px #E052F0;"></span>
+</div>
+</section>
+
+<section style="border-radius: 28px; border: 1px solid rgba(255,255,255,0.10); background: #0A0B10; padding: 32px; display: flex; flex-direction: column; gap: 20px;">
+<div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #A9AEBA;">Network nodes</div>
+<div style="position: relative; height: 200px;">
+<svg width="100%" height="200" viewBox="0 0 330 200" fill="none" style="position: absolute; left: 0px; top: 0px;">
+<path d="M84 60 H120 C140 60, 140 88, 160 88" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"></path>
+<path d="M84 150 H120 C140 150, 140 116, 160 116" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"></path>
+<path d="M226 100 H320" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"></path>
+<path d="M0 100 H40" stroke="rgba(255,255,255,0.2)" stroke-width="1.2"></path>
+</svg>
+<div style="position: absolute; left: 24px; top: 30px; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #2A2E3A, #0C0E14); border: 1px solid rgba(255,255,255,0.16); box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 10px 24px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="#8C919E"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6z"></path></svg>
+</div>
+<div style="position: absolute; left: 24px; top: 120px; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #2A2E3A, #0C0E14); border: 1px solid rgba(255,255,255,0.16); box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 10px 24px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="#8C919E"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6z"></path></svg>
+</div>
+<div style="position: absolute; left: 160px; top: 66px; width: 68px; height: 68px; border-radius: 16px; clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px); background: linear-gradient(160deg, #2A2E3A, #0C0E14); border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center;">
+<svg width="30" height="30" viewBox="0 0 32 32" fill="none" stroke="#F5F6F8" stroke-width="3.2" stroke-linecap="square"><path d="M16 3 L29 16 L22 23"></path><path d="M16 29 L3 16 L10 9"></path></svg>
+</div>
+</div>
+<span style="font-size: 13px; line-height: 1.5; color: #A9AEBA;">Avatar nodes are sculpted glass spheres. Hubs use a chamfered tile. Wires are 1.2px Frost at 35 to 55%.</span>
+</section>
+</div>
+
+</div>
+</template>
+<script type="text/x-dc" id="logic" data-props='{"$preview":{"width":1440,"height":1640}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { toggleOn: true, period: 'yearly', checks: { a: true, b: true, c: false } };
+  }
+  renderVals() {
+    var s = this.state;
+    var self = this;
+    var on = s.toggleOn;
+    var labels = { a: 'Unlimited projects', b: 'Export up to 8K', c: 'Brand customization' };
+    var checks = ['a', 'b', 'c'].map(function (k) {
+      var v = s.checks[k];
+      return {
+        label: labels[k],
+        on: v ? 'true' : 'false',
+        bg: v ? 'rgba(92,200,255,0.16)' : 'rgba(255,255,255,0.04)',
+        border: v ? 'rgba(92,200,255,0.6)' : 'rgba(255,255,255,0.2)',
+        tick: v ? '#9BDDFF' : 'rgba(255,255,255,0)',
+        flip: function () {
+          var next = Object.assign({}, self.state.checks);
+          next[k] = !next[k];
+          self.setState({ checks: next });
+        }
+      };
+    });
+    var m = s.period === 'monthly';
+    return {
+      toggleOn: on ? 'true' : 'false',
+      trackBg: on ? 'linear-gradient(135deg, #5CC8FF, #3B6BFF 60%, #8B5CF6)' : 'rgba(255,255,255,0.08)',
+      trackShadow: on ? '0 0 20px rgba(92,200,255,0.45)' : 'none',
+      knobLeft: on ? '27px' : '3px',
+      flipToggle: function () { self.setState({ toggleOn: !self.state.toggleOn }); },
+      isMonthly: m ? 'true' : 'false',
+      isYearly: m ? 'false' : 'true',
+      segMBg: m ? '#F5F6F8' : 'transparent',
+      segMColor: m ? '#05060A' : '#A9AEBA',
+      segYBg: m ? 'transparent' : '#F5F6F8',
+      segYColor: m ? '#A9AEBA' : '#05060A',
+      pickMonthly: function () { self.setState({ period: 'monthly' }); },
+      pickYearly: function () { self.setState({ period: 'yearly' }); },
+      checks: checks
+    };
+  }
+}
+</script>
+<script>dcMount("tpl","logic","root")</script>
+</body>
+</html>

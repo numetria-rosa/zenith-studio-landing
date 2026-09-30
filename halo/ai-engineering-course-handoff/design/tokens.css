@@ -1,0 +1,85 @@
+/* Obsidian design system · tokens used by the AI Engineering course screens.
+   Every value below is taken from reference/source/*.dc.html. Do not round or "improve" them. */
+
+@theme {
+  /* Surfaces */
+  --color-void: #05060A;          /* page background, never pure #000 */
+  --color-ink: #0A0B10;           /* code editor, terminal, cheat-sheet code (#0A0B10 / #07080C) */
+  --color-ink-2: #0C0E14;
+  --color-sidebar: rgba(10, 11, 16, 0.85);
+
+  /* Text */
+  --color-frost: #F5F6F8;         /* primary text + primary button fill */
+  --color-soft: #C9CCD4;          /* body copy on dark */
+  --color-mist: #A9AEBA;          /* secondary text */
+  --color-dim: #7D8392;           /* labels, captions, mono eyebrows */
+  --color-line-num: #454A57;      /* code line numbers */
+
+  /* Accents */
+  --color-cyan: #5CC8FF;          /* chapter / student app accent (one glow colour per screen) */
+  --color-cyan-text: #9BDDFF;
+  --color-cobalt: #3B6BFF;
+  --color-violet: #8B5CF6;        /* course details page accent */
+  --color-violet-text: #C7B0FF;
+  --color-violet-soft: #E2D6FF;
+  --color-mint: #3DDC97;          /* success, completion, capstone */
+  --color-mint-text: #7FF0BD;
+  --color-amber-text: #FFD27A;    /* Build / project accent, hints */
+  --color-ember: #FF5C7A;         /* errors */
+  --color-ember-text: #FF9BB0;
+
+  /* Stage colours (curriculum + stack card) */
+  --color-stage-orientation: #8C92A0;
+  --color-stage-0: #5CC8FF;
+  --color-stage-1: #7B9BFF;
+  --color-stage-2: #A48BFF;
+  --color-stage-3: #3DDC97;
+
+  /* Code syntax (Python highlighter) */
+  --color-code-default: #E6E8EE;
+  --color-code-keyword: #C7B0FF;
+  --color-code-string: #7FF0BD;
+  --color-code-comment: #6B7180;
+  --color-code-number: #FFD27A;
+  --color-code-function: #9BDDFF;
+  --color-code-type: #FFB6C8;
+
+  /* Type */
+  --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Radii */
+  --radius-pill: 999px;
+  --radius-row: 14px;     /* list rows, small cards */
+  --radius-card-sm: 16px;
+  --radius-card: 22px;    /* outcome cards, panels, code cards 18px */
+  --radius-card-lg: 26px; /* section columns */
+  --radius-hero: 30px;    /* hero panels */
+}
+
+/* Glass surface: the base of almost every card, pill and nav in the designs */
+.glass {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+/* Nested row inside a glass card */
+.glass-row {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+/* Mono eyebrow / label */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 13px;               /* 12–13px in app, 12.5px in module header */
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+/* Faint grid used behind the course hero */
+.grid-bg {
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(60% 55% at 75% 45%, #000, transparent 75%);
+          mask-image: radial-gradient(60% 55% at 75% 45%, #000, transparent 75%);
+}
