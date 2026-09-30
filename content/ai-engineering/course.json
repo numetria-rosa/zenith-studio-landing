@@ -213,12 +213,12 @@
         {
           "icon": "user",
           "name": "Clients",
-          "description": "Track who you sell to, what they pay, and what is live"
+          "description": "How to run a client from first chat to live, a worked example, and your client tracker"
         },
         {
           "icon": "trend",
           "name": "Revenue",
-          "description": "Monthly revenue and a per-client profit calculator"
+          "description": "How the money works, a worked example, your live revenue and a per-client profit calculator"
         },
         {
           "icon": "send",

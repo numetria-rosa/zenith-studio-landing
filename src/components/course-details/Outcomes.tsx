@@ -10,11 +10,12 @@ export function Outcomes({ checkoutHref, price }: { checkoutHref: string; price:
   const { careerPath } = courseContent;
   return (
     <section id="outcomes" className="relative overflow-hidden bg-void">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-[300px] top-[900px] h-[1000px] w-[1000px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(139,92,246,0.18), rgba(5,6,10,0) 62%)" }}
-      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,#000_20%,#000_80%,transparent)]">
+        <div
+          className="pointer-events-none absolute -left-[300px] top-[900px] h-[1000px] w-[1000px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(139,92,246,0.18), rgba(5,6,10,0) 62%)" }}
+        />
+        </div>
       <div className="relative mx-auto flex max-w-[1440px] flex-col gap-12 px-5 py-24 lg:px-20">
         <SectionHead
           eyebrow="What you’ll actually do"

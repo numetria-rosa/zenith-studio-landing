@@ -1,27 +1,34 @@
 import { Eyebrow } from "@/components/obsidian/Eyebrow";
 import { Icon } from "@/components/obsidian/Icon";
-import { getFinalModule, getModelRegistry } from "@/lib/aie/final-module";
-import { fillTemplate } from "@/lib/aie/outreach";
+import { getFinalModule } from "@/lib/aie/final-module";
 
 const INCLUDED = [
   "Organized Python code for all 5 agents, with tests",
   "The best model for each agent, with verified prices",
   "Niches and cities to sell each one to",
   "Cold email templates and the rules to follow",
-  "Client tracker, revenue calculator and a 30-day sell plan",
+  "A client guide and tracker, a revenue guide and calculator, and a 30-day sell plan",
 ];
 
-/** Marketing showcase of the Final module: the agents, best model per agent, niches, cities and the cold email for each. */
+/** Stand-in text for the blurred preview. Deliberately not the real content. */
+const LOCKED = [
+  { label: "Best model", lines: ["Model name and version", "$0.00 in, $0.00 out per 1M tokens", "Why this model fits this agent best"] },
+  { label: "Best niches", lines: ["First niche to approach", "Second niche to approach", "Third niche to approach", "Best cities: Place, ST, Place, ST, Place"] },
+  { label: "Cold email, ready to send", lines: ["Example subject line for this agent", "Plus a follow-up, a legal footer and the starting price to test"] },
+];
+
+/** Teaser for the Final module: the five agents are named, everything else is blurred until the student enrols. */
 export async function FinalModule() {
-  const [mod, registry] = await Promise.all([getFinalModule(), getModelRegistry()]);
+  const mod = await getFinalModule();
 
   return (
     <section id="final-module" className="relative overflow-hidden bg-void">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-[200px] -top-[260px] h-[900px] w-[900px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(139,92,246,0.22), rgba(5,6,10,0) 62%)" }}
-      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,#000_20%,#000_80%,transparent)]">
+        <div
+          className="pointer-events-none absolute -left-[200px] -top-[260px] h-[900px] w-[900px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(139,92,246,0.22), rgba(5,6,10,0) 62%)" }}
+        />
+        </div>
       <div className="relative mx-auto flex max-w-[1440px] flex-col gap-14 px-5 py-24 lg:px-12 xl:px-20">
         <div className="flex flex-col gap-6">
           <Eyebrow className="text-violet-text">The final module</Eyebrow>
@@ -41,64 +48,42 @@ export async function FinalModule() {
         </div>
 
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
-          {mod.agents.map((agent) => {
-            const plan = registry.agents[agent.modelKey]!;
-            const model = registry.models[plan.primary]!;
-            return (
-              <li key={agent.id} className="glass grid gap-6 rounded-3xl p-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)]">
-                <div className="flex items-start gap-4">
-                  <span className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-[14px] border bg-white/[0.05]" style={{ borderColor: `${agent.color}66` }}>
-                    <Icon name={agent.icon} size={22} color={agent.color} />
-                  </span>
-                  <div className="flex flex-col gap-1.5">
-                    <h3 className="m-0 text-[22px] font-medium tracking-[-0.02em]">{agent.name}</h3>
-                    <p className="m-0 text-[14.5px] leading-[1.55] text-mist">{agent.tagline}</p>
-                  </div>
+          {mod.agents.map((agent) => (
+            <li key={agent.id} className="glass grid gap-6 rounded-3xl p-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)]">
+              <div className="flex items-start gap-4">
+                <span className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-[14px] border bg-white/[0.05]" style={{ borderColor: `${agent.color}66` }}>
+                  <Icon name={agent.icon} size={22} color={agent.color} />
+                </span>
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="m-0 text-[22px] font-medium tracking-[-0.02em]">{agent.name}</h3>
+                  <p className="m-0 text-[14.5px] leading-[1.55] text-mist">{agent.tagline}</p>
                 </div>
+              </div>
 
-                <div className="flex flex-col gap-2">
-                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-dim">Best model</span>
-                  <b className="text-[17px] font-medium">{model.label}</b>
-                  <span className="font-mono text-[12px] text-mist">
-                    ${model.price_in} in, ${model.price_out} out per 1M tokens
-                  </span>
-                  <p className="m-0 text-[13.5px] leading-[1.55] text-mist">{plan.why}</p>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-dim">Best niches</span>
-                    <ul className="m-0 flex list-none flex-col gap-1 p-0">
-                      {agent.niches.map((n) => (
-                        <li key={n.name} className="text-[14.5px] text-soft">{n.name}</li>
+              {/* The details are placeholder text, blurred: the real content is only inside the course. */}
+              <div className="relative overflow-hidden rounded-2xl">
+                <div aria-hidden className="pointer-events-none grid select-none gap-5 blur-[7px] md:grid-cols-3">
+                  {LOCKED.map((col) => (
+                    <div key={col.label} className="flex flex-col gap-2">
+                      <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-dim">{col.label}</span>
+                      {col.lines.map((l) => (
+                        <span key={l} className="text-[14.5px] leading-[1.5] text-soft">{l}</span>
                       ))}
-                    </ul>
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-dim">Best cities</span>
-                    <p className="m-0 text-[14.5px] leading-[1.5] text-soft">
-                      {agent.cities.flatMap((g) => g.cities).slice(0, 6).join(", ")}
-                    </p>
-                  </div>
+                    </div>
+                  ))}
                 </div>
-
-                <div className="flex flex-col gap-2">
-                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-dim">Cold email, ready to send</span>
-                  <p className="m-0 rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-3 text-[14px] leading-[1.55] text-soft">
-                    <span className="text-dim">Example subject: </span>
-                    {fillTemplate(agent.email.subjectOptions[0]!, { business: "Sunrise Dental", first_name: "Sam" })}
-                  </p>
-                  <p className="m-0 text-[13.5px] leading-[1.55] text-mist">
-                    Plus a follow-up, a legal footer, and the starting price to test: ${agent.pricing.setupUsd} setup, ${agent.pricing.monthlyUsd} a month.
-                  </p>
+                <div className="absolute inset-0 flex items-center justify-center bg-void/30">
+                  <span className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13.5px] text-frost">
+                    <Icon name="lock" size={14} color="#C7B0FF" />
+                    Model, niches, cities and emails unlock inside the course
+                  </span>
                 </div>
-              </li>
-            );
-          })}
+              </div>
+            </li>
+          ))}
         </ul>
         <p className="m-0 max-w-[820px] text-[13.5px] leading-[1.6] text-dim">
-          Model prices were checked against Anthropic and Groq documentation on {registry.verified}. Niche and city lists are starting points to research, not market data.
-          Starting prices are suggestions to test, not promises of income.
+          Starting prices and niche lists inside the course are suggestions to test and research, not promises of income.
         </p>
       </div>
     </section>

@@ -27,7 +27,8 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
   return (
     <section id="overview" className="relative overflow-hidden bg-void">
       <div className="relative mx-auto min-h-[900px] w-full max-w-[1440px]">
-        {/* glows + grid */}
+        {/* glows + grid: faded top and bottom so the section melts into its neighbours */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,#000,#000_75%,transparent)]">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-[220px] -top-[160px] h-[1000px] w-[1000px] rounded-full"
@@ -39,6 +40,7 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
           style={{ background: "radial-gradient(circle, rgba(92,200,255,0.12), rgba(5,6,10,0) 62%)" }}
         />
         <div aria-hidden className="grid-bg pointer-events-none absolute inset-0" />
+        </div>
 
         {/* top bar */}
         <div className="absolute inset-x-5 top-8 z-10 flex items-center justify-between lg:inset-x-12 xl:inset-x-20">
