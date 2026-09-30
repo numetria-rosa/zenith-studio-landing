@@ -8,7 +8,7 @@ import { type ActivityKind, timeAgo } from "@/lib/account/stats";
 import { auth } from "@/lib/auth";
 
 const MONO = "font-mono uppercase tracking-[0.14em]";
-const CATALOGUE = "/#courses";
+const CATALOGUE = "/lab";
 
 const STATUS = {
   owned: { label: "OWNED", color: "#C9CCD4", box: "border-white/[0.18] bg-white/[0.06]" },

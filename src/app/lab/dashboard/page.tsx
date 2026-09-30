@@ -77,6 +77,12 @@ export default async function DashboardPage() {
   // the signed-in user only, never a client-supplied id.
   const paidAudits = await listPaidAuditsForUser(session.user.id);
 
+  // A pure course student (owns a course, no service work) belongs in the student space.
+  // Service clients keep this hub: it is where their requests, projects and payments live.
+  if (owned.length > 0 && serviceRequests.length === 0 && serviceProjects.length === 0 && paidAudits.length === 0) {
+    redirect("/account");
+  }
+
   // A signed-in user who owns no course but has bought an AI Systems service
   // shouldn't land on a page that brands itself "Zenith Lab" - see CourseBar's
   // own comment. Course owners (with or without services too) keep the Lab brand.
