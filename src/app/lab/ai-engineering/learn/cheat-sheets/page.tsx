@@ -3,19 +3,17 @@ import { LEARN_BASE } from "@/components/learn/nav";
 import { PageHead } from "@/components/learn/PageHead";
 import { Icon } from "@/components/obsidian/Icon";
 import { getAllCheatSheets } from "@/lib/aie/cheatsheets";
-import { getAllModules } from "@/lib/aie/content";
 import { requireEnrollment } from "@/lib/require-enrollment";
 
 export default async function CheatSheets() {
   await requireEnrollment("ai-engineering", LEARN_BASE);
-  const [sheets, modules] = await Promise.all([getAllCheatSheets(), getAllModules()]);
-  const withTab = new Set(modules.filter((m) => m.cheatSheet).map((m) => String(m.number)));
+  const sheets = await getAllCheatSheets();
   return (
     <>
       <PageHead eyebrow="Learn" title="Cheat Sheets" subtitle="One page per module: the formulas, rules and checklists worth keeping open while you build. Print them or download the PDF." />
       <div className="grid gap-4 md:grid-cols-2">
         {sheets.map((sheet) => {
-          const href = withTab.has(sheet.id) ? `${LEARN_BASE}/modules/${sheet.id}/cheat-sheet` : `${LEARN_BASE}/cheat-sheets/${sheet.id}/pdf`;
+          const href = `${LEARN_BASE}/cheat-sheets/${sheet.id}`;
           return (
             <div key={sheet.id} className="glass flex flex-col gap-3 rounded-[24px] p-6">
               <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-dim">{sheet.tag}</span>
