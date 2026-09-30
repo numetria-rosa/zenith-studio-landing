@@ -59,7 +59,7 @@ export default function ZenithStudioLandingPage() {
     // marketing/demo page, not part of the US-facing AI Systems catalog.
     {
       id: "whatsapp-umrah",
-      monthly: "£14",
+      monthly: "£49",
       featured: false,
       name: "WhatsApp AI Agent for Umrah Agencies",
       pitch: "Every enquiry answered on WhatsApp, in the customer's own language.",

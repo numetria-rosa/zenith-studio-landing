@@ -38,7 +38,7 @@ const plans = [
   {
     title: "Starter",
     description: "1 WhatsApp number, 1 team seat, 1,000 AI replies a month.",
-    renewal_price: 14,
+    renewal_price: 49,
   },
   {
     title: "Starter — Founding offer",

@@ -73,7 +73,7 @@ Working estimate used below, until that's confirmed: **2.7% + 1.5%
 
 | Plan | Price/mo | AI cost (LLM+embed) | Whop fee (est.) | Total cost | Margin |
 |---|---|---|---|---|---|
-| Starter | £14.00 | £0.21 | £1.24 | £1.45 | **89.6%** |
+| Starter | £49.00 | £0.21 | £3.76 | £3.97 | **91.9%** |
 | Growth | £29.00 | £0.82 | £2.32 | £3.14 | **89.2%** |
 | Pro | £59.00 | £2.04 | £4.48 | £6.52 | **88.9%** |
 | Starter, founding offer | £9.00 | £0.21 | £0.88 | £1.09 | **87.9%** |
