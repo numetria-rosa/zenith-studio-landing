@@ -6,7 +6,7 @@ import { getService, getMonthlyCheckoutUrl, servicePagePath } from "@/lib/servic
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 import Reveal from "@/components/Reveal";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import MobileNav from "@/components/MobileNav";
+import { SiteNav } from "@/components/site/SiteNav";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -299,60 +299,19 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.14)_1px,transparent_1px)] [background-size:64px_64px]" />
       </div>
 
-      <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 pt-4">
-        <div className="mx-auto max-w-7xl rounded-full border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(72,113,255,0.12)]">
-          <div className="flex items-center justify-between gap-2 px-3 sm:px-7 py-3 sm:py-4">
-            <div className="flex min-w-0 flex-shrink-0 items-center gap-2 sm:gap-3">
-              <img
-                src="/icon.webp"
-                alt="Zenith Studio Icon"
-                className="h-8 w-8 flex-shrink-0 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)] sm:h-9 sm:w-9"
-              />
-              <div className="min-w-0">
-                <div className="truncate text-xs tracking-[0.3em] text-white/60 uppercase sm:text-sm sm:tracking-[0.35em]">Zenith</div>
-                <div className="truncate text-sm font-semibold -mt-0.5 sm:text-base">Studio</div>
-              </div>
-            </div>
-
-            <nav className="hidden md:flex items-center gap-4 text-sm text-white/70 lg:gap-8">
-              <a href="#work" className="hover:text-white transition-colors">{t("nav.work")}</a>
-              <a href="#services" className="hover:text-white transition-colors">{t("nav.services")}</a>
-              <a href="#systems" className="hover:text-white transition-colors">{t("nav.pricing")}</a>
-              <Link href="/services" className="hover:text-white transition-colors">{t("nav.allServices")}</Link>
-              <Link href="/lab" className="hover:text-white transition-colors">{t("nav.courses")}</Link>
-              <a href="#contact" className="hover:text-white transition-colors">{t("nav.contact")}</a>
-            </nav>
-
-            <div className="flex flex-shrink-0 items-center gap-1.5 sm:gap-3">
-              <LanguageSwitcher />
-              <Link
-                href="/sign-in"
-                className="hidden text-sm text-white/60 transition-colors hover:text-white lg:inline"
-              >
-                {t("nav.signIn")}
-              </Link>
-              <LocaleLink
-                href="/audit"
-                className="whitespace-nowrap rounded-full bg-white px-3 py-2 text-xs font-semibold text-black transition hover:scale-[1.02] sm:px-4 sm:text-sm"
-              >
-                {t("nav.freeAudit")}
-              </LocaleLink>
-              <MobileNav
-                items={[
-                  { href: "#work", label: t("nav.work") },
-                  { href: "#services", label: t("nav.services") },
-                  { href: "#systems", label: t("nav.pricing") },
-                  { href: "/services", label: t("nav.allServices") },
-                  { href: "/lab", label: t("nav.courses") },
-                  { href: "#contact", label: t("nav.contact") },
-                ]}
-                signInHref="/sign-in"
-                signInLabel={t("nav.signIn")}
-              />
-            </div>
-          </div>
-        </div>
-      </header>
+      <SiteNav
+        links={[
+          { href: "#work", label: t("nav.work") },
+          { href: "#services", label: t("nav.services") },
+          { href: "#systems", label: t("nav.pricing") },
+          { href: "/services", label: t("nav.allServices") },
+          { href: "/lab", label: t("nav.courses") },
+          { href: "#contact", label: t("nav.contact") },
+        ]}
+        extra={<LanguageSwitcher />}
+        signIn={{ href: "/sign-in", label: t("nav.signIn") }}
+        cta={{ href: "/audit", label: t("nav.freeAudit"), localized: true }}
+      />
 
       <main className="relative z-10 px-4 sm:px-6 lg:px-10">
         <section className="mx-auto grid max-w-7xl items-center gap-12 pb-20 pt-14 lg:grid-cols-[1.1fr_0.9fr] lg:pt-20 min-h-[calc(100vh-110px)]">

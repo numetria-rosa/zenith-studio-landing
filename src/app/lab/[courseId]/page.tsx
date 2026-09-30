@@ -21,6 +21,7 @@ import {
   Hammer,
   Award,
 } from "lucide-react";
+import { BrandMark } from "@/components/site/BrandMark";
 import { fraunces, courseFontVars } from "@/lib/fonts";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
 import { COURSE_RAIL_DATA } from "@/lib/course-rail-data";
@@ -214,18 +215,7 @@ export default async function CourseDetailsPage({
         }}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-7">
-          <span
-            className={`${fraunces.className} inline-flex items-center text-base font-extrabold tracking-tight`}
-            style={{ fontFamily: "var(--font-course-serif), serif" }}
-          >
-            ZENITH
-            <span
-              className="ml-1 inline-flex items-center rounded-[3px] px-1.5 py-0.5 text-[11px] leading-none"
-              style={{ background: "var(--accent)", color: "var(--accentd)" }}
-            >
-              LAB
-            </span>
-          </span>
+          <BrandMark brand="lab" href="/lab" />
           <a
             href={trackedUrl}
             target={isRealCheckout ? "_blank" : undefined}

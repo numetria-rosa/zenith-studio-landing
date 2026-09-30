@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { Hammer, Briefcase, Rocket, Package, ArrowUpRight } from "lucide-react";
 import { GlowBackdrop } from "@/components/GlowBackdrop";
-import { fraunces } from "@/lib/fonts";
+import { SiteNav } from "@/components/site/SiteNav";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
 import { BUNDLES } from "@/lib/bundles";
 import { CourseCatalog } from "./CourseCatalog";
@@ -90,39 +90,16 @@ export default function ZenithLabPage() {
 
       <GlowBackdrop />
 
-      <header className="sticky top-0 z-50 px-4 sm:px-6 lg:px-10 pt-4">
-        <div className="mx-auto max-w-7xl rounded-full border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(52,211,153,0.10)]">
-          <div className="flex items-center justify-between px-5 sm:px-7 py-4">
-            <Link href="/" className="flex items-center gap-3">
-              <img
-                src="/icon.webp"
-                alt="Zenith Studio"
-                className="h-9 w-9 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)]"
-              />
-              <span className={`${fraunces.className} inline-flex items-center text-lg font-bold tracking-tight`}>
-                ZENITH
-                <span className="ml-1 inline-flex items-center rounded-[4px] bg-gradient-to-r from-violet-500 to-blue-400 px-1.5 py-0.5 text-sm leading-none text-white">
-                  LAB
-                </span>
-              </span>
-            </Link>
-
-            <nav className="hidden items-center gap-8 text-sm text-white/70 md:flex">
-              <a href="#catalog" className="transition-colors hover:text-white">Courses</a>
-              <a href="#bundles" className="transition-colors hover:text-white">Bundles</a>
-              <a href="#career-path" className="transition-colors hover:text-white">Career Path</a>
-              <Link href="/" className="transition-colors hover:text-white">Studio</Link>
-            </nav>
-
-            <a
-              href="#catalog"
-              className="hidden rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02] sm:inline-flex"
-            >
-              Browse courses
-            </a>
-          </div>
-        </div>
-      </header>
+      <SiteNav
+        brand="lab"
+        links={[
+          { href: "#catalog", label: "Courses" },
+          { href: "#bundles", label: "Bundles" },
+          { href: "#career-path", label: "Career Path" },
+          { href: "/", label: "Studio" },
+        ]}
+        cta={{ href: "#catalog", label: "Browse courses" }}
+      />
 
       <main className="relative z-10 px-4 sm:px-6 lg:px-10">
         <section className="mx-auto grid max-w-7xl items-center gap-12 pb-20 pt-14 lg:grid-cols-[1.1fr_0.9fr] lg:pt-20 min-h-[calc(100vh-110px)]">
