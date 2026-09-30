@@ -70,8 +70,25 @@ body {
 @keyframes cxPulse{0%{box-shadow:0 0 0 0 rgba(92,200,255,.5)}100%{box-shadow:0 0 0 10px rgba(92,200,255,0)}}.cx-pulse{animation:cxPulse 1.4s ease-out infinite}
 @media (prefers-reduced-motion: reduce){.cx-caret,.cx-spin,.cx-pulse{animation:none}}
 
-/* Cheat sheets print on white: the dark cards are inverted to dark-on-light, and the app chrome is hidden (print:hidden in the shell). */
+/* Cheat sheets print as a light study sheet: the dark tokens are swapped for dark-on-white ones inside the sheet, and each
+   section card keeps its study colour (tinted card, thick left stripe) through the --ac / --tint / --line variables. */
 @media print {
-  @page { margin: 14mm; }
-  [data-cheatsheet] { filter: invert(1) hue-rotate(180deg); }
+  @page { margin: 12mm; }
+  html, body { background: #fff !important; }
+  [data-cheatsheet] {
+    --color-frost: #14161c; --color-soft: #2b2f3a; --color-mist: #4b5160; --color-dim: #5d6373;
+    --color-cyan-text: #1f6f97; --color-mint-text: #23795a; --color-code-default: #14161c; --color-ink: #ffffff;
+    color: #1b1d24;
+  }
+  [data-cheatsheet] [data-card] {
+    background: var(--tint) !important; border: 1px solid var(--line) !important; border-left: 4px solid var(--ac) !important;
+    box-shadow: none !important; break-inside: avoid; padding: 14px 16px !important; margin-bottom: 12px !important;
+  }
+  [data-cheatsheet] [data-card] h2 { color: var(--ac) !important; font-weight: 700; }
+  [data-cheatsheet] [data-card] svg { color: var(--ac); }
+  [data-cheatsheet] [data-card] svg path { stroke: var(--ac); }
+  [data-cheatsheet] [data-formula] { background: #fff !important; border-color: var(--line) !important; }
+  [data-cheatsheet] input[type="checkbox"] { accent-color: var(--ac); }
+  [data-cheatsheet] h1 { color: #14161c; }
+  [data-cheatsheet] { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

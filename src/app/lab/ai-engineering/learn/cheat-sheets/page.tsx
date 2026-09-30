@@ -21,7 +21,8 @@ export default async function CheatSheets() {
               <span className="text-[13.5px] text-mist">{sheet.sections.length} sections</span>
               <div className="mt-auto flex flex-wrap gap-3 pt-1">
                 <Link href={href} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-frost px-[18px] text-[14px] font-medium text-void no-underline hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan">Open <Icon name="arrow" size={15} color="#05060A" strokeWidth={2} /></Link>
-                <a href={`${LEARN_BASE}/cheat-sheets/${sheet.id}/pdf`} className="glass inline-flex min-h-11 items-center gap-2 rounded-full px-[18px] text-[14px] font-medium text-frost no-underline hover:bg-white/[0.07] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan"><Icon name="download" size={15} /> PDF</a>
+                <a href={`${LEARN_BASE}/cheat-sheets/${sheet.id}/pdf`} className="glass inline-flex min-h-11 items-center gap-2 rounded-full px-[18px] text-[14px] font-medium text-frost no-underline hover:bg-white/[0.07] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan"><Icon name="download" size={15} /> Download PDF</a>
+                <Link href={`${href}?print=1`} className="glass inline-flex min-h-11 items-center gap-2 rounded-full px-[18px] text-[14px] font-medium text-frost no-underline hover:bg-white/[0.07] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan">Print</Link>
               </div>
             </div>
           );

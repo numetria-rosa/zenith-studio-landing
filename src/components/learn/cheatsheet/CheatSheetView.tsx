@@ -5,8 +5,14 @@ import { CopyButton } from "./CopyButton";
 import { PrintButton } from "./PrintButton";
 
 const glass = "border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]";
-/** Section label colours cycle through the design's accents. */
-const ACCENTS = ["#5CC8FF", "#FFD27A", "#7FF0BD", "#C7B0FF"];
+/** Section colours cycle through the design's accents. `ac` is the darker ink used on white paper, matching the PDF. */
+const ACCENTS = [
+  { screen: "#5CC8FF", ac: "#1F6F97", tint: "#EAF5FB", line: "#BFE0F0" },
+  { screen: "#FFD27A", ac: "#A8700C", tint: "#FDF5E3", line: "#F0DDAE" },
+  { screen: "#7FF0BD", ac: "#23795A", tint: "#E8F6EF", line: "#B9E2CF" },
+  { screen: "#C7B0FF", ac: "#6444B4", tint: "#F0EBFB", line: "#D3C6F0" },
+] as const;
+type Accent = (typeof ACCENTS)[number];
 
 function Inline({ text }: { text: string }) {
   return (
@@ -28,10 +34,17 @@ function Inline({ text }: { text: string }) {
   );
 }
 
-function Card({ label, accent, children }: { label: string; accent: string; children: ReactNode }) {
+function Card({ label, n, accent, children }: { label: string; n: number; accent: Accent; children: ReactNode }) {
   return (
-    <section className={`mb-[18px] flex break-inside-avoid flex-col gap-3.5 rounded-[22px] p-[22px] ${glass}`}>
-      <h2 className="m-0 font-mono text-[11.5px] font-normal uppercase tracking-[0.14em]" style={{ color: accent }}>
+    <section
+      data-card
+      className={`mb-[18px] flex break-inside-avoid flex-col gap-3.5 rounded-[22px] p-[22px] ${glass}`}
+      style={{ "--ac": accent.ac, "--tint": accent.tint, "--line": accent.line } as React.CSSProperties}
+    >
+      <h2 className="m-0 flex items-center gap-2.5 font-mono text-[11.5px] font-normal uppercase tracking-[0.14em]" style={{ color: accent.screen }}>
+        <span className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold text-void print:text-white" style={{ background: accent.screen }}>
+          {n}
+        </span>
         {label}
       </h2>
       {children}
@@ -75,7 +88,7 @@ export function CheatSheetView({
 
       <div className="columns-1 gap-[18px] md:columns-2">
         {sheet.sections.map((s, i) => (
-          <Card key={s.label} label={s.label} accent={ACCENTS[i % ACCENTS.length]!}>
+          <Card key={s.label} label={s.label} n={i + 1} accent={ACCENTS[i % ACCENTS.length]!}>
             {s.items && (
               <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
                 {s.items.map((item) => (
@@ -89,9 +102,9 @@ export function CheatSheetView({
               </ul>
             )}
             {s.formula && (
-              <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-ink px-[18px] py-4">
+              <div data-formula className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-ink px-[18px] py-4">
                 <code className="break-words font-mono text-[13px] leading-[22px] text-code-default">{s.formula}</code>
-                <CopyButton text={s.formula} />
+                <span className="print:hidden"><CopyButton text={s.formula} /></span>
               </div>
             )}
             {s.checklist && (
@@ -111,7 +124,7 @@ export function CheatSheetView({
           </Card>
         ))}
         {glossary && glossary.length > 0 && (
-          <Card label="Glossary" accent="#C7B0FF">
+          <Card label="Glossary" n={sheet.sections.length + 1} accent={ACCENTS[sheet.sections.length % ACCENTS.length]!}>
             <dl className="m-0 flex flex-col gap-3">
               {glossary.map((g) => (
                 <div key={g.term}>
