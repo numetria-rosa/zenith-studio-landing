@@ -12,7 +12,8 @@ export type CalcAgent = {
 const FIELD =
   "min-h-11 w-full rounded-xl border border-white/[0.14] bg-white/[0.04] px-3.5 text-[15px] text-frost focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan";
 
-const usd = (n: number) => n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: n < 10 ? 2 : 0 });
+const usd = (n: number) =>
+  n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: n < 0.1 ? 4 : n < 10 ? 2 : 0 });
 
 /** Monthly revenue against model cost for N clients on one agent. Prices per million tokens come from the kit's model registry. */
 export function RevenueCalculator({ agents }: { agents: CalcAgent[] }) {
