@@ -29,7 +29,7 @@ export default async function WelcomePage() {
     select: { id: true },
   });
   if (project) redirect(`/services/dashboard/${project.id}`);
-  const dashboardHref = "/lab/dashboard";
+  const dashboardHref = "/account";
 
   return (
     <div

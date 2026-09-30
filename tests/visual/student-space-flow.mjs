@@ -39,6 +39,19 @@ await page.waitForTimeout(800);
 ok(psql(`select "notifyOffers" from "User" where id='u1'`) === "t", "notification toggle persists");
 ok((await offers.getAttribute("aria-pressed")) === "true", "toggle exposes aria-pressed");
 
+// Sign-in password (ported from the old /profile page): too short is rejected, a new one is stored and shown back.
+await page.fill("#pw-next", "short");
+await page.getByRole("button", { name: "Update password" }).click();
+ok(await page.locator("#pw-next").evaluate((el) => !el.validity.valid), "password under 8 characters is rejected by the form");
+await page.fill("#pw-next", "correct-horse-battery");
+await page.getByRole("button", { name: "Update password" }).click();
+await page.getByText("Password updated.").waitFor();
+await page.reload({ waitUntil: "networkidle" });
+ok((await page.getByLabel("Your current password").textContent()) === "correct-horse-battery", "new password is shown back after reload");
+ok(psql(`select "passwordEnc" is not null and "passwordEnc" not like '%correct-horse%' from "User" where id='u1'`) === "t", "password is stored encrypted");
+await page.goto(`${base}/profile`, { waitUntil: "networkidle" });
+ok(page.url().endsWith("/account/profile"), "old /profile redirects to the student space");
+
 // Delete account: needs the exact email, then anonymises and signs out.
 psql(`insert into "User"(id,email,name,"createdAt","updatedAt") values ('u2','bye@example.com','Bye','2026-01-01',now()) on conflict do nothing`);
 psql(`insert into "Session"(id,"sessionToken","userId",expires) values ('s2','deletetoken','u2',now()+interval '1 day') on conflict do nothing`);

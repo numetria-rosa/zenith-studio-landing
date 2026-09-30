@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { cleanUrl, isValidTimeZone } from "@/lib/account/stats";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { encryptPassword } from "@/lib/password";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -84,5 +85,16 @@ export async function deleteAccountAction(confirmEmail: string): Promise<ActionR
     }),
   ]);
   await signOut({ redirectTo: "/" });
+  return { ok: true };
+}
+
+/** The sign-in password (stored encrypted and shown back to the student, as the old /profile page did). */
+export async function changePasswordAction(_prev: ActionResult | null, fd: FormData): Promise<ActionResult> {
+  const userId = await requireUserId();
+  const next = String(fd.get("next") ?? "");
+  if (next.length < 8) return { ok: false, error: "New password must be at least 8 characters." };
+  if (next.length > 200) return { ok: false, error: "That password is too long." };
+  await db.user.update({ where: { id: userId }, data: { passwordEnc: encryptPassword(next) } });
+  revalidatePath("/account/profile");
   return { ok: true };
 }
