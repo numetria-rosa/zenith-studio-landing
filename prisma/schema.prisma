@@ -53,6 +53,16 @@ model User {
   // created before this existed may still have none.
   passwordEnc String?
 
+  // Student space profile (src/app/account/profile). Email stays owned by the login/purchase provider.
+  displayName        String?
+  timezone           String?
+  githubUrl          String?
+  linkedinUrl        String?
+  avatarUrl          String?
+  notifyProductNews  Boolean @default(true)
+  notifyWeeklyRecap  Boolean @default(true)
+  notifyOffers       Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

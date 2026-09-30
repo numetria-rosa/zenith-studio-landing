@@ -22,7 +22,7 @@ const PATHS = {
   send: "M21 3L3 10l7 3 3 7 8-17zM10 13l11-10",
   chat: "M21 12a8 8 0 01-11.5 7.2L4 20l1-4.5A8 8 0 1121 12z",
   phone: "M8 3h8a1 1 0 011 1v16a1 1 0 01-1 1H8a1 1 0 01-1-1V4a1 1 0 011-1zM11 18h2",
-  mail: "M4 6h16v12H4zM4 7l8 6 8-6",
+  mail: "M3 6h18v12H3zM3 7l9 6 9-6",
   calendar: "M5 5h14v15H5zM5 10h14M9 3v4M15 7V3",
   file: "M7 3h7l5 5v13H7zM14 3v5h5M9.5 14h5",
   download: "M12 4v11m0 0l-4-4m4 4l4-4M5 20h14",
@@ -41,6 +41,14 @@ const PATHS = {
   eye: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 100-6 3 3 0 000 6z",
   reset: "M4 12a8 8 0 108-8H8M8 1L5 4l3 3",
   terminal: "M4 17l6-5-6-5M12 19h8",
+  receipt: "M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",
+  bell: "M6 16V11a6 6 0 0112 0v5l2 2H4zM10 20h4",
+  flame: "M12 3c1 3 4 5 4 9a4 4 0 01-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-8z",
+  shield: "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z",
+  pencil: "M4 20h4L19 9l-4-4L4 16zM14 6l4 4",
+  globe: "M12 21a9 9 0 100-18 9 9 0 000 18zM3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18",
+  link: "M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1",
+  signout: "M15 4h4v16h-4M10 8l-4 4 4 4M6 12h11",
 } as const;
 
 export type IconName = keyof typeof PATHS;
