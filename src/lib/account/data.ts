@@ -80,7 +80,7 @@ export async function loadStudentSpace(userId: string): Promise<StudentSpace> {
       title: course.title,
       edition: isAie ? "Career Path Edition" : null,
       meta: isAie ? `${modules.length} modules · ${hours}h · Lifetime access` : "Lifetime access",
-      href: isAie ? LEARN_BASE : courseHomeUrl(course),
+      href: courseHomeUrl(course),
       purchasedAt: e.grantedAt,
       percent: isAie ? aie.percent : null,
       status: !isAie ? "owned" : aie.percent >= 100 ? "completed" : aie.complete > 0 ? "in-progress" : "not-started",

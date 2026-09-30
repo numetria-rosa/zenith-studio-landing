@@ -8,6 +8,8 @@ import { Outcomes } from "@/components/course-details/Outcomes";
 import { courseContent } from "@/components/course-details/data";
 import type { Price } from "@/components/course-details/PriceLockup";
 import { courses } from "../courses-data";
+import { auth } from "@/lib/auth";
+import { hasCourseAccess } from "@/lib/entitlements";
 
 const SITE_URL = "https://zenith-studio.site";
 const COURSE_ID = "ai-engineering";
@@ -46,7 +48,10 @@ export default async function AIEngineeringDetailsPage({
     if (typeof value === "string") utm.set(key, value);
   }
   const qs = utm.toString() ? `?${utm.toString()}` : "";
-  const checkoutHref = isRealCheckout ? `/api/go/${COURSE_ID}${qs}` : url;
+  // Someone who already owns the course goes straight into it instead of back to checkout.
+  const session = await auth();
+  const owns = session?.user?.id ? await hasCourseAccess(session.user.id, COURSE_ID) : false;
+  const checkoutHref = owns && catalogCourse?.learnUrl ? catalogCourse.learnUrl : isRealCheckout ? `/api/go/${COURSE_ID}${qs}` : url;
 
   const price: Price | null =
     card?.price && card.originalPrice && card.discountPercent

@@ -27,6 +27,9 @@ export type Course = {
   /** Where content actually lives on disk, served only through the guarded route.
       Optional when renderMode is "react" - a React course has no static contentDir. */
   contentDir?: string;
+  /** Where an entitled student lands when the course has its own app (the redesigned AI Engineering course).
+      Takes precedence over contentDir/renderMode for links; the static route still serves old bookmarks. */
+  learnUrl?: string;
   /** First page inside contentDir a newly-entitled user should land on.
       Optional when renderMode is "react". */
   firstLessonPath?: string;
@@ -55,6 +58,7 @@ export const COURSES: Course[] = [
     whopAccessPassId: "prod_CKyY55RfnSTlU",
     whopPlanId: "plan_VSU3hyAITNsNk",
     checkoutUrl: "https://whop.com/checkout/ch_ZP0FmXJ0AcayMbn/",
+    learnUrl: "/lab/ai-engineering/learn",
     contentDir: "courses/ai-engineering",
     firstLessonPath: "dashboard",
     waitlistUrl:
@@ -162,6 +166,7 @@ export function getCourseBySlug(slug: string): Course | undefined {
 /** Where an entitled student should land: the guarded static contentDir route
     for a "static" course, or the guarded /learn route for a "react" course. */
 export function courseHomeUrl(course: Course): string {
+  if (course.learnUrl) return course.learnUrl;
   if (course.renderMode === "react") return `/lab/${course.id}/learn`;
   return `/courses/${course.id}/${course.firstLessonPath}`;
 }
