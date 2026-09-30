@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { LEARN_BASE } from "@/components/learn/nav";
 import { QuizView } from "@/components/learn/quiz/QuizView";
 import { getModule } from "@/lib/aie/content";
+import { newQuizSeed } from "@/lib/aie/quiz";
 import { requireEnrollment } from "@/lib/require-enrollment";
 
 export default async function QuizPage({ params }: { params: Promise<{ module: string }> }) {
@@ -20,11 +21,12 @@ export default async function QuizPage({ params }: { params: Promise<{ module: s
 
   return (
     <QuizView
-      module={mod.number}
+      scope={{ module: mod.number }}
+      eyebrow={`Module ${mod.number} quiz`}
       title={mod.quiz.cardTitle ?? `${mod.title}, checked.`}
       bank={mod.quiz.questions}
       passMark={mod.quiz.passMark}
-      seed={Math.floor(Math.random() * 2 ** 31)}
+      seed={newQuizSeed()}
       stuck={{ href: first ? `${base}/lessons/${first.number}` : base, label: first ? `Stuck? Review the lessons, starting at ${first.number} ${first.title}` : "Stuck? Review the module" }}
       next={next}
     />

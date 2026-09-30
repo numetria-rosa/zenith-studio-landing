@@ -1,0 +1,170 @@
+[
+  {
+    "id": "ai-engineer",
+    "name": "AI Engineer",
+    "have": [
+      "Structured-output validation for model responses (Module 1)",
+      "Context and token budget management (Module 2)",
+      "Retrieval-augmented generation with relevance thresholds (Module 3)",
+      "Idempotent tool-calling design (Module 4)",
+      "Bounded agent control flow (Module 5)"
+    ],
+    "need": [
+      "Hands-on experience with a real model provider's API (rate limits, streaming, function-calling schemas in practice)",
+      "Production deployment experience (serving, monitoring, cost tracking at scale)",
+      "Prompt/context engineering across a real, evolving product surface",
+      "Working knowledge of at least one agent framework in production use"
+    ],
+    "projects": [
+      1,
+      3,
+      4,
+      5,
+      8
+    ],
+    "tools": [
+      "An LLM provider SDK (OpenAI, Anthropic, etc.)",
+      "A vector database (Pinecone, pgvector, etc.)",
+      "An observability/tracing tool for LLM calls",
+      "TypeScript or Python"
+    ],
+    "jobs": [
+      "AI Engineer",
+      "Applied AI Engineer",
+      "Generative AI Engineer"
+    ]
+  },
+  {
+    "id": "llm-app",
+    "name": "LLM Application Engineer",
+    "have": [
+      "Prompting and structured-output repair (Module 1)",
+      "RAG pipeline design (Module 3)",
+      "Tool use and function calling (Module 4)",
+      "Reliability for model API calls (Module 6)",
+      "Evaluation and regression detection (Module 7)"
+    ],
+    "need": [
+      "Frontend/UX experience building chat or agent interfaces",
+      "Streaming response handling in a real application",
+      "User-facing prompt iteration and A/B testing practice",
+      "Product sense for where LLM features add real user value vs. novelty"
+    ],
+    "projects": [
+      1,
+      3,
+      6,
+      7,
+      8
+    ],
+    "tools": [
+      "A frontend framework (React, etc.)",
+      "A streaming-capable backend",
+      "An eval/observability platform (LangSmith, Braintrust, or similar)",
+      "A vector database"
+    ],
+    "jobs": [
+      "LLM Application Engineer",
+      "AI Product Engineer",
+      "Conversational AI Engineer"
+    ]
+  },
+  {
+    "id": "ai-ml",
+    "name": "AI/ML Engineer",
+    "have": [
+      "Systematic evaluation methodology (Module 7)",
+      "Retrieval and embeddings fundamentals (Module 3)",
+      "Reliability engineering applied to model-serving calls (Module 6)",
+      "Structured-output validation, directly relevant to model-output post-processing (Module 1)"
+    ],
+    "need": [
+      "Classical ML fundamentals (model training, fine-tuning, evaluation metrics beyond LLM-specific ones)",
+      "Data pipeline and feature engineering experience",
+      "Familiarity with an ML framework (PyTorch, TensorFlow, scikit-learn)",
+      "Model deployment and serving infrastructure beyond calling a hosted API"
+    ],
+    "projects": [
+      3,
+      7,
+      8
+    ],
+    "tools": [
+      "PyTorch or TensorFlow",
+      "A feature/data pipeline tool",
+      "MLflow or a similar experiment-tracking tool",
+      "Python"
+    ],
+    "jobs": [
+      "ML Engineer",
+      "AI/ML Engineer",
+      "Applied Scientist (with additional research background)"
+    ]
+  },
+  {
+    "id": "backend-ai",
+    "name": "Backend / AI Integration Engineer",
+    "have": [
+      "Idempotent tool execution, directly transferable to any idempotent API design (Module 4)",
+      "Retry, backoff, and fallback reliability patterns (Module 6)",
+      "Context/token budget reasoning as a resource-planning skill (Module 2)",
+      "Systematic evaluation as a testing discipline (Module 7)"
+    ],
+    "need": [
+      "A backend framework in production depth (Express, FastAPI, Spring, etc.)",
+      "Database design and query optimization",
+      "Broader distributed-systems experience beyond single-service reliability",
+      "API contract design and versioning at a multi-service scale"
+    ],
+    "projects": [
+      2,
+      4,
+      6,
+      8
+    ],
+    "tools": [
+      "A backend framework",
+      "SQL + a database engine",
+      "Docker / containers",
+      "A cloud provider (AWS/GCP/Azure)"
+    ],
+    "jobs": [
+      "Backend Engineer (AI-adjacent)",
+      "AI Integration Engineer",
+      "Platform Engineer"
+    ]
+  },
+  {
+    "id": "ai-infra",
+    "name": "AI Platform / Infrastructure Engineer",
+    "have": [
+      "Bounded, cost-aware agent control flow (Module 5)",
+      "Reliability patterns model-serving infrastructure depends on (Module 6)",
+      "Evaluation infrastructure and regression gating (Module 7)",
+      "Idempotent execution, directly applicable to tool/action infrastructure (Module 4)"
+    ],
+    "need": [
+      "Infrastructure-as-code experience (Terraform, Pulumi)",
+      "Container orchestration (Kubernetes) in depth",
+      "GPU/inference infrastructure and cost-optimization experience",
+      "On-call and incident-response process experience for production AI systems"
+    ],
+    "projects": [
+      4,
+      5,
+      6,
+      8
+    ],
+    "tools": [
+      "Kubernetes",
+      "Terraform",
+      "A metrics/tracing stack (Prometheus, Grafana, OpenTelemetry)",
+      "An LLM gateway or inference-serving tool"
+    ],
+    "jobs": [
+      "AI Platform Engineer",
+      "AI Infrastructure Engineer",
+      "MLOps Engineer"
+    ]
+  }
+]

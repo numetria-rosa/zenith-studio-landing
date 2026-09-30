@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { Fragment, useMemo, useState, type ReactNode } from "react";
-import { submitQuizAction } from "@/app/lab/ai-engineering/learn/actions";
+import { submitQuizAction, type QuizScope } from "@/app/lab/ai-engineering/learn/actions";
 import { Icon } from "@/components/obsidian/Icon";
-import { drawQuestions, isCorrect, type QuizAnswer } from "@/lib/aie/quiz";
+import { drawMixed, drawQuestions, isCorrect, optionOrder, type QuizAnswer } from "@/lib/aie/quiz";
 import type { QuizQuestion } from "@/lib/aie/types";
 
 const unescape = (s: string) => s.replace(/\\([\\`*_{}[\]()#+\-.!<>])/g, "$1");
@@ -30,18 +30,27 @@ const glass = "border border-white/10 bg-white/[0.035] shadow-[inset_0_1px_0_rgb
 const focus = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan";
 
 type Props = {
-  module: number;
+  scope: QuizScope;
+  /** Mono label above the title, e.g. "Module 3 quiz". */
+  eyebrow: string;
   title: string;
   bank: QuizQuestion[];
+  /** How many questions one attempt draws from `bank` (default: a standard module quiz). */
+  drawSize?: number;
+  /** A mixed quiz: `perModule` questions from each bank, shuffled together (replaces `bank`/`drawSize`). */
+  mixed?: { banks: QuizQuestion[][]; perModule: number };
   passMark: number;
   seed: number;
   stuck: { href: string; label: string };
   next: { href: string; label: string };
 };
 
-export function QuizView({ module, title, bank, passMark, seed, stuck, next }: Props) {
+export function QuizView({ scope, eyebrow, title, bank, drawSize, mixed, passMark, seed, stuck, next }: Props) {
   const [round, setRound] = useState(0);
-  const questions = useMemo(() => drawQuestions(bank, seed + round * 7919), [bank, seed, round]);
+  const questions = useMemo(
+    () => (mixed ? drawMixed(mixed.banks, mixed.perModule, seed + round * 7919) : drawQuestions(bank, seed + round * 7919, drawSize)),
+    [bank, drawSize, mixed, seed, round],
+  );
   const total = questions.length;
   const [q, setQ] = useState(0);
   const [sel, setSel] = useState<number>(-1);
@@ -53,19 +62,20 @@ export function QuizView({ module, title, bank, passMark, seed, stuck, next }: P
   const [saving, setSaving] = useState(false);
 
   const Q = questions[q]!;
+  // Options are shown in a per-attempt shuffled order; `sel` and stored answers keep the original index.
+  const order = useMemo(() => optionOrder(Q, seed + round * 31 + q), [Q, seed, round, q]);
   const answer: QuizAnswer | null = Q.numeric ? (typed.trim() === "" ? null : typed) : sel >= 0 ? sel : null;
   const right = checked && answer !== null && isCorrect(Q, answer);
   const picked = Q.options?.[sel];
   const why = Q.numeric ? (right ? Q.numeric.correct : Q.numeric.incorrect) : picked?.why;
   const correctOption = Q.options?.find((o) => o.correct);
   const last = q === total - 1;
-  const score = questions.filter((x) => answers[x.id] !== undefined && isCorrect(x, answers[x.id]!)).length;
 
   const finish = async (all: Record<string, QuizAnswer>) => {
     setSaving(true);
     setError(null);
     try {
-      setResult(await submitQuizAction({ module }, all));
+      setResult(await submitQuizAction(scope, all));
     } catch {
       // Not saved: still show the score the student earned, and say so.
       const s = questions.filter((x) => isCorrect(x, all[x.id]!)).length;
@@ -108,7 +118,7 @@ export function QuizView({ module, title, bank, passMark, seed, stuck, next }: P
   return (
     <div className="flex flex-col gap-9">
       <div className="flex flex-col gap-2.5">
-        <span className="font-mono text-[12.5px] uppercase tracking-[0.16em] text-cyan">Module {module} quiz</span>
+        <span className="font-mono text-[12.5px] uppercase tracking-[0.16em] text-cyan">{eyebrow}</span>
         <h1 className="m-0 text-[36px] font-medium leading-[1.05] tracking-[-0.04em] sm:text-[44px]">{title}</h1>
       </div>
 
@@ -133,6 +143,13 @@ export function QuizView({ module, title, bank, passMark, seed, stuck, next }: P
               </div>
             </div>
 
+            {Q.logs && (
+              <div className="overflow-x-auto rounded-[14px] border border-white/10 bg-[rgba(5,6,10,0.6)] p-4 font-mono text-[12.5px] leading-[1.9] text-mist" role="group" aria-label="Log excerpt">
+                {Q.logs.map((l, i) => (
+                  <div key={i} className={l.includes("DIFFERENT") ? "text-ember-text" : undefined}>{l}</div>
+                ))}
+              </div>
+            )}
             <h2 className="m-0 max-w-[760px] text-[24px] font-medium leading-[1.25] tracking-[-0.025em] sm:text-[30px]">
               <Inline text={Q.question} />
             </h2>
@@ -157,7 +174,8 @@ export function QuizView({ module, title, bank, passMark, seed, stuck, next }: P
               </div>
             ) : (
               <div role="radiogroup" aria-label="Answers" className="flex flex-col gap-2.5">
-                {Q.options!.map((o, i) => {
+                {order.map((i, pos) => {
+                  const o = Q.options![i]!;
                   const isSel = sel === i;
                   const state = checked ? (o.correct ? "right" : isSel ? "wrong" : "idle") : isSel ? "sel" : "idle";
                   const look = {
@@ -178,7 +196,7 @@ export function QuizView({ module, title, bank, passMark, seed, stuck, next }: P
                       style={{ borderColor: look[0], background: look[1] }}
                     >
                       <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[10px] border font-mono text-[13px] text-soft" style={{ borderColor: look[2] }}>
-                        {"ABCDEF"[i]}
+                        {"ABCDEF"[pos]}
                       </span>
                       <span>
                         <Inline text={o.text} />

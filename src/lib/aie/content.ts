@@ -1,7 +1,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import type { CapstoneContent, CapstoneText } from "./capstone";
-import type { CourseIndex, ModuleContent, ProjectDetail } from "./types";
+import type { CourseIndex, ModuleContent, ProjectDetail, QuizQuestion } from "./types";
 
 /* Course content lives in the repo (content/ai-engineering). AIE_CONTENT_DIR points the
    loader at a different directory (the visual tests use tests/visual/fixtures). */
@@ -85,4 +85,17 @@ export async function getMixedQuizzes(): Promise<MixedQuiz[]> {
   } catch {
     return [];
   }
+}
+
+export type FinalAssessment = { passMark: number; draw: number; questions: QuizQuestion[] };
+
+/** The final competency assessment: `draw` scenarios picked from a pool the modules never show. */
+export async function getFinalAssessment(): Promise<FinalAssessment> {
+  return JSON.parse(await readFile(path.join(contentDir(), "final-assessment.json"), "utf8"));
+}
+
+export type CareerPath = { id: string; name: string; have: string[]; need: string[]; projects: number[]; tools: string[]; jobs: string[] };
+
+export async function getCareerPaths(): Promise<CareerPath[]> {
+  return JSON.parse(await readFile(path.join(contentDir(), "career.json"), "utf8"));
 }

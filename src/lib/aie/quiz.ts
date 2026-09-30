@@ -1,4 +1,4 @@
-import { QUIZ_DRAW_SIZE, type QuizContent, type QuizQuestion } from "./types";
+import { QUIZ_DRAW_SIZE, type QuizQuestion } from "./types";
 
 /** A picked option index, or the number typed for a numeric question. */
 export type QuizAnswer = number | string;
@@ -57,3 +57,6 @@ export function masteryBand(pct: number): { label: string; tone: "mint" | "cyan"
   if (pct >= 70) return { label: "Needs review", tone: "amber" };
   return { label: "Revisit module", tone: "ember" };
 }
+
+/** A fresh seed for one server render of a quiz page (the client hydrates with the same value). */
+export const newQuizSeed = () => Math.floor(Math.random() * 2 ** 31);

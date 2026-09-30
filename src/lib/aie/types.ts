@@ -31,6 +31,8 @@ export type QuizQuestion = {
   principle?: string;
   /** Typed-number question (a handful in modules 2, 3, 6 and 7). */
   numeric?: { answer: number; tolerance: number; correct: string; incorrect: string };
+  /** Log excerpt shown above the question (final-assessment debugging scenario). */
+  logs?: string[];
   objective?: string;
   difficulty?: string;
 };

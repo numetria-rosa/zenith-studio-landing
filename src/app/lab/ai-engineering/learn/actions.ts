@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { LEARN_BASE } from "@/components/learn/nav";
 import { debugMessage, gradeDebugAnswer, gradeDesign, type DesignStatus, type Scores } from "@/lib/aie/capstone";
 import { debugScoreFor, finalFor, getCapstoneState, patchCapstone } from "@/lib/aie/capstone-db";
-import { getCapstone, getMixedQuizzes, getModule, getProject } from "@/lib/aie/content";
+import { getCapstone, getFinalAssessment, getMixedQuizzes, getModule, getProject } from "@/lib/aie/content";
 import { markLessonComplete, saveExerciseRun, saveOrientation, saveProjectDraft, saveQuizAttempt, submitProject } from "@/lib/aie/progress";
 import { cleanProjectInput, type ProjectInput } from "@/lib/aie/project";
 import { gradeQuiz, type QuizAnswer } from "@/lib/aie/quiz";
@@ -32,7 +32,7 @@ export async function saveExerciseRunAction(module: number, code: string, passed
   revalidatePath(`${LEARN_BASE}/modules/${module}`, "layout");
 }
 
-export type QuizScope = { module: number } | { mixed: string };
+export type QuizScope = { module: number } | { mixed: string } | { final: true };
 
 /** Grades a finished quiz (a module's, or a mixed one) on the server and stores the attempt. Returns the score so the client shows the server's number. */
 export async function submitQuizAction(scope: QuizScope, answers: Record<string, QuizAnswer>): Promise<{ score: number; total: number; passed: boolean }> {
@@ -42,6 +42,13 @@ export async function submitQuizAction(scope: QuizScope, answers: Record<string,
     if (!mod?.quiz) throw new Error("No quiz");
     const result = gradeQuiz(mod.quiz.questions, mod.quiz.passMark, answers);
     await saveQuizAttempt(userId, scope.module, result.score, result.total, result.passed);
+    revalidatePath(LEARN_BASE, "layout");
+    return result;
+  }
+  if ("final" in scope) {
+    const fa = await getFinalAssessment();
+    const result = gradeQuiz(fa.questions, fa.passMark, answers, fa.draw);
+    await saveQuizAttempt(userId, 0, result.score, result.total, result.passed, "final");
     revalidatePath(LEARN_BASE, "layout");
     return result;
   }
