@@ -66,13 +66,6 @@ const nextConfig: NextConfig = {
       "./*.md",
     ],
     "/**": [
-      // Prisma ships wasm/"query compiler" builds for every database (MySQL, CockroachDB, SQL Server, SQLite,
-      // Postgres) for edge runtimes and driver adapters. This app uses `new PrismaClient()` on the native library
-      // engine (libquery_engine-*.so.node, which stays), so these were ~55 MB of dead weight in every function
-      // and pushed the biggest ones over Vercel's 250 MB limit.
-      "./node_modules/@prisma/client/runtime/*wasm*",
-      "./node_modules/@prisma/client/runtime/query_compiler_bg*",
-      "./node_modules/@prisma/client/runtime/query_engine_bg*",
       "./node_modules/@signalwire/compatibility-api/lib/**/*",
       "./node_modules/**/*.map",
       "./node_modules/**/*.d.ts",
