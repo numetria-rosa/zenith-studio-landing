@@ -191,3 +191,18 @@ export function Flow({ steps, failureLabel, failureSteps }: { steps: string[]; f
     </div>
   );
 }
+
+/** "The course, end to end": one card per module (module 8's recap). */
+export function RecapGrid({ items }: { items: { n: string; t: string; d: string }[] }) {
+  return (
+    <ul className="m-0 grid list-none gap-3.5 p-0 sm:grid-cols-2">
+      {items.map((i) => (
+        <li key={i.n} className="glass flex flex-col gap-1.5 rounded-[20px] p-[18px]">
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-cyan">{i.n}</span>
+          <b className="text-[16.5px] font-medium tracking-[-0.01em]">{i.t}</b>
+          <span className="text-[14.5px] leading-[1.55] text-mist">{i.d}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}

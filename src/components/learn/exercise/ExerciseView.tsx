@@ -42,9 +42,16 @@ export type ExerciseViewProps = {
   description: ReactNode;
   fileName: string;
   starter: string;
-  solution: string;
+  /** Absent for the capstone: there is no solution to watch, so that button and its lock are not shown. */
+  solution?: string;
+  /** Reset returns to the starter code (the capstone) instead of the last attempt, under this label. */
+  resetToStarter?: string;
+  /** Overrides the "Exercise 1.4 · Code" eyebrow. */
+  eyebrow?: string;
+  /** Where a run is stored, when it is not the module exercise. */
+  save?: (code: string, passed: number) => Promise<unknown>;
   tests: { name: string; hint: string }[];
-  hints: { title: string; body: ReactNode }[];
+  hints?: { title: string; body: ReactNode }[];
   harnessSource: string;
   functionName: string;
   initial: { code: string; attempted: boolean; passed: number };
@@ -87,6 +94,8 @@ export function ExerciseView(p: ExerciseViewProps) {
     const base = new Set(p.starter.split("\n"));
     return code.split("\n").map((l) => mode !== "attempt" && !base.has(l));
   }, [code, mode, p.starter]);
+  const hints = p.hints ?? [];
+  const solution = p.solution;
   const locked = !attempted;
 
   const stop = () => {
@@ -143,23 +152,23 @@ export function ExerciseView(p: ExerciseViewProps) {
 
   const markAttempted = (src: string, savable: boolean, passed: number) => {
     setAttempted(true);
-    if (savable) void saveExerciseRunAction(p.module, src, passed).catch(() => {});
+    if (savable) void (p.save ? p.save(src, passed) : saveExerciseRunAction(p.module, src, passed)).catch(() => {});
   };
 
   const watchSolution = () => {
-    if (locked || busy !== "idle" || mode === "typing") return;
+    if (!solution || locked || busy !== "idle" || mode === "typing") return;
     if (mode === "attempt") attemptRef.current = code;
     if (reducedMotion()) {
-      setCode(p.solution);
+      setCode(solution!);
       setMode("solved");
       return;
     }
     setMode("typing");
     let n = 0;
     const tick = () => {
-      n = Math.min(p.solution.length, n + 3);
-      setCode(p.solution.slice(0, n));
-      if (n < p.solution.length) timers.current.push(setTimeout(tick, 24));
+      n = Math.min(solution!.length, n + 3);
+      setCode(solution!.slice(0, n));
+      if (n < solution!.length) timers.current.push(setTimeout(tick, 24));
       else setMode("solved");
     };
     tick();
@@ -168,7 +177,7 @@ export function ExerciseView(p: ExerciseViewProps) {
   const reset = () => {
     stop();
     setBusy("idle");
-    setCode(attemptRef.current);
+    setCode(p.resetToStarter ? p.starter : attemptRef.current);
     setMode("attempt");
     setTests(p.tests.map(() => "idle"));
     setLog([]);
@@ -194,7 +203,7 @@ export function ExerciseView(p: ExerciseViewProps) {
     <div className="flex flex-col gap-7 lg:flex-row">
       <div className="flex w-full shrink-0 flex-col gap-5 lg:w-[360px]">
         <div className="flex flex-col gap-3">
-          <span className="font-mono text-[12.5px] uppercase tracking-[0.16em] text-cyan">Exercise {p.exerciseId} · Code</span>
+          <span className="font-mono text-[12.5px] uppercase tracking-[0.16em] text-cyan">{p.eyebrow ?? `Exercise ${p.exerciseId} · Code`}</span>
           <h1 className="m-0 text-[36px] font-medium leading-[1.05] tracking-[-0.035em]">{p.title}</h1>
           <p className="m-0 text-[15.5px] leading-[1.65] text-soft">{p.description}</p>
         </div>
@@ -220,9 +229,9 @@ export function ExerciseView(p: ExerciseViewProps) {
           </ul>
         </div>
 
-        {hintCount > 0 && (
+        {hints.length > 0 && hintCount > 0 && (
           <div className="flex flex-col gap-3">
-            {p.hints.slice(0, hintCount).map((h) => (
+            {hints.slice(0, hintCount).map((h) => (
               <div key={h.title} role="note" className="flex gap-3 rounded-[18px] border border-[rgba(245,184,61,0.45)] bg-[rgba(245,184,61,0.07)] p-4 text-[14px] leading-[1.6] text-[#FFE3A6]">
                 <Icon name="bulb" size={20} color="#FFD27A" className="shrink-0" />
                 <span>
@@ -239,20 +248,22 @@ export function ExerciseView(p: ExerciseViewProps) {
             <Icon name={busy === "sandbox" ? "stop" : "play"} size={16} color="#05060A" strokeWidth={2} />
             {busy === "sandbox" ? "Stop" : busy === "reveal" ? "Running…" : "Run tests"}
           </button>
-          <button type="button" onClick={() => setHintCount((n) => Math.min(p.hints.length, n + 1))} disabled={hintCount >= p.hints.length} className={`${pill} ${glass} text-frost disabled:opacity-50`}>
-            <Icon name="bulb" size={16} color="#F5F6F8" />
-            {hintCount >= p.hints.length ? "No more hints" : "Hint"}
-          </button>
-          <button type="button" onClick={watchSolution} aria-disabled={locked || busy !== "idle"} aria-describedby={locked ? "solution-lock" : undefined} className={`${pill} ${glass} text-frost ${locked || busy !== "idle" ? "cursor-not-allowed opacity-50" : ""}`}>
+          {hints.length > 0 && (
+            <button type="button" onClick={() => setHintCount((n) => Math.min(hints.length, n + 1))} disabled={hintCount >= hints.length} className={`${pill} ${glass} text-frost disabled:opacity-50`}>
+              <Icon name="bulb" size={16} color="#F5F6F8" />
+              {hintCount >= hints.length ? "No more hints" : "Hint"}
+            </button>
+          )}
+          {solution && <button type="button" onClick={watchSolution} aria-disabled={locked || busy !== "idle"} aria-describedby={locked ? "solution-lock" : undefined} className={`${pill} ${glass} text-frost ${locked || busy !== "idle" ? "cursor-not-allowed opacity-50" : ""}`}>
             <Icon name="eye" size={16} color="#F5F6F8" />
             Watch solution
-          </button>
+          </button>}
           <button type="button" onClick={reset} className={`${pill} ${glass} col-span-2 text-soft`}>
             <Icon name="reset" size={16} color="#C9CCD4" />
-            Reset to my attempt
+            {p.resetToStarter ?? "Reset to my attempt"}
           </button>
         </div>
-        {locked && (
+        {solution && locked && (
           <p id="solution-lock" className="m-0 -mt-2 font-mono text-[12px] text-dim">
             Run your code at least once to unlock the solution.
           </p>

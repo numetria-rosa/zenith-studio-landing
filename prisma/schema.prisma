@@ -65,6 +65,7 @@ model User {
   aieQuizAttempts AieQuizAttempt[]
   aieProjectProgress AieProjectProgress[]
   aieOrientation AieOrientation?
+  aieCapstone AieCapstone?
   aieClients      AieClient[]
   aieSellPlanSteps AieSellPlanStep[]
   serviceRequests ServiceRequest[]
@@ -270,6 +271,24 @@ model AieOrientation {
   pathTop         String[]
   selfCheckScore  Int?
   selfCheckTotal  Int?
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Module 8 capstone: what the student wrote and the server-graded score of each part
+// (design 0-100, implementation = test pass rate, debugging 0-100). Scores stay null until attempted.
+model AieCapstone {
+  userId          String   @id
+  design          Json     @default("{}")
+  designScore     Int?
+  implCode        String   @default("")
+  implScore       Int?
+  debugQ1         Int?
+  debugAnswer     String   @default("")
+  debugAnswerOk   Boolean?
+  debugScore      Int?
+  review          Json     @default("{}")
   updatedAt       DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

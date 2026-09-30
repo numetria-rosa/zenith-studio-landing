@@ -1,5 +1,6 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
+import type { CapstoneContent, CapstoneText } from "./capstone";
 import type { CourseIndex, ModuleContent, ProjectDetail } from "./types";
 
 /* Course content lives in the repo (content/ai-engineering). AIE_CONTENT_DIR points the
@@ -64,4 +65,14 @@ export async function getProject(id: number): Promise<ProjectDetail | null> {
   } catch {
     return null;
   }
+}
+
+export type CapstoneBundle = { content: CapstoneContent; text: CapstoneText; brief: string; reference: string };
+
+/** The Module 8 capstone: parts as JSON, the client brief and reference outline as MDX, and the grader's messages. */
+export async function getCapstone(): Promise<CapstoneBundle> {
+  const dir = path.join(contentDir(), "capstone");
+  const read = (f: string) => readFile(path.join(dir, f), "utf8");
+  const [content, text, brief, reference] = await Promise.all([read("capstone.json"), read("text.json"), read("brief.mdx"), read("reference.mdx")]);
+  return { content: JSON.parse(content), text: JSON.parse(text), brief, reference };
 }

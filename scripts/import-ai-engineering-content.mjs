@@ -165,6 +165,20 @@ function blocks(nodes, ctx) {
       const id = `m0-${M0_BARE[n.attribs.id]}`;
       widgetText[id] = [];
       out.push(`<Interactive id=${attr(id)} label="" />`);
+    } else if (hasClass(n, "brief")) {
+      // capstone client brief: a tagged panel of paragraphs and a list
+      const tag = text(byClass(n, "btag"));
+      uiLabels.add(tag);
+      out.push(`<Def title=${attr(tag)}>\n\n${blocks(kids(n).filter((c) => !hasClass(c, "btag")), ctx).join("\n\n")}\n\n</Def>`);
+    } else if (hasClass(n, "refsol")) {
+      for (const step of kids(n)) {
+        const label = text(byClass(step, "rslbl"));
+        uiLabels.add(label);
+        out.push(`<Def title=${attr(label)}>\n\n${inline(step.children.filter((c) => !hasClass(c, "rslbl"))).trim()}\n\n</Def>`);
+      }
+    } else if (hasClass(n, "recapgrid")) {
+      const items = kids(n).map((c) => ({ n: text(byClass(c, "rn")), t: text(byClass(c, "rt")), d: text(byClass(c, "rd")) }));
+      out.push(`<RecapGrid items={${JSON.stringify(items)}} />`);
     } else if (hasClass(n, "orient")) {
       const l = text(byClass(n, "lbl"));
       uiLabels.add(l);
@@ -296,6 +310,80 @@ function buildSelfCheck(section, calls) {
   return { parts, scoreLabel: text(byClass(section, "fslbl")), note: text(byClass(section, "optnote")) };
 }
 
+/** The capstone's graded parts (module 8): each part's headings, buttons and prompts, read from the HTML. */
+function readCapstonePart(num, title, section, body) {
+  const intro = inl(find(section, (x) => x.name === "p" && hasClass(x, "mut")));
+  const part = { title, intro };
+  const label = (n) => text(byClass(section, n));
+  const button = (id) => stripGlyph(text(find(section, (x) => x.attribs && x.attribs.id === id)));
+  const byId = (id) => find(section, (x) => x.attribs && x.attribs.id === id);
+  if (num === 5) {
+    Object.assign(part, { frame: label("ilbl"), check: button("btnValidateDesign"), scoreLabel: text(find(byId("designScoreWrap"), (x) => x.name === "span")), scoreEmpty: text(byId("designPct")) });
+  } else if (num === 6) {
+    const box = find(section, (x) => hasClass(x, "interactive"));
+    Object.assign(part, {
+      frame: label("ilbl"),
+      instructions: inl(find(box, (x) => x.name === "p" && hasClass(x, "mut"))),
+      editorLabel: byId("capstoneCodeEditor").attribs["aria-label"],
+      run: button("btnRunCapstoneTests"),
+      reset: button("btnResetCapstoneCode"),
+      scoreLabel: text(find(byId("implScoreWrap"), (x) => x.name === "span")),
+      scoreEmpty: text(byId("implPct")),
+    });
+  } else if (num === 7) {
+    const qtexts = findAll(section, (x) => hasClass(x, "qtext")).map(text);
+    Object.assign(part, {
+      frame: label("ilbl"),
+      code: DomUtils.textContent(byClass(section, "debugcode")).replace(/\r/g, ""),
+      q1: qtexts[0],
+      q2: qtexts[1],
+      answerLabel: byId("debugAnswer").attribs["aria-label"],
+      placeholder: byId("debugAnswer").attribs.placeholder,
+      retry: button("btnRetryDebugQ1"),
+      check: button("btnCheckDebug"),
+      scoreLabel: text(find(byId("debugScoreWrap"), (x) => x.name === "span")),
+      scoreEmpty: text(byId("debugPct")),
+    });
+  } else if (num === 8) {
+    Object.assign(part, {
+      rows: findAll(section, (x) => hasClass(x, "fsrow")).map((r) => text(byClass(r, "fslabel"))),
+      empty: text(byId("fsDesign")),
+      totalLabel: text(find(byClass(section, "fstotal"), (x) => x.name === "span")),
+      recompute: button("btnRecomputeFinal"),
+    });
+  } else if (num === 11) {
+    part.questions = findAll(section, (x) => hasClass(x, "reviewq")).map((q) => ({
+      tag: text(byClass(q, "rqnum")),
+      text: text(byClass(q, "rqtext")),
+      placeholder: find(q, (x) => x.name === "textarea").attribs.placeholder,
+    }));
+  }
+  return part;
+}
+
+/** Writes the capstone content: brief and reference outline as MDX, everything else as capstone.json plus the harness. */
+function writeCapstone(capstone, consts) {
+  const dir = path.join(OUT, "capstone");
+  mkdirSync(dir, { recursive: true });
+  writeClean(path.join(dir, "brief.mdx"), `${capstone.brief.join("\n\n")}
+`);
+  writeClean(path.join(dir, "reference.mdx"), `${capstone.reference}
+`);
+  const harness = parseHarness(consts.CAPSTONE_HARNESS_PY);
+  mkdirSync(path.join(OUT, "exercises"), { recursive: true });
+  writeClean(path.join(OUT, "exercises", "8.py"), consts.CAPSTONE_HARNESS_PY + "\n");
+  const p = capstone.parts;
+  const json = {
+    passMark: 80,
+    design: { ...p[5], fields: consts.designFieldsSpec },
+    implementation: { ...p[6], functionName: harness.functionName, fileName: `${harness.functionName}.py`, starter: consts.CAPSTONE_STARTER, tests: harness.tests, harness: "exercises/8.py" },
+    debugging: { ...p[7], options: consts.debugQ1Options },
+    final: p[8],
+    review: p[11],
+  };
+  writeClean(path.join(dir, "capstone.json"), JSON.stringify(json, null, 2) + "\n");
+}
+
 function importModule(number) {
   const file = path.join(SRC, `module-0${number}.html`);
   const doc = parseDocument(readFileSync(file, "utf8"));
@@ -324,6 +412,7 @@ function importModule(number) {
   let glossary = [];
   let furtherReading = null;
   let selfCheck = null;
+  const capstone = { brief: [], reference: "", parts: {} };
   const ctxBase = { module: number };
 
   const orient = kids(wrap).find((c) => hasClass(c, "orient"));
@@ -348,6 +437,14 @@ function importModule(number) {
       });
     } else if (/^Further reading/.test(title)) {
       furtherReading = blocks(body, { ...ctxBase, section: num }).join("\n\n");
+    } else if (number === 8 && [1, 2, 3, 4].includes(num)) {
+      capstone.brief.push(`## ${title}
+
+${blocks(body, { ...ctxBase, section: num }).join("\n\n")}`);
+    } else if (number === 8 && num === 9) {
+      capstone.reference = blocks(body, { ...ctxBase, section: num }).join("\n\n");
+    } else if (number === 8 && [5, 6, 7, 8, 11].includes(num)) {
+      capstone.parts[num] = readCapstonePart(num, title, section, body);
     } else if (number === 0) {
       // Orientation: sections keep their printed numbers (0.1 appears twice: the text and its interactive), so equal numbers merge into one lesson
       let mdx = blocks(body, { ...ctxBase, section: numText }).join("\n\n");
@@ -431,10 +528,18 @@ function importModule(number) {
   const own = Object.fromEntries(Object.entries(widgetText).filter(([k]) => k.startsWith(`m${number}-`)));
   writeClean(path.join(OUT, "interactives", `${number}.static.json`), JSON.stringify(own, null, 2) + "\n");
 
+  if (number === 8) writeCapstone(capstone, consts);
+
   // verbatim check: every word of the source sections (minus UI labels and script-built widgets) is in the MDX
-  verify(number, wrap, lessons, furtherReading, quiz, glossary, meta, exercise);
+  verify(number, wrap, lessons, `${furtherReading ?? ""}
+
+${capstone.brief.join("\n\n")}
+
+${capstone.reference}`, quiz, glossary, meta, exercise);
   return moduleJson;
 }
+
+const flat = (v) => (typeof v === "string" ? [v] : Array.isArray(v) ? v.flatMap(flat) : v && typeof v === "object" ? Object.values(v).flatMap(flat) : []);
 
 function mdxWords(mdx) {
   const tree = unified().use(remarkParse).use(remarkMdx).parse(mdx);
@@ -445,7 +550,7 @@ function mdxWords(mdx) {
       if (typeof a.value === "string") out.push(a.value);
       else if (a.value?.value) {
         try {
-          out.push(JSON.parse(a.value.value));
+          out.push(...flat(JSON.parse(a.value.value)));
         } catch {
           /* not a string literal */
         }
@@ -457,8 +562,11 @@ function mdxWords(mdx) {
   return out.join(" ").replace(/\s+/g, " ").trim();
 }
 
+// every text node, with a space between elements (module 8's cards have none in the HTML)
+const spaced = (n) => (n.type === "text" ? n.data : (n.children || []).map(spaced).join(" "));
+
 function verify(number, wrap, lessons, furtherReading, quiz, glossary, meta, exercise) {
-  const produced = lessons.map((l) => mdxWords(l.mdx)).join(" ") + " " + (furtherReading ? mdxWords(furtherReading) : "");
+  const produced = lessons.map((l) => mdxWords(l.mdx)).join(" ") + " " + (furtherReading?.trim() ? mdxWords(furtherReading) : "");
   const normalise = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
   const have = new Set(normalise(produced).split(" "));
   const sourceTexts = [];
@@ -468,10 +576,12 @@ function verify(number, wrap, lessons, furtherReading, quiz, glossary, meta, exe
     const kh = byClass(section, "kh");
     const title = text(find(kh, (x) => x.name === "h2"));
     if (/^(Checkpoint|Glossary)/.test(title)) continue;
+    if (number === 8 && /^(Part [1-4]|AI Engineering Design Review)/.test(title)) continue; // read into capstone.json, not MDX
     // widgets built by script have no text in the HTML; the exercise box moves to the Exercise tab
     const skip = (c) => hasClass(c, "interactive") || hasClass(c, "kh") || hasClass(c, "selfcheck-part") || hasClass(c, "finalscore") || hasClass(c, "optnote");
     const clone = { ...section, children: section.children.filter((c) => !skip(c)) };
-    sourceTexts.push(text(clone));
+    // module 8 has block-level cards with no whitespace between them in the HTML: keep their words apart
+    sourceTexts.push(number === 8 ? spaced(clone) : text(clone));
   }
   const missing = [];
   for (const s of sourceTexts) for (const w of normalise(s).split(" ")) if (w && !have.has(w) && !missing.includes(w)) missing.push(w);

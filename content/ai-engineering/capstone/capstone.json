@@ -1,0 +1,302 @@
+{
+  "passMark": 80,
+  "design": {
+    "title": "Part 1: Design document",
+    "intro": "Write each section below for real, in your own words, addressing Meridian's brief specifically. This isn't a checkbox, submissions are inspected for the specific technical content each section needs, and you'll get told exactly what's missing, not just a pass/fail.",
+    "frame": "Design submission",
+    "check": "Check my design document",
+    "scoreLabel": "Design document score",
+    "scoreEmpty": "not yet checked",
+    "fields": [
+      {
+        "id": "structured",
+        "label": "Structured output & validation strategy",
+        "mod": "Module 1",
+        "placeholder": "How do you keep model output trustworthy enough for the rest of the system to act on?",
+        "minWords": 25,
+        "groups": [
+          [
+            "schema",
+            "valid"
+          ],
+          [
+            "repair",
+            "parse",
+            "fenc",
+            "comma"
+          ]
+        ],
+        "minGroups": 2
+      },
+      {
+        "id": "context",
+        "label": "Context & token budget strategy",
+        "mod": "Module 2",
+        "placeholder": "How do you keep retrieved content plus the conversation within the context window? Name an actual budget.",
+        "minWords": 20,
+        "groups": [
+          [
+            "token",
+            "budget"
+          ],
+          [
+            "context window",
+            "window"
+          ],
+          [
+            "chunk",
+            "overlap",
+            "truncat"
+          ]
+        ],
+        "minGroups": 2,
+        "needsNumber": true
+      },
+      {
+        "id": "retrieval",
+        "label": "Retrieval & relevance strategy",
+        "mod": "Module 3",
+        "placeholder": "How do you decide what's relevant, and what happens when nothing is? Name an actual threshold and k.",
+        "minWords": 25,
+        "groups": [
+          [
+            "embedding",
+            "cosine",
+            "similarity"
+          ],
+          [
+            "top-k",
+            "top k",
+            "rank"
+          ],
+          [
+            "threshold",
+            "relevan",
+            "min_score",
+            "min score"
+          ]
+        ],
+        "minGroups": 2,
+        "needsNumber": true
+      },
+      {
+        "id": "tools",
+        "label": "Tool execution & idempotency strategy",
+        "mod": "Module 4",
+        "placeholder": "How do you make a retried tool call safe, without duplicating its side effect?",
+        "minWords": 20,
+        "groups": [
+          [
+            "idempoten",
+            "call id",
+            "stable id"
+          ],
+          [
+            "cache",
+            "cached",
+            "store"
+          ],
+          [
+            "duplicate",
+            "retry",
+            "re-run",
+            "rerun"
+          ]
+        ],
+        "minGroups": 2
+      },
+      {
+        "id": "agent",
+        "label": "Agent control flow strategy",
+        "mod": "Module 5",
+        "placeholder": "How is the agent's loop bounded? What stops it from running or repeating forever? Name an actual step limit.",
+        "minWords": 20,
+        "groups": [
+          [
+            "step limit",
+            "max step",
+            "bound"
+          ],
+          [
+            "stuck",
+            "repeat"
+          ],
+          [
+            "terminat",
+            "stop",
+            "success"
+          ]
+        ],
+        "minGroups": 2,
+        "needsNumber": true
+      },
+      {
+        "id": "reliability",
+        "label": "Reliability strategy for the model API",
+        "mod": "Module 6",
+        "placeholder": "How does the system handle a flaky model API? Retries, backoff, jitter, fallback, with actual numbers.",
+        "minWords": 20,
+        "groups": [
+          [
+            "retry",
+            "retries"
+          ],
+          [
+            "backoff",
+            "exponential"
+          ],
+          [
+            "jitter"
+          ],
+          [
+            "fallback"
+          ]
+        ],
+        "minGroups": 2,
+        "needsNumber": true
+      },
+      {
+        "id": "eval",
+        "label": "Evaluation & regression strategy",
+        "mod": "Module 7",
+        "placeholder": "How do you know a future change actually helped, before it ships?",
+        "minWords": 20,
+        "groups": [
+          [
+            "eval",
+            "test case",
+            "test set"
+          ],
+          [
+            "baseline"
+          ],
+          [
+            "regression",
+            "compare",
+            "before shipping"
+          ]
+        ],
+        "minGroups": 2
+      }
+    ]
+  },
+  "implementation": {
+    "title": "Part 2: Implementation",
+    "intro": "Complete the support-request handler below. Real test cases run your actual code, including a genuine repeated-call-ID test.",
+    "frame": "Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)",
+    "instructions": "Complete `async def handle_support_request(input, kb, ticket_tool, seen)`. `input` is `{\"queryVector\":..., \"callId\":..., \"ticketArgs\":...}`. `kb` is a list of `{\"id\":..., \"vector\":...}`. Find the KB doc with the highest cosine similarity to `input[\"queryVector\"]`. If its score is below `0.4`, return `{\"ok\": True, \"source\": \"none\", \"reason\": \"no relevant KB match\"}` without calling `ticket_tool` at all. Otherwise, check `seen[input[\"callId\"]]` first (return it directly if present), then call `await ticket_tool(input[\"ticketArgs\"])`, caching the result in `seen` only on success, and returning `{\"ok\": True, \"source\": \"kb\", \"docId\":..., \"ticket\":...}`. If `ticket_tool` raises, return `{\"ok\": False, \"source\": \"kb\", \"docId\":..., \"error\":...}` without caching. Never let this function raise.",
+    "editorLabel": "Python code editor for handle_support_request",
+    "run": "Run tests",
+    "reset": "Reset to starter code",
+    "scoreLabel": "Implementation score",
+    "scoreEmpty": "not yet run",
+    "functionName": "handle_support_request",
+    "fileName": "handle_support_request.py",
+    "starter": "async def handle_support_request(input, kb, ticket_tool, seen):\n    # 1. Find the kb doc with the highest cosine similarity to input[\"queryVector\"].\n    #    If the best score is below 0.4, return\n    #    {\"ok\": True, \"source\": \"none\", \"reason\": \"no relevant KB match\"}\n    #    WITHOUT calling ticket_tool at all.\n\n    # 2. Otherwise, check seen[input[\"callId\"]] first. If present, return it directly\n    #    (don't call ticket_tool again for a call ID that already succeeded).\n\n    # 3. Otherwise, await ticket_tool(input[\"ticketArgs\"]). On success, cache\n    #    {\"ok\": True, \"source\": \"kb\", \"docId\": ..., \"ticket\": ...} in seen[input[\"callId\"]] and return it.\n    #    On failure, return {\"ok\": False, \"source\": \"kb\", \"docId\": ..., \"error\": ...} WITHOUT caching,\n    #    so a retry with the same callId gets a real second attempt.\n\n    # YOUR CODE HERE\n\n    pass",
+    "tests": [
+      {
+        "name": "Below-threshold match returns 'none' without calling the ticket tool",
+        "hint": "Find the best cosine-similarity score across kb. If it's below 0.4, return {'ok': True, 'source': 'none', 'reason': ...} immediately, never call ticket_tool."
+      },
+      {
+        "name": "A relevant match calls the ticket tool once and returns its result with the correct docId",
+        "hint": "When the best score is >= 0.4, call ticket_tool(input['ticketArgs']) and return {'ok': True, 'source': 'kb', 'docId': <best match id>, 'ticket': <result>}."
+      },
+      {
+        "name": "The same callId is not re-executed against the ticket tool (idempotency)",
+        "hint": "Before calling ticket_tool, check if seen[input['callId']] already has a value. If so, return it directly instead of calling the tool again."
+      },
+      {
+        "name": "Different callIds for relevant matches execute independently",
+        "hint": "Your idempotency check must be keyed by input['callId'] specifically. Two different callIds should both result in a ticket_tool call."
+      },
+      {
+        "name": "A ticket_tool that raises returns a structured failure and is NOT cached, so a retry with the same callId gets a real second attempt",
+        "hint": "Wrap the ticket_tool call in try/except. On failure, return {'ok': False, ...} WITHOUT writing to seen, so the next call with the same callId calls the tool again."
+      },
+      {
+        "name": "Picks the highest-scoring doc when multiple candidates clear the relevance threshold",
+        "hint": "Compare EVERY document's score and track the maximum, don't just take the first one that clears 0.4, keep checking the rest for a better match."
+      }
+    ],
+    "harness": "exercises/8.py"
+  },
+  "debugging": {
+    "title": "Part 3: Debugging",
+    "intro": "This code shipped to production and caused an incident. Read it, find the bug, and answer both questions, this tests whether you can recognize a familiar failure mode in code you didn't write.",
+    "frame": "Broken code",
+    "code": "async def call_model_with_retry(prompt, attempt=0):\n    try:\n        return await call_model(prompt)\n    except Exception as err:\n        if attempt >= 5:\n            raise Exception(\"exhausted retries\")\n        return await call_model_with_retry(prompt, attempt + 1)",
+    "q1": "Which module's material does this bug violate?",
+    "q2": "In one or two sentences, what specifically is wrong, and what would you change?",
+    "answerLabel": "What's wrong with the code and what would you change",
+    "placeholder": "What's missing, and what's the fix...",
+    "retry": "Retry this question",
+    "check": "Check my answer",
+    "scoreLabel": "Debugging score",
+    "scoreEmpty": "not yet checked",
+    "options": [
+      {
+        "text": "Module 6: the retry has no backoff at all, it retries instantly in a tight loop and never uses jitter, exactly the retry-storm risk",
+        "correct": true
+      },
+      {
+        "text": "Module 4: the retry function doesn't check an idempotency key before calling the model",
+        "correct": false,
+        "reason": "Retrying this outbound model call isn't a duplicate-tool-execution problem, the idempotency concern from Module 4 is about tool calls with real side effects, a plain model call being retried doesn't have that risk here."
+      },
+      {
+        "text": "Module 5: the retry has no step limit at all",
+        "correct": false,
+        "reason": "It does have a bound, attempt >= 5 raises and stops recursing. The problem isn't the absence of a limit, it's that every attempt up to that limit fires instantly with no delay."
+      }
+    ]
+  },
+  "final": {
+    "title": "Part 4: Final capstone score",
+    "intro": "Computed from what you actually submitted above, not from boxes you checked yourself.",
+    "rows": [
+      "Part 1: Design document",
+      "Part 2: Implementation (test pass rate)",
+      "Part 3: Debugging"
+    ],
+    "empty": "not attempted",
+    "totalLabel": "Overall capstone score",
+    "recompute": "Recompute final score"
+  },
+  "review": {
+    "title": "AI Engineering Design Review",
+    "intro": "Ungraded, not checked against an answer key. Before a real engineer calls a system \"done,\" they walk it component by component and ask what happens when that component fails. Do the same here, for the specific Meridian bot you built, not in the abstract.",
+    "questions": [
+      {
+        "tag": "OUTPUT · MODULE 1",
+        "text": "What happens in your implementation when the model returns invalid structure?",
+        "placeholder": "Trace it through your actual handle_support_request code, not in general..."
+      },
+      {
+        "tag": "RETRIEVAL · MODULE 3",
+        "text": "What happens when the relevant information is not retrieved, or nothing clears your relevance threshold?",
+        "placeholder": "What does the bot say to the user, and does it ever pretend to know something it doesn't..."
+      },
+      {
+        "tag": "TOOLS · MODULE 4",
+        "text": "What actions is the model allowed to perform, and what stops it from performing an action it shouldn't?",
+        "placeholder": "Name the specific validation or permission check, and where in the pipeline it runs..."
+      },
+      {
+        "tag": "RELIABILITY · MODULE 6",
+        "text": "What happens when the same event, the same call ID, arrives twice?",
+        "placeholder": "Walk through the cache check in your implementation, what's the actual outcome the second time..."
+      },
+      {
+        "tag": "AGENTS · MODULE 5",
+        "text": "What prevents this system from looping forever, or from repeating a failing action indefinitely?",
+        "placeholder": "Name the specific bound, not just \\"
+      },
+      {
+        "tag": "EVALUATION · MODULE 7",
+        "text": "How would you know, with a number, whether a future change to this bot actually improved it?",
+        "placeholder": "What's in the eval set, what's the baseline, what would count as a regression..."
+      }
+    ]
+  }
+}

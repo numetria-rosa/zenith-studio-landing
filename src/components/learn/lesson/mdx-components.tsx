@@ -2,7 +2,7 @@ import { isValidElement, type ReactNode } from "react";
 import { CodeBlock } from "@/components/obsidian/CodeBlock";
 import { Answer, Practice } from "./Practice";
 import {
-  A, Assume, Callout, Connection, Def, ExerciseLink, FailureCards, Flow, H2, H3, InlineCode, Muted, Ol, P, ProdWarn, Rule, Strong, Ul,
+  A, Assume, Callout, Connection, Def, ExerciseLink, FailureCards, Flow, H2, H3, InlineCode, Muted, Ol, P, ProdWarn, RecapGrid, Rule, Strong, Ul,
 } from "./blocks";
 import { InteractiveHost } from "./InteractiveHost";
 
@@ -28,6 +28,7 @@ export function lessonComponents(opts: { module: number; data: Record<string, un
     Answer,
     FailureCards,
     Flow,
+    RecapGrid,
     // Fenced code becomes the design's code card. ```python filename="ticket.py" sets the file name.
     pre: ({ children }: { children?: ReactNode }) => {
       const el = isValidElement(children) ? (children as { props: { className?: string; children?: ReactNode; "data-meta"?: string } }) : null;

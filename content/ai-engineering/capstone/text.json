@@ -1,0 +1,26 @@
+{
+  "design": {
+    "notWritten": "Not written yet",
+    "tooBrief": "Too brief ({words} words, needs {min}+): say more about the actual mechanism, not just that one exists",
+    "fewIdeas": "Only touches {hit} of {total} distinct ideas this section needs ({missing} missing): naming one concept repeatedly isn't the same as covering the mechanism end to end",
+    "noNumber": "Names the mechanism but no concrete number, \"we use a threshold\" isn't a design, \"0.4 cosine similarity\" is: say what the actual value is",
+    "complete": "Looks complete"
+  },
+  "debug": {
+    "correct": "Correct. Every retry attempt fires immediately with no delay and no randomness, this is plain unbounded-rate instant retry, and would hammer the model API in a tight loop exactly during the load spike it's least able to handle.",
+    "wrong": "Not quite. ",
+    "pass": "Good, that's the fix: add an increasing delay (ideally with jitter) before each retry attempt, e.g. await sleep(baseDelay * 2 ** attempt) before the recursive call, so failed attempts spread out instead of hammering the model API instantly.",
+    "brief": "Say a bit more, and in your own words, not a repeated word or two. What specifically would you add, and where in the function?",
+    "neither": "Not quite, look again at how quickly the function calls itself after a failure. Compare against Module 6's exponential backoff formula.",
+    "noProblem": "You named a fix, but not what's actually broken. Say specifically what the current code does wrong (how soon it retries after a failure), not just what you'd add.",
+    "noStructure": "You've got the right words, but write it as an actual explanation, not a list of terms. Say what's wrong, then what you'd change and why, the way you'd explain it to a teammate reading this code.",
+    "noFix": "You've identified the problem, but not the specific fix. What would you add before the retry, and why does that solve it?"
+  },
+  "final": {
+    "score": "Capstone score: {total}%",
+    "locked": "Score 80%+ across all 3 parts to complete the course →",
+    "ready": "Complete the course →",
+    "banner": "Capstone complete",
+    "bannerText": "You designed, implemented, and debugged a production-shaped AI system end to end, and you can explain why every piece is there. That's the actual deliverable of this course, not the modules themselves, the judgment underneath them."
+  }
+}

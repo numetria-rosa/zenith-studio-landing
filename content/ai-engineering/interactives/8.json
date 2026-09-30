@@ -1,0 +1,194 @@
+{
+  "designFieldsSpec": [
+    {
+      "id": "structured",
+      "label": "Structured output & validation strategy",
+      "mod": "Module 1",
+      "placeholder": "How do you keep model output trustworthy enough for the rest of the system to act on?",
+      "minWords": 25,
+      "groups": [
+        [
+          "schema",
+          "valid"
+        ],
+        [
+          "repair",
+          "parse",
+          "fenc",
+          "comma"
+        ]
+      ],
+      "minGroups": 2
+    },
+    {
+      "id": "context",
+      "label": "Context & token budget strategy",
+      "mod": "Module 2",
+      "placeholder": "How do you keep retrieved content plus the conversation within the context window? Name an actual budget.",
+      "minWords": 20,
+      "groups": [
+        [
+          "token",
+          "budget"
+        ],
+        [
+          "context window",
+          "window"
+        ],
+        [
+          "chunk",
+          "overlap",
+          "truncat"
+        ]
+      ],
+      "minGroups": 2,
+      "needsNumber": true
+    },
+    {
+      "id": "retrieval",
+      "label": "Retrieval & relevance strategy",
+      "mod": "Module 3",
+      "placeholder": "How do you decide what's relevant, and what happens when nothing is? Name an actual threshold and k.",
+      "minWords": 25,
+      "groups": [
+        [
+          "embedding",
+          "cosine",
+          "similarity"
+        ],
+        [
+          "top-k",
+          "top k",
+          "rank"
+        ],
+        [
+          "threshold",
+          "relevan",
+          "min_score",
+          "min score"
+        ]
+      ],
+      "minGroups": 2,
+      "needsNumber": true
+    },
+    {
+      "id": "tools",
+      "label": "Tool execution & idempotency strategy",
+      "mod": "Module 4",
+      "placeholder": "How do you make a retried tool call safe, without duplicating its side effect?",
+      "minWords": 20,
+      "groups": [
+        [
+          "idempoten",
+          "call id",
+          "stable id"
+        ],
+        [
+          "cache",
+          "cached",
+          "store"
+        ],
+        [
+          "duplicate",
+          "retry",
+          "re-run",
+          "rerun"
+        ]
+      ],
+      "minGroups": 2
+    },
+    {
+      "id": "agent",
+      "label": "Agent control flow strategy",
+      "mod": "Module 5",
+      "placeholder": "How is the agent's loop bounded? What stops it from running or repeating forever? Name an actual step limit.",
+      "minWords": 20,
+      "groups": [
+        [
+          "step limit",
+          "max step",
+          "bound"
+        ],
+        [
+          "stuck",
+          "repeat"
+        ],
+        [
+          "terminat",
+          "stop",
+          "success"
+        ]
+      ],
+      "minGroups": 2,
+      "needsNumber": true
+    },
+    {
+      "id": "reliability",
+      "label": "Reliability strategy for the model API",
+      "mod": "Module 6",
+      "placeholder": "How does the system handle a flaky model API? Retries, backoff, jitter, fallback, with actual numbers.",
+      "minWords": 20,
+      "groups": [
+        [
+          "retry",
+          "retries"
+        ],
+        [
+          "backoff",
+          "exponential"
+        ],
+        [
+          "jitter"
+        ],
+        [
+          "fallback"
+        ]
+      ],
+      "minGroups": 2,
+      "needsNumber": true
+    },
+    {
+      "id": "eval",
+      "label": "Evaluation & regression strategy",
+      "mod": "Module 7",
+      "placeholder": "How do you know a future change actually helped, before it ships?",
+      "minWords": 20,
+      "groups": [
+        [
+          "eval",
+          "test case",
+          "test set"
+        ],
+        [
+          "baseline"
+        ],
+        [
+          "regression",
+          "compare",
+          "before shipping"
+        ]
+      ],
+      "minGroups": 2
+    }
+  ],
+  "designScore": null,
+  "implScore": null,
+  "debugQ1Options": [
+    {
+      "text": "Module 6: the retry has no backoff at all, it retries instantly in a tight loop and never uses jitter, exactly the retry-storm risk",
+      "correct": true
+    },
+    {
+      "text": "Module 4: the retry function doesn't check an idempotency key before calling the model",
+      "correct": false,
+      "reason": "Retrying this outbound model call isn't a duplicate-tool-execution problem, the idempotency concern from Module 4 is about tool calls with real side effects, a plain model call being retried doesn't have that risk here."
+    },
+    {
+      "text": "Module 5: the retry has no step limit at all",
+      "correct": false,
+      "reason": "It does have a bound, attempt >= 5 raises and stops recursing. The problem isn't the absence of a limit, it's that every attempt up to that limit fires instantly with no delay."
+    }
+  ],
+  "debugQ1Answered": false,
+  "debugAnswerChecked": false
+}

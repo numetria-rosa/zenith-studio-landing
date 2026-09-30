@@ -1,0 +1,31 @@
+{
+  "number": 8,
+  "slug": "a-production-ai-agent",
+  "title": "A Production AI Agent",
+  "stage": "Stage 3 · Capstone",
+  "minutes": 90,
+  "summary": "Synthesis. You are given a client brief: a support bot that must answer from a knowledge base, act on tools safely, run inside a bounded loop, and survive a flaky model API, graded against a rubric, not vibes.",
+  "objectives": [
+    "A written design specification applying every prior module",
+    "A working implementation of the critical path (retrieval threshold + idempotent tool execution)",
+    "A diagnosis of a real reliability bug in code you didn't write"
+  ],
+  "lessons": [
+    {
+      "number": "8.1",
+      "title": "Before you start",
+      "minutes": 48
+    },
+    {
+      "number": "8.2",
+      "title": "The course, end to end",
+      "minutes": 42
+    }
+  ],
+  "glossary": [],
+  "project": {
+    "title": "Production AI Agent Platform",
+    "brief": "The major portfolio project. Combine structured outputs, token-aware context management, retrieval, idempotent tool calling, a bounded agent loop, retry/fallback reliability, and evaluation into one system with an architecture diagram, implementation, tests, and README.",
+    "projectId": 8
+  }
+}

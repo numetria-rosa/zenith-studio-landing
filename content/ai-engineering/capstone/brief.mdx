@@ -1,0 +1,127 @@
+## The brief
+
+<Def title={"Client brief: Meridian Cloud"}>
+
+Meridian runs a support bot for their platform's documentation. A user asks a question, the bot searches Meridian's knowledge base, answers from what it finds, and files a follow-up ticket so a human can verify anything the bot handled. Your system must decide what's actually relevant, act on tools safely, and keep working when the model API has a bad moment, exactly the AI Engineering pipeline shape.
+
+Three things are explicitly called out as risks in the brief, because they've each caused a production incident with Meridian's previous vendor:
+
+- **Confidently wrong answers.** The previous bot answered every question with its best-scoring KB match, even when nothing in the knowledge base was actually relevant.
+- **Duplicate tickets.** A dropped network response after a successful ticket creation led the agent to retry, filing the same ticket twice.
+- **A flaky model API.** Meridian's model provider has a documented 429 rate-limit rate under load, and occasional multi-second latency spikes.
+
+</Def>
+
+<Callout>
+
+**What the brief is actually testing:** every one of those three risks maps directly to a module you've already completed. Confidently wrong answers is Module 3 (relevance thresholds). Duplicate tickets is Module 4 (idempotent tool execution). A flaky model API is Module 6 (retry, backoff, fallback). The brief isn't hiding the answer, it's telling you exactly which tools to reach for, the skill is recognizing the mapping.
+
+</Callout>
+
+<Practice>
+
+Before scrolling further: for each of the three named risks, name the specific module concept you'd reach for first. Write it down, then compare against the callout above.
+
+<Answer>
+
+Confidently wrong answers → a minimum relevance threshold on retrieval (Module 3), so a low-scoring "best available" match gets excluded instead of confidently presented as an answer. Duplicate tickets → an idempotency key check before the tool executes (Module 4), so a retried call returns the cached result instead of filing a second ticket. Flaky model API → retry with backoff and jitter, falling back once if retries are exhausted (Module 6). If your answers matched, you're already thinking in the right shape for this brief.
+
+</Answer>
+
+</Practice>
+
+<Practice label={"Practice check: a second brief"}>
+
+A different client, Northwind Logistics, wants a bot that answers driver questions from a route-policy handbook and can escalate a question to a human dispatcher via a tool call. Two months in, dispatchers report two problems: some escalations arrive twice when a driver's phone briefly loses signal mid-request and the app auto-retries, and the bot occasionally answers a policy question confidently using an old, superseded page it retrieved even though the current handbook version has a "superseded" flag it never checks. Name the module for each fix.
+
+<Answer>
+
+Duplicate escalations on a client-side retry → the same idempotency pattern as this brief's ticket problem (Module 4): the escalation tool call needs a stable call ID that survives the app's retry, so the second attempt returns the cached result instead of paging a dispatcher twice. Confidently answering from a superseded page isn't quite Module 3's relevance-threshold problem, the retrieved page WAS relevant, it was just stale, this is a data-quality/business-rule check that has to run alongside retrieval: a retrieved document with a "superseded" flag should be excluded or down-weighted before it ever reaches the model, similar in spirit to Module 4's schema-vs-business-rule distinction (structurally valid isn't the same as safe to use).
+
+</Answer>
+
+</Practice>
+
+## Deliverable 1: the design specification
+
+A complete design specification names how the bot keeps model output trustworthy (Module 1), how it manages context budget (Module 2), how it decides what's relevant (Module 3), how it executes tools safely (Module 4), how its agent loop is bounded (Module 5), how it survives a flaky model API (Module 6), and how it knows a change actually helped (Module 7). It should be readable by someone who hasn't seen the brief and still understand exactly what happens at each step and why.
+
+<Def title={"What \"complete\" means here, concretely"}>
+
+For each of the seven areas, a stated mechanism, not just a named concept. "We use retrieval" isn't a design, "we retrieve top-3 chunks, apply a 0.4 cosine-similarity threshold, and return 'no relevant information' if nothing clears it" is.
+
+</Def>
+
+<Practice>
+
+The "answer from the KB" step and the "call the model API" step both need failure-handling strategies, but not the same one. Why might they differ?
+
+<Answer>
+
+"Answer from the KB" is a relevance problem, its main concern is whether the retrieved content is actually good enough to answer from, a Module 3 concern (thresholds, not retries). "Call the model API" is a transient-availability problem, its main concern is whether the call itself succeeds, a Module 6 concern (retries, backoff, fallback). Different steps face different failure modes, a good spec doesn't apply one generic "add a threshold" or "add retries" policy everywhere, it reasons about each step's actual risk.
+
+</Answer>
+
+</Practice>
+
+## Deliverable 2: retrieval threshold and idempotent tool execution
+
+This is the "working implementation of the critical path" the brief asks for, the part that actually has to run, not just be described.
+
+<Def title={"The critical path, concretely"}>
+
+1\. Compute similarity between the query and every KB document (Module 3). 2. If the best match scores below the relevance threshold, return "no relevant information" without ever touching a tool. 3. If a relevant match is found, check whether this exact request (by its call ID) has already filed a ticket (Module 4's idempotency pattern), if so, return the cached result. 4. Otherwise, call the ticket tool, cache the result only on success, so a genuinely failed attempt can still be retried.
+
+</Def>
+
+<Callout>
+
+**Threshold and idempotency solve different problems, and both are needed.** The threshold stops the bot from confidently answering with irrelevant content. Idempotency stops a network retry from filing the same ticket twice. Neither substitutes for the other, a system with only a threshold could still double-file tickets, a system with only idempotency could still answer confidently from a bad match.
+
+</Callout>
+
+<Practice>
+
+Why does the relevance check (step 2) need to happen before the idempotency/ticket-filing logic (steps 3-4), rather than after?
+
+<Answer>
+
+Because filing a ticket for a query the bot couldn't actually answer relevantly is pure waste, and possibly misleading to whoever reviews it later. Checking relevance first means the tool call (and its idempotency bookkeeping) only ever happens for requests worth acting on at all. Checking order matters: idempotency protects a legitimate action from being duplicated, it isn't a substitute for deciding whether the action should happen in the first place.
+
+</Answer>
+
+</Practice>
+
+## Deliverable 3: honest evaluation before shipping
+
+The brief implicitly asks for a way to know whether a future change (a new prompt, a different top-k, a new model) actually helps, not a guess, exactly Module 7's discipline.
+
+<Def title={"What belongs in that plan"}>
+
+A labeled eval set covering both "answerable from the KB" and "genuinely not in the KB" queries (so the threshold logic itself gets tested, not just the happy path). A recorded baseline score. A rule: change one thing, re-run the full eval suite, compare against the baseline, before shipping, not after.
+
+</Def>
+
+<Practice>
+
+Why does the eval set specifically need "genuinely not in the KB" test cases, not just cases with a good answer available?
+
+<Answer>
+
+Because the relevance threshold is exactly what's supposed to catch those cases, an eval set with only answerable questions would never exercise, or catch a regression in, the threshold logic itself. If a future change accidentally lowered the threshold (or removed it), an eval set full of answerable questions wouldn't detect it, only unanswerable test cases can confirm the bot still correctly says "I don't know" when it should.
+
+</Answer>
+
+</Practice>
+
+<Practice label={"Practice check: grading a design doc"}>
+
+A submitted design document contains this line for its evaluation plan: "We'll test the bot with some sample questions and check if the model handles edge cases well." Using the grading standard from Deliverable 3 above, name what's specifically missing, in the same terms a grader would use.
+
+<Answer>
+
+It names an activity ("test with sample questions") but no checkable criterion, "handles edge cases well" isn't something a grader (or a re-run of the eval suite) can score as pass or fail. It's also missing the two components this section calls out explicitly: no recorded baseline to compare against, and no mention of "genuinely not in the KB" cases specifically, so there's no way to tell whether a future change silently broke the threshold logic. This is exactly the "we handle errors" failure pattern from Module 8's cheat sheet, one vague sentence standing in for a mechanism that needs to be named concretely.
+
+</Answer>
+
+</Practice>
