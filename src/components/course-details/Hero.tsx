@@ -1,5 +1,4 @@
-import Image from "next/image";
-import Link from "next/link";
+import { BrandMark } from "@/components/site/BrandMark";
 import { Button } from "@/components/obsidian/Button";
 import { Icon } from "@/components/obsidian/Icon";
 import { StatStrip } from "@/components/obsidian/StatStrip";
@@ -28,15 +27,15 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
     <section id="overview" className="relative overflow-hidden bg-void">
       <div className="relative mx-auto min-h-[900px] w-full max-w-[1440px]">
         {/* glows + grid: faded top and bottom so the section melts into its neighbours */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,#000,#000_75%,transparent)]">
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 left-1/2 w-screen -translate-x-1/2 [mask-image:linear-gradient(to_bottom,#000,#000_75%,transparent)]">
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-[220px] -top-[160px] h-[1000px] w-[1000px] rounded-full"
+          className="pointer-events-none absolute right-[calc(50%-720px-220px)] -top-[160px] h-[1000px] w-[1000px] rounded-full"
           style={{ background: "radial-gradient(circle, rgba(139,92,246,0.34) 0%, rgba(59,107,255,0.10) 40%, rgba(5,6,10,0) 66%)" }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-[420px] -left-[260px] h-[800px] w-[800px] rounded-full"
+          className="pointer-events-none absolute -bottom-[420px] left-[calc(50%-720px-260px)] h-[800px] w-[800px] rounded-full"
           style={{ background: "radial-gradient(circle, rgba(92,200,255,0.12), rgba(5,6,10,0) 62%)" }}
         />
         <div aria-hidden className="grid-bg pointer-events-none absolute inset-0" />
@@ -44,10 +43,7 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
 
         {/* top bar */}
         <div className="absolute inset-x-5 top-8 z-10 flex items-center justify-between lg:inset-x-12 xl:inset-x-20">
-          <Link href="/lab" className="flex min-h-11 items-center gap-3 text-frost no-underline">
-            <Image src="/course/zenith-logo.png" alt="Zenith Studio logo" width={34} height={34} className="h-[34px] w-[34px] object-contain" />
-            <span className="text-[18px] font-semibold tracking-[-0.01em]">Zenith Studio</span>
-          </Link>
+          <BrandMark brand="lab" href="/lab" />
           <nav aria-label="Sections" className="glass hidden gap-1 rounded-full p-1.5 lg:flex">
             {NAV.map(([label, href], i) => (
               <a
