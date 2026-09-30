@@ -277,7 +277,7 @@ export default function ZenithStudioLandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#05060a] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#05060a] text-white overflow-x-clip">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

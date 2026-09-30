@@ -31,7 +31,7 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
   const checkout = service?.monthlyCheckoutUrl || null;
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-black text-white">
+    <div className="relative min-h-screen overflow-x-clip bg-black text-white">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(251,146,60,0.16),transparent_34%),radial-gradient(circle_at_88%_12%,rgba(56,189,248,0.12),transparent_32%),radial-gradient(circle_at_50%_88%,rgba(99,102,241,0.14),transparent_36%)]" />
         <div className="absolute inset-0 opacity-[0.14] [background-image:linear-gradient(rgba(255,255,255,0.09)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.09)_1px,transparent_1px)] [background-size:72px_72px]" />
