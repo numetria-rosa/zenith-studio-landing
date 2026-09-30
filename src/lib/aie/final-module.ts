@@ -36,6 +36,14 @@ export type FinalModule = {
   findClients: { title: string; detail: string }[];
   compliance: { region: string; rule: string; source: string }[];
   sellPlan: { id: string; week: number; title: string; detail: string }[];
+  clientsGuide: {
+    intro: string;
+    statuses: { key: string; meaning: string; move: string }[];
+    steps: { title: string; detail: string }[];
+    tips: string[];
+    example: { business: string; niche: string; city: string; agentId: string; notes: string; steps: string[] };
+  };
+  revenueGuide: { intro: string; terms: { term: string; meaning: string }[]; tips: string[] };
 };
 
 export type ModelEntry = {

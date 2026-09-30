@@ -15,10 +15,73 @@ export default async function ClientsPage() {
   const [mod, clients] = await Promise.all([getFinalModule(), listClients(userId)]);
   const agentName = Object.fromEntries(mod.agents.map((a) => [a.id, a.name]));
   const totals = summarise(clients);
+  const g = mod.clientsGuide;
+  const ex = g.example;
+  const exAgent = mod.agents.find((a) => a.id === ex.agentId) ?? mod.agents[0]!;
 
   return (
     <>
-      <FinalHeader title="Your clients" lede="Every client you are talking to or serving, which agent they get, and what they pay. Revenue is worked out from this list." />
+      <FinalHeader title="Your clients" lede="How to run a client from first conversation to Live, and the list that tracks every one. Revenue is worked out from this list." />
+
+      <section aria-labelledby="how-h" className="flex flex-col gap-4">
+        <h2 id="how-h" className="m-0 text-[26px] font-medium tracking-[-0.02em]">How client work runs</h2>
+        <p className="m-0 max-w-[760px] text-[16px] leading-[1.65] text-soft">{g.intro}</p>
+        <ol className="glass m-0 flex list-none flex-col gap-1 rounded-3xl p-2.5">
+          {g.steps.map((s, i) => (
+            <li key={s.title} className="flex gap-4 rounded-[14px] px-4 py-3.5">
+              <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-white/[0.18] font-mono text-[12px] text-mist">{i + 1}</span>
+              <div className="flex flex-col gap-1">
+                <b className="text-[16px] font-medium">{s.title}</b>
+                <span className="text-[14.5px] leading-[1.6] text-mist">{s.detail}</span>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section aria-labelledby="states-h" className="flex flex-col gap-3">
+        <h2 id="states-h" className="m-0 text-[26px] font-medium tracking-[-0.02em]">What Draft, Ready and Live mean</h2>
+        <div className="grid gap-3 md:grid-cols-3">
+          {g.statuses.map((st) => (
+            <div key={st.key} className="glass flex flex-col gap-2 rounded-[20px] p-5">
+              <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-cyan">{st.key}</span>
+              <span className="text-[15px] leading-[1.55] text-frost">{st.meaning}</span>
+              <span className="text-[13.5px] leading-[1.55] text-mist">{st.move}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="demo-h" className="flex flex-col gap-3">
+        <h2 id="demo-h" className="m-0 text-[26px] font-medium tracking-[-0.02em]">Worked example</h2>
+        <div className="glass flex flex-col gap-4 rounded-[22px] p-6">
+          <div className="grid items-center gap-3 rounded-[18px] border border-white/[0.1] bg-white/[0.03] p-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto]">
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <b className="text-[16px] font-medium">{ex.business}</b>
+              <span className="text-[13.5px] text-mist">{ex.niche} · {ex.city}</span>
+              <span className="text-[13px] text-dim">{ex.notes}</span>
+            </div>
+            <span className="text-[14.5px] text-soft">{exAgent.name}</span>
+            <span className="font-mono text-[12.5px] text-mist">{usd(exAgent.pricing.monthlyUsd * 100)}/mo · {usd(exAgent.pricing.setupUsd * 100)} setup</span>
+          </div>
+          <ol className="m-0 flex list-decimal flex-col gap-1.5 pl-5 text-[15px] leading-[1.6] text-soft">
+            {ex.steps.map((t) => <li key={t}>{t}</li>)}
+          </ol>
+          <p className="m-0 text-[14px] leading-[1.6] text-mist">
+            Once it is Live, this one client adds {usd(exAgent.pricing.monthlyUsd * 100)} a month to your revenue and {usd(exAgent.pricing.setupUsd * 100)} in setup fees. {exAgent.pricing.note}
+          </p>
+          <p className="m-0 text-[13px] text-dim">A made-up business, only to show the flow. Fees are the starting prices for this agent.</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="tips-h" className="flex flex-col gap-3">
+        <h2 id="tips-h" className="m-0 text-[26px] font-medium tracking-[-0.02em]">Tips</h2>
+        <ul className="glass m-0 flex list-none flex-col gap-1 rounded-3xl p-2.5">
+          {g.tips.map((t) => (
+            <li key={t} className="flex gap-3 rounded-[14px] px-4 py-3 text-[15px] leading-[1.6] text-soft"><Icon name="check" size={16} color="#7FF0BD" /><span>{t}</span></li>
+          ))}
+        </ul>
+      </section>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
@@ -35,7 +98,7 @@ export default async function ClientsPage() {
       </div>
 
       <section aria-labelledby="list-h" className="flex flex-col gap-3">
-        <h2 id="list-h" className="m-0 text-[26px] font-medium tracking-[-0.02em]">Client list</h2>
+        <h2 id="list-h" className="m-0 text-[26px] font-medium tracking-[-0.02em]">Your client list</h2>
         {clients.length === 0 ? (
           <p className="glass m-0 rounded-[20px] p-6 text-[15px] text-mist">No clients yet. Add the first one below, even if it is only a conversation you are having.</p>
         ) : (
