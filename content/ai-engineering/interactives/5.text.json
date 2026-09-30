@@ -1,0 +1,21 @@
+{
+  "trace": {
+    "next": "Show next step",
+    "done": "Trace complete",
+    "reset": "Restart trace"
+  },
+  "travel": {
+    "thresholdLabel": "Consecutive identical actions required to trigger \"stuck\":",
+    "next": "Show next step",
+    "reset": "Restart trace",
+    "steps": "Steps used / max",
+    "streak": "Current repeat streak",
+    "status": "Loop status",
+    "notStarted": "Not started",
+    "running": "Running",
+    "stuck": "Stuck",
+    "limit": "Step limit",
+    "stoppedStuck": "Stopped: same action repeated {streak} times in a row (threshold {threshold}).",
+    "stoppedLimit": "Stopped: max_steps reached with no final answer."
+  }
+}

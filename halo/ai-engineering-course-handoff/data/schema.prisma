@@ -1,0 +1,194 @@
+// Suggested starting schema (Neon Postgres + Prisma). Claude Code may adapt it to the existing codebase.
+// Content (modules, lessons, exercises, quizzes, projects, cheat sheets) is authored in the repo
+// under /content and seeded into these tables; student data (enrollment, progress, attempts) lives only here.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")        // Neon pooled connection
+  directUrl = env("DIRECT_URL")          // Neon direct connection for migrations
+}
+
+model Course {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  edition   String?
+  tagline   String
+  stages    Stage[]
+  enrollments Enrollment[]
+}
+
+model Stage {
+  id       String   @id @default(cuid())
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  order    Int
+  label    String   // "Stage 0", "Before you start"
+  name     String?  // "Prompting foundations"
+  color    String   // stage colour token, e.g. "#5CC8FF"
+  modules  Module[]
+  @@unique([courseId, order])
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  stageId     String
+  stage       Stage    @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  number      Int      // 0..8
+  slug        String   @unique
+  title       String
+  summary     String
+  minutes     Int?
+  objectives  String[]
+  lessons     Lesson[]
+  exercises   Exercise[]
+  quiz        Quiz?
+  project     Project?
+  cheatSheet  CheatSheet?
+}
+
+model Lesson {
+  id        String  @id @default(cuid())
+  moduleId  String
+  module    Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  number    String  // "1.4"
+  slug      String
+  title     String
+  minutes   Int
+  bodyMdx   String  // lesson body, MDX (rendered with the design's components)
+  progress  LessonProgress[]
+  @@unique([moduleId, slug])
+}
+
+model Exercise {
+  id          String  @id @default(cuid())
+  moduleId    String
+  module      Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  code        String  // "1.4"
+  title       String
+  prompt      String
+  language    String  @default("python")
+  fileName    String
+  header      String  // fixed lines shown above the editable body
+  starter     String
+  solution    String
+  testFile    String  // pytest source run in Pyodide
+  testNames   String[]
+  hint        String?
+  submissions ExerciseSubmission[]
+}
+
+model Quiz {
+  id        String  @id @default(cuid())
+  moduleId  String  @unique
+  module    Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  passMark  Int
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+}
+
+model QuizQuestion {
+  id          String   @id @default(cuid())
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  order       Int
+  question    String
+  options     String[]
+  answerIndex Int
+  explanation String
+}
+
+model Project {
+  id          String @id @default(cuid())
+  moduleId    String @unique
+  module      Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title       String
+  brief       String
+  passMark    Int
+  details     Json   // requirements[], milestones[], rubric[{criterion, points}], starterTree[], facts[]
+  starterUrl  String?
+  submissions ProjectSubmission[]
+}
+
+model CheatSheet {
+  id       String @id @default(cuid())
+  moduleId String @unique
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title    String
+  blocks   Json   // [{kind: "pipeline"|"code"|"table"|"rules", title, color, ...}]
+  pdfUrl   String?
+}
+
+// ---------- student data ----------
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String?
+  externalId  String?  @unique  // e.g. Whop user id, if access is sold through Whop
+  enrollments Enrollment[]
+  lessonProgress LessonProgress[]
+  quizAttempts   QuizAttempt[]
+  exerciseSubs   ExerciseSubmission[]
+  projectSubs    ProjectSubmission[]
+  createdAt   DateTime @default(now())
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  source    String?  // "whop", "manual"
+  createdAt DateTime @default(now())
+  @@unique([userId, courseId])
+}
+
+model LessonProgress {
+  userId      String
+  lessonId    String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+  @@id([userId, lessonId])
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  quizId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers   Int[]
+  score     Int
+  passed    Boolean
+  createdAt DateTime @default(now())
+}
+
+model ExerciseSubmission {
+  id         String   @id @default(cuid())
+  userId     String
+  exerciseId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  code       String
+  passed     Int
+  total      Int
+  createdAt  DateTime @default(now())
+}
+
+model ProjectSubmission {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  repoUrl   String
+  score     Int?
+  feedback  String?
+  createdAt DateTime @default(now())
+}

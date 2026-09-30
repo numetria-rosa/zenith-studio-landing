@@ -1,0 +1,31 @@
+A model can hallucinate a tool name that doesn't exist, omit a required argument, or produce the wrong type for one, the same way it can produce malformed JSON in a plain text response. The fix is the same discipline as Module 1: validate before you use it, and fail with a clear, structured error instead of letting a bad call crash your handler or silently do the wrong thing.
+
+<Callout>
+
+**An unvalidated tool call is a trust boundary, not a formality.** If the tool executes a database write, sends money, or calls an external API, a missing or malformed argument reaching the handler isn't a cosmetic bug, it's the difference between "the model asked for something odd" and "something odd actually happened."
+
+</Callout>
+
+<Practice>
+
+Should validation errors be silently logged and the call dropped, or reported back to the model as part of the conversation?
+
+<Answer>
+
+Reported back to the model, as a structured error it can read and react to, the same "surface it, don't hide it" principle from Module 1's repair pass. A model that gets a clear "missing required argument: orderId" can often correct itself and retry with a valid call. A model that gets silence, or a generic failure, has no way to know what went wrong or how to fix it.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A CRM's `update_customer_record(customerId: string, fields: object)` tool has a schema that only lists `customerId` as required, it says nothing about what's allowed inside `fields`. A model-generated call arrives with `fields: { plan: "enterprise", accountBalanceCents: 500000 }`, and `accountBalanceCents` isn't something any legitimate caller of this tool should ever be able to set directly. Does "the required field is present with the correct type" mean this call is safe to execute?
+
+<Answer>
+
+No. A schema that only checks for required fields is validating the minimum, not the maximum, it says nothing about which extra fields are allowed to ride along. This is the same class of bug as mass-assignment vulnerabilities in web forms: an object gets passed straight through to a database write, and any key that happens to match a real column gets applied, whether or not the caller should have been able to set it. The fix is an explicit allowlist of permitted keys inside `fields`, checked as part of schema validation, not left for the handler to notice (or not notice) after the fact.
+
+</Answer>
+
+</Practice>

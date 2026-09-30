@@ -1,0 +1,37 @@
+"The model will know when to stop" is not a control mechanism, it's a hope. Models can reason in circles, misjudge whether they have enough information, or simply fail to emit a clean final-answer signal. Every agent loop needs an explicit, code-enforced maximum number of steps, independent of whatever the model itself thinks.
+
+<Def title={"Definition: step limit"}>
+
+A hard maximum on how many reason-act-observe cycles a loop will execute before forcibly stopping, regardless of whether the model has produced a final answer. A circuit breaker for control flow, not a suggestion.
+
+</Def>
+
+<Callout>
+
+**An unbounded loop is an unbounded bill.** Every step is a model call (tokens, cost, latency) plus, often, a tool execution with its own cost or side effects. A loop with no step limit doesn't fail loudly, it just keeps running, and keeps costing, until something external kills it.
+
+</Callout>
+
+<Practice>
+
+A step limit is reached before the model produced a final answer. Is that a bug in your loop, or expected, correct behavior?
+
+<Answer>
+
+Expected, correct behavior, assuming the limit is reasonable for the task. Hitting the cap is the loop doing exactly its job: refusing to run forever. The right response is to surface a clear "couldn't complete within the step budget" outcome (to the caller or the user), not to silently pretend it succeeded, and not to treat reaching the limit itself as an error condition to hide.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A customer-troubleshooting agent debugging a "can't connect" ticket runs 10 different diagnostics in a row, run\_diagnostic("wifi\_signal"), run\_diagnostic("dns\_lookup"), run\_diagnostic("dhcp\_lease"), and so on, each a different check, and hits the step limit with the issue still unresolved. A second agent, on a different ticket, calls run\_diagnostic("dns\_lookup") with the exact same argument four times in a row and also hasn't resolved anything. Should both cases be handled the same way, just as "ran out of budget"?
+
+<Answer>
+
+No. The first agent is legitimately working through a hard, multi-step diagnosis, each step is a different action, so it's a step-limit case, and the fix (if this pattern is common) is likely a larger step budget, not a bug. The second agent is issuing the SAME diagnostic with the SAME argument repeatedly, that's the stuck signal from earlier in this module, and it should be cut off well before step limit regardless of how large the budget is, since raising the limit would just mean more identical failed checks, not a better outcome.
+
+</Answer>
+
+</Practice>

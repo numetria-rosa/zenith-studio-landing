@@ -1,0 +1,105 @@
+{
+  "SAMPLES": [
+    {
+      "id": "s1",
+      "text": "{\"name\": \"Priya\", \"age\": 41}",
+      "validJson": true,
+      "why": "Correct. Clean, valid JSON with no formatting noise."
+    },
+    {
+      "id": "s2",
+      "text": "```json\n{\"name\": \"Sam\", \"age\": 28}\n```",
+      "validJson": false,
+      "why": "Correct, it's invalid AS-IS. The markdown code fence characters (```) aren't valid JSON syntax, json.loads() fails on this exact string even though the JSON inside the fence is fine, the fence has to be stripped first."
+    },
+    {
+      "id": "s3",
+      "text": "{\"name\": \"Alex\", \"age\": 35,}",
+      "validJson": false,
+      "why": "Correct, it's invalid AS-IS. JSON does not allow a trailing comma before a closing brace, this is one of the most common small deviations models produce."
+    },
+    {
+      "id": "s4",
+      "text": "Sure! Here's the info you asked for: the user is 29 years old.",
+      "validJson": false,
+      "why": "Correct, it's invalid AS-IS. This is prose, not JSON at all, no repair pass fixes a response that never attempted the format."
+    },
+    {
+      "id": "s5",
+      "text": "{\"name\": \"Jordan\", \"age\": 50}\n",
+      "validJson": true,
+      "why": "Correct. A trailing newline after valid JSON doesn't affect json.loads(), whitespace outside the JSON value is ignored."
+    }
+  ],
+  "DECISION1_OPTS": [
+    {
+      "t": "A. Trust it, since the JSON parses without error",
+      "correct": false,
+      "why": "Parsing without error only tells you the SYNTAX was fine. It says nothing about the 8% missing an optional field or the 1% with a value outside your allowed set, both of which parse cleanly and still break the downstream API."
+    },
+    {
+      "t": "B. Retry every response automatically, just in case",
+      "correct": false,
+      "why": "Retrying everything wastes a model call and money on the 91% of responses that were already fine, and it doesn't even fix the problem: a retried call can produce the exact same missing field or bad enum value again, nothing about a retry guarantees a different outcome."
+    },
+    {
+      "t": "C. Validate the schema, and explicitly handle the missing-field and invalid-value cases before the API call",
+      "correct": true,
+      "why": "This is the only option that acts on what you actually know: two specific, named failure modes with measured rates. A schema validator that checks required-vs-optional correctly and checks enum membership catches both before they ever reach the downstream API, which is exactly the kind of check a service boundary needs."
+    },
+    {
+      "t": "D. Ask the model to \"be more careful\" in the prompt",
+      "correct": false,
+      "why": "A stronger instruction can lower the RATE (this module's few-shot lesson), it can't lower it to zero, and it does nothing for the two specific failure modes you've already measured. You have real data on how this model behaves; engineer around the data, don't just ask nicer."
+    }
+  ],
+  "PIPE_SAMPLES": [
+    {
+      "id": "p1",
+      "label": "Clean JSON",
+      "text": "{\"category\":\"billing\",\"priority\":\"high\",\"ticket_id\":\"TCK-8821\"}"
+    },
+    {
+      "id": "p2",
+      "label": "Fenced + trailing comma",
+      "text": "```json\n{\"category\":\"login\",\"priority\":\"medium\",\"ticket_id\":\"TCK-8822\",}\n```"
+    },
+    {
+      "id": "p3",
+      "label": "Missing required field",
+      "text": "{\"category\":\"shipping\",\"ticket_id\":\"TCK-8823\"}"
+    },
+    {
+      "id": "p4",
+      "label": "Prose refusal",
+      "text": "I can't set a priority without more information from the customer."
+    }
+  ],
+  "PIPE_REQUIRED": [
+    "category",
+    "priority",
+    "ticket_id"
+  ],
+  "decision": [
+    {
+      "t": "A. Trust it, since the JSON parses without error",
+      "correct": false,
+      "why": "Parsing without error only tells you the SYNTAX was fine. It says nothing about the 8% missing an optional field or the 1% with a value outside your allowed set, both of which parse cleanly and still break the downstream API."
+    },
+    {
+      "t": "B. Retry every response automatically, just in case",
+      "correct": false,
+      "why": "Retrying everything wastes a model call and money on the 91% of responses that were already fine, and it doesn't even fix the problem: a retried call can produce the exact same missing field or bad enum value again, nothing about a retry guarantees a different outcome."
+    },
+    {
+      "t": "C. Validate the schema, and explicitly handle the missing-field and invalid-value cases before the API call",
+      "correct": true,
+      "why": "This is the only option that acts on what you actually know: two specific, named failure modes with measured rates. A schema validator that checks required-vs-optional correctly and checks enum membership catches both before they ever reach the downstream API, which is exactly the kind of check a service boundary needs."
+    },
+    {
+      "t": "D. Ask the model to \"be more careful\" in the prompt",
+      "correct": false,
+      "why": "A stronger instruction can lower the RATE (this module's few-shot lesson), it can't lower it to zero, and it does nothing for the two specific failure modes you've already measured. You have real data on how this model behaves; engineer around the data, don't just ask nicer."
+    }
+  ]
+}

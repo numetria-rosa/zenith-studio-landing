@@ -1,0 +1,15 @@
+<Muted>Adjust the context window and the reserved output budget, and watch the available input budget change.</Muted>
+
+<Interactive id={"m2-s2"} label={"Live calculation"} />
+
+<Practice>
+
+Move reserved-output up to 4000 while the context window is at its minimum, 2000. What happens to the available input budget, and why is this a realistic scenario, not an edge case someone made up?
+
+<Answer>
+
+The available input budget goes negative, there's no room left for input at all, the reserved output alone exceeds the whole window. This is realistic: a smaller/cheaper model with a short context window combined with a task that genuinely needs a long, detailed response (e.g. "write a 3000-word report") is exactly this situation. The fix isn't a UI trick, it's choosing a model with enough context headroom for the task, or reducing what you're asking the output to contain.
+
+</Answer>
+
+</Practice>

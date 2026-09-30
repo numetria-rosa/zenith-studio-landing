@@ -1,0 +1,27 @@
+You've seen the failure modes. Now you write the function that catches them, and five real tests run against your actual code.
+
+<ExerciseLink />
+
+<Practice>
+
+Test 5 feeds your function a response like `"I'm not able to help with that request."`, plain prose, not JSON at all. If you forget the try/except around `json.loads`, what specifically breaks?
+
+<Answer>
+
+`re.match()` and `re.sub()` don't raise on a non-matching plain string, they simply return `None` or the original string unchanged. The place this scenario actually breaks is `json.loads()` itself, parsing "I'm not able to help..." as JSON raises a `json.JSONDecodeError`. Without the try/except, that exception propagates out of your function instead of becoming a clean `{"ok": False, "error": ...}`, exactly the "never raise" requirement in the exercise instructions.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A legal-document extraction tool asks a model to pull `{"party_names": [...], "effective_date": string, "governing_law": string}` out of a scanned contract. One response parses without error, and every required field is present, but `effective_date` comes back as `""`, an empty string. Would `extract_structured_output`, exactly as specified in this module (checking `field in data` for each required field), catch this? Should it?
+
+<Answer>
+
+It would NOT catch it, and that's worth sitting with. `field in data` only checks presence, whether the key exists in the dict at all, it says nothing about whether the value is meaningful. `"effective_date": ""` satisfies "the key is present" just as well as a real date does, so this validator returns `{"ok": True, ...}` on a contract with no effective date. It should catch it, in a real production system, an empty string in a required date field is exactly the kind of defect a schema is supposed to stop, but this module's schema is deliberately simplified to a presence check. A production validator would also check type and, often, a minimum shape (non-empty string, matches a date pattern), the JSON Schema standard mentioned later in this module is what that looks like at full strength. The lesson: "the required fields are present" and "the required fields are usable" are different guarantees, know which one your validator actually gives you.
+
+</Answer>
+
+</Practice>

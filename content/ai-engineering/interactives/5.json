@@ -1,0 +1,89 @@
+{
+  "TRACE_STEPS": [
+    {
+      "role": "reason",
+      "text": "I need to check the status of order #4471 before I can decide whether to notify the customer."
+    },
+    {
+      "role": "act",
+      "text": "get_order_status(orderId: \"4471\")"
+    },
+    {
+      "role": "observe",
+      "text": "Order #4471: status = \"delayed\", expected delivery moved from Jun 3 to Jun 9."
+    },
+    {
+      "role": "reason",
+      "text": "The order is delayed by 6 days. That's a significant enough change that the customer should be notified proactively."
+    },
+    {
+      "role": "act",
+      "text": "send_notification(customerId: \"cus_201\", template: \"delay_notice\", newDate: \"Jun 9\")"
+    },
+    {
+      "role": "observe",
+      "text": "Notification sent successfully, confirmation id ntf_5521."
+    },
+    {
+      "role": "final",
+      "text": "Order #4471 is delayed to Jun 9. The customer has been notified."
+    }
+  ],
+  "TRAVEL_MAX_STEPS": 8,
+  "TRAVEL_STEPS": [
+    {
+      "action": "search_flights(route: \"JFK-CDG\", date: \"2026-09-10\")",
+      "observe": "3 candidate flights found, cheapest is AF1780."
+    },
+    {
+      "action": "compare_prices(candidates: 3)",
+      "observe": "AF1780 economy selected: $612, best price/duration tradeoff."
+    },
+    {
+      "action": "book_flight(flightId: \"AF1780\", fare: \"economy\")",
+      "observe": "Booking rejected: seat_unavailable."
+    },
+    {
+      "action": "book_flight(flightId: \"AF1780\", fare: \"economy\")",
+      "observe": "Booking rejected: seat_unavailable."
+    },
+    {
+      "action": "book_flight(flightId: \"AF1780\", fare: \"economy\")",
+      "observe": "Booking rejected: seat_unavailable."
+    },
+    {
+      "action": "book_flight(flightId: \"AF1780\", fare: \"economy\")",
+      "observe": "Booking rejected: seat_unavailable."
+    },
+    {
+      "action": "book_flight(flightId: \"AF1780\", fare: \"economy\")",
+      "observe": "Booking rejected: seat_unavailable."
+    },
+    {
+      "action": "book_flight(flightId: \"AF1780\", fare: \"economy\")",
+      "observe": "Booking rejected: seat_unavailable."
+    }
+  ],
+  "decision": [
+    {
+      "t": "A. Keep going past 20 steps, the model is clearly making real progress with distinct searches",
+      "correct": false,
+      "why": "A step limit that quietly extends itself whenever the model \"seems to be making progress\" isn't a limit at all, it's a suggestion, exactly what this module opened by rejecting. However legitimate the 20 searches were, the budget existed for a reason: bounded cost and bounded time."
+    },
+    {
+      "t": "B. Treat it as a step-limit outcome, report that the loop ran out of budget before finishing, distinct from a stuck outcome",
+      "correct": true,
+      "why": "This is exactly the trichotomy this module teaches: 20 distinct, non-repeating actions with no final-answer signal is a step-limit ending, not a stuck ending, and not a success. Reporting it as \"ran out of budget on a hard task\" (rather than silently returning nothing, or worse, fabricating an answer from partial reasoning) gives whoever's downstream real signal: this task may need a bigger budget, not that something is broken."
+    },
+    {
+      "t": "C. Treat it as stuck, since 20 calls to the same tool is suspicious",
+      "correct": false,
+      "why": "Stuck detection in this module is defined as the SAME action (same tool AND same arguments) repeating, not the same tool being reused with different arguments. 20 different queries to web_search is 20 different actions that happen to share a tool name, exactly the false-positive this module's coding-agent scenario warned against."
+    },
+    {
+      "t": "D. Silently return whatever partial answer the model's last reasoning text implies",
+      "correct": false,
+      "why": "Success is defined by the model emitting the explicit final-answer signal, not by an outside observer deciding the accumulated reasoning \"looks good enough.\" Fabricating a success from leftover reasoning text hides a real step-limit failure behind something that looks like it worked."
+    }
+  ]
+}

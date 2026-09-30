@@ -100,6 +100,9 @@ export function SidebarContent({
           </span>
           <span className="text-[13px] text-soft">{user.name}</span>
         </div>
+        <Link href="/account" className="flex min-h-11 items-center gap-2 rounded-xl px-1 text-[13px] text-mist no-underline hover:text-frost focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan">
+          <Icon name="grid" size={15} color="#A9AEBA" /> All my courses
+        </Link>
       </div>
     </>
   );

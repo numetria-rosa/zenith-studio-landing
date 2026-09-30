@@ -1,0 +1,145 @@
+{
+  "number": 1,
+  "slug": "prompting-structured-outputs",
+  "title": "Prompting & Structured Outputs",
+  "stage": "Stage 0 · Prompting foundations",
+  "minutes": 45,
+  "summary": "A language model produces text. Your program needs data. This module closes that gap reliably, not with a nicer-sounding prompt, but with validation and repair logic that doesn’t trust the model to behave.",
+  "objectives": [
+    "Turn free-text model output into a typed object your code can trust",
+    "Write a schema the model can follow and your code can enforce",
+    "Catch parse errors and validation errors separately",
+    "Repair bad output once, with the exact error fed back",
+    "Decide when to fail loudly instead of guessing",
+    "Explain what native structured outputs do and don’t guarantee"
+  ],
+  "lessons": [
+    {
+      "number": "1.1",
+      "title": "Text in, data out",
+      "minutes": 6
+    },
+    {
+      "number": "1.2",
+      "title": "Asking for structure: schemas in the prompt",
+      "minutes": 8
+    },
+    {
+      "number": "1.3",
+      "title": "Native structured outputs and JSON mode",
+      "minutes": 7
+    },
+    {
+      "number": "1.4",
+      "title": "Validate, don’t trust",
+      "minutes": 8
+    },
+    {
+      "number": "1.5",
+      "title": "The repair loop",
+      "minutes": 9
+    },
+    {
+      "number": "1.6",
+      "title": "When to fail loudly",
+      "minutes": 7
+    }
+  ],
+  "exercise": {
+    "id": "1.4",
+    "title": "Make parse_ticket() safe",
+    "language": "python",
+    "file": "parse_ticket.py",
+    "testFile": "test_parse_ticket.py",
+    "prompt": "The model returns a ticket as text. Turn it into a validated Ticket, and when it can’t be trusted, raise a clear ValueError instead of crashing somewhere downstream.",
+    "header": "import json\nfrom typing import Literal\nfrom pydantic import BaseModel, ValidationError\n\nclass Ticket(BaseModel):\n    intent: Literal[\"refund\", \"billing\", \"bug\", \"other\"]\n    order_id: int | None\n    urgency: Literal[\"low\", \"medium\", \"high\"]\n",
+    "starter": "def parse_ticket(raw: str) -> Ticket:\n    # TODO: strip code fences, validate against\n    # Ticket, raise ValueError(\"invalid ticket: ...\")\n    return Ticket(**json.loads(raw))",
+    "solution": "def parse_ticket(raw: str) -> Ticket:\n    text = raw.strip()\n    if text.startswith(\"```\"):\n        text = text.split(\"\\n\", 1)[1].rsplit(\"```\", 1)[0]\n    try:\n        return Ticket.model_validate_json(text)\n    except ValidationError as err:\n        raise ValueError(f\"invalid ticket: {err}\") from err",
+    "tests": [
+      {
+        "name": "parses clean JSON",
+        "failureMessage": ""
+      },
+      {
+        "name": "strips ```json code fences",
+        "failureMessage": "JSONDecodeError: Expecting value: line 1 column 1"
+      },
+      {
+        "name": "bad intent raises ValueError(\"invalid ticket\")",
+        "failureMessage": "got pydantic ValidationError, expected \"invalid ticket: …\""
+      },
+      {
+        "name": "missing urgency raises ValueError(\"invalid ticket\")",
+        "failureMessage": "got pydantic ValidationError, expected \"invalid ticket: …\""
+      }
+    ],
+    "hint": "Models often wrap JSON in ```json fences. Strip them first, then use Ticket.model_validate_json() and convert ValidationError into the ValueError your caller expects."
+  },
+  "quiz": {
+    "passMark": 4,
+    "questions": [
+      {
+        "question": "Your code needs {\"intent\": …, \"order_id\": …} from a model. What makes that reliable?",
+        "options": [
+          "A firmer prompt: “Return ONLY valid JSON.”",
+          "Parsing and validating against a schema, then repairing or failing on a mismatch",
+          "Setting temperature to 0",
+          "Adding more few-shot examples"
+        ],
+        "answerIndex": 1,
+        "explanation": "Prompting lowers the failure rate; it never removes it. Reliability comes from code that checks every response."
+      },
+      {
+        "question": "The model returns valid JSON, but \"intent\": \"refund_request\". Your schema allows refund, billing, bug, other. What kind of failure is this?",
+        "options": [
+          "A parse error",
+          "A validation error",
+          "A rate-limit error",
+          "Not a failure, close enough"
+        ],
+        "answerIndex": 1,
+        "explanation": "It parsed fine, so it isn’t a syntax problem. The value is outside the enum, which is exactly what validation exists to catch."
+      },
+      {
+        "question": "What should a repair attempt send back to the model?",
+        "options": [
+          "The same prompt, unchanged",
+          "The invalid output plus the specific validation error",
+          "Nothing, just retry at a higher temperature",
+          "The whole schema documentation"
+        ],
+        "answerIndex": 1,
+        "explanation": "The error message tells the model precisely what to fix. Retrying blind just rolls the dice again."
+      },
+      {
+        "question": "One repair attempt still fails validation. What’s the right move?",
+        "options": [
+          "Keep looping until it passes",
+          "Fail loudly: raise, log the raw output, route to a fallback",
+          "Return a partial object with default values",
+          "Drop the request silently"
+        ],
+        "answerIndex": 1,
+        "explanation": "Unbounded retries burn time and money. A loud, logged failure is something you can see, count and fix."
+      },
+      {
+        "question": "Native structured outputs (constrained decoding) guarantee that…",
+        "options": [
+          "The values are correct",
+          "The output matches the schema’s shape, not that the content is right",
+          "You no longer need business-rule checks",
+          "The call costs less"
+        ],
+        "answerIndex": 1,
+        "explanation": "Constrained decoding controls shape. A well-formed order_id can still point at an order that doesn’t exist."
+      }
+    ]
+  },
+  "project": {
+    "title": "Ticket triager API",
+    "brief": "A support inbox receives free-text messages. Build a small service that turns each one into a validated ticket, repairs bad model output once, and fails loudly, with the raw output logged, when it can’t.",
+    "passMark": 70,
+    "note": "Requirements, milestones, rubric and starter files are shown in reference/source/ChapterProject.dc.html"
+  },
+  "_note": "Sample content written for the design. Replace with the real course content; the shape is what matters."
+}

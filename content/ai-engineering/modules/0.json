@@ -1,0 +1,63 @@
+{
+  "number": 0,
+  "slug": "introduction-to-ai-engineering",
+  "title": "Introduction to AI Engineering",
+  "stage": "Before you start",
+  "minutes": null,
+  "summary": "Before any code: what this field actually is, what people in it actually build, where you might fit, and exactly what the next 8 modules will (and won't) teach you. This module is ungraded and doesn't block Module 1, you can skip ahead any time, but 20 minutes here will make everything after it make more sense.",
+  "objectives": [
+    "Explain what AI Engineering is, and how it differs from ML Engineering, Data Science, AI Research, and MLOps",
+    "Describe the production lifecycle an AI application goes through, and where an AI engineer's work concentrates in it",
+    "Name the AI Engineering specialization directions and roughly where your own interests point",
+    "Prioritize what to actually learn, tools included, instead of feeling like you need to know everything at once",
+    "State exactly what Modules 1–8 will teach you, and what you'll need to learn elsewhere"
+  ],
+  "lessons": [
+    {
+      "number": "0.1",
+      "title": "What is AI Engineering?",
+      "minutes": 3
+    },
+    {
+      "number": "0.2",
+      "title": "What does an AI Engineer actually build?",
+      "minutes": 2
+    },
+    {
+      "number": "0.3",
+      "title": "AI Engineering specializations",
+      "minutes": 2
+    },
+    {
+      "number": "0.4",
+      "title": "What programming do I actually need?",
+      "minutes": 2
+    },
+    {
+      "number": "0.5",
+      "title": "The AI Engineering toolbox",
+      "minutes": 2
+    },
+    {
+      "number": "0.6",
+      "title": "What do I need to learn, in order?",
+      "minutes": 2
+    },
+    {
+      "number": "0.7",
+      "title": "Find your AI Engineering path",
+      "minutes": 2
+    },
+    {
+      "number": "0.8",
+      "title": "Your journey through this course",
+      "minutes": 2
+    },
+    {
+      "number": "0.9",
+      "title": "Can you explain AI Engineering?",
+      "minutes": 2
+    }
+  ],
+  "glossary": []
+}

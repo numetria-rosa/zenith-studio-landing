@@ -1,0 +1,27 @@
+The laziest way to fit content into a budget is "cut it off at the limit." This is almost always the wrong move: it doesn't fail loudly, it succeeds while quietly discarding whatever came after the cut point, often the conclusion of a document, the most recent messages in a conversation, or the specific detail your task actually needed.
+
+<Callout>
+
+**Truncation without a strategy is a silent data-loss bug.** It doesn't throw an error. It doesn't log a warning by default. The system appears to work right up until someone asks a question the cut-off content would have answered.
+
+</Callout>
+
+A *chunking* strategy is the alternative: split content into pieces that each fit the budget, instead of throwing away everything past the first piece. Module 3 (retrieval) is what lets a system search across chunks instead of needing all of them in one prompt at once.
+
+<Practice>
+
+A support-ticket summarizer truncates each ticket's text to the first 500 tokens before summarizing. A customer's actual complaint is in the last paragraph, after a long chronological narrative. What does the summary say, and why is "the code worked without errors" not the same as "the code worked correctly"?
+
+<Answer>
+
+The summary describes the chronological narrative and never mentions the actual complaint, because that paragraph was silently cut off before the model ever saw it. No exception was thrown, no log entry flagged it, the pipeline "worked" in the sense that it ran to completion and produced a plausible-looking summary. This is exactly the danger: a technically successful run that's functionally wrong, the kind of bug that survives testing because nothing in the execution path failed.
+
+</Answer>
+
+</Practice>
+
+<Decision id={"m2"} label={"AI Engineering Decision"}>
+
+A legal-review pipeline sends whole contracts to a model with a 16,000-token context window. Most contracts fit fine. Once every couple hundred documents, a contract is long enough that the prompt would exceed the window entirely. What should the system do?
+
+</Decision>

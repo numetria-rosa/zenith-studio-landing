@@ -1,0 +1,39 @@
+The real payoff of a repeatable eval score isn't the number itself, it's what it lets you compare. Running the same eval suite against the old prompt and the new prompt, the old model and a candidate replacement, tells you objectively whether a change helped, hurt, or made no measurable difference, before it ships to real users.
+
+<Def title={"Definition: regression"}>
+
+A measurable drop in eval score after a change, compared to a known baseline score, signaling the change likely made the system worse on some dimension the eval suite covers.
+
+</Def>
+
+A regression check is only as good as its baseline and its isolation, changing one thing at a time (one prompt, one retrieval parameter) and re-running the full eval suite tells you exactly what caused a score change. Changing several things at once and running the eval once tells you only that SOMETHING changed, not which part.
+
+<Practice>
+
+A team changes both their system prompt (Module 1) and their retrieval top-k value (Module 3) in the same deploy, then runs the eval suite once and sees the score drop by 8 points. What's the practical cost of having changed both at once?
+
+<Answer>
+
+They know something regressed, but not which change caused it, or whether one change improved things while the other hurt worse. Diagnosing it now requires re-running the eval with each change isolated (prompt change alone, top-k change alone) AFTER the fact, work that would have been unnecessary if the changes had been evaluated separately from the start. Isolating variables before evaluating, not after, is what actually makes the eval score actionable.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A content-moderation tool is switching providers. Engineer A wants to swap the provider AND tighten the confidence threshold in the same deploy, then run the eval suite once against the 0.88 baseline. Engineer B wants to swap the provider alone first, run the full eval suite, compare that to baseline, and only then adjust the threshold in a separate isolated run. Whose approach actually tells the team whether the new provider itself is a regression risk?
+
+<Answer>
+
+Engineer B's. Changing the provider and the threshold together and evaluating once produces a single score that reflects the combined effect of both, if it drops, there's no way to tell whether the new provider is worse, the tighter threshold is worse, or one is masking the other. Running the eval with only the provider changed, against the same baseline, isolates that one variable and gives a clean answer about the provider specifically, exactly the discipline this section describes, just applied to a provider swap instead of a prompt change.
+
+</Answer>
+
+</Practice>
+
+<Decision id={"m7"} label={"AI Engineering Decision"}>
+
+Your eval suite of 50 test cases reports 96% average accuracy for a new prompt version, up from 91% on the old one. Before shipping, someone points out: of the 50 cases, only 2 involve a user asking to cancel or dispute a charge, both types the old version also got right, but a manual spot-check of 5 CHARGE-DISPUTE conversations from real traffic (not in the eval set) shows the new prompt getting 4 of 5 wrong. Should you ship based on the 96% score?
+
+</Decision>

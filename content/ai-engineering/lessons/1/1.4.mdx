@@ -1,0 +1,33 @@
+A "few-shot" prompt includes one or more example input/output pairs before the real request, showing the model the exact shape you want rather than describing it in prose. This is usually the single highest-leverage change you can make to output consistency.
+
+<Def title={"Why examples beat descriptions"}>
+
+"Return a JSON object with a name and age field" leaves room for interpretation (nested? array? extra fields?). Showing `{"name": "Priya", "age": 41}` as a worked example removes that ambiguity directly, models are strong pattern-matchers on concrete examples.
+
+</Def>
+
+Few-shot examples reduce how often the model deviates from the shape you want. They do not eliminate deviation. A validator is still required downstream, examples change the odds, not the guarantee.
+
+<Practice>
+
+A teammate says "I added three examples to the prompt, so we don't need a validator anymore." What's wrong with that reasoning?
+
+<Answer>
+
+Few-shot examples are a probabilistic improvement, not a contract. They lower the RATE of malformed output, they don't change what your program does the one time in a hundred (or a thousand) that the model still deviates, adds a caveat, or hits an edge case the examples didn't cover. Removing the validator means that one deviation now crashes or corrupts your program instead of being caught and handled. The fix for imperfect reliability is a validator, not fewer reasons to need one.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A fintech startup's transaction categorizer prompt now includes six few-shot examples covering the common categories (groceries, rent, subscriptions, transfers...). Before this release ships, someone proposes cutting the validator: "six examples is a lot, the model barely misses now." The categorizer's output writes directly into a user's monthly spending report with no human review. What's wrong with cutting the validator here?
+
+<Answer>
+
+Six examples change the odds, not the guarantee, the model can still miscategorize, drop a field, or hand back a category that isn't in your allowed set. In most domains that's an annoying bug. In a spending report that a user trusts as an accurate record of their own money, a silent miscategorization isn't just wrong text, it's wrong financial data presented as fact, with no human in the loop to catch it before the user sees it. The stakes of the downstream consumer, not the example count, determine whether validation is optional. It never is, but it matters even more here, where the cost of an unvalidated deviation is a user's financial record being wrong.
+
+</Answer>
+
+</Practice>

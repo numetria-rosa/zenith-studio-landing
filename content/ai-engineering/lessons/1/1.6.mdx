@@ -1,0 +1,37 @@
+Before giving up on a response, a production system typically tries a short, deterministic repair pass: strip markdown code fences (models love wrapping JSON in ```` ```json ... ``` ```` even when told not to), strip a trailing comma before a closing brace or bracket, then attempt to parse. Only if that still fails do you treat it as a real failure, either retrying the model with the parse error included in the next prompt, or surfacing an error to the caller.
+
+<Callout>
+
+**Repair, then validate, in that order.** Fixing formatting doesn't guarantee the DATA is correct, a syntactically valid JSON object can still be missing a field your schema requires. Both checks are needed, and they check different things.
+
+</Callout>
+
+<Practice>
+
+A raw response parses as valid JSON but is missing the `age` field your schema requires. Is that a repair-pass problem or a validation problem?
+
+<Answer>
+
+Validation. The repair pass only fixes SYNTAX issues (things that stop `json.loads()` from succeeding at all), a missing field is a semantically incomplete but syntactically valid object, `json.loads()` succeeds and hands back a dict that simply doesn't have everything your schema needs. That's exactly why validation is a separate step after parsing, not folded into the repair pass, they catch different classes of failure.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+An e-commerce order-lookup assistant asks a model to return `{"order_id": string, "status": string, "eta_days": number}` for a customer's shipment. Two raw responses come back on two different requests. (A) `{"order_id": "OD-4471", "status": "shipped", "eta_days": 3,}`. (B) `"I looked into it, but I don't have access to that order's tracking status."` Which one belongs in the repair pass, and which should go straight to a retry or reject, and why?
+
+<Answer>
+
+Response A is a repair-pass case: it's JSON with exactly one syntax defect, a trailing comma before the closing brace, that's the deterministic, mechanical fix this module's repair pass exists for, strip it and parse succeeds cleanly. Response B is not malformed JSON, it's not JSON at all, it's the model declining to answer in prose. No amount of fence-stripping or comma-stripping turns a sentence into a valid order object, there's no syntax defect to repair. That's a signal to retry (maybe with a clearer instruction or more context) or reject and surface an error, not a job for the repair pass. Treating B like A, running it through the same repair regexes, just wastes a step, the failure is content-level, not formatting-level.
+
+</Answer>
+
+</Practice>
+
+<Decision id={"m1"} label={"AI Engineering Decision"}>
+
+Your model returns valid JSON. However: **8%** of responses omit one optional field, **1%** contain an unexpected value outside the allowed set, and the downstream API **rejects unknown values outright**. What should happen?
+
+</Decision>

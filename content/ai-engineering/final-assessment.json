@@ -1,0 +1,265 @@
+{
+  "passMark": 8,
+  "draw": 10,
+  "questions": [
+    {
+      "id": "fa_repair_order",
+      "question": "A model returns: Here's the data you wanted: {\"id\": 88, \"active\": true,}\\n (prose prefix, then JSON with a trailing comma). What's the correct sequence of operations before this can be trusted as data?",
+      "source": "pool",
+      "objective": "Structured outputs (novel scenario)",
+      "options": [
+        {
+          "text": "Extract the JSON substring, strip the trailing comma, parse it, then validate against the schema",
+          "correct": true,
+          "why": ""
+        },
+        {
+          "text": "Validate the whole raw string against the schema directly, schema validators can skip past prose automatically",
+          "correct": false,
+          "why": "Schema validators operate on parsed objects, not raw text mixed with prose, the JSON has to be isolated, repaired, and parsed first."
+        },
+        {
+          "text": "Reject it outright, a prose prefix means the model failed the task entirely",
+          "correct": false,
+          "why": "A prose prefix around otherwise-valid JSON is a mechanically extractable and repairable defect, rejecting outright throws away recoverable data."
+        }
+      ]
+    },
+    {
+      "id": "fa_token_budget",
+      "question": "Context window is 12000 tokens. Reserved output is 2500 tokens. Retrieved context is 8200 tokens, and the user's question is 300 tokens. Is this call within the available input budget? Enter 1 for yes, 0 for no.",
+      "source": "pool",
+      "objective": "Token budget (novel numbers)",
+      "numeric": {
+        "answer": 1,
+        "tolerance": 0,
+        "correct": "Available input budget = 12000 − 2500 = 9500. Retrieved context + question = 8200 + 300 = 8500, which is under 9500, so yes, it fits (answer: 1).",
+        "incorrect": "The answer is 1. Available input budget = 12000 − 2500 = 9500. Retrieved context + question = 8200 + 300 = 8500, which is under 9500, so yes, it fits (answer: 1)."
+      }
+    },
+    {
+      "id": "fa_retrieval_scale",
+      "question": "Query vector [4, 0]. Document A's vector is [1, 0], Document B's vector is [40, 0]. Which scores higher on cosine similarity, and why does this feel counter-intuitive if you're thinking about vector length?",
+      "source": "pool",
+      "objective": "Retrieval (novel vectors)",
+      "options": [
+        {
+          "text": "They score identically (both 1.0), cosine similarity divides out magnitude entirely, it only measures direction, not length",
+          "correct": true,
+          "why": ""
+        },
+        {
+          "text": "Document B scores higher, because its vector is much longer",
+          "correct": false,
+          "why": "Cosine similarity specifically divides out magnitude, a 'longer' vector pointing the same direction doesn't score higher, only DIRECTION affects the score."
+        },
+        {
+          "text": "Document A scores higher, because it's closer in raw magnitude to the query",
+          "correct": false,
+          "why": "Magnitude closeness isn't what cosine similarity measures at all, it's the ANGLE between vectors, both A and B point in the exact same direction as the query here."
+        }
+      ]
+    },
+    {
+      "id": "fa_idempotent_tool",
+      "question": "A model's tool call to send_notification(userId, message) has NO call ID at all, just the arguments. The model retries this exact call after a timeout. What can go wrong that a stable call-ID scheme would have prevented?",
+      "source": "pool",
+      "objective": "Tool execution (novel scenario)",
+      "options": [
+        {
+          "text": "Without a call ID to check against, the executor has no way to recognize the retry as the SAME logical request, so it re-runs the handler and sends the notification twice",
+          "correct": true,
+          "why": ""
+        },
+        {
+          "text": "Nothing, tool calls without IDs are automatically deduplicated by argument content",
+          "correct": false,
+          "why": "There's no automatic deduplication based on arguments alone in this course's model, without an explicit call ID to track, the executor has no signal that this is a repeat, not a new request."
+        },
+        {
+          "text": "The model itself will refuse to retry a call with no ID",
+          "correct": false,
+          "why": "The model has no built-in awareness of call IDs or retry safety, that responsibility belongs entirely to the executor's own logic, which needs a stable ID to check against."
+        }
+      ]
+    },
+    {
+      "id": "fa_agent_stuck",
+      "question": "An agent's trace shows: search_docs('refund'), search_docs('refund'), search_docs('refund'), then a final answer on the 4th call. Should this trigger stuck-detection with a 3-repeat threshold?",
+      "source": "pool",
+      "objective": "Agent control flow (novel trace)",
+      "options": [
+        {
+          "text": "Yes, the same action repeated exactly 3 times in a row should trigger stuck-detection immediately on the 3rd repeat, the loop shouldn't need to reach a 4th call at all",
+          "correct": true,
+          "why": ""
+        },
+        {
+          "text": "No, since a final answer eventually followed, the repetition was fine in hindsight",
+          "correct": false,
+          "why": "Stuck-detection has to trigger in the moment, based on the pattern observed so far, not retroactively excused because a later step happened to produce an answer, waiting to see if it 'worked out' defeats the purpose of an early guard."
+        },
+        {
+          "text": "No, 3 repeats is not enough to be considered stuck, only 5 or more should count",
+          "correct": false,
+          "why": "This course's threshold is 3 identical consecutive actions specifically, using a much higher threshold would let a genuinely stuck loop burn significantly more of its step budget before being caught."
+        }
+      ]
+    },
+    {
+      "id": "fa_backoff_calc",
+      "question": "Base delay 400ms, cap 6000ms, formula min(cap, base × 2^attempt). What's the maximum possible delay (in ms) before retry attempt 4 (attempt index 3, since 400 × 2^3 = 3200, under the cap)?",
+      "source": "pool",
+      "objective": "Reliability (novel numbers)",
+      "numeric": {
+        "answer": 3200,
+        "tolerance": 0,
+        "correct": "400 × 2^3 = 3200, which is under the 6000ms cap, so the cap doesn't apply here, the answer is the uncapped exponential value: 3200.",
+        "incorrect": "The answer is 3200. 400 × 2^3 = 3200, which is under the 6000ms cap, so the cap doesn't apply here, the answer is the uncapped exponential value: 3200."
+      }
+    },
+    {
+      "id": "fa_eval_regression",
+      "question": "A team's eval baseline is 0.82. After adding a new retrieval re-ranking step, the new score is 0.82 exactly, unchanged. Is this a regression by this course's definition?",
+      "source": "pool",
+      "objective": "Evaluation (novel scenario)",
+      "options": [
+        {
+          "text": "No, the definition is strictly 'score lower than baseline,' an unchanged score does not meet that definition",
+          "correct": true,
+          "why": ""
+        },
+        {
+          "text": "Yes, any change to the system that doesn't strictly improve the score counts as a regression",
+          "correct": false,
+          "why": "That's a stricter standard than this course's definition, which specifically requires the new score to be LOWER than baseline, not merely unimproved."
+        },
+        {
+          "text": "It can't be determined without re-running the eval a second time",
+          "correct": false,
+          "why": "The regression definition only needs the recorded score compared to baseline, 0.82 is not less than 0.82, so by definition this isn't a regression, no second run is required to determine that."
+        }
+      ]
+    },
+    {
+      "id": "fa_llm_judge",
+      "question": "A team needs to score whether a customer-support response has an appropriately empathetic tone, there's no fixed 'correct' string. Which approach fits this specific criterion best, and why?",
+      "source": "pool",
+      "objective": "Evaluation (novel scenario)",
+      "options": [
+        {
+          "text": "LLM-as-judge, since tone is a genuinely subjective quality dimension with no deterministic check available, exactly the case this scoring approach is reserved for",
+          "correct": true,
+          "why": ""
+        },
+        {
+          "text": "A deterministic exact-match check against a list of empathetic phrases",
+          "correct": false,
+          "why": "Tone isn't reducible to matching specific phrases, a response can be genuinely empathetic without using any phrase from a fixed list, exact-match doesn't fit this kind of subjective criterion."
+        },
+        {
+          "text": "No evaluation is possible for subjective criteria like tone, it should be skipped entirely",
+          "correct": false,
+          "why": "Subjective criteria aren't unevaluable, they're exactly what LLM-as-judge scoring is reserved for, when a deterministic check genuinely doesn't apply."
+        }
+      ]
+    },
+    {
+      "id": "fa_debug_logs",
+      "question": "Given this log, what's the actual bug?",
+      "source": "pool",
+      "objective": "Debugging (novel log excerpt)",
+      "logs": [
+        "11:02:00 [req_44] tool_call — charge_card(orderId:\"o9\") call_id=call_X → ERROR timeout",
+        "11:02:03 [req_44] tool_call — charge_card(orderId:\"o9\") call_id=call_Y → success (DIFFERENT call_id than call_X, same order)",
+        "11:02:03 [SYSTEM] deploy-log — retry wrapper now mints a fresh call_id per attempt (was: reuses original call_id)"
+      ],
+      "options": [
+        {
+          "text": "The retry wrapper generates a new call ID on every retry instead of reusing the original, which breaks the idempotency executor's ability to recognize this as the same logical request, risking a duplicate charge",
+          "correct": true,
+          "why": ""
+        },
+        {
+          "text": "The customer submitted two separate orders by mistake",
+          "correct": false,
+          "why": "The log shows the SAME order (o9) retried after a timeout, this is one logical request retried, not two separate customer actions."
+        },
+        {
+          "text": "This is expected behavior, retries should always get a fresh call ID for security reasons",
+          "correct": false,
+          "why": "A fresh call ID on every retry defeats idempotency entirely, the whole mechanism depends on a STABLE id across retries of the same logical request, this is the deploy-log line confirming exactly what broke."
+        }
+      ]
+    },
+    {
+      "id": "fa_context_vs_retrieval",
+      "question": "A RAG system retrieves 5 chunks that together total 9000 tokens, but the available input budget is only 6000 tokens. What's the most correct fix, combining what you know about token budgets and retrieval?",
+      "source": "pool",
+      "objective": "Synthesis (Modules 2 + 3)",
+      "options": [
+        {
+          "text": "Retrieve fewer chunks or apply a stricter relevance threshold up front, so what's actually retrieved already fits the budget, rather than truncating after the fact",
+          "correct": true,
+          "why": ""
+        },
+        {
+          "text": "Truncate the combined chunk text at 6000 tokens, cutting off whichever chunk comes last",
+          "correct": false,
+          "why": "Naive truncation risks silently cutting off a highly relevant chunk that simply got assembled last, the better fix is retrieving a smaller, better-fitting set to begin with."
+        },
+        {
+          "text": "Increase the context window setting so all 9000 tokens fit",
+          "correct": false,
+          "why": "The context window is a fixed property of the model being used, not a setting you can arbitrarily increase to make a budget problem disappear."
+        }
+      ]
+    },
+    {
+      "id": "fa_tool_vs_agent",
+      "question": "An idempotent tool executor is correctly implemented and working. Does this guarantee the surrounding agent loop can't get stuck retrying that same tool forever?",
+      "source": "pool",
+      "objective": "Synthesis (Modules 4 + 5)",
+      "options": [
+        {
+          "text": "No, idempotency prevents a REPEAT from causing a duplicate side effect, it says nothing about how many times the loop itself keeps deciding to call the tool, that's the loop's own step-limit and stuck-detection job",
+          "correct": true,
+          "why": ""
+        },
+        {
+          "text": "Yes, a correctly idempotent executor automatically caps how many times any tool can be called in a session",
+          "correct": false,
+          "why": "Idempotency has no concept of a call-count cap, it only tracks whether a SPECIFIC call ID already succeeded, a narrower guarantee than bounding the loop's total behavior."
+        },
+        {
+          "text": "Yes, because idempotent execution means the loop will always terminate quickly",
+          "correct": false,
+          "why": "Idempotency affects correctness of REPEATED calls, not how many times the loop chooses to call in the first place, a loop can still spin, calling a perfectly idempotent tool over and over with fresh call IDs each time."
+        }
+      ]
+    },
+    {
+      "id": "fa_reliability_vs_eval",
+      "question": "A team's eval score dropped after they deployed BOTH a new retry-backoff configuration AND a new fallback model, in the same release, evaluated together in one eval run. What's the practical cost of bundling these two changes?",
+      "source": "pool",
+      "objective": "Synthesis (Modules 6 + 7)",
+      "options": [
+        {
+          "text": "They can't isolate which change caused the drop, or whether one change helped while the other hurt worse, diagnosing the actual cause now requires re-running the eval with each change isolated",
+          "correct": true,
+          "why": ""
+        },
+        {
+          "text": "Nothing, the eval score accurately reflects the system's quality either way",
+          "correct": false,
+          "why": "The score itself is accurate as an aggregate outcome, but it conflates the effects of two separate changes, making the CAUSE of the drop ambiguous, which is the real practical cost."
+        },
+        {
+          "text": "The eval suite becomes unusable once more than one change ships in a release",
+          "correct": false,
+          "why": "The eval suite still produces a valid, meaningful score, the issue isn't that the suite broke, it's that attributing WHICH change caused the drop becomes genuinely ambiguous without isolating variables."
+        }
+      ]
+    }
+  ]
+}

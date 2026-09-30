@@ -1,0 +1,27 @@
+<Muted>A short consolidation before you're graded on it.</Muted>
+
+- Describe the reason-act-observe cycle and why the model, not your code, decides each step's content.
+- Explain why a step limit is required regardless of how capable the model is.
+- Distinguish success, step-limit, and stuck as three separate, differently-handled outcomes.
+- Implement a loop that enforces a step limit and detects repeated-action stalls.
+
+<ProdWarn title={"What would break in production?"}>
+
+- **No step limit.** "The model will know when to stop" is a hope, not a control mechanism, an unbounded loop is an unbounded bill, in tokens, tool calls, and time.
+- **Tool abuse from an unconstrained loop.** A stuck agent doesn't just waste steps, if one of its tools has a real side effect, a stuck loop can repeat that side effect just as easily as it repeats a harmless search.
+- **Incorrect task decomposition treated as success.** A loop that hits its step limit with plausible-looking partial reasoning can look done from the outside. Scraping the last reasoning text for something answer-shaped is not the same as the model actually finishing.
+- **Runaway cost from a legitimate-looking loop.** Twenty different tool calls, no repeats, still hits the same bill as twenty repeated ones if nothing bounds the loop itself, distinct actions aren't automatically cheap actions.
+
+<Rule>
+
+**Rule of thumb:** a loop needs a hard step limit AND stuck-detection, because they catch two different failures, running out of budget on a genuinely hard task, and spinning on a task that's actually broken.
+
+</Rule>
+
+</ProdWarn>
+
+<Connection title={"The engineering connection"}>
+
+You can now stop a loop from running forever, and tell a genuinely hard task apart from a stuck one. But a bounded loop says nothing about what happens when an individual model call inside it fails, times out, or comes back malformed. Module 6 covers making each call itself resilient: retries, backoff, and fallback.
+
+</Connection>

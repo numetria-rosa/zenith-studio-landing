@@ -1,0 +1,29 @@
+{
+  "m2-s2": [
+    "Live calculation",
+    "Context window",
+    "8000",
+    "tokens",
+    "Reserved for output",
+    "1000",
+    "tokens",
+    "available input budget (tokens)",
+    "≈ input words (÷ 4 chars/token × ~5.3 chars/word)",
+    "% of window reserved for output"
+  ],
+  "m2-s11": [
+    "Live calculation",
+    "Total collection size",
+    "400,000",
+    "characters",
+    "Chunk size",
+    "500",
+    "tokens",
+    "Overlap",
+    "15",
+    "%",
+    "chunks produced",
+    "total tokens processed across all chunks",
+    "of that is pure overlap overhead"
+  ]
+}

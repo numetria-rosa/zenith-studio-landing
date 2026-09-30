@@ -1,0 +1,46 @@
+Treat model output the way you would treat a form a stranger submitted: it is untrusted input. It might be valid JSON with the wrong fields, the right fields with the wrong types, or a polite sentence with no JSON at all.
+
+Better prompting makes that rarer. Validation decides what happens when it still occurs, and it will.
+
+## Three ways output goes wrong
+
+<FailureCards
+  items={[
+    { label: "01 · Syntax", color: "#FF5C7A", title: "It won’t parse", text: "Code fences, a friendly sentence before the JSON, or output cut off at the token limit.", tag: "JSONDecodeError" },
+    { label: "02 · Shape", color: "#FFD27A", title: "It parses, wrong shape", text: "A missing field, a string where you need an int, or a value outside your enum.", tag: "ValidationError" },
+    { label: "03 · Meaning", color: "#C7B0FF", title: "Right shape, wrong facts", text: "A perfectly valid order_id that doesn’t exist in your database.", tag: "Your business rules" },
+  ]}
+/>
+
+## Validate at the boundary
+
+Define the shape once, as a Pydantic model, and let it reject anything that doesn’t match. Every downstream function then receives a `Ticket`, never a raw string.
+
+```python filename="ticket.py"
+from typing import Literal
+from pydantic import BaseModel, ValidationError
+
+class Ticket(BaseModel):
+    intent: Literal["refund", "billing", "bug", "other"]
+    order_id: int | None
+    urgency: Literal["low", "medium", "high"]
+
+try:
+    ticket = Ticket.model_validate_json(raw)
+except ValidationError as err:
+    print(err.errors()[0]["loc"], err.errors()[0]["msg"])
+```
+
+<Callout>
+
+A schema in the prompt is a request. A schema in your code is a guarantee.
+
+</Callout>
+
+## The whole path, on one line
+
+<Flow
+  steps={["Raw output", "Parse", "Validate", "Business rules", "Use it"]}
+  failureLabel="on any failure"
+  failureSteps={["Repair once, with the error", "Still bad: fail loudly"]}
+/>

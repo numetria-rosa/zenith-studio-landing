@@ -1,0 +1,5 @@
+<Muted>If you want to go deeper than the browser can take you:</Muted>
+
+- The original ReAct paper (Yao et al.) is the source of the reason-act-observe framing used throughout this module, worth reading directly for the reasoning traces it shows.
+- Production agent frameworks typically add richer stuck-detection than exact repetition, semantic similarity between recent actions, or explicit "no progress" signals from the model itself, at the cost of more complexity.
+- Some architectures use a planner/executor split instead of a single reasoning loop, a separate step decomposes the task into a fixed plan upfront, which sidesteps some (not all) of the unbounded-loop risk by bounding the plan length before execution starts.

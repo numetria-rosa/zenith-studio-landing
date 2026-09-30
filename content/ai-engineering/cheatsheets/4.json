@@ -1,0 +1,51 @@
+{
+  "id": "4",
+  "title": "Tool Use & Idempotency Cheat Sheet",
+  "tag": "Module 4",
+  "sections": [
+    {
+      "label": "Validation order (before ANY execution)",
+      "items": [
+        "1. Does the named tool exist in the registry?",
+        "2. Are all required arguments present (and correctly typed)?",
+        "3. Has this call ID already succeeded (idempotency check)?",
+        "Only after all three does the handler actually run."
+      ]
+    },
+    {
+      "label": "Idempotent executor pattern",
+      "formula": "if call_id in seen: return seen[call_id]\ntry:\n    result = handler(args); seen[call_id] = result\nexcept Exception as e:\n    return {'ok': False, 'error': str(e)}  # do NOT cache"
+    },
+    {
+      "label": "Cache successes, never failures",
+      "items": [
+        "A success gets cached against the call ID: a repeat returns the cached result, the handler never re-runs.",
+        "A failure must NOT be cached: the side effect never happened, so a genuine retry deserves a real second attempt."
+      ]
+    },
+    {
+      "label": "Two validation layers",
+      "items": [
+        "**Schema validation**: is the shape/type correct? (structural)",
+        "**Business-rule validation**: does the VALUE make sense for this specific case? (e.g. a refund amount within the order's actual total)",
+        "A call can pass schema validation and still be unsafe to execute."
+      ]
+    },
+    {
+      "label": "Common mistakes",
+      "items": [
+        "Checking the idempotency cache AFTER calling the handler instead of before.",
+        "Caching a result before knowing if the handler actually succeeded.",
+        "Treating schema-valid as \"safe to execute\" without a business-rule check."
+      ]
+    },
+    {
+      "label": "Implementation checklist",
+      "checklist": [
+        "Unknown tool names are rejected before any handler runs.",
+        "A cached success returns without re-invoking the handler.",
+        "A raised error is never written to the idempotency cache."
+      ]
+    }
+  ]
+}

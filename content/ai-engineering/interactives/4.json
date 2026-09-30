@@ -1,0 +1,63 @@
+{
+  "SPOT_CALLS": [
+    {
+      "id": "c1",
+      "code": "{ \"name\": \"send_refund\",\n  \"arguments\": { \"orderId\": \"ord_9\", \"amountCents\": 1200 } }",
+      "valid": true,
+      "explanation": "Correct tool name, both required arguments present with plausible types. Safe to pass through to execution (and any business-rule checks beyond schema)."
+    },
+    {
+      "id": "c2",
+      "code": "{ \"name\": \"send_refund\",\n  \"arguments\": { \"orderId\": \"ord_9\" } }",
+      "valid": false,
+      "explanation": "Missing the required amountCents argument entirely. Must be rejected before the handler runs, a missing field here isn't something the handler should have to guard against itself."
+    },
+    {
+      "id": "c3",
+      "code": "{ \"name\": \"issue_refund\",\n  \"arguments\": { \"orderId\": \"ord_9\", \"amountCents\": 1200 } }",
+      "valid": false,
+      "explanation": "The tool name is issue_refund, not send_refund, it doesn't match anything in the registry. This is a hallucinated or misremembered tool name, and must be rejected as unknown."
+    },
+    {
+      "id": "c4",
+      "code": "{ \"name\": \"send_refund\",\n  \"arguments\": { \"orderId\": \"ord_9\", \"amountCents\": \"1200\" } }",
+      "valid": false,
+      "explanation": "amountCents is a string, not a number. Depending on how strict your schema validation is, this should be rejected (or explicitly coerced with a clear rule) rather than silently passed to a handler expecting a number."
+    },
+    {
+      "id": "c5",
+      "code": "{ \"name\": \"send_refund\",\n  \"arguments\": { \"orderId\": \"ord_9\", \"amountCents\": 5000000 } }",
+      "valid": true,
+      "explanation": "Structurally valid, correct tool, both required fields present with correct types. Whether $50,000 SHOULD be refunded is a business-rule question, not a schema-validation one, see the practice check below."
+    }
+  ],
+  "IDEM_CALL_ID": "call_ops_2291",
+  "idemState": {
+    "stock": 120,
+    "seen": {},
+    "handlerCalls": 0,
+    "submitted": false
+  },
+  "decision": [
+    {
+      "t": "A. Execute it, schema validation passed and that's the executor's job",
+      "correct": false,
+      "why": "Schema validation only proves the call is well-FORMED, correct types, required fields present. It says nothing about whether $42,000 makes sense as a refund on a $38 order. Executing on shape-correctness alone is exactly the gap this module's mass-assignment scenario warned about."
+    },
+    {
+      "t": "B. Reject it outright and never surface it to the model",
+      "correct": false,
+      "why": "Silently dropping it denies the caller any way to correct course, and if this really is a legitimate edge case (a bulk adjustment, a different currency unit), a hard reject with no explanation just breaks the flow. The model needs a specific reason back, not silence."
+    },
+    {
+      "t": "C. Reject it with a bounds-check error tied to the order's actual total, and report that reason back so the model (or a human) can react",
+      "correct": true,
+      "why": "This is schema validation plus a business-rule check, exactly the two-layer pattern this module teaches: the shape is fine, but a refund over 100x the order total should never execute without a specific, named reason. Reporting the reason back (not just failing silently) gives the model a chance to self-correct, the same discipline as Module 1's repair-then-report pattern."
+    },
+    {
+      "t": "D. Execute it, but flag the transaction for a human to review afterward",
+      "correct": false,
+      "why": "\"Execute now, review later\" only works when the action is reversible and low-cost to undo. A $42,000 refund that already left the account isn't something a later review can cleanly undo, the check needs to happen BEFORE execution, not after."
+    }
+  ]
+}

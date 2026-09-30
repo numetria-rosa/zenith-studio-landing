@@ -1,0 +1,591 @@
+{
+  "topics": [
+    {
+      "number": 1,
+      "title": "Variables, types, and numbers",
+      "why": "Module 2 is entirely about counting: how many tokens does a piece of text cost. That's arithmetic on a variable, nothing more, but if you're not fluent with Python's basic types first, the arithmetic itself becomes the obstacle.",
+      "body": [
+        {
+          "type": "p",
+          "text": "A variable is a name pointing at a value. Python figures out the type from the value itself, you don't declare it up front."
+        },
+        {
+          "type": "concept",
+          "title": "core types",
+          "text": "`int` (whole numbers), `float` (decimals), `str` (text), `bool` (True/False). `len(x)` returns the length of a string, list, or dict. `//` is integer (floor) division, it drops any remainder, which matters when you're estimating a whole number of tokens."
+        },
+        {
+          "type": "code",
+          "code": "text = \"Reset your password from Settings.\"\nchar_count = len(text)          # 35\napprox_tokens = char_count // 4  # 8  (floor division, no remainder)\nprint(approx_tokens)"
+        }
+      ],
+      "practice": {
+        "question": "Why floor division (`//`) instead of regular division (`/`) for a token estimate?",
+        "answer": "A token count has to be a whole number, you can't have \"7.25 tokens.\" Regular division would give a float; floor division gives a clean integer, matching what a real token count actually is."
+      },
+      "exercise": {
+        "functionName": "estimate_tokens",
+        "fileName": "estimate_tokens.py",
+        "instructions": "Complete `estimate_tokens(text)`. This is the exact character/4 estimate the rest of this course uses. Return an `int`, using floor division.",
+        "starter": "def estimate_tokens(text):\n    # Return the character count divided by 4, using floor division,\n    # as an int.\n\n    # YOUR CODE HERE\n\n    pass",
+        "solution": "def estimate_tokens(text):\n    return len(text) // 4",
+        "hints": [
+          {
+            "title": "Hint 1",
+            "text": "Get the character count with `len(text)`, then floor-divide by 4."
+          }
+        ],
+        "harness": "python/harness/t1.py",
+        "tests": [
+          {
+            "name": "estimate_tokens with 0 characters returns 0",
+            "hint": "Use len(text) // 4 (floor division), and make sure you return an int."
+          },
+          {
+            "name": "estimate_tokens with 4 characters returns 1",
+            "hint": "Use len(text) // 4 (floor division), and make sure you return an int."
+          },
+          {
+            "name": "estimate_tokens with 40 characters returns 10",
+            "hint": "Use len(text) // 4 (floor division), and make sure you return an int."
+          },
+          {
+            "name": "estimate_tokens with 7 characters returns 1",
+            "hint": "Use len(text) // 4 (floor division), and make sure you return an int."
+          },
+          {
+            "name": "estimate_tokens with 3 characters returns 0",
+            "hint": "Use len(text) // 4 (floor division), and make sure you return an int."
+          }
+        ]
+      }
+    },
+    {
+      "number": 2,
+      "title": "Strings and basic pattern matching",
+      "why": "Module 1 opens with a real, common failure: a model wraps its JSON answer in a markdown code fence. Before you can parse that as JSON, you have to strip the fence off as a plain string operation.",
+      "body": [
+        {
+          "type": "p",
+          "text": "Python strings support slicing, methods like `.strip()` and `.startswith()`, and the `re` module for pattern matching when a fixed check isn't enough."
+        },
+        {
+          "type": "concept",
+          "title": "regex for structural stripping",
+          "text": "`re.match(pattern, text)` tests whether `text` starts with a match for `pattern` and gives you access to captured groups. `match.group(1)` returns whatever the first `(...)` in the pattern captured."
+        },
+        {
+          "type": "code",
+          "code": "import re\n\nraw = '```json\\n{\"status\": \"ok\"}\\n```'\nm = re.match(r\"^```(?:json)?\\s*([\\s\\S]*?)\\s*```$\", raw)\ninner = m.group(1) if m else raw.strip()\nprint(inner)   # {\"status\": \"ok\"}"
+        }
+      ],
+      "practice": {
+        "question": "What should your function do if the text ISN'T wrapped in a fence at all?",
+        "answer": "Return the text unchanged (just stripped of surrounding whitespace). A fence-stripping function shouldn't assume every input has a fence, plenty of valid model output won't."
+      },
+      "exercise": {
+        "functionName": "strip_code_fence",
+        "fileName": "strip_code_fence.py",
+        "instructions": "Complete `strip_code_fence(text)`. If `text` is wrapped in a markdown code fence (with or without a language tag like `json`), return only the content inside. Otherwise, return `text.strip()` unchanged.",
+        "starter": "import re\n\ndef strip_code_fence(text):\n    # If text is wrapped in a markdown code fence (with or without a\n    # language tag), return only the content inside.\n    # Otherwise, return text.strip() unchanged.\n\n    # YOUR CODE HERE\n\n    pass",
+        "solution": "import re\n\ndef strip_code_fence(text):\n    stripped = text.strip()\n    m = re.match(r\"^```(?:\\w+)?\\s*([\\s\\S]*?)\\s*```$\", stripped)\n    if m:\n        return m.group(1)\n    return stripped",
+        "hints": [
+          {
+            "title": "Hint 1",
+            "text": "Use `re.match(r\"^```(?:\\w+)?\\s*([\\s\\S]*?)\\s*```$\", text.strip())`. If it matches, return `group(1)`. If not, return `text.strip()`."
+          }
+        ],
+        "harness": "python/harness/t2.py",
+        "tests": [
+          {
+            "name": "strip_code_fence handles: '```json\\n{\"a\": 1}\\n```'",
+            "hint": "Match a leading and trailing ``` (with optional language tag) and return the captured inner content; otherwise return text.strip()."
+          },
+          {
+            "name": "strip_code_fence handles: '```\\nhello\\n```'",
+            "hint": "Match a leading and trailing ``` (with optional language tag) and return the captured inner content; otherwise return text.strip()."
+          },
+          {
+            "name": "strip_code_fence handles: 'no fence here'",
+            "hint": "Match a leading and trailing ``` (with optional language tag) and return the captured inner content; otherwise return text.strip()."
+          },
+          {
+            "name": "strip_code_fence handles: '  \\n  plain text  \\n  '",
+            "hint": "Match a leading and trailing ``` (with optional language tag) and return the captured inner content; otherwise return text.strip()."
+          },
+          {
+            "name": "strip_code_fence handles: '```python\\nline1\\nline2\\n```'",
+            "hint": "Match a leading and trailing ``` (with optional language tag) and return the captured inner content; otherwise return text.strip()."
+          }
+        ]
+      }
+    },
+    {
+      "number": 3,
+      "title": "Lists and iteration",
+      "why": "Module 2's chunker splits a document into pieces that fit a token budget. Before tackling that token-aware version, get comfortable with the simpler idea underneath it: splitting a list into fixed-size groups.",
+      "body": [
+        {
+          "type": "p",
+          "text": "A Python list is an ordered, mutable sequence. `list[start:end]` slices it; `.append(x)` adds to the end."
+        },
+        {
+          "type": "concept",
+          "title": "building a list of lists",
+          "text": "A common pattern: start with an empty result list, loop over your input in fixed-size steps, and `.append()` each slice as its own sub-list."
+        },
+        {
+          "type": "code",
+          "code": "items = [1, 2, 3, 4, 5]\nsize = 2\nbatches = []\nfor i in range(0, len(items), size):\n    batches.append(items[i:i + size])\nprint(batches)   # [[1, 2], [3, 4], [5]]"
+        }
+      ],
+      "practice": {
+        "question": "What does `items[i:i+size]` return when `i+size` goes past the end of the list?",
+        "answer": "Python slicing never raises an out-of-range error, it just returns whatever is left, even if that's fewer than `size` items (or an empty list). This is why the last batch above has only 1 item, not a crash."
+      },
+      "exercise": {
+        "functionName": "batch",
+        "fileName": "batch.py",
+        "instructions": "Complete `batch(items, size)`. Split `items` into a list of lists, each with at most `size` items, preserving order. An empty input returns an empty list.",
+        "starter": "def batch(items, size):\n    # Split items into a list of lists, each with at most size items,\n    # preserving order. Empty input returns an empty list.\n\n    # YOUR CODE HERE\n\n    pass",
+        "solution": "def batch(items, size):\n    result = []\n    for i in range(0, len(items), size):\n        result.append(items[i:i + size])\n    return result",
+        "hints": [
+          {
+            "title": "Hint 1",
+            "text": "Loop with `for i in range(0, len(items), size)`, appending `items[i:i+size]` each time."
+          }
+        ],
+        "harness": "python/harness/t3.py",
+        "tests": [
+          {
+            "name": "batch([1, 2, 3, 4, 5], 2) == [[1, 2], [3, 4], [5]]",
+            "hint": "Loop with for i in range(0, len(items), size), appending items[i:i+size] each time."
+          },
+          {
+            "name": "batch([], 3) == []",
+            "hint": "Loop with for i in range(0, len(items), size), appending items[i:i+size] each time."
+          },
+          {
+            "name": "batch([1, 2, 3], 10) == [[1, 2, 3]]",
+            "hint": "Loop with for i in range(0, len(items), size), appending items[i:i+size] each time."
+          },
+          {
+            "name": "batch([1, 2, 3], 1) == [[1], [2], [3]]",
+            "hint": "Loop with for i in range(0, len(items), size), appending items[i:i+size] each time."
+          },
+          {
+            "name": "batch(['a', 'b', 'c', 'd'], 2) == [['a', 'b'], ['c', 'd']]",
+            "hint": "Loop with for i in range(0, len(items), size), appending items[i:i+size] each time."
+          }
+        ]
+      }
+    },
+    {
+      "number": 4,
+      "title": "Dictionaries",
+      "why": "Nearly everything an AI system configures, model parameters, tool schemas, retrieval settings, is a dict. A common pattern across every module ahead: start from sane defaults, then let a caller override just the parts they care about.",
+      "body": [
+        {
+          "type": "p",
+          "text": "A dict maps keys to values. `{**a, **b}` builds a new dict by unpacking `a` first, then `b`, so `b`'s keys win on any overlap, without mutating either original dict."
+        },
+        {
+          "type": "concept",
+          "title": "non-destructive merging",
+          "text": "Mutating a shared defaults dict in place is a common bug, the next caller gets a defaults dict that's no longer default. Building a NEW dict avoids that entirely."
+        },
+        {
+          "type": "code",
+          "code": "defaults = {\"temperature\": 0.7, \"max_tokens\": 500}\noverrides = {\"max_tokens\": 1000}\nconfig = {**defaults, **overrides}\nprint(config)          # {'temperature': 0.7, 'max_tokens': 1000}\nprint(defaults)         # unchanged: {'temperature': 0.7, 'max_tokens': 500}"
+        }
+      ],
+      "practice": {
+        "question": "Why does `defaults` stay unchanged after building `config`?",
+        "answer": "`{**defaults, **overrides}` creates a brand-new dict, it reads from both inputs but writes to neither. Contrast with `defaults.update(overrides)`, which WOULD mutate `defaults` in place, a common source of bugs when the same defaults dict is reused across calls."
+      },
+      "exercise": {
+        "functionName": "merge_config",
+        "fileName": "merge_config.py",
+        "instructions": "Complete `merge_config(defaults, overrides)`. Return a new dict combining both, with `overrides` winning on any shared key. Never mutate either input dict.",
+        "starter": "def merge_config(defaults, overrides):\n    # Return a new dict combining both, with overrides winning on any\n    # shared key. Never mutate either input dict.\n\n    # YOUR CODE HERE\n\n    pass",
+        "solution": "def merge_config(defaults, overrides):\n    return {**defaults, **overrides}",
+        "hints": [
+          {
+            "title": "Hint 1",
+            "text": "Return `{**defaults, **overrides}` directly."
+          }
+        ],
+        "harness": "python/harness/t4.py",
+        "tests": [
+          {
+            "name": "overrides win on shared keys",
+            "hint": "Return {**defaults, **overrides}."
+          },
+          {
+            "name": "empty overrides returns an equivalent copy",
+            "hint": "With no overrides, the result should equal defaults exactly."
+          },
+          {
+            "name": "keys only in overrides are added",
+            "hint": "A key present only in overrides should still appear in the result."
+          },
+          {
+            "name": "the original defaults dict is never mutated",
+            "hint": "Build and return a NEW dict, e.g. {**defaults, **overrides}, do not call defaults.update(overrides)."
+          },
+          {
+            "name": "a mix of shared and unique keys merges correctly",
+            "hint": "Every key from both dicts should appear, with overrides winning any conflicts."
+          }
+        ]
+      }
+    },
+    {
+      "number": 5,
+      "title": "Conditionals, loops, and sorting",
+      "why": "Module 3's whole job is retrieval: score every candidate, throw out the irrelevant ones, keep only the best few. That's a filter, a sort, and a slice, the exact combination this topic builds.",
+      "body": [
+        {
+          "type": "p",
+          "text": "`sorted(iterable, key=..., reverse=True)` returns a new sorted list without changing the original. A list comprehension like `[x for x in items if condition]` filters in one line."
+        },
+        {
+          "type": "concept",
+          "title": "filter, sort, then limit, in that order",
+          "text": "Filtering AFTER sorting (or slicing before filtering) can silently drop a result that should have made the cut. The safe order is always: score everything, filter out what doesn't qualify, sort what's left, then take only as many as you need."
+        },
+        {
+          "type": "code",
+          "code": "docs = [{\"id\": \"a\", \"score\": 0.9}, {\"id\": \"b\", \"score\": 0.2}, {\"id\": \"c\", \"score\": 0.6}]\nqualified = [d for d in docs if d[\"score\"] >= 0.4]\nranked = sorted(qualified, key=lambda d: d[\"score\"], reverse=True)\ntop2 = ranked[:2]\nprint(top2)   # [{'id': 'a', 'score': 0.9}, {'id': 'c', 'score': 0.6}]"
+        }
+      ],
+      "practice": {
+        "question": "Why filter by the minimum score BEFORE slicing to the limit, rather than after?",
+        "answer": "Slicing first (say, taking the top 2 by score, then checking if they clear the threshold) can leave you with fewer than you should have, or wrongly include a low scorer if you slice before sorting. Filtering first guarantees every candidate you keep already qualifies, however many end up in the final slice."
+      },
+      "exercise": {
+        "functionName": "top_matches",
+        "fileName": "top_matches.py",
+        "instructions": "Complete `top_matches(docs, min_score, limit)`. `docs` is a list of `{\"id\":..., \"score\":...}` dicts. Return the qualifying docs (score >= min_score), sorted by score descending, limited to at most `limit` results.",
+        "starter": "def top_matches(docs, min_score, limit):\n    # docs: list of {\"id\":..., \"score\":...} dicts.\n    # Return qualifying docs (score >= min_score), sorted by score\n    # descending, limited to at most 'limit' results.\n\n    # YOUR CODE HERE\n\n    pass",
+        "solution": "def top_matches(docs, min_score, limit):\n    qualified = [d for d in docs if d[\"score\"] >= min_score]\n    ranked = sorted(qualified, key=lambda d: d[\"score\"], reverse=True)\n    return ranked[:limit]",
+        "hints": [
+          {
+            "title": "Hint 1",
+            "text": "Filter with a list comprehension, sort with `sorted(..., key=lambda d: d[\"score\"], reverse=True)`, then slice with `[:limit]`."
+          }
+        ],
+        "harness": "python/harness/t5.py",
+        "tests": [
+          {
+            "name": "filters below threshold, sorts descending, limits to 2",
+            "hint": "Filter score >= min_score first, then sort descending by score, then slice to limit."
+          },
+          {
+            "name": "limit higher than qualifying count returns all qualifying docs, sorted",
+            "hint": "Slicing past the end of a list just returns everything available, no error."
+          },
+          {
+            "name": "no docs qualifying returns an empty list",
+            "hint": "If nothing clears min_score, the filtered list is empty before sorting/slicing even runs."
+          },
+          {
+            "name": "result is correctly sorted regardless of input order",
+            "hint": "Always sort AFTER filtering, using key=lambda d: d[\"score\"], reverse=True."
+          },
+          {
+            "name": "limit=1 returns only the single best qualifying match",
+            "hint": "After filtering and sorting, [:limit] with limit=1 keeps only the top entry."
+          }
+        ]
+      }
+    },
+    {
+      "number": 6,
+      "title": "Functions and handling failure with try/except",
+      "why": "Module 7's eval harness has one hard rule: a single broken test case can never crash the whole evaluation run. That discipline starts here, with the basic shape of a function that fails safely instead of taking the whole program down with it.",
+      "body": [
+        {
+          "type": "p",
+          "text": "A function that might fail should say so through its return value, not by letting an exception escape uncaught. `try/except` catches an error and lets you decide what happens next."
+        },
+        {
+          "type": "concept",
+          "title": "try/except",
+          "text": "`try:` wraps code that might raise. `except Exception as e:` catches it, `e` is the exception object, `str(e)` gives its message. Code inside `except` runs only if the `try` block actually raised."
+        },
+        {
+          "type": "code",
+          "code": "def safe_score(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        return None\n\nprint(safe_score(10, 2))   # 5.0\nprint(safe_score(5, 0))    # None, no crash"
+        }
+      ],
+      "practice": {
+        "question": "What would happen to a caller looping over many `(a, b)` pairs if `safe_score` DIDN'T catch the exception?",
+        "answer": "A single `b=0` pair anywhere in the loop would raise, uncaught, and crash the ENTIRE loop, losing every result computed so far, not just the one bad pair. This is exactly the \"one bad input shouldn't take down the whole batch\" principle that shows up again in Module 4's tool executor and Module 7's eval harness."
+      },
+      "exercise": {
+        "functionName": "safe_score",
+        "fileName": "safe_score.py",
+        "instructions": "Complete `safe_score(a, b)`. Return `a / b`. If `b` is 0, catch the `ZeroDivisionError` and return `None` instead of letting it raise.",
+        "starter": "def safe_score(a, b):\n    # Return a / b. If b is 0, catch the ZeroDivisionError and\n    # return None instead of letting it raise.\n\n    # YOUR CODE HERE\n\n    pass",
+        "solution": "def safe_score(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        return None",
+        "hints": [
+          {
+            "title": "Hint 1",
+            "text": "Wrap the division in `try: ... except ZeroDivisionError: return None`."
+          }
+        ],
+        "harness": "python/harness/t6.py",
+        "tests": [
+          {
+            "name": "safe_score(10, 2) == 5",
+            "hint": "Wrap a / b in try/except ZeroDivisionError, returning None on that specific exception."
+          },
+          {
+            "name": "safe_score(5, 0) == None",
+            "hint": "Wrap a / b in try/except ZeroDivisionError, returning None on that specific exception."
+          },
+          {
+            "name": "safe_score(0, 5) == 0",
+            "hint": "Wrap a / b in try/except ZeroDivisionError, returning None on that specific exception."
+          },
+          {
+            "name": "safe_score(-4, 2) == -2",
+            "hint": "Wrap a / b in try/except ZeroDivisionError, returning None on that specific exception."
+          },
+          {
+            "name": "safe_score(7, 2) == 3.5",
+            "hint": "Wrap a / b in try/except ZeroDivisionError, returning None on that specific exception."
+          }
+        ]
+      }
+    },
+    {
+      "number": 7,
+      "title": "Working with JSON",
+      "why": "Every model API speaks JSON. Module 1's entire premise is that a model's JSON-shaped output can't be trusted until it's actually been parsed and validated, starting with just getting `json.loads()` to succeed.",
+      "body": [
+        {
+          "type": "p",
+          "text": "Python's built-in `json` module converts between JSON text and Python objects. `json.loads(text)` parses text into a dict/list/etc; `json.dumps(obj)` does the reverse."
+        },
+        {
+          "type": "concept",
+          "title": "json.loads() raises on invalid input",
+          "text": "Malformed JSON doesn't return `None`, it raises `json.JSONDecodeError`. If you want a function that never crashes on bad input, you have to catch that explicitly."
+        },
+        {
+          "type": "code",
+          "code": "import json\n\nprint(json.loads('{\"status\": \"ok\"}'))   # {'status': 'ok'}\nprint(json.loads('[1, 2, 3]'))          # [1, 2, 3]\ntry:\n    json.loads(\"not json at all\")\nexcept json.JSONDecodeError as e:\n    print(\"failed:\", e)"
+        }
+      ],
+      "practice": {
+        "question": "Why is returning `None` on failure better than letting `json.JSONDecodeError` propagate out of your own function?",
+        "answer": "A caller expecting \"either parsed data or a clear signal it failed\" can check `if result is None` and handle it gracefully. An uncaught exception instead forces every single caller to wrap every single call in its own try/except, or risk a crash, exactly the repair-then-validate discipline Module 1 builds on."
+      },
+      "exercise": {
+        "functionName": "parse_or_none",
+        "fileName": "parse_or_none.py",
+        "instructions": "Complete `parse_or_none(text)`. Try `json.loads(text)` and return the result. If it raises, catch the exception and return `None` instead.",
+        "starter": "import json\n\ndef parse_or_none(text):\n    # Try json.loads(text) and return the result.\n    # If it raises, catch the exception and return None instead.\n\n    # YOUR CODE HERE\n\n    pass",
+        "solution": "import json\n\ndef parse_or_none(text):\n    try:\n        return json.loads(text)\n    except Exception:\n        return None",
+        "hints": [
+          {
+            "title": "Hint 1",
+            "text": "Import `json`, wrap `json.loads(text)` in try/except catching `Exception` (broad is fine here), return `None` on failure."
+          }
+        ],
+        "harness": "python/harness/t7.py",
+        "tests": [
+          {
+            "name": "valid JSON object parses to a dict",
+            "hint": "json.loads() of a valid object string returns a dict directly."
+          },
+          {
+            "name": "valid JSON array parses to a list",
+            "hint": "json.loads() also handles top-level arrays, returning a list."
+          },
+          {
+            "name": "invalid JSON returns None, never raises",
+            "hint": "Catch the exception json.loads() raises on invalid input and return None instead of letting it propagate."
+          },
+          {
+            "name": "empty string returns None",
+            "hint": "An empty string is not valid JSON either, it should be caught the same way."
+          },
+          {
+            "name": "a bare JSON number string like '42' parses to an int",
+            "hint": "JSON top-level values can be numbers too, not just objects/arrays, json.loads(\"42\") returns 42."
+          }
+        ]
+      }
+    },
+    {
+      "number": 8,
+      "title": "Async functions: the shape of a model API call",
+      "why": "Every real model API call is asynchronous, your code sends a request and waits for a response without freezing everything else. Module 6's entire retry-and-fallback system is built from `async def` functions and `await`. This is the minimum shape you need before that module.",
+      "body": [
+        {
+          "type": "p",
+          "text": "`async def` defines a function that can be `await`ed. Inside an async function, `await some_async_call()` pauses until that call finishes, without blocking anything else."
+        },
+        {
+          "type": "concept",
+          "title": "trying calls in order until one works",
+          "text": "A common async pattern (and the direct precursor to Module 6's fallback logic): try a list of async operations one at a time, and use the first one that succeeds, catching failures along the way instead of stopping at the first error."
+        },
+        {
+          "type": "code",
+          "code": "async def fetch_first_success(calls):\n    for call in calls:\n        try:\n            return await call()\n        except Exception:\n            continue\n    return None\n\n# calls is a list of async functions with no arguments, e.g.:\n# async def primary(): raise Exception(\"down\")\n# async def backup(): return \"backup result\"\n# await fetch_first_success([primary, backup])  ->  \"backup result\""
+        }
+      ],
+      "practice": {
+        "question": "If EVERY call in the list raises, what should `fetch_first_success` return, and why not let the last exception propagate?",
+        "answer": "It should return `None` (a clear, structured \"nothing worked\" signal), not let an exception escape. This is the exact same \"never let this function raise, report failure through the return value\" discipline from topics 6 and 7, now applied to async code, and it's precisely what Module 6's `call_with_retry_fallback` builds on directly."
+      },
+      "exercise": {
+        "functionName": "fetch_first_success",
+        "fileName": "fetch_first_success.py",
+        "instructions": "Complete `async def fetch_first_success(calls)`. `calls` is a list of async, no-argument functions. Try each in order with `await`; return the first result that succeeds without raising. If every call raises, return `None`. Never let this function raise.",
+        "starter": "async def fetch_first_success(calls):\n    # calls: list of async, no-argument functions.\n    # Try each in order with await; return the first result that\n    # succeeds without raising. If every call raises, return None.\n    # Never let this function raise.\n\n    # YOUR CODE HERE\n\n    pass",
+        "solution": "async def fetch_first_success(calls):\n    for call in calls:\n        try:\n            return await call()\n        except Exception:\n            continue\n    return None",
+        "hints": [
+          {
+            "title": "Hint 1",
+            "text": "Loop over `calls`, wrapping `await call()` in a try/except. On success, `return` immediately. On exception, `continue` to the next one. After the loop, return `None`."
+          }
+        ],
+        "harness": "python/harness/t8.py",
+        "tests": [
+          {
+            "name": "first call succeeding returns its result without trying the rest",
+            "hint": "Return immediately from inside the loop on the first successful await, do not continue to later calls."
+          },
+          {
+            "name": "first call raising falls through to the second, which succeeds",
+            "hint": "Catch the exception from the failed call and continue the loop to the next one instead of stopping."
+          },
+          {
+            "name": "every call raising returns None, never raises out of the function",
+            "hint": "After the loop finishes without any call succeeding, return None as a clear failure signal."
+          },
+          {
+            "name": "stops trying further calls once one succeeds (c is never attempted)",
+            "hint": "Once a call succeeds, return right away, do not keep looping through the remaining calls."
+          },
+          {
+            "name": "a single-call list that succeeds returns its result",
+            "hint": "The logic should work identically for a list of exactly one call."
+          }
+        ]
+      }
+    }
+  ],
+  "selfCheck": [
+    {
+      "id": "scq1",
+      "question": "What does `len(\"hello\") // 4` evaluate to?",
+      "options": [
+        {
+          "text": "1",
+          "correct": true,
+          "why": "Correct. len(\"hello\") is 5, and 5 // 4 is 1 (floor division drops the remainder)."
+        },
+        {
+          "text": "1.25",
+          "correct": false,
+          "why": "// is floor division, it always returns a whole number (an int), never a float with a fractional part."
+        },
+        {
+          "text": "2",
+          "correct": false,
+          "why": "5 // 4 rounds DOWN, not up, floor division truncates toward zero here, giving 1."
+        }
+      ]
+    },
+    {
+      "id": "scq2",
+      "question": "What does `len(\"hello\") // 4` evaluate to? Question 2 of 5 If a string is NOT wrapped in a markdown fence, what should a well-behaved `strip_code_fence` function do?",
+      "options": [
+        {
+          "text": "Return the text stripped of surrounding whitespace, unchanged otherwise",
+          "correct": true,
+          "why": "Correct. A fence-stripping function shouldn't assume every input has a fence, unfenced input should pass through safely."
+        },
+        {
+          "text": "Raise an exception, since a fence was expected",
+          "correct": false,
+          "why": "Not every valid model response uses a fence, treating the absence of one as an error would reject perfectly good input."
+        },
+        {
+          "text": "Return an empty string",
+          "correct": false,
+          "why": "Discarding valid content because it wasn't fenced would silently lose real data for no reason."
+        }
+      ]
+    },
+    {
+      "id": "scq3",
+      "question": "What does `len(\"hello\") // 4` evaluate to? Question 2 of 5 If a string is NOT wrapped in a markdown fence, what should a well-behaved `strip_code_fence` function do? Question 3 of 5 What does `{**defaults, **overrides}` do to the original `defaults` dict?",
+      "options": [
+        {
+          "text": "Nothing, it creates a new dict and leaves defaults unchanged",
+          "correct": true,
+          "why": "Correct. Dict-unpacking builds a fresh dict, reading from both inputs but mutating neither."
+        },
+        {
+          "text": "It updates defaults in place with overrides' keys",
+          "correct": false,
+          "why": "That describes defaults.update(overrides), a different operation. {**defaults, **overrides} does not touch defaults at all."
+        },
+        {
+          "text": "It empties out defaults after copying its keys",
+          "correct": false,
+          "why": "Dict-unpacking never empties or mutates the dicts it reads from, it only reads their key/value pairs to build a new dict."
+        }
+      ]
+    },
+    {
+      "id": "scq4",
+      "question": "What does `len(\"hello\") // 4` evaluate to? Question 2 of 5 If a string is NOT wrapped in a markdown fence, what should a well-behaved `strip_code_fence` function do? Question 3 of 5 What does `{**defaults, **overrides}` do to the original `defaults` dict? Question 4 of 5 What does `json.loads()` do when given text that isn't valid JSON?",
+      "options": [
+        {
+          "text": "It raises json.JSONDecodeError",
+          "correct": true,
+          "why": "Correct. Invalid JSON is a real, raised exception, not a silent None or empty result, you have to catch it explicitly if you want graceful handling."
+        },
+        {
+          "text": "It returns None silently",
+          "correct": false,
+          "why": "json.loads() does not return None on failure, it raises. Returning None on bad input is something YOUR code has to add explicitly."
+        },
+        {
+          "text": "It returns the original text unchanged",
+          "correct": false,
+          "why": "There's no automatic fallback to the raw text, an invalid-JSON call raises rather than returning anything."
+        }
+      ]
+    },
+    {
+      "id": "scq5",
+      "question": "What does `len(\"hello\") // 4` evaluate to? Question 2 of 5 If a string is NOT wrapped in a markdown fence, what should a well-behaved `strip_code_fence` function do? Question 3 of 5 What does `{**defaults, **overrides}` do to the original `defaults` dict? Question 4 of 5 What does `json.loads()` do when given text that isn't valid JSON? Question 5 of 5 Inside an `async def` function, what does `await some_call()` do?",
+      "options": [
+        {
+          "text": "Pauses execution until that call finishes, without blocking anything else",
+          "correct": true,
+          "why": "Correct. That's the core behavior async/await provides, waiting for a slow operation (like a model API call) without freezing the whole program."
+        },
+        {
+          "text": "Runs the call in the background and immediately continues without waiting",
+          "correct": false,
+          "why": "That's what NOT awaiting would do (or a separate background task). await specifically means 'wait for this to finish before continuing.'"
+        },
+        {
+          "text": "Has no effect unless the function is also decorated as async",
+          "correct": false,
+          "why": "await is only valid INSIDE an async function in the first place, its effect (pausing for the result) is immediate and always applies there."
+        }
+      ]
+    }
+  ]
+}

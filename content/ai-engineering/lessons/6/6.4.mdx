@@ -1,0 +1,19 @@
+Retrying a non-retryable error isn't just wasted effort, it actively delays the moment your system (or your user) learns the request failed, and it does so while consuming the same retry budget a genuinely transient failure would have needed. The correct response to a non-retryable error is to stop immediately and surface it.
+
+<Callout>
+
+**Retrying blindly hides real bugs.** A malformed request retried 5 times with backoff doesn't become valid on attempt 5, it just takes 5 attempts (and the accumulated delay) to fail instead of one. If the bug is in your own request construction, fast, visible failure is what gets it fixed, silent retries just delay the failure without ever preventing it.
+
+</Callout>
+
+<Practice>
+
+An error's classification (retryable or not) isn't always obvious from the HTTP status code alone, some providers return the same generic 500 for both a truly transient fault AND a request that will never succeed. What's the practical implication for how conservatively you should classify "unknown" errors?
+
+<Answer>
+
+When classification is ambiguous, treating an error as retryable (with a bounded retry count, never unlimited) is usually the safer default, a spurious retry on a permanent failure costs one bounded extra attempt, while treating a genuinely transient failure as non-retryable throws away a request that a second try would have saved. The key safeguard either way is the SAME bound: a maximum retry count, so an ambiguous classification never turns into an unbounded retry loop.
+
+</Answer>
+
+</Practice>

@@ -1,0 +1,15 @@
+<Muted>A simplified real trace: an agent answering "What's the status of order \#4471, and should the customer be notified?" Step through it.</Muted>
+
+<Interactive id={"m5-s2"} label={"Agent trace · step through"} />
+
+<Practice>
+
+Count the tool calls (act steps) in the trace above. Each one is a validated, idempotent execution per Module 4. What does Module 4 NOT protect against here, even though every individual call is safe?
+
+<Answer>
+
+Module 4 guarantees each individual call is validated and safe to repeat without duplicating side effects. It says nothing about how many DIFFERENT steps the loop takes overall, or whether the loop ever decides to stop. A perfectly safe tool call, executed as step 40 of an agent that should have finished at step 3, is still a problem, just not the kind Module 4 was built to catch. That's this module's job.
+
+</Answer>
+
+</Practice>

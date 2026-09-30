@@ -19,7 +19,7 @@ export default async function SignInPage({
   const { callbackUrl, error } = await searchParams;
   // Only ever redirect within this site - an absolute or protocol-relative
   // callbackUrl (e.g. "https://evil.example") must never be honored here.
-  const redirectTo = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/lab/dashboard";
+  const redirectTo = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/account";
 
   return (
     <div
@@ -70,8 +70,8 @@ function PasswordSignInForm({ redirectTo }: { redirectTo: string }) {
       .trim()
       .toLowerCase();
     const password = String(formData.get("password") || "");
-    const rawDest = String(formData.get("redirectTo") || "/lab/dashboard");
-    const dest = rawDest.startsWith("/") ? rawDest : "/lab/dashboard";
+    const rawDest = String(formData.get("redirectTo") || "/account");
+    const dest = rawDest.startsWith("/") ? rawDest : "/account";
 
     const user = email ? await db.user.findUnique({ where: { email } }) : null;
     const ok = user?.passwordEnc ? decryptPassword(user.passwordEnc) === password : false;

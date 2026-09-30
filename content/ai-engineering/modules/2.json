@@ -1,0 +1,509 @@
+{
+  "number": 2,
+  "slug": "context-windows-and-token-economics",
+  "title": "Context Windows & Token Economics",
+  "stage": "Stage 0 · Prompting foundations",
+  "minutes": 40,
+  "summary": "Every prompt has a budget, measured in tokens, not characters or \"how much text feels reasonable.\" This module gives you the actual arithmetic for what fits, what it costs, and what to do when your content doesn't fit.",
+  "objectives": [
+    "Distinguish tokens from characters and words, and estimate token counts for planning purposes",
+    "Compute how much input fits in a context window given a reserved output budget",
+    "Explain why naive truncation silently drops information, and what a chunking strategy does instead",
+    "Implement a token-budget-aware chunker that preserves context across chunk boundaries"
+  ],
+  "lessons": [
+    {
+      "number": "2.1",
+      "title": "Before you start",
+      "minutes": 2
+    },
+    {
+      "number": "2.2",
+      "title": "A token is not a word, and not a character",
+      "minutes": 6
+    },
+    {
+      "number": "2.3",
+      "title": "Interactive: how much actually fits",
+      "minutes": 3
+    },
+    {
+      "number": "2.4",
+      "title": "Naive truncation silently destroys information",
+      "minutes": 6
+    },
+    {
+      "number": "2.5",
+      "title": "Why chunks overlap",
+      "minutes": 6
+    },
+    {
+      "number": "2.6",
+      "title": "Cost and latency both scale with tokens",
+      "minutes": 7
+    },
+    {
+      "number": "2.7",
+      "title": "Build it: a token-budget-aware chunker",
+      "minutes": 3
+    },
+    {
+      "number": "2.8",
+      "title": "Before the checkpoint: what you should now be able to do",
+      "minutes": 5
+    },
+    {
+      "number": "2.9",
+      "title": "Interactive: sizing a RAG ingestion run",
+      "minutes": 2
+    }
+  ],
+  "exercise": {
+    "label": "Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)",
+    "instructions": "Complete `chunk_text(words, max_tokens_per_chunk, overlap_words, estimate_tokens)`. `words` is a list of word strings (already split, don't split further). `estimate_tokens(word)` is a function returning the token count for one word, call it per word. Return a list of chunks, each chunk a list of words. No chunk's total estimated tokens may exceed `max_tokens_per_chunk`, UNLESS a single word alone exceeds the budget, in which case it still gets its own chunk, never silently dropped. Each chunk (except the last) should end with the same `overlap_words` words that the next chunk starts with.",
+    "functionName": "chunk_text",
+    "fileName": "chunk_text.py",
+    "starter": "def chunk_text(words, max_tokens_per_chunk, overlap_words, estimate_tokens):\n    # Never silently drop a word, even one that alone exceeds max_tokens_per_chunk.\n    # Each chunk (except the last) should end with the same overlap_words words\n    # that the next chunk starts with.\n\n    # YOUR CODE HERE\n\n    pass",
+    "solution": "def chunk_text(words, max_tokens_per_chunk, overlap_words, estimate_tokens):\n    chunks = []\n    i = 0\n    while i < len(words):\n        chunk = []\n        tokens = 0\n        j = i\n        while j < len(words):\n            t = estimate_tokens(words[j])\n            if tokens + t > max_tokens_per_chunk and len(chunk) > 0:\n                break\n            chunk.append(words[j])\n            tokens += t\n            j += 1\n        chunks.append(chunk)\n        if j >= len(words):\n            break\n        i = max(i + 1, j - overlap_words)\n    return chunks",
+    "hints": [
+      {
+        "title": "Hint 1: conceptual",
+        "mdx": "Walk through the words with two pointers: build the current chunk word-by-word until adding the next word would exceed the budget, then start the next chunk a few words BACK from where you stopped, that's the overlap."
+      },
+      {
+        "title": "Hint 2: specific",
+        "mdx": "Track a running token total for the current chunk. Before adding a word, check if `running_total + estimate_tokens(word) > max_tokens_per_chunk`. If so, and the chunk already has at least one word, stop this chunk here. If the chunk is still empty, add the word anyway (that's the oversized-single-word case)."
+      },
+      {
+        "title": "Hint 3: near-solution",
+        "mdx": "After finishing a chunk ending at word index `j` (exclusive), start the next chunk at index `j - overlap_words` (clamped to not go below 0, and not below where the current chunk started). Stop the outer loop once a chunk reaches the end of the words list."
+      }
+    ],
+    "tests": [
+      {
+        "name": "Generous budget produces a single chunk with everything",
+        "hint": "If the whole input fits under max_tokens_per_chunk, you should end up with exactly one chunk containing all the words."
+      },
+      {
+        "name": "Multi-chunk split respects the token budget and overlaps correctly",
+        "hint": "With max_tokens_per_chunk=3 and 1 token/word, each chunk should hold at most 3 words, and each chunk's last word should equal the next chunk's first word (overlap_words=1)."
+      },
+      {
+        "name": "A single word exceeding the budget alone still gets its own chunk",
+        "hint": "Never drop content. If a chunk is still empty, add the word even if it alone exceeds max_tokens_per_chunk, that is the only way to guarantee no word is silently lost."
+      },
+      {
+        "name": "Every word appears in at least one chunk (nothing silently dropped)",
+        "hint": "Walk through your loop's termination condition carefully, a longer input is where an off-by-one in the overlap math tends to drop the last few words."
+      },
+      {
+        "name": "Zero overlap produces a clean, non-repeating partition",
+        "hint": "With overlap_words=0, chunk boundaries shouldn't repeat any word, [w1,w2,w3] then [w4,w5,w6], nothing shared between them."
+      }
+    ],
+    "harness": "exercises/2.py",
+    "id": "2.7"
+  },
+  "quiz": {
+    "passMark": 4,
+    "questions": [
+      {
+        "id": "m2-q1",
+        "question": "Using this course's estimate of tokens ≈ characters / 4, roughly how many tokens is a 400-character prompt?",
+        "source": "checkpoint",
+        "numeric": {
+          "answer": 100,
+          "tolerance": 0,
+          "correct": "Correct. 400 / 4 = 100 tokens, using this course's estimate.",
+          "incorrect": "Not quite. 400 characters ÷ 4 chars/token = 100 tokens."
+        }
+      },
+      {
+        "id": "m2-q2",
+        "question": "A context window is 4000 tokens, and 800 tokens are reserved for output. What's the available input budget?",
+        "source": "checkpoint",
+        "numeric": {
+          "answer": 3200,
+          "tolerance": 0,
+          "correct": "Correct. 4000 − 800 = 3200 tokens available for input.",
+          "incorrect": "Not quite. Available input = context window − reserved output = 4000 − 800 = 3200."
+        }
+      },
+      {
+        "id": "m2-q3",
+        "question": "Why is naive truncation described as a \"silent\" failure mode specifically?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "It succeeds without error while discarding whatever content came after the cut point",
+            "correct": true,
+            "why": "It runs to completion and produces plausible-looking output while quietly missing content."
+          },
+          {
+            "text": "It raises a visible exception every time content is too long",
+            "correct": false,
+            "why": "That's the opposite of what makes it dangerous, if it raised a visible exception, it would be a loud, easy-to-catch bug, not a silent one."
+          },
+          {
+            "text": "It only affects performance, not correctness",
+            "correct": false,
+            "why": "It affects correctness directly, whatever content was cut off is simply unavailable to the model, that's a correctness problem, not a performance one."
+          }
+        ],
+        "principle": "It runs to completion and produces plausible-looking output while quietly missing content."
+      },
+      {
+        "id": "m2-q4",
+        "question": "What does increasing chunk overlap cost you?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "More total tokens processed across the whole document, since boundary content is repeated, which raises cost and total latency",
+            "correct": true,
+            "why": "Overlap trades cost for boundary continuity, it isn't free."
+          },
+          {
+            "text": "Nothing, overlap is free since it reuses content that was already fetched",
+            "correct": false,
+            "why": "'Already fetched' doesn't mean free to process, the model still has to read those repeated tokens again in the next chunk, that's real additional token cost, not a free reuse."
+          },
+          {
+            "text": "It reduces the number of chunks needed",
+            "correct": false,
+            "why": "Overlap doesn't reduce chunk count, if anything, more overlap per chunk boundary means slightly MORE total chunks are needed to cover the same content, not fewer."
+          }
+        ],
+        "principle": "Overlap trades cost for boundary continuity, it isn't free."
+      },
+      {
+        "id": "m2-q5",
+        "question": "A model call that failed validation (Module 1) gets retried with the original prompt (600 tokens) plus an error explanation (150 tokens) plus a new response (200 tokens). Roughly how many total tokens did that one failed-then-retried request actually cost, across both attempts, compared to a single successful call of the same size?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Roughly 950 tokens total (600 + 150 + 200), noticeably more than a single successful ~800-token call (600 prompt + 200 response)",
+            "correct": true,
+            "why": "A failed-then-retried call costs roughly the sum of both attempts' tokens, not just one."
+          },
+          {
+            "text": "The same as a single call, retries don't add token cost, only latency",
+            "correct": false,
+            "why": "Retries absolutely add token cost, the original prompt is sent again (plus new error context), and a new response is generated, that's real additional tokens billed, not just extra wait time."
+          },
+          {
+            "text": "Less than a single call, since the second attempt is shorter",
+            "correct": false,
+            "why": "The second attempt isn't a replacement for the first, both attempts' tokens count, the original 600-token prompt was already sent (and paid for) on the first, failed attempt."
+          }
+        ],
+        "principle": "A failed-then-retried call costs roughly the sum of both attempts' tokens, not just one."
+      },
+      {
+        "id": "m2q1",
+        "question": "Context window is 16000 tokens, 2000 are reserved for output. How many tokens are available for input?",
+        "source": "pool",
+        "type": "calculation",
+        "difficulty": "medium",
+        "objective": "Compute available input budget",
+        "options": [
+          {
+            "text": "14000",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "16000, the reservation doesn't reduce what's available for input",
+            "correct": false,
+            "why": "Reserved output tokens come out of the same total window, they're not additional headroom, available input = window minus reservation."
+          },
+          {
+            "text": "18000, input and output budgets are separate pools that add together",
+            "correct": false,
+            "why": "They're not separate pools, both input and output share one total context window, that's the entire premise of the budget calculation."
+          }
+        ]
+      },
+      {
+        "id": "m2q2",
+        "question": "What makes naive truncation specifically dangerous, compared to an error that raises an exception?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "Define naive truncation's core failure",
+        "options": [
+          {
+            "text": "It succeeds silently while discarding content, producing plausible-looking output with no indication anything was cut",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "It always crashes the application, which is worse than a normal error",
+            "correct": false,
+            "why": "Naive truncation doesn't crash anything, that's precisely the danger, a loud crash would at least be noticed and handled."
+          },
+          {
+            "text": "It only affects image inputs, not text",
+            "correct": false,
+            "why": "Truncation applies to text content being cut at a token/character limit, it isn't specific to images."
+          }
+        ]
+      },
+      {
+        "id": "m2q3",
+        "question": "A chunker's budget check applies even when the current chunk is still empty. A single word alone exceeds the whole budget. What happens to that word?",
+        "source": "pool",
+        "type": "application",
+        "difficulty": "medium",
+        "objective": "Apply the oversized-single-word rule in chunking",
+        "options": [
+          {
+            "text": "It gets silently dropped, since the check blocks adding it to any chunk, ever",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "It automatically gets its own oversized chunk, chunkers always handle this case correctly by default",
+            "correct": false,
+            "why": "This is only true if the budget check specifically has a guard exempting an empty chunk, without that guard (as described here), the word is dropped, not automatically rescued."
+          },
+          {
+            "text": "It gets truncated to fit the budget",
+            "correct": false,
+            "why": "Nothing in a basic budget-check chunker truncates individual words, an oversized word without the empty-chunk guard is simply never added anywhere."
+          }
+        ]
+      },
+      {
+        "id": "m2q4",
+        "question": "What problem does overlapping chunk boundaries solve?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "Explain the purpose of chunk overlap",
+        "options": [
+          {
+            "text": "It keeps an idea that spans a chunk boundary readable in both the chunk before and after the cut, instead of being split with zero context on either side",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "It reduces the total number of tokens processed across the document",
+            "correct": false,
+            "why": "Overlap increases total tokens processed (the same content is repeated across boundaries), it doesn't reduce it."
+          },
+          {
+            "text": "It makes chunking unnecessary for documents under the context window size",
+            "correct": false,
+            "why": "Overlap is about boundary continuity between MULTIPLE chunks, it has nothing to do with whether chunking is needed at all for a given document size."
+          }
+        ]
+      },
+      {
+        "id": "m2q5",
+        "question": "A team doubles their chunk overlap percentage to improve answer quality at chunk boundaries. What do they need to accept in exchange?",
+        "source": "pool",
+        "type": "engineering-decision",
+        "difficulty": "medium",
+        "objective": "Reason about overlap as a cost tradeoff",
+        "options": [
+          {
+            "text": "More total tokens processed across the whole document (and thus more cost and more total chunks), since repeated boundary content is processed more than once",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Nothing, overlap is free since the repeated content was already fetched once",
+            "correct": false,
+            "why": "'Already fetched' doesn't mean free to process, the model still reads those repeated tokens again in the next chunk, that's real additional cost."
+          },
+          {
+            "text": "Fewer total chunks, since overlap merges adjacent chunks together",
+            "correct": false,
+            "why": "Overlap doesn't merge chunks, if anything more overlap per boundary tends to require slightly MORE chunks to cover the same content, not fewer."
+          }
+        ]
+      },
+      {
+        "id": "m2q6",
+        "question": "A 500-token prompt fails validation, and the retry sends the original prompt plus a 100-token error explanation, generating a new 150-token response. Roughly how many total input+output tokens did this cost across both attempts?",
+        "source": "pool",
+        "type": "calculation",
+        "difficulty": "medium",
+        "objective": "Compute a retry's real token cost",
+        "options": [
+          {
+            "text": "Roughly 750 tokens (500 original + 100 error context + 150 new response), notably more than a single successful call of similar size",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "500 tokens, only the original prompt counts since the retry reuses it",
+            "correct": false,
+            "why": "The error-context tokens and the newly generated response are real additional tokens, they don't disappear because part of the content was reused."
+          },
+          {
+            "text": "150 tokens, only the final successful response counts",
+            "correct": false,
+            "why": "The first attempt's prompt tokens and the retry's added context were both real, billed tokens, ignoring them undercounts the true cost of the retry."
+          }
+        ]
+      },
+      {
+        "id": "m2q7",
+        "question": "A summarizer truncates ticket text to the first 400 tokens. A customer's actual complaint is in the last paragraph. The pipeline runs with no errors and produces a summary. What's actually wrong?",
+        "source": "pool",
+        "type": "debugging",
+        "difficulty": "hard",
+        "objective": "Diagnose a silent-truncation bug in production",
+        "options": [
+          {
+            "text": "The summary is confidently wrong, it describes only the truncated portion and never saw the actual complaint, a technically-successful run that's functionally incorrect",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Nothing is wrong, the pipeline completed without throwing an exception",
+            "correct": false,
+            "why": "Completing without an exception is not the same as being correct, this is exactly the silent-failure trap naive truncation creates."
+          },
+          {
+            "text": "The bug is in the summarization model itself, not the truncation step",
+            "correct": false,
+            "why": "The model is doing its job correctly on the text it actually received, the defect is upstream, truncation never gave it the relevant paragraph to summarize."
+          }
+        ]
+      },
+      {
+        "id": "m2q8",
+        "question": "A small, cheap model has a 2000-token context window. A task genuinely needs a long, detailed 1800-token response. Reserved output alone (1800) is most of the window. What's the real fix?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Recognize a realistic negative-budget scenario",
+        "options": [
+          {
+            "text": "Choose a model with a larger context window, or reduce what the output needs to contain, not a UI trick on the existing budget",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Just set reserved output higher than the context window, the system will figure it out",
+            "correct": false,
+            "why": "Reserving more tokens than the window even contains doesn't create more room, it makes the available input budget negative, there's nothing left to figure out."
+          },
+          {
+            "text": "Truncate the input to zero tokens so all remaining room goes to output",
+            "correct": false,
+            "why": "Zero input tokens likely means the model has nothing to work with for a task that presumably needs some context, this doesn't solve the underlying mismatch between task and model choice."
+          }
+        ]
+      },
+      {
+        "id": "m2q9",
+        "question": "A codebase-documentation generator ingests a 40,000-token source file. The model's context window is 32,000 tokens, with 2,000 reserved for output. Can the whole file fit in one call?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Apply budget arithmetic to a real ingestion pipeline",
+        "options": [
+          {
+            "text": "No, available input is 32,000 − 2,000 = 30,000 tokens, and the file is 40,000, it needs to be chunked, it can't be sent in a single call",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Yes, the file is under the 32,000-token window so it fits fine",
+            "correct": false,
+            "why": "The 32,000-token window has to hold BOTH input and reserved output, only 30,000 of it is actually available for input, the 40,000-token file exceeds that."
+          },
+          {
+            "text": "Yes, as long as the output is kept short the whole file will fit",
+            "correct": false,
+            "why": "The reservation for output is fixed at 2,000 in this scenario regardless of how short the actual output turns out to be, available input is computed from the reservation, not the eventual output length."
+          }
+        ]
+      },
+      {
+        "id": "m2q10",
+        "question": "A customer-support chat assistant needs to keep recent conversation turns in context. Turns are short (avg 40 tokens) but frequent. Should this content be truncated to the last N characters, or handled with the chunking discipline from this module?",
+        "source": "pool",
+        "type": "engineering-decision",
+        "difficulty": "medium",
+        "objective": "Decide chunk size for a multi-turn chat history",
+        "options": [
+          {
+            "text": "Chunking discipline still applies in spirit, even if implemented as \"keep the last N whole turns\" rather than sub-turn chunks, the goal is never silently cutting a turn in half or dropping a turn's context with no signal that it happened",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Plain character truncation is fine here since chat turns are short",
+            "correct": false,
+            "why": "Turn length doesn't remove the risk, cutting mid-turn (or silently dropping older turns with no indication) is the same silent-failure pattern this module warns about, regardless of how short each individual turn is."
+          },
+          {
+            "text": "Neither applies, conversation history doesn't count as \"content\" for budgeting purposes",
+            "correct": false,
+            "why": "Conversation history consumes real input tokens like any other content, it's fully subject to the same budget arithmetic as a document being chunked."
+          }
+        ]
+      },
+      {
+        "id": "m2q11",
+        "question": "Besides correctness, what are the other two practical reasons a chunking or truncation decision matters?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "State why cost and latency both scale with tokens",
+        "options": [
+          {
+            "text": "Cost (roughly tokens × price-per-token) and latency (which generally grows with how many tokens the model reads and generates)",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Only cost, latency is unrelated to how many tokens a call processes",
+            "correct": false,
+            "why": "Latency generally scales with token count too, a call processing more input and generating more output typically takes measurably longer, not just costs more."
+          },
+          {
+            "text": "Only latency, cost is a fixed flat rate per call regardless of size",
+            "correct": false,
+            "why": "Cost is not flat per call in this course's model, it scales with tokens processed, larger calls cost more, not the same amount as a smaller one."
+          }
+        ]
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "token",
+      "definition": "the atomic unit a model processes text as, roughly 4 characters in English."
+    },
+    {
+      "term": "context window",
+      "definition": "the maximum total tokens (input + output) a single model call can hold."
+    },
+    {
+      "term": "truncation",
+      "definition": "cutting content off at a limit; naive truncation silently discards whatever comes after the cut."
+    },
+    {
+      "term": "chunking",
+      "definition": "splitting content into budget-sized pieces instead of discarding what doesn't fit."
+    },
+    {
+      "term": "chunk overlap",
+      "definition": "repeating boundary content between adjacent chunks so no idea is split with zero context."
+    }
+  ],
+  "furtherReading": true,
+  "project": {
+    "title": "Token-Budget-Aware Chunker",
+    "brief": "Build a text chunker that respects a token budget, adds configurable overlap, and never silently truncates mid-sentence.",
+    "projectId": 2
+  },
+  "cheatSheet": {
+    "title": "Context & Token Budget Cheat Sheet"
+  }
+}

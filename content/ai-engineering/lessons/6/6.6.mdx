@@ -1,0 +1,25 @@
+Put together, a reliable call wrapper has a specific, bounded shape: try the primary, retrying only retryable failures up to a fixed limit; the moment a non-retryable error appears OR the retry limit is hit, stop retrying the primary and attempt the fallback exactly once; if that also fails, return a clear failure. Every path through this logic terminates, nothing loops forever.
+
+<Callout>
+
+**Every reliability mechanism in this course bounds something.** Module 2 bounded context (a token budget). Module 5 bounded steps (a step limit). This module bounds retries (a fixed retry count) and bounds the safety net itself (fallback tried once, not retried indefinitely). The pattern repeats because unbounded anything, tokens, steps, retries, is the same underlying risk each time.
+
+</Callout>
+
+<Practice label={"Cross-module check"}>
+
+An agent loop (Module 5) calls a model at each step. That model call now uses this module's retry-and-fallback wrapper internally. If the wrapper's own retry count and fallback aren't bounded, what happens to the loop's step-limit guarantee?
+
+<Answer>
+
+The step COUNT stays bounded, the loop still only takes maxSteps iterations. But each individual step can now silently take far longer (and cost far more) than expected, since an unbounded retry-and-fallback wrapper inside one step defeats the purpose of bounding the number of steps. A step limit only actually bounds total cost and time if everything INSIDE each step is bounded too, which is exactly why this module's retry and fallback logic has its own hard limits.
+
+</Answer>
+
+</Practice>
+
+<Decision id={"m6"} label={"AI Engineering Decision"}>
+
+Your primary model provider starts returning 429s under load, roughly 1 in 6 requests. Your current code retries every 429 immediately, with no delay, up to 3 times. What's wrong with this, and what should change?
+
+</Decision>

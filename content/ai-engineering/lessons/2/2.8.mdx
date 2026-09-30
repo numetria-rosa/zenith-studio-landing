@@ -1,0 +1,27 @@
+<Muted>A short consolidation before you're graded on it.</Muted>
+
+- Estimate token counts for planning, and compute available input budget from context window minus reserved output.
+- Explain why naive truncation is a silent-failure bug, not a correctness shortcut.
+- Explain what overlap buys you at a chunk boundary, and that it isn't free.
+- Implement a chunker that never silently drops content, even for an oversized single unit.
+
+<ProdWarn title={"What would break in production?"}>
+
+- **Truncation with no strategy.** Cutting off at the limit silently discards whatever came after, no error, no warning, just a wrong answer that looks confident.
+- **Fixed chunk sizes across document types.** A chunk size tuned for short support tickets splits a legal contract's clauses mid-sentence.
+- **Overlap tuned to zero.** Saves tokens right up until the one fact you needed was split exactly across a boundary and appears in neither chunk intact.
+- **Budget math that forgets reserved output.** Computing available input as the full context window, with no room saved for the response, produces a request that fails at generation time, not before it.
+
+<Rule>
+
+**Rule of thumb:** a token budget is arithmetic you do before the call, not a limit you discover from an error message after it.
+
+</Rule>
+
+</ProdWarn>
+
+<Connection title={"The engineering connection"}>
+
+You can now fit content into a budget without silently losing any of it. But chunking solves "how do I fit content," not "which chunk is actually relevant to this specific question." Module 3 is retrieval, the mechanism that searches across chunks instead of hoping the right one made it into the prompt by luck.
+
+</Connection>

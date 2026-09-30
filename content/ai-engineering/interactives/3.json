@@ -1,0 +1,74 @@
+{
+  "RANK_CANDIDATES": [
+    {
+      "id": "a",
+      "text": "To reset a customer's password, go to Account > Security, click Reset Password, and send them the emailed link.",
+      "score": 0.91
+    },
+    {
+      "id": "b",
+      "text": "Password policies require at least 12 characters, one number, and one symbol for all customer accounts.",
+      "score": 0.58
+    },
+    {
+      "id": "c",
+      "text": "To reset a router to factory settings, hold the reset button for 10 seconds until the lights flash.",
+      "score": 0.34
+    },
+    {
+      "id": "d",
+      "text": "Our refund policy allows returns within 30 days of purchase with a valid receipt.",
+      "score": 0.07
+    }
+  ],
+  "HR_CHUNKS": [
+    {
+      "id": "sick",
+      "text": "Full-time employees accrue 1 sick day per month during their first year, up to 12 days annually.",
+      "score": 0.88
+    },
+    {
+      "id": "submit",
+      "text": "Sick leave requests should be submitted through the HR portal at least 24 hours in advance when possible.",
+      "score": 0.72
+    },
+    {
+      "id": "parental",
+      "text": "Parental leave for new employees begins after 90 days of continuous employment.",
+      "score": 0.41
+    },
+    {
+      "id": "personal",
+      "text": "Employees may request unpaid personal leave with manager approval.",
+      "score": 0.33
+    },
+    {
+      "id": "holidays",
+      "text": "The office is closed on all federally recognized holidays.",
+      "score": 0.09
+    }
+  ],
+  "HR_K": 3,
+  "debugCase": [
+    {
+      "t": "The model reasoned poorly and just picked the wrong policy from context it had access to",
+      "correct": false,
+      "why": "The model's reasoning isn't actually the failure here, it answered fluently and confidently FROM the context it was given, that's exactly what a model does with retrieved text. The evidence points upstream, to what got retrieved in the first place."
+    },
+    {
+      "t": "A stale, superseded document (support-faq-2023.md) was retrieved above the relevance threshold and blended into the answer, with no recency or supersession signal to exclude it",
+      "correct": true,
+      "why": "Look at the evidence: chunk [3] is explicitly marked \"superseded by pricing.md in 2024\" in its own metadata, yet it still cleared the 0.35 threshold and made it into context, because cosine similarity only measures semantic closeness to the query, it has no idea one document replaced another. The model's answer (\"email support, up to two weeks\") matches chunk [3] almost verbatim, while chunk [1], the CURRENT, correct policy, scored higher but got blended with an outdated one instead of overriding it. The fix isn't a bigger model, it's a retrieval-layer signal: filter or down-rank superseded documents before they ever reach the prompt."
+    },
+    {
+      "t": "The embedding model doesn't understand subscription cancellation as a concept",
+      "correct": false,
+      "why": "The scores say otherwise, all three chunks scored well above the 0.35 threshold on a query about cancellation, the embeddings clearly captured the topic correctly. The problem isn't topic understanding, it's that relevance and currency are two different properties, and only one of them was checked."
+    },
+    {
+      "t": "k was set too high, and a smaller k would have fixed it",
+      "correct": false,
+      "why": "Lowering k to 1 or 2 might accidentally drop the stale chunk here, but that's luck, not a fix, it depends entirely on which chunk happens to score highest on a given query, and would just as easily drop the CORRECT current-policy chunk on a different phrasing. The real gap is that nothing in the system checks whether a retrieved document has been superseded, k doesn't address that at all."
+    }
+  ]
+}

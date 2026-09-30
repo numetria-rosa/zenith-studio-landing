@@ -1,0 +1,31 @@
+Two practical consequences follow directly from everything above: cost is (roughly) `tokens × price-per-token`, and latency generally grows with how many tokens the model has to read and generate. A chunking or truncation decision isn't just a correctness question, it's a cost and speed question too.
+
+<Callout>
+
+**Overlap and chunk count trade off against cost.** More overlap and smaller chunks mean more total chunks, which means more total tokens processed across the whole document, which means more cost and more total latency if chunks are processed sequentially.
+
+</Callout>
+
+<Practice label={"Cross-module check"}>
+
+Module 1's validator rejects malformed output and (in a real system) triggers a retry with the parse error included in the next prompt. Using this module's terms, what does a retry actually cost, beyond just "trying again"?
+
+<Answer>
+
+A retry re-sends the original prompt tokens PLUS the new error-context tokens PLUS generates a new output, it's not free, it's close to double the token cost (and double the latency) of a single successful call. This is exactly why Module 1's repair pass tries deterministic, free fixes (stripping a fence, a trailing comma) before ever falling back to an expensive model retry, the cheap fix should always be tried first.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A multi-document RAG ingestion pipeline chunks 200 source documents into roughly 3,000 chunks total, each embedded with its own model call. If 4% of those calls fail validation and get retried once, roughly how many total model calls does the ingestion run actually make, and why does chunk count matter just as much as retry rate when estimating a pipeline's total cost?
+
+<Answer>
+
+3,000 × 0.04 = 120 failed calls, each retried once, so the run makes roughly 3,000 + 120 = 3,120 total calls, about 4% more than the naive "3,000 chunks, 3,000 calls" estimate. Chunk count matters as much as retry rate because it's a multiplier sitting right next to it: the same 4% retry rate on a pipeline with smaller chunks (or heavier overlap, see the previous section) produces more total chunks, and 4% of a bigger number is a bigger number. Cost estimates for a chunking pipeline have to account for chunk count and retry rate together, not either one in isolation.
+
+</Answer>
+
+</Practice>

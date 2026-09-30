@@ -1,0 +1,46 @@
+{
+  "id": "8",
+  "title": "Capstone Synthesis Cheat Sheet",
+  "tag": "Module 8",
+  "sections": [
+    {
+      "label": "The seven layers, in call order",
+      "items": [
+        "1. **Structured output** (M1): repair + validate every model response before acting on it.",
+        "2. **Context budget** (M2): keep retrieved content + conversation under the available input budget.",
+        "3. **Retrieval** (M3): cosine similarity + relevance threshold, honest \"no answer\" when nothing clears it.",
+        "4. **Tool execution** (M4): validate, then execute idempotently.",
+        "5. **Agent control flow** (M5): hard step limit + stuck detection around the whole loop.",
+        "6. **Reliability** (M6): retry + backoff + one bounded fallback around every model call.",
+        "7. **Evaluation** (M7): labeled eval set with a recorded baseline, re-run before every ship."
+      ]
+    },
+    {
+      "label": "Design-doc checklist (what graders look for)",
+      "checklist": [
+        "Structured output: names the specific repair/validate mechanism, not just \"we validate.\"",
+        "Context budget: states the actual budget arithmetic, not just \"we manage tokens.\"",
+        "Retrieval: names the similarity metric AND the relevance threshold.",
+        "Tool execution: names the idempotency key and what gets cached vs. not.",
+        "Agent control flow: names the step limit AND the stuck-detection rule.",
+        "Reliability: names retry count, backoff formula, and fallback behavior.",
+        "Evaluation: names the baseline comparison and regression rule."
+      ]
+    },
+    {
+      "label": "The recurring pattern across every module",
+      "items": [
+        "Every reliability mechanism in this course bounds SOMETHING: tokens (M2), steps (M5), retries (M6), fallback attempts (M6).",
+        "Unbounded anything: tokens, steps, retries: is the same underlying risk showing up in a different layer."
+      ]
+    },
+    {
+      "label": "Common capstone mistakes",
+      "items": [
+        "Describing a mechanism in one sentence with no specifics (\"we handle errors\") instead of naming the actual logic.",
+        "Forgetting that a failed attempt must stay retryable: caching failures the same way as successes.",
+        "Treating the design document and the implementation as unrelated, they should describe the same system."
+      ]
+    }
+  ]
+}

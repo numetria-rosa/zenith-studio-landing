@@ -1,0 +1,27 @@
+<Muted>Two vectors pointing the same direction score 1.0, regardless of how long either one is. Perpendicular vectors score 0. Opposite directions score -1. Drag the angle and watch the score.</Muted>
+
+<Interactive id={"m3-s3"} label={"Live calculation"} />
+
+<Practice>
+
+Document A's embedding vector is exactly \[2, 0\]. Document B's is \[10, 0\]. Both point in the same direction as a query vector \[1, 0\]. Which document scores higher, and why does this feel surprising if you're thinking about vector length instead of direction?
+
+<Answer>
+
+They score identically, both get a cosine similarity of 1.0 with the query, because cosine similarity divides out magnitude entirely, it only measures the angle between vectors. \[10, 0\] is five times "longer" than \[2, 0\], but length never enters the calculation. This is exactly why it's the standard metric for embeddings, you want "same meaning, said more emphatically" to still count as a strong match, not get penalized or rewarded for vector length, which doesn't reliably correspond to anything meaningful.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A medical-literature search assistant embeds a query about "first-line treatment for pediatric migraine." Abstract A is a concise 150-word summary with embedding \[4, 3\]. Abstract B is a repetitive 900-word abstract that restates the same treatment recommendation in nearly every sentence, with embedding \[12, 9\], three times the magnitude of A, pointing in the exact same direction. Does Abstract B outrank Abstract A because it "says it more"?
+
+<Answer>
+
+No, they score identically. \[12, 9\] is just \[4, 3\] scaled by 3, same direction, same cosine similarity to the query. Repeating a claim more times inflates a document's vector length, not its direction, and direction is all cosine similarity measures. A retrieval system that let verbosity win would systematically favor padded, repetitive abstracts over well-written concise ones, exactly the failure mode magnitude-invariance is designed to prevent.
+
+</Answer>
+
+</Practice>

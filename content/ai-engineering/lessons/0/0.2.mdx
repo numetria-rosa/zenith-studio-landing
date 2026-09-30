@@ -1,0 +1,28 @@
+In practice, most AI engineering work falls into a handful of recognizable shapes:
+
+- **AI chat applications**: a conversational interface backed by a model, with memory and context management.
+- **RAG systems**: retrieval-augmented generation: answering questions grounded in a specific document set, not just the model's training data.
+- **AI agents**: systems that reason across multiple steps, calling tools and taking actions to complete a task, not just answering one question.
+- **AI copilots**: assistants embedded inside an existing product (a code editor, a design tool, a CRM), helping a user do their existing job faster.
+- **AI automation systems**: replacing a manual, rules-based workflow with one that uses a model to handle the judgment calls.
+- **Document intelligence**: extracting structured data out of unstructured documents (contracts, invoices, forms).
+- **AI-powered SaaS**: a product whose core value proposition IS an AI capability, not a bolt-on feature.
+- **Voice AI**: speech-in, speech-out systems, often combining a model with speech-to-text and text-to-speech.
+- **Multimodal applications**: systems that reason over images, audio, or video alongside text.
+- **AI integrations**: connecting a model into existing business systems (a CRM, a support desk, an internal tool) so it can read and act on real company data.
+
+<Interactive id={"m0-flow"} label={"The production lifecycle"} />
+
+Notice what's *not* highlighted: raw data collection/labeling and deep infrastructure/ops work are real, adjacent disciplines (data science and platform engineering, respectively), not the center of gravity for this role, though AI engineers touch both at the edges.
+
+<Practice>
+
+"Evaluation" and "Monitoring" both appear near the end of the flow, after Deployment. Why does Evaluation appear a second time, conceptually, even before a system ships?
+
+<Answer>
+
+Evaluation happens twice in practice: BEFORE shipping (as a gate, deciding whether a change is good enough to deploy, exactly Module 7's subject) and continuously AFTER shipping (as monitoring, catching regressions and drift in production traffic the offline eval set never saw). The diagram shows one flow for simplicity, but real systems loop back from Monitoring into Evaluation constantly.
+
+</Answer>
+
+</Practice>

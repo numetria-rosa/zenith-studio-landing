@@ -1,0 +1,15 @@
+You've seen all three endings, success, step limit, and stuck. Now implement a loop that correctly distinguishes them, and five real tests run against your actual code.
+
+<ExerciseLink />
+
+<Practice>
+
+Test 4 feeds your loop 4 different actions in a row before a final answer on step 5. If your repeat-detection logic doesn't reset the counter when the action CHANGES, what false failure could this test trigger?
+
+<Answer>
+
+Without resetting on change, an off-by-one counter bug could accumulate across DIFFERENT actions and falsely trigger the stuck condition even though nothing actually repeated, incorrectly cutting off a loop that was making real progress. The counter has to be scoped to "how many times in a row has THIS SPECIFIC action just repeated," which means it must reset to 1 (not 0) the moment a different action appears.
+
+</Answer>
+
+</Practice>

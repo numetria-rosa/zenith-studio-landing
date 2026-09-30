@@ -1,0 +1,18 @@
+{
+  "m4-s2": [],
+  "m4-s11": [
+    "Live demo",
+    "Call ID:",
+    "call_ops_2291",
+    "·",
+    "adjust_inventory(sku: \"SKU-2291\", delta: -5)",
+    "Idempotency cache enabled (tracks call IDs that already executed)",
+    "120",
+    "Units in stock",
+    "0",
+    "Times handler actually ran",
+    "Submit call (attempt 1)",
+    "Retry same call ID (attempt 2)",
+    "Reset"
+  ]
+}

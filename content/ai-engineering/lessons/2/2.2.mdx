@@ -1,0 +1,21 @@
+Models don't process text as characters or whole words, they process *tokens*, sub-word chunks produced by a specific tokenizer. "Token economics" isn't jargon for its own sake, everything about what fits in a prompt, what it costs, and how fast it responds is measured in tokens, not in the units you're used to thinking in.
+
+<Def title={"Definition: token"}>
+
+The atomic unit a model's tokenizer splits text into, roughly, but not exactly, 4 characters or three-quarters of a word in English. Punctuation, whitespace, and rare words often cost more tokens than intuition suggests.
+
+</Def>
+
+This course uses a simplified estimate, `tokens ≈ characters / 4`, close enough for planning purposes and exactly what the exercises in this module use. Real tokenizers are more precise and vary by model provider, but the planning discipline is identical either way.
+
+<Practice>
+
+A legal-contract summarizer receives a 52,000-character NDA and is about to send it to a model with a 12,000-token context window, 1,500 tokens of which are reserved for the output summary. Using this course's estimate, roughly how many tokens is the raw NDA text alone, and does it fit as plain input in a single call?
+
+<Answer>
+
+52,000 ÷ 4 = 13,000 tokens for the NDA text. Available input budget is 12,000 − 1,500 = 10,500 tokens. 13,000 is bigger than 10,500, so it does not fit, by about 2,500 tokens. This isn't a rare edge case for this kind of system, contracts routinely run long, and "just send the whole document" silently becomes impossible the moment the document is bigger than the math allows. The pipeline needs either a bigger-context model or a chunking strategy, not a bigger hope.
+
+</Answer>
+
+</Practice>

@@ -1,0 +1,15 @@
+You've seen the classification (retryable vs. not) and the shape (bounded retries, single fallback attempt). Now implement it, and five real tests run against your actual code.
+
+<ExerciseLink />
+
+<Practice>
+
+Test 3 makes `primary_call` raise a non-retryable error, with `max_retries` set to 5. If your code checks `attempt >= max_retries` without ALSO checking `retryable` first, what happens?
+
+<Answer>
+
+Without checking retryable first, a non-retryable error would keep getting retried until the attempt counter separately reaches max\_retries, 6 total calls to a request that was guaranteed to fail on the very first one. The retryable check needs to short-circuit independently of the attempt count, a non-retryable error should stop the primary loop on attempt 1, regardless of how high max\_retries is set.
+
+</Answer>
+
+</Practice>

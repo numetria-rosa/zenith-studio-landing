@@ -1,0 +1,27 @@
+<Muted>A short consolidation before you're graded on it.</Muted>
+
+- Explain why a tool call is a proposal from the model, not an action, until your code executes it.
+- Validate a tool call's name and required arguments before the handler ever runs.
+- Explain why idempotent execution matters specifically for tools with side effects.
+- Implement an executor that caches successes but leaves failures retryable.
+
+<ProdWarn title={"What would break in production?"}>
+
+- **Argument-shape validation without bounds checking.** A refund amount, a date, or a quantity can be the right type and still be nonsense for this specific request.
+- **Duplicated execution.** A retried call without a stable idempotency key re-runs a side effect that already happened, a double charge, a double email, a double ticket.
+- **Dangerous permissions with no allowlist.** An object passed straight through to a handler lets any matching field ride along, including ones no legitimate caller should be able to set (this module's mass-assignment example).
+- **Silent timeout handling.** A call that times out waiting for a response isn't automatically safe to mark "failed, retry freely", the side effect may have already happened server-side.
+
+<Rule>
+
+**Rule of thumb:** schema validation proves the call is well-formed. It says nothing about whether the call is a good idea. Those are two different checks, and production tool executors need both.
+
+</Rule>
+
+</ProdWarn>
+
+<Connection title={"The engineering connection"}>
+
+You can now make a single tool call safe to execute, and safe to retry. But one validated, idempotent call is the base case. Module 5 is what happens when a model chains many tool calls together in a loop, reasoning about what to do next based on each result, and what stops that loop from running forever.
+
+</Connection>

@@ -1,0 +1,68 @@
+{
+  "id": "python",
+  "title": "Python Foundations Cheat Sheet",
+  "tag": "Python Foundations",
+  "sections": [
+    {
+      "label": "Core types",
+      "items": [
+        "`int`, `float`: numbers. `str`: text. `bool`: True/False. `None`: explicitly no value.",
+        "`list`: ordered, mutable. `dict`: key/value pairs. Both are the shapes model responses and tool arguments come back as."
+      ]
+    },
+    {
+      "label": "String basics",
+      "items": [
+        "`f\"{x} tokens\"`: f-strings, the standard way to build a string from variables.",
+        "`s.strip()`, ````s.startswith(\"```\")````, `s.replace(\",\", \"\")`: the string methods this course's repair patterns lean on most.",
+        "`len(s)` works on strings, lists, and dicts alike: the length/count you'll compute constantly for budgets and validation."
+      ]
+    },
+    {
+      "label": "Lists and iteration",
+      "items": [
+        "`for item in items:`: the loop shape behind chunking, retrieval scoring, and eval suites.",
+        "`[x for x in items if cond]`: a list comprehension, a filter written in one line, exactly the shape of a threshold filter.",
+        "Slicing: `items[:k]`: first k items, the mechanism behind top-k."
+      ]
+    },
+    {
+      "label": "Dictionaries",
+      "items": [
+        "`d.get(\"key\", default)`: read a key that might not exist, without raising, use this instead of `d[\"key\"]` whenever a field might be missing.",
+        "`\"key\" in d`: checks presence only, an empty string still counts as present, presence isn't the same as usable.",
+        "`d[\"key\"] = value`: set/overwrite a key."
+      ]
+    },
+    {
+      "label": "Functions and try/except",
+      "items": [
+        "`def f(a, b=default):`: a function with a default argument.",
+        "`try: ... except Exception as e: ...`: catch a failure instead of letting it crash the whole program, the pattern behind every safe_call wrapper in this course.",
+        "Never use a bare `except:` with no type, it silently swallows even a genuine bug (like a typo) alongside the failure you meant to catch."
+      ]
+    },
+    {
+      "label": "JSON",
+      "items": [
+        "`json.loads(text)`: text to a Python object (dict/list). Raises on malformed input.",
+        "`json.dumps(obj)`: a Python object back to a JSON string.",
+        "A raised `json.JSONDecodeError` from `loads()` is exactly the signal this course's repair pass exists to catch and fix before re-attempting."
+      ]
+    },
+    {
+      "label": "Async, in one paragraph",
+      "items": [
+        "`async def f(): ...` defines a coroutine. `await f()` runs it and waits for the result, this is the shape every real model-API call takes (a network call you wait on), even though this course's Worker/Pyodide sandboxes run your exercise code synchronously for simplicity."
+      ]
+    },
+    {
+      "label": "Common mistakes",
+      "items": [
+        "Using `d[\"key\"]` on a field that might be missing instead of `d.get(\"key\")`, causing an uncaught `KeyError`.",
+        "A bare `except:` that hides real bugs along with expected failures.",
+        "Comparing floats with `==` when a small rounding difference is expected, use a tolerance instead."
+      ]
+    }
+  ]
+}

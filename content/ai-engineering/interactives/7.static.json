@@ -1,0 +1,21 @@
+{
+  "m7-s2": [],
+  "m7-s11": [
+    "Live demo",
+    "Candidate run score:",
+    "0.82",
+    "0.82",
+    "Baseline score",
+    "0.82",
+    "Candidate score",
+    "+0.00",
+    "Delta vs. baseline",
+    "PASS",
+    "regression flag",
+    "Candidate meets the baseline.",
+    "regression",
+    "is",
+    "False",
+    ", this candidate is safe to isolate-test against baseline as the next release."
+  ]
+}

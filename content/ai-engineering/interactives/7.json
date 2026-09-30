@@ -1,0 +1,51 @@
+{
+  "SPOT_CASES": [
+    {
+      "id": "c1",
+      "code": "{ input: \"Ticket: \\\"App crashes on login since v4.2\\\"\",\n  expected: \"App crashes on login (regression, v4.2)\",\n  check: (actual) => actual.includes(\"crash\") && actual.includes(\"login\") }",
+      "valid": true,
+      "explanation": "Has an input, a defined expected reference, AND an explicit, checkable criterion (specific keywords the summary must contain). Fully usable as-is."
+    },
+    {
+      "id": "c2",
+      "code": "{ input: \"Ticket: \\\"Billing page shows wrong currency for EU customers\\\"\",\n  expected: \"(judge if the summary is good)\" }",
+      "valid": false,
+      "explanation": "Has an input but no explicit, checkable criterion, just an implicit request to judge quality. Different reviewers (or the same reviewer on different days) would score this inconsistently. Needs a defined check before it's usable."
+    },
+    {
+      "id": "c3",
+      "code": "{ input: \"Ticket: \\\"Feature request: dark mode\\\"\",\n  expected: \"Feature request: dark mode\",\n  check: (actual) => actual.trim() === \"Feature request: dark mode\" }",
+      "valid": true,
+      "explanation": "Exact-match criterion, appropriate here since a short ticket summary has a clear, narrow correct form. Fully usable and fully deterministic."
+    },
+    {
+      "id": "c4",
+      "code": "{ input: \"Ticket: \\\"Password reset email never arrives, tried 3 times\\\"\" }",
+      "valid": false,
+      "explanation": "No expected output and no check function at all, there's nothing here to score against. This is just an input with no criterion, not a usable test case yet."
+    }
+  ],
+  "REG_DEMO_BASELINE": 0.82,
+  "decision": [
+    {
+      "t": "A. Ship it, 96% beats the 91% baseline, that's a measurable win",
+      "correct": false,
+      "why": "The 96% is real, but it's an average across a set where charge-disputes are only 2 of 50 cases, barely enough to move the aggregate even if the new prompt fails them completely. The number went up while a specific, high-stakes category quietly got much worse, exactly the \"good average hides a catastrophic slice\" failure this module warns about."
+    },
+    {
+      "t": "B. Don't ship yet. Add real charge-dispute cases to the eval set, re-run, and check that slice specifically before deciding",
+      "correct": true,
+      "why": "This is the correct move: the spot-check surfaced a real signal (4 of 5 wrong on a high-stakes category) that the eval set was underrepresenting. Before shipping, expand the eval set with enough charge-dispute cases to measure that slice properly, then compare THAT number to baseline, not just the aggregate. A category tied to money and disputes is exactly the kind of failure an average can hide and a slice can catch."
+    },
+    {
+      "t": "C. Trust the manual spot-check over the eval suite entirely, and abandon the eval process for this decision",
+      "correct": false,
+      "why": "The spot-check is valuable because it's what CAUGHT the gap, but 5 cases is too small a sample to replace a systematic eval on its own. The right response is to fold that signal back into a bigger, more representative eval set, not to throw out systematic measurement in favor of an ad hoc check, that's the exact anti-pattern this module opened by rejecting."
+    },
+    {
+      "t": "D. Ship it, but plan to monitor charge-dispute complaints after launch",
+      "correct": false,
+      "why": "Charge disputes are exactly the category where \"monitor after shipping\" is the expensive way to find out, real users would experience the 4-in-5 failure rate the spot-check already revealed. The eval gap is fixable before shipping; waiting for complaints just moves the cost onto users."
+    }
+  ]
+}

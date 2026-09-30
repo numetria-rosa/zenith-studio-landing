@@ -1,0 +1,6 @@
+<Muted>If you want to go deeper than the browser can take you:</Muted>
+
+- **`MCP (Model Context Protocol)`** is the name for this: an open standard, introduced by Anthropic, for how a model-facing application discovers and calls tools exposed by a separate server. It doesn't replace anything in this module, an MCP server still declares a schema, a client still has to validate a call before running it, and the same idempotency problem exists the moment a network retry is possible. What MCP standardizes is the wire format and discovery mechanism across that boundary, not the validate-then-execute discipline itself, that's still yours to implement correctly regardless of which protocol carries the call.
+- Most model providers' tool/function-calling APIs let you supply a JSON Schema per tool directly, letting the model see the exact shape expected often reduces malformed calls before validation even runs, though it never eliminates the need for it.
+- Idempotency keys are a standard pattern in payment APIs (Stripe, for example) for exactly this reason, client-generated unique IDs that let a server safely deduplicate retried requests.
+- Beyond schema and business-rule validation, production tool executors often add permission checks (can this caller invoke this tool at all) and rate limits, both are extensions of the same "validate before executing" principle.

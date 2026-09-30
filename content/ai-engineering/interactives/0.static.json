@@ -1,0 +1,25 @@
+{
+  "m0-classify": [
+    "Classify the task"
+  ],
+  "m0-flow": [
+    "The production lifecycle",
+    "A simplified flow from idea to a monitored, running system. The highlighted stages are where AI engineering work concentrates."
+  ],
+  "m0-roles": [],
+  "m0-priority": [
+    "Priority table",
+    "Technology",
+    "Priority",
+    "Why AI engineers use it",
+    "How much a beginner needs initially",
+    "Where it becomes useful"
+  ],
+  "m0-eco": [],
+  "m0-roadmap": [],
+  "m0-path": [
+    "Path finder",
+    "See my possible directions",
+    "Reset"
+  ]
+}

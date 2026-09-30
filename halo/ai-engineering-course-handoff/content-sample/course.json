@@ -1,0 +1,233 @@
+{
+  "slug": "ai-engineering",
+  "title": "AI Engineering",
+  "edition": "Career Path Edition",
+  "kicker": "Self-paced course · Career Path Edition",
+  "tagline": "The real stack behind production AI products: prompting, retrieval, agents, tool use, structured outputs, and evaluation, applied to a real shipped product, not a toy chatbot.",
+  "stats": [
+    {
+      "value": "8",
+      "label": "modules"
+    },
+    {
+      "value": "11",
+      "label": "in-app pages"
+    },
+    {
+      "value": "6.5h",
+      "label": "of module content"
+    }
+  ],
+  "stages": [
+    {
+      "label": "Before you start",
+      "name": null,
+      "color": "#8C92A0",
+      "modules": [
+        {
+          "number": 0,
+          "title": "Orientation",
+          "minutes": null,
+          "summary": "What this field actually is, what people in it actually build, where you might fit, and exactly what the next 8 modules will (and won’t) teach you."
+        }
+      ]
+    },
+    {
+      "label": "Stage 0",
+      "name": "Prompting foundations",
+      "color": "#5CC8FF",
+      "modules": [
+        {
+          "number": 1,
+          "title": "Prompting & Structured Outputs",
+          "minutes": 45,
+          "summary": "A language model produces text. Your program needs data. This module closes that gap reliably, not with a nicer-sounding prompt, but with validation and repair logic that doesn’t trust the model to behave."
+        },
+        {
+          "number": 2,
+          "title": "Context Windows & Token Economics",
+          "minutes": 40,
+          "summary": "Every prompt has a budget, measured in tokens, not characters or “how much text feels reasonable.” The actual arithmetic for what fits, what it costs, and what to do when your content doesn’t fit."
+        }
+      ]
+    },
+    {
+      "label": "Stage 1",
+      "name": "Retrieval and tools",
+      "color": "#7B9BFF",
+      "modules": [
+        {
+          "number": 3,
+          "title": "Retrieval-Augmented Generation",
+          "minutes": 45,
+          "summary": "A model only knows what’s in its prompt. Retrieval decides, out of everything you could put there, which pieces actually get in, by searching, not by hoping the right chunk made the cut."
+        },
+        {
+          "number": 4,
+          "title": "Tool Use & Function Calling",
+          "minutes": 45,
+          "summary": "A model can only produce text. Everything it does beyond that, looking something up, sending an email, charging a card, happens because a tool call it generated got executed by your code. That execution step is where correctness and safety actually live."
+        }
+      ]
+    },
+    {
+      "label": "Stage 2",
+      "name": "Agents in production",
+      "color": "#A48BFF",
+      "modules": [
+        {
+          "number": 5,
+          "title": "Agent Architectures & Control Flow",
+          "minutes": 45,
+          "summary": "An agent is what happens when a model chains steps together, reasoning about each result before deciding the next action, in a loop it controls. That loop needs boundaries, or it doesn’t stop on its own."
+        },
+        {
+          "number": 6,
+          "title": "Reliability for LLM Systems",
+          "minutes": 40,
+          "summary": "Model APIs fail: rate limits, timeouts, transient server errors. Some failures are worth retrying, some never will succeed no matter how many times you try, and treating them the same wastes time, money, and your users’ patience."
+        },
+        {
+          "number": 7,
+          "title": "Evaluation, Testing & Observability",
+          "minutes": 40,
+          "summary": "“I tried a few prompts and it looked good” isn’t evaluation, it’s a vibe check on a handful of lucky examples. A systematic way to measure whether a system is actually working, and whether a change made it better or worse."
+        }
+      ]
+    },
+    {
+      "label": "Stage 3",
+      "name": "Capstone",
+      "color": "#3DDC97",
+      "modules": [
+        {
+          "number": 8,
+          "title": "Capstone: A Production AI Agent",
+          "minutes": 90,
+          "summary": "A client brief: a support bot that must answer from a knowledge base, act on tools safely, run inside a bounded loop, and survive a flaky model API, graded against a rubric, not vibes."
+        }
+      ]
+    }
+  ],
+  "capstoneRubric": [
+    "Answers from a knowledge base",
+    "Acts on tools safely",
+    "Runs in a bounded loop",
+    "Survives a flaky model API",
+    "Graded against a rubric"
+  ],
+  "appSections": [
+    {
+      "name": "Learn",
+      "color": "#9BDDFF",
+      "description": "Course structure, reference material, and where you left off",
+      "pages": [
+        {
+          "icon": "home",
+          "name": "Dashboard",
+          "description": "Your home base: progress, streaks, and what’s next"
+        },
+        {
+          "icon": "list",
+          "name": "Syllabus",
+          "description": "The full course outline, module by module"
+        },
+        {
+          "icon": "map",
+          "name": "Learning Roadmap",
+          "description": "The whole journey mapped on one page"
+        },
+        {
+          "icon": "sheet",
+          "name": "Cheat Sheets",
+          "description": "Printable quick-reference for every tool"
+        },
+        {
+          "icon": "code",
+          "name": "Python Foundations",
+          "description": "Python fundamentals, taught for this course specifically"
+        }
+      ]
+    },
+    {
+      "name": "Practice",
+      "color": "#C7B0FF",
+      "description": "Extra reps, quizzes, and skill tracking",
+      "pages": [
+        {
+          "icon": "quiz",
+          "name": "Quiz Center",
+          "description": "Every module’s quiz, plus a cumulative final"
+        },
+        {
+          "icon": "flag",
+          "name": "Challenges",
+          "description": "Cross-module challenges that gate the capstone"
+        }
+      ]
+    },
+    {
+      "name": "Build",
+      "color": "#FFD27A",
+      "description": "The real projects and labs you’ll actually ship",
+      "pages": [
+        {
+          "icon": "box",
+          "name": "Projects",
+          "description": "The real portfolio projects you’ll build"
+        }
+      ]
+    },
+    {
+      "name": "Evidence",
+      "color": "#7FF0BD",
+      "description": "Portfolio, career path, and proof you can show",
+      "pages": [
+        {
+          "icon": "award",
+          "name": "Final Assessment",
+          "description": "A cumulative assessment across every module"
+        },
+        {
+          "icon": "folder",
+          "name": "My Portfolio",
+          "description": "Every completed project, auto-summarized"
+        },
+        {
+          "icon": "path",
+          "name": "Career Path",
+          "description": "Career Path Edition: readiness and job-landing playbook"
+        }
+      ]
+    }
+  ],
+  "outcomes": [
+    "Write prompts that produce reliable, structured output",
+    "Ground a model on your own data with retrieval",
+    "Build agents that use tools and take real actions",
+    "Evaluate outputs instead of eyeballing them",
+    "Control cost and latency as usage scales",
+    "Ship a real product with real evals behind it"
+  ],
+  "topics": [
+    "Prompting",
+    "Retrieval",
+    "Agents",
+    "Tool Use",
+    "Structured Outputs",
+    "Evaluation",
+    "Cost & Latency"
+  ],
+  "whyItMatters": [
+    "Retrieval can ground an LLM on information outside its training data.",
+    "Tool use lets an AI system interact with external systems, not just generate text.",
+    "Evaluation is necessary because a response that sounds right can still be wrong.",
+    "Prompting is only one part of a production AI system.",
+    "Cost and latency become real engineering constraints once an AI application scales."
+  ],
+  "careerPath": {
+    "eyebrow": "Career Path Edition",
+    "title": "A shipped AI product with evals you can point to in an interview.",
+    "body": "Whether you’re moving into AI engineering freelance or hired."
+  }
+}

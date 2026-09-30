@@ -1,0 +1,21 @@
+If you split a document into non-overlapping chunks, a sentence or idea that spans a chunk boundary gets cut in half, in one chunk you get the setup with no conclusion, in the next you get the conclusion with no setup. *Overlap*, repeating the last portion of one chunk at the start of the next, keeps that boundary content readable in both directions.
+
+<Def title={"Definition: chunk overlap"}>
+
+A deliberate repetition of content at the boundary between adjacent chunks, so no idea is split with zero context on either side. Typically 10-20% of the chunk size.
+
+</Def>
+
+Overlap isn't free, it means the same content gets processed (and paid for) more than once. The right amount is a tradeoff between boundary-continuity and cost, not a fixed universal number.
+
+<Practice>
+
+A meeting-transcript analyzer chunks a 3-hour transcript for action-item extraction, using 15% overlap. After a few action items turn out to have been split across chunk boundaries and missed, the team bumps overlap to 60% instead of touching chunk size. What does jumping to 60% overlap actually cost, and would increasing chunk size instead have addressed the same failure more cheaply?
+
+<Answer>
+
+At 60% overlap, most of each chunk is a repeat of content the previous chunk already covered, so the total tokens processed across the transcript balloons well past the transcript's actual length, more cost, more latency, for a fix that's really just papering over chunks that are too small for the unit of meaning (one action item's full context) to fit inside one. Increasing chunk size so a typical action-item discussion fits within a single chunk addresses the root cause directly, and a modest overlap (10-20%) is then enough to catch the rare item still split at a boundary. Overlap should catch the occasional edge case, not compensate for chunks sized too small for the content.
+
+</Answer>
+
+</Practice>

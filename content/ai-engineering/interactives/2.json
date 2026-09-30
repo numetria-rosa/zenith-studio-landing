@@ -1,0 +1,24 @@
+{
+  "decision": [
+    {
+      "t": "A. Truncate the contract at the window limit and summarize whatever made it in",
+      "correct": false,
+      "why": "This is exactly the silent-failure bug this module opened with, the truncated tail (often the termination clause, liability terms, or signatures) disappears with no error, and a review that missed it looks identical to a review that caught everything."
+    },
+    {
+      "t": "B. Reject the document outright as \"too long to process\"",
+      "correct": false,
+      "why": "Rejecting throws away a document the system CAN handle, it just needs to be split first. That's a worse outcome for the rare-but-real long contract than solving the actual problem, chunking with overlap."
+    },
+    {
+      "t": "C. Chunk the contract with overlap, sized to the available input budget, and process it in pieces",
+      "correct": true,
+      "why": "This is the module's core lesson applied correctly: compute the available input budget (window minus reserved output), split the contract into chunks that fit it with overlap at the boundaries, and process every chunk, nothing gets silently dropped."
+    },
+    {
+      "t": "D. Switch to a model with a bigger context window only for this document",
+      "correct": false,
+      "why": "This can be a reasonable secondary lever, but on its own it doesn't scale, there's always a contract long enough to exceed whatever window you pick next, and it doesn't remove the need for a real chunking strategy for the documents that still won't fit."
+    }
+  ]
+}

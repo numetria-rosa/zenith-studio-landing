@@ -156,7 +156,7 @@ export function ModuleOverview({ mod, done }: { mod: ModuleContent; done: Set<st
                 icon="code"
                 color="#5CC8FF"
                 kind="Code exercise"
-                title={mod.exercise.cardTitle ?? mod.exercise.title}
+                title={mod.exercise.cardTitle ?? mod.lessons.find((l) => l.number === mod.exercise!.id)?.title ?? "Code exercise"}
                 note={`Runs in the browser · ${mod.exercise.tests.length} tests`}
               />
             )}

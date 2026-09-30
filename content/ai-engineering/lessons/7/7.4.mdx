@@ -1,0 +1,19 @@
+For genuinely subjective criteria (tone, helpfulness, coherence) where no exact-match rule applies, it's tempting to use a second model call to grade the first model's output. This works, up to a point, but it inherits the same unreliability as everything else this course has covered about model output: the judge can be inconsistent, biased toward certain phrasing styles, or simply wrong, and its grading is itself an unverified model output.
+
+<Callout>
+
+**A judge that scores inconsistently is worse than no automated score at all.** If the same output can get a 6 or an 8 from the judge model on different runs, that noise can mask a real regression, or manufacture a fake one, defeating the entire purpose of having a repeatable number to trust.
+
+</Callout>
+
+<Practice>
+
+Given the reliability concerns, when should LLM-as-judge scoring actually be used, versus avoided in favor of something else?
+
+<Answer>
+
+Reserve it for criteria that genuinely have no deterministic check, subjective quality dimensions like tone or helpfulness where "correct" isn't a fixed string or structure. Anything that CAN be checked deterministically (does the output parse as valid JSON, does it contain a required field, does it match an expected value) should be, deterministic checks are consistent, cheap, and fast, exactly the properties LLM-as-judge lacks.
+
+</Answer>
+
+</Practice>

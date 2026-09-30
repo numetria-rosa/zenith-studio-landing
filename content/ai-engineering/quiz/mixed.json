@@ -1,0 +1,30 @@
+[
+  {
+    "id": "mix_1_3",
+    "title": "Mixed Quiz: Modules 1–3",
+    "modules": [
+      1,
+      2,
+      3
+    ],
+    "perModule": 3
+  },
+  {
+    "id": "mix_4_5",
+    "title": "Mixed Quiz: Modules 4–5",
+    "modules": [
+      4,
+      5
+    ],
+    "perModule": 4
+  },
+  {
+    "id": "mix_6_7",
+    "title": "Mixed Quiz: Modules 6–7",
+    "modules": [
+      6,
+      7
+    ],
+    "perModule": 4
+  }
+]

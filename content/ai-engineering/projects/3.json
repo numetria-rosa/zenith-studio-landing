@@ -1,0 +1,63 @@
+{
+  "id": 3,
+  "title": "Vector Similarity Search Engine",
+  "difficulty": "Intermediate",
+  "modules": [
+    3
+  ],
+  "summary": "Build a small in-memory vector search engine: cosine similarity, top-k retrieval, and a relevance-threshold cutoff.",
+  "requirements": [
+    "Implement cosine similarity from scratch (no library).",
+    "Implement top-k retrieval with a minimum-relevance threshold.",
+    "Guard against a zero-magnitude vector without raising or producing NaN.",
+    "Accept a small in-memory document set (id + vector pairs) to search over."
+  ],
+  "start": "Start from Module 3's exercise function and add a small CLI or script that loads a handful of precomputed embeddings (you can hardcode small vectors, this project is about the search logic, not calling an embeddings API) and runs real queries against them.",
+  "acceptance": [
+    "Cosine similarity is verified against known hand-computed values (e.g. identical vectors → 1.0, perpendicular → 0.0, opposite → -1.0).",
+    "Top-k correctly returns the k highest-scoring documents, sorted descending, regardless of input order.",
+    "A minimum-relevance threshold correctly excludes low-scoring documents even when k would allow more results.",
+    "A zero-vector document scores 0 and never raises or produces NaN.",
+    "Scale-invariance is verified: two vectors with the same direction but different magnitude score identically against the same query."
+  ],
+  "tests": [
+    "Identical vectors → similarity 1.0.",
+    "Perpendicular vectors → similarity 0.0.",
+    "Opposite vectors → similarity -1.0.",
+    "5-document set, k=2, threshold=0 → exactly the 2 highest-scoring documents, correctly ordered.",
+    "Same set, threshold=0.5 with only 1 document scoring above it → exactly 1 result, even though k allows more.",
+    "Zero-vector document included in the set → included in results with score 0, no crash."
+  ],
+  "mistakes": [
+    "Sorting or slicing to k before filtering by threshold, producing wrong results when a high scorer is excluded by an early slice.",
+    "Not guarding the zero-magnitude case, letting a division-by-zero exception (or NaN, if using a library) silently propagate.",
+    "Testing only with 2D toy vectors and never verifying against a higher-dimensional case."
+  ],
+  "solution": [
+    "`cosine_similarity(a, b)`: dot product over (magnitude_a × magnitude_b), returning 0 if either magnitude is 0.",
+    "Score every document, filter by threshold, sort descending, slice to k, in that order specifically.",
+    "Verify scale-invariance and the zero-vector case with dedicated unit tests, not just eyeballing output."
+  ],
+  "rubric": [
+    {
+      "key": "architecture",
+      "label": "Architecture",
+      "weight": 33
+    },
+    {
+      "key": "implementation",
+      "label": "Implementation",
+      "weight": 42
+    },
+    {
+      "key": "testing",
+      "label": "Testing",
+      "weight": 17
+    },
+    {
+      "key": "documentation",
+      "label": "Documentation",
+      "weight": 8
+    }
+  ]
+}

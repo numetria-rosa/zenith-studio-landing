@@ -1,0 +1,43 @@
+**AI Engineering** is the discipline of building production software that uses AI models, mostly large language models today, as a core working part of the system. Not training models from scratch. Not researching new architectures. Taking a model that already exists (usually reached through an API) and doing the real engineering work to make it reliable, safe, cost-aware, and genuinely useful inside an application people depend on.
+
+<Def title={"Definition: AI Engineer"}>
+
+A software engineer who specializes in integrating, orchestrating, and operating AI models inside production systems: prompting and validating model output, managing context and retrieval, wiring up tools and agents, and making the whole thing reliable and measurable, everything this course's 8 modules cover, in order.
+
+</Def>
+
+Concrete example: a company wants an internal support bot that answers employee questions from their documentation. An **AI engineer** builds the retrieval pipeline, writes the prompts, wires up the tools it can call, adds reliability and evaluation, and ships it. A **data scientist** might separately analyze which questions employees ask most, to decide what documentation is missing. An **ML engineer** might fine-tune a smaller embedding model if off-the-shelf retrieval quality isn't good enough. An **AI researcher** is who published the paper the fine-tuning technique came from. An **MLOps/AI infrastructure engineer** is who keeps the whole thing running at 2am when GPU costs spike. Same project, five different, overlapping jobs.
+
+<Def title={"How the adjacent fields differ"}>
+
+**vs. Traditional Software Engineering**: same engineering discipline (APIs, testing, reliability, deployment), but working with a component (the model) that is non-deterministic and can be confidently wrong, which is exactly why Modules 1 and 7 of this course exist.
+
+**vs. AI-Assisted Software Engineering**: a different Zenith Lab course for people who have never shipped code. That one teaches HTML/CSS/JS by hand, then Cursor and GitHub, and ends at a live web app. This course assumes programming logic already and builds *LLM products* (RAG, tools, eval). If you cannot yet read a function or open a PR, take AI-Assisted Software Engineering first. Do not treat the two titles as the same job.
+
+**vs. Machine Learning Engineering**: ML engineers typically train, fine-tune, and deploy models themselves. AI engineers typically consume an already-trained model through an API and build the system around it. Some roles blend both.
+
+**vs. Data Science**: data scientists analyze data to answer questions and inform decisions (often with statistics and classical ML). AI engineers build software systems that use AI models to do something in production, on an ongoing basis.
+
+**vs. AI Research**: researchers push the boundary of what models CAN do (new architectures, training techniques, published papers). AI engineers take what already exists and make it work reliably for a real use case.
+
+**vs. MLOps / AI Infrastructure**: infrastructure engineers build and operate the platforms models run on (serving, scaling, GPU cost, deployment pipelines). AI engineers build what runs ON those platforms. Small teams, one person often wears both hats.
+
+</Def>
+
+## Interactive: whose job is this, actually?
+
+<Muted>Six real tasks from a company shipping an AI product. For each, guess which role owns it primarily.</Muted>
+
+<Interactive id={"m0-classify"} label={"Classify the task"} />
+
+<Practice>
+
+Two of the six tasks above could reasonably be argued as belonging to more than one role. Why does that not mean the classification exercise is wrong?
+
+<Answer>
+
+Because these are overlapping career directions, not rigid job-title boundaries, especially at smaller companies where one person covers several of them. The point of naming a "primary" owner isn't to draw a hard legal boundary, it's to build the vocabulary to recognize which SKILL a given task actually requires, so you know what to learn regardless of what your eventual job title says.
+
+</Answer>
+
+</Practice>

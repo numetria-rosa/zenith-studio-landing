@@ -1,0 +1,31 @@
+Idempotency protects against re-running something that already succeeded. It should NOT block a legitimate retry of something that failed, if the handler threw an error and no side effect happened, the model retrying with the same call ID should get a real second attempt, not a cached failure it can never recover from.
+
+<Callout>
+
+**Cache successes, not failures.** Only mark a call ID as "done" once the handler actually completes successfully. A failed attempt should leave the door open for exactly one more real try, that distinction is what makes an idempotent executor useful instead of just a call that permanently breaks after one transient error.
+
+</Callout>
+
+<Practice label={"Cross-module check"}>
+
+Module 6 (later in this course) covers retrying failed model calls with backoff. Is a retried tool call, after a handler failure, the same kind of retry?
+
+<Answer>
+
+Conceptually yes, both are "the same logical operation, attempted again after a failure," and both need the same guarantee: a retry should be safe, not double the side effects. Module 6's focus is deciding WHEN and HOW MANY times to retry a failing call. This module's focus is making sure that WHEN a retry happens, whether initiated by your code or by the model, it doesn't cause harm if the original attempt actually succeeded.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A sales-outreach agent's `send_email(leadId, template)` call times out waiting for the mail provider's response. The request may have reached the provider and actually sent the email, or it may have died before it got there, the executor genuinely has no way to tell which happened. Per this section's "cache successes, not failures" rule, is it automatically safe to leave this call ID retryable?
+
+<Answer>
+
+Not automatically, and this is the gap the rule glosses over. "Cache successes, not failures" assumes your executor KNOWS whether the side effect happened, a clean exception before any network call went out is unambiguous. A timeout on the response is a third case: the request may have landed. Marking it retryable risks a duplicate email exactly the way caching a real success would risk a duplicate charge. Production systems handle this by pushing the idempotency key down to the provider itself, most transactional email and payment APIs accept a client-generated key and deduplicate on their end, so a retry is safe even when your own executor is genuinely uncertain what happened on the first attempt.
+
+</Answer>
+
+</Practice>

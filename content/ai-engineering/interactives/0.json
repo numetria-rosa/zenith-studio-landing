@@ -1,0 +1,564 @@
+{
+  "TASKS": [
+    {
+      "id": "t1",
+      "text": "Write the retrieval pipeline and prompts for an internal support bot.",
+      "role": "AI Engineer",
+      "explain": "This is core AI engineering work: retrieval, prompting, and wiring it into a production system, exactly Modules 1 and 3's territory."
+    },
+    {
+      "id": "t2",
+      "text": "Analyze which questions employees ask the support bot most often, to find gaps in the documentation.",
+      "role": "Data Scientist",
+      "explain": "Analyzing usage data to find a pattern and inform a decision is classic data science, not building the system itself."
+    },
+    {
+      "id": "t3",
+      "text": "Fine-tune a smaller embedding model because off-the-shelf retrieval isn't accurate enough for this company's jargon.",
+      "role": "ML Engineer",
+      "explain": "Training/fine-tuning a model is ML engineering territory, the AI engineer would consume the resulting model, not produce it."
+    },
+    {
+      "id": "t4",
+      "text": "Publish a paper proposing a new attention mechanism that reduces context-window cost.",
+      "role": "AI Researcher",
+      "explain": "Pushing the boundary of what's technically possible, and publishing it, is research, not applied engineering."
+    },
+    {
+      "id": "t5",
+      "text": "Keep GPU costs under control and make sure the model-serving cluster survives a traffic spike.",
+      "role": "AI Infrastructure / MLOps",
+      "explain": "Operating and scaling the platform models run on is infrastructure/MLOps work, distinct from building what runs on top of it."
+    },
+    {
+      "id": "t6",
+      "text": "Add a minimum-relevance threshold so the bot says 'I don't know' instead of guessing from an irrelevant document.",
+      "role": "AI Engineer",
+      "explain": "Directly building the reliability/quality logic of the AI system, this is Module 3's relevance-threshold concept in a real support-bot context."
+    }
+  ],
+  "ROLES": [
+    "AI Engineer",
+    "Data Scientist",
+    "ML Engineer",
+    "AI Researcher",
+    "AI Infrastructure / MLOps"
+  ],
+  "FLOW": [
+    {
+      "name": "Idea",
+      "ai": false
+    },
+    {
+      "name": "Data",
+      "ai": false
+    },
+    {
+      "name": "Model / AI API",
+      "ai": true
+    },
+    {
+      "name": "Backend",
+      "ai": true
+    },
+    {
+      "name": "RAG / Tools / Agents",
+      "ai": true
+    },
+    {
+      "name": "Application",
+      "ai": true
+    },
+    {
+      "name": "Evaluation",
+      "ai": true
+    },
+    {
+      "name": "Deployment",
+      "ai": false
+    },
+    {
+      "name": "Monitoring",
+      "ai": true
+    }
+  ],
+  "ROLE_DETAILS": [
+    {
+      "name": "AI Application Engineer",
+      "build": "End-user-facing AI features: chatbots, copilots, AI-powered product surfaces.",
+      "with": "Model APIs, frontend/backend glue, prompt and context management.",
+      "prog": "JavaScript/TypeScript or Python, comfortable full-stack.",
+      "tools": "An LLM SDK, a frontend framework, a vector DB.",
+      "math": "Minimal, arithmetic-level.",
+      "projects": "A support chatbot, an AI writing assistant, a copilot inside an existing app."
+    },
+    {
+      "name": "LLM / Generative AI Engineer",
+      "build": "The core LLM-powered logic: prompting systems, RAG pipelines, agent loops.",
+      "with": "Model APIs, embeddings, retrieval, tool/function calling.",
+      "prog": "Python primarily, strong async/API skills.",
+      "tools": "LLM SDKs, a vector DB, an orchestration framework.",
+      "math": "Light linear algebra (embeddings, similarity).",
+      "projects": "A RAG system, a multi-step agent, a structured-extraction pipeline."
+    },
+    {
+      "name": "AI/ML Engineer",
+      "build": "Systems that may include model training/fine-tuning alongside LLM integration.",
+      "with": "Training frameworks, evaluation metrics, data pipelines, LLM APIs.",
+      "prog": "Python, comfortable with ML frameworks.",
+      "tools": "PyTorch/TensorFlow, experiment tracking, an LLM SDK.",
+      "math": "Moderate: linear algebra, probability, optimization basics.",
+      "projects": "A fine-tuned classifier, a hybrid ML+LLM pipeline."
+    },
+    {
+      "name": "AI Integration Engineer",
+      "build": "Connecting AI capability into existing business systems (CRM, support desk, internal tools).",
+      "with": "APIs, webhooks, auth, existing enterprise systems.",
+      "prog": "Any backend language, strong API/integration skills.",
+      "tools": "REST/GraphQL clients, auth libraries, an LLM SDK.",
+      "math": "Minimal.",
+      "projects": "An AI feature wired into a CRM, an automated ticket-triage integration."
+    },
+    {
+      "name": "AI Automation Engineer",
+      "build": "Replacing manual, judgment-heavy workflows with AI-assisted automation.",
+      "with": "Workflow tools, APIs, LLMs for the judgment-call steps.",
+      "prog": "Python or JavaScript, workflow/scripting comfort.",
+      "tools": "Automation platforms, an LLM SDK, a task queue.",
+      "math": "Minimal.",
+      "projects": "Automated document processing, an AI-assisted approval workflow."
+    },
+    {
+      "name": "AI Platform / Infrastructure Engineer",
+      "build": "The platform other engineers deploy AI systems on top of.",
+      "with": "Model serving, GPU infrastructure, deployment pipelines.",
+      "prog": "Python plus strong systems/infra skills (Go/Rust helpful, not required to start).",
+      "tools": "Kubernetes, Terraform, a metrics/tracing stack, an inference server.",
+      "math": "Minimal to moderate depending on optimization work.",
+      "projects": "A model-serving platform, an internal LLM gateway with cost tracking."
+    },
+    {
+      "name": "MLOps-oriented roles",
+      "build": "Operationalizing ML/AI: CI/CD for models, monitoring, reproducibility.",
+      "with": "Experiment tracking, model registries, deployment pipelines.",
+      "prog": "Python, strong DevOps/CI-CD skills.",
+      "tools": "MLflow or similar, CI/CD tooling, containerization.",
+      "math": "Light.",
+      "projects": "A model deployment pipeline, an automated retraining/monitoring system."
+    },
+    {
+      "name": "AI Product Engineer",
+      "build": "Deciding WHAT to build with AI, prototyping features, balancing capability against user value.",
+      "with": "LLM APIs, rapid prototyping tools, user feedback loops.",
+      "prog": "Whatever ships fastest, often JavaScript/Python.",
+      "tools": "An LLM SDK, prototyping/no-code tools, analytics.",
+      "math": "Minimal.",
+      "projects": "A rapid AI feature prototype, an A/B-tested AI product surface."
+    }
+  ],
+  "PRIORITY": [
+    {
+      "tech": "Python",
+      "pri": "now",
+      "why": "The dominant language for AI/ML tooling, most SDKs and frameworks ship Python-first.",
+      "now": "Enough to write scripts, call APIs, handle JSON.",
+      "later": "Deepens continuously throughout your career."
+    },
+    {
+      "tech": "Git / GitHub",
+      "pri": "now",
+      "why": "Version control is non-negotiable for any real software work, AI projects included.",
+      "now": "Commit, branch, push, pull, resolve a basic conflict.",
+      "later": "Becomes second nature quickly."
+    },
+    {
+      "tech": "HTTP / REST / JSON",
+      "pri": "now",
+      "why": "Every model API call is an HTTP request returning JSON, this is the literal substrate of the field.",
+      "now": "Understand requests, responses, status codes, and JSON structure.",
+      "later": "Deepens with auth, webhooks, streaming responses."
+    },
+    {
+      "tech": "SQL",
+      "pri": "now",
+      "why": "Nearly every real AI system persists something: logs, retrieval documents, eval results, idempotency keys.",
+      "now": "SELECT/INSERT/UPDATE, basic joins.",
+      "later": "Query optimization, schema design as systems grow."
+    },
+    {
+      "tech": "JavaScript / TypeScript",
+      "pri": "next",
+      "why": "Needed if you're building the user-facing side of an AI product, or working in a JS-first stack.",
+      "now": "Not required to start if you're Python-first.",
+      "later": "Essential for AI application engineers building UIs/copilots."
+    },
+    {
+      "tech": "Linux / Bash",
+      "pri": "next",
+      "why": "Most AI infrastructure runs on Linux; comfort with a shell speeds up everything.",
+      "now": "Basic navigation, running scripts.",
+      "later": "Becomes important once you're deploying or debugging in production."
+    },
+    {
+      "tech": "Docker",
+      "pri": "next",
+      "why": "Standard way to package and run AI services consistently across environments.",
+      "now": "Not required to start.",
+      "later": "Matters once you deploy anything real."
+    },
+    {
+      "tech": "C++ / Rust / Go",
+      "pri": "spec",
+      "why": "Performance-critical inference engines and high-throughput serving infrastructure.",
+      "now": "Not needed to start, at all.",
+      "later": "Only if you move deep into AI platform/infrastructure work."
+    }
+  ],
+  "ECOSYSTEM": [
+    {
+      "name": "Development",
+      "why": "The daily tools for writing, versioning, and running code, category is timeless even as specific tools change.",
+      "ex": "e.g. VS Code, Git, GitHub, a CLI"
+    },
+    {
+      "name": "Languages",
+      "why": "What you actually write the system in, Python dominates AI-specific tooling, JS/TS dominates the application layer.",
+      "ex": "e.g. Python, JavaScript, TypeScript, SQL"
+    },
+    {
+      "name": "AI Models / APIs",
+      "why": "The actual intelligence your system calls out to, swappable in principle if your code isn't tightly coupled to one vendor.",
+      "ex": "e.g. OpenAI, Anthropic, Google/Gemini, Hugging Face, open-source models"
+    },
+    {
+      "name": "Frameworks",
+      "why": "Pre-built orchestration for prompting, retrieval, and agent logic, useful, but everything they do is learnable from first principles (which is what this course teaches).",
+      "ex": "e.g. LangChain, LangGraph, LlamaIndex, and comparable alternatives"
+    },
+    {
+      "name": "Tool connectivity",
+      "why": "The wire format a model-facing app uses to discover and call tools exposed by a separate server, standardizes the plumbing, not the validate-then-execute discipline Module 4 teaches, which still applies underneath it either way.",
+      "ex": "e.g. MCP (Model Context Protocol), and comparable emerging standards"
+    },
+    {
+      "name": "Data",
+      "why": "Where your system's persistent knowledge and state actually live.",
+      "ex": "e.g. PostgreSQL, a vector database, Redis for caching"
+    },
+    {
+      "name": "Infrastructure",
+      "why": "How your system gets packaged, deployed, and kept running at scale.",
+      "ex": "e.g. Docker, a cloud platform, Linux, CI/CD"
+    },
+    {
+      "name": "Evaluation / Observability",
+      "why": "How you know whether the system is actually working, and where it's failing, in production.",
+      "ex": "e.g. LangSmith, Langfuse, OpenTelemetry-based tracing, an eval framework, monitoring dashboards"
+    }
+  ],
+  "ROADMAP": [
+    {
+      "name": "Programming Fundamentals",
+      "taught": "not",
+      "why": "Everything else assumes you can already write and reason about code."
+    },
+    {
+      "name": "Python",
+      "taught": "not",
+      "why": "The dominant language for AI-specific tooling in the real world."
+    },
+    {
+      "name": "Git / GitHub",
+      "taught": "not",
+      "why": "Version control for any real project."
+    },
+    {
+      "name": "HTTP / APIs / JSON",
+      "taught": "partial",
+      "why": "This course assumes familiarity, and reinforces it through every model-call example, but doesn't teach HTTP from zero."
+    },
+    {
+      "name": "SQL / Databases",
+      "taught": "not",
+      "why": "Persistence for retrieval documents, logs, and eval results in real systems."
+    },
+    {
+      "name": "Backend Fundamentals",
+      "taught": "not",
+      "why": "Servers, request/response cycles, basic architecture."
+    },
+    {
+      "name": "AI / ML Fundamentals",
+      "taught": "not",
+      "why": "What a model is, at a conceptual level, this course assumes you already have a rough idea."
+    },
+    {
+      "name": "LLMs",
+      "taught": "partial",
+      "why": "This course teaches how to USE LLMs reliably, not how they're built internally."
+    },
+    {
+      "name": "Prompting + Structured Outputs",
+      "taught": "taught",
+      "why": "Module 1."
+    },
+    {
+      "name": "Context Windows & Token Economics",
+      "taught": "taught",
+      "why": "Module 2."
+    },
+    {
+      "name": "Retrieval-Augmented Generation",
+      "taught": "taught",
+      "why": "Module 3."
+    },
+    {
+      "name": "Tool Use / Function Calling",
+      "taught": "taught",
+      "why": "Module 4."
+    },
+    {
+      "name": "Agent Architectures",
+      "taught": "taught",
+      "why": "Module 5."
+    },
+    {
+      "name": "Reliability & Evaluation",
+      "taught": "taught",
+      "why": "Modules 6 and 7."
+    },
+    {
+      "name": "Deployment",
+      "taught": "not",
+      "why": "Shipping a real service to production infrastructure."
+    },
+    {
+      "name": "Production AI Engineering",
+      "taught": "partial",
+      "why": "The capstone (Module 8) synthesizes everything taught here into one system, real production work adds deployment, scale, and ongoing operations on top."
+    }
+  ],
+  "PATH_QUESTIONS": [
+    {
+      "q": "Do you enjoy building things end-users directly interact with, or the systems underneath that other engineers rely on?",
+      "opts": [
+        {
+          "t": "End-user-facing features",
+          "tags": {
+            "ai-engineer": 1,
+            "llm-app": 2
+          }
+        },
+        {
+          "t": "Underlying systems and infrastructure",
+          "tags": {
+            "ai-infra": 2,
+            "backend-ai": 1
+          }
+        }
+      ]
+    },
+    {
+      "q": "Would you rather wire together existing model APIs, or work on training/fine-tuning models yourself?",
+      "opts": [
+        {
+          "t": "Wire together existing APIs",
+          "tags": {
+            "llm-app": 1,
+            "ai-engineer": 1
+          }
+        },
+        {
+          "t": "Train or fine-tune models",
+          "tags": {
+            "ai-ml": 2
+          }
+        }
+      ]
+    },
+    {
+      "q": "Do you prefer customer-facing integration work, or general-purpose reliability engineering?",
+      "opts": [
+        {
+          "t": "Customer-facing integration",
+          "tags": {
+            "backend-ai": 2
+          }
+        },
+        {
+          "t": "General-purpose reliability engineering",
+          "tags": {
+            "ai-infra": 1,
+            "ai-engineer": 1
+          }
+        }
+      ]
+    },
+    {
+      "q": "How much do you enjoy writing deployment/infrastructure tooling versus writing product-facing code?",
+      "opts": [
+        {
+          "t": "I'd rather write infrastructure tooling",
+          "tags": {
+            "ai-infra": 2
+          }
+        },
+        {
+          "t": "I'd rather write product-facing code",
+          "tags": {
+            "llm-app": 1,
+            "ai-engineer": 1
+          }
+        }
+      ]
+    },
+    {
+      "q": "Do you want a mostly-Python role, or a full-stack role touching both JavaScript and Python?",
+      "opts": [
+        {
+          "t": "Mostly Python",
+          "tags": {
+            "ai-ml": 1,
+            "ai-infra": 1
+          }
+        },
+        {
+          "t": "Full-stack (JS + Python)",
+          "tags": {
+            "llm-app": 2,
+            "ai-engineer": 1
+          }
+        }
+      ]
+    },
+    {
+      "q": "When something breaks in production, are you more drawn to debugging the model's behavior, or debugging the infrastructure it runs on?",
+      "opts": [
+        {
+          "t": "The model's behavior / output quality",
+          "tags": {
+            "ai-engineer": 1,
+            "llm-app": 1
+          }
+        },
+        {
+          "t": "The infrastructure it runs on",
+          "tags": {
+            "ai-infra": 2,
+            "backend-ai": 1
+          }
+        }
+      ]
+    }
+  ],
+  "PATH_NAMES": {
+    "ai-engineer": "AI Engineer",
+    "llm-app": "LLM Application Engineer",
+    "ai-ml": "AI/ML Engineer",
+    "backend-ai": "Backend / AI Integration Engineer",
+    "ai-infra": "AI Platform / Infrastructure Engineer"
+  },
+  "selfCheck": {
+    "parts": [
+      {
+        "kind": "text",
+        "label": "1. Define AI Engineering in your own words",
+        "placeholder": "In a sentence or two, what is AI Engineering..."
+      },
+      {
+        "kind": "choice",
+        "id": "sc2",
+        "label": "2. Which role would primarily handle this task?",
+        "question": "\"Fine-tune a smaller open-source embedding model because off-the-shelf retrieval quality isn't good enough for a niche domain.\"",
+        "options": [
+          {
+            "t": "ML Engineer",
+            "correct": true,
+            "correctText": "Correct. Fine-tuning a model is ML engineering work; the AI engineer would consume the resulting model afterward."
+          },
+          {
+            "t": "AI Engineer",
+            "correct": false,
+            "reason": "AI engineers typically consume already-trained models through an API, training/fine-tuning is ML engineering territory."
+          },
+          {
+            "t": "AI Researcher",
+            "correct": false,
+            "reason": "Fine-tuning an existing model for a practical need isn't the same as researching a new technique or architecture."
+          }
+        ]
+      },
+      {
+        "kind": "choice",
+        "id": "sc3",
+        "label": "3. Which technologies should a complete beginner prioritize first?",
+        "question": "Pick the pair that both belong in \"need to know now.\"",
+        "options": [
+          {
+            "t": "Python and HTTP/REST/JSON",
+            "correct": true,
+            "correctText": "Correct. Both are marked 'need to know now', the dominant AI tooling language and the literal substrate every model API call runs on."
+          },
+          {
+            "t": "Docker and C++",
+            "correct": false,
+            "reason": "Both are 'should learn next' or 'specialized', not day-one priorities for a beginner."
+          },
+          {
+            "t": "Rust and Kubernetes",
+            "correct": false,
+            "reason": "Both are specialized/infrastructure-leaning tools, not where a beginner should start."
+          }
+        ]
+      },
+      {
+        "kind": "choice",
+        "id": "sc4",
+        "label": "4. Identify the stages of an AI engineering workflow",
+        "question": "In the production lifecycle from Lesson 0.2, what comes immediately after \"Model / AI API\" and before \"RAG / Tools / Agents\"?",
+        "options": [
+          {
+            "t": "Backend",
+            "correct": true,
+            "correctText": "Correct. Backend sits between the raw model/API call and the RAG/tools/agent logic built on top of it."
+          },
+          {
+            "t": "Deployment",
+            "correct": false,
+            "reason": "Deployment comes much later in the flow, after Application and Evaluation."
+          },
+          {
+            "t": "Data",
+            "correct": false,
+            "reason": "Data comes near the beginning of the flow, before a model is even called."
+          }
+        ]
+      },
+      {
+        "kind": "choice",
+        "id": "sc5",
+        "label": "5. Which skill do you need before going deeper into this course?",
+        "question": "Modules 1–8 assume comfort with which of these?",
+        "options": [
+          {
+            "t": "Basic programming fundamentals (variables, functions, loops, dictionaries): no prior Python required",
+            "correct": true,
+            "correctText": "Correct. This course teaches the Python you need as you go, only general programming fundamentals are assumed going in."
+          },
+          {
+            "t": "Production Kubernetes experience",
+            "correct": false,
+            "reason": "Infrastructure depth like this is explicitly out of scope for this course, not a prerequisite."
+          },
+          {
+            "t": "Prior Python or AI/ML experience",
+            "correct": false,
+            "reason": "Prior Python isn't required, this course teaches the Python needed for the AI engineering work that follows, from the fundamentals up."
+          }
+        ]
+      }
+    ],
+    "scoreLabel": "Self-check score",
+    "note": "This self-check is a reflection tool. It is not a mastery gate, unlike the checkpoints in Modules 1–8, and completing it is optional before continuing."
+  }
+}

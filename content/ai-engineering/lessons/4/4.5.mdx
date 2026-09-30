@@ -1,0 +1,33 @@
+Networks time out. Clients retry. A model's own reasoning loop can re-emit a call it already made. Whatever the cause, your tool executor has to assume the exact same tool call, same name, same arguments, same call ID, might arrive more than once. If the tool has a side effect (charging a card, sending an email, incrementing a counter), executing it twice is a real bug, not a harmless redundancy.
+
+<Def title={"Definition: idempotent execution"}>
+
+Guaranteeing that executing the same call (identified by a stable ID) more than once produces the same result as executing it once, by detecting the repeat and returning the original outcome instead of re-running the side effect.
+
+</Def>
+
+This is the same core idea Automation Engineering's idempotency module covered for webhooks and retried requests, applied here to model-issued tool calls instead of external event delivery. The mechanism is the same: track which call IDs have already run, and short-circuit repeats.
+
+<Practice>
+
+A payment tool call with ID `call_88` succeeds server-side, but the response is lost to a network blip before the model receives it. The model, seeing no confirmation, retries with the same call ID. What should your executor do, and what would go wrong if call IDs weren't tracked at all?
+
+<Answer>
+
+It should recognize `call_88` as already-executed and return the original cached result, without charging the card again. Without ID tracking, the executor has no way to distinguish "a genuinely new request" from "the same request arriving again after a lost response," and would run the handler twice, in this case, double-charging a customer for one transaction, exactly the failure mode idempotency keys exist to prevent.
+
+</Answer>
+
+</Practice>
+
+<Practice>
+
+A scheduling assistant issues `book_appointment(providerId, slot)` with call ID `call_sched_14` requesting the 2pm slot. It times out waiting for a response and retries, same call ID, but this time the arguments ask for the 3pm slot instead, the model changed its mind between the two attempts while reusing the ID. Should the executor treat this as a normal repeat and return whatever got booked the first time?
+
+<Answer>
+
+No, and this is a distinct failure mode from the payment example above. Idempotency assumes a repeated call ID means "the exact same request, arriving again." Here the ID is the same but the arguments aren't, that's not a retry, it's a collision, two different logical requests accidentally sharing one identifier. Silently returning the cached 2pm result would book the wrong slot without anyone knowing; silently executing the 3pm booking would defeat the point of tracking the ID at all. The correct move is to detect the mismatch and reject the second call with an error (the same call ID was reused with different arguments), the same discipline Stripe's idempotency keys enforce: an ID can only ever be bound to one specific request body.
+
+</Answer>
+
+</Practice>

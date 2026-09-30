@@ -1,0 +1,15 @@
+You've seen the failure mode (silent truncation) and the fix (overlapping chunks). Now implement it, and five real tests run against your actual code.
+
+<ExerciseLink />
+
+<Practice>
+
+Test 3 feeds your chunker a single word whose own token estimate is larger than `maxTokensPerChunk`. If your budget check runs unconditionally, even when the current chunk is still empty, what happens to that word?
+
+<Answer>
+
+It gets silently dropped, exactly the failure mode this whole module is about. If the check "would this exceed the budget" applies even to an empty chunk, the word never gets added anywhere, and the chunker moves on without it, ever. The fix is the same guard used in the reference solution: only enforce the budget once the chunk already has at least one word, an oversized word still needs a home, even a chunk that technically exceeds budget by itself.
+
+</Answer>
+
+</Practice>

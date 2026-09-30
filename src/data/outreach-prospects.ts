@@ -328,14 +328,15 @@ export const DALLAS_DENTAL_PROSPECTS: SeedProspect[] = [
 ];
 
 const LAW = "law-firms";
+const BROKERAGE = "brokerages";
 
 function personalInjury(
-  partial: Omit<SeedProspect, "country" | "niche" | "research"> & { city: string; signals: string[] }
+  partial: Omit<SeedProspect, "country" | "niche" | "research"> & { city: string; country?: string; signals: string[] }
 ): SeedProspect {
   const { signals, ...rest } = partial;
   return {
     ...rest,
-    country: "USA",
+    country: rest.country ?? "USA",
     niche: "Personal injury law",
     research: {
       verified: {
@@ -1260,6 +1261,32 @@ function insurance(
   };
 }
 
+function brokerage(
+  partial: Omit<SeedProspect, "country" | "niche" | "research"> & { city: string; signals: string[] }
+): SeedProspect {
+  const { signals, ...rest } = partial;
+  return {
+    ...rest,
+    country: "USA",
+    niche: "Real estate brokerages",
+    research: {
+      verified: {
+        name: rest.businessName,
+        city: rest.city,
+        country: "USA",
+        niche: "Real estate brokerages",
+        area: rest.area,
+        website: rest.website ?? undefined,
+        phone: rest.phone ?? undefined,
+        email: rest.email ?? undefined,
+        contactName: rest.contactName ?? undefined,
+        observedSignals: signals,
+      },
+      inferences: [rest.opportunity],
+    },
+  };
+}
+
 /** Columbus, OH and Calgary, AB insurance agency research (163 leads,
     AAA_Insurance_Leads_Columbus_Calgary.xlsx), fingerprinted against each
     agency'''s own site for real AMS/rater signatures (not guessed): Applied
@@ -1440,3 +1467,533 @@ export const CALGARY_INSURANCE_PROSPECTS: SeedProspect[] = [
   insurance({"businessName": "Ryder Insurance", "website": "https://ryderins.ca/", "city": "Calgary", "area": "Calgary, AB", "email": null, "phone": "+1 403-284-4771", "prospectScore": 76, "tier": "BACKUP", "recommendedServiceId": "ai-lead-capture", "recommendedOffer": "FREE_WRITTEN_AUDIT", "personalizationSignal": "a 4.5-star rating from only 53 reviews and a static quote form with no online booking or automated follow-up", "buyingSignal": "manual quote-form intake with no automated follow-up", "opportunity": "Ryder Insurance shows no automated review capture (4.5 stars, 53 reviews) and intake runs through a static quote form. The Insurance Account Manager Bundle's front-office layer (instant text-back on new quotes, automated review requests, renewal reminders) fits directly on top, no access to their back-office system required.", "signals": ["a static quote form with no online booking", "your public review count sits at only 53 on a 4.5-star rating, with nothing automated to request more"]}),
   insurance({"businessName": "Stirling Insurance Group Ltd", "website": "http://stirlinginsurancegroup.ca/wp/", "city": "Calgary", "area": "Calgary, AB", "email": null, "phone": "+1 403-720-1939", "prospectScore": 76, "tier": "BACKUP", "recommendedServiceId": "ai-lead-capture", "recommendedOffer": "FREE_WRITTEN_AUDIT", "personalizationSignal": "a 4.4-star rating from only 22 reviews and a static quote form with no online booking or automated follow-up", "buyingSignal": "manual quote-form intake with no automated follow-up", "opportunity": "Stirling Insurance Group Ltd shows no automated review capture (4.4 stars, 22 reviews) and intake runs through a static quote form. The Insurance Account Manager Bundle's front-office layer (instant text-back on new quotes, automated review requests, renewal reminders) fits directly on top, no access to their back-office system required.", "signals": ["a static quote form with no online booking", "your public review count sits at only 22 on a 4.4-star rating, with nothing automated to request more"]}),
 ];
+
+/** Toronto, ON personal injury law firm research, 2026-09-26 pass (full
+    redo of the 2026-09-25 batch, which was discovered to contain fabricated
+    emails and, worse, three rows that were copy-pasted from the existing
+    Ohio batch above with the city/country fields changed and an invented
+    Canadian email added - a serious error caught in review and fully
+    reverted here). Every row below was individually re-verified this pass:
+    real site visited via browser, DOM scanned via script for actual
+    mailto: links and plain-text email addresses (never guessed or
+    pattern-generated), and checked for known live-chat widget scripts
+    (Intercom/Drift/Tawk/Podium/ApexChat/Tidio/etc.) plus a manual look at
+    the rendered page.
+
+    Discovery used OpenSEO's search_local_businesses across ~10 query/area
+    combinations (injury lawyer, accident lawyer, slip and fall lawyer, long
+    term disability lawyer, brain injury lawyer, catastrophic injury lawyer,
+    wrongful death lawyer, etc., before OpenSEO credits ran out mid-session).
+
+    DISQUALIFIED for a live chat widget: Kalsi & Associates (ApexChat,
+    confirmed via vialivechat.com + invitation.apexchat.com scripts loaded on
+    kalsilaw.com), Edge Injury Law (Tidio, code.tidio.co script on
+    edgelegal.ca).
+
+    DROPPED for other reasons: the entire BARAPP Law Alliance network (MA/WPC
+    x2/BE/MPC Personal Injury Lawyer, plus AG Injury Law) - every one of
+    their sites sits behind the same Cloudflare bot-check wall and could not
+    be verified at all, so no claim about them (email or chat widget) could
+    be honestly made; KRMC Personal Injury Lawyer - OpenSEO's own listing had
+    no url/domain, and a follow-up search found no real website, so the
+    entire row (including its previously-fabricated krmc-law.ca domain and
+    email) was dropped rather than guessed at; Diane Parsons - Accident
+    Lawyer - the only mailto: found (mcugini@rpmlawyers.com) doesn't match
+    her name or the site's own domain, too ambiguous to attribute; Solution
+    Law and BAIG Law Firm - multi-practice firms (real estate, immigration,
+    criminal, family) where PI is one of several practice areas, not a focus,
+    same reasoning that has excluded similar firms in every batch above;
+    Taylor & Mergui, Dwell ATX Realty Group-equivalent misses - no email
+    findable after a genuine on-site check; YS Law Firm - site is "under
+    construction"; Ontario Auto Accident Lawyer - SSL handshake failure,
+    could not load the site at all.
+
+    Found 9 real, verified Toronto-area PI boutiques with confirmed public
+    emails, all fitting the target profile (solo to ~7 attorneys, no live
+    chat widget, decision-maker reachable). This is fewer than the 15-20
+    originally targeted - the Toronto/GTA market for solo-to-boutique PI
+    firms turned out to have more chat-widget adoption and more
+    Cloudflare-gated marketing sites than the Ohio/Texas batches above, and
+    OpenSEO ran out of credits before a full second sweep of the GTA could
+    be completed. */
+export const TORONTO_PI_PROSPECTS: SeedProspect[] = [
+  personalInjury({
+    businessName: "Joshua Goldberg Law",
+    website: "https://jgoldberglaw.ca/",
+    city: "Toronto",
+    country: "Canada",
+    area: "Downtown Toronto / Etobicoke / Brampton",
+    email: "info@jgoldberglaw.ca", // mailto: link in site footer, verified live via DOM scan, 2026-09-26
+    phone: "+1 877-898-0777",
+    contactName: "Joshua Goldberg",
+    prospectScore: 88,
+    tier: "HOT",
+    recommendedServiceId: LAW,
+    recommendedOffer: "PAID_AUDIT_CALL",
+    personalizationSignal: "a team of 4-5 lawyers plus paralegal/intake staff, 4.9-star rating from 169 Google reviews, BBB accredited, 24/7 support advertised",
+    buyingSignal: "multi-lawyer boutique with three GTA offices, no visible chat widget",
+    opportunity: "Three-office coordination for a firm promising 24/7 responsiveness is exactly where an after-hours call slips through.",
+    signals: ["4-5 lawyers plus legal assistant and intake coordinator", "4.9-star rating, 169 Google reviews", "BBB accredited", "24/7 support advertised", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "HSK Law Personal Injury Lawyer",
+    website: "https://www.hsklaw.ca/",
+    city: "Toronto",
+    country: "Canada",
+    area: "North York",
+    email: "info@hsklaw.ca", // mailto: link on site, verified live via DOM scan, 2026-09-26 (a decorative "chat" icon class was checked and confirmed to be a static icon, not a live chat script)
+    phone: "+1 416-238-7105",
+    contactName: NA,
+    prospectScore: 85,
+    tier: "HOT",
+    recommendedServiceId: LAW,
+    recommendedOffer: "PAID_AUDIT_CALL",
+    personalizationSignal: "a 5-star rating from 129 Google reviews, contingency-fee PI practice covering car/motorcycle/bicycle/slip-and-fall accidents",
+    buyingSignal: "boutique with unusually high review volume for its size, no live chat script found",
+    opportunity: "High review volume (129 on 5 stars) signals strong intake from reputation alone; a missed after-hours call costs referral trust.",
+    signals: ["5-star rating, 129 Google reviews", "contingency-fee PI specialist", "no live-chat script found in page source"],
+  }),
+  personalInjury({
+    businessName: "Noohi Law",
+    website: "https://noohilaw.com/",
+    city: "Toronto",
+    country: "Canada",
+    area: "North York",
+    email: "mypersonalinjury@noohilaw.com", // mailto: link on site, verified live via DOM scan, 2026-09-26 (a second general inbox, info@noohilaw.com, also confirmed real)
+    phone: "+1 647-424-1395", // number shown live on-site 2026-09-26; differs from OpenSEO's listed GMB number (647-492-8317), possibly an updated line
+    contactName: "Kathy Noohi",
+    prospectScore: 80,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "23+ years serving the GTA, over 1200 clients helped per their own site copy, multilingual support, 4.8-star rating from 93 reviews",
+    buyingSignal: "established boutique with a dedicated PI intake inbox, no visible chat widget",
+    opportunity: "A firm that says it deliberately limits caseload for personalized attention; an after-hours miss runs against that exact pitch.",
+    signals: ["23+ years in the GTA", "4.8-star rating, 93 reviews", "multilingual client support", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "MK Law Firm",
+    website: "https://www.mklaw.ca/",
+    city: "Toronto",
+    country: "Canada",
+    area: "North York",
+    email: "info@mklaw.ca", // mailto: link on site, verified live via DOM scan, 2026-09-26
+    phone: "+1 416-650-0060",
+    contactName: NA,
+    prospectScore: 81,
+    tier: "HOT",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "10+ years handling car collisions, slips and falls, and LTD claims on a contingency basis, 5-star rating from 66 Google reviews",
+    buyingSignal: "established boutique, strong review volume, no visible chat widget",
+    opportunity: "A decade-plus practice with real review volume (66 on 5 stars); after-hours intake gaps are a real, recurring cost at this volume.",
+    signals: ["10+ years in practice", "5-star rating, 66 Google reviews", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Franklin Law Firm",
+    website: "https://franklinlawfirm.ca/",
+    city: "Toronto",
+    country: "Canada",
+    area: "York / Weston Rd, also a Brampton office",
+    email: "robfranklin@franklinlawfirm.ca", // plain-text address (not a mailto: link) on the firm's own contact page, verified live 2026-09-26 - Rob Franklin personally; two more named attorneys (d.carranza@, r.nadarajah@) also confirmed on the same page
+    phone: "+1 416-245-6555",
+    contactName: "Rob Franklin",
+    prospectScore: 79,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "30+ years in personal injury, at least 3 named attorneys across two GTA offices (Toronto and Brampton), contingency-fee intake",
+    buyingSignal: "long-tenured multi-attorney boutique, no visible chat widget",
+    opportunity: "Two-office coordination for a 30-year practice is exactly where an after-hours call slips through.",
+    signals: ["30+ years in personal injury", "3+ named attorneys, two GTA offices", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Gratsias Law",
+    website: "https://www.gratsiaslaw.ca/",
+    city: "Toronto",
+    country: "Canada",
+    area: "North York / Consumers Rd",
+    email: "rita@gratsiaslaw.ca", // mailto: link on site, verified live via DOM scan, 2026-09-26 - Rita Gratsias personally
+    phone: "+1 416-427-9027",
+    contactName: "Rita Gratsias",
+    prospectScore: 74,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a solo/small PI practice with a personal named-attorney inbox, no chat widget or intake staff visible on site",
+    buyingSignal: "solo practitioner, no visible chat widget",
+    opportunity: "Solo practice with no admin layer; the attorney is the intake line, and a missed after-hours call has nowhere else to land.",
+    signals: ["solo/small practice", "personal named-attorney email", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Stanley Razenberg - Personal Injury & LTD Lawyer",
+    website: "https://www.razenberglaw.com/",
+    city: "Toronto",
+    country: "Canada",
+    area: "Downtown Toronto / Dalhousie St",
+    email: "stanley@razenberglaw.ca", // mailto: link on site, verified live via DOM scan, 2026-09-26 - note the real domain is .ca, not the .com the site is hosted under
+    phone: "+1 416-333-0905",
+    contactName: "Stanley Razenberg",
+    prospectScore: 74,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "solo practice, 10+ years, former insurance-company counsel now representing injured and LTD claimants, 5-star rating from 6 reviews",
+    buyingSignal: "solo practitioner with insurance-side background, no visible chat widget",
+    opportunity: "Solo practice with no admin layer; the attorney is the intake line, and a missed call has nowhere else to land.",
+    signals: ["solo practitioner", "former insurance company counsel", "5-star rating, 6 reviews", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Edson Legal",
+    website: "https://www.edsonlegal.com/",
+    city: "Toronto",
+    country: "Canada",
+    area: "North York",
+    email: "bedson@edsonlegal.com", // mailto: link found on-site via a full link-crawl (not on the homepage directly), verified live 2026-09-26 - Barry Edson personally
+    phone: "+1 855-702-3119",
+    contactName: "Barry Edson",
+    prospectScore: 72,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a 2-lawyer practice (Barry Edson and Adam Yoo) focused entirely on PI and insurance law, set a precedent in the Ontario Court of Appeal (Cugliari v. White)",
+    buyingSignal: "small specialist boutique, no visible chat widget",
+    opportunity: "A 2-lawyer firm with an appellate track record draws complex cases; after-hours intake has no admin layer to catch it. Note: the firm's public Google rating is low (2.0 stars from 7 reviews) - worth confirming this is still current before outreach.",
+    signals: ["2-lawyer PI and insurance law specialists", "Ontario Court of Appeal precedent (Cugliari v. White)", "no visible chat widget"],
+  }),
+  personalInjury({
+    businessName: "Your Accident Lawyer",
+    website: "https://youraccidentlawyer.ca/",
+    city: "Toronto",
+    country: "Canada",
+    area: "North York",
+    email: "info@youraccidentlawyer.ca", // confirmed both as a mailto: link and plain text on-site, verified live 2026-09-26
+    phone: "+1 647-465-5487",
+    contactName: "Gail",
+    prospectScore: 71,
+    tier: "GOOD",
+    recommendedServiceId: LAW,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "25+ years of experience, client testimonials consistently name the same attorney (Gail) personally, no chat widget or intake staff visible",
+    buyingSignal: "small named-attorney practice, no visible chat widget",
+    opportunity: "Reviews name the attorney personally handling every case; an after-hours miss breaks that direct-access reputation.",
+    signals: ["25+ years of experience", "reviews name the attorney personally", "no visible chat widget"],
+  }),
+];
+
+/** Austin, TX real estate brokerage/team research, 2026-09-26 pass (full
+    redo of the 2026-09-25 batch, which contained several fabricated emails
+    and, in five cases, entirely invented businesses/domains that don't
+    exist - discovered and reverted here; see the Toronto comment above for
+    the same issue in that batch). Every row below was individually
+    re-verified this pass: real site visited via browser, DOM scanned via
+    script for actual mailto: links and plain-text email addresses (never
+    guessed), and checked for known automated-CRM/lead-routing scripts
+    (BoomTown, kvCORE, Follow Up Boss, Chime, LionDesk) plus common live-chat
+    widget scripts - none were found on any surviving row.
+
+    Discovery used OpenSEO's search_local_businesses across ~6 query/area
+    combinations (real estate brokerage, real estate team, realty group,
+    realty team) before OpenSEO credits ran out mid-session.
+
+    DROPPED for not fitting the multi-agent profile: Central Metro Realty
+    (a 100%-commission brokerage that recruits agents, not a buyer/seller
+    team), RockHouse Realty Group (solo-agent site despite the "Group" name,
+    email routes to the parent eXp franchise).
+
+    DROPPED - site dead, broken, expired, or bot-walled and could not be
+    verified: Om Homes Realty (no real domain), Land& Real Estate Brokerage
+    (reCAPTCHA wall), Allure Real Estate Brokerage (no email found after a
+    genuine check), Live Oak Real Estate Brokerage (no email found), Asset
+    Austin Realty (the domain that was Austin Homes Team has since rebranded
+    entirely - dropped rather than attributed to the wrong business), The
+    Torres Team (no email found on the live site), TexasEx Real Estate Team
+    (site returns a 403 Forbidden), Bond Realty Group (site returns empty),
+    Code3 Realty Group (no email or team page found), Vincent Team (domain
+    has expired and is now a domain-marketplace listing), The Ott Group,
+    Neuhaus Realty Group, NuView Realty Group, Realty Tipps Group, Keith
+    Duble Team, Robert Kauffman Team, Williams Team, JW Team (all Cloudflare-
+    or bot-check-walled, or no email found on the live site), Bexar Realty
+    Group (confirmed to be primarily San Antonio-based despite appearing in
+    the Austin radius search), Joe Lu Team (domain did not resolve).
+
+    Found 16 real, verified Austin-area brokerage/team businesses with
+    confirmed public emails, all fitting the target profile (multiple agents,
+    no automated CRM/chat widget visible on their site) - within the
+    original 15-20 target, unlike the Toronto batch above which fell short
+    for the reasons described there. */
+export const AUSTIN_BROKERAGE_PROSPECTS: SeedProspect[] = [
+  brokerage({
+    businessName: "Four22 Realty Group, LLC",
+    website: "https://four22realtygroup.com/",
+    city: "Austin",
+    area: "North Austin / Burnet Rd",
+    email: "four22realtygroup@gmail.com", // shared team mailto: link on site, verified live 2026-09-26; the same page also lists 18+ individual agent emails, confirming a large team
+    phone: "+1 512-291-3352",
+    contactName: NA,
+    prospectScore: 88,
+    tier: "HOT",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "PAID_AUDIT_CALL",
+    personalizationSignal: "a large team of 18+ individually-listed agents serving Austin, Round Rock, Cedar Park, Leander, Georgetown, Hutto, and Buda, 5-star rating from 78 Google reviews",
+    buyingSignal: "large multi-agent team with no automated CRM or lead-routing script found on their site",
+    opportunity: "An 18+ agent team spanning six-plus markets is exactly the volume where an Inside Sales Agent and Transaction Coordinator earn their keep; no automation was found handling that intake today.",
+    signals: ["18+ individually-listed agents", "5-star rating, 78 Google reviews", "serves 6+ Central Texas markets", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "The Julian Team at Compass Real Estate",
+    website: "https://www.julianteamaustin.com/",
+    city: "Austin",
+    area: "Central Austin / Bee Caves Rd",
+    email: "cody@julianteamaustin.com", // mailto: link on site, verified live via DOM scan, 2026-09-26 - Cody Julian personally
+    phone: "+1 512-318-0075",
+    contactName: "Cody Julian",
+    prospectScore: 85,
+    tier: "HOT",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "PAID_AUDIT_CALL",
+    personalizationSignal: "a Compass-affiliated team led by a former Google/WeWork marketing lead who previously supported 300+ agents' marketing before launching this team, 5-star rating from 58 reviews",
+    buyingSignal: "tech-savvy founder-led team, no automated CRM or lead-routing script found",
+    opportunity: "A founder with real tech-industry marketing chops but no visible automation for buyer/seller lead capture is exactly the gap the bundle fills.",
+    signals: ["Compass-affiliated team", "5-star rating, 58 Google reviews", "founder background in tech marketing", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Best of Austin Living Team at Keller Williams",
+    website: "https://www.bestofaustinliving.com/",
+    city: "Austin",
+    area: "Austin metro (S MoPac Expy office)",
+    email: "team@bestofaustinliving.com", // mailto: link on site, verified live via DOM scan, 2026-09-26
+    phone: "+1 512-994-9206",
+    contactName: "Kristie Bryant",
+    prospectScore: 83,
+    tier: "HOT",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "PAID_AUDIT_CALL",
+    personalizationSignal: "a KW-affiliated team that closed 70+ transactions last year, 5-star rating from 61-83 reviews (listed inconsistently across sources), led by an Austin Board of REALTORS Global Ambassador",
+    buyingSignal: "high-volume KW team, no automated CRM or lead-routing script found",
+    opportunity: "70+ transactions a year across buyers, sellers, and investors is real volume for one team to route manually; no automation was found handling that today.",
+    signals: ["70+ transactions in the past year", "5-star rating, 61+ Google reviews", "led by an ABoR Global Ambassador", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Ascension Realty Group",
+    website: "https://ascensionaustin.com/",
+    city: "Austin",
+    area: "Central Austin / S MoPac Expy",
+    email: "info@ascensionaustin.com", // mailto: link on site, verified live via DOM scan, 2026-09-26
+    phone: "+1 512-535-6300",
+    contactName: NA,
+    prospectScore: 82,
+    tier: "HOT",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a multi-agent team ('Top Austin Real Estate Agents' per their own site copy) with a 4.9-star rating from 83 Google reviews",
+    buyingSignal: "multi-agent team with strong review volume, no automated CRM found",
+    opportunity: "Strong review volume (83 at 4.9 stars) signals real lead flow that a multi-agent team is currently routing by hand.",
+    signals: ["multi-agent team", "4.9-star rating, 83 Google reviews", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Do Kind Group at Keller Williams Realty",
+    website: "https://dokindtx.com/",
+    city: "Austin",
+    area: "Central Austin",
+    email: "listings@dokindtx.com", // mailto: link on site, verified live via DOM scan, 2026-09-26
+    phone: "+1 512-898-9689",
+    contactName: NA,
+    prospectScore: 81,
+    tier: "HOT",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a top-producing KW team with a dedicated team page and 4.9-star rating from 57 Google reviews, serving buyers, sellers, and first-time homeowners across Central Texas",
+    buyingSignal: "top-producing multi-agent KW team, no automated CRM found",
+    opportunity: "A top-producing team serving a wide Central Texas radius is routing buyer/seller intake without visible automation today.",
+    signals: ["top-producing KW team", "4.9-star rating, 57 Google reviews", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "VonDrehle & Mitchell Realty Group",
+    website: "https://vondrehlemitchellhomes.com/",
+    city: "Austin",
+    area: "Lake Travis / Lohmans Crossing Rd",
+    email: "kelly.vondrehle@compass.com", // mailto: link on site, verified live via DOM scan, 2026-09-26 - Kelly VonDrehle personally; a second named principal, Ann Mitchell (ann.mitchell@compass.com), also confirmed real
+    phone: "+1 512-971-1044",
+    contactName: "Kelly VonDrehle",
+    prospectScore: 79,
+    tier: "GOOD",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a two-principal Compass boutique team (Kelly VonDrehle and Ann Mitchell) offering complimentary staging, 5-star rating from 9-25 reviews across their listings",
+    buyingSignal: "two-principal Compass boutique team, no automated CRM found",
+    opportunity: "A two-principal team combining staging, marketing, and negotiation services is routing buyer/seller leads without visible automation.",
+    signals: ["two-principal Compass boutique", "5-star rating across listings", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Vidaurri Realty Group, Inc.",
+    website: "http://vidaurrirealtygroup.com/",
+    city: "Austin",
+    area: "South Austin / Menchaca Rd",
+    email: "sylvia@vidaurrirealtygroup.com", // mailto: link on site, verified live via DOM scan, 2026-09-26
+    phone: "+1 512-423-2543",
+    contactName: "Sylvia Vidaurri",
+    prospectScore: 77,
+    tier: "GOOD",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a small brokerage handling both buyers and sellers with a detailed plan for every transaction, 5-star rating from 23 Google reviews",
+    buyingSignal: "founder-led brokerage, no automated CRM found",
+    opportunity: "A brokerage marketing detailed per-client plans for both buying and selling is routing that intake manually today.",
+    signals: ["founder-led brokerage", "5-star rating, 23 Google reviews", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "The Gentry Group at Keller Williams",
+    website: "http://gentrygrouprealtors.com/",
+    city: "Austin",
+    area: "Austin metro (Westlake, Lake Travis, Round Rock, Cedar Park)",
+    email: "gentry@kw.com", // mailto: link on site, verified live via DOM scan, 2026-09-26 - Gary Gentry personally
+    phone: "+1 512-794-6630",
+    contactName: "Gary Gentry",
+    prospectScore: 76,
+    tier: "GOOD",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "the first Keller Williams agent in the market, covering a wide Austin-metro footprint (Westlake, Lake Travis, Round Rock, Cedar Park, Leander, Dripping Springs, Buda, Kyle), 5-star rating from 21 reviews",
+    buyingSignal: "founder-tenured KW team covering a wide metro footprint, no automated CRM found",
+    opportunity: "A wide-footprint team spanning 7+ named areas is routing intake without visible automation across that whole territory.",
+    signals: ["first KW agent in the market", "covers 7+ named Austin-metro areas", "5-star rating, 21 Google reviews", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Limestone Realty Group",
+    website: "https://www.limestonerealtygroup.com/",
+    city: "Austin",
+    area: "Southwest Austin / RM 1826",
+    email: "hello@limestonerealtygroup.com", // mailto: link on site, verified live via DOM scan, 2026-09-26
+    phone: "+1 512-825-6135",
+    contactName: NA,
+    prospectScore: 75,
+    tier: "GOOD",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "an eXp Luxury-affiliated team with a dedicated team page, 5-star rating from 14 Google reviews",
+    buyingSignal: "eXp Luxury-affiliated multi-agent team, no automated CRM found",
+    opportunity: "A luxury-affiliated team is routing high-value buyer/seller leads without visible automation on their site.",
+    signals: ["eXp Luxury-affiliated team", "5-star rating, 14 Google reviews", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Gold Tier Real Estate",
+    website: "http://www.goldtier.net/",
+    city: "Austin",
+    area: "Lakeway / Central Texas",
+    email: "contact@goldtier.net", // mailto: link on site, verified live via DOM scan, 2026-09-26
+    phone: "+1 512-674-5727",
+    contactName: NA,
+    prospectScore: 74,
+    tier: "GOOD",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a commercial real estate brokerage and consulting firm with a stated team of qualified brokers and agents, 5-star rating from 6 Google reviews",
+    buyingSignal: "multi-broker commercial team, no automated CRM found",
+    opportunity: "A commercial brokerage serving developers, corporations, and individual investors is routing that varied intake without visible automation.",
+    signals: ["multi-broker commercial team", "5-star rating, 6 Google reviews", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Murray Realty Group",
+    website: "http://www.murrayrealtygroup.com/",
+    city: "Austin",
+    area: "Austin metro",
+    email: "mack@murrayrealtygroup.com", // mailto: link on site, verified live via DOM scan, 2026-09-26 - Mack Murray personally
+    phone: "+1 512-265-6096",
+    contactName: "Mack Murray",
+    prospectScore: 73,
+    tier: "GOOD",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a brokerage showcasing luxury listings and assisting first-time homebuyers, also provides mortgage services, 5-star rating from 11 Google reviews",
+    buyingSignal: "founder-led brokerage with mortgage services attached, no automated CRM found",
+    opportunity: "A brokerage bundling mortgage services alongside listings has more intake surface than most, currently handled without visible automation.",
+    signals: ["founder-led brokerage", "bundled mortgage services", "5-star rating, 11 Google reviews", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Smigelski Realty Team",
+    website: "https://www.smigelskirealtyteam.com/",
+    city: "Austin",
+    area: "Austin metro / Great Hills Trl",
+    email: "derek@smigelskirealtyteam.com", // mailto: link on site, verified live via DOM scan, 2026-09-26 - Derek Smigelski personally
+    phone: "+1 737-264-5600",
+    contactName: "Derek Smigelski",
+    prospectScore: 72,
+    tier: "BACKUP",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a team-branded practice serving first-time buyers, seasoned investors, and relocating clients, 5-star rating from 5 Google reviews",
+    buyingSignal: "team-branded practice, no automated CRM found",
+    opportunity: "A team serving a broad client mix (first-timers to investors to relocations) is routing that intake without visible automation.",
+    signals: ["team-branded practice", "5-star rating, 5 Google reviews", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Squires Team at Keller Williams",
+    website: "https://www.squiresteam.com/",
+    city: "Austin",
+    area: "Austin metro (S MoPac Expy office)",
+    email: "johnsquires2@aol.com", // mailto: link on site, verified live via DOM scan, 2026-09-26 - John Squires personally
+    phone: "+1 512-970-1970",
+    contactName: "John Squires",
+    prospectScore: 70,
+    tier: "BACKUP",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a KW-affiliated team built on direct call/text access to the lead agent, no automated intake visible",
+    buyingSignal: "direct-access KW team, no automated CRM found",
+    opportunity: "A team whose own pitch is direct call/text access to the agent has no visible automation catching what's missed after hours.",
+    signals: ["KW-affiliated team", "direct call/text access pitch", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Ace Team ATX",
+    website: "https://www.aceteamatx.com/",
+    city: "Austin",
+    area: "Southwest Austin / Dripping Springs area",
+    email: "david@aceteamatx.com", // mailto: link on site (both cased and lowercase variants), verified live via DOM scan, 2026-09-26 - David Aceves personally
+    phone: "+1 512-360-8788",
+    contactName: "David Aceves",
+    prospectScore: 78,
+    tier: "GOOD",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a team built on proactive communication and anticipating client needs, 5-star rating from 7 Google reviews",
+    buyingSignal: "relationship-focused team, no automated CRM found",
+    opportunity: "A team whose own pitch is proactive, anticipatory communication is routing buyer/seller leads without visible automation.",
+    signals: ["relationship-focused team", "5-star rating, 7 Google reviews", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "Lone Wolf Realty Group",
+    website: "http://www.lonewolfrealtygroup.com/",
+    city: "Austin",
+    area: "North Austin / West Gate Blvd",
+    email: "matthew.kemps@lonewolfrealtygroup.com", // mailto: link on site, verified live via DOM scan, 2026-09-26 - Matthew Kemps personally, co-founder with Kaeli Kemps per site copy
+    phone: "+1 512-768-4334",
+    contactName: "Matthew Kemps",
+    prospectScore: 74,
+    tier: "GOOD",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a husband-and-wife co-founded eXp-affiliated team with a dedicated team page, client-focused approach pitch",
+    buyingSignal: "co-founded eXp-affiliated team, no automated CRM found",
+    opportunity: "A co-founded team pitching personalized, client-focused service is routing that intake without visible automation.",
+    signals: ["husband-and-wife co-founded team", "eXp-affiliated", "no automated CRM found in page scripts"],
+  }),
+  brokerage({
+    businessName: "H Squared Realty Team",
+    website: "http://www.hsquaredrealestateteam.com/",
+    city: "Austin",
+    area: "Austin metro (S MoPac Expy office)",
+    email: "admin@hsquaredrealty.com", // mailto: link on site, verified live via DOM scan, 2026-09-26
+    phone: "+1 512-698-1588",
+    contactName: NA,
+    prospectScore: 76,
+    tier: "GOOD",
+    recommendedServiceId: BROKERAGE,
+    recommendedOffer: "FREE_WRITTEN_AUDIT",
+    personalizationSignal: "a Central Texas real estate team handling traditional purchase/sale and investment transactions, 4.8-star rating from 35 Google reviews",
+    buyingSignal: "multi-agent team with solid review volume, no automated CRM found",
+    opportunity: "A team handling both traditional and investment transactions has varied intake currently routed without visible automation.",
+    signals: ["multi-agent Central Texas team", "4.8-star rating, 35 Google reviews", "no automated CRM found in page scripts"],
+  }),
+];
+

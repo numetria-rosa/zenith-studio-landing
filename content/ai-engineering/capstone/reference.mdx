@@ -1,0 +1,43 @@
+<Muted>Not the only valid answer, a valid one. Compare your design's reasoning against this, not its exact wording.</Muted>
+
+<Def title={"Structured output"}>
+
+Every model response the bot acts on (tool arguments, the final answer shape) is parsed and repaired (strip fences, fix trailing commas) then validated against a schema before use, exactly Module 1's discipline, applied at every model call in the pipeline, not just the first one.
+
+</Def>
+
+<Def title={"Context budget"}>
+
+Retrieved chunks are capped to fit comfortably under the model's context window minus reserved output tokens (Module 2), with top-k and the relevance threshold both tuned to keep typical retrieval well under budget, not just barely fitting.
+
+</Def>
+
+<Def title={"Retrieval"}>
+
+Query and KB documents are embedded, ranked by cosine similarity, top-3 candidates considered, and a 0.4 relevance threshold applied, anything below it means "no relevant information," returned honestly instead of forcing a weak match into the answer.
+
+</Def>
+
+<Def title={"Tool execution"}>
+
+The ticket-filing tool call carries a stable idempotency key per logical request. A repeated key returns the cached result. A failed attempt is never cached, so a genuine retry (after a lost response, say) gets a real second try.
+
+</Def>
+
+<Def title={"Agent control flow"}>
+
+The loop that decides "answer directly" vs. "search again" vs. "file a ticket" has a hard step limit (Module 5) and detects 3 identical consecutive actions as stuck, so a confused reasoning path can't burn the entire budget repeating itself.
+
+</Def>
+
+<Def title={"Reliability"}>
+
+Model API calls retry transient failures (429s, timeouts) with exponential backoff and full jitter, up to a fixed retry count, then fall back to a secondary model exactly once if the primary is still unavailable (Module 6).
+
+</Def>
+
+<Def title={"Evaluation"}>
+
+A labeled eval set, including deliberately unanswerable queries to exercise the threshold logic, is re-run against every prompt or retrieval-parameter change, one variable at a time, compared against a recorded baseline before anything ships (Module 7).
+
+</Def>

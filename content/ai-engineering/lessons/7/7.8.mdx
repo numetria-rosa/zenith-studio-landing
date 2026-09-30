@@ -1,0 +1,27 @@
+<Muted>A short consolidation before you're graded on it.</Muted>
+
+- Explain why ad hoc spot-checking doesn't substitute for a systematic eval.
+- Design a test case with an explicit, checkable criterion, not an implicit "judge if it's good."
+- Explain when to prefer a deterministic check over LLM-as-judge, and why.
+- Implement an eval harness that scores a test set and flags regressions against a baseline.
+
+<ProdWarn title={"What would break in production?"}>
+
+- **Benchmark overfitting.** A prompt tuned against the same 50 eval cases over and over starts memorizing those specific cases' quirks, not the underlying task, and the score stops predicting real-world performance.
+- **Evaluation leakage.** Test cases that overlap with the model's training data, or with the few-shot examples in the prompt itself, produce a score that reflects memorization, not generalization.
+- **A good average hiding a catastrophic slice.** 96% overall can still mean a specific, high-stakes category (refunds, cancellations, medical, legal) is failing badly, if that category is underrepresented in the eval set.
+- **An eval set that never grows.** A static set of test cases stops catching new failure modes the moment real users start doing things the original cases didn't anticipate.
+
+<Rule>
+
+**Rule of thumb:** a single average score is a summary, not evidence. Always check whether it holds up sliced by the categories that matter most, not just in aggregate.
+
+</Rule>
+
+</ProdWarn>
+
+<Connection title={"The engineering connection"}>
+
+You can now tell whether a change actually helped, with a number, not a feeling, and you know to check that number by slice, not just on average. Every piece is now in place: structured outputs, context management, retrieval, tools, an agent loop, reliability, and evaluation. Module 8 is the capstone, combining all seven into one system, and a final competency assessment covering everything from Module 1 forward.
+
+</Connection>

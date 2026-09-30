@@ -1,0 +1,37 @@
+{
+  "frames": ["Classify the task", "The production lifecycle", "Priority table", "Path finder"],
+  "flow": {
+    "intro": "A simplified flow from idea to a monitored, running system. The highlighted stages are where AI engineering work concentrates.",
+    "ai": "AI engineer's focus",
+    "adjacent": "adjacent discipline"
+  },
+  "roles": {
+    "build": "Builds",
+    "with": "Works with",
+    "prog": "Programming",
+    "tools": "Key tools",
+    "math": "Math",
+    "projects": "Typical projects"
+  },
+  "priority": {
+    "cols": ["Technology", "Priority", "Why AI engineers use it", "How much a beginner needs initially", "Where it becomes useful"],
+    "filters": { "all": "All", "now": "Need now", "next": "Should learn next", "spec": "Specialized" },
+    "labels": { "now": "Need to know now", "next": "Should learn next", "spec": "Specialized / optional" }
+  },
+  "roadmap": { "taught": "Taught here", "partial": "Partially taught", "not": "Learn separately" },
+  "path": {
+    "result": "See my possible directions",
+    "reset": "Reset",
+    "title": "Your possible directions",
+    "score": "Affinity score: {score}",
+    "note1": "Remember: this is a rough orientation signal from 6 questions, not a placement test. Explore any of these (or none of them) freely, see ",
+    "link": "Career Path",
+    "note2": " for the full honest breakdown of what each direction needs beyond this course."
+  },
+  "selfCheck": {
+    "notWritten": "Not written yet",
+    "good": "Looks like a solid definition",
+    "try": "Try mentioning what an AI engineer actually integrates or builds, not just 'works with AI'",
+    "wrong": "Not quite. "
+  }
+}

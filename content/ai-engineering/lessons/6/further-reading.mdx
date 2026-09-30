@@ -1,0 +1,5 @@
+<Muted>If you want to go deeper than the browser can take you:</Muted>
+
+- AWS's "Timeouts, retries, and backoff with jitter" architecture blog post is a widely-cited breakdown of why full jitter specifically outperforms fixed or exponential-only backoff under real concurrent load.
+- Circuit breakers (also covered in Automation Engineering) are a complementary pattern, once a certain fraction of recent calls to a provider have failed, stop calling it entirely for a cooldown period instead of retrying each request individually, useful when the failure is at the provider level, not the individual request level.
+- Most model providers publish explicit retry-after headers or documented retryable status codes, worth using directly instead of guessing at classification where available.

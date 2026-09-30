@@ -1,0 +1,49 @@
+{
+  "id": "6",
+  "title": "Reliability Cheat Sheet",
+  "tag": "Module 6",
+  "sections": [
+    {
+      "label": "Full jitter backoff",
+      "formula": "delay = random.random() * min(cap, base * 2 ** attempt)"
+    },
+    {
+      "label": "Retryable vs. non-retryable",
+      "items": [
+        "**Retryable**: 429 (rate limit), timeouts, transient 5xx: the identical request has a real chance of succeeding on retry.",
+        "**Non-retryable**: 400 (malformed request), auth failures: identical retry fails identically, every time."
+      ]
+    },
+    {
+      "label": "Bounded call shape",
+      "items": [
+        "Retry the primary on retryable failures, up to a fixed max.",
+        "Stop retrying immediately on a non-retryable error, don't wait out the budget.",
+        "Once primary is exhausted/blocked, try fallback exactly ONCE, not with the same generous budget."
+      ]
+    },
+    {
+      "label": "Why jitter, not just backoff",
+      "items": [
+        "Fixed or pure-exponential delays synchronize many callers into a simultaneous retry storm.",
+        "Full jitter (random between 0 and the cap) spreads retries across a window instead of a single instant."
+      ]
+    },
+    {
+      "label": "Common mistakes",
+      "items": [
+        "Retrying a non-retryable error until the attempt count runs out instead of failing fast.",
+        "Giving fallback the same retry budget as the primary.",
+        "Using fixed delay or exponential-without-jitter under real concurrent load."
+      ]
+    },
+    {
+      "label": "Implementation checklist",
+      "checklist": [
+        "Retryable classification is checked independently of the attempt counter.",
+        "Primary retries are capped; fallback gets exactly one attempt.",
+        "Both primary and fallback failing returns a clear structured failure, never an uncaught exception."
+      ]
+    }
+  ]
+}

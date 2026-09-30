@@ -1,0 +1,21 @@
+You've seen the two failure modes: executing an invalid call, and executing a valid call twice. Now implement an executor that guards against both, and five real tests run against your actual code.
+
+<ExerciseLink />
+
+<Practice>
+
+Test 5 calls a handler that raises on its first invocation and succeeds on its second, using the same call ID both times. If your code caches the result object BEFORE calling the handler (instead of after), what breaks?
+
+<Answer>
+
+Caching before calling the handler means you'd have to cache something before you know if it succeeded, which either forces you to guess, or forces a second write to overwrite it after the fact, and if that second write is skipped on the error path, a failed attempt gets permanently marked as "done" anyway. The safe order is: try the handler, and only write to `seen` inside the success path, after the handler has actually returned without raising.
+
+</Answer>
+
+</Practice>
+
+<Decision id={"m4"} label={"AI Engineering Decision"}>
+
+A model-generated tool call `issue_refund(orderId: "ORD-991", amountCents: 4200000)` arrives. The schema requires both fields, both are present, both have the correct type, and the order genuinely exists. Nothing about the call is malformed. This order's total was $38.00. What should the executor do?
+
+</Decision>

@@ -1,4 +1,5 @@
-import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Fraunces, IBM_Plex_Mono } from "next/font/google";
+import { plexSans } from "./plex-sans";
 
 /* The same three faces the static course pages (courses/data-science/*.html)
    use - Fraunces for headings, IBM Plex Sans for body, IBM Plex Mono for
@@ -10,12 +11,6 @@ export const fraunces = Fraunces({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-course-serif",
-});
-
-export const plexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-course-sans",
 });
 
 export const plexMono = IBM_Plex_Mono({

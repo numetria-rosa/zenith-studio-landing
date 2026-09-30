@@ -1,0 +1,68 @@
+{
+  "id": 4,
+  "title": "Idempotent Tool-Calling Executor",
+  "difficulty": "Intermediate",
+  "modules": [
+    4
+  ],
+  "summary": "Build a tool executor that safely handles a model retrying the same tool call, validates arguments against a schema, and surfaces errors the model can act on.",
+  "requirements": [
+    "Validate a tool call's name against a registry before execution.",
+    "Validate required arguments are present before execution.",
+    "Execute idempotently: a repeated call ID returns the cached result without re-running the handler.",
+    "A failed handler attempt must NOT be cached, so a retry with the same call ID gets a real second attempt."
+  ],
+  "start": "Start from Module 4's exercise function and wire it to 2-3 real mock tools (e.g. a fake 'send_email' and 'create_ticket') with their own schemas, instead of the single test-mock tool used in the exercise.",
+  "acceptance": [
+    "An unknown tool name is rejected with a structured error before any handler runs.",
+    "A missing required argument is rejected before any handler runs.",
+    "Calling the same tool with the same call ID twice only invokes the handler once, both calls return the identical cached result.",
+    "A handler that raises returns a structured failure and is NOT cached, a retry with the same call ID gets a genuine second attempt.",
+    "Two different call IDs for the same tool execute independently (not falsely deduplicated)."
+  ],
+  "tests": [
+    "Unknown tool name → rejected, handler call count stays 0.",
+    "Missing required argument → rejected, handler call count stays 0.",
+    "Same call ID called twice → handler call count is 1, both results identical.",
+    "Handler raises on first call, succeeds on second call with the SAME call ID → first result is a structured failure, second is a success.",
+    "Two different call IDs, same tool → handler call count is 2."
+  ],
+  "mistakes": [
+    "Checking the idempotency cache after invoking the handler instead of before.",
+    "Caching a result before confirming the handler actually succeeded.",
+    "Deduplicating based on argument similarity instead of call ID, incorrectly blocking legitimate independent calls."
+  ],
+  "solution": [
+    "Look up the tool in the registry, reject if missing.",
+    "Validate every required field is present in the arguments.",
+    "Check the idempotency store for the call ID, return the cached value if present.",
+    "Try/except the handler call: on success cache and return; on failure return a structured error WITHOUT caching."
+  ],
+  "rubric": [
+    {
+      "key": "architecture",
+      "label": "Architecture",
+      "weight": 27
+    },
+    {
+      "key": "implementation",
+      "label": "Implementation",
+      "weight": 33
+    },
+    {
+      "key": "reliability",
+      "label": "Reliability",
+      "weight": 20
+    },
+    {
+      "key": "testing",
+      "label": "Testing",
+      "weight": 13
+    },
+    {
+      "key": "documentation",
+      "label": "Documentation",
+      "weight": 7
+    }
+  ]
+}

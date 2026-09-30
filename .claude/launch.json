@@ -30,6 +30,15 @@
         "tests/visual/dev-server.mjs"
       ],
       "port": 3100
+    },
+    {
+      "name": "aie-real",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "tests/visual/dev-server.mjs",
+        "real"
+      ],
+      "port": 3100
     }
   ]
 }

@@ -63,3 +63,15 @@ body {
     animation: none !important;
   }
 }
+
+/* AI Engineering course app: exercise editor caret, test spinner and "complete" pulse (from the design's ChapterExercise). */
+@keyframes cxBlink{0%,49%{opacity:1}50%,100%{opacity:0}}.cx-caret{animation:cxBlink 1s steps(1) infinite}
+@keyframes cxSpin{to{transform:rotate(360deg)}}.cx-spin{animation:cxSpin .8s linear infinite}
+@keyframes cxPulse{0%{box-shadow:0 0 0 0 rgba(92,200,255,.5)}100%{box-shadow:0 0 0 10px rgba(92,200,255,0)}}.cx-pulse{animation:cxPulse 1.4s ease-out infinite}
+@media (prefers-reduced-motion: reduce){.cx-caret,.cx-spin,.cx-pulse{animation:none}}
+
+/* Cheat sheets print on white: the dark cards are inverted to dark-on-light, and the app chrome is hidden (print:hidden in the shell). */
+@media print {
+  @page { margin: 14mm; }
+  [data-cheatsheet] { filter: invert(1) hue-rotate(180deg); }
+}

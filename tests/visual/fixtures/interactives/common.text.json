@@ -1,0 +1,10 @@
+{
+  "decision": {
+    "correct": "Correct. ",
+    "wrong": "Not the strongest call here. "
+  },
+  "debug": {
+    "correct": "Correct. ",
+    "wrong": "Not the primary cause here. "
+  }
+}

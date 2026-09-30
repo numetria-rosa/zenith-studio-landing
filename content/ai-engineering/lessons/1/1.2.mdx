@@ -1,0 +1,9 @@
+A model that answers "The user's name is Alice and they're 30 years old" said something true and readable. It also produced zero bytes of usable data. If your program's next step is `record.age + 1`, that sentence is worthless until something turns it back into `{ name: "Alice", age: 30 }`.
+
+<Def title={"Definition: structured output"}>
+
+Model output constrained to a predictable, parseable shape, typically JSON matching a schema you define, so a program can consume it without a human or another model in the loop.
+
+</Def>
+
+Two different failure modes hide behind "just ask it for JSON": the model can produce output that's *almost* valid JSON (a trailing comma, a stray code fence), or it can refuse, hedge, or add commentary around otherwise-valid JSON. Both are common. Neither is rare enough to ignore.

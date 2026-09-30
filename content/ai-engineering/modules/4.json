@@ -1,0 +1,537 @@
+{
+  "number": 4,
+  "slug": "tool-use-and-function-calling",
+  "title": "Tool Use & Function Calling",
+  "stage": "Stage 1 · Retrieval and tools",
+  "minutes": 45,
+  "summary": "A model can only produce text. Everything it does beyond that, looking something up, sending an email, charging a card, happens because a tool call it generated got executed by your code. That execution step is where correctness and safety actually live.",
+  "objectives": [
+    "Explain what a tool call actually is, and why the model never directly does anything itself",
+    "Validate a model-generated tool call against a schema before ever executing it",
+    "Explain why tool execution must be idempotent, and what specifically can go wrong if it isn't",
+    "Implement a tool executor that validates arguments, executes safely, and never double-runs a retried call"
+  ],
+  "lessons": [
+    {
+      "number": "4.1",
+      "title": "Before you start",
+      "minutes": 3
+    },
+    {
+      "number": "4.2",
+      "title": "The model doesn't do anything. Your code does.",
+      "minutes": 3
+    },
+    {
+      "number": "4.3",
+      "title": "Interactive: spot the tool call that shouldn't execute",
+      "minutes": 3
+    },
+    {
+      "number": "4.4",
+      "title": "Never execute an unvalidated call",
+      "minutes": 8
+    },
+    {
+      "number": "4.5",
+      "title": "The same call can arrive twice",
+      "minutes": 9
+    },
+    {
+      "number": "4.6",
+      "title": "A failed attempt should still be retryable",
+      "minutes": 8
+    },
+    {
+      "number": "4.7",
+      "title": "Build it: an idempotent tool executor",
+      "minutes": 4
+    },
+    {
+      "number": "4.8",
+      "title": "Before the checkpoint: what you should now be able to do",
+      "minutes": 6
+    },
+    {
+      "number": "4.9",
+      "title": "Interactive: watch idempotency prevent (or fail to prevent) a duplicate side effect",
+      "minutes": 2
+    }
+  ],
+  "exercise": {
+    "label": "Code exercise · Python, runs in a real sandboxed Python interpreter (Pyodide)",
+    "instructions": "Complete `execute_tool(call, registry, seen)`. `call` is a dict `{\"id\":..., \"name\":..., \"arguments\":...}`. `registry` maps tool names to `{\"schema\": {\"required\": [...]}, \"handler\": fn(args)}`. `seen` is a plain dict you use to remember completed call IDs, mutate it directly. Return `{\"ok\": True, \"result\": ...}` or `{\"ok\": False, \"error\": \"...\"}`, never raise. Unknown tool names and missing required arguments must be rejected before the handler runs. A repeated `call[\"id\"]` must return the cached result without calling the handler again. A handler that raises must not be cached, so a later retry with the same ID gets a real second attempt.",
+    "functionName": "execute_tool",
+    "fileName": "execute_tool.py",
+    "starter": "def execute_tool(call, registry, seen):\n    # call: {\"id\":..., \"name\":..., \"arguments\":...}\n    # registry: {tool_name: {\"schema\": {\"required\": [...]}, \"handler\": fn(args)}}\n    # seen: plain dict, use it to remember completed call IDs (mutate directly)\n    # Return {\"ok\": True, \"result\": ...} or {\"ok\": False, \"error\": \"...\"}. Never raise.\n    # Reject unknown tools and missing required arguments before calling the handler.\n    # A repeated call[\"id\"] must return the cached result without re-running the handler.\n    # A raised error must NOT be cached, so a retry with the same id gets a real attempt.\n\n    # YOUR CODE HERE\n\n    pass",
+    "solution": "def execute_tool(call, registry, seen):\n    tool = registry.get(call[\"name\"])\n    if not tool:\n        return {\"ok\": False, \"error\": \"Unknown tool: \" + call[\"name\"]}\n\n    required = (tool.get(\"schema\") or {}).get(\"required\", [])\n    for field in required:\n        if not call.get(\"arguments\") or field not in call[\"arguments\"]:\n            return {\"ok\": False, \"error\": \"Missing required argument: \" + field}\n\n    if seen.get(call[\"id\"]):\n        return seen[call[\"id\"]]\n\n    try:\n        outcome = {\"ok\": True, \"result\": tool[\"handler\"](call[\"arguments\"])}\n    except Exception as e:\n        return {\"ok\": False, \"error\": str(e)}\n\n    seen[call[\"id\"]] = outcome\n    return outcome",
+    "hints": [
+      {
+        "title": "Hint 1: conceptual",
+        "mdx": "There are three gates a call has to pass, in order: does the tool exist, are all required arguments present, has this exact call ID already succeeded. Only after all three does the handler actually run."
+      },
+      {
+        "title": "Hint 2: specific",
+        "mdx": "Look up `registry[call[\"name\"]]` first, if missing, return an error immediately. Then loop over `tool[\"schema\"][\"required\"]` and check each field exists in `call[\"arguments\"]`. Then check `seen[call[\"id\"]]`, if it's already set, return it directly without calling the handler."
+      },
+      {
+        "title": "Hint 3: near-solution",
+        "mdx": "Wrap the handler call in try/except. On success, build `{\"ok\": True, \"result\": ...}`, store it in `seen[call[\"id\"]]`, then return it. On except, return `{\"ok\": False, \"error\": str(e)}` WITHOUT touching `seen`, that's what keeps a failed attempt retryable."
+      }
+    ],
+    "tests": [
+      {
+        "name": "Unknown tool name returns a structured error instead of raising",
+        "hint": "Look up the tool by call[\"name\"] in the registry first. If it is not there, return {\"ok\": False, \"error\": ...} immediately, do not let a missing lookup crash anything."
+      },
+      {
+        "name": "Missing required argument is rejected before the handler ever runs",
+        "hint": "Check every field in schema[\"required\"] exists in call[\"arguments\"] BEFORE calling the handler. If any is missing, return an error and do not call the handler at all."
+      },
+      {
+        "name": "Calling the same call[\"id\"] twice only executes the handler once",
+        "hint": "Before calling the handler, check if seen[call[\"id\"]] already has a value. If so, return that cached value directly instead of calling the handler again."
+      },
+      {
+        "name": "Different call[\"id\"]s for the same tool execute independently",
+        "hint": "Your idempotency check must be keyed by call[\"id\"] specifically, not by tool name. Two different IDs calling the same tool should both run the handler."
+      },
+      {
+        "name": "A raised error is not cached, so a retry with the same call[\"id\"] gets a real second attempt",
+        "hint": "Only write to seen[call[\"id\"]] inside the success path, after the handler returns without raising. On except, return the error WITHOUT touching seen, so the next call with the same id calls the handler again."
+      }
+    ],
+    "harness": "exercises/4.py",
+    "id": "4.7"
+  },
+  "quiz": {
+    "passMark": 4,
+    "questions": [
+      {
+        "id": "m4-q1",
+        "question": "A model calls a tool that doesn't exist in your registry. What should your executor do?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Reject it with a structured error naming the unknown tool, and don't call any handler",
+            "correct": true,
+            "why": "An unknown tool name must be caught and reported before any execution attempt, there's no handler to safely fall back to."
+          },
+          {
+            "text": "Execute the closest-matching known tool instead, in case the model meant that one",
+            "correct": false,
+            "why": "Guessing at intent is dangerous, silently substituting a different tool (with different effects) for what the model actually named is worse than rejecting the call outright."
+          },
+          {
+            "text": "Ignore the call and move on without telling the model anything went wrong",
+            "correct": false,
+            "why": "Silence gives the model no information to self-correct with. A structured error lets it retry with a valid tool name."
+          }
+        ],
+        "principle": "An unknown tool name must be caught and reported before any execution attempt, there's no handler to safely fall back to."
+      },
+      {
+        "id": "m4-q2",
+        "question": "A tool call with a call ID that already succeeded arrives again, with identical arguments. What should the executor do?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Return the cached result from the first execution, without calling the handler again",
+            "correct": true,
+            "why": "That's the entire point of idempotent execution, a repeat of an already-completed call returns the same outcome without re-running the side effect."
+          },
+          {
+            "text": "Execute the handler again to make sure the result is still accurate",
+            "correct": false,
+            "why": "Re-executing defeats the purpose, if the handler has a side effect (a charge, a send), running it again duplicates that effect. The cached result is used precisely to avoid this."
+          },
+          {
+            "text": "Reject the call as a duplicate and return an error",
+            "correct": false,
+            "why": "Rejecting outright isn't right either, the caller (the model) still needs the actual result, just without re-triggering the side effect. Returning the cached success is more useful than an error."
+          }
+        ],
+        "principle": "That's the entire point of idempotent execution, a repeat of an already-completed call returns the same outcome without re-running the side effect."
+      },
+      {
+        "id": "m4-q3",
+        "question": "A handler raises an exception on execution. Should the executor cache that outcome against the call's ID?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "No, only successful outcomes should be cached against a call ID",
+            "correct": true,
+            "why": "If nothing succeeded, there's no side effect to protect against repeating, caching a failure would just block a legitimate retry from ever getting a real attempt."
+          },
+          {
+            "text": "Yes, caching the failure prevents wasted repeated attempts",
+            "correct": false,
+            "why": "That reasoning backfires, if the failure was transient (a timeout, a temporary lock), caching it permanently blocks the one thing that might actually fix it: trying again."
+          },
+          {
+            "text": "It depends on whether the error message is descriptive enough",
+            "correct": false,
+            "why": "Error message quality isn't the deciding factor, whether a side effect actually occurred is. A thrown error before any side effect means it's always safe, and usually necessary, to allow a retry."
+          }
+        ],
+        "principle": "If nothing succeeded, there's no side effect to protect against repeating, caching a failure would just block a legitimate retry from ever getting a real attempt."
+      },
+      {
+        "id": "m4-q4",
+        "question": "A refund tool call passes schema validation (all required fields present, correct types) but requests an amount far outside any order this system has ever processed. Is schema validation alone sufficient here?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "No, schema validation only confirms structure and types, not whether the specific values make sense for this business",
+            "correct": true,
+            "why": "Schema validation and business-rule validation catch different classes of problems, both are needed before anything with real consequences executes."
+          },
+          {
+            "text": "Yes, if the types and required fields are all correct, the call is safe to execute",
+            "correct": false,
+            "why": "Structural correctness doesn't imply business correctness. A refund amount can be a perfectly valid number and still be wildly wrong for this specific order."
+          },
+          {
+            "text": "No additional check is possible once the model has generated the call",
+            "correct": false,
+            "why": "Additional checks are not only possible, they're standard practice, bounds checks, permission checks, and rate limits are all commonly layered on top of schema validation before execution."
+          }
+        ],
+        "principle": "Schema validation and business-rule validation catch different classes of problems, both are needed before anything with real consequences executes."
+      },
+      {
+        "id": "m4-q5",
+        "question": "A model's tool call arrives with arguments as the raw text `{\"location\": \"Paris\",}` (trailing comma, otherwise valid). Using Module 1's repair pattern together with this module's validation, what's the correct order of operations?",
+        "source": "checkpoint",
+        "options": [
+          {
+            "text": "Repair the malformed JSON text first (strip the trailing comma, parse it), then validate the resulting object against the tool's schema",
+            "correct": true,
+            "why": "Repair and validation are sequential, fix the shape first so you have a real object to check, then validate that object's contents against the schema, same order Module 1 established for structured output generally."
+          },
+          {
+            "text": "Validate the raw text against the schema directly, schemas can handle minor JSON syntax issues",
+            "correct": false,
+            "why": "Schema validation operates on parsed data (an actual object), not raw text with syntax errors, the trailing comma has to be fixed and the text parsed into an object before schema validation can even run."
+          },
+          {
+            "text": "Reject the call immediately, trailing commas mean the model is unreliable and shouldn't be trusted with tools",
+            "correct": false,
+            "why": "A trailing comma is a minor, mechanically fixable formatting issue, not evidence of unreliability. Module 1's whole premise is that these small defects are worth repairing rather than treating as fatal."
+          }
+        ],
+        "principle": "Repair and validation are sequential, fix the shape first so you have a real object to check, then validate that object's contents against the schema, same order Module 1 established for structured output generally."
+      },
+      {
+        "id": "m4q1",
+        "question": "What is a model 'calling a tool,' precisely?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "Define what a tool call actually is",
+        "options": [
+          {
+            "text": "The model produces a structured request (a proposal) naming a tool and arguments, your code decides whether to trust it and only then actually executes anything",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "The model directly executes code on your server",
+            "correct": false,
+            "why": "The model never directly executes anything, it only produces text describing what it wants to happen, your code is what actually runs it."
+          },
+          {
+            "text": "The model sends a network request to the tool's API directly",
+            "correct": false,
+            "why": "The model has no independent ability to send network requests, it produces a description of a call, your infrastructure performs the actual execution."
+          }
+        ]
+      },
+      {
+        "id": "m4q2",
+        "question": "A refund tool call has correct types and all required fields, but requests $50,000 on an order that never exceeds $500. Is schema validation alone sufficient to catch this?",
+        "source": "pool",
+        "type": "application",
+        "difficulty": "medium",
+        "objective": "Apply schema validation before business-rule checks",
+        "options": [
+          {
+            "text": "No, this passes structural validation but fails a business-rule check (amount bounds), the two are separate validation layers that catch different problems",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Yes, if the types and required fields are correct, the call is safe to execute",
+            "correct": false,
+            "why": "Structural correctness says nothing about whether the specific VALUES make sense for this business, an amount can be a perfectly valid number and still be wrong for this order."
+          },
+          {
+            "text": "No additional check is possible once the call has been generated",
+            "correct": false,
+            "why": "Additional checks are standard practice, bounds checks, permission checks, and rate limits are all commonly layered on top of schema validation."
+          }
+        ]
+      },
+      {
+        "id": "m4q3",
+        "question": "A payment tool call succeeds server-side, but the response is lost to a network blip. The model retries with the same call ID. What should the executor do?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "hard",
+        "objective": "Apply idempotent execution to a lost-response scenario",
+        "options": [
+          {
+            "text": "Recognize the call ID as already-executed and return the cached original result, without running the handler (and its side effect) again",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Run the handler again since the client never received confirmation of success",
+            "correct": false,
+            "why": "The client's uncertainty about the outcome doesn't change what actually happened server-side, re-running would duplicate a side effect (like a charge) that already completed."
+          },
+          {
+            "text": "Reject the retry outright as a suspicious duplicate",
+            "correct": false,
+            "why": "Rejecting isn't useful either, the caller still needs the actual result, returning the cached success is more useful and still safe."
+          }
+        ]
+      },
+      {
+        "id": "m4q4",
+        "question": "An executor caches a call's result BEFORE invoking the handler, planning to overwrite it after. On the error path, the overwrite is accidentally skipped. What's the consequence?",
+        "source": "pool",
+        "type": "debugging",
+        "difficulty": "hard",
+        "objective": "Diagnose a cache-before-catch bug",
+        "options": [
+          {
+            "text": "A failed attempt gets permanently marked as 'done,' incorrectly blocking any future legitimate retry with that call ID from ever getting a real attempt",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Nothing, the cache will just be correct once the handler eventually succeeds",
+            "correct": false,
+            "why": "If the overwrite-on-success path is what actually corrects the cache, and the error path skips cleanup, a failure gets permanently stuck as cached, blocking legitimate future retries."
+          },
+          {
+            "text": "The handler will simply be called twice for every request",
+            "correct": false,
+            "why": "The bug described causes UNDER-calling on retry (a failed attempt is wrongly treated as complete), not over-calling."
+          }
+        ]
+      },
+      {
+        "id": "m4q5",
+        "question": "Why should only successful outcomes be cached against a call ID, not failures?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "medium",
+        "objective": "Explain why failures shouldn't be cached",
+        "options": [
+          {
+            "text": "If nothing succeeded, there's no side effect to protect against repeating, caching a failure would block a legitimate future retry that might actually succeed",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Caching failures wastes more memory than caching successes",
+            "correct": false,
+            "why": "Memory usage isn't the reason, the reason is correctness: caching a failure permanently blocks a legitimate retry from ever getting a real attempt."
+          },
+          {
+            "text": "Failures should be cached too, for consistency with how successes are handled",
+            "correct": false,
+            "why": "Treating them the same defeats the purpose of idempotency for retries, a transient failure should remain retryable, not get permanently locked in as 'done.'"
+          }
+        ]
+      },
+      {
+        "id": "m4q6",
+        "question": "A model calls a tool name that isn't in your registry. What's the correct response?",
+        "source": "pool",
+        "type": "engineering-decision",
+        "difficulty": "medium",
+        "objective": "Decide how to respond to an unknown tool name",
+        "options": [
+          {
+            "text": "Reject it with a structured error naming the unknown tool, and never call any handler",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Execute the closest-matching known tool instead, in case the model meant that one",
+            "correct": false,
+            "why": "Silently substituting a different tool (with different effects) for what was actually requested is more dangerous than rejecting the call outright."
+          },
+          {
+            "text": "Log it and move on without informing the model",
+            "correct": false,
+            "why": "Silence gives the model nothing to self-correct with, a structured error lets it retry with a valid tool name."
+          }
+        ]
+      },
+      {
+        "id": "m4q7",
+        "question": "A tool call's arguments arrive as raw text {\"location\": \"Paris\",} (trailing comma). What's the correct order of operations before schema validation runs?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Apply repair-then-validate to tool arguments",
+        "options": [
+          {
+            "text": "Repair the malformed JSON text first (strip the trailing comma, parse it), then validate the resulting object against the tool's schema",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Validate the raw text directly against the schema, schemas tolerate minor syntax issues",
+            "correct": false,
+            "why": "Schema validation operates on a parsed object, not text with a syntax error, the trailing comma must be fixed and the text parsed before schema validation can run at all."
+          },
+          {
+            "text": "Reject the call immediately, a trailing comma means the model can't be trusted with tools at all",
+            "correct": false,
+            "why": "A trailing comma is a minor, mechanically-fixable formatting defect, not evidence of unreliability, the whole discipline from Module 1 is repairing these small defects rather than treating them as fatal."
+          }
+        ]
+      },
+      {
+        "id": "m4q8",
+        "question": "Two DIFFERENT call IDs both invoke the same tool with similar arguments. Should the second one be treated as a duplicate and blocked?",
+        "source": "pool",
+        "type": "application",
+        "difficulty": "medium",
+        "objective": "Distinguish two different call IDs from a true duplicate",
+        "options": [
+          {
+            "text": "No, idempotency is keyed by call ID specifically, not by tool name or argument similarity, two different IDs are two legitimately independent requests",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Yes, any repeated call to the same tool should be deduplicated regardless of ID",
+            "correct": false,
+            "why": "That would incorrectly block legitimate independent uses of the same tool, idempotency protects against a SPECIFIC request being duplicated, not against a tool being used more than once."
+          },
+          {
+            "text": "It depends on whether the arguments are byte-for-byte identical, not on the call ID at all",
+            "correct": false,
+            "why": "The call ID, not argument content, is the idempotency key in this course's model, using argument matching instead would incorrectly block distinct legitimate requests that happen to look similar."
+          }
+        ]
+      },
+      {
+        "id": "m4q9",
+        "question": "A calendar-booking tool's schema requires {\"date\": str, \"time\": str, \"attendee_email\": str}, all correctly typed. The requested date is in the past. Does schema validation catch this?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Apply the two validation layers to a real booking tool",
+        "options": [
+          {
+            "text": "No, a past date is still a syntactically valid string in the right shape, this is a business-rule failure (the value doesn't make sense for this use case), not a structural one",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Yes, schema validation checks that dates are chronologically valid relative to today",
+            "correct": false,
+            "why": "Schema validation checks shape and type (is this a string, is this field present), it has no built-in concept of \"today\" or chronological sense, that requires a separate business-rule check."
+          },
+          {
+            "text": "No additional check is needed, the booking tool will simply reject a past date on its own when executed",
+            "correct": false,
+            "why": "Assuming the underlying tool handles this gracefully isn't a safe default, the whole point of layered validation is catching a nonsensical value BEFORE the handler runs, not hoping the handler happens to guard against it."
+          }
+        ]
+      },
+      {
+        "id": "m4q10",
+        "question": "An e-commerce checkout tool is called once per cart. A user's flaky connection causes the client to submit the same checkout request three times within two seconds. What should the idempotency key be built from?",
+        "source": "pool",
+        "type": "engineering-decision",
+        "difficulty": "medium",
+        "objective": "Decide the idempotency key for a multi-step checkout tool",
+        "options": [
+          {
+            "text": "A stable identifier for THIS specific checkout attempt (e.g. a client-generated request ID tied to that cart session), not the cart contents alone, since a different legitimate checkout later with the same cart contents shouldn't be blocked as a false duplicate",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "The cart's contents (item IDs and quantities), since identical carts should always be treated as the same request",
+            "correct": false,
+            "why": "Keying off cart contents would incorrectly block a genuinely new, later purchase of the exact same items, idempotency needs to identify a specific REQUEST attempt, not a recurring pattern of contents."
+          },
+          {
+            "text": "The user's account ID alone, since all of a user's requests should be deduplicated together",
+            "correct": false,
+            "why": "Deduplicating by account ID alone would incorrectly merge a user's separate, legitimate purchases into one, the key needs to be specific to a single request attempt, not scoped to the whole account."
+          }
+        ]
+      },
+      {
+        "id": "m4q11",
+        "question": "Before a tool's handler is ever invoked, what three checks does this module's pattern require, in order?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "State the validation order before any handler runs",
+        "options": [
+          {
+            "text": "Does the tool exist in the registry, are the required arguments present and correctly typed, and has this call ID already succeeded (idempotency check)",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Only whether the arguments are correctly typed, existence and idempotency checks are optional extras",
+            "correct": false,
+            "why": "All three checks are treated as required in this module's pattern, skipping the registry check or the idempotency check leaves real gaps (executing an unknown tool, or duplicating a side effect)."
+          },
+          {
+            "text": "Whether the call ID has succeeded before, then tool existence, then argument types, in that order",
+            "correct": false,
+            "why": "Checking idempotency before confirming the tool even exists is backwards, you'd be looking up a call record for a request that might not even name a valid tool."
+          }
+        ]
+      }
+    ]
+  },
+  "glossary": [
+    {
+      "term": "tool call",
+      "definition": "a structured request from a model naming a tool and providing arguments; a proposal, not an executed action."
+    },
+    {
+      "term": "tool schema",
+      "definition": "a definition of a tool's expected arguments, used to validate a call before execution."
+    },
+    {
+      "term": "idempotent execution",
+      "definition": "guaranteeing a repeated call (same ID) produces the same result as the first, without re-running its side effects."
+    },
+    {
+      "term": "idempotency key",
+      "definition": "a stable identifier used to detect and deduplicate repeated executions of the same logical request."
+    },
+    {
+      "term": "business-rule validation",
+      "definition": "domain-specific checks (limits, permissions) applied after schema validation, since a structurally valid call can still be unsafe to execute."
+    },
+    {
+      "term": "MCP (Model Context Protocol)",
+      "definition": "an open standard for how a model-facing app discovers and calls tools exposed by a separate server; standardizes the wire format, not the validate-then-execute discipline this module teaches."
+    }
+  ],
+  "furtherReading": true,
+  "project": {
+    "title": "Idempotent Tool-Calling Executor",
+    "brief": "Build a tool executor that safely handles a model retrying the same tool call, validates arguments against a schema, and surfaces errors the model can act on.",
+    "projectId": 4
+  },
+  "cheatSheet": {
+    "title": "Tool Use & Idempotency Cheat Sheet"
+  }
+}

@@ -1,0 +1,5 @@
+<Muted>If you want to go deeper than the browser can take you:</Muted>
+
+- Every major model provider publishes an exact tokenizer (e.g. tiktoken-style byte-pair encoding), worth using directly in production instead of the character/4 estimate this course uses for planning.
+- "Lost in the middle" research on long-context models shows that even models with large context windows don't attend to all of it equally, position within the prompt matters, not just whether content technically fits.
+- In production, this shows up as ingestion pipelines with configurable chunk size and overlap, and as cost dashboards that break spend down by prompt tokens vs. completion tokens separately, since they're often priced differently.
