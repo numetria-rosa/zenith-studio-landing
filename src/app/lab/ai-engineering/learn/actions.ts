@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { LEARN_BASE } from "@/components/learn/nav";
 import { debugMessage, gradeDebugAnswer, gradeDesign, type DesignStatus, type Scores } from "@/lib/aie/capstone";
 import { debugScoreFor, finalFor, getCapstoneState, patchCapstone } from "@/lib/aie/capstone-db";
-import { getCapstone, getModule, getProject } from "@/lib/aie/content";
+import { getCapstone, getMixedQuizzes, getModule, getProject } from "@/lib/aie/content";
 import { markLessonComplete, saveExerciseRun, saveOrientation, saveProjectDraft, saveQuizAttempt, submitProject } from "@/lib/aie/progress";
 import { cleanProjectInput, type ProjectInput } from "@/lib/aie/project";
 import { gradeQuiz, type QuizAnswer } from "@/lib/aie/quiz";
@@ -32,14 +32,26 @@ export async function saveExerciseRunAction(module: number, code: string, passed
   revalidatePath(`${LEARN_BASE}/modules/${module}`, "layout");
 }
 
-/** Grades a finished quiz on the server and stores the attempt. Returns the score so the client shows the server's number. */
-export async function submitQuizAction(module: number, answers: Record<string, QuizAnswer>): Promise<{ score: number; total: number; passed: boolean }> {
+export type QuizScope = { module: number } | { mixed: string };
+
+/** Grades a finished quiz (a module's, or a mixed one) on the server and stores the attempt. Returns the score so the client shows the server's number. */
+export async function submitQuizAction(scope: QuizScope, answers: Record<string, QuizAnswer>): Promise<{ score: number; total: number; passed: boolean }> {
   const { userId } = await requireEnrollment("ai-engineering", LEARN_BASE);
-  const mod = await getModule(module);
-  if (!mod?.quiz) throw new Error("No quiz");
-  const result = gradeQuiz(mod.quiz, answers);
-  await saveQuizAttempt(userId, module, result.score, result.total, result.passed);
-  revalidatePath(`${LEARN_BASE}/modules/${module}`, "layout");
+  if ("module" in scope) {
+    const mod = await getModule(scope.module);
+    if (!mod?.quiz) throw new Error("No quiz");
+    const result = gradeQuiz(mod.quiz.questions, mod.quiz.passMark, answers);
+    await saveQuizAttempt(userId, scope.module, result.score, result.total, result.passed);
+    revalidatePath(LEARN_BASE, "layout");
+    return result;
+  }
+  const mixed = (await getMixedQuizzes()).find((m) => m.id === scope.mixed);
+  if (!mixed) throw new Error("No such quiz");
+  const banks = (await Promise.all(mixed.modules.map(getModule))).flatMap((m) => m?.quiz?.questions ?? []);
+  const size = mixed.perModule * mixed.modules.length;
+  const result = gradeQuiz(banks, Math.ceil(size * 0.8), answers, size);
+  await saveQuizAttempt(userId, 0, result.score, result.total, result.passed, mixed.id);
+  revalidatePath(LEARN_BASE, "layout");
   return result;
 }
 

@@ -51,14 +51,29 @@ export async function saveExerciseRun(userId: string, module: number, code: stri
   });
 }
 
-export async function saveQuizAttempt(userId: string, module: number, score: number, total: number, passed: boolean): Promise<void> {
-  await db.aieQuizAttempt.create({ data: { userId, module, score, total, passed } });
+export async function saveQuizAttempt(userId: string, module: number, score: number, total: number, passed: boolean, mixedId?: string): Promise<void> {
+  await db.aieQuizAttempt.create({ data: { userId, module, score, total, passed, mixedId: mixedId ?? null } });
 }
 
 /** Modules whose quiz the student has passed at least once. */
 export async function getPassedQuizzes(userId: string): Promise<Set<number>> {
-  const rows = await db.aieQuizAttempt.findMany({ where: { userId, passed: true }, select: { module: true }, distinct: ["module"] });
+  const rows = await db.aieQuizAttempt.findMany({ where: { userId, passed: true, mixedId: null }, select: { module: true }, distinct: ["module"] });
   return new Set(rows.map((r) => r.module));
+}
+
+export type QuizStat = { attempts: number; best: { score: number; total: number } | null; last: { score: number; total: number } | null };
+
+/** Attempts, best and latest score per quiz, keyed "m3" for a module quiz or "mix_1_3" for a mixed one. */
+export async function getQuizStats(userId: string): Promise<Map<string, QuizStat>> {
+  const rows = await db.aieQuizAttempt.findMany({ where: { userId }, orderBy: { createdAt: "asc" }, select: { module: true, mixedId: true, score: true, total: true } });
+  const out = new Map<string, QuizStat>();
+  for (const r of rows) {
+    const key = r.mixedId ?? `m${r.module}`;
+    const cur = out.get(key) ?? { attempts: 0, best: null, last: null };
+    const one = { score: r.score, total: r.total };
+    out.set(key, { attempts: cur.attempts + 1, best: !cur.best || one.score / one.total > cur.best.score / cur.best.total ? one : cur.best, last: one });
+  }
+  return out;
 }
 
 export type ProjectProgress = {

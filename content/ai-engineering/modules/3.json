@@ -197,6 +197,281 @@
           }
         ],
         "principle": "400 (chunks) + 50 (question) = 450 input tokens, against a 7000-token available budget, plenty of headroom."
+      },
+      {
+        "id": "m3q1",
+        "question": "Query vector [0, 1] compared against document vector [1, 0]. What's the cosine similarity?",
+        "source": "pool",
+        "type": "calculation",
+        "difficulty": "medium",
+        "objective": "Compute cosine similarity for perpendicular vectors",
+        "options": [
+          {
+            "text": "0, the vectors are perpendicular",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "1, both vectors have the same magnitude",
+            "correct": false,
+            "why": "Magnitude being equal doesn't make vectors similar in direction, these two point in completely different directions (90° apart), giving a similarity of 0."
+          },
+          {
+            "text": "-1, the vectors are opposite",
+            "correct": false,
+            "why": "Opposite vectors would be [1,0] and [-1,0], these two are perpendicular, not opposite, perpendicular gives 0, not -1."
+          }
+        ]
+      },
+      {
+        "id": "m3q2",
+        "question": "Why does cosine similarity ignore vector magnitude?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "Explain scale-invariance",
+        "options": [
+          {
+            "text": "Magnitude reflects length, not how semantically related two pieces of text are, dividing it out leaves a pure measure of direction (meaning)",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Because computing magnitude is too computationally expensive",
+            "correct": false,
+            "why": "Magnitude is trivial to compute (a square root of a sum of squares), the reason it's divided out is about MEANING, not computational cost."
+          },
+          {
+            "text": "It doesn't, cosine similarity is affected by magnitude just like dot product is",
+            "correct": false,
+            "why": "This is exactly backwards, cosine similarity is specifically defined to divide out magnitude, that's what distinguishes it from raw dot product."
+          }
+        ]
+      },
+      {
+        "id": "m3q3",
+        "question": "Top-k retrieval with k=5 and no minimum-relevance threshold is asked about a topic completely absent from the document collection. What does it return?",
+        "source": "pool",
+        "type": "application",
+        "difficulty": "medium",
+        "objective": "Apply a relevance threshold correctly",
+        "options": [
+          {
+            "text": "Its 5 best-scoring documents anyway, whatever scored highest among a set of irrelevant matches, since top-k alone has no concept of 'not good enough'",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "An empty result automatically, since nothing is actually relevant",
+            "correct": false,
+            "why": "Without an explicit threshold, top-k has no built-in relevance floor, it always returns exactly k results (or fewer only if the collection itself has fewer than k documents)."
+          },
+          {
+            "text": "An error, since no document scores above a reasonable bar",
+            "correct": false,
+            "why": "There's no error here, similarity scoring doesn't know what 'reasonable' means without an explicit threshold, it just returns the mathematically highest-scoring k."
+          }
+        ]
+      },
+      {
+        "id": "m3q4",
+        "question": "A retrieval function divides dot product by (magnitude_a × magnitude_b) with no zero check. A document has an all-zero embedding vector. What happens?",
+        "source": "pool",
+        "type": "debugging",
+        "difficulty": "hard",
+        "objective": "Diagnose a zero-vector bug",
+        "options": [
+          {
+            "text": "Python raises a ZeroDivisionError right at that division, crashing the whole retrieval call instead of just scoring that one document as irrelevant",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "The function returns a clear, descriptive 'zero vector' error value automatically, with no explicit guard needed",
+            "correct": false,
+            "why": "Python doesn't do this automatically, dividing by zero is a real, unhandled exception unless you explicitly check for a zero magnitude first and return a defined score instead."
+          },
+          {
+            "text": "The document is automatically excluded from results with no other effect",
+            "correct": false,
+            "why": "Without an explicit guard, there's no automatic exclusion, the exception propagates and can crash the entire retrieval call for every document, not just the zero-vector one."
+          }
+        ]
+      },
+      {
+        "id": "m3q5",
+        "question": "What does hybrid search combine, and why?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "Define hybrid search",
+        "options": [
+          {
+            "text": "Vector similarity search with traditional keyword search, since exact terms (product codes, names) can matter even when their embedding similarity to a paraphrase is unremarkable",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Two different embedding models run in parallel for redundancy",
+            "correct": false,
+            "why": "Hybrid search specifically refers to combining vector similarity with KEYWORD search, not running multiple embedding models."
+          },
+          {
+            "text": "Retrieval results from two different document collections merged together",
+            "correct": false,
+            "why": "This describes combining data sources, not the vector+keyword scoring combination that defines hybrid search."
+          }
+        ]
+      },
+      {
+        "id": "m3q6",
+        "question": "Chunking guarantees every word ends up in some chunk. Should retrieval guarantee every chunk ends up in some answer?",
+        "source": "pool",
+        "type": "engineering-decision",
+        "difficulty": "medium",
+        "objective": "Decide what completeness means for retrieval vs. chunking",
+        "options": [
+          {
+            "text": "No, and it shouldn't, chunking's job is completeness (don't lose content), retrieval's job is selectivity (don't include irrelevant content), most chunks correctly never get retrieved for any given query",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Yes, otherwise the chunking step was wasted effort",
+            "correct": false,
+            "why": "Chunking effort isn't wasted just because most chunks go unretrieved for any single query, different queries retrieve different chunks over time, that's the system working correctly, not a failure of completeness."
+          },
+          {
+            "text": "Yes, retrieval should eventually surface every chunk to some user",
+            "correct": false,
+            "why": "There's no such guarantee or requirement, some content may legitimately never be the best answer to any query asked, that's expected, not a bug."
+          }
+        ]
+      },
+      {
+        "id": "m3q7",
+        "question": "A query about 'resetting a customer password' retrieves a chunk about 'resetting a router to factory settings' with a non-trivial similarity score. Why doesn't this score exactly zero?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Recognize a false-positive keyword-overlap match",
+        "options": [
+          {
+            "text": "Embeddings capture broad lexical/semantic overlap (like the shared word 'reset'), not topic identity, a modest positive score across unrelated domains is common, not rare",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "This indicates a bug in the embedding model that needs to be fixed",
+            "correct": false,
+            "why": "This is expected embedding behavior, not a bug, shared vocabulary and phrasing naturally produce some similarity even across different topics."
+          },
+          {
+            "text": "It means the two documents are actually about the same topic",
+            "correct": false,
+            "why": "A moderate score from shared terminology doesn't mean the topics are the same, that's exactly the false-positive risk a relevance threshold exists to catch."
+          }
+        ]
+      },
+      {
+        "id": "m3q8",
+        "question": "Four documents score 0.9, 0.3, 0.7, 0.5 in that input order. With k=2 and minScore=0, which are returned, and in what order?",
+        "source": "pool",
+        "type": "application",
+        "difficulty": "medium",
+        "objective": "Apply top-k correctly with a partial input order",
+        "options": [
+          {
+            "text": "The 0.9 and 0.7 documents, sorted with 0.9 first, the two highest scores regardless of original input position",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "The first two documents in input order (0.9 and 0.3), since top-k just takes the first k results",
+            "correct": false,
+            "why": "Top-k means highest-SCORING k, not first-k-in-input-order, the 0.3 document should not make the cut when 0.7 scored higher."
+          },
+          {
+            "text": "All four documents, since minScore=0 means no filtering happens",
+            "correct": false,
+            "why": "minScore=0 does allow all non-negative scores through the FILTER, but k=2 still limits the final OUTPUT to just the top 2 by score."
+          }
+        ]
+      },
+      {
+        "id": "m3q9",
+        "question": "An internal HR-policy chatbot retrieves its best match at similarity 0.31 for a question about parental leave, when the actual policy document exists but uses different wording than the query. The threshold is set at 0.5. What should happen, and is the threshold necessarily wrong?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Apply threshold reasoning to a real knowledge-base search",
+        "options": [
+          {
+            "text": "The bot should return \"no relevant information found\" since nothing cleared the threshold, and the threshold isn't necessarily wrong, it may indicate the underlying document needs better wording, phrasing, or a rewritten summary that embeds closer to how people actually ask",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "The threshold should always be lowered until this specific query's best match clears it",
+            "correct": false,
+            "why": "Tuning the threshold down to force one query's best-but-still-weak match through undermines the threshold for every OTHER query too, a targeted fix (better document phrasing, or a hybrid keyword layer) addresses the specific gap without weakening the general filter."
+          },
+          {
+            "text": "The bot should always answer using the best-scoring match regardless of the threshold, since some answer is better than none",
+            "correct": false,
+            "why": "This is exactly the \"confidently wrong\" failure mode a threshold exists to prevent, a 0.31 similarity score, well below 0.5, isn't a reliable basis for a confident answer."
+          }
+        ]
+      },
+      {
+        "id": "m3q10",
+        "question": "A retrieval function sorts candidates by score, slices to the top 3, THEN filters out anything below the threshold. Five candidates score 0.9, 0.2, 0.15, 0.1, 0.05, with threshold 0.4. What does this buggy order return, and how does it differ from filtering first?",
+        "source": "pool",
+        "type": "debugging",
+        "difficulty": "hard",
+        "objective": "Diagnose a filter-after-slice bug",
+        "options": [
+          {
+            "text": "It returns just [0.9] after filtering the sliced top-3 ([0.9, 0.2, 0.15]) down to only what clears 0.4, which happens to match filter-then-slice here, but the bug is real: with a different score distribution, slicing first can permanently discard a candidate that would have cleared the threshold, before filtering ever gets a chance to see it",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "The two orderings always produce identical results regardless of the score distribution, so the order doesn't actually matter",
+            "correct": false,
+            "why": "The orders coincide on THIS particular input, but they're not equivalent in general, slice-then-filter can only ever return candidates from the pre-filter top-k, permanently losing any lower-ranked-but-still-relevant candidate that a filter-first approach would have kept in consideration."
+          },
+          {
+            "text": "Slicing before filtering just returns fewer results faster, with no correctness difference from filtering first",
+            "correct": false,
+            "why": "There is a real correctness difference in general, filtering before slicing guarantees every threshold-clearing candidate is considered before the top-k cut, slicing first can wrongly exclude one earlier."
+          }
+        ]
+      },
+      {
+        "id": "m3q11",
+        "question": "A retrieval system always returns its top-k results even for a query about something the document collection has zero coverage of. What concept in this module is specifically meant to catch that case?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "medium",
+        "objective": "Explain why 'relevant' and 'exists in the collection' aren't the same",
+        "options": [
+          {
+            "text": "A minimum-relevance threshold, without one the system has no way to say 'nothing here is actually good enough', it just returns whatever scored highest among a set of irrelevant candidates",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Chunk overlap, from Module 2, since it's about preserving content at boundaries",
+            "correct": false,
+            "why": "Chunk overlap addresses boundary continuity during ingestion, it has no bearing on whether a QUERY has any relevant match in the collection at all."
+          },
+          {
+            "text": "Increasing k so more results are returned, giving a better chance something relevant is included",
+            "correct": false,
+            "why": "Increasing k only returns MORE of the same irrelevant candidates when nothing in the collection is actually relevant, it doesn't introduce any relevance floor, only a threshold does that."
+          }
+        ]
       }
     ]
   },

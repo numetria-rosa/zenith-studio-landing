@@ -76,3 +76,13 @@ export async function getCapstone(): Promise<CapstoneBundle> {
   const [content, text, brief, reference] = await Promise.all([read("capstone.json"), read("text.json"), read("brief.mdx"), read("reference.mdx")]);
   return { content: JSON.parse(content), text: JSON.parse(text), brief, reference };
 }
+
+export type MixedQuiz = { id: string; title: string; modules: number[]; perModule: number };
+
+export async function getMixedQuizzes(): Promise<MixedQuiz[]> {
+  try {
+    return JSON.parse(await readFile(path.join(contentDir(), "quiz", "mixed.json"), "utf8"));
+  } catch {
+    return [];
+  }
+}

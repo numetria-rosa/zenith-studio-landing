@@ -215,6 +215,281 @@
             "why": "Not quite. After stripping the ``` fence and the trailing comma before }, what's left is {\"status\": \"ok\"}, which IS valid JSON, that's exactly why the repair pass runs before parsing."
           }
         ]
+      },
+      {
+        "id": "m1q1",
+        "question": "A model returns ```json\\n{\"status\": \"ok\",}\\n``` (markdown fence, trailing comma). What is the correct order of operations before this data can be trusted?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Apply the repair-then-validate order",
+        "options": [
+          {
+            "text": "Strip the markdown fence, remove the trailing comma, parse as JSON, then validate against the schema, in that order",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Validate against the schema first, then repair whatever the validator flags",
+            "correct": false,
+            "why": "Schema validation needs a parsed object to inspect, you can't validate JSON you haven't successfully parsed yet, the fence and comma have to be fixed and the text parsed first."
+          },
+          {
+            "text": "Reject it immediately, a markdown fence means the model isn't following instructions",
+            "correct": false,
+            "why": "A markdown fence is one of the most common, easily-repaired deviations, rejecting outright throws away perfectly recoverable output instead of fixing it deterministically."
+          }
+        ]
+      },
+      {
+        "id": "m1q2",
+        "question": "Why must structured model output be validated even when the prompt explicitly asked for a specific JSON schema?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "Explain why every model output needs validation",
+        "options": [
+          {
+            "text": "The model can still produce output that doesn't match the schema, asking for a shape doesn't guarantee the shape was produced",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Validation is only needed if the prompt didn't specify a schema",
+            "correct": false,
+            "why": "A specified schema in the prompt is a strong hint to the model, not an enforced guarantee, the model can still deviate."
+          },
+          {
+            "text": "Validation is only needed for free-text responses, not JSON-shaped ones",
+            "correct": false,
+            "why": "JSON-shaped output is exactly what needs validation, malformed or incorrectly-typed JSON is a common failure mode this course covers directly."
+          }
+        ]
+      },
+      {
+        "id": "m1q3",
+        "question": "A repair function strips trailing commas AFTER attempting json.loads(). On input {\"a\": 1,} it raises instead of repairing. What's the bug?",
+        "source": "pool",
+        "type": "debugging",
+        "difficulty": "hard",
+        "objective": "Diagnose a repair-order bug",
+        "options": [
+          {
+            "text": "The repair step runs after the parse attempt already failed, trailing-comma stripping has to happen BEFORE calling json.loads(), not after",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "json.loads() doesn't support trailing commas ever, so no repair order would fix this",
+            "correct": false,
+            "why": "json.loads() indeed rejects trailing commas, that's exactly why the repair step exists, to strip them before parsing, the bug is purely about step ORDER."
+          },
+          {
+            "text": "The regex used to strip commas is wrong",
+            "correct": false,
+            "why": "The described bug is about WHEN the repair runs relative to parsing, not the correctness of the stripping logic itself."
+          }
+        ]
+      },
+      {
+        "id": "m1q4",
+        "question": "Which of these is NOT something a deterministic repair pass can fix?",
+        "source": "pool",
+        "type": "application",
+        "difficulty": "medium",
+        "objective": "Distinguish a repairable defect from a non-repairable one",
+        "options": [
+          {
+            "text": "The model returning conversational prose instead of ever attempting JSON at all",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "A markdown code fence wrapped around otherwise-valid JSON",
+            "correct": false,
+            "why": "Stripping a fence is a simple, deterministic, always-safe repair, this is exactly the kind of thing a repair pass handles well."
+          },
+          {
+            "text": "A single trailing comma before a closing brace",
+            "correct": false,
+            "why": "Trailing commas are mechanically detectable and removable with a simple regex, a textbook repairable defect."
+          }
+        ]
+      },
+      {
+        "id": "m1q5",
+        "question": "After stripping fences and trailing commas, json.loads() still raises. What's the appropriate next step?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Know when to fall back to a model retry",
+        "options": [
+          {
+            "text": "Fall back to an expensive retry (re-prompting the model with the parse error included), since the cheap deterministic fixes didn't work",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Give up and return the raw unparsed text to the caller as-is",
+            "correct": false,
+            "why": "Silently returning unusable text to a caller expecting structured data just moves the failure downstream instead of handling it."
+          },
+          {
+            "text": "Try stripping the trailing comma again, a second time",
+            "correct": false,
+            "why": "Repeating an already-attempted deterministic fix that didn't work won't produce a different result, the next step is escalating, not repeating."
+          }
+        ]
+      },
+      {
+        "id": "m1q6",
+        "question": "What planning-level relationship between characters and tokens does this course use?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "State this course's token estimate",
+        "options": [
+          {
+            "text": "tokens ≈ characters / 4",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "tokens ≈ characters × 4",
+            "correct": false,
+            "why": "This inverts the relationship, a token is roughly 4 characters, not 4 tokens per character."
+          },
+          {
+            "text": "tokens = words exactly, one token per word",
+            "correct": false,
+            "why": "Tokens are sub-word units, not whole words, punctuation and rare words often cost MORE than one token each."
+          }
+        ]
+      },
+      {
+        "id": "m1q7",
+        "question": "A required field is missing from an otherwise well-formed model response. What should the system do?",
+        "source": "pool",
+        "type": "engineering-decision",
+        "difficulty": "hard",
+        "objective": "Decide how to surface a validation failure",
+        "options": [
+          {
+            "text": "Reject the response and surface a clear, structured error naming the missing field, rather than proceeding with incomplete data",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Fill the missing field with a reasonable-looking default and continue silently",
+            "correct": false,
+            "why": "Silently fabricating a value for a required field hides a real problem and can produce confidently wrong downstream behavior."
+          },
+          {
+            "text": "Ignore the missing field if the rest of the response looks fine",
+            "correct": false,
+            "why": "A required field being missing is exactly the kind of defect validation exists to catch, ignoring it defeats the purpose of validating at all."
+          }
+        ]
+      },
+      {
+        "id": "m1q8",
+        "question": "A model asked for JSON responds: \"Sure! Here's what I found: the user is 29.\" Why doesn't a repair pass fix this the way it fixes a trailing comma?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Recognize why prose isn't a parse failure to repair",
+        "options": [
+          {
+            "text": "There's no JSON structure present at all to repair, the model never attempted the format, repair only fixes small deviations from an otherwise-present structure",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Because the response is too long for a repair pass to process",
+            "correct": false,
+            "why": "Length isn't the issue, structure is, a repair pass targets small syntactic deviations, not a complete absence of the requested format."
+          },
+          {
+            "text": "Because repair passes only work on responses under 100 characters",
+            "correct": false,
+            "why": "There's no length threshold involved, the issue is that prose has no JSON structure to repair in the first place."
+          }
+        ]
+      },
+      {
+        "id": "m1q9",
+        "question": "An insurance-claim intake bot asks a model to extract {\"claimant_name\": str, \"incident_date\": str, \"amount\": number} from a submitted description. It returns valid JSON, but amount is the string \"about $2,400\" instead of a number. Is this a repair-pass fix or a validation failure?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Apply repair-then-validate to a real intake form",
+        "options": [
+          {
+            "text": "A validation failure, the JSON parsed fine, the defect is a type mismatch (string where a number was required), that's schema validation's job to catch, not the repair pass's",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "A repair-pass fix, since \"about $2,400\" can be turned into 2400 with a bit of string cleanup",
+            "correct": false,
+            "why": "Even though a human could guess the intended number, this isn't a small syntactic defect like a trailing comma, silently coercing a fuzzy string into a number risks fabricating precision the source text didn't actually contain, that's a rejection-and-clarify case, not a mechanical repair."
+          },
+          {
+            "text": "Neither, since the JSON is syntactically valid the whole response should be accepted as-is",
+            "correct": false,
+            "why": "Syntactic validity (it parsed) and semantic correctness (the fields have the right types and meaning) are different checks, this response passes the first and fails the second."
+          }
+        ]
+      },
+      {
+        "id": "m1q10",
+        "question": "A structured-output validator's repair pass is triggered on 40% of calls to a particular prompt, and about half of those still fail validation even after repair. What does this pattern suggest about the fix?",
+        "source": "pool",
+        "type": "engineering-decision",
+        "difficulty": "medium",
+        "objective": "Decide when repeated malformed output stops being a repair problem",
+        "options": [
+          {
+            "text": "The prompt itself likely needs to change, a repair pass masking a persistently bad hit rate is treating a systemic prompt problem as if it were an occasional parsing inconvenience",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Nothing, a 40% repair rate is normal and expected for any structured-output prompt",
+            "correct": false,
+            "why": "A recurring, high repair-then-still-fails rate is a signal worth investigating, not a baseline to accept silently, it points at the prompt (or schema clarity) as the actual problem."
+          },
+          {
+            "text": "The repair pass needs more regex rules added until the failure rate reaches zero",
+            "correct": false,
+            "why": "Continuously patching repair logic to paper over a persistently bad hit rate treats a symptom, the more durable fix is improving the prompt or schema that's producing malformed output this often in the first place."
+          }
+        ]
+      },
+      {
+        "id": "m1q11",
+        "question": "A response fails to parse as JSON at all. Does it make sense to run schema validation against it anyway, \"just in case\"?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "Distinguish parsing from validation as two separate stages",
+        "options": [
+          {
+            "text": "No, schema validation checks fields on a parsed object, if there's no parsed object yet there's nothing for the validator to inspect",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Yes, validation can check the raw text directly without a successful parse first",
+            "correct": false,
+            "why": "Schema validation operates on structured data (an object with fields), not on raw unparsed text, a parse has to succeed first."
+          },
+          {
+            "text": "Yes, but only for schemas with fewer than five fields",
+            "correct": false,
+            "why": "Field count has no bearing on whether validation needs a successfully parsed object first, that requirement is unconditional."
+          }
+        ]
       }
     ]
   },

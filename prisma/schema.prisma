@@ -234,7 +234,8 @@ model AieExerciseProgress {
 model AieQuizAttempt {
   id        String   @id @default(cuid())
   userId    String
-  module    Int
+  module    Int // 0 for a mixed quiz
+  mixedId   String? // set for a mixed quiz (content/ai-engineering/quiz/mixed.json)
   score     Int
   total     Int
   passed    Boolean

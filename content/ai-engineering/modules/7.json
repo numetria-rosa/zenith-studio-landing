@@ -209,6 +209,231 @@
           }
         ],
         "principle": "Evaluating both changes together conflates their effects, the score drop is real, but its cause is ambiguous until the changes are isolated and re-tested separately."
+      },
+      {
+        "id": "m7q3",
+        "question": "When a task's correctness CAN be checked with fixed logic (schema validation, exact match), which approach should be preferred over LLM-as-judge?",
+        "source": "pool",
+        "type": "engineering-decision",
+        "difficulty": "medium",
+        "objective": "Prefer deterministic checks where they apply",
+        "options": [
+          {
+            "text": "The deterministic check, it's consistent, cheap, and exactly reproducible, wherever a fixed correct answer or shape exists",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "LLM-as-judge, since it generalizes better even to cases with a known correct answer",
+            "correct": false,
+            "why": "When a fixed correct answer or shape already exists, there's nothing an LLM judge adds that a deterministic check doesn't already handle exactly and consistently."
+          },
+          {
+            "text": "Whichever is cheaper to run for this specific test case",
+            "correct": false,
+            "why": "Cost isn't the deciding tradeoff here, deterministic checks are both cheaper AND more reliable when they apply, there's no real tradeoff to weigh."
+          }
+        ]
+      },
+      {
+        "id": "m7q4",
+        "question": "An eval run scores 0.70 against a recorded baseline of 0.75. Using this course's definition, is this a regression?",
+        "source": "pool",
+        "type": "application",
+        "difficulty": "medium",
+        "objective": "Apply the regression definition",
+        "options": [
+          {
+            "text": "Yes, the new score (0.70) is lower than the baseline (0.75), meeting the definition of a regression",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "No, a 5-point difference is too small to count as a real regression",
+            "correct": false,
+            "why": "The definition used in this course is simply 'lower than baseline', there's no minimum-magnitude exemption, any measurable drop below baseline counts."
+          },
+          {
+            "text": "It can't be determined without knowing the exact test cases used",
+            "correct": false,
+            "why": "The regression definition only requires comparing the score to the baseline, 0.70 < 0.75 is sufficient to classify it as a regression regardless of which specific cases were included."
+          }
+        ]
+      },
+      {
+        "id": "m7q5",
+        "question": "An eval harness's loop calls tc['check'](actual) with no try/except around it. One test case's check() function has a bug and raises. What happens to the other test cases?",
+        "source": "pool",
+        "type": "debugging",
+        "difficulty": "hard",
+        "objective": "Diagnose an eval harness that lets one bad checker crash everything",
+        "options": [
+          {
+            "text": "The exception propagates up out of the loop and crashes the entire evaluation, losing results for every other test case too, not just the broken one",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Nothing, Python automatically isolates each loop iteration from exceptions raised in other iterations",
+            "correct": false,
+            "why": "A for-loop has no built-in per-iteration exception isolation, an unhandled raise inside the loop body stops the loop immediately and propagates out."
+          },
+          {
+            "text": "Only that one test case is marked failed, the rest continue normally by default",
+            "correct": false,
+            "why": "Without an explicit try/except around the check() call specifically, there's no default per-case isolation, the exception aborts the whole run."
+          }
+        ]
+      },
+      {
+        "id": "m7q6",
+        "question": "A team changes their system prompt AND their retrieval top-k value in one deploy, then runs the eval suite once and sees a score drop. What's the practical downside of evaluating both changes together?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Reason about isolating variables before evaluating",
+        "options": [
+          {
+            "text": "They can't tell which change caused the drop, or whether one change improved things while the other hurt worse, isolating the cause now requires re-running the eval with each change separated",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Nothing, the eval score reflects reality either way regardless of how many things changed",
+            "correct": false,
+            "why": "The score is accurate as an aggregate outcome, but it conflates the effects of both changes, making the CAUSE ambiguous, which is the actual practical problem."
+          },
+          {
+            "text": "The eval suite itself becomes invalid once more than one variable changes between runs",
+            "correct": false,
+            "why": "The eval suite still produces a valid, meaningful score, the issue isn't the suite's validity, it's that attributing the cause of the change becomes ambiguous."
+          }
+        ]
+      },
+      {
+        "id": "m7q7",
+        "question": "What is a 'golden dataset' in the context of evaluation?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "easy",
+        "objective": "Define a golden dataset",
+        "options": [
+          {
+            "text": "A curated, hand-labeled test set updated carefully and deliberately over time, since eval quality is bounded by the quality and coverage of its test cases",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "The single highest-scoring output an eval run has ever produced",
+            "correct": false,
+            "why": "This describes a best individual result, not the curated test-set concept a golden dataset actually refers to."
+          },
+          {
+            "text": "An automatically-generated set of test cases requiring no human review",
+            "correct": false,
+            "why": "A golden dataset is specifically hand-labeled and carefully curated, the opposite of an unreviewed automatically-generated set."
+          }
+        ]
+      },
+      {
+        "id": "m7q8",
+        "question": "A proposed eval test case has an input and an 'expected' field reading '(judge if the summary is good)'. What's missing for this to be a usable eval case?",
+        "source": "pool",
+        "type": "application",
+        "difficulty": "medium",
+        "objective": "Design a test case with a real criterion",
+        "options": [
+          {
+            "text": "An explicit, checkable criterion, not an implicit request to judge quality, without one, different reviewers (or the same reviewer on different days) will score it inconsistently",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Nothing is missing, this is already a complete and usable eval test case",
+            "correct": false,
+            "why": "An implicit 'judge if it's good' provides no fixed criterion, that's exactly the kind of inconsistent, unrepeatable scoring a real eval case needs to avoid."
+          },
+          {
+            "text": "Only the input is missing, the expected field alone is sufficient",
+            "correct": false,
+            "why": "The input is actually present here, what's missing is a defined, checkable criterion, not the input."
+          }
+        ]
+      },
+      {
+        "id": "m7q9",
+        "question": "A support-ticket classifier assigns one of five fixed categories to each ticket. An engineer proposes evaluating it with an LLM judge that reads the ticket and the assigned category and rates 1-5 how appropriate it seems. Is this the right approach?",
+        "source": "pool",
+        "type": "scenario",
+        "difficulty": "medium",
+        "objective": "Apply deterministic-vs-judge reasoning to a real classification eval",
+        "options": [
+          {
+            "text": "No, each ticket in a labeled eval set has one correct category, an exact-match deterministic check against the labeled answer is cheaper, consistent, and exactly reproducible, an LLM judge adds unnecessary unreliability to a problem that already has a fixed correct answer",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Yes, an LLM judge is always a better choice since it can account for nuance a simple match can't",
+            "correct": false,
+            "why": "There's no nuance to account for when a fixed-category classification task already has one correct labeled answer per ticket, that's precisely the situation where a deterministic check is both sufficient and preferable."
+          },
+          {
+            "text": "Yes, but only if the categories have similar-sounding names that a script might confuse",
+            "correct": false,
+            "why": "Even with similar-sounding category names, an exact string match against the labeled correct category is still a deterministic, reliable check, category-name similarity doesn't require introducing judge-based scoring."
+          }
+        ]
+      },
+      {
+        "id": "m7q10",
+        "question": "A team's recorded baseline score (0.88) was computed on an earlier, smaller eval set. They've since added 20 new labeled cases to the eval set but kept using the old baseline number for regression comparisons. What's wrong with this setup?",
+        "source": "pool",
+        "type": "debugging",
+        "difficulty": "hard",
+        "objective": "Diagnose a baseline that was recorded against the wrong eval set",
+        "options": [
+          {
+            "text": "The baseline and the current eval set are no longer the same measurement, comparing a new score (on the expanded set) against an old baseline (on the smaller set) can flag false regressions or hide real ones, since the score's meaning changed when the test set changed",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Nothing is wrong, a baseline score is valid indefinitely regardless of what's later added to the eval set",
+            "correct": false,
+            "why": "A baseline is only a meaningful comparison point for the SAME eval set it was measured on, expanding the set changes what the score represents, the baseline needs to be re-recorded on the new set."
+          },
+          {
+            "text": "The only problem is that the eval now takes longer to run, the comparison itself is still valid",
+            "correct": false,
+            "why": "Runtime isn't the issue, the actual problem is a mismatch in what's being measured, comparing scores across two different-sized test sets isn't a like-for-like regression check."
+          }
+        ]
+      },
+      {
+        "id": "m7q11",
+        "question": "Why does this module recommend wrapping each individual test case's check() call in its own try/except, rather than one try/except around the entire eval loop?",
+        "source": "pool",
+        "type": "recall",
+        "difficulty": "medium",
+        "objective": "Explain why every check() call needs independent error isolation",
+        "options": [
+          {
+            "text": "One try/except around the whole loop still lets a single bad checker abort every remaining test case, wrapping each call individually isolates a broken checker to just its own case so the rest of the suite still runs and reports",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "There's no real difference, a single try/except around the whole loop provides the same per-case isolation",
+            "correct": false,
+            "why": "A try/except around the WHOLE loop still exits the loop entirely the first time any single check() raises, it doesn't isolate failures to individual cases the way a per-call try/except does."
+          },
+          {
+            "text": "Per-case try/except is only needed when the eval set has more than 50 test cases",
+            "correct": false,
+            "why": "The isolation benefit has nothing to do with eval set size, even a 3-case suite benefits from one broken checker not silently discarding the other two cases' results."
+          }
+        ]
       }
     ]
   },
