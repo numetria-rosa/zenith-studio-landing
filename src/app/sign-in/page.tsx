@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { decryptPassword } from "@/lib/password";
 import { createSessionForUser } from "@/lib/session";
 import { courseFontVars } from "@/lib/fonts";
-import Link from "next/link";
+import { BrandMark } from "@/components/site/BrandMark";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -26,11 +26,9 @@ export default async function SignInPage({
       className={`${courseFontVars} min-h-screen bg-[#0d0f14] font-[family-name:var(--font-course-sans)] text-[#eeeee7] flex items-center justify-center px-4`}
     >
       <div className="w-full max-w-sm">
-        <Link href="/" className="mb-10 flex items-center justify-center gap-2">
-          <span className="font-[family-name:var(--font-course-serif)] text-lg font-extrabold tracking-[-0.02em]">
-            ZENITH STUDIO
-          </span>
-        </Link>
+        <div className="mb-10 flex justify-center">
+          <BrandMark brand="studio" />
+        </div>
 
         <div className="rounded-xl border border-[#232838] bg-[#151920] p-8">
           <h1 className="font-[family-name:var(--font-course-serif)] text-xl font-semibold tracking-[-0.01em]">

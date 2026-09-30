@@ -7,6 +7,7 @@ import { allServicePageSlugs, getServicePage, PAID_AUDIT_BOOKING_URL } from "@/l
 import ServiceHeroVisual from "./ServiceHeroVisual";
 import ReceptionistFlowDiagram from "./ReceptionistFlowDiagram";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { SiteNav } from "@/components/site/SiteNav";
 
 export function generateStaticParams() {
   return allServicePageSlugs().map((slug) => ({ slug }));
@@ -36,41 +37,15 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
         <div className="absolute inset-0 opacity-[0.14] [background-image:linear-gradient(rgba(255,255,255,0.09)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.09)_1px,transparent_1px)] [background-size:72px_72px]" />
       </div>
 
-      <header className="relative z-20 px-4 pt-5 sm:px-8 lg:px-12">
-        <div className="mx-auto flex max-w-7xl items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3.5 backdrop-blur-xl">
-          <Link href="/" className="flex items-center gap-3">
-            <img
-              src="/icon.webp"
-              alt="Zenith Studio"
-              className="h-9 w-9 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)]"
-            />
-            <span className="leading-tight">
-              <span className="block text-[10px] uppercase tracking-[0.32em] text-white/55">Zenith</span>
-              <span className="-mt-0.5 block text-sm font-semibold">Studio</span>
-            </span>
-          </Link>
-          <nav className="hidden text-[13px] text-white/45 sm:block">
-            <Link href="/" className="hover:text-white">
-              Home
-            </Link>
-            <span className="px-2">/</span>
-            <Link href="/#systems" className="hover:text-white">
-              Services
-            </Link>
-            <span className="px-2">/</span>
-            <span className="text-white/80">{page.title}</span>
-          </nav>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher />
-            <Link
-              href="/audit"
-              className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-[1.02]"
-            >
-              Free written audit
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SiteNav
+        links={[
+          { href: "/", label: "Home" },
+          { href: "/services", label: "Services", active: true },
+          { href: "/lab", label: "Courses" },
+        ]}
+        extra={<LanguageSwitcher />}
+        cta={{ href: "/audit", label: "Free written audit", localized: true }}
+      />
 
       <main className="relative z-10">
         <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-8 pt-10 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:px-12 lg:pt-14">

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Link } from "@/i18n/navigation";
 import AuditForm from "./AuditForm";
+import { SiteNav } from "@/components/site/SiteNav";
 import { PAID_AUDIT_BOOKING_URL } from "@/lib/paid-audit";
 
 export const metadata: Metadata = {
@@ -17,26 +17,14 @@ export default function AuditPage() {
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.14)_1px,transparent_1px)] [background-size:64px_64px]" />
       </div>
 
-      <header className="sticky top-0 z-50 px-4 pt-4 sm:px-6 lg:px-10">
-        <div className="mx-auto max-w-4xl rounded-full border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(72,113,255,0.12)]">
-          <div className="flex items-center justify-between px-5 py-4 sm:px-7">
-            <Link href="/" className="flex items-center gap-3">
-              <img
-                src="/icon.webp"
-                alt="Zenith Studio Icon"
-                className="h-9 w-9 rounded-2xl shadow-[0_0_30px_rgba(110,95,255,0.55)]"
-              />
-              <div>
-                <div className="text-xs tracking-[0.35em] text-white/60 uppercase">Zenith</div>
-                <div className="-mt-0.5 text-sm font-semibold">Studio</div>
-              </div>
-            </Link>
-            <Link href="/" className="text-sm text-white/60 transition-colors hover:text-white">
-              Back to site
-            </Link>
-          </div>
-        </div>
-      </header>
+      <SiteNav
+        links={[
+          { href: "/", label: "Home" },
+          { href: "/services", label: "Services" },
+          { href: "/lab", label: "Courses" },
+        ]}
+        cta={{ href: "/audit", label: "Free audit", localized: true }}
+      />
 
       <main className="relative z-10 mx-auto max-w-4xl px-4 pb-24 pt-12 sm:px-6 lg:px-10">
         <div className="max-w-2xl">
