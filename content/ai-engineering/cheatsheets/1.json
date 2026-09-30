@@ -1,0 +1,58 @@
+{
+  "id": "1",
+  "title": "Structured Outputs Cheat Sheet",
+  "tag": "Module 1",
+  "sections": [
+    {
+      "label": "Repair order (always this sequence)",
+      "items": [
+        "1. Strip a markdown code fence if present.",
+        "2. Strip trailing commas before `}` or `]`.",
+        "3. `json.loads()` the result.",
+        "4. Validate the parsed object against the schema.",
+        "Never validate before you've successfully parsed."
+      ]
+    },
+    {
+      "label": "What repair CAN fix",
+      "items": [
+        "A markdown fence wrapped around otherwise-valid JSON.",
+        "A single trailing comma before a closing brace/bracket.",
+        "A trailing newline after valid JSON (whitespace is ignored by `json.loads()`)."
+      ]
+    },
+    {
+      "label": "What repair CANNOT fix",
+      "items": [
+        "Prose that never attempted JSON at all: there's no structure to repair.",
+        "A field with the wrong TYPE (a string where a number was required): that's a validation failure, not a parse failure.",
+        "A missing required field: same, a validation failure."
+      ]
+    },
+    {
+      "label": "Decision rule",
+      "items": [
+        "Parse fails after repair → escalate to an expensive model retry with the error included.",
+        "Parse succeeds, schema fails → reject with a structured error naming the specific field.",
+        "Both succeed → safe to use."
+      ]
+    },
+    {
+      "label": "Common mistakes",
+      "items": [
+        "Stripping the trailing comma AFTER attempting `json.loads()` instead of before.",
+        "Silently defaulting a missing required field instead of rejecting.",
+        "Treating prose-only output the same as a fixable syntax defect."
+      ]
+    },
+    {
+      "label": "Implementation checklist",
+      "checklist": [
+        "Fence-stripping happens before parse.",
+        "Trailing-comma stripping happens before parse.",
+        "A parse failure returns a structured error, never raises uncaught.",
+        "A validation failure names the specific missing/wrong-typed field."
+      ]
+    }
+  ]
+}

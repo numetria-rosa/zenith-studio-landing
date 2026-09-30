@@ -227,5 +227,8 @@
     "title": "Vector Similarity Search Engine",
     "brief": "Build a small in-memory vector search engine: cosine similarity, top-k retrieval, and a relevance-threshold cutoff.",
     "projectId": 3
+  },
+  "cheatSheet": {
+    "title": "Retrieval (RAG) Cheat Sheet"
   }
 }

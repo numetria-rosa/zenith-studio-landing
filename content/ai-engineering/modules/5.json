@@ -251,5 +251,8 @@
     "title": "Bounded ReAct Agent Loop",
     "brief": "Build a reason-act-observe agent loop with a hard step limit, explicit termination conditions, and protection against repeating the same failing action forever.",
     "projectId": 5
+  },
+  "cheatSheet": {
+    "title": "Agent Control Flow Cheat Sheet"
   }
 }

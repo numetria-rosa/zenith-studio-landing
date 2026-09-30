@@ -13,7 +13,7 @@ export function ModuleHeader({ mod, lessonHref }: { mod: ModuleContent; lessonHr
   if (mod.cheatSheet) tabs.push({ label: "Cheat sheet", href: `${base}/cheat-sheet`, match: `${base}/cheat-sheet` });
 
   return (
-    <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+    <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center print:hidden">
       <div className="flex flex-col gap-1.5">
         <span className="font-mono text-[12px] uppercase tracking-[0.12em] text-dim">{mod.stage}</span>
         <span className="text-[20px] font-medium tracking-[-0.02em]">

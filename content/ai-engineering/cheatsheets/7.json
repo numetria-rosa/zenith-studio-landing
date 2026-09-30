@@ -1,0 +1,49 @@
+{
+  "id": "7",
+  "title": "Evaluation Cheat Sheet",
+  "tag": "Module 7",
+  "sections": [
+    {
+      "label": "What makes a usable eval case",
+      "items": [
+        "An input AND an explicit, checkable criterion: not an implicit \"judge if it's good.\"",
+        "Deterministic checks (exact match, schema validation) wherever a fixed correct answer/shape exists.",
+        "LLM-as-judge reserved for genuinely subjective criteria with no deterministic check available."
+      ]
+    },
+    {
+      "label": "Regression definition",
+      "formula": "regression = (baseline is a real number) AND (new_score < baseline)"
+    },
+    {
+      "label": "Isolating variables",
+      "items": [
+        "Change ONE thing (one prompt, one retrieval parameter), then re-run the full eval suite.",
+        "Changing several things and evaluating once tells you SOMETHING changed, not WHICH part."
+      ]
+    },
+    {
+      "label": "Deterministic vs. LLM-as-judge",
+      "items": [
+        "Deterministic: consistent, cheap, exactly reproducible: always prefer when it applies.",
+        "LLM-as-judge: inherits the exact unreliability it's measuring, the judge's own grading is an unverified model output."
+      ]
+    },
+    {
+      "label": "Common mistakes",
+      "items": [
+        "Spot-checking a handful of outputs instead of running a systematic, repeatable eval.",
+        "Not wrapping each check() call in its own try/except: one bad checker can crash the whole evaluation.",
+        "Changing multiple variables in one deploy, then evaluating once."
+      ]
+    },
+    {
+      "label": "Implementation checklist",
+      "checklist": [
+        "Every eval case has an explicit pass/fail criterion, not an implicit judgment call.",
+        "model_fn and check() failures are each caught independently, never crashing the whole run.",
+        "A baseline score is recorded and compared before every ship."
+      ]
+    }
+  ]
+}

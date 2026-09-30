@@ -1,0 +1,51 @@
+{
+  "id": "0",
+  "title": "AI Engineering Orientation Cheat Sheet",
+  "tag": "Module 0",
+  "sections": [
+    {
+      "label": "The field, in one line",
+      "items": [
+        "AI Engineering = integrating, orchestrating, and operating already-trained AI models (mostly LLMs via API) inside production software, not training models from scratch."
+      ]
+    },
+    {
+      "label": "Adjacent fields, the fast distinction",
+      "items": [
+        "**ML Engineer**: trains/fine-tunes models themselves.",
+        "**Data Scientist**: analyzes data to inform decisions.",
+        "**AI Researcher**: pushes what models CAN do, publishes.",
+        "**MLOps / AI Infra**: builds/operates the platform models run on.",
+        "**AI Engineer (you)**: builds what runs ON TOP of an existing model, reliably."
+      ]
+    },
+    {
+      "label": "Learn-now priority (in order)",
+      "items": [
+        "Python, Git/GitHub, HTTP/REST/JSON, SQL: all 'need to know now.'",
+        "JavaScript/TypeScript, Linux/Bash, Docker: 'should learn next.'",
+        "C++/Rust/Go: specialized, only relevant deep in infra/platform work."
+      ]
+    },
+    {
+      "label": "The production lifecycle",
+      "items": [
+        "IDEA → DATA → MODEL/API → BACKEND → RAG/TOOLS/AGENTS → APPLICATION → EVALUATION → DEPLOYMENT → MONITORING.",
+        "An AI engineer's work concentrates from Model/API through Monitoring, not the raw Data or Deployment infrastructure stages."
+      ]
+    },
+    {
+      "label": "Specialization directions (overlapping, not rigid)",
+      "items": [
+        "AI Application Engineer, LLM/Generative AI Engineer, AI/ML Engineer, AI Integration Engineer, AI Automation Engineer, AI Platform/Infrastructure Engineer, MLOps-oriented roles, AI Product Engineer."
+      ]
+    },
+    {
+      "label": "What this course teaches vs. doesn't",
+      "items": [
+        "Teaches: Python fundamentals, prompting/structured outputs, context budgeting, RAG, tool use, agents, reliability, evaluation (Python Foundations + Modules 1–8).",
+        "Doesn't teach: advanced Python, SQL, deployment/cloud, model training/fine-tuning, production vector-DB ops, a specific vendor's SDK syntax."
+      ]
+    }
+  ]
+}

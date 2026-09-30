@@ -255,5 +255,8 @@
     "title": "Idempotent Tool-Calling Executor",
     "brief": "Build a tool executor that safely handles a model retrying the same tool call, validates arguments against a schema, and surfaces errors the model can act on.",
     "projectId": 4
+  },
+  "cheatSheet": {
+    "title": "Tool Use & Idempotency Cheat Sheet"
   }
 }

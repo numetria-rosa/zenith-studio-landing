@@ -239,5 +239,8 @@
     "title": "Prompt Evaluation Harness",
     "brief": "Build a deterministic eval harness that scores model outputs against a labeled test set using multiple criteria, and flags regressions between two prompt versions.",
     "projectId": 7
+  },
+  "cheatSheet": {
+    "title": "Evaluation Cheat Sheet"
   }
 }

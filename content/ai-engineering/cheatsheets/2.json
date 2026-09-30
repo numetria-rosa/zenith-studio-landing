@@ -1,0 +1,46 @@
+{
+  "id": "2",
+  "title": "Context & Token Budget Cheat Sheet",
+  "tag": "Module 2",
+  "sections": [
+    {
+      "label": "Planning estimate",
+      "items": [
+        "This course's estimate: `tokens ≈ characters / 4` for English text.",
+        "Real tokenizers vary by provider and are more precise, use this for planning only."
+      ]
+    },
+    {
+      "label": "Key formula",
+      "formula": "available_input = context_window − reserved_output"
+    },
+    {
+      "label": "Chunking rules",
+      "items": [
+        "Never silently drop content: an oversized single word still gets its own chunk, even if it alone exceeds the budget.",
+        "Overlap repeats boundary content so no idea is split with zero context on either side, typically 10–20% of chunk size.",
+        "More overlap = more total tokens processed = more cost, it's a tradeoff, not a free win."
+      ]
+    },
+    {
+      "label": "The oversized-word guard",
+      "formula": "if tokens + t > max and len(chunk) > 0: break  # only enforce once chunk is non-empty"
+    },
+    {
+      "label": "Common mistakes",
+      "items": [
+        "Truncating instead of chunking: silently drops whatever came after the cut, with no error.",
+        "Enforcing the budget check even on an empty chunk, silently dropping an oversized single word.",
+        "Forgetting that a retry re-sends the ENTIRE original prompt plus new context, roughly doubling token cost."
+      ]
+    },
+    {
+      "label": "Implementation checklist",
+      "checklist": [
+        "Available input budget is computed, not assumed.",
+        "Chunker never drops a word, oversized or not.",
+        "Overlap is applied consistently at every chunk boundary except the last."
+      ]
+    }
+  ]
+}

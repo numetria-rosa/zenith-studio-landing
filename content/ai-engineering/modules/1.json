@@ -245,5 +245,8 @@
     "title": "Structured Output Validator",
     "brief": "Build a tool that validates and repairs raw model output against a JSON schema: strips markdown fences, fixes trailing commas, reports what it couldn't fix.",
     "projectId": 1
+  },
+  "cheatSheet": {
+    "title": "Structured Outputs Cheat Sheet"
   }
 }

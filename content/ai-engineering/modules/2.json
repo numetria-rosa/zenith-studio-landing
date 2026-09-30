@@ -227,5 +227,8 @@
     "title": "Token-Budget-Aware Chunker",
     "brief": "Build a text chunker that respects a token budget, adds configurable overlap, and never silently truncates mid-sentence.",
     "projectId": 2
+  },
+  "cheatSheet": {
+    "title": "Context & Token Budget Cheat Sheet"
   }
 }

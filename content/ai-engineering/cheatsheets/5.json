@@ -1,0 +1,43 @@
+{
+  "id": "5",
+  "title": "Agent Control Flow Cheat Sheet",
+  "tag": "Module 5",
+  "sections": [
+    {
+      "label": "The three valid loop endings",
+      "items": [
+        "**Success**: the model emits a distinct final-answer signal.",
+        "**Step limit**: the hard cap is reached with no final answer.",
+        "**Stuck**: the same action repeats some threshold number of times in a row (this course uses 3)."
+      ]
+    },
+    {
+      "label": "Stuck-detection pattern",
+      "formula": "if action == last_action:\n    repeat_count += 1\nelse:\n    last_action, repeat_count = action, 1\nif repeat_count >= 3: return {'status': 'stuck'}"
+    },
+    {
+      "label": "Why a step limit is non-negotiable",
+      "items": [
+        "\"The model will know when to stop\" is a hope, not a mechanism.",
+        "Every step is a real cost: tokens, latency, and often a tool execution with its own side effects.",
+        "Hitting the limit is CORRECT behavior for a hard task, not a bug to hide."
+      ]
+    },
+    {
+      "label": "Common mistakes",
+      "items": [
+        "Forgetting to reset the repeat counter when the action changes: causes false 'stuck' triggers on legitimately alternating actions.",
+        "Treating idempotent tool execution as if it also bounds the loop: it doesn't, it only protects individual calls from duplicate side effects.",
+        "Silently returning a partial answer when the step limit is hit instead of clearly reporting 'did not finish.'"
+      ]
+    },
+    {
+      "label": "Implementation checklist",
+      "checklist": [
+        "Step limit is enforced with a real hard cap, not just a suggestion.",
+        "3 identical consecutive actions trigger 'stuck' well before the step limit.",
+        "Alternating different actions never falsely trigger stuck-detection."
+      ]
+    }
+  ]
+}

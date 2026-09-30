@@ -1,0 +1,52 @@
+{
+  "id": "3",
+  "title": "Retrieval (RAG) Cheat Sheet",
+  "tag": "Module 3",
+  "sections": [
+    {
+      "label": "Cosine similarity",
+      "formula": "cos(a,b) = dot(a,b) / (‖a‖ × ‖b‖)"
+    },
+    {
+      "label": "Key properties",
+      "items": [
+        "Range: -1 (opposite) to 1 (identical direction), 0 = perpendicular/unrelated.",
+        "Scale-invariant: magnitude is divided out, only direction (meaning) matters.",
+        "Guard against a zero-magnitude vector before dividing, or Python will raise `ZeroDivisionError`."
+      ]
+    },
+    {
+      "label": "Top-k + threshold pattern",
+      "items": [
+        "1. Score every candidate.",
+        "2. FILTER out anything below the minimum relevance threshold.",
+        "3. SORT the remaining candidates descending.",
+        "4. SLICE to the top k.",
+        "Filter before slicing: slicing first can wrongly exclude a high scorer that appeared late in an unsorted list."
+      ]
+    },
+    {
+      "label": "Why a threshold matters",
+      "items": [
+        "Top-k alone always returns k results, even from an irrelevant collection, it has no concept of 'not good enough.'",
+        "'Best available' is not the same as 'actually relevant': a wrong-topic chunk sharing a keyword can still score moderately positive."
+      ]
+    },
+    {
+      "label": "Common mistakes",
+      "items": [
+        "Sorting or slicing before filtering by threshold.",
+        "Not guarding a zero-vector, letting `ZeroDivisionError` crash the whole retrieval call.",
+        "Assuming a non-zero score means relevant, without ever setting a threshold at all."
+      ]
+    },
+    {
+      "label": "Implementation checklist",
+      "checklist": [
+        "Zero-vector inputs return score 0, never a raised exception.",
+        "Results are filtered by threshold before being sliced to k.",
+        "Ties/near-ties are broken by score, not by input list order."
+      ]
+    }
+  ]
+}
