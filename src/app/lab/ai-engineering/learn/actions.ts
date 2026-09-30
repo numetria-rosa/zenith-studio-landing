@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { LEARN_BASE } from "@/components/learn/nav";
 import { debugMessage, gradeDebugAnswer, gradeDesign, type DesignStatus, type Scores } from "@/lib/aie/capstone";
 import { debugScoreFor, finalFor, getCapstoneState, patchCapstone } from "@/lib/aie/capstone-db";
-import { getCapstone, getChallenges, getFinalAssessment, getMixedQuizzes, getModule, getProject } from "@/lib/aie/content";
+import { getCapstone, getChallenges, getFinalAssessment, getPythonFoundations, PYTHON_MODULE_BASE, getMixedQuizzes, getModule, getProject } from "@/lib/aie/content";
 import { markLessonComplete, saveExerciseRun, saveOrientation, saveProjectDraft, saveQuizAttempt, submitProject } from "@/lib/aie/progress";
 import { cleanProjectInput, type ProjectInput } from "@/lib/aie/project";
 import { gradeQuiz, type QuizAnswer } from "@/lib/aie/quiz";
@@ -156,4 +156,13 @@ export async function submitChallengeAction(id: string, answers: Record<string, 
   await saveQuizAttempt(userId, 0, result.score, result.total, result.passed, `challenge_${id}`);
   revalidatePath(LEARN_BASE, "layout");
   return result;
+}
+
+/** Stores a Python Foundations exercise run (topic 1-8), like saveExerciseRunAction does for a module exercise. */
+export async function savePythonRunAction(topic: number, code: string, passed: number): Promise<void> {
+  const { userId } = await requireEnrollment("ai-engineering", LEARN_BASE);
+  const t = (await getPythonFoundations()).topics.find((x) => x.number === topic);
+  if (!t || code.length > 20000 || !Number.isInteger(passed) || passed < 0 || passed > t.exercise.tests.length) throw new Error("Invalid run");
+  await saveExerciseRun(userId, PYTHON_MODULE_BASE + topic, code, passed, t.exercise.tests.length);
+  revalidatePath(`${LEARN_BASE}/python`, "layout");
 }

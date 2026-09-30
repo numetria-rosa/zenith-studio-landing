@@ -115,3 +115,34 @@ export type Challenge = {
 export async function getChallenges(): Promise<Challenge[]> {
   return JSON.parse(await readFile(path.join(contentDir(), "challenges.json"), "utf8"));
 }
+
+export type PythonTopic = {
+  number: number;
+  title: string;
+  why: string;
+  body: ({ type: "p"; text: string } | { type: "concept"; title: string; text: string } | { type: "code"; code: string })[];
+  practice: { question: string; answer: string } | null;
+  exercise: {
+    functionName: string;
+    fileName: string;
+    instructions: string;
+    starter: string;
+    solution: string;
+    hints: { title: string; text: string }[];
+    harness: string;
+    tests: { name: string; hint: string }[];
+  };
+};
+
+/** Python Foundations: eight topics, each with a lesson and a real-Python exercise, plus an ungraded self-check. */
+export async function getPythonFoundations(): Promise<{ topics: PythonTopic[]; selfCheck: QuizQuestion[] }> {
+  return JSON.parse(await readFile(path.join(contentDir(), "python", "topics.json"), "utf8"));
+}
+
+export async function getPythonHarness(topic: number): Promise<string> {
+  if (!Number.isInteger(topic) || topic < 1 || topic > 8) throw new Error(`Bad topic: ${topic}`);
+  return readFile(path.join(contentDir(), "python", "harness", `t${topic}.py`), "utf8");
+}
+
+/** Python Foundations exercises are stored in AieExerciseProgress under module 100 + topic number. */
+export const PYTHON_MODULE_BASE = 100;
