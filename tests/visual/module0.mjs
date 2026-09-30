@@ -47,6 +47,12 @@ const groups = page.locator("fieldset");
 for (let i = 0; i < 6; i++) await groups.nth(i).getByRole("button").first().click();
 await see.click();
 check(await seen("Affinity score"), "path: directions shown with scores");
+await page.waitForTimeout(800);
+await go("/lessons/0.7");
+check((await seen("Your possible directions")) && !(await seen("Affinity score")), "path: saved directions show after a reload");
+await go("/lessons/0.7");
+for (let i = 0; i < 6; i++) await page.locator("fieldset").nth(i).getByRole("button").first().click();
+await see.click();
 await page.getByRole("button", { name: "Reset" }).click();
 check(!(await seen("Affinity score")), "path: reset clears the result");
 
@@ -58,6 +64,9 @@ const opts = page.getByRole("button", { name: "ML Engineer" });
 await opts.first().click();
 check(await seen("Correct. Fine-tuning a model is ML engineering work"), "self-check: correct answer explained");
 check(await seen("Self-check score"), "self-check: score box shows");
+await page.waitForTimeout(800);
+await go("/lessons/0.9");
+check(await seen("Self-check score"), "self-check: score is still there after a reload");
 await page.screenshot({ path: "tests/visual/out/m0-selfcheck.png", fullPage: true });
 
 check(errors.length === 0, `no console errors ${errors.slice(0, 3).join(" | ")}`);

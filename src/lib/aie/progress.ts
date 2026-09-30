@@ -108,3 +108,13 @@ export async function submitProject(
     update: { ...data, completedAt: new Date() },
   });
 }
+
+export type Orientation = { pathTop: string[]; selfCheckScore: number | null; selfCheckTotal: number | null };
+
+export async function getOrientation(userId: string): Promise<Orientation | null> {
+  return db.aieOrientation.findUnique({ where: { userId }, select: { pathTop: true, selfCheckScore: true, selfCheckTotal: true } });
+}
+
+export async function saveOrientation(userId: string, data: Partial<Orientation>): Promise<void> {
+  await db.aieOrientation.upsert({ where: { userId }, create: { userId, ...data }, update: data });
+}

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { LessonView } from "@/components/learn/lesson/LessonView";
 import { LEARN_BASE } from "@/components/learn/nav";
 import { getFurtherReadingMdx, getInteractiveData, getLessonMdx, getModule } from "@/lib/aie/content";
-import { getCompletedLessons } from "@/lib/aie/progress";
+import { getCompletedLessons, getOrientation } from "@/lib/aie/progress";
 import { requireEnrollment } from "@/lib/require-enrollment";
 
 export default async function LessonPage({ params }: { params: Promise<{ module: string; lesson: string }> }) {
@@ -18,6 +18,8 @@ export default async function LessonPage({ params }: { params: Promise<{ module:
     getFurtherReadingMdx(mod.number),
   ]);
   if (body === null) notFound();
+  // module 0 keeps the path finder result and self-check score
+  if (mod.number === 0) data.saved = await getOrientation(userId);
 
   return <LessonView mod={mod} lesson={lesson} body={body} done={done} data={data} furtherReading={furtherReading} />;
 }

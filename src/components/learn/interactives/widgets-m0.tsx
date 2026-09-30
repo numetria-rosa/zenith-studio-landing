@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { saveOrientationAction } from "@/app/lab/ai-engineering/learn/actions";
 import { LEARN_BASE } from "@/components/learn/nav";
 import { Btn, OptionButton, Result, fmt } from "./ui";
 
@@ -200,6 +201,8 @@ export function M0Path({ data }: Props) {
   const t = data.text.path;
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [shown, setShown] = useState(false);
+  // the directions saved from an earlier visit show until the student answers again
+  const [savedTop, setSavedTop] = useState<string[]>(data.saved?.pathTop ?? []);
   const total = data.PATH_QUESTIONS.length;
 
   const ranked = () => {
@@ -228,25 +231,35 @@ export function M0Path({ data }: Props) {
         </fieldset>
       ))}
       <div className="flex flex-wrap gap-2.5">
-        <Btn primary disabled={Object.keys(answers).length < total} onClick={() => setShown(true)}>
+        <Btn
+          primary
+          disabled={Object.keys(answers).length < total}
+          onClick={() => {
+            setShown(true);
+            const top = ranked().map(([k]) => k);
+            setSavedTop(top);
+            void saveOrientationAction({ pathTop: top }).catch(() => {});
+          }}
+        >
           {t.result}
         </Btn>
         <Btn
           onClick={() => {
             setAnswers({});
             setShown(false);
+            setSavedTop([]);
           }}
         >
           {t.reset}
         </Btn>
       </div>
-      {shown && (
+      {(shown || savedTop.length > 0) && (
         <div role="status" className="flex flex-col gap-3 rounded-2xl border border-[rgba(92,200,255,0.30)] bg-[rgba(92,200,255,0.06)] p-5">
           <b className="font-mono text-[12.5px] font-medium uppercase tracking-[0.14em] text-cyan">{t.title}</b>
-          {ranked().map(([k, v]) => (
+          {(shown ? ranked() : savedTop.map((k) => [k, null] as const)).map(([k, v]) => (
             <div key={k} className="flex items-baseline justify-between gap-3 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3">
               <span className="text-[16px] font-medium">{data.PATH_NAMES[k]}</span>
-              <span className="font-mono text-[12.5px] text-mist">{fmt(t.score, { score: v })}</span>
+              {v !== null && <span className="font-mono text-[12.5px] text-mist">{fmt(t.score, { score: v })}</span>}
             </div>
           ))}
           <p className="m-0 text-[13.5px] leading-[1.6] text-mist">
@@ -280,7 +293,13 @@ export function M0SelfCheck({ data }: Props) {
   const choices = sc.parts.filter((p) => p.kind === "choice");
   const right = choices.filter((p) => p.options[picks[p.id]!]?.correct).length;
   const started = written || Object.keys(picks).length > 0;
-  const pct = Math.round(((written && good ? 1 : 0) + right) / sc.parts.length * 100);
+  const score = (written && good ? 1 : 0) + right;
+  const saved = data.saved?.selfCheckScore as number | null | undefined;
+  const pct = Math.round((started ? score : (saved ?? 0)) / sc.parts.length * 100);
+
+  useEffect(() => {
+    if (started) void saveOrientationAction({ score, total: sc.parts.length }).catch(() => {});
+  }, [started, score, sc.parts.length]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -307,7 +326,7 @@ export function M0SelfCheck({ data }: Props) {
           )}
         </div>
       ))}
-      {started && (
+      {(started || (saved !== null && saved !== undefined)) && (
         <div role="status" className="flex flex-col gap-1 rounded-2xl border border-[rgba(92,200,255,0.30)] bg-[rgba(92,200,255,0.06)] p-5">
           <b className="text-[40px] font-medium tracking-[-0.04em]">{pct}%</b>
           <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-mist">{sc.scoreLabel}</span>

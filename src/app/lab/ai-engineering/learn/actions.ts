@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { LEARN_BASE } from "@/components/learn/nav";
 import { getModule, getProject } from "@/lib/aie/content";
-import { markLessonComplete, saveExerciseRun, saveProjectDraft, saveQuizAttempt, submitProject } from "@/lib/aie/progress";
+import { markLessonComplete, saveExerciseRun, saveOrientation, saveProjectDraft, saveQuizAttempt, submitProject } from "@/lib/aie/progress";
 import { cleanProjectInput, type ProjectInput } from "@/lib/aie/project";
 import { gradeQuiz, type QuizAnswer } from "@/lib/aie/quiz";
 import { requireEnrollment } from "@/lib/require-enrollment";
@@ -51,4 +51,17 @@ export async function saveProjectAction(projectId: number, input: ProjectInput, 
   else await saveProjectDraft(userId, projectId, { checklist: clean.checklist, rubric: clean.rubric, score: clean.score });
   revalidatePath(LEARN_BASE, "layout");
   return { score: clean.score };
+}
+
+/** Module 0: stores the path finder's top directions or the self-check score (each saved on its own). */
+export async function saveOrientationAction(input: { pathTop: string[] } | { score: number; total: number }): Promise<void> {
+  const { userId } = await requireEnrollment("ai-engineering", LEARN_BASE);
+  if ("pathTop" in input) {
+    if (!Array.isArray(input.pathTop) || input.pathTop.length > 5 || input.pathTop.some((k) => typeof k !== "string" || k.length > 40)) throw new Error("Invalid path");
+    await saveOrientation(userId, { pathTop: input.pathTop });
+  } else {
+    if (!Number.isInteger(input.score) || !Number.isInteger(input.total) || input.total !== 5 || input.score < 0 || input.score > input.total) throw new Error("Invalid score");
+    await saveOrientation(userId, { selfCheckScore: input.score, selfCheckTotal: input.total });
+  }
+  revalidatePath(`${LEARN_BASE}/modules/0`, "layout");
 }
