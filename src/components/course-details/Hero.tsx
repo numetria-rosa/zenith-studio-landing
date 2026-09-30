@@ -38,7 +38,7 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
               <span className="h-2 w-2 rounded-[4px] bg-violet shadow-[0_0_12px_#8B5CF6]" />
               {courseContent.kicker}
             </span>
-            <h1 className="m-0 text-[64px] font-medium leading-[0.95] tracking-[-0.055em] sm:text-[clamp(64px,7.78vw,112px)]">
+            <h1 className="m-0 text-[clamp(48px,17vw,64px)] font-medium leading-[0.95] tracking-[-0.055em] sm:text-[clamp(64px,7.78vw,112px)]">
               AI
               <br />
               <span className="bg-[linear-gradient(100deg,#F5F6F8_0%,#C7B0FF_45%,#9BDDFF_100%)] bg-clip-text text-transparent">
@@ -82,17 +82,17 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
               return (
                 <div
                   key={m.number}
-                  className={`grid grid-cols-[34px_minmax(0,1fr)_72px_44px] items-center gap-3.5 rounded-[14px] px-4 xl:grid-cols-[34px_minmax(0,1fr)_120px_44px] ${
+                  className={`grid grid-cols-[28px_minmax(0,1fr)_40px] items-center gap-3 rounded-[14px] px-3 sm:grid-cols-[34px_minmax(0,1fr)_72px_44px] sm:gap-3.5 sm:px-4 xl:grid-cols-[34px_minmax(0,1fr)_120px_44px] ${
                     capstone ? "border border-[rgba(61,220,151,0.40)] bg-[rgba(61,220,151,0.08)] py-3.5" : "py-[11px]"
                   }`}
                 >
                   <span className="font-mono text-[12px]" style={{ color: capstone ? "#3DDC97" : m.stage.color }}>
                     {String(m.number).padStart(2, "0")}
                   </span>
-                  <span className={`truncate text-[15px] ${capstone ? "text-frost" : "text-soft"}`}>
+                  <span className={`text-[14.5px] leading-[1.35] sm:truncate sm:text-[15px] ${capstone ? "text-frost" : "text-soft"}`}>
                     {m.title.replace(": ", " · ")}
                   </span>
-                  <span className="h-1.5 overflow-hidden rounded-[3px] bg-white/[0.07]">
+                  <span className="hidden h-1.5 overflow-hidden rounded-[3px] bg-white/[0.07] sm:block">
                     <span className="block h-full rounded-[3px]" style={{ width, background: capstone ? "#3DDC97" : m.stage.color }} />
                   </span>
                   <span className="text-right font-mono text-[12px] text-mist">{m.minutes}m</span>

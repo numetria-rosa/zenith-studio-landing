@@ -29,7 +29,7 @@ export function Inside() {
                   {section.pages.length} {section.pages.length === 1 ? "page" : "pages"}
                 </span>
               </div>
-              <p className="m-0 mb-1.5 min-h-[45px] text-[14.5px] leading-[1.55] text-mist">{section.description}</p>
+              <p className="m-0 mb-1.5 xl:min-h-[45px] text-[14.5px] leading-[1.55] text-mist">{section.description}</p>
               {section.pages.map((page) => (
                 <div key={page.name} className="glass-row flex items-start gap-3.5 rounded-2xl p-3.5">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] border border-white/[0.12] bg-white/[0.05]">

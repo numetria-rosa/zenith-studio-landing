@@ -61,7 +61,7 @@ export async function FinalModule() {
               </div>
 
               {/* The details are placeholder text, blurred: the real content is only inside the course. */}
-              <div className="relative overflow-hidden rounded-2xl">
+              <div className="relative max-h-44 overflow-hidden rounded-2xl md:max-h-none">
                 <div aria-hidden className="pointer-events-none grid select-none gap-5 blur-[7px] md:grid-cols-3">
                   {LOCKED.map((col) => (
                     <div key={col.label} className="flex flex-col gap-2">
