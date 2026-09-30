@@ -38,8 +38,13 @@ export function SiteNav({
   const ctaProps = cta.external ? { target: "_blank", rel: "noopener noreferrer" } : {};
 
   return (
-    <header className={`sticky top-0 z-50 border-b bg-gradient-to-b from-[#05060a]/95 to-[#05060a]/80 py-3.5 backdrop-blur-[18px] transition-colors ${scrolled ? "border-white/10" : "border-transparent"}`}>
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-12">
+    <header className="sticky top-0 z-50 py-3.5">
+      {/* Backdrop: a blurred veil that fades out below the bar, so it never shows as a band over glows or images. */}
+      <div
+        aria-hidden
+        className={`pointer-events-none absolute inset-x-0 -bottom-7 top-0 backdrop-blur-[18px] transition-colors [mask-image:linear-gradient(to_bottom,#000_62%,transparent)] ${scrolled ? "bg-gradient-to-b from-[#05060a]/95 to-[#05060a]/60" : "bg-gradient-to-b from-[#05060a]/85 to-[#05060a]/30"}`}
+      />
+      <div className="relative mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-12">
         <div className="flex items-center justify-between gap-4">
           <BrandMark brand={brand} />
 
