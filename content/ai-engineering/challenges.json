@@ -1,0 +1,360 @@
+[
+  {
+    "id": "rag",
+    "title": "Reliable RAG Support Bot",
+    "intro": "You're designing a retrieval-augmented support bot for a client. Make the calls a senior AI engineer would actually have to make.",
+    "pipeline": [
+      "User query",
+      "Retrieval (embed + search)",
+      "Context assembly",
+      "Model call (with tools)",
+      "Tool execution",
+      "Response"
+    ],
+    "note": "Known failure modes you must design around: retrieved content exceeding the token budget, model API rate limits under load, a tool call retried after a lost response, an agent loop repeating the same search without progress, and low-relevance chunks getting forced into context anyway.",
+    "questions": [
+      {
+        "id": "pQ1",
+        "label": "Context budget",
+        "question": "Retrieved chunks for a query total 7500 tokens. The context window is 8000 tokens, with 1500 reserved for output. What should happen?",
+        "source": "pool",
+        "options": [
+          {
+            "text": "Retrieval should return fewer or higher-threshold chunks so total content fits the 6500-token available input budget, not send all 7500 tokens and risk truncation or exceeding the window",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Send all 7500 tokens anyway, most model providers tolerate going slightly over",
+            "correct": false,
+            "why": "7500 exceeds the 6500-token AVAILABLE input budget (8000 window − 1500 reserved output), this isn't a minor overage tolerance question, it risks exceeding the hard context window ceiling entirely."
+          },
+          {
+            "text": "Truncate the combined chunk text at 6500 tokens by cutting off whatever comes last",
+            "correct": false,
+            "why": "Naive truncation (Module 2) silently drops content, often the most relevant chunk if it happened to be assembled last. The fix is retrieving a smaller, better-fitting set up front, not truncating after the fact."
+          }
+        ]
+      },
+      {
+        "id": "pQ2",
+        "label": "Reliability",
+        "question": "Mid-conversation, the model API returns a 429 (rate limited). What should the bot do?",
+        "source": "pool",
+        "options": [
+          {
+            "text": "Retry with exponential backoff and jitter, a 429 is a transient, retryable failure",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Immediately fail the whole request and tell the user to try again later",
+            "correct": false,
+            "why": "A 429 is exactly the kind of transient failure a bounded retry has a real chance of resolving, giving up immediately throws away requests a short wait would have saved."
+          },
+          {
+            "text": "Switch to the fallback model on the very first 429, without attempting any retries on the primary",
+            "correct": false,
+            "why": "A single rate-limit response doesn't mean the primary is unavailable, retrying with backoff first (per Module 6) is the correct response, fallback is for when retries are exhausted or the primary is genuinely down."
+          }
+        ]
+      },
+      {
+        "id": "pQ3",
+        "label": "Tool use",
+        "question": "The bot calls a create_support_ticket tool; the network drops the response after the ticket was actually created server-side, and the agent retries with the same call ID. What should happen?",
+        "source": "pool",
+        "options": [
+          {
+            "text": "The idempotent executor recognizes the repeated call ID and returns the original cached result, without creating a second ticket",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Create a new ticket, since the first attempt's outcome is genuinely unknown from the client's perspective",
+            "correct": false,
+            "why": "The point of an idempotency key is exactly to make the client's uncertainty irrelevant, the server already knows this call ID succeeded, and should return that result rather than act again."
+          },
+          {
+            "text": "Reject the retry outright as a duplicate error",
+            "correct": false,
+            "why": "Rejecting isn't useful either, the caller still needs the actual result. Returning the cached success is more useful than an error and prevents a duplicate ticket."
+          }
+        ]
+      },
+      {
+        "id": "pQ4",
+        "label": "Agent control flow",
+        "question": "The bot's agent loop calls search_kb with the exact same query three times in a row without making progress. What should the loop do?",
+        "source": "pool",
+        "options": [
+          {
+            "text": "Detect the 3 identical consecutive actions and stop the loop early as 'stuck', rather than continuing to burn steps",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Keep going, the model will eventually try something different on its own",
+            "correct": false,
+            "why": "That's the exact trap Module 5 warns about, an unguarded loop has no reason to assume the model will spontaneously change approach, and keeps burning steps (and cost) waiting."
+          },
+          {
+            "text": "Increase the step limit so the loop has more room to keep trying",
+            "correct": false,
+            "why": "More steps doesn't fix repeating the identical action, it just means more identical, unproductive attempts before hitting the (now higher) limit."
+          }
+        ]
+      },
+      {
+        "id": "pQ5",
+        "label": "Retrieval quality",
+        "question": "The relevance threshold is set at cosine similarity 0.4. The top result for a query scores 0.22. What should the bot do?",
+        "source": "pool",
+        "options": [
+          {
+            "text": "Treat it as below the relevance threshold and exclude it, returning 'no relevant information found' rather than forcing a low-relevance chunk into context",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Include it anyway, since it's still the single best-scoring option available",
+            "correct": false,
+            "why": "Top-k without a threshold has exactly this failure mode, 'best available' isn't the same as 'actually relevant.' A confidently wrong answer built on a bad match is worse than admitting no good match exists."
+          },
+          {
+            "text": "Lower the relevance threshold to 0.2 so this result qualifies",
+            "correct": false,
+            "why": "Changing the threshold to fit whatever result happens to come back defeats the purpose of having one, the threshold should reflect what counts as genuinely relevant, not be tuned after the fact to include a specific weak match."
+          }
+        ]
+      },
+      {
+        "id": "pQ6",
+        "label": "Evaluation",
+        "question": "After tuning the retrieval top-k value, how do you know whether the change actually helped, before shipping it?",
+        "source": "pool",
+        "options": [
+          {
+            "text": "Re-run the eval suite with only the top-k change applied, and compare the score to the recorded baseline",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Read through a handful of new responses and judge whether they feel better",
+            "correct": false,
+            "why": "That's exactly the ad hoc spot-check Module 7 warns isn't a substitute for systematic evaluation, no repeatable number, no reliable way to compare against the baseline."
+          },
+          {
+            "text": "Ship it, and monitor user complaints over the following weeks to see if quality dropped",
+            "correct": false,
+            "why": "Waiting for user complaints means shipping a possible regression to real users first. The eval suite exists specifically to catch this BEFORE it ships, not after."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "incident",
+    "title": "Agent Failure Investigation",
+    "intro": "A completely new incident. You did not build this system, you're investigating it cold, the way an on-call engineer would.",
+    "stats": [
+      {
+        "value": "2x",
+        "label": "duplicate customer emails reported",
+        "bad": true
+      },
+      {
+        "value": "avg 8.4 steps",
+        "label": "agent steps per request (baseline: 3.1)",
+        "bad": false
+      },
+      {
+        "value": "eval score −11pts",
+        "label": "vs. last week's baseline",
+        "bad": true
+      }
+    ],
+    "logs": [
+      {
+        "err": false,
+        "time": "09:02:01",
+        "req": "[req_771]",
+        "kind": "agent-loop",
+        "text": "step 1, reason: \"need order status\""
+      },
+      {
+        "err": false,
+        "time": "09:02:02",
+        "req": "[req_771]",
+        "kind": "tool_call",
+        "text": "get_order_status(orderId: \"5521\") → success"
+      },
+      {
+        "err": false,
+        "time": "09:02:03",
+        "req": "[req_771]",
+        "kind": "agent-loop",
+        "text": "step 2, reason: \"notify customer of delay\""
+      },
+      {
+        "err": true,
+        "time": "09:02:04",
+        "req": "[req_771]",
+        "kind": "tool_call",
+        "text": "send_email(customerId:\"c88\", template:\"delay\") call_id=call_A → ERROR timeout (response lost, outcome unknown)"
+      },
+      {
+        "err": false,
+        "time": "09:02:09",
+        "req": "[req_771]",
+        "kind": "agent-loop",
+        "text": "step 3, reason: \"retry: notify customer of delay\""
+      },
+      {
+        "err": true,
+        "time": "09:02:09",
+        "req": "[req_771]",
+        "kind": "tool_call",
+        "text": "send_email(customerId:\"c88\", template:\"delay\") call_id=call_B → success (DUPLICATE: same customer + template as call_A, different call_id)"
+      },
+      {
+        "err": false,
+        "time": "09:00:00",
+        "req": "[SYSTEM]",
+        "kind": "deploy-log",
+        "text": "agent-orchestrator v3.2 deployed (tool retries now generate a NEW call_id each attempt; previously reused the original call_id)"
+      },
+      {
+        "err": true,
+        "time": "09:05:44",
+        "req": "[req_902]",
+        "kind": "agent-loop",
+        "text": "step 9, reason: \"search_kb: refund policy\" (7th consecutive identical search_kb call this request)"
+      },
+      {
+        "err": true,
+        "time": "09:05:45",
+        "req": "[SYSTEM]",
+        "kind": "agent-loop",
+        "text": "step-limit (10) reached for req_902, no final answer returned"
+      }
+    ],
+    "questions": [
+      {
+        "id": "iQ1",
+        "label": "WHAT happened",
+        "question": "WHAT happened",
+        "source": "pool",
+        "options": [
+          {
+            "text": "A deploy broke tool-call idempotency by generating a new call ID on every retry, causing duplicate customer emails, while a separate agent request got stuck repeating an identical search and burned its entire step budget with no answer",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "The model provider had an outage that caused all these symptoms",
+            "correct": false,
+            "why": "Nothing in the evidence points at a provider outage, both symptoms trace directly to the 09:00:00 deploy's retry-logic change and a loop that lacked working stuck-detection."
+          },
+          {
+            "text": "Customers simply submitted duplicate requests on their own",
+            "correct": false,
+            "why": "The log clearly shows call_A and call_B originating from the SAME agent request (req_771) retrying its own tool call, not two separate customer-initiated requests."
+          }
+        ]
+      },
+      {
+        "id": "iQ2",
+        "label": "WHY did it happen",
+        "question": "WHY did it happen",
+        "source": "pool",
+        "options": [
+          {
+            "text": "The v3.2 deploy changed tool-call retries to mint a new call ID each attempt, breaking the idempotency guarantee that depends on a STABLE id across retries; separately, req_902's loop shows the repeated-action guard wasn't actually catching the 7x identical search_kb call",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "A transient network blip that resolved on its own",
+            "correct": false,
+            "why": "The 09:00:00 deploy-log entry is a direct, timed match to when the duplicate-email pattern started, that's not a transient blip, that's a version-specific behavior change."
+          },
+          {
+            "text": "The customer's email provider was rejecting messages, causing retries",
+            "correct": false,
+            "why": "There's no evidence of email delivery failure, the log shows the SECOND send succeeding, the problem is that a second send happened at all for the same customer and template."
+          }
+        ]
+      },
+      {
+        "id": "iQ3",
+        "label": "WHAT evidence proves it (not \"I think\", cite the log line)",
+        "question": "WHAT evidence proves it (not \"I think\", cite the log line)",
+        "source": "pool",
+        "options": [
+          {
+            "text": "The 09:00:00 deploy-log line stating call IDs are now regenerated per retry, combined with call_A and call_B targeting the identical customer+template, plus the step-limit-reached line for req_902 after 7 identical search_kb calls",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "The 2x duplicate-email count by itself",
+            "correct": false,
+            "why": "That number shows something is wrong, but on its own doesn't prove WHY, you need the deploy-log line and the matching call_A/call_B pattern to establish the actual causal chain."
+          },
+          {
+            "text": "General intuition that agent systems are inherently unreliable",
+            "correct": false,
+            "why": "That's a prior belief, not evidence from this incident. The task requires citing specific log lines that actually happened here."
+          }
+        ]
+      },
+      {
+        "id": "iQ4",
+        "label": "WHAT should be fixed first",
+        "question": "WHAT should be fixed first",
+        "source": "pool",
+        "options": [
+          {
+            "text": "Revert or hotfix the retry logic so it reuses the ORIGINAL call ID across retries of the same logical tool call, restoring the idempotency guarantee that's directly causing duplicate customer-facing actions",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Raise the agent loop's step limit so req_902-style requests have more room to finish",
+            "correct": false,
+            "why": "A higher step limit doesn't fix repeating an identical action, it would just let the same unproductive pattern run longer before hitting the new, higher cap."
+          },
+          {
+            "text": "Disable retries on tool calls entirely",
+            "correct": false,
+            "why": "Removing retries sacrifices a real reliability mechanism for genuinely transient failures. The actual bug is that retries now break idempotency, not that retries exist at all."
+          }
+        ]
+      },
+      {
+        "id": "iQ5",
+        "label": "HOW should the system change to prevent recurrence",
+        "question": "HOW should the system change to prevent recurrence",
+        "source": "pool",
+        "options": [
+          {
+            "text": "Add regression tests to the eval suite that specifically check call-ID stability across tool-call retries and stuck-loop early-termination, so a future deploy breaking either gets caught by a dropping eval score before shipping, not discovered via duplicate customer emails",
+            "correct": true,
+            "why": ""
+          },
+          {
+            "text": "Nothing systemic, this was a one-off deploy mistake",
+            "correct": false,
+            "why": "A deploy silently changing a core reliability guarantee (stable call IDs) is a repeatable process gap, not a one-off, without a systemic check it can recur on any future deploy touching retry logic."
+          },
+          {
+            "text": "Just monitor duplicate-email complaints more closely going forward",
+            "correct": false,
+            "why": "Better monitoring helps you notice faster after the fact, it doesn't prevent the root cause (broken call-ID stability) from shipping again on the next deploy."
+          }
+        ]
+      }
+    ]
+  }
+]

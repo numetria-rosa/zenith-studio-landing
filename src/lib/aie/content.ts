@@ -99,3 +99,19 @@ export type CareerPath = { id: string; name: string; have: string[]; need: strin
 export async function getCareerPaths(): Promise<CareerPath[]> {
   return JSON.parse(await readFile(path.join(contentDir(), "career.json"), "utf8"));
 }
+
+export type Challenge = {
+  id: string;
+  title: string;
+  intro: string;
+  pipeline?: string[];
+  note?: string;
+  stats?: { value: string; label: string; bad: boolean }[];
+  logs?: { err: boolean; time: string; req: string; kind: string; text: string }[];
+  questions: (QuizQuestion & { label: string })[];
+};
+
+/** The two cross-module challenges; a challenge is passed when every question is answered correctly. */
+export async function getChallenges(): Promise<Challenge[]> {
+  return JSON.parse(await readFile(path.join(contentDir(), "challenges.json"), "utf8"));
+}

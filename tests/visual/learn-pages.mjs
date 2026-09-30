@@ -2,6 +2,7 @@
 // see student-space.mjs). Completes a final assessment and a mixed quiz and checks the attempts are stored.
 import { chromium } from "@playwright/test";
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 
 const base = process.env.BASE_URL ?? "http://localhost:3100";
 const L = `${base}/lab/ai-engineering/learn`;
@@ -40,4 +41,17 @@ await runQuiz("/quizzes/mixed/mix_1_3", 9);
 ok(psql(`select count(*) from "AieQuizAttempt" where "mixedId"='mix_1_3'`) === "1", "mixed quiz: attempt saved");
 await page.goto(`${L}/quizzes`, { waitUntil: "networkidle" });
 ok(await page.getByText(/attempt/).first().isVisible(), "Quiz Center shows the attempts");
+
+// Cross-module challenges: pick every correct option (by its text) in the first, then one wrong answer in the second.
+const challenges = JSON.parse(readFileSync("content/ai-engineering/challenges.json", "utf8"));
+psql(`delete from "AieQuizAttempt" where "mixedId" like 'challenge_%'`);
+await page.goto(`${L}/challenges`, { waitUntil: "networkidle", timeout: 120000 });
+for (const q of challenges[0].questions) await page.getByRole("radio", { name: q.options.find((o) => o.correct).text.slice(0, 40) }).first().click();
+await page.getByText("Challenge passed.").waitFor({ timeout: 30000 });
+ok(psql(`select score||'/'||total||'/'||passed from "AieQuizAttempt" where "mixedId"='challenge_rag'`) === "6/6/true", "challenge 1: all-correct run passes and is saved");
+const wrong = challenges[1].questions[0].options.find((o) => !o.correct).text.slice(0, 40);
+await page.getByRole("radio", { name: wrong }).first().click();
+for (const q of challenges[1].questions.slice(1)) await page.getByRole("radio", { name: q.options.find((o) => o.correct).text.slice(0, 40) }).first().click();
+await page.getByText(/Every answer needs to be right/).waitFor({ timeout: 30000 });
+ok(psql(`select passed from "AieQuizAttempt" where "mixedId"='challenge_incident'`) === "f", "challenge 2: one wrong answer fails");
 await browser.close();

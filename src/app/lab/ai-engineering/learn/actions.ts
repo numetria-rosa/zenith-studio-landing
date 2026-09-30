@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { LEARN_BASE } from "@/components/learn/nav";
 import { debugMessage, gradeDebugAnswer, gradeDesign, type DesignStatus, type Scores } from "@/lib/aie/capstone";
 import { debugScoreFor, finalFor, getCapstoneState, patchCapstone } from "@/lib/aie/capstone-db";
-import { getCapstone, getFinalAssessment, getMixedQuizzes, getModule, getProject } from "@/lib/aie/content";
+import { getCapstone, getChallenges, getFinalAssessment, getMixedQuizzes, getModule, getProject } from "@/lib/aie/content";
 import { markLessonComplete, saveExerciseRun, saveOrientation, saveProjectDraft, saveQuizAttempt, submitProject } from "@/lib/aie/progress";
 import { cleanProjectInput, type ProjectInput } from "@/lib/aie/project";
 import { gradeQuiz, type QuizAnswer } from "@/lib/aie/quiz";
@@ -144,4 +144,16 @@ export async function capstoneAction(input: CapstoneInput): Promise<CapstoneResu
 
   revalidatePath(`${LEARN_BASE}/modules/8`, "layout");
   return { scores, ...finalFor(scores, content.passMark), ...out };
+}
+
+/** Grades a cross-module challenge on the server (every question must be right to pass) and stores the attempt. */
+export async function submitChallengeAction(id: string, answers: Record<string, QuizAnswer>): Promise<{ score: number; total: number; passed: boolean }> {
+  const { userId } = await requireEnrollment("ai-engineering", LEARN_BASE);
+  const challenge = (await getChallenges()).find((c) => c.id === id);
+  if (!challenge) throw new Error("No such challenge");
+  const n = challenge.questions.length;
+  const result = gradeQuiz(challenge.questions, n, answers, n);
+  await saveQuizAttempt(userId, 0, result.score, result.total, result.passed, `challenge_${id}`);
+  revalidatePath(LEARN_BASE, "layout");
+  return result;
 }
