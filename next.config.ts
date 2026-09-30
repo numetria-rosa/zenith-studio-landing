@@ -66,6 +66,33 @@ const nextConfig: NextConfig = {
       "./*.md",
     ],
     "/**": [
+      // Several server modules read files through process.cwd() (the AI Engineering course content, the
+      // /demo and /services HTML), which the tracer cannot follow, so every route that imports them was
+      // bundling the whole repo: insta/ 86 MB, public/ 40 MB, halo/ 12 MB, linkedin/ 11 MB, scripts/, tests/...
+      // That pushed 149 functions to ~270 MB against Vercel's 250 MB limit. At runtime the server only reads
+      // content/, courses/, public/demos/ and public/services-catalog.html, so everything below is dead weight
+      // (static files in public/ are served by the CDN, not by functions).
+      "./insta/**/*",
+      "./linkedin/**/*",
+      "./halo/**/*",
+      "./scripts/**/*",
+      "./tests/**/*",
+      "./docs/**/*",
+      "./web-dev/**/*",
+      "./whop-product-images/**/*",
+      "./n8n_course_zenith_html/**/*",
+      "./law-firm-client-scripts/**/*",
+      "./real-estate-client-scripts/**/*",
+      "./playbook/**/*",
+      "./zenith-ai-kit/**/*",
+      "./public/insta/**/*",
+      "./public/linkedin/**/*",
+      "./public/sites/**/*",
+      "./public/favicon/**/*",
+      "./public/logos/**/*",
+      "./public/work/**/*",
+      "./public/lab/**/*",
+      "./*.xlsx",
       "./node_modules/@signalwire/compatibility-api/lib/**/*",
       "./node_modules/**/*.map",
       "./node_modules/**/*.d.ts",
