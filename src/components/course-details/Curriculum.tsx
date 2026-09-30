@@ -57,11 +57,12 @@ export async function Curriculum() {
   const lastNumber = allModules[allModules.length - 1].number;
   return (
     <section id="curriculum" className="relative overflow-hidden bg-void">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-[500px] left-1/2 -ml-[550px] h-[900px] w-[1100px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(61,220,151,0.10), rgba(5,6,10,0) 62%)" }}
-      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,#000_20%,#000_80%,transparent)]">
+        <div
+          className="pointer-events-none absolute -bottom-[500px] left-1/2 -ml-[550px] h-[900px] w-[1100px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(61,220,151,0.10), rgba(5,6,10,0) 62%)" }}
+        />
+        </div>
       <div className="relative mx-auto flex max-w-[1440px] flex-col gap-[72px] px-5 py-24 lg:px-20">
         <SectionHead
           eyebrow="Full curriculum"
@@ -81,7 +82,7 @@ export async function Curriculum() {
                   <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: stage.color }} />
                   {stage.label}
                 </span>
-                {stage.name && <span className="text-[20px] font-medium tracking-[-0.01em]">{stage.name}</span>}
+                {stage.name && <span className="pl-[19px] text-[20px] font-medium tracking-[-0.01em]">{stage.name}</span>}
               </div>
               <div className="flex flex-col gap-4 md:flex-row">
                 {stage.modules.map((m) => (
@@ -101,7 +102,7 @@ export async function Curriculum() {
                 <span className="h-[9px] w-[9px] rounded-[3px]" style={{ background: VIOLET }} />
                 Final module
               </span>
-              <span className="text-[20px] font-medium tracking-[-0.01em]">Sell what you built</span>
+              <span className="pl-[19px] text-[20px] font-medium tracking-[-0.01em]">Sell what you built</span>
             </div>
             <div
               className="flex min-w-0 flex-1 flex-col gap-3.5 rounded-3xl p-[26px]"
@@ -119,7 +120,7 @@ export async function Curriculum() {
               </div>
               <h3 className="m-0 text-[23px] font-medium leading-[1.2] tracking-[-0.02em]">Final module: {finalModule.agents.length} AI agents you can sell</h3>
               <p className="m-0 text-[15.5px] leading-[1.6] text-mist">
-                The organized code for each agent, the best model for each, who to sell it to and where, the cold emails to send, and a 30-day plan to your first paying client.
+                The organized code for each agent, the best model for each, who to sell it to and where, the cold emails to send, how to run clients and work out your revenue, and a 30-day plan to your first paying client.
               </p>
               <ul className="m-0 mt-1 flex list-none flex-wrap gap-2 p-0">
                 {finalModule.agents.map((a) => (

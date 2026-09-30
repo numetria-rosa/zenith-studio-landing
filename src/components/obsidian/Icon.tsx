@@ -2,6 +2,7 @@
 // (halo/ai-engineering-course-handoff/reference/source/*.dc.html).
 const PATHS = {
   check: "M5 12.5l4.5 4.5L19 7.5",
+  lock: "M7 11V8a5 5 0 0110 0v3M5 11h14v9H5zM12 15v2",
   arrow: "M5 12h14M13 6l6 6-6 6",
   clock: "M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
   home: "M3 11l9-7 9 7M5 10v10h14V10",

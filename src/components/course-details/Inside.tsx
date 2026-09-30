@@ -5,11 +5,12 @@ import { courseContent, totalPages } from "./data";
 export function Inside() {
   return (
     <section id="inside" className="relative overflow-hidden bg-void">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-[300px] -top-[300px] h-[900px] w-[900px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(59,107,255,0.20), rgba(5,6,10,0) 62%)" }}
-      />
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,#000_20%,#000_80%,transparent)]">
+        <div
+          className="pointer-events-none absolute -right-[300px] -top-[300px] h-[900px] w-[900px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(59,107,255,0.20), rgba(5,6,10,0) 62%)" }}
+        />
+        </div>
       <div className="relative mx-auto flex max-w-[1440px] flex-col gap-14 px-5 py-24 lg:px-20">
         <SectionHead
           eyebrow="Inside the course"
