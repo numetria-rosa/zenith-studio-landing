@@ -5,7 +5,7 @@ import { plexSans } from "@/lib/plex-sans";
 import { auth } from "@/lib/auth";
 import { decideCourseAccess } from "@/lib/course-access";
 import { getCachedAccess, setCachedAccess } from "@/lib/course-access-cache";
-import { getCourse } from "@/lib/courses";
+import { getCourse, isLaunched } from "@/lib/courses";
 import { hasCourseAccess } from "@/lib/entitlements";
 import { SESSION_COOKIE_NAME } from "@/lib/session";
 import "katex/dist/katex.min.css";
@@ -45,7 +45,7 @@ export default async function LearnLayout({
     if (sessionToken) setCachedAccess(sessionToken, courseId, userId, entitled);
   }
 
-  const decision = decideCourseAccess({ coursePublished: course.published, userId, entitled });
+  const decision = decideCourseAccess({ coursePublished: course.published, userId, entitled, launched: isLaunched(course) });
   if (decision.action === "redirect-sign-in") {
     redirect(`/sign-in?callbackUrl=${encodeURIComponent(`/lab/${courseId}/learn`)}`);
   }

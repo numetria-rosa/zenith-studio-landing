@@ -45,7 +45,21 @@ export type Course = {
   waitlistUrl: string;
   /** False = not for sale yet; hidden from "Available courses" purchase CTAs. */
   published: boolean;
+  /** ISO date-time the content opens. Until then an owner sees the course as locked ("Launches 2 October"). Omit for a course that is open now. */
+  launchesAt?: string;
 };
+
+/** The day the other courses open for their owners; AI Engineering is open now. */
+const LAUNCH_DAY = "2026-10-02T00:00:00Z";
+
+export function isLaunched(course: Pick<Course, "launchesAt">, now: Date = new Date()): boolean {
+  return !course.launchesAt || now.getTime() >= new Date(course.launchesAt).getTime();
+}
+
+/** "2 October", for the lock message. */
+export function launchLabel(course: Pick<Course, "launchesAt">): string {
+  return course.launchesAt ? new Date(course.launchesAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" }) : "";
+}
 
 export const COURSES: Course[] = [
   {
@@ -89,6 +103,7 @@ export const COURSES: Course[] = [
     // revocation, and cross-course isolation all confirmed, test data
     // cleaned up afterward) before flipping this to true.
     published: true,
+    launchesAt: LAUNCH_DAY,
   },
   {
     id: "ai-automation",
@@ -107,6 +122,7 @@ export const COURSES: Course[] = [
     // Content is built (8 modules, 80 practice tasks, 8 projects). Real Whop
     // product/plan created 2026-08-30 (prod_2u2WQzQUio8kF / plan_ED9yF9ehN2RIa).
     published: true,
+    launchesAt: LAUNCH_DAY,
   },
   {
     id: "ai-assisted-software-engineering",
@@ -129,6 +145,7 @@ export const COURSES: Course[] = [
     // Real Whop product/plan created 2026-08-30
     // (prod_rW17sq9hKeXYN / plan_ximKlnIKYO7Bx).
     published: true,
+    launchesAt: LAUNCH_DAY,
   },
   {
     id: "math-for-ml",
@@ -152,6 +169,7 @@ export const COURSES: Course[] = [
     // $21.25 (75% off $85) through Sept 7, matching the other 4 courses'
     // launch-sale deadline. See scripts/create-math-for-ml-whop-product.mjs.
     published: true,
+    launchesAt: LAUNCH_DAY,
   },
 ];
 

@@ -1,4 +1,4 @@
-import { COURSES, courseHomeUrl } from "@/lib/courses";
+import { COURSES, courseHomeUrl, isLaunched, launchLabel } from "@/lib/courses";
 import { db } from "@/lib/db";
 import { getUserEntitlements } from "@/lib/entitlements";
 import { LEARN_BASE } from "@/components/learn/nav";
@@ -20,7 +20,7 @@ export type OwnedCourse = {
   purchasedAt: Date;
   /** null when we don't track lesson progress for this course. */
   percent: number | null;
-  status: "owned" | "not-started" | "in-progress" | "completed";
+  status: "owned" | "locked" | "not-started" | "in-progress" | "completed";
   lastOpened: Date | null;
   accent: string;
   cover: string;
@@ -79,11 +79,11 @@ export async function loadStudentSpace(userId: string): Promise<StudentSpace> {
       id: course.id,
       title: course.title,
       edition: isAie ? "Career Path Edition" : null,
-      meta: isAie ? `${modules.length} modules · ${hours}h · Lifetime access` : "Lifetime access",
+      meta: isAie ? `${modules.length} modules · ${hours}h · Lifetime access` : isLaunched(course) ? "Lifetime access" : `Launches ${launchLabel(course)} · Lifetime access`,
       href: courseHomeUrl(course),
       purchasedAt: e.grantedAt,
       percent: isAie ? aie.percent : null,
-      status: !isAie ? "owned" : aie.percent >= 100 ? "completed" : aie.complete > 0 ? "in-progress" : "not-started",
+      status: !isAie ? (isLaunched(course) ? "owned" : "locked") : aie.percent >= 100 ? "completed" : aie.complete > 0 ? "in-progress" : "not-started",
       lastOpened: isAie ? lastOpened : null,
       accent: ACCENTS[i % ACCENTS.length]![0],
       cover: ACCENTS[i % ACCENTS.length]![1],

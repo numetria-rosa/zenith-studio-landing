@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { getCourse, getCheckoutUrl, courseHomeUrl } from "@/lib/courses";
+import { getCourse, getCheckoutUrl, courseHomeUrl, isLaunched, launchLabel } from "@/lib/courses";
 import { hasCourseAccess } from "@/lib/entitlements";
 
 export async function generateMetadata({
@@ -42,9 +42,10 @@ export default async function CourseLandingPage({
   if (!course || !course.published) notFound();
 
   const session = await auth();
+  let owns = false;
   if (session?.user?.id) {
-    const owns = await hasCourseAccess(session.user.id, courseId);
-    if (owns) redirect(courseHomeUrl(course));
+    owns = await hasCourseAccess(session.user.id, courseId);
+    if (owns && isLaunched(course)) redirect(courseHomeUrl(course));
   }
 
   const { url: checkoutUrl, isRealCheckout } = getCheckoutUrl(course);
@@ -59,6 +60,14 @@ export default async function CourseLandingPage({
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">{course.title}</h1>
         <p className="mt-4 text-white/60 leading-7">{course.description}</p>
 
+        {owns ? (
+          <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+            <p className="text-lg font-semibold">Launches {launchLabel(course)}</p>
+            <p className="mt-2 text-sm text-white/60">You own this course. It opens on {launchLabel(course)}, and it will show up in your student space when it does.</p>
+            <Link href="/account" className="mt-5 inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-black">Back to my courses</Link>
+          </div>
+        ) : (
+        <>
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-6 text-left">
           <p className="text-sm text-white/70">
             {session?.user
@@ -91,6 +100,8 @@ export default async function CourseLandingPage({
             </Link>
           )}
         </div>
+        </>
+        )}
       </div>
     </div>
   );

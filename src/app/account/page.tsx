@@ -6,12 +6,14 @@ import { ProgressBar } from "@/components/obsidian/ProgressBar";
 import { loadStudentSpace, type OwnedCourse } from "@/lib/account/data";
 import { type ActivityKind, timeAgo } from "@/lib/account/stats";
 import { auth } from "@/lib/auth";
+import { getCourse, launchLabel } from "@/lib/courses";
 
 const MONO = "font-mono uppercase tracking-[0.14em]";
 const CATALOGUE = "/lab";
 
 const STATUS = {
   owned: { label: "OWNED", color: "#C9CCD4", box: "border-white/[0.18] bg-white/[0.06]" },
+  locked: { label: "LOCKED", color: "#FFD27A", box: "border-[rgba(245,184,61,0.4)] bg-[rgba(245,184,61,0.10)]" },
   "in-progress": { label: "IN PROGRESS", color: "#5CC8FF", box: "border-[rgba(92,200,255,0.4)] bg-[rgba(92,200,255,0.10)]" },
   "not-started": { label: "NOT STARTED", color: "#C9CCD4", box: "border-white/[0.18] bg-white/[0.06]" },
   completed: { label: "COMPLETED", color: "#7FF0BD", box: "border-[rgba(61,220,151,0.5)] bg-[rgba(61,220,151,0.10)]" },
@@ -52,7 +54,7 @@ export default async function MyCourses() {
             <h2 id="my-courses" className="m-0 text-[28px] font-medium tracking-[-0.025em]">My courses</h2>
             <span className="text-[14px] text-mist">{s.courses.length} owned</span>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-4">
             {s.courses.map((c) => <CourseCard key={c.id} course={c} />)}
             <Link
               href={CATALOGUE}
@@ -166,12 +168,14 @@ function Stat({ icon, color, value, label }: { icon: IconName; color: string; va
 
 function CourseCard({ course: c }: { course: OwnedCourse }) {
   const st = STATUS[c.status];
+  const locked = c.status === "locked";
   const cta = c.status === "not-started" ? "Start course" : c.status === "owned" ? "Open course" : "Continue";
+  const launch = locked ? launchLabel(getCourse(c.id) ?? {}) : "";
   return (
-    <div className="glass flex flex-col gap-[18px] rounded-[26px] p-6">
-      <div className="relative h-32 overflow-hidden rounded-[18px] border border-white/[0.08]" style={{ background: `linear-gradient(135deg, ${c.cover}, rgba(10,11,16,0.9))` }}>
+    <div className={`glass flex h-full min-w-0 flex-col gap-[18px] rounded-[26px] p-5 sm:p-6 ${locked ? "opacity-90" : ""}`}>
+      <div className="relative h-36 shrink-0 overflow-hidden rounded-[18px] border border-white/[0.08]" style={{ background: `linear-gradient(135deg, ${c.cover}, rgba(10,11,16,0.9))`, filter: locked ? "saturate(0.45)" : undefined }}>
         <div aria-hidden className="absolute inset-0 [background-image:linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:24px_24px]" />
-        <span className="absolute bottom-4 left-5 text-[28px] font-medium tracking-[-0.04em]">{c.title}</span>
+        <span aria-hidden className="absolute bottom-4 left-5 right-5 line-clamp-3 text-[22px] font-medium leading-[1.15] tracking-[-0.03em]">{c.title}</span>
         <span className={`absolute right-3.5 top-3.5 inline-flex items-center gap-[7px] whitespace-nowrap rounded-full border px-3 py-[5px] font-mono text-[12px] tracking-[0.08em] ${st.box}`} style={{ color: st.color }}>
           <span className="h-1.5 w-1.5 rounded-full" style={{ background: st.color }} />
           {st.label}
@@ -188,11 +192,18 @@ function CourseCard({ course: c }: { course: OwnedCourse }) {
           <span className="font-mono text-[12.5px] text-soft">{c.percent}%</span>
         </div>
       )}
-      <div className="flex items-center justify-between gap-3">
-        <span className="whitespace-nowrap text-[13px] text-dim">
+      <div className="mt-auto flex flex-col gap-3 pt-1">
+        <span className="text-[13px] text-dim">
           {c.lastOpened ? `Last opened ${timeAgo(c.lastOpened)}` : `Purchased ${c.purchasedAt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`}
         </span>
-        <Button href={c.href} variant={c.status === "not-started" || c.status === "owned" ? "glass" : "primary"} size="md" arrow>{cta}</Button>
+        {locked ? (
+          <span aria-disabled className="inline-flex min-h-12 w-full cursor-not-allowed items-center justify-center gap-2.5 rounded-full border border-[rgba(245,184,61,0.35)] bg-[rgba(245,184,61,0.08)] px-[22px] text-[15px] font-medium text-amber-text">
+            <Icon name="lock" size={16} />
+            Launches {launch}
+          </span>
+        ) : (
+        <div className="[&>a]:w-full [&>a]:whitespace-nowrap"><Button href={c.href} variant={c.status === "not-started" || c.status === "owned" ? "glass" : "primary"} size="md" arrow>{cta}</Button></div>
+        )}
       </div>
     </div>
   );

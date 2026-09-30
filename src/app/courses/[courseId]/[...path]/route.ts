@@ -4,7 +4,7 @@ import path from "node:path";
 import { auth } from "@/lib/auth";
 import { decideCourseAccess } from "@/lib/course-access";
 import { getCachedAccess, setCachedAccess } from "@/lib/course-access-cache";
-import { getCourse } from "@/lib/courses";
+import { getCourse, isLaunched } from "@/lib/courses";
 import { hasCourseAccess } from "@/lib/entitlements";
 import { fileNameFromPath, wrapCoursePage } from "@/lib/course-rail-template";
 import { SESSION_COOKIE_NAME } from "@/lib/session";
@@ -77,6 +77,7 @@ export async function GET(
     coursePublished: true,
     userId,
     entitled,
+    launched: isLaunched(course),
   });
   if (decision.action === "redirect-sign-in") {
     const callbackUrl = encodeURIComponent(request.nextUrl.pathname);
