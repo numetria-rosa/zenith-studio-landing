@@ -45,6 +45,7 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
         ]}
         extra={<LanguageSwitcher />}
         cta={{ href: "/audit", label: "Free written audit", localized: true }}
+        signIn={{ href: "/sign-in", label: "Sign in" }}
       />
 
       <main className="relative z-10">

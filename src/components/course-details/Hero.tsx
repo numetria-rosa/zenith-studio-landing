@@ -1,18 +1,8 @@
-import { BrandMark } from "@/components/site/BrandMark";
 import { Button } from "@/components/obsidian/Button";
 import { Icon } from "@/components/obsidian/Icon";
 import { StatStrip } from "@/components/obsidian/StatStrip";
 import { courseContent, numberedModules, totalHours, totalPages } from "./data";
 import { PriceLockup, type Price } from "./PriceLockup";
-
-const NAV = [
-  ["Overview", "#overview"],
-  ["Curriculum", "#curriculum"],
-  ["Final module", "#final-module"],
-  ["Inside", "#inside"],
-  ["Outcomes", "#outcomes"],
-  ["Career path", "#career-path"],
-] as const;
 
 export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Price | null }) {
   const stats = [
@@ -41,29 +31,8 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
         <div aria-hidden className="grid-bg pointer-events-none absolute inset-0" />
         </div>
 
-        {/* top bar */}
-        <div className="absolute inset-x-5 top-8 z-10 flex items-center justify-between lg:inset-x-12 xl:inset-x-20">
-          <BrandMark brand="lab" href="/lab" />
-          <nav aria-label="Sections" className="glass hidden gap-1 rounded-full p-1.5 lg:flex">
-            {NAV.map(([label, href], i) => (
-              <a
-                key={href}
-                href={href}
-                className={`rounded-full px-[18px] py-2.5 text-[15px] no-underline transition-colors hover:bg-white/[0.07] hover:text-frost focus-visible:outline-2 focus-visible:outline-violet-text ${
-                  i === 0 ? "bg-white/[0.07] text-frost" : "text-soft"
-                }`}
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
-          <Button href={checkoutHref} size="nav">
-            Start the course
-          </Button>
-        </div>
-
         {/* content */}
-        <div className="relative flex flex-col gap-14 px-5 pb-16 pt-[128px] min-[1100px]:flex-row min-[1100px]:items-start min-[1100px]:justify-between min-[1100px]:gap-10 min-[1100px]:px-12 xl:px-20 min-[1100px]:pb-0 min-[1100px]:pt-[178px]">
+        <div className="relative flex flex-col gap-14 px-5 pb-16 pt-[56px] min-[1100px]:flex-row min-[1100px]:items-start min-[1100px]:justify-between min-[1100px]:gap-10 min-[1100px]:px-12 xl:px-20 min-[1100px]:pb-0 min-[1100px]:pt-[178px]">
           <div className="flex w-full flex-col gap-7 min-[1100px]:min-w-0 min-[1100px]:flex-[0_1_640px]">
             <span className="glass inline-flex items-center gap-2.5 self-start rounded-full py-2 pl-3 pr-4 font-mono text-[12.5px] uppercase tracking-[0.14em] text-soft">
               <span className="h-2 w-2 rounded-[4px] bg-violet shadow-[0_0_12px_#8B5CF6]" />

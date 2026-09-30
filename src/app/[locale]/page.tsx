@@ -302,9 +302,8 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
       <SiteNav
         links={[
           { href: "#work", label: t("nav.work") },
-          { href: "#services", label: t("nav.services") },
+          { href: "#services", label: t("nav.services"), children: [{ href: "/services", label: t("nav.catalogue") }] },
           { href: "#systems", label: t("nav.pricing") },
-          { href: "/services", label: t("nav.allServices") },
           { href: "/lab", label: t("nav.courses") },
           { href: "#contact", label: t("nav.contact") },
         ]}

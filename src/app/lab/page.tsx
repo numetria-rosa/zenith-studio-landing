@@ -99,6 +99,7 @@ export default function ZenithLabPage() {
           { href: "/", label: "Studio" },
         ]}
         cta={{ href: "#catalog", label: "Browse courses" }}
+        signIn={{ href: "/sign-in", label: "Sign in" }}
       />
 
       <main className="relative z-10 px-4 sm:px-6 lg:px-10">

@@ -24,6 +24,7 @@ export default function AuditPage() {
           { href: "/lab", label: "Courses" },
         ]}
         cta={{ href: "/audit", label: "Free audit", localized: true }}
+        signIn={{ href: "/sign-in", label: "Sign in" }}
       />
 
       <main className="relative z-10 mx-auto max-w-4xl px-4 pb-24 pt-12 sm:px-6 lg:px-10">

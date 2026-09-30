@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCourse, getCheckoutUrl } from "@/lib/courses";
+import { SiteNav } from "@/components/site/SiteNav";
 import { Hero } from "@/components/course-details/Hero";
 import { Curriculum } from "@/components/course-details/Curriculum";
 import { FinalModule } from "@/components/course-details/FinalModule";
@@ -60,6 +61,19 @@ export default async function AIEngineeringDetailsPage({
 
   return (
     <main className="min-h-screen bg-void font-sans text-frost antialiased [line-height:normal]">
+      <SiteNav
+        brand="lab"
+        links={[
+          { href: "#overview", label: "Overview" },
+          { href: "#curriculum", label: "Curriculum" },
+          { href: "#final-module", label: "Final module" },
+          { href: "#inside", label: "Inside" },
+          { href: "#outcomes", label: "Outcomes" },
+          { href: "#career-path", label: "Career path" },
+        ]}
+        cta={{ href: checkoutHref, label: owns ? "Open the course" : "Start the course", plain: true }}
+        signIn={{ href: "/sign-in", label: "Sign in" }}
+      />
       <Hero checkoutHref={checkoutHref} price={price} />
       <Curriculum />
       <FinalModule />
