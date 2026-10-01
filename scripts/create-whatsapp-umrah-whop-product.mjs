@@ -1,9 +1,7 @@
 // One-off script: creates the Whop product and plans for the WhatsApp AI
 // Agent for Umrah/Hajj agencies (Starter, GBP). Growth/Pro aren't launched
 // yet (waitlist only, see CLAUDE.md) so no plans are created for them here.
-// Founding offer's "first 10 agencies" cap is tracked in our own DB
-// (WaSubscription.foundingOffer), not Whop-side - Whop has no built-in
-// remaining-seats counter for a plan.
+// There is no founding offer any more: Starter is a single £49/month plan.
 //
 // Currency: Whop's plan currency field is a free ISO 4217 string (checked
 // against @whop/sdk's types, not documented as an enum) - "gbp" used here,
@@ -40,11 +38,6 @@ const plans = [
     description: "1 WhatsApp number, 1 team seat, 1,000 AI replies a month.",
     renewal_price: 49,
   },
-  {
-    title: "Starter — Founding offer",
-    description: "Locked-in founding price for the first 10 agencies, in exchange for a testimonial and a feedback call. Same Starter plan otherwise.",
-    renewal_price: 9,
-  },
 ];
 
 const created = [];
@@ -70,7 +63,7 @@ for (const plan of plans) {
 
 console.log("\nPaste these into the WhatsApp Umrah pricing page / lib:");
 for (const c of created) {
-  const constName = c.title.includes("Founding") ? "WHATSAPP_UMRAH_FOUNDING_PLAN_ID" : "WHATSAPP_UMRAH_STARTER_PLAN_ID";
+  const constName = "WHATSAPP_UMRAH_STARTER_PLAN_ID";
   console.log(`export const ${constName} = "${c.planId}";`);
   console.log(`// checkout: ${c.purchaseUrl}`);
 }

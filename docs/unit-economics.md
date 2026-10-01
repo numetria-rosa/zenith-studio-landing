@@ -74,12 +74,10 @@ Working estimate used below, until that's confirmed: **2.7% + 1.5%
 | Plan | Price/mo | AI cost (LLM+embed) | Whop fee (est.) | Total cost | Margin |
 |---|---|---|---|---|---|
 | Starter | £49.00 | £0.21 | £3.76 | £3.97 | **91.9%** |
-| Growth | £29.00 | £0.82 | £2.32 | £3.14 | **89.2%** |
-| Pro | £59.00 | £2.04 | £4.48 | £6.52 | **88.9%** |
-| Starter, founding offer | £9.00 | £0.21 | £0.88 | £1.09 | **87.9%** |
+| Growth | £99.00 | £0.82 | £7.36 | £8.18 | **91.7%** |
+| Pro | £199.00 | £2.04 | £14.56 | £16.60 | **91.7%** |
 
-All comfortably clear the spec's 50% margin floor, even at the low end of
-the founding offer, and even using the higher, unverified Whop fee
+All comfortably clear the spec's 50% margin floor, even using the higher, unverified Whop fee
 estimate. **The AI cost line barely matters** — Groq's current pricing is
 cheap enough that inference is a rounding error next to payment
 processing. The one number here worth nailing down before it's load-
