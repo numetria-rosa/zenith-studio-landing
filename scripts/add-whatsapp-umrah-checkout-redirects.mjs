@@ -1,6 +1,6 @@
 // Same two-mechanism fix as add-whop-checkout-redirects.mjs +
 // set-whop-product-redirects.mjs, applied to the WhatsApp Umrah product's
-// two plans (Starter, Founding) - see those scripts' own comments for why
+// the Starter plan (the Founding offer was removed) - see those scripts' own comments for why
 // both a per-plan Checkout Configuration AND the product's own
 // redirect_purchase_url are needed. Found missing during the 2026-09-29
 // "does the marketing->checkout->dashboard handoff actually work" audit:
@@ -25,7 +25,6 @@ const client = new Whop({ apiKey });
 const PRODUCT_ID = "prod_XAv74ApRLkBNO";
 const PLANS = [
   { label: "Starter", id: "plan_e2E6hZwmNsuTR" },
-  { label: "Founding offer", id: "plan_G6YskaJaQcoJD" },
 ];
 
 async function main() {

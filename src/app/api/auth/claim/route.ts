@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { createSessionForUser } from "@/lib/session";
+import { claimDestination } from "@/lib/whatsapp-umrah/claim-destination";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -43,12 +44,13 @@ export async function GET(request: NextRequest) {
   // asks for their details); the webhook created the project in the same
   // transaction as this claim. WhatsApp Umrah buyers go to their agency
   // dashboard the same way (webhook's provisionWaAgency + this route's own
-  // createPurchaseClaim call, both in handlePaymentSucceeded's WA branch).
-  // Course buyers keep the /welcome page.
+  // createPurchaseClaim call, both in handlePaymentSucceeded's WA branch);
+  // when a buyer has both, the newest purchase wins. Course buyers keep the
+  // /welcome page.
   const [project, waMembership] = await Promise.all([
-    db.serviceProject.findFirst({ where: { userId: claim.userId }, orderBy: { createdAt: "desc" }, select: { id: true } }),
-    db.waMembership.findFirst({ where: { userId: claim.userId }, orderBy: { createdAt: "desc" }, select: { agencyId: true } }),
+    db.serviceProject.findFirst({ where: { userId: claim.userId }, orderBy: { createdAt: "desc" }, select: { id: true, createdAt: true } }),
+    db.waMembership.findFirst({ where: { userId: claim.userId }, orderBy: { createdAt: "desc" }, select: { agencyId: true, createdAt: true } }),
   ]);
-  const destination = project ? `/services/dashboard/${project.id}` : waMembership ? `/whatsapp-umrah/${waMembership.agencyId}` : "/welcome";
+  const destination = claimDestination({ project, waMembership });
   return NextResponse.redirect(new URL(destination, origin));
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/account/AccountShell";
 import { Button } from "@/components/obsidian/Button";
 import { Icon, type IconName } from "@/components/obsidian/Icon";
@@ -6,6 +7,7 @@ import { ProgressBar } from "@/components/obsidian/ProgressBar";
 import { loadStudentSpace, type OwnedCourse } from "@/lib/account/data";
 import { type ActivityKind, timeAgo } from "@/lib/account/stats";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { getCourse, launchLabel } from "@/lib/courses";
 
 const MONO = "font-mono uppercase tracking-[0.14em]";
@@ -28,6 +30,13 @@ const ACTIVITY_ICON: Record<ActivityKind, { icon: IconName; color: string }> = {
 export default async function MyCourses() {
   const session = await auth();
   const s = await loadStudentSpace(session!.user!.id!);
+  // A WhatsApp agent customer has an agency dashboard of their own. If that is all they own, sign-in lands them there.
+  const agencies = await db.waMembership.findMany({
+    where: { userId: session!.user!.id! },
+    orderBy: { createdAt: "desc" },
+    select: { agencyId: true, agency: { select: { name: true } } },
+  });
+  if (agencies.length > 0 && s.courses.length === 0) redirect(`/whatsapp-umrah/${agencies[0]!.agencyId}`);
   const first = s.user.name.split(/\s+/)[0]!;
 
   return (
@@ -38,6 +47,21 @@ export default async function MyCourses() {
         subtitle="Pick up where you left off, or open any course you own. Everything you bought stays here, for good."
         action={<Button href={CATALOGUE} variant="glass" size="md" arrow>Browse courses</Button>}
       />
+
+      {agencies.map((a) => (
+        <Link
+          key={a.agencyId}
+          href={`/whatsapp-umrah/${a.agencyId}`}
+          className="glass flex items-center justify-between gap-4 rounded-[22px] p-5 text-frost no-underline hover:bg-white/[0.05]"
+        >
+          <span className="flex flex-col gap-1">
+            <span className={`${MONO} text-[11.5px] text-mint-text`}>WhatsApp AI agent</span>
+            <b className="text-[18px] font-medium tracking-[-0.02em]">{a.agency.name}</b>
+            <span className="text-[14px] text-mist">Open your WhatsApp dashboard</span>
+          </span>
+          <Icon name="arrow" size={18} />
+        </Link>
+      ))}
 
       <Hero hero={s.hero} />
 
