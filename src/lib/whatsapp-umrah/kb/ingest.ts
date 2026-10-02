@@ -12,10 +12,11 @@ export type IngestResult = { ok: true; chunkCount: number } | { ok: false; error
     WaKbChunk.embedding is an Unsupported("vector") column - the normal
     Prisma client can't select or write it. */
 export async function ingestDocument(documentId: string): Promise<IngestResult> {
-  const doc = await db.waKbDocument.findUnique({ where: { id: documentId }, select: { id: true, agencyId: true, rawText: true } });
+  const doc = await db.waKbDocument.findUnique({ where: { id: documentId }, select: { id: true, agencyId: true, rawText: true, kind: true } });
   if (!doc) return { ok: false, error: "not_found" };
 
-  const chunks = chunkText(doc.rawText);
+  // A package or FAQ is already one short, labelled block: keep it whole so a price never lands in a different chunk to its hotel.
+  const chunks = doc.kind === "PACKAGE" || doc.kind === "FAQ" ? [doc.rawText.trim()].filter(Boolean) : chunkText(doc.rawText);
   if (chunks.length === 0) return { ok: false, error: "no content to embed after chunking" };
 
   const result = await embed(chunks, "document");

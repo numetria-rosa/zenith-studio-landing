@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { getWhopClient } from "@/lib/whop";
 import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
 import { ingestDocument } from "@/lib/whatsapp-umrah/kb/ingest";
+import { faqToText, packageToText, parseFaqForm, parsePackageForm } from "@/lib/whatsapp-umrah/kb/structured";
 import { takeOverConversation, resumeAi } from "@/lib/whatsapp-umrah/handoff";
 import { runAgentPipeline } from "@/lib/whatsapp-umrah/agent/pipeline";
 import { decryptSecret } from "@/lib/secrets";
@@ -63,6 +64,44 @@ export async function addKbDocumentAction(agencyId: string, formData: FormData):
   const result = await ingestDocument(doc.id);
   if (!result.ok) throw new Error(result.error);
   revalidatePath(`/whatsapp-umrah/${agencyId}`);
+}
+
+/** Create (documentId empty) or update a structured package. The form values are kept as JSON so the owner can edit
+    them again; the text the AI reads is generated from them and re-embedded on every save. */
+export async function savePackageAction(agencyId: string, documentId: string | null, formData: FormData): Promise<void> {
+  const { agency } = await requireOwnedAgency(agencyId);
+  const parsed = parsePackageForm(formData);
+  if (!parsed.ok) throw new Error(parsed.error);
+  const data = { title: parsed.fields.name, rawText: packageToText(parsed.fields), fields: parsed.fields as unknown as Prisma.InputJsonValue };
+  let id = documentId;
+  if (id) {
+    const result = await db.waKbDocument.updateMany({ where: { id, agencyId: agency.id, kind: "PACKAGE" }, data });
+    if (result.count === 0) throw new Error("not_found");
+  } else {
+    id = (await db.waKbDocument.create({ data: { ...data, agencyId: agency.id, kind: "PACKAGE" }, select: { id: true } })).id;
+  }
+  const ingest = await ingestDocument(id);
+  if (!ingest.ok) throw new Error(ingest.error);
+  revalidatePath(`/whatsapp-umrah/${agencyId}`);
+  redirect(`/whatsapp-umrah/${agencyId}/kb?tab=packages`);
+}
+
+export async function saveFaqAction(agencyId: string, documentId: string | null, formData: FormData): Promise<void> {
+  const { agency } = await requireOwnedAgency(agencyId);
+  const parsed = parseFaqForm(formData);
+  if (!parsed.ok) throw new Error(parsed.error);
+  const data = { title: parsed.fields.question, rawText: faqToText(parsed.fields), fields: parsed.fields as unknown as Prisma.InputJsonValue };
+  let id = documentId;
+  if (id) {
+    const result = await db.waKbDocument.updateMany({ where: { id, agencyId: agency.id, kind: "FAQ" }, data });
+    if (result.count === 0) throw new Error("not_found");
+  } else {
+    id = (await db.waKbDocument.create({ data: { ...data, agencyId: agency.id, kind: "FAQ" }, select: { id: true } })).id;
+  }
+  const ingest = await ingestDocument(id);
+  if (!ingest.ok) throw new Error(ingest.error);
+  revalidatePath(`/whatsapp-umrah/${agencyId}`);
+  redirect(`/whatsapp-umrah/${agencyId}/kb?tab=faqs`);
 }
 
 export async function deleteKbDocumentAction(agencyId: string, documentId: string): Promise<void> {
