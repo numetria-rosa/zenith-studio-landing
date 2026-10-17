@@ -7,7 +7,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-[#05060a] px-6 py-16 text-white">
       <div className="mx-auto max-w-2xl">
         <h1 className="text-2xl font-extrabold tracking-tight">Privacy Policy</h1>
-        <p className="mt-2 text-sm text-white/50">Last updated September 10, 2026</p>
+        <p className="mt-2 text-sm text-white/50">Last updated October 17, 2026</p>
 
         <p className="mt-8 text-[15px] leading-7 text-white/75">
           Zenith Studio (&ldquo;we&rdquo;, &ldquo;us&rdquo;) builds AI-powered systems and courses for
