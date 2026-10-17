@@ -64,8 +64,20 @@ export default function PrivacyPage() {
         <p className="mt-4 text-[15px] leading-7 text-white/75">
           We use trusted third-party providers to deliver our services, including Google and Microsoft (for
           calendar/email access you explicitly authorize), SignalWire (for phone and SMS), Vapi (for AI voice
-          calls), Cal.com (for appointment booking), Groq (for AI text drafting), Resend (for email delivery),
-          and Whop (for payments). Each provider only receives the data necessary to perform its function.
+          calls), Cal.com (for appointment booking), Groq and Anthropic (for AI text drafting), Voyage AI (for
+          searching a client&apos;s own knowledge base), Resend (for email delivery), Vercel (hosting), Neon
+          (database), and Whop (for payments). Each provider only receives the data necessary to perform its
+          function.
+        </p>
+
+        <h2 className="mt-10 text-lg font-semibold">Requests from public authorities</h2>
+        <p className="mt-4 text-[15px] leading-7 text-white/75">
+          If a public authority asks us for personal data, including data we receive through Meta&apos;s
+          WhatsApp Business Platform, we: review every request to confirm it is lawful and properly issued;
+          challenge any request we consider unlawful, overly broad, or not properly issued; disclose only the
+          minimum data needed to comply; and keep a written record of each request, our response, the legal
+          basis, and who was involved. Where the law allows, we tell the affected client before disclosing
+          anything.
         </p>
 
         <h2 className="mt-10 text-lg font-semibold">Data retention and deletion</h2>
