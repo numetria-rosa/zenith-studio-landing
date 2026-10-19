@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { getOwnedAgency, getUsageSummary } from "@/lib/whatsapp-umrah/dashboard-data";
 import { isEmbeddedSignupCapReached, EMBEDDED_SIGNUP_ENABLED } from "@/lib/whatsapp-umrah/embedded-signup";
 import { requestManualConnectAction } from "./actions";
+import { EmbeddedSignupButton } from "./EmbeddedSignupButton";
 import { Icon } from "@/app/services/dashboard/[clientId]/Icon";
 import waStyles from "./waConsole.module.css";
 
@@ -21,7 +22,9 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
   const whatsappConnected = agency.whatsapp?.status === "CONNECTED";
   const settingsConfigured = !!agency.agentSettings;
   const pendingConnectRequest = agency.manualConnectRequests[0] ?? null;
-  const showEmbeddedSignupWidget = !whatsappConnected && !pendingConnectRequest && EMBEDDED_SIGNUP_ENABLED && !(await isEmbeddedSignupCapReached());
+  const metaAppId = process.env.NEXT_PUBLIC_META_APP_ID;
+  const metaConfigId = process.env.NEXT_PUBLIC_META_ES_CONFIG_ID;
+  const showEmbeddedSignupWidget = !whatsappConnected && !pendingConnectRequest && EMBEDDED_SIGNUP_ENABLED && !!metaAppId && !!metaConfigId && !(await isEmbeddedSignupCapReached());
 
   const checklist = [
     { done: kbHasContent, label: "Add your packages and FAQs", detail: "Paste or upload your knowledge base so the agent has real facts to answer from.", href: `/whatsapp-umrah/${agencyId}/kb` },
@@ -65,7 +68,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
               Request sent {pendingConnectRequest.createdAt.toISOString().slice(0, 10)} - our team will connect your number within 24 hours.
             </p>
           ) : showEmbeddedSignupWidget ? (
-            <p style={{ fontSize: 14, color: "var(--zc-muted)" }}>Connect with Meta - coming soon.</p>
+            <EmbeddedSignupButton agencyId={agencyId} appId={metaAppId!} configId={metaConfigId!} />
           ) : (
             <>
               <p style={{ fontSize: 13, color: "var(--zc-muted)", marginBottom: 12 }}>

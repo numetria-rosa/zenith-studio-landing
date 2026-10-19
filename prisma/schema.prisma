@@ -1765,6 +1765,9 @@ model WaWhatsAppAccount {
   phoneNumberId        String?           @unique
   displayPhoneNumber   String?
   encryptedAccessToken String? // see CLAUDE.md §7 - encryptSecret/decryptSecret, own env key
+  // Two-step verification PIN we set when registering the number for Cloud API (Embedded Signup),
+  // encrypted with the same key as the token; needed to re-register the number later.
+  encryptedRegistrationPin String?
   status               WaAccountStatus   @default(PENDING)
   lastError            String?
   connectedAt          DateTime?

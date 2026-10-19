@@ -2,9 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/admin";
 import { db } from "@/lib/db";
-import { encryptSecret } from "@/lib/secrets";
-import { META_TOKEN_ENV } from "@/lib/whatsapp-umrah/inbound";
-import { logWaAuditEvent } from "@/lib/whatsapp-umrah/audit";
+import { saveWhatsAppConnection } from "@/lib/whatsapp-umrah/connect";
 import { HqTopbar } from "../HqTopbar";
 import { Toast } from "../Toast";
 
@@ -41,31 +39,7 @@ export default async function AdminWhatsAppUmrahPage() {
       redirect(`/admin/whatsapp-umrah?flash=${encodeURIComponent("All fields except display number are required.")}`);
     }
 
-    const isReconnect = await db.waWhatsAppAccount.findUnique({ where: { agencyId }, select: { id: true } });
-    const encryptedAccessToken = encryptSecret(accessToken, META_TOKEN_ENV);
-    await db.waWhatsAppAccount.upsert({
-      where: { agencyId },
-      create: { agencyId, provider: "META", wabaId, phoneNumberId, displayPhoneNumber, encryptedAccessToken, status: "CONNECTED", connectedAt: new Date() },
-      update: { wabaId, phoneNumberId, displayPhoneNumber, encryptedAccessToken, status: "CONNECTED", lastError: null, connectedAt: new Date() },
-    });
-    // Connecting the number is what a pending manual-connect request was
-    // asking for - resolve it automatically instead of a separate button.
-    await db.waManualConnectRequest.updateMany({ where: { agencyId, status: "PENDING" }, data: { status: "RESOLVED", resolvedAt: new Date() } });
-
-    // Same checklist the Overview page shows the agency owner (kb content +
-    // settings configured) - connecting WhatsApp is the last of the three,
-    // so this is the one place an agency actually goes LIVE and starts
-    // getting real replies (inbound.ts refuses anything else).
-    const agency = await db.waAgency.findUnique({
-      where: { id: agencyId },
-      select: { status: true, agentSettings: { select: { id: true } }, kbDocuments: { select: { _count: { select: { chunks: true } } } } },
-    });
-    const kbHasContent = agency?.kbDocuments.some((d) => d._count.chunks > 0) ?? false;
-    if (agency && agency.status !== "LIVE" && kbHasContent && agency.agentSettings) {
-      await db.waAgency.update({ where: { id: agencyId }, data: { status: "LIVE" } });
-    }
-
-    await logWaAuditEvent(agencyId, session.user.id, isReconnect ? "waba_reconnected" : "waba_connected", { wabaId, phoneNumberId });
+    await saveWhatsAppConnection({ agencyId, wabaId, phoneNumberId, displayPhoneNumber, accessToken, method: "MANUAL", actorUserId: session.user.id });
     revalidatePath("/admin/whatsapp-umrah");
     redirect(`/admin/whatsapp-umrah?flash=${encodeURIComponent("WhatsApp number connected.")}`);
   }

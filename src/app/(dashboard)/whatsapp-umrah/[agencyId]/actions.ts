@@ -17,6 +17,9 @@ import { deleteContactData } from "@/lib/whatsapp-umrah/gdpr";
 import type { BusinessHours } from "@/lib/whatsapp-umrah/hours";
 import { Prisma } from "@prisma/client";
 import { logWaAuditEvent } from "@/lib/whatsapp-umrah/audit";
+import { EMBEDDED_SIGNUP_ENABLED, isEmbeddedSignupCapReached } from "@/lib/whatsapp-umrah/embedded-signup";
+import { finishEmbeddedSignup, newRegistrationPin } from "@/lib/whatsapp-umrah/embedded-signup-flow";
+import { saveWhatsAppConnection } from "@/lib/whatsapp-umrah/connect";
 
 const HOURS_DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
@@ -291,4 +294,42 @@ export async function simulateMessageAction(agencyId: string, customerMessage: s
     guardsTriggered: result.guardsTriggered,
     action: result.action,
   };
+}
+
+/** Embedded Signup finished in the agency owner's browser: exchange the code and connect the number,
+    all server-side (src/lib/whatsapp-umrah/embedded-signup-flow.ts). Returns a message instead of
+    throwing so the button can show it; the code is only valid for 30 seconds, so this runs at once. */
+export async function completeEmbeddedSignupAction(
+  agencyId: string,
+  input: { code: string; wabaId: string; phoneNumberId: string | null; event: string },
+): Promise<{ ok: true; displayPhoneNumber: string | null } | { ok: false; error: string }> {
+  const { agency, userId } = await requireOwnedAgency(agencyId);
+  if (!EMBEDDED_SIGNUP_ENABLED || (await isEmbeddedSignupCapReached())) return { ok: false, error: "Connecting with Meta is not available right now. Please use the request form instead." };
+  const appId = process.env.NEXT_PUBLIC_META_APP_ID;
+  const appSecret = process.env.META_APP_SECRET;
+  if (!appId || !appSecret) return { ok: false, error: "Connecting with Meta is not configured yet. Please use the request form instead." };
+
+  const pin = newRegistrationPin();
+  try {
+    const result = await finishEmbeddedSignup(
+      { code: String(input.code), wabaId: String(input.wabaId), phoneNumberId: input.phoneNumberId ? String(input.phoneNumberId) : null, event: String(input.event) },
+      { fetch, appId, appSecret, pin },
+    );
+    await saveWhatsAppConnection({
+      agencyId: agency.id,
+      wabaId: String(input.wabaId),
+      phoneNumberId: String(input.phoneNumberId),
+      displayPhoneNumber: result.displayPhoneNumber,
+      accessToken: result.accessToken,
+      method: "EMBEDDED_SIGNUP",
+      actorUserId: userId,
+      registrationPin: result.registered ? pin : null,
+    });
+    revalidatePath(`/whatsapp-umrah/${agencyId}`);
+    return { ok: true, displayPhoneNumber: result.displayPhoneNumber };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Connecting with Meta failed.";
+    await logWaAuditEvent(agency.id, userId, "embedded_signup_failed", { error, wabaId: input.wabaId, event: input.event });
+    return { ok: false, error };
+  }
 }
