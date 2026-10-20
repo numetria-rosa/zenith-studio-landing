@@ -1,0 +1,186 @@
+import { randomBytes } from "node:crypto";
+import { del, head } from "@vercel/blob";
+import { db } from "@/lib/db";
+import { sendAsBusiness } from "@/lib/client-mail";
+import { businessNameOf } from "@/lib/services";
+import { getSiteUrl } from "@/lib/site";
+import { chaseEmail, checklistItems, isDueForChase, MAX_UPLOAD_BYTES, REJECT_REASONS } from "@/lib/document-chaser";
+
+/* AI Document Chaser: database side. Every accountant-facing function checks the project belongs to the
+   signed-in user and is this service; the client-facing ones are keyed by the secret upload token only. */
+
+export const DOC_CHASER_SERVICE_ID = "accounting-document-chaser";
+
+/** Clients' documents live in their own Blob store created with private access (the site's main store is
+    public, and a store's access mode is fixed at creation). No fallback to the main store, on purpose. */
+export function docBlobToken(): string {
+  const t = process.env.DOC_CHASER_BLOB_READ_WRITE_TOKEN;
+  if (!t) throw new Error("DOC_CHASER_BLOB_READ_WRITE_TOKEN is not set");
+  return t;
+}
+
+type Result = { ok: true } | { ok: false; error: string };
+
+async function ownedProject(projectId: string, userId: string) {
+  return db.serviceProject.findFirst({ where: { id: projectId, userId, sourceServiceId: DOC_CHASER_SERVICE_ID }, select: { id: true } });
+}
+
+export const uploadUrlFor = (token: string) => `${getSiteUrl()}/upload/${token}`;
+
+/** Adds clients with a checklist. Existing clients (same email) are left as they are. */
+export async function addDocChaseClients(
+  projectId: string,
+  userId: string,
+  input: { clients: { name: string; email: string }[]; checklistId: string; extras: string[] },
+): Promise<{ ok: true; added: number; existing: number } | { ok: false; error: string }> {
+  if (!(await ownedProject(projectId, userId))) return { ok: false, error: "not_found" };
+  if (input.clients.length === 0) return { ok: false, error: "Add at least one client with a valid email." };
+  if (input.clients.length > 500) return { ok: false, error: "Import up to 500 clients at a time." };
+  let items: string[];
+  try {
+    items = checklistItems(input.checklistId, input.extras);
+  } catch {
+    return { ok: false, error: "Pick a checklist." };
+  }
+  const existing = new Set(
+    (await db.docChaseClient.findMany({ where: { projectId, email: { in: input.clients.map((c) => c.email) } }, select: { email: true } })).map((c) => c.email),
+  );
+  let added = 0;
+  for (const c of input.clients) {
+    if (existing.has(c.email)) continue;
+    await db.docChaseClient.create({
+      data: {
+        projectId,
+        name: c.name.slice(0, 120),
+        email: c.email,
+        checklist: input.checklistId,
+        uploadToken: randomBytes(24).toString("base64url"),
+        items: { create: items.map((label, order) => ({ label, order })) },
+      },
+    });
+    added++;
+  }
+  return { ok: true, added, existing: existing.size };
+}
+
+async function ownedItem(projectId: string, userId: string, itemId: string) {
+  return db.docChaseItem.findFirst({ where: { id: itemId, client: { projectId, project: { userId, sourceServiceId: DOC_CHASER_SERVICE_ID } } }, include: { client: true } });
+}
+
+/** Accept an upload, or send it back with one of the fixed reasons (the client is reminded at the next run). */
+export async function reviewDocChaseItem(projectId: string, userId: string, itemId: string, decision: "accept" | "reject", reason?: string): Promise<Result> {
+  const item = await ownedItem(projectId, userId, itemId);
+  if (!item) return { ok: false, error: "not_found" };
+  if (decision === "accept") {
+    await db.docChaseItem.update({ where: { id: itemId }, data: { status: "ACCEPTED", rejectReason: null } });
+    const open = await db.docChaseItem.count({ where: { clientId: item.clientId, status: { not: "ACCEPTED" } } });
+    if (open === 0) await db.docChaseClient.update({ where: { id: item.clientId }, data: { status: "DONE", completedAt: new Date() } });
+    return { ok: true };
+  }
+  if (!reason || !REJECT_REASONS.includes(reason)) return { ok: false, error: "Pick a reason to send it back." };
+  await db.docChaseItem.update({ where: { id: itemId }, data: { status: "REQUESTED", rejectReason: reason } });
+  // A sent-back document gets a reminder at the next run, and a client marked done is reopened.
+  await db.docChaseClient.update({ where: { id: item.clientId }, data: { lastChasedAt: null, status: item.client.status === "PAUSED" ? "PAUSED" : "ACTIVE", completedAt: null } });
+  return { ok: true };
+}
+
+export async function setDocChaseClientStatus(projectId: string, userId: string, clientId: string, status: "ACTIVE" | "PAUSED"): Promise<Result> {
+  const c = await db.docChaseClient.findFirst({ where: { id: clientId, projectId, project: { userId } }, select: { id: true } });
+  if (!c) return { ok: false, error: "not_found" };
+  await db.docChaseClient.update({ where: { id: clientId }, data: { status } });
+  return { ok: true };
+}
+
+/** Removes a client, their requests and every file they uploaded. */
+export async function deleteDocChaseClient(projectId: string, userId: string, clientId: string): Promise<Result> {
+  const c = await db.docChaseClient.findFirst({ where: { id: clientId, projectId, project: { userId } }, include: { items: { select: { filePathname: true } } } });
+  if (!c) return { ok: false, error: "not_found" };
+  const files = c.items.map((i) => i.filePathname).filter((p): p is string => !!p);
+  if (files.length) await del(files, { token: docBlobToken() }).catch(() => {});
+  await db.docChaseClient.delete({ where: { id: clientId } });
+  return { ok: true };
+}
+
+// ---------- client side (upload page) ----------
+
+export async function getUploadPortal(token: string) {
+  if (!/^[A-Za-z0-9_-]{20,64}$/.test(token)) return null;
+  const client = await db.docChaseClient.findUnique({
+    where: { uploadToken: token },
+    include: { items: { orderBy: { order: "asc" } }, project: { select: { title: true, sourceServiceId: true, stage: true } } },
+  });
+  if (!client || client.project.sourceServiceId !== DOC_CHASER_SERVICE_ID) return null;
+  return { client, businessName: businessNameOf(client.project) || "Your accountant" };
+}
+
+/** Can this token upload to this item? Used before issuing a Blob upload token. */
+export async function canUpload(token: string, itemId: string): Promise<{ clientId: string } | null> {
+  const portal = await getUploadPortal(token);
+  const item = portal?.client.items.find((i) => i.id === itemId);
+  if (!portal || !item || item.status === "ACCEPTED" || portal.client.project.stage === "PAUSED") return null;
+  return { clientId: portal.client.id };
+}
+
+/** After the browser finished uploading straight to Blob: check the file is really there, then record it. */
+export async function confirmUpload(token: string, itemId: string, pathname: string, fileName: string): Promise<Result> {
+  const allowed = await canUpload(token, itemId);
+  if (!allowed) return { ok: false, error: "This link has expired or the document is already accepted." };
+  if (!pathname.startsWith(`doc-chaser/${allowed.clientId}/${itemId}-`)) return { ok: false, error: "Upload not recognised." };
+  const blob = await head(pathname, { token: docBlobToken() }).catch(() => null);
+  if (!blob || blob.size > MAX_UPLOAD_BYTES) return { ok: false, error: "We couldn't find that upload. Please try again." };
+
+  const previous = await db.docChaseItem.findUnique({ where: { id: itemId }, select: { filePathname: true } });
+  await db.docChaseItem.update({
+    where: { id: itemId },
+    data: { status: "RECEIVED", filePathname: pathname, fileName: fileName.slice(0, 160), uploadedAt: new Date(), rejectReason: null },
+  });
+  if (previous?.filePathname && previous.filePathname !== pathname) await del(previous.filePathname, { token: docBlobToken() }).catch(() => {});
+  return { ok: true };
+}
+
+// ---------- daily run ----------
+
+/** Emails every client who still owes documents (on the reminder schedule), and tells the accountant
+    once a client has sent everything. */
+export async function runDocumentChaser(now = new Date()): Promise<{ chased: number; completed: number; failed: number }> {
+  const clients = await db.docChaseClient.findMany({
+    where: { status: "ACTIVE", project: { sourceServiceId: DOC_CHASER_SERVICE_ID, stage: { not: "PAUSED" } } },
+    include: {
+      items: { orderBy: { order: "asc" } },
+      project: { select: { title: true, sourceServiceId: true, user: { select: { email: true } } } },
+    },
+  });
+  let chased = 0;
+  let completed = 0;
+  let failed = 0;
+  for (const c of clients) {
+    const businessName = businessNameOf(c.project) || "Your accountant";
+    const accountantEmail = c.project.user.email;
+    const outstanding = c.items.filter((i) => i.status === "REQUESTED");
+
+    // Everything uploaded (some may still need review): tell the accountant once, stop chasing.
+    if (outstanding.length === 0) {
+      if (accountantEmail) {
+        await sendAsBusiness({
+          businessName: "Zenith Document Chaser",
+          to: accountantEmail,
+          replyTo: null,
+          subject: `${c.name} has sent everything`,
+          text: `${c.name} (${c.email}) has uploaded every document on their list. Review them in your dashboard.`,
+        });
+      }
+      await db.docChaseClient.update({ where: { id: c.id }, data: { status: "DONE", completedAt: now } });
+      completed++;
+      continue;
+    }
+
+    if (!isDueForChase(c, outstanding.length, now)) continue;
+    const mail = chaseEmail({ businessName, clientName: c.name, items: outstanding, uploadUrl: uploadUrlFor(c.uploadToken), reminder: c.chaseCount });
+    const sent = await sendAsBusiness({ businessName, to: c.email, replyTo: accountantEmail, subject: mail.subject, text: mail.text });
+    if (sent.ok) {
+      await db.docChaseClient.update({ where: { id: c.id }, data: { chaseCount: { increment: 1 }, lastChasedAt: now } });
+      chased++;
+    } else failed++;
+  }
+  return { chased, completed, failed };
+}

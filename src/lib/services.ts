@@ -76,6 +76,21 @@ export const SERVICES: Service[] = [
     setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/ch_ZvGXKYoanGI1eVn/",
   },
+  // Whop product not created yet (ask before running the creation script):
+  // empty ids keep it out of checkout until then, per this file's convention.
+  {
+    id: "accounting-document-chaser",
+    title: "AI Document Chaser",
+    pitch: "Stop chasing clients for paperwork.",
+    description:
+      "Emails every client the exact documents you still need, with a private upload link, and keeps reminding them every few days until everything is in. You review each upload in one place.",
+    setupPriceDisplay: "",
+    monthlyPriceDisplay: "$500/mo",
+    whopSetupPlanId: "",
+    whopMonthlyPlanId: "",
+    setupCheckoutUrl: "",
+    monthlyCheckoutUrl: "",
+  },
   // The two vertical/role offers from src/app/page.tsx's own `verticalSystems`
   // array - monthly-only (no separate setup plan), which is why
   // setupPriceDisplay/whopSetupPlanId/setupCheckoutUrl are empty, matching

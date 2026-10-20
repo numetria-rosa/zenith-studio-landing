@@ -821,6 +821,7 @@ model ServiceProject {
   agentChanges      AgentChangeRequest[]
   transactions      Transaction[]
   dormantContacts   DormantContact[]
+  docChaseClients    DocChaseClient[]
   textingRegistration TextingRegistration?
 
   @@index([userId])
@@ -2175,4 +2176,44 @@ model WaWaitlistSignup {
   createdAt DateTime @default(now())
 
   @@index([plan])
+}
+
+// AI Document Chaser (accountants): one row per end client the accountant needs documents from.
+// uploadToken is the secret in the client's private upload link (no account needed).
+model DocChaseClient {
+  id           String    @id @default(cuid())
+  projectId    String
+  name         String
+  email        String
+  checklist    String // a CHECKLISTS id in src/lib/document-chaser.ts
+  status       String    @default("ACTIVE") // ACTIVE | PAUSED | DONE
+  uploadToken  String    @unique
+  chaseCount   Int       @default(0)
+  lastChasedAt DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  items   DocChaseItem[]
+
+  @@unique([projectId, email])
+  @@index([projectId])
+}
+
+model DocChaseItem {
+  id           String    @id @default(cuid())
+  clientId     String
+  label        String
+  order        Int       @default(0)
+  status       String    @default("REQUESTED") // REQUESTED | RECEIVED | ACCEPTED
+  rejectReason String? // set when the accountant sends a file back; shown to the client
+  filePathname String? // private Vercel Blob pathname of the latest upload
+  fileName     String?
+  uploadedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  client DocChaseClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
 }

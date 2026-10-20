@@ -20,6 +20,8 @@ import { adjustableSettings, readSettings, dbDormantDays } from "@/lib/agent-set
 import { createTransaction, updateDeadline, setDocumentReceived, setTransactionStatus } from "@/lib/transaction-coordinator";
 import { importContacts, startReengagement, markContactReplied, isDormant } from "@/lib/database-manager";
 import { getSiteUrl } from "@/lib/site";
+import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, MAX_CHASES, REJECT_REASONS, parseClientCsv } from "@/lib/document-chaser";
+import { addDocChaseClients, deleteDocChaseClient, reviewDocChaseItem, setDocChaseClientStatus, uploadUrlFor } from "@/lib/document-chaser-db";
 import { qualificationGroups, qualificationRulesText, readChoices, faqGroups, faqText, hoursText, DAYS, OPEN_TIMES, CLOSE_TIMES, CRM_FORMATS, type ChoiceGroup } from "@/lib/setup-options";
 import { CopyField, TestLeadForm } from "./ConnectForm";
 import { ENTITY_TYPES, readDetails, submitTextingRegistration, formConsentText } from "@/lib/texting-registration";
@@ -333,6 +335,55 @@ export default async function AgentDetailPage({
     revalidatePath(dashboardBase, "layout");
     if (!result.ok) failTo(agentBase, result.error);
     redirect(`${agentBase}?flash=${encodeURIComponent("Submitted. US carriers usually approve within a few business days, and we'll email you the moment texting is live.")}`);
+  }
+
+  // ---------- AI Document Chaser ----------
+  async function addChaseClientsAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const file = formData.get("file");
+    const csv = file instanceof File && file.size > 0 ? await file.text() : "";
+    const name = String(formData.get("name") || "").trim();
+    const email = String(formData.get("email") || "").trim();
+    const parsed = parseClientCsv(csv || (email ? `name,email\n"${name.replace(/"/g, "")}",${email}` : ""));
+    const result = await addDocChaseClients(clientId, session2!.user.id, {
+      clients: parsed.clients,
+      checklistId: String(formData.get("checklist") || ""),
+      extras: formData.getAll("extras").map(String).filter((e) => EXTRA_ITEMS.includes(e)),
+    });
+    revalidatePath(dashboardBase, "layout");
+    if (!result.ok) failTo(agentBase, result.error);
+    const parts = [`Added ${result.added} client${result.added === 1 ? "" : "s"}. Their first email goes out in the next daily run.`];
+    if (result.existing) parts.push(`${result.existing} already on your list were left as they are.`);
+    if (parsed.skipped) parts.push(`${parsed.skipped} row${parsed.skipped === 1 ? "" : "s"} skipped (no valid email or a duplicate).`);
+    redirect(`${agentBase}?flash=${encodeURIComponent(parts.join(" "))}`);
+  }
+
+  async function reviewDocAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const decision = formData.get("decision") === "accept" ? "accept" : "reject";
+    const result = await reviewDocChaseItem(clientId, session2!.user.id, String(formData.get("id") || ""), decision, String(formData.get("reason") || ""));
+    revalidatePath(dashboardBase, "layout");
+    if (!result.ok) failTo(agentBase, result.error);
+    redirect(agentBase);
+  }
+
+  async function chaseClientAction(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const id = String(formData.get("id") || "");
+    const op = String(formData.get("op") || "");
+    const result =
+      op === "delete"
+        ? await deleteDocChaseClient(clientId, session2!.user.id, id)
+        : await setDocChaseClientStatus(clientId, session2!.user.id, id, op === "pause" ? "PAUSED" : "ACTIVE");
+    revalidatePath(dashboardBase, "layout");
+    if (!result.ok) failTo(agentBase, result.error);
+    redirect(agentBase);
   }
 
   // ---------- Setup-needed states, per real agent ----------
@@ -769,6 +820,149 @@ export default async function AgentDetailPage({
             </div>
           </section>
         )}
+      </div>
+    );
+  }
+
+  // ---------- Accountants: AI Document Chaser ----------
+  if (agentId === "chaser") {
+    const clients = project.docChaseClients;
+    const small = { minHeight: 30, padding: "0 10px", fontSize: 12 } as const;
+    return (
+      <div>
+        <Breadcrumb clientId={clientId} agentName={agent.name} />
+        <Header agent={agent} tone={status.tone} clientId={clientId} />
+        {flash && <FlashBox text={flash} />}
+        {activateError && <p className={s.errorBox} style={{ maxWidth: 720 }}>{activateError}</p>}
+
+        <div className={`${u.card} ${s.setupCard}`} style={{ marginTop: 28, maxWidth: 720 }}>
+          <p className={s.setupTitle}>{clients.length === 0 ? "Add your first clients" : "Add more clients"}</p>
+          <p className={s.setupDesc}>
+            Each client gets an email in {businessName || "your business"}&apos;s name listing exactly what you need, with a private upload link (no
+            account needed). We remind them every {CHASE_GAP_DAYS} days, up to {MAX_CHASES} times, until everything is in. Replies go to your own inbox.
+          </p>
+          <form action={addChaseClientsAction} style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 14 }}>
+            <div className={s.formRow}>
+              <label className={s.label}>What do you need from them?</label>
+              <select name="checklist" className={s.input} defaultValue="personal-tax">
+                {CHECKLISTS.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label} ({c.items.length} documents)
+                  </option>
+                ))}
+              </select>
+            </div>
+            <fieldset style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+              <legend className={s.label}>Also ask for (optional)</legend>
+              <div className={a.options} style={{ paddingTop: 10, gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
+                {EXTRA_ITEMS.map((e) => (
+                  <label key={e} className={a.option} style={{ padding: 12 }}>
+                    <input type="checkbox" name="extras" value={e} className={a.radio} />
+                    <span className={a.optionLabel}>{e}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <div className={s.formRow}>
+              <label className={s.label}>Upload a client list (CSV with a name and an email column)</label>
+              <input name="file" type="file" accept=".csv,text/csv" className={s.input} />
+            </div>
+            <p style={{ margin: 0, fontSize: 13, color: "var(--zc-muted)" }}>Or add one client:</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14 }}>
+              <div className={s.formRow}>
+                <label className={s.label}>Client name</label>
+                <input name="name" placeholder="Jane Doe" className={s.input} />
+              </div>
+              <div className={s.formRow}>
+                <label className={s.label}>Client email</label>
+                <input name="email" type="email" placeholder="jane@example.com" className={s.input} />
+              </div>
+            </div>
+            <button type="submit" className={u.btnPrimary} style={{ alignSelf: "flex-start" }}>
+              Start chasing
+            </button>
+          </form>
+        </div>
+
+        <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16, maxWidth: 720 }}>
+          {clients.map((c) => {
+            const done = c.items.filter((i) => i.status !== "REQUESTED").length;
+            return (
+              <section key={c.id} className={u.card} style={{ padding: 20, opacity: c.status === "PAUSED" ? 0.7 : 1 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 600, fontSize: 16 }}>{c.name}</p>
+                    <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--zc-muted)" }}>
+                      {c.email} · {done} of {c.items.length} received ·{" "}
+                      {c.status === "DONE" ? "all in" : c.status === "PAUSED" ? "paused" : c.chaseCount >= MAX_CHASES ? "reminder limit reached" : `${c.chaseCount} email${c.chaseCount === 1 ? "" : "s"} sent`}
+                    </p>
+                  </div>
+                  <form action={chaseClientAction} style={{ display: "flex", gap: 8 }}>
+                    <input type="hidden" name="id" value={c.id} />
+                    {c.status === "ACTIVE" && (
+                      <button type="submit" name="op" value="pause" className={u.btnGhost} style={small}>
+                        Pause
+                      </button>
+                    )}
+                    {c.status === "PAUSED" && (
+                      <button type="submit" name="op" value="resume" className={u.btnGhost} style={small}>
+                        Resume
+                      </button>
+                    )}
+                  </form>
+                </div>
+                <details style={{ marginTop: 10 }}>
+                  <summary style={{ fontSize: 13, cursor: "pointer", color: "var(--zc-muted)" }}>Upload link and delete</summary>
+                  <CopyField label="Private link, only share it with this client" value={uploadUrlFor(c.uploadToken)} />
+                  <form action={chaseClientAction} style={{ marginTop: 10 }}>
+                    <input type="hidden" name="id" value={c.id} />
+                    <button type="submit" name="op" value="delete" className={u.btnGhost} style={small}>
+                      Delete this client and every file they uploaded
+                    </button>
+                  </form>
+                </details>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
+                  {c.items.map((i) => (
+                    <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                      <span style={{ flex: 1, minWidth: 180, fontSize: 14, color: i.status === "ACCEPTED" ? "var(--zc-muted)" : "var(--zc-text)" }}>
+                        {i.status === "ACCEPTED" && <Icon name="check" size={12} strokeWidth={2.4} />} {i.label}
+                        {i.status === "REQUESTED" && i.rejectReason && <span style={{ color: "var(--zc-muted)" }}> · sent back: {i.rejectReason}</span>}
+                      </span>
+                      {i.filePathname && (
+                        <a href={`/api/doc-chaser/file/${i.id}`} target="_blank" rel="noopener noreferrer" className={u.btnGhost} style={small}>
+                          View file
+                        </a>
+                      )}
+                      {i.status === "RECEIVED" ? (
+                        <form action={reviewDocAction} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                          <input type="hidden" name="id" value={i.id} />
+                          <button type="submit" name="decision" value="accept" className={u.btnPrimary} style={small}>
+                            Accept
+                          </button>
+                          <select name="reason" className={s.input} style={{ minHeight: 30, padding: "0 8px", fontSize: 12 }} aria-label={`Reason to send back ${i.label}`} defaultValue="">
+                            <option value="" disabled>
+                              Send back because...
+                            </option>
+                            {REJECT_REASONS.map((r) => (
+                              <option key={r} value={r}>
+                                {r}
+                              </option>
+                            ))}
+                          </select>
+                          <button type="submit" name="decision" value="reject" className={u.btnGhost} style={small}>
+                            Send back
+                          </button>
+                        </form>
+                      ) : (
+                        <span style={{ fontSize: 12, fontFamily: "var(--zc-mono)", color: "var(--zc-muted)" }}>{i.status === "ACCEPTED" ? "accepted" : "waiting"}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </div>
       </div>
     );
   }
