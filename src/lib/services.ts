@@ -217,6 +217,7 @@ export function servicePagePath(serviceId: string): string | null {
     only describing the service in prose. */
 export const DEMO_PATH_BY_SERVICE_ID: Record<string, string> = {
   "ai-inbox-manager": "/demo/ai-inbox-manager",
+  "accounting-document-chaser": "/demo/ai-document-chaser",
   "ai-lead-capture": "/demo/ai-lead-capture-follow-up",
   "ai-receptionist": "/demo/ai-receptionist",
   "law-firms": "/demo/law-firm-ai-team",
