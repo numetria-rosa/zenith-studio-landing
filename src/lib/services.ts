@@ -84,7 +84,7 @@ export const SERVICES: Service[] = [
     description:
       "Emails every client the exact documents you still need, with a private upload link, and keeps reminding them every few days until everything is in. You review each upload in one place.",
     setupPriceDisplay: "",
-    monthlyPriceDisplay: "$500/mo",
+    monthlyPriceDisplay: "$120/mo",
     whopSetupPlanId: "",
     whopMonthlyPlanId: "plan_2dyLkFK7HA9WS",
     setupCheckoutUrl: "",

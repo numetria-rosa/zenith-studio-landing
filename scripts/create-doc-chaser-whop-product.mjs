@@ -1,4 +1,4 @@
-// One-off script: creates the Whop product, the $500/month plan and a checkout link (redirecting buyers
+// One-off script: creates the Whop product, the monthly plan (created at $500, lowered to $120 on 2026-10-21 via plans.update) and a checkout link (redirecting buyers
 // to /api/auth/claim) for the AI Document Chaser. Creates duplicates if re-run.
 //
 // Usage: node --env-file=.env scripts/create-doc-chaser-whop-product.mjs
@@ -37,7 +37,7 @@ const plan = await client.plans.create({
   title: "Monthly",
   description: "Set up for you, cancel anytime.",
   initial_price: 0, // first renewal_price charge is the full price, nothing doubled on day one
-  renewal_price: 500,
+  renewal_price: 120,
   billing_period: 30,
 });
 console.log("Plan:", plan.id);
