@@ -76,8 +76,7 @@ export const SERVICES: Service[] = [
     setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/ch_ZvGXKYoanGI1eVn/",
   },
-  // Whop product not created yet (ask before running the creation script):
-  // empty ids keep it out of checkout until then, per this file's convention.
+  // Created 2026-10-21 via scripts/create-doc-chaser-whop-product.mjs.
   {
     id: "accounting-document-chaser",
     title: "AI Document Chaser",
@@ -87,9 +86,9 @@ export const SERVICES: Service[] = [
     setupPriceDisplay: "",
     monthlyPriceDisplay: "$500/mo",
     whopSetupPlanId: "",
-    whopMonthlyPlanId: "",
+    whopMonthlyPlanId: "plan_2dyLkFK7HA9WS",
     setupCheckoutUrl: "",
-    monthlyCheckoutUrl: "",
+    monthlyCheckoutUrl: "https://whop.com/checkout/ch_lF3HlFKHuchALxg/",
   },
   // The two vertical/role offers from src/app/page.tsx's own `verticalSystems`
   // array - monthly-only (no separate setup plan), which is why
