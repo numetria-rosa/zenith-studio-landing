@@ -7,6 +7,11 @@ import { db } from "@/lib/db";
    right on running. This is what makes the Pause button on the admin page
    actually stop something, not just change a label. */
 export async function isProjectPaused(projectId: string): Promise<boolean> {
-  const project = await db.serviceProject.findUnique({ where: { id: projectId }, select: { stage: true } });
-  return project?.stage === "PAUSED";
+  const project = await db.serviceProject.findUnique({ where: { id: projectId }, select: { stage: true, usageHoldUntil: true } });
+  return project?.stage === "PAUSED" || (!!project?.usageHoldUntil && project.usageHoldUntil > new Date());
+}
+
+/** Same rule as isProjectPaused, as a Prisma filter for the cron queries: not paused, and not on a usage hold. */
+export function runnableProject() {
+  return { stage: { not: "PAUSED" as const }, OR: [{ usageHoldUntil: null }, { usageHoldUntil: { lte: new Date() } }] };
 }

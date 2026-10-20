@@ -795,6 +795,9 @@ model ServiceProject {
   // Fixed option values only, applied by code the moment they're saved.
   agentSettings Json?
 
+  /// Set by the weekly cost cap or the hourly rate limit (usage-costs.ts); every runtime treats the project as paused until then.
+  usageHoldUntil DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

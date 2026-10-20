@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { runnableProject } from "@/lib/project-pause";
 import { getFreshAccessToken } from "@/lib/oauth-connections";
 import {
   fetchGoogleCalendarEvents,
@@ -181,7 +182,7 @@ export async function syncAndDraftTimeEntriesForConnection(
 
 export async function runBillingClerkForAllProjects(): Promise<{ connectionsProcessed: number; entriesCreated: number }> {
   const connections = await db.oAuthConnection.findMany({
-    where: { status: "CONNECTED", project: { stage: { not: "PAUSED" } } },
+    where: { status: "CONNECTED", project: runnableProject() },
     include: { project: { select: { specialty: true } } },
   });
   let entriesCreated = 0;

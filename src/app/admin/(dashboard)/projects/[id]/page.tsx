@@ -33,6 +33,7 @@ import {
 import { approveTimeEntry, rejectTimeEntry } from "@/lib/billing-clerk";
 import { LAW_FIRM_SPECIALTIES, LEGAL_SPECIALTY_PROFILES } from "@/lib/legal-specialties";
 import { getMonthlyCostCents, resolveMonthlyBudgetCents, isBudgetAutoPaused } from "@/lib/usage-costs";
+import { db } from "@/lib/db";
 
 /* Admin operations view for a single ServiceProject (Slice 4 of the
    business command center, 2026-08-28: /admin/projects/[id]). Every write
@@ -129,6 +130,14 @@ export default async function AdminProjectDetailPage({
     if (!result.ok) {
       redirect(`${path}?stageError=${encodeURIComponent(result.error)}`);
     }
+  }
+
+  async function liftUsageHold() {
+    "use server";
+    const session = await requireAdmin();
+    if (!session) return;
+    await db.serviceProject.update({ where: { id }, data: { usageHoldUntil: null } });
+    revalidatePath(path);
   }
 
   async function createMonthlyCheckout() {
@@ -326,6 +335,20 @@ export default async function AdminProjectDetailPage({
             </form>
           </div>
         </div>
+
+        {project.usageHoldUntil && project.usageHoldUntil > new Date() && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-400/30 bg-amber-400/[0.06] p-4">
+            <p className="text-sm text-amber-200">
+              On a usage hold until {project.usageHoldUntil.toISOString().slice(0, 16).replace("T", " ")} UTC (weekly cost cap or hourly
+              rate limit). Calls, texts and AI drafts are blocked until then, and it lifts on its own.
+            </p>
+            <form action={liftUsageHold}>
+              <button type="submit" className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-200 hover:bg-amber-400/20">
+                Lift hold now
+              </button>
+            </form>
+          </div>
+        )}
 
         {budgetAutoPaused && (
           <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/[0.06] p-4">

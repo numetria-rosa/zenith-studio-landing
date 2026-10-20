@@ -11,6 +11,8 @@ const DAY = 86400000;
 /** Days between reminders, and the most reminders one client ever gets. */
 export const CHASE_GAP_DAYS = 3; // ponytail: fixed; make it a per-accountant setting if clients ask
 export const MAX_CHASES = 6;
+/** Most reminder emails one accountant's account sends per daily run; anyone over it is simply due tomorrow. */
+export const MAX_EMAILS_PER_RUN = 150;
 
 export const CHECKLISTS = [
   {

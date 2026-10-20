@@ -1,10 +1,11 @@
 import { randomBytes } from "node:crypto";
+import { runnableProject } from "@/lib/project-pause";
 import { del, head } from "@vercel/blob";
 import { db } from "@/lib/db";
 import { sendAsBusiness } from "@/lib/client-mail";
 import { businessNameOf } from "@/lib/services";
 import { getSiteUrl } from "@/lib/site";
-import { chaseEmail, checklistItems, isDueForChase, MAX_UPLOAD_BYTES, REJECT_REASONS } from "@/lib/document-chaser";
+import { chaseEmail, checklistItems, isDueForChase, MAX_EMAILS_PER_RUN, MAX_UPLOAD_BYTES, REJECT_REASONS } from "@/lib/document-chaser";
 
 /* AI Document Chaser: database side. Every accountant-facing function checks the project belongs to the
    signed-in user and is this service; the client-facing ones are keyed by the secret upload token only. */
@@ -144,7 +145,7 @@ export async function confirmUpload(token: string, itemId: string, pathname: str
     once a client has sent everything. */
 export async function runDocumentChaser(now = new Date()): Promise<{ chased: number; completed: number; failed: number }> {
   const clients = await db.docChaseClient.findMany({
-    where: { status: "ACTIVE", project: { sourceServiceId: DOC_CHASER_SERVICE_ID, stage: { not: "PAUSED" } } },
+    where: { status: "ACTIVE", project: { sourceServiceId: DOC_CHASER_SERVICE_ID, ...runnableProject() } },
     include: {
       items: { orderBy: { order: "asc" } },
       project: { select: { title: true, sourceServiceId: true, user: { select: { email: true } } } },
@@ -153,6 +154,7 @@ export async function runDocumentChaser(now = new Date()): Promise<{ chased: num
   let chased = 0;
   let completed = 0;
   let failed = 0;
+  const sentPerProject = new Map<string, number>();
   for (const c of clients) {
     const businessName = businessNameOf(c.project) || "Your accountant";
     const accountantEmail = c.project.user.email;
@@ -175,10 +177,13 @@ export async function runDocumentChaser(now = new Date()): Promise<{ chased: num
     }
 
     if (!isDueForChase(c, outstanding.length, now)) continue;
+    const sentSoFar = sentPerProject.get(c.projectId) ?? 0;
+    if (sentSoFar >= MAX_EMAILS_PER_RUN) continue;
     const mail = chaseEmail({ businessName, clientName: c.name, items: outstanding, uploadUrl: uploadUrlFor(c.uploadToken), reminder: c.chaseCount });
     const sent = await sendAsBusiness({ businessName, to: c.email, replyTo: accountantEmail, subject: mail.subject, text: mail.text });
     if (sent.ok) {
       await db.docChaseClient.update({ where: { id: c.id }, data: { chaseCount: { increment: 1 }, lastChasedAt: now } });
+      sentPerProject.set(c.projectId, sentSoFar + 1);
       chased++;
     } else failed++;
   }

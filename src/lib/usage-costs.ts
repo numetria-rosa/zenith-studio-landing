@@ -39,6 +39,48 @@ export async function recordUsageCost(projectId: string, costCents: number, sour
   if (costCents <= 0) return;
   await db.serviceMetric.create({ data: { projectId, key: USAGE_METRIC_KEY, value: costCents } });
   await checkBudgetThresholds(projectId, source);
+  await checkShortTermLimits(projectId, source);
+}
+
+/* Short-term limits on top of the monthly cap, so one client can't burn the whole month's budget in a
+   few days (weekly cap) or run away in a loop (hourly rate limit). Both set a temporary hold that lifts on
+   its own (ServiceProject.usageHoldUntil, enforced by isProjectPaused/runnableProject), unlike the
+   monthly cap's PAUSED stage, which waits for an admin.
+   ponytail: fixed for every client; make them per-plan settings if a client legitimately needs bursts. */
+export const WEEKLY_BUDGET_SHARE = 0.4; // of the monthly budget, per rolling 7 days
+export const HOURLY_EVENT_LIMIT = 120; // paid actions (texts, calls, AI drafts) per rolling hour
+const HOUR = 3600_000;
+const DAY = 24 * HOUR;
+
+/** Pure: how long to hold a project, given its recent usage. null = no hold. */
+export function usageHold(input: { weekCents: number; monthlyBudgetCents: number; hourEvents: number; now: Date }): { until: Date; reason: "weekly" | "hourly" } | null {
+  if (input.monthlyBudgetCents > 0 && input.weekCents > input.monthlyBudgetCents * WEEKLY_BUDGET_SHARE) return { until: new Date(input.now.getTime() + DAY), reason: "weekly" };
+  if (input.hourEvents > HOURLY_EVENT_LIMIT) return { until: new Date(input.now.getTime() + HOUR), reason: "hourly" };
+  return null;
+}
+
+async function checkShortTermLimits(projectId: string, source: string): Promise<void> {
+  const now = new Date();
+  const [week, hourEvents, monthlyBudgetCents] = await Promise.all([
+    db.serviceMetric.aggregate({ where: { projectId, key: USAGE_METRIC_KEY, recordedAt: { gte: new Date(now.getTime() - 7 * DAY) } }, _sum: { value: true } }),
+    db.serviceMetric.count({ where: { projectId, key: USAGE_METRIC_KEY, recordedAt: { gte: new Date(now.getTime() - HOUR) } } }),
+    resolveMonthlyBudgetCents(projectId),
+  ]);
+  const hold = usageHold({ weekCents: week._sum.value ?? 0, monthlyBudgetCents, hourEvents, now });
+  if (!hold) return;
+  // Only the call that starts a hold alerts; later events inside the same hold are already blocked upstream.
+  const started = await db.serviceProject.updateMany({
+    where: { id: projectId, OR: [{ usageHoldUntil: null }, { usageHoldUntil: { lte: now } }] },
+    data: { usageHoldUntil: hold.until },
+  });
+  if (started.count === 0) return;
+  const project = await db.serviceProject.findUnique({ where: { id: projectId }, select: { title: true } });
+  await sendAdminAlert(
+    `Usage limit hit (${hold.reason}), on hold until ${hold.until.toISOString().slice(0, 16).replace("T", " ")} UTC: ${project?.title ?? projectId}`,
+    hold.reason === "weekly"
+      ? `Spend over the last 7 days passed ${WEEKLY_BUDGET_SHARE * 100}% of this client's monthly budget ($${(monthlyBudgetCents / 100).toFixed(2)}). Calls, texts and AI drafts are held for 24 hours and resume on their own. Last event: ${source}. To lift it now, clear usageHoldUntil on the project.`
+      : `More than ${HOURLY_EVENT_LIMIT} paid actions in the last hour, which usually means a loop. Held for 1 hour, then it resumes on its own. Last event: ${source}.`
+  );
 }
 
 function currentMonthKey(): string {
