@@ -9,7 +9,7 @@
 //   node --experimental-strip-types scripts/pull-accountant-leads.mjs US us-states 50,20 OH,PA,MI
 //     (US: per state, top 50 firms + top 20 solo practitioners)
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { analyzeAccountantSite, followUpLinks } from "../src/lib/accountant-site-check.ts";
 
 const [country, outName, quota, statesArg] = process.argv.slice(2);
@@ -103,10 +103,20 @@ const regions = country === "UK" ? ["UK"] : statesArg.split(",");
 const seen = new Set();
 const kept = [];
 const summary = [];
+// Each region's checked sites are cached, so a re-run after a network failure resumes instead of starting over.
+mkdirSync("leads/.cache", { recursive: true });
 for (const region of regions) {
-  const els = (await overpass(areaQuery(region))).filter((e) => e.tags.website || e.tags["contact:website"]);
-  console.log(`${region}: ${els.length} listings with a website`);
-  const results = (await pool(els, 6, (e) => check(e, region))).filter(Boolean);
+  const cacheFile = `leads/.cache/${country}-${region}.json`;
+  let els, results;
+  if (existsSync(cacheFile)) {
+    ({ els, results } = JSON.parse(readFileSync(cacheFile, "utf8")));
+    console.log(`${region}: ${els.length} listings with a website (cached)`);
+  } else {
+    els = (await overpass(areaQuery(region))).filter((e) => e.tags.website || e.tags["contact:website"]);
+    console.log(`${region}: ${els.length} listings with a website`);
+    results = (await pool(els, 6, (e) => check(e, region))).filter(Boolean);
+    writeFileSync(cacheFile, JSON.stringify({ els: els.map(() => 0), results }));
+  }
   const good = results
     .filter((r) => r.score >= MIN_SCORE && r.email)
     .filter((r) => {
