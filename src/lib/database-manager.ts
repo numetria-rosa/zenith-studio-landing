@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { runnableProject } from "@/lib/project-pause";
 import { db } from "@/lib/db";
 import { sendAsBusiness } from "@/lib/client-mail";
 import { getSiteUrl } from "@/lib/site";
@@ -120,7 +121,7 @@ export async function unsubscribeContact(token: string): Promise<boolean> {
 /** Daily: sends the next email to every contact whose gap has passed, capped per client. */
 export async function runDatabaseManager(now = new Date()): Promise<{ sent: number; finished: number }> {
   const contacts = await db.dormantContact.findMany({
-    where: { status: "IN_SEQUENCE", project: { stage: { not: "PAUSED" } } },
+    where: { status: "IN_SEQUENCE", project: runnableProject() },
     orderBy: { createdAt: "asc" },
     include: { project: { select: { title: true, agentSettings: true, user: { select: { email: true } } } } },
   });

@@ -54,41 +54,41 @@ model User {
   passwordEnc String?
 
   // Student space profile (src/app/account/profile). Email stays owned by the login/purchase provider.
-  displayName        String?
-  timezone           String?
-  githubUrl          String?
-  linkedinUrl        String?
-  avatarUrl          String?
-  notifyProductNews  Boolean @default(true)
-  notifyWeeklyRecap  Boolean @default(true)
-  notifyOffers       Boolean @default(false)
+  displayName       String?
+  timezone          String?
+  githubUrl         String?
+  linkedinUrl       String?
+  avatarUrl         String?
+  notifyProductNews Boolean @default(true)
+  notifyWeeklyRecap Boolean @default(true)
+  notifyOffers      Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  accounts        Account[]
-  sessions        Session[]
-  entitlements    CourseEntitlement[]
-  progress        CourseProgress[]
-  aieLessonProgress AieLessonProgress[]
+  accounts            Account[]
+  sessions            Session[]
+  entitlements        CourseEntitlement[]
+  progress            CourseProgress[]
+  aieLessonProgress   AieLessonProgress[]
   aieExerciseProgress AieExerciseProgress[]
-  aieQuizAttempts AieQuizAttempt[]
-  aieProjectProgress AieProjectProgress[]
-  aieOrientation AieOrientation?
-  aieCapstone AieCapstone?
-  aieClients      AieClient[]
-  aieSellPlanSteps AieSellPlanStep[]
-  serviceRequests ServiceRequest[]
-  purchaseClaims  PurchaseClaim[]
-  proposals       Proposal[]
-  serviceProjects ServiceProject[]
-  assignedProjects ServiceProject[] @relation("ServiceProjectAssignee")
-  clientDocuments ClientDocument[]
-  serviceMessages ServiceMessage[]
-  supportRequests SupportRequest[]
-  assignedTasks   Task[]            @relation("TaskAssignee")
-  paidAudits      PaidAudit[]
-  waMemberships   WaMembership[]
+  aieQuizAttempts     AieQuizAttempt[]
+  aieProjectProgress  AieProjectProgress[]
+  aieOrientation      AieOrientation?
+  aieCapstone         AieCapstone?
+  aieClients          AieClient[]
+  aieSellPlanSteps    AieSellPlanStep[]
+  serviceRequests     ServiceRequest[]
+  purchaseClaims      PurchaseClaim[]
+  proposals           Proposal[]
+  serviceProjects     ServiceProject[]
+  assignedProjects    ServiceProject[]      @relation("ServiceProjectAssignee")
+  clientDocuments     ClientDocument[]
+  serviceMessages     ServiceMessage[]
+  supportRequests     SupportRequest[]
+  assignedTasks       Task[]                @relation("TaskAssignee")
+  paidAudits          PaidAudit[]
+  waMemberships       WaMembership[]
 }
 
 model Account {
@@ -138,7 +138,7 @@ model CourseEntitlement {
   source String @default("whop")
 
   whopMembershipId String?
-  whopPaymentId     String?
+  whopPaymentId    String?
 
   grantedAt DateTime  @default(now())
   revokedAt DateTime?
@@ -182,13 +182,13 @@ model WebhookEvent {
 // then closes the tab without entering payment info leaves no trace on
 // Whop's side at all. This is the only way to see that drop-off.
 model CheckoutAttempt {
-  id         String   @id @default(cuid())
-  courseId   String
-  utmSource  String?
-  utmMedium  String?
+  id          String   @id @default(cuid())
+  courseId    String
+  utmSource   String?
+  utmMedium   String?
   utmCampaign String?
-  utmContent String?
-  createdAt  DateTime @default(now())
+  utmContent  String?
+  createdAt   DateTime @default(now())
 
   @@index([courseId])
   @@index([createdAt])
@@ -261,15 +261,15 @@ model AieQuizAttempt {
 model AieProjectProgress {
   userId       String
   projectId    Int
-  checklist    Json     @default("[]")
-  rubric       Json     @default("{}")
-  githubUrl    String   @default("")
-  description  String   @default("")
-  technologies String   @default("")
-  testsPassed  String   @default("")
-  score        Int      @default(0)
+  checklist    Json      @default("[]")
+  rubric       Json      @default("{}")
+  githubUrl    String    @default("")
+  description  String    @default("")
+  technologies String    @default("")
+  testsPassed  String    @default("")
+  score        Int       @default(0)
   completedAt  DateTime?
-  updatedAt    DateTime @updatedAt
+  updatedAt    DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -278,11 +278,11 @@ model AieProjectProgress {
 
 // Module 0 (orientation): the path-finder's top directions and the ungraded self-check score.
 model AieOrientation {
-  userId          String   @id
-  pathTop         String[]
-  selfCheckScore  Int?
-  selfCheckTotal  Int?
-  updatedAt       DateTime @updatedAt
+  userId         String   @id
+  pathTop        String[]
+  selfCheckScore Int?
+  selfCheckTotal Int?
+  updatedAt      DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -290,17 +290,17 @@ model AieOrientation {
 // Module 8 capstone: what the student wrote and the server-graded score of each part
 // (design 0-100, implementation = test pass rate, debugging 0-100). Scores stay null until attempted.
 model AieCapstone {
-  userId          String   @id
-  design          Json     @default("{}")
-  designScore     Int?
-  implCode        String   @default("")
-  implScore       Int?
-  debugQ1         Int?
-  debugAnswer     String   @default("")
-  debugAnswerOk   Boolean?
-  debugScore      Int?
-  review          Json     @default("{}")
-  updatedAt       DateTime @updatedAt
+  userId        String   @id
+  design        Json     @default("{}")
+  designScore   Int?
+  implCode      String   @default("")
+  implScore     Int?
+  debugQ1       Int?
+  debugAnswer   String   @default("")
+  debugAnswerOk Boolean?
+  debugScore    Int?
+  review        Json     @default("{}")
+  updatedAt     DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -341,11 +341,11 @@ model AieSellPlanStep {
 // system's monthlyStatus can later go to "canceled" without erasing that
 // it was ever built. serviceId matches src/lib/services.ts's id.
 model ServiceRequest {
-  id       String @id @default(cuid())
-  userId   String
+  id        String @id @default(cuid())
+  userId    String
   serviceId String
 
-  status        String @default("new")      // new | scoping | building | live | maintenance
+  status        String @default("new") // new | scoping | building | live | maintenance
   monthlyStatus String @default("inactive") // inactive | active | canceled
 
   // Zenith HQ addition, 2026-09-25: which cycle this client is billed on.
@@ -527,15 +527,15 @@ enum RecommendationPriority {
 // ServiceCatalog offering — nullable since not every recommendation maps to
 // an existing catalog service (e.g. a bespoke build not yet cataloged).
 model AuditRecommendation {
-  id               String                  @id @default(cuid())
+  id               String                 @id @default(cuid())
   auditId          String
   catalogServiceId String?
   title            String
   priority         RecommendationPriority
-  rationale        String                  @db.Text
-  expectedOutcome  String                  @db.Text
+  rationale        String                 @db.Text
+  expectedOutcome  String                 @db.Text
   estimatedEffort  String
-  createdAt        DateTime                @default(now())
+  createdAt        DateTime               @default(now())
 
   audit          AuditRequest    @relation(fields: [auditId], references: [id], onDelete: Cascade)
   catalogService ServiceCatalog? @relation(fields: [catalogServiceId], references: [id])
@@ -629,14 +629,14 @@ model Proposal {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  audit    AuditRequest?     @relation(fields: [auditId], references: [id])
-  user     User?             @relation(fields: [userId], references: [id])
-  items    ProposalItem[]
-  versions ProposalVersion[]
-  approvals ClientApproval[]
+  audit           AuditRequest?     @relation(fields: [auditId], references: [id])
+  user            User?             @relation(fields: [userId], references: [id])
+  items           ProposalItem[]
+  versions        ProposalVersion[]
+  approvals       ClientApproval[]
   serviceProjects ServiceProject[]
-  paidAudits PaidAudit[]
-  prospect   Prospect?
+  paidAudits      PaidAudit[]
+  prospect        Prospect?
 
   @@index([auditId])
   @@index([userId])
@@ -661,8 +661,8 @@ model ProposalItem {
   kind             ProposalItemKind
   amountCents      Int
   unitLabel        String?
-  isOptionalAddOn  Boolean @default(false)
-  order            Int     @default(0)
+  isOptionalAddOn  Boolean          @default(false)
+  order            Int              @default(0)
   catalogServiceId String?
 
   proposal       Proposal        @relation(fields: [proposalId], references: [id], onDelete: Cascade)
@@ -699,12 +699,12 @@ enum ClientApprovalAction {
 // all. ipAddress is best-effort (request.headers.get("x-forwarded-for")),
 // never blocking on failure to obtain one.
 model ClientApproval {
-  id         String                @id @default(cuid())
-  proposalId String
-  action     ClientApprovalAction
-  note       String?               @db.Text
+  id          String               @id @default(cuid())
+  proposalId  String
+  action      ClientApprovalAction
+  note        String?              @db.Text
   respondedAt DateTime             @default(now())
-  ipAddress  String?
+  ipAddress   String?
 
   proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
 
@@ -795,6 +795,12 @@ model ServiceProject {
   // Fixed option values only, applied by code the moment they're saved.
   agentSettings Json?
 
+  /// Set by the weekly cost cap or the hourly rate limit (usage-costs.ts); every runtime treats the project as paused until then.
+  usageHoldUntil DateTime?
+
+  /// When the subscription was cancelled (Whop membership.deactivated). Client data held for this service is purged 30 days later.
+  cancelledAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -803,25 +809,26 @@ model ServiceProject {
   proposal       Proposal?       @relation(fields: [proposalId], references: [id])
   assignee       User?           @relation("ServiceProjectAssignee", fields: [assigneeUserId], references: [id])
 
-  milestones      ProjectMilestone[]
-  requirements    ClientRequirement[]
-  integrations    Integration[]
-  metrics         ServiceMetric[]
-  documents       ClientDocument[]
-  messages        ServiceMessage[]
-  supportRequests SupportRequest[]
-  tasks           Task[]
-  leads           Lead[]
-  oauthConnections OAuthConnection[]
-  timeEntries      TimeEntry[]
-  mailConnections  MailConnection[]
-  inboxDrafts      InboxDraft[]
+  milestones             ProjectMilestone[]
+  requirements           ClientRequirement[]
+  integrations           Integration[]
+  metrics                ServiceMetric[]
+  documents              ClientDocument[]
+  messages               ServiceMessage[]
+  supportRequests        SupportRequest[]
+  tasks                  Task[]
+  leads                  Lead[]
+  oauthConnections       OAuthConnection[]
+  timeEntries            TimeEntry[]
+  mailConnections        MailConnection[]
+  inboxDrafts            InboxDraft[]
   insuranceCrmLogEntries InsuranceCrmLogEntry[]
-  insurancePolicies InsurancePolicy[]
-  agentChanges      AgentChangeRequest[]
-  transactions      Transaction[]
-  dormantContacts   DormantContact[]
-  textingRegistration TextingRegistration?
+  insurancePolicies      InsurancePolicy[]
+  agentChanges           AgentChangeRequest[]
+  transactions           Transaction[]
+  dormantContacts        DormantContact[]
+  docChaseClients        DocChaseClient[]
+  textingRegistration    TextingRegistration?
 
   @@index([userId])
   @@index([proposalId])
@@ -847,16 +854,16 @@ enum OAuthConnectionStatus {
 // (AES-256-GCM, key only in server env, see lib/secrets.ts), so a DB leak
 // alone still doesn't hand out live access to a firm's inbox.
 model OAuthConnection {
-  id                    String                 @id @default(cuid())
+  id                    String                @id @default(cuid())
   projectId             String
   provider              OAuthProvider
   accountEmail          String // whose mailbox/calendar this is
-  encryptedRefreshToken String                 @db.Text
+  encryptedRefreshToken String                @db.Text
   scope                 String
-  status                OAuthConnectionStatus  @default(CONNECTED)
-  connectedAt           DateTime               @default(now())
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
+  status                OAuthConnectionStatus @default(CONNECTED)
+  connectedAt           DateTime              @default(now())
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
 
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -939,18 +946,18 @@ enum MailConnectionStatus {
 }
 
 model MailConnection {
-  id                    String                @id @default(cuid())
-  projectId             String
-  provider              MailProvider
-  emailAddress          String
+  id                   String               @id @default(cuid())
+  projectId            String
+  provider             MailProvider
+  emailAddress         String
   // AES-256-GCM ciphertext via src/lib/password.ts, same mechanism and key
   // already used for client login passwords — never stored in plaintext.
-  encryptedAppPassword  String                @db.Text
-  status                MailConnectionStatus  @default(CONNECTED)
-  lastError             String?
-  connectedAt           DateTime              @default(now())
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
+  encryptedAppPassword String               @db.Text
+  status               MailConnectionStatus @default(CONNECTED)
+  lastError            String?
+  connectedAt          DateTime             @default(now())
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
 
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -1004,19 +1011,19 @@ enum LeadStatus {
 // email, so an email channel would sit unused, add one only once a lead
 // source that actually has emails exists. See follow-up-clerk.ts.
 model Lead {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   projectId String
   name      String?
   phone     String?
   email     String?
-  message   String?    @db.Text // the enquiry text itself, for web-form leads
+  message   String? @db.Text // the enquiry text itself, for web-form leads
   source    String // e.g. "missed-call-text-back", "web-form", "manual"
 
   // AI Lead Capture & Follow-Up only, null for every other source. Never
   // gates the follow-up sequence itself (a "not qualified" lead still gets
   // worked; this is visibility for the business, not an auto-reject).
   qualified         Boolean?
-  qualificationNote String?    @db.Text
+  qualificationNote String?  @db.Text
 
   status             LeadStatus @default(NEW)
   sequenceStep       Int        @default(0)
@@ -1112,14 +1119,14 @@ enum RequirementStatus {
 // provide/confirm before/during build), deliberately not split into two
 // models.
 model ClientRequirement {
-  id        String             @id @default(cuid())
+  id        String            @id @default(cuid())
   projectId String
   label     String
-  detail    String?            @db.Text
-  status    RequirementStatus  @default(MISSING)
-  order     Int                @default(0)
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
+  detail    String?           @db.Text
+  status    RequirementStatus @default(MISSING)
+  order     Int               @default(0)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -1150,15 +1157,15 @@ enum IntegrationStatus {
 // persist a credential, that is its own dedicated slice with a real
 // secrets manager, not a field on this table.
 model Integration {
-  id          String             @id @default(cuid())
+  id          String            @id @default(cuid())
   projectId   String
   provider    String // e.g. "gmail", "twilio", "crm", "vapi", "cal"
-  status      IntegrationStatus  @default(NOT_CONNECTED)
+  status      IntegrationStatus @default(NOT_CONNECTED)
   externalRef String? // opaque reference/id ONLY — never a raw secret, credential, API key, or token
   config      Json? // non-secret runtime config for this provider (business name, FAQ, hours, event type id), read by the service's runtime engine to build behavior per client without hardcoding it
   connectedAt DateTime?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -1378,7 +1385,7 @@ model PaidAudit {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   relatedAuditRequest AuditRequest? @relation(fields: [relatedAuditRequestId], references: [id])
   relatedProposal     Proposal?     @relation(fields: [relatedProposalId], references: [id])
 
@@ -1475,8 +1482,8 @@ model Prospect {
   recommendedOffer     String
   outreachPath         OutreachPath
 
-  personalizationSignal String @db.Text
-  opportunity           String @db.Text
+  personalizationSignal String  @db.Text
+  opportunity           String  @db.Text
   buyingSignal          String?
   researchData          Json
 
@@ -1509,19 +1516,19 @@ model OutreachMessage {
 
   emailType    OutreachEmailType
   subject      String
-  bodyText     String            @db.Text
-  bodyHtml     String            @db.Text
+  bodyText     String                @db.Text
+  bodyHtml     String                @db.Text
   qualityScore Int
   status       OutreachMessageStatus @default(DRAFT)
 
-  factsUsed        Json
-  factCheckPassed  Boolean @default(false)
-  factCheckNotes   Json?
-  servicePagePath  String
-  proposalPath     String?
-  auditCta         String
+  factsUsed       Json
+  factCheckPassed Boolean @default(false)
+  factCheckNotes  Json?
+  servicePagePath String
+  proposalPath    String?
+  auditCta        String
 
-  resendEmailId String? @unique
+  resendEmailId String?     @unique
   scheduledFor  DateTime?
   sentAt        DateTime?
   deliveredAt   DateTime?
@@ -1663,17 +1670,17 @@ model DormantContact {
 // behalf through SignalWire's Campaign Registry API. Texts are held until
 // status is ACTIVE; see src/lib/texting-registration.ts.
 model TextingRegistration {
-  id          String   @id @default(cuid())
-  projectId   String   @unique
-  status      String   @default("BRAND_PENDING") // BRAND_PENDING | CAMPAIGN_PENDING | NUMBER_PENDING | ACTIVE | FAILED
+  id          String    @id @default(cuid())
+  projectId   String    @unique
+  status      String    @default("BRAND_PENDING") // BRAND_PENDING | CAMPAIGN_PENDING | NUMBER_PENDING | ACTIVE | FAILED
   brandId     String?
   campaignId  String?
   orderId     String?
   details     Json // what the client submitted (legal name, EIN, address, ...)
   lastError   String?
-  submittedAt DateTime @default(now())
+  submittedAt DateTime  @default(now())
   activatedAt DateTime?
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime  @updatedAt
 
   project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -1709,18 +1716,18 @@ model WaAgency {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  memberships   WaMembership[]
-  whatsapp      WaWhatsAppAccount?
-  kbDocuments   WaKbDocument[]
-  agentSettings WaAgentSettings?
-  contacts      WaContact[]
-  conversations WaConversation[]
-  leads         WaLead[]
-  handoffs      WaHandoff[]
-  subscription  WaSubscription?
-  usageCounters WaUsageCounter[]
-  auditLog      WaAuditLog[]
-  promptRuns    WaPromptRun[]
+  memberships           WaMembership[]
+  whatsapp              WaWhatsAppAccount?
+  kbDocuments           WaKbDocument[]
+  agentSettings         WaAgentSettings?
+  contacts              WaContact[]
+  conversations         WaConversation[]
+  leads                 WaLead[]
+  handoffs              WaHandoff[]
+  subscription          WaSubscription?
+  usageCounters         WaUsageCounter[]
+  auditLog              WaAuditLog[]
+  promptRuns            WaPromptRun[]
   manualConnectRequests WaManualConnectRequest[]
 
   @@index([status])
@@ -1758,24 +1765,24 @@ enum WaAccountStatus {
 // One number per agency at Starter/Growth (Pro allows up to 3 - enforced
 // by entitlement check, not a DB constraint, since the cap differs by plan).
 model WaWhatsAppAccount {
-  id                   String            @id @default(cuid())
-  agencyId             String            @unique
-  provider             WaProvider        @default(META)
-  wabaId               String?
-  phoneNumberId        String?           @unique
-  displayPhoneNumber   String?
-  encryptedAccessToken String? // see CLAUDE.md §7 - encryptSecret/decryptSecret, own env key
+  id                       String          @id @default(cuid())
+  agencyId                 String          @unique
+  provider                 WaProvider      @default(META)
+  wabaId                   String?
+  phoneNumberId            String?         @unique
+  displayPhoneNumber       String?
+  encryptedAccessToken     String? // see CLAUDE.md §7 - encryptSecret/decryptSecret, own env key
   // Two-step verification PIN we set when registering the number for Cloud API (Embedded Signup),
   // encrypted with the same key as the token; needed to re-register the number later.
   encryptedRegistrationPin String?
-  status               WaAccountStatus   @default(PENDING)
-  lastError            String?
-  connectedAt          DateTime?
+  status                   WaAccountStatus @default(PENDING)
+  lastError                String?
+  connectedAt              DateTime?
   // Which path connected this number - the Embedded Signup weekly cap
   // (see src/lib/whatsapp-umrah/embedded-signup.ts) only counts
   // EMBEDDED_SIGNUP rows, matching Meta's own "new business customers"
   // definition. Existing/manually-connected agencies default to MANUAL.
-  connectMethod        WaConnectMethod   @default(MANUAL)
+  connectMethod            WaConnectMethod @default(MANUAL)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1793,12 +1800,14 @@ enum WaManualConnectRequestStatus {
   RESOLVED
 }
 
-/* Fallback when Embedded Signup is off or its weekly cap is hit (CLAUDE.md's
-   onboarding path + the 2026-09-30 cap-tracking work): the agency owner
-   fills this in from their dashboard instead of self-connecting, an admin
-   sees it in Zenith HQ, and marks it resolved once they've manually
-   connected the number via the admin WABA page. No email - this table IS
-   the notification surface. */
+/**
+ * Fallback when Embedded Signup is off or its weekly cap is hit (CLAUDE.md's
+ * onboarding path + the 2026-09-30 cap-tracking work): the agency owner
+ * fills this in from their dashboard instead of self-connecting, an admin
+ * sees it in Zenith HQ, and marks it resolved once they've manually
+ * connected the number via the admin WABA page. No email - this table IS
+ * the notification surface.
+ */
 model WaManualConnectRequest {
   id            String                       @id @default(cuid())
   agencyId      String
@@ -2175,4 +2184,46 @@ model WaWaitlistSignup {
   createdAt DateTime @default(now())
 
   @@index([plan])
+}
+
+// AI Document Chaser (accountants): one row per end client the accountant needs documents from.
+// uploadToken is the secret in the client's private upload link (no account needed).
+model DocChaseClient {
+  id           String    @id @default(cuid())
+  projectId    String
+  name         String
+  email        String
+  checklist    String // a CHECKLISTS id in src/lib/document-chaser.ts
+  status       String    @default("ACTIVE") // ACTIVE | PAUSED | DONE
+  uploadToken  String    @unique
+  chaseCount   Int       @default(0)
+  lastChasedAt DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  items   DocChaseItem[]
+
+  @@unique([projectId, email])
+  @@index([projectId])
+}
+
+model DocChaseItem {
+  id            String    @id @default(cuid())
+  clientId      String
+  label         String
+  order         Int       @default(0)
+  status        String    @default("REQUESTED") // REQUESTED | RECEIVED | ACCEPTED
+  rejectReason  String? // set when the accountant sends a file back; shown to the client
+  filePathname  String? // private Vercel Blob pathname of the latest upload
+  fileName      String?
+  uploadedAt    DateTime?
+  /// Set when the stored file was deleted under the retention rule (the item keeps its status).
+  fileDeletedAt DateTime?
+  createdAt     DateTime  @default(now())
+
+  client DocChaseClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
 }

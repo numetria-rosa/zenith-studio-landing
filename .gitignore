@@ -62,3 +62,7 @@ tests/visual/out/
 # agent kit (python)
 __pycache__/
 .pytest_cache/
+
+# Prospect lists from scripts/pull-accountant-leads.mjs (business contact data, kept out of git)
+/leads/
+/doc-chaser-test-kit/

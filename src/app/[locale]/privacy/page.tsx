@@ -1,3 +1,4 @@
+import { CANCELLED_GRACE_DAYS, FILE_RETENTION_DAYS } from "@/lib/document-chaser";
 import Link from "next/link";
 
 export const metadata = { title: "Privacy Policy" };
@@ -7,7 +8,7 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-[#05060a] px-6 py-16 text-white">
       <div className="mx-auto max-w-2xl">
         <h1 className="text-2xl font-extrabold tracking-tight">Privacy Policy</h1>
-        <p className="mt-2 text-sm text-white/50">Last updated October 17, 2026</p>
+        <p className="mt-2 text-sm text-white/50">Last updated October 21, 2026</p>
 
         <p className="mt-8 text-[15px] leading-7 text-white/75">
           Zenith Studio (&ldquo;we&rdquo;, &ldquo;us&rdquo;) builds AI-powered systems and courses for
@@ -49,6 +50,14 @@ export default function PrivacyPage() {
             </Link>{" "}
             for what is processed and for how long.
           </li>
+          <li>
+            <strong>Client documents (AI Document Chaser clients only):</strong> the accounting firm adds its
+            clients&apos; names and email addresses, and those clients upload documents (for example tax and bank
+            statements) through a private link. The accounting firm is the data controller for this information
+            and we are the data processor, acting only on the firm&apos;s instructions. Uploaded files are stored
+            privately with Vercel in London, can only be opened by the firm from its signed-in dashboard, and are
+            never used for anything other than delivering them to that firm.
+          </li>
         </ul>
 
         <h2 className="mt-10 text-lg font-semibold">How we use this information</h2>
@@ -65,7 +74,7 @@ export default function PrivacyPage() {
           We use trusted third-party providers to deliver our services, including Google and Microsoft (for
           calendar/email access you explicitly authorize), SignalWire (for phone and SMS), Vapi (for AI voice
           calls), Cal.com (for appointment booking), Groq and Anthropic (for AI text drafting), Voyage AI (for
-          searching a client&apos;s own knowledge base), Resend (for email delivery), Vercel (hosting), Neon
+          searching a client&apos;s own knowledge base), Resend (for email delivery), Vercel (hosting and private file storage), Neon
           (database), and Whop (for payments). Each provider only receives the data necessary to perform its
           function.
         </p>
@@ -86,6 +95,14 @@ export default function PrivacyPage() {
           obligations. You can revoke Google or Microsoft calendar/email access at any time from your Google
           or Microsoft account settings, or by contacting us, and we will stop syncing new data immediately.
           To request deletion of your data, email us at the address below.
+        </p>
+        <p className="mt-4 text-[15px] leading-7 text-white/75">
+          For the AI Document Chaser: each uploaded file is deleted automatically {FILE_RETENTION_DAYS} days after upload. A firm
+          can delete any client, with every file that client uploaded, at any time from its dashboard. If a firm
+          cancels its subscription, the service stops immediately, the firm has {CANCELLED_GRACE_DAYS} days to download its
+          clients&apos; files, and then all of its clients&apos; data and files are deleted. A client of a firm
+          who wants their data deleted should contact the firm, which can delete it straight away; we will also
+          act on such a request if it reaches us directly, after confirming it with the firm.
         </p>
 
         <h2 className="mt-10 text-lg font-semibold">Contact</h2>

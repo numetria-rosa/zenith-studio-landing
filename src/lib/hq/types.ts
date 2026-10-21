@@ -83,6 +83,7 @@ export const SERVICE_ORDER: ServiceKey[] = [
   "ai-inbox-manager",
   "ai-receptionist",
   "ai-lead-capture",
+  "accounting-document-chaser",
 ];
 
 export const SERVICE_COLOR: Record<ServiceKey, string> = {
@@ -92,6 +93,7 @@ export const SERVICE_COLOR: Record<ServiceKey, string> = {
   "ai-inbox-manager": "#2BA37A",
   "ai-receptionist": "#D9788F",
   "ai-lead-capture": "#C99A3D",
+  "accounting-document-chaser": "#4FA3A5",
 };
 
 export const SERVICE_SHORT: Record<ServiceKey, string> = {
@@ -101,6 +103,7 @@ export const SERVICE_SHORT: Record<ServiceKey, string> = {
   "ai-inbox-manager": "Inbox Manager",
   "ai-receptionist": "Receptionist",
   "ai-lead-capture": "Lead Capture",
+  "accounting-document-chaser": "Doc Chaser",
 };
 
 export const SETUP_STEPS = ["Payment received", "Tools connected", "Agents tuned and tested", "Ready"] as const;

@@ -4,7 +4,7 @@ import { fetchUnseenEmails, sendMailReply } from "@/lib/mail-imap";
 import { groqChatCompletion } from "@/lib/groq";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
-import { isProjectPaused } from "@/lib/project-pause";
+import { isProjectPaused, runnableProject } from "@/lib/project-pause";
 import { readSettings, inboxReplyStyle, inboxSignOff } from "@/lib/agent-settings";
 import type { MailConnection } from "@prisma/client";
 
@@ -106,7 +106,7 @@ export async function syncAndDraftForConnection(connection: MailConnection): Pro
 
 export async function runInboxManagerForAllProjects(): Promise<{ connectionsProcessed: number; draftsCreated: number }> {
   const connections = await db.mailConnection.findMany({
-    where: { status: "CONNECTED", project: { stage: { not: "PAUSED" } } },
+    where: { status: "CONNECTED", project: runnableProject() },
   });
   let draftsCreated = 0;
   for (const connection of connections) {

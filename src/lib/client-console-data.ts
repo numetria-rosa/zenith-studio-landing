@@ -18,9 +18,9 @@ import type { IconName } from "@/app/services/dashboard/[clientId]/Icon";
    for something that doesn't actually run. */
 
 export type Tone = "run" | "need" | "done" | "dim";
-export type PlanId = "law-firms" | "insurance-ai-team" | "brokerages" | "ai-inbox-manager" | "ai-receptionist" | "ai-lead-capture";
+export type PlanId = "law-firms" | "insurance-ai-team" | "brokerages" | "ai-inbox-manager" | "ai-receptionist" | "ai-lead-capture" | "accounting-document-chaser";
 
-export const SUPPORTED_PLANS: PlanId[] = ["law-firms", "insurance-ai-team", "brokerages", "ai-inbox-manager", "ai-receptionist", "ai-lead-capture"];
+export const SUPPORTED_PLANS: PlanId[] = ["law-firms", "insurance-ai-team", "brokerages", "ai-inbox-manager", "ai-receptionist", "ai-lead-capture", "accounting-document-chaser"];
 
 export function isSupportedPlan(sourceServiceId: string | null): sourceServiceId is PlanId {
   return SUPPORTED_PLANS.includes(sourceServiceId as PlanId);
@@ -78,6 +78,7 @@ export type ConsoleProject = {
   }[];
   dormantContacts: { id: string; name: string; status: string; lastSentAt: Date | null; sequenceStep: number }[];
   textingRegistration: { status: string; submittedAt: Date; lastError: string | null } | null;
+  docChaseClients?: { id: string; name: string; status: string; chaseCount: number; lastChasedAt: Date | null; completedAt: Date | null; createdAt: Date; items: { id: string; label: string; status: string; uploadedAt: Date | null }[] }[];
 };
 
 function hasIntegration(project: ConsoleProject, provider: string): boolean {
@@ -543,10 +544,62 @@ function inboxManagerApprovalItems(project: ConsoleProject, agentHref: (agentId:
     .map((d) => ({ id: d.id, kind: "inboxDraft" as const, title: d.subject, meta: "Reply drafted, waiting on your review", agentName: "AI Inbox Manager", href: agentHref("inbox") }));
 }
 
+// ---------- AI Document Chaser (accountants) ----------
+
+export const DOC_CHASER_AGENTS: AgentDefinition[] = [
+  { id: "chaser", name: "AI Document Chaser", icon: "file", real: true, description: "Chases your clients for the documents you need, by email, every few days until everything is in, with a private upload link for each." },
+];
+
+const chaseClients = (p: ConsoleProject) => p.docChaseClients ?? [];
+const toReview = (p: ConsoleProject) => chaseClients(p).flatMap((c) => c.items.filter((i) => i.status === "RECEIVED").map((i) => ({ ...i, clientName: c.name })));
+
+function docChaserStatus(project: ConsoleProject): AgentStatus {
+  const clients = chaseClients(project);
+  const review = toReview(project).length;
+  if (clients.length === 0) return { tone: "need", stateLabel: "needs setup", todayLabel: "Clients chased", todayValue: 0 };
+  if (review > 0) return { tone: "need", stateLabel: "waiting on you", todayLabel: "To review", todayValue: review };
+  return { tone: "run", stateLabel: "running", todayLabel: "Clients chasing", todayValue: clients.filter((c) => c.status === "ACTIVE").length };
+}
+
+function docChaserKpiTiles(project: ConsoleProject): { label: string; value: string | number }[] {
+  const items = chaseClients(project).flatMap((c) => c.items);
+  return [
+    { label: "Clients being chased", value: chaseClients(project).filter((c) => c.status === "ACTIVE").length },
+    { label: "Documents received", value: items.filter((i) => i.status !== "REQUESTED").length },
+    { label: "Still outstanding", value: items.filter((i) => i.status === "REQUESTED").length },
+  ];
+}
+
+function docChaserWorkflowSteps(project: ConsoleProject): WorkflowStep[] {
+  const has = chaseClients(project).length > 0;
+  const review = toReview(project).length;
+  return [
+    { title: "Client list", kind: "trigger", detail: "with a checklist each", state: has ? "done" : "pending" },
+    { title: "Email request", kind: "email", detail: "private upload link", state: has ? "done" : "pending" },
+    { title: "Reminders", kind: "email", detail: "every 3 days until sent", state: has ? "done" : "pending" },
+    { title: "Your review", kind: "human review", detail: review > 0 ? `${review} waiting` : "none waiting", state: review > 0 ? "human-waiting" : has ? "human-pending" : "pending" },
+    { title: "All in", kind: "notify", detail: "you get an email", state: has ? "done" : "pending" },
+  ];
+}
+
+function docChaserActivityFeed(project: ConsoleProject): ActivityEvent[] {
+  const events: ActivityEvent[] = [];
+  for (const c of chaseClients(project)) {
+    for (const i of c.items) if (i.uploadedAt) events.push({ tone: "done", text: `${c.name} sent: ${i.label}`, meta: `AI Document Chaser · ${i.uploadedAt.toISOString().slice(0, 10)}`, at: i.uploadedAt });
+    if (c.lastChasedAt) events.push({ tone: "run", text: `Reminded ${c.name} (${c.chaseCount} so far)`, meta: `AI Document Chaser · ${c.lastChasedAt.toISOString().slice(0, 10)}`, at: c.lastChasedAt });
+    if (c.completedAt) events.push({ tone: "done", text: `${c.name} sent everything`, meta: `AI Document Chaser · ${c.completedAt.toISOString().slice(0, 10)}`, at: c.completedAt });
+  }
+  return events.sort((a, b) => b.at.getTime() - a.at.getTime());
+}
+
+function docChaserApprovalItems(project: ConsoleProject, agentHref: (agentId: string) => string): ApprovalItem[] {
+  return toReview(project).map((i) => ({ id: i.id, kind: "docReview" as const, title: `${i.clientName}: ${i.label}`, meta: "Uploaded, waiting on your review", agentName: "AI Document Chaser", href: agentHref("chaser") }));
+}
+
 // ---------- Dispatcher ----------
 
 export type ActivityEvent = { tone: Tone; text: string; meta: string; at: Date };
-export type ApprovalItem = { id: string; kind: "timeEntry" | "inboxDraft" | "renewalBatch"; title: string; meta: string; agentName: string; href: string };
+export type ApprovalItem = { id: string; kind: "timeEntry" | "inboxDraft" | "renewalBatch" | "docReview"; title: string; meta: string; agentName: string; href: string };
 
 export function planAgents(sourceServiceId: string | null): AgentDefinition[] {
   if (sourceServiceId === "law-firms") return LAW_FIRM_AGENTS;
@@ -555,6 +608,7 @@ export function planAgents(sourceServiceId: string | null): AgentDefinition[] {
   if (sourceServiceId === "ai-inbox-manager") return INBOX_MANAGER_AGENTS;
   if (sourceServiceId === "ai-receptionist") return RECEPTIONIST_AGENTS;
   if (sourceServiceId === "ai-lead-capture") return LEAD_CAPTURE_AGENTS;
+  if (sourceServiceId === "accounting-document-chaser") return DOC_CHASER_AGENTS;
   return [];
 }
 
@@ -572,6 +626,8 @@ export function planAgentStatus(project: ConsoleProject, agentId: string): Agent
       return receptionistAgentStatus(project);
     case "ai-lead-capture":
       return leadResponseStatus(project);
+    case "accounting-document-chaser":
+      return docChaserStatus(project);
     default:
       return { tone: "dim", stateLabel: "idle", todayLabel: "–", todayValue: "–" };
   }
@@ -597,6 +653,8 @@ export function planKpiTiles(project: ConsoleProject): { label: string; value: s
       return receptionistKpiTiles(project);
     case "ai-lead-capture":
       return leadCaptureKpiTiles(project);
+    case "accounting-document-chaser":
+      return docChaserKpiTiles(project);
     default:
       return [];
   }
@@ -616,6 +674,8 @@ export function planWorkflowSteps(project: ConsoleProject, agentId: string): Wor
       return receptionistWorkflowSteps(project);
     case "ai-lead-capture":
       return leadResponseWorkflowSteps(project);
+    case "accounting-document-chaser":
+      return docChaserWorkflowSteps(project);
     default:
       return [];
   }
@@ -635,6 +695,8 @@ export function planActivityFeed(project: ConsoleProject): ActivityEvent[] {
       return receptionistActivityFeed();
     case "ai-lead-capture":
       return leadResponseActivityFeed(project, "AI Lead Capture & Follow-Up");
+    case "accounting-document-chaser":
+      return docChaserActivityFeed(project);
     default:
       return [];
   }
@@ -654,6 +716,8 @@ export function planApprovalItems(project: ConsoleProject, agentHref: (agentId: 
       return receptionistApprovalItems();
     case "ai-lead-capture":
       return [];
+    case "accounting-document-chaser":
+      return docChaserApprovalItems(project, agentHref);
     default:
       return [];
   }
@@ -713,6 +777,10 @@ export function planSetupItems(project: ConsoleProject): SetupItem[] {
       return [...leadSetupItems(project, "lead-capture", "Lead Capture"), textingItem(project, "lead-capture")];
     case "ai-receptionist":
       return [{ agentId: "receptionist", title: "Turn on your AI Receptionist", detail: "Add your hours and FAQs and get your phone number.", done: hasIntegration(project, "vapi") }];
+    case "accounting-document-chaser":
+      return [
+        { agentId: "chaser", title: "Add your first clients", detail: "Import a spreadsheet of names and emails, pick a checklist, and the chasing starts.", done: chaseClients(project).length > 0 },
+      ];
     case "ai-inbox-manager":
       return [{ agentId: "inbox", title: "Connect your mailbox", detail: "Takes two minutes with an app password.", done: project.mailConnections.some((c) => c.status === "CONNECTED") }];
     default:
@@ -773,5 +841,6 @@ export function planLabel(sourceServiceId: string | null): string {
   if (sourceServiceId === "ai-inbox-manager") return "AI Inbox Manager";
   if (sourceServiceId === "ai-receptionist") return "AI Receptionist";
   if (sourceServiceId === "ai-lead-capture") return "AI Lead Capture & Follow-Up";
+  if (sourceServiceId === "accounting-document-chaser") return "AI Document Chaser";
   return "AI Team";
 }

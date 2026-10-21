@@ -29,6 +29,10 @@
       "schedule": "0 13 * * *"
     },
     {
+      "path": "/api/cron/document-chaser",
+      "schedule": "0 12 * * *"
+    },
+    {
       "path": "/api/cron/snapshot-mrr",
       "schedule": "0 6 1 * *"
     },

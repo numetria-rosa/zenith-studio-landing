@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { runnableProject } from "@/lib/project-pause";
 import { sendAsBusiness } from "@/lib/client-mail";
 import { readSettings, tcReminderDays, tcDocumentChaseEmail } from "@/lib/agent-settings";
 
@@ -121,7 +122,7 @@ export async function setTransactionStatus(projectId: string, userId: string, tr
 /** Daily: deadline reminders to the agent, document chases to the client. */
 export async function runTransactionCoordinator(now = new Date()): Promise<{ reminders: number; chases: number }> {
   const transactions = await db.transaction.findMany({
-    where: { status: "ACTIVE", project: { stage: { not: "PAUSED" } } },
+    where: { status: "ACTIVE", project: runnableProject() },
     include: {
       deadlines: { orderBy: { order: "asc" } },
       documents: { orderBy: { order: "asc" } },

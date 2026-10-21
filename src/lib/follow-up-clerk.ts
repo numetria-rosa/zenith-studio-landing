@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { runnableProject } from "@/lib/project-pause";
 import { sendSms, isTextBackConfig } from "@/lib/signalwire-text-back";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import { recordUsageCost, ESTIMATED_COST_CENTS } from "@/lib/usage-costs";
@@ -21,7 +22,7 @@ function daysSince(date: Date): number {
 
 export async function processFollowUps(): Promise<{ processed: number; lost: number; sent: number }> {
   const leads = await db.lead.findMany({
-    where: { status: { in: ["NEW", "IN_SEQUENCE"] }, sequenceStoppedAt: null, project: { stage: { not: "PAUSED" } } },
+    where: { status: { in: ["NEW", "IN_SEQUENCE"] }, sequenceStoppedAt: null, project: runnableProject() },
     include: { project: { include: { integrations: { where: { provider: "signalwire" } }, textingRegistration: { select: { status: true, activatedAt: true } } } } },
   });
 

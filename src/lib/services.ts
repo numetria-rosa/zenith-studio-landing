@@ -76,6 +76,20 @@ export const SERVICES: Service[] = [
     setupCheckoutUrl: "",
     monthlyCheckoutUrl: "https://whop.com/checkout/ch_ZvGXKYoanGI1eVn/",
   },
+  // Created 2026-10-21 via scripts/create-doc-chaser-whop-product.mjs.
+  {
+    id: "accounting-document-chaser",
+    title: "AI Document Chaser",
+    pitch: "Stop chasing clients for paperwork.",
+    description:
+      "Emails every client the exact documents you still need, with a private upload link, and keeps reminding them every few days until everything is in. You review each upload in one place.",
+    setupPriceDisplay: "",
+    monthlyPriceDisplay: "$120/mo",
+    whopSetupPlanId: "",
+    whopMonthlyPlanId: "plan_2dyLkFK7HA9WS",
+    setupCheckoutUrl: "",
+    monthlyCheckoutUrl: "https://whop.com/checkout/ch_lF3HlFKHuchALxg/",
+  },
   // The two vertical/role offers from src/app/page.tsx's own `verticalSystems`
   // array - monthly-only (no separate setup plan), which is why
   // setupPriceDisplay/whopSetupPlanId/setupCheckoutUrl are empty, matching
@@ -202,6 +216,7 @@ export function servicePagePath(serviceId: string): string | null {
     only describing the service in prose. */
 export const DEMO_PATH_BY_SERVICE_ID: Record<string, string> = {
   "ai-inbox-manager": "/demo/ai-inbox-manager",
+  "accounting-document-chaser": "/demo/ai-document-chaser",
   "ai-lead-capture": "/demo/ai-lead-capture-follow-up",
   "ai-receptionist": "/demo/ai-receptionist",
   "law-firms": "/demo/law-firm-ai-team",
