@@ -162,11 +162,11 @@ export function findContactFirstName(body: string, email?: string): string | nul
   if (/^[a-z]{3,12}$/i.test(local) && !ROLE_INBOX.test(local)) {
     const cap = local[0]!.toUpperCase() + local.slice(1).toLowerCase();
     for (const m of body.matchAll(new RegExp(`\\b${cap} ([A-Z][a-zA-Z'-]{1,20})`, "g")))
-      if (!BUSINESS_WORD.test(m[1]!) && !NOT_FIRST_NAMES.test(cap)) return cap;
+      if (!BUSINESS_WORD.test(m[1]!) && !NOT_FIRST_NAMES.test(cap) && FIRST_NAMES.has(local.toLowerCase())) return cap;
   }
   for (const re of [NAME_THEN_ROLE, ROLE_THEN_NAME]) {
     const m = body.match(re);
-    if (m?.[1] && !NOT_FIRST_NAMES.test(m[1]) && !BUSINESS_WORD.test(m[2]!)) return m[1];
+    if (m?.[1] && FIRST_NAMES.has(m[1].toLowerCase()) && !BUSINESS_WORD.test(m[2]!)) return m[1];
   }
   return null;
 }
@@ -187,3 +187,25 @@ export function followUpLinks(html: string, baseUrl: string): string[] {
   }
   return [...out].slice(0, 3);
 }
+
+/* Common given names (UK, US, South Asian, Arabic, other common in UK/US accountancy), lowercase. Used to
+   accept a scraped "contact name" only when it's a real first name: a missing name just means the email
+   isn't personalised, a wrong one ("Hi Xero") wrecks it. ponytail: a fixed list, so rare names are missed. */
+const FIRST_NAMES = new Set(
+  `aaron abby abdul abigail adam adeel adil adrian ahmad ahmed aidan aiden aileen aisha alan alana albert alex alexander alexandra alexis ali alice alicia alison alistair allan allison alyssa amal amanda amber amelia amir amit amy ana andrea andrew andy angela angus anil anita ann anna anne annette anthony antonio april archie arjun arthur arun asad ashley ashok asif asim aslam audrey austin ayesha
+  barbara barry beatrice becky belinda ben benjamin bernard beth bethany betty beverley beverly bilal bill billy blake bob bobby bonnie brad bradley brandon brenda brendan brett brian bridget brittany bruce bryan
+  callum calum cameron carl carla carly carol caroline carolyn carrie casey catherine cathy charles charlie charlotte chelsea cheryl chloe chris christian christina christine christopher cindy claire clare clark claudia clive colin connie connor craig crystal cynthia
+  dale dan dana daniel danielle danny darren dave david dawn dean debbie deborah debra declan deepak denise dennis derek diana diane dina dominic don donald donna doris dorothy doug douglas duncan dylan
+  eamon ed eddie edward eileen elaine eleanor elizabeth ella ellen ellie emily emma eric erica erin ethan eugene eve evelyn
+  faisal faiza farah farhan farid farooq fatima fiona frances francesca francis frank fraser fred freddie frederick
+  gail gareth garry gary gavin gemma geof geoff geoffrey george georgia gerald geraldine gerry gillian gina glen glenn gloria gordon grace graeme graham grant greg gregory gurpreet
+  hamid hamza hannah harjit harold harpreet harriet harry harvey hasan hassan hayley heather heidi helen henry holly howard hugh hussain
+  iain ian imran irene isaac isabel isabella ishan jack jackie jacob jacqueline jade jake james jamie jan jane janet janice jason jasmine jaspreet jay jayne jean jeff jeffrey jenna jennifer jenny jeremy jessica jill jim jimmy jo joan joanna joanne jodie joe joel john johnny jon jonathan jordan joseph josh joshua joyce judith judy julia julian julie june justin
+  kamal kamran karen karl kate katherine kathleen kathryn kathy katie kay keith kelly kellie ken kenneth kerry kevin khalid kieran kim kimberly kirsty kishan kris kristen kumar kyle
+  lara laura lauren lawrence leah lee leon leslie liam lily linda lindsay lindsey lisa liz lorna lorraine louise lucy luke lydia lynn lynne
+  madison mahmood malcolm mandy manaf manish manoj marc marcus margaret maria marian marie marilyn mark martin martyn mary matt matthew maureen max megan melanie melissa mia michael michele michelle mike mitchell mo mohammed mohammad mohamed mohsin molly monica muhammad murray
+  nadeem nadia naeem naomi nasir natalie nathan naveed naz neil nick nicholas nichola nicola nicole nigel nikhil nina noah noel nora norman
+  oliver olivia omar oscar owen paige pam pamela patricia patrick paul paula pauline peggy penny peter phil philip phillip phoebe pradeep priya rachel rahul raj rajesh rajiv ralph ramesh ravi raymond rebecca reece rehan richard rick rob robert robin robyn rod roger ronald rory rosa rose rosemary ross roy ruby rupert russell ruth ryan
+  sadia saeed sajid salim sally sam samantha samir samuel sandeep sandra sanjay sara sarah sarfraz scott sean shabana shahid shahzad shane shanna shannon sharon shaun sheila shelley sherry shirley shona simon sophie stacey stanley stephanie stephen steve steven stewart stuart sue sukhdeep sunil susan suzanne sylvia
+  tahir tanya tara tariq ted teddy teresa terry thomas tim timothy tina toby todd tom tommy tony tracey tracy trevor tyler umar usman valerie vanessa victor victoria vijay vikram vincent vivek waqas wayne wendy will william yasmin yusuf zach zachary zahid zara zoe`.split(/\s+/),
+);
