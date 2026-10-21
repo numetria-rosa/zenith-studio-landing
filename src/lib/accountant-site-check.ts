@@ -19,6 +19,10 @@ export type SiteCheck = {
   personalTax: boolean;
   corporateUk: boolean;
   solo: boolean;
+  largeFirm: boolean;
+  notAccounting: boolean;
+  /** First name of the owner/partner if the site names one, for "Hi Sarah" instead of an unaddressed info@ email. */
+  contactFirstName: string | null;
   score: number;
   reasons: string[];
 };
@@ -47,6 +51,18 @@ const PORTAL_VENDORS: [string, RegExp][] = [
 ];
 
 const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+// Real TLDs only: any two-letter country code, or a common generic one. Drops scrambled anti-bot addresses
+// like "vasb@psnctebhc.pbz" (ROT13 of a real one).
+const GENERIC_TLDS = new Set(["com", "net", "org", "biz", "info", "co", "us", "uk", "pro", "cpa", "tax", "accountant", "accountants", "email", "online", "site", "law", "group", "services", "finance", "financial", "solutions", "consulting", "business", "io", "me"]);
+const realTld = (email: string) => {
+  const tld = email.split(".").pop() ?? "";
+  return tld.length === 2 || GENERIC_TLDS.has(tld);
+};
+export const FREEMAIL = /@(gmail|googlemail|yahoo|aol|hotmail|outlook|live|msn|icloud|me|btinternet|sky|virginmedia|talktalk|comcast|att|verizon|sbcglobal|bellsouth|charter)\./i;
+
+/** Big networks and multi-office firms: they have their own systems and won't buy this from a cold email. */
+const LARGE_FIRM_NAMES =
+  /haines watts|hwca\.com|azets|\buhy\b|scrutton bland|\bbdo\b|grant thornton|\brsm\b|kpmg|deloitte|\bpwc\b|ernst|crowe|mazars|forvis|menzies|moore kingston|bishop fleming|saffery|french duncan|johnston carmichael|duncan & toplis|xeinadin|\bdains\b|cooper parry|kreston|baker tilly|\bcbiz\b|cohnreznick|plante moran|cliftonlarsonallen|claconnect|eide bailly|wipfli|swanson ?reed|h ?& ?r block|jackson hewitt|liberty tax|taxassist|tax assist/i;
 const JUNK_EMAIL = /(example\.|sentry|wixpress|domain\.com|email\.com|yourdomain|\.(png|jpe?g|gif|webp|svg)$|^u00|godaddy|squarespace|wordpress)/i;
 
 function text(html: string): string {
@@ -65,7 +81,7 @@ export function extractEmails(html: string, siteHost: string): string[] {
   const found = new Set<string>();
   for (const m of raw.matchAll(EMAIL)) {
     const e = m[0].toLowerCase().replace(/^mailto:/, "").replace(/\.$/, "");
-    if (!JUNK_EMAIL.test(e) && e.length <= 80) found.add(e);
+    if (!JUNK_EMAIL.test(e) && e.length <= 80 && realTld(e)) found.add(e);
   }
   const host = siteHost.replace(/^www\./, "").toLowerCase();
   return [...found].sort((a, b) => Number(b.endsWith("@" + host) || b.endsWith("." + host)) - Number(a.endsWith("@" + host) || a.endsWith("." + host)));
@@ -83,11 +99,22 @@ export function analyzeAccountantSite(pages: { url: string; html: string }[], op
     /(documents|information|paperwork) (we|you'?ll) need|what (to|you need to) (bring|send|provide)|(tax|year[- ]end|document) (organi[sz]er|checklist)|checklist|e-?mail (us )?(your|the) (documents|paperwork|records)|send (us )?(your|the) (documents|paperwork|records)/i.test(
       body,
     );
-  const personalTax = /self[- ]assessment|personal tax|individual (tax|returns?)|tax returns? for individuals|\b1040\b|sole traders?|landlords?/i.test(body);
+  // A dedicated service page or heading, not a passing mention of "sole traders" in a footer.
+  const personalTax =
+    /href=["'][^"']*(self-?assessment|personal-tax|individual-tax|tax-returns?|1040|individual-returns?)[^"']*["']/i.test(html) ||
+    /<h[1-4][^>]*>[^<]*(self[- ]assessment|personal tax|individual tax|tax returns? for individuals|personal (income )?tax returns?)/i.test(html);
   const corporateUk = /\b(ltd|limited|llp)\b|company (no|number|registration)|registered in (england|scotland|wales)|registration (no|number)/i.test(body + " " + opts.businessName);
   const firmWords = /&|\band\b|associates|group|partners|llp|ltd|limited|inc|services|accountants|accounting|tax|bookkeeping|consult/i;
   const personName = /^[A-Z][a-z]+( [A-Z]\.?)? [A-Z][a-zA-Z'-]+(,? (CPA|EA|CA|ACA|ACCA|FCCA))*$/.test(opts.businessName.trim());
   const solo = (personName && !firmWords.test(opts.businessName)) || /sole practitioner|\bI am a (chartered|certified|cpa|qualified)|\bI'm a (chartered|certified|cpa)|my clients/i.test(body);
+
+  const largeFirm =
+    LARGE_FIRM_NAMES.test(opts.businessName) ||
+    LARGE_FIRM_NAMES.test(host) ||
+    /\b(\d{2,}|ten|twelve|twenty)\s+(offices|locations|branches)\b|offices (across|throughout) the (uk|country|us)|nationwide network/i.test(body);
+  const notAccounting =
+    /\b(wealth|invest(ment|ing|ments)?|r ?& ?d|payroll|mortgages?|insurance|financial planning|cfo)\b/i.test(opts.businessName) &&
+    !/account|tax|cpa|bookkeep|chartered/i.test(opts.businessName);
 
   let score = 50;
   if (vendor) (score -= 40), reasons.push(`uses ${vendor}`);
@@ -97,10 +124,51 @@ export function analyzeAccountantSite(pages: { url: string; html: string }[], op
   if (personalTax) (score += 15), reasons.push("does personal tax / self-assessment");
   if (solo) (score += 5), reasons.push("solo practitioner");
   const emails = extractEmails(html, host);
+  const contactFirstName = findContactFirstName(body, emails[0]);
   if (emails.length === 0) (score -= 100), reasons.push("no public email");
+  if (largeFirm) (score -= 100), reasons.push("large or multi-office firm");
+  if (notAccounting) (score -= 100), reasons.push("not an accounting practice");
+  if (emails[0] && !FREEMAIL.test(emails[0]) && !sameSite(emails[0], host)) (score -= 10), reasons.push("email is on a different domain from the website");
+  if (contactFirstName) (score += 5), reasons.push(`contact: ${contactFirstName}`);
   if (opts.country === "UK" && !corporateUk) (score -= 100), reasons.push("not a limited company or LLP (UK cold email needs consent)");
 
-  return { emails, portalVendor: vendor, genericPortal, docChecklist, personalTax, corporateUk, solo, score: Math.max(0, Math.min(100, score)), reasons };
+  return { emails, portalVendor: vendor, genericPortal, docChecklist, personalTax, corporateUk, solo, largeFirm, notAccounting, contactFirstName, score: Math.max(0, Math.min(100, score)), reasons };
+}
+
+/** Email and website belong to the same business: same domain, or the same name on another TLD (whitefieldtax.com vs .co.uk). */
+export function sameSite(email: string, host: string): boolean {
+  const d = (email.split("@")[1] ?? "").toLowerCase();
+  const h = host.replace(/^www\./, "").toLowerCase();
+  const name = (x: string) => x.replace(/\.(co|org|ac|gov|com)\.[a-z]{2}$|\.[a-z]{2,}$/i, "").split(".").pop() ?? x;
+  return d === h || d.endsWith("." + h) || h.endsWith("." + d) || name(d) === name(h);
+}
+
+const ROLE = "(?:Managing Director|Managing Partner|Co-Founder|Founder|Director|Owner|Principal|Partner|Proprietor)";
+const PERSON = "([A-Z][a-z]{1,15})(?: [A-Z]\\.)? ([A-Z][a-zA-Z'-]{1,20})";
+// "Numerawise Solutions" and "Emerging Businesses" look like "First Last" but the second word gives them away.
+const BUSINESS_WORD = /^(Solutions|Group|Tax|Taxes|Accounting|Accountants?|CPAs?|LLC|LLP|Ltd|Limited|Inc|Services|Associates|Bookkeeping|Consulting|Financial|Partners|Company|Advisors|Advisory|Businesses|Business|Clients|Firm|Office|Practice|Team|Payroll|Audit)$/;
+const QUALS = "(?:,? (?:FCCA|ACCA|ACA|FCA|CTA|ATT|CPA|EA|MAAT|AAT))*";
+const NAME_THEN_ROLE = new RegExp(`${PERSON}${QUALS}\\s*[,\\-|(]?\\s*${ROLE}\\b`);
+const ROLE_THEN_NAME = new RegExp(`\\b${ROLE}\\s*[:\\-|,]?\\s*${PERSON}`);
+// Capitalised words that sit next to a role in marketing copy but aren't names.
+const NOT_FIRST_NAMES =
+  /^(The|Our|Your|Meet|About|Contact|Tax|Taxes|Accounts|Accounting|Business|Company|Client|Clients|Senior|Junior|Associate|Office|Chartered|Certified|Practice|Team|Read|View|More|Home|Services|Managing|Finance|Finances|Financial|Founder|Founders|Firm|Owner|Owners|Partner|Partners|Director|Directors|Principal|President|Last|First|Next|Now|With|And|For|From|Trusted|Affordable|Expert|Experts|Professional|Quality|Personal|Small|Local|Free|Call|Get|Book|Schedule|Welcome|Hello|Dear|Best|New|Year|Our|Why|How|What|When|Who|Since|Founded|Family|Owned|Award|Winning|Leading|Experienced|Qualified|Registered|Licensed|Full|Learn|Join|Ask|Talk|Speak|Email|Phone|Message|Visit|See|Find|Payroll|Bookkeeping|Audit|Advisory|Consulting|Wealth|Group|Firm's|Company's|Elite|Platinum|Premier|Complete|Total|Simple|Smart|Better|Real|True|Proud|Dedicated|Helping|Serving|Solutions|Emerging|Growing|Startup|Startups|Individual|Individuals|Corporate|Nonprofit|Nonprofits|Industries|Industry)$/;
+const ROLE_INBOX = /^(info|admin|office|hello|enquiries|enquiry|contact|mail|reception|tax|taxes|accounts|accounting|bookkeeping|support|help|team|clients?|service|sales|billing|payroll|cpa|staff|frontdesk|inquiries|general)$/i;
+
+/** First name of whoever runs the practice. Prefers a name that matches the email itself ("sarah@" and "Sarah
+    Jones" on the site); otherwise a name the site puts next to a role ("Sarah Jones, Director"). */
+export function findContactFirstName(body: string, email?: string): string | null {
+  const local = (email ?? "").split("@")[0]!.split(/[._-]/)[0] ?? "";
+  if (/^[a-z]{3,12}$/i.test(local) && !ROLE_INBOX.test(local)) {
+    const cap = local[0]!.toUpperCase() + local.slice(1).toLowerCase();
+    for (const m of body.matchAll(new RegExp(`\\b${cap} ([A-Z][a-zA-Z'-]{1,20})`, "g")))
+      if (!BUSINESS_WORD.test(m[1]!) && !NOT_FIRST_NAMES.test(cap)) return cap;
+  }
+  for (const re of [NAME_THEN_ROLE, ROLE_THEN_NAME]) {
+    const m = body.match(re);
+    if (m?.[1] && !NOT_FIRST_NAMES.test(m[1]) && !BUSINESS_WORD.test(m[2]!)) return m[1];
+  }
+  return null;
 }
 
 /** Same-site links worth a second look for emails and checklists. */
