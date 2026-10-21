@@ -65,3 +65,4 @@ __pycache__/
 
 # Prospect lists from scripts/pull-accountant-leads.mjs (business contact data, kept out of git)
 /leads/
+/doc-chaser-test-kit/

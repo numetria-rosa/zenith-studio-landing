@@ -31,7 +31,9 @@ export function UploadButton({ token, clientId, itemId, label, replace }: { toke
       setState({ busy: false, progress: 100, error: null });
       router.refresh();
     } catch (err) {
-      setState({ busy: false, progress: 0, error: err instanceof Error && err.message ? err.message : "The upload didn't go through. Please try again." });
+      // Storage errors are technical ("Vercel Blob: ..."); our own messages from confirmUpload are written for clients.
+      const msg = err instanceof Error ? err.message : "";
+      setState({ busy: false, progress: 0, error: msg && !/blob|token|fetch/i.test(msg) ? msg : "The upload didn't go through. Please try again in a minute, or reply to the email you got and we'll help." });
     } finally {
       if (input.current) input.current.value = "";
     }

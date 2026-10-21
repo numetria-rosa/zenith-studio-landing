@@ -26,6 +26,7 @@ export async function POST(request: Request): Promise<Response> {
     });
     return Response.json(result);
   } catch (err) {
-    return Response.json({ error: err instanceof Error ? err.message : "Upload failed" }, { status: 400 });
+    console.error("doc-chaser upload token refused:", err instanceof Error ? err.message : err);
+    return Response.json({ error: "Upload not allowed" }, { status: 400 });
   }
 }
