@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getUploadPortal } from "@/lib/document-chaser-db";
 import { UploadButton } from "./UploadButton";
+import { FILE_RETENTION_DAYS } from "@/lib/document-chaser";
 
 export const metadata = { title: "Upload your documents", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -61,6 +62,15 @@ export default async function UploadPage({ params }: { params: Promise<{ token: 
 
         <p className="m-0 text-[13px] leading-6 text-white/45">
           Questions? Reply to the email {businessName} sent you. This page is private to you; please don&apos;t share the link.
+        </p>
+        <p className="m-0 mt-2 text-[13px] leading-6 text-white/45">
+          Your files are stored privately in the UK and only {businessName} can open them. They are deleted from this
+          service automatically {FILE_RETENTION_DAYS} days after you upload them. Zenith Studio runs this page for{" "}
+          {businessName}; see our{" "}
+          <a href="/privacy" className="underline">
+            privacy policy
+          </a>
+          .
         </p>
       </div>
     </main>

@@ -20,7 +20,7 @@ import { adjustableSettings, readSettings, dbDormantDays } from "@/lib/agent-set
 import { createTransaction, updateDeadline, setDocumentReceived, setTransactionStatus } from "@/lib/transaction-coordinator";
 import { importContacts, startReengagement, markContactReplied, isDormant } from "@/lib/database-manager";
 import { getSiteUrl } from "@/lib/site";
-import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, MAX_CHASES, REJECT_REASONS, parseClientCsv } from "@/lib/document-chaser";
+import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_CHASES, REJECT_REASONS, parseClientCsv } from "@/lib/document-chaser";
 import { addDocChaseClients, deleteDocChaseClient, reviewDocChaseItem, setDocChaseClientStatus, uploadUrlFor } from "@/lib/document-chaser-db";
 import { qualificationGroups, qualificationRulesText, readChoices, faqGroups, faqText, hoursText, DAYS, OPEN_TIMES, CLOSE_TIMES, CRM_FORMATS, type ChoiceGroup } from "@/lib/setup-options";
 import { CopyField, TestLeadForm } from "./ConnectForm";
@@ -839,7 +839,8 @@ export default async function AgentDetailPage({
           <p className={s.setupTitle}>{clients.length === 0 ? "Add your first clients" : "Add more clients"}</p>
           <p className={s.setupDesc}>
             Each client gets an email in {businessName || "your business"}&apos;s name listing exactly what you need, with a private upload link (no
-            account needed). We remind them every {CHASE_GAP_DAYS} days, up to {MAX_CHASES} times, until everything is in. Replies go to your own inbox.
+            account needed). We remind them every {CHASE_GAP_DAYS} days, up to {MAX_CHASES} times, until everything is in. Replies go to your own inbox. Uploaded files are deleted
+            automatically {FILE_RETENTION_DAYS} days after upload, so save each one to your own records once you&apos;ve accepted it.
           </p>
           <form action={addChaseClientsAction} style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 14 }}>
             <div className={s.formRow}>
@@ -927,6 +928,7 @@ export default async function AgentDetailPage({
                       <span style={{ flex: 1, minWidth: 180, fontSize: 14, color: i.status === "ACCEPTED" ? "var(--zc-muted)" : "var(--zc-text)" }}>
                         {i.status === "ACCEPTED" && <Icon name="check" size={12} strokeWidth={2.4} />} {i.label}
                         {i.status === "REQUESTED" && i.rejectReason && <span style={{ color: "var(--zc-muted)" }}> · sent back: {i.rejectReason}</span>}
+                        {i.fileDeletedAt && !i.filePathname && <span style={{ color: "var(--zc-muted)" }}> · file deleted after {FILE_RETENTION_DAYS} days</span>}
                       </span>
                       {i.filePathname && (
                         <a href={`/api/doc-chaser/file/${i.id}`} target="_blank" rel="noopener noreferrer" className={u.btnGhost} style={small}>

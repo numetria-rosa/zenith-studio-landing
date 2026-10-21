@@ -426,6 +426,11 @@ async function grantServiceAccess(
         data: { stage: "LIVE" },
       });
     }
+    // Re-subscribing brings a cancelled service back (whatever wasn't purged yet is still there).
+    await tx.serviceProject.updateMany({
+      where: { userId, sourceServiceId: serviceId, stage: "CANCELLED" },
+      data: { stage: "LIVE", cancelledAt: null },
+    });
   }
 
   // Every catalog service gets a real ServiceProject delivery workspace on
@@ -561,10 +566,22 @@ async function handleMembershipDeactivated(tx: Tx, membership: Membership) {
     data: { status: "revoked", revokedAt: new Date() },
   });
 
+  const cancelledRequests = await tx.serviceRequest.findMany({
+    where: { whopMonthlyMembershipId: membership.id, monthlyStatus: "active" },
+    select: { userId: true, serviceId: true },
+  });
   const serviceResult = await tx.serviceRequest.updateMany({
     where: { whopMonthlyMembershipId: membership.id, monthlyStatus: "active" },
     data: { monthlyStatus: "canceled" }, // build `status` is untouched - a lapsed retainer doesn't erase what was built
   });
+  // A cancelled subscription stops the service itself (every runtime checks isProjectPaused/runnableProject),
+  // and starts the clock on deleting the client data it holds (see purgeCancelledDocChaserData).
+  for (const r of cancelledRequests) {
+    await tx.serviceProject.updateMany({
+      where: { userId: r.userId, sourceServiceId: r.serviceId, stage: { notIn: ["CANCELLED", "COMPLETED"] } },
+      data: { stage: "CANCELLED", cancelledAt: new Date() },
+    });
+  }
 
   if (courseResult.count === 0 && serviceResult.count === 0) {
     console.warn(`[whop webhook] membership.deactivated for ${membership.id} matched no active entitlement or service request`);

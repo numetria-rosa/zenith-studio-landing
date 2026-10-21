@@ -11,6 +11,22 @@ const DAY = 86400000;
 /** Days between reminders, and the most reminders one client ever gets. */
 export const CHASE_GAP_DAYS = 3; // ponytail: fixed; make it a per-accountant setting if clients ask
 export const MAX_CHASES = 6;
+/* Retention (UK GDPR storage limitation; we are the processor, the accountant the controller). Accountants keep
+   their own records in their own systems; we are only the collection point, so files don't stay here. */
+export const FILE_RETENTION_DAYS = 180; // an uploaded file is deleted this long after upload
+export const CANCELLED_GRACE_DAYS = 30; // after a cancellation, the accountant has this long to download, then all client data goes
+export const ORPHAN_GRACE_HOURS = 24; // a stored file no document points to (unfinished upload, deleted client) is removed after this
+
+/** Which stored files the daily purge deletes. Pure, so the rules are testable without storage. */
+export function filesToPurge(
+  stored: { pathname: string; uploadedAt: Date }[],
+  referenced: Set<string>,
+  now: Date,
+): string[] {
+  const cutoff = now.getTime() - ORPHAN_GRACE_HOURS * 3600000;
+  return stored.filter((b) => !referenced.has(b.pathname) && b.uploadedAt.getTime() < cutoff).map((b) => b.pathname);
+}
+
 /** Most reminder emails one accountant's account sends per daily run; anyone over it is simply due tomorrow. */
 export const MAX_EMAILS_PER_RUN = 150;
 

@@ -1,11 +1,11 @@
 import { randomBytes } from "node:crypto";
 import { runnableProject } from "@/lib/project-pause";
-import { del, head } from "@vercel/blob";
+import { del, head, list } from "@vercel/blob";
 import { db } from "@/lib/db";
 import { sendAsBusiness } from "@/lib/client-mail";
 import { businessNameOf } from "@/lib/services";
 import { getSiteUrl } from "@/lib/site";
-import { chaseEmail, checklistItems, isDueForChase, MAX_EMAILS_PER_RUN, MAX_UPLOAD_BYTES, REJECT_REASONS } from "@/lib/document-chaser";
+import { CANCELLED_GRACE_DAYS, chaseEmail, checklistItems, FILE_RETENTION_DAYS, filesToPurge, isDueForChase, MAX_EMAILS_PER_RUN, MAX_UPLOAD_BYTES, REJECT_REASONS } from "@/lib/document-chaser";
 
 /* AI Document Chaser: database side. Every accountant-facing function checks the project belongs to the
    signed-in user and is this service; the client-facing ones are keyed by the secret upload token only. */
@@ -110,7 +110,8 @@ export async function getUploadPortal(token: string) {
     where: { uploadToken: token },
     include: { items: { orderBy: { order: "asc" } }, project: { select: { title: true, sourceServiceId: true, stage: true } } },
   });
-  if (!client || client.project.sourceServiceId !== DOC_CHASER_SERVICE_ID) return null;
+  // A cancelled or finished service's links stop working straight away.
+  if (!client || client.project.sourceServiceId !== DOC_CHASER_SERVICE_ID || ["CANCELLED", "COMPLETED"].includes(client.project.stage)) return null;
   return { client, businessName: businessNameOf(client.project) || "Your accountant" };
 }
 
@@ -188,4 +189,46 @@ export async function runDocumentChaser(now = new Date()): Promise<{ chased: num
     } else failed++;
   }
   return { chased, completed, failed };
+}
+
+// ---------- retention ----------
+
+const DAY_MS = 86400000;
+
+/** Daily: deletes files past retention, all client data of services cancelled more than the grace period ago,
+    and any stored file no document points to (unfinished uploads, rows deleted outside the app). */
+export async function purgeDocChaserData(now = new Date()): Promise<{ expiredFiles: number; cancelledClients: number; orphanFiles: number }> {
+  const token = docBlobToken();
+
+  const expired = await db.docChaseItem.findMany({
+    where: { filePathname: { not: null }, uploadedAt: { lt: new Date(now.getTime() - FILE_RETENTION_DAYS * DAY_MS) } },
+    select: { id: true, filePathname: true },
+  });
+  if (expired.length) {
+    await del(expired.map((i) => i.filePathname!), { token });
+    await db.docChaseItem.updateMany({ where: { id: { in: expired.map((i) => i.id) } }, data: { filePathname: null, fileDeletedAt: now } });
+  }
+
+  const cancelled = await db.docChaseClient.findMany({
+    where: { project: { sourceServiceId: DOC_CHASER_SERVICE_ID, stage: "CANCELLED", cancelledAt: { lt: new Date(now.getTime() - CANCELLED_GRACE_DAYS * DAY_MS) } } },
+    select: { id: true, items: { select: { filePathname: true } } },
+  });
+  const cancelledFiles = cancelled.flatMap((c) => c.items.map((i) => i.filePathname).filter((p): p is string => !!p));
+  if (cancelledFiles.length) await del(cancelledFiles, { token });
+  if (cancelled.length) await db.docChaseClient.deleteMany({ where: { id: { in: cancelled.map((c) => c.id) } } });
+
+  const stored: { pathname: string; uploadedAt: Date }[] = [];
+  let cursor: string | undefined;
+  do {
+    const page = await list({ prefix: "doc-chaser/", cursor, limit: 1000, token });
+    stored.push(...page.blobs.map((b) => ({ pathname: b.pathname, uploadedAt: b.uploadedAt })));
+    cursor = page.hasMore ? page.cursor : undefined;
+  } while (cursor);
+  const referenced = new Set(
+    (await db.docChaseItem.findMany({ where: { filePathname: { in: stored.map((b) => b.pathname) } }, select: { filePathname: true } })).map((i) => i.filePathname!),
+  );
+  const orphans = filesToPurge(stored, referenced, now);
+  if (orphans.length) await del(orphans, { token });
+
+  return { expiredFiles: expired.length, cancelledClients: cancelled.length, orphanFiles: orphans.length };
 }

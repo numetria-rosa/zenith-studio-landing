@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHECKLISTS, chaseEmail, checklistItems, isDueForChase, parseClientCsv, REJECT_REASONS, uploadPathname } from "./document-chaser";
+import { CHECKLISTS, chaseEmail, checklistItems, filesToPurge, isDueForChase, parseClientCsv, REJECT_REASONS, uploadPathname } from "./document-chaser";
 
 const DAY = 86400000;
 
@@ -69,6 +69,19 @@ describe("chaseEmail", () => {
   it("uses no em dashes", () => {
     const m = chaseEmail({ businessName: "B", clientName: "Jo", items, uploadUrl: "u", reminder: 1 });
     expect(m.subject + m.text).not.toMatch(/—/);
+  });
+});
+
+describe("filesToPurge", () => {
+  const now = new Date("2026-10-21T12:00:00Z");
+  const hoursAgo = (h: number) => new Date(now.getTime() - h * 3600000);
+  it("deletes stored files no document points to, but only after a day (an upload may still be confirming)", () => {
+    const stored = [
+      { pathname: "doc-chaser/c1/i1-a-p60.pdf", uploadedAt: hoursAgo(48) },
+      { pathname: "doc-chaser/c1/i2-b-old.pdf", uploadedAt: hoursAgo(48) },
+      { pathname: "doc-chaser/c9/i9-c-new.pdf", uploadedAt: hoursAgo(2) },
+    ];
+    expect(filesToPurge(stored, new Set(["doc-chaser/c1/i1-a-p60.pdf"]), now)).toEqual(["doc-chaser/c1/i2-b-old.pdf"]);
   });
 });
 
