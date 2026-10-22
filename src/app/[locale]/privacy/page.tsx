@@ -41,7 +41,7 @@ export default function PrivacyPage() {
             phone/text system you have configured and to improve its accuracy for your business.
           </li>
           <li>
-            <strong>WhatsApp message data (WhatsApp AI Agent for Umrah Agencies clients only):</strong> for the
+            <strong>WhatsApp message data (WhatsApp AI Agent for Travel Agencies clients only):</strong> for the
             agency itself, we process your own knowledge base content and WhatsApp Business account credentials to
             operate the agent. For the agency&apos;s own customers, the agency is the data controller and we are the
             data processor - see the product&apos;s{" "}

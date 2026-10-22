@@ -11,7 +11,7 @@ export default function WhatsAppUmrahDpaPage() {
     <div className="min-h-screen bg-[#05060a] px-6 py-16 text-white">
       <div className="mx-auto max-w-2xl">
         <h1 className="text-2xl font-extrabold tracking-tight">Data Processing Agreement</h1>
-        <p className="mt-2 text-sm text-white/50">WhatsApp AI Agent for Umrah Agencies - draft template, last updated September 2026</p>
+        <p className="mt-2 text-sm text-white/50">WhatsApp AI Agent for Travel Agencies - draft template, last updated September 2026</p>
         <p className="mt-4 rounded-lg border border-amber-400/30 bg-amber-400/5 px-4 py-3 text-[13px] leading-6 text-amber-200/90">
           This page is a draft template, not reviewed by a solicitor. It sets out reasonable, standard terms for how Zenith
           Studio processes data on your behalf, but you should have it checked before relying on it for a live dispute or a
