@@ -1,4 +1,4 @@
-import { Fraunces, IBM_Plex_Mono } from "next/font/google";
+import { Fraunces, IBM_Plex_Mono, Unbounded } from "next/font/google";
 import { plexSans } from "./plex-sans";
 
 /* The same three faces the static course pages (courses/data-science/*.html)
@@ -20,3 +20,11 @@ export const plexMono = IBM_Plex_Mono({
 });
 
 export const courseFontVars = `${fraunces.variable} ${plexSans.variable} ${plexMono.variable}`;
+
+/* The Zenith wordmark font (the owner picked Unbounded on 2026-10-21). Used only for the
+   "Zenith Studio" / "Zenith Lab" wordmark next to the Z mark (public/brand/zenith-mark.png). */
+export const wordmark = Unbounded({
+  subsets: ["latin"],
+  weight: ["600"],
+  variable: "--font-wordmark",
+});

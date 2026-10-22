@@ -26,7 +26,7 @@ export function SidebarContent({
   return (
     <>
       <div className="flex items-center gap-3 px-2">
-        <Image src="/course/zenith-logo.png" alt="Zenith Studio logo" width={32} height={32} className="h-8 w-8 object-contain" />
+        <Image src="/brand/zenith-mark.png" alt="Zenith Studio logo" width={32} height={32} className="h-8 w-8 object-contain" />
         <div className="flex flex-col">
           <b className="text-[15px] font-semibold">AI Engineering</b>
           <span className="text-[12px] text-mist">Career Path Edition</span>

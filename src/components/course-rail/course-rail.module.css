@@ -68,11 +68,7 @@
 }
 
 .railBrand {
-  font-family: var(--font-course-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--mut2);
+  color: var(--tx, #eeeee7);
   padding: 0 4px;
 }
 .railTitle {

@@ -1,0 +1,16 @@
+/* Zenith logo for the static HTML pages (services catalogue, demo pages, course pages): the Z mark
+   (/brand/zenith-mark.png) and the Unbounded wordmark, matching the React BrandMark component.
+   Linked last in each page's <head>; !important because several pages restyle these classes later. */
+@import url("https://fonts.googleapis.com/css2?family=Unbounded:wght@600&text=ZenithStudoLAB%20&display=swap");
+
+/* Marketing pages: <a class="brand"><span class="zlogo"></span>Zenith Studio</a> */
+.brand { font-family: "Unbounded", sans-serif !important; font-weight: 600 !important; letter-spacing: -0.01em !important; font-size: 15px !important; }
+footer .brand { font-size: 13px !important; }
+.brand .zword { font: inherit !important; text-transform: none !important; }
+.zlogo { background: url("/brand/zenith-mark.png") center / contain no-repeat !important; }
+
+/* Course pages: <span class="logo">Zenith<b>LAB</b></span> */
+.logo { display: inline-flex !important; align-items: center; gap: 8px; font-family: "Unbounded", sans-serif !important; font-weight: 600 !important; letter-spacing: -0.01em !important; font-size: 14px !important; }
+.logo::before { content: ""; width: 24px; height: 24px; flex-shrink: 0; background: url("/brand/zenith-mark.png") center / contain no-repeat; }
+.logo b { font-family: "Unbounded", sans-serif !important; font-size: 10px !important; letter-spacing: 0.04em !important; }
+.zicon { background: none !important; box-shadow: none !important; border-radius: 0 !important; border: 0 !important; }

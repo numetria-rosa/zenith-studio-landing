@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Geist, Geist_Mono, Unbounded } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { db } from "@/lib/db";
 import { decryptPassword } from "@/lib/password";
 import { createSessionForUser } from "@/lib/session";
+import { wordmark } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -13,8 +14,6 @@ export const metadata: Metadata = {
 
 const sans = Geist({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 const mono = Geist_Mono({ subsets: ["latin"], weight: ["400", "500"] });
-// Wordmark font picked by the owner on 2026-10-21 (option 08 on /brand/logo-fonts.html).
-const wordmark = Unbounded({ subsets: ["latin"], weight: ["600"] });
 
 const ERRORS: Record<string, string> = {
   invalid_password: "That email and password don't match.",

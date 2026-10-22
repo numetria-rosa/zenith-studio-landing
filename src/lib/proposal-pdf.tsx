@@ -1,4 +1,6 @@
-import { Document, Page, Text, View, StyleSheet, Font, renderToBuffer } from "@react-pdf/renderer";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { Document, Page, Text, View, Image, StyleSheet, Font, renderToBuffer } from "@react-pdf/renderer";
 import { db } from "@/lib/db";
 import {
   PROPOSAL_ITEM_KIND_LABELS,
@@ -34,6 +36,10 @@ Font.register({
     { src: "https://fonts.gstatic.com/s/geist/v5/gyBhhwUxId8gMGYQMKR3pzfaWI_RHOQ4nQ.ttf", fontWeight: 800 },
   ],
 });
+// The Zenith wordmark font (see src/lib/fonts.ts), from the copy in public/brand.
+Font.register({ family: "Unbounded", src: path.join(process.cwd(), "public", "brand", "Unbounded-SemiBold.ttf"), fontWeight: 600 });
+// Loaded as bytes: react-pdf silently drops a plain Windows file path.
+const MARK = { data: readFileSync(path.join(process.cwd(), "public", "brand", "zenith-mark.png")), format: "png" as const };
 
 const BG = "#05060a";
 const BORDER = "#20242f";
@@ -58,22 +64,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   brandMark: {
-    width: 8,
-    height: 8,
-    backgroundColor: CYAN,
-    borderRadius: 2,
-    marginRight: 6,
+    width: 18,
+    height: 18,
+    marginRight: 7,
   },
   brandRowLeft: {
     flexDirection: "row",
     alignItems: "center",
   },
   brandName: {
-    fontSize: 8.5,
+    fontFamily: "Unbounded",
+    fontSize: 9.5,
     fontWeight: 600,
-    letterSpacing: 2.5,
-    textTransform: "uppercase",
-    color: MUTED,
+    color: TEXT,
   },
   preparedDate: {
     fontSize: 8,
@@ -303,7 +306,8 @@ function ProposalPdfDocument({ data }: { data: ProposalPdfData }) {
       <Page size="A4" style={styles.page}>
         <View style={styles.brandRow}>
           <View style={styles.brandRowLeft}>
-            <View style={styles.brandMark} />
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image src={MARK} style={styles.brandMark} />
             <Text style={styles.brandName}>Zenith Studio</Text>
           </View>
           <Text style={styles.preparedDate}>{formatDate(data.preparedAt)}</Text>
