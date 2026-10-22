@@ -61,11 +61,11 @@ export default function ZenithStudioLandingPage() {
       id: "whatsapp-umrah",
       monthly: "£49",
       featured: false,
-      name: "WhatsApp AI Agent for Umrah Agencies",
+      name: "WhatsApp AI Agent for Travel Agencies",
       pitch: "Every enquiry answered on WhatsApp, in the customer's own language.",
       description:
         "Answers from your own packages and FAQs - prices, dates, hotels, cancellation policy - in English, Arabic, Turkish or Urdu, and captures every lead. Never invents an answer; hands off cleanly for anything outside your knowledge base.",
-      live: "UK Umrah & Hajj agencies",
+      live: "UK travel agencies",
       features: [
         "English, Arabic, Turkish, Urdu",
         "Captures and qualifies every lead",

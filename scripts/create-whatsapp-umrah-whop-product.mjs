@@ -24,7 +24,7 @@ const client = new Whop({ apiKey });
 
 const product = await client.products.create({
   account_id: companyId,
-  title: "WhatsApp AI Agent for Umrah Agencies",
+  title: "WhatsApp AI Agent for Travel Agencies", // renamed from "...for Umrah Agencies" on 2026-10-22
   headline: "Every Umrah enquiry answered on WhatsApp, instantly, in the customer's language",
   description:
     "An AI agent on your own WhatsApp number that answers from your packages and FAQs, captures leads, and hands off to your team - live within days, no contract, cancel anytime. Meta's own WhatsApp message charges are billed to your agency's own Meta account, separately from this plan.",

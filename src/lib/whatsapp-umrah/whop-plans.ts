@@ -34,7 +34,7 @@ export async function provisionWaAgency(
   if (existing) return { isNew: false, agencyId: existing.agencyId };
 
   const baseName = params.userName?.trim() || params.userEmail?.split("@")[0] || "New agency";
-  const displayName = `${baseName}'s Umrah Agency`;
+  const displayName = `${baseName}'s Travel Agency`;
   const slugBase = slugify(baseName) || "agency";
   const slug = `${slugBase}-${Date.now().toString(36)}`;
 
