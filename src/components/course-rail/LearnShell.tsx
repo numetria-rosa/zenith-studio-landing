@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 import { CourseRailClient } from "./CourseRailClient";
 import type { CourseRailData } from "@/lib/course-rail-data";
 import styles from "./course-rail.module.css";
+import { BrandLockup } from "@/components/site/BrandMark";
 
 /* Shared page shell for every "react" render-mode course page (lesson,
    practice, diagnostic - real and preview alike): the sticky glass sidebar,
@@ -56,9 +57,7 @@ export function LearnShell({
               <button type="button" className={styles.railToggle} aria-label={open ? "Close course navigation" : "Open course navigation"} onClick={() => setOpen((o) => !o)}>
                 {open ? <X size={16} /> : <Menu size={16} />}
               </button>
-              <span className="font-[family-name:var(--font-course-serif)] text-[16px] font-extrabold tracking-[-0.02em]">
-                ZENITH<b className="ml-0.5 rounded-[2px] bg-[#8b7cf6] px-1.5 py-px text-[#120f24]">LAB</b>
-              </span>
+              <BrandLockup brand="lab" size="sm" />
               <span className="ml-auto hidden min-w-0 truncate font-[family-name:var(--font-course-mono)] text-[12px] uppercase tracking-[0.08em] text-[#676e7d] sm:block">
                 {courseLabel}
               </span>

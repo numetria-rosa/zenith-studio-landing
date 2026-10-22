@@ -41,10 +41,8 @@ export function Sidebar({
     <aside className={s.sidebar}>
       <div className={s.brand}>
         <div className={s.logoTile}>
-          <svg width={22} height={22} viewBox="0 0 32 32" fill="none" stroke="#C7B0FF" strokeWidth={3.2} strokeLinecap="square" aria-hidden>
-            <path d="M16 3 L29 16 L22 23" />
-            <path d="M16 29 L3 16 L10 9" />
-          </svg>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/zenith-mark.png" alt="Zenith Studio" width={28} height={28} />
         </div>
         <div className={s.brandText}>
           <div className={s.brandTitle}>{planLabel}</div>

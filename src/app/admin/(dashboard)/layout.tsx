@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/admin";
 import { getHqClients, listSupportRequestsForHq, attentionQueue } from "@/lib/hq";
 import { HqSidebar } from "./HqSidebar";
 import "./hq.css";
+import { wordmark } from "@/lib/fonts";
 
 /* Zenith HQ - the owner-only business command center, replacing the
    previous plain-Tailwind /admin shell with the same Obsidian dark-glass
@@ -37,7 +38,7 @@ export default async function HqLayout({ children }: { children: React.ReactNode
   const ownerName = admin.user?.name?.split(" ")[0] || "Owner";
 
   return (
-    <div className="zhq">
+    <div className={`zhq ${wordmark.variable}`}>
       <div className="app">
         <HqSidebar badges={badges} ownerName={ownerName} />
         <main className="main">

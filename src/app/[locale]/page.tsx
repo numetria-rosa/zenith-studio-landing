@@ -232,7 +232,7 @@ export default function ZenithStudioLandingPage() {
         "@id": `${SITE_URL}/#organization`,
         name: "Zenith Studio",
         url: SITE_URL,
-        logo: `${SITE_URL}/icon.webp`,
+        logo: `${SITE_URL}/brand/zenith-mark.png`,
         image: `${SITE_URL}/opengraph-image`,
         description:
           "AI automation agency building done-for-you systems that capture leads, book appointments, and clear the inbox. AI receptionists, lead follow-up, and custom integrations.",

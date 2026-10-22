@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon, type IconName } from "@/components/obsidian/Icon";
+import { wordmark } from "@/lib/fonts";
 
 export type AccountUser = { name: string; email: string; initials: string };
 
@@ -20,9 +21,9 @@ export function AccountSidebar({ user, signOut }: { user: AccountUser; signOut: 
   return (
     <>
       <div className="flex items-center gap-3 px-2">
-        <Image src="/course/zenith-logo.png" alt="Zenith Studio logo" width={32} height={32} className="h-8 w-8 object-contain" />
+        <Image src="/brand/zenith-mark.png" alt="Zenith Studio logo" width={32} height={32} className="h-8 w-8 object-contain" />
         <div className="flex flex-col">
-          <b className="text-[15px] font-semibold">Zenith Studio</b>
+          <b className={`${wordmark.className} text-[14px] font-semibold tracking-[-0.01em]`}>Zenith Studio</b>
           <span className="text-[12px] text-mist">Student space</span>
         </div>
       </div>

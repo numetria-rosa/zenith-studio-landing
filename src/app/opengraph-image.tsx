@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 
 // Auto-generated social share card. Shows whenever the site is linked on
@@ -6,7 +8,13 @@ export const alt = "Zenith Studio: AI automation systems for modern business";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  const brandDir = path.join(process.cwd(), "public", "brand");
+  const [mark, unbounded] = await Promise.all([readFile(path.join(brandDir, "zenith-mark.png")), readFile(path.join(brandDir, "Unbounded-SemiBold.ttf"))]);
+  const markSrc = `data:image/png;base64,${mark.toString("base64")}`;
+  // Body text stays Geist (same Google Fonts files the proposal PDF registers); only the wordmark is Unbounded.
+  const geist = (file: string) => fetch(`https://fonts.gstatic.com/s/geist/v5/${file}.ttf`).then((r) => r.arrayBuffer());
+  const [geist500, geist800] = await Promise.all([geist("gyBhhwUxId8gMGYQMKR3pzfaWI_RruM4nQ"), geist("gyBhhwUxId8gMGYQMKR3pzfaWI_RHOQ4nQ")]);
   return new ImageResponse(
     (
       <div
@@ -21,7 +29,7 @@ export default function OpengraphImage() {
           backgroundImage:
             "radial-gradient(circle at 18% 12%, rgba(111,144,255,0.32), transparent 42%), radial-gradient(circle at 84% 20%, rgba(216,82,255,0.28), transparent 38%), radial-gradient(circle at 50% 100%, rgba(0,183,255,0.22), transparent 45%)",
           color: "white",
-          fontFamily: "sans-serif",
+          fontFamily: "Geist",
         }}
       >
         <div
@@ -29,21 +37,14 @@ export default function OpengraphImage() {
             display: "flex",
             alignItems: "center",
             gap: "16px",
-            fontSize: 26,
-            letterSpacing: "0.3em",
-            textTransform: "uppercase",
-            color: "rgba(255,255,255,0.62)",
+            fontSize: 30,
+            fontFamily: "Unbounded",
+            letterSpacing: "-0.01em",
+            color: "white",
           }}
         >
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 12,
-              background: "linear-gradient(135deg, #6f90ff, #d852ff)",
-              display: "flex",
-            }}
-          />
+          {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
+          <img src={markSrc} width={64} height={64} />
           Zenith Studio
         </div>
 
@@ -95,6 +96,13 @@ export default function OpengraphImage() {
         </div>
       </div>
     ),
-    size,
+    {
+      ...size,
+      fonts: [
+        { name: "Geist", data: geist500, weight: 500, style: "normal" },
+        { name: "Geist", data: geist800, weight: 800, style: "normal" },
+        { name: "Unbounded", data: unbounded, weight: 600, style: "normal" },
+      ],
+    },
   );
 }

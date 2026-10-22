@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronDown, Lock } from "lucide-react";
 import type { CourseRailData } from "@/lib/course-rail-data";
 import styles from "./course-rail.module.css";
+import { BrandLockup } from "@/components/site/BrandMark";
 
 /* The "react" render mode's sidebar content - same CourseRailData shape
    every static course's rail (course-rail-template.ts, string-templated
@@ -66,7 +67,9 @@ export function CourseRail({
 
   return (
     <>
-      <div className={styles.railBrand}>Zenith Lab</div>
+      <div className={styles.railBrand}>
+        <BrandLockup brand="lab" size="sm" />
+      </div>
       <div className={styles.railTitle}>{data.title}</div>
 
       <div className={styles.railAccount}>

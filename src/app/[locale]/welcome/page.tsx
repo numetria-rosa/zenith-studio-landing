@@ -9,6 +9,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { hasCourseAccess } from "@/lib/entitlements";
 import { decryptPassword } from "@/lib/password";
+import { wordmark } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "Welcome | Zenith Studio",
@@ -54,8 +55,8 @@ export default async function WelcomePage() {
 
       <main className="relative flex w-full max-w-[520px] flex-col gap-7">
         <div className="flex items-center gap-3 self-center">
-          <Image src="/course/zenith-logo.png" alt="" width={32} height={32} className="h-8 w-8 object-contain" />
-          <b className="text-[15px] font-semibold">Zenith Studio</b>
+          <Image src="/brand/zenith-mark.png" alt="" width={32} height={32} className="h-8 w-8 object-contain" />
+          <b className={`${wordmark.className} text-[14px] font-semibold tracking-[-0.01em]`}>Zenith Studio</b>
         </div>
 
         <section className="glass flex flex-col gap-6 rounded-[30px] p-8 sm:p-10">
