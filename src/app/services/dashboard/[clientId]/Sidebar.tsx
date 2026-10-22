@@ -63,6 +63,11 @@ export function Sidebar({
         })}
       </nav>
 
+      <Link href="/my-services" className={s.navItem}>
+        <Icon name="grid" size={18} strokeWidth={1.8} />
+        <span className={s.navLabel}>All my services</span>
+      </Link>
+
       <div className={s.footer}>
         <button type="button" className={s.askBtn} onClick={() => open()} data-tour="ask-sidebar">
           <Icon name="message" size={16} />

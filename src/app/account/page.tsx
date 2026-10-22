@@ -7,7 +7,7 @@ import { ProgressBar } from "@/components/obsidian/ProgressBar";
 import { loadStudentSpace, type OwnedCourse } from "@/lib/account/data";
 import { type ActivityKind, timeAgo } from "@/lib/account/stats";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { loadOwnedServices } from "@/lib/account/services";
 import { getCourse, launchLabel } from "@/lib/courses";
 
 const MONO = "font-mono uppercase tracking-[0.14em]";
@@ -30,13 +30,9 @@ const ACTIVITY_ICON: Record<ActivityKind, { icon: IconName; color: string }> = {
 export default async function MyCourses() {
   const session = await auth();
   const s = await loadStudentSpace(session!.user!.id!);
-  // A WhatsApp agent customer has an agency dashboard of their own. If that is all they own, sign-in lands them there.
-  const agencies = await db.waMembership.findMany({
-    where: { userId: session!.user!.id! },
-    orderBy: { createdAt: "desc" },
-    select: { agencyId: true, agency: { select: { name: true } } },
-  });
-  if (agencies.length > 0 && s.courses.length === 0) redirect(`/whatsapp-umrah/${agencies[0]!.agencyId}`);
+  // Courses are for students, services for clients: a client with no courses belongs on their services home.
+  const services = await loadOwnedServices(session!.user!.id!);
+  if (services.length > 0 && s.courses.length === 0) redirect("/my-services");
   const first = s.user.name.split(/\s+/)[0]!;
 
   return (
@@ -48,20 +44,18 @@ export default async function MyCourses() {
         action={<Button href={CATALOGUE} variant="glass" size="md" arrow>Browse courses</Button>}
       />
 
-      {agencies.map((a) => (
+      {services.length > 0 && (
         <Link
-          key={a.agencyId}
-          href={`/whatsapp-umrah/${a.agencyId}`}
+          href="/my-services"
           className="glass flex items-center justify-between gap-4 rounded-[22px] p-5 text-frost no-underline hover:bg-white/[0.05]"
         >
           <span className="flex flex-col gap-1">
-            <span className={`${MONO} text-[11.5px] text-mint-text`}>WhatsApp AI agent</span>
-            <b className="text-[18px] font-medium tracking-[-0.02em]">{a.agency.name}</b>
-            <span className="text-[14px] text-mist">Open your WhatsApp dashboard</span>
+            <span className={`${MONO} text-[11.5px] text-mint-text`}>Zenith Studio client</span>
+            <b className="text-[17px] font-medium tracking-[-0.02em]">You also have {services.length === 1 ? "a service" : `${services.length} services`} with us. Go to your services</b>
           </span>
           <Icon name="arrow" size={18} />
         </Link>
-      ))}
+      )}
 
       <Hero hero={s.hero} />
 

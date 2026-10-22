@@ -14,6 +14,7 @@ const paths = {
     </>
   ),
   home: <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />,
+  grid: <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />,
   users: (
     <>
       <circle cx="9" cy="8" r="3.5" />

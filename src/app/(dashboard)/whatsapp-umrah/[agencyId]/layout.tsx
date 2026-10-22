@@ -38,6 +38,10 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
               {item.label}
             </Link>
           ))}
+          <Link href="/my-services" className={waStyles.navLink} style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+            <Icon name="grid" size={17} strokeWidth={1.8} />
+            All my services
+          </Link>
         </aside>
         <main className={waStyles.main}>{children}</main>
       </div>
