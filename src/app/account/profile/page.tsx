@@ -8,7 +8,7 @@ import { initialsOf } from "@/lib/account/data";
 import { loadPurchases } from "@/lib/account/purchases";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { decryptPassword } from "@/lib/password";
+import { tryDecryptPassword } from "@/lib/password";
 import { getCompletedLessons } from "@/lib/aie/progress";
 
 const MONO = "font-mono uppercase tracking-[0.14em]";
@@ -67,7 +67,7 @@ export default async function ProfilePage() {
               <NotificationToggles initial={{ productNews: user.notifyProductNews, weeklyRecap: user.notifyWeeklyRecap, offers: user.notifyOffers }} />
             </div>
           </section>
-          <PasswordCard email={user.email} current={user.passwordEnc ? decryptPassword(user.passwordEnc) : null} />
+          <PasswordCard email={user.email} current={tryDecryptPassword(user.passwordEnc)} />
           <section aria-labelledby="delete" className="flex flex-col gap-4 rounded-[26px] border border-[rgba(255,92,122,0.30)] bg-[rgba(255,92,122,0.05)] p-7 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-1.5">
               <h2 id="delete" className="m-0 text-[18px] font-medium tracking-[-0.01em]">Delete account</h2>

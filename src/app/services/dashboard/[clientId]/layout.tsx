@@ -9,7 +9,7 @@ import { OnboardingModal } from "./OnboardingModal";
 import { businessNameOf, getService } from "@/lib/services";
 import { DashboardTour } from "./DashboardTour";
 import { db } from "@/lib/db";
-import { decryptPassword } from "@/lib/password";
+import { tryDecryptPassword } from "@/lib/password";
 import consoleStyles from "./console.module.css";
 import shell from "./sidebar.module.css";
 
@@ -46,7 +46,7 @@ export default async function ClientConsoleLayout({
   // Direct buyers (no proposal) arrive without a business name on file.
   const needsOnboarding = !businessNameOf(project);
   const user = await db.user.findUnique({ where: { id: session.user.id }, select: { passwordEnc: true, dashboardTourSeenAt: true } });
-  const password = needsOnboarding && user?.passwordEnc ? decryptPassword(user.passwordEnc) : null;
+  const password = needsOnboarding ? tryDecryptPassword(user?.passwordEnc) : null;
   // Tour starts once the details popup is done, and only ever once per account.
   const showTour = !needsOnboarding && !user?.dashboardTourSeenAt;
   const answers = planQuickAnswers(project, project.sourceServiceId ? (getService(project.sourceServiceId)?.monthlyPriceDisplay ?? null) : null);

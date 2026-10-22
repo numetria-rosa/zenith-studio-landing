@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { decryptPassword } from "@/lib/password";
+import { tryDecryptPassword } from "@/lib/password";
 import { createSessionForUser } from "@/lib/session";
 import { isAdminEmail } from "@/lib/admin";
 
@@ -32,7 +32,7 @@ export default async function AdminLoginPage({
     const password = String(formData.get("password") || "");
 
     const user = email ? await db.user.findUnique({ where: { email } }) : null;
-    const passwordOk = user?.passwordEnc ? decryptPassword(user.passwordEnc) === password : false;
+    const passwordOk = tryDecryptPassword(user?.passwordEnc) === password && password !== "";
     const isAdmin = !!user && (user.role === "ADMIN" || isAdminEmail(user.email));
 
     if (!passwordOk || !user || !isAdmin) {

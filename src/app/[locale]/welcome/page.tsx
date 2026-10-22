@@ -8,7 +8,7 @@ import { Icon } from "@/components/obsidian/Icon";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { hasCourseAccess } from "@/lib/entitlements";
-import { decryptPassword } from "@/lib/password";
+import { tryDecryptPassword } from "@/lib/password";
 import { wordmark } from "@/lib/fonts";
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default async function WelcomePage() {
   if (!session?.user?.id) redirect("/sign-in");
 
   const user = await db.user.findUniqueOrThrow({ where: { id: session.user.id } });
-  const password = user.passwordEnc ? decryptPassword(user.passwordEnc) : null;
+  const password = tryDecryptPassword(user.passwordEnc);
   // Service buyers belong in their client dashboard (its popup shows the
   // password), even if they reach this page from an old link.
   const project = await db.serviceProject.findFirst({
