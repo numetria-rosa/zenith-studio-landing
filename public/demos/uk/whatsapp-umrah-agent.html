@@ -277,13 +277,13 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
 }
 /* ==== WA hero v2 ==== */
 /* ---------- Inbox hero ---------- */
-.ih{position:relative;padding-block:clamp(40px,6vw,72px) clamp(56px,8vw,110px)}
+.ih{position:relative;padding-block:clamp(28px,3.5vw,48px) clamp(56px,8vw,110px)}
 .ih-glow{position:absolute;border-radius:50%;pointer-events:none}
 .ih-glow-a{right:-6%;top:-10%;width:900px;height:900px;max-width:120vw;background:radial-gradient(circle,rgba(61,220,151,.30) 0%,rgba(43,163,122,.10) 38%,rgba(5,6,10,0) 66%)}
 .ih-glow-b{left:-240px;bottom:-320px;width:680px;height:680px;background:radial-gradient(circle,rgba(59,107,255,.20),rgba(5,6,10,0) 62%)}
 .ih-word{position:absolute;left:50%;top:clamp(10px,3vw,40px);transform:translateX(-50%);font-size:clamp(140px,22vw,320px);line-height:1;font-weight:600;letter-spacing:-.06em;white-space:nowrap;background:linear-gradient(180deg,rgba(61,220,151,.36) 0%,rgba(61,220,151,.03) 78%);-webkit-background-clip:text;background-clip:text;color:transparent;pointer-events:none;user-select:none}
-.ih-grid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,640px);gap:24px;align-items:center}
-.ih-copy{display:flex;flex-direction:column;gap:24px;max-width:560px;padding-top:clamp(40px,8vw,120px)}
+.ih-grid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,640px);gap:24px;align-items:start}
+.ih-copy{display:flex;flex-direction:column;gap:24px;max-width:560px;padding-top:clamp(8px,1.5vw,24px)}
 .ih-eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mist)}
 .ih-eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 12px rgba(61,220,151,.9)}
 .ih h1{font-size:clamp(40px,5.2vw,68px);line-height:1.02;font-weight:500;letter-spacing:-.045em}
@@ -330,7 +330,7 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
 .t3{top:225px}.t2{top:330px}.t1{top:440px}
 @media (max-width: 1060px){
   .ih-grid{grid-template-columns:minmax(0,1fr)}
-  .ih-copy{padding-top:clamp(40px,10vw,90px)}
+  .ih-copy{padding-top:clamp(8px,3vw,24px)}
   .stack-fit{justify-self:center;max-width:560px}
 }
 @media (prefers-reduced-motion: reduce){.plane,.beam i,.float{animation:none!important}}
