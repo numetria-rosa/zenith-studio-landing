@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import { db } from "@/lib/db";
-import { decryptPassword } from "@/lib/password";
+import { tryDecryptPassword } from "@/lib/password";
 import { createSessionForUser } from "@/lib/session";
 import { wordmark } from "@/lib/fonts";
 
@@ -97,7 +97,7 @@ function PasswordSignInForm({ redirectTo }: { redirectTo: string }) {
     const dest = rawDest.startsWith("/") ? rawDest : "/start";
 
     const user = email ? await db.user.findUnique({ where: { email } }) : null;
-    const ok = user?.passwordEnc ? decryptPassword(user.passwordEnc) === password : false;
+    const ok = password !== "" && tryDecryptPassword(user?.passwordEnc) === password;
     if (!ok || !user) {
       redirect(`/sign-in?error=invalid_password&callbackUrl=${encodeURIComponent(dest)}`);
     }

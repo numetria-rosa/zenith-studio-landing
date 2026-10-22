@@ -31,6 +31,18 @@ export function decryptPassword(stored: string): string {
   return Buffer.concat([decipher.update(Buffer.from(ciphertextHex, "hex")), decipher.final()]).toString("utf8");
 }
 
+/** For pages that show or check a password: a value encrypted under a different key (for example one set while
+    running locally against the shared database) can't be read, and that must not crash the page. Returns null,
+    which the pages treat as "no password set" / "doesn't match". */
+export function tryDecryptPassword(stored: string | null | undefined): string | null {
+  if (!stored) return null;
+  try {
+    return decryptPassword(stored);
+  } catch {
+    return null;
+  }
+}
+
 // 20 random base62-ish chars - no ambiguous-looking symbols, easy to read
 // off a screen, strong enough it's never worth brute-forcing.
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
