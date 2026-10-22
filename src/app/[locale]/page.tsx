@@ -313,7 +313,7 @@ Cal.ns["free-automation-audit"]("ui", {"hideEventTypeDetails":false,"layout":"mo
       />
 
       <main className="relative z-10 px-4 sm:px-6 lg:px-10">
-        <section className="mx-auto grid max-w-7xl items-center gap-12 pb-20 pt-14 lg:grid-cols-[1.1fr_0.9fr] lg:pt-20 min-h-[calc(100vh-110px)]">
+        <section className="mx-auto grid max-w-7xl items-center gap-12 pb-20 pt-8 lg:grid-cols-[1.1fr_0.9fr] lg:pt-10">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-xs uppercase tracking-[0.28em] text-cyan-200/90 backdrop-blur-xl">
               {t("hero.badge")}

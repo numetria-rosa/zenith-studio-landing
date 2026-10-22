@@ -49,7 +49,7 @@ export default async function ServiceDetailsPage({ params }: { params: Promise<{
       />
 
       <main className="relative z-10">
-        <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-8 pt-10 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:px-12 lg:pt-14">
+        <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-8 pt-6 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:px-12 lg:pt-8">
           <div>
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-black">
               <span className="text-sm font-extrabold tracking-tight">&lt;/&gt;</span>
