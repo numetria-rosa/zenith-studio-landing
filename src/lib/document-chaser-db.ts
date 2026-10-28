@@ -33,7 +33,7 @@ export async function addDocChaseClients(
   projectId: string,
   userId: string,
   input: { clients: { name: string; email: string }[]; checklistId: string; extras: string[] },
-): Promise<{ ok: true; added: number; existing: number } | { ok: false; error: string }> {
+): Promise<{ ok: true; added: number; existing: number; emailed: number } | { ok: false; error: string }> {
   if (!(await ownedProject(projectId, userId))) return { ok: false, error: "not_found" };
   if (input.clients.length === 0) return { ok: false, error: "Add at least one client with a valid email." };
   if (input.clients.length > 500) return { ok: false, error: "Import up to 500 clients at a time." };
@@ -46,10 +46,10 @@ export async function addDocChaseClients(
   const existing = new Set(
     (await db.docChaseClient.findMany({ where: { projectId, email: { in: input.clients.map((c) => c.email) } }, select: { email: true } })).map((c) => c.email),
   );
-  let added = 0;
+  const ids: string[] = [];
   for (const c of input.clients) {
     if (existing.has(c.email)) continue;
-    await db.docChaseClient.create({
+    const created = await db.docChaseClient.create({
       data: {
         projectId,
         name: c.name.slice(0, 120),
@@ -58,10 +58,13 @@ export async function addDocChaseClients(
         uploadToken: randomBytes(24).toString("base64url"),
         items: { create: items.map((label, order) => ({ label, order })) },
       },
+      select: { id: true },
     });
-    added++;
+    ids.push(created.id);
   }
-  return { ok: true, added, existing: existing.size };
+  // Day 0: the first email goes out now, not at the next daily run. The rest (over the per-run cap) go at that run.
+  const emailed = ids.length ? (await chaseClients({ id: { in: ids } })).chased : 0;
+  return { ok: true, added: ids.length, existing: existing.size, emailed };
 }
 
 async function ownedItem(projectId: string, userId: string, itemId: string) {
@@ -145,8 +148,12 @@ export async function confirmUpload(token: string, itemId: string, pathname: str
 /** Emails every client who still owes documents (on the reminder schedule), and tells the accountant
     once a client has sent everything. */
 export async function runDocumentChaser(now = new Date()): Promise<{ chased: number; completed: number; failed: number }> {
+  return chaseClients({}, now);
+}
+
+async function chaseClients(where: { id?: { in: string[] } }, now = new Date()): Promise<{ chased: number; completed: number; failed: number }> {
   const clients = await db.docChaseClient.findMany({
-    where: { status: "ACTIVE", project: { sourceServiceId: DOC_CHASER_SERVICE_ID, ...runnableProject() } },
+    where: { ...where, status: "ACTIVE", project: { sourceServiceId: DOC_CHASER_SERVICE_ID, ...runnableProject() } },
     include: {
       items: { orderBy: { order: "asc" } },
       project: { select: { title: true, sourceServiceId: true, user: { select: { email: true } } } },
@@ -189,6 +196,41 @@ export async function runDocumentChaser(now = new Date()): Promise<{ chased: num
     } else failed++;
   }
   return { chased, completed, failed };
+}
+
+/** "Send me a test email first": the exact first email a client gets, sent to the accountant's own address. */
+export async function sendDocChaserTestEmail(projectId: string, userId: string, checklistId: string, extras: string[]): Promise<Result> {
+  const project = await db.serviceProject.findFirst({
+    where: { id: projectId, userId, sourceServiceId: DOC_CHASER_SERVICE_ID },
+    select: { title: true, sourceServiceId: true, user: { select: { email: true } } },
+  });
+  if (!project?.user.email) return { ok: false, error: "not_found" };
+  let items: string[];
+  try {
+    items = checklistItems(checklistId, extras);
+  } catch {
+    return { ok: false, error: "Pick a checklist." };
+  }
+  const businessName = businessNameOf(project) || "Your accountant";
+  const mail = chaseEmail({
+    businessName,
+    clientName: "Jane Doe",
+    items: items.map((label) => ({ label, rejectReason: null })),
+    uploadUrl: "[Your client's private upload link goes here]",
+    reminder: 0,
+  });
+  const sent = await sendAsBusiness({
+    businessName,
+    to: project.user.email,
+    replyTo: project.user.email,
+    subject: `[Test] ${mail.subject}`,
+    text: `This is a test. Your clients get exactly this email, with their own name and a working private upload link.
+
+---
+
+${mail.text}`,
+  });
+  return sent.ok ? { ok: true } : { ok: false, error: "The test email couldn't be sent. Try again in a minute." };
 }
 
 // ---------- retention ----------

@@ -21,7 +21,8 @@ import { createTransaction, updateDeadline, setDocumentReceived, setTransactionS
 import { importContacts, startReengagement, markContactReplied, isDormant } from "@/lib/database-manager";
 import { getSiteUrl } from "@/lib/site";
 import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_CHASES, REJECT_REASONS, parseClientCsv } from "@/lib/document-chaser";
-import { addDocChaseClients, deleteDocChaseClient, reviewDocChaseItem, setDocChaseClientStatus, uploadUrlFor } from "@/lib/document-chaser-db";
+import { addDocChaseClients, deleteDocChaseClient, reviewDocChaseItem, sendDocChaserTestEmail, setDocChaseClientStatus, uploadUrlFor } from "@/lib/document-chaser-db";
+import { DocChaserSetup } from "./DocChaserSetup";
 import { qualificationGroups, qualificationRulesText, readChoices, faqGroups, faqText, hoursText, DAYS, OPEN_TIMES, CLOSE_TIMES, CRM_FORMATS, type ChoiceGroup } from "@/lib/setup-options";
 import { CopyField, TestLeadForm } from "./ConnectForm";
 import { ENTITY_TYPES, readDetails, submitTextingRegistration, formConsentText } from "@/lib/texting-registration";
@@ -354,10 +355,22 @@ export default async function AgentDetailPage({
     });
     revalidatePath(dashboardBase, "layout");
     if (!result.ok) failTo(agentBase, result.error);
-    const parts = [`Added ${result.added} client${result.added === 1 ? "" : "s"}. Their first email goes out in the next daily run.`];
+    const left = result.added - result.emailed;
+    const parts = [
+      `Added ${result.added} client${result.added === 1 ? "" : "s"}. ${result.emailed} first email${result.emailed === 1 ? "" : "s"} sent just now${left ? `, ${left} more go out in the next daily run` : ""}.`,
+    ];
     if (result.existing) parts.push(`${result.existing} already on your list were left as they are.`);
     if (parsed.skipped) parts.push(`${parsed.skipped} row${parsed.skipped === 1 ? "" : "s"} skipped (no valid email or a duplicate).`);
     redirect(`${agentBase}?flash=${encodeURIComponent(parts.join(" "))}`);
+  }
+
+  async function testChaseEmailAction(formData: FormData): Promise<{ ok: boolean; message: string }> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) return { ok: false, message: "Sign in again, then retry." };
+    const extras = formData.getAll("extras").map(String).filter((e) => EXTRA_ITEMS.includes(e));
+    const result = await sendDocChaserTestEmail(clientId, session2.user.id, String(formData.get("checklist") || ""), extras);
+    return result.ok ? { ok: true, message: `Test email sent to ${session2.user.email}. Check your inbox (and spam).` } : { ok: false, message: result.error };
   }
 
   async function reviewDocAction(formData: FormData): Promise<void> {
@@ -835,57 +848,20 @@ export default async function AgentDetailPage({
         {flash && <FlashBox text={flash} />}
         {activateError && <p className={s.errorBox} style={{ maxWidth: 720 }}>{activateError}</p>}
 
-        <div className={`${u.card} ${s.setupCard}`} style={{ marginTop: 28, maxWidth: 720 }}>
-          <p className={s.setupTitle}>{clients.length === 0 ? "Add your first clients" : "Add more clients"}</p>
-          <p className={s.setupDesc}>
-            Each client gets an email in {businessName || "your business"}&apos;s name listing exactly what you need, with a private upload link (no
-            account needed). We remind them every {CHASE_GAP_DAYS} days, up to {MAX_CHASES} times, until everything is in. Replies go to your own inbox. Uploaded files are deleted
-            automatically {FILE_RETENTION_DAYS} days after upload, so save each one to your own records once you&apos;ve accepted it.
-          </p>
-          <form action={addChaseClientsAction} style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 14 }}>
-            <div className={s.formRow}>
-              <label className={s.label}>What do you need from them?</label>
-              <select name="checklist" className={s.input} defaultValue="personal-tax">
-                {CHECKLISTS.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.label} ({c.items.length} documents)
-                  </option>
-                ))}
-              </select>
-            </div>
-            <fieldset style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
-              <legend className={s.label}>Also ask for (optional)</legend>
-              <div className={a.options} style={{ paddingTop: 10, gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
-                {EXTRA_ITEMS.map((e) => (
-                  <label key={e} className={a.option} style={{ padding: 12 }}>
-                    <input type="checkbox" name="extras" value={e} className={a.radio} />
-                    <span className={a.optionLabel}>{e}</span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-            <div className={s.formRow}>
-              <label className={s.label}>Upload a client list (CSV with a name and an email column)</label>
-              <input name="file" type="file" accept=".csv,text/csv" className={s.input} />
-            </div>
-            <p style={{ margin: 0, fontSize: 13, color: "var(--zc-muted)" }}>Or add one client:</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14 }}>
-              <div className={s.formRow}>
-                <label className={s.label}>Client name</label>
-                <input name="name" placeholder="Jane Doe" className={s.input} />
-              </div>
-              <div className={s.formRow}>
-                <label className={s.label}>Client email</label>
-                <input name="email" type="email" placeholder="jane@example.com" className={s.input} />
-              </div>
-            </div>
-            <button type="submit" className={u.btnPrimary} style={{ alignSelf: "flex-start" }}>
-              Start chasing
-            </button>
-          </form>
-        </div>
+        <DocChaserSetup
+          checklists={CHECKLISTS.map((l) => ({ id: l.id, label: l.label, items: l.items }))}
+          extras={EXTRA_ITEMS}
+          businessName={businessName || "Your firm"}
+          gapDays={CHASE_GAP_DAYS}
+          maxChases={MAX_CHASES}
+          retentionDays={FILE_RETENTION_DAYS}
+          first={clients.length === 0}
+          addAction={addChaseClientsAction}
+          testAction={testChaseEmailAction}
+        />
 
-        <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16, maxWidth: 720 }}>
+        {clients.length > 0 && <h2 style={{ margin: "40px 0 0", fontSize: 22, fontWeight: 600 }}>Your clients</h2>}
+        <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 16, maxWidth: 900 }}>
           {clients.map((c) => {
             const done = c.items.filter((i) => i.status !== "REQUESTED").length;
             return (
