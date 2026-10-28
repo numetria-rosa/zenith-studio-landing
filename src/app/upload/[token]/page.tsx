@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getUploadPortal } from "@/lib/document-chaser-db";
 import { UploadButton } from "./UploadButton";
+import { ItemActions } from "./ItemActions";
 import { FILE_RETENTION_DAYS } from "@/lib/document-chaser";
 
 export const metadata = { title: "Upload your documents", robots: { index: false, follow: false } };
@@ -42,19 +43,25 @@ export default async function UploadPage({ params }: { params: Promise<{ token: 
 
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {client.items.map((item) => {
-            const state = item.status === "ACCEPTED" ? "Accepted" : item.status === "RECEIVED" ? "Received, being checked" : item.rejectReason ? "Please send again" : "Needed";
-            const tone = item.status === "ACCEPTED" || item.status === "RECEIVED" ? "text-[#7FF0BD]" : item.rejectReason ? "text-[#FF9BB0]" : "text-white/60";
+            const na = item.status === "NOT_APPLICABLE";
+            const state =
+              item.status === "ACCEPTED" ? "Accepted" : item.status === "RECEIVED" ? "Received, being checked" : na ? "You told us you don't have this" : item.rejectReason ? "Please send again" : "Needed";
+            const tone = item.status === "ACCEPTED" || item.status === "RECEIVED" ? "text-[#7FF0BD]" : item.rejectReason && !na ? "text-[#FF9BB0]" : "text-white/60";
             return (
-              <li key={item.id} className="flex flex-col justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:flex-row sm:items-center">
-                <div className="flex min-w-0 flex-col gap-1">
-                  <span className="text-[16px] font-medium">{item.label}</span>
-                  <span className={`text-[13.5px] ${tone}`}>
-                    {state}
-                    {item.rejectReason ? `: ${item.rejectReason}` : ""}
-                    {item.fileName && item.status !== "REQUESTED" ? ` · ${item.fileName}` : ""}
-                  </span>
+              <li key={item.id} className={`flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-5 ${na ? "opacity-70" : ""}`}>
+                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                  <div className="flex min-w-0 flex-col gap-1">
+                    <span className="text-[16px] font-medium">{item.label}</span>
+                    <span className={`text-[13.5px] ${tone}`}>
+                      {state}
+                      {item.rejectReason && !na ? `: ${item.rejectReason}` : ""}
+                      {na && item.clientNote ? `: "${item.clientNote}"` : ""}
+                      {item.fileName && item.status !== "REQUESTED" && !na ? ` · ${item.fileName}` : ""}
+                    </span>
+                  </div>
+                  {item.status !== "ACCEPTED" && !na && <UploadButton token={token} clientId={client.id} itemId={item.id} label={item.label} replace={item.status === "RECEIVED"} />}
                 </div>
-                {item.status !== "ACCEPTED" && <UploadButton token={token} clientId={client.id} itemId={item.id} label={item.label} replace={item.status === "RECEIVED"} />}
+                {item.status !== "ACCEPTED" && <ItemActions token={token} itemId={item.id} label={item.label} status={item.status} />}
               </li>
             );
           })}
