@@ -44,9 +44,14 @@ export function DocChaserSetup({
   const [dragging, setDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // A client typed into the fields but never "Add"-ed still counts: forgetting the Add button must not lose them.
+  const draft = email.trim() ? parseClientCsv(`name,email
+"${name.replace(/"/g, "")}",${email.trim()}`).clients[0] : undefined;
+  const toSend = draft && !pending.some((p) => p.email === draft.email) ? [...pending, draft] : pending;
+
   const checklist = checklists.find((l) => l.id === checklistId)!;
   const docCount = checklist.items.length + picked.filter((e) => !checklist.items.includes(e)).length;
-  const preview = pending[0]?.name.split(/\s+/)[0] || "Jane";
+  const preview = toSend[0]?.name.split(/\s+/)[0] || "Jane";
 
   function addMany(list: Pending[], skipped: number, from?: string) {
     const known = new Set(pending.map((p) => p.email));
@@ -94,14 +99,14 @@ export function DocChaserSetup({
         className={c.card}
         action={addAction}
         onSubmit={(e) => {
-          if (!pending.length) e.preventDefault();
+          if (!toSend.length) e.preventDefault();
         }}
       >
         <input type="hidden" name="checklist" value={checklistId} />
         {picked.map((e) => (
           <input key={e} type="hidden" name="extras" value={e} />
         ))}
-        <input type="hidden" name="csv" value={["name,email", ...pending.map((p) => `"${p.name.replace(/"/g, "")}",${p.email}`)].join("\n")} />
+        <input type="hidden" name="csv" value={["name,email", ...toSend.map((p) => `"${p.name.replace(/"/g, "")}",${p.email}`)].join("\n")} />
 
         <header className={c.cardHead}>
           <h2 className={c.cardTitle}>{first ? "Add your first clients" : "Add more clients"}</h2>
@@ -270,7 +275,7 @@ export function DocChaserSetup({
             <p className={c.stepSub}>Emails go out in your firm&apos;s name. You can pause or delete any client later.</p>
             <div className={c.chips}>
               <span className={c.chip}>
-                <Icon name="users" size={15} /> {pending.length} client{pending.length === 1 ? "" : "s"}
+                <Icon name="users" size={15} /> {toSend.length} client{toSend.length === 1 ? "" : "s"}
               </span>
               <span className={c.chip}>
                 <Icon name="file" size={15} /> {docCount} documents each
@@ -280,7 +285,7 @@ export function DocChaserSetup({
               </span>
             </div>
             <div className={c.actions}>
-              <button type="submit" className={c.start} disabled={!pending.length}>
+              <button type="submit" className={c.start} disabled={!toSend.length}>
                 Start chasing <Icon name="arrowRight" size={18} />
               </button>
               <button
@@ -297,7 +302,7 @@ export function DocChaserSetup({
                 <Icon name="mail" size={16} /> {testing ? "Sending..." : "Send me a test email first"}
               </button>
             </div>
-            {!pending.length && <p className={c.hint}>Add at least one client in step 2 to start.</p>}
+            {!toSend.length && <p className={c.hint}>Add at least one client in step 2 to start.</p>}
           </div>
         </section>
       </form>
@@ -310,7 +315,7 @@ export function DocChaserSetup({
           </div>
           <div className={c.mail}>
             <p className={c.mailFrom}>
-              From {businessName} · to {pending[0]?.name || "Jane Doe"}
+              From {businessName} · to {toSend[0]?.name || "Jane Doe"}
             </p>
             <p className={c.mailSubject}>Documents needed by {businessName}</p>
             <p className={c.mailText}>Hi {preview}, we need a few documents from you to get your work done. Upload them securely below, no account needed.</p>

@@ -1,20 +1,20 @@
 /* AI Document Chaser setup screen. Uses the console tokens (--zc-*) from console.module.css. Button rules are
    prefixed with .layout to outrank the console's global `.console button` reset. */
 
+/* Sized by the space the dashboard actually gives it (sidebar, browser zoom), not the window: the side column
+   drops below the card when there's no room, and the card's insides reflow on its own width (@container). */
 .layout {
   margin-top: 28px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--zc-rcol);
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--zc-gap);
-  align-items: start;
-}
-@media (max-width: 1180px) {
-  .layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
+  align-items: flex-start;
 }
 
 .card {
+  flex: 1 1 620px;
+  min-width: 0;
+  container-type: inline-size;
   border: 1px solid var(--zc-line);
   border-radius: 28px;
   background: linear-gradient(180deg, var(--zc-panel-2), var(--zc-panel));
@@ -250,14 +250,9 @@
 .oneRow {
   margin-top: 24px;
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
   gap: 14px;
   align-items: end;
-}
-@media (max-width: 760px) {
-  .oneRow {
-    grid-template-columns: 1fr;
-  }
 }
 .field {
   display: flex;
@@ -498,9 +493,12 @@
 }
 
 .side {
-  display: flex;
-  flex-direction: column;
+  flex: 1 1 340px;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
   gap: var(--zc-gap);
+  align-items: start;
 }
 .sideCard {
   padding: 4px 22px 22px;
@@ -637,7 +635,7 @@
   color: var(--zc-text-2);
 }
 
-@media (max-width: 640px) {
+@container (max-width: 640px) {
   .cardHead,
   .step {
     padding: 24px 18px;
@@ -670,5 +668,10 @@
   }
   .ready {
     display: none;
+  }
+}
+@container (max-width: 780px) {
+  .oneRow {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
