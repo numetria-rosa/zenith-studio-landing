@@ -675,3 +675,84 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* step 1: editing the document list */
+.linkRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 20px;
+}
+.layout .linkMuted {
+  margin-top: 14px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--zc-muted);
+  font: inherit;
+  font-size: 14.5px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.editor {
+  margin-top: 14px;
+  padding: 10px;
+  border: 1px solid var(--zc-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.editList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.editList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 8px 8px 12px;
+  border-bottom: 1px solid var(--zc-line);
+  font-size: 15.5px;
+  color: var(--zc-text);
+}
+.editList li:last-child {
+  border-bottom: 0;
+}
+.editList .empty {
+  color: var(--zc-muted);
+  font-size: 14.5px;
+}
+.addItem {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+.addItem .inputWrap {
+  min-height: 52px;
+}
+.addItem .addBtn {
+  min-height: 52px;
+}
+
+/* the real file input sits inside its label button, invisible but still reachable by keyboard */
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.layout label.ghostBtn {
+  position: relative;
+}
+.layout label.ghostBtn:focus-within {
+  outline: 2px solid var(--zc-done);
+  outline-offset: 3px;
+}
+.mailMore {
+  color: #777;
+  padding-left: 26px;
+}

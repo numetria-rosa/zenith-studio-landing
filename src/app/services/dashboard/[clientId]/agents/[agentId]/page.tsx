@@ -20,8 +20,8 @@ import { adjustableSettings, readSettings, dbDormantDays } from "@/lib/agent-set
 import { createTransaction, updateDeadline, setDocumentReceived, setTransactionStatus } from "@/lib/transaction-coordinator";
 import { importContacts, startReengagement, markContactReplied, isDormant } from "@/lib/database-manager";
 import { getSiteUrl } from "@/lib/site";
-import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_CHASES, REJECT_REASONS, parseClientCsv } from "@/lib/document-chaser";
-import { addDocChaseClients, deleteDocChaseClient, reviewDocChaseItem, sendDocChaserTestEmail, setDocChaseClientStatus, uploadUrlFor } from "@/lib/document-chaser-db";
+import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_CHASES, MAX_ITEMS, REJECT_REASONS, parseClientCsv } from "@/lib/document-chaser";
+import { addDocChaseClients, addDocChaseItem, deleteDocChaseClient, removeDocChaseItem, reviewDocChaseItem, sendDocChaserTestEmail, setDocChaseClientStatus, uploadUrlFor } from "@/lib/document-chaser-db";
 import { DocChaserSetup } from "./DocChaserSetup";
 import { qualificationGroups, qualificationRulesText, readChoices, faqGroups, faqText, hoursText, DAYS, OPEN_TIMES, CLOSE_TIMES, CRM_FORMATS, type ChoiceGroup } from "@/lib/setup-options";
 import { CopyField, TestLeadForm } from "./ConnectForm";
@@ -351,7 +351,7 @@ export default async function AgentDetailPage({
     const result = await addDocChaseClients(clientId, session2!.user.id, {
       clients: parsed.clients,
       checklistId: String(formData.get("checklist") || ""),
-      extras: formData.getAll("extras").map(String).filter((e) => EXTRA_ITEMS.includes(e)),
+      items: formData.getAll("items").map(String),
     });
     revalidatePath(dashboardBase, "layout");
     if (!result.ok) failTo(agentBase, result.error);
@@ -368,8 +368,7 @@ export default async function AgentDetailPage({
     "use server";
     const session2 = await auth();
     if (!session2?.user?.id) return { ok: false, message: "Sign in again, then retry." };
-    const extras = formData.getAll("extras").map(String).filter((e) => EXTRA_ITEMS.includes(e));
-    const result = await sendDocChaserTestEmail(clientId, session2.user.id, String(formData.get("checklist") || ""), extras);
+    const result = await sendDocChaserTestEmail(clientId, session2.user.id, formData.getAll("items").map(String));
     return result.ok ? { ok: true, message: `Test email sent to ${session2.user.email}. Check your inbox (and spam).` } : { ok: false, message: result.error };
   }
 
@@ -390,10 +389,15 @@ export default async function AgentDetailPage({
     if (!session2?.user?.id) signInTo(agentBase);
     const id = String(formData.get("id") || "");
     const op = String(formData.get("op") || "");
+    const uid = session2!.user.id;
     const result =
       op === "delete"
-        ? await deleteDocChaseClient(clientId, session2!.user.id, id)
-        : await setDocChaseClientStatus(clientId, session2!.user.id, id, op === "pause" ? "PAUSED" : "ACTIVE");
+        ? await deleteDocChaseClient(clientId, uid, id)
+        : op === "add-doc"
+          ? await addDocChaseItem(clientId, uid, id, String(formData.get("label") || ""))
+          : op === "remove-doc"
+            ? await removeDocChaseItem(clientId, uid, id)
+            : await setDocChaseClientStatus(clientId, uid, id, op === "pause" ? "PAUSED" : "ACTIVE");
     revalidatePath(dashboardBase, "layout");
     if (!result.ok) failTo(agentBase, result.error);
     redirect(agentBase);
@@ -851,6 +855,7 @@ export default async function AgentDetailPage({
         <DocChaserSetup
           checklists={CHECKLISTS.map((l) => ({ id: l.id, label: l.label, items: l.items }))}
           extras={EXTRA_ITEMS}
+          maxItems={MAX_ITEMS}
           businessName={businessName || "Your firm"}
           gapDays={CHASE_GAP_DAYS}
           maxChases={MAX_CHASES}
@@ -934,9 +939,26 @@ export default async function AgentDetailPage({
                       ) : (
                         <span style={{ fontSize: 12, fontFamily: "var(--zc-mono)", color: "var(--zc-muted)" }}>{i.status === "ACCEPTED" ? "accepted" : "waiting"}</span>
                       )}
+                      {i.status === "REQUESTED" && !i.filePathname && c.items.length > 1 && (
+                        <form action={chaseClientAction}>
+                          <input type="hidden" name="id" value={i.id} />
+                          <button type="submit" name="op" value="remove-doc" className={u.btnGhost} style={{ ...small, padding: "0 8px" }} aria-label={`Stop asking ${c.name} for ${i.label}`} title="Stop asking for this">
+                            <Icon name="x" size={13} />
+                          </button>
+                        </form>
+                      )}
                     </div>
                   ))}
                 </div>
+                {c.items.length < MAX_ITEMS && (
+                  <form action={chaseClientAction} style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
+                    <input type="hidden" name="id" value={c.id} />
+                    <input name="label" required maxLength={160} placeholder={`Ask ${c.name.split(/\s+/)[0]} for another document`} aria-label={`Ask ${c.name} for another document`} className={s.input} style={{ flex: 1, minWidth: 200, minHeight: 34, fontSize: 13 }} />
+                    <button type="submit" name="op" value="add-doc" className={u.btnGhost} style={small}>
+                      <Icon name="plus" size={13} /> Add document
+                    </button>
+                  </form>
+                )}
               </section>
             );
           })}

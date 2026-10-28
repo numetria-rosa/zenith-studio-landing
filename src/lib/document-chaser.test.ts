@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHECKLISTS, chaseEmail, checklistItems, filesToPurge, isDueForChase, parseClientCsv, REJECT_REASONS, uploadPathname } from "./document-chaser";
+import { CHECKLISTS, chaseEmail, cleanItems, filesToPurge, MAX_ITEMS, isDueForChase, parseClientCsv, REJECT_REASONS, uploadPathname } from "./document-chaser";
 
 const DAY = 86400000;
 
@@ -8,13 +8,9 @@ describe("checklists", () => {
     expect(new Set(CHECKLISTS.map((c) => c.id)).size).toBe(CHECKLISTS.length);
     for (const c of CHECKLISTS) expect(c.items.length).toBeGreaterThan(2);
   });
-  it("builds the item list from a template plus picked extras, without duplicates", () => {
-    const items = checklistItems("personal-tax", ["Photo ID", checklistItems("personal-tax", [])[0]!]);
-    expect(items).toContain("Photo ID");
-    expect(new Set(items).size).toBe(items.length);
-  });
-  it("rejects an unknown template", () => {
-    expect(() => checklistItems("nope", [])).toThrow();
+  it("cleans an edited document list: trims, drops blanks and repeats (any case), caps the count", () => {
+    expect(cleanItems(["  Photo ID ", "photo id", "", "Bank   statements", "   "])).toEqual(["Photo ID", "Bank statements"]);
+    expect(cleanItems(Array.from({ length: 50 }, (_, i) => `Doc ${i}`))).toHaveLength(MAX_ITEMS);
   });
 });
 
@@ -26,6 +22,14 @@ describe("parseClientCsv", () => {
       { name: "Bob", email: "bob@example.co.uk" },
     ]);
     expect(r.skipped).toBe(0);
+  });
+  it("reads semicolon and tab separated files (Excel in European locales)", () => {
+    const want = [
+      { name: "Jane Doe", email: "jane@example.com" },
+      { name: "Doe, John", email: "john@example.com" },
+    ];
+    expect(parseClientCsv('Nom;Email\r\nJane Doe;jane@example.com\r\n"Doe, John";john@example.com\r\n').clients).toEqual(want);
+    expect(parseClientCsv("Name\tEmail\nJane Doe\tjane@example.com\nDoe, John\tjohn@example.com\n").clients).toEqual(want);
   });
   it("accepts email-first columns and quoted names with commas", () => {
     expect(parseClientCsv('email,name\n"x@y.com","Smith, Ann"').clients).toEqual([{ name: "Smith, Ann", email: "x@y.com" }]);
