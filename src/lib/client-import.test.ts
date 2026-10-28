@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { applyColumns, columnLetter, emailIn, guessColumns, readTable } from "./client-import";
-import { checklistName, clientStage, detectChecklist } from "./document-chaser";
+import { checklistName, clientStage, detectChecklist, parseStartDay, zipEntryName } from "./document-chaser";
 
 const run = (text: string) => {
   const t = readTable(text);
@@ -81,5 +81,25 @@ describe("clientStage", () => {
     expect(it2("ACTIVE", ["REQUESTED", "REQUESTED"])).toBe("waiting");
     expect(it2("ACTIVE", ["ACCEPTED", "REQUESTED"])).toBe("started");
     expect(it2("ACTIVE", ["ACCEPTED", "NOT_APPLICABLE"])).toBe("complete");
+  });
+});
+
+describe("zipEntryName", () => {
+  it("names files after the client and document, keeps the extension, numbers clashes", () => {
+    const taken = new Set<string>();
+    expect(zipEntryName("Jane Doe", "W-2 from each employer", "scan.PDF", taken)).toBe("Jane Doe - W-2 from each employer.pdf");
+    expect(zipEntryName("Jane Doe", "W-2 from each employer", "other.pdf", taken)).toBe("Jane Doe - W-2 from each employer (2).pdf");
+    expect(zipEntryName("A/B\\C: Co", 'Bad "name"?', "x.jpg", taken)).toBe("A B C Co - Bad name.jpg");
+  });
+});
+
+describe("parseStartDay", () => {
+  const now = new Date("2026-01-10T15:00:00Z");
+  it("accepts tomorrow to a year out, as midnight UTC", () => {
+    expect(parseStartDay("", now)).toBeNull();
+    expect(parseStartDay("2026-02-20", now)).toEqual(new Date("2026-02-20T00:00:00Z"));
+    expect(parseStartDay("2026-01-10", now)).toBe("invalid");
+    expect(parseStartDay("2027-03-01", now)).toBe("invalid");
+    expect(parseStartDay("20/02/2026", now)).toBe("invalid");
   });
 });

@@ -24,13 +24,17 @@ export async function anthropicComplete(input: {
   userPrompt: string;
   maxTokens?: number;
   pdfBase64?: string;
+  /** A photo or scan instead of a PDF (image/jpeg, image/png, image/gif or image/webp). */
+  image?: { base64: string; mediaType: string };
+  model?: string;
 }): Promise<AnthropicResult> {
-  const userContent = input.pdfBase64
-    ? [
-        { type: "document", source: { type: "base64", media_type: "application/pdf", data: input.pdfBase64 } },
-        { type: "text", text: input.userPrompt },
-      ]
-    : input.userPrompt;
+  // Content block shapes: platform.claude.com/docs/en/build-with-claude/vision and .../pdf-support
+  const file = input.pdfBase64
+    ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: input.pdfBase64 } }
+    : input.image
+      ? { type: "image", source: { type: "base64", media_type: input.image.mediaType, data: input.image.base64 } }
+      : null;
+  const userContent = file ? [file, { type: "text", text: input.userPrompt }] : input.userPrompt;
 
   const res = await fetch(`${ANTHROPIC_API_BASE}/messages`, {
     method: "POST",
@@ -40,7 +44,7 @@ export async function anthropicComplete(input: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: ANTHROPIC_MODEL,
+      model: input.model ?? ANTHROPIC_MODEL,
       max_tokens: input.maxTokens ?? 800,
       system: input.systemPrompt,
       messages: [{ role: "user", content: userContent }],

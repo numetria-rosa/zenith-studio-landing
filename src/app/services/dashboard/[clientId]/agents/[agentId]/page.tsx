@@ -20,7 +20,9 @@ import { adjustableSettings, readSettings, dbDormantDays } from "@/lib/agent-set
 import { createTransaction, updateDeadline, setDocumentReceived, setTransactionStatus } from "@/lib/transaction-coordinator";
 import { importContacts, startReengagement, markContactReplied, isDormant } from "@/lib/database-manager";
 import { getSiteUrl } from "@/lib/site";
-import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_CHASES, MAX_ITEMS } from "@/lib/document-chaser";
+import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_CHASES, MAX_ITEMS, parseStartDay, SMS_ADDON_MONTHLY_USD } from "@/lib/document-chaser";
+import { db } from "@/lib/db";
+import { sendAsBusiness } from "@/lib/client-mail";
 import { addDocChaseClients, addDocChaseItem, changeDocChaseChecklist, deleteDocChaseClient, deleteDocChecklist, listDocChecklists, reaskDocChaseItem, remindDocChaseClientNow, removeDocChaseItem, reviewDocChaseItem, saveDocChecklist, sendDocChaserTestEmail, setDocChaseClientStatus, type NewChaseClient } from "@/lib/document-chaser-db";
 import { readXlsx } from "@/lib/spreadsheet";
 import { DocChaserClients } from "./DocChaserClients";
@@ -366,15 +368,45 @@ export default async function AgentDetailPage({
     } catch {
       failTo(agentBase, "The client list couldn't be read. Refresh the page and try again.");
     }
-    const result = await addDocChaseClients(clientId, session2!.user.id, clients);
+    // "Start on a date": a YYYY-MM-DD from tomorrow to a year out; the daily run that day sends the first email.
+    const start = parseStartDay(String(formData.get("startAt") || ""));
+    if (start === "invalid") failTo(agentBase, "Pick a start date between tomorrow and a year from now.");
+    const startAt = start;
+    const result = await addDocChaseClients(clientId, session2!.user.id, clients, startAt);
     revalidatePath(dashboardBase, "layout");
     if (!result.ok) failTo(agentBase, result.error);
     const left = result.added - result.emailed;
+    const when = startAt?.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
     const parts = [
-      `Added ${result.added} client${result.added === 1 ? "" : "s"}. ${result.emailed} first email${result.emailed === 1 ? "" : "s"} sent just now${left ? `, ${left} more go out in the next daily run` : ""}.`,
+      startAt
+        ? `Added ${result.added} client${result.added === 1 ? "" : "s"}. Their first email goes out on ${when}.`
+        : `Added ${result.added} client${result.added === 1 ? "" : "s"}. ${result.emailed} first email${result.emailed === 1 ? "" : "s"} sent just now${left ? `, ${left} more go out in the next daily run` : ""}.`,
     ];
     if (result.existing) parts.push(`${result.existing} already on your list were left as they are.`);
     redirect(`${agentBase}?flash=${encodeURIComponent(parts.join(" "))}#clients`);
+  }
+
+  /** Text reminders are an add-on we switch on by hand once US carriers approve the firm's texting
+      registration, so this only records the request and tells us. */
+  async function requestTextRemindersAction(): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const already = await db.agentChangeRequest.findFirst({ where: { projectId: clientId, agentId: "chaser", status: "SMS_REQUESTED" }, select: { id: true } });
+    if (!already) {
+      await db.agentChangeRequest.create({
+        data: { projectId: clientId, userId: session2!.user.id, agentId: "chaser", status: "SMS_REQUESTED", changes: [{ key: "text_reminders", from: "off", to: "requested" }] },
+      });
+      await sendAsBusiness({
+        businessName: "Zenith Document Chaser",
+        to: "hello@zenith-studio.site",
+        replyTo: session2!.user.email ?? null,
+        subject: `Text reminders requested: ${businessName || clientId}`,
+        text: `${session2!.user.email} asked for text reminders on the AI Document Chaser for "${businessName || clientId}" (project ${clientId}).\n\nNext: register their 10DLC brand and campaign with SignalWire, add the $${SMS_ADDON_MONTHLY_USD}/month add-on to their billing, then switch texting on.`,
+      });
+    }
+    revalidatePath(agentBase);
+    redirect(`${agentBase}?flash=${encodeURIComponent("Request received. We'll email you once the carriers approve texting, usually within 1 to 3 weeks. Nothing is charged until texting is live.")}`);
   }
 
   async function testChaseEmailAction(formData: FormData): Promise<{ ok: boolean; message: string }> {
@@ -896,7 +928,10 @@ export default async function AgentDetailPage({
 
   // ---------- Accountants: AI Document Chaser ----------
   if (agentId === "chaser") {
-    const saved = await listDocChecklists(clientId);
+    const [saved, smsRequest] = await Promise.all([
+      listDocChecklists(clientId),
+      db.agentChangeRequest.findFirst({ where: { projectId: clientId, agentId: "chaser", status: "SMS_REQUESTED" }, select: { createdAt: true } }),
+    ]);
     const options = [
       ...CHECKLISTS.map((l) => ({ key: `std:${l.id}`, name: l.label, group: l.region, items: [...l.items] })),
       ...saved.map((l) => ({ key: `saved:${l.id}`, name: l.name, group: "Yours", items: l.items })),
@@ -933,6 +968,8 @@ export default async function AgentDetailPage({
           act={chaseClientAction}
           review={reviewDocAction}
         />
+
+        <TextRemindersCard requestedAt={smsRequest?.createdAt ?? null} action={requestTextRemindersAction} />
       </div>
     );
   }
@@ -1124,6 +1161,36 @@ function TextingCard({
             </div>
           </form>
         </>
+      )}
+    </section>
+  );
+}
+
+/* Email is how the Document Chaser chases. Texting is an optional add-on with a real wait and a real cost,
+   both stated before anyone asks for it. */
+function TextRemindersCard({ requestedAt, action }: { requestedAt: Date | null; action: () => Promise<void> }) {
+  return (
+    <section className={u.card} style={{ marginTop: 40, padding: 24, maxWidth: 760 }}>
+      <Eyebrow>Optional add-on</Eyebrow>
+      <p style={{ margin: "10px 0 0", fontSize: 18, fontWeight: 600 }}>Text message reminders</p>
+      <p style={{ margin: "8px 0 0", fontSize: 15, lineHeight: 1.6, color: "var(--zc-text-2)" }}>
+        Reminders go by email, which works straight away. If you also want each reminder sent by text, two things to know first:
+      </p>
+      <ul style={{ margin: "10px 0 0", paddingLeft: 20, fontSize: 15, lineHeight: 1.7, color: "var(--zc-text-2)" }}>
+        <li>US phone carriers have to approve your firm for business texting first. That usually takes 1 to 3 weeks, sometimes longer.</li>
+        <li>It costs ${SMS_ADDON_MONTHLY_USD} a month on top of your plan, starting only once texting is live.</li>
+        <li>Clients will only get texts after they agree to receive them.</li>
+      </ul>
+      {requestedAt ? (
+        <p style={{ margin: "16px 0 0", fontSize: 14.5, color: "var(--zc-done-text)" }}>
+          Requested on {requestedAt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}. We&apos;ll email you when the carriers approve it.
+        </p>
+      ) : (
+        <form action={action} style={{ marginTop: 16 }}>
+          <button type="submit" className={u.btnGhost}>
+            Request text reminders
+          </button>
+        </form>
       )}
     </section>
   );
