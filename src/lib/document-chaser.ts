@@ -30,44 +30,146 @@ export function filesToPurge(
 /** Most reminder emails one accountant's account sends per daily run; anyone over it is simply due tomorrow. */
 export const MAX_EMAILS_PER_RUN = 150;
 
+/* Standard starting lists, by country. Each document is phrased so the client can tell whether it applies to
+   them; anything that doesn't, they mark "I don't have this" on the upload page. `match` is how a value in an
+   imported spreadsheet (a "Return type" or "Entity" column, say) picks this list: whole words, any case. */
 export const CHECKLISTS = [
   {
-    id: "personal-tax",
-    label: "Personal tax return",
+    id: "us-1040",
+    region: "US",
+    label: "Individual tax return (1040)",
+    match: ["1040", "individual", "personal", "joint", "mfj", "single"],
     items: [
       "Last year's tax return",
-      "Year-end pay summary from each employer (W-2 or P60)",
-      "Bank and savings interest statements",
-      "Dividend and investment statements",
-      "Pension or retirement contributions",
-      "Rental income and expenses (if any)",
-      "Receipts for deductible expenses and donations",
+      "Photo ID (driver's license or passport)",
+      "W-2 from each employer",
+      "1099-INT and 1099-DIV (bank interest and dividends)",
+      "1099-B or consolidated brokerage statement",
+      "1099-NEC, 1099-MISC or 1099-K (other income)",
+      "1099-R and SSA-1099 (retirement and Social Security)",
+      "1098 mortgage interest statement",
+      "1098-T or 1098-E (tuition, student loan interest)",
+      "1095-A (Marketplace health insurance)",
+      "Charitable donation receipts",
+      "Estimated tax payments made this year",
     ],
   },
   {
-    id: "business-tax",
-    label: "Business tax return",
+    id: "us-schedule-c",
+    region: "US",
+    label: "Self-employed (Schedule C)",
+    match: ["schedule c", "sch c", "sole proprietor", "sole prop", "self employed", "self-employed", "freelance", "contractor"],
     items: [
       "Profit and loss for the year",
+      "Business bank and credit card statements",
+      "1099-NEC and 1099-K you received",
+      "Business expense receipts",
+      "Mileage log",
+      "Home office size and costs",
+      "Estimated tax payments made this year",
+    ],
+  },
+  {
+    id: "us-rental",
+    region: "US",
+    label: "Rental property (Schedule E)",
+    match: ["schedule e", "sch e", "rental", "landlord", "real estate"],
+    items: [
+      "Rent received, for each property",
+      "Property expenses (repairs, insurance, management fees)",
+      "1098 mortgage interest, for each property",
+      "Property tax bills",
+      "Closing statement for any property bought or sold this year",
+    ],
+  },
+  {
+    id: "us-business",
+    region: "US",
+    label: "Business return (1120-S, 1065, 1120)",
+    match: ["1120", "1120s", "1120-s", "1065", "s corp", "s-corp", "c corp", "corporation", "partnership", "llc", "business", "company", "entity"],
+    items: [
+      "Profit and loss and balance sheet",
+      "Bank and credit card statements (all accounts, full year)",
+      "Payroll reports (941s and W-3)",
+      "1099s you issued to contractors",
+      "Loan statements",
+      "Fixed asset purchases and sales",
+      "Last year's business return",
+      "Changes in owners or ownership percentages",
+    ],
+  },
+  {
+    id: "uk-self-assessment",
+    region: "UK",
+    label: "Self Assessment (UK)",
+    match: ["self assessment", "sa100", "sole trader"],
+    items: [
+      "Last year's tax return",
+      "P60 from each employer",
+      "P11D (benefits in kind)",
+      "Bank and savings interest statements",
+      "Dividend vouchers",
+      "Pension contributions",
+      "Rental income and expenses",
+      "Self-employment income and expenses",
+      "Gift Aid donations",
+    ],
+  },
+  {
+    id: "uk-company",
+    region: "UK",
+    label: "Limited company year end (UK)",
+    match: ["ltd", "limited", "ct600", "year end", "corporation tax"],
+    items: [
       "Business bank statements (all accounts, full year)",
-      "Sales invoices or income records",
-      "Expense receipts",
+      "Sales invoices",
+      "Purchase invoices and receipts",
       "Payroll summary",
-      "Loan and finance agreements",
+      "VAT returns",
+      "Loan agreements",
       "Asset purchases and sales",
+      "Director's loan account details",
     ],
   },
   {
     id: "monthly-bookkeeping",
+    region: "Any",
     label: "Monthly bookkeeping",
+    match: ["bookkeeping", "monthly", "books"],
     items: ["Bank statements for the month", "Sales invoices issued", "Purchase receipts and bills", "Credit card statements", "Cash expenses"],
   },
   {
     id: "new-client",
+    region: "Any",
     label: "New client onboarding",
-    items: ["Photo ID", "Proof of address", "Signed engagement letter", "Last year's accounts or tax return", "Tax reference or ID number"],
+    match: ["onboarding", "new client"],
+    items: ["Photo ID", "Proof of address", "Signed engagement letter", "Last year's accounts or tax return"],
   },
 ] as const;
+
+/* Lists clients were given before the US/UK split; their stored ids still need a readable name. */
+const OLD_CHECKLIST_NAMES: Record<string, string> = { "personal-tax": "Personal tax return", "business-tax": "Business tax return" };
+
+/** What to show for the checklist a client was set up with (stored as a name, or an older list's id). */
+export function checklistName(stored: string): string {
+  return CHECKLISTS.find((l) => l.id === stored)?.label ?? OLD_CHECKLIST_NAMES[stored] ?? stored;
+}
+
+/** Picks a checklist from a spreadsheet value like "1040", "S Corp" or "Rental": a saved list whose name matches
+    exactly wins, then a standard list with a matching keyword (whole words, longest first). Null = no match. */
+export function detectChecklist(raw: string, saved: { id: string; name: string }[]): string | null {
+  const v = raw.trim().toLowerCase();
+  if (!v) return null;
+  const own = saved.find((s) => s.name.trim().toLowerCase() === v);
+  if (own) return own.id;
+  const words = ` ${v.replace(/[^a-z0-9-]+/g, " ")} `;
+  let best: { id: string; len: number } | null = null;
+  for (const l of CHECKLISTS) {
+    if (l.label.toLowerCase() === v) return l.id;
+    for (const m of l.match) if (words.includes(` ${m} `) && (!best || m.length > best.len)) best = { id: l.id, len: m.length };
+  }
+  return best?.id ?? null;
+}
 
 /** Common one-off documents the accountant can tick on top of a template. */
 export const EXTRA_ITEMS = ["Photo ID", "Proof of address", "Signed engagement letter", "Mortgage interest statement", "Childcare costs", "Student loan statement", "Foreign income records", "Crypto transaction history"];
@@ -217,3 +319,13 @@ export const UPLOAD_CONTENT_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+
+/** Where a client is, for the accountant's list: something to review first, then who hasn't started. */
+export type ClientStage = "review" | "waiting" | "started" | "complete" | "paused";
+export function clientStage(c: { status: string; items: { status: string }[] }): ClientStage {
+  if (c.items.some((i) => i.status === "RECEIVED")) return "review";
+  if (c.status === "PAUSED") return "paused";
+  if (c.status === "DONE" || !c.items.some((i) => i.status === "REQUESTED")) return "complete";
+  return c.items.some((i) => i.status !== "REQUESTED") ? "started" : "waiting";
+}
+export const STAGE_LABELS: Record<ClientStage, string> = { review: "Needs review", waiting: "Not started", started: "In progress", complete: "Complete", paused: "Paused" };

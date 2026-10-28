@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { sendAsBusiness } from "@/lib/client-mail";
 import { businessNameOf } from "@/lib/services";
 import { getSiteUrl } from "@/lib/site";
-import { CANCELLED_GRACE_DAYS, chaseEmail, CHECKLISTS, cleanItems, FILE_RETENTION_DAYS, filesToPurge, isDueForChase, MAX_EMAILS_PER_RUN, MAX_ITEMS, MAX_UPLOAD_BYTES, REJECT_REASONS } from "@/lib/document-chaser";
+import { CANCELLED_GRACE_DAYS, chaseEmail, cleanItems, FILE_RETENTION_DAYS, filesToPurge, isDueForChase, MAX_CHASES, MAX_EMAILS_PER_RUN, MAX_ITEMS, MAX_UPLOAD_BYTES, REJECT_REASONS } from "@/lib/document-chaser";
 
 /* AI Document Chaser: database side. Every accountant-facing function checks the project belongs to the
    signed-in user and is this service; the client-facing ones are keyed by the secret upload token only. */
@@ -28,32 +28,38 @@ async function ownedProject(projectId: string, userId: string) {
 
 export const uploadUrlFor = (token: string) => `${getSiteUrl()}/upload/${token}`;
 
-/** Adds clients with the accountant's document list (a template they may have edited). Existing clients (same
-    email) are left as they are. */
+/** One client to add: their own document list (from a checklist, maybe edited) and that list's name. */
+export type NewChaseClient = { name: string; email: string; checklist: string; items: string[] };
+
+const VALID_EMAIL = /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/;
+
+/** Adds clients, each with their own document list. Existing clients (same email) are left as they are. */
 export async function addDocChaseClients(
   projectId: string,
   userId: string,
-  input: { clients: { name: string; email: string }[]; checklistId: string; items: string[] },
+  input: NewChaseClient[],
 ): Promise<{ ok: true; added: number; existing: number; emailed: number } | { ok: false; error: string }> {
   if (!(await ownedProject(projectId, userId))) return { ok: false, error: "not_found" };
-  if (input.clients.length === 0) return { ok: false, error: "Add at least one client with a valid email." };
-  if (input.clients.length > 500) return { ok: false, error: "Import up to 500 clients at a time." };
-  const items = cleanItems(input.items);
-  if (items.length === 0) return { ok: false, error: "Add at least one document to ask for." };
+  const seen = new Set<string>();
+  const clients = input
+    .map((c) => ({ name: String(c.name ?? "").trim().slice(0, 120), email: String(c.email ?? "").trim().toLowerCase(), checklist: String(c.checklist ?? "").trim().slice(0, 120) || "Custom", items: cleanItems((c.items ?? []).map(String)) }))
+    .filter((c) => VALID_EMAIL.test(c.email) && c.items.length > 0 && !seen.has(c.email) && seen.add(c.email));
+  if (clients.length === 0) return { ok: false, error: "Add at least one client with a valid email and at least one document." };
+  if (clients.length > 500) return { ok: false, error: "Import up to 500 clients at a time." };
   const existing = new Set(
-    (await db.docChaseClient.findMany({ where: { projectId, email: { in: input.clients.map((c) => c.email) } }, select: { email: true } })).map((c) => c.email),
+    (await db.docChaseClient.findMany({ where: { projectId, email: { in: clients.map((c) => c.email) } }, select: { email: true } })).map((c) => c.email),
   );
   const ids: string[] = [];
-  for (const c of input.clients) {
+  for (const c of clients) {
     if (existing.has(c.email)) continue;
     const created = await db.docChaseClient.create({
       data: {
         projectId,
-        name: c.name.slice(0, 120),
+        name: c.name || c.email.split("@")[0]!,
         email: c.email,
-        checklist: CHECKLISTS.some((l) => l.id === input.checklistId) ? input.checklistId : "custom",
+        checklist: c.checklist,
         uploadToken: randomBytes(24).toString("base64url"),
-        items: { create: items.map((label, order) => ({ label, order })) },
+        items: { create: c.items.map((label, order) => ({ label, order })) },
       },
       select: { id: true },
     });
@@ -62,6 +68,77 @@ export async function addDocChaseClients(
   // Day 0: the first email goes out now, not at the next daily run. The rest (over the per-run cap) go at that run.
   const emailed = ids.length ? (await chaseClients({ id: { in: ids } })).chased : 0;
   return { ok: true, added: ids.length, existing: existing.size, emailed };
+}
+
+// ---------- the firm's own saved checklists ----------
+
+export async function listDocChecklists(projectId: string) {
+  return db.docChecklist.findMany({ where: { projectId }, orderBy: { name: "asc" }, select: { id: true, name: true, items: true } });
+}
+
+/** Saves a named list (same name = replaced), so the firm sets it up once and picks it for any client. */
+export async function saveDocChecklist(projectId: string, userId: string, rawName: string, rawItems: string[]): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  if (!(await ownedProject(projectId, userId))) return { ok: false, error: "not_found" };
+  const name = rawName.replace(/\s+/g, " ").trim().slice(0, 80);
+  const items = cleanItems(rawItems);
+  if (!name) return { ok: false, error: "Give the checklist a name." };
+  if (items.length === 0) return { ok: false, error: "A checklist needs at least one document." };
+  if ((await db.docChecklist.count({ where: { projectId } })) >= 50 && !(await db.docChecklist.findUnique({ where: { projectId_name: { projectId, name } } })))
+    return { ok: false, error: "You can save up to 50 checklists. Delete one you no longer use first." };
+  const saved = await db.docChecklist.upsert({ where: { projectId_name: { projectId, name } }, create: { projectId, name, items }, update: { items }, select: { id: true } });
+  return { ok: true, id: saved.id };
+}
+
+export async function deleteDocChecklist(projectId: string, userId: string, id: string): Promise<Result> {
+  if (!(await ownedProject(projectId, userId))) return { ok: false, error: "not_found" };
+  await db.docChecklist.deleteMany({ where: { id, projectId } });
+  return { ok: true };
+}
+
+/** Moves a client to another list. What they already sent (or said they don't have) is kept; documents still
+    waiting that aren't on the new list are dropped; new ones are added and chased from the next run. */
+export async function changeDocChaseChecklist(projectId: string, userId: string, clientId: string, rawName: string, rawItems: string[]): Promise<Result> {
+  const c = await db.docChaseClient.findFirst({ where: { id: clientId, projectId, project: { userId } }, include: { items: true } });
+  if (!c) return { ok: false, error: "not_found" };
+  const items = cleanItems(rawItems);
+  if (items.length === 0) return { ok: false, error: "Pick a checklist with at least one document." };
+  const wanted = new Set(items.map((i) => i.toLowerCase()));
+  const drop = c.items.filter((i) => i.status === "REQUESTED" && !i.filePathname && !wanted.has(i.label.toLowerCase()));
+  const have = new Set(c.items.filter((i) => !drop.includes(i)).map((i) => i.label.toLowerCase()));
+  const add = items.filter((i) => !have.has(i.toLowerCase()));
+  const start = Math.max(-1, ...c.items.map((i) => i.order)) + 1;
+  await db.$transaction([
+    db.docChaseItem.deleteMany({ where: { id: { in: drop.map((i) => i.id) } } }),
+    db.docChaseItem.createMany({ data: add.map((label, n) => ({ clientId, label, order: start + n })) }),
+    db.docChaseClient.update({
+      where: { id: clientId },
+      data: { checklist: rawName.trim().slice(0, 120) || "Custom", ...(add.length ? { lastChasedAt: null, completedAt: null, status: c.status === "PAUSED" ? "PAUSED" : "ACTIVE" } : {}) },
+    }),
+  ]);
+  return { ok: true };
+}
+
+/** "Remind now": emails this client their outstanding list straight away (not more than once an hour). */
+export async function remindDocChaseClientNow(projectId: string, userId: string, clientId: string): Promise<Result> {
+  const c = await db.docChaseClient.findFirst({ where: { id: clientId, projectId, project: { userId } }, select: { status: true, chaseCount: true, lastChasedAt: true } });
+  if (!c) return { ok: false, error: "not_found" };
+  if (c.status !== "ACTIVE") return { ok: false, error: c.status === "PAUSED" ? "Resume this client first." : "This client has sent everything." };
+  if (c.chaseCount >= MAX_CHASES) return { ok: false, error: `This client has had all ${MAX_CHASES} reminders. Contact them directly.` };
+  if (c.lastChasedAt && Date.now() - c.lastChasedAt.getTime() < 3600000) return { ok: false, error: "They were emailed less than an hour ago." };
+  await db.docChaseClient.update({ where: { id: clientId }, data: { lastChasedAt: null } });
+  const r = await chaseClients({ id: { in: [clientId] } });
+  return r.chased ? { ok: true } : { ok: false, error: "The reminder couldn't be sent. Try again in a few minutes." };
+}
+
+/** The accountant asks again for a document the client said they don't have. */
+export async function reaskDocChaseItem(projectId: string, userId: string, itemId: string): Promise<Result> {
+  const item = await ownedItem(projectId, userId, itemId);
+  if (!item || item.status !== "NOT_APPLICABLE") return { ok: false, error: "not_found" };
+  await db.$transaction([
+    db.docChaseItem.update({ where: { id: itemId }, data: { status: "REQUESTED", clientNote: null } }),
+    db.docChaseClient.update({ where: { id: item.clientId }, data: { lastChasedAt: null, completedAt: null, status: item.client.status === "PAUSED" ? "PAUSED" : "ACTIVE" } }),
+  ]);
+  return { ok: true };
 }
 
 async function ownedItem(projectId: string, userId: string, itemId: string) {
@@ -74,7 +151,7 @@ export async function reviewDocChaseItem(projectId: string, userId: string, item
   if (!item) return { ok: false, error: "not_found" };
   if (decision === "accept") {
     await db.docChaseItem.update({ where: { id: itemId }, data: { status: "ACCEPTED", rejectReason: null } });
-    const open = await db.docChaseItem.count({ where: { clientId: item.clientId, status: { not: "ACCEPTED" } } });
+    const open = await db.docChaseItem.count({ where: { clientId: item.clientId, status: { notIn: ["ACCEPTED", "NOT_APPLICABLE"] } } });
     if (open === 0) await db.docChaseClient.update({ where: { id: item.clientId }, data: { status: "DONE", completedAt: new Date() } });
     return { ok: true };
   }
@@ -167,6 +244,39 @@ export async function confirmUpload(token: string, itemId: string, pathname: str
   return { ok: true };
 }
 
+/** The client says they don't have this document (this year it doesn't apply, say). It stops being chased; the
+    accountant sees the note and can ask again. */
+export async function markNotApplicable(token: string, itemId: string, note: string): Promise<Result> {
+  const portal = await getUploadPortal(token);
+  const item = portal?.client.items.find((i) => i.id === itemId);
+  if (!portal || !item || item.status !== "REQUESTED" || item.filePathname) return { ok: false, error: "This document can't be changed now." };
+  await db.docChaseItem.update({ where: { id: itemId }, data: { status: "NOT_APPLICABLE", clientNote: note.trim().slice(0, 300) || null } });
+  return { ok: true };
+}
+
+/** The client changed their mind: the document goes back on their list. */
+export async function undoNotApplicable(token: string, itemId: string): Promise<Result> {
+  const portal = await getUploadPortal(token);
+  const item = portal?.client.items.find((i) => i.id === itemId);
+  if (!portal || !item || item.status !== "NOT_APPLICABLE") return { ok: false, error: "This document can't be changed now." };
+  await db.docChaseItem.update({ where: { id: itemId }, data: { status: "REQUESTED", clientNote: null } });
+  return { ok: true };
+}
+
+/** "I have more than one" (two employers, two brokerages): adds "W-2 from each employer (2)" so each file has
+    its own place and its own review. */
+export async function addAnotherOf(token: string, itemId: string): Promise<Result> {
+  const portal = await getUploadPortal(token);
+  const items = portal?.client.items ?? [];
+  const item = items.find((i) => i.id === itemId);
+  if (!portal || !item) return { ok: false, error: "This link has expired." };
+  if (items.length >= MAX_ITEMS) return { ok: false, error: "That's the most documents this list can hold. Reply to the email and we'll help." };
+  const base = item.label.replace(/ \(\d+\)$/, "");
+  const n = items.filter((i) => i.label === base || i.label.startsWith(`${base} (`)).length + 1;
+  await db.docChaseItem.create({ data: { clientId: portal.client.id, label: `${base} (${n})`.slice(0, 160), order: item.order } });
+  return { ok: true };
+}
+
 // ---------- daily run ----------
 
 /** Emails every client who still owes documents (on the reminder schedule), and tells the accountant
@@ -200,7 +310,7 @@ async function chaseClients(where: { id?: { in: string[] } }, now = new Date()):
           to: accountantEmail,
           replyTo: null,
           subject: `${c.name} has sent everything`,
-          text: `${c.name} (${c.email}) has uploaded every document on their list. Review them in your dashboard.`,
+          text: `${c.name} (${c.email}) has answered every document on their list: uploaded, or told you they don't have it. Review them in your dashboard.`,
         });
       }
       await db.docChaseClient.update({ where: { id: c.id }, data: { status: "DONE", completedAt: now } });

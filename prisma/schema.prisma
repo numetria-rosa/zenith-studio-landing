@@ -828,6 +828,7 @@ model ServiceProject {
   transactions           Transaction[]
   dormantContacts        DormantContact[]
   docChaseClients        DocChaseClient[]
+  docChecklists          DocChecklist[]
   textingRegistration    TextingRegistration?
 
   @@index([userId])
@@ -2193,7 +2194,7 @@ model DocChaseClient {
   projectId    String
   name         String
   email        String
-  checklist    String // the CHECKLISTS id it started from (src/lib/document-chaser.ts), or "custom"; the items are the real list
+  checklist    String // name of the list it started from (older rows: a CHECKLISTS id); see checklistName(). The items are the real list.
   status       String    @default("ACTIVE") // ACTIVE | PAUSED | DONE
   uploadToken  String    @unique
   chaseCount   Int       @default(0)
@@ -2209,13 +2210,27 @@ model DocChaseClient {
   @@index([projectId])
 }
 
+/// A firm's own named document list, reusable for any client of that Document Chaser project.
+model DocChecklist {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  items     String[]
+  createdAt DateTime @default(now())
+
+  project ServiceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, name])
+}
+
 model DocChaseItem {
   id            String    @id @default(cuid())
   clientId      String
   label         String
   order         Int       @default(0)
-  status        String    @default("REQUESTED") // REQUESTED | RECEIVED | ACCEPTED
+  status        String    @default("REQUESTED") // REQUESTED | RECEIVED | ACCEPTED | NOT_APPLICABLE (client says they don't have it)
   rejectReason  String? // set when the accountant sends a file back; shown to the client
+  clientNote    String? // the client's own note, e.g. why they don't have it (status NOT_APPLICABLE)
   filePathname  String? // private Vercel Blob pathname of the latest upload
   fileName      String?
   uploadedAt    DateTime?

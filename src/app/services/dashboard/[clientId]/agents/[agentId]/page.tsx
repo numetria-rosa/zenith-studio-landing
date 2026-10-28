@@ -20,8 +20,10 @@ import { adjustableSettings, readSettings, dbDormantDays } from "@/lib/agent-set
 import { createTransaction, updateDeadline, setDocumentReceived, setTransactionStatus } from "@/lib/transaction-coordinator";
 import { importContacts, startReengagement, markContactReplied, isDormant } from "@/lib/database-manager";
 import { getSiteUrl } from "@/lib/site";
-import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_CHASES, MAX_ITEMS, REJECT_REASONS, parseClientCsv } from "@/lib/document-chaser";
-import { addDocChaseClients, addDocChaseItem, deleteDocChaseClient, removeDocChaseItem, reviewDocChaseItem, sendDocChaserTestEmail, setDocChaseClientStatus, uploadUrlFor } from "@/lib/document-chaser-db";
+import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_CHASES, MAX_ITEMS } from "@/lib/document-chaser";
+import { addDocChaseClients, addDocChaseItem, changeDocChaseChecklist, deleteDocChaseClient, deleteDocChecklist, listDocChecklists, reaskDocChaseItem, remindDocChaseClientNow, removeDocChaseItem, reviewDocChaseItem, saveDocChecklist, sendDocChaserTestEmail, setDocChaseClientStatus, type NewChaseClient } from "@/lib/document-chaser-db";
+import { readXlsx } from "@/lib/spreadsheet";
+import { DocChaserClients } from "./DocChaserClients";
 import { DocChaserSetup } from "./DocChaserSetup";
 import { qualificationGroups, qualificationRulesText, readChoices, faqGroups, faqText, hoursText, DAYS, OPEN_TIMES, CLOSE_TIMES, CRM_FORMATS, type ChoiceGroup } from "@/lib/setup-options";
 import { CopyField, TestLeadForm } from "./ConnectForm";
@@ -53,12 +55,12 @@ export default async function AgentDetailPage({
   searchParams,
 }: {
   params: Promise<{ clientId: string; agentId: string }>;
-  searchParams: Promise<{ activateError?: string; flash?: string }>;
+  searchParams: Promise<{ activateError?: string; flash?: string; show?: string; list?: string }>;
 }) {
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { clientId, agentId } = await params;
-  const { activateError, flash } = await searchParams;
+  const { activateError, flash, show, list } = await searchParams;
   const project = await getOwnedServiceProject(clientId, session.user.id);
   if (!project) notFound();
   if (!isSupportedPlan(project.sourceServiceId)) notFound();
@@ -339,17 +341,32 @@ export default async function AgentDetailPage({
   }
 
   // ---------- AI Document Chaser ----------
+  // A checklist key is "std:<CHECKLISTS id>" or "saved:<DocChecklist id>"; resolved here, never trusted from the form.
+  async function resolveChecklist(key: string): Promise<{ name: string; items: string[] } | null> {
+    if (key.startsWith("std:")) {
+      const l = CHECKLISTS.find((x) => x.id === key.slice(4));
+      return l ? { name: l.label, items: [...l.items] } : null;
+    }
+    if (key.startsWith("saved:")) {
+      const l = (await listDocChecklists(clientId)).find((x) => x.id === key.slice(6));
+      return l ? { name: l.name, items: l.items } : null;
+    }
+    return null;
+  }
+
   async function addChaseClientsAction(formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
     if (!session2?.user?.id) signInTo(agentBase);
-    // The setup screen sends its whole client list (typed or from a file) as one CSV field.
-    const parsed = parseClientCsv(String(formData.get("csv") || ""));
-    const result = await addDocChaseClients(clientId, session2!.user.id, {
-      clients: parsed.clients,
-      checklistId: String(formData.get("checklist") || ""),
-      items: formData.getAll("items").map(String),
-    });
+    // The setup screen sends every client with their own list as JSON; addDocChaseClients re-validates each one.
+    let clients: NewChaseClient[] = [];
+    try {
+      const raw = JSON.parse(String(formData.get("clients") || "[]"));
+      if (Array.isArray(raw)) clients = raw.slice(0, 501);
+    } catch {
+      failTo(agentBase, "The client list couldn't be read. Refresh the page and try again.");
+    }
+    const result = await addDocChaseClients(clientId, session2!.user.id, clients);
     revalidatePath(dashboardBase, "layout");
     if (!result.ok) failTo(agentBase, result.error);
     const left = result.added - result.emailed;
@@ -357,8 +374,7 @@ export default async function AgentDetailPage({
       `Added ${result.added} client${result.added === 1 ? "" : "s"}. ${result.emailed} first email${result.emailed === 1 ? "" : "s"} sent just now${left ? `, ${left} more go out in the next daily run` : ""}.`,
     ];
     if (result.existing) parts.push(`${result.existing} already on your list were left as they are.`);
-    if (parsed.skipped) parts.push(`${parsed.skipped} row${parsed.skipped === 1 ? "" : "s"} skipped (no valid email or a duplicate).`);
-    redirect(`${agentBase}?flash=${encodeURIComponent(parts.join(" "))}`);
+    redirect(`${agentBase}?flash=${encodeURIComponent(parts.join(" "))}#clients`);
   }
 
   async function testChaseEmailAction(formData: FormData): Promise<{ ok: boolean; message: string }> {
@@ -369,6 +385,40 @@ export default async function AgentDetailPage({
     return result.ok ? { ok: true, message: `Test email sent to ${session2.user.email}. Check your inbox (and spam).` } : { ok: false, message: result.error };
   }
 
+  /** Excel files are read here (the browser reads CSV and pasted rows itself). */
+  async function readSpreadsheetAction(formData: FormData): Promise<{ ok: true; table: string[][] } | { ok: false; error: string }> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) return { ok: false, error: "Sign in again, then retry." };
+    const file = formData.get("file");
+    if (!(file instanceof File) || file.size === 0) return { ok: false, error: "That file is empty." };
+    if (file.size > 5 * 1024 * 1024) return { ok: false, error: "That file is over 5 MB. Save just the client list as its own file." };
+    try {
+      const table = await readXlsx(await file.arrayBuffer());
+      return table.length ? { ok: true, table } : { ok: false, error: "That spreadsheet has no rows." };
+    } catch {
+      return { ok: false, error: "That Excel file couldn't be read. In Excel, choose File, Save As, and pick CSV or Excel Workbook (.xlsx)." };
+    }
+  }
+
+  async function saveChecklistAction(formData: FormData): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) return { ok: false, error: "Sign in again, then retry." };
+    const r = await saveDocChecklist(clientId, session2.user.id, String(formData.get("name") || ""), formData.getAll("items").map(String));
+    revalidatePath(agentBase);
+    return r;
+  }
+
+  async function deleteChecklistAction(formData: FormData): Promise<{ ok: boolean }> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) return { ok: false };
+    const r = await deleteDocChecklist(clientId, session2.user.id, String(formData.get("id") || ""));
+    revalidatePath(agentBase);
+    return { ok: r.ok };
+  }
+
   async function reviewDocAction(formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
@@ -377,7 +427,7 @@ export default async function AgentDetailPage({
     const result = await reviewDocChaseItem(clientId, session2!.user.id, String(formData.get("id") || ""), decision, String(formData.get("reason") || ""));
     revalidatePath(dashboardBase, "layout");
     if (!result.ok) failTo(agentBase, result.error);
-    redirect(agentBase);
+    redirect(`${agentBase}#clients`);
   }
 
   async function chaseClientAction(formData: FormData): Promise<void> {
@@ -387,17 +437,23 @@ export default async function AgentDetailPage({
     const id = String(formData.get("id") || "");
     const op = String(formData.get("op") || "");
     const uid = session2!.user.id;
-    const result =
-      op === "delete"
-        ? await deleteDocChaseClient(clientId, uid, id)
-        : op === "add-doc"
-          ? await addDocChaseItem(clientId, uid, id, String(formData.get("label") || ""))
-          : op === "remove-doc"
-            ? await removeDocChaseItem(clientId, uid, id)
-            : await setDocChaseClientStatus(clientId, uid, id, op === "pause" ? "PAUSED" : "ACTIVE");
+    let result: { ok: true } | { ok: false; error: string };
+    let flashText = "";
+    if (op === "delete") result = await deleteDocChaseClient(clientId, uid, id);
+    else if (op === "add-doc") result = await addDocChaseItem(clientId, uid, id, String(formData.get("label") || ""));
+    else if (op === "remove-doc") result = await removeDocChaseItem(clientId, uid, id);
+    else if (op === "reask") result = await reaskDocChaseItem(clientId, uid, id);
+    else if (op === "remind") {
+      result = await remindDocChaseClientNow(clientId, uid, id);
+      flashText = "Reminder sent.";
+    } else if (op === "change-checklist") {
+      const list = await resolveChecklist(String(formData.get("checklist") || ""));
+      result = list ? await changeDocChaseChecklist(clientId, uid, id, list.name, list.items) : { ok: false, error: "Pick a checklist." };
+      if (list) flashText = `Checklist changed to ${list.name}.`;
+    } else result = await setDocChaseClientStatus(clientId, uid, id, op === "pause" ? "PAUSED" : "ACTIVE");
     revalidatePath(dashboardBase, "layout");
     if (!result.ok) failTo(agentBase, result.error);
-    redirect(agentBase);
+    redirect(`${agentBase}${flashText ? `?flash=${encodeURIComponent(flashText)}` : ""}#clients`);
   }
 
   // ---------- Setup-needed states, per real agent ----------
@@ -840,8 +896,11 @@ export default async function AgentDetailPage({
 
   // ---------- Accountants: AI Document Chaser ----------
   if (agentId === "chaser") {
-    const clients = project.docChaseClients;
-    const small = { minHeight: 30, padding: "0 10px", fontSize: 12 } as const;
+    const saved = await listDocChecklists(clientId);
+    const options = [
+      ...CHECKLISTS.map((l) => ({ key: `std:${l.id}`, name: l.label, group: l.region, items: [...l.items] })),
+      ...saved.map((l) => ({ key: `saved:${l.id}`, name: l.name, group: "Yours", items: l.items })),
+    ];
     return (
       <div>
         <Breadcrumb clientId={clientId} agentName={agent.name} />
@@ -850,116 +909,30 @@ export default async function AgentDetailPage({
         {activateError && <p className={s.errorBox} style={{ maxWidth: 720 }}>{activateError}</p>}
 
         <DocChaserSetup
-          checklists={CHECKLISTS.map((l) => ({ id: l.id, label: l.label, items: l.items }))}
+          checklists={options}
           extras={EXTRA_ITEMS}
           maxItems={MAX_ITEMS}
           businessName={businessName || "Your firm"}
           gapDays={CHASE_GAP_DAYS}
           maxChases={MAX_CHASES}
           retentionDays={FILE_RETENTION_DAYS}
-          first={clients.length === 0}
+          first={project.docChaseClients.length === 0}
           addAction={addChaseClientsAction}
           testAction={testChaseEmailAction}
+          readSpreadsheet={readSpreadsheetAction}
+          saveChecklist={saveChecklistAction}
+          deleteChecklist={deleteChecklistAction}
         />
 
-        {clients.length > 0 && <h2 style={{ margin: "40px 0 0", fontSize: 22, fontWeight: 600 }}>Your clients</h2>}
-        <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 16, maxWidth: 900 }}>
-          {clients.map((c) => {
-            const done = c.items.filter((i) => i.status !== "REQUESTED").length;
-            return (
-              <section key={c.id} className={u.card} style={{ padding: 20, opacity: c.status === "PAUSED" ? 0.7 : 1 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-                  <div>
-                    <p style={{ margin: 0, fontWeight: 600, fontSize: 16 }}>{c.name}</p>
-                    <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--zc-muted)" }}>
-                      {c.email} · {done} of {c.items.length} received ·{" "}
-                      {c.status === "DONE" ? "all in" : c.status === "PAUSED" ? "paused" : c.chaseCount >= MAX_CHASES ? "reminder limit reached" : `${c.chaseCount} email${c.chaseCount === 1 ? "" : "s"} sent`}
-                    </p>
-                  </div>
-                  <form action={chaseClientAction} style={{ display: "flex", gap: 8 }}>
-                    <input type="hidden" name="id" value={c.id} />
-                    {c.status === "ACTIVE" && (
-                      <button type="submit" name="op" value="pause" className={u.btnGhost} style={small}>
-                        Pause
-                      </button>
-                    )}
-                    {c.status === "PAUSED" && (
-                      <button type="submit" name="op" value="resume" className={u.btnGhost} style={small}>
-                        Resume
-                      </button>
-                    )}
-                  </form>
-                </div>
-                <details style={{ marginTop: 10 }}>
-                  <summary style={{ fontSize: 13, cursor: "pointer", color: "var(--zc-muted)" }}>Upload link and delete</summary>
-                  <CopyField label="Private link, only share it with this client" value={uploadUrlFor(c.uploadToken)} />
-                  <form action={chaseClientAction} style={{ marginTop: 10 }}>
-                    <input type="hidden" name="id" value={c.id} />
-                    <button type="submit" name="op" value="delete" className={u.btnGhost} style={small}>
-                      Delete this client and every file they uploaded
-                    </button>
-                  </form>
-                </details>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
-                  {c.items.map((i) => (
-                    <div key={i.id} style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                      <span style={{ flex: 1, minWidth: 180, fontSize: 14, color: i.status === "ACCEPTED" ? "var(--zc-muted)" : "var(--zc-text)" }}>
-                        {i.status === "ACCEPTED" && <Icon name="check" size={12} strokeWidth={2.4} />} {i.label}
-                        {i.status === "REQUESTED" && i.rejectReason && <span style={{ color: "var(--zc-muted)" }}> · sent back: {i.rejectReason}</span>}
-                        {i.fileDeletedAt && !i.filePathname && <span style={{ color: "var(--zc-muted)" }}> · file deleted after {FILE_RETENTION_DAYS} days</span>}
-                      </span>
-                      {i.filePathname && (
-                        <a href={`/api/doc-chaser/file/${i.id}`} target="_blank" rel="noopener noreferrer" className={u.btnGhost} style={small}>
-                          View file
-                        </a>
-                      )}
-                      {i.status === "RECEIVED" ? (
-                        <form action={reviewDocAction} style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                          <input type="hidden" name="id" value={i.id} />
-                          <button type="submit" name="decision" value="accept" className={u.btnPrimary} style={small}>
-                            Accept
-                          </button>
-                          <select name="reason" className={s.input} style={{ minHeight: 30, padding: "0 8px", fontSize: 12 }} aria-label={`Reason to send back ${i.label}`} defaultValue="">
-                            <option value="" disabled>
-                              Send back because...
-                            </option>
-                            {REJECT_REASONS.map((r) => (
-                              <option key={r} value={r}>
-                                {r}
-                              </option>
-                            ))}
-                          </select>
-                          <button type="submit" name="decision" value="reject" className={u.btnGhost} style={small}>
-                            Send back
-                          </button>
-                        </form>
-                      ) : (
-                        <span style={{ fontSize: 12, fontFamily: "var(--zc-mono)", color: "var(--zc-muted)" }}>{i.status === "ACCEPTED" ? "accepted" : "waiting"}</span>
-                      )}
-                      {i.status === "REQUESTED" && !i.filePathname && c.items.length > 1 && (
-                        <form action={chaseClientAction}>
-                          <input type="hidden" name="id" value={i.id} />
-                          <button type="submit" name="op" value="remove-doc" className={u.btnGhost} style={{ ...small, padding: "0 8px" }} aria-label={`Stop asking ${c.name} for ${i.label}`} title="Stop asking for this">
-                            <Icon name="x" size={13} />
-                          </button>
-                        </form>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                {c.items.length < MAX_ITEMS && (
-                  <form action={chaseClientAction} style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
-                    <input type="hidden" name="id" value={c.id} />
-                    <input name="label" required maxLength={160} placeholder={`Ask ${c.name.split(/\s+/)[0]} for another document`} aria-label={`Ask ${c.name} for another document`} className={s.input} style={{ flex: 1, minWidth: 200, minHeight: 34, fontSize: 13 }} />
-                    <button type="submit" name="op" value="add-doc" className={u.btnGhost} style={small}>
-                      <Icon name="plus" size={13} /> Add document
-                    </button>
-                  </form>
-                )}
-              </section>
-            );
-          })}
-        </div>
+        <DocChaserClients
+          clients={project.docChaseClients}
+          base={agentBase}
+          show={show}
+          list={list}
+          options={options}
+          act={chaseClientAction}
+          review={reviewDocAction}
+        />
       </div>
     );
   }
