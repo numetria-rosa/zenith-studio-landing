@@ -2193,7 +2193,7 @@ model DocChaseClient {
   projectId    String
   name         String
   email        String
-  checklist    String // a CHECKLISTS id in src/lib/document-chaser.ts
+  checklist    String // the CHECKLISTS id it started from (src/lib/document-chaser.ts), or "custom"; the items are the real list
   status       String    @default("ACTIVE") // ACTIVE | PAUSED | DONE
   uploadToken  String    @unique
   chaseCount   Int       @default(0)

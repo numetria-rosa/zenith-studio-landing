@@ -80,16 +80,26 @@ export const REJECT_REASONS = [
   "Please send it as a PDF",
 ];
 
-export function checklistItems(checklistId: string, extras: string[]): string[] {
-  const list = CHECKLISTS.find((c) => c.id === checklistId);
-  if (!list) throw new Error("Unknown checklist");
-  return [...new Set([...list.items, ...extras.map((e) => e.trim()).filter(Boolean)])].map((s) => s.slice(0, 160));
+export const MAX_ITEMS = 30;
+
+/** The accountant's own document list (edited from a template, or per client): trimmed, no blanks, no repeats
+    (ignoring case), each label capped, at most MAX_ITEMS. */
+export function cleanItems(items: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of items) {
+    const label = raw.replace(/\s+/g, " ").trim().slice(0, 160);
+    if (!label || seen.has(label.toLowerCase())) continue;
+    seen.add(label.toLowerCase());
+    out.push(label);
+  }
+  return out.slice(0, MAX_ITEMS);
 }
 
 const EMAIL = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
 
-/** Very small CSV reader: double-quoted fields, commas inside quotes. */
-function splitRow(line: string): string[] {
+/** Very small CSV reader: double-quoted fields, separators inside quotes. */
+function splitRow(line: string, sep: string): string[] {
   const out: string[] = [];
   let cur = "";
   let quoted = false;
@@ -100,7 +110,7 @@ function splitRow(line: string): string[] {
         cur += '"';
         i++;
       } else quoted = !quoted;
-    } else if (ch === "," && !quoted) {
+    } else if (ch === sep && !quoted) {
       out.push(cur);
       cur = "";
     } else cur += ch;
@@ -109,9 +119,14 @@ function splitRow(line: string): string[] {
   return out.map((s) => s.trim());
 }
 
-/** Client list from a CSV with a name column and an email column, in either order, header optional. */
+/** Client list from a CSV with a name column and an email column, in either order, header optional. The
+    separator is whichever of comma, semicolon or tab the first line uses most: Excel in French, German and
+    other European locales saves "CSV" with semicolons. */
 export function parseClientCsv(text: string): { clients: { name: string; email: string }[]; skipped: number } {
-  const rows = text.replace(/^﻿/, "").split(/\r?\n/).filter((l) => l.trim()).map(splitRow);
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim());
+  const first = lines[0] ?? "";
+  const sep = [",", ";", "\t"].reduce((best, d) => (first.split(d).length > first.split(best).length ? d : best), ",");
+  const rows = lines.map((l) => splitRow(l, sep));
   if (rows.length === 0) return { clients: [], skipped: 0 };
   let emailCol = 1;
   let nameCol = 0;

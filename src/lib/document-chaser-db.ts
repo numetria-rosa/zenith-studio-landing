@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { sendAsBusiness } from "@/lib/client-mail";
 import { businessNameOf } from "@/lib/services";
 import { getSiteUrl } from "@/lib/site";
-import { CANCELLED_GRACE_DAYS, chaseEmail, checklistItems, FILE_RETENTION_DAYS, filesToPurge, isDueForChase, MAX_EMAILS_PER_RUN, MAX_UPLOAD_BYTES, REJECT_REASONS } from "@/lib/document-chaser";
+import { CANCELLED_GRACE_DAYS, chaseEmail, CHECKLISTS, cleanItems, FILE_RETENTION_DAYS, filesToPurge, isDueForChase, MAX_EMAILS_PER_RUN, MAX_ITEMS, MAX_UPLOAD_BYTES, REJECT_REASONS } from "@/lib/document-chaser";
 
 /* AI Document Chaser: database side. Every accountant-facing function checks the project belongs to the
    signed-in user and is this service; the client-facing ones are keyed by the secret upload token only. */
@@ -28,21 +28,18 @@ async function ownedProject(projectId: string, userId: string) {
 
 export const uploadUrlFor = (token: string) => `${getSiteUrl()}/upload/${token}`;
 
-/** Adds clients with a checklist. Existing clients (same email) are left as they are. */
+/** Adds clients with the accountant's document list (a template they may have edited). Existing clients (same
+    email) are left as they are. */
 export async function addDocChaseClients(
   projectId: string,
   userId: string,
-  input: { clients: { name: string; email: string }[]; checklistId: string; extras: string[] },
+  input: { clients: { name: string; email: string }[]; checklistId: string; items: string[] },
 ): Promise<{ ok: true; added: number; existing: number; emailed: number } | { ok: false; error: string }> {
   if (!(await ownedProject(projectId, userId))) return { ok: false, error: "not_found" };
   if (input.clients.length === 0) return { ok: false, error: "Add at least one client with a valid email." };
   if (input.clients.length > 500) return { ok: false, error: "Import up to 500 clients at a time." };
-  let items: string[];
-  try {
-    items = checklistItems(input.checklistId, input.extras);
-  } catch {
-    return { ok: false, error: "Pick a checklist." };
-  }
+  const items = cleanItems(input.items);
+  if (items.length === 0) return { ok: false, error: "Add at least one document to ask for." };
   const existing = new Set(
     (await db.docChaseClient.findMany({ where: { projectId, email: { in: input.clients.map((c) => c.email) } }, select: { email: true } })).map((c) => c.email),
   );
@@ -54,7 +51,7 @@ export async function addDocChaseClients(
         projectId,
         name: c.name.slice(0, 120),
         email: c.email,
-        checklist: input.checklistId,
+        checklist: CHECKLISTS.some((l) => l.id === input.checklistId) ? input.checklistId : "custom",
         uploadToken: randomBytes(24).toString("base64url"),
         items: { create: items.map((label, order) => ({ label, order })) },
       },
@@ -92,6 +89,33 @@ export async function setDocChaseClientStatus(projectId: string, userId: string,
   const c = await db.docChaseClient.findFirst({ where: { id: clientId, projectId, project: { userId } }, select: { id: true } });
   if (!c) return { ok: false, error: "not_found" };
   await db.docChaseClient.update({ where: { id: clientId }, data: { status } });
+  return { ok: true };
+}
+
+/** Asks one client for one more document. A client who had sent everything is reopened, and the new document
+    goes out with the next daily run. */
+export async function addDocChaseItem(projectId: string, userId: string, clientId: string, rawLabel: string): Promise<Result> {
+  const c = await db.docChaseClient.findFirst({ where: { id: clientId, projectId, project: { userId } }, include: { items: { select: { label: true, order: true } } } });
+  if (!c) return { ok: false, error: "not_found" };
+  const [label] = cleanItems([rawLabel]);
+  if (!label) return { ok: false, error: "Type the name of the document." };
+  if (c.items.some((i) => i.label.toLowerCase() === label.toLowerCase())) return { ok: false, error: `${c.name} is already asked for "${label}".` };
+  if (c.items.length >= MAX_ITEMS) return { ok: false, error: `A client can be asked for up to ${MAX_ITEMS} documents.` };
+  await db.$transaction([
+    db.docChaseItem.create({ data: { clientId, label, order: Math.max(-1, ...c.items.map((i) => i.order)) + 1 } }),
+    db.docChaseClient.update({ where: { id: clientId }, data: { lastChasedAt: null, completedAt: null, status: c.status === "PAUSED" ? "PAUSED" : "ACTIVE" } }),
+  ]);
+  return { ok: true };
+}
+
+/** Stops asking a client for a document. Only one they haven't sent yet: an uploaded file stays until reviewed. */
+export async function removeDocChaseItem(projectId: string, userId: string, itemId: string): Promise<Result> {
+  const item = await ownedItem(projectId, userId, itemId);
+  if (!item) return { ok: false, error: "not_found" };
+  if (item.status !== "REQUESTED" || item.filePathname) return { ok: false, error: "That document has already been sent. Accept it or send it back instead." };
+  const others = await db.docChaseItem.count({ where: { clientId: item.clientId, id: { not: itemId } } });
+  if (others === 0) return { ok: false, error: "A client needs at least one document. Delete the client instead." };
+  await db.docChaseItem.delete({ where: { id: itemId } });
   return { ok: true };
 }
 
@@ -199,18 +223,14 @@ async function chaseClients(where: { id?: { in: string[] } }, now = new Date()):
 }
 
 /** "Send me a test email first": the exact first email a client gets, sent to the accountant's own address. */
-export async function sendDocChaserTestEmail(projectId: string, userId: string, checklistId: string, extras: string[]): Promise<Result> {
+export async function sendDocChaserTestEmail(projectId: string, userId: string, rawItems: string[]): Promise<Result> {
   const project = await db.serviceProject.findFirst({
     where: { id: projectId, userId, sourceServiceId: DOC_CHASER_SERVICE_ID },
     select: { title: true, sourceServiceId: true, user: { select: { email: true } } },
   });
   if (!project?.user.email) return { ok: false, error: "not_found" };
-  let items: string[];
-  try {
-    items = checklistItems(checklistId, extras);
-  } catch {
-    return { ok: false, error: "Pick a checklist." };
-  }
+  const items = cleanItems(rawItems);
+  if (items.length === 0) return { ok: false, error: "Add at least one document to ask for." };
   const businessName = businessNameOf(project) || "Your accountant";
   const mail = chaseEmail({
     businessName,

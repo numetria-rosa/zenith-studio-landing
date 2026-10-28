@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
-import { parseClientCsv } from "@/lib/document-chaser";
+import { useState, useTransition } from "react";
+import { cleanItems, parseClientCsv } from "@/lib/document-chaser";
 import { Icon } from "../../Icon";
 import c from "./chaser.module.css";
 
@@ -14,6 +14,7 @@ type Pending = { name: string; email: string };
 export function DocChaserSetup({
   checklists,
   extras,
+  maxItems,
   businessName,
   gapDays,
   maxChases,
@@ -24,6 +25,7 @@ export function DocChaserSetup({
 }: {
   checklists: Checklist[];
   extras: string[];
+  maxItems: number;
   businessName: string;
   gapDays: number;
   maxChases: number;
@@ -33,6 +35,9 @@ export function DocChaserSetup({
   testAction: (fd: FormData) => Promise<{ ok: boolean; message: string }>;
 }) {
   const [checklistId, setChecklistId] = useState(checklists[0]!.id);
+  // The template's documents, as the accountant has edited them for this batch.
+  const [items, setItems] = useState<string[]>([...checklists[0]!.items]);
+  const [newItem, setNewItem] = useState("");
   const [picked, setPicked] = useState<string[]>([]);
   const [showItems, setShowItems] = useState(false);
   const [mode, setMode] = useState<"one" | "list">("one");
@@ -42,15 +47,28 @@ export function DocChaserSetup({
   const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
   const [testing, startTest] = useTransition();
   const [dragging, setDragging] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
 
   // A client typed into the fields but never "Add"-ed still counts: forgetting the Add button must not lose them.
-  const draft = email.trim() ? parseClientCsv(`name,email
-"${name.replace(/"/g, "")}",${email.trim()}`).clients[0] : undefined;
+  const draft = email.trim() ? parseClientCsv(`name,email\n"${name.replace(/"/g, "")}",${email.trim()}`).clients[0] : undefined;
   const toSend = draft && !pending.some((p) => p.email === draft.email) ? [...pending, draft] : pending;
 
   const checklist = checklists.find((l) => l.id === checklistId)!;
-  const docCount = checklist.items.length + picked.filter((e) => !checklist.items.includes(e)).length;
+  const finalItems = cleanItems([...items, ...picked]);
+  const edited = items.join("\n") !== checklist.items.join("\n");
+
+  function pickChecklist(id: string) {
+    setChecklistId(id);
+    setItems([...checklists.find((l) => l.id === id)!.items]);
+  }
+
+  function addItem() {
+    const label = newItem.trim();
+    if (!label) return;
+    if (finalItems.some((i) => i.toLowerCase() === label.toLowerCase())) return setNewItem("");
+    if (finalItems.length >= maxItems) return;
+    setItems((cur) => [...cur, label]);
+    setNewItem("");
+  }
   const preview = toSend[0]?.name.split(/\s+/)[0] || "Jane";
 
   function addMany(list: Pending[], skipped: number, from?: string) {
@@ -79,8 +97,9 @@ export function DocChaserSetup({
 
   async function readFile(file: File | undefined) {
     if (!file) return;
-    if (!/\.csv$/i.test(file.name) && file.type !== "text/csv") return setNote({ ok: false, text: "Pick a .csv file. In Excel or Google Sheets: File, then Download or Save as, then CSV." });
+    if (!/\.(csv|txt)$/i.test(file.name) && file.type !== "text/csv") return setNote({ ok: false, text: "Pick a .csv file. In Excel or Google Sheets: File, then Download or Save as, then CSV." });
     const parsed = parseClientCsv(await file.text());
+    if (!parsed.clients.length) return setNote({ ok: false, text: `No email addresses found in ${file.name}. It needs one row per client, with a name column and an email column.` });
     addMany(parsed.clients, parsed.skipped, file.name);
   }
 
@@ -89,7 +108,7 @@ export function DocChaserSetup({
   function fields(): FormData {
     const fd = new FormData();
     fd.set("checklist", checklistId);
-    picked.forEach((e) => fd.append("extras", e));
+    finalItems.forEach((i) => fd.append("items", i));
     return fd;
   }
 
@@ -99,12 +118,12 @@ export function DocChaserSetup({
         className={c.card}
         action={addAction}
         onSubmit={(e) => {
-          if (!toSend.length) e.preventDefault();
+          if (!toSend.length || !finalItems.length) e.preventDefault();
         }}
       >
         <input type="hidden" name="checklist" value={checklistId} />
-        {picked.map((e) => (
-          <input key={e} type="hidden" name="extras" value={e} />
+        {finalItems.map((i) => (
+          <input key={i} type="hidden" name="items" value={i} />
         ))}
         <input type="hidden" name="csv" value={["name,email", ...toSend.map((p) => `"${p.name.replace(/"/g, "")}",${p.email}`)].join("\n")} />
 
@@ -117,30 +136,69 @@ export function DocChaserSetup({
           <span className={c.num}>1</span>
           <div className={c.stepBody}>
             <h3 className={c.stepTitle}>What do you need from them?</h3>
-            <p className={c.stepSub}>Pick a checklist, then add anything extra for this batch.</p>
+            <p className={c.stepSub}>Start from a checklist, then change any document on it or add your own.</p>
 
             <p className={c.eyebrow}>Document checklist</p>
             <label className={c.select}>
               <Icon name="file" size={18} />
-              <select value={checklistId} onChange={(e) => setChecklistId(e.target.value)} aria-label="Document checklist">
+              <select value={checklistId} onChange={(e) => pickChecklist(e.target.value)} aria-label="Document checklist">
                 {checklists.map((l) => (
                   <option key={l.id} value={l.id}>
                     {l.label}
                   </option>
                 ))}
               </select>
-              <span className={c.badge}>{checklist.items.length} documents</span>
+              <span className={c.badge}>
+                {items.length} document{items.length === 1 ? "" : "s"}
+                {edited ? ", edited" : ""}
+              </span>
               <Icon name="chevronDown" size={18} />
             </label>
-            <button type="button" className={c.link} onClick={() => setShowItems(!showItems)} aria-expanded={showItems}>
-              {showItems ? "Hide" : "View"} the {checklist.items.length} documents
-            </button>
+            <div className={c.linkRow}>
+              <button type="button" className={c.link} onClick={() => setShowItems(!showItems)} aria-expanded={showItems}>
+                {showItems ? "Done editing" : `View or edit the ${items.length} documents`}
+              </button>
+              {edited && (
+                <button type="button" className={c.linkMuted} onClick={() => setItems([...checklist.items])}>
+                  Reset to the standard list
+                </button>
+              )}
+            </div>
             {showItems && (
-              <ul className={c.itemList}>
-                {checklist.items.map((i) => (
-                  <li key={i}>{i}</li>
-                ))}
-              </ul>
+              <div className={c.editor}>
+                <ul className={c.editList}>
+                  {items.map((i) => (
+                    <li key={i}>
+                      <span>{i}</span>
+                      <button type="button" className={c.remove} aria-label={`Stop asking for ${i}`} onClick={() => setItems((cur) => cur.filter((x) => x !== i))}>
+                        <Icon name="x" size={15} />
+                      </button>
+                    </li>
+                  ))}
+                  {items.length === 0 && <li className={c.empty}>No documents yet. Add one below or tick an extra.</li>}
+                </ul>
+                <div className={c.addItem}>
+                  <span className={c.inputWrap}>
+                    <Icon name="plus" size={16} />
+                    <input
+                      value={newItem}
+                      maxLength={160}
+                      onChange={(e) => setNewItem(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addItem();
+                        }
+                      }}
+                      placeholder="Add a document, e.g. Payslips for March"
+                      aria-label="Add a document"
+                    />
+                  </span>
+                  <button type="button" className={c.addBtn} onClick={addItem} disabled={!newItem.trim() || finalItems.length >= maxItems}>
+                    Add
+                  </button>
+                </div>
+              </div>
             )}
 
             <div className={c.eyebrowRow}>
@@ -226,19 +284,19 @@ export function DocChaserSetup({
                 <Icon name="upload" size={22} />
                 <p className={c.dropTitle}>Drop your CSV here</p>
                 <p className={c.dropSub}>One row per client, with a name column and an email column. Excel and Google Sheets can both save as CSV.</p>
-                <button type="button" className={c.ghostBtn} onClick={() => fileRef.current?.click()}>
+                {/* A label around the input: the browser opens the file picker itself, no script click needed. */}
+                <label className={c.ghostBtn}>
                   Choose a CSV file
-                </button>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept=".csv,text/csv"
-                  hidden
-                  onChange={(e) => {
-                    readFile(e.target.files?.[0]);
-                    e.target.value = "";
-                  }}
-                />
+                  <input
+                    type="file"
+                    accept=".csv,.txt,text/csv"
+                    className={c.fileInput}
+                    onChange={(e) => {
+                      readFile(e.target.files?.[0]);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
               </div>
             )}
 
@@ -278,20 +336,20 @@ export function DocChaserSetup({
                 <Icon name="users" size={15} /> {toSend.length} client{toSend.length === 1 ? "" : "s"}
               </span>
               <span className={c.chip}>
-                <Icon name="file" size={15} /> {docCount} documents each
+                <Icon name="file" size={15} /> {finalItems.length} document{finalItems.length === 1 ? "" : "s"} each
               </span>
               <span className={c.chip}>
                 <Icon name="calendar" size={15} /> Reminder every {gapDays} days, up to {maxChases}
               </span>
             </div>
             <div className={c.actions}>
-              <button type="submit" className={c.start} disabled={!toSend.length}>
+              <button type="submit" className={c.start} disabled={!toSend.length || !finalItems.length}>
                 Start chasing <Icon name="arrowRight" size={18} />
               </button>
               <button
                 type="button"
                 className={c.testBtn}
-                disabled={testing}
+                disabled={testing || !finalItems.length}
                 onClick={() =>
                   startTest(async () => {
                     const r = await testAction(fields());
@@ -302,6 +360,7 @@ export function DocChaserSetup({
                 <Icon name="mail" size={16} /> {testing ? "Sending..." : "Send me a test email first"}
               </button>
             </div>
+            {!finalItems.length && <p className={c.hint}>Add at least one document in step 1 to start.</p>}
             {!toSend.length && <p className={c.hint}>Add at least one client in step 2 to start.</p>}
           </div>
         </section>
@@ -320,14 +379,12 @@ export function DocChaserSetup({
             <p className={c.mailSubject}>Documents needed by {businessName}</p>
             <p className={c.mailText}>Hi {preview}, we need a few documents from you to get your work done. Upload them securely below, no account needed.</p>
             <ul className={c.mailList}>
-              <li>
-                <i /> {checklist.label} checklist ({checklist.items.length})
-              </li>
-              {picked.map((e) => (
-                <li key={e}>
-                  <i /> {e}
+              {finalItems.slice(0, 5).map((i) => (
+                <li key={i}>
+                  <i /> {i}
                 </li>
               ))}
+              {finalItems.length > 5 && <li className={c.mailMore}>and {finalItems.length - 5} more</li>}
             </ul>
             <span className={c.mailBtn}>Upload securely</span>
           </div>
