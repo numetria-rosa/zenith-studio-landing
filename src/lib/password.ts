@@ -1,8 +1,8 @@
 import { randomBytes, createCipheriv, createDecipheriv } from "node:crypto";
 
 /* Reversible, not one-way: the profile page needs to show a buyer their
-   actual current password on demand (no email flow exists to fall back on
-   for a lost password), so a one-way hash can't work here. AES-256-GCM
+   actual current password on demand, so a one-way hash can't work here
+   (a lost password is reset by email, see password-reset.ts). AES-256-GCM
    keyed by PASSWORD_ENCRYPTION_KEY - a secret that lives only in server
    env vars, never in the database - means a database leak alone still
    doesn't hand out every password; both the DB and the server environment
