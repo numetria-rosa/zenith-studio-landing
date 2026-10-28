@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { checklistName, clientStage, FILE_RETENTION_DAYS, MAX_CHASES, MAX_ITEMS, REJECT_REASONS, STAGE_LABELS, type ClientStage } from "@/lib/document-chaser";
+import { checklistName, clientStage, FILE_RETENTION_DAYS, startsLater, MAX_CHASES, MAX_ITEMS, REJECT_REASONS, STAGE_LABELS, type ClientStage } from "@/lib/document-chaser";
 import { uploadUrlFor } from "@/lib/document-chaser-db";
 import { CopyField } from "./ConnectForm";
 import { Icon } from "../../Icon";
 import c from "./chaser.module.css";
 
-type Item = { id: string; label: string; status: string; rejectReason: string | null; clientNote: string | null; filePathname: string | null; fileDeletedAt: Date | null };
-type Client = { id: string; name: string; email: string; checklist: string; status: string; chaseCount: number; uploadToken: string; items: Item[] };
+type Item = { id: string; label: string; status: string; rejectReason: string | null; clientNote: string | null; filePathname: string | null; fileDeletedAt: Date | null; aiVerdict: string | null; aiNote: string | null };
+type Client = { id: string; name: string; email: string; checklist: string; status: string; chaseCount: number; uploadToken: string; startAt: Date | null; items: Item[] };
 type Option = { key: string; name: string };
 
 const ORDER: ClientStage[] = ["review", "waiting", "started", "complete", "paused"];
@@ -126,7 +126,17 @@ export function DocChaserClients({
                       )}
                     </form>
                     <span className={c.meta}>
-                      {cl.chaseCount} of {MAX_CHASES} emails sent
+                      {startsLater(cl.startAt) && cl.startAt
+                        ? `First email on ${cl.startAt.toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "UTC" })}`
+                        : `${cl.chaseCount} of ${MAX_CHASES} emails sent`}
+                      {cl.items.some((i) => i.filePathname) && (
+                        <>
+                          {" · "}
+                          <a href={`/api/doc-chaser/zip/${cl.id}`} className={c.inlineLink}>
+                            Download all files (.zip)
+                          </a>
+                        </>
+                      )}
                     </span>
                   </div>
 
@@ -140,6 +150,12 @@ export function DocChaserClients({
                           {i.status === "REQUESTED" && i.rejectReason && <small>Sent back: {i.rejectReason}</small>}
                           {i.status === "NOT_APPLICABLE" && <small>Client says they don&apos;t have this{i.clientNote ? `: "${i.clientNote}"` : "."}</small>}
                           {i.fileDeletedAt && !i.filePathname && <small>File deleted after {FILE_RETENTION_DAYS} days</small>}
+                          {i.status === "RECEIVED" && i.aiVerdict && (
+                            <small className={i.aiVerdict === "check" ? c.aiCheck : c.aiOk}>
+                              {i.aiVerdict === "check" ? "AI check, look closely: " : "AI check: "}
+                              {i.aiNote || (i.aiVerdict === "ok" ? "looks right." : "this may not be the right document.")}
+                            </small>
+                          )}
                         </span>
                         <span className={c.docActions}>
                           {i.filePathname && (

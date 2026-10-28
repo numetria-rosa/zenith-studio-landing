@@ -29,6 +29,8 @@ export const ESTIMATED_COST_CENTS = {
   SIGNALWIRE_SMS: 1,
   SIGNALWIRE_VOICE_TRIGGER: 1,
   GROQ_CALL: 1,
+  // Claude Haiku 5.5 reading one uploaded document: really ~0.03 to 0.3 cents; 1 is the smallest whole unit.
+  CLAUDE_DOC_CHECK: 1,
   // Fallback only, used when a Vapi webhook payload has no real cost field.
   VAPI_PER_MINUTE_FALLBACK: 10,
 } as const;

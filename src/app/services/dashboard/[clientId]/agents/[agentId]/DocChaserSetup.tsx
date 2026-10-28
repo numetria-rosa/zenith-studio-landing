@@ -72,6 +72,8 @@ export function DocChaserSetup({
   const [dragging, setDragging] = useState(false);
   const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, startBusy] = useTransition();
+  const [later, setLater] = useState(false);
+  const [startDay, setStartDay] = useState("");
 
   const base = options.find((o) => o.key === defaultKey) ?? options[0]!;
   const defaultItems = cleanItems([...items, ...picked]);
@@ -520,9 +522,36 @@ export function DocChaserSetup({
                 <Icon name="calendar" size={15} /> Reminder every {gapDays} days, up to {maxChases}
               </span>
             </div>
+
+            <fieldset className={c.when}>
+              <legend className={c.eyebrow}>First email</legend>
+              <label className={c.checkLabel}>
+                <input type="radio" name="when" checked={!later} onChange={() => setLater(false)} />
+                Send it now
+              </label>
+              <label className={c.checkLabel}>
+                <input type="radio" name="when" checked={later} onChange={() => setLater(true)} />
+                Start on a date
+              </label>
+              {later && (
+                <input
+                  type="date"
+                  name="startAt"
+                  required
+                  min={dayAfter(1)}
+                  max={dayAfter(366)}
+                  value={startDay}
+                  onChange={(e) => setStartDay(e.target.value)}
+                  className={c.rowSelect}
+                  aria-label="Date of the first email"
+                />
+              )}
+              {later && <p className={c.meta}>Useful when documents aren&apos;t out yet, for example brokerage 1099s in mid-February.</p>}
+            </fieldset>
+
             <div className={c.actions}>
-              <button type="submit" className={c.start} disabled={!payload.length || payload.some((p) => !p.items.length)}>
-                Start chasing <Icon name="arrowRight" size={18} />
+              <button type="submit" className={c.start} disabled={!payload.length || payload.some((p) => !p.items.length) || (later && !startDay)}>
+                {later ? "Schedule chasing" : "Start chasing"} <Icon name="arrowRight" size={18} />
               </button>
               <button
                 type="button"
@@ -732,4 +761,9 @@ function Stage({ icon, title, text }: { icon: "mail" | "calendar" | "check" | "m
       </div>
     </li>
   );
+}
+
+/** YYYY-MM-DD, n days from today (UTC, matching the server's check). */
+function dayAfter(n: number): string {
+  return new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 }

@@ -38,6 +38,8 @@ export async function addDocChaseClients(
   projectId: string,
   userId: string,
   input: NewChaseClient[],
+  /** First email on this day instead of now (from the daily run that day). */
+  startAt: Date | null = null,
 ): Promise<{ ok: true; added: number; existing: number; emailed: number } | { ok: false; error: string }> {
   if (!(await ownedProject(projectId, userId))) return { ok: false, error: "not_found" };
   const seen = new Set<string>();
@@ -58,6 +60,7 @@ export async function addDocChaseClients(
         name: c.name || c.email.split("@")[0]!,
         email: c.email,
         checklist: c.checklist,
+        startAt,
         uploadToken: randomBytes(24).toString("base64url"),
         items: { create: c.items.map((label, order) => ({ label, order })) },
       },
@@ -65,7 +68,8 @@ export async function addDocChaseClients(
     });
     ids.push(created.id);
   }
-  // Day 0: the first email goes out now, not at the next daily run. The rest (over the per-run cap) go at that run.
+  // Day 0: the first email goes out now (unless scheduled for later), not at the next daily run. The rest (over
+  // the per-run cap) go at that run.
   const emailed = ids.length ? (await chaseClients({ id: { in: ids } })).chased : 0;
   return { ok: true, added: ids.length, existing: existing.size, emailed };
 }
@@ -125,7 +129,8 @@ export async function remindDocChaseClientNow(projectId: string, userId: string,
   if (c.status !== "ACTIVE") return { ok: false, error: c.status === "PAUSED" ? "Resume this client first." : "This client has sent everything." };
   if (c.chaseCount >= MAX_CHASES) return { ok: false, error: `This client has had all ${MAX_CHASES} reminders. Contact them directly.` };
   if (c.lastChasedAt && Date.now() - c.lastChasedAt.getTime() < 3600000) return { ok: false, error: "They were emailed less than an hour ago." };
-  await db.docChaseClient.update({ where: { id: clientId }, data: { lastChasedAt: null } });
+  // "Remind now" also starts a client who was scheduled for later.
+  await db.docChaseClient.update({ where: { id: clientId }, data: { lastChasedAt: null, startAt: null } });
   const r = await chaseClients({ id: { in: [clientId] } });
   return r.chased ? { ok: true } : { ok: false, error: "The reminder couldn't be sent. Try again in a few minutes." };
 }
@@ -238,7 +243,7 @@ export async function confirmUpload(token: string, itemId: string, pathname: str
   const previous = await db.docChaseItem.findUnique({ where: { id: itemId }, select: { filePathname: true } });
   await db.docChaseItem.update({
     where: { id: itemId },
-    data: { status: "RECEIVED", filePathname: pathname, fileName: fileName.slice(0, 160), uploadedAt: new Date(), rejectReason: null },
+    data: { status: "RECEIVED", filePathname: pathname, fileName: fileName.slice(0, 160), uploadedAt: new Date(), rejectReason: null, aiVerdict: null, aiNote: null },
   });
   if (previous?.filePathname && previous.filePathname !== pathname) await del(previous.filePathname, { token: docBlobToken() }).catch(() => {});
   return { ok: true };
@@ -287,7 +292,7 @@ export async function runDocumentChaser(now = new Date()): Promise<{ chased: num
 
 async function chaseClients(where: { id?: { in: string[] } }, now = new Date()): Promise<{ chased: number; completed: number; failed: number }> {
   const clients = await db.docChaseClient.findMany({
-    where: { ...where, status: "ACTIVE", project: { sourceServiceId: DOC_CHASER_SERVICE_ID, ...runnableProject() } },
+    where: { ...where, status: "ACTIVE", OR: [{ startAt: null }, { startAt: { lte: now } }], project: { sourceServiceId: DOC_CHASER_SERVICE_ID, ...runnableProject() } },
     include: {
       items: { orderBy: { order: "asc" } },
       project: { select: { title: true, sourceServiceId: true, user: { select: { email: true } } } },

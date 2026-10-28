@@ -329,3 +329,31 @@ export function clientStage(c: { status: string; items: { status: string }[] }):
   return c.items.some((i) => i.status !== "REQUESTED") ? "started" : "waiting";
 }
 export const STAGE_LABELS: Record<ClientStage, string> = { review: "Needs review", waiting: "Not started", started: "In progress", complete: "Complete", paused: "Paused" };
+
+/** File name inside a client's zip: "Jane Doe - W-2 from each employer.pdf", safe on Windows and macOS,
+    numbered when two documents would clash. */
+export function zipEntryName(clientName: string, label: string, fileName: string, taken: Set<string>): string {
+  const clean = (s: string) => s.replace(/[\\/:*?"<>|\x00-\x1f]+/g, " ").replace(/\s+/g, " ").trim();
+  const ext = (fileName.match(/\.[A-Za-z0-9]{1,6}$/)?.[0] ?? "").toLowerCase();
+  const base = clean(`${clientName} - ${label}`).slice(0, 120) || "document";
+  let name = `${base}${ext}`;
+  for (let n = 2; taken.has(name.toLowerCase()); n++) name = `${base} (${n})${ext}`;
+  taken.add(name.toLowerCase());
+  return name;
+}
+
+/** The optional text-reminder add-on's price, shown to the firm before they ask for it. */
+export const SMS_ADDON_MONTHLY_USD = 15;
+
+/** "Start on a date" from the setup form: a YYYY-MM-DD between tomorrow and a year out, as midnight UTC (the
+    daily run that day sends the first email). "" = start now; "invalid" = anything else. */
+export function parseStartDay(day: string, now = new Date()): Date | null | "invalid" {
+  if (!day) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return "invalid";
+  const d = new Date(`${day}T00:00:00Z`);
+  const t = d.getTime();
+  return Number.isNaN(t) || t <= now.getTime() || t > now.getTime() + 366 * DAY ? "invalid" : d;
+}
+
+/** A client whose first email is still in the future. */
+export const startsLater = (startAt: Date | null, now = new Date()) => !!startAt && startAt.getTime() > now.getTime();

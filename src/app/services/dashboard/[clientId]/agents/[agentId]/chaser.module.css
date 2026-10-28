@@ -1174,3 +1174,33 @@ details[open] > .clientSummary > svg:last-child {
 .more summary {
   cursor: pointer;
 }
+
+.inlineLink {
+  color: var(--zc-run-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.docText small.aiCheck {
+  color: var(--zc-need-text);
+}
+.docText small.aiOk {
+  color: var(--zc-done-text);
+}
+
+.when {
+  margin: 22px 0 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
+}
+.when legend {
+  margin: 0 0 10px;
+  padding: 0;
+}
+.when .meta {
+  flex-basis: 100%;
+  margin-top: 0;
+}
