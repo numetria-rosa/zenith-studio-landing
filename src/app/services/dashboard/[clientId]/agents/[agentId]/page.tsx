@@ -343,11 +343,8 @@ export default async function AgentDetailPage({
     "use server";
     const session2 = await auth();
     if (!session2?.user?.id) signInTo(agentBase);
-    const file = formData.get("file");
-    const csv = file instanceof File && file.size > 0 ? await file.text() : "";
-    const name = String(formData.get("name") || "").trim();
-    const email = String(formData.get("email") || "").trim();
-    const parsed = parseClientCsv(csv || (email ? `name,email\n"${name.replace(/"/g, "")}",${email}` : ""));
+    // The setup screen sends its whole client list (typed or from a file) as one CSV field.
+    const parsed = parseClientCsv(String(formData.get("csv") || ""));
     const result = await addDocChaseClients(clientId, session2!.user.id, {
       clients: parsed.clients,
       checklistId: String(formData.get("checklist") || ""),
