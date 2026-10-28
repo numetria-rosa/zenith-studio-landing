@@ -63,6 +63,32 @@ Zenith Studio`,
   });
 }
 
+/** "Forgot password" link from /sign-in/forgot. */
+export async function sendPasswordResetEmail(to: string, resetUrl: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  const client = getResendClient();
+  if (!client) return { ok: false, error: "RESEND_API_KEY is not configured" };
+
+  const { error } = await client.emails.send({
+    from: FROM_ADDRESS,
+    to,
+    subject: "Reset your Zenith Studio password",
+    text: `Hi,
+
+Someone (hopefully you) asked to reset the password for this Zenith Studio account.
+
+Set a new password here. The link works once and expires in 1 hour:
+
+${resetUrl}
+
+If you didn't ask for this, ignore this email. Your password stays the same.
+
+Zenith Studio`,
+  });
+
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 export type SendProjectKickoffEmailInput = {
   to: string;
   clientName: string | null;

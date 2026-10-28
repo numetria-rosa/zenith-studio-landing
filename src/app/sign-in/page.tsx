@@ -55,7 +55,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
             <ShieldIcon />
             <p className="m-0">
               First time here? Use the email you paid with; your password was shown right after checkout and is always on your profile.
-              Can&apos;t get in?{" "}
+              Lost it? Use &ldquo;Forgot password?&rdquo; above. Still stuck?{" "}
               <a href="mailto:hello@zenith-studio.site" className="text-[#5ee6a8] underline-offset-4 hover:underline">
                 Contact the Zenith Studio team.
               </a>
@@ -120,7 +120,12 @@ function PasswordSignInForm({ redirectTo }: { redirectTo: string }) {
         </span>
       </label>
       <label className="flex flex-col gap-2">
-        <span className="text-[15px] font-medium text-white/85">Password</span>
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="text-[15px] font-medium text-white/85">Password</span>
+          <Link href="/sign-in/forgot" className="text-[14px] text-[#5ee6a8] underline-offset-4 hover:underline">
+            Forgot password?
+          </Link>
+        </span>
         <span className="relative">
           <LockIcon />
           <input type="password" name="password" required autoComplete="current-password" placeholder="Your password" className={field} />
