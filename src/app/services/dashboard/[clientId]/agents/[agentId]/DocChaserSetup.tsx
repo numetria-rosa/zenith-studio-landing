@@ -78,6 +78,7 @@ export function DocChaserSetup({
   const [startDay, setStartDay] = useState("");
   // "Create a custom checklist": a list started from scratch rather than from a template.
   const [custom, setCustom] = useState(false);
+  const [saveNote, setSaveNote] = useState<{ ok: boolean; text: string } | null>(null);
 
   const base = options.find((o) => o.key === defaultKey) ?? options[0]!;
   const defaultItems = cleanItems([...items, ...picked]);
@@ -112,7 +113,7 @@ export function DocChaserSetup({
     defaultItems.forEach((i) => fd.append("items", i));
     startBusy(async () => {
       const r = await saveChecklist(fd);
-      if (!r.ok) return setNote({ ok: false, text: r.error });
+      if (!r.ok) return setSaveNote({ ok: false, text: r.error });
       const opt = { key: `saved:${r.id}`, name: saveName.replace(/\s+/g, " ").trim(), group: "Yours", items: defaultItems };
       setOptions((cur) => [opt, ...cur.filter((o) => o.key !== opt.key && !(o.group === "Yours" && o.name === opt.name))]);
       setCustom(false);
@@ -120,7 +121,7 @@ export function DocChaserSetup({
       setItems(defaultItems);
       setPicked([]);
       setSaveName("");
-      setNote({ ok: true, text: `Saved "${opt.name}". It's in every checklist menu from now on.` });
+      setSaveNote({ ok: true, text: `Saved "${opt.name}". It's in every checklist menu from now on.` });
     });
   }
   function deleteMine() {
@@ -334,6 +335,11 @@ export function DocChaserSetup({
                     Save
                   </button>
                 </div>
+                {saveNote && (
+                  <p role="status" className={saveNote.ok ? c.noteOk : c.noteBad}>
+                    {saveNote.text}
+                  </p>
+                )}
               </div>
             )}
 
