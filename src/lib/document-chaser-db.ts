@@ -217,7 +217,7 @@ export async function getUploadPortal(token: string) {
   if (!/^[A-Za-z0-9_-]{20,64}$/.test(token)) return null;
   const client = await db.docChaseClient.findUnique({
     where: { uploadToken: token },
-    include: { items: { orderBy: { order: "asc" } }, project: { select: { title: true, sourceServiceId: true, stage: true } } },
+    include: { items: { orderBy: [{ order: "asc" }, { createdAt: "asc" }] }, project: { select: { title: true, sourceServiceId: true, stage: true } } },
   });
   // A cancelled or finished service's links stop working straight away.
   if (!client || client.project.sourceServiceId !== DOC_CHASER_SERVICE_ID || ["CANCELLED", "COMPLETED"].includes(client.project.stage)) return null;
@@ -294,7 +294,7 @@ async function chaseClients(where: { id?: { in: string[] } }, now = new Date()):
   const clients = await db.docChaseClient.findMany({
     where: { ...where, status: "ACTIVE", OR: [{ startAt: null }, { startAt: { lte: now } }], project: { sourceServiceId: DOC_CHASER_SERVICE_ID, ...runnableProject() } },
     include: {
-      items: { orderBy: { order: "asc" } },
+      items: { orderBy: [{ order: "asc" }, { createdAt: "asc" }] },
       project: { select: { title: true, sourceServiceId: true, user: { select: { email: true } } } },
     },
   });

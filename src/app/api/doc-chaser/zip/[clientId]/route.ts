@@ -16,7 +16,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ clientI
   const { clientId } = await params;
   const client = await db.docChaseClient.findFirst({
     where: { id: clientId, project: { userId: session.user.id, sourceServiceId: DOC_CHASER_SERVICE_ID } },
-    select: { name: true, items: { where: { filePathname: { not: null } }, orderBy: { order: "asc" }, select: { label: true, fileName: true, filePathname: true } } },
+    select: { name: true, items: { where: { filePathname: { not: null } }, orderBy: [{ order: "asc" }, { createdAt: "asc" }], select: { label: true, fileName: true, filePathname: true } } },
   });
   if (!client || client.items.length === 0) return new Response("No files to download", { status: 404 });
 
