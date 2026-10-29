@@ -32,12 +32,15 @@ export const MAX_EMAILS_PER_RUN = 150;
 
 /* Standard starting lists, by country. Each document is phrased so the client can tell whether it applies to
    them; anything that doesn't, they mark "I don't have this" on the upload page. `match` is how a value in an
-   imported spreadsheet (a "Return type" or "Entity" column, say) picks this list: whole words, any case. */
+   imported spreadsheet (a "Return type" or "Entity" column, say) picks this list: whole words, any case.
+   `label` is the name stored on each client, so it never changes; `title` and `sub` are how the picker shows it. */
 export const CHECKLISTS = [
   {
     id: "us-1040",
     region: "US",
     label: "Individual tax return (1040)",
+    title: "Individual tax return",
+    sub: "Form 1040",
     match: ["1040", "individual", "personal", "joint", "mfj", "single"],
     items: [
       "Last year's tax return",
@@ -58,6 +61,8 @@ export const CHECKLISTS = [
     id: "us-schedule-c",
     region: "US",
     label: "Self-employed (Schedule C)",
+    title: "Self-employed",
+    sub: "Schedule C",
     match: ["schedule c", "sch c", "sole proprietor", "sole prop", "self employed", "self-employed", "freelance", "contractor"],
     items: [
       "Profit and loss for the year",
@@ -73,6 +78,8 @@ export const CHECKLISTS = [
     id: "us-rental",
     region: "US",
     label: "Rental property (Schedule E)",
+    title: "Rental property",
+    sub: "Schedule E",
     match: ["schedule e", "sch e", "rental", "landlord", "real estate"],
     items: [
       "Rent received, for each property",
@@ -86,6 +93,8 @@ export const CHECKLISTS = [
     id: "us-business",
     region: "US",
     label: "Business return (1120-S, 1065, 1120)",
+    title: "Business return",
+    sub: "1120-S · 1065 · 1120",
     match: ["1120", "1120s", "1120-s", "1065", "s corp", "s-corp", "c corp", "corporation", "partnership", "llc", "business", "company", "entity"],
     items: [
       "Profit and loss and balance sheet",
@@ -102,6 +111,8 @@ export const CHECKLISTS = [
     id: "uk-self-assessment",
     region: "UK",
     label: "Self Assessment (UK)",
+    title: "Self Assessment",
+    sub: "SA100",
     match: ["self assessment", "sa100", "sole trader"],
     items: [
       "Last year's tax return",
@@ -119,6 +130,8 @@ export const CHECKLISTS = [
     id: "uk-company",
     region: "UK",
     label: "Limited company year end (UK)",
+    title: "Limited company year end",
+    sub: "Accounts · CT600",
     match: ["ltd", "limited", "ct600", "year end", "corporation tax"],
     items: [
       "Business bank statements (all accounts, full year)",
@@ -135,6 +148,8 @@ export const CHECKLISTS = [
     id: "monthly-bookkeeping",
     region: "Any",
     label: "Monthly bookkeeping",
+    title: "Monthly bookkeeping",
+    sub: "Recurring",
     match: ["bookkeeping", "monthly", "books"],
     items: ["Bank statements for the month", "Sales invoices issued", "Purchase receipts and bills", "Credit card statements", "Cash expenses"],
   },
@@ -142,6 +157,8 @@ export const CHECKLISTS = [
     id: "new-client",
     region: "Any",
     label: "New client onboarding",
+    title: "New client onboarding",
+    sub: "One-off",
     match: ["onboarding", "new client"],
     items: ["Photo ID", "Proof of address", "Signed engagement letter", "Last year's accounts or tax return"],
   },

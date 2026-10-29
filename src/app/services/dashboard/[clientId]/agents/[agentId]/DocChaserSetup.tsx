@@ -4,10 +4,12 @@ import { useState, useTransition } from "react";
 import { applyColumns, columnLetter, emailIn, guessColumns, readTable, type Columns, type Table } from "@/lib/client-import";
 import { cleanItems, detectChecklist } from "@/lib/document-chaser";
 import { Icon } from "../../Icon";
+import { ChecklistPicker, type PickerOption } from "./ChecklistPicker";
 import c from "./chaser.module.css";
 
 /** A checklist the accountant can pick: a standard one ("std:<id>") or one of the firm's saved ones ("saved:<id>"). */
-type Option = { key: string; name: string; group: string; items: string[] };
+type Option = PickerOption;
+const CUSTOM_NAME = "Custom checklist";
 type Row = { name: string; email: string; key: string };
 type Importing = { table: Table; cols: Columns; source: string };
 type Result<T = object> = ({ ok: true } & T) | { ok: false; error: string };
@@ -74,11 +76,14 @@ export function DocChaserSetup({
   const [busy, startBusy] = useTransition();
   const [later, setLater] = useState(false);
   const [startDay, setStartDay] = useState("");
+  // "Create a custom checklist": a list started from scratch rather than from a template.
+  const [custom, setCustom] = useState(false);
 
   const base = options.find((o) => o.key === defaultKey) ?? options[0]!;
   const defaultItems = cleanItems([...items, ...picked]);
   const edited = items.join("|") !== base.items.join("|");
-  const resolve = (key: string) => (key === DEFAULT ? { name: base.name, items: defaultItems } : (options.find((o) => o.key === key) ?? { name: base.name, items: defaultItems }));
+  const defaultName = custom ? CUSTOM_NAME : base.name;
+  const resolve = (key: string) => (key === DEFAULT ? { name: defaultName, items: defaultItems } : (options.find((o) => o.key === key) ?? { name: defaultName, items: defaultItems }));
 
   // A client typed but never "Add"-ed still counts: forgetting the Add button must not lose them.
   const draftEmail = emailIn(email);
@@ -90,6 +95,7 @@ export function DocChaserSetup({
 
   // ---------- step 1 ----------
   function pickDefault(key: string) {
+    setCustom(false);
     setDefaultKey(key);
     setItems([...(options.find((o) => o.key === key)?.items ?? [])]);
     setPicked([]);
@@ -109,6 +115,7 @@ export function DocChaserSetup({
       if (!r.ok) return setNote({ ok: false, text: r.error });
       const opt = { key: `saved:${r.id}`, name: saveName.replace(/\s+/g, " ").trim(), group: "Yours", items: defaultItems };
       setOptions((cur) => [opt, ...cur.filter((o) => o.key !== opt.key && !(o.group === "Yours" && o.name === opt.name))]);
+      setCustom(false);
       setDefaultKey(opt.key);
       setItems(defaultItems);
       setPicked([]);
@@ -200,7 +207,7 @@ export function DocChaserSetup({
           {placeholder}
         </option>
       )}
-      <option value={DEFAULT}>Step 1 list: {base.name}</option>
+      <option value={DEFAULT}>Step 1 list: {defaultName}</option>
       {GROUPS.map(([g, title]) => {
         const opts = options.filter((o) => o.group === g);
         return opts.length ? (
@@ -240,33 +247,28 @@ export function DocChaserSetup({
             <p className={c.stepSub}>This is the default list for everyone you add below. You can give any client a different checklist in step 2.</p>
 
             <p className={c.eyebrow}>Default checklist</p>
-            <label className={c.select}>
-              <Icon name="file" size={18} />
-              <select value={defaultKey} onChange={(e) => pickDefault(e.target.value)} aria-label="Default checklist">
-                {GROUPS.map(([g, title]) => {
-                  const opts = options.filter((o) => o.group === g);
-                  return opts.length ? (
-                    <optgroup key={g} label={title}>
-                      {opts.map((o) => (
-                        <option key={o.key} value={o.key}>
-                          {o.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ) : null;
-                })}
-              </select>
-              <span className={c.badge}>
-                {items.length} document{items.length === 1 ? "" : "s"}
-                {edited ? ", edited" : ""}
-              </span>
-              <Icon name="chevronDown" size={18} />
-            </label>
+            <ChecklistPicker
+              options={options}
+              value={custom ? "" : defaultKey}
+              onChange={pickDefault}
+              onCreate={() => {
+                setCustom(true);
+                setItems([]);
+                setPicked([]);
+                setShowItems(true);
+              }}
+              current={{
+                title: custom ? CUSTOM_NAME : (base.title ?? base.name),
+                sub: custom ? "Your own list" : base.sub,
+                group: custom ? undefined : base.group,
+                badge: `${items.length} document${items.length === 1 ? "" : "s"}${edited && !custom ? ", edited" : ""}`,
+              }}
+            />
             <div className={c.linkRow}>
               <button type="button" className={c.link} onClick={() => setShowItems(!showItems)} aria-expanded={showItems}>
                 {showItems ? "Done editing" : `View or edit the ${items.length} documents`}
               </button>
-              {edited && (
+              {edited && !custom && (
                 <button type="button" className={c.linkMuted} onClick={() => setItems([...base.items])}>
                   Undo my changes
                 </button>

@@ -1237,3 +1237,202 @@ details[open] > .clientSummary > svg:last-child {
   flex-basis: 100%;
   margin-top: 0;
 }
+
+/* ---------- checklist picker (step 1) ---------- */
+.picker {
+  position: relative;
+}
+.layout .pickerButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 0 20px;
+  border: 1px solid var(--zc-line-2);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--zc-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.layout .pickerButton:hover {
+  border-color: rgba(92, 200, 255, 0.35);
+}
+.layout .pickerButton:focus-visible,
+.layout .pickerOpen {
+  outline: 0;
+  border-color: rgba(92, 200, 255, 0.55);
+  box-shadow: 0 0 0 4px rgba(92, 200, 255, 0.1);
+}
+.pickerTitle {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--zc-text);
+  font-size: 17px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pickerTitle small,
+.pickerName small {
+  font-family: var(--zc-mono);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--zc-dim);
+}
+.pickerButton .badge {
+  margin-left: 0;
+}
+.chevUp {
+  display: inline-flex;
+  transform: rotate(180deg);
+}
+.region {
+  flex: none;
+  padding: 3px 9px;
+  border: 1px solid var(--zc-line-2);
+  border-radius: 8px;
+  font-family: var(--zc-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--zc-text-2);
+}
+.pickerPanel {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  border: 1px solid var(--zc-line-2);
+  border-radius: 20px;
+  background: #0c0f15;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.85);
+  overflow: hidden;
+}
+.pickerSearch {
+  margin: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 1px solid var(--zc-line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--zc-dim);
+}
+.pickerSearch:focus-within {
+  border-color: rgba(92, 200, 255, 0.45);
+}
+.pickerSearch input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--zc-text);
+  font: inherit;
+  font-size: 16px;
+}
+.pickerSearch input::placeholder {
+  color: var(--zc-dim);
+}
+.pickerList {
+  max-height: min(60vh, 560px);
+  overflow-y: auto;
+  padding: 4px 10px 10px;
+  border-top: 1px solid var(--zc-line);
+}
+.pickerGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 10px 8px;
+  font-family: var(--zc-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--zc-dim);
+}
+.pickerGroup::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--zc-line);
+}
+.pickerItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 54px;
+  padding: 0 16px 0 12px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  cursor: pointer;
+}
+.pickerActive {
+  background: rgba(255, 255, 255, 0.04);
+}
+.pickerSelected {
+  border-color: rgba(92, 200, 255, 0.4);
+  background: rgba(92, 200, 255, 0.08);
+}
+.pickerCheck {
+  flex: none;
+  width: 20px;
+  display: inline-flex;
+  color: var(--zc-run-text);
+}
+.pickerName {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  color: var(--zc-text);
+  font-size: 16px;
+}
+.pickerCount {
+  flex: none;
+  font-family: var(--zc-mono);
+  font-size: 13px;
+  color: var(--zc-muted);
+}
+.pickerEmpty {
+  margin: 0;
+  padding: 18px 12px;
+  font-size: 14.5px;
+  color: var(--zc-muted);
+}
+.layout .pickerCreate {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 26px;
+  border: 0;
+  border-top: 1px solid var(--zc-line);
+  background: transparent;
+  color: var(--zc-run-text);
+  font: inherit;
+  font-size: 15.5px;
+  cursor: pointer;
+  text-align: left;
+}
+.layout .pickerCreate:hover {
+  background: rgba(92, 200, 255, 0.05);
+}
+@container (max-width: 640px) {
+  .pickerTitle small,
+  .pickerButton .region {
+    display: none;
+  }
+}
