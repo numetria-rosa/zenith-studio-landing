@@ -343,18 +343,6 @@ export default async function AgentDetailPage({
   }
 
   // ---------- AI Document Chaser ----------
-  // A checklist key is "std:<CHECKLISTS id>" or "saved:<DocChecklist id>"; resolved here, never trusted from the form.
-  async function resolveChecklist(key: string): Promise<{ name: string; items: string[] } | null> {
-    if (key.startsWith("std:")) {
-      const l = CHECKLISTS.find((x) => x.id === key.slice(4));
-      return l ? { name: l.label, items: [...l.items] } : null;
-    }
-    if (key.startsWith("saved:")) {
-      const l = (await listDocChecklists(clientId)).find((x) => x.id === key.slice(6));
-      return l ? { name: l.name, items: l.items } : null;
-    }
-    return null;
-  }
 
   async function addChaseClientsAction(formData: FormData): Promise<void> {
     "use server";
@@ -479,7 +467,7 @@ export default async function AgentDetailPage({
       result = await remindDocChaseClientNow(clientId, uid, id);
       flashText = "Reminder sent.";
     } else if (op === "change-checklist") {
-      const list = await resolveChecklist(String(formData.get("checklist") || ""));
+      const list = await resolveChecklist(clientId, String(formData.get("checklist") || ""));
       result = list ? await changeDocChaseChecklist(clientId, uid, id, list.name, list.items) : { ok: false, error: "Pick a checklist." };
       if (list) flashText = `Checklist changed to ${list.name}.`;
     } else result = await setDocChaseClientStatus(clientId, uid, id, op === "pause" ? "PAUSED" : "ACTIVE");
@@ -1073,6 +1061,18 @@ export default async function AgentDetailPage({
 // serializable values, and a local helper function crashed every form save.
 function signInTo(agentBase: string): never {
   redirect(`/sign-in?callbackUrl=${encodeURIComponent(agentBase)}`);
+}
+/** A checklist key is "std:<CHECKLISTS id>" or "saved:<DocChecklist id>"; resolved here, never trusted from the form. */
+async function resolveChecklist(projectId: string, key: string): Promise<{ name: string; items: string[] } | null> {
+  if (key.startsWith("std:")) {
+    const l = CHECKLISTS.find((x) => x.id === key.slice(4));
+    return l ? { name: l.label, items: [...l.items] } : null;
+  }
+  if (key.startsWith("saved:")) {
+    const l = (await listDocChecklists(projectId)).find((x) => x.id === key.slice(6));
+    return l ? { name: l.name, items: l.items } : null;
+  }
+  return null;
 }
 function failTo(agentBase: string, error: string): never {
   redirect(`${agentBase}?activateError=${encodeURIComponent(error)}`);
