@@ -439,23 +439,22 @@ export default async function AgentDetailPage({
     return { ok: r.ok };
   }
 
-  async function reviewDocAction(formData: FormData): Promise<void> {
+  async function reviewDocAction(decisionArg: string, formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
     if (!session2?.user?.id) signInTo(agentBase);
-    const decision = formData.get("decision") === "accept" ? "accept" : "reject";
+    const decision = decisionArg === "accept" ? "accept" : "reject";
     const result = await reviewDocChaseItem(clientId, session2!.user.id, String(formData.get("id") || ""), decision, String(formData.get("reason") || ""));
     revalidatePath(dashboardBase, "layout");
     if (!result.ok) failTo(agentBase, result.error);
     redirect(`${agentBase}#clients`);
   }
 
-  async function chaseClientAction(formData: FormData): Promise<void> {
+  async function chaseClientAction(op: string, formData: FormData): Promise<void> {
     "use server";
     const session2 = await auth();
     if (!session2?.user?.id) signInTo(agentBase);
     const id = String(formData.get("id") || "");
-    const op = String(formData.get("op") || "");
     const uid = session2!.user.id;
     let result: { ok: true } | { ok: false; error: string };
     let flashText = "";

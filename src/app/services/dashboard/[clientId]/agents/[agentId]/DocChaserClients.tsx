@@ -29,8 +29,8 @@ export function DocChaserClients({
   show?: string;
   list?: string;
   options: Option[];
-  act: (fd: FormData) => Promise<void>;
-  review: (fd: FormData) => Promise<void>;
+  act: (op: string, fd: FormData) => Promise<void>;
+  review: (decision: string, fd: FormData) => Promise<void>;
 }) {
   if (clients.length === 0) return null;
   const staged = clients.map((cl) => ({ cl, stage: clientStage(cl), list: checklistName(cl.checklist) }));
@@ -109,20 +109,20 @@ export function DocChaserClients({
 
                 <div className={c.clientBody}>
                   <div className={c.clientActions}>
-                    <form action={act}>
+                    <form>
                       <input type="hidden" name="id" value={cl.id} />
                       {cl.status === "ACTIVE" && (
-                        <button type="submit" name="op" value="remind" className={c.smallBtn} disabled={cl.chaseCount >= MAX_CHASES}>
+                        <button type="submit" formAction={act.bind(null, "remind")} className={c.smallBtn} disabled={cl.chaseCount >= MAX_CHASES}>
                           <Icon name="mail" size={14} /> Remind now
                         </button>
                       )}
                       {cl.status === "ACTIVE" && (
-                        <button type="submit" name="op" value="pause" className={c.smallBtn}>
+                        <button type="submit" formAction={act.bind(null, "pause")} className={c.smallBtn}>
                           <Icon name="pause" size={14} /> Pause
                         </button>
                       )}
                       {cl.status === "PAUSED" && (
-                        <button type="submit" name="op" value="resume" className={c.smallBtn}>
+                        <button type="submit" formAction={act.bind(null, "resume")} className={c.smallBtn}>
                           Resume
                         </button>
                       )}
@@ -166,9 +166,9 @@ export function DocChaserClients({
                             </a>
                           )}
                           {i.status === "RECEIVED" && (
-                            <form action={review} className={c.inlineForm}>
+                            <form className={c.inlineForm}>
                               <input type="hidden" name="id" value={i.id} />
-                              <button type="submit" name="decision" value="accept" className={c.acceptBtn}>
+                              <button type="submit" formAction={review.bind(null, "accept")} className={c.acceptBtn}>
                                 Accept
                               </button>
                               <select name="reason" className={c.smallSelect} aria-label={`Reason to send back ${i.label}`} defaultValue="">
@@ -181,15 +181,15 @@ export function DocChaserClients({
                                   </option>
                                 ))}
                               </select>
-                              <button type="submit" name="decision" value="reject" className={c.smallBtn}>
+                              <button type="submit" formAction={review.bind(null, "reject")} className={c.smallBtn}>
                                 Send back
                               </button>
                             </form>
                           )}
                           {i.status === "NOT_APPLICABLE" && (
-                            <form action={act}>
+                            <form>
                               <input type="hidden" name="id" value={i.id} />
-                              <button type="submit" name="op" value="reask" className={c.smallBtn}>
+                              <button type="submit" formAction={act.bind(null, "reask")} className={c.smallBtn}>
                                 Ask again
                               </button>
                             </form>
@@ -197,9 +197,9 @@ export function DocChaserClients({
                           {i.status === "ACCEPTED" && <span className={c.docState}>Accepted</span>}
                           {i.status === "REQUESTED" && <span className={c.docState}>Waiting</span>}
                           {i.status === "REQUESTED" && !i.filePathname && cl.items.length > 1 && (
-                            <form action={act}>
+                            <form>
                               <input type="hidden" name="id" value={i.id} />
-                              <button type="submit" name="op" value="remove-doc" className={c.iconBtn} aria-label={`Stop asking ${cl.name} for ${i.label}`} title="Stop asking for this">
+                              <button type="submit" formAction={act.bind(null, "remove-doc")} className={c.iconBtn} aria-label={`Stop asking ${cl.name} for ${i.label}`} title="Stop asking for this">
                                 <Icon name="x" size={14} />
                               </button>
                             </form>
@@ -211,10 +211,10 @@ export function DocChaserClients({
 
                   <div className={c.clientTools}>
                     {cl.items.length < MAX_ITEMS && (
-                      <form action={act} className={c.toolForm}>
+                      <form className={c.toolForm}>
                         <input type="hidden" name="id" value={cl.id} />
                         <input name="label" required maxLength={160} placeholder="Ask for another document" aria-label={`Ask ${cl.name} for another document`} className={c.smallInput} />
-                        <button type="submit" name="op" value="add-doc" className={c.smallBtn}>
+                        <button type="submit" formAction={act.bind(null, "add-doc")} className={c.smallBtn}>
                           <Icon name="plus" size={14} /> Add
                         </button>
                       </form>
@@ -226,9 +226,9 @@ export function DocChaserClients({
                   <details className={c.more}>
                     <summary>Upload link and delete</summary>
                     <CopyField label="Private link, only share it with this client" value={uploadUrlFor(cl.uploadToken)} />
-                    <form action={act} style={{ marginTop: 10 }}>
+                    <form style={{ marginTop: 10 }}>
                       <input type="hidden" name="id" value={cl.id} />
-                      <button type="submit" name="op" value="delete" className={c.dangerBtn}>
+                      <button type="submit" formAction={act.bind(null, "delete")} className={c.dangerBtn}>
                         Delete this client and every file they uploaded
                       </button>
                     </form>
