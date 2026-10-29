@@ -933,8 +933,8 @@ export default async function AgentDetailPage({
       db.agentChangeRequest.findFirst({ where: { projectId: clientId, agentId: "chaser", status: "SMS_REQUESTED" }, select: { createdAt: true } }),
     ]);
     const options = [
-      ...CHECKLISTS.map((l) => ({ key: `std:${l.id}`, name: l.label, group: l.region, items: [...l.items] })),
-      ...saved.map((l) => ({ key: `saved:${l.id}`, name: l.name, group: "Yours", items: l.items })),
+      ...CHECKLISTS.map((l) => ({ key: `std:${l.id}`, name: l.label, title: l.title, sub: l.sub, group: l.region, items: [...l.items] })),
+      ...saved.map((l) => ({ key: `saved:${l.id}`, name: l.name, sub: "Saved", group: "Yours", items: l.items })),
     ];
     return (
       <div>
