@@ -152,7 +152,10 @@ export function DocChaserClients({
                           {i.status === "REQUESTED" && i.rejectReason && <small>Sent back: {i.rejectReason}</small>}
                           {i.status === "NOT_APPLICABLE" && <small>Client says they don&apos;t have this{i.clientNote ? `: "${i.clientNote}"` : "."}</small>}
                           {i.fileDeletedAt && !i.filePathname && <small>File deleted after {FILE_RETENTION_DAYS} days</small>}
-                          {i.status === "RECEIVED" && i.aiVerdict && (
+                          {i.status === "RECEIVED" && i.aiVerdict === "failed" && (
+                            <small title={i.aiNote ?? undefined}>AI check didn&apos;t run for this file. Review it yourself.</small>
+                          )}
+                          {i.status === "RECEIVED" && (i.aiVerdict === "ok" || i.aiVerdict === "check") && (
                             <small className={i.aiVerdict === "check" ? c.aiCheck : c.aiOk}>
                               {i.aiVerdict === "check" ? "AI check, look closely: " : "AI check: "}
                               {i.aiNote || (i.aiVerdict === "ok" ? "looks right." : "this may not be the right document.")}

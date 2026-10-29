@@ -48,9 +48,16 @@ export function parseVerdict(reply: string): { verdict: "ok" | "check"; note: st
   }
 }
 
-/** Checks the item's current file and stores the verdict. Never throws: a failed check just leaves no verdict. */
+/** A check that couldn't run is recorded on the document (verdict "failed", the reason in the note) so the
+    accountant sees "AI check didn't run" instead of silence, and we can see why. */
+async function markFailed(itemId: string, reason: string): Promise<void> {
+  console.error("[doc-check] failed:", reason);
+  await db.docChaseItem.updateMany({ where: { id: itemId, status: "RECEIVED" }, data: { aiVerdict: "failed", aiNote: reason.replace(/\s+/g, " ").slice(0, 160) } }).catch(() => {});
+}
+
+/** Checks the item's current file and stores the verdict. Never throws. */
 export async function checkUploadedDocument(itemId: string): Promise<void> {
-  if (!process.env.ANTHROPIC_API_KEY) return;
+  if (!process.env.ANTHROPIC_API_KEY) return markFailed(itemId, "ANTHROPIC_API_KEY is not set on the server");
   try {
     const item = await db.docChaseItem.findFirst({
       where: { id: itemId, status: "RECEIVED", client: { project: { sourceServiceId: DOC_CHASER_SERVICE_ID } } },
@@ -74,10 +81,11 @@ export async function checkUploadedDocument(itemId: string): Promise<void> {
     });
     await recordUsageCost(item.client.projectId, ESTIMATED_COST_CENTS.CLAUDE_DOC_CHECK, "doc-check");
     const v = r.ok ? parseVerdict(r.content) : null;
-    if (!r.ok) console.error("[doc-check] Claude call failed:", r.error.slice(0, 300));
+    if (!r.ok) return markFailed(itemId, `Claude call failed: ${r.error}`);
+    if (!v) return markFailed(itemId, "Claude's answer couldn't be read");
     // Only store it if the same file is still there (the client may have replaced it meanwhile).
-    if (v) await db.docChaseItem.updateMany({ where: { id: itemId, filePathname: item.filePathname }, data: { aiVerdict: v.verdict, aiNote: v.note || null } });
+    await db.docChaseItem.updateMany({ where: { id: itemId, filePathname: item.filePathname }, data: { aiVerdict: v.verdict, aiNote: v.note || null } });
   } catch (err) {
-    console.error("[doc-check] failed:", err instanceof Error ? err.message : err);
+    await markFailed(itemId, err instanceof Error ? err.message : String(err));
   }
 }
