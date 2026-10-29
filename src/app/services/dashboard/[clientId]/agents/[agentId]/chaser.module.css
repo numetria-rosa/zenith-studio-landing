@@ -1242,7 +1242,8 @@ details[open] > .clientSummary > svg:last-child {
 .picker {
   position: relative;
 }
-.layout .pickerButton {
+.layout .pickerButton,
+.clients .pickerButton {
   width: 100%;
   display: flex;
   align-items: center;
@@ -1258,11 +1259,14 @@ details[open] > .clientSummary > svg:last-child {
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
-.layout .pickerButton:hover {
+.layout .pickerButton:hover,
+.clients .pickerButton:hover {
   border-color: rgba(92, 200, 255, 0.35);
 }
 .layout .pickerButton:focus-visible,
-.layout .pickerOpen {
+.layout .pickerOpen,
+.clients .pickerButton:focus-visible,
+.clients .pickerOpen {
   outline: 0;
   border-color: rgba(92, 200, 255, 0.55);
   box-shadow: 0 0 0 4px rgba(92, 200, 255, 0.1);
@@ -1435,4 +1439,30 @@ details[open] > .clientSummary > svg:last-child {
   .pickerButton .region {
     display: none;
   }
+}
+
+/* the same picker, smaller, on each client's card */
+.layout .pickerCompact,
+.clients .pickerCompact {
+  min-height: 40px;
+  padding: 0 14px;
+  gap: 10px;
+  border-radius: 12px;
+}
+.pickerCompact .pickerTitle {
+  font-size: 14px;
+}
+.pickerCompact .pickerTitle small {
+  font-size: 12px;
+}
+.pickerCompact .badge {
+  padding: 2px 10px;
+  font-size: 12px;
+}
+.toolForm .picker {
+  flex: 1;
+  min-width: 0;
+}
+.clients .pickerCreate {
+  display: none;
 }

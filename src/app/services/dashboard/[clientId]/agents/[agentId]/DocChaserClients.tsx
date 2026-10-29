@@ -2,12 +2,14 @@ import Link from "next/link";
 import { checklistName, clientStage, FILE_RETENTION_DAYS, startsLater, MAX_CHASES, MAX_ITEMS, REJECT_REASONS, STAGE_LABELS, type ClientStage } from "@/lib/document-chaser";
 import { uploadUrlFor } from "@/lib/document-chaser-db";
 import { CopyField } from "./ConnectForm";
+import { ChangeChecklist } from "./ChangeChecklist";
+import type { PickerOption } from "./ChecklistPicker";
 import { Icon } from "../../Icon";
 import c from "./chaser.module.css";
 
 type Item = { id: string; label: string; status: string; rejectReason: string | null; clientNote: string | null; filePathname: string | null; fileDeletedAt: Date | null; aiVerdict: string | null; aiNote: string | null };
 type Client = { id: string; name: string; email: string; checklist: string; status: string; chaseCount: number; uploadToken: string; startAt: Date | null; items: Item[] };
-type Option = { key: string; name: string };
+type Option = PickerOption;
 
 const ORDER: ClientStage[] = ["review", "waiting", "started", "complete", "paused"];
 
@@ -217,22 +219,7 @@ export function DocChaserClients({
                         </button>
                       </form>
                     )}
-                    <form action={act} className={c.toolForm}>
-                      <input type="hidden" name="id" value={cl.id} />
-                      <select name="checklist" className={c.smallSelect} aria-label={`Change ${cl.name}'s checklist`} defaultValue="">
-                        <option value="" disabled>
-                          Change checklist to...
-                        </option>
-                        {options.map((o) => (
-                          <option key={o.key} value={o.key}>
-                            {o.name}
-                          </option>
-                        ))}
-                      </select>
-                      <button type="submit" name="op" value="change-checklist" className={c.smallBtn}>
-                        Change
-                      </button>
-                    </form>
+                    <ChangeChecklist clientId={cl.id} clientName={cl.name} current={listName} options={options} act={act} />
                   </div>
                   <p className={c.meta}>Changing the checklist keeps everything already sent, and adds the new documents to chase.</p>
 

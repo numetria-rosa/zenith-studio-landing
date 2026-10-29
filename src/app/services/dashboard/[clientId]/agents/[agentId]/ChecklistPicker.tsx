@@ -22,13 +22,19 @@ export function ChecklistPicker({
   onChange,
   onCreate,
   current,
+  compact,
+  label = "Checklist",
 }: {
   options: PickerOption[];
   value: string;
   onChange: (key: string) => void;
-  onCreate: () => void;
+  /** Shows "Create a custom checklist" at the bottom when given. */
+  onCreate?: () => void;
   /** What the closed button shows: the chosen list, or a custom one being built. */
   current: { title: string; sub?: string; group?: string; badge: string };
+  /** The smaller button used on each client's card. */
+  compact?: boolean;
+  label?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -78,7 +84,14 @@ export function ChecklistPicker({
 
   return (
     <div className={c.picker} ref={root}>
-      <button type="button" className={`${c.pickerButton} ${open ? c.pickerOpen : ""}`} aria-haspopup="listbox" aria-expanded={open} onClick={() => (open ? setOpen(false) : openList())}>
+      <button
+        type="button"
+        className={`${c.pickerButton} ${compact ? c.pickerCompact : ""} ${open ? c.pickerOpen : ""}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={`${label}: ${current.title}`}
+        onClick={() => (open ? setOpen(false) : openList())}
+      >
         <Icon name="file" size={18} />
         <span className={c.pickerTitle}>
           {current.title}
@@ -141,16 +154,18 @@ export function ChecklistPicker({
             ))}
             {!flat.length && <p className={c.pickerEmpty}>No checklist matches &ldquo;{query}&rdquo;.</p>}
           </div>
-          <button
-            type="button"
-            className={c.pickerCreate}
-            onClick={() => {
-              setOpen(false);
-              onCreate();
-            }}
-          >
-            <Icon name="plus" size={16} /> Create a custom checklist
-          </button>
+          {onCreate && (
+            <button
+              type="button"
+              className={c.pickerCreate}
+              onClick={() => {
+                setOpen(false);
+                onCreate();
+              }}
+            >
+              <Icon name="plus" size={16} /> Create a custom checklist
+            </button>
+          )}
         </div>
       )}
     </div>
