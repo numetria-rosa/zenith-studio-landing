@@ -132,8 +132,41 @@
   inset: 0;
   padding: 0 200px 0 52px;
 }
-.select select option {
+/* The open list of every checklist menu (default list, per client, bulk, "Change checklist to..."): the browser
+   draws it, so only colours carry over. Group headings (United States, United Kingdom...) get a dim tinted row,
+   the choices the panel colour, so nothing is left white-on-white. */
+.select select,
+.rowSelect,
+.smallSelect {
+  color-scheme: dark;
+}
+.select select optgroup,
+.rowSelect optgroup,
+.smallSelect optgroup {
+  background: #161a24;
+  color: var(--zc-run-text);
+  font-style: normal;
+  font-weight: 600;
+  font-size: 13px;
+}
+.select select option,
+.rowSelect option,
+.smallSelect option {
   background: var(--zc-panel-2);
+  color: var(--zc-text);
+  font-weight: 400;
+  font-size: 15px;
+}
+.select select option:checked,
+.rowSelect option:checked,
+.smallSelect option:checked {
+  background: #1d3a30;
+  color: var(--zc-done-text);
+}
+.select select option:disabled,
+.rowSelect option:disabled,
+.smallSelect option:disabled {
+  color: var(--zc-dim);
 }
 .select > svg,
 .select .badge {
