@@ -282,6 +282,16 @@ export async function addAnotherOf(token: string, itemId: string): Promise<Resul
   return { ok: true };
 }
 
+/** The client's X on an extra, still-empty slot ("Label (2)"): removes just that slot. */
+export async function removeExtraSlot(token: string, itemId: string): Promise<Result> {
+  const portal = await getUploadPortal(token);
+  const item = portal?.client.items.find((i) => i.id === itemId);
+  if (!portal || !item) return { ok: false, error: "This link has expired." };
+  if (!/ \(\d+\)$/.test(item.label) || item.status !== "REQUESTED" || item.filePathname) return { ok: false, error: "Only an empty extra file slot can be removed." };
+  await db.docChaseItem.delete({ where: { id: itemId } });
+  return { ok: true };
+}
+
 // ---------- daily run ----------
 
 /** Emails every client who still owes documents (on the reminder schedule), and tells the accountant

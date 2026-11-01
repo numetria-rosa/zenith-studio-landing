@@ -413,3 +413,14 @@ export function parseStartDay(day: string, now = new Date()): Date | null | "inv
 
 /** A client whose first email is still in the future. */
 export const startsLater = (startAt: Date | null, now = new Date()) => !!startAt && startAt.getTime() > now.getTime();
+
+/** The upload page shows one card per requested document, with one slot per file. "Add another file" stores
+    an extra row labelled "Label (2)"; this folds those rows back under their parent, in first-seen order. */
+export function groupUploadItems<T extends { id: string; label: string }>(items: T[]): { base: string; parent: T; slots: T[] }[] {
+  const groups = new Map<string, T[]>();
+  for (const it of items) {
+    const base = it.label.replace(/ \(\d+\)$/, "");
+    groups.set(base, [...(groups.get(base) ?? []), it]);
+  }
+  return [...groups].map(([base, slots]) => ({ base, parent: slots.find((x) => x.label === base) ?? slots[0], slots }));
+}
