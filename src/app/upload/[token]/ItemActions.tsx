@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { addAnotherAction, notApplicableAction } from "./actions";
 
 /* Under each document on the client's upload page: "I don't have this" (with an optional reason, so the
-   accountant isn't left guessing) and "I have more than one" (a second W-2, another brokerage). */
+   accountant isn't left guessing) and "Add another file" (a second W-2, another brokerage). */
 export function ItemActions({ token, itemId, label, status }: { token: string; itemId: string; label: string; status: string }) {
   const router = useRouter();
   const [asking, setAsking] = useState(false);
@@ -22,12 +22,12 @@ export function ItemActions({ token, itemId, label, status }: { token: string; i
       router.refresh();
     });
 
-  const link = "text-[13.5px] text-white/60 underline underline-offset-4 hover:text-white disabled:opacity-50";
+  const link = "inline-flex min-h-9 items-center gap-1.5 text-[13.5px] text-white/65 hover:text-white disabled:opacity-50";
 
   if (status === "NOT_APPLICABLE")
     return (
       <button type="button" className={link} disabled={busy} onClick={() => run(() => notApplicableAction(token, itemId, "", true))}>
-        Undo, I do have it
+        I do have it
       </button>
     );
 
@@ -58,14 +58,14 @@ export function ItemActions({ token, itemId, label, status }: { token: string; i
           </span>
         </div>
       ) : (
-        <span className="flex flex-wrap gap-x-5 gap-y-1">
+        <span className="flex flex-wrap gap-x-5 gap-y-0">
           {status === "REQUESTED" && (
             <button type="button" className={link} onClick={() => setAsking(true)}>
-              I don&apos;t have this
+              <span aria-hidden="true">&#8856;</span> I don&apos;t have this
             </button>
           )}
           <button type="button" className={link} disabled={busy} onClick={() => run(() => addAnotherAction(token, itemId))}>
-            I have more than one
+            <span aria-hidden="true">+</span> Add another file
           </button>
         </span>
       )}
