@@ -26,6 +26,7 @@ import { sendAsBusiness } from "@/lib/client-mail";
 import { addDocChaseClients, addDocChaseItem, changeDocChaseChecklist, deleteDocChaseClient, deleteDocChecklist, listDocChecklists, reaskDocChaseItem, remindDocChaseClientNow, removeDocChaseItem, reviewDocChaseItem, saveDocChecklist, sendDocChaserTestEmail, setDocChaseClientStatus, type NewChaseClient } from "@/lib/document-chaser-db";
 import { readXlsx } from "@/lib/spreadsheet";
 import { DocChaserClients } from "./DocChaserClients";
+import { TextReminders } from "./TextReminders";
 import { DocChaserSetup } from "./DocChaserSetup";
 import { qualificationGroups, qualificationRulesText, readChoices, faqGroups, faqText, hoursText, DAYS, OPEN_TIMES, CLOSE_TIMES, CRM_FORMATS, type ChoiceGroup } from "@/lib/setup-options";
 import { CopyField, TestLeadForm } from "./ConnectForm";
@@ -395,6 +396,25 @@ export default async function AgentDetailPage({
     }
     revalidatePath(agentBase);
     redirect(`${agentBase}?flash=${encodeURIComponent("Request received. We'll email you once the carriers approve texting, usually within 1 to 3 weeks. Nothing is charged until texting is live.")}`);
+  }
+
+  /** Withdraws a text-reminder request before it goes live. */
+  async function cancelTextRemindersAction(): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) signInTo(agentBase);
+    const removed = await db.agentChangeRequest.deleteMany({ where: { projectId: clientId, agentId: "chaser", status: "SMS_REQUESTED" } });
+    if (removed.count > 0) {
+      await sendAsBusiness({
+        businessName: "Zenith Document Chaser",
+        to: "hello@zenith-studio.site",
+        replyTo: session2!.user.email ?? null,
+        subject: `Text reminders request cancelled: ${businessName || clientId}`,
+        text: `${session2!.user.email} cancelled the text reminders request for "${businessName || clientId}" (project ${clientId}). Nothing to register or bill.`,
+      });
+    }
+    revalidatePath(agentBase);
+    redirect(`${agentBase}?flash=${encodeURIComponent("Request cancelled. Nothing was charged. You can request text reminders again anytime.")}`);
   }
 
   async function testChaseEmailAction(formData: FormData): Promise<{ ok: boolean; message: string }> {
@@ -956,7 +976,7 @@ export default async function AgentDetailPage({
           review={reviewDocAction}
         />
 
-        <TextRemindersCard requestedAt={smsRequest?.createdAt ?? null} action={requestTextRemindersAction} />
+        <TextReminders requestedAt={smsRequest?.createdAt ?? null} businessName={businessName || "Your firm"} price={SMS_ADDON_MONTHLY_USD} request={requestTextRemindersAction} cancel={cancelTextRemindersAction} />
       </div>
     );
   }
@@ -1160,36 +1180,6 @@ function TextingCard({
             </div>
           </form>
         </>
-      )}
-    </section>
-  );
-}
-
-/* Email is how the Document Chaser chases. Texting is an optional add-on with a real wait and a real cost,
-   both stated before anyone asks for it. */
-function TextRemindersCard({ requestedAt, action }: { requestedAt: Date | null; action: () => Promise<void> }) {
-  return (
-    <section className={u.card} style={{ marginTop: 40, padding: 24, maxWidth: 760 }}>
-      <Eyebrow>Optional add-on</Eyebrow>
-      <p style={{ margin: "10px 0 0", fontSize: 18, fontWeight: 600 }}>Text message reminders</p>
-      <p style={{ margin: "8px 0 0", fontSize: 15, lineHeight: 1.6, color: "var(--zc-text-2)" }}>
-        Reminders go by email, which works straight away. If you also want each reminder sent by text, two things to know first:
-      </p>
-      <ul style={{ margin: "10px 0 0", paddingLeft: 20, fontSize: 15, lineHeight: 1.7, color: "var(--zc-text-2)" }}>
-        <li>US phone carriers have to approve your firm for business texting first. That usually takes 1 to 3 weeks, sometimes longer.</li>
-        <li>It costs ${SMS_ADDON_MONTHLY_USD} a month on top of your plan, starting only once texting is live.</li>
-        <li>Clients will only get texts after they agree to receive them.</li>
-      </ul>
-      {requestedAt ? (
-        <p style={{ margin: "16px 0 0", fontSize: 14.5, color: "var(--zc-done-text)" }}>
-          Requested on {requestedAt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}. We&apos;ll email you when the carriers approve it.
-        </p>
-      ) : (
-        <form action={action} style={{ marginTop: 16 }}>
-          <button type="submit" className={u.btnGhost}>
-            Request text reminders
-          </button>
-        </form>
       )}
     </section>
   );

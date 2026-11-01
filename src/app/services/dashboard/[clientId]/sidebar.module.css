@@ -95,18 +95,64 @@
   gap: 12px;
   padding-top: 16px;
 }
-.askBtn {
+.footer .askBtn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  border-radius: var(--zc-r-pill);
-  background: var(--zc-action);
-  color: var(--zc-action-text);
-  font-weight: 600;
-  font-size: 14px;
-  box-shadow: var(--zc-glow-action);
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 14px 8px 8px;
+  border-radius: 18px;
+  border: 1px solid rgba(92, 200, 255, 0.28);
+  background: linear-gradient(135deg, rgba(92, 200, 255, 0.12), rgba(139, 92, 246, 0.14));
+  color: var(--zc-text);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.footer .askBtn:hover {
+  border-color: rgba(92, 200, 255, 0.6);
+  box-shadow: 0 0 34px rgba(92, 200, 255, 0.2);
+  transform: translateY(-1px);
+}
+.footer .askBtn:focus-visible {
+  outline: 2px solid var(--zc-run);
+  outline-offset: 3px;
+}
+.askIc {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  border: 1px solid rgba(92, 200, 255, 0.4);
+  background: rgba(5, 6, 10, 0.55);
+  color: var(--zc-run-text);
+  box-shadow: 0 0 20px rgba(92, 200, 255, 0.18);
+}
+.askTx {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+}
+.askTx small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--zc-muted);
+}
+.askTx small i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--zc-done);
+  box-shadow: 0 0 7px var(--zc-done);
 }
 .userCard {
   display: flex;

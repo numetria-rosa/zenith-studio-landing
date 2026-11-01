@@ -70,8 +70,16 @@ export function Sidebar({
 
       <div className={s.footer}>
         <button type="button" className={s.askBtn} onClick={() => open()} data-tour="ask-sidebar">
-          <Icon name="message" size={16} />
-          Ask your team
+          <span className={s.askIc}>
+            <Icon name="sparkle" size={18} />
+          </span>
+          <span className={s.askTx}>
+            Ask your team
+            <small>
+              <i />
+              Live answers
+            </small>
+          </span>
         </button>
         <div className={s.userCard}>
           <div className={s.avatar}>{initial}</div>
