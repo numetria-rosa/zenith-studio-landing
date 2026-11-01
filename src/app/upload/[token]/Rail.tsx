@@ -42,7 +42,7 @@ export function MobileFooter({ firm }: { firm: string }) {
 export function Rail({ firm, first, docs }: { firm: string; first: string; docs: Doc[] }) {
   const st = stats(docs);
   return (
-    <aside className="relative flex flex-col overflow-hidden px-5 pb-0 pt-7 lg:sticky lg:top-0 lg:box-border lg:h-screen lg:w-[470px] lg:flex-shrink-0 lg:border-r lg:border-[rgba(255,255,255,0.07)] lg:bg-[linear-gradient(180deg,rgba(92,200,255,0.05),rgba(5,6,10,0)_40%),#07080D] lg:px-11 lg:pb-10 lg:pt-12">
+    <aside className="relative flex flex-col overflow-hidden px-5 pb-0 pt-7 lg:overflow-y-auto lg:overflow-x-hidden lg:sticky lg:top-0 lg:box-border lg:h-screen lg:w-[470px] lg:flex-shrink-0 lg:border-r lg:border-[rgba(255,255,255,0.07)] lg:bg-[linear-gradient(180deg,rgba(92,200,255,0.05),rgba(5,6,10,0)_40%),#07080D] lg:px-11 lg:pb-10 lg:pt-12">
       <div className="pointer-events-none absolute left-1/2 top-[-420px] h-[800px] w-[700px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(92,200,255,0.13),rgba(5,6,10,0)_62%)] lg:left-[-200px] lg:top-[-260px] lg:h-[700px] lg:translate-x-0 lg:bg-[radial-gradient(circle,rgba(92,200,255,0.16),rgba(5,6,10,0)_62%)]" />
       <header className="relative flex items-center gap-3">
         <div className={`${GLASS} flex h-[42px] w-[42px] flex-none items-center justify-center rounded-[12px] text-[15px] font-semibold`}>{firm.trim().charAt(0).toUpperCase()}</div>
@@ -60,7 +60,7 @@ export function Rail({ firm, first, docs }: { firm: string; first: string; docs:
       <ProgressSegments done={st.done} total={st.total} left={st.left} pct={st.pct} segs={st.segs} />
 
       <div className={`${MONO} relative mb-2 mt-[30px] hidden text-[12px] uppercase tracking-[0.16em] text-[#7D8392] lg:block`}>Your checklist</div>
-      <div className="relative hidden min-h-0 shrink flex-col overflow-y-auto lg:flex">
+      <div className="relative hidden shrink flex-col overflow-y-auto lg:flex lg:min-h-[220px]">
         {docs.map((d) => (
           <ChecklistRow key={d.id} title={d.title} state={d.skip ? "skip" : !needs(d) ? "sent" : partial(d) ? "partial" : "todo"} />
         ))}
