@@ -790,46 +790,98 @@ export function planSetupItems(project: ConsoleProject): SetupItem[] {
 
 // ---------- Ask your team (answers from live data, no AI yet) ----------
 
-export type QuickAnswer = { question: string; answer: string[] };
+export type QuickAnswerItem = { title: string; detail?: string; tone?: "need" | "run" | "done"; action?: { label: string; href: string } };
+export type QuickAnswer = {
+  question: string;
+  group: "Right now" | "Your team" | "Billing";
+  icon: "bell" | "clock" | "cpu" | "clipboard" | "dollar" | "logout";
+  /** The short label at the right of the question in the menu. */
+  meta: string;
+  /** A count shown as a badge beside the meta, when it is worth a look. */
+  badge?: number;
+  headline: string;
+  items: QuickAnswerItem[];
+};
+
+const NUMBER_WORDS = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+function ago(at: Date, now = Date.now()): string {
+  const m = Math.max(1, Math.round((now - at.getTime()) / 60000));
+  return m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`;
+}
 
 export function planQuickAnswers(project: ConsoleProject, priceDisplay: string | null): QuickAnswer[] {
+  const base = `/services/dashboard/${project.id}`;
+  const agentHref = (id: string) => `${base}/agents/${id}`;
   const agents = planAgents(project.sourceServiceId);
   const setup = planSetupItems(project);
   const todo = setup.filter((s) => !s.done);
-  const approvals = planApprovalItems(project, () => "");
+  const approvals = planApprovalItems(project, agentHref);
   const dayAgo = Date.now() - 86400000;
   const today = planActivityFeed(project).filter((e) => e.at.getTime() >= dayAgo);
+  const running = agents.filter((a) => a.real);
+  const needCount = todo.length + approvals.length;
+  const finish = (s: SetupItem): QuickAnswerItem => ({ title: s.title, detail: s.detail, tone: "need", action: { label: "Finish setup", href: agentHref(s.agentId) } });
+  const settings = { label: "Open Settings", href: `${base}/settings` };
 
   return [
     {
       question: "What needs me right now?",
-      answer:
-        todo.length + approvals.length === 0
-          ? ["Nothing. Everything is set up and nothing is waiting on you."]
-          : [...todo.map((s) => `Setup: ${s.title}`), ...approvals.map((a) => `${a.agentName}: ${a.title}`)],
+      group: "Right now",
+      icon: "bell",
+      meta: "Approvals & setup",
+      badge: needCount || undefined,
+      headline: needCount === 0 ? "Nothing needs you right now." : `${needCount < 10 ? NUMBER_WORDS[needCount] : needCount} ${needCount === 1 ? "thing is" : "things are"} waiting on you.`,
+      items:
+        needCount === 0
+          ? [{ title: "Everything is set up", detail: "Nothing is waiting on you.", tone: "done" }]
+          : [
+              ...approvals.map((a): QuickAnswerItem => ({ title: a.title, detail: `${a.agentName} · ${a.meta}`, tone: "need", action: { label: "Review", href: a.href } })),
+              ...todo.map(finish),
+            ],
     },
     {
       question: "What did my team do in the last 24 hours?",
-      answer: today.length === 0 ? ["No activity in the last 24 hours yet."] : today.slice(0, 8).map((e) => e.text),
+      group: "Right now",
+      icon: "clock",
+      meta: "Activity",
+      headline: today.length === 0 ? "No activity in the last 24 hours yet." : `${plural(today.length, "thing", "things")} happened in the last 24 hours.`,
+      items: today.slice(0, 6).map((e): QuickAnswerItem => ({ title: e.text, detail: ago(e.at), tone: "run" })),
     },
     {
       question: "Which agents are running?",
-      answer: agents.map((a) => `${a.name}: ${a.real ? planAgentStatus(project, a.id).stateLabel : "coming soon"}`),
+      group: "Your team",
+      icon: "cpu",
+      meta: `${running.length} active`,
+      headline: running.length === 1 ? "One agent is on shift." : `${running.length} agents are on shift.`,
+      items: agents.map((a): QuickAnswerItem => ({ title: a.name, detail: a.real ? planAgentStatus(project, a.id).stateLabel : "Coming soon", tone: a.real ? "run" : undefined, action: a.real ? { label: "Open", href: agentHref(a.id) } : undefined })),
     },
     {
       question: "What's left to set up?",
-      answer: todo.length === 0 ? ["Nothing, your setup is complete."] : todo.map((s) => `${s.title}. ${s.detail}`),
+      group: "Your team",
+      icon: "clipboard",
+      meta: todo.length === 0 ? "All done" : `${plural(todo.length, "item needs", "items need")} you`,
+      headline: todo.length === 0 ? "Your setup is complete." : `${plural(todo.length, "step", "steps")} left.`,
+      items: todo.length === 0 ? [{ title: "Nothing left to do", detail: "Your setup is complete.", tone: "done" }] : todo.map(finish),
     },
     {
       question: "What am I paying?",
-      answer: [
-        priceDisplay ? `${priceDisplay}, setup included. No contract.` : "See Settings for your plan.",
-        "You can cancel anytime from Settings; you keep access until the end of the period you paid for.",
+      group: "Billing",
+      icon: "dollar",
+      meta: "Plan & invoices",
+      headline: priceDisplay ? `${priceDisplay}, setup included.` : "See Settings for your plan.",
+      items: [
+        { title: priceDisplay ? `${priceDisplay}, setup included` : "Your plan is in Settings", detail: "No contract.", tone: "done" },
+        { title: "Cancel anytime", detail: "You keep access until the end of the period you paid for.", action: settings },
       ],
     },
     {
       question: "How do I cancel?",
-      answer: ["Open Settings and choose Cancel plan. Nothing else to do, and your agents stop at the end of your current billing period."],
+      group: "Billing",
+      icon: "logout",
+      meta: "Anytime",
+      headline: "You can cancel any time.",
+      items: [{ title: "Open Settings and choose Cancel plan", detail: "Nothing else to do. Your agents stop at the end of your current billing period.", action: settings }],
     },
   ];
 }

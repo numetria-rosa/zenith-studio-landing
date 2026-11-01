@@ -123,6 +123,19 @@ const paths = {
     </>
   ),
   x: <path d="M6 6l12 12M18 6L6 18" />,
+  arrowLeft: <path d="M19 12H5M11 6l-6 6 6 6" />,
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </>
+  ),
+  sparkle: (
+    <>
+      <path d="M11 3l1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z" />
+      <path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z" />
+    </>
+  ),
   chevronDown: <path d="M6 9l6 6 6-6" />,
   alert: (
     <>
