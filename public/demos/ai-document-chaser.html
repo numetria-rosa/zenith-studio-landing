@@ -329,7 +329,7 @@ footer{padding-block:48px 64px;color:var(--dim);font-size:14px}
 .zt-cap p{color:var(--mist);font-size:14.5px;line-height:1.5;max-width:52ch}
 .zt-ctrl .chip{padding-bottom:4px}
 .zt-ctrl{display:flex;align-items:flex-start;gap:10px}
-.zt-ctrl .chips{grid-template-columns:repeat(6,minmax(0,1fr))}
+.zt-ctrl .chips{grid-template-columns:repeat(7,minmax(0,1fr))}
 @media (max-width: 900px){.zt-foot{grid-template-columns:minmax(0,1fr);padding:16px;gap:14px}.zt-cap{min-height:0}}
 @media (max-width: 700px){.zt-ctrl .chips{grid-template-columns:repeat(3,minmax(0,1fr))}.zt-shell{border-radius:24px}.zt-mac{border-radius:10px}}
 .pill a,.brand{white-space:nowrap}
@@ -813,6 +813,44 @@ main{flex:1;min-width:0;padding:26px 34px 70px}
 #spot{position:fixed;z-index:60;pointer-events:none;opacity:0;border:1.5px solid rgba(92,200,255,.8);box-shadow:0 0 0 1px rgba(92,200,255,.2),0 0 30px rgba(92,200,255,.3);transition:opacity .25s}
 .rip{position:fixed;z-index:99;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:2px solid var(--runt);pointer-events:none;animation:rip .6s ease-out forwards}@keyframes rip{from{transform:scale(.3);opacity:1}to{transform:scale(2.2);opacity:0}}
 .lock{cursor:none}.lock *{cursor:none!important}
+
+.ask{display:flex;gap:12px;align-items:center;justify-content:flex-start;padding:8px 14px 8px 8px;border-radius:18px;border:1px solid rgba(92,200,255,.28);background:linear-gradient(135deg,rgba(92,200,255,.12),rgba(139,92,246,.14));text-align:left;box-shadow:none}
+.ask:hover{border-color:rgba(92,200,255,.6);box-shadow:0 0 30px rgba(92,200,255,.2)}
+.ask .ic{width:40px;height:40px;border-radius:13px;border:1px solid rgba(92,200,255,.4);background:rgba(5,6,10,.55);display:grid;place-items:center;color:var(--runt);flex:none}
+.ask .tx{display:flex;flex-direction:column;gap:2px;font-size:15px;font-weight:500;line-height:1.2}.ask .tx small{display:flex;gap:6px;align-items:center;font-size:11.5px;font-weight:400;color:var(--muted)}.ask .tx small i{width:6px;height:6px;border-radius:50%;background:var(--done);box-shadow:0 0 7px var(--done)}
+#askm{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(3,4,7,.72);backdrop-filter:blur(8px)}#askm.on{display:flex}
+.am{width:100%;max-width:700px;max-height:calc(100vh - 40px);display:flex;flex-direction:column;border-radius:28px;background:linear-gradient(180deg,#0c0f15,#090b10);border:1px solid var(--line2);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 1px 0 rgba(92,200,255,.18);overflow:hidden}
+.am .hd2{display:flex;gap:16px;align-items:flex-start;padding:24px 26px 6px}
+.am .lg{width:50px;height:50px;border-radius:15px;border:1px solid rgba(92,200,255,.3);background:linear-gradient(145deg,rgba(92,200,255,.14),rgba(139,92,246,.14));display:grid;place-items:center;color:var(--runt);flex:none}
+.am h2{margin:0;font-size:25px;font-weight:600;letter-spacing:-.025em}.am .sb{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:14px;color:var(--muted)}
+.am .lv{display:inline-flex;gap:7px;align-items:center;padding:2px 10px;border-radius:999px;border:1px solid rgba(61,220,151,.4);background:rgba(61,220,151,.08);color:var(--donet);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}.am .lv i{width:7px;height:7px;border-radius:50%;background:var(--done);box-shadow:0 0 8px var(--done)}
+.am .esc{margin-left:auto;display:inline-flex;gap:8px;align-items:center;padding:8px 13px;border-radius:12px;border:1px solid var(--line2);font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2)}
+.am .bd{padding:6px 26px 18px;overflow-y:auto}
+.am .gp{display:flex;gap:14px;align-items:center;margin:16px 0 4px;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}.am .gp:after{content:"";flex:1;height:1px;background:var(--line)}
+.am .rw{width:100%;display:flex;gap:16px;align-items:center;min-height:56px;padding:4px 12px 4px 6px;border:1px solid transparent;border-radius:16px;font-size:16.5px}
+.am .rw:hover,.am .rw.hov{background:rgba(255,255,255,.04);border-color:var(--line)}
+.am .rw .ci{width:46px;height:46px;border-radius:14px;border:1px solid var(--line2);display:grid;place-items:center;flex:none}
+.am .rw .q{flex:1}.am .rw .mt{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.am .bg{min-width:26px;height:26px;border-radius:99px;background:var(--need);color:#1c1405;display:grid;place-items:center;font-size:13.5px;font-weight:600;padding:0 7px}
+.am .c-need{color:var(--needt);border-color:rgba(245,184,61,.4)!important;background:rgba(245,184,61,.08)}.am .c-run{color:var(--runt);border-color:rgba(92,200,255,.4)!important;background:rgba(92,200,255,.08)}.am .c-done{color:var(--donet);border-color:rgba(61,220,151,.4)!important;background:rgba(61,220,151,.08)}.am .c-vio{color:#c7b0ff;border-color:rgba(139,92,246,.4)!important;background:rgba(139,92,246,.1)}.am .c-mut{color:var(--text2);background:rgba(255,255,255,.04)}
+.am .bk{display:inline-flex;gap:8px;align-items:center;margin:12px 0 16px 4px;color:var(--runt);font-size:14.5px}
+.am .us{margin-left:auto;width:fit-content;max-width:85%;padding:11px 19px;border-radius:16px;border:1px solid rgba(92,200,255,.3);background:rgba(92,200,255,.08);font-size:16px}
+.am .rp{display:flex;gap:13px;margin-top:20px}.am .sp2{width:36px;height:36px;border-radius:11px;border:1px solid rgba(92,200,255,.3);background:rgba(92,200,255,.08);display:grid;place-items:center;color:var(--runt);flex:none}
+.am .hl{margin:5px 0 13px;font-size:17.5px}
+.am .cds{border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.025);overflow:hidden}
+.am .cd{display:flex;gap:13px;align-items:center;padding:15px 17px;border-top:1px solid var(--line)}.am .cd:first-child{border-top:0}
+.am .cd .dt{width:10px;height:10px;border-radius:50%;background:var(--need);box-shadow:0 0 10px rgba(245,184,61,.5);flex:none}
+.am .cd b{display:block;font-size:16px;font-weight:500}.am .cd small{display:block;margin-top:3px;font-size:13.5px;color:var(--muted)}
+.am .cd .go2{margin-left:auto;padding:9px 19px;border-radius:999px;background:var(--done);color:#04140c;font-size:14.5px;font-weight:600;white-space:nowrap}
+.am .stp{display:block;margin-top:11px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.am .nx{margin:22px 0 10px;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.am .chs{display:flex;gap:9px;flex-wrap:wrap}.am .chs span{padding:10px 18px;border-radius:999px;border:1px solid var(--line2);background:rgba(255,255,255,.03);font-size:14.5px}
+.am .ft{padding:14px 26px 18px;border-top:1px solid var(--line)}
+.am .fr{display:flex;gap:12px;align-items:center;min-height:50px;padding:0 13px 0 17px;border:1px dashed var(--line2);border-radius:15px;color:var(--muted);font-size:16px}.am .fr span{flex:1}
+.am .fr em{font-style:normal;padding:4px 12px;border-radius:999px;border:1px solid rgba(139,92,246,.5);background:rgba(139,92,246,.12);color:#c7b0ff;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase}
+.am .ky{display:flex;gap:20px;margin:12px 0 0 4px;font-size:13px;color:var(--dim)}.am .ky b{display:inline-block;margin-right:7px;padding:2px 8px;border-radius:7px;border:1px solid var(--line2);background:rgba(255,255,255,.04);color:var(--text2);font-weight:400;font-family:var(--mono);font-size:11.5px}
+.am .vw{display:none}.am .vw.on{display:block}
+@media (max-width:1180px){#askm{padding:12px}.am{max-width:640px}}
 @media (max-width:1180px){.lay{grid-template-columns:minmax(0,1fr)}.side2{display:none}.kpis{grid-template-columns:repeat(2,1fr)}.ov{grid-template-columns:1fr}.sg{grid-template-columns:1fr}main{padding:22px 22px 60px}.side{width:200px}}
 </style>
 <div class="app">
@@ -826,7 +864,7 @@ main{flex:1;min-width:0;padding:26px 34px 70px}
     <button type="button" data-view="settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 100-6 3 3 0 000 6zM12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Settings</button>
   </nav>
   <div class="sp"></div>
-  <button class="ask" type="button" data-toast="Ask your team answers questions about your dashboard in plain English."><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 01-11.5 7.2L4 21l1.8-5.5A8 8 0 1121 12z"/></svg>Ask your team</button>
+  <button class="ask" type="button" data-ask><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3l1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/></svg></span><span class="tx">Ask your team<small><i></i>Live answers</small></span></button>
   <div class="me"><i>S</i><span>Smith &amp; Co<small>Owner</small></span></div>
 </aside>
 <main id="main">
@@ -929,6 +967,18 @@ main{flex:1;min-width:0;padding:26px 34px 70px}
   </div></section>
 
 </main></div>
+<div id="askm" role="dialog" aria-label="Ask your team"><div class="am">
+<div class="hd2"><span class="lg"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 01-11.5 7.2L4 21l1.8-5.5A8 8 0 1121 12z"/></svg></span><div><h2>Ask your team</h2><div class="sb"><span class="lv"><i></i>Live</span>Answers come straight from your team's data.</div></div><button class="esc" type="button" data-close>Esc &#10005;</button></div>
+<div class="bd">
+<div class="vw on" id="am-menu"><p class="gp">Right now</p><button class="rw first" type="button" data-q="needs"><span class="ci c-need"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0"/></svg></span><span class="q">What needs me right now?</span><span class="bg">2</span><span class="mt">Approvals &amp; setup</span></button><button class="rw" type="button" data-toast="Each question answers from your live data."><span class="ci c-run"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 110-18 9 9 0 010 18zM12 7v5l3 2"/></svg></span><span class="q">What did my team do in the last 24 hours?</span><span class="mt">Activity</span></button><p class="gp">Your team</p><button class="rw" type="button" data-toast="Each question answers from your live data."><span class="ci c-done"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8h8v8H8zM5 5h14v14H5zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg></span><span class="q">Which agents are running?</span><span class="mt">1 active</span></button><button class="rw" type="button" data-toast="Each question answers from your live data."><span class="ci c-need"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3H9zM6 5h12v16H6zM9 12h6M9 16h4"/></svg></span><span class="q">What's left to set up?</span><span class="mt">All done</span></button><p class="gp">Billing</p><button class="rw" type="button" data-toast="Each question answers from your live data."><span class="ci c-vio"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M16 7H10a3 3 0 000 6h4a3 3 0 010 6H8"/></svg></span><span class="q">What am I paying?</span><span class="mt">Plan &amp; invoices</span></button><button class="rw" type="button" data-toast="Each question answers from your live data."><span class="ci c-mut"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></span><span class="q">How do I cancel?</span><span class="mt">Anytime</span></button></div>
+<div class="vw" id="am-ans"><button class="bk" type="button" data-back>&#8592; All questions</button><div class="us">What needs me right now?</div>
+<div class="rp"><span class="sp2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3l1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z"/></svg></span><div style="flex:1;min-width:0"><p class="hl">Two things are waiting on you.</p>
+<div class="cds"><div class="cd"><i class="dt"></i><span><b>Jane Doe: W-2 from each employer</b><small>AI Document Chaser &middot; Uploaded, waiting on your review</small></span><span class="go2" id="am-review">Review</span></div><div class="cd"><i class="dt"></i><span><b>Acme Inc: Profit and loss and balance sheet</b><small>AI Document Chaser &middot; Uploaded, waiting on your review</small></span><span class="go2">Review</span></div></div>
+<span class="stp">From live data &middot; just now</span></div></div>
+<p class="nx">Ask next</p><div class="chs"><span>What did my team do in the last 24 hours?</span><span>Which agents are running?</span><span>What am I paying?</span></div></div>
+</div>
+<div class="ft"><div class="fr"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3l1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z"/></svg><span>Ask in your own words</span><em>Coming soon</em></div><p class="ky"><span><b>&#8593;&#8595;</b>move</span><span><b>&#8629;</b>ask</span><span><b>esc</b>close</span></p></div>
+</div></div>
 <div id="spot" aria-hidden="true"></div>
 <div id="toast" role="status" hidden></div>
 <script>
@@ -942,7 +992,7 @@ main{flex:1;min-width:0;padding:26px 34px 70px}
   var spot = document.getElementById('spot'), toastEl = document.getElementById('toast');
   var gen = 0, paused = true, running = false, userMode = false, ch = 0, chElapsed = 0;
   var px = innerWidth * 0.62, py = innerHeight * 0.8;
-  var DUR = [8000, 13000, 9500, 13500, 7500, 8000];
+  var DUR = [8000, 13000, 9500, 13500, 7500, 8000, 11000];
 
   function post(m) { try { parent.postMessage(Object.assign({ zt: 1 }, m), '*'); } catch (e) {} }
   function q(s) { return typeof s === 'string' ? document.querySelector(s) : s; }
@@ -952,12 +1002,22 @@ main{flex:1;min-width:0;padding:26px 34px 70px}
     document.querySelectorAll('.nav button').forEach(function (b) { if (b.dataset.view === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
     window.scrollTo(0, 0);
   }
-  function reset(v) { main.innerHTML = INIT; toastEl.hidden = true; show(v || 'overview'); spotOn(null); }
+  var askm = document.getElementById('askm');
+  function openAsk() { askView('menu'); askm.classList.add('on'); }
+  function closeAsk() { askm.classList.remove('on'); }
+  function askView(v) { document.getElementById('am-menu').classList.toggle('on', v === 'menu'); document.getElementById('am-ans').classList.toggle('on', v === 'ans'); }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAsk(); });
+  askm.addEventListener('click', function (e) { if (e.target === askm) closeAsk(); });
+  function reset(v) { closeAsk(); main.innerHTML = INIT; toastEl.hidden = true; show(v || 'overview'); spotOn(null); }
 
   /* the buttons really work, so a visitor who takes over can click around */
   document.addEventListener('click', function (e) {
     var t = e.target.closest('button,[data-card],#zip'); if (!t) return;
-    if (t.dataset.view) show(t.dataset.view);
+    if (t.hasAttribute('data-ask')) openAsk();
+    else if (t.hasAttribute('data-close')) closeAsk();
+    else if (t.hasAttribute('data-back')) askView('menu');
+    else if (t.dataset.q) askView('ans');
+    else if (t.dataset.view) show(t.dataset.view);
     else if (t.hasAttribute('data-pick')) document.getElementById('picker').classList.toggle('open'), document.getElementById('pbtn').classList.toggle('open');
     else if (t.dataset.filter) {
       document.querySelectorAll('#flt button').forEach(function (b) { b.setAttribute('aria-pressed', String(b === t)); });
@@ -1059,6 +1119,16 @@ main{flex:1;min-width:0;padding:26px 34px 70px}
       reset('overview'); await click('.nav [data-view="settings"]'); await sleep(800);
       await move('.sg .sc:nth-child(1)'); await sleep(1500);
       await move('.sg .sc:nth-child(2)'); await sleep(1700);
+    },
+    /* 6 ask your team */
+    async function () {
+      reset('overview'); await sleep(300);
+      await click('.ask'); await sleep(1500);
+      await move('.am .rw[data-q]'); await sleep(700);
+      await click('.am .rw[data-q]'); await sleep(1500);
+      await move('.am .cds'); await sleep(2200);
+      await move('#am-review'); await sleep(1300);
+      await click('[data-close]'); await sleep(500);
     }
   ];
   /* where each chapter ends, for reduced motion and direct jumps */
@@ -1069,6 +1139,7 @@ main{flex:1;min-width:0;padding:26px 34px 70px}
     if (i === 3) { show('agent'); document.getElementById('c-jane').classList.add('open'); window.scrollTo(0, document.getElementById('c-jane').offsetTop - 90); }
     if (i === 4) show('activity');
     if (i === 5) show('settings');
+    if (i === 6) { show('overview'); openAsk(); askView('ans'); }
   }
   async function runFrom(i) {
     var g = ++gen; running = true;
@@ -1115,7 +1186,8 @@ window.ZT_CH = [
   ["Your clients", "Everyone in one list", "Filter by who needs review, who is in progress and who has not started. Progress for each client at a glance."],
   ["Review", "Review what needs you", "The AI check flags wrong-year or unreadable files. Accept, or send back with a reason, and download everything as one zip."],
   ["Activity", "Every step is logged", "A plain record of what was sent, what came in and who finished, newest first."],
-  ["Settings", "Private by default", "Files are stored privately and deleted after 180 days. One flat monthly price, no per-seat fees."]
+  ["Settings", "Private by default", "Files are stored privately and deleted after 180 days. One flat monthly price, no per-seat fees."],
+  ["Ask", "Ask your team anything", "Everyday questions answered from your live data, with buttons that take you straight to what needs you."]
 ];
 (function () {
   var CH = window.ZT_CH;
