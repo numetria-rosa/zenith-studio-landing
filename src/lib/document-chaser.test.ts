@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHECKLISTS, chaseEmail, cleanItems, filesToPurge, MAX_ITEMS, isDueForChase, parseClientCsv, REJECT_REASONS, uploadPathname } from "./document-chaser";
+import { CHECKLISTS, groupUploadItems, chaseEmail, cleanItems, filesToPurge, MAX_ITEMS, isDueForChase, parseClientCsv, REJECT_REASONS, uploadPathname } from "./document-chaser";
 
 const DAY = 86400000;
 
@@ -95,5 +95,20 @@ describe("uploads", () => {
   });
   it("has reject reasons to pick from", () => {
     expect(REJECT_REASONS.length).toBeGreaterThan(2);
+  });
+});
+
+describe("groupUploadItems", () => {
+  it("folds Label (2) and (3) rows under their parent, keeping order", () => {
+    const rows = [
+      { id: "a", label: "Receipts" },
+      { id: "b", label: "Bank statements" },
+      { id: "c", label: "Receipts (2)" },
+      { id: "d", label: "Receipts (3)" },
+    ];
+    const g = groupUploadItems(rows);
+    expect(g.map((x) => x.base)).toEqual(["Receipts", "Bank statements"]);
+    expect(g[0].parent.id).toBe("a");
+    expect(g[0].slots.map((x) => x.id)).toEqual(["a", "c", "d"]);
   });
 });

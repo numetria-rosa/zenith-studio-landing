@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { checkUploadedDocument } from "@/lib/doc-check";
-import { addAnotherOf, confirmUpload, markNotApplicable, undoNotApplicable } from "@/lib/document-chaser-db";
+import { addAnotherOf, confirmUpload, removeExtraSlot, markNotApplicable, undoNotApplicable } from "@/lib/document-chaser-db";
 
 /** Called by the upload page once the browser has put a file in Blob storage. */
 export async function confirmUploadAction(token: string, itemId: string, pathname: string, fileName: string): Promise<{ ok: true } | { ok: false; error: string }> {
@@ -26,6 +26,13 @@ export async function notApplicableAction(token: string, itemId: string, note: s
 /** "I have more than one": another slot for the same document. */
 export async function addAnotherAction(token: string, itemId: string): Promise<{ ok: true } | { ok: false; error: string }> {
   const result = await addAnotherOf(String(token), String(itemId));
+  if (result.ok) revalidatePath(`/upload/${token}`);
+  return result;
+}
+
+/** The X on an extra, empty file slot. */
+export async function removeSlotAction(token: string, itemId: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  const result = await removeExtraSlot(String(token), String(itemId));
   if (result.ok) revalidatePath(`/upload/${token}`);
   return result;
 }
