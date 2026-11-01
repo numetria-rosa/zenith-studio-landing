@@ -30,6 +30,45 @@ export function filesToPurge(
 /** Most reminder emails one accountant's account sends per daily run; anyone over it is simply due tomorrow. */
 export const MAX_EMAILS_PER_RUN = 150;
 
+/* One line under each document on the client's upload page: what it is and where to find it. Keyed by the
+   stored label (without a trailing " (2)"); anything not listed just shows no hint. */
+const DOC_HINTS: Record<string, string> = {
+  "Last year's tax return": "The full return, all pages, as filed",
+  "Photo ID (driver's license or passport)": "A clear photo of the front, both sides for a license",
+  "W-2 from each employer": "Sent by each employer in January",
+  "1099-INT and 1099-DIV (bank interest and dividends)": "From your bank or broker, usually sent in January",
+  "1099-B or consolidated brokerage statement": "From your broker, sometimes called a 1099 composite",
+  "1099-NEC, 1099-MISC or 1099-K (other income)": "From anyone who paid you outside a job",
+  "1099-R and SSA-1099 (retirement and Social Security)": "From your plan or the Social Security Administration",
+  "1098 mortgage interest statement": "From your lender, usually sent in January",
+  "1098-T or 1098-E (tuition, student loan interest)": "From your school or loan servicer",
+  "1095-A (Marketplace health insurance)": "From the health insurance Marketplace",
+  "Charitable donation receipts": "Receipts or letters from each charity",
+  "Estimated tax payments made this year": "Dates and amounts, or the payment confirmations",
+  "Profit and loss for the year": "Income minus expenses, January to December",
+  "Business bank and credit card statements": "Every account used for the business, full year",
+  "Business expense receipts": "Photos are fine, one per receipt",
+  "Mileage log": "Date, trip purpose and miles for each business trip",
+  "Home office size and costs": "Square footage and rent, utilities or mortgage",
+  "Property expenses (repairs, insurance, management fees)": "Repairs, insurance and management fees",
+  "Property tax bills": "From your county or city",
+  "Closing statement for any property bought or sold this year": "Also called a settlement statement",
+  "P60 from each employer": "Your end-of-year pay summary",
+  "P11D (benefits in kind)": "From your employer if you got company benefits",
+  "Bank and savings interest statements": "Interest earned this tax year",
+  "Dividend vouchers": "From each company or fund that paid you",
+  "Pension contributions": "Statements showing what went in this year",
+  "Gift Aid donations": "Charity, date and amount",
+  "Sales invoices": "Every invoice you issued in the period",
+  "Purchase invoices and receipts": "Bills from suppliers, photos are fine",
+  "VAT returns": "The returns filed for the period",
+  "Payroll summary": "Gross pay, tax and NI for the period",
+};
+
+export function docHint(label: string): string | null {
+  return DOC_HINTS[label.replace(/ \(\d+\)$/, "")] ?? null;
+}
+
 /* Standard starting lists, by country. Each document is phrased so the client can tell whether it applies to
    them; anything that doesn't, they mark "I don't have this" on the upload page. `match` is how a value in an
    imported spreadsheet (a "Return type" or "Entity" column, say) picks this list: whole words, any case.
