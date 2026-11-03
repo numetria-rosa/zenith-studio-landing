@@ -55,25 +55,28 @@ function billingPeriodEnd(periodStart: Date): Date {
   return new Date(Date.UTC(periodStart.getUTCFullYear(), periodStart.getUTCMonth() + 1, 0));
 }
 
-export type CapCheck = { withinCap: true; used: number; cap: number } | { withinCap: false; used: number; cap: number };
+export type CapCheck = { withinCap: boolean; used: number; cap: number; planCap: number };
 
-/** Reads the agency's plan and this month's AI reply usage in one place -
+/** The plan's cap, lowered to the agency's own monthly limit when it set one. Never raised: the plan cap
+    is what covers our AI cost per reply. */
+export function effectiveCap(planCap: number, agencyLimit: number | null | undefined): number {
+  return agencyLimit && agencyLimit > 0 ? Math.min(planCap, agencyLimit) : planCap;
+}
+
+/** Reads the agency's plan, its own monthly limit and this month's AI reply usage in one place -
     every caller (the webhook, the simulator's cap-aware messaging, an
-    admin page) reads the same number the same way. */
+    admin page) reads the same number the same way. Each AI reply is one outbound message
+    Meta bills the agency for, so the limit also caps their Meta bill. */
 export async function withinCap(agencyId: string): Promise<CapCheck> {
-  const subscription = await db.waSubscription.findUnique({ where: { agencyId }, select: { plan: true } });
-  const plan = subscription?.plan ?? "STARTER";
-  const periodStart = currentBillingPeriodStart();
-  const usage = await db.waUsageCounter.findUnique({
-    where: { agencyId_periodStart: { agencyId, periodStart } },
-    select: { aiReplies: true, overagePacks: true },
-  });
-  // Each paid £5 overage pack (WaUsageCounter.overagePacks, see
-  // src/lib/whatsapp-umrah/overage.ts) adds 1,000 replies to THIS period's
-  // cap on top of the plan's base allowance.
-  const cap = replyCapFor(plan) + (usage?.overagePacks ?? 0) * 1000;
+  const [subscription, settings, usage] = await Promise.all([
+    db.waSubscription.findUnique({ where: { agencyId }, select: { plan: true } }),
+    db.waAgentSettings.findUnique({ where: { agencyId }, select: { monthlyReplyLimit: true } }),
+    db.waUsageCounter.findUnique({ where: { agencyId_periodStart: { agencyId, periodStart: currentBillingPeriodStart() } }, select: { aiReplies: true } }),
+  ]);
+  const planCap = replyCapFor(subscription?.plan ?? "STARTER");
+  const cap = effectiveCap(planCap, settings?.monthlyReplyLimit);
   const used = usage?.aiReplies ?? 0;
-  return used < cap ? { withinCap: true, used, cap } : { withinCap: false, used, cap };
+  return { withinCap: used < cap, used, cap, planCap };
 }
 
 /** Increments this month's AI reply counter, creating the row if this is

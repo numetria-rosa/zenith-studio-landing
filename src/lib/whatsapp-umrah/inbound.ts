@@ -76,7 +76,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
   const cap = await withinCap(agency.id);
   if (!cap.withinCap) {
     if (ownerEmail) {
-      await sendPlainEmail(ownerEmail, `${agency.name}: monthly AI reply limit reached`, `Your WhatsApp agent has used its ${cap.cap} AI replies for this month, so it's paused until the new month starts. New messages are still saved to your dashboard.`);
+      await sendPlainEmail(ownerEmail, `${agency.name}: monthly AI reply limit reached`, `Your WhatsApp agent has used its ${cap.cap} AI replies for this month${cap.cap < cap.planCap ? " (the limit you set)" : ""}, so it's paused until the new month starts. You can change your limit in Settings. New messages are still saved to your dashboard.`);
     }
     return;
   }

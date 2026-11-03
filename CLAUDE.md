@@ -176,11 +176,9 @@ The agent:
   (a third paid LLM provider) without asking first, per the "ask before
   adding paid services" rule. The KB vector column is scaffolded at 1536
   dimensions as a placeholder pending this decision.
-- Whop's support for a metered/usage-based add-on (the optional £5 per
-  extra 1,000 replies pack) hasn't been verified against Whop's current
-  API. Worst case: implement it as a second one-time Whop plan purchased
-  on demand, matching how this repo already handles one-time add-ons
-  elsewhere.
+- **Extra-replies add-on: removed 2026-11-03.** Agencies pay Meta directly, so they set their own
+  monthly reply limit (Settings, capped at the plan allowance) instead of buying £5 packs. The plan
+  cap stays as the ceiling because it covers our per-reply AI cost. Archive the £5 plan in Whop.
 
 ## Rules for whoever is building this
 

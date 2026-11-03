@@ -11,7 +11,6 @@ import { createServiceProjectWithDefaults } from "@/lib/service-projects";
 import { resolveProposalByWhopPlanId, classifyProposalPaymentLeg } from "@/lib/proposal-payments";
 import { sendMetaPurchaseEvent } from "@/lib/meta-capi";
 import { sendAdminAlert } from "@/lib/outreach-mail";
-import { creditOveragePack } from "@/lib/whatsapp-umrah/overage";
 import { waPlanForWhopPlanId, provisionWaAgency, pauseWaAgencyByMembership } from "@/lib/whatsapp-umrah/whop-plans";
 
 /* Zenith Lab - Whop webhook handler.
@@ -121,31 +120,10 @@ type PostCommitInfo = {
 };
 
 async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<PostCommitInfo | null> {
-  // WhatsApp Umrah's £5 "extra 1,000 replies" add-on: bought from inside the
-  // client dashboard via Whop's embedded Checkout Element, which stamps
-  // metadata.agencyId on the payment (see docs.whop.com/developer/guides/
-  // embed-checkout - "Do not grant access from onComplete, use the
-  // payment.succeeded webhook"). Resolved by plan id first since this plan
-  // has no product/course/service mapping at all.
-  if (payment.plan?.id && payment.plan.id === process.env.WHATSAPP_UMRAH_OVERAGE_PLAN_ID) {
-    const agencyId = (payment.metadata as Record<string, unknown> | null)?.agencyId;
-    if (typeof agencyId !== "string" || !agencyId) {
-      console.error("[whop webhook] overage pack payment.succeeded missing metadata.agencyId", payment.id);
-      return null;
-    }
-    const agency = await tx.waAgency.findUnique({ where: { id: agencyId }, select: { id: true } });
-    if (!agency) {
-      console.error("[whop webhook] overage pack payment.succeeded - no such WaAgency", agencyId, payment.id);
-      return null;
-    }
-    await creditOveragePack(tx, agencyId);
-    return null;
-  }
-
   // WhatsApp Umrah's Starter/Founding subscription (see
   // scripts/create-whatsapp-umrah-whop-product.mjs) - also has no
-  // product/course/service mapping, resolved by plan id the same way as
-  // the overage plan above. membership.activated (below) provisions the
+  // product/course/service mapping, resolved by plan id.
+  // membership.activated (below) provisions the
   // same agency idempotently if that event arrives first.
   const waPlanMatch = waPlanForWhopPlanId(payment.plan?.id);
   if (waPlanMatch) {

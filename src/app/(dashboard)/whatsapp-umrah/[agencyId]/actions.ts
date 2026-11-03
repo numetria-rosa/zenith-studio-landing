@@ -223,18 +223,19 @@ export async function updateAgentSettingsAction(agencyId: string, formData: Form
   revalidatePath(`/whatsapp-umrah/${agencyId}/settings`);
 }
 
-/** The £5/1,000-extra-replies add-on pack (see CLAUDE.md's overage add-on
-    section) is off by default - "one-click enable" toggle, separate from
-    the rest of updateAgentSettingsAction so it isn't accidentally flipped
-    off by an unrelated settings save. */
-export async function toggleOverageEnabledAction(agencyId: string, formData: FormData): Promise<void> {
+/** The agency's own monthly reply limit (blank = just the plan cap). Capped at the plan's allowance when
+    read (effectiveCap), so a higher number here simply means "the plan cap". */
+export async function setReplyLimitAction(agencyId: string, formData: FormData): Promise<void> {
   const { agency } = await requireOwnedAgency(agencyId);
-  const enabled = formData.get("overageEnabled") === "on";
+  const raw = String(formData.get("monthlyReplyLimit") ?? "").trim();
+  const n = Math.floor(Number(raw));
+  const monthlyReplyLimit = raw && Number.isFinite(n) && n > 0 ? n : null;
   await db.waAgentSettings.upsert({
     where: { agencyId: agency.id },
-    create: { agencyId: agency.id, overageEnabled: enabled },
-    update: { overageEnabled: enabled },
+    create: { agencyId: agency.id, monthlyReplyLimit },
+    update: { monthlyReplyLimit },
   });
+  revalidatePath(`/whatsapp-umrah/${agencyId}`);
   revalidatePath(`/whatsapp-umrah/${agencyId}/settings`);
 }
 
