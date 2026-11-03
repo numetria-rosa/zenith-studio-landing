@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
-import { updateAgentSettingsAction, toggleOverageEnabledAction, cancelSubscriptionAction } from "../actions";
-import { OverageCheckout } from "./OverageCheckout";
+import { updateAgentSettingsAction, setReplyLimitAction, cancelSubscriptionAction } from "../actions";
 import { CancelPlanButton } from "@/app/services/dashboard/[clientId]/CancelPlanButton";
 import type { BusinessHours } from "@/lib/whatsapp-umrah/hours";
 import waStyles from "../waConsole.module.css";
@@ -150,25 +149,28 @@ export default async function SettingsPage({ params }: { params: Promise<{ agenc
 
       <div className={waStyles.card} style={{ marginTop: 20 }}>
         <div className={waStyles.label} style={{ marginBottom: 6 }}>
-          Extra replies add-on
+          Monthly reply limit
         </div>
         <p style={{ fontSize: 13, color: "var(--zc-muted)", marginBottom: 12 }}>
-          Off by default. Turn it on to buy £5 top-up packs (1,000 more AI replies each) whenever you get close to your
-          plan&apos;s monthly cap, instead of replies stopping until next month.
+          Each reply your agent sends is a message Meta bills to your own WhatsApp account. Set the most you want it to send in a month. At 80% you&apos;ll
+          see a warning here, and at 100% the agent pauses until next month (new messages are still saved). Leave it blank to use your plan&apos;s full allowance.
         </p>
-        <form
-          action={toggleOverageEnabledAction.bind(null, agencyId)}
-          style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: s?.overageEnabled ? 16 : 0 }}
-        >
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
-            <input type="checkbox" name="overageEnabled" defaultChecked={s?.overageEnabled ?? false} />
-            Allow buying extra reply packs
-          </label>
+        <form action={setReplyLimitAction.bind(null, agencyId)} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <input
+            type="number"
+            name="monthlyReplyLimit"
+            min={1}
+            step={1}
+            defaultValue={s?.monthlyReplyLimit ?? ""}
+            placeholder="Plan allowance"
+            aria-label="Monthly reply limit"
+            className={waStyles.input}
+            style={{ maxWidth: 180 }}
+          />
           <button type="submit" style={{ fontSize: 13 }}>
             Save
           </button>
         </form>
-        {s?.overageEnabled ? <OverageCheckout agencyId={agencyId} /> : null}
       </div>
 
       <div className={waStyles.card} style={{ marginTop: 20 }}>

@@ -129,11 +129,6 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
           <span style={{ fontSize: 20, fontWeight: 600 }}>
             {usage.used} <span style={{ fontSize: 14, fontWeight: 400, color: "var(--zc-muted)" }}>/ {usage.cap}</span>
           </span>
-          {usage.overagePacks > 0 && (
-            <span style={{ fontSize: 12, color: "var(--zc-muted)" }}>
-              +{usage.overagePacks} pack{usage.overagePacks === 1 ? "" : "s"} bought this period
-            </span>
-          )}
         </div>
         <div style={{ height: 6, borderRadius: 3, background: "var(--zc-line)", overflow: "hidden", marginBottom: 12 }}>
           <div
@@ -145,7 +140,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
           />
         </div>
         <Link href={`/whatsapp-umrah/${agencyId}/settings`} style={{ fontSize: 13, color: "var(--zc-run-text)" }}>
-          {usage.overagePacks > 0 || nearCap ? "Buy 1,000 more replies - £5 →" : "Turn on the extra replies add-on →"}
+          {usage.cap < usage.planCap ? "Change your monthly limit →" : "Set a monthly limit →"}
         </Link>
       </div>
     </div>
