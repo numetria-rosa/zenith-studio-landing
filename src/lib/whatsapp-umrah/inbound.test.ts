@@ -38,6 +38,7 @@ vi.mock("@/lib/secrets", () => ({ decryptSecret: () => "token" }));
 vi.mock("@/lib/outreach-mail", () => ({ sendPlainEmail: vi.fn(), sendAdminAlert: vi.fn() }));
 vi.mock("./entitlements", () => ({ withinCap: async () => ({ withinCap: true, used: 0, cap: 100, planCap: 100 }), recordAiReply: async () => {} }));
 vi.mock("./send-failure", () => ({ trackSend: async () => {}, noteSendFailure: async () => {} }));
+vi.mock("./handoff-alerts", () => ({ alertHandoff: vi.fn(), alertWaitingCustomer: vi.fn() }));
 vi.mock("./leads", () => ({ upsertLeadFromDraft: async () => null, notifyOwnerOfHotLead: async () => {} }));
 vi.mock("./agent/pipeline", () => ({
   runAgentPipeline: async () => {
@@ -47,6 +48,7 @@ vi.mock("./agent/pipeline", () => ({
 }));
 
 import { processInboundMedia, processInboundMessage } from "./inbound";
+import { alertHandoff, alertWaitingCustomer } from "./handoff-alerts";
 import { MockWhatsAppProvider } from "./provider/mock";
 import { OPT_IN_REPLIES, OPT_OUT_REPLIES, SENSITIVE_DATA_REPLIES, VOICE_NOTE_REPLIES } from "./agent/fixed-replies";
 
@@ -60,6 +62,8 @@ beforeEach(() => {
   state.handoffs = [];
   state.lastInboundText = null;
   state.pipelineCalls = 0;
+  vi.mocked(alertHandoff).mockClear();
+  vi.mocked(alertWaitingCustomer).mockClear();
 });
 
 describe("photos, documents and voice notes", () => {
@@ -72,6 +76,7 @@ describe("photos, documents and voice notes", () => {
     expect(state.handoffs).toHaveLength(1);
     expect(state.handoffs[0]).toMatchObject({ reason: "customer sent a photo, document or video", triggeredBy: "AUTO" });
     expect(state.pipelineCalls).toBe(0);
+    expect(alertHandoff).toHaveBeenCalledWith({ agencyId: "a1", conversationId: "v1", reason: "customer sent a photo, document or video", message: null });
   });
 
   it("answers a voice note in the language of the customer's last text message", async () => {
@@ -88,6 +93,16 @@ describe("photos, documents and voice notes", () => {
     await processInboundMedia({ ...base, type: "IMAGE", reply: "security" }, provider);
     expect(provider.sent).toEqual([]);
     expect(state.messages).toHaveLength(1);
+    expect(alertHandoff).not.toHaveBeenCalled();
+    expect(alertWaitingCustomer).toHaveBeenCalledWith({ agencyId: "a1", conversationId: "v1", message: null });
+  });
+
+  it("tells the team when the customer writes again in a chat that is waiting on a person", async () => {
+    state.conversation.status = "HUMAN";
+    const provider = new MockWhatsAppProvider();
+    await processInboundMessage(text("Hello? Is anyone there?"), provider);
+    expect(provider.sent).toEqual([]);
+    expect(alertWaitingCustomer).toHaveBeenCalledWith({ agencyId: "a1", conversationId: "v1", message: "Hello? Is anyone there?" });
   });
 });
 

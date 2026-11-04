@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency, getUsageSummary } from "@/lib/whatsapp-umrah/dashboard-data";
+import { countWaitingConversations } from "@/lib/whatsapp-umrah/handoff-alerts";
 import { isEmbeddedSignupCapReached, EMBEDDED_SIGNUP_ENABLED } from "@/lib/whatsapp-umrah/embedded-signup";
 import { requestManualConnectAction } from "./actions";
 import { EmbeddedSignupButton } from "./EmbeddedSignupButton";
@@ -18,6 +19,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
   const usagePct = Math.min(100, Math.round((usage.used / usage.cap) * 100));
   const nearCap = usagePct >= 80;
 
+  const waiting = await countWaitingConversations(agencyId);
   const kbHasContent = agency.kbDocuments.some((d) => d._count.chunks > 0);
   const whatsappConnected = agency.whatsapp?.status === "CONNECTED";
   const settingsConfigured = !!agency.agentSettings;
@@ -40,6 +42,17 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
       <p className={waStyles.pageDesc}>
         {agency.status === "LIVE" ? "Your AI agent is live." : allDone ? "Everything's set - your agent goes live once your WhatsApp number is connected." : "A few steps left before you're live."}
       </p>
+
+      {waiting > 0 && (
+        <div className={waStyles.card} role="status" style={{ marginBottom: 20 }}>
+          <div className={waStyles.label} style={{ marginBottom: 6 }}>
+            {waiting} {waiting === 1 ? "customer is" : "customers are"} waiting for a person
+          </div>
+          <Link href={`/whatsapp-umrah/${agencyId}/inbox`} style={{ fontSize: 14, color: "var(--zc-run-text)" }}>
+            Open the inbox →
+          </Link>
+        </div>
+      )}
 
       {agency.whatsapp?.lastError && (
         <div className={waStyles.card} role="alert" style={{ borderColor: "var(--zc-error-text)", marginBottom: 20 }}>

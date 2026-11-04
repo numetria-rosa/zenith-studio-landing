@@ -36,6 +36,7 @@ export default async function InboxPage({ params, searchParams }: { params: Prom
               <div className={waStyles.convName}>{c.contact.name || c.contact.phone}</div>
               <div className={waStyles.convMeta}>
                 <span className={`${waStyles.badge} ${c.status === "HUMAN" ? waStyles.badgeHuman : waStyles.badgeAi}`}>{c.status === "HUMAN" ? "Human" : "AI"}</span>{" "}
+                {c.status === "HUMAN" && c.messages[0]?.direction === "IN" && <span className={`${waStyles.badge} ${waStyles.badgeHuman}`}>Needs reply</span>}{" "}
                 {c._count.messages} message{c._count.messages === 1 ? "" : "s"}
               </div>
             </Link>
