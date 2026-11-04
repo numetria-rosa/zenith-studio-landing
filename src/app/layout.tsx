@@ -1,20 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans as geistSans } from "geist/font/sans";
+import { GeistMono as geistMono } from "geist/font/mono";
 import { Analytics } from "@vercel/analytics/next";
 import { getLocale } from "next-intl/server";
 import { MetaPixel } from "@/components/MetaPixel";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
+// Geist comes from the `geist` package (font files in node_modules), not next/font/google: the Google fetch
+// failed intermittently during Vercel builds. The package sets the same --font-geist-sans / --font-geist-mono variables.
 const SITE_URL = "https://zenith-studio.site";
 
 export const metadata: Metadata = {
