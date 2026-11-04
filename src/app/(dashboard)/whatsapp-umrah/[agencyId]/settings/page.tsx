@@ -44,6 +44,12 @@ export default async function SettingsPage({ params }: { params: Promise<{ agenc
         <div className={waStyles.grid2}>
           <div className={waStyles.card}>
             <div className={waStyles.formRow}>
+              <label className={waStyles.label} htmlFor="agencyName">
+                Agency name
+              </label>
+              <input id="agencyName" name="agencyName" defaultValue={agency.name} maxLength={80} className={waStyles.input} />
+            </div>
+            <div className={waStyles.formRow}>
               <label className={waStyles.label} htmlFor="agentName">
                 Agent name
               </label>
@@ -124,10 +130,13 @@ export default async function SettingsPage({ params }: { params: Promise<{ agenc
         <div className={waStyles.card} style={{ marginTop: 20 }}>
           <div className={waStyles.formRow}>
             <label className={waStyles.label} htmlFor="autoResumeIdleMinutes">
-              Auto-resume AI after a handoff, once idle for (minutes)
+              Let the AI take over again after your team goes quiet for (minutes)
             </label>
             <input id="autoResumeIdleMinutes" name="autoResumeIdleMinutes" type="number" min="0" defaultValue={s?.autoResumeIdleMinutes ?? ""} className={waStyles.input} placeholder="Off by default" />
           </div>
+          <p style={{ fontSize: 12, color: "var(--zc-dim)" }}>
+            If a customer writes in a chat your team took over and nobody on your team has replied for this long, the agent answers again. Blank keeps the chat with your team until you resume it.
+          </p>
         </div>
 
         <div className={waStyles.card} style={{ marginTop: 20 }}>

@@ -220,7 +220,9 @@ export async function updateAgentSettingsAction(agencyId: string, formData: Form
     })(),
   };
   await db.waAgentSettings.upsert({ where: { agencyId: agency.id }, create: { agencyId: agency.id, ...data }, update: data });
-  revalidatePath(`/whatsapp-umrah/${agencyId}/settings`);
+  const agencyName = String(formData.get("agencyName") || "").trim().slice(0, 80);
+  if (agencyName && agencyName !== agency.name) await db.waAgency.update({ where: { id: agency.id }, data: { name: agencyName } });
+  revalidatePath(`/whatsapp-umrah/${agencyId}`, "layout");
 }
 
 /** The agency's own monthly reply limit (blank = just the plan cap). Capped at the plan's allowance when

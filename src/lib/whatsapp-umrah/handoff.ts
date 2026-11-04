@@ -2,8 +2,7 @@ import { db } from "@/lib/db";
 
 /* Human takeover/resume - spec 3.3. Auto-handoff (guard-triggered) is
    built in agent/pipeline.ts + inbound.ts; this is the manual side: the
-   dashboard's "Take over"/"Resume AI" buttons, plus the idle auto-resume
-   timer. Detecting a human reply sent from the agency's own WhatsApp
+   dashboard's "Take over"/"Resume AI" buttons, plus the idle auto-resume. Detecting a human reply sent from the agency's own WhatsApp
    Business app is also built, separately, in
    inbound.ts's processEchoedStaffMessage - confirmed against Meta's
    smb_message_echoes webhook reference (2026-09-28), see CLAUDE.md. */
@@ -42,31 +41,26 @@ export async function resumeAi(agencyId: string, conversationId: string): Promis
   return { ok: true };
 }
 
-/** Idle auto-resume - off by default (spec 3.3: "auto-resume after a
-    configurable idle period (default off)"). Called from a cron, same
-    shape as this repo's other daily/periodic jobs. Idle is measured from
-    the handoff's own startedAt, not the conversation's last activity -
-    an agent actively working a handed-off chat (even without a new
-    customer message) shouldn't get the AI silently reactivated under
-    them. */
-export async function autoResumeIdleConversations(): Promise<number> {
-  const openHandoffs = await db.waHandoff.findMany({
-    where: { resolvedAt: null },
-    select: { id: true, conversationId: true, startedAt: true, agency: { select: { agentSettings: { select: { autoResumeIdleMinutes: true } } } } },
-  });
+/** Whether a chat the team took over has been quiet long enough for the AI to answer again: measured from the
+    team's last activity (the handoff itself, or their latest reply), so an agent actively working a chat never
+    has the AI reactivated under them. */
+export function isIdleLongEnough(input: { lastTeamActivityAt: Date; idleMinutes: number; now?: Date }): boolean {
+  const { lastTeamActivityAt, idleMinutes, now = new Date() } = input;
+  return idleMinutes > 0 && now.getTime() - lastTeamActivityAt.getTime() >= idleMinutes * 60_000;
+}
 
-  let resumed = 0;
-  for (const handoff of openHandoffs) {
-    const idleMinutes = handoff.agency.agentSettings?.autoResumeIdleMinutes;
-    if (!idleMinutes) continue;
-    const idleSince = Date.now() - handoff.startedAt.getTime();
-    if (idleSince < idleMinutes * 60_000) continue;
-
-    await db.$transaction([
-      db.waConversation.update({ where: { id: handoff.conversationId }, data: { status: "AI" } }),
-      db.waHandoff.update({ where: { id: handoff.id }, data: { resolvedAt: new Date() } }),
-    ]);
-    resumed++;
-  }
-  return resumed;
+/** The "let the AI take over again after N minutes" setting (spec 3.3, off by default). It is checked when the
+    customer next writes in a chat waiting on a person, not by a timer: the project's cron plan only runs
+    daily, and the moment the AI would speak is the moment the customer writes. Returns whether it resumed. */
+export async function resumeIfIdle(agencyId: string, conversationId: string, idleMinutes: number | null | undefined): Promise<boolean> {
+  if (!idleMinutes) return false;
+  const [handoff, lastReply] = await Promise.all([
+    db.waHandoff.findFirst({ where: { conversationId, resolvedAt: null }, orderBy: { startedAt: "desc" }, select: { startedAt: true } }),
+    db.waMessage.findFirst({ where: { conversationId, direction: "OUT", sender: "HUMAN" }, orderBy: { createdAt: "desc" }, select: { createdAt: true } }),
+  ]);
+  const times = [handoff?.startedAt, lastReply?.createdAt].filter((d): d is Date => !!d);
+  if (times.length === 0) return false;
+  const lastTeamActivityAt = new Date(Math.max(...times.map((d) => d.getTime())));
+  if (!isIdleLongEnough({ lastTeamActivityAt, idleMinutes })) return false;
+  return (await resumeAi(agencyId, conversationId)).ok;
 }

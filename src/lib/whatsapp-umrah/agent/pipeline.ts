@@ -2,6 +2,7 @@ import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/
 import { retrieveKbChunks, type RetrievedChunk } from "../kb/retrieve";
 import { containsSensitiveData, isOptOutMessage } from "./pre-guards";
 import { guessLanguage } from "./language";
+import { applyPersona, LANGUAGE_NAMES, loadPersona, personaPrompt, replyLanguageAllowed, type Persona } from "./persona";
 import { HOLDING_MESSAGES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
 import { draftReply, type DraftResult } from "./draft";
 import { escalateDraft } from "./escalate";
@@ -88,7 +89,8 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
 
   const retrieval = await retrieveKbChunks(input.agencyId, input.customerMessage);
   const kbContext = retrieval.ok ? formatKbContext(retrieval.chunks) : "";
-  const draftInput = { customerMessage: input.customerMessage, kbContext, conversationHistory: input.conversationHistory ?? "" };
+  const persona = await loadPersona(input.agencyId);
+  const draftInput = { customerMessage: input.customerMessage, kbContext, conversationHistory: input.conversationHistory ?? "", persona: personaPrompt(persona) };
   const promptRuns: PromptRunRecord[] = [];
 
   const first = await draftReply(draftInput);
@@ -98,8 +100,10 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   }
   const firstFailures = runGuards(first.draft, kbContext);
   promptRuns.push(toPromptRunRecord("DRAFT", GROQ_MODEL(), first, guardNames(firstFailures)));
+  // A language the agency has switched off goes to a person (no retry: a second draft would be in the same language).
+  if (!replyLanguageAllowed(first.draft.language, persona)) return languageOffResult(first.draft, persona, promptRuns);
   if (firstFailures.length === 0) {
-    return replyResult(first.draft, "groq:" + GROQ_MODEL(), [], promptRuns);
+    return replyResult(first.draft, "groq:" + GROQ_MODEL(), [], promptRuns, persona);
   }
 
   const escalated = await escalateDraft(draftInput, firstFailures);
@@ -114,7 +118,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   const secondFailures = runGuards(escalated.draft, kbContext);
   promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures)));
   if (secondFailures.length === 0) {
-    return replyResult(escalated.draft, "claude:" + CLAUDE_MODEL(), guardNames(firstFailures), promptRuns);
+    return replyResult(escalated.draft, "claude:" + CLAUDE_MODEL(), guardNames(firstFailures), promptRuns, persona);
   }
 
   return handoffResult(
@@ -130,8 +134,13 @@ function guardNames(failures: GuardFailure[]): string[] {
   return failures.map((f) => f.guard);
 }
 
-function replyResult(draft: AgentDraft, model: string, guardsTriggered: string[], promptRuns: PromptRunRecord[]): PipelineResult {
-  return { action: "reply", text: draft.reply, language: draft.language, intent: draft.intent, leadFields: draft.leadFields, model, guardsTriggered, promptRuns };
+function replyResult(draft: AgentDraft, model: string, guardsTriggered: string[], promptRuns: PromptRunRecord[], persona: Persona): PipelineResult {
+  return { action: "reply", text: applyPersona(draft.reply, persona), language: draft.language, intent: draft.intent, leadFields: draft.leadFields, model, guardsTriggered, promptRuns };
+}
+
+function languageOffResult(draft: AgentDraft, persona: Persona, promptRuns: PromptRunRecord[]): PipelineResult {
+  const names = persona.languages.map((l) => LANGUAGE_NAMES[l]).join(", ");
+  return handoffResult(`customer wrote in ${LANGUAGE_NAMES[draft.language]}, which this agency has not enabled (it replies in: ${names})`, draft.language, ["language_disabled"], draft, promptRuns);
 }
 
 function handoffResult(reason: string, language: Language, guardsTriggered: string[], draft: AgentDraft | null, promptRuns: PromptRunRecord[]): PipelineResult {
