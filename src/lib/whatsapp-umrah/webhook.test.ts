@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createHmac } from "node:crypto";
-import { extractEchoedStaffMessages, extractInboundTextMessages, verifyMetaSignature } from "./webhook";
+import { extractEchoedStaffMessages, extractFailedDeliveries, extractInboundTextMessages, verifyMetaSignature } from "./webhook";
 
 const REAL_EXAMPLE_PAYLOAD = {
   object: "whatsapp_business_account",
@@ -119,5 +119,26 @@ describe("extractEchoedStaffMessages", () => {
   it("never throws on malformed shapes", () => {
     expect(extractEchoedStaffMessages(null)).toEqual([]);
     expect(extractEchoedStaffMessages({})).toEqual([]);
+  });
+});
+
+describe("extractFailedDeliveries", () => {
+  const statusPayload = (statuses: unknown[]) => ({
+    entry: [{ changes: [{ field: "messages", value: { metadata: { phone_number_id: "555" }, statuses } }] }],
+  });
+
+  it("keeps only failed deliveries, with Meta's error", () => {
+    const out = extractFailedDeliveries(
+      statusPayload([
+        { id: "wamid.1", status: "delivered", recipient_id: "447700900000" },
+        { id: "wamid.2", status: "failed", recipient_id: "447700900000", errors: [{ code: 131042, title: "Business eligibility payment issue" }] },
+      ]),
+    );
+    expect(out).toEqual([{ phoneNumberId: "555", to: "447700900000", waMessageId: "wamid.2", error: "131042 Business eligibility payment issue" }]);
+  });
+  it("says so when a failed status carries no error detail, and ignores unknown shapes", () => {
+    expect(extractFailedDeliveries(statusPayload([{ id: "w", status: "failed" }]))[0]?.error).toBe("message failed");
+    expect(extractFailedDeliveries({ nothing: true })).toEqual([]);
+    expect(extractFailedDeliveries(null)).toEqual([]);
   });
 });

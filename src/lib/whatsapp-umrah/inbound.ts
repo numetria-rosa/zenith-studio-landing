@@ -6,8 +6,9 @@ import { upsertLeadFromDraft, notifyOwnerOfHotLead } from "./leads";
 import { MetaCloudWhatsAppProvider } from "./provider/meta";
 import { withinCap, recordAiReply } from "./entitlements";
 import { isWithinBusinessHours } from "./hours";
+import { trackSend, noteSendFailure } from "./send-failure";
 import type { WhatsAppProvider } from "./provider/types";
-import type { EchoedStaffMessage, InboundTextMessage } from "./webhook";
+import type { EchoedStaffMessage, FailedDelivery, InboundTextMessage } from "./webhook";
 import type { Language } from "./agent/types";
 
 export const META_TOKEN_ENV = "META_ACCESS_TOKEN_ENCRYPTION_KEY";
@@ -29,7 +30,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
 
   const account = await db.waWhatsAppAccount.findFirst({
     where: { phoneNumberId: msg.phoneNumberId, status: "CONNECTED" },
-    select: { agencyId: true, encryptedAccessToken: true },
+    select: { agencyId: true, encryptedAccessToken: true, lastError: true },
   });
   if (!account) return; // number not connected to any agency (or disconnected) - nothing to route this to
 
@@ -93,6 +94,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
         data: { conversationId: conversation.id, agencyId: agency.id, direction: "OUT", sender: "AI", type: "TEXT", waMessageId: sendResult.ok ? sendResult.waMessageId : null, body: awayText, metaBillable: sendResult.ok },
       });
       if (sendResult.ok) await recordAiReply(agency.id);
+      await trackSend(agency.id, account.lastError, sendResult);
     }
     return; // away-message-only mode never runs the pipeline - saves the LLM call entirely, not just skips a reply
   }
@@ -146,6 +148,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
       },
     });
     if (sendResult.ok) await recordAiReply(agency.id);
+    await trackSend(agency.id, account.lastError, sendResult);
   }
 
   if (result.action === "handoff") {
@@ -209,4 +212,12 @@ export async function processEchoedStaffMessage(echo: EchoedStaffMessage): Promi
       db.waHandoff.create({ data: { agencyId: account.agencyId, conversationId: conversation.id, reason: "staff replied via the WhatsApp Business app", triggeredBy: "AUTO" } }),
     ]);
   }
+}
+
+/** Meta reported one of our messages as failed after accepting it (see webhook.ts's extractFailedDeliveries):
+    shows the reason on the agency's dashboard and tells the owner. */
+export async function processFailedDelivery(failure: FailedDelivery): Promise<void> {
+  const account = await db.waWhatsAppAccount.findFirst({ where: { phoneNumberId: failure.phoneNumberId, status: "CONNECTED" }, select: { agencyId: true } });
+  if (!account) return;
+  await noteSendFailure(account.agencyId, failure.error);
 }

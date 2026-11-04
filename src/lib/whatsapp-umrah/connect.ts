@@ -2,10 +2,12 @@ import { db } from "@/lib/db";
 import { encryptSecret } from "@/lib/secrets";
 import { META_TOKEN_ENV } from "@/lib/whatsapp-umrah/inbound";
 import { logWaAuditEvent } from "@/lib/whatsapp-umrah/audit";
+import { subscribeWabaToApp } from "@/lib/whatsapp-umrah/embedded-signup-flow";
+import { syncAgencyLive } from "@/lib/whatsapp-umrah/live";
 
 /* Saving a connected WhatsApp number, shared by the admin manual connect (Zenith HQ) and Embedded Signup.
    Token and PIN are encrypted at rest (CLAUDE.md §7). Connecting is the last onboarding step, so this is
-   also where an agency with a knowledge base and settings goes LIVE (inbound.ts refuses anything else). */
+   also one of the places an agency can go LIVE (see live.ts: inbound.ts refuses anything else). */
 export async function saveWhatsAppConnection(input: {
   agencyId: string;
   wabaId: string;
@@ -17,6 +19,9 @@ export async function saveWhatsAppConnection(input: {
   registrationPin?: string | null;
 }): Promise<void> {
   const { agencyId, wabaId, phoneNumberId, displayPhoneNumber, method } = input;
+  // A pasted-in token never went through Embedded Signup, which is what subscribes our app to the WABA. Without
+  // this call Meta sends no webhooks and the agent never hears a customer, so do it here (and fail loudly).
+  if (method === "MANUAL") await subscribeWabaToApp(wabaId, input.accessToken, fetch);
   const encryptedAccessToken = encryptSecret(input.accessToken, META_TOKEN_ENV);
   const encryptedRegistrationPin = input.registrationPin ? encryptSecret(input.registrationPin, META_TOKEN_ENV) : undefined;
   const isReconnect = await db.waWhatsAppAccount.findUnique({ where: { agencyId }, select: { id: true } });
@@ -28,14 +33,7 @@ export async function saveWhatsAppConnection(input: {
   });
   await db.waManualConnectRequest.updateMany({ where: { agencyId, status: "PENDING" }, data: { status: "RESOLVED", resolvedAt: new Date() } });
 
-  const agency = await db.waAgency.findUnique({
-    where: { id: agencyId },
-    select: { status: true, agentSettings: { select: { id: true } }, kbDocuments: { select: { _count: { select: { chunks: true } } } } },
-  });
-  const kbHasContent = agency?.kbDocuments.some((d) => d._count.chunks > 0) ?? false;
-  if (agency && agency.status !== "LIVE" && kbHasContent && agency.agentSettings) {
-    await db.waAgency.update({ where: { id: agencyId }, data: { status: "LIVE" } });
-  }
+  await syncAgencyLive(agencyId);
   const action = method === "EMBEDDED_SIGNUP" ? "waba_connected_embedded_signup" : isReconnect ? "waba_reconnected" : "waba_connected";
   await logWaAuditEvent(agencyId, input.actorUserId, action, { wabaId, phoneNumberId });
 }

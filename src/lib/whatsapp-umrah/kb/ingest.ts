@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { chunkText } from "./chunk";
 import { embed, toVectorLiteral } from "./voyage";
+import { syncAgencyLive } from "../live";
 
 export type IngestResult = { ok: true; chunkCount: number } | { ok: false; error: string };
 
@@ -34,5 +35,6 @@ export async function ingestDocument(documentId: string): Promise<IngestResult> 
     `;
   }
 
+  await syncAgencyLive(doc.agencyId); // the knowledge base may have been the last missing piece
   return { ok: true, chunkCount: chunks.length };
 }

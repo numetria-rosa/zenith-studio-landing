@@ -110,3 +110,39 @@ export function extractEchoedStaffMessages(payload: unknown): EchoedStaffMessage
   }
   return out;
 }
+
+export type FailedDelivery = { phoneNumberId: string; to: string; waMessageId: string; error: string };
+
+/** Delivery receipts Meta sends back for messages we sent, keeping only the failed ones. A send can be accepted
+    by the API and still fail afterwards (no payment method, undeliverable), and this is the only place that
+    shows up. Shape per developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/reference/
+    messages/status (statuses[].status "failed" with errors[]): not re-read for this change, so check it against
+    a real failed send. Never throws on a shape it doesn't recognise. */
+export function extractFailedDeliveries(payload: unknown): FailedDelivery[] {
+  const out: FailedDelivery[] = [];
+  const entries = (payload as { entry?: unknown[] })?.entry;
+  if (!Array.isArray(entries)) return out;
+  for (const entry of entries) {
+    const changes = (entry as { changes?: unknown[] })?.changes;
+    if (!Array.isArray(changes)) continue;
+    for (const change of changes) {
+      const value = (change as { value?: Record<string, unknown> })?.value;
+      if (!value || (change as { field?: string }).field !== "messages") continue;
+      const phoneNumberId = (value.metadata as { phone_number_id?: string } | undefined)?.phone_number_id;
+      const statuses = value.statuses as Record<string, unknown>[] | undefined;
+      if (!phoneNumberId || !Array.isArray(statuses)) continue;
+      for (const st of statuses) {
+        if (st.status !== "failed") continue;
+        const errors = st.errors as { code?: number; title?: string; message?: string }[] | undefined;
+        const first = errors?.[0];
+        out.push({
+          phoneNumberId,
+          to: String(st.recipient_id ?? ""),
+          waMessageId: String(st.id ?? ""),
+          error: first ? `${first.code ?? ""} ${first.title ?? first.message ?? "message failed"}`.trim() : "message failed",
+        });
+      }
+    }
+  }
+  return out;
+}

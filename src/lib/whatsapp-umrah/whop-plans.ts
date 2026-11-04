@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient, WaPlan } from "@prisma/client";
+import { syncAgencyLive } from "./live";
 
 type Tx = PrismaClient | Prisma.TransactionClient;
 
@@ -30,8 +31,14 @@ export async function provisionWaAgency(
   tx: Tx,
   params: { userId: string; userName: string | null; userEmail: string | null; whopMembershipId: string; whopPlanId: string; plan: WaPlan; foundingOffer: boolean }
 ): Promise<{ isNew: boolean; agencyId: string }> {
-  const existing = await tx.waSubscription.findUnique({ where: { whopMembershipId: params.whopMembershipId }, select: { agencyId: true } });
-  if (existing) return { isNew: false, agencyId: existing.agencyId };
+  const existing = await tx.waSubscription.findUnique({ where: { whopMembershipId: params.whopMembershipId }, select: { agencyId: true, status: true } });
+  if (existing) {
+    // A payment succeeding on a subscription that was past due (or cancelled and re-subscribed) restores it, and
+    // an agency that billing paused goes live again once it is otherwise ready (see live.ts).
+    if (existing.status !== "ACTIVE") await tx.waSubscription.update({ where: { agencyId: existing.agencyId }, data: { status: "ACTIVE" } });
+    await syncAgencyLive(existing.agencyId, tx);
+    return { isNew: false, agencyId: existing.agencyId };
+  }
 
   const baseName = params.userName?.trim() || params.userEmail?.split("@")[0] || "New agency";
   const displayName = `${baseName}'s Travel Agency`;

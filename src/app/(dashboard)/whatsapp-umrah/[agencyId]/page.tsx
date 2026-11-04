@@ -41,6 +41,15 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
         {agency.status === "LIVE" ? "Your AI agent is live." : allDone ? "Everything's set - your agent goes live once your WhatsApp number is connected." : "A few steps left before you're live."}
       </p>
 
+      {agency.whatsapp?.lastError && (
+        <div className={waStyles.card} role="alert" style={{ borderColor: "var(--zc-error-text)", marginBottom: 20 }}>
+          <div className={waStyles.label} style={{ marginBottom: 6, color: "var(--zc-error-text)" }}>
+            WhatsApp replies are not going out
+          </div>
+          <p style={{ fontSize: 14, margin: 0 }}>{agency.whatsapp.lastError}</p>
+        </div>
+      )}
+
       <div className={waStyles.card}>
         {checklist.map((item, i) => (
           <div key={i} className={waStyles.checklistItem}>
@@ -68,7 +77,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
               Request sent {pendingConnectRequest.createdAt.toISOString().slice(0, 10)} - our team will connect your number within 24 hours.
             </p>
           ) : showEmbeddedSignupWidget ? (
-            <EmbeddedSignupButton agencyId={agencyId} appId={metaAppId!} configId={metaConfigId!} />
+            <EmbeddedSignupButton agencyId={agencyId} appId={metaAppId!} configId={metaConfigId!} coexistence={process.env.NEXT_PUBLIC_META_ES_COEXISTENCE !== "false"} />
           ) : (
             <>
               <p style={{ fontSize: 13, color: "var(--zc-muted)", marginBottom: 12 }}>
