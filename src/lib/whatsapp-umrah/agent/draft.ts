@@ -47,6 +47,7 @@ export type DraftInput = {
   customerMessage: string;
   kbContext: string; // formatted "[chunk-id] content" blocks, see pipeline.ts
   conversationHistory: string; // formatted recent turns, may be empty
+  persona?: string; // the agency's style note, see persona.ts
 };
 
 export type DraftResult = { ok: true; draft: AgentDraft; promptTokens?: number; completionTokens?: number; latencyMs: number } | { ok: false; error: string; latencyMs: number };
@@ -74,7 +75,7 @@ async function callGroq(userPrompt: string, model: string): Promise<Response> {
 }
 
 export async function draftReply(input: DraftInput, model = DRAFT_MODEL): Promise<DraftResult> {
-  const userPrompt = `KNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\nRECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}`;
+  const userPrompt = `${input.persona ? `${input.persona}\n\n` : ""}KNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\nRECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}`;
   const startedAt = Date.now();
 
   try {

@@ -8,6 +8,7 @@ import { withinCap, recordAiReply } from "./entitlements";
 import { isWithinBusinessHours } from "./hours";
 import { trackSend, noteSendFailure } from "./send-failure";
 import { alertHandoff, alertWaitingCustomer } from "./handoff-alerts";
+import { resumeIfIdle } from "./handoff";
 import { containsSensitiveData, isOptInMessage, isOptOutMessage } from "./agent/pre-guards";
 import { guessLanguage } from "./agent/language";
 import { HOLDING_MESSAGES, OPT_IN_REPLIES, OPT_OUT_REPLIES, SENSITIVE_DATA_REPLIES, VOICE_NOTE_REPLIES } from "./agent/fixed-replies";
@@ -68,7 +69,7 @@ async function resolveInbound(msg: { phoneNumberId: string; from: string; waMess
       name: true,
       status: true,
       memberships: { where: { role: "OWNER" }, take: 1, select: { user: { select: { email: true } } } },
-      agentSettings: { select: { businessHours: true, awayMode: true, awayMessage: true } },
+      agentSettings: { select: { businessHours: true, awayMode: true, awayMessage: true, autoResumeIdleMinutes: true } },
     },
   });
   if (!agency || agency.status !== "LIVE") return null; // onboarding/paused agencies don't get live replies yet
@@ -147,9 +148,15 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
   }
 
   if (conversation.status === "HUMAN") {
-    // a person already took over - AI stays silent, per spec - but they should hear that the customer is waiting
-    await alertWaitingCustomer({ agencyId: agency.id, conversationId: conversation.id, message: msg.body });
-    return;
+    // A person took over. If the agency set "let the AI take over again after N quiet minutes" and the team has
+    // been quiet that long, the agent answers this message. Otherwise it stays silent, per spec, and the team
+    // hears that the customer is waiting.
+    if (await resumeIfIdle(agency.id, conversation.id, agency.agentSettings?.autoResumeIdleMinutes)) {
+      conversation.status = "AI";
+    } else {
+      await alertWaitingCustomer({ agencyId: agency.id, conversationId: conversation.id, message: msg.body });
+      return;
+    }
   }
 
   if (!(await underReplyLimit(agency, ownerEmail))) return;
