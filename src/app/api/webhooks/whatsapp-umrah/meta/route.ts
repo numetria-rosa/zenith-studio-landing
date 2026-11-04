@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
-import { verifyMetaSignature, extractInboundTextMessages, extractEchoedStaffMessages, extractFailedDeliveries } from "@/lib/whatsapp-umrah/webhook";
-import { processInboundMessage, processEchoedStaffMessage, processFailedDelivery } from "@/lib/whatsapp-umrah/inbound";
+import { verifyMetaSignature, extractInboundTextMessages, extractEchoedStaffMessages, extractFailedDeliveries, extractInboundMediaMessages } from "@/lib/whatsapp-umrah/webhook";
+import { processInboundMessage, processEchoedStaffMessage, processFailedDelivery, processInboundMedia } from "@/lib/whatsapp-umrah/inbound";
 
 /* Meta's WhatsApp Cloud API webhook - verification handshake (GET) and
    inbound events (POST). Shapes confirmed against developers.facebook.com/
@@ -53,6 +53,15 @@ export async function POST(request: NextRequest): Promise<Response> {
       // Meta think the whole POST failed and retry it (re-processing
       // messages that already succeeded) - log and move on.
       console.error("[whatsapp-umrah webhook] failed to process message", msg.waMessageId, err);
+    }
+  }
+
+  // Photos, documents, voice notes: never read, always answered with a fixed message and handed to a person.
+  for (const media of extractInboundMediaMessages(payload)) {
+    try {
+      await processInboundMedia(media);
+    } catch (err) {
+      console.error("[whatsapp-umrah webhook] failed to process media message", media.waMessageId, err);
     }
   }
 

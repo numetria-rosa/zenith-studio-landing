@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createHmac } from "node:crypto";
-import { extractEchoedStaffMessages, extractFailedDeliveries, extractInboundTextMessages, verifyMetaSignature } from "./webhook";
+import { extractEchoedStaffMessages, extractFailedDeliveries, extractInboundMediaMessages, extractInboundTextMessages, verifyMetaSignature } from "./webhook";
 
 const REAL_EXAMPLE_PAYLOAD = {
   object: "whatsapp_business_account",
@@ -140,5 +140,29 @@ describe("extractFailedDeliveries", () => {
     expect(extractFailedDeliveries(statusPayload([{ id: "w", status: "failed" }]))[0]?.error).toBe("message failed");
     expect(extractFailedDeliveries({ nothing: true })).toEqual([]);
     expect(extractFailedDeliveries(null)).toEqual([]);
+  });
+});
+
+describe("extractInboundMediaMessages", () => {
+  const payload = (messages: unknown[]) => ({
+    entry: [{ changes: [{ field: "messages", value: { metadata: { phone_number_id: "555" }, contacts: [{ wa_id: "447700900000", profile: { name: "Sam" } }], messages } }] }],
+  });
+  const m = (type: string, id = "wamid." + type) => ({ type, id, from: "447700900000", timestamp: "1" });
+
+  it("picks out photos, documents, voice notes, locations and shared contacts, by what they need", () => {
+    const out = extractInboundMediaMessages(payload([m("image"), m("document"), m("audio"), m("location"), m("contacts"), m("video")]));
+    expect(out.map((x) => [x.type, x.reply])).toEqual([
+      ["IMAGE", "security"],
+      ["DOCUMENT", "security"],
+      ["AUDIO", "voice"],
+      ["OTHER", "team"],
+      ["OTHER", "team"],
+      ["OTHER", "security"],
+    ]);
+    expect(out[0]).toMatchObject({ phoneNumberId: "555", from: "447700900000", contactName: "Sam" });
+  });
+  it("ignores text, reactions, stickers and anything unknown", () => {
+    expect(extractInboundMediaMessages(payload([m("text"), m("reaction"), m("sticker"), m("button"), m("interactive"), m("unsupported")]))).toEqual([]);
+    expect(extractInboundMediaMessages(null)).toEqual([]);
   });
 });

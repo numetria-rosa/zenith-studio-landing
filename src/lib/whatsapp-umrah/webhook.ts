@@ -146,3 +146,58 @@ export function extractFailedDeliveries(payload: unknown): FailedDelivery[] {
   }
   return out;
 }
+
+export type InboundMediaMessage = {
+  phoneNumberId: string;
+  from: string;
+  waMessageId: string;
+  timestamp: string;
+  contactName: string | null;
+  /** WaMessageType to store: the content itself is never downloaded or kept. */
+  type: "IMAGE" | "DOCUMENT" | "AUDIO" | "OTHER";
+  /** Which fixed reply fits: "security" for anything that could be an ID or document, "voice" for audio,
+      "team" for anything else a person should look at (a location, a shared contact). */
+  reply: "security" | "voice" | "team";
+};
+
+const MEDIA_KINDS: Record<string, Pick<InboundMediaMessage, "type" | "reply">> = {
+  image: { type: "IMAGE", reply: "security" },
+  document: { type: "DOCUMENT", reply: "security" },
+  video: { type: "OTHER", reply: "security" },
+  audio: { type: "AUDIO", reply: "voice" },
+  location: { type: "OTHER", reply: "team" },
+  contacts: { type: "OTHER", reply: "team" },
+};
+
+/** Inbound messages that aren't plain text: photos, documents, videos, voice notes, a shared location or
+    contact. Reactions, stickers, button replies and system messages are skipped on purpose (nothing to answer).
+    A photo may well be a passport page, so these never go near the model or storage: they are logged as a
+    typed message with no body, and the customer gets a fixed reply and a handoff. Message types from memory of
+    Meta's webhook reference (messages[].type), not re-read for this change: check against a real photo and voice note. */
+export function extractInboundMediaMessages(payload: unknown): InboundMediaMessage[] {
+  const out: InboundMediaMessage[] = [];
+  const entries = (payload as { entry?: unknown[] })?.entry;
+  if (!Array.isArray(entries)) return out;
+  for (const entry of entries) {
+    const changes = (entry as { changes?: unknown[] })?.changes;
+    if (!Array.isArray(changes)) continue;
+    for (const change of changes) {
+      const value = (change as { value?: Record<string, unknown> })?.value;
+      if (!value || (change as { field?: string }).field !== "messages") continue;
+      const phoneNumberId = (value.metadata as { phone_number_id?: string } | undefined)?.phone_number_id;
+      const contacts = value.contacts as { profile?: { name?: string }; wa_id?: string }[] | undefined;
+      const messages = value.messages as Record<string, unknown>[] | undefined;
+      if (!phoneNumberId || !Array.isArray(messages)) continue;
+      for (const msg of messages) {
+        const kind = typeof msg.type === "string" ? MEDIA_KINDS[msg.type] : undefined;
+        const from = msg.from as string | undefined;
+        const id = msg.id as string | undefined;
+        const timestamp = msg.timestamp as string | undefined;
+        if (!kind || !from || !id || !timestamp) continue;
+        const contact = contacts?.find((c) => c.wa_id === from);
+        out.push({ phoneNumberId, from, waMessageId: id, timestamp, contactName: contact?.profile?.name ?? null, ...kind });
+      }
+    }
+  }
+  return out;
+}

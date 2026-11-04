@@ -1,6 +1,8 @@
 import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v1";
 import { retrieveKbChunks, type RetrievedChunk } from "../kb/retrieve";
 import { containsSensitiveData, isOptOutMessage } from "./pre-guards";
+import { guessLanguage } from "./language";
+import { HOLDING_MESSAGES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
 import { draftReply, type DraftResult } from "./draft";
 import { escalateDraft } from "./escalate";
 import { runGuards } from "./guards";
@@ -50,20 +52,6 @@ function toPromptRunRecord(stage: "DRAFT" | "ESCALATION", model: string, result:
    WaPromptRun - this module is pure orchestration over already-fetched
    inputs, so the simulator can call it with zero WhatsApp involvement. */
 
-const HOLDING_MESSAGES: Record<Language, string> = {
-  en: "Thanks for your message. Someone from our team will get back to you shortly.",
-  ar: "شكرًا لرسالتك. سيتواصل معك أحد أفراد فريقنا قريبًا.",
-  tr: "Mesajınız için teşekkürler. Ekibimizden biri kısa süre içinde size dönecek.",
-  ur: "آپ کے پیغام کا شکریہ۔ ہماری ٹیم کا کوئی رکن جلد آپ سے رابطہ کرے گا۔",
-};
-
-const SENSITIVE_DATA_REPLIES: Record<Language, string> = {
-  en: "For your security, please don't send documents or card details here. Our team will collect anything needed securely.",
-  ar: "لأمانك، يرجى عدم إرسال المستندات أو تفاصيل البطاقة هنا. سيقوم فريقنا بجمع أي شيء مطلوب بشكل آمن.",
-  tr: "Güvenliğiniz için lütfen buraya belge veya kart bilgisi göndermeyin. Ekibimiz gerekenleri güvenli şekilde toplayacaktır.",
-  ur: "آپ کی حفاظت کے لیے، براہ کرم دستاویزات یا کارڈ کی تفصیلات یہاں نہ بھیجیں۔ ہماری ٹیم محفوظ طریقے سے ضرورت کی چیزیں جمع کرے گی۔",
-};
-
 function formatKbContext(chunks: RetrievedChunk[]): string {
   return chunks.map((c) => `[${c.id}] ${c.content}`).join("\n\n");
 }
@@ -83,13 +71,16 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     return { action: "handoff", reason: "customer opted out", holdingMessage: "", language: fallbackLanguage, intent: null, leadFields: null, guardsTriggered: ["opt_out"], promptRuns: [] };
   }
   if (containsSensitiveData(input.customerMessage)) {
+    // CLAUDE.md 3.1: say the team will collect it securely, and hand off. In the customer's own language, read
+    // from the message itself since the model hasn't run.
+    const language = input.detectedLanguage ?? guessLanguage(input.customerMessage);
     return {
-      action: "reply",
-      text: SENSITIVE_DATA_REPLIES[fallbackLanguage],
-      language: fallbackLanguage,
+      action: "handoff",
+      reason: "customer sent what looks like a passport or card number",
+      holdingMessage: SENSITIVE_DATA_REPLIES[language],
+      language,
       intent: "other",
       leadFields: null,
-      model: "pre-guard",
       guardsTriggered: ["sensitive_data"],
       promptRuns: [],
     };

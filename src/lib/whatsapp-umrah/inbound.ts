@@ -7,8 +7,11 @@ import { MetaCloudWhatsAppProvider } from "./provider/meta";
 import { withinCap, recordAiReply } from "./entitlements";
 import { isWithinBusinessHours } from "./hours";
 import { trackSend, noteSendFailure } from "./send-failure";
+import { containsSensitiveData, isOptInMessage, isOptOutMessage } from "./agent/pre-guards";
+import { guessLanguage } from "./agent/language";
+import { HOLDING_MESSAGES, OPT_IN_REPLIES, OPT_OUT_REPLIES, SENSITIVE_DATA_REPLIES, VOICE_NOTE_REPLIES } from "./agent/fixed-replies";
 import type { WhatsAppProvider } from "./provider/types";
-import type { EchoedStaffMessage, FailedDelivery, InboundTextMessage } from "./webhook";
+import type { EchoedStaffMessage, FailedDelivery, InboundMediaMessage, InboundTextMessage } from "./webhook";
 import type { Language } from "./agent/types";
 
 export const META_TOKEN_ENV = "META_ACCESS_TOKEN_ENCRYPTION_KEY";
@@ -19,20 +22,43 @@ export const META_TOKEN_ENV = "META_ACCESS_TOKEN_ENCRYPTION_KEY";
 const DEFAULT_TIMEZONE = "Europe/London";
 const DEFAULT_AWAY_MESSAGE = "Thanks for your message. We're outside our usual hours right now, but we'll reply as soon as we're back.";
 
-/** One inbound text message, start to finish: dedupe, opt-out, load
-    everything, run the pipeline if the AI should speak, send, store,
-    meter, capture the lead. Separate from the webhook route so it's
-    testable with a MockWhatsAppProvider and doesn't depend on Next.js
-    request/response types - the route is a thin wrapper over this. */
-export async function processInboundMessage(msg: InboundTextMessage, providerOverride?: WhatsAppProvider): Promise<void> {
+type Delivery = { agencyId: string; conversationId: string; phoneNumberId: string; to: string; encryptedAccessToken: string | null; lastError: string | null };
+
+/** Sends one text to the customer, stores it, meters it (every send is a message Meta bills the agency for, so
+    all of them count toward the agency's limit) and reports a failed send. Returns whether it went out. */
+async function deliver(d: Delivery, text: string, providerOverride?: WhatsAppProvider): Promise<boolean> {
+  const accessToken = d.encryptedAccessToken ? decryptSecret(d.encryptedAccessToken, META_TOKEN_ENV) : null;
+  const provider = providerOverride ?? (accessToken ? new MetaCloudWhatsAppProvider(accessToken) : null);
+  if (!provider) return false;
+  const sendResult = await provider.sendText({ phoneNumberId: d.phoneNumberId, to: d.to, body: text });
+  await db.waMessage.create({
+    data: {
+      conversationId: d.conversationId,
+      agencyId: d.agencyId,
+      direction: "OUT",
+      sender: "AI",
+      type: "TEXT",
+      waMessageId: sendResult.ok ? sendResult.waMessageId : null,
+      body: text,
+      metaBillable: sendResult.ok, // billable service-message send from 1 Oct 2026, see CLAUDE.md
+    },
+  });
+  if (sendResult.ok) await recordAiReply(d.agencyId);
+  await trackSend(d.agencyId, d.lastError, sendResult);
+  return sendResult.ok;
+}
+
+/** Everything both text and media messages need before anything is said: dedupe, the connected number, the
+    agency (LIVE only) and the contact. null means "nothing to do". */
+async function resolveInbound(msg: { phoneNumberId: string; from: string; waMessageId: string; contactName: string | null }) {
   const existingMessage = await db.waMessage.findUnique({ where: { waMessageId: msg.waMessageId }, select: { id: true } });
-  if (existingMessage) return; // Meta retries failed/slow-acked webhooks for up to 7 days - dedupe, don't reprocess
+  if (existingMessage) return null; // Meta retries failed/slow-acked webhooks for up to 7 days - dedupe, don't reprocess
 
   const account = await db.waWhatsAppAccount.findFirst({
     where: { phoneNumberId: msg.phoneNumberId, status: "CONNECTED" },
     select: { agencyId: true, encryptedAccessToken: true, lastError: true },
   });
-  if (!account) return; // number not connected to any agency (or disconnected) - nothing to route this to
+  if (!account) return null; // number not connected to any agency (or disconnected) - nothing to route this to
 
   const agency = await db.waAgency.findUnique({
     where: { id: account.agencyId },
@@ -44,7 +70,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
       agentSettings: { select: { businessHours: true, awayMode: true, awayMessage: true } },
     },
   });
-  if (!agency || agency.status !== "LIVE") return; // onboarding/paused agencies don't get live replies yet
+  if (!agency || agency.status !== "LIVE") return null; // onboarding/paused agencies don't get live replies yet
 
   const contact = await db.waContact.upsert({
     where: { agencyId_phone: { agencyId: agency.id, phone: msg.from } },
@@ -52,50 +78,79 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
     create: { agencyId: agency.id, phone: msg.from, name: msg.contactName },
     select: { id: true, optOut: true },
   });
-  if (contact.optOut) return; // never message an opted-out contact, not even a handoff holding message
+  return { account, agency, contact, ownerEmail: agency.memberships[0]?.user.email };
+}
 
+async function openConversation(agencyId: string, contactId: string) {
   let conversation = await db.waConversation.findFirst({
-    where: { agencyId: agency.id, contactId: contact.id, status: { not: "CLOSED" } },
+    where: { agencyId, contactId, status: { not: "CLOSED" } },
     orderBy: { createdAt: "desc" },
     select: { id: true, status: true },
   });
   if (!conversation) {
-    conversation = await db.waConversation.create({
-      data: { agencyId: agency.id, contactId: contact.id, status: "AI", entryPoint: "ORGANIC" },
-      select: { id: true, status: true },
-    });
+    conversation = await db.waConversation.create({ data: { agencyId, contactId, status: "AI", entryPoint: "ORGANIC" }, select: { id: true, status: true } });
   }
   await db.waConversation.update({ where: { id: conversation.id }, data: { lastCustomerMessageAt: new Date() } });
+  return conversation;
+}
 
+/** The agency's reply limit: when it's used up the agent goes quiet (messages are still saved) and the owner is told. */
+async function underReplyLimit(agency: { id: string; name: string }, ownerEmail: string | undefined): Promise<boolean> {
+  const cap = await withinCap(agency.id);
+  if (cap.withinCap) return true;
+  if (ownerEmail) {
+    await sendPlainEmail(ownerEmail, `${agency.name}: monthly AI reply limit reached`, `Your WhatsApp agent has used its ${cap.cap} AI replies for this month${cap.cap < cap.planCap ? " (the limit you set)" : ""}, so it's paused until the new month starts. You can change your limit in Settings. New messages are still saved to your dashboard.`);
+  }
+  return false;
+}
+
+async function handOff(agencyId: string, conversationId: string, reason: string): Promise<void> {
+  await db.waConversation.update({ where: { id: conversationId }, data: { status: "HUMAN" } });
+  await db.waHandoff.create({ data: { agencyId, conversationId, reason, triggeredBy: "AUTO" } });
+}
+
+/** One inbound text message, start to finish: dedupe, opt-out, load
+    everything, run the pipeline if the AI should speak, send, store,
+    meter, capture the lead. Separate from the webhook route so it's
+    testable with a MockWhatsAppProvider and doesn't depend on Next.js
+    request/response types - the route is a thin wrapper over this. */
+export async function processInboundMessage(msg: InboundTextMessage, providerOverride?: WhatsAppProvider): Promise<void> {
+  const ctx = await resolveInbound(msg);
+  if (!ctx) return;
+  const { account, agency, contact, ownerEmail } = ctx;
+  const language = guessLanguage(msg.body);
+
+  // STOP is honoured for good: nothing more is sent to an opted-out contact until they send START.
+  if (contact.optOut) {
+    if (!isOptInMessage(msg.body)) return;
+    await db.waContact.update({ where: { id: contact.id }, data: { optOut: false } });
+    const reopened = await openConversation(agency.id, contact.id);
+    await db.waMessage.create({ data: { conversationId: reopened.id, agencyId: agency.id, direction: "IN", sender: "CUSTOMER", type: "TEXT", waMessageId: msg.waMessageId, body: msg.body } });
+    await deliver({ conversationId: reopened.id, phoneNumberId: msg.phoneNumberId, to: msg.from, ...account }, OPT_IN_REPLIES[language], providerOverride);
+    return;
+  }
+
+  const conversation = await openConversation(agency.id, contact.id);
   await db.waMessage.create({
     data: { conversationId: conversation.id, agencyId: agency.id, direction: "IN", sender: "CUSTOMER", type: "TEXT", waMessageId: msg.waMessageId, body: msg.body },
   });
+  const delivery: Delivery = { conversationId: conversation.id, phoneNumberId: msg.phoneNumberId, to: msg.from, ...account };
+
+  if (isOptOutMessage(msg.body)) {
+    await db.waContact.update({ where: { id: contact.id }, data: { optOut: true } });
+    await deliver(delivery, OPT_OUT_REPLIES[language], providerOverride);
+    await db.waConversation.update({ where: { id: conversation.id }, data: { status: "CLOSED" } });
+    return;
+  }
 
   if (conversation.status === "HUMAN") return; // a person already took over - AI stays silent, per spec
 
-  const ownerEmail = agency.memberships[0]?.user.email;
-  const cap = await withinCap(agency.id);
-  if (!cap.withinCap) {
-    if (ownerEmail) {
-      await sendPlainEmail(ownerEmail, `${agency.name}: monthly AI reply limit reached`, `Your WhatsApp agent has used its ${cap.cap} AI replies for this month${cap.cap < cap.planCap ? " (the limit you set)" : ""}, so it's paused until the new month starts. You can change your limit in Settings. New messages are still saved to your dashboard.`);
-    }
-    return;
-  }
+  if (!(await underReplyLimit(agency, ownerEmail))) return;
 
   const settings = agency.agentSettings;
   const outsideHours = !isWithinBusinessHours(settings?.businessHours ?? null, DEFAULT_TIMEZONE);
   if (outsideHours && settings?.awayMode === "AWAY_MESSAGE_ONLY") {
-    const awayText = settings.awayMessage?.trim() || DEFAULT_AWAY_MESSAGE;
-    const accessToken = account.encryptedAccessToken ? decryptSecret(account.encryptedAccessToken, META_TOKEN_ENV) : null;
-    const provider = providerOverride ?? (accessToken ? new MetaCloudWhatsAppProvider(accessToken) : null);
-    if (provider) {
-      const sendResult = await provider.sendText({ phoneNumberId: msg.phoneNumberId, to: msg.from, body: awayText });
-      await db.waMessage.create({
-        data: { conversationId: conversation.id, agencyId: agency.id, direction: "OUT", sender: "AI", type: "TEXT", waMessageId: sendResult.ok ? sendResult.waMessageId : null, body: awayText, metaBillable: sendResult.ok },
-      });
-      if (sendResult.ok) await recordAiReply(agency.id);
-      await trackSend(agency.id, account.lastError, sendResult);
-    }
+    await deliver(delivery, settings.awayMessage?.trim() || DEFAULT_AWAY_MESSAGE, providerOverride);
     return; // away-message-only mode never runs the pipeline - saves the LLM call entirely, not just skips a reply
   }
 
@@ -107,7 +162,11 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
   });
   const conversationHistory = history
     .reverse()
-    .map((m) => `${m.sender === "CUSTOMER" ? "Customer" : "AI"}: ${m.body ?? ""}`)
+    .map((m) => {
+      // A passport or card number a customer sent earlier stays out of every later model call.
+      const text = m.sender === "CUSTOMER" && m.body && containsSensitiveData(m.body) ? "[details withheld for security]" : (m.body ?? "");
+      return `${m.sender === "CUSTOMER" ? "Customer" : "AI"}: ${text}`;
+    })
     .join("\n");
 
   const result = await runAgentPipeline({ agencyId: agency.id, customerMessage: msg.body, conversationHistory });
@@ -129,32 +188,9 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
     });
   }
 
-  const accessToken = account.encryptedAccessToken ? decryptSecret(account.encryptedAccessToken, META_TOKEN_ENV) : null;
-  const provider = providerOverride ?? (accessToken ? new MetaCloudWhatsAppProvider(accessToken) : null);
   const outboundText = result.action === "reply" ? result.text : result.holdingMessage;
-
-  if (outboundText && provider) {
-    const sendResult = await provider.sendText({ phoneNumberId: msg.phoneNumberId, to: msg.from, body: outboundText });
-    await db.waMessage.create({
-      data: {
-        conversationId: conversation.id,
-        agencyId: agency.id,
-        direction: "OUT",
-        sender: "AI",
-        type: "TEXT",
-        waMessageId: sendResult.ok ? sendResult.waMessageId : null,
-        body: outboundText,
-        metaBillable: sendResult.ok, // billable service-message send from 1 Oct 2026, see CLAUDE.md
-      },
-    });
-    if (sendResult.ok) await recordAiReply(agency.id);
-    await trackSend(agency.id, account.lastError, sendResult);
-  }
-
-  if (result.action === "handoff") {
-    await db.waConversation.update({ where: { id: conversation.id }, data: { status: "HUMAN" } });
-    await db.waHandoff.create({ data: { agencyId: agency.id, conversationId: conversation.id, reason: result.reason, triggeredBy: "AUTO" } });
-  }
+  if (outboundText) await deliver(delivery, outboundText, providerOverride);
+  if (result.action === "handoff") await handOff(agency.id, conversation.id, result.reason);
 
   // Lead capture runs on a handoff too, not only a normal reply - a
   // customer who states their budget/dates/travellers and then gets
@@ -177,6 +213,31 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
       leadSummary: `Language: ${result.language as Language}`,
     });
   }
+}
+
+/** A photo, document, video, voice note or shared location/contact. The content is never downloaded or kept
+    (a photo may be a passport page): the message is logged by type only, the customer gets a fixed reply in
+    the language of their last text message, and a person takes over. CLAUDE.md 3.1: "If a customer sends
+    them anyway, the reply says the team will collect documents securely, and hands off." */
+export async function processInboundMedia(msg: InboundMediaMessage, providerOverride?: WhatsAppProvider): Promise<void> {
+  const ctx = await resolveInbound(msg);
+  if (!ctx || ctx.contact.optOut) return;
+  const { account, agency, contact, ownerEmail } = ctx;
+
+  const conversation = await openConversation(agency.id, contact.id);
+  await db.waMessage.create({
+    data: { conversationId: conversation.id, agencyId: agency.id, direction: "IN", sender: "CUSTOMER", type: msg.type, waMessageId: msg.waMessageId, body: null },
+  });
+  if (conversation.status === "HUMAN") return; // a person already has this chat
+  if (!(await underReplyLimit(agency, ownerEmail))) return;
+
+  const lastText = await db.waMessage.findFirst({ where: { conversationId: conversation.id, direction: "IN", type: "TEXT" }, orderBy: { createdAt: "desc" }, select: { body: true } });
+  const language = guessLanguage(lastText?.body ?? "");
+  const replies = msg.reply === "security" ? SENSITIVE_DATA_REPLIES : msg.reply === "voice" ? VOICE_NOTE_REPLIES : HOLDING_MESSAGES;
+  const reason = msg.reply === "security" ? "customer sent a photo, document or video" : msg.reply === "voice" ? "customer sent a voice note" : "customer shared a location or contact";
+
+  await deliver({ conversationId: conversation.id, phoneNumberId: msg.phoneNumberId, to: msg.from, ...account }, replies[language], providerOverride);
+  await handOff(agency.id, conversation.id, reason);
 }
 
 /** A staff member replied to a customer from the agency's own WhatsApp
