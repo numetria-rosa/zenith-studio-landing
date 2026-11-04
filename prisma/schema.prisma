@@ -1953,6 +1953,7 @@ model WaConversation {
   entryPoint            WaEntryPoint         @default(ORGANIC)
   lastCustomerMessageAt DateTime?
   aiPausedUntil         DateTime? // auto-resume timer, when autoResumeIdleMinutes is set
+  humanAlertedAt        DateTime? // when the team was last emailed that this chat needs a person (handoff-alerts.ts)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -7,6 +7,7 @@ import { MetaCloudWhatsAppProvider } from "./provider/meta";
 import { withinCap, recordAiReply } from "./entitlements";
 import { isWithinBusinessHours } from "./hours";
 import { trackSend, noteSendFailure } from "./send-failure";
+import { alertHandoff, alertWaitingCustomer } from "./handoff-alerts";
 import { containsSensitiveData, isOptInMessage, isOptOutMessage } from "./agent/pre-guards";
 import { guessLanguage } from "./agent/language";
 import { HOLDING_MESSAGES, OPT_IN_REPLIES, OPT_OUT_REPLIES, SENSITIVE_DATA_REPLIES, VOICE_NOTE_REPLIES } from "./agent/fixed-replies";
@@ -104,9 +105,11 @@ async function underReplyLimit(agency: { id: string; name: string }, ownerEmail:
   return false;
 }
 
-async function handOff(agencyId: string, conversationId: string, reason: string): Promise<void> {
+/** Hands the chat to a person and tells the team by email (customerMessage null = not plain text). */
+async function handOff(agencyId: string, conversationId: string, reason: string, customerMessage: string | null): Promise<void> {
   await db.waConversation.update({ where: { id: conversationId }, data: { status: "HUMAN" } });
   await db.waHandoff.create({ data: { agencyId, conversationId, reason, triggeredBy: "AUTO" } });
+  await alertHandoff({ agencyId, conversationId, reason, message: customerMessage });
 }
 
 /** One inbound text message, start to finish: dedupe, opt-out, load
@@ -143,7 +146,11 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
     return;
   }
 
-  if (conversation.status === "HUMAN") return; // a person already took over - AI stays silent, per spec
+  if (conversation.status === "HUMAN") {
+    // a person already took over - AI stays silent, per spec - but they should hear that the customer is waiting
+    await alertWaitingCustomer({ agencyId: agency.id, conversationId: conversation.id, message: msg.body });
+    return;
+  }
 
   if (!(await underReplyLimit(agency, ownerEmail))) return;
 
@@ -190,7 +197,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
 
   const outboundText = result.action === "reply" ? result.text : result.holdingMessage;
   if (outboundText) await deliver(delivery, outboundText, providerOverride);
-  if (result.action === "handoff") await handOff(agency.id, conversation.id, result.reason);
+  if (result.action === "handoff") await handOff(agency.id, conversation.id, result.reason, msg.body);
 
   // Lead capture runs on a handoff too, not only a normal reply - a
   // customer who states their budget/dates/travellers and then gets
@@ -228,7 +235,10 @@ export async function processInboundMedia(msg: InboundMediaMessage, providerOver
   await db.waMessage.create({
     data: { conversationId: conversation.id, agencyId: agency.id, direction: "IN", sender: "CUSTOMER", type: msg.type, waMessageId: msg.waMessageId, body: null },
   });
-  if (conversation.status === "HUMAN") return; // a person already has this chat
+  if (conversation.status === "HUMAN") {
+    await alertWaitingCustomer({ agencyId: agency.id, conversationId: conversation.id, message: null });
+    return; // a person already has this chat
+  }
   if (!(await underReplyLimit(agency, ownerEmail))) return;
 
   const lastText = await db.waMessage.findFirst({ where: { conversationId: conversation.id, direction: "IN", type: "TEXT" }, orderBy: { createdAt: "desc" }, select: { body: true } });
@@ -237,7 +247,7 @@ export async function processInboundMedia(msg: InboundMediaMessage, providerOver
   const reason = msg.reply === "security" ? "customer sent a photo, document or video" : msg.reply === "voice" ? "customer sent a voice note" : "customer shared a location or contact";
 
   await deliver({ conversationId: conversation.id, phoneNumberId: msg.phoneNumberId, to: msg.from, ...account }, replies[language], providerOverride);
-  await handOff(agency.id, conversation.id, reason);
+  await handOff(agency.id, conversation.id, reason, null);
 }
 
 /** A staff member replied to a customer from the agency's own WhatsApp
