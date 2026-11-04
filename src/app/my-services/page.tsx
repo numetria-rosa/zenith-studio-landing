@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getUserEntitlements } from "@/lib/entitlements";
@@ -11,8 +12,8 @@ import { signOutAction } from "@/app/account/actions";
 
 export const metadata: Metadata = { title: "Your services", robots: { index: false, follow: false } };
 
-const sans = Geist({ subsets: ["latin"], weight: ["400", "500", "600"] });
-const mono = Geist_Mono({ subsets: ["latin"], weight: ["400", "500"] });
+const sans = GeistSans;
+const mono = GeistMono;
 
 /* The client home: one card per service they bought, each opening that service's own dashboard. Courses are
    for students and live in the separate student space (/account); a client who also studies gets one link

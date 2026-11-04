@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { db } from "@/lib/db";
 import { tryDecryptPassword } from "@/lib/password";
 import { createSessionForUser } from "@/lib/session";
@@ -12,8 +13,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const sans = Geist({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
-const mono = Geist_Mono({ subsets: ["latin"], weight: ["400", "500"] });
+const sans = GeistSans;
+const mono = GeistMono;
 
 const ERRORS: Record<string, string> = {
   invalid_password: "That email and password don't match.",

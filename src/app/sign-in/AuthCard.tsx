@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Geist } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import { BrandMark } from "@/components/site/BrandMark";
 
-const sans = Geist({ subsets: ["latin"], weight: ["400", "500", "600"] });
+const sans = GeistSans;
 
 /* Shared shell for the forgot / reset password pages. */
 export const field =
