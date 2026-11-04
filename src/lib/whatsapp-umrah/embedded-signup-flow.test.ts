@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { finishEmbeddedSignup, parseSignupMessage } from "./embedded-signup-flow";
+import { finishEmbeddedSignup, parseSignupMessage, subscribeWabaToApp } from "./embedded-signup-flow";
 
 type Call = { url: string; method: string; body?: unknown; auth?: string | null };
 
@@ -28,7 +28,7 @@ describe("finishEmbeddedSignup", () => {
     ]);
     const r = await finishEmbeddedSignup({ code: "CODE", wabaId: "999", phoneNumberId: "555", event: "FINISH" }, { ...base, fetch: fn });
 
-    expect(r).toEqual({ accessToken: "BIZ_TOKEN", displayPhoneNumber: "+44 20 7946 0000", registered: true });
+    expect(r).toEqual({ accessToken: "BIZ_TOKEN", phoneNumberId: "555", displayPhoneNumber: "+44 20 7946 0000", registered: true, syncErrors: [] });
     const exchange = new URL(calls[0]!.url);
     expect(exchange.pathname).toMatch(/\/oauth\/access_token$/);
     expect(Object.fromEntries(exchange.searchParams)).toEqual({ client_id: "111", client_secret: "shh", code: "CODE" });
@@ -39,15 +39,48 @@ describe("finishEmbeddedSignup", () => {
     expect(calls[3]!.url).toMatch(/\/555\?fields=display_phone_number/);
   });
 
-  it("does not register a WhatsApp Business app number (coexistence): it is already registered", async () => {
+  it("does not register a WhatsApp Business app number (coexistence), and asks for its contacts then history sync", async () => {
     const { fn, calls } = scriptedFetch([
       { json: { access_token: "BIZ_TOKEN" } },
       { json: { success: true } },
       { json: { display_phone_number: "+44 7700 900000" } },
+      { json: { messaging_product: "whatsapp", request_id: "r1" } },
+      { json: { messaging_product: "whatsapp", request_id: "r2" } },
     ]);
     const r = await finishEmbeddedSignup({ code: "C", wabaId: "999", phoneNumberId: "555", event: "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING" }, { ...base, fetch: fn });
     expect(r.registered).toBe(false);
+    expect(r.syncErrors).toEqual([]);
     expect(calls.map((c) => c.url).some((u) => u.endsWith("/register"))).toBe(false);
+    expect(calls[3]).toMatchObject({ method: "POST", body: { messaging_product: "whatsapp", sync_type: "smb_app_state_sync" } });
+    expect(calls[3]!.url).toMatch(/\/555\/smb_app_data$/);
+    expect(calls[4]).toMatchObject({ method: "POST", body: { messaging_product: "whatsapp", sync_type: "history" } });
+  });
+
+  it("finds the number itself when a coexistence signup reports only the WABA", async () => {
+    const { fn, calls } = scriptedFetch([
+      { json: { access_token: "BIZ_TOKEN" } },
+      { json: { success: true } },
+      { json: { data: [{ id: "777" }] } },
+      { json: { display_phone_number: "+44 7700 900001" } },
+      { json: { request_id: "r1" } },
+      { json: { request_id: "r2" } },
+    ]);
+    const r = await finishEmbeddedSignup({ code: "C", wabaId: "999", phoneNumberId: null, event: "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING" }, { ...base, fetch: fn });
+    expect(r.phoneNumberId).toBe("777");
+    expect(calls[2]!.url).toMatch(/\/999\/phone_numbers\?fields=id$/);
+  });
+
+  it("keeps a working connection when a coexistence sync request fails, and reports it", async () => {
+    const { fn } = scriptedFetch([
+      { json: { access_token: "BIZ_TOKEN" } },
+      { json: { success: true } },
+      { json: { display_phone_number: "+44 7700 900000" } },
+      { status: 400, json: { error: { message: "sync already requested" } } },
+      { json: { request_id: "r2" } },
+    ]);
+    const r = await finishEmbeddedSignup({ code: "C", wabaId: "999", phoneNumberId: "555", event: "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING" }, { ...base, fetch: fn });
+    expect(r.syncErrors).toEqual(["smb_app_state_sync: sync already requested"]);
+    expect(r.phoneNumberId).toBe("555");
   });
 
   it("names the step that failed, and never leaks the app secret in the error", async () => {
@@ -91,5 +124,23 @@ describe("parseSignupMessage", () => {
       kind: "cancel",
       reason: "Number in use",
     });
+  });
+});
+
+describe("subscribeWabaToApp", () => {
+  it("subscribes the app to the WABA with the given token", async () => {
+    const { fn, calls } = scriptedFetch([{ json: { success: true } }]);
+    await subscribeWabaToApp("999", "TOKEN", fn);
+    expect(calls[0]).toMatchObject({ method: "POST", auth: "Bearer TOKEN" });
+    expect(calls[0]!.url).toMatch(/\/999\/subscribed_apps$/);
+  });
+  it("fails loudly when Meta refuses, so a manual connect doesn't look finished with no webhooks", async () => {
+    const { fn } = scriptedFetch([{ status: 403, json: { error: { message: "Insufficient permission" } } }]);
+    await expect(subscribeWabaToApp("999", "TOKEN", fn)).rejects.toThrow(/subscription failed: Insufficient permission/i);
+  });
+  it("refuses a WABA id that is not numeric, before calling anything", async () => {
+    const { fn, calls } = scriptedFetch([]);
+    await expect(subscribeWabaToApp("../x", "TOKEN", fn)).rejects.toThrow(/invalid/i);
+    expect(calls).toHaveLength(0);
   });
 });

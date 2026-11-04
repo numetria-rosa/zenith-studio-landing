@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
-import { verifyMetaSignature, extractInboundTextMessages, extractEchoedStaffMessages } from "@/lib/whatsapp-umrah/webhook";
-import { processInboundMessage, processEchoedStaffMessage } from "@/lib/whatsapp-umrah/inbound";
+import { verifyMetaSignature, extractInboundTextMessages, extractEchoedStaffMessages, extractFailedDeliveries } from "@/lib/whatsapp-umrah/webhook";
+import { processInboundMessage, processEchoedStaffMessage, processFailedDelivery } from "@/lib/whatsapp-umrah/inbound";
 
 /* Meta's WhatsApp Cloud API webhook - verification handshake (GET) and
    inbound events (POST). Shapes confirmed against developers.facebook.com/
@@ -64,6 +64,15 @@ export async function POST(request: NextRequest): Promise<Response> {
       await processEchoedStaffMessage(echo);
     } catch (err) {
       console.error("[whatsapp-umrah webhook] failed to process staff echo", echo.waMessageId, err);
+    }
+  }
+
+  // Messages we sent that Meta later reports as failed (e.g. no payment method on the agency's account).
+  for (const failure of extractFailedDeliveries(payload)) {
+    try {
+      await processFailedDelivery(failure);
+    } catch (err) {
+      console.error("[whatsapp-umrah webhook] failed to process delivery failure", failure.waMessageId, err);
     }
   }
 

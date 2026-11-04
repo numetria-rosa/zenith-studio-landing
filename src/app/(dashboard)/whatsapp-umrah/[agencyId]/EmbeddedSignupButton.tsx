@@ -7,7 +7,7 @@ import waStyles from "./waConsole.module.css";
 
 /* Meta's Embedded Signup popup (v4), per developers.facebook.com/documentation/business-messaging/whatsapp/
    embedded-signup/implementation and .../versions (read 2026-10-19): load the JS SDK, FB.login with our
-   Facebook Login for Business configuration, response_type "code", and an empty extras object (v4 is chosen
+   Facebook Login for Business configuration, response_type "code", and the extras below (v4 is chosen
    by the configuration itself). The popup posts the WABA and phone number ids to this window; FB.login's
    callback gives a code that expires in 30 seconds. Once both are in, the server finishes the connection. */
 
@@ -24,7 +24,7 @@ declare global {
 
 const SDK_SRC = "https://connect.facebook.net/en_US/sdk.js";
 
-export function EmbeddedSignupButton({ agencyId, appId, configId }: { agencyId: string; appId: string; configId: string }) {
+export function EmbeddedSignupButton({ agencyId, appId, configId, coexistence }: { agencyId: string; appId: string; configId: string; coexistence: boolean }) {
   const [ready, setReady] = useState(false);
   const [status, setStatus] = useState<{ tone: "info" | "ok" | "bad"; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -95,7 +95,15 @@ export function EmbeddedSignupButton({ agencyId, appId, configId }: { agencyId: 
         code.current = c;
         void submitIfReady();
       },
-      { config_id: configId, response_type: "code", override_default_response_type: true, extras: {} },
+      {
+        config_id: configId,
+        response_type: "code",
+        override_default_response_type: true,
+        // Coexistence (an agency keeps using its WhatsApp Business app while we answer through the API) is what
+        // makes "the AI pauses when a person replies" work: featureType per developers.facebook.com/documentation/
+        // business-messaging/whatsapp/embedded-signup/onboarding-business-app-users (read 2026-11-04).
+        extras: coexistence ? { setup: {}, featureType: "whatsapp_business_app_onboarding", sessionInfoVersion: "3" } : { setup: {} },
+      },
     );
   }
 

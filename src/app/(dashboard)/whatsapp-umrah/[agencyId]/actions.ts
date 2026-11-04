@@ -319,13 +319,14 @@ export async function completeEmbeddedSignupAction(
     await saveWhatsAppConnection({
       agencyId: agency.id,
       wabaId: String(input.wabaId),
-      phoneNumberId: String(input.phoneNumberId),
+      phoneNumberId: result.phoneNumberId,
       displayPhoneNumber: result.displayPhoneNumber,
       accessToken: result.accessToken,
       method: "EMBEDDED_SIGNUP",
       actorUserId: userId,
       registrationPin: result.registered ? pin : null,
     });
+    if (result.syncErrors.length > 0) await logWaAuditEvent(agency.id, userId, "coexistence_sync_failed", { errors: result.syncErrors });
     revalidatePath(`/whatsapp-umrah/${agencyId}`);
     return { ok: true, displayPhoneNumber: result.displayPhoneNumber };
   } catch (err) {
