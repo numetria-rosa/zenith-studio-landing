@@ -38,3 +38,23 @@ export const OPT_IN_REPLIES: Record<Language, string> = {
   tr: "Tekrar hoş geldiniz. Bu asistandan yeniden yanıt alacaksınız. Size nasıl yardımcı olabiliriz?",
   ur: "خوش آمدید۔ آپ کو اس اسسٹنٹ کی طرف سے دوبارہ جوابات ملیں گے۔ ہم آپ کی کیا مدد کر سکتے ہیں؟",
 };
+
+/** Turned down politely, in the customer's language, and the chat stays with the agent (Meta bans open-ended
+    assistants on the platform, CLAUDE.md section 2, so this is a refusal, not a handoff). */
+export const OFF_TOPIC_REPLIES: Record<Language, string> = {
+  en: "I can only help with our Umrah and Hajj packages and your booking. Is there anything about your trip I can help with?",
+  ar: "يمكنني المساعدة فقط في باقات العمرة والحج الخاصة بنا وحجزك. هل هناك شيء يخص رحلتك يمكنني مساعدتك به؟",
+  tr: "Yalnızca Umre ve Hac paketlerimiz ve rezervasyonunuzla ilgili yardımcı olabilirim. Yolculuğunuzla ilgili yardımcı olabileceğim bir şey var mı?",
+  ur: "میں صرف ہمارے عمرہ اور حج کے پیکجز اور آپ کی بکنگ میں مدد کر سکتا ہوں۔ کیا آپ کے سفر کے بارے میں کوئی ایسی بات ہے جس میں میں مدد کر سکوں؟",
+};
+
+/** "Are you a real person or a bot?" Never claims to be human (CLAUDE.md 3.1), and offers a person. */
+export function identityReply(language: Language, agentName: string, agencyName: string): string {
+  const text: Record<Language, string> = {
+    en: `I'm ${agentName}, ${agencyName}'s virtual assistant. I can answer questions about our packages, and a member of our team can step in whenever you'd like.`,
+    ar: `أنا ${agentName}، المساعد الافتراضي لـ ${agencyName}. يمكنني الإجابة عن أسئلتك حول باقاتنا، ويمكن لأحد أفراد فريقنا التدخل متى أردت.`,
+    tr: `Ben ${agentName}, ${agencyName} sanal asistanıyım. Paketlerimizle ilgili sorularınızı yanıtlayabilirim; dilerseniz ekibimizden biri de devreye girebilir.`,
+    ur: `میں ${agentName} ہوں، ${agencyName} کا ورچوئل اسسٹنٹ۔ میں ہمارے پیکجز کے بارے میں آپ کے سوالات کے جواب دے سکتا ہوں، اور آپ چاہیں تو ہماری ٹیم کا کوئی رکن بھی بات کر سکتا ہے۔`,
+  };
+  return text[language];
+}

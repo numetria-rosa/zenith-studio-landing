@@ -51,3 +51,12 @@ export function containsSensitiveData(text: string): boolean {
     return digits.length >= 13 && digits.length <= 19 && passesLuhn(digits);
   });
 }
+
+/** "Am I talking to a real person or a bot?" / "are you AI" / "is this a robot". English only: other languages
+    reach the model, which has an identity_question intent for them. It needs the question form straight away
+    ("are you a ..."), so "can I speak to a real person" and "are you able to put me through to a person" stay
+    requests for a person. */
+const IDENTITY_QUESTION = /\b(?:are you|r u|is this|am i (?:talking|speaking|chatting|texting|messaging) (?:to|with))\s+(?:(?:a|an|the|really|actually)\s+)*(?:real\s+|actual\s+|live\s+)?(?:person|human|bot|robot|chatbot|ai|machine)\b/i;
+export function isIdentityQuestion(text: string): boolean {
+  return IDENTITY_QUESTION.test(text);
+}

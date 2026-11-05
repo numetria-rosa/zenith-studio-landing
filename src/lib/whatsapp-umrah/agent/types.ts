@@ -22,6 +22,7 @@ export const INTENTS = [
   "emergency",
   "off_topic",
   "person_request",
+  "identity_question",
   "other",
 ] as const;
 export type Intent = (typeof INTENTS)[number];

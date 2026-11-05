@@ -8,7 +8,7 @@ vi.mock("./draft", () => ({
 }));
 vi.mock("./escalate", () => ({ escalateDraft: async () => ({ ok: false, error: "the model must not run", latencyMs: 0 }) }));
 import { runAgentPipeline } from "./pipeline";
-import { SENSITIVE_DATA_REPLIES } from "./fixed-replies";
+import { identityReply, OFF_TOPIC_REPLIES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
 
 describe("a message carrying a passport or card number", () => {
   it("hands off with the secure-documents message, without running the model", async () => {
@@ -38,5 +38,59 @@ describe("the agency's settings reach the reply", () => {
     const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "merhaba" });
     expect(r).toMatchObject({ action: "handoff", language: "tr", guardsTriggered: ["language_disabled"] });
     expect(r.action === "handoff" && r.reason).toMatch(/Turkish.*not enabled/);
+  });
+});
+
+describe("messages answered with fixed text instead of a handoff", () => {
+  const draft = (over: Record<string, unknown> = {}) => ({ reply: "x", language: "en", intent: "other", leadFields: null, handoffReason: null, confidence: 0.9, kbIdsUsed: [], ...over });
+  const settings = { agentName: "Sara", tone: "WARM", emojiEnabled: true, signOff: null, languagesEnabled: ["en", "ar", "tr", "ur"] };
+
+  it("an off-topic request gets a polite refusal and stays with the agent", async () => {
+    model.draft = draft({ intent: "off_topic", reply: "Here is a poem about the sea..." });
+    model.settings = settings;
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "write me a poem" });
+    expect(r).toMatchObject({ action: "reply", text: OFF_TOPIC_REPLIES.en, guardsTriggered: ["off_topic"] });
+    expect(r.action === "reply" && r.text).not.toMatch(/poem/i);
+  });
+
+  it("the refusal is in the customer's language", async () => {
+    model.draft = draft({ intent: "off_topic", language: "ar" });
+    model.settings = settings;
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "اكتب لي قصيدة" });
+    expect(r).toMatchObject({ action: "reply", text: OFF_TOPIC_REPLIES.ar });
+  });
+
+  it("'are you a bot?' is answered without the model, by name, and never claims to be human", async () => {
+    model.draft = null; // the model must not even be called
+    model.settings = settings;
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "Wait, am I talking to a real person or a bot?" });
+    expect(r).toMatchObject({ action: "reply", text: identityReply("en", "Sara", "Al Noor Travel"), guardsTriggered: ["identity_question"] });
+    expect(r.action === "reply" && r.text).toMatch(/virtual assistant/);
+  });
+
+  it("an identity question in another language is caught by the model's intent", async () => {
+    model.draft = draft({ intent: "identity_question", language: "tr" });
+    model.settings = settings;
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "Sen bir robot musun?" });
+    expect(r).toMatchObject({ action: "reply", language: "tr", text: identityReply("tr", "Sara", "Al Noor Travel") });
+  });
+});
+
+describe("why a chat was handed over, in plain words", () => {
+  const settings = { agentName: "Sara", tone: "WARM", emojiEnabled: true, signOff: null, languagesEnabled: ["en"] };
+  const draft = (over: Record<string, unknown>) => ({ reply: "x", language: "en", intent: "other", leadFields: null, handoffReason: null, confidence: 0.9, kbIdsUsed: [], ...over });
+
+  it("says the customer asked for a person, not an internal guard message", async () => {
+    model.draft = draft({ intent: "person_request" });
+    model.settings = settings;
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "can I speak to someone?" });
+    expect(r.action === "handoff" && r.reason).toBe("the customer asked to speak to a person");
+  });
+
+  it("never puts a raw provider error in the reason", async () => {
+    model.draft = null; // draft step fails with "the model must not run"
+    model.settings = settings;
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "how much is Hajj?" });
+    expect(r.action === "handoff" && r.reason).toBe("the assistant had a technical problem and couldn't answer");
   });
 });
