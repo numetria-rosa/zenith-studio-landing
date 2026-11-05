@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency, getAnalyticsSummary } from "@/lib/whatsapp-umrah/dashboard-data";
-import { AMBER, Card, CYAN, EMBER, Label, LEAD_STATUSES, MINT, PageHeader, STATUS, Tile, VIOLET, cx } from "@/components/wa/ui";
+import { Card, Label, PageHeader, Tile } from "@/components/wa/ui";
+import { AMBER, CYAN, EMBER, LEAD_STATUSES, MINT, STATUS, VIOLET, cx } from "@/components/wa/tokens";
 import { WaIcon, type WaIconName } from "@/components/wa/Icon";
 import { replyTime } from "@/components/wa/format";
 

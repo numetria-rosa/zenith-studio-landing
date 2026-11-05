@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { WaIcon, type WaIconName } from "@/components/wa/Icon";
 import { ConfirmAction } from "@/components/wa/ConfirmDialog";
-import { AMBER, Card, CYAN, FieldLabel, GhostButton, GlassButton, Hint, Input, Label, MINT, Pill, PrimaryButton, Segmented, Tile, Toggle, VIOLET, cx } from "@/components/wa/ui";
+import { Card, FieldLabel, GhostButton, GlassButton, Hint, Input, Label, Pill, PrimaryButton, Segmented, Tile, Toggle } from "@/components/wa/ui";
+import { AMBER, CYAN, MINT, VIOLET, cx } from "@/components/wa/tokens";
 import { updateAgentSettingsAction } from "../actions";
 
 const DAYS = [["mon", "Monday"], ["tue", "Tuesday"], ["wed", "Wednesday"], ["thu", "Thursday"], ["fri", "Friday"], ["sat", "Saturday"], ["sun", "Sunday"]] as const;

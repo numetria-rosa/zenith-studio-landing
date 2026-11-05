@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { WaIcon, type WaIconName } from "@/components/wa/Icon";
-import { cx } from "@/components/wa/ui";
+import { cx } from "@/components/wa/tokens";
 
 const NAV: { href: string; label: string; icon: WaIconName }[] = [
   { href: "", label: "Overview", icon: "home" },

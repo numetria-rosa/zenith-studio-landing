@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { WaIcon } from "@/components/wa/Icon";
-import { Card, Input, Label, LEAD_STATUSES, PopoverMenu, STATUS, Tile, cx, type LeadStatus } from "@/components/wa/ui";
+import { Card, Input, Label, PopoverMenu, Tile } from "@/components/wa/ui";
+import { LEAD_STATUSES, STATUS, cx, type LeadStatus } from "@/components/wa/tokens";
 import { initialOf } from "@/components/wa/format";
 import { setLeadStatusAction } from "../actions";
 
