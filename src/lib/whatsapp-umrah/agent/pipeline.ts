@@ -1,9 +1,10 @@
-import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v1";
+import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v2";
 import { retrieveKbChunks, type RetrievedChunk } from "../kb/retrieve";
-import { containsSensitiveData, isOptOutMessage } from "./pre-guards";
+import { containsSensitiveData, isIdentityQuestion, isOptOutMessage } from "./pre-guards";
+import { plainHandoffReason, TECHNICAL_PROBLEM_REASON } from "./reasons";
 import { guessLanguage } from "./language";
 import { applyPersona, LANGUAGE_NAMES, loadPersona, personaPrompt, replyLanguageAllowed, type Persona } from "./persona";
-import { HOLDING_MESSAGES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
+import { HOLDING_MESSAGES, identityReply, OFF_TOPIC_REPLIES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
 import { draftReply, type DraftResult } from "./draft";
 import { escalateDraft } from "./escalate";
 import { runGuards } from "./guards";
@@ -87,21 +88,32 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     };
   }
 
+  const persona = await loadPersona(input.agencyId);
+  if (isIdentityQuestion(input.customerMessage)) {
+    const language = input.detectedLanguage ?? guessLanguage(input.customerMessage);
+    return fixedReplyResult(identityReply(language, persona.agentName, persona.agencyName), language, "identity_question", "identity_question", persona, []);
+  }
+
   const retrieval = await retrieveKbChunks(input.agencyId, input.customerMessage);
   const kbContext = retrieval.ok ? formatKbContext(retrieval.chunks) : "";
-  const persona = await loadPersona(input.agencyId);
   const draftInput = { customerMessage: input.customerMessage, kbContext, conversationHistory: input.conversationHistory ?? "", persona: personaPrompt(persona) };
   const promptRuns: PromptRunRecord[] = [];
 
   const first = await draftReply(draftInput);
   if (!first.ok) {
     promptRuns.push(toPromptRunRecord("DRAFT", GROQ_MODEL(), first, ["draft_error"]));
-    return handoffResult("draft failed: " + first.error, fallbackLanguage, ["draft_error"], null, promptRuns);
+    console.error("[whatsapp-umrah pipeline] draft failed:", first.error); // the detail is for us; the owner gets a plain reason
+    return handoffResult(TECHNICAL_PROBLEM_REASON, fallbackLanguage, ["draft_error"], null, promptRuns);
   }
   const firstFailures = runGuards(first.draft, kbContext);
   promptRuns.push(toPromptRunRecord("DRAFT", GROQ_MODEL(), first, guardNames(firstFailures)));
   // A language the agency has switched off goes to a person (no retry: a second draft would be in the same language).
   if (!replyLanguageAllowed(first.draft.language, persona)) return languageOffResult(first.draft, persona, promptRuns);
+  // Two kinds of message are answered by fixed text, not by what the model wrote: "are you a bot?" (never claim to
+  // be human) and anything off-topic (a polite refusal, because Meta bans open-ended chat). Neither hands off.
+  const lang = first.draft.language;
+  if (first.draft.intent === "identity_question") return fixedReplyResult(identityReply(lang, persona.agentName, persona.agencyName), lang, "identity_question", "identity_question", persona, promptRuns);
+  if (first.draft.intent === "off_topic") return fixedReplyResult(OFF_TOPIC_REPLIES[lang], lang, "off_topic", "off_topic", persona, promptRuns);
   if (firstFailures.length === 0) {
     return replyResult(first.draft, "groq:" + GROQ_MODEL(), [], promptRuns, persona);
   }
@@ -113,7 +125,8 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     // failed a guard (e.g. a booking request that correctly hands off but
     // still stated the customer's budget/dates) - see leads.ts on why
     // this must not be thrown away.
-    return handoffResult("escalation failed: " + escalated.error, first.draft.language, guardNames(firstFailures), first.draft, promptRuns);
+    console.error("[whatsapp-umrah pipeline] escalation failed:", escalated.error);
+    return handoffResult(plainHandoffReason(first.draft, firstFailures), first.draft.language, guardNames(firstFailures), first.draft, promptRuns);
   }
   const secondFailures = runGuards(escalated.draft, kbContext);
   promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures)));
@@ -122,7 +135,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   }
 
   return handoffResult(
-    escalated.draft.handoffReason || secondFailures.map((f) => f.detail).join("; "),
+    plainHandoffReason(escalated.draft, secondFailures),
     escalated.draft.language,
     [...guardNames(firstFailures), ...guardNames(secondFailures)],
     escalated.draft,
@@ -136,6 +149,10 @@ function guardNames(failures: GuardFailure[]): string[] {
 
 function replyResult(draft: AgentDraft, model: string, guardsTriggered: string[], promptRuns: PromptRunRecord[], persona: Persona): PipelineResult {
   return { action: "reply", text: applyPersona(draft.reply, persona), language: draft.language, intent: draft.intent, leadFields: draft.leadFields, model, guardsTriggered, promptRuns };
+}
+
+function fixedReplyResult(text: string, language: Language, intent: "identity_question" | "off_topic", guard: string, persona: Persona, promptRuns: PromptRunRecord[]): PipelineResult {
+  return { action: "reply", text: applyPersona(text, persona), language, intent, leadFields: null, model: "fixed", guardsTriggered: [guard], promptRuns };
 }
 
 function languageOffResult(draft: AgentDraft, persona: Persona, promptRuns: PromptRunRecord[]): PipelineResult {

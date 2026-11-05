@@ -1,4 +1,4 @@
-import { DRAFT_SYSTEM_PROMPT_V1 } from "../../../../prompts/whatsapp-umrah/draft-system-v1";
+import { DRAFT_SYSTEM_PROMPT_V2 } from "../../../../prompts/whatsapp-umrah/draft-system-v2";
 import { INTENTS, LANGUAGES, type AgentDraft, type GuardFailure } from "./types";
 import type { DraftInput, DraftResult } from "./draft";
 
@@ -63,7 +63,7 @@ export async function escalateDraft(input: DraftInput, previousFailures: GuardFa
       body: JSON.stringify({
         model: ESCALATION_MODEL,
         max_tokens: 800,
-        system: DRAFT_SYSTEM_PROMPT_V1,
+        system: DRAFT_SYSTEM_PROMPT_V2,
         tools: [AGENT_DRAFT_TOOL],
         tool_choice: { type: "tool", name: "agent_draft" },
         messages: [{ role: "user", content: userPrompt }],

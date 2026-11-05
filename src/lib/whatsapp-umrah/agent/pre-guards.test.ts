@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { containsSensitiveData, isOptInMessage, isOptOutMessage } from "./pre-guards";
+import { containsSensitiveData, isIdentityQuestion, isOptInMessage, isOptOutMessage } from "./pre-guards";
 import { guessLanguage } from "./language";
 
 describe("isOptOutMessage", () => {
@@ -51,5 +51,14 @@ describe("containsSensitiveData", () => {
   it("does not flag an ordinary short question", () => {
     expect(containsSensitiveData("how much for 2 travellers in March?")).toBe(false);
     expect(containsSensitiveData("my number is 07700900000")).toBe(false); // 11 digits, below the 13-digit card threshold
+  });
+});
+
+describe("isIdentityQuestion", () => {
+  it("catches the usual ways of asking whether it's a bot", () => {
+    for (const t of ["Wait, am I talking to a real person or a bot?", "are you a bot", "Are you human?", "is this a robot", "are you AI?", "Am I speaking with a person?"]) expect(isIdentityQuestion(t)).toBe(true);
+  });
+  it("does not treat a request for a person as an identity question", () => {
+    for (const t of ["Can I speak to a real person?", "I want to talk to a human", "are you able to put me through to a person?", "how much is the 7 night package?"]) expect(isIdentityQuestion(t)).toBe(false);
   });
 });

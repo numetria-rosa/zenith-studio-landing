@@ -1,4 +1,4 @@
-import { DRAFT_SYSTEM_PROMPT_V1 } from "../../../../prompts/whatsapp-umrah/draft-system-v1";
+import { DRAFT_SYSTEM_PROMPT_V2 } from "../../../../prompts/whatsapp-umrah/draft-system-v2";
 import { INTENTS, LANGUAGES, type AgentDraft } from "./types";
 
 /* Draft step: Groq, strict JSON schema mode (constrained decoding - the
@@ -65,7 +65,7 @@ async function callGroq(userPrompt: string, model: string): Promise<Response> {
     body: JSON.stringify({
       model,
       messages: [
-        { role: "system", content: DRAFT_SYSTEM_PROMPT_V1 },
+        { role: "system", content: DRAFT_SYSTEM_PROMPT_V2 },
         { role: "user", content: userPrompt },
       ],
       temperature: 0.3,
