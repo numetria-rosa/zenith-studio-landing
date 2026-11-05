@@ -85,12 +85,19 @@ export async function alertWaitingCustomer(args: { agencyId: string; conversatio
   }
 }
 
-/** How many chats are waiting on a person right now: handed over, and the customer spoke last. For the dashboard. */
+/** A chat is waiting on a person when it has been handed over and nobody on the team has replied since the
+    customer last wrote. (The agent's own "someone will get back to you" does not count as a reply.) */
+export function isWaitingOnPerson(chat: { status: string; lastCustomerMessageAt: Date | null; lastHumanReplyAt: Date | null }): boolean {
+  if (chat.status !== "HUMAN" || !chat.lastCustomerMessageAt) return false;
+  return !chat.lastHumanReplyAt || chat.lastHumanReplyAt < chat.lastCustomerMessageAt;
+}
+
+/** How many chats are waiting on a person right now. For the dashboard's Overview card and Inbox badge. */
 export async function countWaitingConversations(agencyId: string): Promise<number> {
   const chats = await db.waConversation.findMany({
     where: { agencyId, status: "HUMAN" },
     take: 100,
-    select: { messages: { orderBy: { createdAt: "desc" }, take: 1, select: { direction: true } } },
+    select: { status: true, lastCustomerMessageAt: true, messages: { where: { direction: "OUT", sender: "HUMAN" }, orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } } },
   });
-  return chats.filter((c) => c.messages[0]?.direction === "IN").length;
+  return chats.filter((c) => isWaitingOnPerson({ status: c.status, lastCustomerMessageAt: c.lastCustomerMessageAt, lastHumanReplyAt: c.messages[0]?.createdAt ?? null })).length;
 }

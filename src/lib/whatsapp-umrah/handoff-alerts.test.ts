@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/db", () => ({ db: {} }));
 vi.mock("@/lib/outreach-mail", () => ({ sendPlainEmail: vi.fn() }));
-import { describeCustomerMessage, handoffEmail, REPEAT_ALERT_MINUTES, shouldAlertAgain } from "./handoff-alerts";
+import { describeCustomerMessage, handoffEmail, isWaitingOnPerson, REPEAT_ALERT_MINUTES, shouldAlertAgain } from "./handoff-alerts";
 
 const t = (iso: string) => new Date(iso);
 
@@ -53,5 +53,21 @@ describe("handoffEmail", () => {
     const { subject, text } = handoffEmail({ ...base, reason: null, repeat: true });
     expect(subject).toBe("Al Noor Travel: Sam is still waiting for a reply");
     expect(text).not.toContain("Why:");
+  });
+});
+
+describe("isWaitingOnPerson", () => {
+  const customerAt = t("2026-11-05T10:00:00Z");
+  it("is waiting once a chat is handed over, even though the agent's own holding message came last", () => {
+    expect(isWaitingOnPerson({ status: "HUMAN", lastCustomerMessageAt: customerAt, lastHumanReplyAt: null })).toBe(true);
+  });
+  it("stops waiting once someone on the team replies after the customer's last message", () => {
+    expect(isWaitingOnPerson({ status: "HUMAN", lastCustomerMessageAt: customerAt, lastHumanReplyAt: t("2026-11-05T10:05:00Z") })).toBe(false);
+  });
+  it("waits again when the customer writes after the team's reply", () => {
+    expect(isWaitingOnPerson({ status: "HUMAN", lastCustomerMessageAt: t("2026-11-05T10:30:00Z"), lastHumanReplyAt: t("2026-11-05T10:05:00Z") })).toBe(true);
+  });
+  it("is never waiting while the agent is handling the chat", () => {
+    expect(isWaitingOnPerson({ status: "AI", lastCustomerMessageAt: customerAt, lastHumanReplyAt: null })).toBe(false);
   });
 });

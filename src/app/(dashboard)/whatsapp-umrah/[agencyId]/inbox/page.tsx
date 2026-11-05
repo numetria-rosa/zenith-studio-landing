@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { getOwnedAgency, listConversations, getConversationThread } from "@/lib/whatsapp-umrah/dashboard-data";
 import { takeOverConversationAction, resumeAiAction, sendHumanReplyAction, deleteContactAction } from "../actions";
 import { DeleteContactButton } from "./DeleteContactButton";
+import { isWaitingOnPerson } from "@/lib/whatsapp-umrah/handoff-alerts";
 import waStyles from "../waConsole.module.css";
 
 export default async function InboxPage({ params, searchParams }: { params: Promise<{ agencyId: string }>; searchParams: Promise<{ c?: string }> }) {
@@ -36,7 +37,7 @@ export default async function InboxPage({ params, searchParams }: { params: Prom
               <div className={waStyles.convName}>{c.contact.name || c.contact.phone}</div>
               <div className={waStyles.convMeta}>
                 <span className={`${waStyles.badge} ${c.status === "HUMAN" ? waStyles.badgeHuman : waStyles.badgeAi}`}>{c.status === "HUMAN" ? "Human" : "AI"}</span>{" "}
-                {c.status === "HUMAN" && c.messages[0]?.direction === "IN" && <span className={`${waStyles.badge} ${waStyles.badgeHuman}`}>Needs reply</span>}{" "}
+                {isWaitingOnPerson({ status: c.status, lastCustomerMessageAt: c.lastCustomerMessageAt, lastHumanReplyAt: c.messages[0]?.createdAt ?? null }) && <span className={`${waStyles.badge} ${waStyles.badgeHuman}`}>Needs reply</span>}{" "}
                 {c._count.messages} message{c._count.messages === 1 ? "" : "s"}
               </div>
             </Link>
