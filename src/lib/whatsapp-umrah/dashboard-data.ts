@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { db } from "@/lib/db";
+import { isWithinBusinessHours } from "./hours";
 
 /* Client-facing dashboard data access. Same IDOR-safe pattern as
    src/lib/service-workspace.ts's getOwnedServiceProject: every query is
@@ -30,12 +31,26 @@ export async function getUsageSummary(agencyId: string) {
 }
 
 export async function listConversations(agencyId: string) {
-  return db.waConversation.findMany({
+  const conversations = await db.waConversation.findMany({
     where: { agencyId },
     orderBy: { updatedAt: "desc" },
     take: 50,
-    include: { contact: { select: { name: true, phone: true } }, _count: { select: { messages: true } }, messages: { where: { direction: "OUT", sender: "HUMAN" }, orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } } },
+    include: {
+      contact: { select: { name: true, phone: true, language: true } },
+      _count: { select: { messages: true } },
+      messages: { where: { direction: "OUT", sender: "HUMAN" }, orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } },
+      leads: { orderBy: { createdAt: "desc" }, take: 1, select: { status: true } },
+    },
   });
+  // The newest message of each chat (either side), for the list preview.
+  const latest = await db.waMessage.findMany({
+    where: { agencyId, conversationId: { in: conversations.map((c) => c.id) } },
+    orderBy: [{ conversationId: "asc" }, { createdAt: "desc" }],
+    distinct: ["conversationId"],
+    select: { conversationId: true, body: true, createdAt: true },
+  });
+  const byConversation = new Map(latest.map((m) => [m.conversationId, m]));
+  return conversations.map((c) => ({ ...c, lastMessage: byConversation.get(c.id) ?? null }));
 }
 
 export async function getConversationThread(agencyId: string, conversationId: string) {
@@ -44,7 +59,8 @@ export async function getConversationThread(agencyId: string, conversationId: st
     include: {
       contact: true,
       messages: { orderBy: { createdAt: "asc" } },
-      handoffs: { orderBy: { startedAt: "desc" }, take: 1 },
+      handoffs: { orderBy: { startedAt: "asc" } }, // all of them: each is a divider in the chat when control changes
+      leads: { orderBy: { createdAt: "desc" }, take: 1 },
     },
   });
 }
@@ -58,21 +74,27 @@ export async function listLeads(agencyId: string, status?: string) {
   });
 }
 
-/** Everything the analytics page shows, in one pass over the last 30
-    days - conversations, leads, hot leads, handoff rate, average time to
-    first AI reply, and this month's usage against the plan cap. */
-export async function getAnalyticsSummary(agencyId: string) {
-  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+const DAY_MS = 24 * 60 * 60 * 1000;
+const TZ = "Europe/London"; // same assumption as hours.ts: agencies are UK-based for now
 
-  const [conversationCount, leadCounts, handoffCount, totalConversations, capData] = await Promise.all([
-    db.waConversation.count({ where: { agencyId, createdAt: { gte: since } } }),
+/** Everything the analytics page shows for the last `days` days (and the same length before, for the "vs previous"
+    figures). Handoff rate counts conversations that had at least one handoff, not handoff events, so it can never pass 100%. */
+export async function getAnalyticsSummary(agencyId: string, days = 30) {
+  const now = Date.now();
+  const since = new Date(now - days * DAY_MS);
+  const prevSince = new Date(now - 2 * days * DAY_MS);
+
+  const [conversations, prevConversations, leadCounts, prevHot, handedOff, capData, contacts] = await Promise.all([
+    db.waConversation.findMany({ where: { agencyId, createdAt: { gte: since } }, select: { createdAt: true } }),
+    db.waConversation.count({ where: { agencyId, createdAt: { gte: prevSince, lt: since } } }),
     db.waLead.groupBy({ by: ["status"], where: { agencyId, createdAt: { gte: since } }, _count: true }),
-    db.waHandoff.count({ where: { agencyId, startedAt: { gte: since } } }),
-    db.waConversation.count({ where: { agencyId, createdAt: { gte: since } } }),
+    db.waLead.count({ where: { agencyId, status: "HOT", createdAt: { gte: prevSince, lt: since } } }),
+    db.waHandoff.findMany({ where: { agencyId, startedAt: { gte: since } }, distinct: ["conversationId"], select: { conversationId: true } }),
     (async () => {
       const { withinCap } = await import("./entitlements");
       return withinCap(agencyId);
     })(),
+    db.waContact.groupBy({ by: ["language"], where: { agencyId, createdAt: { gte: since } }, _count: true }),
   ]);
 
   const firstReplyGaps = await db.$queryRaw<{ avg_seconds: number | null }[]>`
@@ -85,13 +107,40 @@ export async function getAnalyticsSummary(agencyId: string) {
     ) first_out ON true
     WHERE c."agencyId" = ${agencyId} AND c."createdAt" >= ${since}
   `;
+  const inbound = await db.waMessage.findMany({ where: { agencyId, direction: "IN", createdAt: { gte: since } }, select: { createdAt: true } });
 
+  // Conversations per day, oldest first, zero-filled.
+  const dayKey = (d: Date) => d.toLocaleDateString("en-CA", { timeZone: TZ });
+  const perDayMap = new Map<string, number>();
+  for (let i = days - 1; i >= 0; i--) perDayMap.set(dayKey(new Date(now - i * DAY_MS)), 0);
+  for (const c of conversations) perDayMap.set(dayKey(c.createdAt), (perDayMap.get(dayKey(c.createdAt)) ?? 0) + 1);
+
+  // Customer messages by hour of day, in agency time.
+  const hourly = Array.from({ length: 24 }, () => 0);
+  for (const m of inbound) hourly[Number(new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour: "2-digit", hour12: false }).format(m.createdAt)) % 24]++;
+
+  // Share of customer messages that arrived outside the agency's office hours (null when it is open 24/7).
+  const hoursSettings = await db.waAgentSettings.findUnique({ where: { agencyId }, select: { businessHours: true } });
+  const outsideHoursPct = hoursSettings?.businessHours && inbound.length > 0 ? Math.round((inbound.filter((m) => !isWithinBusinessHours(hoursSettings.businessHours, TZ, m.createdAt)).length / inbound.length) * 100) : null;
+
+  const languageTotal = contacts.reduce((sum, c) => sum + c._count, 0);
+  const languages = Object.fromEntries(["en", "ar", "tr", "ur"].map((code) => [code, languageTotal ? Math.round(((contacts.find((c) => (c.language ?? "en") === code)?._count ?? 0) / languageTotal) * 100) : 0]));
+
+  const hot = leadCounts.find((l) => l.status === "HOT")?._count ?? 0;
   return {
-    conversations: conversationCount,
-    leadsByStatus: Object.fromEntries(leadCounts.map((l) => [l.status, l._count])),
-    hotLeads: leadCounts.find((l) => l.status === "HOT")?._count ?? 0,
-    handoffRate: totalConversations > 0 ? handoffCount / totalConversations : 0,
+    days,
+    conversations: conversations.length,
+    conversationsDelta: conversations.length - prevConversations,
+    leadsByStatus: Object.fromEntries(leadCounts.map((l) => [l.status, l._count])) as Record<string, number>,
+    hotLeads: hot,
+    hotLeadsDelta: hot - prevHot,
+    handoffRate: conversations.length > 0 ? Math.min(1, handedOff.length / conversations.length) : 0,
     avgFirstReplySeconds: firstReplyGaps[0]?.avg_seconds ?? null,
+    perDay: [...perDayMap].map(([date, count]) => ({ date, count })),
+    hourly,
+    outsideHoursPct,
+    languages,
+    languageTotal,
     usage: capData,
   };
 }

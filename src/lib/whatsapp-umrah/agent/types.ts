@@ -83,8 +83,11 @@ export type PromptRunRecord = {
   error?: string;
 };
 
+/** A knowledge-base item a reply was drawn from (shown in the simulator as "Answered from ..."). */
+export type KbSource = { kind: string; title: string };
+
 export type PipelineResult =
-  | { action: "reply"; text: string; language: Language; intent: Intent; leadFields: LeadFields | null; model: string; guardsTriggered: string[]; promptRuns: PromptRunRecord[] }
+  | { action: "reply"; text: string; language: Language; intent: Intent; leadFields: LeadFields | null; model: string; guardsTriggered: string[]; promptRuns: PromptRunRecord[]; sources: KbSource[] }
   | {
       action: "handoff";
       reason: string;

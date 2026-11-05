@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { parseSignupMessage, type SignupMessage } from "@/lib/whatsapp-umrah/embedded-signup-flow";
 import { completeEmbeddedSignupAction } from "./actions";
-import waStyles from "./waConsole.module.css";
+import { PrimaryButton } from "@/components/wa/ui";
 
 /* Meta's Embedded Signup popup (v4), per developers.facebook.com/documentation/business-messaging/whatsapp/
    embedded-signup/implementation and .../versions (read 2026-10-19): load the JS SDK, FB.login with our
@@ -107,24 +107,18 @@ export function EmbeddedSignupButton({ agencyId, appId, configId, coexistence }:
     );
   }
 
-  const tone = status?.tone === "ok" ? "var(--zc-done)" : status?.tone === "bad" ? "var(--zc-error-text)" : "var(--zc-muted)";
+  const tone = status?.tone === "ok" ? "text-mint-text" : status?.tone === "bad" ? "text-ember-text" : "text-mist";
   return (
     <div>
-      <p style={{ fontSize: 13, color: "var(--zc-muted)", marginBottom: 12 }}>
+      <p className="mb-4 mt-0 text-[14px] leading-[1.55] text-mist">
         Log in with the Facebook account that manages your business, choose or create your WhatsApp Business account, and add the number your customers message. It
         takes about five minutes. After that, add a payment method in WhatsApp Manager: Meta bills WhatsApp messages to you directly.
       </p>
-      <button
-        type="button"
-        onClick={launch}
-        disabled={!ready || busy}
-        className={waStyles.badgeAi}
-        style={{ padding: "11px 20px", fontSize: 14, border: "1px solid var(--zc-done)", minHeight: 44, cursor: ready && !busy ? "pointer" : "not-allowed", opacity: ready && !busy ? 1 : 0.6 }}
-      >
+      <PrimaryButton onClick={launch} disabled={!ready || busy}>
         {busy ? "Waiting for Meta..." : "Connect with Meta"}
-      </button>
+      </PrimaryButton>
       {status && (
-        <p role="status" style={{ fontSize: 13, marginTop: 10, color: tone }}>
+        <p role="status" className={`mb-0 mt-3 text-[13px] ${tone}`}>
           {status.text}
         </p>
       )}

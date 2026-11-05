@@ -1,11 +1,15 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency, listConversations, getConversationThread } from "@/lib/whatsapp-umrah/dashboard-data";
 import { takeOverConversationAction, resumeAiAction, sendHumanReplyAction, deleteContactAction } from "../actions";
-import { DeleteContactButton } from "./DeleteContactButton";
 import { isWaitingOnPerson } from "@/lib/whatsapp-umrah/handoff-alerts";
-import waStyles from "../waConsole.module.css";
+import { guessLanguage } from "@/lib/whatsapp-umrah/agent/language";
+import { LANGUAGE_NAMES } from "@/lib/whatsapp-umrah/agent/persona";
+import { PageHeader } from "@/components/wa/ui";
+import { shortTime } from "@/components/wa/format";
+import { InboxView, type ListItem, type ThreadView, type TimelineItem } from "./InboxView";
+
+const hhmm = (d: Date) => d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 
 export default async function InboxPage({ params, searchParams }: { params: Promise<{ agencyId: string }>; searchParams: Promise<{ c?: string }> }) {
   const session = await auth();
@@ -14,81 +18,73 @@ export default async function InboxPage({ params, searchParams }: { params: Prom
   const { c: selectedId } = await searchParams;
   const agency = await getOwnedAgency(agencyId, session.user.id);
   if (!agency) notFound();
+  const agentName = agency.agentSettings?.agentName ?? "Your agent";
 
   const conversations = await listConversations(agencyId);
-  const activeId = selectedId || conversations[0]?.id;
+  const activeId = selectedId || conversations[0]?.id || null;
   const thread = activeId ? await getConversationThread(agencyId, activeId) : null;
 
-  const takeOver = activeId ? takeOverConversationAction.bind(null, agencyId, activeId) : null;
-  const resume = activeId ? resumeAiAction.bind(null, agencyId, activeId) : null;
-  const sendReply = activeId ? sendHumanReplyAction.bind(null, agencyId, activeId) : null;
-  const deleteContact = thread ? deleteContactAction.bind(null, agencyId, thread.contactId) : null;
+  const list: ListItem[] = conversations.map((c) => ({
+    id: c.id,
+    name: c.contact.name || c.contact.phone,
+    phone: c.contact.phone,
+    preview: c.lastMessage?.body ?? "",
+    time: c.lastMessage ? shortTime(c.lastMessage.createdAt) : "",
+    status: c.status,
+    waiting: isWaitingOnPerson({ status: c.status, lastCustomerMessageAt: c.lastCustomerMessageAt, lastHumanReplyAt: c.messages[0]?.createdAt ?? null }),
+    leadStatus: c.leads[0]?.status ?? null,
+  }));
+
+  let view: ThreadView | null = null;
+  if (thread) {
+    // The chat is the messages in order, with a divider wherever control changed hands.
+    const events = thread.handoffs.flatMap((h) => [
+      { at: h.startedAt, label: `${h.triggeredBy === "MANUAL" ? "YOUR TEAM TOOK OVER" : `${agentName.toUpperCase()} HANDED THIS TO YOUR TEAM`} · ${hhmm(h.startedAt)}`, id: `${h.id}-start` },
+      ...(h.resolvedAt ? [{ at: h.resolvedAt, label: `${agentName.toUpperCase()} IS BACK ON THIS CHAT · ${hhmm(h.resolvedAt)}`, id: `${h.id}-end` }] : []),
+    ]);
+    const entries = [
+      ...thread.messages.map((m) => ({ at: m.createdAt, item: { kind: "msg", id: m.id, who: m.sender === "CUSTOMER" ? "customer" : m.sender === "HUMAN" ? "team" : "ai", body: m.body ?? "", time: hhmm(m.createdAt) } as TimelineItem })),
+      ...events.map((e) => ({ at: e.at, item: { kind: "divider", id: e.id, label: e.label } as TimelineItem })),
+    ].sort((a, b) => a.at.getTime() - b.at.getTime());
+    const first = thread.messages[0]?.createdAt;
+    const items: TimelineItem[] = [...(first ? [{ kind: "divider", id: "day", label: first.toDateString() === new Date().toDateString() ? "TODAY" : first.toLocaleDateString("en-GB", { day: "numeric", month: "long" }).toUpperCase() } as TimelineItem] : []), ...entries.map((e) => e.item)];
+    const lead = thread.leads[0];
+    const languages = [...new Set(thread.messages.filter((m) => m.sender === "CUSTOMER" && m.body).map((m) => LANGUAGE_NAMES[guessLanguage(m.body!)]))].join(", ");
+    view = {
+      id: thread.id,
+      contactId: thread.contactId,
+      name: thread.contact.name || thread.contact.phone,
+      phone: thread.contact.phone,
+      status: thread.status,
+      messageCount: thread.messages.length,
+      items,
+      lead: lead ? { status: lead.status, travelDates: lead.travelDates, travelers: lead.travelers, budgetGbp: lead.budgetGbp, packagePreference: lead.packagePreference } : null,
+      languages: languages || "English",
+      exportHref: `/api/whatsapp-umrah/${agencyId}/contacts/${thread.contactId}/export`,
+    };
+  }
 
   return (
     <div>
-      <h1 className={waStyles.pageTitle}>Inbox</h1>
-      <p className={waStyles.pageDesc}>Every conversation, live. Take over any chat, or let the AI keep going.</p>
-
-      <div className={waStyles.twoCol}>
-        <div className={waStyles.convList}>
-          {conversations.length === 0 && <p style={{ color: "var(--zc-muted)", fontSize: 14 }}>No conversations yet.</p>}
-          {conversations.map((c) => (
-            <Link key={c.id} href={`/whatsapp-umrah/${agencyId}/inbox?c=${c.id}`} className={`${waStyles.convItem} ${c.id === activeId ? waStyles.convItemActive : ""}`}>
-              <div className={waStyles.convName}>{c.contact.name || c.contact.phone}</div>
-              <div className={waStyles.convMeta}>
-                <span className={`${waStyles.badge} ${c.status === "HUMAN" ? waStyles.badgeHuman : waStyles.badgeAi}`}>{c.status === "HUMAN" ? "Human" : "AI"}</span>{" "}
-                {isWaitingOnPerson({ status: c.status, lastCustomerMessageAt: c.lastCustomerMessageAt, lastHumanReplyAt: c.messages[0]?.createdAt ?? null }) && <span className={`${waStyles.badge} ${waStyles.badgeHuman}`}>Needs reply</span>}{" "}
-                {c._count.messages} message{c._count.messages === 1 ? "" : "s"}
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {thread ? (
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 16 }}>{thread.contact.name || thread.contact.phone}</div>
-                <span className={`${waStyles.badge} ${thread.status === "HUMAN" ? waStyles.badgeHuman : waStyles.badgeAi}`}>{thread.status === "HUMAN" ? "Human is handling this" : "AI is replying"}</span>
-              </div>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <a href={`/api/whatsapp-umrah/${agencyId}/contacts/${thread.contactId}/export`} style={{ fontSize: 12, color: "var(--zc-muted)" }}>
-                  Export data
-                </a>
-                <DeleteContactButton action={deleteContact!} />
-                <form action={thread.status === "HUMAN" ? resume! : takeOver!}>
-                  <button type="submit" className={waStyles.badgeAi} style={{ padding: "8px 16px", border: "1px solid var(--zc-done)" }}>
-                    {thread.status === "HUMAN" ? "Resume AI" : "Take over"}
-                  </button>
-                </form>
-              </div>
-            </div>
-
-            <div className={waStyles.chatWrap} style={{ height: "55vh" }}>
-              <div className={waStyles.chatMessages}>
-                {thread.messages.map((m) => (
-                  <div key={m.id} className={`${waStyles.bubble} ${m.direction === "IN" ? waStyles.bubbleUser : waStyles.bubbleAi}`}>
-                    {m.body}
-                    <div className={waStyles.bubbleMeta}>
-                      {m.sender === "CUSTOMER" ? "Customer" : m.sender === "HUMAN" ? "You" : "AI"} · {m.createdAt.toISOString().slice(11, 16)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {thread.status === "HUMAN" && (
-                <form action={sendReply!} className={waStyles.chatComposer}>
-                  <input name="body" className={waStyles.input} placeholder="Type your reply…" required />
-                  <button type="submit" className={waStyles.badgeAi} style={{ padding: "0 18px", border: "1px solid var(--zc-done)", flexShrink: 0 }}>
-                    Send
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-        ) : (
-          <p style={{ color: "var(--zc-muted)", fontSize: 14 }}>Select a conversation.</p>
-        )}
-      </div>
+      <PageHeader title="Inbox" subtitle={`Every conversation, live. Take over any chat, or let ${agentName} keep going.`} />
+      <InboxView
+        agencyId={agencyId}
+        agencyName={agency.name}
+        agentName={agentName}
+        list={list}
+        activeId={activeId}
+        thread={view}
+        actions={
+          activeId && thread
+            ? {
+                takeOver: takeOverConversationAction.bind(null, agencyId, activeId),
+                resume: resumeAiAction.bind(null, agencyId, activeId),
+                send: sendHumanReplyAction.bind(null, agencyId, activeId),
+                deleteContact: deleteContactAction.bind(null, agencyId, thread.contactId),
+              }
+            : null
+        }
+      />
     </div>
   );
 }

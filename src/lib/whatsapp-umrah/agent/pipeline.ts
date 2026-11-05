@@ -8,7 +8,8 @@ import { HOLDING_MESSAGES, identityReply, OFF_TOPIC_REPLIES, SENSITIVE_DATA_REPL
 import { draftReply, type DraftResult } from "./draft";
 import { escalateDraft } from "./escalate";
 import { runGuards } from "./guards";
-import type { AgentDraft, GuardFailure, Language, PipelineResult, PromptRunRecord } from "./types";
+import { db } from "@/lib/db";
+import type { AgentDraft, GuardFailure, KbSource, Language, PipelineResult, PromptRunRecord } from "./types";
 
 const GROQ_MODEL = () => process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 const CLAUDE_MODEL = () => process.env.CLAUDE_MODEL || "claude-haiku-4-5-20251001";
@@ -115,7 +116,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   if (first.draft.intent === "identity_question") return fixedReplyResult(identityReply(lang, persona.agentName, persona.agencyName), lang, "identity_question", "identity_question", persona, promptRuns);
   if (first.draft.intent === "off_topic") return fixedReplyResult(OFF_TOPIC_REPLIES[lang], lang, "off_topic", "off_topic", persona, promptRuns);
   if (firstFailures.length === 0) {
-    return replyResult(first.draft, "groq:" + GROQ_MODEL(), [], promptRuns, persona);
+    return replyResult(first.draft, "groq:" + GROQ_MODEL(), [], promptRuns, persona, await resolveSources(input.agencyId, first.draft.kbIdsUsed));
   }
 
   const escalated = await escalateDraft(draftInput, firstFailures);
@@ -131,7 +132,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   const secondFailures = runGuards(escalated.draft, kbContext);
   promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures)));
   if (secondFailures.length === 0) {
-    return replyResult(escalated.draft, "claude:" + CLAUDE_MODEL(), guardNames(firstFailures), promptRuns, persona);
+    return replyResult(escalated.draft, "claude:" + CLAUDE_MODEL(), guardNames(firstFailures), promptRuns, persona, await resolveSources(input.agencyId, escalated.draft.kbIdsUsed));
   }
 
   return handoffResult(
@@ -147,12 +148,27 @@ function guardNames(failures: GuardFailure[]): string[] {
   return failures.map((f) => f.guard);
 }
 
-function replyResult(draft: AgentDraft, model: string, guardsTriggered: string[], promptRuns: PromptRunRecord[], persona: Persona): PipelineResult {
-  return { action: "reply", text: applyPersona(draft.reply, persona), language: draft.language, intent: draft.intent, leadFields: draft.leadFields, model, guardsTriggered, promptRuns };
+function replyResult(draft: AgentDraft, model: string, guardsTriggered: string[], promptRuns: PromptRunRecord[], persona: Persona, sources: KbSource[]): PipelineResult {
+  return { action: "reply", text: applyPersona(draft.reply, persona), language: draft.language, intent: draft.intent, leadFields: draft.leadFields, model, guardsTriggered, promptRuns, sources };
+}
+
+/** The knowledge-base items behind a reply: the chunk ids the model reports using, resolved to their documents,
+    scoped to the agency, one entry per document. */
+async function resolveSources(agencyId: string, chunkIds: string[]): Promise<KbSource[]> {
+  if (chunkIds.length === 0) return [];
+  const chunks = await db.waKbChunk.findMany({ where: { id: { in: chunkIds }, agencyId }, select: { document: { select: { id: true, kind: true, title: true } } } });
+  const seen = new Set<string>();
+  const sources: KbSource[] = [];
+  for (const { document } of chunks) {
+    if (seen.has(document.id)) continue;
+    seen.add(document.id);
+    sources.push({ kind: document.kind, title: document.title });
+  }
+  return sources;
 }
 
 function fixedReplyResult(text: string, language: Language, intent: "identity_question" | "off_topic", guard: string, persona: Persona, promptRuns: PromptRunRecord[]): PipelineResult {
-  return { action: "reply", text: applyPersona(text, persona), language, intent, leadFields: null, model: "fixed", guardsTriggered: [guard], promptRuns };
+  return { action: "reply", text: applyPersona(text, persona), language, intent, leadFields: null, model: "fixed", guardsTriggered: [guard], promptRuns, sources: [] };
 }
 
 function languageOffResult(draft: AgentDraft, persona: Persona, promptRuns: PromptRunRecord[]): PipelineResult {

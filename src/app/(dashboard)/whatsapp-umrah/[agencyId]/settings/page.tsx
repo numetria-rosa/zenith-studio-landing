@@ -1,27 +1,12 @@
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
-import { updateAgentSettingsAction, setReplyLimitAction, cancelSubscriptionAction } from "../actions";
-import { CancelPlanButton } from "@/app/services/dashboard/[clientId]/CancelPlanButton";
+import { getOwnedAgency, getUsageSummary } from "@/lib/whatsapp-umrah/dashboard-data";
+import { cancelSubscriptionAction } from "../actions";
+import { PageHeader } from "@/components/wa/ui";
 import type { BusinessHours } from "@/lib/whatsapp-umrah/hours";
-import waStyles from "../waConsole.module.css";
+import { SettingsForm, type SettingsState } from "./SettingsForm";
 
-const LANGUAGES = [
-  { value: "en", label: "English" },
-  { value: "ar", label: "Arabic" },
-  { value: "tr", label: "Turkish" },
-  { value: "ur", label: "Urdu" },
-];
-
-const DAYS: { key: keyof BusinessHours; label: string }[] = [
-  { key: "mon", label: "Monday" },
-  { key: "tue", label: "Tuesday" },
-  { key: "wed", label: "Wednesday" },
-  { key: "thu", label: "Thursday" },
-  { key: "fri", label: "Friday" },
-  { key: "sat", label: "Saturday" },
-  { key: "sun", label: "Sunday" },
-];
+const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
 export default async function SettingsPage({ params }: { params: Promise<{ agencyId: string }> }) {
   const session = await auth();
@@ -31,181 +16,33 @@ export default async function SettingsPage({ params }: { params: Promise<{ agenc
   if (!agency) notFound();
 
   const s = agency.agentSettings;
-  const enabledLanguages = new Set(s?.languagesEnabled ?? ["en", "ar", "tr", "ur"]);
-  const businessHours = (s?.businessHours ?? null) as BusinessHours | null;
-  const action = updateAgentSettingsAction.bind(null, agencyId);
+  const usage = await getUsageSummary(agencyId);
+  const hours = (s?.businessHours ?? null) as BusinessHours | null;
+
+  const initial: SettingsState = {
+    agencyName: agency.name,
+    agentName: s?.agentName ?? "Assistant",
+    tone: s?.tone === "FORMAL" ? "FORMAL" : "WARM",
+    signOff: s?.signOff ?? "",
+    emoji: s?.emojiEnabled ?? true,
+    langs: s?.languagesEnabled ?? ["en", "ar", "tr", "ur"],
+    allDay: !hours, // no hours saved means open 24/7
+    days: Object.fromEntries(DAY_KEYS.map((k) => [k, { on: !!hours?.[k], open: hours?.[k]?.open ?? "09:00", close: hours?.[k]?.close ?? "17:00" }])) as SettingsState["days"],
+    outside: s?.awayMode === "AWAY_MESSAGE_ONLY" ? "AWAY_MESSAGE_ONLY" : "AI_REPLIES",
+    awayMessage: s?.awayMessage ?? "",
+    resumeOn: !!s?.autoResumeIdleMinutes,
+    mins: s?.autoResumeIdleMinutes ?? 30,
+    limit: s?.monthlyReplyLimit ? String(s.monthlyReplyLimit) : "",
+    retention: String(s?.retentionMonths ?? 12),
+  };
+
+  const sub = agency.subscription;
+  const billing = sub ? { planLabel: sub.plan === "STARTER" ? "Starter" : String(sub.plan), active: sub.status === "ACTIVE", foundingOffer: !!sub.foundingOffer, canCancel: !!sub.whopMembershipId && sub.status === "ACTIVE" } : null;
 
   return (
     <div>
-      <h1 className={waStyles.pageTitle}>Settings</h1>
-      <p className={waStyles.pageDesc}>How your agent sounds, which languages it replies in, and what happens outside your hours.</p>
-
-      <form action={action}>
-        <div className={waStyles.grid2}>
-          <div className={waStyles.card}>
-            <div className={waStyles.formRow}>
-              <label className={waStyles.label} htmlFor="agencyName">
-                Agency name
-              </label>
-              <input id="agencyName" name="agencyName" defaultValue={agency.name} maxLength={80} className={waStyles.input} />
-            </div>
-            <div className={waStyles.formRow}>
-              <label className={waStyles.label} htmlFor="agentName">
-                Agent name
-              </label>
-              <input id="agentName" name="agentName" defaultValue={s?.agentName ?? "Assistant"} className={waStyles.input} />
-            </div>
-            <div className={waStyles.formRow}>
-              <label className={waStyles.label} htmlFor="tone">
-                Tone
-              </label>
-              <select id="tone" name="tone" defaultValue={s?.tone ?? "WARM"} className={waStyles.select}>
-                <option value="WARM">Warm</option>
-                <option value="FORMAL">Formal</option>
-              </select>
-            </div>
-            <div className={waStyles.formRow}>
-              <label className={waStyles.label} htmlFor="signOff">
-                Sign-off (optional)
-              </label>
-              <input id="signOff" name="signOff" defaultValue={s?.signOff ?? ""} className={waStyles.input} placeholder="e.g. - The Harlow Travel team" />
-            </div>
-            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
-              <input type="checkbox" name="emojiEnabled" defaultChecked={s?.emojiEnabled ?? true} />
-              Allow emoji in replies
-            </label>
-          </div>
-
-          <div className={waStyles.card}>
-            <div className={waStyles.label} style={{ marginBottom: 10 }}>
-              Languages your agent replies in
-            </div>
-            {LANGUAGES.map((l) => (
-              <label key={l.value} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, marginBottom: 8 }}>
-                <input type="checkbox" name="languages" value={l.value} defaultChecked={enabledLanguages.has(l.value)} />
-                {l.label}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className={waStyles.card} style={{ marginTop: 20 }}>
-          <div className={waStyles.formRow}>
-            <label className={waStyles.label} htmlFor="awayMode">
-              Outside your business hours
-            </label>
-            <select id="awayMode" name="awayMode" defaultValue={s?.awayMode ?? "AI_REPLIES"} className={waStyles.select}>
-              <option value="AI_REPLIES">Keep answering (recommended)</option>
-              <option value="AWAY_MESSAGE_ONLY">Send an away message only</option>
-            </select>
-          </div>
-          <div className={waStyles.formRow}>
-            <label className={waStyles.label} htmlFor="awayMessage">
-              Away message
-            </label>
-            <input id="awayMessage" name="awayMessage" defaultValue={s?.awayMessage ?? ""} className={waStyles.input} placeholder="We're closed right now, back within office hours." />
-          </div>
-          <div className={waStyles.label} style={{ marginTop: 16, marginBottom: 10 }}>
-            Business hours
-          </div>
-          <p style={{ fontSize: 12, color: "var(--zc-dim)", marginBottom: 12 }}>
-            Check a day and set its hours to mark it open. Leave every day unchecked to stay open 24/7 (the default) - once at least one day is checked, any day left unchecked counts as closed.
-          </p>
-          {DAYS.map((day) => {
-            const today = businessHours?.[day.key];
-            return (
-              <div key={day.key} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8, fontSize: 14 }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 8, width: 130, flexShrink: 0 }}>
-                  <input type="checkbox" name={`hours_${day.key}_open`} defaultChecked={!!today} />
-                  {day.label}
-                </label>
-                <input type="time" name={`hours_${day.key}_start`} defaultValue={today?.open ?? "09:00"} className={waStyles.input} style={{ maxWidth: 120 }} />
-                <span style={{ color: "var(--zc-muted)" }}>to</span>
-                <input type="time" name={`hours_${day.key}_end`} defaultValue={today?.close ?? "17:00"} className={waStyles.input} style={{ maxWidth: 120 }} />
-              </div>
-            );
-          })}
-        </div>
-
-        <div className={waStyles.card} style={{ marginTop: 20 }}>
-          <div className={waStyles.formRow}>
-            <label className={waStyles.label} htmlFor="autoResumeIdleMinutes">
-              Let the AI take over again after your team goes quiet for (minutes)
-            </label>
-            <input id="autoResumeIdleMinutes" name="autoResumeIdleMinutes" type="number" min="0" defaultValue={s?.autoResumeIdleMinutes ?? ""} className={waStyles.input} placeholder="Off by default" />
-          </div>
-          <p style={{ fontSize: 12, color: "var(--zc-dim)" }}>
-            If a customer writes in a chat your team took over and nobody on your team has replied for this long, the agent answers again. Blank keeps the chat with your team until you resume it.
-          </p>
-        </div>
-
-        <div className={waStyles.card} style={{ marginTop: 20 }}>
-          <div className={waStyles.formRow}>
-            <label className={waStyles.label} htmlFor="retentionMonths">
-              Delete customer data after (months)
-            </label>
-            <input id="retentionMonths" name="retentionMonths" type="number" min="1" defaultValue={s?.retentionMonths ?? 12} className={waStyles.input} />
-          </div>
-          <p style={{ fontSize: 12, color: "var(--zc-dim)" }}>
-            UK GDPR retention setting. A contact with no activity for this long is permanently deleted, on the 1st of each month.
-          </p>
-        </div>
-
-        <button type="submit" className={waStyles.badgeAi} style={{ marginTop: 20, padding: "10px 20px", fontSize: 14, border: "1px solid var(--zc-done)" }}>
-          Save settings
-        </button>
-      </form>
-
-      <div className={waStyles.card} style={{ marginTop: 20 }}>
-        <div className={waStyles.label} style={{ marginBottom: 6 }}>
-          Monthly reply limit
-        </div>
-        <p style={{ fontSize: 13, color: "var(--zc-muted)", marginBottom: 12 }}>
-          Each reply your agent sends is a message Meta bills to your own WhatsApp account. Set the most you want it to send in a month. At 80% you&apos;ll
-          see a warning here, and at 100% the agent pauses until next month (new messages are still saved). Leave it blank to use your plan&apos;s full allowance.
-        </p>
-        <form action={setReplyLimitAction.bind(null, agencyId)} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <input
-            type="number"
-            name="monthlyReplyLimit"
-            min={1}
-            step={1}
-            defaultValue={s?.monthlyReplyLimit ?? ""}
-            placeholder="Plan allowance"
-            aria-label="Monthly reply limit"
-            className={waStyles.input}
-            style={{ maxWidth: 180 }}
-          />
-          <button type="submit" style={{ fontSize: 13 }}>
-            Save
-          </button>
-        </form>
-      </div>
-
-      <div className={waStyles.card} style={{ marginTop: 20 }}>
-        <div className={waStyles.label} style={{ marginBottom: 6 }}>
-          Compliance
-        </div>
-        <p style={{ fontSize: 13, color: "var(--zc-muted)" }}>
-          <a href="/whatsapp-umrah/dpa" target="_blank" rel="noopener noreferrer" style={{ color: "var(--zc-run-text)" }}>
-            Data Processing Agreement
-          </a>{" "}
-          - includes ready-to-use WhatsApp opt-in wording for your own customers.
-        </p>
-      </div>
-
-      {agency.subscription?.whopMembershipId && agency.subscription.status === "ACTIVE" && (
-        <div className={waStyles.card} style={{ marginTop: 20 }}>
-          <div className={waStyles.label} style={{ marginBottom: 6 }}>
-            Billing
-          </div>
-          <p style={{ fontSize: 13, color: "var(--zc-muted)", marginBottom: 12 }}>
-            {agency.subscription.plan === "STARTER" ? "Starter" : agency.subscription.plan}
-            {agency.subscription.foundingOffer ? " - Founding offer" : ""}, billed monthly via Whop.
-          </p>
-          <CancelPlanButton action={cancelSubscriptionAction.bind(null, agencyId)} />
-        </div>
-      )}
+      <PageHeader title="Settings" subtitle={`How ${initial.agentName} sounds, which languages it replies in, and what happens outside your hours.`} />
+      <SettingsForm agencyId={agencyId} initial={initial} used={usage.used} planCap={usage.planCap} billing={billing} cancelAction={cancelSubscriptionAction.bind(null, agencyId)} />
     </div>
   );
 }
