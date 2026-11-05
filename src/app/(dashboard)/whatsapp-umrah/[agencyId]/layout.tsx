@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
+import { countWaitingConversations } from "@/lib/whatsapp-umrah/handoff-alerts";
 import { Icon } from "@/app/services/dashboard/[clientId]/Icon";
 import waStyles from "./waConsole.module.css";
 
@@ -23,6 +24,7 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
   if (!agency) notFound();
 
   const base = `/whatsapp-umrah/${agencyId}`;
+  const waiting = await countWaitingConversations(agencyId);
 
   return (
     <div className={waStyles.waConsole}>
@@ -36,6 +38,11 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
             <Link key={item.href} href={`${base}${item.href}`} className={waStyles.navLink}>
               <Icon name={item.icon} size={17} strokeWidth={1.8} />
               {item.label}
+              {item.href === "/inbox" && waiting > 0 && (
+                <span aria-label={`${waiting} waiting for you`} style={{ marginLeft: "auto", minWidth: 20, padding: "1px 7px", borderRadius: 999, background: "var(--zc-error-text)", color: "#05060A", fontSize: 12, fontWeight: 600, textAlign: "center" }}>
+                  {waiting}
+                </span>
+              )}
             </Link>
           ))}
           <Link href="/my-services" className={waStyles.navLink} style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.08)" }}>

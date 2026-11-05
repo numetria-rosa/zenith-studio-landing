@@ -34,7 +34,7 @@ export async function listConversations(agencyId: string) {
     where: { agencyId },
     orderBy: { updatedAt: "desc" },
     take: 50,
-    include: { contact: { select: { name: true, phone: true } }, _count: { select: { messages: true } }, messages: { orderBy: { createdAt: "desc" }, take: 1, select: { direction: true } } },
+    include: { contact: { select: { name: true, phone: true } }, _count: { select: { messages: true } }, messages: { where: { direction: "OUT", sender: "HUMAN" }, orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } } },
   });
 }
 
