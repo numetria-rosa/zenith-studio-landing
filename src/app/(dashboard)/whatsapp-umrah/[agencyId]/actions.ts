@@ -184,13 +184,16 @@ export async function deleteContactAction(agencyId: string, contactId: string): 
   redirect(`/whatsapp-umrah/${agencyId}/inbox`);
 }
 
-export async function updateLeadStatusAction(agencyId: string, leadId: string, formData: FormData): Promise<void> {
+const LEAD_STATUS_VALUES = ["NEW", "QUALIFIED", "HOT", "HANDED_OFF", "WON", "LOST"] as const;
+
+/** Changes a lead's status the moment the owner picks it in the Leads table (no Save button). */
+export async function setLeadStatusAction(agencyId: string, leadId: string, status: string): Promise<void> {
   const { agency } = await requireOwnedAgency(agencyId);
-  const status = String(formData.get("status") || "");
+  if (!(LEAD_STATUS_VALUES as readonly string[]).includes(status)) throw new Error("Unknown status.");
   const lead = await db.waLead.findFirst({ where: { id: leadId, agencyId: agency.id }, select: { id: true } });
   if (!lead) throw new Error("not_found");
   await db.$transaction([
-    db.waLead.update({ where: { id: lead.id }, data: { status: status as never } }),
+    db.waLead.update({ where: { id: lead.id }, data: { status: status as (typeof LEAD_STATUS_VALUES)[number] } }),
     db.waLeadEvent.create({ data: { leadId: lead.id, type: "status_changed", detail: `manually set to ${status}` } }),
   ]);
   revalidatePath(`/whatsapp-umrah/${agencyId}/leads`);
@@ -214,6 +217,10 @@ export async function updateAgentSettingsAction(agencyId: string, formData: Form
     })(),
     // UK GDPR (CLAUDE.md §7): per-agency retention setting, default 12
     // months. Read by the monthly purge job, src/lib/whatsapp-umrah/gdpr.ts.
+    monthlyReplyLimit: (() => {
+      const raw = Math.floor(Number(formData.get("monthlyReplyLimit")));
+      return Number.isFinite(raw) && raw > 0 ? raw : null; // blank = the plan's full allowance (see effectiveCap)
+    })(),
     retentionMonths: (() => {
       const raw = Number(formData.get("retentionMonths"));
       return Number.isFinite(raw) && raw > 0 ? Math.round(raw) : 12;
@@ -223,22 +230,6 @@ export async function updateAgentSettingsAction(agencyId: string, formData: Form
   const agencyName = String(formData.get("agencyName") || "").trim().slice(0, 80);
   if (agencyName && agencyName !== agency.name) await db.waAgency.update({ where: { id: agency.id }, data: { name: agencyName } });
   revalidatePath(`/whatsapp-umrah/${agencyId}`, "layout");
-}
-
-/** The agency's own monthly reply limit (blank = just the plan cap). Capped at the plan's allowance when
-    read (effectiveCap), so a higher number here simply means "the plan cap". */
-export async function setReplyLimitAction(agencyId: string, formData: FormData): Promise<void> {
-  const { agency } = await requireOwnedAgency(agencyId);
-  const raw = String(formData.get("monthlyReplyLimit") ?? "").trim();
-  const n = Math.floor(Number(raw));
-  const monthlyReplyLimit = raw && Number.isFinite(n) && n > 0 ? n : null;
-  await db.waAgentSettings.upsert({
-    where: { agencyId: agency.id },
-    create: { agencyId: agency.id, monthlyReplyLimit },
-    update: { monthlyReplyLimit },
-  });
-  revalidatePath(`/whatsapp-umrah/${agencyId}`);
-  revalidatePath(`/whatsapp-umrah/${agencyId}/settings`);
 }
 
 /** Same "cancel at period end, let the membership.deactivated webhook
@@ -281,14 +272,14 @@ export async function requestManualConnectAction(agencyId: string, formData: For
   revalidatePath(`/whatsapp-umrah/${agencyId}`);
 }
 
-export type SimulatorTurn = { role: "customer" | "ai"; text: string; language?: string; guardsTriggered?: string[] };
+export type SimulatorTurn = { role: "customer" | "ai"; text: string; language?: string; guardsTriggered?: string[]; sources?: { kind: string; title: string }[] };
 
 /** Simulator: calls the real pipeline against the real KB, with a real
     LLM call - the only thing "simulated" is that nothing ever touches
     WhatsApp. Per spec 3.4: simulator messages never count toward the
     reply cap or get metered/logged to WaPromptRun - a genuinely free,
     unlimited test surface. */
-export async function simulateMessageAction(agencyId: string, customerMessage: string): Promise<{ text: string; language: string; guardsTriggered: string[]; action: "reply" | "handoff" }> {
+export async function simulateMessageAction(agencyId: string, customerMessage: string): Promise<{ text: string; language: string; guardsTriggered: string[]; action: "reply" | "handoff"; sources: { kind: string; title: string }[] }> {
   const { agency } = await requireOwnedAgency(agencyId);
   const result = await runAgentPipeline({ agencyId: agency.id, customerMessage });
   return {
@@ -296,6 +287,7 @@ export async function simulateMessageAction(agencyId: string, customerMessage: s
     language: result.language,
     guardsTriggered: result.guardsTriggered,
     action: result.action,
+    sources: result.action === "reply" ? result.sources : [],
   };
 }
 

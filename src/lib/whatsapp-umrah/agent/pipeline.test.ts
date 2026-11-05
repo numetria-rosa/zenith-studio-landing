@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("../kb/retrieve", () => ({ retrieveKbChunks: async () => ({ ok: true, chunks: [] }) }));
 const model = vi.hoisted(() => ({ draft: null as null | Record<string, unknown>, settings: null as null | Record<string, unknown> }));
-vi.mock("@/lib/db", () => ({ db: { waAgency: { findUnique: async () => ({ name: "Al Noor Travel", agentSettings: model.settings }) } } }));
+const chunkRows = vi.hoisted(() => ({ rows: [] as { document: { id: string; kind: string; title: string } }[] }));
+vi.mock("@/lib/db", () => ({ db: { waAgency: { findUnique: async () => ({ name: "Al Noor Travel", agentSettings: model.settings }) }, waKbChunk: { findMany: async () => chunkRows.rows } } }));
 vi.mock("./draft", () => ({
   draftReply: async () => (model.draft ? { ok: true, draft: model.draft, latencyMs: 1 } : { ok: false, error: "the model must not run", latencyMs: 0 }),
 }));
@@ -92,5 +93,25 @@ describe("why a chat was handed over, in plain words", () => {
     model.settings = settings;
     const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "how much is Hajj?" });
     expect(r.action === "handoff" && r.reason).toBe("the assistant had a technical problem and couldn't answer");
+  });
+});
+
+describe("where a reply came from", () => {
+  const settings = { agentName: "Sara", tone: "WARM", emojiEnabled: true, signOff: null, languagesEnabled: ["en"] };
+  const draft = (kbIdsUsed: string[]) => ({ reply: "Happy to help with that.", language: "en", intent: "other", leadFields: null, handoffReason: null, confidence: 0.9, kbIdsUsed });
+
+  it("lists each knowledge item once, resolved from the chunks the model used", async () => {
+    model.draft = draft(["c1", "c2"]);
+    model.settings = settings;
+    chunkRows.rows = [{ document: { id: "d1", kind: "PACKAGE", title: "7 Night Economy Umrah" } }, { document: { id: "d1", kind: "PACKAGE", title: "7 Night Economy Umrah" } }, { document: { id: "d2", kind: "FAQ", title: "Is the visa included?" } }];
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "price?" });
+    expect(r.action === "reply" && r.sources).toEqual([{ kind: "PACKAGE", title: "7 Night Economy Umrah" }, { kind: "FAQ", title: "Is the visa included?" }]);
+  });
+
+  it("is empty when the model used nothing from the knowledge base", async () => {
+    model.draft = draft([]);
+    model.settings = settings;
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "hello" });
+    expect(r.action === "reply" && r.sources).toEqual([]);
   });
 });

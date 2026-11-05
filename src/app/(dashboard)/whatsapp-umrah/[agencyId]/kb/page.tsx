@@ -4,18 +4,14 @@ import { auth } from "@/lib/auth";
 import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
 import { packageFromJson, type FaqFields, type PackageFields } from "@/lib/whatsapp-umrah/kb/structured";
 import { addKbDocumentAction, deleteKbDocumentAction, saveFaqAction, savePackageAction } from "../actions";
-import waStyles from "../waConsole.module.css";
+import { Card, Chip, CYAN, FieldLabel, GlassButton, IconButton, Input, MINT, PageHeader, Pill, PrimaryButton, Textarea, Tile, VIOLET, cx } from "@/components/wa/ui";
+import { WaIcon, type WaIconName } from "@/components/wa/Icon";
+import { ConfirmAction } from "@/components/wa/ConfirmDialog";
+import { gbp } from "@/components/wa/format";
 import { PackageForm } from "./PackageForm";
+import { FaqList } from "./FaqList";
 
 type Tab = "packages" | "faqs" | "info";
-const TABS: { id: Tab; label: string }[] = [
-  { id: "packages", label: "Packages" },
-  { id: "faqs", label: "FAQs" },
-  { id: "info", label: "General info" },
-];
-
-const gbp = (n: number) => `£${n.toLocaleString("en-GB", { maximumFractionDigits: 2 })}`;
-const muted: React.CSSProperties = { fontSize: 12, color: "var(--zc-muted)", marginTop: 2 };
 
 export default async function KbPage({ params, searchParams }: { params: Promise<{ agencyId: string }>; searchParams: Promise<{ tab?: string; edit?: string; new?: string }> }) {
   const session = await auth();
@@ -27,193 +23,177 @@ export default async function KbPage({ params, searchParams }: { params: Promise
 
   const tab: Tab = sp.tab === "faqs" || sp.tab === "info" ? sp.tab : "packages";
   const base = `/whatsapp-umrah/${agencyId}/kb`;
+  const agentName = agency.agentSettings?.agentName ?? "Your agent";
   const docs = agency.kbDocuments;
   const packages = docs.filter((d) => d.kind === "PACKAGE");
   const faqs = docs.filter((d) => d.kind === "FAQ");
   const info = docs.filter((d) => d.kind !== "PACKAGE" && d.kind !== "FAQ");
-  const counts: Record<Tab, number> = { packages: packages.length, faqs: faqs.length, info: info.length };
 
   const editing = sp.edit ? docs.find((d) => d.id === sp.edit && d.kind === (tab === "faqs" ? "FAQ" : "PACKAGE")) : undefined;
   const showPackageForm = tab === "packages" && (sp.new === "1" || Boolean(editing));
+  const editingFaq = editing && tab === "faqs" ? (editing.fields as FaqFields | null) : null;
+
+  const tabs: { id: Tab; label: string; sub: string; count: number; color: string; icon: WaIconName }[] = [
+    { id: "packages", label: "Packages", sub: "Prices, hotels, nights and airports", count: packages.length, color: CYAN, icon: "plane" },
+    { id: "faqs", label: "FAQs", sub: "Questions customers ask, in your words", count: faqs.length, color: VIOLET, icon: "chat" },
+    { id: "info", label: "General info", sub: "Policies, ATOL, visas, opening hours", count: info.length, color: MINT, icon: "file" },
+  ];
+  const addAction = tab === "packages" ? { label: "Add a package", href: `${base}?tab=packages&new=1` } : tab === "faqs" ? { label: "Add an FAQ", href: `${base}?tab=faqs#faq-question` } : { label: "Add general info", href: `${base}?tab=info#info-title` };
 
   return (
     <div>
-      <h1 className={waStyles.pageTitle}>Knowledge base</h1>
-      <p className={waStyles.pageDesc}>Everything the agent knows. It only ever answers from what&apos;s here, so keep packages, FAQs and general info up to date.</p>
+      <PageHeader title="Knowledge base" subtitle={`Everything ${agentName} knows. ${agentName} only answers from what's here, so keep it up to date.`} actions={<PrimaryButton href={addAction.href} icon="plus">{addAction.label}</PrimaryButton>} />
 
-      <div style={{ display: "flex", gap: 6, marginBottom: 22, flexWrap: "wrap" }} role="tablist" aria-label="Knowledge base sections">
-        {TABS.map((t) => (
-          <Link
-            key={t.id}
-            href={`${base}?tab=${t.id}`}
-            role="tab"
-            aria-selected={tab === t.id}
-            className={`${waStyles.navLink} ${tab === t.id ? waStyles.navLinkActive : ""}`}
-            style={{ width: "auto", padding: "8px 16px" }}
-          >
-            {t.label} <span style={{ opacity: 0.6, marginLeft: 6 }}>{counts[t.id]}</span>
-          </Link>
-        ))}
+      <div role="tablist" aria-label="Knowledge base sections" className="mb-[22px] grid gap-3" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
+        {tabs.map((t) => {
+          const on = t.id === tab;
+          return (
+            <Link
+              key={t.id}
+              href={`${base}?tab=${t.id}`}
+              role="tab"
+              aria-selected={on}
+              className={cx("flex items-center gap-[14px] rounded-[18px] px-[18px] py-4 text-left text-frost no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan", on ? "bg-[rgba(92,200,255,.08)] shadow-[inset_0_0_0_1px_rgba(92,200,255,.45),0_0_30px_rgba(92,200,255,.10)]" : "bg-[rgba(255,255,255,.02)] shadow-[inset_0_0_0_1px_rgba(255,255,255,.08)]")}
+            >
+              <Tile size={42} color={t.color} style={{ border: `1px solid ${t.color}45` }}>
+                <WaIcon name={t.icon} size={19} stroke={t.color} />
+              </Tile>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[16px] font-semibold">{t.label}</span>
+                  <span className="font-mono text-[13px] text-dim">{t.count}</span>
+                </div>
+                <div className="mt-[3px] text-[13px] text-mist">{t.sub}</div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
       {tab === "packages" && (
         <>
-          {showPackageForm ? (
-            <PackageForm
-              action={savePackageAction.bind(null, agencyId, editing?.id ?? null)}
-              values={editing ? packageFromJson(editing.fields) : packageFromJson(null)}
-              cancelHref={`${base}?tab=packages`}
-            />
-          ) : (
-            <div style={{ marginBottom: 18 }}>
-              <Link href={`${base}?tab=packages&new=1`} className={waStyles.badgeAi} style={{ padding: "9px 18px", fontSize: 14, border: "1px solid var(--zc-done)", display: "inline-block" }}>
-                + Add a package
-              </Link>
-            </div>
-          )}
-          {packages.length === 0 ? (
-            <p style={{ color: "var(--zc-muted)", fontSize: 14 }}>No packages yet. Add your first one: each field you fill in becomes something the agent can answer from.</p>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {packages.map((doc) => {
-                const f = doc.fields ? (packageFromJson(doc.fields) as PackageFields) : null;
-                const del = deleteKbDocumentAction.bind(null, agencyId, doc.id);
-                return (
-                  <div key={doc.id} className={waStyles.card} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, padding: 16 }}>
-                    <div>
-                      <div style={{ fontWeight: 500 }}>
-                        {doc.title} {f && <span style={{ color: "var(--zc-done-text)", marginLeft: 8 }}>{gbp(f.pricePerPerson)} pp</span>}
-                      </div>
-                      {f && (
-                        <div style={muted}>
-                          {f.type} · {f.nightsMakkah + f.nightsMadinah} nights
-                          {f.makkahHotel.name ? ` · ${f.makkahHotel.name}` : ""}
-                          {f.departureAirports ? ` · from ${f.departureAirports}` : ""}
-                        </div>
-                      )}
-                    </div>
-                    <div style={{ display: "flex", gap: 16, fontSize: 13, whiteSpace: "nowrap" }}>
-                      <Link href={`${base}?tab=packages&edit=${doc.id}`} style={{ color: "var(--zc-run-text)" }}>
-                        Edit
-                      </Link>
-                      <form action={del}>
-                        <button type="submit" style={{ fontSize: 13, color: "var(--zc-error-text)" }}>
-                          Remove
-                        </button>
-                      </form>
-                    </div>
+          {showPackageForm && <PackageForm action={savePackageAction.bind(null, agencyId, editing?.id ?? null)} values={editing ? packageFromJson(editing.fields) : packageFromJson(null)} cancelHref={`${base}?tab=packages`} />}
+          <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
+            {packages.map((doc) => {
+              const f = doc.fields ? (packageFromJson(doc.fields) as PackageFields) : null;
+              return (
+                <Card as="article" key={doc.id} className="flex min-w-0 flex-col p-[22px]">
+                  <div className="flex items-center gap-2">
+                    {f && <Pill color={CYAN}>{f.type}</Pill>}
+                    {f && <span className="font-mono text-[12px] text-dim">{f.nightsMakkah + f.nightsMadinah} nights</span>}
+                    <span className="flex-1" />
+                    <IconButton icon="edit" label={`Edit ${doc.title}`} href={`${base}?tab=packages&edit=${doc.id}`} />
+                    <ConfirmAction
+                      action={deleteKbDocumentAction.bind(null, agencyId, doc.id)}
+                      title="Remove this package?"
+                      description={`${agentName} will stop quoting "${doc.title}" straight away.`}
+                      confirmLabel="Remove"
+                      trigger={<IconButton icon="trash" label={`Remove ${doc.title}`} stroke="#FF9BB0" />}
+                    />
                   </div>
-                );
-              })}
-            </div>
-          )}
+                  <h3 className="mb-0 mt-4 text-[19px] font-semibold tracking-[-0.015em]">{doc.title}</h3>
+                  {f && (
+                    <>
+                      <div className="mt-[10px]">
+                        <span className="text-[30px] font-semibold tracking-[-0.03em] text-mint-text">{gbp(f.pricePerPerson)}</span>
+                        <span className="text-[14px] text-mist"> per person</span>
+                      </div>
+                      <div className="mt-4 flex flex-col gap-2 border-t border-[rgba(255,255,255,.06)] pt-[14px] text-[14px] text-soft">
+                        {f.makkahHotel.name && (
+                          <span className="flex items-center gap-[10px]">
+                            <WaIcon name="hotel" size={16} stroke="#7D8392" />
+                            {f.makkahHotel.name}
+                          </span>
+                        )}
+                        {f.departureAirports && (
+                          <span className="flex items-center gap-[10px]">
+                            <WaIcon name="plane" size={16} stroke="#7D8392" />
+                            From {f.departureAirports}
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </Card>
+              );
+            })}
+            <Link href={`${base}?tab=packages&new=1`} className="flex min-h-[230px] flex-col items-center justify-center gap-3 rounded-[22px] border border-dashed border-[rgba(255,255,255,.18)] bg-[rgba(255,255,255,.015)] text-[15px] text-soft no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan">
+              <Tile size={46} radius={23} style={{ background: "rgba(61,220,151,.10)", border: "1px solid rgba(61,220,151,.4)" }}>
+                <WaIcon name="plus" size={20} stroke="#7FF0BD" strokeWidth={2} />
+              </Tile>
+              Add a package
+              <span className="text-[13px] text-dim">Name, price, nights, hotel, airports</span>
+            </Link>
+          </div>
         </>
       )}
 
       {tab === "faqs" && (
-        <>
-          <form action={saveFaqAction.bind(null, agencyId, editing?.id ?? null)} className={waStyles.card} style={{ marginBottom: 24 }}>
-            <div className={waStyles.formRow}>
-              <label className={waStyles.label} htmlFor="question">
-                Question
-              </label>
-              <input id="question" name="question" className={waStyles.input} defaultValue={editing ? (editing.fields as FaqFields | null)?.question ?? editing.title : ""} placeholder="e.g. Is the visa included?" required />
-            </div>
-            <div className={waStyles.formRow}>
-              <label className={waStyles.label} htmlFor="answer">
-                Answer
-              </label>
-              <textarea id="answer" name="answer" className={waStyles.textarea} style={{ minHeight: 90 }} defaultValue={editing ? (editing.fields as FaqFields | null)?.answer ?? "" : ""} placeholder="The answer exactly as you want customers to hear it." required />
-            </div>
-            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-              <button type="submit" className={waStyles.badgeAi} style={{ padding: "9px 18px", fontSize: 14, border: "1px solid var(--zc-done)" }}>
-                {editing ? "Save FAQ" : "Add FAQ"}
-              </button>
-              {editing && (
-                <Link href={`${base}?tab=faqs`} style={{ fontSize: 14, color: "var(--zc-muted)" }}>
-                  Cancel
-                </Link>
-              )}
-            </div>
-          </form>
-          {faqs.length === 0 ? (
-            <p style={{ color: "var(--zc-muted)", fontSize: 14 }}>No FAQs yet.</p>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {faqs.map((doc) => {
-                const f = doc.fields as FaqFields | null;
-                const del = deleteKbDocumentAction.bind(null, agencyId, doc.id);
-                return (
-                  <div key={doc.id} className={waStyles.card} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, padding: 16 }}>
-                    <div>
-                      <div style={{ fontWeight: 500 }}>{f?.question ?? doc.title}</div>
-                      {f?.answer && <div style={{ ...muted, fontSize: 13, marginTop: 4 }}>{f.answer}</div>}
-                    </div>
-                    <div style={{ display: "flex", gap: 16, fontSize: 13, whiteSpace: "nowrap" }}>
-                      <Link href={`${base}?tab=faqs&edit=${doc.id}`} style={{ color: "var(--zc-run-text)" }}>
-                        Edit
-                      </Link>
-                      <form action={del}>
-                        <button type="submit" style={{ fontSize: 13, color: "var(--zc-error-text)" }}>
-                          Remove
-                        </button>
-                      </form>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </>
+        <div className="grid items-start gap-[18px]" style={{ gridTemplateColumns: "minmax(0, 1fr) 380px" }}>
+          <FaqList
+            agentName={agentName}
+            items={faqs.map((doc) => {
+              const f = doc.fields as FaqFields | null;
+              return { id: doc.id, question: f?.question ?? doc.title, answer: f?.answer ?? "", editHref: `${base}?tab=faqs&edit=${doc.id}#faq-question`, remove: deleteKbDocumentAction.bind(null, agencyId, doc.id) };
+            })}
+          />
+          <Card className="p-[22px]">
+            <form key={editing?.id ?? "new"} action={saveFaqAction.bind(null, agencyId, editing?.id ?? null)}>
+              <div className="text-[16px] font-semibold">{editing ? "Edit FAQ" : "Add an FAQ"}</div>
+              <FieldLabel htmlFor="faq-question" className="mt-4">Question</FieldLabel>
+              <Input id="faq-question" name="question" defaultValue={editingFaq?.question ?? (editing ? editing.title : "")} placeholder="e.g. Is the visa included?" required />
+              <FieldLabel htmlFor="faq-answer" className="mt-4">Answer</FieldLabel>
+              <Textarea id="faq-answer" name="answer" defaultValue={editingFaq?.answer ?? ""} placeholder="The answer exactly as you want customers to hear it." required />
+              <PrimaryButton type="submit" className="mt-4 w-full">{editing ? "Save FAQ" : "Add FAQ"}</PrimaryButton>
+              {editing && <GlassButton href={`${base}?tab=faqs`} className="mt-2 w-full">Cancel</GlassButton>}
+            </form>
+          </Card>
+        </div>
       )}
 
       {tab === "info" && (
-        <>
-          <p style={{ color: "var(--zc-muted)", fontSize: 14, marginBottom: 14 }}>Policies and anything that is not a package or a question: cancellation policy, ATOL details, opening hours, visa guidance you offer.</p>
-          <div className={waStyles.card} style={{ marginBottom: 24 }}>
-            <form action={addKbDocumentAction.bind(null, agencyId)}>
-              <div className={waStyles.formRow}>
-                <label className={waStyles.label} htmlFor="title">
-                  Title
-                </label>
-                <input id="title" name="title" className={waStyles.input} placeholder="e.g. Cancellation policy, ATOL details" required />
-              </div>
-              <div className={waStyles.formRow}>
-                <label className={waStyles.label} htmlFor="rawText">
-                  Content
-                </label>
-                <textarea id="rawText" name="rawText" className={waStyles.textarea} placeholder="Paste or type the text exactly as you want the agent to use it." required />
-              </div>
-              <button type="submit" className={waStyles.badgeAi} style={{ padding: "9px 18px", fontSize: 14, border: "1px solid var(--zc-done)" }}>
-                Add and process
-              </button>
-            </form>
-          </div>
-          {info.length === 0 ? (
-            <p style={{ color: "var(--zc-muted)", fontSize: 14 }}>Nothing added yet.</p>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {info.map((doc) => {
-                const del = deleteKbDocumentAction.bind(null, agencyId, doc.id);
-                return (
-                  <div key={doc.id} className={waStyles.card} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 16 }}>
-                    <div>
-                      <div style={{ fontWeight: 500 }}>{doc.title}</div>
-                      <div style={muted}>
-                        {doc._count.chunks} chunk{doc._count.chunks === 1 ? "" : "s"} · added {doc.createdAt.toISOString().slice(0, 10)}
-                      </div>
-                    </div>
-                    <form action={del}>
-                      <button type="submit" style={{ fontSize: 13, color: "var(--zc-error-text)" }}>
-                        Remove
-                      </button>
-                    </form>
+        <div className="grid items-start gap-[18px]" style={{ gridTemplateColumns: "minmax(0, 1fr) 380px" }}>
+          <div className="flex min-w-0 flex-col gap-[14px]">
+            {info.map((doc) => (
+              <Card key={doc.id} className="flex gap-4 p-[22px]">
+                <Tile size={42} style={{ background: "rgba(61,220,151,.10)", border: "1px solid rgba(61,220,151,.35)" }}>
+                  <WaIcon name="file" size={19} stroke="#7FF0BD" />
+                </Tile>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[16px] font-semibold">{doc.title}</div>
+                  <div className="mt-[5px] font-mono text-[12px] text-dim">
+                    {doc._count.chunks} {doc._count.chunks === 1 ? "chunk" : "chunks"} · added {doc.createdAt.toISOString().slice(0, 10)}
                   </div>
-                );
-              })}
+                </div>
+                <ConfirmAction
+                  action={deleteKbDocumentAction.bind(null, agencyId, doc.id)}
+                  title="Remove this info?"
+                  description={`${agentName} will stop using "${doc.title}" straight away.`}
+                  confirmLabel="Remove"
+                  trigger={<IconButton icon="trash" label={`Remove ${doc.title}`} stroke="#FF9BB0" />}
+                />
+              </Card>
+            ))}
+            <div className="rounded-[18px] border border-dashed border-[rgba(255,255,255,.14)] px-5 py-[18px]">
+              <div className="text-[14px] text-soft">Anything that isn&apos;t a package or a question goes here. For example:</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {["Cancellation policy", "ATOL details", "Opening hours", "Visa guidance"].map((t) => (
+                  <Chip key={t}>{t}</Chip>
+                ))}
+              </div>
             </div>
-          )}
-        </>
+          </div>
+          <Card className="p-[22px]">
+            <form action={addKbDocumentAction.bind(null, agencyId)}>
+              <div className="text-[16px] font-semibold">Add general info</div>
+              <FieldLabel htmlFor="info-title" className="mt-4">Title</FieldLabel>
+              <Input id="info-title" name="title" placeholder="e.g. Cancellation policy, ATOL details" required />
+              <FieldLabel htmlFor="info-text" className="mt-4">Content</FieldLabel>
+              <Textarea id="info-text" name="rawText" placeholder={`Paste or type the text exactly as you want ${agentName} to use it.`} required />
+              <PrimaryButton type="submit" className="mt-4 w-full">Add and process</PrimaryButton>
+            </form>
+          </Card>
+        </div>
       )}
     </div>
   );
