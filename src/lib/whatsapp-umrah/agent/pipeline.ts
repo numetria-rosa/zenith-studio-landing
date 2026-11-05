@@ -1,4 +1,4 @@
-import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v2";
+import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v3";
 import { retrieveKbChunks, type RetrievedChunk } from "../kb/retrieve";
 import { containsSensitiveData, isIdentityQuestion, isOptOutMessage } from "./pre-guards";
 import { plainHandoffReason, TECHNICAL_PROBLEM_REASON } from "./reasons";
