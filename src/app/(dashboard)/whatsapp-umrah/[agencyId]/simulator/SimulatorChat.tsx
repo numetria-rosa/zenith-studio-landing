@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { WaIcon } from "@/components/wa/Icon";
-import { Card, GlassButton, Input, Label, PageHeader, Pill, PrimaryButton, VIOLET, cx, hhmm, isRtl } from "@/components/wa/ui";
+import { Card, GlassButton, Input, Label, PageHeader, Pill, PrimaryButton } from "@/components/wa/ui";
+import { VIOLET, cx, hhmm, isRtl } from "@/components/wa/tokens";
 import { simulateMessageAction, type SimulatorTurn } from "../actions";
 
 const KIND_LABEL: Record<string, string> = { PACKAGE: "Packages", FAQ: "FAQs" };

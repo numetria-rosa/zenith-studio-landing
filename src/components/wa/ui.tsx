@@ -4,11 +4,11 @@ import * as Popover from "@radix-ui/react-popover";
 import Link from "next/link";
 import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { WaIcon, type WaIconName } from "./Icon";
+import { cx } from "./tokens";
 
 /* Primitives for the WhatsApp agent dashboard. Values come straight from the design handoff
    (design/tokens.css and reference/source/*.dc.html): every size, colour and radius is in the class strings. */
 
-export const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
 /** Visible cyan focus ring on every interactive element. */
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan";
@@ -84,25 +84,6 @@ export const IconButton = forwardRef<HTMLButtonElement, { icon: WaIconName; labe
 });
 
 /* ---------- pills ---------- */
-
-/** One status colour map, used everywhere (spec "Status colour map"). */
-export const STATUS = {
-  NEW: { label: "New", color: "#5CC8FF" },
-  QUALIFIED: { label: "Qualified", color: "#C7B0FF" },
-  HOT: { label: "Hot", color: "#FF9BB0" },
-  HANDED_OFF: { label: "Handed off", color: "#FFD27A" },
-  WON: { label: "Won", color: "#3DDC97" },
-  LOST: { label: "Lost", color: "#7D8392" },
-} as const;
-export type LeadStatus = keyof typeof STATUS;
-export const LEAD_STATUSES = Object.keys(STATUS) as LeadStatus[];
-
-export const MINT = "#3DDC97";
-export const AMBER = "#FFD27A";
-export const VIOLET = "#C7B0FF";
-export const CYAN = "#5CC8FF";
-export const EMBER = "#FF9BB0";
-export const DIM = "#7D8392";
 
 export const Pill = forwardRef<HTMLSpanElement, { color: string; dot?: boolean; className?: string; children: ReactNode } & React.HTMLAttributes<HTMLSpanElement>>(function Pill({ color, dot = true, className, children, style, ...rest }, ref) {
   return (
@@ -259,9 +240,3 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
     </div>
   );
 }
-
-/** Time of day in HH:MM, for message captions. */
-export const hhmm = (d: Date | string) => new Date(d).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-
-/** Arabic/Urdu text gets dir="rtl"; captions stay LTR. */
-export const isRtl = (text: string | null | undefined) => /[؀-ۿ]/.test(text ?? "");

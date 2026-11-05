@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { WaIcon } from "@/components/wa/Icon";
 import { ConfirmAction } from "@/components/wa/ConfirmDialog";
-import { GhostButton, cx, isRtl } from "@/components/wa/ui";
+import { GhostButton } from "@/components/wa/ui";
+import { cx, isRtl } from "@/components/wa/tokens";
 
 export type FaqItem = { id: string; question: string; answer: string; editHref: string; remove: () => Promise<void> };
 
