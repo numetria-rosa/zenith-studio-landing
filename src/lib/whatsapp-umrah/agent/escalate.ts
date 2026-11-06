@@ -1,6 +1,6 @@
 import { DRAFT_SYSTEM_PROMPT_V4 } from "../../../../prompts/whatsapp-umrah/draft-system-v4";
 import { INTENTS, LANGUAGES, type AgentDraft, type GuardFailure } from "./types";
-import type { DraftInput, DraftResult } from "./draft";
+import { todayLine, type DraftInput, type DraftResult } from "./draft";
 
 /* Escalation step: one retry on Claude when Groq's draft fails a guard -
    see CLAUDE.md and the spec's pipeline step ("escalate to the Claude
@@ -53,7 +53,7 @@ const AGENT_DRAFT_TOOL = {
 } as const;
 
 export async function escalateDraft(input: DraftInput, previousFailures: GuardFailure[]): Promise<DraftResult> {
-  const userPrompt = `${input.persona ? `${input.persona}\n\n` : ""}KNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\nRECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}\n\nA FIRST ATTEMPT AT THIS FAILED THESE CHECKS - do not repeat the same mistake:\n${previousFailures.map((f) => `- ${f.guard}: ${f.detail}`).join("\n")}`;
+  const userPrompt = `${input.persona ? `${input.persona}\n\n` : ""}${todayLine()}\n\nKNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\nRECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}\n\nA FIRST ATTEMPT AT THIS FAILED THESE CHECKS - do not repeat the same mistake:\n${previousFailures.map((f) => `- ${f.guard}: ${f.detail}`).join("\n")}`;
 
   const startedAt = Date.now();
   try {

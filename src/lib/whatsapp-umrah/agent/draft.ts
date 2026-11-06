@@ -43,6 +43,9 @@ const DRAFT_SCHEMA = {
   additionalProperties: false,
 } as const;
 
+/** The prompt needs today's date to read "next month" or "this Ramadan". UK time, since that is the agency's. */
+export const todayLine = () => `TODAY: ${new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" })}`;
+
 export type DraftInput = {
   customerMessage: string;
   kbContext: string; // formatted "[chunk-id] content" blocks, see pipeline.ts
@@ -75,7 +78,7 @@ async function callGroq(userPrompt: string, model: string): Promise<Response> {
 }
 
 export async function draftReply(input: DraftInput, model = DRAFT_MODEL): Promise<DraftResult> {
-  const userPrompt = `${input.persona ? `${input.persona}\n\n` : ""}KNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\nRECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}`;
+  const userPrompt = `${input.persona ? `${input.persona}\n\n` : ""}${todayLine()}\n\nKNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\nRECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}`;
   const startedAt = Date.now();
 
   try {

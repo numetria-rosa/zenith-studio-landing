@@ -32,18 +32,40 @@ describe("groundingCheck", () => {
     const reply = "The 7 Night Economy Umrah is £1,295 per person, so £2,590 for two of you. I'll note Ramadan 2027 for the team.";
 
     it("passes the group total and the year the customer typed", () => {
-      const draft = baseDraft({ reply, leadFields: { travelers: 2 } });
+      const draft = baseDraft({ reply });
       expect(groundingCheck(draft, kb, message)).toBeNull();
     });
 
     it("still rejects a total that is not price x travellers", () => {
-      const draft = baseDraft({ reply: "£1,295 per person, so £2,800 for two.", leadFields: { travelers: 2 } });
+      const draft = baseDraft({ reply: "£1,295 per person, so £2,800 for two." });
       expect(groundingCheck(draft, kb, message)?.detail).toContain("2800");
     });
 
-    it("rejects the total when the model did not report a party size, and the year when the customer never typed it", () => {
-      expect(groundingCheck(baseDraft({ reply: "£2,590 for two." }), kb, message)?.detail).toContain("2590");
+    it("still rejects a year the customer never typed", () => {
       expect(groundingCheck(baseDraft({ reply: "Ramadan 2027 is open." }), kb, "when can we go?")?.detail).toContain("2027");
+    });
+  });
+
+  describe("arithmetic the agent is expected to do", () => {
+    const kb = "7 Night Economy Umrah: £1,295 per person, 7 nights. Deposit £200. Child 2 to 11: £1,150.";
+    const ok = (reply: string, message = "") => groundingCheck(baseDraft({ reply }), kb, message);
+
+    it("passes totals for any party size, balance after deposit, adult plus child, and a per-night price", () => {
+      expect(ok("For three that is £3,885.")).toBeNull();
+      expect(ok("The balance after the £200 deposit is £1,095.")).toBeNull();
+      expect(ok("One adult and one child is £2,445.")).toBeNull();
+      expect(ok("That works out at about £185 a night.")).toBeNull();
+    });
+
+    it("passes date and stay arithmetic from the customer's own numbers", () => {
+      // 5 March + 7 nights = 12 March, and 7 + 7 = 14 nights for a double stay
+      expect(ok("Leaving 5 March, you would be back on 12 March.", "we fly 5 March for 7 nights")).toBeNull();
+      expect(ok("Two weeks is 14 nights.", "")).toBeNull();
+    });
+
+    it("still rejects a price that is no arithmetic on anything given", () => {
+      expect(ok("It is £1,777 per person.")?.guard).toBe("grounding");
+      expect(ok("It is £3,333 for you both.")?.guard).toBe("grounding");
     });
   });
 
@@ -88,6 +110,9 @@ describe("confidenceCheck", () => {
     const draft = baseDraft({ confidence: 0.2, reply: "I'll check on that for you." });
     expect(confidenceCheck(draft)?.guard).toBe("confidence");
   });
+  it("does not fail a draft that answers from a KB chunk", () => {
+    expect(confidenceCheck(baseDraft({ confidence: 0.3, kbIdsUsed: ["chunk1"] }))).toBeNull();
+  });
   it("passes a confident draft", () => {
     expect(confidenceCheck(baseDraft({ confidence: 0.95 }))).toBeNull();
   });
@@ -101,6 +126,11 @@ describe("hedgeCheck", () => {
   it("catches the same hedge with typographic apostrophes, as models commonly emit", () => {
     const draft = baseDraft({ reply: "I’m sorry, I don’t have that information right now. I’ll check with our team." });
     expect(hedgeCheck(draft)?.guard).toBe("hedge");
+  });
+  it("lets a KB-backed answer say the team will confirm the rest, and ask a follow-up", () => {
+    const reply = "The 7 Night Economy Umrah is £1,295 per person. I'll check Ramadan availability with the team. Which days of Ramadan are you planning to go?";
+    expect(hedgeCheck(baseDraft({ reply, kbIdsUsed: ["chunk1"] }))).toBeNull();
+    expect(hedgeCheck(baseDraft({ reply }))?.guard).toBe("hedge");
   });
   it("passes a direct answer", () => {
     expect(hedgeCheck(baseDraft({ reply: "It's £950 for 10 nights." }))).toBeNull();

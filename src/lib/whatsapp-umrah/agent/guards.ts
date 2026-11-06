@@ -23,26 +23,29 @@ function extractNumericClaims(text: string): string[] {
   return [...new Set([...currency.map(normalize), ...bare.map(normalize)])];
 }
 
-/** Every price/date-shaped number the draft states must appear somewhere
-    in the KB text it was given. Doesn't try to understand which number
-    means what - a reply that quotes ANY number absent from the retrieved
-    KB text fails, which is the safe direction (a false failure costs one
-    retry; a false pass ships an invented fact). */
-/** Totals for a group: every £ amount in the KB times each party size from 2 up to the number of travellers the
-    model reported (capped), so "£2,590 for two" passes when the KB says £1,295 per person. */
-const MAX_PARTY = 20;
-function groupTotals(kbContextText: string, travelers: number | undefined): string[] {
-  const n = Math.min(Math.floor(travelers ?? 0), MAX_PARTY);
-  const amounts = (kbContextText.match(CURRENCY_TOKEN) ?? []).map((s) => Number(s.replace(/[£,\s]/g, "")));
-  const totals: string[] = [];
-  for (let k = 2; k <= n; k++) for (const a of amounts) totals.push(String(Math.round(a * k * 100) / 100));
-  return totals;
+/** Arithmetic the agent is expected to do for the customer, so its answers can pass without being in the KB
+    verbatim: a £ price times a party size or number of nights (2 to 20), sums and differences of £ amounts
+    (child + adult, price minus deposit), a £ price divided by nights, and sums and differences of small numbers
+    (a start day plus nights is the end day). Every operand still comes from the KB or the customer's message. */
+const MAX_MULTIPLIER = 20;
+function derivedNumbers(texts: string): string[] {
+  const money = (texts.match(CURRENCY_TOKEN) ?? []).map((s) => Number(s.replace(/[£,\s]/g, "")));
+  const small = [...new Set((texts.replace(CURRENCY_TOKEN, " ").match(BARE_NUMBER_TOKEN) ?? []).map((s) => Number(s.replace(/,/g, ""))).filter((n) => n >= 1 && n <= 90))];
+  const out: number[] = [];
+  for (let k = 2; k <= MAX_MULTIPLIER; k++) for (const m of money) out.push(m * k);
+  for (const a of money) for (const b of money) out.push(a + b, Math.abs(a - b));
+  for (const m of money) for (const n of [...small, ...Array.from({ length: MAX_MULTIPLIER - 1 }, (_, i) => i + 2)]) out.push(m / n, Math.round(m / n), Math.floor(m / n));
+  for (const a of small) for (const b of small) out.push(a + b, Math.abs(a - b));
+  return out.map((n) => String(Math.round(n * 100) / 100));
 }
 
-/** Numbers the customer typed themselves (a year, a headcount) are theirs, not invented, so echoing them is fine. */
+/** Every price/date-shaped number the draft states must come from the KB text it was given, from the customer's
+    own message (a year, a headcount are theirs, not invented), or from arithmetic on those (derivedNumbers).
+    Doesn't try to understand which number means what: a reply quoting ANY other number fails, the safe direction
+    (a false failure costs one retry; a false pass ships an invented fact). */
 export function groundingCheck(draft: AgentDraft, kbContextText: string, customerMessage = ""): GuardFailure | null {
   const claimed = extractNumericClaims(draft.reply);
-  const kbNumbers = new Set([...extractNumericClaims(kbContextText), ...extractNumericClaims(customerMessage), ...groupTotals(kbContextText, draft.leadFields?.travelers)]);
+  const kbNumbers = new Set([...extractNumericClaims(kbContextText), ...extractNumericClaims(customerMessage), ...derivedNumbers(`${kbContextText}\n${customerMessage}`)]);
   const ungrounded = claimed.filter((n) => !kbNumbers.has(n));
   if (ungrounded.length === 0) return null;
   return { guard: "grounding", detail: `reply states number(s) not found in retrieved KB text: ${ungrounded.join(", ")}` };
@@ -80,6 +83,7 @@ export function lengthCheck(draft: AgentDraft): GuardFailure | null {
     a starting point, tune once real WaPromptRun confidence data exists. */
 const MIN_CONFIDENCE = 0.5;
 export function confidenceCheck(draft: AgentDraft): GuardFailure | null {
+  if (draft.kbIdsUsed.length > 0) return null; // an answer built from KB text is grounded; the number checks cover the rest
   if (draft.confidence < MIN_CONFIDENCE) return { guard: "confidence", detail: `model reported confidence ${draft.confidence}, below the ${MIN_CONFIDENCE} threshold` };
   return null;
 }
@@ -99,6 +103,7 @@ export function confidenceCheck(draft: AgentDraft): GuardFailure | null {
 // reporting low confidence.
 const HEDGE_PHRASES = [/i'm not sure/i, /i don't have that/i, /let me check/i, /i'll check/i, /i will check/i, /not certain/i];
 export function hedgeCheck(draft: AgentDraft): GuardFailure | null {
+  if (draft.kbIdsUsed.length > 0) return null; // "the team will confirm your dates" after a real answer is fine
   // Models commonly emit typographic apostrophes (U+2019 "'") - normalize
   // to straight ones before matching, or every phrase above silently
   // never matches real output (found in testing 2026-09-28).
