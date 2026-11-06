@@ -192,7 +192,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
           <Card className="overflow-hidden">
             <div className="px-[22px] pb-3 pt-5"><Label>Quick actions</Label></div>
             {[
-              { href: `${base}/kb?tab=packages&new=1`, title: "Add a package", sub: "New dates, prices or hotels", color: MINT, icon: "plus" as const },
+              { href: `${base}/kb/packages/new`, title: "Add a package", sub: "New dates, prices or hotels", color: MINT, icon: "plus" as const },
               { href: `${base}/kb?tab=faqs`, title: "Add an FAQ", sub: `Teach ${agentName} a new answer`, color: CYAN, icon: "book" as const },
               { href: `${base}/simulator`, title: "Test in the simulator", sub: "Never touches WhatsApp", color: VIOLET, icon: "chat" as const },
             ].map((a) => (

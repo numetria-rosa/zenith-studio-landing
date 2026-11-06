@@ -3,18 +3,17 @@ import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
 import { packageFromJson, type FaqFields, type PackageFields } from "@/lib/whatsapp-umrah/kb/structured";
-import { addKbDocumentAction, deleteKbDocumentAction, saveFaqAction, savePackageAction } from "../actions";
+import { addKbDocumentAction, deleteKbDocumentAction, saveFaqAction } from "../actions";
 import { Card, Chip, FieldLabel, GlassButton, IconButton, Input, PageHeader, Pill, PrimaryButton, Textarea, Tile } from "@/components/wa/ui";
 import { CYAN, MINT, VIOLET, cx } from "@/components/wa/tokens";
 import { WaIcon, type WaIconName } from "@/components/wa/Icon";
 import { ConfirmAction } from "@/components/wa/ConfirmDialog";
 import { gbp } from "@/components/wa/format";
-import { PackageForm } from "./PackageForm";
 import { FaqList } from "./FaqList";
 
 type Tab = "packages" | "faqs" | "info";
 
-export default async function KbPage({ params, searchParams }: { params: Promise<{ agencyId: string }>; searchParams: Promise<{ tab?: string; edit?: string; new?: string }> }) {
+export default async function KbPage({ params, searchParams }: { params: Promise<{ agencyId: string }>; searchParams: Promise<{ tab?: string; edit?: string }> }) {
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { agencyId } = await params;
@@ -30,16 +29,16 @@ export default async function KbPage({ params, searchParams }: { params: Promise
   const faqs = docs.filter((d) => d.kind === "FAQ");
   const info = docs.filter((d) => d.kind !== "PACKAGE" && d.kind !== "FAQ");
 
-  const editing = sp.edit ? docs.find((d) => d.id === sp.edit && d.kind === (tab === "faqs" ? "FAQ" : "PACKAGE")) : undefined;
-  const showPackageForm = tab === "packages" && (sp.new === "1" || Boolean(editing));
-  const editingFaq = editing && tab === "faqs" ? (editing.fields as FaqFields | null) : null;
+  const editing = tab === "faqs" && sp.edit ? docs.find((d) => d.id === sp.edit && d.kind === "FAQ") : undefined;
+  const editingFaq = editing ? (editing.fields as FaqFields | null) : null;
+  const newPackageHref = `${base}/packages/new`;
 
   const tabs: { id: Tab; label: string; sub: string; count: number; color: string; icon: WaIconName }[] = [
     { id: "packages", label: "Packages", sub: "Prices, hotels, nights and airports", count: packages.length, color: CYAN, icon: "plane" },
     { id: "faqs", label: "FAQs", sub: "Questions customers ask, in your words", count: faqs.length, color: VIOLET, icon: "chat" },
     { id: "info", label: "General info", sub: "Policies, ATOL, visas, opening hours", count: info.length, color: MINT, icon: "file" },
   ];
-  const addAction = tab === "packages" ? { label: "Add a package", href: `${base}?tab=packages&new=1` } : tab === "faqs" ? { label: "Add an FAQ", href: `${base}?tab=faqs#faq-question` } : { label: "Add general info", href: `${base}?tab=info#info-title` };
+  const addAction = tab === "packages" ? { label: "Add a package", href: newPackageHref } : tab === "faqs" ? { label: "Add an FAQ", href: `${base}?tab=faqs#faq-question` } : { label: "Add general info", href: `${base}?tab=info#info-title` };
 
   return (
     <div>
@@ -73,7 +72,6 @@ export default async function KbPage({ params, searchParams }: { params: Promise
 
       {tab === "packages" && (
         <>
-          {showPackageForm && <PackageForm action={savePackageAction.bind(null, agencyId, editing?.id ?? null)} values={editing ? packageFromJson(editing.fields) : packageFromJson(null)} cancelHref={`${base}?tab=packages`} />}
           <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
             {packages.map((doc) => {
               const f = doc.fields ? (packageFromJson(doc.fields) as PackageFields) : null;
@@ -83,7 +81,7 @@ export default async function KbPage({ params, searchParams }: { params: Promise
                     {f && <Pill color={CYAN}>{f.type}</Pill>}
                     {f && <span className="font-mono text-[12px] text-dim">{f.nightsMakkah + f.nightsMadinah} nights</span>}
                     <span className="flex-1" />
-                    <IconButton icon="edit" label={`Edit ${doc.title}`} href={`${base}?tab=packages&edit=${doc.id}`} />
+                    <IconButton icon="edit" label={`Edit ${doc.title}`} href={`${base}/packages/${doc.id}/edit`} />
                     <ConfirmAction
                       action={deleteKbDocumentAction.bind(null, agencyId, doc.id)}
                       title="Remove this package?"
@@ -118,7 +116,7 @@ export default async function KbPage({ params, searchParams }: { params: Promise
                 </Card>
               );
             })}
-            <Link href={`${base}?tab=packages&new=1`} className="flex min-h-[230px] flex-col items-center justify-center gap-3 rounded-[22px] border border-dashed border-[rgba(255,255,255,.18)] bg-[rgba(255,255,255,.015)] text-[15px] text-soft no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan">
+            <Link href={newPackageHref} className="flex min-h-[230px] flex-col items-center justify-center gap-3 rounded-[22px] border border-dashed border-[rgba(255,255,255,.18)] bg-[rgba(255,255,255,.015)] text-[15px] text-soft no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan">
               <Tile size={46} radius={23} style={{ background: "rgba(61,220,151,.10)", border: "1px solid rgba(61,220,151,.4)" }}>
                 <WaIcon name="plus" size={20} stroke="#7FF0BD" strokeWidth={2} />
               </Tile>

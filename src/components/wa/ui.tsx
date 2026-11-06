@@ -89,7 +89,7 @@ export const Pill = forwardRef<HTMLSpanElement, { color: string; dot?: boolean; 
   return (
     <span
       ref={ref}
-      className={cx("inline-flex h-6 items-center gap-[6px] whitespace-nowrap rounded-full px-[10px] font-mono text-[11px] uppercase tracking-[.06em]", className)}
+      className={cx("inline-flex h-[26px] items-center gap-[6px] whitespace-nowrap rounded-full px-[10px] font-mono text-[11px] uppercase tracking-[.06em]", className)}
       style={{ background: `${color}1A`, border: `1px solid ${color}55`, color, ...style }}
       {...rest}
     >
@@ -129,7 +129,8 @@ export function Toggle({ checked, onChange, label, disabled, name }: { checked: 
   );
 }
 
-const INPUT =
+/** Text-field look, shared with controls that must match inputs (the package Type listbox). */
+export const INPUT =
   "box-border h-[46px] w-full rounded-[14px] border border-[rgba(255,255,255,.12)] bg-[rgba(255,255,255,.04)] px-[14px] font-sans text-[15px] text-frost outline-none placeholder:text-dim focus:border-[rgba(92,200,255,.6)] focus:shadow-[0_0_0_3px_rgba(92,200,255,.15)] disabled:opacity-50";
 
 export const Input = forwardRef<HTMLInputElement, { mono?: boolean } & InputHTMLAttributes<HTMLInputElement>>(function Input({ mono, className, ...rest }, ref) {
@@ -196,7 +197,7 @@ export function Segmented<T extends string>({ options, value, onChange, label, s
 
 /* ---------- popover menu (Radix Popover) ---------- */
 
-export function PopoverMenu({ trigger, children, align = "start", width = 230, role = "menu", label, open, onOpenChange }: { trigger: ReactNode; children: ReactNode; align?: "start" | "end"; width?: number; role?: "menu" | "listbox"; label?: string; open?: boolean; onOpenChange?: (o: boolean) => void }) {
+export function PopoverMenu({ trigger, children, align = "start", width = 230, offset = 8, role = "menu", label, open, onOpenChange }: { trigger: ReactNode; children: ReactNode; align?: "start" | "end"; width?: number; offset?: number; role?: "menu" | "listbox"; label?: string; open?: boolean; onOpenChange?: (o: boolean) => void }) {
   return (
     <Popover.Root open={open} onOpenChange={onOpenChange}>
       <Popover.Trigger asChild>{trigger}</Popover.Trigger>
@@ -205,7 +206,7 @@ export function PopoverMenu({ trigger, children, align = "start", width = 230, r
           role={role}
           aria-label={label}
           align={align}
-          sideOffset={8}
+          sideOffset={offset}
           collisionPadding={16}
           style={{ width }}
           className="z-50 rounded-2xl border border-[rgba(255,255,255,.14)] bg-popover p-[6px] shadow-[0_24px_60px_rgba(0,0,0,.65)] outline-none"
