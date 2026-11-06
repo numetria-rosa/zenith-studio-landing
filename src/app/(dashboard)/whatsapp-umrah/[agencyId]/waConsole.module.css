@@ -55,14 +55,6 @@
 .waConsole * {
   box-sizing: border-box;
 }
-.waConsole button {
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-}
 
 .shell {
   display: grid;
