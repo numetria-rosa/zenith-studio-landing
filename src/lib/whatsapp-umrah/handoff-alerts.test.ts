@@ -49,6 +49,10 @@ describe("handoffEmail", () => {
     expect(text).toContain("Their message: Can I speak to someone?");
     expect(text).toContain("/whatsapp-umrah/a1/inbox?c=v1");
   });
+  it("tells staff what the customer has already said, so they do not re-ask", () => {
+    expect(handoffEmail({ ...base, summary: "2 travellers, Ramadan 2027", repeat: false }).text).toContain("What we know so far: 2 travellers, Ramadan 2027");
+    expect(handoffEmail({ ...base, repeat: false }).text).not.toContain("What we know");
+  });
   it("a repeat says the customer is still waiting", () => {
     const { subject, text } = handoffEmail({ ...base, reason: null, repeat: true });
     expect(subject).toBe("Al Noor Travel: Sam is still waiting for a reply");

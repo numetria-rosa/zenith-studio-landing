@@ -10,7 +10,7 @@ import { AMBER, MINT, STATUS, VIOLET, cx, isRtl, type LeadStatus } from "@/compo
 import { initialOf } from "@/components/wa/format";
 
 export type ListItem = { id: string; name: string; phone: string; preview: string; time: string; status: string; waiting: boolean; leadStatus: LeadStatus | null };
-export type TimelineItem = { kind: "msg"; id: string; who: "customer" | "ai" | "team"; body: string; time: string } | { kind: "divider"; id: string; label: string };
+export type TimelineItem = { kind: "msg"; id: string; who: "customer" | "ai" | "team"; body: string; time: string; flagged?: boolean } | { kind: "divider"; id: string; label: string; note?: string };
 export type ThreadView = {
   id: string;
   contactId: string;
@@ -31,7 +31,7 @@ type Props = {
   list: ListItem[];
   activeId: string | null;
   thread: ThreadView | null;
-  actions: { takeOver: () => Promise<void>; resume: () => Promise<void>; send: (formData: FormData) => Promise<void>; deleteContact: () => Promise<void> } | null;
+  actions: { takeOver: () => Promise<void>; resume: () => Promise<void>; send: (formData: FormData) => Promise<void>; deleteContact: () => Promise<void>; flag: (messageId: string, flagged: boolean) => Promise<void> } | null;
 };
 
 export function InboxView({ agencyId, agencyName, agentName, list, activeId, thread, actions }: Props) {
@@ -133,7 +133,10 @@ export function InboxView({ agencyId, agencyName, agentName, list, activeId, thr
                 it.kind === "divider" ? (
                   <div key={it.id} className="my-1 flex items-center gap-3">
                     <span className="h-px flex-1 bg-[rgba(255,255,255,.07)]" />
-                    <span className="font-mono text-[11px] tracking-[.06em] text-dim">{it.label}</span>
+                    <span className="text-center">
+                      <span className="block font-mono text-[11px] tracking-[.06em] text-dim">{it.label}</span>
+                      {it.note && <span className="mt-[2px] block text-[12.5px] text-mist">Why: {it.note}</span>}
+                    </span>
                     <span className="h-px flex-1 bg-[rgba(255,255,255,.07)]" />
                   </div>
                 ) : (
@@ -151,6 +154,19 @@ export function InboxView({ agencyId, agencyName, agentName, list, activeId, thr
                       <div dir="ltr" className={cx("mt-[6px] flex items-center gap-1 font-mono text-[11px]", it.who === "customer" ? "text-dim" : it.who === "ai" ? "text-mint-text opacity-85" : "text-violet-text")}>
                         {it.who === "ai" && <WaIcon name="sparkle" size={11} stroke="#7FF0BD" />}
                         {it.who === "customer" ? thread.name : it.who === "ai" ? `${agentName} · AI` : "Your team"} · {it.time}
+                        {it.who === "ai" && (
+                          <button
+                            type="button"
+                            disabled={pending}
+                            aria-pressed={!!it.flagged}
+                            title={it.flagged ? "Flagged as wrong. Click to undo." : "Flag this reply as wrong"}
+                            onClick={() => run(() => actions.flag(it.id, !it.flagged))}
+                            className={cx("ml-auto inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 font-mono text-[11px]", it.flagged ? "text-ember-text" : "text-mint-text opacity-70 hover:opacity-100")}
+                          >
+                            <WaIcon name="flag" size={11} stroke={it.flagged ? "#FF9B7A" : "#7FF0BD"} />
+                            {it.flagged ? "Flagged" : "Flag"}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

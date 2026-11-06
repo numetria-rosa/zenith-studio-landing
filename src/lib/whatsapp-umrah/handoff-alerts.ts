@@ -28,7 +28,7 @@ export function describeCustomerMessage(message: string | null): string {
   return text.length > 300 ? `${text.slice(0, 297)}...` : text;
 }
 
-export function handoffEmail(input: { agencyName: string; agencyId: string; conversationId: string; customer: string; reason: string | null; message: string | null; repeat: boolean }) {
+export function handoffEmail(input: { agencyName: string; agencyId: string; conversationId: string; customer: string; reason: string | null; message: string | null; summary?: string; repeat: boolean }) {
   const link = `${SITE_URL}/whatsapp-umrah/${input.agencyId}/inbox?c=${input.conversationId}`;
   const subject = input.repeat ? `${input.agencyName}: ${input.customer} is still waiting for a reply` : `${input.agencyName}: ${input.customer} needs a person`;
   const lines = [
@@ -37,6 +37,7 @@ export function handoffEmail(input: { agencyName: string; agencyId: string; conv
     ...(input.reason && !input.repeat ? [`Why: ${input.reason}`] : []),
     `Customer: ${input.customer}`,
     `Their message: ${describeCustomerMessage(input.message)}`,
+    ...(input.summary && !input.repeat ? [`What we know so far: ${input.summary}`] : []),
     "",
     `Open the chat and reply: ${link}`,
   ];
@@ -52,18 +53,18 @@ async function teamEmails(agencyId: string): Promise<{ agencyName: string; email
   return { agencyName: agency.name, emails: agency.memberships.map((m) => m.user.email).filter((e): e is string => !!e) };
 }
 
-async function sendAlert(args: { agencyId: string; conversationId: string; reason: string | null; message: string | null; repeat: boolean }): Promise<void> {
+async function sendAlert(args: { agencyId: string; conversationId: string; reason: string | null; message: string | null; summary?: string; repeat: boolean }): Promise<void> {
   const team = await teamEmails(args.agencyId);
   if (!team || team.emails.length === 0) return;
   const conversation = await db.waConversation.findUnique({ where: { id: args.conversationId }, select: { contact: { select: { name: true, phone: true } } } });
   const customer = conversation?.contact.name || (conversation?.contact.phone ? `+${conversation.contact.phone}` : "A customer");
-  const { subject, text } = handoffEmail({ agencyName: team.agencyName, agencyId: args.agencyId, conversationId: args.conversationId, customer, reason: args.reason, message: args.message, repeat: args.repeat });
+  const { subject, text } = handoffEmail({ agencyName: team.agencyName, agencyId: args.agencyId, conversationId: args.conversationId, customer, reason: args.reason, message: args.message, summary: args.summary, repeat: args.repeat });
   await db.waConversation.update({ where: { id: args.conversationId }, data: { humanAlertedAt: new Date() } });
   await Promise.all(team.emails.map((to) => sendPlainEmail(to, subject, text).catch((err) => console.error("[whatsapp-umrah] handoff alert email failed", err))));
 }
 
 /** A chat was just handed to a person by the agent. Never throws: an alert that fails must not break the reply path. */
-export async function alertHandoff(args: { agencyId: string; conversationId: string; reason: string; message: string | null }): Promise<void> {
+export async function alertHandoff(args: { agencyId: string; conversationId: string; reason: string; message: string | null; summary?: string }): Promise<void> {
   try {
     await sendAlert({ ...args, repeat: false });
   } catch (err) {

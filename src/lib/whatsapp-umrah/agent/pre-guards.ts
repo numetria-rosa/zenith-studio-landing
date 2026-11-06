@@ -1,3 +1,5 @@
+import { toAsciiDigits } from "./digits";
+
 /* Cheap, no-LLM checks run before the draft call - see CLAUDE.md 3.1 and
    the spec's pipeline step 3 ("Pre-guards (cheap, no LLM where possible)").
    Pure text functions only; DB-dependent checks (human-active pause, plan
@@ -44,7 +46,8 @@ function passesLuhn(digits: string): boolean {
   return sum % 10 === 0;
 }
 
-export function containsSensitiveData(text: string): boolean {
+export function containsSensitiveData(raw: string): boolean {
+  const text = toAsciiDigits(raw);
   if (PASSPORT_PATTERN.test(text)) return true;
   return (text.match(DIGIT_RUN) ?? []).some((run) => {
     const digits = run.replace(/\D/g, "");

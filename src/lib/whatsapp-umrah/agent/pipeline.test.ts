@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../kb/retrieve", () => ({ retrieveKbChunks: async () => ({ ok: true, chunks: [] }) }));
+vi.mock("../kb/retrieve", () => ({ loadKbChunks: async () => ({ ok: true, chunks: [] }) }));
 const model = vi.hoisted(() => ({ draft: null as null | Record<string, unknown>, settings: null as null | Record<string, unknown> }));
 const chunkRows = vi.hoisted(() => ({ rows: [] as { document: { id: string; kind: string; title: string } }[] }));
 vi.mock("@/lib/db", () => ({ db: { waAgency: { findUnique: async () => ({ name: "Al Noor Travel", agentSettings: model.settings }) }, waKbChunk: { findMany: async () => chunkRows.rows } } }));
@@ -8,8 +8,8 @@ vi.mock("./draft", () => ({
   draftReply: async () => (model.draft ? { ok: true, draft: model.draft, latencyMs: 1 } : { ok: false, error: "the model must not run", latencyMs: 0 }),
 }));
 vi.mock("./escalate", () => ({ escalateDraft: async () => ({ ok: false, error: "the model must not run", latencyMs: 0 }) }));
-import { runAgentPipeline } from "./pipeline";
-import { identityReply, OFF_TOPIC_REPLIES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
+import { holdingMessageFor, runAgentPipeline } from "./pipeline";
+import { HOLDING_MESSAGES, identityReply, OFF_TOPIC_REPLIES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
 
 describe("a message carrying a passport or card number", () => {
   it("hands off with the secure-documents message, without running the model", async () => {
@@ -113,5 +113,22 @@ describe("where a reply came from", () => {
     model.settings = settings;
     const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "hello" });
     expect(r.action === "reply" && r.sources).toEqual([]);
+  });
+});
+
+describe("holdingMessageFor", () => {
+  const draft = (over: Partial<import("./types").AgentDraft> = {}): import("./types").AgentDraft => ({ reply: "", language: "en", intent: "package_info", leadFields: null, handoffReason: null, confidence: 0.9, kbIdsUsed: [], ...over });
+  it("adds a question for their dates and party size when the answer just isn't in the knowledge base", () => {
+    expect(holdingMessageFor("en", ["no_kb_source"], draft())).toContain("how many people will be travelling");
+  });
+  it("is the plain message once we already know their dates and party size", () => {
+    const known = draft({ leadFields: { travelDates: "Ramadan 2027", travelers: 2 } });
+    expect(holdingMessageFor("en", ["no_kb_source"], known)).toBe(HOLDING_MESSAGES.en);
+  });
+  it("never adds a question to a complaint, an emergency or a request for a person", () => {
+    for (const intent of ["complaint", "emergency", "person_request", "payment_dispute"] as const) expect(holdingMessageFor("en", ["scope"], draft({ intent }))).toBe(HOLDING_MESSAGES.en);
+  });
+  it("is the plain message for a language the agency switched off", () => {
+    expect(holdingMessageFor("ar", ["language_disabled"], draft({ language: "ar" }))).toBe(HOLDING_MESSAGES.ar);
   });
 });

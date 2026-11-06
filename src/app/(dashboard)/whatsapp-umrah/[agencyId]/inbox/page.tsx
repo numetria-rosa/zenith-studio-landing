@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency, listConversations, getConversationThread } from "@/lib/whatsapp-umrah/dashboard-data";
-import { takeOverConversationAction, resumeAiAction, sendHumanReplyAction, deleteContactAction } from "../actions";
+import { takeOverConversationAction, resumeAiAction, sendHumanReplyAction, deleteContactAction, flagReplyAction } from "../actions";
 import { isWaitingOnPerson } from "@/lib/whatsapp-umrah/handoff-alerts";
 import { guessLanguage } from "@/lib/whatsapp-umrah/agent/language";
 import { LANGUAGE_NAMES } from "@/lib/whatsapp-umrah/agent/persona";
@@ -39,12 +39,12 @@ export default async function InboxPage({ params, searchParams }: { params: Prom
   if (thread) {
     // The chat is the messages in order, with a divider wherever control changed hands.
     const events = thread.handoffs.flatMap((h) => [
-      { at: h.startedAt, label: `${h.triggeredBy === "MANUAL" ? "YOUR TEAM TOOK OVER" : `${agentName.toUpperCase()} HANDED THIS TO YOUR TEAM`} · ${hhmm(h.startedAt)}`, id: `${h.id}-start` },
+      { at: h.startedAt, label: `${h.triggeredBy === "MANUAL" ? "YOUR TEAM TOOK OVER" : `${agentName.toUpperCase()} HANDED THIS TO YOUR TEAM`} · ${hhmm(h.startedAt)}`, id: `${h.id}-start`, note: h.triggeredBy === "AUTO" ? h.reason : undefined },
       ...(h.resolvedAt ? [{ at: h.resolvedAt, label: `${agentName.toUpperCase()} IS BACK ON THIS CHAT · ${hhmm(h.resolvedAt)}`, id: `${h.id}-end` }] : []),
     ]);
     const entries = [
-      ...thread.messages.map((m) => ({ at: m.createdAt, item: { kind: "msg", id: m.id, who: m.sender === "CUSTOMER" ? "customer" : m.sender === "HUMAN" ? "team" : "ai", body: m.body ?? "", time: hhmm(m.createdAt) } as TimelineItem })),
-      ...events.map((e) => ({ at: e.at, item: { kind: "divider", id: e.id, label: e.label } as TimelineItem })),
+      ...thread.messages.map((m) => ({ at: m.createdAt, item: { kind: "msg", id: m.id, who: m.sender === "CUSTOMER" ? "customer" : m.sender === "HUMAN" ? "team" : "ai", body: m.body ?? "", time: hhmm(m.createdAt), flagged: !!m.flaggedAt } as TimelineItem })),
+      ...events.map((e) => ({ at: e.at, item: { kind: "divider", id: e.id, label: e.label, note: "note" in e ? e.note : undefined } as TimelineItem })),
     ].sort((a, b) => a.at.getTime() - b.at.getTime());
     const first = thread.messages[0]?.createdAt;
     const items: TimelineItem[] = [...(first ? [{ kind: "divider", id: "day", label: first.toDateString() === new Date().toDateString() ? "TODAY" : first.toLocaleDateString("en-GB", { day: "numeric", month: "long" }).toUpperCase() } as TimelineItem] : []), ...entries.map((e) => e.item)];
@@ -81,6 +81,7 @@ export default async function InboxPage({ params, searchParams }: { params: Prom
                 resume: resumeAiAction.bind(null, agencyId, activeId),
                 send: sendHumanReplyAction.bind(null, agencyId, activeId),
                 deleteContact: deleteContactAction.bind(null, agencyId, thread.contactId),
+                flag: flagReplyAction.bind(null, agencyId),
               }
             : null
         }

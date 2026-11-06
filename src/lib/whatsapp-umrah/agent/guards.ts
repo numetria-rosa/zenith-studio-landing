@@ -1,5 +1,6 @@
 import type { AgentDraft, GuardFailure } from "./types";
 import { HARD_HANDOFF_INTENTS } from "./types";
+import { toAsciiDigits } from "./digits";
 
 /* Post-guards, run on every draft before it can be sent - see CLAUDE.md
    3.1 and the spec's pipeline step 6 ("Post-guards: grounding check on
@@ -16,7 +17,8 @@ import { HARD_HANDOFF_INTENTS } from "./types";
 const CURRENCY_TOKEN = /£\s?[\d,]+(?:\.\d+)?/g;
 const BARE_NUMBER_TOKEN = /\b\d[\d,]*\d\b/g; // "1,295" is one number, not "1" and "295"
 
-function extractNumericClaims(text: string): string[] {
+function extractNumericClaims(raw: string): string[] {
+  const text = toAsciiDigits(raw);
   const currency = text.match(CURRENCY_TOKEN) ?? [];
   const bare = text.replace(CURRENCY_TOKEN, " ").match(BARE_NUMBER_TOKEN) ?? [];
   const normalize = (s: string) => s.replace(/[£,\s]/g, "");
@@ -28,7 +30,8 @@ function extractNumericClaims(text: string): string[] {
     (child + adult, price minus deposit), a £ price divided by nights, and sums and differences of small numbers
     (a start day plus nights is the end day). Every operand still comes from the KB or the customer's message. */
 const MAX_MULTIPLIER = 20;
-function derivedNumbers(texts: string): string[] {
+function derivedNumbers(raw: string): string[] {
+  const texts = toAsciiDigits(raw);
   const money = (texts.match(CURRENCY_TOKEN) ?? []).map((s) => Number(s.replace(/[£,\s]/g, "")));
   const small = [...new Set((texts.replace(CURRENCY_TOKEN, " ").match(BARE_NUMBER_TOKEN) ?? []).map((s) => Number(s.replace(/,/g, ""))).filter((n) => n >= 1 && n <= 90))];
   const out: number[] = [];
@@ -69,7 +72,7 @@ export function scopeGuard(draft: AgentDraft): GuardFailure | null {
 /** Basic sanity, not a content check: an empty reply, or one implausibly
     long for a WhatsApp message, is itself a signal something went wrong
     upstream (a truncated/malformed generation) rather than a real answer. */
-const MAX_REPLY_CHARS = 1000;
+const MAX_REPLY_CHARS = 1500; // a list of several matching packages is longer than a one-line answer
 export function lengthCheck(draft: AgentDraft): GuardFailure | null {
   if (!draft.reply.trim()) return { guard: "length", detail: "empty reply" };
   if (draft.reply.length > MAX_REPLY_CHARS) return { guard: "length", detail: `reply too long (${draft.reply.length} chars)` };

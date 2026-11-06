@@ -9,6 +9,7 @@ import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
 import { ingestDocument } from "@/lib/whatsapp-umrah/kb/ingest";
 import { faqToText, packageToText, parseFaqForm, parsePackageForm } from "@/lib/whatsapp-umrah/kb/structured";
 import { takeOverConversation, resumeAi } from "@/lib/whatsapp-umrah/handoff";
+import { setReplyFlag } from "@/lib/whatsapp-umrah/flags";
 import { runAgentPipeline } from "@/lib/whatsapp-umrah/agent/pipeline";
 import { decryptSecret } from "@/lib/secrets";
 import { META_TOKEN_ENV } from "@/lib/whatsapp-umrah/inbound";
@@ -117,6 +118,12 @@ export async function takeOverConversationAction(agencyId: string, conversationI
   const { agency, userId } = await requireOwnedAgency(agencyId);
   const result = await takeOverConversation(agency.id, conversationId, userId);
   if (!result.ok) throw new Error(result.error);
+  revalidatePath(`/whatsapp-umrah/${agencyId}/inbox`);
+}
+
+export async function flagReplyAction(agencyId: string, messageId: string, flagged: boolean): Promise<void> {
+  const { agency } = await requireOwnedAgency(agencyId);
+  await setReplyFlag(agency.id, messageId, flagged);
   revalidatePath(`/whatsapp-umrah/${agencyId}/inbox`);
 }
 

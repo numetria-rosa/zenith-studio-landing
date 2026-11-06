@@ -98,7 +98,7 @@ describe("lengthCheck", () => {
     expect(lengthCheck(baseDraft({ reply: "   " }))?.guard).toBe("length");
   });
   it("fails on an implausibly long reply", () => {
-    expect(lengthCheck(baseDraft({ reply: "a".repeat(1001) }))?.guard).toBe("length");
+    expect(lengthCheck(baseDraft({ reply: "a".repeat(1501) }))?.guard).toBe("length");
   });
   it("passes a normal reply", () => {
     expect(lengthCheck(baseDraft())).toBeNull();
@@ -159,5 +159,19 @@ describe("runGuards", () => {
   it("returns nothing for a clean, grounded, in-scope draft that cites its KB source", () => {
     const draft = baseDraft({ reply: "It's £950 for 10 nights.", kbIdsUsed: ["chunk1"] });
     expect(runGuards(draft, "£950, 10 nights")).toEqual([]);
+  });
+});
+
+describe("Arabic and Urdu digits", () => {
+  const kb = "Economy package: £1,295 per person, 7 nights.";
+  it("reads Arabic-Indic and Urdu digits, so an invented price in them still fails", () => {
+    expect(groundingCheck(baseDraft({ reply: "السعر ٩٩٩٩ جنيه." }), kb)?.detail).toContain("9999");
+    expect(groundingCheck(baseDraft({ reply: "قیمت ۹۹۹۹ پاؤنڈ ہے۔" }), kb)?.detail).toContain("9999");
+  });
+  it("passes a grounded number written in Arabic-Indic digits, separators included", () => {
+    expect(groundingCheck(baseDraft({ reply: "السعر £١٬٢٩٥ للشخص لمدة ٧ ليالٍ." }), kb)).toBeNull();
+  });
+  it("passes arithmetic written in Arabic-Indic digits", () => {
+    expect(groundingCheck(baseDraft({ reply: "المجموع £٢٬٥٩٠ لشخصين." }), kb)).toBeNull();
   });
 });

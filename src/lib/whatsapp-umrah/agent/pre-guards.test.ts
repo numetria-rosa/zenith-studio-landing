@@ -62,3 +62,10 @@ describe("isIdentityQuestion", () => {
     for (const t of ["Can I speak to a real person?", "I want to talk to a human", "are you able to put me through to a person?", "how much is the 7 night package?"]) expect(isIdentityQuestion(t)).toBe(false);
   });
 });
+
+describe("containsSensitiveData with Arabic and Urdu digits", () => {
+  it("catches a card number typed in Arabic-Indic or Urdu digits", () => {
+    expect(containsSensitiveData("٤٢٤٢ ٤٢٤٢ ٤٢٤٢ ٤٢٤٢")).toBe(true);
+    expect(containsSensitiveData("۴۲۴۲ ۴۲۴۲ ۴۲۴۲ ۴۲۴۲")).toBe(true);
+  });
+});

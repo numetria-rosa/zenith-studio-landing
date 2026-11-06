@@ -2000,6 +2000,7 @@ model WaMessage {
   templateName      String?
   body              String?
   metaBillable      Boolean            @default(false) // counted separately from ai_replies in usage metering
+  flaggedAt         DateTime? // an AI reply the owner marked as wrong
   costEstimateCents Int?
 
   createdAt DateTime @default(now())

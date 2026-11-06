@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isHotLead } from "./leads";
+import { isHotLead, leadSummaryLine } from "./leads";
 import type { LeadFields } from "./agent/types";
 
 const noFields: LeadFields = {};
@@ -21,5 +21,15 @@ describe("isHotLead", () => {
 
   it("is not hot for an ordinary info question with no fields", () => {
     expect(isHotLead(noFields, "package_info")).toBe(false);
+  });
+});
+
+describe("leadSummaryLine", () => {
+  it("gives staff one line of what the customer has said", () => {
+    expect(leadSummaryLine({ travelers: 2, travelDates: "Ramadan 2027", departureCity: "Manchester", budgetGbp: 3000 })).toBe("2 travellers, Ramadan 2027, from Manchester, budget £3,000");
+  });
+  it("is empty when nothing is known", () => {
+    expect(leadSummaryLine(null)).toBe("");
+    expect(leadSummaryLine({})).toBe("");
   });
 });

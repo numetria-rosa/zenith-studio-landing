@@ -127,3 +127,18 @@ export async function notifyOwnerOfHotLead(input: {
     params: [input.customerName || input.customerPhone],
   });
 }
+
+/** One line for staff on what the customer has told us so far, e.g. "2 travellers, Ramadan 2027, from Manchester". */
+export function leadSummaryLine(f: LeadFields | null): string {
+  if (!f) return "";
+  return [
+    f.travelers ? `${f.travelers} traveller${f.travelers === 1 ? "" : "s"}` : null,
+    f.travelDates,
+    f.departureCity && `from ${f.departureCity}`,
+    f.packagePreference && `interested in ${f.packagePreference}`,
+    f.hotelTier && `${f.hotelTier} hotel`,
+    f.budgetGbp ? `budget £${f.budgetGbp.toLocaleString("en-GB")}` : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
+}

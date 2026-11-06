@@ -1,15 +1,15 @@
 import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v4";
-import { retrieveKbChunks, type RetrievedChunk } from "../kb/retrieve";
+import { loadKbChunks, type RetrievedChunk } from "../kb/retrieve";
 import { containsSensitiveData, isIdentityQuestion, isOptOutMessage } from "./pre-guards";
 import { plainHandoffReason, TECHNICAL_PROBLEM_REASON } from "./reasons";
 import { guessLanguage } from "./language";
 import { applyPersona, LANGUAGE_NAMES, loadPersona, personaPrompt, replyLanguageAllowed, type Persona } from "./persona";
-import { HOLDING_MESSAGES, identityReply, OFF_TOPIC_REPLIES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
+import { HOLDING_FOLLOW_UPS, HOLDING_MESSAGES, identityReply, OFF_TOPIC_REPLIES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
 import { draftReply, type DraftResult } from "./draft";
 import { escalateDraft } from "./escalate";
 import { runGuards } from "./guards";
 import { db } from "@/lib/db";
-import type { AgentDraft, GuardFailure, KbSource, Language, PipelineResult, PromptRunRecord } from "./types";
+import { HARD_HANDOFF_INTENTS, type AgentDraft, type GuardFailure, type KbSource, type Language, type PipelineResult, type PromptRunRecord } from "./types";
 
 const GROQ_MODEL = () => process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 const CLAUDE_MODEL = () => process.env.CLAUDE_MODEL || "claude-haiku-4-5-20251001";
@@ -95,7 +95,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     return fixedReplyResult(identityReply(language, persona.agentName, persona.agencyName), language, "identity_question", "identity_question", persona, []);
   }
 
-  const retrieval = await retrieveKbChunks(input.agencyId, input.customerMessage);
+  const retrieval = await loadKbChunks(input.agencyId, input.customerMessage);
   const kbContext = retrieval.ok ? formatKbContext(retrieval.chunks) : "";
   const draftInput = { customerMessage: input.customerMessage, kbContext, conversationHistory: input.conversationHistory ?? "", persona: personaPrompt(persona) };
   const promptRuns: PromptRunRecord[] = [];
@@ -176,11 +176,22 @@ function languageOffResult(draft: AgentDraft, persona: Persona, promptRuns: Prom
   return handoffResult(`customer wrote in ${LANGUAGE_NAMES[draft.language]}, which this agency has not enabled (it replies in: ${names})`, draft.language, ["language_disabled"], draft, promptRuns);
 }
 
+/** The holding message, plus a question for the customer when the handoff is only a knowledge gap or a technical
+    problem (not a complaint, dispute, emergency, request for a person or a disabled language) and we still lack
+    their dates or party size. */
+export function holdingMessageFor(language: Language, guardsTriggered: string[], draft: AgentDraft | null): string {
+  const base = HOLDING_MESSAGES[language];
+  const personNeeded = (draft && HARD_HANDOFF_INTENTS.includes(draft.intent)) || guardsTriggered.includes("language_disabled");
+  const known = draft?.leadFields;
+  if (personNeeded || (known?.travelDates && known?.travelers)) return base;
+  return `${base} ${HOLDING_FOLLOW_UPS[language]}`;
+}
+
 function handoffResult(reason: string, language: Language, guardsTriggered: string[], draft: AgentDraft | null, promptRuns: PromptRunRecord[]): PipelineResult {
   return {
     action: "handoff",
     reason,
-    holdingMessage: HOLDING_MESSAGES[language],
+    holdingMessage: holdingMessageFor(language, guardsTriggered, draft),
     language,
     intent: draft?.intent ?? null,
     leadFields: draft?.leadFields ?? null,

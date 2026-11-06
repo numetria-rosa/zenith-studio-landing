@@ -11,6 +11,15 @@ export const HOLDING_MESSAGES: Record<Language, string> = {
   ur: "آپ کے پیغام کا شکریہ۔ ہماری ٹیم کا کوئی رکن جلد آپ سے رابطہ کرے گا۔",
 };
 
+/** Added to the holding message when the chat is handed off only because the answer isn't in the knowledge base
+    (not a complaint or a request for a person), so the customer's wait gives the team their dates and party size. */
+export const HOLDING_FOLLOW_UPS: Record<Language, string> = {
+  en: "In the meantime, which dates are you thinking of, and how many people will be travelling?",
+  ar: "في هذه الأثناء، ما هي التواريخ التي تفكر فيها وكم عدد المسافرين؟",
+  tr: "Bu arada, hangi tarihleri düşünüyorsunuz ve kaç kişi seyahat edecek?",
+  ur: "اس دوران، آپ کون سی تاریخیں سوچ رہے ہیں اور کتنے لوگ سفر کریں گے؟",
+};
+
 export const SENSITIVE_DATA_REPLIES: Record<Language, string> = {
   en: "For your security, please don't send documents or card details here. Our team will collect anything needed securely.",
   ar: "لأمانك، يرجى عدم إرسال المستندات أو تفاصيل البطاقة هنا. سيقوم فريقنا بجمع أي شيء مطلوب بشكل آمن.",

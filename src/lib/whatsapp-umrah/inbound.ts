@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { decryptSecret } from "@/lib/secrets";
 import { sendPlainEmail } from "@/lib/outreach-mail";
 import { runAgentPipeline } from "./agent/pipeline";
-import { upsertLeadFromDraft, notifyOwnerOfHotLead } from "./leads";
+import { leadSummaryLine, upsertLeadFromDraft, notifyOwnerOfHotLead } from "./leads";
 import { MetaCloudWhatsAppProvider } from "./provider/meta";
 import { withinCap, recordAiReply } from "./entitlements";
 import { isWithinBusinessHours } from "./hours";
@@ -107,10 +107,10 @@ async function underReplyLimit(agency: { id: string; name: string }, ownerEmail:
 }
 
 /** Hands the chat to a person and tells the team by email (customerMessage null = not plain text). */
-async function handOff(agencyId: string, conversationId: string, reason: string, customerMessage: string | null): Promise<void> {
+async function handOff(agencyId: string, conversationId: string, reason: string, customerMessage: string | null, summary?: string): Promise<void> {
   await db.waConversation.update({ where: { id: conversationId }, data: { status: "HUMAN" } });
   await db.waHandoff.create({ data: { agencyId, conversationId, reason, triggeredBy: "AUTO" } });
-  await alertHandoff({ agencyId, conversationId, reason, message: customerMessage });
+  await alertHandoff({ agencyId, conversationId, reason, message: customerMessage, summary });
 }
 
 /** One inbound text message, start to finish: dedupe, opt-out, load
@@ -204,7 +204,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
 
   const outboundText = result.action === "reply" ? result.text : result.holdingMessage;
   if (outboundText) await deliver(delivery, outboundText, providerOverride);
-  if (result.action === "handoff") await handOff(agency.id, conversation.id, result.reason, msg.body);
+  if (result.action === "handoff") await handOff(agency.id, conversation.id, result.reason, msg.body, leadSummaryLine(result.leadFields));
 
   // Lead capture runs on a handoff too, not only a normal reply - a
   // customer who states their budget/dates/travellers and then gets
