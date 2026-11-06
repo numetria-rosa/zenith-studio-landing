@@ -26,6 +26,27 @@ describe("groundingCheck", () => {
     expect(result?.detail).toContain("1200");
   });
 
+  describe("the 'two of us in Ramadan 2027' question", () => {
+    const kb = "7 Night Economy Umrah: £1,295 per person.";
+    const message = "i want to go to umrah with my mom in ramadhan 2027, how much will it be the two of us";
+    const reply = "The 7 Night Economy Umrah is £1,295 per person, so £2,590 for two of you. I'll note Ramadan 2027 for the team.";
+
+    it("passes the group total and the year the customer typed", () => {
+      const draft = baseDraft({ reply, leadFields: { travelers: 2 } });
+      expect(groundingCheck(draft, kb, message)).toBeNull();
+    });
+
+    it("still rejects a total that is not price x travellers", () => {
+      const draft = baseDraft({ reply: "£1,295 per person, so £2,800 for two.", leadFields: { travelers: 2 } });
+      expect(groundingCheck(draft, kb, message)?.detail).toContain("2800");
+    });
+
+    it("rejects the total when the model did not report a party size, and the year when the customer never typed it", () => {
+      expect(groundingCheck(baseDraft({ reply: "£2,590 for two." }), kb, message)?.detail).toContain("2590");
+      expect(groundingCheck(baseDraft({ reply: "Ramadan 2027 is open." }), kb, "when can we go?")?.detail).toContain("2027");
+    });
+  });
+
   it("ignores single-digit numbers (too noisy to be worth checking)", () => {
     const draft = baseDraft({ reply: "We have 5-star hotels." });
     expect(groundingCheck(draft, "Nothing relevant retrieved.")).toBeNull();

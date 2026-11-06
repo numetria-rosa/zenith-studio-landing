@@ -14,13 +14,13 @@ import { HARD_HANDOFF_INTENTS } from "./types";
     hotel" isn't a fact that needs grounding on its own) for the safety
     this buys. */
 const CURRENCY_TOKEN = /£\s?[\d,]+(?:\.\d+)?/g;
-const BARE_NUMBER_TOKEN = /\b\d{2,}\b/g;
+const BARE_NUMBER_TOKEN = /\b\d[\d,]*\d\b/g; // "1,295" is one number, not "1" and "295"
 
 function extractNumericClaims(text: string): string[] {
   const currency = text.match(CURRENCY_TOKEN) ?? [];
-  const bare = text.match(BARE_NUMBER_TOKEN) ?? [];
+  const bare = text.replace(CURRENCY_TOKEN, " ").match(BARE_NUMBER_TOKEN) ?? [];
   const normalize = (s: string) => s.replace(/[£,\s]/g, "");
-  return [...new Set([...currency.map(normalize), ...bare])];
+  return [...new Set([...currency.map(normalize), ...bare.map(normalize)])];
 }
 
 /** Every price/date-shaped number the draft states must appear somewhere
@@ -28,9 +28,21 @@ function extractNumericClaims(text: string): string[] {
     means what - a reply that quotes ANY number absent from the retrieved
     KB text fails, which is the safe direction (a false failure costs one
     retry; a false pass ships an invented fact). */
-export function groundingCheck(draft: AgentDraft, kbContextText: string): GuardFailure | null {
+/** Totals for a group: every £ amount in the KB times each party size from 2 up to the number of travellers the
+    model reported (capped), so "£2,590 for two" passes when the KB says £1,295 per person. */
+const MAX_PARTY = 20;
+function groupTotals(kbContextText: string, travelers: number | undefined): string[] {
+  const n = Math.min(Math.floor(travelers ?? 0), MAX_PARTY);
+  const amounts = (kbContextText.match(CURRENCY_TOKEN) ?? []).map((s) => Number(s.replace(/[£,\s]/g, "")));
+  const totals: string[] = [];
+  for (let k = 2; k <= n; k++) for (const a of amounts) totals.push(String(Math.round(a * k * 100) / 100));
+  return totals;
+}
+
+/** Numbers the customer typed themselves (a year, a headcount) are theirs, not invented, so echoing them is fine. */
+export function groundingCheck(draft: AgentDraft, kbContextText: string, customerMessage = ""): GuardFailure | null {
   const claimed = extractNumericClaims(draft.reply);
-  const kbNumbers = new Set(extractNumericClaims(kbContextText));
+  const kbNumbers = new Set([...extractNumericClaims(kbContextText), ...extractNumericClaims(customerMessage), ...groupTotals(kbContextText, draft.leadFields?.travelers)]);
   const ungrounded = claimed.filter((n) => !kbNumbers.has(n));
   if (ungrounded.length === 0) return null;
   return { guard: "grounding", detail: `reply states number(s) not found in retrieved KB text: ${ungrounded.join(", ")}` };
@@ -112,8 +124,8 @@ export function noKbSourceCheck(draft: AgentDraft): GuardFailure | null {
   return null;
 }
 
-export function runGuards(draft: AgentDraft, kbContextText: string): GuardFailure[] {
-  return [scopeGuard(draft), groundingCheck(draft, kbContextText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft)].filter(
+export function runGuards(draft: AgentDraft, kbContextText: string, customerMessage = ""): GuardFailure[] {
+  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft)].filter(
     (f): f is GuardFailure => f !== null
   );
 }

@@ -1,4 +1,4 @@
-import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v3";
+import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v4";
 import { retrieveKbChunks, type RetrievedChunk } from "../kb/retrieve";
 import { containsSensitiveData, isIdentityQuestion, isOptOutMessage } from "./pre-guards";
 import { plainHandoffReason, TECHNICAL_PROBLEM_REASON } from "./reasons";
@@ -106,7 +106,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     console.error("[whatsapp-umrah pipeline] draft failed:", first.error); // the detail is for us; the owner gets a plain reason
     return handoffResult(TECHNICAL_PROBLEM_REASON, fallbackLanguage, ["draft_error"], null, promptRuns);
   }
-  const firstFailures = runGuards(first.draft, kbContext);
+  const firstFailures = runGuards(first.draft, kbContext, input.customerMessage);
   promptRuns.push(toPromptRunRecord("DRAFT", GROQ_MODEL(), first, guardNames(firstFailures)));
   // A language the agency has switched off goes to a person (no retry: a second draft would be in the same language).
   if (!replyLanguageAllowed(first.draft.language, persona)) return languageOffResult(first.draft, persona, promptRuns);
@@ -129,7 +129,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     console.error("[whatsapp-umrah pipeline] escalation failed:", escalated.error);
     return handoffResult(plainHandoffReason(first.draft, firstFailures), first.draft.language, guardNames(firstFailures), first.draft, promptRuns);
   }
-  const secondFailures = runGuards(escalated.draft, kbContext);
+  const secondFailures = runGuards(escalated.draft, kbContext, input.customerMessage);
   promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures)));
   if (secondFailures.length === 0) {
     return replyResult(escalated.draft, "claude:" + CLAUDE_MODEL(), guardNames(firstFailures), promptRuns, persona, await resolveSources(input.agencyId, escalated.draft.kbIdsUsed));
