@@ -5,7 +5,7 @@ import { WaIcon } from "@/components/wa/Icon";
 import { Card, Hint, Label, Pill } from "@/components/wa/ui";
 import { CYAN } from "@/components/wa/tokens";
 
-/** Sticky right rail: live package card, an example reply (a front-end template, no AI call), and what Sara can answer. */
+/** Sticky right rail: live package card, an example reply (a front-end template, no AI call), and what the agent can answer. */
 export function PackageRail({ d, agentName, agencyName }: { d: PackageDraft; agentName: string; agencyName: string }) {
   const price = parsePrice(d.price);
   const nights = totalNights(d);

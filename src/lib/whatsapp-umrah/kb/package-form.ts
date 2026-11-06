@@ -137,7 +137,7 @@ export function stepStates(d: PackageDraft): (boolean | null)[] {
   return [!!d.name.trim(), totalNights(d) > 0 && !!d.makkahName.trim(), price !== null && price > 0, d.airports.length > 0, d.items.some((i) => i.state !== 0), null];
 }
 
-/** The 9 things Sara can answer from this package. */
+/** The 9 things the agent can answer from this package. */
 export function answerChecks(d: PackageDraft): [string, boolean][] {
   const price = parsePrice(d.price);
   return [
@@ -153,7 +153,7 @@ export function answerChecks(d: PackageDraft): [string, boolean][] {
   ];
 }
 
-/** Front-end template only: an example of Sara's reply, built from the fields. No AI call. */
+/** Front-end template only: an example of the agent's reply, built from the fields. No AI call. */
 export function exampleAnswer(d: PackageDraft, agentName: string, agencyName: string): string {
   const price = parsePrice(d.price);
   const priceText = price !== null && price > 0 ? gbp(price) : "£-";

@@ -146,7 +146,7 @@ export function SettingsForm({ agencyId, initial, used, planCap, billing, cancel
                 </div>
                 <div>
                   <FieldLabel htmlFor="signOff">Sign-off (optional)</FieldLabel>
-                  <Input id="signOff" value={s.signOff} placeholder="e.g. Sara, Zenith Demo Travel" onChange={(e) => set("signOff", e.target.value)} />
+                  <Input id="signOff" value={s.signOff} placeholder="e.g. Zen, Zenith Demo Travel" onChange={(e) => set("signOff", e.target.value)} />
                   <Hint>Added to the end of every reply.</Hint>
                 </div>
                 <div className="flex items-center gap-[14px]">

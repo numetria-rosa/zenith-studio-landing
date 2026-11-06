@@ -7,7 +7,7 @@ import { FieldLabel, GhostButton, Hint, INPUT, Input, Label, Pill, PopoverMenu, 
 import { CYAN, EMBER, MINT, cx } from "@/components/wa/tokens";
 
 type Set = (patch: Partial<PackageDraft>) => void;
-type StepProps = { d: PackageDraft; set: Set };
+type StepProps = { d: PackageDraft; set: Set; agentName: string };
 
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan";
 const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
@@ -70,7 +70,7 @@ function TypeListbox({ value, onChange }: { value: string; onChange: (v: string)
   );
 }
 
-export function BasicsStep({ d, set }: StepProps) {
+export function BasicsStep({ d, set, agentName }: StepProps) {
   return (
     <section className="px-7 py-[26px]">
       <StepHead title="Basics" sub="What customers will ask for by name." />
@@ -88,7 +88,7 @@ export function BasicsStep({ d, set }: StepProps) {
         <FieldLabel htmlFor="pkg-description">
           Description <span className="text-dim">(optional)</span>
         </FieldLabel>
-        <Textarea id="pkg-description" rows={3} value={d.description} maxLength={LIMITS.long} onChange={(e) => set({ description: e.target.value })} placeholder="One or two sentences Sara can use to describe this package." />
+        <Textarea id="pkg-description" rows={3} value={d.description} maxLength={LIMITS.long} onChange={(e) => set({ description: e.target.value })} placeholder={`One or two sentences ${agentName} can use to describe this package.`} />
       </div>
     </section>
   );
@@ -140,7 +140,7 @@ const KEYS = {
   madinah: { nights: "nightsMadinah", name: "madinahName", stars: "madinahStars", metres: "madinahMetres" },
 } as const;
 
-function HotelCard({ h, d, set }: { h: Hotel } & StepProps) {
+function HotelCard({ h, d, set }: { h: Hotel } & Omit<StepProps, "agentName">) {
   const k = KEYS[h.key];
   const put = (key: keyof PackageDraft, value: string | number) => set({ [key]: value } as Partial<PackageDraft>);
   const walk = walkMinutes(d[k.metres]);
@@ -190,10 +190,10 @@ export function StayStep({ d, set }: StepProps) {
 
 /* ---------- 3. Price ---------- */
 
-export function PriceStep({ d, set }: StepProps) {
+export function PriceStep({ d, set, agentName }: StepProps) {
   return (
     <section className="px-7 py-[26px]">
-      <StepHead title="Price" sub="Exactly what Sara quotes. Always per person." />
+      <StepHead title="Price" sub={`Exactly what ${agentName} quotes. Always per person.`} />
       <div className="grid items-start gap-[18px]" style={{ gridTemplateColumns: "220px minmax(0, 1fr)" }}>
         <div>
           <FieldLabel htmlFor="pkg-price">Price per person</FieldLabel>
@@ -233,7 +233,7 @@ export function PriceStep({ d, set }: StepProps) {
 
 /* ---------- 4. Travel ---------- */
 
-export function TravelStep({ d, set }: StepProps) {
+export function TravelStep({ d, set, agentName }: StepProps) {
   const [draft, setDraft] = useState("");
   const [full, setFull] = useState(false);
   const add = (raw: string) => {
@@ -288,7 +288,7 @@ export function TravelStep({ d, set }: StepProps) {
           </button>
         ))}
       </div>
-      {full && <Hint className="mt-2">That is as many airports as Sara can hold for one package. Remove one to add another.</Hint>}
+      {full && <Hint className="mt-2">That is as many airports as {agentName} can hold for one package. Remove one to add another.</Hint>}
       <div className="mt-[18px] grid gap-[14px]" style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)" }}>
         <div>
           <FieldLabel htmlFor="pkg-airline">Airline and flights</FieldLabel>
@@ -331,7 +331,7 @@ const STATE_STYLE: Record<ChipState, string> = {
   2: "border-[rgba(255,92,122,.45)] bg-[rgba(255,92,122,.08)] text-ember-text",
 };
 
-export function IncludedStep({ d, set }: StepProps) {
+export function IncludedStep({ d, set, agentName }: StepProps) {
   const [adding, setAdding] = useState(false);
   const [text, setText] = useState("");
   const nInc = d.items.filter((i) => i.state === 1).length;
@@ -400,7 +400,7 @@ export function IncludedStep({ d, set }: StepProps) {
         </span>
         <span className="inline-flex items-center gap-[6px]">
           <span className="box-border h-2 w-2 rounded-[4px] border border-[rgba(255,255,255,.3)]" />
-          Sara won&apos;t mention it
+          {agentName} won&apos;t mention it
         </span>
       </div>
     </section>
@@ -409,10 +409,10 @@ export function IncludedStep({ d, set }: StepProps) {
 
 /* ---------- 6. Extras ---------- */
 
-export function ExtrasStep({ d, set }: StepProps) {
+export function ExtrasStep({ d, set, agentName }: StepProps) {
   return (
     <section className="px-7 py-[26px]">
-      <StepHead title="Extras" sub="Optional notes Sara may repeat word for word." />
+      <StepHead title="Extras" sub={`Optional notes ${agentName} may repeat word for word.`} />
       <Textarea aria-label="Anything else" rows={4} value={d.notes} maxLength={LIMITS.long} onChange={(e) => set({ notes: e.target.value })} placeholder="e.g. Children 2 to 11 sharing with two adults are £1,150. Cancellation follows our standard policy." />
     </section>
   );

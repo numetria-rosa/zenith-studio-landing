@@ -138,7 +138,7 @@ export function PackageEditor({ base, mode, savedName, initial, agentName, agenc
             </div>
 
             <div className="flex-1">
-              <Panel d={d} set={set} />
+              <Panel d={d} set={set} agentName={agentName} />
             </div>
 
             <div className="flex items-center gap-3 border-t border-[rgba(255,255,255,.07)] px-6 py-4">

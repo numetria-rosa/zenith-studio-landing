@@ -96,8 +96,8 @@ describe("package form draft", () => {
   });
 
   it("the example reply is built from the fields", () => {
-    const text = exampleAnswer(draftFromFields(economy), "Sara", "Zenith Demo Travel");
-    expect(text).toBe("The 7 Night Economy Umrah is £1,295 per person (quad sharing). 4 nights in Makkah at Dar Al Safa Hotel (3★), 600m from the Haram. 3 nights in Madinah. Flights from London Heathrow, Manchester, Birmingham. Includes return flights, visa, airport transfers, breakfast. Sara, Zenith Demo Travel");
+    const text = exampleAnswer(draftFromFields(economy), "Zen", "Zenith Demo Travel");
+    expect(text).toBe("The 7 Night Economy Umrah is £1,295 per person (quad sharing). 4 nights in Makkah at Dar Al Safa Hotel (3★), 600m from the Haram. 3 nights in Madinah. Flights from London Heathrow, Manchester, Birmingham. Includes return flights, visa, airport transfers, breakfast. Zen, Zenith Demo Travel");
   });
 
   it("save is blocked on the step that needs fixing, in the same order the parser checks", () => {
