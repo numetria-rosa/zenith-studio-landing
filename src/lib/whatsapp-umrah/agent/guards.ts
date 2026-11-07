@@ -148,23 +148,35 @@ const UNSUPPORTED_PROMISES: [RegExp, RegExp, string][] = [
   [/\bpayment link\b/i, /\b(send|share|email)\b[^.]{0,30}\bpayment link\b/i, "promises a payment link"],
   [/\b(by|via|with|using) (a )?(credit |debit )?card\b|\bcard payment\b/i, /\b(pay|payment|deposit|balance)\b[^.]{0,60}\bcard\b|\bcard payments?\b/i, "names card as a payment method"],
 ];
-/** A group of two or more with a per-person price given as the TOTAL: "For 2 travellers the total is £3,950" when
-    £3,950 is one person's price. The number check can't see it (£3,950 is in the knowledge base), and it costs the
-    customer a wrong quote, so a figure sitting next to the word "total" that is a per-person price fails. */
+/** For a group of two or more, a PER-PERSON figure given where the group figure belongs: "For 2 travellers the total
+    is £3,950" (one person's price), "the deposit is £750" (one person's deposit), "the balance is £3,200" (one
+    person's balance). The number check can't see it, because each of those figures really is in the knowledge base,
+    and it gives the customer a wrong quote. So a figure sitting next to the word "total", "deposit" or "balance" that
+    equals a per-person figure fails, unless the reply says "per person" (or similar) beside it. */
+export type PerPersonFigures = { prices: number[]; deposits: number[]; balances: number[] };
 const PARTY_WORDS: Record<string, number> = { two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 };
 const PER_PERSON_HINT = /per person|per adult|each|a head|pp\b|per traveller/i;
-export function perPersonAsTotalCheck(draft: AgentDraft, perPersonPrices: number[]): GuardFailure | null {
-  if (perPersonPrices.length === 0) return null;
+const FIGURE_WORDS: { key: keyof PerPersonFigures; word: string; label: string }[] = [
+  { key: "prices", word: "total", label: "the total" },
+  { key: "deposits", word: "deposit", label: "the deposit" },
+  { key: "balances", word: "balance|remaining", label: "the balance" },
+];
+export function perPersonFigureCheck(draft: AgentDraft, figures: PerPersonFigures): GuardFailure | null {
   const text = toAsciiDigits(draft.reply);
   const said = text.match(/\b(\d+|two|three|four|five|six|seven|eight)\s+(?:travellers?|people|adults|persons|passengers|guests)\b/i)?.[1]?.toLowerCase();
   const party = draft.leadFields?.travelers ?? (said ? (PARTY_WORDS[said] ?? Number(said)) : 1);
   if (!(party >= 2)) return null;
-  const nearTotal = [...text.matchAll(/\btotal\b[^£.\n]{0,40}£\s?([\d,]+(?:\.\d+)?)|£\s?([\d,]+(?:\.\d+)?)([^.\n£]{0,25}?)\btotal\b/gi)];
-  for (const m of nearTotal) {
-    const amount = Number((m[1] ?? m[2]).replace(/,/g, ""));
-    const between = m[3] ?? "";
-    if (perPersonPrices.includes(amount) && !PER_PERSON_HINT.test(between)) {
-      return { guard: "per_person_as_total", detail: `reply gives £${amount.toLocaleString("en-GB")} as the total for ${party} travellers, but that is the per-person price (the total is in the QUOTES table)` };
+  for (const { key, word, label } of FIGURE_WORDS) {
+    const perPerson = figures[key];
+    if (perPerson.length === 0) continue;
+    const near = new RegExp(`\\b(?:${word})\\b[^£.\\n]{0,40}£\\s?([\\d,]+(?:\\.\\d+)?)|£\\s?([\\d,]+(?:\\.\\d+)?)([^.\\n£]{0,25}?)\\b(?:${word})\\b`, "gi");
+    for (const m of text.matchAll(near)) {
+      const amount = Number((m[1] ?? m[2]).replace(/,/g, ""));
+      const before = m[3] ?? "";
+      const after = text.slice(m.index + m[0].length, m.index + m[0].length + 25);
+      if (perPerson.includes(amount) && !PER_PERSON_HINT.test(before) && !PER_PERSON_HINT.test(after)) {
+        return { guard: "per_person_figure", detail: `reply gives £${amount.toLocaleString("en-GB")} as ${label} for ${party} travellers, but that is the per-person figure (the group figure is in the QUOTES table)` };
+      }
     }
   }
   return null;
@@ -191,8 +203,8 @@ export function promptLeakCheck(draft: AgentDraft): GuardFailure | null {
   return null;
 }
 
-export function runGuards(draft: AgentDraft, kbContextText: string, customerMessage = "", extraText = "", perPersonPrices: number[] = []): GuardFailure[] {
-  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft), unsupportedPromiseCheck(draft, kbContextText), falseBookingClaimCheck(draft), perPersonAsTotalCheck(draft, perPersonPrices)].filter(
+export function runGuards(draft: AgentDraft, kbContextText: string, customerMessage = "", extraText = "", perPerson: PerPersonFigures = { prices: [], deposits: [], balances: [] }): GuardFailure[] {
+  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft), unsupportedPromiseCheck(draft, kbContextText), falseBookingClaimCheck(draft), perPersonFigureCheck(draft, perPerson)].filter(
     (f): f is GuardFailure => f !== null
   );
 }

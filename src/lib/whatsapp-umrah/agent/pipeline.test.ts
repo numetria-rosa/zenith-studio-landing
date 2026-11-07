@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("../kb/retrieve", () => ({ loadKbChunks: async () => ({ ok: true, chunks: [] }) }));
-const model = vi.hoisted(() => ({ draft: null as null | Record<string, unknown>, settings: null as null | Record<string, unknown> }));
+const model = vi.hoisted(() => ({ draft: null as null | Record<string, unknown>, claude: null as null | Record<string, unknown>, settings: null as null | Record<string, unknown> }));
 const chunkRows = vi.hoisted(() => ({ rows: [] as { document: { id: string; kind: string; title: string } }[] }));
 vi.mock("@/lib/db", () => ({ db: { waAgency: { findUnique: async () => ({ name: "Al Noor Travel", agentSettings: model.settings }) }, waKbChunk: { findMany: async () => chunkRows.rows }, waOccasion: { findMany: async () => [] }, waKbDocument: { findMany: async () => [] } } }));
 vi.mock("./draft", () => ({
   draftReply: async () => (model.draft ? { ok: true, draft: model.draft, latencyMs: 1 } : { ok: false, error: "the model must not run", latencyMs: 0 }),
 }));
-vi.mock("./escalate", () => ({ escalateDraft: async () => ({ ok: false, error: "the model must not run", latencyMs: 0 }) }));
+vi.mock("./escalate", () => ({ escalateDraft: async () => (model.claude ? { ok: true, draft: model.claude, latencyMs: 1 } : { ok: false, error: "the model must not run", latencyMs: 0 }) }));
 import { holdingMessageFor, runAgentPipeline } from "./pipeline";
 import { HOLDING_MESSAGES, identityReply, OFF_TOPIC_REPLIES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
 
@@ -130,5 +130,46 @@ describe("holdingMessageFor", () => {
   });
   it("is the plain message for a language the agency switched off", () => {
     expect(holdingMessageFor("ar", ["language_disabled"], draft({ language: "ar" }))).toBe(HOLDING_MESSAGES.ar);
+  });
+});
+
+describe("when Groq is down or rate limited", () => {
+  const draft = (over: Record<string, unknown> = {}) => ({ reply: "Hello from Claude.", language: "en", intent: "other", leadFields: null, handoffReason: null, confidence: 0.9, kbIdsUsed: [], readyToBook: false, ...over });
+  const reset = () => Object.assign(model, { draft: null, claude: null, settings: null });
+
+  it("lets Claude draft the reply instead of telling the customer there is a technical problem", async () => {
+    reset();
+    model.claude = draft();
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "hello" });
+    expect(r).toMatchObject({ action: "reply", model: expect.stringMatching(/^claude:/) });
+    expect(r.action === "reply" && r.text).toContain("Hello from Claude.");
+    // the failed Groq call is logged, then the Claude draft
+    expect(r.promptRuns.map((p) => [p.stage, p.guardsTriggered.includes("draft_error")])).toEqual([["DRAFT", true], ["DRAFT", false]]);
+    expect(r.promptRuns[0].model).toMatch(/gpt-oss|groq|llama/i);
+    expect(r.promptRuns[1].model).toMatch(/claude/i);
+  });
+
+  it("the Claude draft still goes through every guard", async () => {
+    reset();
+    model.claude = draft({ intent: "pricing", reply: "That is £9,999 per person.", kbIdsUsed: ["c1"] });
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "how much?" });
+    expect(r).toMatchObject({ action: "handoff" });
+    expect(r.action === "handoff" && r.guardsTriggered).toContain("grounding");
+  });
+
+  it("hands off with a technical-problem reason only when Claude fails too", async () => {
+    reset();
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "hello" });
+    expect(r).toMatchObject({ action: "handoff", guardsTriggered: ["draft_error"] });
+    expect(r.action === "handoff" && r.reason).toMatch(/technical problem/);
+  });
+
+  it("uses Groq as before when it works", async () => {
+    reset();
+    model.draft = draft({ reply: "Hello from Groq." });
+    model.claude = draft({ reply: "Hello from Claude." });
+    const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "hello" });
+    expect(r).toMatchObject({ action: "reply", model: expect.stringMatching(/^groq:/) });
+    expect(r.action === "reply" && r.text).toContain("Hello from Groq.");
   });
 });

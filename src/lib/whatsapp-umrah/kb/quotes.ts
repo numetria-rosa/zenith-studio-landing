@@ -35,9 +35,14 @@ export function quotesPrompt(packages: PackageFields[]): string {
   return [`QUOTES (already worked out, for 1 to ${MAX_PARTY} travellers at the per-person price. Copy these figures for totals, deposits and balances, never do the sums yourself):`, ...lines].join("\n");
 }
 
-/** The quotes table for the prompt, and every per-person price (so the guards can tell a total from a per-person figure). */
-export async function loadQuotes(agencyId: string): Promise<{ text: string; perPersonPrices: number[] }> {
+/** The quotes table for the prompt, and every per-person price, deposit and balance (so the guards can tell a group
+    figure from a per-person one). */
+export async function loadQuotes(agencyId: string): Promise<{ text: string; perPerson: { prices: number[]; deposits: number[]; balances: number[] } }> {
   const docs = await db.waKbDocument.findMany({ where: { agencyId, kind: "PACKAGE" }, orderBy: { createdAt: "asc" }, take: 30, select: { fields: true } });
-  const packages = docs.map((d) => packageFromJson(d.fields));
-  return { text: quotesPrompt(packages), perPersonPrices: [...new Set(packages.map((p) => p.pricePerPerson).filter((n) => n > 0))] };
+  const packages = docs.map((d) => packageFromJson(d.fields)).filter((p) => p.pricePerPerson > 0);
+  const uniq = (xs: (number | null)[]) => [...new Set(xs.filter((n): n is number => n !== null && n > 0))];
+  return {
+    text: quotesPrompt(packages),
+    perPerson: { prices: uniq(packages.map((p) => p.pricePerPerson)), deposits: uniq(packages.map((p) => p.deposit)), balances: uniq(packages.map((p) => (p.deposit === null ? null : round2(p.pricePerPerson - p.deposit)))) },
+  };
 }

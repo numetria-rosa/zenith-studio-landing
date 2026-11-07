@@ -50,7 +50,7 @@ describe("the suite itself", () => {
     expect(SCENARIOS.length).toBeGreaterThanOrEqual(60);
     expect(new Set(SCENARIOS.map((s) => s.id)).size).toBe(SCENARIOS.length);
     const cats = new Set(SCENARIOS.map((s) => s.category));
-    for (const c of ["sensitive", "pricing", "dates", "occasions", "vague", "handoff", "knowledge gap", "scope", "injection", "languages", "booking", "memory", "format", "identity"]) expect(cats.has(c)).toBe(true);
+    for (const c of ["sensitive", "pricing", "dates", "occasions", "vague", "handoff", "knowledge gap", "scope", "injection", "languages", "booking", "memory", "format", "identity", "resilience"]) expect(cats.has(c)).toBe(true);
   });
   it("fixture packages are the four the scenarios assume", () => {
     expect(FIXTURE_PACKAGES).toHaveLength(4);

@@ -66,6 +66,8 @@ export type PipelineInput = {
   customerMessage: string;
   conversationHistory?: string; // caller-formatted, e.g. "Customer: ...\nAI: ..."
   detectedLanguage?: Language; // fallback if a guard fires before the model reports one
+  /** Which model writes the first draft. Groq by default; "claude" is for comparing the two (the retry is always Claude). */
+  firstDrafter?: "groq" | "claude";
   knownDetails?: string; // what earlier turns of this chat already told us, e.g. "2 travellers, Ramadan 2027" (see leadSummaryLine)
 };
 
@@ -109,14 +111,26 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   const draftInput = { customerMessage: input.customerMessage, kbContext, extraContext, conversationHistory: input.conversationHistory ?? "", persona: personaPrompt(persona) };
   const promptRuns: PromptRunRecord[] = [];
 
-  const first = await draftReply(draftInput);
+  let drafter: "groq" | "claude" = input.firstDrafter ?? "groq";
+  let drafterModel = drafter === "claude" ? CLAUDE_MODEL() : GROQ_MODEL();
+  let first = drafter === "claude" ? await escalateDraft(draftInput, []) : await draftReply(draftInput);
+  // Groq is the cheap first drafter, but it can be down or rate limited (its free tier allows ~200,000 tokens a day,
+  // about 40 of our messages). A customer must never get a "technical problem" because of that: Claude drafts instead.
+  // Both failing is the only case that hands off. The failed Groq call is still logged, for the owner's stats and ours.
+  if (!first.ok && drafter === "groq") {
+    promptRuns.push(toPromptRunRecord("DRAFT", drafterModel, first, ["draft_error"]));
+    console.error("[whatsapp-umrah pipeline] Groq draft failed, drafting with Claude instead:", first.error);
+    drafterModel = CLAUDE_MODEL();
+    first = await escalateDraft(draftInput, []);
+    drafter = "claude";
+  }
   if (!first.ok) {
-    promptRuns.push(toPromptRunRecord("DRAFT", GROQ_MODEL(), first, ["draft_error"]));
+    promptRuns.push(toPromptRunRecord("DRAFT", drafterModel, first, ["draft_error"]));
     console.error("[whatsapp-umrah pipeline] draft failed:", first.error); // the detail is for us; the owner gets a plain reason
     return handoffResult(TECHNICAL_PROBLEM_REASON, fallbackLanguage, ["draft_error"], null, promptRuns);
   }
-  const firstFailures = runGuards(first.draft, kbContext, input.customerMessage, extraContext, quotes.perPersonPrices);
-  promptRuns.push(toPromptRunRecord("DRAFT", GROQ_MODEL(), first, guardNames(firstFailures)));
+  const firstFailures = runGuards(first.draft, kbContext, input.customerMessage, extraContext, quotes.perPerson);
+  promptRuns.push(toPromptRunRecord("DRAFT", drafterModel, first, guardNames(firstFailures)));
   // A language the agency has switched off goes to a person (no retry: a second draft would be in the same language).
   if (!replyLanguageAllowed(first.draft.language, persona)) return languageOffResult(first.draft, persona, promptRuns);
   // Two kinds of message are answered by fixed text, not by what the model wrote: "are you a bot?" (never claim to
@@ -125,7 +139,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   if (first.draft.intent === "identity_question") return fixedReplyResult(identityReply(lang, persona.agentName, persona.agencyName), lang, "identity_question", "identity_question", persona, promptRuns);
   if (first.draft.intent === "off_topic") return fixedReplyResult(OFF_TOPIC_REPLIES[lang], lang, "off_topic", "off_topic", persona, promptRuns);
   if (firstFailures.length === 0) {
-    return replyResult(first.draft, "groq:" + GROQ_MODEL(), [], promptRuns, persona, await resolveSources(input.agencyId, first.draft.kbIdsUsed));
+    return replyResult(first.draft, `${drafter}:${drafterModel}`, [], promptRuns, persona, await resolveSources(input.agencyId, first.draft.kbIdsUsed));
   }
 
   const escalated = await escalateDraft(draftInput, firstFailures);
@@ -138,7 +152,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     console.error("[whatsapp-umrah pipeline] escalation failed:", escalated.error);
     return handoffResult(plainHandoffReason(first.draft, firstFailures), first.draft.language, guardNames(firstFailures), first.draft, promptRuns);
   }
-  const secondFailures = runGuards(escalated.draft, kbContext, input.customerMessage, extraContext, quotes.perPersonPrices);
+  const secondFailures = runGuards(escalated.draft, kbContext, input.customerMessage, extraContext, quotes.perPerson);
   promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures)));
   if (secondFailures.length === 0) {
     return replyResult(escalated.draft, "claude:" + CLAUDE_MODEL(), guardNames(firstFailures), promptRuns, persona, await resolveSources(input.agencyId, escalated.draft.kbIdsUsed));

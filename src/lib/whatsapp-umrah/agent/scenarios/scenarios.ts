@@ -31,7 +31,7 @@ export type Scenario = {
   known?: string;
   /** Languages the agency has switched on (default: all four). */
   languages?: Language[];
-  /** What the scripted model says. Omitted when the model must not run. */
+  /** What the scripted model says. Omitted when the model must not run, or (with `retry`) when Groq is down and Claude answers. */
   draft?: AgentDraft;
   /** If the first draft fails a guard, what the retry says (omit to make the retry fail the same way). */
   retry?: AgentDraft;
@@ -125,7 +125,10 @@ export const SCENARIOS: Scenario[] = [
   S("book-call-promise-retried", "booking", "ok book the ramadan one for 2, how do we pay?", { action: "reply", readyToBook: true, guards: ["unsupported_promise"], includes: ["in touch"], excludes: ["call you"] }, { draft: D("Great. For 2 travellers it is £7,900, with a £1,500 deposit. Our team will call you shortly.", { intent: "booking_interest", readyToBook: true }), retry: D("Great. For 2 travellers it is £7,900, with a £1,500 deposit. Our team will be in touch shortly.", { intent: "booking_interest", readyToBook: true }) }),
   S("pay-bank-transfer-invented", "pricing", "can i pay by bank transfer?", { action: "handoff", guards: ["unsupported_promise"] }, { draft: D("Yes, you can pay the deposit by bank transfer.", { intent: "pricing" }) }),
   S("book-never-says-booked", "booking", "ok book the ramadan one for 2", { action: "reply", readyToBook: true, guards: ["false_booking_claim"], includes: ["noted"], excludes: ["I've booked"] }, { draft: D("Great! I've booked the Ramadan Umrah 2027 for 2 travellers, £7,900 in total, with a £1,500 deposit.", { intent: "booking_interest", readyToBook: true }), retry: D("Great, I've noted your request for the Ramadan Umrah 2027 for 2 travellers, £7,900 in total, with a £1,500 deposit. Our team will take it from here.", { intent: "booking_interest", readyToBook: true }) }),
-  S("price-per-person-as-total", "pricing", "how much for two on the ramadan one?", { action: "reply", guards: ["per_person_as_total"], includes: ["7,900"] }, { draft: D("For 2 travellers the total is £3,950 and the deposit is £1,500.", { intent: "pricing" }), retry: D("For 2 travellers the total is £7,900 and the deposit is £1,500.", { intent: "pricing" }) }),
+  S("price-per-person-as-total", "pricing", "how much for two on the ramadan one?", { action: "reply", guards: ["per_person_figure"], includes: ["7,900"] }, { draft: D("For 2 travellers the total is £3,950 and the deposit is £1,500.", { intent: "pricing" }), retry: D("For 2 travellers the total is £7,900 and the deposit is £1,500.", { intent: "pricing" }) }),
+  S("price-per-person-deposit-as-group", "pricing", "what deposit for two on the ramadan one?", { action: "reply", guards: ["per_person_figure"], includes: ["1,500"] }, { draft: D("For 2 travellers the deposit is £750.", { intent: "pricing" }), retry: D("For 2 travellers the deposit is £1,500, which is £750 per person.", { intent: "pricing" }) }),
+  S("price-per-person-balance-as-group", "pricing", "balance for two on the ramadan one?", { action: "reply", guards: ["per_person_figure"], includes: ["6,400"] }, { draft: D("For 2 travellers the balance is £3,200, due 10 weeks before departure.", { intent: "pricing" }), retry: D("For 2 travellers the balance is £6,400, due 10 weeks before departure.", { intent: "pricing" }) }),
+  S("groq-down-claude-answers", "resilience", "how much is the ramadan package for two?", { action: "reply", includes: ["7,900"], excludes: ["technical problem", "Someone from our team"] }, { retry: D("The Ramadan Umrah 2027 is £3,950 per person, so £7,900 for two. Which airport would you leave from?", { intent: "pricing" }) }),
   S("book-just-asking-price", "booking", "how much is ramadan for two?", { action: "reply", readyToBook: false }, { draft: D("It is £7,900 for two. Shall I note your details?", { intent: "pricing", readyToBook: false }) }),
   S("book-card-number-blocked", "booking", "book it, card 4242 4242 4242 4242", { action: "handoff", guards: ["sensitive_data"], noModel: true }),
 

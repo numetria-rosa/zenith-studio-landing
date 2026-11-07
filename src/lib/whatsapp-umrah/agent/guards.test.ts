@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { confidenceCheck, groundingCheck, hedgeCheck, lengthCheck, noKbSourceCheck, runGuards, scopeGuard, unsupportedPromiseCheck, falseBookingClaimCheck, perPersonAsTotalCheck } from "./guards";
+import { confidenceCheck, groundingCheck, hedgeCheck, lengthCheck, noKbSourceCheck, runGuards, scopeGuard, unsupportedPromiseCheck, falseBookingClaimCheck, perPersonFigureCheck } from "./guards";
 import type { AgentDraft } from "./types";
 
 const baseDraft = (overrides: Partial<AgentDraft> = {}): AgentDraft => ({
@@ -213,24 +213,43 @@ describe("falseBookingClaimCheck", () => {
   });
 });
 
-describe("perPersonAsTotalCheck", () => {
-  const prices = [1295, 3950];
+describe("perPersonFigureCheck", () => {
+  const prices = { prices: [1295, 3950], deposits: [200, 750], balances: [1095, 3200] };
   const say = (reply: string, travelers?: number) => baseDraft({ reply, leadFields: travelers ? { travelers } : null });
   it("rejects a per-person price given as the total for a group (the live bug)", () => {
-    expect(perPersonAsTotalCheck(say("For 2 travellers the total is £3,950 and the deposit is £1,500."), prices)?.guard).toBe("per_person_as_total");
-    expect(perPersonAsTotalCheck(say("The total for the two of you is £3,950.", 2), prices)?.guard).toBe("per_person_as_total");
-    expect(perPersonAsTotalCheck(say("That comes to £1,295 in total.", 3), prices)?.guard).toBe("per_person_as_total");
+    expect(perPersonFigureCheck(say("For 2 travellers the total is £3,950 and the deposit is £1,500."), prices)?.guard).toBe("per_person_figure");
+    expect(perPersonFigureCheck(say("The total for the two of you is £3,950.", 2), prices)?.guard).toBe("per_person_figure");
+    expect(perPersonFigureCheck(say("That comes to £1,295 in total.", 3), prices)?.guard).toBe("per_person_figure");
   });
   it("accepts the right total, and a per-person price quoted as such next to the total", () => {
-    expect(perPersonAsTotalCheck(say("For 2 travellers the total is £7,900."), prices)).toBeNull();
-    expect(perPersonAsTotalCheck(say("It is £3,950 per person, so the total for 2 travellers is £7,900."), prices)).toBeNull();
-    expect(perPersonAsTotalCheck(say("£3,950 per person, £7,900 in total for 2 travellers."), prices)).toBeNull();
+    expect(perPersonFigureCheck(say("For 2 travellers the total is £7,900."), prices)).toBeNull();
+    expect(perPersonFigureCheck(say("It is £3,950 per person, so the total for 2 travellers is £7,900."), prices)).toBeNull();
+    expect(perPersonFigureCheck(say("£3,950 per person, £7,900 in total for 2 travellers."), prices)).toBeNull();
   });
   it("leaves a single traveller and replies with no party size alone", () => {
-    expect(perPersonAsTotalCheck(say("The total is £3,950 for one traveller.", 1), prices)).toBeNull();
-    expect(perPersonAsTotalCheck(say("The total package price is £3,950."), prices)).toBeNull();
+    expect(perPersonFigureCheck(say("The total is £3,950 for one traveller.", 1), prices)).toBeNull();
+    expect(perPersonFigureCheck(say("The total package price is £3,950."), prices)).toBeNull();
   });
   it("does nothing without any package prices", () => {
-    expect(perPersonAsTotalCheck(say("For 2 travellers the total is £3,950."), [])).toBeNull();
+    expect(perPersonFigureCheck(say("For 2 travellers the total is £3,950."), { prices: [], deposits: [], balances: [] })).toBeNull();
+  });
+});
+
+describe("perPersonFigureCheck: deposits and balances", () => {
+  const figs = { prices: [1295, 3950], deposits: [200, 750], balances: [1095, 3200] };
+  const say = (reply: string, travelers?: number) => baseDraft({ reply, leadFields: travelers ? { travelers } : null });
+  it("rejects a per-person deposit or balance given for the group", () => {
+    expect(perPersonFigureCheck(say("For 2 travellers the deposit is £750."), figs)?.guard).toBe("per_person_figure");
+    expect(perPersonFigureCheck(say("The deposit is £750 to book.", 2), figs)?.detail).toMatch(/deposit/);
+    expect(perPersonFigureCheck(say("For 2 travellers the balance is £3,200."), figs)?.detail).toMatch(/balance/);
+    expect(perPersonFigureCheck(say("The remaining £1,095 is due 10 weeks before departure.", 2), figs)?.guard).toBe("per_person_figure");
+  });
+  it("accepts the group figure, and a per-person one that says so", () => {
+    expect(perPersonFigureCheck(say("For 2 travellers the deposit is £1,500 and the balance is £6,400."), figs)).toBeNull();
+    expect(perPersonFigureCheck(say("The deposit is £750 per person, so £1,500 for 2 travellers."), figs)).toBeNull();
+    expect(perPersonFigureCheck(say("£750 deposit each, £1,500 in all for 2 travellers."), figs)).toBeNull();
+  });
+  it("leaves one traveller alone", () => {
+    expect(perPersonFigureCheck(say("The deposit is £750.", 1), figs)).toBeNull();
   });
 });
