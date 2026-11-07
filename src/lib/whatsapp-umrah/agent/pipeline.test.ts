@@ -30,7 +30,7 @@ describe("the agency's settings reach the reply", () => {
     model.draft = draft();
     model.settings = settings;
     const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "hello" });
-    expect(r).toMatchObject({ action: "reply", text: "Welcome How can I help?\n\nThe Al Noor team" });
+    expect(r).toMatchObject({ action: "reply", text: "Welcome How can I help?\n\nZeen, Al Noor Travel" });
   });
 
   it("hands off, in the customer's language, when they write in one the agency switched off", async () => {
@@ -44,7 +44,7 @@ describe("the agency's settings reach the reply", () => {
 
 describe("messages answered with fixed text instead of a handoff", () => {
   const draft = (over: Record<string, unknown> = {}) => ({ reply: "x", language: "en", intent: "other", leadFields: null, handoffReason: null, confidence: 0.9, kbIdsUsed: [], ...over });
-  const settings = { agentName: "Zen", tone: "WARM", emojiEnabled: true, signOff: null, languagesEnabled: ["en", "ar", "tr", "ur"] };
+  const settings = { agentName: "Zeen", tone: "WARM", emojiEnabled: true, signOff: null, languagesEnabled: ["en", "ar", "tr", "ur"] };
 
   it("an off-topic request gets a polite refusal and stays with the agent", async () => {
     model.draft = draft({ intent: "off_topic", reply: "Here is a poem about the sea..." });
@@ -65,7 +65,7 @@ describe("messages answered with fixed text instead of a handoff", () => {
     model.draft = null; // the model must not even be called
     model.settings = settings;
     const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "Wait, am I talking to a real person or a bot?" });
-    expect(r).toMatchObject({ action: "reply", text: identityReply("en", "Zen", "Al Noor Travel"), guardsTriggered: ["identity_question"] });
+    expect(r).toMatchObject({ action: "reply", text: identityReply("en", "Zeen", "Al Noor Travel"), guardsTriggered: ["identity_question"] });
     expect(r.action === "reply" && r.text).toMatch(/virtual assistant/);
   });
 
@@ -73,12 +73,12 @@ describe("messages answered with fixed text instead of a handoff", () => {
     model.draft = draft({ intent: "identity_question", language: "tr" });
     model.settings = settings;
     const r = await runAgentPipeline({ agencyId: "a1", customerMessage: "Sen bir robot musun?" });
-    expect(r).toMatchObject({ action: "reply", language: "tr", text: identityReply("tr", "Zen", "Al Noor Travel") });
+    expect(r).toMatchObject({ action: "reply", language: "tr", text: identityReply("tr", "Zeen", "Al Noor Travel") });
   });
 });
 
 describe("why a chat was handed over, in plain words", () => {
-  const settings = { agentName: "Zen", tone: "WARM", emojiEnabled: true, signOff: null, languagesEnabled: ["en"] };
+  const settings = { agentName: "Zeen", tone: "WARM", emojiEnabled: true, signOff: null, languagesEnabled: ["en"] };
   const draft = (over: Record<string, unknown>) => ({ reply: "x", language: "en", intent: "other", leadFields: null, handoffReason: null, confidence: 0.9, kbIdsUsed: [], ...over });
 
   it("says the customer asked for a person, not an internal guard message", async () => {
@@ -97,7 +97,7 @@ describe("why a chat was handed over, in plain words", () => {
 });
 
 describe("where a reply came from", () => {
-  const settings = { agentName: "Zen", tone: "WARM", emojiEnabled: true, signOff: null, languagesEnabled: ["en"] };
+  const settings = { agentName: "Zeen", tone: "WARM", emojiEnabled: true, signOff: null, languagesEnabled: ["en"] };
   const draft = (kbIdsUsed: string[]) => ({ reply: "Happy to help with that.", language: "en", intent: "other", leadFields: null, handoffReason: null, confidence: 0.9, kbIdsUsed });
 
   it("lists each knowledge item once, resolved from the chunks the model used", async () => {

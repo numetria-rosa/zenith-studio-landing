@@ -25,7 +25,9 @@ export function buildPersona(
     agentName: AGENT_NAME,
     tone: settings?.tone ?? "WARM",
     emoji: settings?.emojiEnabled ?? true,
-    signOff: oneLine(settings?.signOff ?? "", 120) || null,
+    // The sign-off is "<agent>, <agency>" whenever the owner has it switched on. Any text saved before the name
+    // became fixed (an old "Sara, ...") only counts as "on"; it is never sent.
+    signOff: settings?.signOff?.trim() ? `${AGENT_NAME}, ${oneLine(agency?.name ?? "", 80) || "the agency"}` : null,
     languages: settings ? (languages.length > 0 ? languages : ["en"]) : [...LANGUAGES],
   };
 }

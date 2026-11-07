@@ -23,7 +23,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ agenc
   const initial: SettingsState = {
     agencyName: agency.name,
     tone: s?.tone === "FORMAL" ? "FORMAL" : "WARM",
-    signOff: s?.signOff ?? "",
+    signOff: !!s?.signOff?.trim(),
     emoji: s?.emojiEnabled ?? true,
     langs: s?.languagesEnabled ?? ["en", "ar", "tr", "ur"],
     allDay: !hours, // no hours saved means open 24/7

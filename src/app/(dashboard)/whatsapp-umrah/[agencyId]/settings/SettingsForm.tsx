@@ -1,5 +1,6 @@
 "use client";
 
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { WaIcon, type WaIconName } from "@/components/wa/Icon";
@@ -15,7 +16,7 @@ type DayKey = (typeof DAYS)[number][0];
 export type SettingsState = {
   agencyName: string;
   tone: "WARM" | "FORMAL";
-  signOff: string;
+  signOff: boolean;
   emoji: boolean;
   langs: string[];
   allDay: boolean;
@@ -88,7 +89,7 @@ export function SettingsForm({ agencyId, initial, used, planCap, billing, cancel
     const f = new FormData();
     f.set("agencyName", s.agencyName);
     f.set("tone", s.tone);
-    f.set("signOff", s.signOff);
+    if (s.signOff) f.set("signOff", `${AGENT_NAME}, ${s.agencyName.trim()}`);
     if (s.emoji) f.set("emojiEnabled", "on");
     s.langs.forEach((l) => f.append("languages", l));
     f.set("awayMode", s.outside);
@@ -141,10 +142,9 @@ export function SettingsForm({ agencyId, initial, used, planCap, billing, cancel
                   <FieldLabel>Tone</FieldLabel>
                   <Segmented label="Tone" size="sm" value={s.tone} onChange={(v) => set("tone", v)} options={[{ value: "WARM", label: "Warm" }, { value: "FORMAL", label: "Formal" }]} className="rounded-[14px] [&_button]:h-[38px] [&_button]:rounded-[10px] [&_button]:text-[14px]" />
                 </div>
-                <div>
-                  <FieldLabel htmlFor="signOff">Sign-off (optional)</FieldLabel>
-                  <Input id="signOff" value={s.signOff} placeholder="e.g. Zen, Zenith Demo Travel" onChange={(e) => set("signOff", e.target.value)} />
-                  <Hint>Added to the end of every reply.</Hint>
+                <div className="flex items-center gap-[14px]">
+                  <Toggle checked={s.signOff} onChange={(v) => set("signOff", v)} label="Sign every reply" />
+                  <div><div className="text-[14.5px]">Sign every reply</div><div className="text-[13px] text-dim">Adds &ldquo;{AGENT_NAME}, {s.agencyName.trim() || "your agency"}&rdquo; to the end.</div></div>
                 </div>
                 <div className="flex items-center gap-[14px]">
                   <Toggle checked={s.emoji} onChange={(v) => set("emoji", v)} label="Allow emoji in replies" />
@@ -156,7 +156,7 @@ export function SettingsForm({ agencyId, initial, used, planCap, billing, cancel
                 <div className="mt-[14px] max-w-[85%] rounded-[16px_16px_16px_6px] bg-bubble px-[14px] py-[10px] text-[14px]">Is the visa included?</div>
                 <div className="ml-auto mt-[10px] max-w-[90%] rounded-[16px_16px_6px_16px] border border-[rgba(61,220,151,.3)] bg-[rgba(61,220,151,.10)] px-[14px] py-3 text-[14px] leading-[1.5]">
                   {previewReply}
-                  {s.signOff.trim() && (<><br /><span className="text-mint-text">{s.signOff.trim()}</span></>)}
+                  {s.signOff && (<><br /><span className="text-mint-text">{AGENT_NAME}, {s.agencyName.trim() || "your agency"}</span></>)}
                 </div>
                 <Hint className="mt-3">How a reply looks with your current tone and sign-off.</Hint>
               </div>
