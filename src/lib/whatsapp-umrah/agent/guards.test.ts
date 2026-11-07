@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { confidenceCheck, groundingCheck, hedgeCheck, lengthCheck, noKbSourceCheck, runGuards, scopeGuard, unsupportedPromiseCheck, falseBookingClaimCheck, perPersonFigureCheck } from "./guards";
+import { confidenceCheck, groundingCheck, hedgeCheck, lengthCheck, noKbSourceCheck, runGuards, scopeGuard, unsupportedPromiseCheck, falseBookingClaimCheck, perPersonClaimCheck, perPersonFigureCheck } from "./guards";
 import type { AgentDraft } from "./types";
 
 const baseDraft = (overrides: Partial<AgentDraft> = {}): AgentDraft => ({
@@ -251,5 +251,27 @@ describe("perPersonFigureCheck: deposits and balances", () => {
   });
   it("leaves one traveller alone", () => {
     expect(perPersonFigureCheck(say("The deposit is £750.", 1), figs)).toBeNull();
+  });
+});
+
+describe("perPersonClaimCheck", () => {
+  const kb = "Price: £3,950 per person (twin sharing). Deposit: £750 per person.";
+  const say = (reply: string) => baseDraft({ reply });
+  it("rejects a group figure labelled per person (the live bug)", () => {
+    expect(perPersonClaimCheck(say("The deposit to book is £1,500 per person, so £3,000 in total."), kb)?.guard).toBe("per_person_claim");
+    expect(perPersonClaimCheck(say("It is £7,900 per person."), kb)?.guard).toBe("per_person_claim");
+    expect(perPersonClaimCheck(say("£1,500 each."), kb)?.guard).toBe("per_person_claim");
+  });
+  it("accepts a per-person figure that is in the knowledge base", () => {
+    expect(perPersonClaimCheck(say("The deposit is £750 per person, so £1,500 for two."), kb)).toBeNull();
+    expect(perPersonClaimCheck(say("£3,950 per person, twin sharing."), kb)).toBeNull();
+    expect(perPersonClaimCheck(say("£3,950 each."), kb)).toBeNull();
+  });
+  it("accepts a per-person figure the customer gave (their budget)", () => {
+    expect(perPersonClaimCheck(say("Under £2,000 per person we have the Economy package."), kb, "something under 2000 pounds each")).toBeNull();
+    expect(perPersonClaimCheck(say("Under £2,000 per person we have the Economy package."), kb, "what do you have?")?.guard).toBe("per_person_claim");
+  });
+  it("leaves replies that never say per person alone", () => {
+    expect(perPersonClaimCheck(say("For two travellers the total is £7,900."), kb)).toBeNull();
   });
 });

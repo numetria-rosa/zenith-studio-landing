@@ -182,6 +182,21 @@ export function perPersonFigureCheck(draft: AgentDraft, figures: PerPersonFigure
   return null;
 }
 
+/** The reverse mistake: a GROUP figure labelled "per person" ("the deposit is £1,500 per person" when £1,500 is the
+    deposit for two and £750 is the per-person one). A per-person price, deposit or balance is always a figure the
+    agency wrote in its own knowledge base, so a number given as "per person" that is not in the knowledge base text
+    (only in the worked-out quotes table, or from the sums) is a total mislabelled. */
+export function perPersonClaimCheck(draft: AgentDraft, kbContextText: string, customerMessage = ""): GuardFailure | null {
+  const text = toAsciiDigits(draft.reply);
+  // The customer's own numbers (a budget, "under 2000") are theirs, so "under £2,000 per person" is not invented.
+  const inKb = new Set([...extractNumericClaims(kbContextText), ...extractNumericClaims(customerMessage)]);
+  for (const m of text.matchAll(/£\s?([\d,]+(?:\.\d+)?)\s*(?:per person|per adult|each|a head|pp\b)/gi)) {
+    const amount = m[1].replace(/,/g, "");
+    if (!inKb.has(amount)) return { guard: "per_person_claim", detail: `reply says £${Number(amount).toLocaleString("en-GB")} is per person, but that figure is not a per-person price in the knowledge base (it looks like a group total)` };
+  }
+  return null;
+}
+
 /** The agent never makes a booking, the team does. "I've booked it" or "your booking is confirmed" promises something
     that has not happened, whatever the knowledge base says, so it is rejected outright. */
 const FALSE_BOOKING_CLAIM = /\b(I(?:'ve| have)|we(?:'ve| have)) (booked|reserved|confirmed)\b|\byour (booking|reservation|place|seats?) (is|are|has been|have been) (confirmed|booked|reserved|secured|complete)/i;
@@ -204,7 +219,7 @@ export function promptLeakCheck(draft: AgentDraft): GuardFailure | null {
 }
 
 export function runGuards(draft: AgentDraft, kbContextText: string, customerMessage = "", extraText = "", perPerson: PerPersonFigures = { prices: [], deposits: [], balances: [] }): GuardFailure[] {
-  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft), unsupportedPromiseCheck(draft, kbContextText), falseBookingClaimCheck(draft), perPersonFigureCheck(draft, perPerson)].filter(
+  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft), unsupportedPromiseCheck(draft, kbContextText), falseBookingClaimCheck(draft), perPersonFigureCheck(draft, perPerson), perPersonClaimCheck(draft, kbContextText, customerMessage)].filter(
     (f): f is GuardFailure => f !== null
   );
 }
