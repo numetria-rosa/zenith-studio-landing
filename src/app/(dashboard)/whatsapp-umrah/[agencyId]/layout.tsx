@@ -41,8 +41,8 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
   const displayName = session.user.name || session.user.email || "Account";
 
   return (
-    <div className={`${waStyles.waConsole} flex min-h-screen bg-void font-sans text-frost`}>
-      <aside className="sticky top-0 box-border flex h-screen w-[264px] shrink-0 flex-col overflow-y-auto border-r border-[rgba(255,255,255,.07)] bg-wa-sidebar px-4 pb-5 pt-[26px]">
+    <div className={`${waStyles.waConsole} flex bg-void font-sans text-frost`}>
+      <aside className={`${waStyles.waSidebar} sticky top-0 box-border flex w-[264px] shrink-0 flex-col overflow-y-auto border-r border-[rgba(255,255,255,.07)] bg-wa-sidebar px-4 pb-5 pt-[26px]`}>
         <div className="flex items-center gap-3 px-2">
           <Tile size={40} style={{ background: "linear-gradient(135deg, rgba(61,220,151,.28), rgba(92,200,255,.20))", border: "1px solid rgba(127,240,189,.4)" }}>
             <WaIcon name="whatsapp" size={20} stroke="#7FF0BD" />

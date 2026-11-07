@@ -7,6 +7,10 @@
    product's own layout/screens. */
 
 .waConsole {
+  /* The whole console renders at 90%: at 100% browser zoom the sidebar overflowed and needed its own scrollbar. */
+  --wa-zoom: 0.9;
+  zoom: var(--wa-zoom);
+  min-height: calc(100vh / var(--wa-zoom));
   color-scheme: dark;
   --zc-void: #05060a;
   --zc-panel: #0a0b10;
@@ -352,4 +356,9 @@
   font-size: 12px;
   color: var(--zc-muted);
   margin-top: 2px;
+}
+
+/* Zoom shrinks every length, including viewport units, so full-height boxes are divided by the zoom to still fill the window. */
+.waSidebar {
+  height: calc(100vh / var(--wa-zoom));
 }
