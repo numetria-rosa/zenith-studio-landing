@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency, getUsageSummary } from "@/lib/whatsapp-umrah/dashboard-data";
@@ -21,7 +22,6 @@ export default async function SettingsPage({ params }: { params: Promise<{ agenc
 
   const initial: SettingsState = {
     agencyName: agency.name,
-    agentName: s?.agentName ?? "Assistant",
     tone: s?.tone === "FORMAL" ? "FORMAL" : "WARM",
     signOff: s?.signOff ?? "",
     emoji: s?.emojiEnabled ?? true,
@@ -41,7 +41,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ agenc
 
   return (
     <div>
-      <PageHeader title="Settings" subtitle={`How ${initial.agentName} sounds, which languages it replies in, and what happens outside your hours.`} />
+      <PageHeader title="Settings" subtitle={`How ${AGENT_NAME} sounds, which languages it replies in, and what happens outside your hours.`} />
       <SettingsForm agencyId={agencyId} initial={initial} used={usage.used} planCap={usage.planCap} billing={billing} cancelAction={cancelSubscriptionAction.bind(null, agencyId)} />
     </div>
   );

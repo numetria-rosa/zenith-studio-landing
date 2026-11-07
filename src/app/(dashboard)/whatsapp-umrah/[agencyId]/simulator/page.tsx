@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -21,7 +22,7 @@ export default async function SimulatorPage({ params }: { params: Promise<{ agen
   if (!agency) notFound();
 
   const s = agency.agentSettings;
-  const agentName = s?.agentName ?? "Assistant";
+  const agentName = AGENT_NAME;
   const base = `/whatsapp-umrah/${agencyId}`;
   const packages = agency.kbDocuments.filter((d) => d.kind === "PACKAGE").length;
   const faqs = agency.kbDocuments.filter((d) => d.kind === "FAQ").length;

@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import { db } from "@/lib/db";
 import { LANGUAGES, type Language } from "./types";
 
@@ -16,12 +17,12 @@ const oneLine = (text: string, max: number) => text.replace(/\s+/g, " ").trim().
 
 export function buildPersona(
   agency: { name: string } | null,
-  settings: { agentName: string; tone: "WARM" | "FORMAL"; emojiEnabled: boolean; signOff: string | null; languagesEnabled: string[] } | null,
+  settings: { tone: "WARM" | "FORMAL"; emojiEnabled: boolean; signOff: string | null; languagesEnabled: string[] } | null,
 ): Persona {
   const languages = (settings?.languagesEnabled ?? []).filter((l): l is Language => (LANGUAGES as readonly string[]).includes(l));
   return {
     agencyName: oneLine(agency?.name ?? "", 80) || "the agency",
-    agentName: oneLine(settings?.agentName ?? "", 40) || "Assistant",
+    agentName: AGENT_NAME,
     tone: settings?.tone ?? "WARM",
     emoji: settings?.emojiEnabled ?? true,
     signOff: oneLine(settings?.signOff ?? "", 120) || null,
@@ -32,7 +33,7 @@ export function buildPersona(
 export async function loadPersona(agencyId: string): Promise<Persona> {
   const agency = await db.waAgency.findUnique({
     where: { id: agencyId },
-    select: { name: true, agentSettings: { select: { agentName: true, tone: true, emojiEnabled: true, signOff: true, languagesEnabled: true } } },
+    select: { name: true, agentSettings: { select: { tone: true, emojiEnabled: true, signOff: true, languagesEnabled: true } } },
   });
   return buildPersona(agency, agency?.agentSettings ?? null);
 }

@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -24,7 +25,7 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
     db.waMembership.findFirst({ where: { agencyId, userId: session.user.id }, select: { role: true } }),
   ]);
 
-  const agentName = agency.agentSettings?.agentName ?? "Your agent";
+  const agentName = AGENT_NAME;
   const connected = agency.whatsapp?.status === "CONNECTED";
   const live = agency.status === "LIVE" && connected;
   const status = live

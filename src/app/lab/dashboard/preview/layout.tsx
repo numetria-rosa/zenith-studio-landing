@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Sora, Manrope, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { requireAdmin } from "@/lib/admin";
 import { Sidebar } from "./_halo/Sidebar";
 import tokens from "./_halo/tokens.module.css";
@@ -19,9 +19,20 @@ import shell from "./_halo/shell.module.css";
    login) on your own machine: set PREVIEW_DASHBOARD_BYPASS=1 in your local
    .env.local (gitignored, never set on Vercel) and restart `next dev`. */
 
-const sora = Sora({ subsets: ["latin"], weight: ["400", "600"], variable: "--halo-font-display" });
-const manrope = Manrope({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--halo-font-body" });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--halo-font-mono" });
+// Self-hosted (OFL-1.1, @fontsource 5.3.0, latin): see src/lib/fraunces.ts for why not next/font/google.
+const sora = localFont({ variable: "--halo-font-display", display: "swap", src: [
+    { path: "../../../../fonts/sora/sora-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "../../../../fonts/sora/sora-latin-600-normal.woff2", weight: "600", style: "normal" },
+  ] });
+const manrope = localFont({ variable: "--halo-font-body", display: "swap", src: [
+    { path: "../../../../fonts/manrope/manrope-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "../../../../fonts/manrope/manrope-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "../../../../fonts/manrope/manrope-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ] });
+const jetbrainsMono = localFont({ variable: "--halo-font-mono", display: "swap", src: [
+    { path: "../../../../fonts/jetbrains-mono/jetbrains-mono-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "../../../../fonts/jetbrains-mono/jetbrains-mono-latin-500-normal.woff2", weight: "500", style: "normal" },
+  ] });
 
 export default async function DashboardPreviewLayout({ children }: { children: React.ReactNode }) {
   const admin = await requireAdmin();

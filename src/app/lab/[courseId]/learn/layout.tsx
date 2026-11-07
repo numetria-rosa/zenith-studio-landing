@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { cookies } from "next/headers";
-import { Fraunces, IBM_Plex_Mono } from "next/font/google";
+import { fraunces } from "@/lib/fraunces";
+import { plexMono } from "@/lib/plex-mono";
 import { plexSans } from "@/lib/plex-sans";
 import { auth } from "@/lib/auth";
 import { decideCourseAccess } from "@/lib/course-access";
@@ -12,8 +13,6 @@ import "katex/dist/katex.min.css";
 
 // Same type family as the 4 static courses (zenith-lab.css), loaded via
 // next/font instead of a Google Fonts <link> tag now that this is real React.
-const fraunces = Fraunces({ variable: "--font-course-serif", subsets: ["latin"] });
-const plexMono = IBM_Plex_Mono({ variable: "--font-course-mono", weight: ["400", "500", "600"], subsets: ["latin"] });
 
 /* The "react" render mode's equivalent of the guard in
    src/app/courses/[courseId]/[...path]/route.ts - one checkpoint above every

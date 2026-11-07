@@ -14,7 +14,6 @@ const LANGS = [["en", "English", "English"], ["ar", "Arabic", "العربية"],
 type DayKey = (typeof DAYS)[number][0];
 export type SettingsState = {
   agencyName: string;
-  agentName: string;
   tone: "WARM" | "FORMAL";
   signOff: string;
   emoji: boolean;
@@ -67,7 +66,7 @@ export function SettingsForm({ agencyId, initial, used, planCap, billing, cancel
   const dirty = useMemo(() => JSON.stringify(s) !== JSON.stringify(baseline), [s, baseline]);
   const noDayOpen = !s.allDay && !DAYS.some(([k]) => s.days[k].on);
   const badMessage = s.outside === "AWAY_MESSAGE_ONLY" && !s.awayMessage.trim();
-  const invalid = noDayOpen || badMessage || s.langs.length === 0 || !s.agentName.trim();
+  const invalid = noDayOpen || badMessage || s.langs.length === 0;
 
   // Highlight the section being read in the left nav.
   useEffect(() => {
@@ -88,7 +87,6 @@ export function SettingsForm({ agencyId, initial, used, planCap, billing, cancel
   function save() {
     const f = new FormData();
     f.set("agencyName", s.agencyName);
-    f.set("agentName", s.agentName);
     f.set("tone", s.tone);
     f.set("signOff", s.signOff);
     if (s.emoji) f.set("emojiEnabled", "on");
@@ -138,7 +136,6 @@ export function SettingsForm({ agencyId, initial, used, planCap, billing, cancel
               <div className="flex flex-col gap-[18px]">
                 <div className="grid grid-cols-2 gap-[14px]">
                   <div><FieldLabel htmlFor="agencyName">Agency name</FieldLabel><Input id="agencyName" value={s.agencyName} maxLength={80} onChange={(e) => set("agencyName", e.target.value)} /></div>
-                  <div><FieldLabel htmlFor="agentName">Agent name</FieldLabel><Input id="agentName" value={s.agentName} onChange={(e) => set("agentName", e.target.value)} /></div>
                 </div>
                 <div>
                   <FieldLabel>Tone</FieldLabel>

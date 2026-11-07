@@ -1730,6 +1730,7 @@ model WaAgency {
   auditLog              WaAuditLog[]
   promptRuns            WaPromptRun[]
   manualConnectRequests WaManualConnectRequest[]
+  occasions             WaOccasion[]
 
   @@index([status])
 }
@@ -2244,4 +2245,21 @@ model DocChaseItem {
   client DocChaseClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId])
+}
+
+// An occasion on the agency's own calendar (Ramadan 2027, Eid, half-term...): a name and one day or a date range.
+// The agent reads these to match a customer's "Ramadan" or "Eid" to the packages whose travel dates fall in it.
+model WaOccasion {
+  id        String    @id @default(cuid())
+  agencyId  String
+  name      String
+  startDate DateTime  @db.Date
+  endDate   DateTime? @db.Date // null = a single day
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId, startDate])
 }

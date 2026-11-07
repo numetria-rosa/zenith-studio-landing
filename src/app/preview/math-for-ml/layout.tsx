@@ -1,4 +1,5 @@
-import { Fraunces, IBM_Plex_Mono } from "next/font/google";
+import { fraunces } from "@/lib/fraunces";
+import { plexMono } from "@/lib/plex-mono";
 import { plexSans } from "@/lib/plex-sans";
 import "katex/dist/katex.min.css";
 
@@ -8,8 +9,6 @@ import "katex/dist/katex.min.css";
    its [[...lessonSlug]]/page.tsx sibling) before the course ships - the real,
    gated route is /lab/math-for-ml/learn/... once the course is published. */
 
-const fraunces = Fraunces({ variable: "--font-course-serif", subsets: ["latin"] });
-const plexMono = IBM_Plex_Mono({ variable: "--font-course-mono", weight: ["400", "500", "600"], subsets: ["latin"] });
 
 export default function PreviewLayout({ children }: { children: React.ReactNode }) {
   return (

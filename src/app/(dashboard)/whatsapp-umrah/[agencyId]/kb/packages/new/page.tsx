@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
@@ -12,5 +13,5 @@ export default async function NewPackagePage({ params }: { params: Promise<{ age
   const agency = await getOwnedAgency(agencyId, session.user.id);
   if (!agency) notFound();
 
-  return <PackageEditor base={`/whatsapp-umrah/${agencyId}`} mode="new" savedName="" initial={emptyDraft()} agentName={agency.agentSettings?.agentName ?? "Your agent"} agencyName={agency.name} save={savePackageAction.bind(null, agencyId, null)} />;
+  return <PackageEditor base={`/whatsapp-umrah/${agencyId}`} mode="new" savedName="" initial={emptyDraft()} agentName={AGENT_NAME} agencyName={agency.name} save={savePackageAction.bind(null, agencyId, null)} />;
 }

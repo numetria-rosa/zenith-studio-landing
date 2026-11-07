@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -23,7 +24,7 @@ export default async function KbPage({ params, searchParams }: { params: Promise
 
   const tab: Tab = sp.tab === "faqs" || sp.tab === "info" ? sp.tab : "packages";
   const base = `/whatsapp-umrah/${agencyId}/kb`;
-  const agentName = agency.agentSettings?.agentName ?? "Your agent";
+  const agentName = AGENT_NAME;
   const docs = agency.kbDocuments;
   const packages = docs.filter((d) => d.kind === "PACKAGE");
   const faqs = docs.filter((d) => d.kind === "FAQ");

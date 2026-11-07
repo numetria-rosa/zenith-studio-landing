@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
@@ -27,7 +28,7 @@ export default async function AnalyticsPage({ params, searchParams }: { params: 
 
   const days = RANGES.find((r) => String(r) === range) ?? 30;
   const sm = await getAnalyticsSummary(agencyId, days);
-  const agentName = agency.agentSettings?.agentName ?? "Your agent";
+  const agentName = AGENT_NAME;
   const base = `/whatsapp-umrah/${agencyId}`;
   const { used, cap } = sm.usage;
   const maxDay = Math.max(1, ...sm.perDay.map((d) => d.count));

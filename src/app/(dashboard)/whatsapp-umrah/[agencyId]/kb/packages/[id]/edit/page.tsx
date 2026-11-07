@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
@@ -17,5 +18,5 @@ export default async function EditPackagePage({ params }: { params: Promise<{ ag
 
   const fields = packageFromJson(doc.fields);
   const initial = draftFromFields({ ...fields, name: fields.name || doc.title });
-  return <PackageEditor base={`/whatsapp-umrah/${agencyId}`} mode="edit" savedName={initial.name} initial={initial} agentName={agency.agentSettings?.agentName ?? "Your agent"} agencyName={agency.name} save={savePackageAction.bind(null, agencyId, doc.id)} />;
+  return <PackageEditor base={`/whatsapp-umrah/${agencyId}`} mode="edit" savedName={initial.name} initial={initial} agentName={AGENT_NAME} agencyName={agency.name} save={savePackageAction.bind(null, agencyId, doc.id)} />;
 }

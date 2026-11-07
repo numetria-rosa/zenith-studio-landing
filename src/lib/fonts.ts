@@ -1,4 +1,6 @@
-import { Fraunces, IBM_Plex_Mono, Unbounded } from "next/font/google";
+import localFont from "next/font/local";
+import { fraunces } from "./fraunces";
+import { plexMono } from "./plex-mono";
 import { plexSans } from "./plex-sans";
 
 /* The same three faces the static course pages (courses/data-science/*.html)
@@ -7,24 +9,16 @@ import { plexSans } from "./plex-sans";
    /lab/dashboard) so the experience right after checkout reads as a
    continuation of the course product a buyer is about to land in, not a
    different app with its own visual identity. */
-export const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-course-serif",
-});
+export { fraunces };
 
-export const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-course-mono",
-});
+export { plexMono };
 
 export const courseFontVars = `${fraunces.variable} ${plexSans.variable} ${plexMono.variable}`;
 
 /* The Zenith wordmark font (the owner picked Unbounded on 2026-10-21). Used only for the
    "Zenith Studio" / "Zenith Lab" wordmark next to the Z mark (public/brand/zenith-mark.png). */
-export const wordmark = Unbounded({
-  subsets: ["latin"],
-  weight: ["600"],
+export const wordmark = localFont({
+  src: [{ path: "../fonts/unbounded/unbounded-latin-600-normal.woff2", weight: "600", style: "normal" }],
   variable: "--font-wordmark",
+  display: "swap",
 });

@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency, listLeads } from "@/lib/whatsapp-umrah/dashboard-data";
@@ -28,7 +29,7 @@ export default async function LeadsPage({ params }: { params: Promise<{ agencyId
 
   return (
     <div>
-      <PageHeader title="Leads" subtitle={`Every enquiry ${agency.agentSettings?.agentName ?? "your agent"} has qualified, newest first. Change a status and it saves straight away.`} />
+      <PageHeader title="Leads" subtitle={`Every enquiry ${AGENT_NAME} has qualified, newest first. Change a status and it saves straight away.`} />
       <LeadsTable agencyId={agencyId} rows={rows} />
     </div>
   );

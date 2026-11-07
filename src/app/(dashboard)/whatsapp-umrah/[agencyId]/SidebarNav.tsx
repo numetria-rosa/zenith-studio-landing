@@ -8,6 +8,7 @@ import { cx } from "@/components/wa/tokens";
 const NAV: { href: string; label: string; icon: WaIconName }[] = [
   { href: "", label: "Overview", icon: "home" },
   { href: "/kb", label: "Knowledge base", icon: "book" },
+  { href: "/occasions", label: "Occasions", icon: "calendar" },
   { href: "/simulator", label: "Simulator", icon: "chat" },
   { href: "/inbox", label: "Inbox", icon: "inbox" },
   { href: "/leads", label: "Leads", icon: "users" },

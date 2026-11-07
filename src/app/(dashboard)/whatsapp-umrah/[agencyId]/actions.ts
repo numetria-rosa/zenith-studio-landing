@@ -10,6 +10,7 @@ import { ingestDocument } from "@/lib/whatsapp-umrah/kb/ingest";
 import { faqToText, packageToText, parseFaqForm, parsePackageForm } from "@/lib/whatsapp-umrah/kb/structured";
 import { takeOverConversation, resumeAi } from "@/lib/whatsapp-umrah/handoff";
 import { setReplyFlag } from "@/lib/whatsapp-umrah/flags";
+import { parseOccasionForm, SUGGESTED_OCCASIONS } from "@/lib/whatsapp-umrah/occasions";
 import { runAgentPipeline } from "@/lib/whatsapp-umrah/agent/pipeline";
 import { decryptSecret } from "@/lib/secrets";
 import { META_TOKEN_ENV } from "@/lib/whatsapp-umrah/inbound";
@@ -114,6 +115,35 @@ export async function deleteKbDocumentAction(agencyId: string, documentId: strin
   revalidatePath(`/whatsapp-umrah/${agencyId}`);
 }
 
+/** Add or edit one occasion on the agency's calendar (a name plus one day or a date range). Scoped by agency. */
+export async function saveOccasionAction(agencyId: string, occasionId: string | null, formData: FormData): Promise<void> {
+  const { agency } = await requireOwnedAgency(agencyId);
+  const parsed = parseOccasionForm(formData);
+  if (!parsed.ok) throw new Error(parsed.error);
+  if (occasionId) {
+    const result = await db.waOccasion.updateMany({ where: { id: occasionId, agencyId: agency.id }, data: parsed.value });
+    if (result.count === 0) throw new Error("not_found");
+  } else {
+    await db.waOccasion.create({ data: { ...parsed.value, agencyId: agency.id } });
+  }
+  revalidatePath(`/whatsapp-umrah/${agencyId}/occasions`);
+}
+
+export async function deleteOccasionAction(agencyId: string, occasionId: string): Promise<void> {
+  const { agency } = await requireOwnedAgency(agencyId);
+  await db.waOccasion.deleteMany({ where: { id: occasionId, agencyId: agency.id } });
+  revalidatePath(`/whatsapp-umrah/${agencyId}/occasions`);
+}
+
+/** Adds the suggested 2027 occasions the agency doesn't already have by name. */
+export async function addSuggestedOccasionsAction(agencyId: string): Promise<void> {
+  const { agency } = await requireOwnedAgency(agencyId);
+  const have = new Set((await db.waOccasion.findMany({ where: { agencyId: agency.id }, select: { name: true } })).map((o) => o.name.toLowerCase()));
+  const missing = SUGGESTED_OCCASIONS.filter((o) => !have.has(o.name.toLowerCase()));
+  if (missing.length > 0) await db.waOccasion.createMany({ data: missing.map((o) => ({ ...o, agencyId: agency.id })) });
+  revalidatePath(`/whatsapp-umrah/${agencyId}/occasions`);
+}
+
 export async function takeOverConversationAction(agencyId: string, conversationId: string): Promise<void> {
   const { agency, userId } = await requireOwnedAgency(agencyId);
   const result = await takeOverConversation(agency.id, conversationId, userId);
@@ -210,7 +240,6 @@ export async function updateAgentSettingsAction(agencyId: string, formData: Form
   const { agency } = await requireOwnedAgency(agencyId);
   const languages = formData.getAll("languages").map(String);
   const data = {
-    agentName: String(formData.get("agentName") || "Assistant").trim() || "Assistant",
     tone: (formData.get("tone") === "FORMAL" ? "FORMAL" : "WARM") as "FORMAL" | "WARM",
     emojiEnabled: formData.get("emojiEnabled") === "on",
     signOff: String(formData.get("signOff") || "").trim() || null,

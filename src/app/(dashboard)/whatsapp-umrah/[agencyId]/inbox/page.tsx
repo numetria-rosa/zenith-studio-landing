@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency, listConversations, getConversationThread } from "@/lib/whatsapp-umrah/dashboard-data";
@@ -18,7 +19,7 @@ export default async function InboxPage({ params, searchParams }: { params: Prom
   const { c: selectedId } = await searchParams;
   const agency = await getOwnedAgency(agencyId, session.user.id);
   if (!agency) notFound();
-  const agentName = agency.agentSettings?.agentName ?? "Your agent";
+  const agentName = AGENT_NAME;
 
   const conversations = await listConversations(agencyId);
   const activeId = selectedId || conversations[0]?.id || null;

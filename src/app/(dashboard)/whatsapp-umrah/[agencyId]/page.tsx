@@ -1,3 +1,4 @@
+import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
@@ -21,7 +22,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
 
   const [summary, conversations] = await Promise.all([getAnalyticsSummary(agencyId, 30), listConversations(agencyId)]);
   const base = `/whatsapp-umrah/${agencyId}`;
-  const agentName = agency.agentSettings?.agentName ?? "Your agent";
+  const agentName = AGENT_NAME;
   const { used, cap } = summary.usage;
   const pct = cap > 0 ? Math.min(100, (used / cap) * 100) : 0;
 
