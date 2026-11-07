@@ -14,6 +14,7 @@ const NAV: { href: string; label: string; icon: WaIconName }[] = [
   { href: "/leads", label: "Leads", icon: "users" },
   { href: "/analytics", label: "Analytics", icon: "activity" },
   { href: "/settings", label: "Settings", icon: "settings" },
+  { href: "/guide", label: "Guide", icon: "info" },
 ];
 
 const ITEM = "flex h-[42px] items-center gap-3 rounded-xl px-3 text-[14.5px] text-mist no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan";

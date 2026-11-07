@@ -7,6 +7,8 @@ import { countWaitingConversations } from "@/lib/whatsapp-umrah/handoff-alerts";
 import { Glass, Label, Tile } from "@/components/wa/ui";
 import { WaIcon } from "@/components/wa/Icon";
 import { SidebarNav } from "./SidebarNav";
+import { TermsGate } from "./TermsGate";
+import { needsTerms } from "@/lib/whatsapp-umrah/terms";
 import waStyles from "./waConsole.module.css";
 
 /* The shell: sidebar (brand, live status, nav, replies meter, account) and the main column. The shell is flex,
@@ -85,7 +87,7 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
           <div className="absolute -right-[260px] -top-[320px] h-[900px] w-[900px] rounded-full" style={{ background: "radial-gradient(circle, #5CC8FF22, rgba(5,6,10,0) 62%)" }} />
         </div>
-        <div className="relative">{children}</div>
+        <div className="relative">{needsTerms(agency) ? <TermsGate agencyId={agencyId} /> : children}</div>
       </main>
     </div>
   );

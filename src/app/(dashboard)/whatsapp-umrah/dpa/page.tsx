@@ -46,8 +46,9 @@ export default function WhatsAppUmrahDpaPage() {
         <p className="mt-4 text-[15px] leading-7 text-white/75">
           Message content is sent to Groq (bulk drafting) and, for a small share of escalated replies, Anthropic
           (Claude), both solely to generate a draft reply - never to train a model on your data. WhatsApp delivery is
-          via Meta&apos;s WhatsApp Business Platform, under your own WhatsApp Business Account. Billing runs through
-          Whop.
+          via Meta&apos;s WhatsApp Business Platform, under your own WhatsApp Business Account. Knowledge base text is
+          sent to Voyage AI to create the search embeddings. Data is stored with Neon (database) and served by Vercel
+          (hosting), team alert emails are sent through Resend, and billing runs through Whop.
         </p>
 
         <h2 className="mt-10 text-lg font-semibold">Retention and deletion</h2>

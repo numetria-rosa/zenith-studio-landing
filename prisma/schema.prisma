@@ -1714,6 +1714,11 @@ model WaAgency {
   country String         @default("GB") // ISO 3166-1 alpha-2; more countries later, UK only at launch
   status  WaAgencyStatus @default(ONBOARDING)
 
+  // The owner's recorded acceptance of the DPA, terms, AI disclosure and Meta billing (see lib/whatsapp-umrah/terms.ts).
+  termsAcceptedAt   DateTime?
+  termsAcceptedById String?
+  termsVersion      String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

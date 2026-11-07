@@ -20,6 +20,7 @@ import { deleteContactData } from "@/lib/whatsapp-umrah/gdpr";
 import type { BusinessHours } from "@/lib/whatsapp-umrah/hours";
 import { Prisma } from "@prisma/client";
 import { logWaAuditEvent } from "@/lib/whatsapp-umrah/audit";
+import { allAccepted, TERMS_VERSION } from "@/lib/whatsapp-umrah/terms";
 import { EMBEDDED_SIGNUP_ENABLED, isEmbeddedSignupCapReached } from "@/lib/whatsapp-umrah/embedded-signup";
 import { finishEmbeddedSignup, newRegistrationPin } from "@/lib/whatsapp-umrah/embedded-signup-flow";
 import { saveWhatsAppConnection } from "@/lib/whatsapp-umrah/connect";
@@ -58,6 +59,15 @@ async function requireOwnedAgency(agencyId: string) {
   const agency = await getOwnedAgency(agencyId, session.user.id);
   if (!agency) throw new Error("not_found");
   return { userId: session.user.id, agency };
+}
+
+/** The owner ticks every statement in TERMS_ITEMS; the time, who and which version are stored and audit logged. */
+export async function acceptTermsAction(agencyId: string, formData: FormData): Promise<void> {
+  const { userId, agency } = await requireOwnedAgency(agencyId);
+  if (!allAccepted(formData.getAll("accept").map(String))) throw new Error("Tick every box to continue.");
+  await db.waAgency.update({ where: { id: agency.id }, data: { termsAcceptedAt: new Date(), termsAcceptedById: userId, termsVersion: TERMS_VERSION } });
+  await logWaAuditEvent(agency.id, userId, "terms_accepted", { version: TERMS_VERSION });
+  revalidatePath(`/whatsapp-umrah/${agencyId}`, "layout");
 }
 
 export async function addKbDocumentAction(agencyId: string, formData: FormData): Promise<void> {
