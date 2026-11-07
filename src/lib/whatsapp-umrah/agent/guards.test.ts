@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { confidenceCheck, groundingCheck, hedgeCheck, lengthCheck, noKbSourceCheck, runGuards, scopeGuard, unsupportedPromiseCheck, falseBookingClaimCheck, perPersonClaimCheck, perPersonFigureCheck } from "./guards";
+import { confidenceCheck, groundingCheck, hedgeCheck, lengthCheck, noKbSourceCheck, runGuards, scopeGuard, unsupportedPromiseCheck, falseBookingClaimCheck, perPersonClaimCheck, perPersonFigureCheck, quoteConsistencyCheck } from "./guards";
 import type { AgentDraft } from "./types";
 
 const baseDraft = (overrides: Partial<AgentDraft> = {}): AgentDraft => ({
@@ -273,5 +273,39 @@ describe("perPersonClaimCheck", () => {
   });
   it("leaves replies that never say per person alone", () => {
     expect(perPersonClaimCheck(say("For two travellers the total is £7,900."), kb)).toBeNull();
+  });
+});
+
+describe("quoteConsistencyCheck: the exact quote for a known package and party", () => {
+  const packages = [
+    { name: "Ramadan Umrah 2027, last 10 nights", type: "Ramadan Umrah", pricePerPerson: 3950, deposit: 750, priceBasis: "twin sharing" },
+    { name: "7 Night Economy Umrah", type: "Umrah", pricePerPerson: 1295, deposit: 200, priceBasis: "quad sharing" },
+  ];
+  const say = (reply: string, leadFields: { travelers?: number; packagePreference?: string } | null = null) => baseDraft({ reply, leadFields });
+  const ramadan = "the Ramadan Umrah 2027, last 10 nights";
+
+  it("rejects the live replies that got a figure wrong, and names the right one", () => {
+    const a = quoteConsistencyCheck(say(`Noted for ${ramadan}. For 2 travellers the total is £3,950 and the deposit is £1,500.`), packages);
+    expect(a?.guard).toBe("quote_mismatch");
+    expect(a?.detail).toBe("the total for 2 travellers on Ramadan Umrah 2027, last 10 nights is £7,900, not £3,950");
+    const b = quoteConsistencyCheck(say(`${ramadan} for 2 travellers: the total is £7,900. The deposit to book is £1,500 per person, so £3,000 in total.`), packages);
+    expect(b?.detail).toMatch(/total .* is £7,900, not £3,000|deposit .* is £1,500/);
+    expect(quoteConsistencyCheck(say(`For 2 travellers on ${ramadan} the deposit is £750 and the balance is £6,400.`), packages)?.detail).toBe("the deposit for 2 travellers on Ramadan Umrah 2027, last 10 nights is £1,500, not £750");
+  });
+  it("uses the package and party the model recorded when the reply does not say them", () => {
+    expect(quoteConsistencyCheck(say("The total is £3,950.", { travelers: 2, packagePreference: "ramadan" }), packages)?.detail).toMatch(/£7,900/);
+  });
+  it("accepts a reply whose figures are exactly right, with per-person figures labelled", () => {
+    expect(quoteConsistencyCheck(say(`${ramadan} for 2 travellers is £7,900 in total. The deposit is £1,500 (£750 per person) and the balance is £6,400.`), packages)).toBeNull();
+    expect(quoteConsistencyCheck(say(`£3,950 per person, so £7,900 in total for 2 travellers on ${ramadan}.`), packages)).toBeNull();
+  });
+  it("does not pair a figure with the wrong word (a deposit followed later by the balance)", () => {
+    expect(quoteConsistencyCheck(say(`${ramadan} for 2 travellers is £7,900, with a £1,500 deposit to book and the balance due 10 weeks before departure.`), packages)).toBeNull();
+  });
+  it("stays out of it when the package or the party is unclear, for one traveller, and for children", () => {
+    expect(quoteConsistencyCheck(say("For 2 travellers the total is £3,950."), packages)).toBeNull();
+    expect(quoteConsistencyCheck(say(`For 1 traveller on ${ramadan} the total is £3,950.`), packages)).toBeNull();
+    expect(quoteConsistencyCheck(say(`2 adults and 1 child on ${ramadan}: total £8,000.`), packages)).toBeNull();
+    expect(quoteConsistencyCheck(say(`Compare ${ramadan} and 7 Night Economy Umrah: total for 2 £9,999.`), packages)).toBeNull();
   });
 });

@@ -1,6 +1,7 @@
 import type { AgentDraft, GuardFailure } from "./types";
 import { HARD_HANDOFF_INTENTS } from "./types";
 import { toAsciiDigits } from "./digits";
+import { detectParty, matchPackage, quoteFor, type QuotePackage } from "../kb/quote-sentence";
 
 /* Post-guards, run on every draft before it can be sent - see CLAUDE.md
    3.1 and the spec's pipeline step 6 ("Post-guards: grounding check on
@@ -161,6 +162,24 @@ const FIGURE_WORDS: { key: keyof PerPersonFigures; word: string; label: string }
   { key: "deposits", word: "deposit", label: "the deposit" },
   { key: "balances", word: "balance|remaining", label: "the balance" },
 ];
+/** The £ amounts that sit right beside one of the quote words ("total", "deposit", "balance|remaining"). An amount only
+    counts for a word when no OTHER quote word lies between them: in "£1,500 deposit to book and the balance due in 10
+    weeks", £1,500 belongs to the deposit and has nothing to say about the balance. `around` is the text either side, for
+    spotting "per person". */
+const QUOTE_WORDS = ["total", "deposit", "balance", "remaining"];
+function figuresNear(text: string, word: string): { amount: number; around: string }[] {
+  const own = word.split("|");
+  const others = new RegExp(`\\b(?:${QUOTE_WORDS.filter((w) => !own.includes(w)).join("|")})\\b`, "i");
+  const near = new RegExp(`\\b(?:${word})\\b([^£.\\n]{0,40})£\\s?([\\d,]+(?:\\.\\d+)?)|£\\s?([\\d,]+(?:\\.\\d+)?)([^.\\n£]{0,25}?)\\b(?:${word})\\b`, "gi");
+  const out: { amount: number; around: string }[] = [];
+  for (const m of text.matchAll(near)) {
+    const between = m[1] ?? m[4] ?? "";
+    if (others.test(between)) continue;
+    const amount = Number((m[2] ?? m[3]).replace(/,/g, ""));
+    out.push({ amount, around: `${between} ${text.slice(m.index + m[0].length, m.index + m[0].length + 25)}` });
+  }
+  return out;
+}
 export function perPersonFigureCheck(draft: AgentDraft, figures: PerPersonFigures): GuardFailure | null {
   const text = toAsciiDigits(draft.reply);
   const said = text.match(/\b(\d+|two|three|four|five|six|seven|eight)\s+(?:travellers?|people|adults|persons|passengers|guests)\b/i)?.[1]?.toLowerCase();
@@ -169,13 +188,38 @@ export function perPersonFigureCheck(draft: AgentDraft, figures: PerPersonFigure
   for (const { key, word, label } of FIGURE_WORDS) {
     const perPerson = figures[key];
     if (perPerson.length === 0) continue;
-    const near = new RegExp(`\\b(?:${word})\\b[^£.\\n]{0,40}£\\s?([\\d,]+(?:\\.\\d+)?)|£\\s?([\\d,]+(?:\\.\\d+)?)([^.\\n£]{0,25}?)\\b(?:${word})\\b`, "gi");
-    for (const m of text.matchAll(near)) {
-      const amount = Number((m[1] ?? m[2]).replace(/,/g, ""));
-      const before = m[3] ?? "";
-      const after = text.slice(m.index + m[0].length, m.index + m[0].length + 25);
-      if (perPerson.includes(amount) && !PER_PERSON_HINT.test(before) && !PER_PERSON_HINT.test(after)) {
+    for (const { amount, around } of figuresNear(text, word)) {
+      if (perPerson.includes(amount) && !PER_PERSON_HINT.test(around)) {
         return { guard: "per_person_figure", detail: `reply gives £${amount.toLocaleString("en-GB")} as ${label} for ${party} travellers, but that is the per-person figure (the group figure is in the QUOTES table)` };
+      }
+    }
+  }
+  return null;
+}
+
+/** The exact check, when the package and the party size are known: every total, deposit and balance in the reply must
+    be THE figure for that package and that many travellers (worked out in code), or carry "per person" beside it.
+    This is the one that settles a quote; the checks around it catch the same slips when the package is unclear. The
+    failure names the right figure, so the retry can simply use it. A mixed party (children, infants) is skipped, as
+    it is priced from the package text and not by price x travellers. */
+const MIXED_PARTY = /\b(child|children|infants?|kids?|baby|babies|toddlers?)\b/i;
+export function quoteConsistencyCheck(draft: AgentDraft, packages: QuotePackage[], customerMessage = ""): GuardFailure | null {
+  if (packages.length === 0 || MIXED_PARTY.test(`${draft.reply} ${customerMessage}`)) return null;
+  const text = toAsciiDigits(draft.reply);
+  const named = packages.filter((p) => text.toLowerCase().includes(p.name.toLowerCase()));
+  const hinted = draft.leadFields?.packagePreference ? matchPackage(draft.leadFields.packagePreference, packages) : null;
+  const pkg = named.length === 1 ? named[0] : named.length === 0 ? hinted : null;
+  if (!pkg) return null;
+  const party = draft.leadFields?.travelers ?? detectParty(text) ?? detectParty(customerMessage);
+  if (!party || party < 2) return null;
+  const q = quoteFor(pkg, party);
+  const expected: [string, number | null, string][] = [["total", q.total, "total"], ["deposit", q.deposit, "deposit"], ["balance|remaining", q.balance, "balance"]];
+  for (const [word, want, label] of expected) {
+    if (want === null) continue;
+    for (const { amount, around } of figuresNear(text, word)) {
+      if (amount !== want && !PER_PERSON_HINT.test(around)) {
+        const fmt = (n: number) => `£${n.toLocaleString("en-GB")}`;
+        return { guard: "quote_mismatch", detail: `the ${label} for ${party} travellers on ${pkg.name} is ${fmt(want)}, not ${fmt(amount)}` };
       }
     }
   }
@@ -218,8 +262,8 @@ export function promptLeakCheck(draft: AgentDraft): GuardFailure | null {
   return null;
 }
 
-export function runGuards(draft: AgentDraft, kbContextText: string, customerMessage = "", extraText = "", perPerson: PerPersonFigures = { prices: [], deposits: [], balances: [] }): GuardFailure[] {
-  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft), unsupportedPromiseCheck(draft, kbContextText), falseBookingClaimCheck(draft), perPersonFigureCheck(draft, perPerson), perPersonClaimCheck(draft, kbContextText, customerMessage)].filter(
+export function runGuards(draft: AgentDraft, kbContextText: string, customerMessage = "", extraText = "", perPerson: PerPersonFigures = { prices: [], deposits: [], balances: [] }, packages: QuotePackage[] = []): GuardFailure[] {
+  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft), unsupportedPromiseCheck(draft, kbContextText), falseBookingClaimCheck(draft), perPersonFigureCheck(draft, perPerson), perPersonClaimCheck(draft, kbContextText, customerMessage), quoteConsistencyCheck(draft, packages, customerMessage)].filter(
     (f): f is GuardFailure => f !== null
   );
 }

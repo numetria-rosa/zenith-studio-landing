@@ -190,7 +190,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
   // What this customer has already told us (dates, travellers, airport...), kept on the lead, so it survives past the
   // last 12 messages and the agent never asks for it twice.
   const knownFields = await loadKnownLeadFields(conversation.id);
-  const result = await runAgentPipeline({ agencyId: agency.id, customerMessage: msg.body, conversationHistory, knownDetails: leadSummaryLine(knownFields) });
+  const result = await runAgentPipeline({ agencyId: agency.id, customerMessage: msg.body, conversationHistory, knownDetails: leadSummaryLine(knownFields), knownFields });
 
   if (result.promptRuns.length > 0) {
     await db.waPromptRun.createMany({

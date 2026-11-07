@@ -2,6 +2,7 @@ import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/
 import { loadKbChunks, type RetrievedChunk } from "../kb/retrieve";
 import { loadOccasions, occasionsPrompt } from "../occasions";
 import { loadQuotes } from "../kb/quotes";
+import { quoteRequest } from "../kb/quote-sentence";
 import { containsSensitiveData, isIdentityQuestion, isOptOutMessage } from "./pre-guards";
 import { plainHandoffReason, TECHNICAL_PROBLEM_REASON } from "./reasons";
 import { guessLanguage } from "./language";
@@ -11,7 +12,7 @@ import { draftReply, type DraftResult } from "./draft";
 import { escalateDraft } from "./escalate";
 import { runGuards } from "./guards";
 import { db } from "@/lib/db";
-import { HARD_HANDOFF_INTENTS, type AgentDraft, type GuardFailure, type KbSource, type Language, type PipelineResult, type PromptRunRecord } from "./types";
+import { HARD_HANDOFF_INTENTS, type AgentDraft, type LeadFields, type GuardFailure, type KbSource, type Language, type PipelineResult, type PromptRunRecord } from "./types";
 
 const GROQ_MODEL = () => process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 const CLAUDE_MODEL = () => process.env.CLAUDE_MODEL || "claude-haiku-4-5-20251001";
@@ -68,6 +69,7 @@ export type PipelineInput = {
   detectedLanguage?: Language; // fallback if a guard fires before the model reports one
   /** Which model writes the first draft. Groq by default; "claude" is for comparing the two (the retry is always Claude). */
   firstDrafter?: "groq" | "claude";
+  knownFields?: LeadFields; // the same facts, structured (package preference, travellers), to price from
   knownDetails?: string; // what earlier turns of this chat already told us, e.g. "2 travellers, Ramadan 2027" (see leadSummaryLine)
 };
 
@@ -107,7 +109,11 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   // facts, so a reply may quote it (it joins the text the grounding check reads).
   const known = input.knownDetails ? `WHAT THE CUSTOMER HAS ALREADY TOLD US (do not ask for these again): ${input.knownDetails}.` : "";
   const quotes = await loadQuotes(input.agencyId);
-  const extraContext = [quotes.text, occasionsPrompt(await loadOccasions(input.agencyId)), known].filter(Boolean).join("\n\n");
+  // When the message and what we already know name a package and a party size, the quote is worked out here and the
+  // model is told to use exactly it (and the guards check the reply against the same numbers).
+  const request = quoteRequest({ message: input.customerMessage, knownPackage: input.knownFields?.packagePreference, knownTravellers: input.knownFields?.travelers }, quotes.packages);
+  const quoteLine = request ? `QUOTE FOR THIS CUSTOMER (worked out in code: when you state a total, deposit or balance for them, use exactly these figures): ${request.sentence}` : "";
+  const extraContext = [quotes.text, quoteLine, occasionsPrompt(await loadOccasions(input.agencyId)), known].filter(Boolean).join("\n\n");
   const draftInput = { customerMessage: input.customerMessage, kbContext, extraContext, conversationHistory: input.conversationHistory ?? "", persona: personaPrompt(persona) };
   const promptRuns: PromptRunRecord[] = [];
 
@@ -129,7 +135,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     console.error("[whatsapp-umrah pipeline] draft failed:", first.error); // the detail is for us; the owner gets a plain reason
     return handoffResult(TECHNICAL_PROBLEM_REASON, fallbackLanguage, ["draft_error"], null, promptRuns);
   }
-  const firstFailures = runGuards(first.draft, kbContext, input.customerMessage, extraContext, quotes.perPerson);
+  const firstFailures = runGuards(first.draft, kbContext, input.customerMessage, extraContext, quotes.perPerson, quotes.packages);
   promptRuns.push(toPromptRunRecord("DRAFT", drafterModel, first, guardNames(firstFailures)));
   // A language the agency has switched off goes to a person (no retry: a second draft would be in the same language).
   if (!replyLanguageAllowed(first.draft.language, persona)) return languageOffResult(first.draft, persona, promptRuns);
@@ -152,7 +158,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     console.error("[whatsapp-umrah pipeline] escalation failed:", escalated.error);
     return handoffResult(plainHandoffReason(first.draft, firstFailures), first.draft.language, guardNames(firstFailures), first.draft, promptRuns);
   }
-  const secondFailures = runGuards(escalated.draft, kbContext, input.customerMessage, extraContext, quotes.perPerson);
+  const secondFailures = runGuards(escalated.draft, kbContext, input.customerMessage, extraContext, quotes.perPerson, quotes.packages);
   promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures)));
   if (secondFailures.length === 0) {
     return replyResult(escalated.draft, "claude:" + CLAUDE_MODEL(), guardNames(firstFailures), promptRuns, persona, await resolveSources(input.agencyId, escalated.draft.kbIdsUsed));
