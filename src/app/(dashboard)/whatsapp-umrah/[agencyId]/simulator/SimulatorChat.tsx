@@ -23,7 +23,11 @@ export function SimulatorChat({ agencyId, agencyName, agentName, rail }: { agenc
   const [input, setInput] = useState("");
   const [pending, startTransition] = useTransition();
   const scroller = useRef<HTMLDivElement>(null);
-  useEffect(() => scroller.current?.scrollTo({ top: scroller.current.scrollHeight }), [turns, pending]);
+  // A block body on purpose: an effect must return nothing or a cleanup function, and an arrow that returns scrollTo's
+  // result hands React whatever the browser (or an extension patching scrollTo) returns, which crashed the page on send.
+  useEffect(() => {
+    scroller.current?.scrollTo({ top: scroller.current.scrollHeight });
+  }, [turns, pending]);
 
   function send(textOverride?: string) {
     const text = (textOverride ?? input).trim();

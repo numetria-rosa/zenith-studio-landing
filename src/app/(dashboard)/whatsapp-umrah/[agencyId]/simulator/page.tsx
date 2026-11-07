@@ -34,7 +34,7 @@ export default async function SimulatorPage({ params }: { params: Promise<{ agen
       <Card className="px-[22px] pb-[10px] pt-5">
         <Label className="mb-2 block">How {agentName} is set up</Label>
         <Row label="Tone">{s?.tone === "FORMAL" ? "Formal" : "Warm"}</Row>
-        <Row label="Sign-off">{s?.signOff || <span className="text-dim">None</span>}</Row>
+        <Row label="Sign-off">{s?.signOff?.trim() ? `${AGENT_NAME}, ${agency.name}` : <span className="text-dim">None</span>}</Row>
         <Row label="Emoji">{emoji ? "On" : <span className="text-dim">Off</span>}</Row>
         <Row label="Languages">
           <span className="inline-flex gap-[5px]">{(s?.languagesEnabled ?? ["en", "ar", "tr", "ur"]).map((l) => <Chip key={l} className="px-[10px] font-mono text-[11px] uppercase tracking-[.06em] text-soft">{l}</Chip>)}</span>
