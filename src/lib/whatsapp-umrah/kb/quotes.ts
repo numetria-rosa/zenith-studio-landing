@@ -35,7 +35,9 @@ export function quotesPrompt(packages: PackageFields[]): string {
   return [`QUOTES (already worked out, for 1 to ${MAX_PARTY} travellers at the per-person price. Copy these figures for totals, deposits and balances, never do the sums yourself):`, ...lines].join("\n");
 }
 
-export async function loadQuotes(agencyId: string): Promise<string> {
+/** The quotes table for the prompt, and every per-person price (so the guards can tell a total from a per-person figure). */
+export async function loadQuotes(agencyId: string): Promise<{ text: string; perPersonPrices: number[] }> {
   const docs = await db.waKbDocument.findMany({ where: { agencyId, kind: "PACKAGE" }, orderBy: { createdAt: "asc" }, take: 30, select: { fields: true } });
-  return quotesPrompt(docs.map((d) => packageFromJson(d.fields)));
+  const packages = docs.map((d) => packageFromJson(d.fields));
+  return { text: quotesPrompt(packages), perPersonPrices: [...new Set(packages.map((p) => p.pricePerPerson).filter((n) => n > 0))] };
 }

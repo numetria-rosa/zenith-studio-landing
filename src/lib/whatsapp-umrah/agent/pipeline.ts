@@ -104,7 +104,8 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   // occasions calendar, and what this customer has already told us. All of it is the agency's or the customer's own
   // facts, so a reply may quote it (it joins the text the grounding check reads).
   const known = input.knownDetails ? `WHAT THE CUSTOMER HAS ALREADY TOLD US (do not ask for these again): ${input.knownDetails}.` : "";
-  const extraContext = [await loadQuotes(input.agencyId), occasionsPrompt(await loadOccasions(input.agencyId)), known].filter(Boolean).join("\n\n");
+  const quotes = await loadQuotes(input.agencyId);
+  const extraContext = [quotes.text, occasionsPrompt(await loadOccasions(input.agencyId)), known].filter(Boolean).join("\n\n");
   const draftInput = { customerMessage: input.customerMessage, kbContext, extraContext, conversationHistory: input.conversationHistory ?? "", persona: personaPrompt(persona) };
   const promptRuns: PromptRunRecord[] = [];
 
@@ -114,7 +115,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     console.error("[whatsapp-umrah pipeline] draft failed:", first.error); // the detail is for us; the owner gets a plain reason
     return handoffResult(TECHNICAL_PROBLEM_REASON, fallbackLanguage, ["draft_error"], null, promptRuns);
   }
-  const firstFailures = runGuards(first.draft, kbContext, input.customerMessage, extraContext);
+  const firstFailures = runGuards(first.draft, kbContext, input.customerMessage, extraContext, quotes.perPersonPrices);
   promptRuns.push(toPromptRunRecord("DRAFT", GROQ_MODEL(), first, guardNames(firstFailures)));
   // A language the agency has switched off goes to a person (no retry: a second draft would be in the same language).
   if (!replyLanguageAllowed(first.draft.language, persona)) return languageOffResult(first.draft, persona, promptRuns);
@@ -137,7 +138,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     console.error("[whatsapp-umrah pipeline] escalation failed:", escalated.error);
     return handoffResult(plainHandoffReason(first.draft, firstFailures), first.draft.language, guardNames(firstFailures), first.draft, promptRuns);
   }
-  const secondFailures = runGuards(escalated.draft, kbContext, input.customerMessage, extraContext);
+  const secondFailures = runGuards(escalated.draft, kbContext, input.customerMessage, extraContext, quotes.perPersonPrices);
   promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures)));
   if (secondFailures.length === 0) {
     return replyResult(escalated.draft, "claude:" + CLAUDE_MODEL(), guardNames(firstFailures), promptRuns, persona, await resolveSources(input.agencyId, escalated.draft.kbIdsUsed));
