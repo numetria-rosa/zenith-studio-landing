@@ -34,6 +34,9 @@ export type PackageDraft = {
   price: string;
   basis: string;
   deposit: string;
+  childPrice: string;
+  infantPrice: string;
+  childMaxAge: string;
   terms: string;
   airports: string[];
   airline: string;
@@ -76,6 +79,9 @@ export function draftFromFields(f: PackageFields): PackageDraft {
     price: numText(f.pricePerPerson),
     basis: f.priceBasis,
     deposit: numText(f.deposit),
+    childPrice: numText(f.childPrice),
+    infantPrice: numText(f.infantPrice),
+    childMaxAge: numText(f.childMaxAge),
     terms: f.paymentTerms,
     airports: splitAirports(f.departureAirports),
     airline: f.airline,
@@ -106,6 +112,9 @@ export function draftToFormEntries(d: PackageDraft): Record<string, string> {
     pricePerPerson: d.price,
     priceBasis: d.basis,
     deposit: d.deposit,
+    childPrice: d.childPrice,
+    infantPrice: d.infantPrice,
+    childMaxAge: d.childMaxAge,
     paymentTerms: d.terms,
     departureAirports: joinAirports(d.airports),
     airline: d.airline,

@@ -29,7 +29,7 @@ export const FIXTURE_PACKAGES: PackageFields[] = [
     name: "Family Group Umrah, Easter 2027", type: "Group package", nightsMakkah: 5, nightsMadinah: 4,
     makkahHotel: { name: "Dar Al Safa Hotel", stars: 3, distanceMetres: 650 }, madinahHotel: { name: "Al Noor Residence", stars: 3, distanceMetres: 400 },
     pricePerPerson: 1650, priceBasis: "per adult, triple sharing", deposit: 300, travelDates: "Departs 1 Apr 2027, returns 10 Apr 2027", departureAirports: "London Heathrow",
-    notes: "Children 2 to 11 are £1,150, infants £350.",
+    childPrice: 1150, infantPrice: 350, childMaxAge: 11,
   }),
 ];
 

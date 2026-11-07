@@ -227,6 +227,20 @@ export function PriceStep({ d, set, agentName }: StepProps) {
           <Input id="pkg-terms" value={d.terms} maxLength={LIMITS.long} onChange={(e) => set({ terms: e.target.value })} placeholder="e.g. balance due 8 weeks before departure" />
         </div>
       </div>
+      <div className="mt-[18px] grid gap-[18px]" style={{ gridTemplateColumns: "220px 220px minmax(0, 1fr)" }}>
+        <div>
+          <FieldLabel htmlFor="pkg-child">Child price (optional)</FieldLabel>
+          <Input id="pkg-child" mono inputMode="decimal" value={d.childPrice} maxLength={12} onChange={(e) => set({ childPrice: e.target.value })} placeholder="1150" />
+        </div>
+        <div>
+          <FieldLabel htmlFor="pkg-infant">Infant price (optional)</FieldLabel>
+          <Input id="pkg-infant" mono inputMode="decimal" value={d.infantPrice} maxLength={12} onChange={(e) => set({ infantPrice: e.target.value })} placeholder="350" />
+        </div>
+        <div>
+          <FieldLabel htmlFor="pkg-child-age">Children are 2 up to age</FieldLabel>
+          <Input id="pkg-child-age" mono inputMode="numeric" value={d.childMaxAge} maxLength={2} onChange={(e) => set({ childMaxAge: e.target.value })} placeholder="11 (under 2 is an infant)" />
+        </div>
+      </div>
     </section>
   );
 }

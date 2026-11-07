@@ -18,6 +18,10 @@ export type PackageFields = {
   pricePerPerson: number;
   priceBasis: string;
   deposit: number | null;
+  /** Price for a child (age 2 up to childMaxAge) and for an infant (under 2); null when the agency doesn't set one. */
+  childPrice: number | null;
+  infantPrice: number | null;
+  childMaxAge: number | null;
   paymentTerms: string;
   departureAirports: string;
   airline: string;
@@ -27,6 +31,9 @@ export type PackageFields = {
   excluded: string[];
   notes: string;
 };
+
+export const INFANT_UNDER = 2;
+export const DEFAULT_CHILD_MAX_AGE = 11;
 
 export type FaqFields = { question: string; answer: string };
 
@@ -84,6 +91,9 @@ export function parsePackageForm(form: FormData): Parsed<PackageFields> {
       pricePerPerson: price,
       priceBasis: str(form.get("priceBasis"), MAX_SHORT),
       deposit: num(form.get("deposit")),
+      childPrice: num(form.get("childPrice")),
+      infantPrice: num(form.get("infantPrice")),
+      childMaxAge: ((a) => (a !== null && a >= INFANT_UNDER && a <= 17 ? Math.round(a) : null))(num(form.get("childMaxAge"))),
       paymentTerms: str(form.get("paymentTerms"), MAX_LONG),
       departureAirports: str(form.get("departureAirports"), MAX_SHORT),
       airline: str(form.get("airline"), MAX_SHORT),
@@ -125,6 +135,8 @@ export function packageToText(f: PackageFields): string {
     hotelText("Madinah hotel", "the Prophet's Mosque", f.madinahHotel),
     `Price: ${gbp(f.pricePerPerson)} per person${f.priceBasis ? ` (${f.priceBasis})` : ""}.`,
     f.deposit !== null && `Deposit: ${gbp(f.deposit)} per person.`,
+    f.childPrice !== null && `Child price: ${gbp(f.childPrice)} per child aged ${INFANT_UNDER} to ${f.childMaxAge ?? DEFAULT_CHILD_MAX_AGE}.`,
+    f.infantPrice !== null && `Infant price: ${gbp(f.infantPrice)} per infant under ${INFANT_UNDER}.`,
     f.paymentTerms && `Payment terms: ${f.paymentTerms}`,
     f.departureAirports && `Departs from: ${f.departureAirports}.`,
     f.airline && `Flights: ${f.airline}.`,
@@ -152,6 +164,9 @@ export const PACKAGE_FORM_DEFAULTS: PackageFields = {
   pricePerPerson: 0,
   priceBasis: "",
   deposit: null,
+  childPrice: null,
+  infantPrice: null,
+  childMaxAge: null,
   paymentTerms: "",
   departureAirports: "",
   airline: "",

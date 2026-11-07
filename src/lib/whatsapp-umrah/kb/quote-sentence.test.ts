@@ -71,3 +71,28 @@ describe("quoteRequest", () => {
     expect(quoteRequest({ message: "2 adults and 1 child on the easter family package" }, PACKAGES)).toBeNull();
   });
 });
+
+import { detectMixedParty } from "./quote-sentence";
+
+describe("mixed parties", () => {
+  const FAMILY: QuotePackage = { ...P("Family Group Umrah, Easter 2027", "Group package", 1650, 300), childPrice: 1150, infantPrice: 350, childMaxAge: 11 };
+  it("reads adults, children and infants, and uses a stated age to pick the band", () => {
+    expect(detectMixedParty("2 adults and 1 child aged 6")).toEqual({ adults: 2, children: 1, infants: 0 });
+    expect(detectMixedParty("2 adults, 2 kids (ages 5 and 8) and a baby")).toEqual({ adults: 2, children: 2, infants: 1 });
+    expect(detectMixedParty("my wife and 1 child")).toBeNull(); // no explicit adult count
+  });
+  it("an age under 2 is an infant, over the child limit is an adult", () => {
+    expect(detectMixedParty("2 adults and 2 children aged 1 and 14")).toEqual({ adults: 3, children: 0, infants: 1 });
+  });
+  it("quotes each band at its own price", () => {
+    const r = quoteRequest({ message: "2 adults and 1 child aged 6 on the easter family package" }, [FAMILY]);
+    expect(r?.sentence).toContain("£4,450 in total");
+    expect(r?.party).toBe(3);
+  });
+  it("adds an infant at the infant price", () => {
+    expect(quoteRequest({ message: "2 adults and 1 infant on the easter family package" }, [FAMILY])?.sentence).toContain("£3,650 in total");
+  });
+  it("does not quote when the agency set no child price", () => {
+    expect(quoteRequest({ message: "2 adults and 1 child on the easter family package" }, [{ ...FAMILY, childPrice: null }])).toBeNull();
+  });
+});

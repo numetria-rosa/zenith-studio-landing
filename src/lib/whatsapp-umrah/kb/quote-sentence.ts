@@ -1,4 +1,4 @@
-import type { PackageFields } from "./structured";
+import { DEFAULT_CHILD_MAX_AGE, INFANT_UNDER, type PackageFields } from "./structured";
 
 /* Quotes written in code. Once we know WHICH package and HOW MANY travellers (from this message or from what the chat
    already told us), the total, deposit and balance are worked out here and handed to the model as a ready sentence,
@@ -15,7 +15,7 @@ export function quoteFor(p: Pick<PackageFields, "pricePerPerson" | "deposit">, p
   return { total, deposit, balance: deposit === null ? null : round2(total - deposit) };
 }
 
-export type QuotePackage = Pick<PackageFields, "name" | "type" | "pricePerPerson" | "deposit" | "priceBasis">;
+export type QuotePackage = Pick<PackageFields, "name" | "type" | "pricePerPerson" | "deposit" | "priceBasis"> & Partial<Pick<PackageFields, "childPrice" | "infantPrice" | "childMaxAge">>;
 
 const gbp = (n: number) => `£${n.toLocaleString("en-GB", { maximumFractionDigits: 2 })}`;
 const WORDS: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 };
@@ -96,10 +96,65 @@ export function quoteSentence(p: QuotePackage, party: number): string {
   return parts.join(" ");
 }
 
+export type MixedParty = { adults: number; children: number; infants: number };
+
+/** "2 adults and 1 child aged 6", "2 adults, 2 kids (5 and 8) and a baby": who is travelling, by price band. A stated age
+    decides the band (under 2 infant, up to childMaxAge child, older adult); a child with no age is priced as a child.
+    Null unless the message gives an explicit adult count and at least one child or infant. */
+export function detectMixedParty(text: string, childMaxAge = DEFAULT_CHILD_MAX_AGE): MixedParty | null {
+  const t = text.toLowerCase();
+  const count = (words: string) => {
+    let total = 0;
+    for (const m of t.matchAll(new RegExp(`\\b(?:${ONE_OR_MORE}|an?)\\s+(?:${words})\\b`, "g"))) total += m[1] ? (WORDS[m[1]] ?? Number(m[1])) : 1;
+    return total;
+  };
+  const adults = count("adults?");
+  let children = count("child|children|kids?");
+  let infants = count("infants?|babies|baby");
+  if (adults < 1 || children + infants < 1 || adults + children + infants > MAX_PARTY) return null;
+  const ages: number[] = [];
+  for (const m of t.matchAll(/\b(?:aged?|ages)\s*:?\s*((?:\d{1,2}(?:\s*(?:,|and|&)\s*)?)+)/g)) ages.push(...m[1].match(/\d{1,2}/g)!.map(Number));
+  for (const m of t.matchAll(/(\d{1,2})[\s-]*(?:years?|yrs?)[\s-]*olds?/g)) ages.push(Number(m[1]));
+  let adultsOut = adults;
+  if (ages.length === children + infants) {
+    const kids = ages.length;
+    infants = ages.filter((a) => a < INFANT_UNDER).length;
+    children = ages.filter((a) => a >= INFANT_UNDER && a <= childMaxAge).length;
+    adultsOut += kids - infants - children;
+  }
+  return { adults: adultsOut, children, infants };
+}
+
+/** The total for a mixed party, each band at its own price. Null when a band is needed but the agency set no price. */
+export function mixedQuoteSentence(p: QuotePackage, m: MixedParty): string | null {
+  const childPrice = p.childPrice ?? null;
+  const infantPrice = p.infantPrice ?? null;
+  if ((m.children > 0 && childPrice === null) || (m.infants > 0 && infantPrice === null)) return null;
+  const parts: string[] = [];
+  const who: string[] = [];
+  let total = 0;
+  const band = (n: number, label: string, labelPlural: string, price: number | null) => {
+    if (n === 0 || price === null) return;
+    total += n * price;
+    who.push(`${n} ${n === 1 ? label : labelPlural}`);
+    parts.push(`${n} ${n === 1 ? label : labelPlural} at ${gbp(price)} each = ${gbp(round2(n * price))}`);
+  };
+  band(m.adults, "adult", "adults", p.pricePerPerson);
+  band(m.children, "child", "children", childPrice);
+  band(m.infants, "infant", "infants", infantPrice);
+  const ages = [m.children > 0 ? `Child price applies to ages ${INFANT_UNDER} to ${p.childMaxAge ?? DEFAULT_CHILD_MAX_AGE}.` : "", m.infants > 0 ? `Infant price applies under ${INFANT_UNDER}.` : ""].filter(Boolean).join(" ");
+  return `${p.name} for ${who.join(" and ")}: ${gbp(round2(total))} in total (${parts.join(", ")}). ${ages}`.trim();
+}
+
 /** The quote for this customer, when the package and the party size can both be told from what they wrote and what
     we already know about them. A mixed party (children, infants) is priced from the package text, not by this sum. */
 export function quoteRequest(input: { message: string; knownPackage?: string; knownTravellers?: number }, packages: QuotePackage[]): { pkg: QuotePackage; party: number; sentence: string } | null {
-  if (/\b(child|children|infants?|kids?|baby|babies|toddlers?)\b/i.test(input.message)) return null;
+  if (/\b(child|children|infants?|kids?|baby|babies|toddlers?)\b/i.test(input.message)) {
+    const pkg = matchPackage(input.message, packages);
+    const mix = detectMixedParty(input.message, pkg?.childMaxAge ?? DEFAULT_CHILD_MAX_AGE);
+    const sentence = pkg && mix ? mixedQuoteSentence(pkg, mix) : null;
+    return pkg && mix && sentence ? { pkg, party: mix.adults + mix.children + mix.infants, sentence } : null;
+  }
   const party = detectParty(input.message) ?? input.knownTravellers ?? null;
   const pkg = matchPackage(input.message, packages) ?? (input.knownPackage ? matchPackage(input.knownPackage, packages) : null);
   if (!pkg || !party || !(pkg.pricePerPerson > 0)) return null;
