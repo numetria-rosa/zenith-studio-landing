@@ -22,7 +22,7 @@ export function isHotLead(fields: LeadFields, intent: Intent): boolean {
   return hasCoreFields || wantsToAct;
 }
 
-function mergeLeadFields(existing: LeadFields, incoming: LeadFields | null): LeadFields {
+export function mergeLeadFields(existing: LeadFields, incoming: LeadFields | null): LeadFields {
   if (!incoming) return existing;
   return {
     travelDates: incoming.travelDates ?? existing.travelDates,
@@ -31,6 +31,24 @@ function mergeLeadFields(existing: LeadFields, incoming: LeadFields | null): Lea
     departureCity: incoming.departureCity ?? existing.departureCity,
     hotelTier: incoming.hotelTier ?? existing.hotelTier,
     packagePreference: incoming.packagePreference ?? existing.packagePreference,
+  };
+}
+
+/** What we already know about this conversation's customer, from earlier turns. */
+export async function loadKnownLeadFields(conversationId: string): Promise<LeadFields> {
+  const l = await db.waLead.findFirst({
+    where: { conversationId },
+    orderBy: { createdAt: "desc" },
+    select: { travelDates: true, travelers: true, budgetGbp: true, departureCity: true, hotelTier: true, packagePreference: true },
+  });
+  if (!l) return {};
+  return {
+    travelDates: l.travelDates ?? undefined,
+    travelers: l.travelers ?? undefined,
+    budgetGbp: l.budgetGbp ?? undefined,
+    departureCity: l.departureCity ?? undefined,
+    hotelTier: l.hotelTier ?? undefined,
+    packagePreference: l.packagePreference ?? undefined,
   };
 }
 

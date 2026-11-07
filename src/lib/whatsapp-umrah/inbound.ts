@@ -2,7 +2,8 @@ import { db } from "@/lib/db";
 import { decryptSecret } from "@/lib/secrets";
 import { sendPlainEmail } from "@/lib/outreach-mail";
 import { runAgentPipeline } from "./agent/pipeline";
-import { leadSummaryLine, upsertLeadFromDraft, notifyOwnerOfHotLead } from "./leads";
+import { leadSummaryLine, loadKnownLeadFields, mergeLeadFields, upsertLeadFromDraft, notifyOwnerOfHotLead } from "./leads";
+import { BOOKING_READY_REASON } from "./agent/reasons";
 import { MetaCloudWhatsAppProvider } from "./provider/meta";
 import { withinCap, recordAiReply } from "./entitlements";
 import { isWithinBusinessHours } from "./hours";
@@ -171,7 +172,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
   const history = await db.waMessage.findMany({
     where: { conversationId: conversation.id },
     orderBy: { createdAt: "desc" },
-    take: 6,
+    take: 12, // enough of the chat for "yes, the second one"; the lead record below carries the facts further back
     select: { sender: true, body: true },
   });
   const conversationHistory = history
@@ -183,7 +184,10 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
     })
     .join("\n");
 
-  const result = await runAgentPipeline({ agencyId: agency.id, customerMessage: msg.body, conversationHistory });
+  // What this customer has already told us (dates, travellers, airport...), kept on the lead, so it survives past the
+  // last 12 messages and the agent never asks for it twice.
+  const knownFields = await loadKnownLeadFields(conversation.id);
+  const result = await runAgentPipeline({ agencyId: agency.id, customerMessage: msg.body, conversationHistory, knownDetails: leadSummaryLine(knownFields) });
 
   if (result.promptRuns.length > 0) {
     await db.waPromptRun.createMany({
@@ -204,7 +208,11 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
 
   const outboundText = result.action === "reply" ? result.text : result.holdingMessage;
   if (outboundText) await deliver(delivery, outboundText, providerOverride);
-  if (result.action === "handoff") await handOff(agency.id, conversation.id, result.reason, msg.body, leadSummaryLine(result.leadFields));
+  const summary = leadSummaryLine(mergeLeadFields(knownFields, result.leadFields));
+  if (result.action === "handoff") await handOff(agency.id, conversation.id, result.reason, msg.body, summary);
+  // The customer committed to booking: the agent has just confirmed the package, total, deposit and next step, and
+  // now the team takes the chat to collect documents and payment, with the details above ready for them.
+  else if (result.readyToBook) await handOff(agency.id, conversation.id, BOOKING_READY_REASON, msg.body, summary);
 
   // Lead capture runs on a handoff too, not only a normal reply - a
   // customer who states their budget/dates/travellers and then gets

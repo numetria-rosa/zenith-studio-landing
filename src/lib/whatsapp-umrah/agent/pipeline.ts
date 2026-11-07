@@ -1,6 +1,7 @@
 import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v4";
 import { loadKbChunks, type RetrievedChunk } from "../kb/retrieve";
 import { loadOccasions, occasionsPrompt } from "../occasions";
+import { loadQuotes } from "../kb/quotes";
 import { containsSensitiveData, isIdentityQuestion, isOptOutMessage } from "./pre-guards";
 import { plainHandoffReason, TECHNICAL_PROBLEM_REASON } from "./reasons";
 import { guessLanguage } from "./language";
@@ -65,6 +66,7 @@ export type PipelineInput = {
   customerMessage: string;
   conversationHistory?: string; // caller-formatted, e.g. "Customer: ...\nAI: ..."
   detectedLanguage?: Language; // fallback if a guard fires before the model reports one
+  knownDetails?: string; // what earlier turns of this chat already told us, e.g. "2 travellers, Ramadan 2027" (see leadSummaryLine)
 };
 
 export async function runAgentPipeline(input: PipelineInput): Promise<PipelineResult> {
@@ -98,11 +100,12 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
 
   const retrieval = await loadKbChunks(input.agencyId, input.customerMessage);
   const kbContext = retrieval.ok ? formatKbContext(retrieval.chunks) : "";
-  const occasions = occasionsPrompt(await loadOccasions(input.agencyId));
-  const draftInput = { customerMessage: input.customerMessage, kbContext, occasions, conversationHistory: input.conversationHistory ?? "", persona: personaPrompt(persona) };
-  // The occasion dates are the agency's own facts too, so a reply may quote them.
-  const groundingText = occasions ? `${kbContext}
-${occasions}` : kbContext;
+  // Everything the model may use besides the knowledge base chunks: the worked-out quotes table, the agency's
+  // occasions calendar, and what this customer has already told us. All of it is the agency's or the customer's own
+  // facts, so a reply may quote it (it joins the text the grounding check reads).
+  const known = input.knownDetails ? `WHAT THE CUSTOMER HAS ALREADY TOLD US (do not ask for these again): ${input.knownDetails}.` : "";
+  const extraContext = [await loadQuotes(input.agencyId), occasionsPrompt(await loadOccasions(input.agencyId)), known].filter(Boolean).join("\n\n");
+  const draftInput = { customerMessage: input.customerMessage, kbContext, extraContext, conversationHistory: input.conversationHistory ?? "", persona: personaPrompt(persona) };
   const promptRuns: PromptRunRecord[] = [];
 
   const first = await draftReply(draftInput);
@@ -111,7 +114,7 @@ ${occasions}` : kbContext;
     console.error("[whatsapp-umrah pipeline] draft failed:", first.error); // the detail is for us; the owner gets a plain reason
     return handoffResult(TECHNICAL_PROBLEM_REASON, fallbackLanguage, ["draft_error"], null, promptRuns);
   }
-  const firstFailures = runGuards(first.draft, groundingText, input.customerMessage);
+  const firstFailures = runGuards(first.draft, kbContext, input.customerMessage, extraContext);
   promptRuns.push(toPromptRunRecord("DRAFT", GROQ_MODEL(), first, guardNames(firstFailures)));
   // A language the agency has switched off goes to a person (no retry: a second draft would be in the same language).
   if (!replyLanguageAllowed(first.draft.language, persona)) return languageOffResult(first.draft, persona, promptRuns);
@@ -134,7 +137,7 @@ ${occasions}` : kbContext;
     console.error("[whatsapp-umrah pipeline] escalation failed:", escalated.error);
     return handoffResult(plainHandoffReason(first.draft, firstFailures), first.draft.language, guardNames(firstFailures), first.draft, promptRuns);
   }
-  const secondFailures = runGuards(escalated.draft, groundingText, input.customerMessage);
+  const secondFailures = runGuards(escalated.draft, kbContext, input.customerMessage, extraContext);
   promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures)));
   if (secondFailures.length === 0) {
     return replyResult(escalated.draft, "claude:" + CLAUDE_MODEL(), guardNames(firstFailures), promptRuns, persona, await resolveSources(input.agencyId, escalated.draft.kbIdsUsed));
@@ -154,7 +157,9 @@ function guardNames(failures: GuardFailure[]): string[] {
 }
 
 function replyResult(draft: AgentDraft, model: string, guardsTriggered: string[], promptRuns: PromptRunRecord[], persona: Persona, sources: KbSource[]): PipelineResult {
-  return { action: "reply", text: applyPersona(draft.reply, persona), language: draft.language, intent: draft.intent, leadFields: draft.leadFields, model, guardsTriggered, promptRuns, sources };
+  // A customer who has committed to booking is a booking_interest lead whatever intent the model picked.
+  const readyToBook = draft.readyToBook === true;
+  return { action: "reply", text: applyPersona(draft.reply, persona), language: draft.language, intent: readyToBook ? "booking_interest" : draft.intent, leadFields: draft.leadFields, model, guardsTriggered, promptRuns, sources, readyToBook };
 }
 
 /** The knowledge-base items behind a reply: the chunk ids the model reports using, resolved to their documents,

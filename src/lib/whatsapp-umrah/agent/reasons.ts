@@ -12,6 +12,9 @@ const INTENT_REASONS: Partial<Record<Intent, string>> = {
   fiqh_question: "the customer asked a religious ruling question, which the assistant doesn't answer",
 };
 
+/** Not a failure: the customer said they want to book, the agent confirmed the details, and the team takes over. */
+export const BOOKING_READY_REASON = "the customer is ready to book";
+
 export const TECHNICAL_PROBLEM_REASON = "the assistant had a technical problem and couldn't answer";
 
 /** The reason for a handoff after the checks failed: what the customer asked if that is what triggered it,

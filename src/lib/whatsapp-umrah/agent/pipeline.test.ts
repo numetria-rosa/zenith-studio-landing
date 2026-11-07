@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("../kb/retrieve", () => ({ loadKbChunks: async () => ({ ok: true, chunks: [] }) }));
 const model = vi.hoisted(() => ({ draft: null as null | Record<string, unknown>, settings: null as null | Record<string, unknown> }));
 const chunkRows = vi.hoisted(() => ({ rows: [] as { document: { id: string; kind: string; title: string } }[] }));
-vi.mock("@/lib/db", () => ({ db: { waAgency: { findUnique: async () => ({ name: "Al Noor Travel", agentSettings: model.settings }) }, waKbChunk: { findMany: async () => chunkRows.rows }, waOccasion: { findMany: async () => [] } } }));
+vi.mock("@/lib/db", () => ({ db: { waAgency: { findUnique: async () => ({ name: "Al Noor Travel", agentSettings: model.settings }) }, waKbChunk: { findMany: async () => chunkRows.rows }, waOccasion: { findMany: async () => [] }, waKbDocument: { findMany: async () => [] } } }));
 vi.mock("./draft", () => ({
   draftReply: async () => (model.draft ? { ok: true, draft: model.draft, latencyMs: 1 } : { ok: false, error: "the model must not run", latencyMs: 0 }),
 }));

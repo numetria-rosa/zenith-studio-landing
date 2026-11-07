@@ -59,6 +59,8 @@ export type AgentDraft = {
   handoffReason: string | null;
   confidence: number;
   kbIdsUsed: string[];
+  /** The customer has clearly committed to booking (set by the model, see prompt rule 14). */
+  readyToBook?: boolean;
 };
 
 export type GuardFailure = { guard: string; detail: string };
@@ -87,7 +89,7 @@ export type PromptRunRecord = {
 export type KbSource = { kind: string; title: string };
 
 export type PipelineResult =
-  | { action: "reply"; text: string; language: Language; intent: Intent; leadFields: LeadFields | null; model: string; guardsTriggered: string[]; promptRuns: PromptRunRecord[]; sources: KbSource[] }
+  | { action: "reply"; text: string; language: Language; intent: Intent; leadFields: LeadFields | null; model: string; guardsTriggered: string[]; promptRuns: PromptRunRecord[]; sources: KbSource[]; readyToBook?: boolean }
   | {
       action: "handoff";
       reason: string;

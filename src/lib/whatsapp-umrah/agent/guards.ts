@@ -30,13 +30,16 @@ function extractNumericClaims(raw: string): string[] {
     (child + adult, price minus deposit), a £ price divided by nights, and sums and differences of small numbers
     (a start day plus nights is the end day). Every operand still comes from the KB or the customer's message. */
 const MAX_MULTIPLIER = 20;
+const MAX_PARTY = 8;
 function derivedNumbers(raw: string): string[] {
   const texts = toAsciiDigits(raw);
-  const money = (texts.match(CURRENCY_TOKEN) ?? []).map((s) => Number(s.replace(/[£,\s]/g, "")));
+  const money = [...new Set((texts.match(CURRENCY_TOKEN) ?? []).map((s) => Number(s.replace(/[£,\s]/g, ""))))];
   const small = [...new Set((texts.replace(CURRENCY_TOKEN, " ").match(BARE_NUMBER_TOKEN) ?? []).map((s) => Number(s.replace(/,/g, ""))).filter((n) => n >= 1 && n <= 90))];
   const out: number[] = [];
   for (let k = 2; k <= MAX_MULTIPLIER; k++) for (const m of money) out.push(m * k);
   for (const a of money) for (const b of money) out.push(a + b, Math.abs(a - b));
+  // A mixed party: some travellers at one price and some at another (2 adults and 1 child: 2a + 1b).
+  for (const a of money) for (const b of money) for (let k = 1; k <= MAX_PARTY; k++) for (let m = 1; m <= MAX_PARTY; m++) out.push(a * k + b * m);
   for (const m of money) for (const n of [...small, ...Array.from({ length: MAX_MULTIPLIER - 1 }, (_, i) => i + 2)]) out.push(m / n, Math.round(m / n), Math.floor(m / n));
   for (const a of small) for (const b of small) out.push(a + b, Math.abs(a - b));
   return out.map((n) => String(Math.round(n * 100) / 100));
@@ -46,9 +49,11 @@ function derivedNumbers(raw: string): string[] {
     own message (a year, a headcount are theirs, not invented), or from arithmetic on those (derivedNumbers).
     Doesn't try to understand which number means what: a reply quoting ANY other number fails, the safe direction
     (a false failure costs one retry; a false pass ships an invented fact). */
-export function groundingCheck(draft: AgentDraft, kbContextText: string, customerMessage = ""): GuardFailure | null {
+export function groundingCheck(draft: AgentDraft, kbContextText: string, customerMessage = "", extraText = ""): GuardFailure | null {
   const claimed = extractNumericClaims(draft.reply);
-  const kbNumbers = new Set([...extractNumericClaims(kbContextText), ...extractNumericClaims(customerMessage), ...derivedNumbers(`${kbContextText}\n${customerMessage}`)]);
+  // extraText (the worked-out quotes table, the occasions calendar, what the customer already told us) may be quoted as
+  // it is, but is not a base for further arithmetic: only the knowledge base and the customer's message are.
+  const kbNumbers = new Set([...extractNumericClaims(kbContextText), ...extractNumericClaims(customerMessage), ...extractNumericClaims(extraText), ...derivedNumbers(`${kbContextText}\n${customerMessage}`)]);
   const ungrounded = claimed.filter((n) => !kbNumbers.has(n));
   if (ungrounded.length === 0) return null;
   return { guard: "grounding", detail: `reply states number(s) not found in retrieved KB text: ${ungrounded.join(", ")}` };
@@ -132,8 +137,16 @@ export function noKbSourceCheck(draft: AgentDraft): GuardFailure | null {
   return null;
 }
 
-export function runGuards(draft: AgentDraft, kbContextText: string, customerMessage = ""): GuardFailure[] {
-  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft)].filter(
+/** Prompt injection that works shows up as the model reciting its own instructions or context. A customer-facing
+    reply never contains these markers, so one that does is rejected (and retried, then handed off). */
+const LEAK_MARKERS = [/RULES, NO EXCEPTIONS/i, /KNOWLEDGE BASE:/i, /AGENCY STYLE/i, /QUOTES \(already/i, /OCCASIONS \(the agency/i, /WHAT THE CUSTOMER HAS ALREADY TOLD US/i, /kbIdsUsed/, /readyToBook/];
+export function promptLeakCheck(draft: AgentDraft): GuardFailure | null {
+  if (LEAK_MARKERS.some((m) => m.test(draft.reply))) return { guard: "prompt_leak", detail: "reply repeats the assistant's own instructions or context" };
+  return null;
+}
+
+export function runGuards(draft: AgentDraft, kbContextText: string, customerMessage = "", extraText = ""): GuardFailure[] {
+  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft)].filter(
     (f): f is GuardFailure => f !== null
   );
 }

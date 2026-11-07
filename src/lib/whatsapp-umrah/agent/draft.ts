@@ -38,8 +38,9 @@ const DRAFT_SCHEMA = {
     handoffReason: { type: ["string", "null"] },
     confidence: { type: "number" },
     kbIdsUsed: { type: "array", items: { type: "string" } },
+    readyToBook: { type: "boolean" },
   },
-  required: ["reply", "language", "intent", "leadFields", "handoffReason", "confidence", "kbIdsUsed"],
+  required: ["reply", "language", "intent", "leadFields", "handoffReason", "confidence", "kbIdsUsed", "readyToBook"],
   additionalProperties: false,
 } as const;
 
@@ -49,7 +50,7 @@ export const todayLine = () => `TODAY: ${new Date().toLocaleDateString("en-GB", 
 export type DraftInput = {
   customerMessage: string;
   kbContext: string; // formatted "[chunk-id] content" blocks, see pipeline.ts
-  occasions?: string; // the agency's occasions calendar as prompt text, see occasions.ts
+  extraContext?: string; // quotes table, occasions calendar and what we already know about the customer, as prompt text
   conversationHistory: string; // formatted recent turns, may be empty
   persona?: string; // the agency's style note, see persona.ts
 };
@@ -79,7 +80,7 @@ async function callGroq(userPrompt: string, model: string): Promise<Response> {
 }
 
 export async function draftReply(input: DraftInput, model = DRAFT_MODEL): Promise<DraftResult> {
-  const userPrompt = `${input.persona ? `${input.persona}\n\n` : ""}${todayLine()}\n\nKNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\n${input.occasions ? `${input.occasions}\n\n` : ""}RECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}`;
+  const userPrompt = `${input.persona ? `${input.persona}\n\n` : ""}${todayLine()}\n\nKNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\n${input.extraContext ? `${input.extraContext}\n\n` : ""}RECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}`;
   const startedAt = Date.now();
 
   try {

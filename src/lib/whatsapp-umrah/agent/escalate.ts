@@ -46,14 +46,15 @@ const AGENT_DRAFT_TOOL = {
       handoffReason: { type: ["string", "null"] },
       confidence: { type: "number" },
       kbIdsUsed: { type: "array", items: { type: "string" } },
+      readyToBook: { type: "boolean" },
     },
-    required: ["reply", "language", "intent", "leadFields", "handoffReason", "confidence", "kbIdsUsed"],
+    required: ["reply", "language", "intent", "leadFields", "handoffReason", "confidence", "kbIdsUsed", "readyToBook"],
     additionalProperties: false,
   },
 } as const;
 
 export async function escalateDraft(input: DraftInput, previousFailures: GuardFailure[]): Promise<DraftResult> {
-  const userPrompt = `${input.persona ? `${input.persona}\n\n` : ""}${todayLine()}\n\nKNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\n${input.occasions ? `${input.occasions}\n\n` : ""}RECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}\n\nA FIRST ATTEMPT AT THIS FAILED THESE CHECKS - do not repeat the same mistake:\n${previousFailures.map((f) => `- ${f.guard}: ${f.detail}`).join("\n")}`;
+  const userPrompt = `${input.persona ? `${input.persona}\n\n` : ""}${todayLine()}\n\nKNOWLEDGE BASE:\n${input.kbContext || "(nothing retrieved for this question)"}\n\n${input.extraContext ? `${input.extraContext}\n\n` : ""}RECENT CONVERSATION:\n${input.conversationHistory || "(no prior messages)"}\n\nCUSTOMER MESSAGE:\n${input.customerMessage}\n\nA FIRST ATTEMPT AT THIS FAILED THESE CHECKS - do not repeat the same mistake:\n${previousFailures.map((f) => `- ${f.guard}: ${f.detail}`).join("\n")}`;
 
   const startedAt = Date.now();
   try {

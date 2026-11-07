@@ -322,7 +322,7 @@ export async function simulateMessageAction(agencyId: string, customerMessage: s
     text: result.action === "reply" ? result.text : result.holdingMessage,
     language: result.language,
     guardsTriggered: result.guardsTriggered,
-    action: result.action,
+    action: result.action === "reply" && result.readyToBook ? "handoff" : result.action, // a committed booking goes to the team too
     sources: result.action === "reply" ? result.sources : [],
   };
 }
