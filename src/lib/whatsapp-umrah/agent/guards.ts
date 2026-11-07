@@ -148,6 +148,14 @@ const UNSUPPORTED_PROMISES: [RegExp, RegExp, string][] = [
   [/\bpayment link\b/i, /\b(send|share|email)\b[^.]{0,30}\bpayment link\b/i, "promises a payment link"],
   [/\b(by|via|with|using) (a )?(credit |debit )?card\b|\bcard payment\b/i, /\b(pay|payment|deposit|balance)\b[^.]{0,60}\bcard\b|\bcard payments?\b/i, "names card as a payment method"],
 ];
+/** The agent never makes a booking, the team does. "I've booked it" or "your booking is confirmed" promises something
+    that has not happened, whatever the knowledge base says, so it is rejected outright. */
+const FALSE_BOOKING_CLAIM = /\b(I(?:'ve| have)|we(?:'ve| have)) (booked|reserved|confirmed)\b|\byour (booking|reservation|place|seats?) (is|are|has been|have been) (confirmed|booked|reserved|secured|complete)/i;
+export function falseBookingClaimCheck(draft: AgentDraft): GuardFailure | null {
+  const normalized = draft.reply.replace(/[‘’]/g, "'");
+  return FALSE_BOOKING_CLAIM.test(normalized) ? { guard: "false_booking_claim", detail: "reply says the booking is made or confirmed, but only the team can do that" } : null;
+}
+
 export function unsupportedPromiseCheck(draft: AgentDraft, kbContextText: string): GuardFailure | null {
   const hit = UNSUPPORTED_PROMISES.find(([said, allowed]) => said.test(draft.reply) && !allowed.test(kbContextText));
   return hit ? { guard: "unsupported_promise", detail: `reply ${hit[2]}, which the knowledge base does not say` } : null;
@@ -162,7 +170,7 @@ export function promptLeakCheck(draft: AgentDraft): GuardFailure | null {
 }
 
 export function runGuards(draft: AgentDraft, kbContextText: string, customerMessage = "", extraText = ""): GuardFailure[] {
-  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft), unsupportedPromiseCheck(draft, kbContextText)].filter(
+  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft), unsupportedPromiseCheck(draft, kbContextText), falseBookingClaimCheck(draft)].filter(
     (f): f is GuardFailure => f !== null
   );
 }

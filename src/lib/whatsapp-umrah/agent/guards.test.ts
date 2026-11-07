@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { confidenceCheck, groundingCheck, hedgeCheck, lengthCheck, noKbSourceCheck, runGuards, scopeGuard, unsupportedPromiseCheck } from "./guards";
+import { confidenceCheck, groundingCheck, hedgeCheck, lengthCheck, noKbSourceCheck, runGuards, scopeGuard, unsupportedPromiseCheck, falseBookingClaimCheck } from "./guards";
 import type { AgentDraft } from "./types";
 
 const baseDraft = (overrides: Partial<AgentDraft> = {}): AgentDraft => ({
@@ -196,5 +196,19 @@ describe("unsupportedPromiseCheck", () => {
   });
   it("leaves ordinary replies alone", () => {
     expect(unsupportedPromiseCheck(say("Our team will be in touch shortly."), "")).toBeNull();
+  });
+});
+
+describe("falseBookingClaimCheck", () => {
+  const say = (reply: string) => baseDraft({ reply });
+  it("rejects a reply that says the booking is made or confirmed", () => {
+    expect(falseBookingClaimCheck(say("Great! I've booked the Ramadan package."))?.guard).toBe("false_booking_claim");
+    expect(falseBookingClaimCheck(say("I’ve booked it for you."))?.guard).toBe("false_booking_claim");
+    expect(falseBookingClaimCheck(say("Your booking is confirmed."))?.guard).toBe("false_booking_claim");
+    expect(falseBookingClaimCheck(say("We have reserved your seats."))?.guard).toBe("false_booking_claim");
+  });
+  it("allows noting a request and ordinary mentions of booking", () => {
+    expect(falseBookingClaimCheck(say("I've noted your request. Our team will complete the booking."))).toBeNull();
+    expect(falseBookingClaimCheck(say("You can book by choosing a package and paying the deposit."))).toBeNull();
   });
 });
