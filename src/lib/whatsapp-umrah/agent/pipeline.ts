@@ -1,4 +1,4 @@
-import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v4";
+import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v5";
 import { loadKbChunks, type RetrievedChunk } from "../kb/retrieve";
 import { loadOccasions, occasionsPrompt } from "../occasions";
 import { loadQuotes } from "../kb/quotes";
