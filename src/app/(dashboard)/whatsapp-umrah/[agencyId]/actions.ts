@@ -10,6 +10,7 @@ import { ingestDocument } from "@/lib/whatsapp-umrah/kb/ingest";
 import { faqToText, packageToText, parseFaqForm, parsePackageForm } from "@/lib/whatsapp-umrah/kb/structured";
 import { takeOverConversation, resumeAi } from "@/lib/whatsapp-umrah/handoff";
 import { setReplyFlag } from "@/lib/whatsapp-umrah/flags";
+import { simulatorBlocked } from "@/lib/whatsapp-umrah/entitlements";
 import { parseOccasionForm, SUGGESTED_OCCASIONS } from "@/lib/whatsapp-umrah/occasions";
 import { runAgentPipeline } from "@/lib/whatsapp-umrah/agent/pipeline";
 import { decryptSecret } from "@/lib/secrets";
@@ -317,7 +318,15 @@ export type SimulatorTurn = { role: "customer" | "ai"; text: string; language?: 
     unlimited test surface. */
 export async function simulateMessageAction(agencyId: string, customerMessage: string): Promise<{ text: string; language: string; guardsTriggered: string[]; action: "reply" | "handoff"; sources: { kind: string; title: string }[] }> {
   const { agency } = await requireOwnedAgency(agencyId);
+  const blocked = await simulatorBlocked(agency.id);
+  if (blocked) return { text: blocked, language: "en", guardsTriggered: ["simulator_limit"], action: "reply", sources: [] };
   const result = await runAgentPipeline({ agencyId: agency.id, customerMessage });
+  // Saved like a real chat's runs (no conversation), so test spend counts toward the monthly AI budget.
+  if (result.promptRuns.length > 0) {
+    await db.waPromptRun.createMany({
+      data: result.promptRuns.map((r) => ({ agencyId: agency.id, stage: r.stage, model: r.model, promptVersion: r.promptVersion, inputTokens: r.inputTokens, outputTokens: r.outputTokens, latencyMs: r.latencyMs, costEstimateCents: r.costEstimateCents, guardsTriggered: r.guardsTriggered })),
+    });
+  }
   return {
     text: result.action === "reply" ? result.text : result.holdingMessage,
     language: result.language,

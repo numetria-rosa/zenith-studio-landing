@@ -48,7 +48,7 @@ export function SimulatorChat({ agencyId, agencyName, agentName, rail }: { agenc
     <div>
       <PageHeader
         title="Simulator"
-        subtitle={`Chat with ${agentName} exactly as a customer would. Nothing here reaches WhatsApp or counts toward your reply limit.`}
+        subtitle={`Chat with ${agentName} exactly as a customer would. Nothing here reaches WhatsApp or counts toward your reply limit. Up to 60 test messages a day.`}
         actions={<GlassButton icon="reset" onClick={() => { setTurns([]); setInput(""); }}>Reset chat</GlassButton>}
       />
       <div className="grid items-start gap-[18px]" style={{ gridTemplateColumns: "minmax(0, 1fr) 340px" }}>

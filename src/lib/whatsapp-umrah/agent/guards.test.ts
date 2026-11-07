@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { confidenceCheck, groundingCheck, hedgeCheck, lengthCheck, noKbSourceCheck, runGuards, scopeGuard } from "./guards";
+import { confidenceCheck, groundingCheck, hedgeCheck, lengthCheck, noKbSourceCheck, runGuards, scopeGuard, unsupportedPromiseCheck } from "./guards";
 import type { AgentDraft } from "./types";
 
 const baseDraft = (overrides: Partial<AgentDraft> = {}): AgentDraft => ({
@@ -173,5 +173,28 @@ describe("Arabic and Urdu digits", () => {
   });
   it("passes arithmetic written in Arabic-Indic digits", () => {
     expect(groundingCheck(baseDraft({ reply: "المجموع £٢٬٥٩٠ لشخصين." }), kb)).toBeNull();
+  });
+});
+
+describe("unsupportedPromiseCheck", () => {
+  const say = (reply: string) => baseDraft({ reply });
+  it("rejects a promise the knowledge base never makes", () => {
+    expect(unsupportedPromiseCheck(say("Our team will call you shortly."), "Package: Ramadan. Price: £3,950.")?.guard).toBe("unsupported_promise");
+    expect(unsupportedPromiseCheck(say("You can pay by bank transfer."), "Deposit to book, full balance due 10 weeks before departure.")?.guard).toBe("unsupported_promise");
+    expect(unsupportedPromiseCheck(say("We will send you a payment link."), "Payment terms: deposit to book.")?.guard).toBe("unsupported_promise");
+    expect(unsupportedPromiseCheck(say("Pay the deposit by card."), "Payment terms: deposit to book.")?.guard).toBe("unsupported_promise");
+  });
+  it("is not fooled by the KB merely mentioning the word (call our office, phone number, card details)", () => {
+    const kb = "Questions? Call our office on 0800 123 456 or find our phone number on the website. We never take card details on WhatsApp.";
+    expect(unsupportedPromiseCheck(say("Our team will call you shortly."), kb)?.guard).toBe("unsupported_promise");
+    expect(unsupportedPromiseCheck(say("Pay the deposit by card."), kb)?.guard).toBe("unsupported_promise");
+  });
+  it("allows the promise when the knowledge base makes it", () => {
+    expect(unsupportedPromiseCheck(say("Our team will call you shortly."), "After booking, our team will call you within a day to confirm.")).toBeNull();
+    expect(unsupportedPromiseCheck(say("You can pay by bank transfer."), "Pay the deposit by bank transfer to the account we send you.")).toBeNull();
+    expect(unsupportedPromiseCheck(say("You can pay by card."), "We accept payment by debit or credit card.")).toBeNull();
+  });
+  it("leaves ordinary replies alone", () => {
+    expect(unsupportedPromiseCheck(say("Our team will be in touch shortly."), "")).toBeNull();
   });
 });

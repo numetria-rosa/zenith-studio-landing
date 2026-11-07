@@ -141,11 +141,12 @@ export function noKbSourceCheck(draft: AgentDraft): GuardFailure | null {
     ones ("our team will call you", "pay by bank transfer"). A reply may only say so if the knowledge base does.
     [what the reply says, what the knowledge base must contain for it to be allowed] */
 const UNSUPPORTED_PROMISES: [RegExp, RegExp, string][] = [
-  [/\b(call|phone|ring)\s+you\b/i, /\b(call|phone|ring)\b/i, "says the team will call the customer"],
-  [/\b(e-?mail)\s+you\b|\bsend you an e-?mail\b/i, /\be-?mail\b/i, "says the team will email the customer"],
-  [/\bbank transfer\b/i, /\bbank transfer\b/i, "names bank transfer as a payment method"],
-  [/\bpayment link\b/i, /\bpayment link\b/i, "promises a payment link"],
-  [/\b(by|via|with|using) (a )?(credit |debit )?card\b|\bcard payment\b/i, /\bcard\b/i, "names card as a payment method"],
+  // The KB must make the SAME promise, not merely mention the word ("call our office" is not "we will call you").
+  [/\b(call|phone|ring)\s+you\b/i, /\b(we|team|agent|consultant|someone)\b[^.]{0,40}\b(call|phone|ring)\b[^.]{0,20}\b(you|customers?|clients?)\b/i, "says the team will call the customer"],
+  [/\b(e-?mail)\s+you\b|\bsend you an e-?mail\b/i, /\b(we|team|agent|consultant|someone)\b[^.]{0,40}\be-?mail\b[^.]{0,20}\b(you|customers?|clients?)\b/i, "says the team will email the customer"],
+  [/\bbank transfer\b/i, /\b(pay|payment|deposit|balance)\b[^.]{0,60}\bbank transfer\b|\bbank transfer\b[^.]{0,60}\b(pay|payment|deposit|balance)\b/i, "names bank transfer as a payment method"],
+  [/\bpayment link\b/i, /\b(send|share|email)\b[^.]{0,30}\bpayment link\b/i, "promises a payment link"],
+  [/\b(by|via|with|using) (a )?(credit |debit )?card\b|\bcard payment\b/i, /\b(pay|payment|deposit|balance)\b[^.]{0,60}\bcard\b|\bcard payments?\b/i, "names card as a payment method"],
 ];
 export function unsupportedPromiseCheck(draft: AgentDraft, kbContextText: string): GuardFailure | null {
   const hit = UNSUPPORTED_PROMISES.find(([said, allowed]) => said.test(draft.reply) && !allowed.test(kbContextText));

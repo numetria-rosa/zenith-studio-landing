@@ -102,7 +102,10 @@ async function underReplyLimit(agency: { id: string; name: string }, ownerEmail:
   const cap = await withinCap(agency.id);
   if (cap.withinCap) return true;
   if (ownerEmail) {
-    await sendPlainEmail(ownerEmail, `${agency.name}: monthly AI reply limit reached`, `Your WhatsApp agent has used its ${cap.cap} AI replies for this month${cap.cap < cap.planCap ? " (the limit you set)" : ""}, so it's paused until the new month starts. You can change your limit in Settings. New messages are still saved to your dashboard.`);
+    const why = cap.limit === "budget"
+      ? "has used this month's AI allowance for your plan (it was working through longer conversations than a typical month)"
+      : `has used its ${cap.cap} AI replies for this month${cap.cap < cap.planCap ? " (the limit you set)" : ""}`;
+    await sendPlainEmail(ownerEmail, `${agency.name}: monthly AI limit reached`, `Your WhatsApp agent ${why}, so it's paused until the new month starts. ${cap.limit === "budget" ? "If you regularly need more, reply to this email and we'll look at your plan." : "You can change your limit in Settings."} New messages are still saved to your dashboard.`);
   }
   return false;
 }

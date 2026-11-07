@@ -176,9 +176,11 @@ The agent:
   (a third paid LLM provider) without asking first, per the "ask before
   adding paid services" rule. The KB vector column is scaffolded at 1536
   dimensions as a placeholder pending this decision.
-- **Extra-replies add-on: removed 2026-11-03.** Agencies pay Meta directly, so they set their own
-  monthly reply limit (Settings, capped at the plan allowance) instead of buying £5 packs. The plan
-  cap stays as the ceiling because it covers our per-reply AI cost. Archive the £5 plan in Whop.
+- **Reply limits and margin (decided 2026-11-07).** The extra-replies add-on stays removed. Agencies pay Meta
+  directly, but WE pay for the AI calls, so the owner's own limit in Settings can only lower the plan's, never raise
+  it. Every plan must keep at least 80% margin: each plan has a monthly AI budget (economics.ts) and the agent
+  pauses when an agency's estimated AI spend reaches it, whatever the reply count. Reply caps: Starter 1,000,
+  Growth 3,500, Pro 8,000. Workings and assumptions in docs/unit-economics.md; economics.test.ts enforces the rule.
 
 ## Rules for whoever is building this
 
