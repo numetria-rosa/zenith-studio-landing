@@ -137,6 +137,21 @@ export function noKbSourceCheck(draft: AgentDraft): GuardFailure | null {
   return null;
 }
 
+/** Promises about HOW the agency will contact or take payment are policy, and a model fills the gap with plausible
+    ones ("our team will call you", "pay by bank transfer"). A reply may only say so if the knowledge base does.
+    [what the reply says, what the knowledge base must contain for it to be allowed] */
+const UNSUPPORTED_PROMISES: [RegExp, RegExp, string][] = [
+  [/\b(call|phone|ring)\s+you\b/i, /\b(call|phone|ring)\b/i, "says the team will call the customer"],
+  [/\b(e-?mail)\s+you\b|\bsend you an e-?mail\b/i, /\be-?mail\b/i, "says the team will email the customer"],
+  [/\bbank transfer\b/i, /\bbank transfer\b/i, "names bank transfer as a payment method"],
+  [/\bpayment link\b/i, /\bpayment link\b/i, "promises a payment link"],
+  [/\b(by|via|with|using) (a )?(credit |debit )?card\b|\bcard payment\b/i, /\bcard\b/i, "names card as a payment method"],
+];
+export function unsupportedPromiseCheck(draft: AgentDraft, kbContextText: string): GuardFailure | null {
+  const hit = UNSUPPORTED_PROMISES.find(([said, allowed]) => said.test(draft.reply) && !allowed.test(kbContextText));
+  return hit ? { guard: "unsupported_promise", detail: `reply ${hit[2]}, which the knowledge base does not say` } : null;
+}
+
 /** Prompt injection that works shows up as the model reciting its own instructions or context. A customer-facing
     reply never contains these markers, so one that does is rejected (and retried, then handed off). */
 const LEAK_MARKERS = [/RULES, NO EXCEPTIONS/i, /KNOWLEDGE BASE:/i, /AGENCY STYLE/i, /QUOTES \(already/i, /OCCASIONS \(the agency/i, /WHAT THE CUSTOMER HAS ALREADY TOLD US/i, /kbIdsUsed/, /readyToBook/];
@@ -146,7 +161,7 @@ export function promptLeakCheck(draft: AgentDraft): GuardFailure | null {
 }
 
 export function runGuards(draft: AgentDraft, kbContextText: string, customerMessage = "", extraText = ""): GuardFailure[] {
-  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft)].filter(
+  return [scopeGuard(draft), groundingCheck(draft, kbContextText, customerMessage, extraText), lengthCheck(draft), confidenceCheck(draft), hedgeCheck(draft), noKbSourceCheck(draft), promptLeakCheck(draft), unsupportedPromiseCheck(draft, kbContextText)].filter(
     (f): f is GuardFailure => f !== null
   );
 }
