@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/db", () => ({ db: {} }));
-import { applyPersona, buildPersona, personaPrompt, replyLanguageAllowed } from "./persona";
+import { applyPersona, buildPersona, cleanForWhatsApp, personaPrompt, replyLanguageAllowed } from "./persona";
 
 const settings = { tone: "FORMAL" as const, emojiEnabled: false, signOff: "The Al Noor team", languagesEnabled: ["en", "ar"] };
 
@@ -63,5 +63,24 @@ describe("replyLanguageAllowed", () => {
     const p = buildPersona({ name: "A" }, settings);
     expect(replyLanguageAllowed("ar", p)).toBe(true);
     expect(replyLanguageAllowed("tr", p)).toBe(false);
+  });
+});
+
+describe("cleanForWhatsApp", () => {
+  const EN = String.fromCharCode(0x2013);
+  const EM = String.fromCharCode(0x2014);
+  it("turns em dashes and spaced en dashes into commas", () => {
+    expect(cleanForWhatsApp(`It is 14 nights ${EN} 10 in Makkah ${EM} and 4 in Madinah.`)).toBe("It is 14 nights, 10 in Makkah, and 4 in Madinah.");
+    expect(cleanForWhatsApp(`Great${EM}thanks`)).toBe("Great, thanks");
+  });
+  it("leaves an unspaced range and hyphens alone", () => {
+    expect(cleanForWhatsApp(`The 9${EN}11 March dates, 7-night stay`)).toBe(`The 9${EN}11 March dates, 7-night stay`);
+  });
+  it("turns Markdown bold into WhatsApp bold and drops heading marks", () => {
+    expect(cleanForWhatsApp("- **Ramadan Umrah 2027**: 10 nights\n## Notes")).toBe("- *Ramadan Umrah 2027*: 10 nights\nNotes");
+  });
+  it("is applied to every reply", () => {
+    const p = buildPersona({ name: "A" }, { tone: "WARM", emojiEnabled: true, signOff: null, languagesEnabled: ["en"] });
+    expect(applyPersona(`**Hi** ${EM} welcome`, p)).toBe("*Hi*, welcome");
   });
 });

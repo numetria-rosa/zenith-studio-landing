@@ -52,9 +52,21 @@ export function personaPrompt(p: Persona): string {
 
 const EMOJI = /[\p{Extended_Pictographic}️‍]/gu;
 
-/** The reply as it is sent: emoji removed if the agency switched them off, and the sign-off appended. */
+/** Tidies a reply for WhatsApp: no long dashes (any em dash, or an en dash with spaces around it, becomes a comma;
+    an unspaced range like 9-11 March is left alone), and Markdown bold (**x**) becomes WhatsApp's *x*, since WhatsApp doesn't
+    render the double-asterisk form and the customer would see the stars. Headings lose their # marks. */
+export function cleanForWhatsApp(text: string): string {
+  return text
+    .replace(/\s*—\s*/g, ", ")
+    .replace(/\s+–\s+/g, ", ")
+    .replace(/\*\*([^*\n]+)\*\*/g, "*$1*")
+    .replace(/^#{1,6}\s+/gm, "");
+}
+
+/** The reply as it is sent: tidied for WhatsApp, emoji removed if the agency switched them off, and the sign-off appended. */
 export function applyPersona(reply: string, p: Persona): string {
-  let text = p.emoji ? reply : reply.replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/ +([.,!?])/g, "$1").trim();
+  const tidy = cleanForWhatsApp(reply);
+  let text = p.emoji ? tidy : tidy.replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/ +([.,!?])/g, "$1").trim();
   if (p.signOff && !text.endsWith(p.signOff)) text = `${text}\n\n${p.signOff}`;
   return text;
 }
