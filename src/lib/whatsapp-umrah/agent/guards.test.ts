@@ -292,6 +292,10 @@ describe("quoteConsistencyCheck: the exact quote for a known package and party",
     expect(b?.detail).toMatch(/total .* is £7,900, not £3,000|deposit .* is £1,500/);
     expect(quoteConsistencyCheck(say(`For 2 travellers on ${ramadan} the deposit is £750 and the balance is £6,400.`), packages)?.detail).toBe("the deposit for 2 travellers on Ramadan Umrah 2027, last 10 nights is £1,500, not £750");
   });
+  it("a word followed by its own amount labels that amount, not the one before it", () => {
+    expect(quoteConsistencyCheck(say(`Balance: £6,400 (total £7,900 minus deposit £1,500), for 2 travellers on ${ramadan}.`), packages)).toBeNull();
+    expect(quoteConsistencyCheck(say(`Balance: £6,400. Total £7,900. Deposit £1,500, for 2 travellers on ${ramadan}.`), packages)).toBeNull();
+  });
   it("uses the package and party the model recorded when the reply does not say them", () => {
     expect(quoteConsistencyCheck(say("The total is £3,950.", { travelers: 2, packagePreference: "ramadan" }), packages)?.detail).toMatch(/£7,900/);
   });

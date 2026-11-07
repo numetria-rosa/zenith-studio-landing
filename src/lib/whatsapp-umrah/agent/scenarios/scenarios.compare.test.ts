@@ -50,7 +50,12 @@ type Row = { id: string; category: string; passed: boolean; problems: string[]; 
 
 const results: Record<Drafter, Row[]> = { groq: [], claude: [] };
 
-const live = (s: Scenario): Scenario => ({ ...s, expect: { ...s.expect, includes: (s.expect.includes ?? []).filter((t) => /\d/.test(t)), guards: undefined, promptIncludes: undefined, noModel: false } });
+// A scenario that expects a guard to fire is proving a scripted bad draft is caught; a real model usually writes a good reply
+// instead, so action and wording are not judged there (the excludes still are). Elsewhere only price figures are required.
+const live = (s: Scenario): Scenario => {
+  const trap = (s.expect.guards ?? []).length > 0;
+  return { ...s, expect: { ...s.expect, action: trap ? "any" : s.expect.action, includes: trap ? [] : (s.expect.includes ?? []).filter((t) => /\d,\d{3}/.test(t)), guards: undefined, promptIncludes: undefined, noModel: false } };
+};
 
 describe.skipIf(!out)("model comparison", () => {
   describe.each(drafters)("first draft by %s", (drafter) => {

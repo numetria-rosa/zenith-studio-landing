@@ -10,7 +10,7 @@ export function checkScenario(s: Scenario, r: PipelineResult, opts: { modelCalle
   const e = s.expect;
   const bad: string[] = [];
   const text = finalText(r);
-  if (r.action !== e.action) bad.push(`expected ${e.action}, got ${r.action}${r.action === "handoff" ? ` (${r.reason})` : ""}`);
+  if (e.action !== "any" && r.action !== e.action) bad.push(`expected ${e.action}, got ${r.action}${r.action === "handoff" ? ` (${r.reason})` : ""}`);
   for (const g of e.guards ?? []) if (!r.guardsTriggered.includes(g)) bad.push(`guard "${g}" did not fire (fired: ${r.guardsTriggered.join(", ") || "none"})`);
   for (const t of e.includes ?? []) if (!text.includes(t)) bad.push(`reply is missing "${t}"`);
   for (const t of e.excludes ?? []) if (text.includes(t)) bad.push(`reply contains "${t}"`);

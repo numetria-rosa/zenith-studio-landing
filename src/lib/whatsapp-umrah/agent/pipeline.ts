@@ -1,4 +1,4 @@
-import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v5";
+import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v6";
 import { loadKbChunks, type RetrievedChunk } from "../kb/retrieve";
 import { loadOccasions, occasionsPrompt } from "../occasions";
 import { loadQuotes } from "../kb/quotes";
@@ -156,7 +156,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     // still stated the customer's budget/dates) - see leads.ts on why
     // this must not be thrown away.
     console.error("[whatsapp-umrah pipeline] escalation failed:", escalated.error);
-    return handoffResult(plainHandoffReason(first.draft, firstFailures), first.draft.language, guardNames(firstFailures), first.draft, promptRuns);
+    return handoffResult(plainHandoffReason(first.draft, firstFailures), first.draft.language, guardNames(firstFailures), withKnown(first.draft, input.knownFields), promptRuns);
   }
   const secondFailures = runGuards(escalated.draft, kbContext, input.customerMessage, extraContext, quotes.perPerson, quotes.packages);
   promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures)));
@@ -168,9 +168,17 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     plainHandoffReason(escalated.draft, secondFailures),
     escalated.draft.language,
     [...guardNames(firstFailures), ...guardNames(secondFailures)],
-    escalated.draft,
+    withKnown(escalated.draft, input.knownFields),
     promptRuns
   );
+}
+
+/** The draft with what the chat already told us filled in where the model left a field empty, so a hand-off's holding
+    message does not ask again for dates or a party size the customer has given. */
+function withKnown(draft: AgentDraft, known?: LeadFields): AgentDraft {
+  if (!known) return draft;
+  const own = Object.fromEntries(Object.entries(draft.leadFields ?? {}).filter(([, v]) => v !== null && v !== undefined && v !== ""));
+  return { ...draft, leadFields: { ...known, ...own } as AgentDraft["leadFields"] };
 }
 
 function guardNames(failures: GuardFailure[]): string[] {

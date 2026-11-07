@@ -175,6 +175,8 @@ function figuresNear(text: string, word: string): { amount: number; around: stri
   for (const m of text.matchAll(near)) {
     const between = m[1] ?? m[4] ?? "";
     if (others.test(between)) continue;
+    // "£6,400 (total £7,900 ...": a word with its own amount straight after it labels that amount, not the one before it.
+    if (m[3] !== undefined && /^[\s:=-]*(?:of |is )?£/.test(text.slice(m.index + m[0].length))) continue;
     const amount = Number((m[2] ?? m[3]).replace(/,/g, ""));
     out.push({ amount, around: `${between} ${text.slice(m.index + m[0].length, m.index + m[0].length + 25)}` });
   }

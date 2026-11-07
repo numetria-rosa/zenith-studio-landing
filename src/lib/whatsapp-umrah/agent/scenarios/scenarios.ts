@@ -8,7 +8,8 @@ import type { AgentDraft, Language } from "../types";
    Add a scenario when a reply goes wrong: the inbox's "Flag" button lists them (listFlaggedReplies). */
 
 export type Expect = {
-  action: "reply" | "handoff";
+  /** "any" is for the live run only: a scenario that exists to prove a bad scripted draft is caught, where a good real reply is also fine. */
+  action: "reply" | "handoff" | "any";
   /** Guards that must have fired (for a hand-off caused by a guard, or a fixed reply). */
   guards?: string[];
   /** Text the final message (reply or holding message) must contain / must not contain. */
@@ -58,7 +59,7 @@ export const SCENARIOS: Scenario[] = [
   S("price-two-travellers", "pricing", "i want to go to umrah with my mom in ramadhan 2027, how much will it be the two of us", { action: "reply", includes: ["7,900"], excludes: ["Someone from our team"], promptIncludes: ["QUOTE FOR THIS CUSTOMER", "£7,900 in total"] }, { draft: D("The Ramadan Umrah 2027 is £3,950 per person, so £7,900 for the two of you. Which departure airport would you prefer?", { intent: "pricing", leadFields: { travelers: 2, travelDates: "Ramadan 2027", packagePreference: "Ramadan Umrah 2027" } as AgentDraft["leadFields"] }) }),
   S("price-three-economy", "pricing", "economy package for 3 of us?", { action: "reply", includes: ["3,885"] }, { draft: D("The 7 Night Economy Umrah is £1,295 per person, so £3,885 for three.", { intent: "pricing", kbIdsUsed: ["p1"] }) }),
   S("price-deposit-two", "pricing", "what deposit for two people on the ramadan one", { action: "reply", includes: ["1,500"] }, { draft: D("The deposit is £750 per person, so £1,500 for two.", { intent: "pricing" }) }),
-  S("price-balance-two", "pricing", "and how much is left to pay after the deposit for two?", { action: "reply", includes: ["6,400"] }, { draft: D("After the £1,500 deposit, the balance for two is £6,400.", { intent: "pricing" }) }),
+  S("price-balance-two", "pricing", "and how much is left to pay after the deposit for two?", { action: "reply", includes: ["6,400"] }, { history: "Customer: tell me about the ramadan 2027 package\nAI: The Ramadan Umrah 2027 is £3,950 per person, twin sharing.", draft: D("After the £1,500 deposit, the balance for two is £6,400.", { intent: "pricing" }) }),
   S("price-family-mixed", "pricing", "2 adults and 1 child 6 years old, easter family package", { action: "reply", includes: ["4,450"] }, { draft: D("Two adults at £1,650 is £3,300, plus one child at £1,150, so £4,450 in total.", { intent: "pricing", kbIdsUsed: ["p4"] }) }),
   S("price-invented", "pricing", "how much for the vip package?", { action: "handoff", guards: ["grounding"] }, { draft: D("The VIP package is £9,999 per person.", { intent: "pricing" }) }),
   S("price-wrong-total", "pricing", "ramadan for two?", { action: "handoff", guards: ["grounding"] }, { draft: D("For two that is £8,321 in total.", { intent: "pricing" }) }),
@@ -135,7 +136,7 @@ export const SCENARIOS: Scenario[] = [
   S("book-card-number-blocked", "booking", "book it, card 4242 4242 4242 4242", { action: "handoff", guards: ["sensitive_data"], noModel: true }),
 
   // --- memory: what we already know reaches the model
-  S("memory-known-details", "memory", "yes, the second one", { action: "reply", includes: ["2,450"], promptIncludes: ["ALREADY TOLD US", "2 travellers", "from Manchester"] }, { known: "2 travellers, from Manchester", history: "Customer: what premium options do you have?\nAI: The 10 Night Premium Umrah is £2,450 per person.", draft: D("The 10 Night Premium Umrah at £2,450 per person, so £4,900 for two from Manchester.", { intent: "booking_interest", kbIdsUsed: ["p2"] }) }),
+  S("memory-known-details", "memory", "yes, the second one", { action: "reply", includes: ["4,900"], promptIncludes: ["ALREADY TOLD US", "2 travellers", "from Manchester"] }, { known: "2 travellers, from Manchester", history: "Customer: what premium options do you have?\nAI: The 10 Night Premium Umrah is £2,450 per person.", draft: D("The 10 Night Premium Umrah at £2,450 per person, so £4,900 for two from Manchester.", { intent: "booking_interest", kbIdsUsed: ["p2"] }) }),
   S("memory-no-repeat-question", "memory", "what about hotels?", { action: "reply", promptIncludes: ["do not ask for these again"] }, { known: "3 travellers, Ramadan 2027", draft: D("The Ramadan Umrah 2027 uses the Al Marwa Grand Hotel in Makkah and the Taiba Front Hotel in Madinah.", { kbIdsUsed: ["p3"] }) }),
 
   // --- how replies look on WhatsApp
