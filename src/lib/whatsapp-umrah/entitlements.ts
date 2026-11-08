@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import type { WaPlan } from "@prisma/client";
-import { aiBudgetUsdCents } from "./economics";
+import { EXTRA_PACK_REPLIES, aiBudgetUsdCents, extraPackBudgetUsdCents } from "./economics";
 import { currencyForWhopPlanId } from "./whop-plans";
 
 /* Shared entitlement/usage functions - see spec section 6: "Entitlement
@@ -64,10 +64,12 @@ export type CapCheck = {
   withinCap: boolean;
   used: number;
   cap: number;
-  /** The month's allowance: the plan's replies plus any extra packs bought this month. */
+  /** The month's allowance: the plan's replies plus the extra replies in play this month. */
   planCap: number;
-  /** Replies bought as extra packs this month (already included in planCap and cap). */
+  /** Extra replies in this month's allowance: the ones already used this month plus the ones still left. */
   extraReplies: number;
+  /** Extra replies still unused. They carry over from month to month until they are used. */
+  extraRemaining: number;
   spendUsdCents: number;
   budgetUsdCents: number;
   limit: "replies" | "budget" | null;
@@ -77,7 +79,12 @@ export type CapCheck = {
     is what covers our AI cost per reply. */
 export function effectiveCap(planCap: number, agencyLimit: number | null | undefined, extraReplies = 0): number {
   // Extra replies were paid for on top, so the agency's own lower limit applies to the plan's replies only.
-  return (agencyLimit && agencyLimit > 0 ? Math.min(planCap, agencyLimit) : planCap) + extraReplies;
+  return baseCap(planCap, agencyLimit) + extraReplies;
+}
+
+/** The plan's replies for the month, lowered to the agency's own limit. Extra replies are used only after these. */
+export function baseCap(planCap: number, agencyLimit: number | null | undefined): number {
+  return agencyLimit && agencyLimit > 0 ? Math.min(planCap, agencyLimit) : planCap;
 }
 
 /** Reads the agency's plan, its own monthly limit and this month's AI reply usage in one place -
@@ -92,29 +99,43 @@ export async function withinCap(agencyId: string): Promise<CapCheck> {
     db.waUsageCounter.findUnique({ where: { agencyId_periodStart: { agencyId, periodStart } }, select: { aiReplies: true } }),
     // Everything the model cost us for this agency this month, real chats and Simulator tests alike (US cents).
     db.waPromptRun.aggregate({ where: { agencyId, createdAt: { gte: periodStart } }, _sum: { costEstimateCents: true } }),
-    // Extra packs bought for this month (one-time, they lapse when the month ends).
-    db.waExtraReplies.aggregate({ where: { agencyId, periodStart }, _sum: { replies: true, budgetUsdCents: true } }),
+    // Extra replies still unused. They never lapse, so every pack counts, whatever month it was bought in.
+    db.waExtraReplies.aggregate({ where: { agencyId, remaining: { gt: 0 } }, _sum: { remaining: true } }),
   ]);
   const plan = subscription?.plan ?? "STARTER";
-  const extraReplies = extras._sum.replies ?? 0;
-  const planCap = replyCapFor(plan) + extraReplies;
-  const cap = effectiveCap(replyCapFor(plan), settings?.monthlyReplyLimit, extraReplies);
+  const currency = currencyForWhopPlanId(subscription?.whopPlanId);
   const used = usage?.aiReplies ?? 0;
+  const base = baseCap(replyCapFor(plan), settings?.monthlyReplyLimit);
+  const extraRemaining = extras._sum.remaining ?? 0;
+  // Replies past the plan's own this month were drawn from extra packs (recordAiReply), so they stay part of the cap.
+  const extraReplies = Math.max(0, used - base) + extraRemaining;
+  const planCap = replyCapFor(plan) + extraReplies;
+  const cap = base + extraReplies;
   const spendUsdCents = spend._sum.costEstimateCents ?? 0;
-  const budgetUsdCents = aiBudgetUsdCents(plan, currencyForWhopPlanId(subscription?.whopPlanId)) + (extras._sum.budgetUsdCents ?? 0);
+  // Every extra reply brings its share of a pack's AI budget with it, so the margin holds however many are used.
+  const budgetUsdCents = aiBudgetUsdCents(plan, currency) + (extraReplies * extraPackBudgetUsdCents(currency)) / EXTRA_PACK_REPLIES;
   const limit = spendUsdCents >= budgetUsdCents ? "budget" : used >= cap ? "replies" : null;
-  return { withinCap: limit === null, used, cap, planCap, extraReplies, spendUsdCents, budgetUsdCents, limit };
+  return { withinCap: limit === null, used, cap, planCap, extraReplies, extraRemaining, spendUsdCents, budgetUsdCents, limit };
 }
 
 /** Increments this month's AI reply counter, creating the row if this is
     the agency's first reply of the period. */
 export async function recordAiReply(agencyId: string): Promise<void> {
   const periodStart = currentBillingPeriodStart();
-  await db.waUsageCounter.upsert({
+  const counter = await db.waUsageCounter.upsert({
     where: { agencyId_periodStart: { agencyId, periodStart } },
     create: { agencyId, periodStart, periodEnd: billingPeriodEnd(periodStart), aiReplies: 1 },
     update: { aiReplies: { increment: 1 } },
+    select: { aiReplies: true },
   });
+  // A reply past the plan's own replies for the month is one of the agency's extra replies: take it from the oldest pack.
+  const [subscription, settings] = await Promise.all([
+    db.waSubscription.findUnique({ where: { agencyId }, select: { plan: true } }),
+    db.waAgentSettings.findUnique({ where: { agencyId }, select: { monthlyReplyLimit: true } }),
+  ]);
+  if (counter.aiReplies <= baseCap(replyCapFor(subscription?.plan ?? "STARTER"), settings?.monthlyReplyLimit)) return;
+  const pack = await db.waExtraReplies.findFirst({ where: { agencyId, remaining: { gt: 0 } }, orderBy: { createdAt: "asc" }, select: { id: true } });
+  if (pack) await db.waExtraReplies.update({ where: { id: pack.id }, data: { remaining: { decrement: 1 } } });
 }
 
 /** The Simulator runs the real model, so it costs us too. It is metered like real chats (its runs are saved without a

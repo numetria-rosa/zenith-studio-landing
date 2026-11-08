@@ -45,7 +45,7 @@ export default async function SettingsPage({ params, searchParams }: { params: P
   return (
     <div>
       <PageHeader title="Settings" subtitle={`How ${AGENT_NAME} sounds, which languages it replies in, and what happens outside your hours.`} />
-      <SettingsForm agencyId={agencyId} initial={initial} used={usage.used} planCap={usage.planCap - usage.extraReplies} extraReplies={usage.extraReplies} pack={{ replies: offer.replies, price: formatPackPrice(offer.currency, offer.price) }} justBought={extra === "thanks"} buyAction={buyExtraRepliesAction.bind(null, agencyId)} billing={billing} cancelAction={cancelSubscriptionAction.bind(null, agencyId)} />
+      <SettingsForm agencyId={agencyId} initial={initial} used={usage.used} planCap={usage.planCap - usage.extraReplies} extraReplies={usage.extraReplies} extraLeft={usage.extraRemaining} pack={{ replies: offer.replies, price: formatPackPrice(offer.currency, offer.price) }} justBought={extra === "thanks"} buyAction={buyExtraRepliesAction.bind(null, agencyId)} billing={billing} cancelAction={cancelSubscriptionAction.bind(null, agencyId)} />
     </div>
   );
 }

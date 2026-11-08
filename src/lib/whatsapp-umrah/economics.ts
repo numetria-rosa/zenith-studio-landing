@@ -64,10 +64,11 @@ export function marginAt(plan: WaPlan, aiSpendGbp: number, currency: PlanCurrenc
   return (price - whopFeeGbp(plan, currency) - INFRA_PER_AGENCY_GBP[plan] - aiSpendGbp) / price;
 }
 
-/* Extra replies: an owner who needs more than the plan's monthly replies buys them in packs, one-time, valid for the
-   current month only (decided 2026-11-08, reversing the 2026-11-07 removal of the add-on). Packs carry a 60% margin,
+/* Extra replies: an owner who needs more than the plan's monthly replies buys them in packs, one-time, and they never
+   expire: they are used up, oldest pack first, only once the plan's replies for the month are gone (decided 2026-11-08,
+   reversing the 2026-11-07 removal of the add-on; first made month-only, then made to carry over the same day). Packs carry a 60% margin,
    not the 80% the plans keep: the agency already pays for hosting and the plan, so a pack is only the Whop fee and the
-   AI calls. Each pack raises that month's reply cap by EXTRA_PACK_REPLIES and its AI budget by extraPackBudgetGbp, so the
+   AI calls. Each extra reply raises the month's cap by one and its AI budget by a pack's budget divided by EXTRA_PACK_REPLIES, so the
    agent still pauses when the extra spend runs out, whatever the reply count. */
 export const EXTRA_PACK_REPLIES = 500;
 export const EXTRA_PACK_MIN_MARGIN = 0.6;

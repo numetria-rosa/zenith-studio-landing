@@ -37,6 +37,8 @@ type Props = {
   /** The plan's own monthly replies, without extra packs. */
   planCap: number;
   extraReplies: number;
+  /** Extra replies still unused; they carry over month to month. */
+  extraLeft: number;
   pack: { replies: number; price: string };
   justBought: boolean;
   buyAction: () => Promise<{ url: string }>;
@@ -68,7 +70,7 @@ function SectionHead({ icon, color, title, sub }: { icon: WaIconName; color: str
 
 const sectionCard = "scroll-mt-6 px-[26px] py-6";
 
-export function SettingsForm({ agencyId, initial, used, planCap, extraReplies, pack, justBought, buyAction, billing, cancelAction }: Props) {
+export function SettingsForm({ agencyId, initial, used, planCap, extraReplies, extraLeft, pack, justBought, buyAction, billing, cancelAction }: Props) {
   const [buying, setBuying] = useState(false);
   const [buyError, setBuyError] = useState("");
   const [baseline, setBaseline] = useState(initial);
@@ -295,8 +297,8 @@ export function SettingsForm({ agencyId, initial, used, planCap, extraReplies, p
               <div className="min-w-0 flex-1">
                 <div className="text-[15px] font-semibold">Need more replies this month?</div>
                 <div className="mt-1 text-[13.5px] text-mist">
-                  Add {pack.replies.toLocaleString("en-GB")} more for {pack.price}. One-time, valid until the end of this month, no subscription.
-                  {extraReplies > 0 ? ` You have added ${extraReplies.toLocaleString("en-GB")} this month.` : ""}
+                  Add {pack.replies.toLocaleString("en-GB")} more for {pack.price}. One-time, no subscription. They never expire: they are used only once your monthly replies run out, and carry over until they are finished.
+                  {extraLeft > 0 ? ` You have ${extraLeft.toLocaleString("en-GB")} extra ${extraLeft === 1 ? "reply" : "replies"} left.` : ""}
                 </div>
                 {justBought && <div role="status" className="mt-1 text-[13px] text-mint-text">Thank you. Your extra replies appear here as soon as the payment clears, usually within a minute.</div>}
                 {buyError && <div role="alert" className="mt-1 text-[13px] text-ember-text">{buyError}</div>}

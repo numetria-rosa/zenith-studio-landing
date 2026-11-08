@@ -179,9 +179,8 @@ The agent:
   dimensions as a placeholder pending this decision.
 - **Reply limits and margin (decided 2026-11-07, add-on reinstated 2026-11-08).** Agencies pay Meta
   directly, but WE pay for the AI calls, so the owner's own limit in Settings can only lower the plan's, never raise
-  it. An owner who needs more than the plan's replies buys extra packs: 500 replies each, one-time, valid for the
-  current month only (GBP 6, USD 9, CAD 12, AUD 13, ZAR 140), at a 60% margin on the pack (not 80%), each pack raising
-  that month's reply cap and AI budget. See extra-replies.ts and economics.ts (EXTRA_PACK_*). Every plan must keep at least 80% margin: each plan has a monthly AI budget (economics.ts) and the agent
+  it. An owner who needs more than the plan's replies buys extra packs: 500 replies each, one-time, never expiring (GBP 6, USD 9, CAD 12, AUD 13, ZAR 140), at a 60% margin on the pack (not 80%). They are used up, oldest pack first, only
+  after the plan's replies for the month, and each extra reply brings its share of a pack's AI budget. See extra-replies.ts and economics.ts (EXTRA_PACK_*). Every plan must keep at least 80% margin: each plan has a monthly AI budget (economics.ts) and the agent
   pauses when an agency's estimated AI spend reaches it, whatever the reply count. Reply caps: Starter 1,000,
   Growth 3,500, Pro 8,000. Workings and assumptions in docs/unit-economics.md; economics.test.ts enforces the rule.
 

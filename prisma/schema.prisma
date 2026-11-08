@@ -2188,14 +2188,16 @@ model WaPromptRun {
 }
 
 // Growth/Pro aren't launched yet - "Coming soon, join waitlist" on pricing.
-// A one-time purchase of extra AI replies for one month (economics.ts, EXTRA_PACK_*). One row per Whop payment;
+// A one-time purchase of extra AI replies (economics.ts, EXTRA_PACK_*). They never expire: they are used up, oldest
+// pack first, only after the plan's own replies for the month are gone. One row per Whop payment;
 // whopPaymentId is unique so a webhook retry cannot add the replies twice. budgetUsdCents is the AI budget the pack
 // carries, stored at purchase time so later price changes never rewrite what was already sold.
 model WaExtraReplies {
   id             String   @id @default(cuid())
   agencyId       String
-  periodStart    DateTime
+  periodStart    DateTime // the month it was bought; packs never lapse, so this is only a record
   replies        Int
+  remaining      Int // replies not used yet; counts down as the agent uses them, oldest pack first
   budgetUsdCents Int
   currency       String
   whopPaymentId  String   @unique

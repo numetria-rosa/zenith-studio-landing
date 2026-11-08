@@ -6,7 +6,7 @@ import { EXTRA_PACK_PRICE_LOCAL, EXTRA_PACK_REPLIES, extraPackBudgetUsdCents, ty
 
 type Tx = PrismaClient | Prisma.TransactionClient;
 
-/* Extra AI replies, bought in packs of EXTRA_PACK_REPLIES, one-time, for the current month only (economics.ts has the
+/* Extra AI replies, bought in packs of EXTRA_PACK_REPLIES, one-time, never expiring (economics.ts has the
    prices and the 60% margin rule). Each purchase is its own Whop checkout, created here with the agency's id in the
    checkout's metadata; Whop copies that metadata onto the payment, and the webhook (api/webhooks/whop) credits the pack
    when the payment succeeds. The pack is a plain one-time plan per currency on its own hidden Whop product
@@ -69,7 +69,7 @@ type ExtraPayment = {
   total?: number | null;
 };
 
-/** Credits a paid pack to its agency for the current month. Idempotent on the Whop payment id. Refuses (and says why
+/** Credits a paid pack to its agency. It stays until it has been used. Idempotent on the Whop payment id. Refuses (and says why
     in the log) anything that does not match what we sold: an unknown agency or currency, or an amount below the price. */
 export async function recordExtraRepliesPayment(tx: Tx, payment: ExtraPayment): Promise<"recorded" | "duplicate" | "rejected"> {
   const meta = (payment.metadata ?? {}) as { agencyId?: unknown; currency?: unknown };
@@ -97,6 +97,7 @@ export async function recordExtraRepliesPayment(tx: Tx, payment: ExtraPayment): 
       agencyId,
       periodStart: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)),
       replies: EXTRA_PACK_REPLIES,
+      remaining: EXTRA_PACK_REPLIES,
       budgetUsdCents: Math.round(extraPackBudgetUsdCents(currency)),
       currency,
       whopPaymentId: payment.id,
