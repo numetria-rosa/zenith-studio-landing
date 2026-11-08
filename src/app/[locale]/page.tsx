@@ -70,6 +70,7 @@ export default function ZenithStudioLandingPage() {
         "English, Arabic, Turkish, Urdu",
         "Captures and qualifies every lead",
         "Hands off for fiqh, visa or payment questions",
+        "Meta-verified, approved Tech Provider",
       ],
     } satisfies SystemContent & { id: string; monthly: string; featured: boolean },
   ];
