@@ -12,6 +12,19 @@ export const MIN_MARGIN = 0.8;
 
 export const PLAN_PRICE_GBP: Record<WaPlan, number> = { STARTER: 49, GROWTH: 99, PRO: 199 };
 
+/** The Starter plan is sold in five currencies, each its own Whop plan (see scripts/create-whatsapp-umrah-country-plans.mjs).
+    What the owner charges in each, and what that is worth in pounds at a strong-pound exchange rate (1.37 USD, 1.90 CAD,
+    2.07 AUD, 22.5 ZAR to the pound, rounded down to 50p), so the margin rule holds even if the pound is strong. The AI budget
+    for a currency is worked out from its pound value, not from 49, because the other currencies are priced below it. */
+export type PlanCurrency = "GBP" | "USD" | "CAD" | "AUD" | "ZAR";
+export const STARTER_PRICE_LOCAL: Record<PlanCurrency, number> = { GBP: 49, USD: 52, CAD: 83, AUD: 85, ZAR: 900 };
+export const STARTER_PRICE_GBP_EQUIV: Record<PlanCurrency, number> = { GBP: 49, USD: 37.5, CAD: 43.5, AUD: 41, ZAR: 40 };
+
+/** What the plan is worth to us in pounds, in the currency it was bought in (only Starter is sold in other currencies). */
+export function planPriceGbp(plan: WaPlan, currency: PlanCurrency = "GBP"): number {
+  return plan === "STARTER" ? STARTER_PRICE_GBP_EQUIV[currency] : PLAN_PRICE_GBP[plan];
+}
+
 /** Whop's fee, the working estimate from docs/unit-economics.md (2.7% + 1.5% + 1% + 2%, plus 30 cents a charge).
     Not yet confirmed with Whop for a UK recurring plan; if it turns out higher, lower the budgets here. */
 export const WHOP_FEE_RATE = 0.072;
@@ -30,23 +43,23 @@ export const PLANNING_COST_PER_REPLY_GBP = 0.0025;
 /** Share of the budget kept back for calls we don't log (the query-translation step) and for estimate error. */
 const SAFETY = 0.9;
 
-export function whopFeeGbp(plan: WaPlan): number {
-  return PLAN_PRICE_GBP[plan] * WHOP_FEE_RATE + WHOP_FEE_FIXED_GBP;
+export function whopFeeGbp(plan: WaPlan, currency: PlanCurrency = "GBP"): number {
+  return planPriceGbp(plan, currency) * WHOP_FEE_RATE + WHOP_FEE_FIXED_GBP;
 }
 
 /** Monthly AI spend a plan can carry and still keep MIN_MARGIN, in pounds, rounded down to 50p. */
-export function aiBudgetGbp(plan: WaPlan): number {
-  const room = PLAN_PRICE_GBP[plan] * (1 - MIN_MARGIN) - whopFeeGbp(plan) - INFRA_PER_AGENCY_GBP[plan];
+export function aiBudgetGbp(plan: WaPlan, currency: PlanCurrency = "GBP"): number {
+  const room = planPriceGbp(plan, currency) * (1 - MIN_MARGIN) - whopFeeGbp(plan, currency) - INFRA_PER_AGENCY_GBP[plan];
   return Math.max(0, Math.floor(room * SAFETY * 2) / 2);
 }
 
 /** The budget in US cents, the unit WaPromptRun.costEstimateCents is stored in. */
-export function aiBudgetUsdCents(plan: WaPlan): number {
-  return (aiBudgetGbp(plan) / USD_TO_GBP) * 100;
+export function aiBudgetUsdCents(plan: WaPlan, currency: PlanCurrency = "GBP"): number {
+  return (aiBudgetGbp(plan, currency) / USD_TO_GBP) * 100;
 }
 
 /** Margin on the plan's price if the agency spends `aiSpendGbp` of AI in a month. */
-export function marginAt(plan: WaPlan, aiSpendGbp: number): number {
-  const price = PLAN_PRICE_GBP[plan];
-  return (price - whopFeeGbp(plan) - INFRA_PER_AGENCY_GBP[plan] - aiSpendGbp) / price;
+export function marginAt(plan: WaPlan, aiSpendGbp: number, currency: PlanCurrency = "GBP"): number {
+  const price = planPriceGbp(plan, currency);
+  return (price - whopFeeGbp(plan, currency) - INFRA_PER_AGENCY_GBP[plan] - aiSpendGbp) / price;
 }

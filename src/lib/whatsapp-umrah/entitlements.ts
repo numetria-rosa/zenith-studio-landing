@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import type { WaPlan } from "@prisma/client";
 import { aiBudgetUsdCents } from "./economics";
+import { currencyForWhopPlanId } from "./whop-plans";
 
 /* Shared entitlement/usage functions - see spec section 6: "Entitlement
    checks go through one function can(agency, feature) and one usage
@@ -74,7 +75,7 @@ export function effectiveCap(planCap: number, agencyLimit: number | null | undef
 export async function withinCap(agencyId: string): Promise<CapCheck> {
   const periodStart = currentBillingPeriodStart();
   const [subscription, settings, usage, spend] = await Promise.all([
-    db.waSubscription.findUnique({ where: { agencyId }, select: { plan: true } }),
+    db.waSubscription.findUnique({ where: { agencyId }, select: { plan: true, whopPlanId: true } }),
     db.waAgentSettings.findUnique({ where: { agencyId }, select: { monthlyReplyLimit: true } }),
     db.waUsageCounter.findUnique({ where: { agencyId_periodStart: { agencyId, periodStart } }, select: { aiReplies: true } }),
     // Everything the model cost us for this agency this month, real chats and Simulator tests alike (US cents).
@@ -85,7 +86,7 @@ export async function withinCap(agencyId: string): Promise<CapCheck> {
   const cap = effectiveCap(planCap, settings?.monthlyReplyLimit);
   const used = usage?.aiReplies ?? 0;
   const spendUsdCents = spend._sum.costEstimateCents ?? 0;
-  const budgetUsdCents = aiBudgetUsdCents(plan);
+  const budgetUsdCents = aiBudgetUsdCents(plan, currencyForWhopPlanId(subscription?.whopPlanId));
   const limit = spendUsdCents >= budgetUsdCents ? "budget" : used >= cap ? "replies" : null;
   return { withinCap: limit === null, used, cap, planCap, spendUsdCents, budgetUsdCents, limit };
 }

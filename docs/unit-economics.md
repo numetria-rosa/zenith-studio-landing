@@ -119,3 +119,15 @@ At the planning cost and at the plan's reply count (typical month), and at the A
 Embeddings are free (see above) and not in the table. Re-run this once Whop's exact rate is confirmed and once real
 `WaPromptRun` data replaces the 35% escalation assumption. If Whop's fee turns out higher, lower the budgets in
 `economics.ts` (the test will tell you which plans no longer clear 80%).
+
+## Starter in other currencies (2026-11-08)
+
+Starter is also sold in US, Canadian, Australian and South African currency, each its own Whop plan on the same product
+(a plan has one currency, and subscriptions cannot use Whop's adaptive pricing, which is one-time payments only:
+https://docs.whop.com/payments-and-billing/fees/adaptive-pricing). Prices: USD 52, CAD 83, AUD 85, ZAR 900. At a
+strong-pound rate those are worth about £37.50, £43.50, £41 and £40, below the £49 UK price, so each currency gets an AI
+budget sized from its own price (`STARTER_PRICE_GBP_EQUIV` in `economics.ts`): £3.00 for USD, £3.50 for CAD, AUD and ZAR,
+against £4.50 for GBP. 1,000 replies still fit (about £2.50 at the planning cost), but there is less headroom, so a heavy
+month on a Claude-heavy agency reaches the budget sooner and the agent pauses. `economics.test.ts` checks all five.
+Whop's fee for foreign-currency cards may be higher than the 7.2% working figure; confirm it on a real payment and lower
+the budgets if so.

@@ -3,9 +3,10 @@
 // local departure cities, and the country's name in the headings. Output: public/demos/<cc>/whatsapp-umrah-agent.html.
 // Re-run after editing the UK page. The routes are registered in src/app/demo/[slug]/[serviceName]/route.ts.
 //
-// Plan prices (PRICE) are set so each plan stays at or above about 45 pounds at a strong-pound exchange rate, which is
-// the floor where the Starter AI budget in src/lib/whatsapp-umrah/economics.ts still leaves the 80% margin. Raise them
-// if the pound weakens against the local currency. The conversion rates below are only for the sample-chat amounts.
+// Plan prices are the owner's decision (2026-11-08): US $52, Canada C$83, Australia A$85, South Africa R900. In pounds
+// those are below the 49 the Starter AI budget in src/lib/whatsapp-umrah/economics.ts was sized for, so economics.ts
+// sizes each currency's budget from its own price (STARTER_PRICE_GBP_EQUIV). The conversion rates below are only for
+// the amounts in the sample chats.
 //
 // Usage: node scripts/build-umrah-country-demos.mjs
 
@@ -14,10 +15,10 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 const SRC = "public/demos/uk/whatsapp-umrah-agent.html";
 
 const COUNTRIES = {
-  us: { name: "US", symbol: "$", code: "USD", words: "US dollars", price: 64, rate: 1.35, tld: "com", unit: "/ month", cities: ["New York", "Chicago", "Houston", "Detroit", "Dallas"] },
-  ca: { name: "Canadian", symbol: "$", code: "CAD", words: "Canadian dollars", price: 89, rate: 1.85, tld: "ca", unit: "CAD / month", cities: ["Toronto", "Montreal", "Mississauga", "Calgary", "Ottawa"] },
-  au: { name: "Australian", symbol: "$", code: "AUD", words: "Australian dollars", price: 99, rate: 2.0, tld: "com.au", unit: "AUD / month", cities: ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide"] },
-  za: { name: "South African", symbol: "R", code: "ZAR", words: "rand", price: 1049, rate: 22, tld: "co.za", unit: "/ month", cities: ["Johannesburg", "Cape Town", "Durban", "Pretoria", "Port Elizabeth"] },
+  us: { checkout: "https://whop.com/checkout/ch_3yCnqoK4wsfnVkJ/", name: "US", symbol: "$", code: "USD", words: "US dollars", price: 52, rate: 1.35, tld: "com", unit: "/ month", cities: ["New York", "Chicago", "Houston", "Detroit", "Dallas"] },
+  ca: { checkout: "https://whop.com/checkout/ch_5gz3oRodm3dR7lb/", name: "Canadian", symbol: "$", code: "CAD", words: "Canadian dollars", price: 83, rate: 1.85, tld: "ca", unit: "CAD / month", cities: ["Toronto", "Montreal", "Mississauga", "Calgary", "Ottawa"] },
+  au: { checkout: "https://whop.com/checkout/ch_3EmEku0gszYMzjv/", name: "Australian", symbol: "$", code: "AUD", words: "Australian dollars", price: 85, rate: 2.0, tld: "com.au", unit: "AUD / month", cities: ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide"] },
+  za: { checkout: "https://whop.com/checkout/ch_Li6eHzPXGuRRKpT/", name: "South African", symbol: "R", code: "ZAR", words: "rand", price: 900, rate: 22, tld: "co.za", unit: "/ month", cities: ["Johannesburg", "Cape Town", "Durban", "Pretoria", "Port Elizabeth"] },
 };
 
 // UK sample cities in the page, mapped by position to the country's cities.
@@ -46,10 +47,9 @@ for (const [cc, c] of Object.entries(COUNTRIES)) {
   // The plan price: the pricing card, the FAQ and the dashboard sample all say £49.
   h = must(h, '<div class="amt"><b>£49</b><span>/ month</span></div>', `<div class="amt"><b>${price}</b><span>${c.unit}</span></div>`);
   h = must(h, "£49", price);
-  // The UK checkout takes pounds. Until this country has its own Whop checkout, the buttons email us instead.
-  const subject = encodeURIComponent(`WhatsApp AI Agent for ${c.name} agencies`);
-  h = must(h, "https://whop.com/checkout/ch_M5XKy2oxQQkoO28/", `mailto:hello@zenith-studio.site?subject=${subject}`);
-  h = must(h, "var START_URL = 'mailto:hello@zenith-studio.site?subject=" + subject + "';", "var START_URL = '';", "START_URL");
+  // Each country has its own Whop plan in local currency (scripts/create-whatsapp-umrah-country-plans.mjs) and a checkout
+  // link that redirects to /api/auth/claim after purchase (scripts/add-whatsapp-umrah-checkout-redirects.mjs).
+  h = must(h, "https://whop.com/checkout/ch_M5XKy2oxQQkoO28/", c.checkout);
   // Sample cities (through placeholders so a new city name can never be replaced again).
   UK_CITIES.forEach((city, i) => (h = h.replace(new RegExp(`\\b${city}\\b`, "g"), `@@CITY${i}@@`)));
   UK_CITIES.forEach((_, i) => (h = h.split(`@@CITY${i}@@`).join(c.cities[i])));

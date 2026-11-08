@@ -4,10 +4,10 @@ import { readFileSync } from "node:fs";
 // The country demo pages are generated from the UK one (scripts/build-umrah-country-demos.mjs). If the UK page changes
 // and the generator is not re-run, or the generator leaks UK text into another country, this fails.
 const EXPECT = {
-  us: { plan: "$64", words: "US dollars", city: "New York" },
-  ca: { plan: "$89", words: "Canadian dollars", city: "Toronto" },
-  au: { plan: "$99", words: "Australian dollars", city: "Sydney" },
-  za: { plan: "R1,049", words: "rand", city: "Johannesburg" },
+  us: { plan: "$52", words: "US dollars", city: "New York", checkout: "ch_3yCnqoK4wsfnVkJ" },
+  ca: { plan: "$83", words: "Canadian dollars", city: "Toronto", checkout: "ch_5gz3oRodm3dR7lb" },
+  au: { plan: "$85", words: "Australian dollars", city: "Sydney", checkout: "ch_3EmEku0gszYMzjv" },
+  za: { plan: "R900", words: "rand", city: "Johannesburg", checkout: "ch_Li6eHzPXGuRRKpT" },
 } as const;
 
 describe.each(Object.entries(EXPECT))("demo page: %s", (cc, e) => {
@@ -21,7 +21,9 @@ describe.each(Object.entries(EXPECT))("demo page: %s", (cc, e) => {
     expect(html).toContain(e.city);
     expect(html).not.toMatch(/\b(Manchester|Birmingham|Bradford|Leicester|London)\b/);
   });
-  it("does not send buyers to the UK pound checkout", () => {
+  it("sends buyers to this country's own local-currency checkout, never the UK pound one", () => {
+    expect(html).toContain(`https://whop.com/checkout/${e.checkout}/`);
     expect(html).not.toContain("ch_M5XKy2oxQQkoO28");
+    expect(html).not.toContain("mailto:");
   });
 });

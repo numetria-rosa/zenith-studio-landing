@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from "vitest";
-import { waPlanForWhopPlanId } from "./whop-plans";
+import { currencyForWhopPlanId, waPlanForWhopPlanId } from "./whop-plans";
 
 describe("waPlanForWhopPlanId", () => {
   beforeEach(() => {
@@ -19,5 +19,25 @@ describe("waPlanForWhopPlanId", () => {
     expect(waPlanForWhopPlanId("plan_something_else")).toBeNull();
     expect(waPlanForWhopPlanId(null)).toBeNull();
     expect(waPlanForWhopPlanId(undefined)).toBeNull();
+  });
+});
+
+describe("currency plans", () => {
+  beforeEach(() => {
+    process.env.WHATSAPP_UMRAH_STARTER_PLAN_ID = "plan_gbp";
+    process.env.WHATSAPP_UMRAH_STARTER_PLAN_ID_USD = "plan_usd";
+    process.env.WHATSAPP_UMRAH_STARTER_PLAN_ID_ZAR = "plan_zar";
+  });
+
+  it("a country plan grants Starter and reports its currency", () => {
+    expect(waPlanForWhopPlanId("plan_usd")).toEqual({ plan: "STARTER", foundingOffer: false });
+    expect(currencyForWhopPlanId("plan_usd")).toBe("USD");
+    expect(currencyForWhopPlanId("plan_zar")).toBe("ZAR");
+  });
+
+  it("the UK plan, an unknown plan and no plan are GBP", () => {
+    expect(currencyForWhopPlanId("plan_gbp")).toBe("GBP");
+    expect(currencyForWhopPlanId("plan_other")).toBe("GBP");
+    expect(currencyForWhopPlanId(null)).toBe("GBP");
   });
 });

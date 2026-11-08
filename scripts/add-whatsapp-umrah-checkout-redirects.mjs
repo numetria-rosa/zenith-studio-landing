@@ -25,6 +25,11 @@ const client = new Whop({ apiKey });
 const PRODUCT_ID = "prod_XAv74ApRLkBNO";
 const PLANS = [
   { label: "Starter", id: "plan_e2E6hZwmNsuTR" },
+  // Country plans from scripts/create-whatsapp-umrah-country-plans.mjs
+  { label: "Starter US (USD 52)", id: "plan_MhE10jwPePZ0C" },
+  { label: "Starter CA (CAD 83)", id: "plan_EJqJLamM10oue" },
+  { label: "Starter AU (AUD 85)", id: "plan_wUxGQaV27I2j0" },
+  { label: "Starter ZA (ZAR 900)", id: "plan_PBW3VzzefZNSU" },
 ];
 
 async function main() {

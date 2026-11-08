@@ -1,5 +1,6 @@
 import type { Prisma, PrismaClient, WaPlan } from "@prisma/client";
 import { syncAgencyLive } from "./live";
+import type { PlanCurrency } from "./economics";
 
 type Tx = PrismaClient | Prisma.TransactionClient;
 
@@ -10,8 +11,20 @@ type Tx = PrismaClient | Prisma.TransactionClient;
 export function waPlanForWhopPlanId(planId: string | null | undefined): { plan: WaPlan; foundingOffer: boolean } | null {
   if (!planId) return null;
   if (planId === process.env.WHATSAPP_UMRAH_STARTER_PLAN_ID) return { plan: "STARTER", foundingOffer: false };
+  if (currencyForWhopPlanId(planId) !== "GBP") return { plan: "STARTER", foundingOffer: false };
   if (planId === process.env.WHATSAPP_UMRAH_FOUNDING_PLAN_ID) return { plan: "STARTER", foundingOffer: true };
   return null;
+}
+
+/** The Starter plan exists once per currency, each its own Whop plan (a plan has one currency and subscriptions can't
+    use adaptive pricing: https://docs.whop.com/payments-and-billing/fees/adaptive-pricing). The UK plan is
+    WHATSAPP_UMRAH_STARTER_PLAN_ID; the others are WHATSAPP_UMRAH_STARTER_PLAN_ID_<CURRENCY>. Anything else is GBP. */
+export function currencyForWhopPlanId(planId: string | null | undefined): PlanCurrency {
+  if (!planId) return "GBP";
+  for (const currency of ["USD", "CAD", "AUD", "ZAR"] as const) {
+    if (planId === process.env[`WHATSAPP_UMRAH_STARTER_PLAN_ID_${currency}`]) return currency;
+  }
+  return "GBP";
 }
 
 function slugify(text: string): string {
