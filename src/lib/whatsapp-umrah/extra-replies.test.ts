@@ -4,7 +4,7 @@ const state = vi.hoisted(() => ({ agencyExists: true, rows: [] as { whopPaymentI
 vi.mock("@/lib/db", () => ({ db: {} }));
 vi.mock("@/lib/whop", () => ({ getWhopClient: () => ({}) }));
 
-import { EXTRA_REPLIES_KIND, formatPackPrice, isExtraRepliesPayment, recordExtraRepliesPayment } from "./extra-replies";
+import { EXTRA_PACK_PLAN_IDS, EXTRA_REPLIES_KIND, formatPackPrice, isExtraRepliesPayment, recordExtraRepliesPayment } from "./extra-replies";
 import { EXTRA_PACK_REPLIES, extraPackBudgetUsdCents } from "./economics";
 
 const tx = {
@@ -50,6 +50,15 @@ describe("recording a paid pack", () => {
     expect(isExtraRepliesPayment({ kind: EXTRA_REPLIES_KIND })).toBe(true);
     expect(isExtraRepliesPayment({ kind: "something else" })).toBe(false);
     expect(isExtraRepliesPayment(null)).toBe(false);
+  });
+});
+
+describe("the Whop plans", () => {
+  it("every currency has its own plan id", () => {
+    const ids = Object.values(EXTRA_PACK_PLAN_IDS);
+    expect(Object.keys(EXTRA_PACK_PLAN_IDS).sort()).toEqual(["AUD", "CAD", "GBP", "USD", "ZAR"]);
+    expect(new Set(ids).size).toBe(5);
+    for (const id of ids) expect(id).toMatch(/^plan_[A-Za-z0-9]+$/);
   });
 });
 

@@ -9,12 +9,22 @@ type Tx = PrismaClient | Prisma.TransactionClient;
 /* Extra AI replies, bought in packs of EXTRA_PACK_REPLIES, one-time, for the current month only (economics.ts has the
    prices and the 60% margin rule). Each purchase is its own Whop checkout, created here with the agency's id in the
    checkout's metadata; Whop copies that metadata onto the payment, and the webhook (api/webhooks/whop) credits the pack
-   when the payment succeeds. The pack is a plain one-time plan on its own hidden Whop product
-   (scripts/create-whatsapp-umrah-extra-replies-product.mjs), so it never touches the Starter subscription.
+   when the payment succeeds. The pack is a plain one-time plan per currency on its own hidden Whop product
+   (scripts/create-whatsapp-umrah-extra-replies-product.mjs and ...-plans.mjs), so it never touches the Starter subscription.
    Docs: docs.whop.com/api-reference/checkout-configurations/create-a-checkout-configuration (inline plan, metadata). */
 
 export const EXTRA_REPLIES_PRODUCT_ID = "prod_cdUFAHRqgjvTU";
 export const EXTRA_REPLIES_KIND = "wa_extra_replies";
+
+/** One hidden one-time Whop plan per currency on that product (scripts/create-whatsapp-umrah-extra-replies-plans.mjs),
+    priced from EXTRA_PACK_PRICE_LOCAL. Plan ids are public, so they live in code like the Starter plans do. */
+export const EXTRA_PACK_PLAN_IDS: Record<PlanCurrency, string> = {
+  GBP: "plan_r0tyf8IXdahMZ",
+  USD: "plan_9Obi0lJqbSuFc",
+  CAD: "plan_sf3pVQ9nQF3tp",
+  AUD: "plan_pa7hufGHN0VYk",
+  ZAR: "plan_5ATKWORbTZGhr",
+};
 
 const CURRENCIES: PlanCurrency[] = ["GBP", "USD", "CAD", "AUD", "ZAR"];
 
@@ -31,7 +41,7 @@ export function formatPackPrice(currency: PlanCurrency, price: number): string {
   return `${SYMBOL[currency]}${price.toLocaleString("en-GB")}${currency === "CAD" || currency === "AUD" ? ` ${currency}` : ""}`;
 }
 
-/** A Whop checkout for one pack. The buyer returns to the dashboard's Settings page afterwards. */
+/** A Whop checkout for one pack, on the currency's own plan. The buyer returns to the dashboard's Settings page afterwards. */
 export async function createExtraRepliesCheckout(agencyId: string, siteUrl: string): Promise<{ url: string; currency: PlanCurrency; price: number }> {
   const companyId = process.env.WHOP_COMPANY_ID;
   if (!companyId) throw new Error("WHOP_COMPANY_ID is not set");
@@ -41,15 +51,7 @@ export async function createExtraRepliesCheckout(agencyId: string, siteUrl: stri
     mode: "payment",
     metadata: { kind: EXTRA_REPLIES_KIND, agencyId, replies, currency },
     redirect_url: `${siteUrl.replace(/\/$/, "")}/whatsapp-umrah/${agencyId}/settings?extra=thanks`,
-    plan: {
-      product_id: EXTRA_REPLIES_PRODUCT_ID,
-      title: `${replies} extra AI replies`.slice(0, 30),
-      description: `${replies} more AI replies for the rest of this month. One-time, does not renew.`,
-      plan_type: "one_time",
-      currency: currency.toLowerCase(),
-      initial_price: price,
-      visibility: "hidden",
-    },
+    plan_id: EXTRA_PACK_PLAN_IDS[currency],
   });
   if (!config.purchase_url) throw new Error("Whop returned no checkout link");
   return { url: config.purchase_url, currency, price };
