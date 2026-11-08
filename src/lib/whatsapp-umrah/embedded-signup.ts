@@ -1,24 +1,24 @@
 import { db } from "@/lib/db";
 
 /* Embedded Signup, per CLAUDE.md's onboarding path: behind a feature flag,
-   off until Zenith is an approved Meta Tech Provider (Business Verification
-   + App Review, in progress as of 2026-09-30 - see docs.whop... no, see
-   developers.facebook.com/documentation/business-messaging/whatsapp/
-   solution-providers/get-started-for-tech-providers). The real "Connect
-   with Meta" widget (Facebook Login for Business JS SDK + a Configuration
-   ID from Meta's app dashboard) isn't wired in yet - there's nothing to
-   test it against until that approval exists. This file only owns the
-   decision of which UI an agency owner sees: the (future) widget, or the
+   behind WHATSAPP_UMRAH_EMBEDDED_SIGNUP_ENABLED. Zenith is an approved Meta Tech Provider
+   (developers.facebook.com/documentation/business-messaging/whatsapp/
+   solution-providers/get-started-for-tech-providers) and the "Connect with
+   Meta" widget (EmbeddedSignupButton.tsx) is live. This file only owns the
+   decision of which UI an agency owner sees: the widget, or the
    manual-connect fallback form, and the weekly cap that governs it. */
 
 export const EMBEDDED_SIGNUP_ENABLED = process.env.WHATSAPP_UMRAH_EMBEDDED_SIGNUP_ENABLED === "true";
 
-// Meta's own default limit for unapproved Tech Providers: 10 new business
-// customers per rolling 7-day window (not calendar week), confirmed at the
-// URL above 2026-09-30. Raises to 200/7 days automatically once Business
-// Verification + App Review + Access Verification are all complete.
-const DEFAULT_WEEKLY_CAP = 10;
-function weeklyCap(): number {
+// Meta's limit on new business customers a Tech Provider can onboard in a rolling 7-day window (not a calendar week):
+// 10 by default, raised automatically to 200 once Business Verification, App Review and Access Verification are all
+// complete (Meta's Embedded Signup overview, read 2026-11-08, via developers.facebook.com/documentation/business-
+// messaging/whatsapp/embedded-signup/overview). All three are complete for Zenith Studio as of 2026-11-08 (business
+// verified, app approved for whatsapp_business_messaging and whatsapp_business_management, Access Verification granted),
+// so the default is 200. WHATSAPP_UMRAH_EMBEDDED_SIGNUP_WEEKLY_CAP overrides it. Past 200 a week, Meta says to apply
+// to become a Meta Business Partner.
+const DEFAULT_WEEKLY_CAP = 200;
+export function weeklyCap(): number {
   const raw = Number(process.env.WHATSAPP_UMRAH_EMBEDDED_SIGNUP_WEEKLY_CAP);
   return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_WEEKLY_CAP;
 }
