@@ -1,4 +1,4 @@
-import { DRAFT_SYSTEM_PROMPT } from "../../../../prompts/whatsapp-umrah/draft-system-v6";
+import { DRAFT_SYSTEM_PROMPT } from "../../../../prompts/whatsapp-umrah/draft-system-v7";
 import { INTENTS, LANGUAGES, type AgentDraft } from "./types";
 
 /* Draft step: Groq, strict JSON schema mode (constrained decoding - the
