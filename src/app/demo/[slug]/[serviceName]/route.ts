@@ -14,6 +14,11 @@ const PAGES: Record<string, Record<string, string>> = {
   uk: {
     "whatsapp-umrah-agent": "uk/whatsapp-umrah-agent.html",
   },
+  // Generated from the UK page by scripts/build-umrah-country-demos.mjs (local currency and cities).
+  us: { "whatsapp-umrah-agent": "us/whatsapp-umrah-agent.html" },
+  ca: { "whatsapp-umrah-agent": "ca/whatsapp-umrah-agent.html" },
+  au: { "whatsapp-umrah-agent": "au/whatsapp-umrah-agent.html" },
+  za: { "whatsapp-umrah-agent": "za/whatsapp-umrah-agent.html" },
 };
 
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string; serviceName: string }> }) {

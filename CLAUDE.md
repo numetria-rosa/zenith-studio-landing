@@ -39,7 +39,8 @@ infrastructure:
   service card on `/services` (public/services-catalog.html) and the
   landing page, linking out to its own marketing/demo pages at
   `/whatsapp-umrah` and `/demo/[country]/[serviceName]` (country is a
-  dynamic segment; only `uk` exists today, more countries are added
+  dynamic segment: `uk`, plus `us`, `ca`, `au` and `za` generated from the UK page by
+  `scripts/build-umrah-country-demos.mjs` with local currency; more countries are added
   without new routes).
 - Dashboard UI reuses this repo's existing design system components
   (ui.module.css tokens, Icon, card/eyebrow patterns) rather than
