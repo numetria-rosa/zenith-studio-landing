@@ -8,7 +8,8 @@
 // attached to one product. Plans are hidden: reachable only from the country demo page, not listed on the store page.
 //
 // Usage: node --env-file=.env scripts/create-whatsapp-umrah-country-plans.mjs
-// Prints the plan ids and checkout links. Add the ids to .env and Vercel as WHATSAPP_UMRAH_STARTER_PLAN_ID_<CC>.
+// Prints the plan ids and checkout links. Put the ids in COUNTRY_STARTER_PLAN_IDS (src/lib/whatsapp-umrah/whop-plans.ts) so the
+// webhook recognises them; no environment variable is needed.
 
 import Whop from "@whop/sdk";
 

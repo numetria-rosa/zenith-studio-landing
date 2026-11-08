@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from "vitest";
-import { currencyForWhopPlanId, waPlanForWhopPlanId } from "./whop-plans";
+import { COUNTRY_STARTER_PLAN_IDS, currencyForWhopPlanId, waPlanForWhopPlanId } from "./whop-plans";
 
 describe("waPlanForWhopPlanId", () => {
   beforeEach(() => {
@@ -25,14 +25,14 @@ describe("waPlanForWhopPlanId", () => {
 describe("currency plans", () => {
   beforeEach(() => {
     process.env.WHATSAPP_UMRAH_STARTER_PLAN_ID = "plan_gbp";
-    process.env.WHATSAPP_UMRAH_STARTER_PLAN_ID_USD = "plan_usd";
-    process.env.WHATSAPP_UMRAH_STARTER_PLAN_ID_ZAR = "plan_zar";
   });
 
-  it("a country plan grants Starter and reports its currency", () => {
-    expect(waPlanForWhopPlanId("plan_usd")).toEqual({ plan: "STARTER", foundingOffer: false });
-    expect(currencyForWhopPlanId("plan_usd")).toBe("USD");
-    expect(currencyForWhopPlanId("plan_zar")).toBe("ZAR");
+  it("a country plan grants Starter and reports its currency, with no environment setup", () => {
+    expect(waPlanForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.USD)).toEqual({ plan: "STARTER", foundingOffer: false });
+    expect(currencyForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.USD)).toBe("USD");
+    expect(currencyForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.CAD)).toBe("CAD");
+    expect(currencyForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.AUD)).toBe("AUD");
+    expect(currencyForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.ZAR)).toBe("ZAR");
   });
 
   it("the UK plan, an unknown plan and no plan are GBP", () => {

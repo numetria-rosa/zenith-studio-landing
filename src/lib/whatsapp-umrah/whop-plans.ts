@@ -16,14 +16,21 @@ export function waPlanForWhopPlanId(planId: string | null | undefined): { plan: 
   return null;
 }
 
-/** The Starter plan exists once per currency, each its own Whop plan (a plan has one currency and subscriptions can't
-    use adaptive pricing: https://docs.whop.com/payments-and-billing/fees/adaptive-pricing). The UK plan is
-    WHATSAPP_UMRAH_STARTER_PLAN_ID; the others are WHATSAPP_UMRAH_STARTER_PLAN_ID_<CURRENCY>. Anything else is GBP. */
+/** The Starter plan exists once per currency, each its own Whop plan on the same product (a plan has one currency and
+    subscriptions can't use adaptive pricing: https://docs.whop.com/payments-and-billing/fees/adaptive-pricing). The UK
+    plan is WHATSAPP_UMRAH_STARTER_PLAN_ID; the others are listed here, created by
+    scripts/create-whatsapp-umrah-country-plans.mjs. Plan ids are public (they are in checkout links), so they live in
+    code and the webhook needs no setup. Anything not listed is GBP. */
+export const COUNTRY_STARTER_PLAN_IDS: Record<Exclude<PlanCurrency, "GBP">, string> = {
+  USD: "plan_MhE10jwPePZ0C",
+  CAD: "plan_EJqJLamM10oue",
+  AUD: "plan_wUxGQaV27I2j0",
+  ZAR: "plan_PBW3VzzefZNSU",
+};
+
 export function currencyForWhopPlanId(planId: string | null | undefined): PlanCurrency {
   if (!planId) return "GBP";
-  for (const currency of ["USD", "CAD", "AUD", "ZAR"] as const) {
-    if (planId === process.env[`WHATSAPP_UMRAH_STARTER_PLAN_ID_${currency}`]) return currency;
-  }
+  for (const [currency, id] of Object.entries(COUNTRY_STARTER_PLAN_IDS)) if (planId === id) return currency as PlanCurrency;
   return "GBP";
 }
 
