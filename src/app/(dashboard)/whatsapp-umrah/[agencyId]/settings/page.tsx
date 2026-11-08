@@ -2,22 +2,25 @@ import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOwnedAgency, getUsageSummary } from "@/lib/whatsapp-umrah/dashboard-data";
-import { cancelSubscriptionAction } from "../actions";
+import { buyExtraRepliesAction, cancelSubscriptionAction } from "../actions";
+import { extraPackOffer, formatPackPrice } from "@/lib/whatsapp-umrah/extra-replies";
 import { PageHeader } from "@/components/wa/ui";
 import type { BusinessHours } from "@/lib/whatsapp-umrah/hours";
 import { SettingsForm, type SettingsState } from "./SettingsForm";
 
 const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
-export default async function SettingsPage({ params }: { params: Promise<{ agencyId: string }> }) {
+export default async function SettingsPage({ params, searchParams }: { params: Promise<{ agencyId: string }>; searchParams: Promise<{ extra?: string }> }) {
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { agencyId } = await params;
+  const { extra } = await searchParams;
   const agency = await getOwnedAgency(agencyId, session.user.id);
   if (!agency) notFound();
 
   const s = agency.agentSettings;
   const usage = await getUsageSummary(agencyId);
+  const offer = await extraPackOffer(agencyId);
   const hours = (s?.businessHours ?? null) as BusinessHours | null;
 
   const initial: SettingsState = {
@@ -42,7 +45,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ agenc
   return (
     <div>
       <PageHeader title="Settings" subtitle={`How ${AGENT_NAME} sounds, which languages it replies in, and what happens outside your hours.`} />
-      <SettingsForm agencyId={agencyId} initial={initial} used={usage.used} planCap={usage.planCap} billing={billing} cancelAction={cancelSubscriptionAction.bind(null, agencyId)} />
+      <SettingsForm agencyId={agencyId} initial={initial} used={usage.used} planCap={usage.planCap - usage.extraReplies} extraReplies={usage.extraReplies} pack={{ replies: offer.replies, price: formatPackPrice(offer.currency, offer.price) }} justBought={extra === "thanks"} buyAction={buyExtraRepliesAction.bind(null, agencyId)} billing={billing} cancelAction={cancelSubscriptionAction.bind(null, agencyId)} />
     </div>
   );
 }

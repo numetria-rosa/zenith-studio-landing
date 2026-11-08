@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { WaPlan } from "@prisma/client";
-import { PLANNING_COST_PER_REPLY_GBP, MIN_MARGIN, PLAN_PRICE_GBP, STARTER_PRICE_GBP_EQUIV, STARTER_PRICE_LOCAL, aiBudgetGbp, aiBudgetUsdCents, marginAt, type PlanCurrency } from "./economics";
+import { PLANNING_COST_PER_REPLY_GBP, MIN_MARGIN, PLAN_PRICE_GBP, STARTER_PRICE_GBP_EQUIV, STARTER_PRICE_LOCAL, EXTRA_PACK_MIN_MARGIN, EXTRA_PACK_PRICE_GBP_EQUIV, EXTRA_PACK_PRICE_LOCAL, EXTRA_PACK_REPLIES, extraPackBudgetGbp, extraPackMarginAt, aiBudgetGbp, aiBudgetUsdCents, marginAt, type PlanCurrency } from "./economics";
 import { replyCapFor } from "./entitlements";
 
 const PLANS: WaPlan[] = ["STARTER", "GROWTH", "PRO"];
@@ -47,5 +47,21 @@ describe("Starter in every currency", () => {
   it("the pound values are no higher than the local prices converted at a strong-pound rate", () => {
     const strongPoundRate = { GBP: 1, USD: 1.37, CAD: 1.9, AUD: 2.07, ZAR: 22.5 };
     for (const c of CURRENCIES) expect(STARTER_PRICE_GBP_EQUIV[c]).toBeLessThanOrEqual(STARTER_PRICE_LOCAL[c] / strongPoundRate[c] + 0.01);
+  });
+});
+
+describe("extra reply packs", () => {
+  it.each(CURRENCIES)("%s: a pack keeps at least 60% even when its whole AI budget is spent", (currency) => {
+    expect(extraPackMarginAt(extraPackBudgetGbp(currency), currency)).toBeGreaterThanOrEqual(EXTRA_PACK_MIN_MARGIN);
+  });
+  it.each(CURRENCIES)("%s: the pack's replies fit inside its AI budget at the planning cost per reply", (currency) => {
+    expect(EXTRA_PACK_REPLIES * PLANNING_COST_PER_REPLY_GBP).toBeLessThanOrEqual(extraPackBudgetGbp(currency));
+  });
+  it("the local prices are the ones set for the dashboard and the pages", () => {
+    expect(EXTRA_PACK_PRICE_LOCAL).toEqual({ GBP: 6, USD: 9, CAD: 12, AUD: 13, ZAR: 140 });
+  });
+  it("the pound values are no higher than the local prices converted at a strong-pound rate", () => {
+    const strongPoundRate = { GBP: 1, USD: 1.37, CAD: 1.9, AUD: 2.07, ZAR: 22.5 };
+    for (const c of CURRENCIES) expect(EXTRA_PACK_PRICE_GBP_EQUIV[c]).toBeLessThanOrEqual(EXTRA_PACK_PRICE_LOCAL[c] / strongPoundRate[c] + 0.01);
   });
 });

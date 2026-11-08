@@ -15,10 +15,10 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 const SRC = "public/demos/uk/whatsapp-umrah-agent.html";
 
 const COUNTRIES = {
-  us: { checkout: "https://whop.com/checkout/ch_3yCnqoK4wsfnVkJ/", name: "US", symbol: "$", code: "USD", words: "US dollars", price: 52, rate: 1.35, tld: "com", unit: "/ month", cities: ["New York", "Chicago", "Houston", "Detroit", "Dallas"] },
-  ca: { checkout: "https://whop.com/checkout/ch_5gz3oRodm3dR7lb/", name: "Canadian", symbol: "$", code: "CAD", words: "Canadian dollars", price: 83, rate: 1.85, tld: "ca", unit: "CAD / month", cities: ["Toronto", "Montreal", "Mississauga", "Calgary", "Ottawa"] },
-  au: { checkout: "https://whop.com/checkout/ch_3EmEku0gszYMzjv/", name: "Australian", symbol: "$", code: "AUD", words: "Australian dollars", price: 85, rate: 2.0, tld: "com.au", unit: "AUD / month", cities: ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide"] },
-  za: { checkout: "https://whop.com/checkout/ch_Li6eHzPXGuRRKpT/", name: "South African", symbol: "R", code: "ZAR", words: "rand", price: 900, rate: 22, tld: "co.za", unit: "/ month", cities: ["Johannesburg", "Cape Town", "Durban", "Pretoria", "Port Elizabeth"] },
+  us: { checkout: "https://whop.com/checkout/ch_3yCnqoK4wsfnVkJ/", name: "US", symbol: "$", code: "USD", words: "US dollars", price: 52, pack: "$9", rate: 1.35, tld: "com", unit: "/ month", cities: ["New York", "Chicago", "Houston", "Detroit", "Dallas"] },
+  ca: { checkout: "https://whop.com/checkout/ch_5gz3oRodm3dR7lb/", name: "Canadian", symbol: "$", code: "CAD", words: "Canadian dollars", price: 83, pack: "$12 CAD", rate: 1.85, tld: "ca", unit: "CAD / month", cities: ["Toronto", "Montreal", "Mississauga", "Calgary", "Ottawa"] },
+  au: { checkout: "https://whop.com/checkout/ch_3EmEku0gszYMzjv/", name: "Australian", symbol: "$", code: "AUD", words: "Australian dollars", price: 85, pack: "$13 AUD", rate: 2.0, tld: "com.au", unit: "AUD / month", cities: ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide"] },
+  za: { checkout: "https://whop.com/checkout/ch_Li6eHzPXGuRRKpT/", name: "South African", symbol: "R", code: "ZAR", words: "rand", price: 900, pack: "R140", rate: 22, tld: "co.za", unit: "/ month", cities: ["Johannesburg", "Cape Town", "Durban", "Pretoria", "Port Elizabeth"] },
 };
 
 // UK sample cities in the page, mapped by position to the country's cities.
@@ -53,6 +53,9 @@ for (const [cc, c] of Object.entries(COUNTRIES)) {
   // Sample cities (through placeholders so a new city name can never be replaced again).
   UK_CITIES.forEach((city, i) => (h = h.replace(new RegExp(`\\b${city}\\b`, "g"), `@@CITY${i}@@`)));
   UK_CITIES.forEach((_, i) => (h = h.split(`@@CITY${i}@@`).join(c.cities[i])));
+  // The extra-replies pack has its own local price (economics.ts EXTRA_PACK_PRICE_LOCAL), not a converted one.
+  h = must(h, "Add 500 more replies for £6", `Add 500 more replies for ${c.pack}`);
+  h = must(h, "add 500 replies at a time for £6", `add 500 replies at a time for ${c.pack}`);
   h = must(h, "<u>£</u>", `<u>${c.symbol}</u>`, "<u>£</u>");
   // Every remaining pound amount in the sample chats, dashboard and packages.
   h = h.replace(/£(\d[\d,]*)/g, (_, n) => `${c.symbol}${fmt(nice(Number(n.replace(/,/g, "")) * c.rate))}`);

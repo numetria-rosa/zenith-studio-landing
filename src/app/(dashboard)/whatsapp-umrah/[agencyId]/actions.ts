@@ -21,6 +21,7 @@ import type { BusinessHours } from "@/lib/whatsapp-umrah/hours";
 import { Prisma } from "@prisma/client";
 import { logWaAuditEvent } from "@/lib/whatsapp-umrah/audit";
 import { allAccepted, TERMS_VERSION } from "@/lib/whatsapp-umrah/terms";
+import { createExtraRepliesCheckout } from "@/lib/whatsapp-umrah/extra-replies";
 import { EMBEDDED_SIGNUP_ENABLED, isEmbeddedSignupCapReached } from "@/lib/whatsapp-umrah/embedded-signup";
 import { finishEmbeddedSignup, newRegistrationPin } from "@/lib/whatsapp-umrah/embedded-signup-flow";
 import { saveWhatsAppConnection } from "@/lib/whatsapp-umrah/connect";
@@ -59,6 +60,18 @@ async function requireOwnedAgency(agencyId: string) {
   const agency = await getOwnedAgency(agencyId, session.user.id);
   if (!agency) throw new Error("not_found");
   return { userId: session.user.id, agency };
+}
+
+/** Starts a purchase of one pack of extra AI replies and returns the Whop checkout to send the owner to. The replies
+    are credited by the webhook once the payment succeeds, never here. */
+export async function buyExtraRepliesAction(agencyId: string): Promise<{ url: string }> {
+  const { userId, agency } = await requireOwnedAgency(agencyId);
+  const owner = await db.waMembership.findFirst({ where: { agencyId: agency.id, userId, role: "OWNER" }, select: { id: true } });
+  if (!owner) throw new Error("Only the owner can buy extra replies.");
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || "https://zenith-studio.site";
+  const { url } = await createExtraRepliesCheckout(agency.id, siteUrl);
+  await logWaAuditEvent(agency.id, userId, "extra_replies_checkout_started");
+  return { url };
 }
 
 /** The owner's on/off switch for the AI replies. Pausing leaves the agency LIVE (billing and setup still control

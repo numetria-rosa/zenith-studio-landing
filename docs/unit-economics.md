@@ -131,3 +131,19 @@ against £4.50 for GBP. 1,000 replies still fit (about £2.50 at the planning co
 month on a Claude-heavy agency reaches the budget sooner and the agent pauses. `economics.test.ts` checks all five.
 Whop's fee for foreign-currency cards may be higher than the 7.2% working figure; confirm it on a real payment and lower
 the budgets if so.
+
+## Extra reply packs (2026-11-08)
+
+An agency that needs more than the plan's monthly replies can buy a pack of 500 more, one-time, for the current month
+only. Whop fee plus AI cost are the only costs (the agency already pays for hosting through its plan), and the pack is
+priced for a 60% margin, a deliberate step down from the 80% the plans keep. Prices: GBP 6, USD 9, CAD 12, AUD 13,
+ZAR 140 (at strong-pound rates about 6, 6.5, 6, 6 and 6 pounds). The AI budget a pack carries is GBP 1.50 in every
+currency (price x 40% less the 7.2% + 23p Whop fee, x 0.9 safety, rounded down to 25p): 500 replies at the planning cost
+of 0.25p each is GBP 1.25, so a typical month fits and the agent still pauses if a heavy one does not. If the budget is
+spent in full the margin is 64% on a GBP 6 pack. `economics.test.ts` checks every currency.
+
+A pack is bought from Settings, under Monthly reply limit: `createExtraRepliesCheckout` makes a Whop checkout for a
+one-time plan on its own hidden product, with the agency id in the checkout metadata, and the webhook credits the
+pack (idempotent on the payment id) when the payment succeeds. A pack lapses at the end of the month. The owner's own
+lower limit applies to the plan's replies only; packs are added on top. Packs are cheaper per reply than Growth, so an
+agency buying several each month is better off on a bigger plan: worth watching once Growth is launched.

@@ -30,7 +30,19 @@ export type SettingsState = {
 };
 
 type Billing = { planLabel: string; active: boolean; foundingOffer: boolean; canCancel: boolean } | null;
-type Props = { agencyId: string; initial: SettingsState; used: number; planCap: number; billing: Billing; cancelAction: () => Promise<void> };
+type Props = {
+  agencyId: string;
+  initial: SettingsState;
+  used: number;
+  /** The plan's own monthly replies, without extra packs. */
+  planCap: number;
+  extraReplies: number;
+  pack: { replies: number; price: string };
+  justBought: boolean;
+  buyAction: () => Promise<{ url: string }>;
+  billing: Billing;
+  cancelAction: () => Promise<void>;
+};
 
 const SECTIONS: { id: string; label: string; icon: WaIconName }[] = [
   { id: "s-agent", label: "Agent", icon: "person" },
@@ -56,7 +68,9 @@ function SectionHead({ icon, color, title, sub }: { icon: WaIconName; color: str
 
 const sectionCard = "scroll-mt-6 px-[26px] py-6";
 
-export function SettingsForm({ agencyId, initial, used, planCap, billing, cancelAction }: Props) {
+export function SettingsForm({ agencyId, initial, used, planCap, extraReplies, pack, justBought, buyAction, billing, cancelAction }: Props) {
+  const [buying, setBuying] = useState(false);
+  const [buyError, setBuyError] = useState("");
   const [baseline, setBaseline] = useState(initial);
   const [s, setS] = useState(initial);
   const [error, setError] = useState<string | null>(null);
@@ -111,7 +125,7 @@ export function SettingsForm({ agencyId, initial, used, planCap, billing, cancel
   }
 
   const limitNum = Math.floor(Number(s.limit));
-  const effectiveCap = Number.isFinite(limitNum) && limitNum > 0 ? Math.min(limitNum, planCap) : planCap;
+  const effectiveCap = (Number.isFinite(limitNum) && limitNum > 0 ? Math.min(limitNum, planCap) : planCap) + extraReplies;
   const pct = effectiveCap > 0 ? Math.min(100, (used / effectiveCap) * 100) : 0;
   const formal = s.tone === "FORMAL";
   const previewReply = formal ? "The Umrah visa is included in every package. Our team will apply for it on your behalf." : "Yes, the Umrah visa is included in every package and our team applies for it for you.";
@@ -276,6 +290,33 @@ export function SettingsForm({ agencyId, initial, used, planCap, billing, cancel
                 </div>
                 <Hint>Leave blank to use your plan&apos;s full allowance ({planCap.toLocaleString("en-GB")}).</Hint>
               </div>
+            </div>
+            <div className="mt-5 flex flex-wrap items-center gap-4 rounded-2xl border border-[rgba(255,255,255,.08)] bg-[rgba(255,255,255,.025)] px-5 py-4">
+              <div className="min-w-0 flex-1">
+                <div className="text-[15px] font-semibold">Need more replies this month?</div>
+                <div className="mt-1 text-[13.5px] text-mist">
+                  Add {pack.replies.toLocaleString("en-GB")} more for {pack.price}. One-time, valid until the end of this month, no subscription.
+                  {extraReplies > 0 ? ` You have added ${extraReplies.toLocaleString("en-GB")} this month.` : ""}
+                </div>
+                {justBought && <div role="status" className="mt-1 text-[13px] text-mint-text">Thank you. Your extra replies appear here as soon as the payment clears, usually within a minute.</div>}
+                {buyError && <div role="alert" className="mt-1 text-[13px] text-ember-text">{buyError}</div>}
+              </div>
+              <GlassButton
+                disabled={buying}
+                onClick={async () => {
+                  setBuying(true);
+                  setBuyError("");
+                  try {
+                    const { url } = await buyAction();
+                    window.location.href = url;
+                  } catch (e) {
+                    setBuyError(e instanceof Error ? e.message : "Something went wrong.");
+                    setBuying(false);
+                  }
+                }}
+              >
+                {buying ? "Opening checkout..." : `Add ${pack.replies.toLocaleString("en-GB")} replies for ${pack.price}`}
+              </GlassButton>
             </div>
           </Card>
 

@@ -12,6 +12,7 @@ import { resolveProposalByWhopPlanId, classifyProposalPaymentLeg } from "@/lib/p
 import { sendMetaPurchaseEvent } from "@/lib/meta-capi";
 import { sendAdminAlert } from "@/lib/outreach-mail";
 import { waPlanForWhopPlanId, provisionWaAgency, pauseWaAgencyByMembership } from "@/lib/whatsapp-umrah/whop-plans";
+import { isExtraRepliesPayment, recordExtraRepliesPayment } from "@/lib/whatsapp-umrah/extra-replies";
 
 /* Zenith Lab - Whop webhook handler.
    Implements whop-checkout-links-and-webhooks.md §3.3/§3.7 exactly:
@@ -120,6 +121,12 @@ type PostCommitInfo = {
 };
 
 async function handlePaymentSucceeded(tx: Tx, payment: Payment): Promise<PostCommitInfo | null> {
+  // A pack of extra AI replies bought from the WhatsApp dashboard (src/lib/whatsapp-umrah/extra-replies.ts). It is a
+  // one-time plan on its own product, identified by the metadata we put on the checkout, and only ever credits replies.
+  if (isExtraRepliesPayment(payment.metadata)) {
+    await recordExtraRepliesPayment(tx, payment);
+    return null;
+  }
   // WhatsApp Umrah's Starter/Founding subscription (see
   // scripts/create-whatsapp-umrah-whop-product.mjs) - also has no
   // product/course/service mapping, resolved by plan id.

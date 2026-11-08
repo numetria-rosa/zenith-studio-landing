@@ -63,3 +63,29 @@ export function marginAt(plan: WaPlan, aiSpendGbp: number, currency: PlanCurrenc
   const price = planPriceGbp(plan, currency);
   return (price - whopFeeGbp(plan, currency) - INFRA_PER_AGENCY_GBP[plan] - aiSpendGbp) / price;
 }
+
+/* Extra replies: an owner who needs more than the plan's monthly replies buys them in packs, one-time, valid for the
+   current month only (decided 2026-11-08, reversing the 2026-11-07 removal of the add-on). Packs carry a 60% margin,
+   not the 80% the plans keep: the agency already pays for hosting and the plan, so a pack is only the Whop fee and the
+   AI calls. Each pack raises that month's reply cap by EXTRA_PACK_REPLIES and its AI budget by extraPackBudgetGbp, so the
+   agent still pauses when the extra spend runs out, whatever the reply count. */
+export const EXTRA_PACK_REPLIES = 500;
+export const EXTRA_PACK_MIN_MARGIN = 0.6;
+export const EXTRA_PACK_PRICE_LOCAL: Record<PlanCurrency, number> = { GBP: 6, USD: 9, CAD: 12, AUD: 13, ZAR: 140 };
+/** What a pack is worth in pounds at a strong-pound rate (1.37 USD, 1.90 CAD, 2.07 AUD, 22.5 ZAR), rounded down to 50p. */
+export const EXTRA_PACK_PRICE_GBP_EQUIV: Record<PlanCurrency, number> = { GBP: 6, USD: 6.5, CAD: 6, AUD: 6, ZAR: 6 };
+
+/** AI spend one pack can carry and still keep EXTRA_PACK_MIN_MARGIN, in pounds, rounded down to 25p. */
+export function extraPackBudgetGbp(currency: PlanCurrency = "GBP"): number {
+  const price = EXTRA_PACK_PRICE_GBP_EQUIV[currency];
+  const room = price * (1 - EXTRA_PACK_MIN_MARGIN) - (price * WHOP_FEE_RATE + WHOP_FEE_FIXED_GBP);
+  return Math.max(0, Math.floor(room * SAFETY * 4) / 4);
+}
+export function extraPackBudgetUsdCents(currency: PlanCurrency = "GBP"): number {
+  return (extraPackBudgetGbp(currency) / USD_TO_GBP) * 100;
+}
+/** Margin on one pack if its AI budget is spent in full. */
+export function extraPackMarginAt(aiSpendGbp: number, currency: PlanCurrency = "GBP"): number {
+  const price = EXTRA_PACK_PRICE_GBP_EQUIV[currency];
+  return (price - (price * WHOP_FEE_RATE + WHOP_FEE_FIXED_GBP) - aiSpendGbp) / price;
+}

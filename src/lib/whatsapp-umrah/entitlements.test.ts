@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({ plan: "STARTER", limit: null as number | null, replies: 0, spendCents: 0 as number | null, simulatorToday: 0 }));
+const state = vi.hoisted(() => ({ plan: "STARTER", limit: null as number | null, replies: 0, spendCents: 0 as number | null, simulatorToday: 0, extraReplies: 0, extraBudgetCents: 0 }));
 vi.mock("@/lib/db", () => ({
   db: {
     waSubscription: { findUnique: async () => ({ plan: state.plan }) },
     waAgentSettings: { findUnique: async () => ({ monthlyReplyLimit: state.limit }) },
     waUsageCounter: { findUnique: async () => ({ aiReplies: state.replies }) },
+    waExtraReplies: { aggregate: async () => ({ _sum: { replies: state.extraReplies || null, budgetUsdCents: state.extraBudgetCents || null } }) },
     waPromptRun: { aggregate: async () => ({ _sum: { costEstimateCents: state.spendCents } }), count: async () => state.simulatorToday },
   },
 }));
@@ -23,6 +24,10 @@ describe("effectiveCap", () => {
   it("never raises it above the plan cap", () => {
     expect(effectiveCap(1000, 5000)).toBe(1000);
   });
+  it("adds extra replies on top, past even the agency's own lower limit", () => {
+    expect(effectiveCap(1000, null, 500)).toBe(1500);
+    expect(effectiveCap(1000, 300, 500)).toBe(800);
+  });
   it("ignores a zero or negative limit", () => {
     expect(effectiveCap(1000, 0)).toBe(1000);
     expect(effectiveCap(1000, -5)).toBe(1000);
@@ -30,7 +35,7 @@ describe("effectiveCap", () => {
 });
 
 describe("withinCap: the reply count and the AI budget", () => {
-  const reset = () => Object.assign(state, { plan: "STARTER", limit: null, replies: 0, spendCents: 0, simulatorToday: 0 });
+  const reset = () => Object.assign(state, { plan: "STARTER", limit: null, replies: 0, spendCents: 0, simulatorToday: 0, extraReplies: 0, extraBudgetCents: 0 });
 
   it("lets the agent answer while both are under their limits", async () => {
     reset();
@@ -59,6 +64,25 @@ describe("withinCap: the reply count and the AI budget", () => {
     expect(await withinCap("a1")).toMatchObject({ withinCap: false, limit: "budget" });
   });
 
+  it("a bought pack raises the month's reply cap and AI budget, so the agent keeps going past 1,000", async () => {
+    reset();
+    state.replies = 1000;
+    state.extraReplies = 500;
+    state.extraBudgetCents = 187;
+    expect(await withinCap("a1")).toMatchObject({ withinCap: true, cap: 1500, planCap: 1500, extraReplies: 500, limit: null });
+    state.spendCents = aiBudgetUsdCents("STARTER") + 100;
+    expect(await withinCap("a1")).toMatchObject({ withinCap: true, budgetUsdCents: aiBudgetUsdCents("STARTER") + 187 });
+    state.spendCents = aiBudgetUsdCents("STARTER") + 187;
+    expect(await withinCap("a1")).toMatchObject({ withinCap: false, limit: "budget" });
+  });
+
+  it("stops again at the raised cap", async () => {
+    reset();
+    state.replies = 1500;
+    state.extraReplies = 500;
+    expect(await withinCap("a1")).toMatchObject({ withinCap: false, limit: "replies", cap: 1500 });
+  });
+
   it("treats a month with no priced runs as zero spend", async () => {
     reset();
     state.spendCents = null;
@@ -67,7 +91,7 @@ describe("withinCap: the reply count and the AI budget", () => {
 });
 
 describe("simulatorBlocked", () => {
-  const reset = () => Object.assign(state, { plan: "STARTER", limit: null, replies: 0, spendCents: 0, simulatorToday: 0 });
+  const reset = () => Object.assign(state, { plan: "STARTER", limit: null, replies: 0, spendCents: 0, simulatorToday: 0, extraReplies: 0, extraBudgetCents: 0 });
   it("allows tests under the daily limit", async () => {
     reset();
     state.simulatorToday = SIMULATOR_DAILY_LIMIT - 1;

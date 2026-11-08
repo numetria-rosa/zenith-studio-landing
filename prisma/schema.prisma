@@ -1724,6 +1724,8 @@ model WaAgency {
   // setup control, so a payment recovering or a package being added never switches the agent back on by itself.
   agentPausedAt DateTime?
 
+  extraReplies WaExtraReplies[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -2186,6 +2188,24 @@ model WaPromptRun {
 }
 
 // Growth/Pro aren't launched yet - "Coming soon, join waitlist" on pricing.
+// A one-time purchase of extra AI replies for one month (economics.ts, EXTRA_PACK_*). One row per Whop payment;
+// whopPaymentId is unique so a webhook retry cannot add the replies twice. budgetUsdCents is the AI budget the pack
+// carries, stored at purchase time so later price changes never rewrite what was already sold.
+model WaExtraReplies {
+  id             String   @id @default(cuid())
+  agencyId       String
+  periodStart    DateTime
+  replies        Int
+  budgetUsdCents Int
+  currency       String
+  whopPaymentId  String   @unique
+  createdAt      DateTime @default(now())
+
+  agency WaAgency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId, periodStart])
+}
+
 model WaWaitlistSignup {
   id       String  @id @default(cuid())
   email    String

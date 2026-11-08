@@ -60,12 +60,24 @@ function billingPeriodEnd(periodStart: Date): Date {
 }
 
 /** `limit` says what stopped the agent: the reply count (the plan's, or the one the agency set) or the AI budget. */
-export type CapCheck = { withinCap: boolean; used: number; cap: number; planCap: number; spendUsdCents: number; budgetUsdCents: number; limit: "replies" | "budget" | null };
+export type CapCheck = {
+  withinCap: boolean;
+  used: number;
+  cap: number;
+  /** The month's allowance: the plan's replies plus any extra packs bought this month. */
+  planCap: number;
+  /** Replies bought as extra packs this month (already included in planCap and cap). */
+  extraReplies: number;
+  spendUsdCents: number;
+  budgetUsdCents: number;
+  limit: "replies" | "budget" | null;
+};
 
 /** The plan's cap, lowered to the agency's own monthly limit when it set one. Never raised: the plan cap
     is what covers our AI cost per reply. */
-export function effectiveCap(planCap: number, agencyLimit: number | null | undefined): number {
-  return agencyLimit && agencyLimit > 0 ? Math.min(planCap, agencyLimit) : planCap;
+export function effectiveCap(planCap: number, agencyLimit: number | null | undefined, extraReplies = 0): number {
+  // Extra replies were paid for on top, so the agency's own lower limit applies to the plan's replies only.
+  return (agencyLimit && agencyLimit > 0 ? Math.min(planCap, agencyLimit) : planCap) + extraReplies;
 }
 
 /** Reads the agency's plan, its own monthly limit and this month's AI reply usage in one place -
@@ -74,21 +86,24 @@ export function effectiveCap(planCap: number, agencyLimit: number | null | undef
     Meta bills the agency for, so the limit also caps their Meta bill. */
 export async function withinCap(agencyId: string): Promise<CapCheck> {
   const periodStart = currentBillingPeriodStart();
-  const [subscription, settings, usage, spend] = await Promise.all([
+  const [subscription, settings, usage, spend, extras] = await Promise.all([
     db.waSubscription.findUnique({ where: { agencyId }, select: { plan: true, whopPlanId: true } }),
     db.waAgentSettings.findUnique({ where: { agencyId }, select: { monthlyReplyLimit: true } }),
     db.waUsageCounter.findUnique({ where: { agencyId_periodStart: { agencyId, periodStart } }, select: { aiReplies: true } }),
     // Everything the model cost us for this agency this month, real chats and Simulator tests alike (US cents).
     db.waPromptRun.aggregate({ where: { agencyId, createdAt: { gte: periodStart } }, _sum: { costEstimateCents: true } }),
+    // Extra packs bought for this month (one-time, they lapse when the month ends).
+    db.waExtraReplies.aggregate({ where: { agencyId, periodStart }, _sum: { replies: true, budgetUsdCents: true } }),
   ]);
   const plan = subscription?.plan ?? "STARTER";
-  const planCap = replyCapFor(plan);
-  const cap = effectiveCap(planCap, settings?.monthlyReplyLimit);
+  const extraReplies = extras._sum.replies ?? 0;
+  const planCap = replyCapFor(plan) + extraReplies;
+  const cap = effectiveCap(replyCapFor(plan), settings?.monthlyReplyLimit, extraReplies);
   const used = usage?.aiReplies ?? 0;
   const spendUsdCents = spend._sum.costEstimateCents ?? 0;
-  const budgetUsdCents = aiBudgetUsdCents(plan, currencyForWhopPlanId(subscription?.whopPlanId));
+  const budgetUsdCents = aiBudgetUsdCents(plan, currencyForWhopPlanId(subscription?.whopPlanId)) + (extras._sum.budgetUsdCents ?? 0);
   const limit = spendUsdCents >= budgetUsdCents ? "budget" : used >= cap ? "replies" : null;
-  return { withinCap: limit === null, used, cap, planCap, spendUsdCents, budgetUsdCents, limit };
+  return { withinCap: limit === null, used, cap, planCap, extraReplies, spendUsdCents, budgetUsdCents, limit };
 }
 
 /** Increments this month's AI reply counter, creating the row if this is
