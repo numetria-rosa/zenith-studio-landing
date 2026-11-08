@@ -11,6 +11,7 @@ const state = vi.hoisted(() => ({
   handoffs: [] as { reason: string; triggeredBy: string }[],
   lastInboundText: null as string | null,
   pipelineCalls: 0,
+  paused: false,
 }));
 
 vi.mock("@/lib/db", () => ({
@@ -21,7 +22,7 @@ vi.mock("@/lib/db", () => ({
       findFirst: async () => (state.lastInboundText ? { body: state.lastInboundText } : null),
     },
     waWhatsAppAccount: { findFirst: async () => ({ agencyId: "a1", encryptedAccessToken: null, lastError: null }) },
-    waAgency: { findUnique: async () => ({ id: "a1", name: "Al Noor Travel", status: "LIVE", memberships: [], agentSettings: null }) },
+    waAgency: { findUnique: async () => ({ id: "a1", name: "Al Noor Travel", status: "LIVE", agentPausedAt: state.paused ? new Date() : null, memberships: [], agentSettings: null }) },
     waContact: {
       upsert: async () => state.contact,
       update: async ({ data }: { data: { optOut: boolean } }) => void (state.contact.optOut = data.optOut),
@@ -62,6 +63,7 @@ beforeEach(() => {
   state.handoffs = [];
   state.lastInboundText = null;
   state.pipelineCalls = 0;
+  state.paused = false;
   vi.mocked(alertHandoff).mockClear();
   vi.mocked(alertWaitingCustomer).mockClear();
 });
@@ -131,5 +133,34 @@ describe("STOP and START", () => {
     await processInboundMessage(text("START"), provider);
     expect(state.contact.optOut).toBe(false);
     expect(provider.sent).toEqual([{ kind: "text", to: "447700900000", body: OPT_IN_REPLIES.en }]);
+  });
+});
+
+describe("the owner has paused the agent", () => {
+  it("saves the message and tells the team, but sends nothing and never calls the model", async () => {
+    state.paused = true;
+    const provider = new MockWhatsAppProvider();
+    await processInboundMessage(text("How much is Ramadan for two?"), provider);
+    expect(state.messages).toHaveLength(1);
+    expect(provider.sent).toEqual([]);
+    expect(state.pipelineCalls).toBe(0);
+    expect(alertWaitingCustomer).toHaveBeenCalledWith({ agencyId: "a1", conversationId: "v1", message: "How much is Ramadan for two?" });
+  });
+
+  it("does not answer a photo either, and does not hand the chat off", async () => {
+    state.paused = true;
+    const provider = new MockWhatsAppProvider();
+    await processInboundMedia({ ...base, type: "IMAGE", reply: "security" }, provider);
+    expect(provider.sent).toEqual([]);
+    expect(state.handoffs).toEqual([]);
+    expect(alertWaitingCustomer).toHaveBeenCalled();
+  });
+
+  it("still honours STOP, because that is a legal promise and not an AI reply", async () => {
+    state.paused = true;
+    const provider = new MockWhatsAppProvider();
+    await processInboundMessage(text("STOP"), provider);
+    expect(state.contact.optOut).toBe(true);
+    expect(provider.sent).toHaveLength(1);
   });
 });

@@ -69,6 +69,7 @@ async function resolveInbound(msg: { phoneNumberId: string; from: string; waMess
       id: true,
       name: true,
       status: true,
+      agentPausedAt: true,
       memberships: { where: { role: "OWNER" }, take: 1, select: { user: { select: { email: true } } } },
       agentSettings: { select: { businessHours: true, awayMode: true, awayMessage: true, autoResumeIdleMinutes: true } },
     },
@@ -163,6 +164,11 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
     }
   }
 
+  // The owner switched the agent off: the message is saved above, a person is told, nothing goes out automatically.
+  if (agency.agentPausedAt) {
+    await alertWaitingCustomer({ agencyId: agency.id, conversationId: conversation.id, message: msg.body });
+    return;
+  }
   if (!(await underReplyLimit(agency, ownerEmail))) return;
 
   const settings = agency.agentSettings;
@@ -256,6 +262,10 @@ export async function processInboundMedia(msg: InboundMediaMessage, providerOver
   if (conversation.status === "HUMAN") {
     await alertWaitingCustomer({ agencyId: agency.id, conversationId: conversation.id, message: null });
     return; // a person already has this chat
+  }
+  if (agency.agentPausedAt) {
+    await alertWaitingCustomer({ agencyId: agency.id, conversationId: conversation.id, message: null });
+    return;
   }
   if (!(await underReplyLimit(agency, ownerEmail))) return;
 

@@ -29,12 +29,12 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
 
   const agentName = AGENT_NAME;
   const connected = agency.whatsapp?.status === "CONNECTED";
-  const live = agency.status === "LIVE" && connected;
+  const live = agency.status === "LIVE" && connected && !agency.agentPausedAt;
   const status = live
     ? { color: "#3DDC97", text: `${agentName} is live` }
     : !connected
       ? { color: "#FF9BB0", text: "WhatsApp not connected" }
-      : agency.status === "PAUSED"
+      : agency.status === "PAUSED" || agency.agentPausedAt
         ? { color: "#FFD27A", text: `${agentName} is paused` }
         : { color: "#FFD27A", text: "Not live yet" };
   const pct = usage.cap > 0 ? Math.min(100, (usage.used / usage.cap) * 100) : 0;

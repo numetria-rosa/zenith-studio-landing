@@ -1719,6 +1719,11 @@ model WaAgency {
   termsAcceptedById String?
   termsVersion      String?
 
+  // The owner's own on/off switch for the AI replies (Overview page). Null = running. When set, customer messages are
+  // still saved and the team is alerted, but nothing is sent automatically. Separate from `status`, which billing and
+  // setup control, so a payment recovering or a package being added never switches the agent back on by itself.
+  agentPausedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

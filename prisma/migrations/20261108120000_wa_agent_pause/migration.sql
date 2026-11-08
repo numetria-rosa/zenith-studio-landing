@@ -1,0 +1,1 @@
+ALTER TABLE "WaAgency" ADD COLUMN "agentPausedAt" TIMESTAMP(3);

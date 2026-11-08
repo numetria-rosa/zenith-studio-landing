@@ -61,6 +61,17 @@ async function requireOwnedAgency(agencyId: string) {
   return { userId: session.user.id, agency };
 }
 
+/** The owner's on/off switch for the AI replies. Pausing leaves the agency LIVE (billing and setup still control
+    that) and only sets agentPausedAt: inbound.ts then saves customer messages and alerts the team but sends nothing. */
+export async function setAgentPausedAction(agencyId: string, paused: boolean): Promise<void> {
+  const { userId, agency } = await requireOwnedAgency(agencyId);
+  const owner = await db.waMembership.findFirst({ where: { agencyId: agency.id, userId, role: "OWNER" }, select: { id: true } });
+  if (!owner) throw new Error("Only the owner can pause or resume the agent.");
+  await db.waAgency.update({ where: { id: agency.id }, data: { agentPausedAt: paused ? new Date() : null } });
+  await logWaAuditEvent(agency.id, userId, paused ? "agent_paused" : "agent_resumed");
+  revalidatePath(`/whatsapp-umrah/${agencyId}`, "layout");
+}
+
 /** The owner ticks every statement in TERMS_ITEMS; the time, who and which version are stored and audit logged. */
 export async function acceptTermsAction(agencyId: string, formData: FormData): Promise<void> {
   const { userId, agency } = await requireOwnedAgency(agencyId);

@@ -10,6 +10,7 @@ import { WaIcon, type WaIconName } from "@/components/wa/Icon";
 import { Modal } from "@/components/wa/ConfirmDialog";
 import { initialOf, replyTime, shortTime } from "@/components/wa/format";
 import { ConnectPanel } from "./ConnectPanel";
+import { AgentSwitch } from "./AgentSwitch";
 
 const LANG_ENABLED_DEFAULT = 4;
 
@@ -48,7 +49,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
   ];
   const doneCount = setup.filter((r) => r.done).length;
 
-  const subtitle = agency.status === "LIVE" && connected ? `${agentName} is live and answering your customers on WhatsApp.` : connected ? "A few steps left before you're live." : "Connect your WhatsApp number to go live.";
+  const subtitle = agency.status === "LIVE" && connected && agency.agentPausedAt ? `${agentName} is paused. Your team is answering customers.` : agency.status === "LIVE" && connected ? `${agentName} is live and answering your customers on WhatsApp.` : connected ? "A few steps left before you're live." : "Connect your WhatsApp number to go live.";
 
   const stats: { label: string; value: React.ReactNode; caption: string; color: string; icon: WaIconName }[] = [
     { label: "Conversations", value: summary.conversations, caption: "LAST 30 DAYS", color: CYAN, icon: "chat" },
@@ -69,6 +70,10 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
           </>
         }
       />
+
+      {connected && agency.status === "LIVE" && (
+        <AgentSwitch agencyId={agencyId} agentName={agentName} paused={!!agency.agentPausedAt} since={agency.agentPausedAt ? shortTime(agency.agentPausedAt) : null} />
+      )}
 
       {!connected && (
         <Card className="mb-[18px] p-6">
