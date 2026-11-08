@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from "vitest";
-import { COUNTRY_STARTER_PLAN_IDS, currencyForWhopPlanId, waPlanForWhopPlanId } from "./whop-plans";
+import { COUNTRY_STARTER_PLAN_IDS, currencyForWhopPlanId, marketForWhopPlanId, waPlanForWhopPlanId } from "./whop-plans";
 
 describe("waPlanForWhopPlanId", () => {
   beforeEach(() => {
@@ -39,5 +39,24 @@ describe("currency plans", () => {
     expect(currencyForWhopPlanId("plan_gbp")).toBe("GBP");
     expect(currencyForWhopPlanId("plan_other")).toBe("GBP");
     expect(currencyForWhopPlanId(null)).toBe("GBP");
+  });
+});
+
+describe("the market tag", () => {
+  beforeEach(() => {
+    process.env.WHATSAPP_UMRAH_STARTER_PLAN_ID = "plan_gbp";
+  });
+
+  it("reads the market and currency from the plan the agency first bought", () => {
+    expect(marketForWhopPlanId("plan_gbp")).toEqual({ market: "UK", currency: "GBP" });
+    expect(marketForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.USD)).toEqual({ market: "US", currency: "USD" });
+    expect(marketForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.CAD)).toEqual({ market: "CA", currency: "CAD" });
+    expect(marketForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.AUD)).toEqual({ market: "AU", currency: "AUD" });
+    expect(marketForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.ZAR)).toEqual({ market: "ZA", currency: "ZAR" });
+  });
+
+  it("shows no tag when there is no plan on record or it is not one of ours", () => {
+    expect(marketForWhopPlanId(null)).toBeNull();
+    expect(marketForWhopPlanId("plan_something_else")).toBeNull();
   });
 });

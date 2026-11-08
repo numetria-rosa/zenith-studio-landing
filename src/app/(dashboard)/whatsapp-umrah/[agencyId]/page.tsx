@@ -11,6 +11,7 @@ import { Modal } from "@/components/wa/ConfirmDialog";
 import { initialOf, replyTime, shortTime } from "@/components/wa/format";
 import { ConnectPanel } from "./ConnectPanel";
 import { AgentSwitch } from "./AgentSwitch";
+import { marketForWhopPlanId } from "@/lib/whatsapp-umrah/whop-plans";
 
 const LANG_ENABLED_DEFAULT = 4;
 
@@ -23,6 +24,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
 
   const [summary, conversations] = await Promise.all([getAnalyticsSummary(agencyId, 30), listConversations(agencyId)]);
   const base = `/whatsapp-umrah/${agencyId}`;
+  const market = marketForWhopPlanId(agency.subscription?.whopPlanId);
   const agentName = AGENT_NAME;
   const { used, cap } = summary.usage;
   const pct = cap > 0 ? Math.min(100, (used / cap) * 100) : 0;
@@ -62,6 +64,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
     <div>
       <PageHeader
         title="Overview"
+        titleTag={market && <span title={`Signed up in ${market.currency}. Extra replies are bought in the same currency.`} className="inline-flex h-[26px] items-center gap-[6px] rounded-full border border-[rgba(92,200,255,.35)] bg-[rgba(92,200,255,.08)] px-[10px] font-mono text-[11.5px] tracking-[.08em] text-cyan-text">{market.market} · {market.currency}</span>}
         subtitle={subtitle}
         actions={
           <>

@@ -230,11 +230,14 @@ export function MenuItem({ icon, tone = "default", children, ...rest }: { icon?:
 
 /* ---------- page header ---------- */
 
-export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: ReactNode; actions?: ReactNode }) {
+export function PageHeader({ title, subtitle, actions, titleTag }: { title: string; subtitle?: ReactNode; actions?: ReactNode; titleTag?: ReactNode }) {
   return (
     <div className="mb-7 flex items-end gap-5">
       <div className="min-w-0 flex-1">
-        <h1 className="m-0 text-[38px] font-semibold leading-[1.05] tracking-[-0.035em]">{title}</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="m-0 text-[38px] font-semibold leading-[1.05] tracking-[-0.035em]">{title}</h1>
+          {titleTag}
+        </div>
         {subtitle && <p className="mb-0 mt-[10px] text-[15.5px] leading-[1.5] text-mist">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-[10px]">{actions}</div>}

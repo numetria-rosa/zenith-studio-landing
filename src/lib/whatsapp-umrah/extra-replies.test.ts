@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({ agencyExists: true, rows: [] as { whopPaymentId: string; replies: number; budgetUsdCents: number; currency: string; agencyId: string }[] }));
-vi.mock("@/lib/db", () => ({ db: {} }));
+const state = vi.hoisted(() => ({ planId: null as string | null, agencyExists: true, rows: [] as { whopPaymentId: string; replies: number; budgetUsdCents: number; currency: string; agencyId: string }[] }));
+vi.mock("@/lib/db", () => ({ db: { waSubscription: { findUnique: async () => ({ whopPlanId: state.planId }) } } }));
 vi.mock("@/lib/whop", () => ({ getWhopClient: () => ({}) }));
 
-import { EXTRA_PACK_PLAN_IDS, EXTRA_REPLIES_KIND, formatPackPrice, isExtraRepliesPayment, recordExtraRepliesPayment } from "./extra-replies";
+import { COUNTRY_STARTER_PLAN_IDS } from "./whop-plans";
+import { EXTRA_PACK_PLAN_IDS, EXTRA_REPLIES_KIND, extraPackOffer, formatPackPrice, isExtraRepliesPayment, recordExtraRepliesPayment } from "./extra-replies";
 import { EXTRA_PACK_REPLIES, extraPackBudgetUsdCents } from "./economics";
 
 const tx = {
@@ -50,6 +51,19 @@ describe("recording a paid pack", () => {
     expect(isExtraRepliesPayment({ kind: EXTRA_REPLIES_KIND })).toBe(true);
     expect(isExtraRepliesPayment({ kind: "something else" })).toBe(false);
     expect(isExtraRepliesPayment(null)).toBe(false);
+  });
+});
+
+describe("the pack follows the plan the agency first bought", () => {
+  it("is priced in the currency of the agency's own plan", async () => {
+    state.planId = COUNTRY_STARTER_PLAN_IDS.USD;
+    expect(await extraPackOffer("a1")).toMatchObject({ currency: "USD", price: 9 });
+    state.planId = COUNTRY_STARTER_PLAN_IDS.ZAR;
+    expect(await extraPackOffer("a1")).toMatchObject({ currency: "ZAR", price: 140 });
+  });
+  it("falls back to pounds for the UK plan or no plan on record", async () => {
+    state.planId = null;
+    expect(await extraPackOffer("a1")).toMatchObject({ currency: "GBP", price: 6 });
   });
 });
 

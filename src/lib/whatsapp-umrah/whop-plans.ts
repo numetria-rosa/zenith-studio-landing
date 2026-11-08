@@ -34,6 +34,17 @@ export function currencyForWhopPlanId(planId: string | null | undefined): PlanCu
   return "GBP";
 }
 
+/** The market an agency signed up in, read from the Whop plan it first bought: UK/GBP, US/USD, CA/CAD, AU/AUD, ZA/ZAR.
+    Null when the agency has no Whop plan on record (for example one an admin created by hand), so no tag is shown
+    rather than a wrong one. The extra-replies pack is priced in the same currency (extra-replies.ts). */
+const MARKET_FOR_CURRENCY: Record<PlanCurrency, string> = { GBP: "UK", USD: "US", CAD: "CA", AUD: "AU", ZAR: "ZA" };
+export function marketForWhopPlanId(planId: string | null | undefined): { market: string; currency: PlanCurrency } | null {
+  if (!planId) return null;
+  if (planId !== process.env.WHATSAPP_UMRAH_STARTER_PLAN_ID && currencyForWhopPlanId(planId) === "GBP") return null;
+  const currency = currencyForWhopPlanId(planId);
+  return { market: MARKET_FOR_CURRENCY[currency], currency };
+}
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
