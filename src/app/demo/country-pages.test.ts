@@ -21,6 +21,10 @@ describe.each(Object.entries(EXPECT))("demo page: %s", (cc, e) => {
     expect(html).toContain(e.city);
     expect(html).not.toMatch(/\b(Manchester|Birmingham|Bradford|Leicester|London)\b/);
   });
+  it("says the business is Meta-verified and an approved Tech Provider, in the hero and the FAQ", () => {
+    expect(html).toContain("Meta-verified business");
+    expect(html).toContain("Is this approved by Meta?");
+  });
   it("sends buyers to this country's own local-currency checkout, never the UK pound one", () => {
     expect(html).toContain(`https://whop.com/checkout/${e.checkout}/`);
     expect(html).not.toContain("ch_M5XKy2oxQQkoO28");
