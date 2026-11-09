@@ -46,7 +46,7 @@ const paceMs = Number(process.env.EVAL_PACE_MS ?? 0);
 const picked = SCENARIOS.filter((s) => !s.expect.noModel && !s.languages && (!only || s.category === only || s.id === only) && (!ids || ids.includes(s.id)));
 
 type Drafter = "groq" | "claude";
-type Row = { id: string; category: string; passed: boolean; problems: string[]; firstDraftBroke: string[]; handedOff: boolean; costCents: number; ms: number; reply: string };
+type Row = { id: string; category: string; passed: boolean; problems: string[]; firstDraftBroke: string[]; handedOff: boolean; intent: string | null; reason: string; costCents: number; ms: number; reply: string };
 
 const results: Record<Drafter, Row[]> = { groq: [], claude: [] };
 
@@ -71,6 +71,8 @@ describe.skipIf(!out)("model comparison", () => {
         problems,
         firstDraftBroke: r.guardsTriggered.filter((g) => g !== "off_topic" && g !== "identity_question"),
         handedOff: r.action === "handoff",
+        intent: r.intent,
+        reason: r.action === "handoff" ? r.reason : "",
         costCents: r.promptRuns.reduce((n, p) => n + (p.costEstimateCents ?? 0), 0),
         ms: Date.now() - started,
         reply: r.action === "reply" ? r.text : r.holdingMessage,
