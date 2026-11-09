@@ -25,6 +25,9 @@ const CLAUDE_MODEL = () => process.env.CLAUDE_MODEL || "claude-haiku-4-5-2025100
 const KNOWN_PRICES_PER_1M: Record<string, { input: number; output: number }> = {
   "openai/gpt-oss-20b": { input: 0.075, output: 0.3 },
   "claude-haiku-4-5-20251001": { input: 1, output: 5 },
+  // platform.claude.com/docs/en/about-claude/pricing, read 2026-11-09: Haiku 5.5 is $0.10 in / $0.50 out for prompts up to
+  // 100,000 tokens (ours are about 5,000). Needed here so that setting CLAUDE_MODEL to it still counts toward the plan budget.
+  "claude-haiku-5-5": { input: 0.1, output: 0.5 },
 };
 
 function estimateCostCents(model: string, inputTokens?: number, outputTokens?: number): number | undefined {

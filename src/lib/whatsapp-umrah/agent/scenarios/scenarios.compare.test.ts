@@ -5,7 +5,7 @@ import { checkScenario } from "./check";
 
 /* The model comparison: the same scenarios through the real pipeline (real guards, real retry on Claude), once with
    Groq writing the first draft and once with Claude Haiku writing it. Against the fixture agency (no database), real
-   model calls. It costs a few pence and needs GROQ_API_KEY and ANTHROPIC_API_KEY, so it only runs when EVAL_COMPARE is
+   model calls. Groq is free; Claude (EVAL_DRAFTERS=claude or groq,claude) costs about 50p per full run. It needs GROQ_API_KEY (and ANTHROPIC_API_KEY for Claude), so it only runs when EVAL_COMPARE is
    set to the path the results are written to:
 
      EVAL_COMPARE=out.json node --env-file=.env ./node_modules/vitest/vitest.mjs run src/lib/whatsapp-umrah/agent/scenarios/scenarios.compare.test.ts
@@ -39,7 +39,9 @@ import { runAgentPipeline } from "../pipeline";
 const out = process.env.EVAL_COMPARE;
 const only = process.env.EVAL_ONLY;
 const ids = process.env.EVAL_IDS?.split(",").map((x) => x.trim()).filter(Boolean); // optional: only these scenario ids
-const drafters = (process.env.EVAL_DRAFTERS ?? "groq,claude").split(",") as Drafter[];
+// Groq is free, Claude costs real money (about 50p for all scenarios): the default is Groq alone. Add Claude on purpose, ideally
+// with EVAL_IDS or EVAL_ONLY so only the scenarios you changed are paid for, and run the full Claude set once before a release.
+const drafters = (process.env.EVAL_DRAFTERS ?? "groq").split(",") as Drafter[];
 // Groq's free tier allows ~8,000 tokens a minute and one of our prompts is ~4,600, so a back-to-back run is rate limited
 // and every reply becomes a "technical problem" hand-off. EVAL_PACE_MS spaces the calls out (about 40000 for Groq).
 const paceMs = Number(process.env.EVAL_PACE_MS ?? 0);

@@ -64,17 +64,22 @@ export async function escalateDraft(input: DraftInput, previousFailures: GuardFa
       body: JSON.stringify({
         model: ESCALATION_MODEL,
         max_tokens: 800,
-        system: DRAFT_SYSTEM_PROMPT,
+        // cache_control: the system prompt (and the tool above it, which sit first in the cached prefix) is identical on every
+        // call, so repeat calls within 5 minutes read it at a tenth of the input price. Minimum cacheable size is 512 tokens on
+        // Haiku 5.5 and 4,096 on Haiku 4.5 (ours is about 2,600, so on 4.5 this is silently a no-op), per
+        // platform.claude.com/docs/en/build-with-claude/prompt-caching, read 2026-11-09.
+        system: [{ type: "text", text: DRAFT_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
         tools: [AGENT_DRAFT_TOOL],
         tool_choice: { type: "tool", name: "agent_draft" },
         messages: [{ role: "user", content: userPrompt }],
       }),
     });
     if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}`, latencyMs: Date.now() - startedAt };
-    const body = (await res.json()) as { content?: { type: string; input?: unknown }[]; usage?: { input_tokens?: number; output_tokens?: number } };
+    const body = (await res.json()) as { content?: { type: string; input?: unknown }[]; usage?: { input_tokens?: number; output_tokens?: number; cache_creation_input_tokens?: number; cache_read_input_tokens?: number } };
     const toolUse = body.content?.find((b) => b.type === "tool_use");
     if (!toolUse?.input) return { ok: false, error: "Claude did not return a tool_use block", latencyMs: Date.now() - startedAt };
-    return { ok: true, draft: toolUse.input as AgentDraft, promptTokens: body.usage?.input_tokens, completionTokens: body.usage?.output_tokens, latencyMs: Date.now() - startedAt };
+    return { ok: true, draft: toolUse.input as AgentDraft, // input_tokens excludes cached tokens; count them all at the full input price, so the plan budget is never under-counted
+      promptTokens: body.usage ? (body.usage.input_tokens ?? 0) + (body.usage.cache_creation_input_tokens ?? 0) + (body.usage.cache_read_input_tokens ?? 0) : undefined, completionTokens: body.usage?.output_tokens, latencyMs: Date.now() - startedAt };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "Claude escalation request failed", latencyMs: Date.now() - startedAt };
   }
