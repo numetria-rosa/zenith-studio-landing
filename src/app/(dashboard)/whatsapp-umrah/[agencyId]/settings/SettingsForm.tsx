@@ -8,7 +8,8 @@ import { ConfirmAction } from "@/components/wa/ConfirmDialog";
 import { Card, FieldLabel, GhostButton, GlassButton, Hint, Input, Label, Pill, PrimaryButton, Segmented, Tile, Toggle } from "@/components/wa/ui";
 import { AMBER, CYAN, MINT, VIOLET, cx } from "@/components/wa/tokens";
 import { updateAgentSettingsAction } from "../actions";
-import { isKnownTimezone, timezoneChoices } from "@/lib/whatsapp-umrah/timezone";
+import { isKnownTimezone } from "@/lib/whatsapp-umrah/timezone";
+import { TimezonePicker } from "@/components/wa/TimezonePicker";
 
 const DAYS = [["mon", "Monday"], ["tue", "Tuesday"], ["wed", "Wednesday"], ["thu", "Thursday"], ["fri", "Friday"], ["sat", "Saturday"], ["sun", "Sunday"]] as const;
 const LANGS = [["en", "English", "English"], ["ar", "Arabic", "العربية"], ["tr", "Turkish", "Türkçe"], ["ur", "Urdu", "اردو"]] as const;
@@ -85,7 +86,6 @@ export function SettingsForm({ agencyId, initial, used, planCap, extraReplies, e
 
   const set = <K extends keyof SettingsState>(k: K, v: SettingsState[K]) => setS((p) => ({ ...p, [k]: v }));
   const [tzDetected, setTzDetected] = useState(false);
-  const tzChoices = useMemo(() => timezoneChoices(s.timezone), [s.timezone]);
   // First time hours are turned on with no saved timezone: offer the zone this browser is in, for the owner to confirm and save.
   useEffect(() => {
     if (s.allDay || s.tzSaved || tzDetected) return;
@@ -223,9 +223,7 @@ export function SettingsForm({ agencyId, initial, used, planCap, extraReplies, e
               <>
                 <div className="mt-[14px]">
                   <FieldLabel htmlFor="timezone">Your timezone</FieldLabel>
-                  <select id="timezone" value={s.timezone} onChange={(e) => set("timezone", e.target.value)} className="h-11 w-full rounded-xl border border-[rgba(255,255,255,.10)] bg-[rgba(255,255,255,.03)] px-3 text-[14.5px] text-inherit">
-                    {tzChoices.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
-                  </select>
+                  <TimezonePicker id="timezone" value={s.timezone} onChange={(v) => set("timezone", v)} />
                   <Hint className="mt-2">{tzDetected ? "Detected from your browser. Check it is where your office is, then save. " : ""}Your opening hours below are read in this timezone.</Hint>
                 </div>
                 <div className="mt-[10px]">
