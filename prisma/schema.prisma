@@ -1908,7 +1908,8 @@ model WaAgentSettings {
   emojiEnabled          Boolean    @default(true)
   signOff               String?
   languagesEnabled      String[]   @default(["en", "ar", "tr", "ur"]) // English, Arabic, Turkish, Urdu (standard script) - narrowed 2026-09-28, see CLAUDE.md
-  businessHours         Json? // per-day open/close, agency timezone
+  businessHours         Json? // per-day open/close, in `timezone` below
+  timezone              String? // IANA id from timezone.ts; null = the default for the agency's market
   awayMode              WaAwayMode @default(AI_REPLIES)
   awayMessage           String?
   hotLeadRule           Json? // configurable: which captured fields / triggers count as "hot"

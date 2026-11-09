@@ -18,6 +18,7 @@ import { META_TOKEN_ENV } from "@/lib/whatsapp-umrah/inbound";
 import { MetaCloudWhatsAppProvider } from "@/lib/whatsapp-umrah/provider/meta";
 import { deleteContactData } from "@/lib/whatsapp-umrah/gdpr";
 import type { BusinessHours } from "@/lib/whatsapp-umrah/hours";
+import { isKnownTimezone } from "@/lib/whatsapp-umrah/timezone";
 import { Prisma } from "@prisma/client";
 import { logWaAuditEvent } from "@/lib/whatsapp-umrah/audit";
 import { allAccepted, TERMS_VERSION } from "@/lib/whatsapp-umrah/terms";
@@ -282,6 +283,7 @@ export async function updateAgentSettingsAction(agencyId: string, formData: Form
     awayMode: (formData.get("awayMode") === "AWAY_MESSAGE_ONLY" ? "AWAY_MESSAGE_ONLY" : "AI_REPLIES") as "AI_REPLIES" | "AWAY_MESSAGE_ONLY",
     awayMessage: String(formData.get("awayMessage") || "").trim() || null,
     businessHours: (parseBusinessHoursForm(formData) ?? Prisma.JsonNull) as Prisma.InputJsonValue,
+    timezone: isKnownTimezone(String(formData.get("timezone"))) ? String(formData.get("timezone")) : null,
     autoResumeIdleMinutes: (() => {
       const raw = Number(formData.get("autoResumeIdleMinutes"));
       return Number.isFinite(raw) && raw > 0 ? Math.round(raw) : null;

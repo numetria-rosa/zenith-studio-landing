@@ -6,6 +6,8 @@ import { buyExtraRepliesAction, cancelSubscriptionAction } from "../actions";
 import { extraPackOffer, formatPackPrice } from "@/lib/whatsapp-umrah/extra-replies";
 import { PageHeader } from "@/components/wa/ui";
 import type { BusinessHours } from "@/lib/whatsapp-umrah/hours";
+import { resolveTimezone } from "@/lib/whatsapp-umrah/timezone";
+import { marketForWhopPlanId } from "@/lib/whatsapp-umrah/whop-plans";
 import { SettingsForm, type SettingsState } from "./SettingsForm";
 
 const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
@@ -31,6 +33,8 @@ export default async function SettingsPage({ params, searchParams }: { params: P
     langs: s?.languagesEnabled ?? ["en", "ar", "tr", "ur"],
     allDay: !hours, // no hours saved means open 24/7
     days: Object.fromEntries(DAY_KEYS.map((k) => [k, { on: !!hours?.[k], open: hours?.[k]?.open ?? "09:00", close: hours?.[k]?.close ?? "17:00" }])) as SettingsState["days"],
+    tzSaved: !!s?.timezone,
+    timezone: resolveTimezone(s?.timezone, marketForWhopPlanId(agency.subscription?.whopPlanId)?.market),
     outside: s?.awayMode === "AWAY_MESSAGE_ONLY" ? "AWAY_MESSAGE_ONLY" : "AI_REPLIES",
     awayMessage: s?.awayMessage ?? "",
     resumeOn: !!s?.autoResumeIdleMinutes,

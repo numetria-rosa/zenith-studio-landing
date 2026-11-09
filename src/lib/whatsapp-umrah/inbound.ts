@@ -7,6 +7,8 @@ import { BOOKING_READY_REASON } from "./agent/reasons";
 import { MetaCloudWhatsAppProvider } from "./provider/meta";
 import { withinCap, recordAiReply } from "./entitlements";
 import { isWithinBusinessHours } from "./hours";
+import { resolveTimezone } from "./timezone";
+import { marketForWhopPlanId } from "./whop-plans";
 import { trackSend, noteSendFailure } from "./send-failure";
 import { alertHandoff, alertWaitingCustomer } from "./handoff-alerts";
 import { resumeIfIdle } from "./handoff";
@@ -22,7 +24,6 @@ export const META_TOKEN_ENV = "META_ACCESS_TOKEN_ENCRYPTION_KEY";
 // Every agency is UK-based today (see CLAUDE.md - UK-only launch). One
 // timezone assumption, not a per-agency setting yet: add
 // WaAgentSettings.timezone if/when agencies outside UK time are onboarded.
-const DEFAULT_TIMEZONE = "Europe/London";
 const DEFAULT_AWAY_MESSAGE = "Thanks for your message. We're outside our usual hours right now, but we'll reply as soon as we're back.";
 
 type Delivery = { agencyId: string; conversationId: string; phoneNumberId: string; to: string; encryptedAccessToken: string | null; lastError: string | null };
@@ -71,7 +72,8 @@ async function resolveInbound(msg: { phoneNumberId: string; from: string; waMess
       status: true,
       agentPausedAt: true,
       memberships: { where: { role: "OWNER" }, take: 1, select: { user: { select: { email: true } } } },
-      agentSettings: { select: { businessHours: true, awayMode: true, awayMessage: true, autoResumeIdleMinutes: true } },
+      agentSettings: { select: { businessHours: true, awayMode: true, awayMessage: true, autoResumeIdleMinutes: true, timezone: true } },
+      subscription: { select: { whopPlanId: true } },
     },
   });
   if (!agency || agency.status !== "LIVE") return null; // onboarding/paused agencies don't get live replies yet
@@ -172,7 +174,7 @@ export async function processInboundMessage(msg: InboundTextMessage, providerOve
   if (!(await underReplyLimit(agency, ownerEmail))) return;
 
   const settings = agency.agentSettings;
-  const outsideHours = !isWithinBusinessHours(settings?.businessHours ?? null, DEFAULT_TIMEZONE);
+  const outsideHours = !isWithinBusinessHours(settings?.businessHours ?? null, resolveTimezone(settings?.timezone, marketForWhopPlanId(agency.subscription?.whopPlanId)?.market));
   if (outsideHours && settings?.awayMode === "AWAY_MESSAGE_ONLY") {
     await deliver(delivery, settings.awayMessage?.trim() || DEFAULT_AWAY_MESSAGE, providerOverride);
     return; // away-message-only mode never runs the pipeline - saves the LLM call entirely, not just skips a reply

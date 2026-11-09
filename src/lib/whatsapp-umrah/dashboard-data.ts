@@ -1,6 +1,8 @@
 import { cache } from "react";
 import { db } from "@/lib/db";
 import { isWithinBusinessHours } from "./hours";
+import { resolveTimezone } from "./timezone";
+import { marketForWhopPlanId } from "./whop-plans";
 
 /* Client-facing dashboard data access. Same IDOR-safe pattern as
    src/lib/service-workspace.ts's getOwnedServiceProject: every query is
@@ -75,13 +77,14 @@ export async function listLeads(agencyId: string, status?: string) {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const TZ = "Europe/London"; // same assumption as hours.ts: agencies are UK-based for now
 
 /** Everything the analytics page shows for the last `days` days (and the same length before, for the "vs previous"
     figures). Handoff rate counts conversations that had at least one handoff, not handoff events, so it can never pass 100%. */
 export async function getAnalyticsSummary(agencyId: string, days = 30) {
   const now = Date.now();
   const since = new Date(now - days * DAY_MS);
+  const tzRow = await db.waAgency.findUnique({ where: { id: agencyId }, select: { agentSettings: { select: { timezone: true } }, subscription: { select: { whopPlanId: true } } } });
+  const TZ = resolveTimezone(tzRow?.agentSettings?.timezone, marketForWhopPlanId(tzRow?.subscription?.whopPlanId)?.market);
   const prevSince = new Date(now - 2 * days * DAY_MS);
 
   const [conversations, prevConversations, leadCounts, prevHot, handedOff, capData, contacts] = await Promise.all([
