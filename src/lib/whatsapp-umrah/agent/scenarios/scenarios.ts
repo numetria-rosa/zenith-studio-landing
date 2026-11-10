@@ -97,7 +97,7 @@ export const SCENARIOS: Scenario[] = [
   S("gap-nothing-cited", "knowledge gap", "do you offer helicopter transfers in makkah?", { action: "handoff", guards: ["no_kb_source"], includes: ["how many people will be travelling"] }, { draft: D("We can arrange that.", { kbIdsUsed: [] }) }),
   S("gap-hedge", "knowledge gap", "is there a wheelchair-accessible room?", { action: "handoff", guards: ["hedge"], includes: ["Someone from our team"] }, { draft: D("Let me check that for you.", { intent: "other", kbIdsUsed: [] }) }),
   S("gap-low-confidence", "knowledge gap", "do you cover travel insurance?", { action: "handoff", guards: ["confidence"] }, { draft: D("Maybe.", { intent: "other", kbIdsUsed: [], confidence: 0.2 }) }),
-  S("gap-no-follow-up-when-known", "knowledge gap", "any buggy transfers?", { action: "handoff", excludes: ["how many people will be travelling"] }, { known: "2 travellers, Ramadan 2027", draft: D("Let me check.", { intent: "other", kbIdsUsed: [], leadFields: { travelDates: "Ramadan 2027", travelers: 2 } as AgentDraft["leadFields"] }) }),
+  S("gap-no-follow-up-when-known", "knowledge gap", "any buggy transfers?", { action: "any", excludes: ["how many people will be travelling"] }, { known: "2 travellers, Ramadan 2027", draft: D("Let me check.", { intent: "other", kbIdsUsed: [], leadFields: { travelDates: "Ramadan 2027", travelers: 2 } as AgentDraft["leadFields"] }) }),
   S("gap-partial-answer-ok", "knowledge gap", "ramadan package for two, and do you do airport pickup in jeddah?", { action: "reply", includes: ["7,900", "team will confirm"] }, { draft: D("The Ramadan Umrah 2027 is £7,900 for two. I'll check airport pickup in Jeddah and our team will confirm.", { intent: "pricing" }) }),
 
   // --- scope and manipulation
