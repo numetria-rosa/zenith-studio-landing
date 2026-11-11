@@ -1,8 +1,11 @@
 import { Icon, type IconName } from "@/components/obsidian/Icon";
 import { SectionHead } from "@/components/obsidian/SectionHead";
-import { courseContent, totalPages } from "./data";
+import { totalPages, type CourseDetails } from "./data";
 
-export function Inside() {
+const COLUMNS: Record<number, string> = { 1: "xl:grid-cols-1", 2: "xl:grid-cols-2", 3: "xl:grid-cols-3", 4: "xl:grid-cols-4", 5: "xl:grid-cols-5" };
+
+export function Inside({ details }: { details: CourseDetails }) {
+  const pages = totalPages(details);
   return (
     <section id="inside" className="relative overflow-hidden bg-void">
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,#000_20%,#000_80%,transparent)]">
@@ -14,11 +17,11 @@ export function Inside() {
       <div className="relative mx-auto flex max-w-[1440px] flex-col gap-14 px-5 py-24 lg:px-20">
         <SectionHead
           eyebrow="Inside the course"
-          title={`${courseContent.appSections.length} sections, ${totalPages} real pages.`}
+          title={`${details.appSections.length} sections, ${pages} real pages.`}
           intro="The course is an app, not a video playlist. Every page has one job, from where you left off to proof you can show."
         />
-        <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-5">
-          {courseContent.appSections.map((section) => (
+        <div className={`grid items-start gap-4 md:grid-cols-2 ${COLUMNS[details.appSections.length] ?? "xl:grid-cols-5"}`}>
+          {details.appSections.map((section) => (
             <div key={section.name} className="glass flex min-w-0 flex-col gap-4 rounded-[26px] p-6">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3">
                 <h3 className="m-0 text-[28px] font-medium tracking-[-0.03em]">{section.name}</h3>
@@ -37,7 +40,7 @@ export function Inside() {
                   </span>
                   <div className="flex flex-col gap-[3px]">
                     <b className="text-[16px] font-medium">{page.name}</b>
-                    <span className="text-[14px] leading-[1.5] text-mist">{page.description}</span>
+                    {page.description && <span className="text-[14px] leading-[1.5] text-mist">{page.description}</span>}
                   </div>
                 </div>
               ))}

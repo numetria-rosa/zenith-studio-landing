@@ -28,6 +28,8 @@ import { COURSE_RAIL_DATA } from "@/lib/course-rail-data";
 import { COURSE_PAGE_DESCRIPTIONS } from "@/lib/course-page-descriptions";
 import { courses } from "../courses-data";
 import { CurriculumAccordion } from "./CurriculumAccordion";
+import { CourseDetailsPage as NewCourseDetailsPage } from "@/components/course-details/CourseDetailsPage";
+import { getCourseDetails } from "@/components/course-details/data";
 
 const SITE_URL = "https://zenith-studio.site";
 
@@ -86,6 +88,9 @@ export default async function CourseDetailsPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { courseId } = await params;
+  // Every published course gets the new design; courses without a curriculum yet keep this page.
+  const details = getCourseDetails(courseId);
+  if (details) return <NewCourseDetailsPage details={details} searchParams={await searchParams} />;
   const course = findCourse(courseId);
   if (!course) notFound();
 

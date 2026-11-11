@@ -9,7 +9,12 @@
    Created via scripts/create-whop-bundles.mjs on 2026-09-03. Prices are
    15% off the sum of the bundled courses' live per-course prices at
    creation time - not automated, so if a course's individual price
-   changes later, a bundle's price does not silently follow it. */
+   changes later, a bundle's price does not silently follow it.
+
+   2026-11-11: AI Engineering + AI Automation raised to $92.86 = 15% off
+   ($72 AI Engineering + $37.25 AI Automation), on Whop plan
+   plan_NFGFagPrJyNM5. The SWE + AI Engineering bundle is $82.24 = 15% off
+   ($72 + $24.75 AI-Assisted Software Engineering), plan_GnqESzu68VSrz. */
 
 export type Bundle = {
   id: string; // stable internal id, distinct from any Course.id
@@ -34,7 +39,7 @@ export const BUNDLES: Bundle[] = [
     description:
       "Full access to AI Engineering and AI Automation, bundled at 15% off buying them separately.",
     courseIds: ["ai-engineering", "ai-automation"],
-    price: "$56.10",
+    price: "$92.86",
     whopAccessPassId: "prod_vTnpT739BU4eM",
     whopPlanId: "plan_NFGFagPrJyNM5",
     checkoutUrl: "https://whop.com/checkout/ch_clT6JZX5ajWpEVz/",
@@ -45,7 +50,7 @@ export const BUNDLES: Bundle[] = [
     description:
       "Full access to AI-Assisted Software Engineering and AI Engineering, bundled at 15% off buying them separately.",
     courseIds: ["ai-assisted-software-engineering", "ai-engineering"],
-    price: "$45.48",
+    price: "$82.24",
     whopAccessPassId: "prod_WiyrjnVMppopW",
     whopPlanId: "plan_GnqESzu68VSrz",
     checkoutUrl: "https://whop.com/checkout/ch_CVSTtl6itCjaBCA/",

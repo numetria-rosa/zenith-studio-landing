@@ -3,11 +3,11 @@ import { Icon } from "@/components/obsidian/Icon";
 import { Chip } from "@/components/obsidian/Pill";
 import { Eyebrow } from "@/components/obsidian/Eyebrow";
 import { SectionHead } from "@/components/obsidian/SectionHead";
-import { courseContent } from "./data";
+import type { CourseDetails } from "./data";
 import { PriceLockup, type Price } from "./PriceLockup";
 
-export function Outcomes({ checkoutHref, price }: { checkoutHref: string; price: Price | null }) {
-  const { careerPath } = courseContent;
+export function Outcomes({ details, checkoutHref, ctaLabel, price }: { details: CourseDetails; checkoutHref: string; ctaLabel: string; price: Price | null }) {
+  const { careerPath } = details;
   return (
     <section id="outcomes" className="relative overflow-hidden bg-void">
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,#000_20%,#000_80%,transparent)]">
@@ -20,10 +20,10 @@ export function Outcomes({ checkoutHref, price }: { checkoutHref: string; price:
         <SectionHead
           eyebrow="What you’ll actually do"
           title="Skills you ship, not slides you watch."
-          intro={`${numberWord(courseContent.outcomes.length)} things you can do by the end, each one practised on a real product rather than a toy example.`}
+          intro={details.copy.outcomesIntro}
         />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {courseContent.outcomes.map((o) => (
+          {details.outcomes.map((o) => (
             <div key={o} className="glass flex flex-col gap-[18px] rounded-[22px] p-6">
               <span className="flex h-[42px] w-[42px] items-center justify-center rounded-xl border border-[rgba(199,176,255,0.35)] bg-[rgba(139,92,246,0.12)]">
                 <Icon name="check" size={18} color="#C7B0FF" strokeWidth={2.2} />
@@ -34,7 +34,7 @@ export function Outcomes({ checkoutHref, price }: { checkoutHref: string; price:
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
           <span className="mr-2 font-mono text-[12px] uppercase tracking-[0.14em] text-dim">Tools and topics covered</span>
-          {courseContent.topics.map((t) => (
+          {details.topics.map((t) => (
             <Chip key={t}>{t}</Chip>
           ))}
         </div>
@@ -45,11 +45,11 @@ export function Outcomes({ checkoutHref, price }: { checkoutHref: string; price:
           <div className="flex flex-col gap-4">
             <Eyebrow className="text-violet-text">Why it matters</Eyebrow>
             <h2 className="m-0 text-[40px] font-medium leading-[1.04] tracking-[-0.045em] sm:text-[52px]">
-              The gap between a demo and a product.
+              {details.copy.whyTitle}
             </h2>
           </div>
           <ol className="m-0 list-none p-0">
-            {courseContent.whyItMatters.map((w, i) => (
+            {details.whyItMatters.map((w, i) => (
               <li
                 key={w}
                 className={`grid grid-cols-[56px_minmax(0,1fr)] items-baseline gap-4 py-5 ${i > 0 ? "border-t border-white/[0.08]" : ""}`}
@@ -78,7 +78,7 @@ export function Outcomes({ checkoutHref, price }: { checkoutHref: string; price:
             <div className="flex shrink-0 flex-col gap-3">
               {price && <PriceLockup price={price} compact />}
               <Button href={checkoutHref} size="xl" arrow>
-                Start the course
+                {ctaLabel}
               </Button>
               <Button href="#curriculum" variant="glass" size="xl">
                 See the curriculum
@@ -91,6 +91,3 @@ export function Outcomes({ checkoutHref, price }: { checkoutHref: string; price:
   );
 }
 
-function numberWord(n: number) {
-  return ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"][n] ?? String(n);
-}

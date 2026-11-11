@@ -1,17 +1,17 @@
 import { Button } from "@/components/obsidian/Button";
 import { Icon } from "@/components/obsidian/Icon";
 import { StatStrip } from "@/components/obsidian/StatStrip";
-import { courseContent, numberedModules, totalHours, totalPages } from "./data";
+import { numberedModules, totalHours, type CourseDetails } from "./data";
 import { PriceLockup, type Price } from "./PriceLockup";
 
-export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Price | null }) {
-  const stats = [
-    { value: String(numberedModules.length), label: "modules" },
-    { value: String(totalPages), label: "in-app pages" },
-    { value: totalHours, label: "of module content" },
-  ];
-  const stack = [...numberedModules].reverse();
-  const capstoneNumber = numberedModules[numberedModules.length - 1].number;
+export function Hero({ details, checkoutHref, ctaLabel, price }: { details: CourseDetails; checkoutHref: string; ctaLabel: string; price: Price | null }) {
+  const modules = numberedModules(details);
+  const stack = [...modules].reverse();
+  const capstoneNumber = details.capstone ? modules[modules.length - 1].number : null;
+  const longest = Math.max(90, ...modules.map((m) => m.minutes ?? 0));
+  const hours = totalHours(details);
+  const [first, ...rest] = details.title.split(" ");
+  const second = rest.join(" ");
 
   return (
     <section id="overview" className="relative overflow-hidden bg-void">
@@ -36,26 +36,36 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
           <div className="flex w-full flex-col gap-7 min-[1100px]:min-w-0 min-[1100px]:flex-[0_1_640px]">
             <span className="glass inline-flex items-center gap-2.5 self-start rounded-full py-2 pl-3 pr-4 font-mono text-[12.5px] uppercase tracking-[0.14em] text-soft">
               <span className="h-2 w-2 rounded-[4px] bg-violet shadow-[0_0_12px_#8B5CF6]" />
-              {courseContent.kicker}
+              {details.kicker}
             </span>
-            <h1 className="m-0 text-[clamp(48px,17vw,64px)] font-medium leading-[0.95] tracking-[-0.055em] sm:text-[clamp(64px,7.78vw,112px)]">
-              AI
-              <br />
-              <span className="bg-[linear-gradient(100deg,#F5F6F8_0%,#C7B0FF_45%,#9BDDFF_100%)] bg-clip-text text-transparent">
-                Engineering
-              </span>
+            <h1
+              className={`m-0 font-medium leading-[0.95] tracking-[-0.055em] ${
+                second.length > 14
+                  ? "text-[clamp(40px,12vw,56px)] sm:text-[clamp(52px,5.6vw,80px)]"
+                  : "text-[clamp(48px,17vw,64px)] sm:text-[clamp(64px,7.78vw,112px)]"
+              }`}
+            >
+              {first}
+              {second && (
+                <>
+                  <br />
+                  <span className="bg-[linear-gradient(100deg,#F5F6F8_0%,#C7B0FF_45%,#9BDDFF_100%)] bg-clip-text text-transparent">
+                    {second}
+                  </span>
+                </>
+              )}
             </h1>
-            <p className="m-0 max-w-[580px] text-[20px] leading-[1.55] text-soft">{courseContent.tagline}</p>
+            <p className="m-0 max-w-[580px] text-[20px] leading-[1.55] text-soft">{details.tagline}</p>
             <div className="flex flex-wrap items-start gap-x-3 gap-y-4">
               <Button href={checkoutHref} arrow>
-                Start the course
+                {ctaLabel}
               </Button>
               <Button href="#curriculum" variant="glass">
                 See the curriculum
               </Button>
               {price && <PriceLockup price={price} className="ml-2 self-center" />}
             </div>
-            <StatStrip stats={stats} />
+            <StatStrip stats={details.stats} />
           </div>
 
           {/* stack card */}
@@ -69,16 +79,16 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
           >
             <div className="mb-2 flex items-center justify-between gap-3 border-b border-white/[0.08] px-4 pb-3.5">
               <span className="font-mono text-[13px] uppercase tracking-[0.16em] text-violet-text">
-                The stack you’ll build, bottom up
+                What you’ll build, bottom up
               </span>
               <span className="inline-flex shrink-0 items-center gap-2 text-[13px] text-mist">
                 <Icon name="clock" size={15} color="#A9AEBA" />
-                {totalHours} total
+                {hours} total
               </span>
             </div>
             {stack.map((m) => {
               const capstone = m.number === capstoneNumber;
-              const width = `${Math.round(((m.minutes ?? 0) / 90) * 100)}%`;
+              const width = `${Math.round(((m.minutes ?? 0) / longest) * 100)}%`;
               return (
                 <div
                   key={m.number}
@@ -95,14 +105,16 @@ export function Hero({ checkoutHref, price }: { checkoutHref: string; price: Pri
                   <span className="hidden h-1.5 overflow-hidden rounded-[3px] bg-white/[0.07] sm:block">
                     <span className="block h-full rounded-[3px]" style={{ width, background: capstone ? "#3DDC97" : m.stage.color }} />
                   </span>
-                  <span className="text-right font-mono text-[12px] text-mist">{m.minutes}m</span>
+                  <span className="text-right font-mono text-[12px] text-mist">{m.minutes ? `${m.minutes}m` : ""}</span>
                 </div>
               );
             })}
-            <div className="mt-2 flex items-center gap-2.5 border-t border-white/[0.08] px-4 pt-3.5 text-[13.5px] text-mist">
-              <span className="h-2 w-2 rounded-[4px] bg-stage-orientation" />
-              Starts with Module 0 · Orientation
-            </div>
+            {details.stages[0]?.modules[0]?.number === 0 && (
+              <div className="mt-2 flex items-center gap-2.5 border-t border-white/[0.08] px-4 pt-3.5 text-[13.5px] text-mist">
+                <span className="h-2 w-2 rounded-[4px] bg-stage-orientation" />
+                Starts with Module 0 · {details.stages[0].modules[0].title}
+              </div>
+            )}
           </div>
         </div>
       </div>

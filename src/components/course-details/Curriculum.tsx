@@ -3,12 +3,12 @@ import { Pill } from "@/components/obsidian/Pill";
 import { SectionHead } from "@/components/obsidian/SectionHead";
 import { StageBadge } from "@/components/obsidian/StageBadge";
 import { getFinalModule } from "@/lib/aie/final-module";
-import { allModules, courseContent, type Module } from "./data";
+import { allModules, type CourseDetails, type Module } from "./data";
 
 const MINT = "#3DDC97";
 const VIOLET = "#C7B0FF";
 
-function ModuleCard({ m, color, capstone }: { m: Module; color: string; capstone: boolean }) {
+function ModuleCard({ m, color, capstone, rubric }: { m: Module; color: string; capstone: boolean; rubric: string[] }) {
   return (
     <div
       className={`flex min-w-0 flex-1 flex-col gap-3.5 rounded-3xl p-[26px] ${capstone ? "" : "glass"}`}
@@ -24,20 +24,20 @@ function ModuleCard({ m, color, capstone }: { m: Module; color: string; capstone
     >
       <div className="flex items-center justify-between">
         <StageBadge color={color}>{m.number}</StageBadge>
-        {m.minutes === null ? (
-          <Pill>Start here</Pill>
-        ) : (
+        {m.minutes !== null ? (
           <Pill>
             <Icon name="clock" size={13} color="#A9AEBA" />
             {m.minutes}m
           </Pill>
-        )}
+        ) : m.number === 0 ? (
+          <Pill>Start here</Pill>
+        ) : null}
       </div>
       <h3 className="m-0 text-[23px] font-medium leading-[1.2] tracking-[-0.02em]">{m.title}</h3>
       <p className="m-0 text-[15.5px] leading-[1.6] text-mist">{m.summary}</p>
-      {capstone && (
+      {capstone && rubric.length > 0 && (
         <ul className="m-0 mt-1 flex list-none flex-wrap gap-2 p-0">
-          {courseContent.capstoneRubric.map((r) => (
+          {rubric.map((r) => (
             <li
               key={r}
               className="inline-flex items-center gap-2 rounded-full border border-[rgba(61,220,151,0.30)] bg-[rgba(61,220,151,0.08)] px-[13px] py-[7px] text-[13.5px] text-mint-text"
@@ -52,9 +52,10 @@ function ModuleCard({ m, color, capstone }: { m: Module; color: string; capstone
   );
 }
 
-export async function Curriculum() {
-  const finalModule = await getFinalModule();
-  const lastNumber = allModules[allModules.length - 1].number;
+export async function Curriculum({ details }: { details: CourseDetails }) {
+  const finalModule = details.finalModule ? await getFinalModule() : null;
+  const modules = allModules(details);
+  const lastNumber = details.capstone ? modules[modules.length - 1].number : null;
   return (
     <section id="curriculum" className="relative overflow-hidden bg-void">
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,#000_20%,#000_80%,transparent)]">
@@ -66,8 +67,8 @@ export async function Curriculum() {
       <div className="relative mx-auto flex max-w-[1440px] flex-col gap-[72px] px-5 py-24 lg:px-20">
         <SectionHead
           eyebrow="Full curriculum"
-          title={`${allModules.length} modules, in order.`}
-          intro="Orientation first, then four stages that each build on the last, ending in a capstone graded against a rubric, not vibes."
+          title={`${modules.length} modules, in order.`}
+          intro={details.copy.curriculumIntro}
         />
         <div className="relative flex flex-col gap-9">
           <div
@@ -75,7 +76,7 @@ export async function Curriculum() {
             className="absolute bottom-[60px] left-1 top-[22px] hidden w-px lg:block"
             style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18), rgba(61,220,151,0.5))" }}
           />
-          {courseContent.stages.map((stage) => (
+          {details.stages.map((stage) => (
             <div key={stage.label} className="grid items-start gap-5 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
               <div className="flex flex-col gap-2.5 lg:pt-2.5">
                 <span className="inline-flex items-center gap-2.5 font-mono text-[13px] uppercase tracking-[0.14em] text-mist">
@@ -91,11 +92,13 @@ export async function Curriculum() {
                     m={m}
                     color={m.number === lastNumber ? MINT : stage.color}
                     capstone={m.number === lastNumber}
+                    rubric={details.capstoneRubric}
                   />
                 ))}
               </div>
             </div>
           ))}
+          {finalModule && (
           <div className="grid items-start gap-5 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
             <div className="flex flex-col gap-2.5 lg:pt-2.5">
               <span className="inline-flex items-center gap-2.5 font-mono text-[13px] uppercase tracking-[0.14em] text-mist">
@@ -132,6 +135,7 @@ export async function Curriculum() {
               </ul>
             </div>
           </div>
+          )}
         </div>
       </div>
     </section>
