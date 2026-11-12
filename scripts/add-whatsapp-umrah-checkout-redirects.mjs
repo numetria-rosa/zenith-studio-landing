@@ -30,6 +30,7 @@ const PLANS = [
   { label: "Starter CA (CAD 83)", id: "plan_EJqJLamM10oue" },
   { label: "Starter AU (AUD 85)", id: "plan_wUxGQaV27I2j0" },
   { label: "Starter ZA (ZAR 900)", id: "plan_PBW3VzzefZNSU" },
+  { label: "Starter FR (EUR 45)", id: "plan_JDrOfJnw6iWT7" },
 ];
 
 async function main() {

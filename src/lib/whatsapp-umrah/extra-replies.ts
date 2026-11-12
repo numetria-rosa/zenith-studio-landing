@@ -24,9 +24,10 @@ export const EXTRA_PACK_PLAN_IDS: Record<PlanCurrency, string> = {
   CAD: "plan_sf3pVQ9nQF3tp",
   AUD: "plan_pa7hufGHN0VYk",
   ZAR: "plan_5ATKWORbTZGhr",
+  EUR: "plan_Ylau7D9dAEbpr",
 };
 
-const CURRENCIES: PlanCurrency[] = ["GBP", "USD", "CAD", "AUD", "ZAR"];
+const CURRENCIES: PlanCurrency[] = ["GBP", "USD", "CAD", "AUD", "ZAR", "EUR"];
 
 /** What a pack costs this agency, in the currency it pays its plan in. */
 export async function extraPackOffer(agencyId: string): Promise<{ currency: PlanCurrency; price: number; replies: number }> {
@@ -35,7 +36,7 @@ export async function extraPackOffer(agencyId: string): Promise<{ currency: Plan
   return { currency, price: EXTRA_PACK_PRICE_LOCAL[currency], replies: EXTRA_PACK_REPLIES };
 }
 
-const SYMBOL: Record<PlanCurrency, string> = { GBP: "£", USD: "$", CAD: "$", AUD: "$", ZAR: "R" };
+const SYMBOL: Record<PlanCurrency, string> = { GBP: "£", USD: "$", CAD: "$", AUD: "$", ZAR: "R", EUR: "€" };
 /** "£6", "$9", "$12 CAD", "$13 AUD", "R140": the symbol, then the code where "$" alone would be ambiguous. */
 export function formatPackPrice(currency: PlanCurrency, price: number): string {
   return `${SYMBOL[currency]}${price.toLocaleString("en-GB")}${currency === "CAD" || currency === "AUD" ? ` ${currency}` : ""}`;

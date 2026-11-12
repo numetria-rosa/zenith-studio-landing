@@ -33,7 +33,7 @@ describe("the 80% margin rule", () => {
 });
 
 // Starter is sold in five currencies, each priced below 49 pounds outside the UK, so each gets a budget sized to its own price.
-const CURRENCIES: PlanCurrency[] = ["GBP", "USD", "CAD", "AUD", "ZAR"];
+const CURRENCIES: PlanCurrency[] = ["GBP", "USD", "CAD", "AUD", "ZAR", "EUR"];
 describe("Starter in every currency", () => {
   it.each(CURRENCIES)("%s keeps at least 80% even when its whole AI budget is spent", (currency) => {
     expect(marginAt("STARTER", aiBudgetGbp("STARTER", currency), currency)).toBeGreaterThanOrEqual(MIN_MARGIN);
@@ -42,10 +42,10 @@ describe("Starter in every currency", () => {
     expect(replyCapFor("STARTER") * PLANNING_COST_PER_REPLY_GBP).toBeLessThanOrEqual(aiBudgetGbp("STARTER", currency));
   });
   it("the local prices are the ones set for the demo pages and the Whop plans", () => {
-    expect(STARTER_PRICE_LOCAL).toEqual({ GBP: 49, USD: 52, CAD: 83, AUD: 85, ZAR: 900 });
+    expect(STARTER_PRICE_LOCAL).toEqual({ GBP: 49, USD: 52, CAD: 83, AUD: 85, ZAR: 900, EUR: 45 });
   });
   it("the pound values are no higher than the local prices converted at a strong-pound rate", () => {
-    const strongPoundRate = { GBP: 1, USD: 1.37, CAD: 1.9, AUD: 2.07, ZAR: 22.5 };
+    const strongPoundRate = { GBP: 1, USD: 1.37, CAD: 1.9, AUD: 2.07, ZAR: 22.5, EUR: 1.2 };
     for (const c of CURRENCIES) expect(STARTER_PRICE_GBP_EQUIV[c]).toBeLessThanOrEqual(STARTER_PRICE_LOCAL[c] / strongPoundRate[c] + 0.01);
   });
 });
@@ -58,10 +58,10 @@ describe("extra reply packs", () => {
     expect(EXTRA_PACK_REPLIES * PLANNING_COST_PER_REPLY_GBP).toBeLessThanOrEqual(extraPackBudgetGbp(currency));
   });
   it("the local prices are the ones set for the dashboard and the pages", () => {
-    expect(EXTRA_PACK_PRICE_LOCAL).toEqual({ GBP: 6, USD: 9, CAD: 12, AUD: 13, ZAR: 140 });
+    expect(EXTRA_PACK_PRICE_LOCAL).toEqual({ GBP: 6, USD: 9, CAD: 12, AUD: 13, ZAR: 140, EUR: 8 });
   });
   it("the pound values are no higher than the local prices converted at a strong-pound rate", () => {
-    const strongPoundRate = { GBP: 1, USD: 1.37, CAD: 1.9, AUD: 2.07, ZAR: 22.5 };
+    const strongPoundRate = { GBP: 1, USD: 1.37, CAD: 1.9, AUD: 2.07, ZAR: 22.5, EUR: 1.2 };
     for (const c of CURRENCIES) expect(EXTRA_PACK_PRICE_GBP_EQUIV[c]).toBeLessThanOrEqual(EXTRA_PACK_PRICE_LOCAL[c] / strongPoundRate[c] + 0.01);
   });
 });

@@ -26,6 +26,7 @@ export const COUNTRY_STARTER_PLAN_IDS: Record<Exclude<PlanCurrency, "GBP">, stri
   CAD: "plan_EJqJLamM10oue",
   AUD: "plan_wUxGQaV27I2j0",
   ZAR: "plan_PBW3VzzefZNSU",
+  EUR: "plan_JDrOfJnw6iWT7", // France, EUR 45 (scripts/create-whatsapp-umrah-fr-plans.mjs)
 };
 
 export function currencyForWhopPlanId(planId: string | null | undefined): PlanCurrency {
@@ -34,10 +35,10 @@ export function currencyForWhopPlanId(planId: string | null | undefined): PlanCu
   return "GBP";
 }
 
-/** The market an agency signed up in, read from the Whop plan it first bought: UK/GBP, US/USD, CA/CAD, AU/AUD, ZA/ZAR.
+/** The market an agency signed up in, read from the Whop plan it first bought: UK/GBP, US/USD, CA/CAD, AU/AUD, ZA/ZAR, FR/EUR.
     Null when the agency has no Whop plan on record (for example one an admin created by hand), so no tag is shown
     rather than a wrong one. The extra-replies pack is priced in the same currency (extra-replies.ts). */
-const MARKET_FOR_CURRENCY: Record<PlanCurrency, string> = { GBP: "UK", USD: "US", CAD: "CA", AUD: "AU", ZAR: "ZA" };
+const MARKET_FOR_CURRENCY: Record<PlanCurrency, string> = { GBP: "UK", USD: "US", CAD: "CA", AUD: "AU", ZAR: "ZA", EUR: "FR" };
 export function marketForWhopPlanId(planId: string | null | undefined): { market: string; currency: PlanCurrency } | null {
   if (!planId) return null;
   if (planId !== process.env.WHATSAPP_UMRAH_STARTER_PLAN_ID && currencyForWhopPlanId(planId) === "GBP") return null;

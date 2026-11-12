@@ -17,9 +17,10 @@ export const TIMEZONE_OPTIONS = [
   { id: "Australia/Adelaide", label: "Australia Central (Adelaide)", market: "AU" },
   { id: "Australia/Perth", label: "Australia West (Perth)", market: "AU" },
   { id: "Africa/Johannesburg", label: "South Africa (Johannesburg)", market: "ZA" },
+  { id: "Europe/Paris", label: "France (Paris)", market: "FR" },
 ] as const;
 
-const MARKET_DEFAULT: Record<string, string> = { UK: "Europe/London", US: "America/New_York", CA: "America/Toronto", AU: "Australia/Sydney", ZA: "Africa/Johannesburg" };
+const MARKET_DEFAULT: Record<string, string> = { UK: "Europe/London", US: "America/New_York", CA: "America/Toronto", AU: "Australia/Sydney", ZA: "Africa/Johannesburg", FR: "Europe/Paris" };
 
 /** The zone to read hours in: the one the owner saved, else the main zone of their market, else London. */
 export function resolveTimezone(saved: string | null | undefined, market: string | null | undefined): string {

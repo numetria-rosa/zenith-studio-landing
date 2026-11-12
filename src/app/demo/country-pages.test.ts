@@ -8,6 +8,7 @@ const EXPECT = {
   ca: { plan: "$83", words: "Canadian dollars", city: "Toronto", checkout: "ch_5gz3oRodm3dR7lb", pack: "$12 CAD" },
   au: { plan: "$85", words: "Australian dollars", city: "Sydney", checkout: "ch_3EmEku0gszYMzjv", pack: "$13 AUD" },
   za: { plan: "R900", words: "rand", city: "Johannesburg", checkout: "ch_Li6eHzPXGuRRKpT", pack: "R140" },
+  fr: { plan: "€45", words: "euros", city: "Paris", checkout: "ch_6TXEjCU7jRskGZY", pack: "€8" },
 } as const;
 
 describe.each(Object.entries(EXPECT))("demo page: %s", (cc, e) => {

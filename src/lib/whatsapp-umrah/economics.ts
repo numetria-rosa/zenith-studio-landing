@@ -12,13 +12,13 @@ export const MIN_MARGIN = 0.8;
 
 export const PLAN_PRICE_GBP: Record<WaPlan, number> = { STARTER: 49, GROWTH: 99, PRO: 199 };
 
-/** The Starter plan is sold in five currencies, each its own Whop plan (see scripts/create-whatsapp-umrah-country-plans.mjs).
+/** The Starter plan is sold in six currencies, each its own Whop plan (see scripts/create-whatsapp-umrah-country-plans.mjs).
     What the owner charges in each, and what that is worth in pounds at a strong-pound exchange rate (1.37 USD, 1.90 CAD,
-    2.07 AUD, 22.5 ZAR to the pound, rounded down to 50p), so the margin rule holds even if the pound is strong. The AI budget
+    2.07 AUD, 22.5 ZAR, 1.20 EUR to the pound, rounded down to 50p), so the margin rule holds even if the pound is strong. The AI budget
     for a currency is worked out from its pound value, not from 49, because the other currencies are priced below it. */
-export type PlanCurrency = "GBP" | "USD" | "CAD" | "AUD" | "ZAR";
-export const STARTER_PRICE_LOCAL: Record<PlanCurrency, number> = { GBP: 49, USD: 52, CAD: 83, AUD: 85, ZAR: 900 };
-export const STARTER_PRICE_GBP_EQUIV: Record<PlanCurrency, number> = { GBP: 49, USD: 37.5, CAD: 43.5, AUD: 41, ZAR: 40 };
+export type PlanCurrency = "GBP" | "USD" | "CAD" | "AUD" | "ZAR" | "EUR";
+export const STARTER_PRICE_LOCAL: Record<PlanCurrency, number> = { GBP: 49, USD: 52, CAD: 83, AUD: 85, ZAR: 900, EUR: 45 };
+export const STARTER_PRICE_GBP_EQUIV: Record<PlanCurrency, number> = { GBP: 49, USD: 37.5, CAD: 43.5, AUD: 41, ZAR: 40, EUR: 37.5 };
 
 /** What the plan is worth to us in pounds, in the currency it was bought in (only Starter is sold in other currencies). */
 export function planPriceGbp(plan: WaPlan, currency: PlanCurrency = "GBP"): number {
@@ -72,9 +72,9 @@ export function marginAt(plan: WaPlan, aiSpendGbp: number, currency: PlanCurrenc
    agent still pauses when the extra spend runs out, whatever the reply count. */
 export const EXTRA_PACK_REPLIES = 500;
 export const EXTRA_PACK_MIN_MARGIN = 0.6;
-export const EXTRA_PACK_PRICE_LOCAL: Record<PlanCurrency, number> = { GBP: 6, USD: 9, CAD: 12, AUD: 13, ZAR: 140 };
-/** What a pack is worth in pounds at a strong-pound rate (1.37 USD, 1.90 CAD, 2.07 AUD, 22.5 ZAR), rounded down to 50p. */
-export const EXTRA_PACK_PRICE_GBP_EQUIV: Record<PlanCurrency, number> = { GBP: 6, USD: 6.5, CAD: 6, AUD: 6, ZAR: 6 };
+export const EXTRA_PACK_PRICE_LOCAL: Record<PlanCurrency, number> = { GBP: 6, USD: 9, CAD: 12, AUD: 13, ZAR: 140, EUR: 8 };
+/** What a pack is worth in pounds at a strong-pound rate (1.37 USD, 1.90 CAD, 2.07 AUD, 22.5 ZAR, 1.20 EUR), rounded down to 50p. */
+export const EXTRA_PACK_PRICE_GBP_EQUIV: Record<PlanCurrency, number> = { GBP: 6, USD: 6.5, CAD: 6, AUD: 6, ZAR: 6, EUR: 6.5 };
 
 /** AI spend one pack can carry and still keep EXTRA_PACK_MIN_MARGIN, in pounds, rounded down to 25p. */
 export function extraPackBudgetGbp(currency: PlanCurrency = "GBP"): number {

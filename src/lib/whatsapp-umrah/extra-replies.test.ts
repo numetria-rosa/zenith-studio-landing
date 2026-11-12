@@ -70,8 +70,8 @@ describe("the pack follows the plan the agency first bought", () => {
 describe("the Whop plans", () => {
   it("every currency has its own plan id", () => {
     const ids = Object.values(EXTRA_PACK_PLAN_IDS);
-    expect(Object.keys(EXTRA_PACK_PLAN_IDS).sort()).toEqual(["AUD", "CAD", "GBP", "USD", "ZAR"]);
-    expect(new Set(ids).size).toBe(5);
+    expect(Object.keys(EXTRA_PACK_PLAN_IDS).sort()).toEqual(["AUD", "CAD", "EUR", "GBP", "USD", "ZAR"]);
+    expect(new Set(ids).size).toBe(6);
     for (const id of ids) expect(id).toMatch(/^plan_[A-Za-z0-9]+$/);
   });
 });
@@ -83,5 +83,6 @@ describe("the price label", () => {
     expect(formatPackPrice("CAD", 12)).toBe("$12 CAD");
     expect(formatPackPrice("AUD", 13)).toBe("$13 AUD");
     expect(formatPackPrice("ZAR", 140)).toBe("R140");
+    expect(formatPackPrice("EUR", 8)).toBe("€8");
   });
 });

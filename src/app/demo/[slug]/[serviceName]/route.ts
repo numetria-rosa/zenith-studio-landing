@@ -19,6 +19,7 @@ const PAGES: Record<string, Record<string, string>> = {
   ca: { "whatsapp-umrah-agent": "ca/whatsapp-umrah-agent.html" },
   au: { "whatsapp-umrah-agent": "au/whatsapp-umrah-agent.html" },
   za: { "whatsapp-umrah-agent": "za/whatsapp-umrah-agent.html" },
+  fr: { "whatsapp-umrah-agent": "fr/whatsapp-umrah-agent.html" },
 };
 
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string; serviceName: string }> }) {

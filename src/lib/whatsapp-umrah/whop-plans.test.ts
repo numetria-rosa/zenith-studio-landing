@@ -33,6 +33,7 @@ describe("currency plans", () => {
     expect(currencyForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.CAD)).toBe("CAD");
     expect(currencyForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.AUD)).toBe("AUD");
     expect(currencyForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.ZAR)).toBe("ZAR");
+    expect(currencyForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.EUR)).toBe("EUR");
   });
 
   it("the UK plan, an unknown plan and no plan are GBP", () => {
@@ -53,6 +54,7 @@ describe("the market tag", () => {
     expect(marketForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.CAD)).toEqual({ market: "CA", currency: "CAD" });
     expect(marketForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.AUD)).toEqual({ market: "AU", currency: "AUD" });
     expect(marketForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.ZAR)).toEqual({ market: "ZA", currency: "ZAR" });
+    expect(marketForWhopPlanId(COUNTRY_STARTER_PLAN_IDS.EUR)).toEqual({ market: "FR", currency: "EUR" });
   });
 
   it("shows no tag when there is no plan on record or it is not one of ours", () => {

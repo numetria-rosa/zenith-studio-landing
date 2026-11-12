@@ -19,6 +19,7 @@ const COUNTRIES = {
   ca: { checkout: "https://whop.com/checkout/ch_5gz3oRodm3dR7lb/", name: "Canadian", symbol: "$", code: "CAD", words: "Canadian dollars", price: 83, pack: "$12 CAD", rate: 1.85, tld: "ca", unit: "CAD / month", cities: ["Toronto", "Montreal", "Mississauga", "Calgary", "Ottawa"] },
   au: { checkout: "https://whop.com/checkout/ch_3EmEku0gszYMzjv/", name: "Australian", symbol: "$", code: "AUD", words: "Australian dollars", price: 85, pack: "$13 AUD", rate: 2.0, tld: "com.au", unit: "AUD / month", cities: ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide"] },
   za: { checkout: "https://whop.com/checkout/ch_Li6eHzPXGuRRKpT/", name: "South African", symbol: "R", code: "ZAR", words: "rand", price: 900, pack: "R140", rate: 22, tld: "co.za", unit: "/ month", cities: ["Johannesburg", "Cape Town", "Durban", "Pretoria", "Port Elizabeth"] },
+  fr: { checkout: "https://whop.com/checkout/ch_6TXEjCU7jRskGZY/", name: "French", symbol: "€", code: "EUR", words: "euros", price: 45, pack: "€8", rate: 1.15, tld: "fr", unit: "/ month", cities: ["Lyon", "Paris", "Marseille", "Lille", "Toulouse"] },
 };
 
 // UK sample cities in the page, mapped by position to the country's cities.
