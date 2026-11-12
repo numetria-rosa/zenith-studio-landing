@@ -64,10 +64,10 @@ export default function ZenithStudioLandingPage() {
       name: "WhatsApp AI Agent for Travel Agencies",
       pitch: "Every enquiry answered on WhatsApp, in the customer's own language.",
       description:
-        "Answers from your own packages and FAQs - prices, dates, hotels, cancellation policy - in English, Arabic, Turkish or Urdu, and captures every lead. Never invents an answer; hands off cleanly for anything outside your knowledge base.",
+        "Answers from your own packages and FAQs - prices, dates, hotels, cancellation policy - in English, Arabic, Turkish, Urdu or French, and captures every lead. Never invents an answer; hands off cleanly for anything outside your knowledge base.",
       live: "UK travel agencies",
       features: [
-        "English, Arabic, Turkish, Urdu",
+        "English, Arabic, Turkish, Urdu, French",
         "Captures and qualifies every lead",
         "Hands off for fiqh, visa or payment questions",
         "Meta-verified, approved Tech Provider",

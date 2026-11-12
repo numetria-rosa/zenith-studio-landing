@@ -115,6 +115,10 @@ export const SCENARIOS: Scenario[] = [
   S("lang-ar-invented-digits", "languages", "كم السعر؟", { action: "handoff", guards: ["grounding"], language: "ar" }, { draft: D("السعر ٩٩٩٩ جنيه.", { language: "ar", intent: "pricing" }) }),
   S("lang-tr-visa", "languages", "Umre vizesi dahil mi?", { action: "reply", language: "tr" }, { draft: D("Evet, Umre vizesi tüm paketlere dahildir.", { language: "tr", kbIdsUsed: ["f1"] }) }),
   S("lang-ur-visa", "languages", "کیا عمرہ ویزا شامل ہے؟", { action: "reply", language: "ur" }, { draft: D("جی ہاں، عمرہ ویزا تمام پیکجز میں شامل ہے۔", { language: "ur", kbIdsUsed: ["f1"] }) }),
+  S("lang-fr-price", "languages", "Bonjour, combien coûte la Omra du Ramadan ?", { action: "reply", language: "fr", includes: ["3,950"] }, { draft: D("Bonjour ! La Omra du Ramadan 2027 coûte £3,950 par personne.", { language: "fr", intent: "pricing" }) }),
+  S("lang-fr-space-digits", "languages", "Quel est le prix de la Omra du Ramadan ?", { action: "reply", language: "fr" }, { draft: D("La Omra du Ramadan 2027 coûte 3 950 £ par personne.", { language: "fr", intent: "pricing" }) }),
+  S("lang-fr-invented-digits", "languages", "Quel est le prix ?", { action: "handoff", guards: ["grounding"], language: "fr" }, { draft: D("Le prix est de 9 999 £ par personne.", { language: "fr", intent: "pricing" }) }),
+  S("lang-fr-not-enabled", "languages", "Bonjour, le visa est-il inclus ?", { action: "handoff", guards: ["language_disabled"], language: "fr" }, { languages: ["en", "ar", "tr", "ur"], draft: D("Oui, le visa est inclus.", { language: "fr", kbIdsUsed: ["f1"] }) }),
   S("lang-tr-not-enabled", "languages", "Umre vizesi dahil mi?", { action: "handoff", guards: ["language_disabled"], language: "tr" }, { languages: ["en", "ar", "ur"], draft: D("Evet, dahildir.", { language: "tr", kbIdsUsed: ["f1"] }) }),
   S("lang-ar-handoff-holding", "languages", "أريد التحدث مع موظف", { action: "handoff", language: "ar", guards: ["scope"] }, { draft: D("بالطبع، سيتواصل معك أحد أفراد فريقنا.", { language: "ar", intent: "person_request", kbIdsUsed: [] }) }),
 

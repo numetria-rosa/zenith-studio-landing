@@ -9,7 +9,7 @@ const CAN = [
   "Work out totals, deposits and balances for a group, and for adults plus children when you have set child and infant prices.",
   "List every package that fits a vague question (a month, an occasion, a hotel, a budget).",
   "Remember what the customer already said in the chat and not ask it twice.",
-  "Reply in English, Arabic, Turkish or Urdu, matching each message.",
+  "Reply in English, Arabic, Turkish, Urdu or French, matching each message.",
   "Pass the chat to your team with a plain reason and a summary when someone is ready to book, complains, or asks for a person.",
   "Relay your ATOL number if you have put it in your knowledge base.",
 ];

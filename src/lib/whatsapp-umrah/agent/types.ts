@@ -2,7 +2,7 @@
    rules this exists to enforce, and section 4 of the original spec
    (draft -> guards -> escalate -> handoff) for the pipeline shape. */
 
-export const LANGUAGES = ["en", "ar", "tr", "ur"] as const;
+export const LANGUAGES = ["en", "ar", "tr", "ur", "fr"] as const;
 export type Language = (typeof LANGUAGES)[number];
 
 /* Every intent the model can self-report. The three *_question/emergency

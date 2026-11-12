@@ -1,4 +1,4 @@
-import { DRAFT_SYSTEM_PROMPT } from "../../../../prompts/whatsapp-umrah/draft-system-v8";
+import { DRAFT_SYSTEM_PROMPT } from "../../../../prompts/whatsapp-umrah/draft-system-v9";
 import { INTENTS, LANGUAGES, type AgentDraft, type GuardFailure } from "./types";
 import { todayLine, type DraftInput, type DraftResult } from "./draft";
 

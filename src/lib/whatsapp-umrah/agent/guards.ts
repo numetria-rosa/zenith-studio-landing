@@ -106,11 +106,11 @@ export function confidenceCheck(draft: AgentDraft): GuardFailure | null {
     stops there" - nobody follows up on a reply nobody flagged. Matches
     the reply text itself rather than trusting only the structured field,
     same reasoning as scopeGuard not trusting only reply text. */
-// ponytail: English phrases only - confidenceCheck is the only net for a
+// ponytail: English and French phrases only - confidenceCheck is the only net for a
 // hedged reply in Arabic/Turkish/Urdu. Add per-language phrases here if
 // real traffic shows the model hedging in those languages without also
 // reporting low confidence.
-const HEDGE_PHRASES = [/i'm not sure/i, /i don't have that/i, /let me check/i, /i'll check/i, /i will check/i, /not certain/i];
+const HEDGE_PHRASES = [/i'm not sure/i, /i don't have that/i, /let me check/i, /i'll check/i, /i will check/i, /not certain/i, /je ne suis pas s[uû]r/i, /je vais v[ée]rifier/i, /laissez-moi v[ée]rifier/i, /je v[ée]rifie/i];
 export function hedgeCheck(draft: AgentDraft): GuardFailure | null {
   if (draft.kbIdsUsed.length > 0) return null; // "the team will confirm your dates" after a real answer is fine
   // Models commonly emit typographic apostrophes (U+2019 "'") - normalize

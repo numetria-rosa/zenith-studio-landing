@@ -1,5 +1,6 @@
 import type { PipelineResult } from "../types";
 import type { Scenario } from "./scenarios";
+import { toAsciiDigits } from "../digits";
 
 /** The message the customer would actually receive: the reply, or the holding message on a hand-off. */
 export const finalText = (r: PipelineResult) => (r.action === "reply" ? r.text : r.holdingMessage);
@@ -12,7 +13,9 @@ export function checkScenario(s: Scenario, r: PipelineResult, opts: { modelCalle
   const text = finalText(r);
   if (e.action !== "any" && r.action !== e.action) bad.push(`expected ${e.action}, got ${r.action}${r.action === "handoff" ? ` (${r.reason})` : ""}`);
   for (const g of e.guards ?? []) if (!r.guardsTriggered.includes(g)) bad.push(`guard "${g}" did not fire (fired: ${r.guardsTriggered.join(", ") || "none"})`);
-  for (const t of e.includes ?? []) if (!text.includes(t)) bad.push(`reply is missing "${t}"`);
+  // A French reply writes £3 950 for £3,950: compare numbers the way the agent's own checks read them.
+  const readable = toAsciiDigits(text);
+  for (const t of e.includes ?? []) if (!text.includes(t) && !readable.includes(t)) bad.push(`reply is missing "${t}"`);
   for (const t of e.excludes ?? []) if (text.includes(t)) bad.push(`reply contains "${t}"`);
   if (e.language && r.language !== e.language) bad.push(`expected language ${e.language}, got ${r.language}`);
   if (e.readyToBook !== undefined && (r.action === "reply" && r.readyToBook === true) !== e.readyToBook) bad.push(`readyToBook should be ${e.readyToBook}`);

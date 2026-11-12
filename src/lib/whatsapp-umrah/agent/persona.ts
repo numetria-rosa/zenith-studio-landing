@@ -10,7 +10,7 @@ import { LANGUAGES, type Language } from "./types";
 
 export type Persona = { agencyName: string; agentName: string; tone: "WARM" | "FORMAL"; emoji: boolean; signOff: string | null; languages: Language[] };
 
-export const LANGUAGE_NAMES: Record<Language, string> = { en: "English", ar: "Arabic", tr: "Turkish", ur: "Urdu" };
+export const LANGUAGE_NAMES: Record<Language, string> = { en: "English", ar: "Arabic", tr: "Turkish", ur: "Urdu", fr: "French" };
 
 // Owner-written text goes into a prompt, so it is flattened to one short line first.
 const oneLine = (text: string, max: number) => text.replace(/\s+/g, " ").trim().slice(0, max);

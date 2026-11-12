@@ -58,7 +58,8 @@ infrastructure:
   WhatsApp conversation).
 - Customer languages: English, Arabic, Turkish, Urdu (standard script —
   no Roman Urdu, Bengali, or Gujarati; the user narrowed this list
-  2026-09-28, four languages is enough). Detect and reply in whatever
+  2026-09-28) and French (added by the user 2026-11-13, for the French
+  market; the French wording has not been reviewed by a native speaker). Detect and reply in whatever
   the customer used for *that message*, not a conversation-level
   setting.
 - UK agencies are ATOL-protected. The agent may relay an agency's own ATOL
@@ -104,8 +105,8 @@ infrastructure:
   raises it to 200/7 days. Build a `WhatsAppProvider` interface with a
   `MetaCloudProvider` implementation and a `MockProvider` for tests. First
   agencies connect manually via the admin dashboard (paste WABA ID, phone
-  number ID, token). Embedded Signup behind a feature flag, off until
-  we're approved. Note: Embedded Signup v2/v3 deprecate 15 Oct 2026 — if
+  number ID, token). Embedded Signup behind a feature flag. We ARE an approved
+  Tech Provider now (confirmed by the owner, 2026-11-12) and Embedded Signup is on. Note: Embedded Signup v2/v3 deprecate 15 Oct 2026 — if
   built, it must be v4.
 - **Webhook security.** Verify `X-Hub-Signature-256` on every inbound
   webhook. Dedupe by `wa_message_id`, idempotent handling. Respond 200

@@ -29,11 +29,14 @@ describe("opt-out in four languages, and the way back in", () => {
 });
 
 describe("guessLanguage", () => {
-  it("tells our four languages apart by script and letters", () => {
+  it("tells our five languages apart by script, letters and a few telltale words", () => {
     expect(guessLanguage("how much is Umrah in March?")).toBe("en");
     expect(guessLanguage("كم سعر العمرة في رمضان")).toBe("ar");
     expect(guessLanguage("عمرے کا کتنا خرچہ ہے؟ ٹکٹ بھی شامل ہے")).toBe("ur");
     expect(guessLanguage("Umre fiyatları ne kadar, ğ ş ı")).toBe("tr");
+    expect(guessLanguage("Bonjour, combien coûte la Omra en mars ?")).toBe("fr");
+    expect(guessLanguage("quel est le prix pour deux personnes")).toBe("fr");
+    expect(guessLanguage("Ramadan package, non smoking room please")).toBe("en");
   });
 });
 

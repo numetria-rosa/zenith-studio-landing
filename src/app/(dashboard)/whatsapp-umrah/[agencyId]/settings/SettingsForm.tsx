@@ -12,7 +12,7 @@ import { isKnownTimezone } from "@/lib/whatsapp-umrah/timezone";
 import { TimezonePicker } from "@/components/wa/TimezonePicker";
 
 const DAYS = [["mon", "Monday"], ["tue", "Tuesday"], ["wed", "Wednesday"], ["thu", "Thursday"], ["fri", "Friday"], ["sat", "Saturday"], ["sun", "Sunday"]] as const;
-const LANGS = [["en", "English", "English"], ["ar", "Arabic", "العربية"], ["tr", "Turkish", "Türkçe"], ["ur", "Urdu", "اردو"]] as const;
+const LANGS = [["en", "English", "English"], ["ar", "Arabic", "العربية"], ["tr", "Turkish", "Türkçe"], ["ur", "Urdu", "اردو"], ["fr", "French", "Français"]] as const;
 
 type DayKey = (typeof DAYS)[number][0];
 export type SettingsState = {
@@ -198,7 +198,7 @@ export function SettingsForm({ agencyId, initial, used, planCap, extraReplies, e
           {/* Languages */}
           <Card as="section" id="s-lang" className={sectionCard}>
             <SectionHead icon="globe" color={VIOLET} title="Languages" sub="Your agent replies in any language you tick." />
-            <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+            <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
               {LANGS.map(([code, name, native]) => {
                 const on = s.langs.includes(code);
                 return (

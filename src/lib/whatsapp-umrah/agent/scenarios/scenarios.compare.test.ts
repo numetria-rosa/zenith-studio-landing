@@ -22,7 +22,7 @@ vi.mock("@/lib/db", async () => {
   ]);
   return {
     db: {
-      waAgency: { findUnique: async () => ({ name: "Zenith Demo Travel", agentSettings: { tone: "WARM", emojiEnabled: false, signOff: "on", languagesEnabled: ["en", "ar", "tr", "ur"] } }) },
+      waAgency: { findUnique: async () => ({ name: "Zenith Demo Travel", agentSettings: { tone: "WARM", emojiEnabled: false, signOff: "on", languagesEnabled: ["en", "ar", "tr", "ur", "fr"] } }) },
       waKbChunk: { findMany: async (a: { where: { id: { in: string[] } } }) => a.where.id.in.filter((id) => docs[id]).map((id) => ({ document: docs[id] })) },
       waOccasion: { findMany: async () => f.FIXTURE_OCCASIONS },
       waKbDocument: { findMany: async () => f.FIXTURE_PACKAGES.map((p) => ({ fields: p })) },

@@ -119,6 +119,9 @@ describe("confidenceCheck", () => {
 });
 
 describe("hedgeCheck", () => {
+  it("catches a hedged French reply too", () => {
+    expect(hedgeCheck(baseDraft({ language: "fr", reply: "Je ne suis pas sûr, je vais vérifier et revenir vers vous." }))?.guard).toBe("hedge");
+  });
   it("catches a hedged reply even when the model reports high confidence", () => {
     const draft = baseDraft({ confidence: 0.9, reply: "I'm not sure about that one, let me check and get back to you." });
     expect(hedgeCheck(draft)?.guard).toBe("hedge");

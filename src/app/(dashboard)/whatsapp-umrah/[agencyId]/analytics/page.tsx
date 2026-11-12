@@ -14,6 +14,7 @@ const LANGS: { code: string; name: string; color: string }[] = [
   { code: "ar", name: "Arabic", color: "#3DDC97" },
   { code: "tr", name: "Turkish", color: "#C7B0FF" },
   { code: "ur", name: "Urdu", color: "#FFD27A" },
+  { code: "fr", name: "French", color: "#FF8FA3" },
 ];
 
 const delta = (n: number) => (n === 0 ? "SAME AS PREVIOUS" : `${n > 0 ? "+" : ""}${n} VS PREVIOUS`);
