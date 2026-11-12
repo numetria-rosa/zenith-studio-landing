@@ -85,10 +85,9 @@ export const courses: CourseCard[] = [
     practiceTasks: 315,
     portfolioProjects: 10,
     hasCapstone: true,
-    price: "$30",
+    price: "$72",
     originalPrice: "$120",
-    discountPercent: 75,
-    discountDeadline: "2026-09-07T23:59:59-00:00",
+    discountPercent: 40,
     summary:
       "Spreadsheets through a full capstone analysis: clean real messy data, query it, analyze it in Python, validate it statistically, and ship a dashboard that answers an actual business question.",
     whatYoullDo: [
@@ -349,10 +348,9 @@ export const courses: CourseCard[] = [
     practiceTasks: 212,
     portfolioProjects: 8,
     hasCapstone: true,
-    price: "$24.75",
+    price: "$59.40",
     originalPrice: "$99",
-    discountPercent: 75,
-    discountDeadline: "2026-09-07T23:59:59-00:00",
+    discountPercent: 40,
     summary:
       "Zero to a live Northline Digital web app: write HTML, CSS, and JavaScript yourself, then specify, inspect, test, and ship with an AI coding partner. This is not AI Engineering - that course builds LLM products (RAG, tools, eval) and assumes programming logic already.",
     whatYoullDo: [
@@ -521,10 +519,9 @@ export const courses: CourseCard[] = [
     practiceTasks: 35,
     portfolioProjects: 5,
     hasCapstone: true,
-    price: "$21.25",
+    price: "$51",
     originalPrice: "$85",
-    discountPercent: 75,
-    discountDeadline: "2026-09-07T23:59:59-00:00",
+    discountPercent: 40,
     summary:
       "From vectors to attention: build the real mathematical foundations behind machine learning in a computational lab, not a video series - drag a slider and watch entropy, gradients, and attention weights actually change.",
     whatYoullDo: [
@@ -674,10 +671,9 @@ export const courses: CourseCard[] = [
     practiceTasks: 80,
     portfolioProjects: 8,
     hasCapstone: true,
-    price: "$37.25",
+    price: "$89.40",
     originalPrice: "$149",
-    discountPercent: 75,
-    discountDeadline: "2026-09-07T23:59:59-00:00",
+    discountPercent: 40,
     summary:
       "Build client-ready workflow judgment: map a real process, survive retries and replayed events in a simulated runtime, and put AI behind a schema and a human gate. n8n is the example, not the product.",
     whatYoullDo: [
