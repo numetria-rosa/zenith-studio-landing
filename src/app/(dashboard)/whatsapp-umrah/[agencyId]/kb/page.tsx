@@ -11,10 +11,12 @@ import { WaIcon, type WaIconName } from "@/components/wa/Icon";
 import { ConfirmAction } from "@/components/wa/ConfirmDialog";
 import { gbp } from "@/components/wa/format";
 import { FaqList } from "./FaqList";
+import { getT } from "@/lib/whatsapp-umrah/ui-lang-server";
 
 type Tab = "packages" | "faqs" | "info";
 
 export default async function KbPage({ params, searchParams }: { params: Promise<{ agencyId: string }>; searchParams: Promise<{ tab?: string; edit?: string }> }) {
+  const t = await getT();
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { agencyId } = await params;
@@ -39,32 +41,32 @@ export default async function KbPage({ params, searchParams }: { params: Promise
     { id: "faqs", label: "FAQs", sub: "Questions customers ask, in your words", count: faqs.length, color: VIOLET, icon: "chat" },
     { id: "info", label: "General info", sub: "Policies, ATOL, visas, opening hours", count: info.length, color: MINT, icon: "file" },
   ];
-  const addAction = tab === "packages" ? { label: "Add a package", href: newPackageHref } : tab === "faqs" ? { label: "Add an FAQ", href: `${base}?tab=faqs#faq-question` } : { label: "Add general info", href: `${base}?tab=info#info-title` };
+  const addAction = tab === "packages" ? { label: t("Add a package"), href: newPackageHref } : tab === "faqs" ? { label: t("Add an FAQ"), href: `${base}?tab=faqs#faq-question` } : { label: t("Add general info"), href: `${base}?tab=info#info-title` };
 
   return (
     <div>
-      <PageHeader title="Knowledge base" subtitle={`Everything ${agentName} knows. ${agentName} only answers from what's here, so keep it up to date.`} actions={<PrimaryButton href={addAction.href} icon="plus">{addAction.label}</PrimaryButton>} />
+      <PageHeader title={t("Knowledge base")} subtitle={t("Everything {agentName} knows. {agentName2} only answers from what's here, so keep it up to date.", { agentName, agentName2: agentName })} actions={<PrimaryButton href={addAction.href} icon="plus">{t(addAction.label)}</PrimaryButton>} />
 
-      <div role="tablist" aria-label="Knowledge base sections" className="mb-[22px] grid gap-3" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
-        {tabs.map((t) => {
-          const on = t.id === tab;
+      <div role="tablist" aria-label={t("Knowledge base sections")} className="mb-[22px] grid gap-3" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
+        {tabs.map((tabItem) => {
+          const on = tabItem.id === tab;
           return (
             <Link
-              key={t.id}
-              href={`${base}?tab=${t.id}`}
+              key={tabItem.id}
+              href={`${base}?tab=${tabItem.id}`}
               role="tab"
               aria-selected={on}
               className={cx("flex items-center gap-[14px] rounded-[18px] px-[18px] py-4 text-left text-frost no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan", on ? "bg-[rgba(92,200,255,.08)] shadow-[inset_0_0_0_1px_rgba(92,200,255,.45),0_0_30px_rgba(92,200,255,.10)]" : "bg-[rgba(255,255,255,.02)] shadow-[inset_0_0_0_1px_rgba(255,255,255,.08)]")}
             >
-              <Tile size={42} color={t.color} style={{ border: `1px solid ${t.color}45` }}>
-                <WaIcon name={t.icon} size={19} stroke={t.color} />
+              <Tile size={42} color={tabItem.color} style={{ border: `1px solid ${tabItem.color}45` }}>
+                <WaIcon name={tabItem.icon} size={19} stroke={tabItem.color} />
               </Tile>
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[16px] font-semibold">{t.label}</span>
-                  <span className="font-mono text-[13px] text-dim">{t.count}</span>
+                  <span className="text-[16px] font-semibold">{t(tabItem.label)}</span>
+                  <span className="font-mono text-[13px] text-dim">{tabItem.count}</span>
                 </div>
-                <div className="mt-[3px] text-[13px] text-mist">{t.sub}</div>
+                <div className="mt-[3px] text-[13px] text-mist">{t(tabItem.sub)}</div>
               </div>
             </Link>
           );
@@ -80,23 +82,23 @@ export default async function KbPage({ params, searchParams }: { params: Promise
                 <Card as="article" key={doc.id} className="flex min-w-0 flex-col p-[22px]">
                   <div className="flex items-center gap-2">
                     {f && <Pill color={CYAN}>{f.type}</Pill>}
-                    {f && <span className="font-mono text-[12px] text-dim">{f.nightsMakkah + f.nightsMadinah} nights</span>}
+                    {f && <span className="font-mono text-[12px] text-dim">{f.nightsMakkah + f.nightsMadinah} {t("nights")}</span>}
                     <span className="flex-1" />
-                    <IconButton icon="edit" label={`Edit ${doc.title}`} href={`${base}/packages/${doc.id}/edit`} />
+                    <IconButton icon="edit" label={t("Edit {title}", { title: doc.title })} href={`${base}/packages/${doc.id}/edit`} />
                     <ConfirmAction
                       action={deleteKbDocumentAction.bind(null, agencyId, doc.id)}
-                      title="Remove this package?"
-                      description={`${agentName} will stop quoting "${doc.title}" straight away.`}
-                      confirmLabel="Remove"
-                      trigger={<IconButton icon="trash" label={`Remove ${doc.title}`} stroke="#FF9BB0" />}
+                      title={t("Remove this package?")}
+                      description={t("{agentName} will stop quoting \"{title}\" straight away.", { agentName, title: doc.title })}
+                      confirmLabel={t("Remove")}
+                      trigger={<IconButton icon="trash" label={t("Remove {title}", { title: doc.title })} stroke="#FF9BB0" />}
                     />
                   </div>
-                  <h3 className="mb-0 mt-4 text-[19px] font-semibold tracking-[-0.015em]">{doc.title}</h3>
+                  <h3 className="mb-0 mt-4 text-[19px] font-semibold tracking-[-0.015em]">{t(doc.title)}</h3>
                   {f && (
                     <>
                       <div className="mt-[10px]">
                         <span className="text-[30px] font-semibold tracking-[-0.03em] text-mint-text">{gbp(f.pricePerPerson)}</span>
-                        <span className="text-[14px] text-mist"> per person</span>
+                        <span className="text-[14px] text-mist"> {t("per person")}</span>
                       </div>
                       <div className="mt-4 flex flex-col gap-2 border-t border-[rgba(255,255,255,.06)] pt-[14px] text-[14px] text-soft">
                         {f.makkahHotel.name && (
@@ -108,7 +110,7 @@ export default async function KbPage({ params, searchParams }: { params: Promise
                         {f.departureAirports && (
                           <span className="flex items-center gap-[10px]">
                             <WaIcon name="plane" size={16} stroke="#7D8392" />
-                            From {f.departureAirports}
+                            {t("From")} {f.departureAirports}
                           </span>
                         )}
                       </div>
@@ -121,8 +123,8 @@ export default async function KbPage({ params, searchParams }: { params: Promise
               <Tile size={46} radius={23} style={{ background: "rgba(61,220,151,.10)", border: "1px solid rgba(61,220,151,.4)" }}>
                 <WaIcon name="plus" size={20} stroke="#7FF0BD" strokeWidth={2} />
               </Tile>
-              Add a package
-              <span className="text-[13px] text-dim">Name, price, nights, hotel, airports</span>
+              {t("Add a package")}
+              <span className="text-[13px] text-dim">{t("Name, price, nights, hotel, airports")}</span>
             </Link>
           </div>
         </>
@@ -139,13 +141,13 @@ export default async function KbPage({ params, searchParams }: { params: Promise
           />
           <Card className="p-[22px]">
             <form key={editing?.id ?? "new"} action={saveFaqAction.bind(null, agencyId, editing?.id ?? null)}>
-              <div className="text-[16px] font-semibold">{editing ? "Edit FAQ" : "Add an FAQ"}</div>
-              <FieldLabel htmlFor="faq-question" className="mt-4">Question</FieldLabel>
-              <Input id="faq-question" name="question" defaultValue={editingFaq?.question ?? (editing ? editing.title : "")} placeholder="e.g. Is the visa included?" required />
-              <FieldLabel htmlFor="faq-answer" className="mt-4">Answer</FieldLabel>
-              <Textarea id="faq-answer" name="answer" defaultValue={editingFaq?.answer ?? ""} placeholder="The answer exactly as you want customers to hear it." required />
-              <PrimaryButton type="submit" className="mt-4 w-full">{editing ? "Save FAQ" : "Add FAQ"}</PrimaryButton>
-              {editing && <GlassButton href={`${base}?tab=faqs`} className="mt-2 w-full">Cancel</GlassButton>}
+              <div className="text-[16px] font-semibold">{editing ? t("Edit FAQ") : t("Add an FAQ")}</div>
+              <FieldLabel htmlFor="faq-question" className="mt-4">{t("Question")}</FieldLabel>
+              <Input id="faq-question" name="question" defaultValue={editingFaq?.question ?? (editing ? editing.title : "")} placeholder={t("e.g. Is the visa included?")} required />
+              <FieldLabel htmlFor="faq-answer" className="mt-4">{t("Answer")}</FieldLabel>
+              <Textarea id="faq-answer" name="answer" defaultValue={editingFaq?.answer ?? ""} placeholder={t("The answer exactly as you want customers to hear it.")} required />
+              <PrimaryButton type="submit" className="mt-4 w-full">{editing ? t("Save FAQ") : t("Add FAQ")}</PrimaryButton>
+              {editing && <GlassButton href={`${base}?tab=faqs`} className="mt-2 w-full">{t("Cancel")}</GlassButton>}
             </form>
           </Card>
         </div>
@@ -160,37 +162,37 @@ export default async function KbPage({ params, searchParams }: { params: Promise
                   <WaIcon name="file" size={19} stroke="#7FF0BD" />
                 </Tile>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[16px] font-semibold">{doc.title}</div>
+                  <div className="text-[16px] font-semibold">{t(doc.title)}</div>
                   <div className="mt-[5px] font-mono text-[12px] text-dim">
-                    {doc._count.chunks} {doc._count.chunks === 1 ? "chunk" : "chunks"} · added {doc.createdAt.toISOString().slice(0, 10)}
+                    {doc._count.chunks} {doc._count.chunks === 1 ? t("chunk") : t("chunks")} {t("· added")} {doc.createdAt.toISOString().slice(0, 10)}
                   </div>
                 </div>
                 <ConfirmAction
                   action={deleteKbDocumentAction.bind(null, agencyId, doc.id)}
-                  title="Remove this info?"
-                  description={`${agentName} will stop using "${doc.title}" straight away.`}
-                  confirmLabel="Remove"
-                  trigger={<IconButton icon="trash" label={`Remove ${doc.title}`} stroke="#FF9BB0" />}
+                  title={t("Remove this info?")}
+                  description={t("{agentName} will stop using \"{title}\" straight away.", { agentName, title: doc.title })}
+                  confirmLabel={t("Remove")}
+                  trigger={<IconButton icon="trash" label={t("Remove {title}", { title: doc.title })} stroke="#FF9BB0" />}
                 />
               </Card>
             ))}
             <div className="rounded-[18px] border border-dashed border-[rgba(255,255,255,.14)] px-5 py-[18px]">
-              <div className="text-[14px] text-soft">Anything that isn&apos;t a package or a question goes here. For example:</div>
+              <div className="text-[14px] text-soft">{t("Anything that isn't a package or a question goes here. For example:")}</div>
               <div className="mt-3 flex flex-wrap gap-2">
-                {["Cancellation policy", "ATOL details", "Opening hours", "Visa guidance"].map((t) => (
-                  <Chip key={t}>{t}</Chip>
+                {["Cancellation policy", "ATOL details", "Opening hours", "Visa guidance"].map((chip) => (
+                  <Chip key={chip}>{t(chip)}</Chip>
                 ))}
               </div>
             </div>
           </div>
           <Card className="p-[22px]">
             <form action={addKbDocumentAction.bind(null, agencyId)}>
-              <div className="text-[16px] font-semibold">Add general info</div>
-              <FieldLabel htmlFor="info-title" className="mt-4">Title</FieldLabel>
-              <Input id="info-title" name="title" placeholder="e.g. Cancellation policy, ATOL details" required />
-              <FieldLabel htmlFor="info-text" className="mt-4">Content</FieldLabel>
-              <Textarea id="info-text" name="rawText" placeholder={`Paste or type the text exactly as you want ${agentName} to use it.`} required />
-              <PrimaryButton type="submit" className="mt-4 w-full">Add and process</PrimaryButton>
+              <div className="text-[16px] font-semibold">{t("Add general info")}</div>
+              <FieldLabel htmlFor="info-title" className="mt-4">{t("Title")}</FieldLabel>
+              <Input id="info-title" name="title" placeholder={t("e.g. Cancellation policy, ATOL details")} required />
+              <FieldLabel htmlFor="info-text" className="mt-4">{t("Content")}</FieldLabel>
+              <Textarea id="info-text" name="rawText" placeholder={t("Paste or type the text exactly as you want {agentName} to use it.", { agentName })} required />
+              <PrimaryButton type="submit" className="mt-4 w-full">{t("Add and process")}</PrimaryButton>
             </form>
           </Card>
         </div>

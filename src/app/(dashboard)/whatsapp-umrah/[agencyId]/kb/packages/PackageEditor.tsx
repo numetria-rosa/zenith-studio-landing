@@ -10,6 +10,7 @@ import { Card, GlassButton, Hint, PageHeader, PrimaryButton } from "@/components
 import { cx } from "@/components/wa/tokens";
 import { BasicsStep, ExtrasStep, IncludedStep, PriceStep, StayStep, TravelStep } from "./PackageSteps";
 import { PackageRail } from "./PackageRail";
+import { useT } from "@/components/wa/i18n";
 
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan";
 const PANELS = [BasicsStep, StayStep, PriceStep, TravelStep, IncludedStep, ExtrasStep];
@@ -19,6 +20,7 @@ const PANELS = [BasicsStep, StayStep, PriceStep, TravelStep, IncludedStep, Extra
  * the same fields savePackageAction already parses. Leaving with unsaved changes asks first.
  */
 export function PackageEditor({ base, mode, savedName, initial, agentName, agencyName, save }: { base: string; mode: "new" | "edit"; savedName: string; initial: PackageDraft; agentName: string; agencyName: string; save: (formData: FormData) => Promise<void> }) {
+  const t = useT();
   const router = useRouter();
   const [d, setD] = useState(initial);
   const [step, setStep] = useState(0);
@@ -79,32 +81,32 @@ export function PackageEditor({ base, mode, savedName, initial, agentName, agenc
 
   return (
     <div className="leading-[normal]">
-      <nav aria-label="Breadcrumb" className="mb-[14px] flex items-center gap-2 text-[13.5px] text-dim">
+      <nav aria-label={t("Breadcrumb")} className="mb-[14px] flex items-center gap-2 text-[13.5px] text-dim">
         <Link href={kbHref} className="text-mist no-underline hover:text-frost">
-          Knowledge base
+          {t("Knowledge base")}
         </Link>
         <span aria-hidden="true">/</span>
         <Link href={`${kbHref}?tab=packages`} className="text-mist no-underline hover:text-frost">
-          Packages
+          {t("Packages")}
         </Link>
         <span aria-hidden="true">/</span>
-        <span className="text-frost">{mode === "new" ? "New package" : savedName}</span>
+        <span className="text-frost">{mode === "new" ? t("New package") : savedName}</span>
       </nav>
       <PageHeader
-        title={mode === "new" ? "Add a package" : "Edit package"}
+        title={mode === "new" ? t("Add a package") : t("Edit package")}
         subtitle={
           <>
-            {agentName} quotes these details word for word.
+            {agentName} {t("quotes these details word for word.")}
             {/* the second sentence only fits on one line (so the page still fits the screen) from 1400px wide */}
-            <span className="hidden min-[1400px]:inline"> Fill in as much as you can: {agentName} can only answer from what&apos;s here.</span>
+            <span className="hidden min-[1400px]:inline"> {t("Fill in as much as you can:")} {agentName} {t("can only answer from what's here.")}</span>
           </>
         }
         actions={
           <>
-            <GlassButton href={`${kbHref}?tab=packages`}>Cancel</GlassButton>
+            <GlassButton href={`${kbHref}?tab=packages`}>{t("Cancel")}</GlassButton>
             <PrimaryButton onClick={submit} disabled={saving}>
               <WaIcon name="check" size={16} stroke="#05060A" strokeWidth={2.4} />
-              {saving ? "Saving..." : "Save package"}
+              {saving ? t("Saving...") : t("Save package")}
             </PrimaryButton>
           </>
         }
@@ -113,13 +115,13 @@ export function PackageEditor({ base, mode, savedName, initial, agentName, agenc
       <div className="grid items-start gap-[22px]" style={{ gridTemplateColumns: "minmax(0, 1fr) 360px" }}>
         <div className="min-w-0">
           <Card className="flex min-h-[642px] min-w-0 flex-col">
-            <div role="tablist" aria-label="Package steps" className="flex items-center border-b border-[rgba(255,255,255,.07)] px-6 py-[18px]">
+            <div role="tablist" aria-label={t("Package steps")} className="flex items-center border-b border-[rgba(255,255,255,.07)] px-6 py-[18px]">
               {STEPS.map((label, i) => {
                 const current = step === i;
                 const done = states[i] === true;
                 return (
                   <Fragment key={label}>
-                    <button type="button" role="tab" aria-selected={current} aria-label={`Step ${i + 1}: ${label}`} onClick={() => setStep(i)} className={cx("flex cursor-pointer items-center gap-[9px] whitespace-nowrap border-0 bg-transparent px-1 py-[6px]", FOCUS)}>
+                    <button type="button" role="tab" aria-selected={current} aria-label={t("Step {n}: {label}", { n: i + 1, label: t(label) })} onClick={() => setStep(i)} className={cx("flex cursor-pointer items-center gap-[9px] whitespace-nowrap border-0 bg-transparent px-1 py-[6px]", FOCUS)}>
                       <span
                         className={cx(
                           "box-border flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[13px] font-mono text-[11.5px] font-semibold",
@@ -129,7 +131,7 @@ export function PackageEditor({ base, mode, savedName, initial, agentName, agenc
                         {done && !current ? <WaIcon name="check" size={13} stroke="#05060A" strokeWidth={2.8} /> : `0${i + 1}`}
                       </span>
                       {/* below 1400px the card is too narrow for six labels, so only the current step keeps its name */}
-                      <span className={cx("text-[14px]", current ? "text-frost" : cx("hidden min-[1400px]:inline", done ? "text-soft" : "text-dim"))}>{label}</span>
+                      <span className={cx("text-[14px]", current ? "text-frost" : cx("hidden min-[1400px]:inline", done ? "text-soft" : "text-dim"))}>{t(label)}</span>
                     </button>
                     {i < STEPS.length - 1 && <span aria-hidden="true" className={cx("mx-[10px] h-[1.5px] min-w-[12px] flex-1 rounded-[1px]", done ? "bg-[rgba(61,220,151,.5)]" : "bg-[rgba(255,255,255,.10)]")} />}
                   </Fragment>
@@ -145,20 +147,20 @@ export function PackageEditor({ base, mode, savedName, initial, agentName, agenc
               {step > 0 && (
                 <GlassButton onClick={() => setStep(step - 1)}>
                   <WaIcon name="arrow" size={15} stroke="#C9CCD4" strokeWidth={2} className="rotate-180" />
-                  Back
+                  {t("Back")}
                 </GlassButton>
               )}
               <span className="flex-1 text-center font-mono text-[12px] text-dim">
-                Step {step + 1} of {STEPS.length}
+                {t("Step")} {step + 1} {t("of")} {STEPS.length}
               </span>
               {last ? (
                 <PrimaryButton onClick={submit} disabled={saving}>
                   <WaIcon name="check" size={16} stroke="#05060A" strokeWidth={2.4} />
-                  {saving ? "Saving..." : "Save package"}
+                  {saving ? t("Saving...") : t("Save package")}
                 </PrimaryButton>
               ) : (
                 <GlassButton className="!text-frost" onClick={() => setStep(step + 1)}>
-                  Next: {STEPS[step + 1]}
+                  {t("Next:")} {STEPS[step + 1]}
                   <WaIcon name="arrow" size={15} stroke="#F5F6F8" strokeWidth={2} />
                 </GlassButton>
               )}
@@ -169,7 +171,7 @@ export function PackageEditor({ base, mode, savedName, initial, agentName, agenc
               {error}
             </div>
           ) : (
-            <Hint className="mt-3 text-center">You can save at any step. {agentName} starts using the package as soon as you save.</Hint>
+            <Hint className="mt-3 text-center">{t("You can save at any step.")} {agentName} {t("starts using the package as soon as you save.")}</Hint>
           )}
         </div>
         <PackageRail d={d} agentName={agentName} agencyName={agencyName} />
@@ -178,9 +180,9 @@ export function PackageEditor({ base, mode, savedName, initial, agentName, agenc
       <ConfirmDialog
         open={leaveTo !== null}
         onOpenChange={(o) => !o && setLeaveTo(null)}
-        title="Leave without saving?"
-        description="You have changes to this package that haven't been saved. If you leave now, they're lost."
-        confirmLabel="Leave"
+        title={t("Leave without saving?")}
+        description={t("You have changes to this package that haven't been saved. If you leave now, they're lost.")}
+        confirmLabel={t("Leave")}
         onConfirm={() => {
           guard.current = false;
           const to = leaveTo;

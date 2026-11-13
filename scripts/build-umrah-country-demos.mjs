@@ -11,6 +11,7 @@
 // Usage: node scripts/build-umrah-country-demos.mjs
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { FR } from "./umrah-demo-fr.mjs";
 
 const SRC = "public/demos/uk/whatsapp-umrah-agent.html";
 
@@ -31,6 +32,53 @@ const fmt = (n) => n.toLocaleString("en-US");
 function must(html, from, to, label) {
   if (!html.includes(from)) throw new Error(`UK page no longer contains "${label ?? from}"; update the generator`);
   return html.split(from).join(to);
+}
+
+
+// France: the page is built in English first (euro amounts, French cities), then every string is replaced with its
+// French version from umrah-demo-fr.mjs. Page text and attributes are matched on the HTML outside scripts; inside the
+// scripts every string literal is read left to right (so an apostrophe in a double-quoted string can't confuse it) and
+// replaced when it matches. Anything left in English is listed so it can be added to the dictionary.
+const escapeJs = (v, q) => v.split("\\").join("\\\\").split(q).join("\\" + q);
+function translateFr(html) {
+  const left = new Set();
+  const parts = html.split(/(<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>)/g);
+  const out = parts.map((part, i) => {
+    if (i % 2 === 0) {
+      return part
+        .replace(/>([^<>]*[A-Za-z][^<>]*)</g, (m, t) => {
+          const key = t.replace(/\s+/g, " ").trim();
+          if (!key) return m;
+          if (FR[key]) return ">" + t.match(/^\s*/)[0] + FR[key] + t.match(/\s*$/)[0] + "<";
+          if (!/^[A-Z]{1,3}$|^[\d\s.,:/%+·&;€$-]+$|^&nbsp;$|^[A-Z]{2,12}$|^Zenith Studio$|^© /.test(key)) left.add(key);
+          return m;
+        })
+        .replace(/\b(aria-label|title|placeholder|alt|content)="([^"]*)"/g, (m, a, v) => (FR[v] ? `${a}="${FR[v]}"` : m));
+    }
+    if (part.startsWith("<style")) return part;
+    return part.replace(/"((?:[^"\\\n]|\\.)*)"|'((?:[^'\\\n]|\\.)*)'/g, (m, d, sq) => {
+      const v = d ?? sq;
+      const q = d !== undefined ? '"' : "'";
+      if (FR[v]) return q + escapeJs(FR[v], q) + q;
+      if (!/[<>]/.test(v) && !/\b(placeholder|title|aria-label|alt)=/.test(v)) return m;
+      // A piece of HTML the dashboard app builds in script: translate the text between its tags and its placeholder/title attributes.
+      const piece = v
+        .replace(/(^|>)([^<>]+)(?=<|$)/g, (mm, lead, t) => {
+          const key = t.replace(/\s+/g, " ").trim();
+          if (!key) return mm;
+          if (FR[key]) return lead + t.match(/^\s*/)[0] + escapeJs(FR[key], q) + t.match(/\s*$/)[0];
+          if (/[A-Za-z]{3}/.test(key) && !/[{}();=\[\]"]/.test(key) && !/^[A-Z]{1,3}$|^&nbsp;$|^[A-Z]{2,12}$/.test(key)) left.add("script piece: " + key);
+          return mm;
+        })
+        .replace(/\b(placeholder|title|aria-label|alt)=(\\?")([^"\\]*)/g, (mm, a, qq, val) => (FR[val] ? `${a}=${qq}${escapeJs(FR[val], q)}` : mm));
+      return q + piece + q;
+    });
+  });
+  let h = out.join("").replace(/<html lang="en">/g, '<html lang="fr">');
+  h = h.split("+44 7700 900123").join("+33 6 12 34 56 78"); // the dashboard sample's WhatsApp number
+  // 1,725 euros the French way: "1 725 €" (narrow no-break space between the thousands, no-break space before the sign).
+  h = h.replace(/€(\d[\d,]*)/g, (_, n) => n.replace(/,/g, " ") + " €");
+  return { html: h, left: [...left] };
 }
 
 const uk = readFileSync(SRC, "utf8");
@@ -63,6 +111,11 @@ for (const [cc, c] of Object.entries(COUNTRIES)) {
   if (/£|\bUK\b|GBP|pounds/.test(h.replace(/[^\n]*(?:UK_CITIES)[^\n]*/g, ""))) {
     const left = h.match(/.{0,40}(£|\bUK\b|GBP|pounds).{0,40}/g)?.slice(0, 3);
     throw new Error(`${cc}: UK text left over: ${JSON.stringify(left)}`);
+  }
+  if (cc === "fr") {
+    const t = translateFr(h);
+    h = t.html;
+    if (t.left.length) console.log(`fr: ${t.left.length} strings still in English:\n  ` + t.left.join("\n  "));
   }
   mkdirSync(`public/demos/${cc}`, { recursive: true });
   writeFileSync(`public/demos/${cc}/whatsapp-umrah-agent.html`, h);

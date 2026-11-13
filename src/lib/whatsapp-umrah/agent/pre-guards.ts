@@ -9,10 +9,10 @@ function normalize(text: string): string {
   return text.trim().toLowerCase().replace(/[.!?]+$/, "");
 }
 
-/** WhatsApp's own opt-out convention plus common variants, in the four languages we answer in. Matched as a
+/** WhatsApp's own opt-out convention plus common variants, in the five languages we answer in. Matched as a
     whole trimmed message (not a substring of a longer sentence) - a customer typing "stop worrying, what's
     the price" should not be treated as opting out. */
-const OPT_OUT_WORDS = ["stop", "unsubscribe", "opt out", "optout", "إيقاف", "ايقاف", "توقف", "إلغاء الاشتراك", "durdur", "abonelikten çık", "بند کریں"];
+const OPT_OUT_WORDS = ["stop", "unsubscribe", "opt out", "optout", "إيقاف", "ايقاف", "توقف", "إلغاء الاشتراك", "durdur", "abonelikten çık", "بند کریں", "arrêt", "arrêtez", "arrêter", "désabonner", "se désabonner", "désabonnement"];
 export function isOptOutMessage(text: string): boolean {
   return OPT_OUT_WORDS.includes(normalize(text));
 }

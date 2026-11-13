@@ -8,7 +8,6 @@ const EXPECT = {
   ca: { plan: "$83", words: "Canadian dollars", city: "Toronto", checkout: "ch_5gz3oRodm3dR7lb", pack: "$12 CAD" },
   au: { plan: "$85", words: "Australian dollars", city: "Sydney", checkout: "ch_3EmEku0gszYMzjv", pack: "$13 AUD" },
   za: { plan: "R900", words: "rand", city: "Johannesburg", checkout: "ch_Li6eHzPXGuRRKpT", pack: "R140" },
-  fr: { plan: "€45", words: "euros", city: "Paris", checkout: "ch_6TXEjCU7jRskGZY", pack: "€8" },
 } as const;
 
 describe.each(Object.entries(EXPECT))("demo page: %s", (cc, e) => {
@@ -34,5 +33,27 @@ describe.each(Object.entries(EXPECT))("demo page: %s", (cc, e) => {
     expect(html).toContain(`https://whop.com/checkout/${e.checkout}/`);
     expect(html).not.toContain("ch_M5XKy2oxQQkoO28");
     expect(html).not.toContain("mailto:");
+  });
+});
+
+// France is generated in French (scripts/umrah-demo-fr.mjs), so it has its own checks instead of the English wording above.
+describe("demo page: fr", () => {
+  const html = readFileSync("public/demos/fr/whatsapp-umrah-agent.html", "utf8");
+  it("is French, with the plan and the pack in euros written the French way", () => {
+    expect(html).toContain('<html lang="fr">');
+    expect(html).toContain("<b>45 €</b>");
+    expect(html).toContain("Tarif en euros");
+    expect(html).toContain("Ajoutez 500 réponses pour 8 €");
+    expect(html).not.toMatch(/£|GBP|UK|pounds|Priced in/);
+  });
+  it("uses French cities and the French checkout", () => {
+    expect(html).toContain("Paris");
+    expect(html).not.toMatch(/(Manchester|Birmingham|Bradford|Leicester|London)/);
+    expect(html).toContain("https://whop.com/checkout/ch_6TXEjCU7jRskGZY/");
+    expect(html).not.toContain("ch_M5XKy2oxQQkoO28");
+  });
+  it("translates the page, the dashboard tour and its sample chats", () => {
+    for (const text of ["Chaque demande d'Omra", "Votre tableau de bord, en visite guidée", "Cinq langues, détectées automatiquement", "Rendre à l", "Prospects chauds", "Wa alaykoum salam"]) expect(html).toContain(text);
+    for (const english of ["Every Umrah enquiry", "Hand back to AI", "Take over any chat", "Four languages", "Answers from your packages"]) expect(html).not.toContain(english);
   });
 });

@@ -10,11 +10,17 @@ import { SidebarNav } from "./SidebarNav";
 import { TermsGate } from "./TermsGate";
 import { needsTerms } from "@/lib/whatsapp-umrah/terms";
 import waStyles from "./waConsole.module.css";
+import { getT, getUiLang } from "@/lib/whatsapp-umrah/ui-lang-server";
+import { uiLocale } from "@/lib/whatsapp-umrah/ui-lang";
+import { UiLangProvider } from "@/components/wa/i18n";
+import { LanguageSelect } from "@/components/wa/LanguageSelect";
 
 /* The shell: sidebar (brand, live status, nav, replies meter, account) and the main column. The shell is flex,
    and main has min-width 0 so wide content can never push the page sideways. */
 
 export default async function WhatsAppUmrahLayout({ children, params }: { children: React.ReactNode; params: Promise<{ agencyId: string }> }) {
+  const t = await getT();
+  const lang = await getUiLang();
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { agencyId } = await params;
@@ -31,16 +37,17 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
   const connected = agency.whatsapp?.status === "CONNECTED";
   const live = agency.status === "LIVE" && connected && !agency.agentPausedAt;
   const status = live
-    ? { color: "#3DDC97", text: `${agentName} is live` }
+    ? { color: "#3DDC97", text: t("{agent} is live", { agent: agentName }) }
     : !connected
-      ? { color: "#FF9BB0", text: "WhatsApp not connected" }
+      ? { color: "#FF9BB0", text: t("WhatsApp not connected") }
       : agency.status === "PAUSED" || agency.agentPausedAt
-        ? { color: "#FFD27A", text: `${agentName} is paused` }
-        : { color: "#FFD27A", text: "Not live yet" };
+        ? { color: "#FFD27A", text: t("{agent} is paused", { agent: agentName }) }
+        : { color: "#FFD27A", text: t("Not live yet") };
   const pct = usage.cap > 0 ? Math.min(100, (usage.used / usage.cap) * 100) : 0;
-  const displayName = session.user.name || session.user.email || "Account";
+  const displayName = session.user.name || session.user.email || t("Account");
 
   return (
+    <UiLangProvider lang={lang}>
     <div className={`${waStyles.waConsole} flex bg-void font-sans text-frost`}>
       <aside className={`${waStyles.waSidebar} sticky top-0 box-border flex w-[264px] shrink-0 flex-col overflow-y-auto border-r border-[rgba(255,255,255,.07)] bg-wa-sidebar px-4 pb-5 pt-[26px]`}>
         <div className="flex items-center gap-3 px-2">
@@ -49,13 +56,13 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
           </Tile>
           <div className="min-w-0">
             <div className="truncate text-[15px] font-semibold">{agency.name}</div>
-            <div className="mt-[3px] font-mono text-[10.5px] tracking-[.1em] text-dim">WHATSAPP AI AGENT</div>
+            <div className="mt-[3px] font-mono text-[10.5px] tracking-[.1em] text-dim">{t("WHATSAPP AI AGENT")}</div>
           </div>
         </div>
 
         <Glass className="mx-1 mb-[18px] mt-5 flex items-center gap-[10px] rounded-[14px] px-3 py-[11px]">
           <span className="h-2 w-2 rounded-[4px]" style={{ background: status.color, boxShadow: `0 0 10px ${status.color}` }} />
-          <div className="min-w-0 flex-1 truncate text-[13.5px]">{status.text}</div>
+          <div className="min-w-0 flex-1 truncate text-[13.5px]">{t(status.text)}</div>
           {connected && agency.whatsapp?.displayPhoneNumber && <span className="font-mono text-[11px] text-dim">{agency.whatsapp.displayPhoneNumber}</span>}
         </Glass>
 
@@ -63,9 +70,9 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
 
         <div className="mt-auto pt-6">
           <Glass className="rounded-2xl p-[14px]">
-            <Label className="text-[10.5px]">AI replies · this month</Label>
+            <Label className="text-[10.5px]">{t("AI replies · this month")}</Label>
             <div className="mt-2 text-[18px] font-semibold">
-              {usage.used.toLocaleString("en-GB")} <span className="text-[14px] font-normal text-dim">/ {usage.cap.toLocaleString("en-GB")}</span>
+              {usage.used.toLocaleString(uiLocale(lang))} <span className="text-[14px] font-normal text-dim">/ {usage.cap.toLocaleString(uiLocale(lang))}</span>
             </div>
             <div className="mt-[10px] h-[5px] overflow-hidden rounded-[3px] bg-[rgba(255,255,255,.08)]">
               <div className="h-full min-w-[4px] bg-mint" style={{ width: `${pct}%`, background: pct >= 80 ? "#FFD27A" : "#3DDC97" }} />
@@ -77,9 +84,10 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
             </Tile>
             <div className="min-w-0 flex-1">
               <div className="truncate text-[14px]">{displayName}</div>
-              <div className="text-[12.5px] text-dim">{membership?.role === "AGENT" ? "Team member" : "Owner"}</div>
+              <div className="text-[12.5px] text-dim">{membership?.role === "AGENT" ? t("Team member") : t("Owner")}</div>
             </div>
           </div>
+          <LanguageSelect />
         </div>
       </aside>
 
@@ -90,5 +98,6 @@ export default async function WhatsAppUmrahLayout({ children, params }: { childr
         <div className="relative">{needsTerms(agency) ? <TermsGate agencyId={agencyId} /> : children}</div>
       </main>
     </div>
+    </UiLangProvider>
   );
 }

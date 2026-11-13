@@ -5,6 +5,7 @@ import { WaIcon } from "@/components/wa/Icon";
 import { INPUT, PopoverMenu } from "@/components/wa/ui";
 import { cx } from "@/components/wa/tokens";
 import { TIMEZONE_OPTIONS, timezoneChoices } from "@/lib/whatsapp-umrah/timezone";
+import { useT } from "@/components/wa/i18n";
 
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan";
 const SUGGESTED = new Set<string>(TIMEZONE_OPTIONS.map((o) => o.id));
@@ -20,6 +21,7 @@ function offsetLabel(id: string): string {
 
 /** A searchable timezone list in the dashboard's own style (the browser's native menu ignores the dark theme). */
 export function TimezonePicker({ id, value, onChange }: { id?: string; value: string; onChange: (v: string) => void }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
@@ -48,7 +50,7 @@ export function TimezonePicker({ id, value, onChange }: { id?: string; value: st
         onMouseEnter={() => setActive(i)}
         className={cx("flex h-[38px] w-full cursor-pointer items-center gap-3 rounded-[10px] border-0 px-3 text-left text-[14px] text-frost", FOCUS, i === active ? "bg-[rgba(255,255,255,.07)]" : "bg-transparent")}
       >
-        <span className="min-w-0 flex-1 truncate">{o.label}</span>
+        <span className="min-w-0 flex-1 truncate">{t(o.label)}</span>
         <span className="font-mono text-[12px] text-dim">{o.offset}</span>
         {on && <WaIcon name="check" size={15} stroke="#7FF0BD" strokeWidth={2.4} />}
       </button>
@@ -58,7 +60,7 @@ export function TimezonePicker({ id, value, onChange }: { id?: string; value: st
   return (
     <PopoverMenu
       role="listbox"
-      label="Timezone"
+      label={t("Timezone")}
       width={440}
       offset={6}
       open={open}
@@ -83,8 +85,8 @@ export function TimezonePicker({ id, value, onChange }: { id?: string; value: st
         <input
           autoFocus
           value={query}
-          placeholder="Search a city or country"
-          aria-label="Search timezones"
+          placeholder={t("Search a city or country")}
+          aria-label={t("Search timezones")}
           onChange={(e) => {
             setQuery(e.target.value);
             setActive(0);
@@ -98,11 +100,11 @@ export function TimezonePicker({ id, value, onChange }: { id?: string; value: st
         />
       </div>
       <div className="max-h-[320px] overflow-y-auto pr-[2px]">
-        {shown.length === 0 && <div className="px-3 py-6 text-center text-[13.5px] text-dim">No timezone matches &ldquo;{query}&rdquo;.</div>}
+        {shown.length === 0 && <div className="px-3 py-6 text-center text-[13.5px] text-dim">{t("No timezone matches “")}{query}&rdquo;.</div>}
         {shown.map((o, i) => (
           <div key={o.id}>
-            {!q && i === 0 && SUGGESTED.has(o.id) && <div className="px-3 pb-1 pt-2 font-mono text-[11px] uppercase tracking-[.16em] text-dim">Suggested</div>}
-            {!q && !SUGGESTED.has(o.id) && (i === 0 || SUGGESTED.has(shown[i - 1].id)) && <div className="px-3 pb-1 pt-3 font-mono text-[11px] uppercase tracking-[.16em] text-dim">All timezones</div>}
+            {!q && i === 0 && SUGGESTED.has(o.id) && <div className="px-3 pb-1 pt-2 font-mono text-[11px] uppercase tracking-[.16em] text-dim">{t("Suggested")}</div>}
+            {!q && !SUGGESTED.has(o.id) && (i === 0 || SUGGESTED.has(shown[i - 1].id)) && <div className="px-3 pb-1 pt-3 font-mono text-[11px] uppercase tracking-[.16em] text-dim">{t("All timezones")}</div>}
             {row(o, i)}
           </div>
         ))}

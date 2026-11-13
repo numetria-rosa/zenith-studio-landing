@@ -6,21 +6,23 @@ import { WaIcon } from "@/components/wa/Icon";
 import { ConfirmAction } from "@/components/wa/ConfirmDialog";
 import { GhostButton } from "@/components/wa/ui";
 import { cx, isRtl } from "@/components/wa/tokens";
+import { useT } from "@/components/wa/i18n";
 
 export type FaqItem = { id: string; question: string; answer: string; editHref: string; remove: () => Promise<void> };
 
 /** FAQ accordion: one answer open at a time. */
 export function FaqList({ items, agentName }: { items: FaqItem[]; agentName: string }) {
+  const t = useT();
   const [open, setOpen] = useState<string | null>(items[0]?.id ?? null);
   return (
     <div className="overflow-hidden rounded-[22px] border border-[rgba(255,255,255,.09)] bg-card shadow-[inset_0_1px_0_rgba(255,255,255,.05)]">
       <div className="flex justify-between px-[22px] py-[18px]">
         <span className="font-mono text-[11.5px] uppercase tracking-[.16em] text-dim">
-          {items.length} {items.length === 1 ? "question" : "questions"}
+          {items.length} {items.length === 1 ? t("question") : t("questions")}
         </span>
-        <span className="text-[13px] text-dim">{agentName} uses your answer word for word</span>
+        <span className="text-[13px] text-dim">{agentName} {t("uses your answer word for word")}</span>
       </div>
-      {items.length === 0 && <div className="border-t border-[rgba(255,255,255,.06)] px-[22px] py-8 text-center text-[14px] text-dim">No FAQs yet. Add your first one on the right.</div>}
+      {items.length === 0 && <div className="border-t border-[rgba(255,255,255,.06)] px-[22px] py-8 text-center text-[14px] text-dim">{t("No FAQs yet. Add your first one on the right.")}</div>}
       {items.map((f) => {
         const isOpen = open === f.id;
         return (
@@ -42,16 +44,16 @@ export function FaqList({ items, agentName }: { items: FaqItem[]; agentName: str
                 <div className="-ml-[10px] mt-3 flex gap-[6px]">
                   <Link href={f.editHref} className="inline-flex h-[34px] items-center gap-[7px] rounded-[10px] px-[10px] text-[13.5px] text-mist no-underline hover:bg-[rgba(255,255,255,.05)] hover:text-frost">
                     <WaIcon name="edit" size={14} stroke="#A9AEBA" />
-                    Edit
+                    {t("Edit")}
                   </Link>
                   <ConfirmAction
                     action={f.remove}
-                    title="Remove this FAQ?"
-                    description={`${agentName} will stop using this answer straight away.`}
-                    confirmLabel="Remove"
+                    title={t("Remove this FAQ?")}
+                    description={t("{agentName} will stop using this answer straight away.", { agentName })}
+                    confirmLabel={t("Remove")}
                     trigger={
                       <GhostButton icon="trash" className="!text-ember-text">
-                        Remove
+                        {t("Remove")}
                       </GhostButton>
                     }
                   />

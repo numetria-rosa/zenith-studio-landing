@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
 import { AGENT_NAME } from "@/lib/whatsapp-umrah/agent-name";
 import { Glass, PageHeader } from "@/components/wa/ui";
+import { getT } from "@/lib/whatsapp-umrah/ui-lang-server";
 
 const CAN = [
   "Answer from your packages, FAQs and occasions: prices, dates, hotels, distances, what is included, deposits and payment terms.",
@@ -39,6 +40,7 @@ const TIPS: [string, string][] = [
 ];
 
 export default async function GuidePage({ params }: { params: Promise<{ agencyId: string }> }) {
+  const t = await getT();
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { agencyId } = await params;
@@ -46,30 +48,30 @@ export default async function GuidePage({ params }: { params: Promise<{ agencyId
 
   const list = (items: string[]) => (
     <ul className="mt-3 space-y-2 text-[14px] leading-6 text-mist">
-      {items.map((t) => <li key={t} className="list-disc ml-5">{t}</li>)}
+      {items.map((item) => <li key={item} className="list-disc ml-5">{t(item)}</li>)}
     </ul>
   );
 
   return (
     <div>
-      <PageHeader title="Guide" subtitle={`What ${AGENT_NAME} can and cannot do, and how to fill in your knowledge base so it answers well.`} />
+      <PageHeader title={t("Guide")} subtitle={t("What {AGENT_NAME} can and cannot do, and how to fill in your knowledge base so it answers well.", { AGENT_NAME })} />
       <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))" }}>
         <Glass className="rounded-2xl p-6">
-          <h2 className="text-[16px] font-semibold">{AGENT_NAME} can</h2>
+          <h2 className="text-[16px] font-semibold">{AGENT_NAME} {t("can")}</h2>
           {list(CAN)}
         </Glass>
         <Glass className="rounded-2xl p-6">
-          <h2 className="text-[16px] font-semibold">{AGENT_NAME} will not</h2>
+          <h2 className="text-[16px] font-semibold">{AGENT_NAME} {t("will not")}</h2>
           {list(CANT)}
         </Glass>
       </div>
       <Glass className="mt-5 rounded-2xl p-6">
-        <h2 className="text-[16px] font-semibold">Filling in your knowledge base well</h2>
+        <h2 className="text-[16px] font-semibold">{t("Filling in your knowledge base well")}</h2>
         <ol className="mt-3 space-y-4 text-[14px] leading-6">
           {TIPS.map(([title, body], i) => (
             <li key={title} className="flex gap-3">
               <span className="font-mono text-dim">{i + 1}</span>
-              <span><strong>{title}.</strong> <span className="text-mist">{body}</span></span>
+              <span><strong>{t(title)}.</strong> <span className="text-mist">{t(body)}</span></span>
             </li>
           ))}
         </ol>

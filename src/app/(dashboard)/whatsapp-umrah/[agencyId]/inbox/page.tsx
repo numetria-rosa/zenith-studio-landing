@@ -9,10 +9,12 @@ import { LANGUAGE_NAMES } from "@/lib/whatsapp-umrah/agent/persona";
 import { PageHeader } from "@/components/wa/ui";
 import { shortTime } from "@/components/wa/format";
 import { InboxView, type ListItem, type ThreadView, type TimelineItem } from "./InboxView";
+import { getT } from "@/lib/whatsapp-umrah/ui-lang-server";
 
 const hhmm = (d: Date) => d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 
 export default async function InboxPage({ params, searchParams }: { params: Promise<{ agencyId: string }>; searchParams: Promise<{ c?: string }> }) {
+  const t = await getT();
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { agencyId } = await params;
@@ -40,8 +42,8 @@ export default async function InboxPage({ params, searchParams }: { params: Prom
   if (thread) {
     // The chat is the messages in order, with a divider wherever control changed hands.
     const events = thread.handoffs.flatMap((h) => [
-      { at: h.startedAt, label: `${h.triggeredBy === "MANUAL" ? "YOUR TEAM TOOK OVER" : `${agentName.toUpperCase()} HANDED THIS TO YOUR TEAM`} · ${hhmm(h.startedAt)}`, id: `${h.id}-start`, note: h.triggeredBy === "AUTO" ? h.reason : undefined },
-      ...(h.resolvedAt ? [{ at: h.resolvedAt, label: `${agentName.toUpperCase()} IS BACK ON THIS CHAT · ${hhmm(h.resolvedAt)}`, id: `${h.id}-end` }] : []),
+      { at: h.startedAt, label: `${h.triggeredBy === "MANUAL" ? t("YOUR TEAM TOOK OVER") : t("{agent} HANDED THIS TO YOUR TEAM", { agent: agentName.toUpperCase() })} · ${hhmm(h.startedAt)}`, id: `${h.id}-start`, note: h.triggeredBy === "AUTO" ? h.reason : undefined },
+      ...(h.resolvedAt ? [{ at: h.resolvedAt, label: `${t("{agent} IS BACK ON THIS CHAT", { agent: agentName.toUpperCase() })} · ${hhmm(h.resolvedAt)}`, id: `${h.id}-end` }] : []),
     ]);
     const entries = [
       ...thread.messages.map((m) => ({ at: m.createdAt, item: { kind: "msg", id: m.id, who: m.sender === "CUSTOMER" ? "customer" : m.sender === "HUMAN" ? "team" : "ai", body: m.body ?? "", time: hhmm(m.createdAt), flagged: !!m.flaggedAt } as TimelineItem })),
@@ -60,14 +62,14 @@ export default async function InboxPage({ params, searchParams }: { params: Prom
       messageCount: thread.messages.length,
       items,
       lead: lead ? { status: lead.status, travelDates: lead.travelDates, travelers: lead.travelers, budgetGbp: lead.budgetGbp, packagePreference: lead.packagePreference } : null,
-      languages: languages || "English",
+      languages: languages || t("English"),
       exportHref: `/api/whatsapp-umrah/${agencyId}/contacts/${thread.contactId}/export`,
     };
   }
 
   return (
     <div>
-      <PageHeader title="Inbox" subtitle={`Every conversation, live. Take over any chat, or let ${agentName} keep going.`} />
+      <PageHeader title={t("Inbox")} subtitle={t("Every conversation, live. Take over any chat, or let {agentName} keep going.", { agentName })} />
       <InboxView
         agencyId={agencyId}
         agencyName={agency.name}

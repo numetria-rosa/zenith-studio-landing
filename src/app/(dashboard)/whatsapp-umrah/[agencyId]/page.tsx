@@ -12,10 +12,14 @@ import { initialOf, replyTime, shortTime } from "@/components/wa/format";
 import { ConnectPanel } from "./ConnectPanel";
 import { AgentSwitch } from "./AgentSwitch";
 import { marketForWhopPlanId } from "@/lib/whatsapp-umrah/whop-plans";
+import { getT, getUiLang } from "@/lib/whatsapp-umrah/ui-lang-server";
+import { uiLocale } from "@/lib/whatsapp-umrah/ui-lang";
 
 const LANG_ENABLED_DEFAULT = 4;
 
 export default async function OverviewPage({ params }: { params: Promise<{ agencyId: string }> }) {
+  const t = await getT();
+  const locale = uiLocale(await getUiLang());
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { agencyId } = await params;
@@ -44,32 +48,32 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
   const tested = conversations.length > 0;
 
   const setup = [
-    { done: kbHasContent, title: "Packages and FAQs added", detail: `${packages} ${packages === 1 ? "package" : "packages"} · ${faqs} ${faqs === 1 ? "FAQ" : "FAQs"} · ${info} info`, action: kbHasContent ? null : { label: "Add", href: `${base}/kb` } },
-    { done: connected, title: connected ? "WhatsApp connected" : "WhatsApp not connected", detail: connected ? (agency.whatsapp?.displayPhoneNumber ?? "") : "Not connected", amber: !connected, manage: connected },
-    { done: !!s, title: "Tone, languages and hours set", detail: `${s?.tone === "FORMAL" ? "Formal" : "Warm"} · ${languages} ${languages === 1 ? "language" : "languages"} · ${open247 ? "open 24/7" : "set hours"}`, action: s ? null : { label: "Set up", href: `${base}/settings` } },
-    { done: tested, title: "Tested in the simulator", detail: "Run a test any time", action: tested ? null : { label: "Test", href: `${base}/simulator` } },
+    { done: kbHasContent, title: "Packages and FAQs added", detail: `${packages} ${t(packages === 1 ? "package" : "packages")} · ${faqs} ${t(faqs === 1 ? "FAQ" : "FAQs")} · ${info} ${t("info")}`, action: kbHasContent ? null : { label: "Add", href: `${base}/kb` } },
+    { done: connected, title: connected ? "WhatsApp connected" : "WhatsApp not connected", detail: connected ? (agency.whatsapp?.displayPhoneNumber ?? "") : t("Not connected"), amber: !connected, manage: connected },
+    { done: !!s, title: "Tone, languages and hours set", detail: `${s?.tone === "FORMAL" ? t("Formal") : t("Warm")} · ${languages} ${t(languages === 1 ? "language" : "languages")} · ${open247 ? t("open 24/7") : t("set hours")}`, action: s ? null : { label: "Set up", href: `${base}/settings` } },
+    { done: tested, title: "Tested in the simulator", detail: t("Run a test any time"), action: tested ? null : { label: "Test", href: `${base}/simulator` } },
   ];
   const doneCount = setup.filter((r) => r.done).length;
 
-  const subtitle = agency.status === "LIVE" && connected && agency.agentPausedAt ? `${agentName} is paused. Your team is answering customers.` : agency.status === "LIVE" && connected ? `${agentName} is live and answering your customers on WhatsApp.` : connected ? "A few steps left before you're live." : "Connect your WhatsApp number to go live.";
+  const subtitle = agency.status === "LIVE" && connected && agency.agentPausedAt ? t("{agentName} is paused. Your team is answering customers.", { agentName }) : agency.status === "LIVE" && connected ? t("{agentName} is live and answering your customers on WhatsApp.", { agentName }) : connected ? "A few steps left before you're live." : "Connect your WhatsApp number to go live.";
 
   const stats: { label: string; value: React.ReactNode; caption: string; color: string; icon: WaIconName }[] = [
     { label: "Conversations", value: summary.conversations, caption: "LAST 30 DAYS", color: CYAN, icon: "chat" },
     { label: "Hot leads", value: summary.hotLeads, caption: "READY TO BOOK", color: EMBER, icon: "flame" },
     { label: "Avg. first reply", value: replyTime(summary.avgFirstReplySeconds), caption: "AI, 24/7", color: VIOLET, icon: "bolt" },
-    { label: "AI replies", value: <>{used.toLocaleString("en-GB")}<span className="text-[18px] font-normal text-dim"> / {cap.toLocaleString("en-GB")}</span></>, caption: "THIS MONTH", color: MINT, icon: "sparkle" },
+    { label: "AI replies", value: <>{used.toLocaleString(locale)}<span className="text-[18px] font-normal text-dim"> / {cap.toLocaleString(locale)}</span></>, caption: "THIS MONTH", color: MINT, icon: "sparkle" },
   ];
 
   return (
     <div>
       <PageHeader
-        title="Overview"
-        titleTag={market && <span title={`Signed up in ${market.currency}. Extra replies are bought in the same currency.`} className="inline-flex h-[26px] items-center gap-[6px] rounded-full border border-[rgba(92,200,255,.35)] bg-[rgba(92,200,255,.08)] px-[10px] font-mono text-[11.5px] tracking-[.08em] text-cyan-text">{market.market} · {market.currency}</span>}
+        title={t("Overview")}
+        titleTag={market && <span title={t("Signed up in {currency}. Extra replies are bought in the same currency.", { currency: market.currency })} className="inline-flex h-[26px] items-center gap-[6px] rounded-full border border-[rgba(92,200,255,.35)] bg-[rgba(92,200,255,.08)] px-[10px] font-mono text-[11.5px] tracking-[.08em] text-cyan-text">{market.market} · {market.currency}</span>}
         subtitle={subtitle}
         actions={
           <>
-            <GlassButton href={`${base}/simulator`} icon="chat">Open simulator</GlassButton>
-            <PrimaryButton href={`${base}/inbox`} icon="inbox">Open inbox</PrimaryButton>
+            <GlassButton href={`${base}/simulator`} icon="chat">{t("Open simulator")}</GlassButton>
+            <PrimaryButton href={`${base}/inbox`} icon="inbox">{t("Open inbox")}</PrimaryButton>
           </>
         }
       />
@@ -85,8 +89,8 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
               <WaIcon name="whatsapp" size={22} stroke={MINT} />
             </Tile>
             <div className="min-w-0 flex-1">
-              <h2 className="m-0 text-[18px] font-semibold">Connect your WhatsApp number</h2>
-              <p className="mb-4 mt-1 text-[14px] text-mist">{agentName} starts answering customers as soon as your number is connected.</p>
+              <h2 className="m-0 text-[18px] font-semibold">{t("Connect your WhatsApp number")}</h2>
+              <p className="mb-4 mt-1 text-[14px] text-mist">{agentName} {t("starts answering customers as soon as your number is connected.")}</p>
               <ConnectPanel agency={agency} email={session.user.email ?? ""} />
             </div>
           </div>
@@ -97,7 +101,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
         <div role="alert" className="mb-[18px] flex items-start gap-4 rounded-[22px] border border-[rgba(255,92,122,.4)] bg-[rgba(255,92,122,.07)] px-[22px] py-5">
           <WaIcon name="info" size={22} stroke={EMBER} />
           <div>
-            <div className="text-[16px] font-semibold">WhatsApp replies are not going out</div>
+            <div className="text-[16px] font-semibold">{t("WhatsApp replies are not going out")}</div>
             <div className="mt-1 text-[14px] text-soft">{agency.whatsapp.lastError}</div>
           </div>
         </div>
@@ -110,7 +114,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
           </Tile>
           <div className="min-w-0 flex-1">
             <div className="text-[17px] font-semibold">
-              {waitingChats.length} {waitingChats.length === 1 ? "customer is" : "customers are"} waiting for a person
+              {waitingChats.length} {waitingChats.length === 1 ? t("customer is") : t("customers are")} {t("waiting for a person")}
             </div>
             <div className="mt-1 truncate text-[14px] text-soft">
               {firstWaiting.contact.name || firstWaiting.contact.phone}
@@ -123,7 +127,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
               {firstWaiting.lastMessage && <span className="font-mono text-[12px] text-dim"> · {shortTime(firstWaiting.lastMessage.createdAt)}</span>}
             </div>
           </div>
-          <PrimaryButton href={`${base}/inbox?c=${firstWaiting.id}`} iconRight="arrow">Reply now</PrimaryButton>
+          <PrimaryButton href={`${base}/inbox?c=${firstWaiting.id}`} iconRight="arrow">{t("Reply now")}</PrimaryButton>
         </div>
       )}
 
@@ -131,13 +135,13 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
         {stats.map((st) => (
           <Card key={st.label} className="rounded-[20px] p-5">
             <div className="flex items-center justify-between">
-              <span className="text-[13.5px] text-mist">{st.label}</span>
+              <span className="text-[13.5px] text-mist">{t(st.label)}</span>
               <Tile size={30} radius={10} color={st.color}>
                 <WaIcon name={st.icon} size={15} stroke={st.color} />
               </Tile>
             </div>
             <div className="mt-[10px] text-[34px] font-semibold tracking-[-0.03em]">{st.value}</div>
-            <div className="mt-[6px] font-mono text-[11.5px] text-dim">{st.caption}</div>
+            <div className="mt-[6px] font-mono text-[11.5px] text-dim">{t(st.caption)}</div>
             {st.label === "AI replies" && (
               <div className="mt-3 h-[6px] overflow-hidden rounded-[3px] bg-[rgba(255,255,255,.08)]">
                 <div className="h-full min-w-[6px] rounded-[3px] bg-mint" style={{ width: `${pct}%` }} />
@@ -150,10 +154,10 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
       <div className="mt-[18px] grid items-start gap-[18px]" style={{ gridTemplateColumns: "minmax(0, 1.55fr) minmax(0, 1fr)" }}>
         <Card className="overflow-hidden">
           <div className="flex items-center justify-between px-[22px] pb-[14px] pt-5">
-            <Label>Latest conversations</Label>
-            <Link href={`${base}/inbox`} className="text-[13.5px] text-cyan-text no-underline hover:text-[#C9ECFF]">View inbox →</Link>
+            <Label>{t("Latest conversations")}</Label>
+            <Link href={`${base}/inbox`} className="text-[13.5px] text-cyan-text no-underline hover:text-[#C9ECFF]">{t("View inbox →")}</Link>
           </div>
-          {conversations.length === 0 && <div className="border-t border-[rgba(255,255,255,.06)] px-[22px] py-8 text-center text-[14px] text-dim">No conversations yet. They appear here as customers message your number.</div>}
+          {conversations.length === 0 && <div className="border-t border-[rgba(255,255,255,.06)] px-[22px] py-8 text-center text-[14px] text-dim">{t("No conversations yet. They appear here as customers message your number.")}</div>}
           {conversations.slice(0, 4).map((c) => {
             const waiting = waitingIds.has(c.id);
             const preview = c.lastMessage?.body ?? "";
@@ -163,7 +167,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-[10px]">
                     <span className="text-[15px]">{c.contact.name || c.contact.phone}</span>
-                    {waiting ? <Pill color={AMBER}>Needs you</Pill> : c.status === "HUMAN" ? <Pill color={VIOLET}>Your team</Pill> : <Pill color={MINT}>{agentName} answered</Pill>}
+                    {waiting ? <Pill color={AMBER}>{t("Needs you")}</Pill> : c.status === "HUMAN" ? <Pill color={VIOLET}>{t("Your team")}</Pill> : <Pill color={MINT}>{agentName} {t("answered")}</Pill>}
                   </div>
                   <div dir={isRtl(preview) ? "rtl" : "ltr"} className="mt-[3px] truncate text-[13.5px] text-mist">{preview}</div>
                 </div>
@@ -176,8 +180,8 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
         <div className="flex min-w-0 flex-col gap-[18px]">
           <Card className="px-[22px] pb-2 pt-5">
             <div className="mb-2 flex items-center justify-between">
-              <Label>Setup</Label>
-              <Pill color={doneCount === setup.length ? MINT : AMBER}>{doneCount} of {setup.length} done</Pill>
+              <Label>{t("Setup")}</Label>
+              <Pill color={doneCount === setup.length ? MINT : AMBER}>{doneCount} {t("of")} {setup.length} {t("done")}</Pill>
             </div>
             {setup.map((r) => (
               <div key={r.title} className="flex gap-3 border-t border-[rgba(255,255,255,.06)] py-3">
@@ -185,24 +189,24 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
                   {r.done && <WaIcon name="check" size={13} stroke="#05060A" strokeWidth={2.6} />}
                 </Tile>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[14.5px]">{r.title}</div>
+                  <div className="text-[14.5px]">{t(r.title)}</div>
                   <div className="mt-[2px] text-[13px]" style={{ color: r.amber ? AMBER : "#7D8392" }}>{r.detail}</div>
                 </div>
                 {r.manage && (
-                  <Modal title="Manage your WhatsApp number" description="Reconnect your number, or connect a different one." trigger={<button type="button" className="cursor-pointer self-center border-0 bg-transparent p-0 text-[13px] text-cyan-text">Manage</button>}>
+                  <Modal title={t("Manage your WhatsApp number")} description={t("Reconnect your number, or connect a different one.")} trigger={<button type="button" className="cursor-pointer self-center border-0 bg-transparent p-0 text-[13px] text-cyan-text">{t("Manage")}</button>}>
                     <ConnectPanel agency={agency} email={session.user.email ?? ""} />
                   </Modal>
                 )}
-                {r.action && <Link href={r.action.href} className="self-center text-[13px] text-cyan-text no-underline">{r.action.label}</Link>}
+                {r.action && <Link href={r.action.href} className="self-center text-[13px] text-cyan-text no-underline">{t(r.action.label)}</Link>}
               </div>
             ))}
           </Card>
 
           <Card className="overflow-hidden">
-            <div className="px-[22px] pb-3 pt-5"><Label>Quick actions</Label></div>
+            <div className="px-[22px] pb-3 pt-5"><Label>{t("Quick actions")}</Label></div>
             {[
               { href: `${base}/kb/packages/new`, title: "Add a package", sub: "New dates, prices or hotels", color: MINT, icon: "plus" as const },
-              { href: `${base}/kb?tab=faqs`, title: "Add an FAQ", sub: `Teach ${agentName} a new answer`, color: CYAN, icon: "book" as const },
+              { href: `${base}/kb?tab=faqs`, title: "Add an FAQ", sub: t("Teach {agentName} a new answer", { agentName }), color: CYAN, icon: "book" as const },
               { href: `${base}/simulator`, title: "Test in the simulator", sub: "Never touches WhatsApp", color: VIOLET, icon: "chat" as const },
             ].map((a) => (
               <Link key={a.title} href={a.href} className="flex items-center gap-[14px] border-t border-[rgba(255,255,255,.06)] px-[22px] py-[14px] text-frost no-underline hover:bg-[rgba(255,255,255,.03)]">
@@ -210,8 +214,8 @@ export default async function OverviewPage({ params }: { params: Promise<{ agenc
                   <WaIcon name={a.icon} size={16} stroke={a.color} />
                 </Tile>
                 <div className="flex-1">
-                  <div className="text-[14.5px]">{a.title}</div>
-                  <div className="mt-[2px] text-[12.5px] text-dim">{a.sub}</div>
+                  <div className="text-[14.5px]">{t(a.title)}</div>
+                  <div className="mt-[2px] text-[12.5px] text-dim">{t(a.sub)}</div>
                 </div>
                 <WaIcon name="arrow" size={16} stroke="#7D8392" />
               </Link>

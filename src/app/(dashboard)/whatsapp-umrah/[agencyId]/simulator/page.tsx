@@ -6,6 +6,7 @@ import { getOwnedAgency } from "@/lib/whatsapp-umrah/dashboard-data";
 import { Card, Chip, Label } from "@/components/wa/ui";
 import { WaIcon, type WaIconName } from "@/components/wa/Icon";
 import { SimulatorChat } from "./SimulatorChat";
+import { getT } from "@/lib/whatsapp-umrah/ui-lang-server";
 
 const Row = ({ label, children, icon }: { label: string; children: React.ReactNode; icon?: WaIconName }) => (
   <div className="flex justify-between gap-3 border-t border-[rgba(255,255,255,.06)] py-[11px] text-[14px]">
@@ -15,6 +16,7 @@ const Row = ({ label, children, icon }: { label: string; children: React.ReactNo
 );
 
 export default async function SimulatorPage({ params }: { params: Promise<{ agencyId: string }> }) {
+  const t = await getT();
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { agencyId } = await params;
@@ -32,26 +34,26 @@ export default async function SimulatorPage({ params }: { params: Promise<{ agen
   const rail = (
     <>
       <Card className="px-[22px] pb-[10px] pt-5">
-        <Label className="mb-2 block">How {agentName} is set up</Label>
-        <Row label="Tone">{s?.tone === "FORMAL" ? "Formal" : "Warm"}</Row>
-        <Row label="Sign-off">{s?.signOff?.trim() ? `${AGENT_NAME}, ${agency.name}` : <span className="text-dim">None</span>}</Row>
-        <Row label="Emoji">{emoji ? "On" : <span className="text-dim">Off</span>}</Row>
-        <Row label="Languages">
+        <Label className="mb-2 block">{t("How")} {agentName} {t("is set up")}</Label>
+        <Row label={t("Tone")}>{s?.tone === "FORMAL" ? t("Formal") : t("Warm")}</Row>
+        <Row label={t("Sign-off")}>{s?.signOff?.trim() ? `${AGENT_NAME}, ${agency.name}` : <span className="text-dim">{t("None")}</span>}</Row>
+        <Row label={t("Emoji")}>{emoji ? t("On") : <span className="text-dim">{t("Off")}</span>}</Row>
+        <Row label={t("Languages")}>
           <span className="inline-flex gap-[5px]">{(s?.languagesEnabled ?? ["en", "ar", "tr", "ur"]).map((l) => <Chip key={l} className="px-[10px] font-mono text-[11px] uppercase tracking-[.06em] text-soft">{l}</Chip>)}</span>
         </Row>
-        <Row label="Hours">{s?.businessHours ? "Set hours" : "Open 24/7"}</Row>
-        <Link href={`${base}/settings`} className="mb-[10px] mt-2 inline-block text-[13.5px] text-cyan-text no-underline">Change in Settings →</Link>
+        <Row label={t("Hours")}>{s?.businessHours ? t("Set hours") : t("Open 24/7")}</Row>
+        <Link href={`${base}/settings`} className="mb-[10px] mt-2 inline-block text-[13.5px] text-cyan-text no-underline">{t("Change in Settings →")}</Link>
       </Card>
       <Card className="px-[22px] pb-[10px] pt-5">
-        <Label className="mb-2 block">What {agentName} can answer from</Label>
-        <Row label="Packages" icon="plane">{packages}</Row>
-        <Row label="FAQs" icon="chat">{faqs}</Row>
-        <Row label="General info" icon="file">{info}</Row>
-        <Link href={`${base}/kb`} className="mb-[10px] mt-2 inline-block text-[13.5px] text-cyan-text no-underline">Open knowledge base →</Link>
+        <Label className="mb-2 block">{t("What")} {agentName} {t("can answer from")}</Label>
+        <Row label={t("Packages")} icon="plane">{packages}</Row>
+        <Row label={t("FAQs")} icon="chat">{faqs}</Row>
+        <Row label={t("General info")} icon="file">{info}</Row>
+        <Link href={`${base}/kb`} className="mb-[10px] mt-2 inline-block text-[13.5px] text-cyan-text no-underline">{t("Open knowledge base →")}</Link>
       </Card>
       <div className="flex gap-3 rounded-[18px] border border-[rgba(199,176,255,.25)] bg-[rgba(139,92,246,.08)] px-[18px] py-4 text-[13.5px] leading-[1.5] text-soft">
         <WaIcon name="info" size={18} stroke="#C7B0FF" />
-        <span>If {agentName} gets something wrong, fix the package or FAQ it came from, then ask again here.</span>
+        <span>{t("If")} {agentName} {t("gets something wrong, fix the package or FAQ it came from, then ask again here.")}</span>
       </div>
     </>
   );

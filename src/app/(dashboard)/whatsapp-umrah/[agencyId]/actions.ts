@@ -26,6 +26,7 @@ import { createExtraRepliesCheckout } from "@/lib/whatsapp-umrah/extra-replies";
 import { EMBEDDED_SIGNUP_ENABLED, isEmbeddedSignupCapReached } from "@/lib/whatsapp-umrah/embedded-signup";
 import { finishEmbeddedSignup, newRegistrationPin } from "@/lib/whatsapp-umrah/embedded-signup-flow";
 import { saveWhatsAppConnection } from "@/lib/whatsapp-umrah/connect";
+import { getT } from "@/lib/whatsapp-umrah/ui-lang-server";
 
 const HOURS_DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
@@ -379,11 +380,12 @@ export async function completeEmbeddedSignupAction(
   agencyId: string,
   input: { code: string; wabaId: string; phoneNumberId: string | null; event: string },
 ): Promise<{ ok: true; displayPhoneNumber: string | null } | { ok: false; error: string }> {
+  const t = await getT();
   const { agency, userId } = await requireOwnedAgency(agencyId);
-  if (!EMBEDDED_SIGNUP_ENABLED || (await isEmbeddedSignupCapReached())) return { ok: false, error: "Connecting with Meta is not available right now. Please use the request form instead." };
+  if (!EMBEDDED_SIGNUP_ENABLED || (await isEmbeddedSignupCapReached())) return { ok: false, error: t("Connecting with Meta is not available right now. Please use the request form instead.") };
   const appId = process.env.NEXT_PUBLIC_META_APP_ID;
   const appSecret = process.env.META_APP_SECRET;
-  if (!appId || !appSecret) return { ok: false, error: "Connecting with Meta is not configured yet. Please use the request form instead." };
+  if (!appId || !appSecret) return { ok: false, error: t("Connecting with Meta is not configured yet. Please use the request form instead.") };
 
   const pin = newRegistrationPin();
   try {
@@ -405,7 +407,7 @@ export async function completeEmbeddedSignupAction(
     revalidatePath(`/whatsapp-umrah/${agencyId}`);
     return { ok: true, displayPhoneNumber: result.displayPhoneNumber };
   } catch (err) {
-    const error = err instanceof Error ? err.message : "Connecting with Meta failed.";
+    const error = err instanceof Error ? err.message : t("Connecting with Meta failed.");
     await logWaAuditEvent(agency.id, userId, "embedded_signup_failed", { error, wabaId: input.wabaId, event: input.event });
     return { ok: false, error };
   }

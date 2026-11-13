@@ -3,6 +3,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState, useTransition, type ReactNode } from "react";
 import { GlassButton, PrimaryButton } from "./ui";
+import { useT } from "@/components/wa/i18n";
 
 /** Modal shell used for "Manage WhatsApp" and for destructive confirmations (Radix Dialog: focus trap, Esc to close). */
 export function Modal({ trigger, title, description, children, open, onOpenChange, width = 560 }: { trigger?: ReactNode; title: string; description?: string; children: ReactNode; open?: boolean; onOpenChange?: (o: boolean) => void; width?: number }) {
@@ -26,11 +27,12 @@ export function Modal({ trigger, title, description, children, open, onOpenChang
 
 /** "Are you sure?" dialog. The confirm button runs `onConfirm` (typically a form submit or server action). */
 export function ConfirmDialog({ trigger, title, description, confirmLabel, onConfirm, open, onOpenChange, pending }: { trigger?: ReactNode; title: string; description: string; confirmLabel: string; onConfirm: () => void; open?: boolean; onOpenChange?: (o: boolean) => void; pending?: boolean }) {
+  const t = useT();
   return (
     <Modal trigger={trigger} title={title} description={description} open={open} onOpenChange={onOpenChange} width={440}>
       <div className="flex justify-end gap-[10px]">
         <Dialog.Close asChild>
-          <GlassButton>Cancel</GlassButton>
+          <GlassButton>{t("Cancel")}</GlassButton>
         </Dialog.Close>
         <PrimaryButton onClick={onConfirm} disabled={pending} className="!bg-[#FF5C7A] !text-white !shadow-[0_0_24px_rgba(255,92,122,.25)]">
           {confirmLabel}

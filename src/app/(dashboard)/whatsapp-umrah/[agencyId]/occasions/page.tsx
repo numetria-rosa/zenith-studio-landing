@@ -7,10 +7,12 @@ import { formatOccasionDates } from "@/lib/whatsapp-umrah/occasions";
 import { addSuggestedOccasionsAction, deleteOccasionAction, saveOccasionAction } from "../actions";
 import { PageHeader } from "@/components/wa/ui";
 import { OccasionsView } from "./OccasionsView";
+import { getT } from "@/lib/whatsapp-umrah/ui-lang-server";
 
 const day = (d: Date) => d.toISOString().slice(0, 10);
 
 export default async function OccasionsPage({ params }: { params: Promise<{ agencyId: string }> }) {
+  const t = await getT();
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { agencyId } = await params;
@@ -29,7 +31,7 @@ export default async function OccasionsPage({ params }: { params: Promise<{ agen
 
   return (
     <div>
-      <PageHeader title="Occasions" subtitle={`Your own calendar of Ramadan, Eid, Hajj, school holidays and anything else you sell around. ${AGENT_NAME} uses it to match what customers ask for to your packages.`} />
+      <PageHeader title={t("Occasions")} subtitle={t("Your own calendar of Ramadan, Eid, Hajj, school holidays and anything else you sell around. {AGENT_NAME} uses it to match what customers ask for to your packages.", { AGENT_NAME })} />
       <OccasionsView items={items} agentName={AGENT_NAME} save={saveOccasionAction.bind(null, agencyId)} addSuggested={addSuggestedOccasionsAction.bind(null, agencyId)} />
     </div>
   );

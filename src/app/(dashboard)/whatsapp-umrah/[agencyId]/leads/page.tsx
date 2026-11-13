@@ -5,8 +5,10 @@ import { getOwnedAgency, listLeads } from "@/lib/whatsapp-umrah/dashboard-data";
 import { PageHeader } from "@/components/wa/ui";
 import { shortTime } from "@/components/wa/format";
 import { LeadsTable, type LeadRow } from "./LeadsTable";
+import { getT } from "@/lib/whatsapp-umrah/ui-lang-server";
 
 export default async function LeadsPage({ params }: { params: Promise<{ agencyId: string }> }) {
+  const t = await getT();
   const session = await auth();
   if (!session?.user?.id) notFound();
   const { agencyId } = await params;
@@ -29,7 +31,7 @@ export default async function LeadsPage({ params }: { params: Promise<{ agencyId
 
   return (
     <div>
-      <PageHeader title="Leads" subtitle={`Every enquiry ${AGENT_NAME} has qualified, newest first. Change a status and it saves straight away.`} />
+      <PageHeader title={t("Leads")} subtitle={t("Every enquiry {AGENT_NAME} has qualified, newest first. Change a status and it saves straight away.", { AGENT_NAME })} />
       <LeadsTable agencyId={agencyId} rows={rows} />
     </div>
   );

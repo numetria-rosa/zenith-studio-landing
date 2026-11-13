@@ -15,11 +15,16 @@ describe("isOptOutMessage", () => {
   });
 });
 
-describe("opt-out in four languages, and the way back in", () => {
+describe("opt-out in five languages, and the way back in", () => {
   it("recognises the whole-message opt-out in Arabic, Turkish and Urdu", () => {
     expect(isOptOutMessage("توقف")).toBe(true);
     expect(isOptOutMessage("Durdur")).toBe(true);
     expect(isOptOutMessage("بند کریں")).toBe(true);
+  });
+  it("recognises the whole-message opt-out in French, but not a sentence", () => {
+    expect(isOptOutMessage("Arrêtez")).toBe(true);
+    expect(isOptOutMessage("se désabonner")).toBe(true);
+    expect(isOptOutMessage("arrêtez de me demander, quel est le prix ?")).toBe(false);
   });
   it("recognises START but not the word inside a sentence", () => {
     expect(isOptInMessage("START")).toBe(true);

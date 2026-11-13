@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { parseSignupMessage, type SignupMessage } from "@/lib/whatsapp-umrah/embedded-signup-flow";
 import { completeEmbeddedSignupAction } from "./actions";
 import { PrimaryButton } from "@/components/wa/ui";
+import { useT } from "@/components/wa/i18n";
 
 /* Meta's Embedded Signup popup (v4), per developers.facebook.com/documentation/business-messaging/whatsapp/
    embedded-signup/implementation and .../versions (read 2026-10-19): load the JS SDK, FB.login with our
@@ -25,6 +26,7 @@ declare global {
 const SDK_SRC = "https://connect.facebook.net/en_US/sdk.js";
 
 export function EmbeddedSignupButton({ agencyId, appId, configId, coexistence }: { agencyId: string; appId: string; configId: string; coexistence: boolean }) {
+  const t = useT();
   const [ready, setReady] = useState(false);
   const [status, setStatus] = useState<{ tone: "info" | "ok" | "bad"; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -52,7 +54,7 @@ export function EmbeddedSignupButton({ agencyId, appId, configId, coexistence }:
       if (!msg) return;
       if (msg.kind === "cancel") {
         setBusy(false);
-        setStatus({ tone: "bad", text: `Meta setup was not finished (${msg.reason}). You can try again.` });
+        setStatus({ tone: "bad", text: t("Meta setup was not finished ({reason}). You can try again.", { reason: msg.reason }) });
         return;
       }
       finish.current = msg;
@@ -66,10 +68,10 @@ export function EmbeddedSignupButton({ agencyId, appId, configId, coexistence }:
   async function submitIfReady() {
     if (sent.current || !code.current || !finish.current) return;
     sent.current = true;
-    setStatus({ tone: "info", text: "Connecting your number..." });
+    setStatus({ tone: "info", text: t("Connecting your number...") });
     const r = await completeEmbeddedSignupAction(agencyId, { code: code.current, wabaId: finish.current.wabaId, phoneNumberId: finish.current.phoneNumberId, event: finish.current.event });
     setBusy(false);
-    if (r.ok) setStatus({ tone: "ok", text: `Connected${r.displayPhoneNumber ? ` ${r.displayPhoneNumber}` : ""}. Refreshing...` });
+    if (r.ok) setStatus({ tone: "ok", text: t("Connected{phone}. Refreshing...", { phone: r.displayPhoneNumber ? ` ${r.displayPhoneNumber}` : "" }) });
     else {
       sent.current = false;
       code.current = null;
@@ -89,7 +91,7 @@ export function EmbeddedSignupButton({ agencyId, appId, configId, coexistence }:
         const c = response.authResponse?.code;
         if (!c) {
           setBusy(false);
-          if (!finish.current) setStatus({ tone: "bad", text: "Meta setup was closed before it finished. You can try again." });
+          if (!finish.current) setStatus({ tone: "bad", text: t("Meta setup was closed before it finished. You can try again.") });
           return;
         }
         code.current = c;
@@ -111,15 +113,14 @@ export function EmbeddedSignupButton({ agencyId, appId, configId, coexistence }:
   return (
     <div>
       <p className="mb-4 mt-0 text-[14px] leading-[1.55] text-mist">
-        Log in with the Facebook account that manages your business, choose or create your WhatsApp Business account, and add the number your customers message. It
-        takes about five minutes. After that, add a payment method in WhatsApp Manager: Meta bills WhatsApp messages to you directly.
+        {t("Log in with the Facebook account that manages your business, choose or create your WhatsApp Business account, and add the number your customers message. It takes about five minutes. After that, add a payment method in WhatsApp Manager: Meta bills WhatsApp messages to you directly.")}
       </p>
       <PrimaryButton onClick={launch} disabled={!ready || busy}>
-        {busy ? "Waiting for Meta..." : "Connect with Meta"}
+        {busy ? t("Waiting for Meta...") : t("Connect with Meta")}
       </PrimaryButton>
       {status && (
         <p role="status" className={`mb-0 mt-3 text-[13px] ${tone}`}>
-          {status.text}
+          {t(status.text)}
         </p>
       )}
     </div>
