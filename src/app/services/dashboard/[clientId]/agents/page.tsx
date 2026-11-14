@@ -21,7 +21,7 @@ export default async function ClientConsoleAgents({ params }: { params: Promise<
   return (
     <div>
       <h1 className={s.title}>Your agents</h1>
-      <p className={s.subtitle}>{agents.length} agents working for {project.title}.</p>
+      <p className={s.subtitle}>{agents.length} agent{agents.length === 1 ? "" : "s"} working for {project.title}.</p>
 
       <div className={s.grid}>
         {agents.map((agent) => {

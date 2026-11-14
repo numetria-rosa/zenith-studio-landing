@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { sendAsBusiness } from "@/lib/client-mail";
 import { businessNameOf } from "@/lib/services";
 import { getSiteUrl } from "@/lib/site";
-import { CANCELLED_GRACE_DAYS, chaseEmail, cleanItems, FILE_RETENTION_DAYS, filesToPurge, isDueForChase, MAX_CHASES, MAX_EMAILS_PER_RUN, MAX_ITEMS, MAX_UPLOAD_BYTES, REJECT_REASONS } from "@/lib/document-chaser";
+import { CANCELLED_GRACE_DAYS, chaseEmail, cleanItems, FILE_RETENTION_DAYS, filesToPurge, isAbandonedExtraSlot, isDueForChase, MAX_CHASES, MAX_EMAILS_PER_RUN, MAX_ITEMS, MAX_UPLOAD_BYTES, REJECT_REASONS, sentBackEmail } from "@/lib/document-chaser";
 
 /* AI Document Chaser: database side. Every accountant-facing function checks the project belongs to the
    signed-in user and is this service; the client-facing ones are keyed by the secret upload token only. */
@@ -150,21 +150,43 @@ async function ownedItem(projectId: string, userId: string, itemId: string) {
   return db.docChaseItem.findFirst({ where: { id: itemId, client: { projectId, project: { userId, sourceServiceId: DOC_CHASER_SERVICE_ID } } }, include: { client: true } });
 }
 
-/** Accept an upload, or send it back with one of the fixed reasons (the client is reminded at the next run). */
-export async function reviewDocChaseItem(projectId: string, userId: string, itemId: string, decision: "accept" | "reject", reason?: string): Promise<Result> {
+/** What happened to the client's email when a document was sent back: sent, couldn't be sent (they're reminded at
+    the next daily run), or not sent because chasing is paused. */
+export type ReviewResult = { ok: true; clientName: string; emailed?: "sent" | "failed" | "paused" } | { ok: false; error: string };
+
+/** Accept an upload, or send it back with one of the fixed reasons. A sent-back document emails the client right
+    away (what was wrong, and the link for a new copy). */
+export async function reviewDocChaseItem(projectId: string, userId: string, itemId: string, decision: "accept" | "reject", reason?: string): Promise<ReviewResult> {
   const item = await ownedItem(projectId, userId, itemId);
   if (!item) return { ok: false, error: "not_found" };
+  const clientName = item.client.name;
   if (decision === "accept") {
     await db.docChaseItem.update({ where: { id: itemId }, data: { status: "ACCEPTED", rejectReason: null } });
     const open = await db.docChaseItem.count({ where: { clientId: item.clientId, status: { notIn: ["ACCEPTED", "NOT_APPLICABLE"] } } });
     if (open === 0) await db.docChaseClient.update({ where: { id: item.clientId }, data: { status: "DONE", completedAt: new Date() } });
-    return { ok: true };
+    return { ok: true, clientName };
   }
   if (!reason || !REJECT_REASONS.includes(reason)) return { ok: false, error: "Pick a reason to send it back." };
   await db.docChaseItem.update({ where: { id: itemId }, data: { status: "REQUESTED", rejectReason: reason } });
-  // A sent-back document gets a reminder at the next run, and a client marked done is reopened.
-  await db.docChaseClient.update({ where: { id: item.clientId }, data: { lastChasedAt: null, status: item.client.status === "PAUSED" ? "PAUSED" : "ACTIVE", completedAt: null } });
-  return { ok: true };
+  // A client marked done is reopened. Until the email below goes out, the next daily run reminds them.
+  const paused = item.client.status === "PAUSED";
+  await db.docChaseClient.update({ where: { id: item.clientId }, data: { lastChasedAt: null, status: paused ? "PAUSED" : "ACTIVE", completedAt: null } });
+  if (paused) return { ok: true, clientName, emailed: "paused" };
+
+  const project = await db.serviceProject.findUnique({ where: { id: projectId }, select: { title: true, sourceServiceId: true, user: { select: { email: true } } } });
+  if (!project) return { ok: true, clientName, emailed: "failed" };
+  const sentBack = await db.docChaseItem.findMany({ where: { clientId: item.clientId, status: "REQUESTED", rejectReason: { not: null } }, orderBy: [{ order: "asc" }, { createdAt: "asc" }], select: { label: true, rejectReason: true } });
+  const mail = sentBackEmail({
+    businessName: businessNameOf(project) || "Your accountant",
+    clientName,
+    items: sentBack.map((i) => ({ label: i.label, rejectReason: i.rejectReason! })),
+    uploadUrl: uploadUrlFor(item.client.uploadToken),
+  });
+  const sent = await sendAsBusiness({ businessName: businessNameOf(project) || "Your accountant", to: item.client.email, replyTo: project.user.email, subject: mail.subject, text: mail.text });
+  if (!sent.ok) return { ok: true, clientName, emailed: "failed" };
+  // The client now has the link, so the regular reminders count from today.
+  await db.docChaseClient.update({ where: { id: item.clientId }, data: { lastChasedAt: new Date() } });
+  return { ok: true, clientName, emailed: "sent" };
 }
 
 export async function setDocChaseClientStatus(projectId: string, userId: string, clientId: string, status: "ACTIVE" | "PAUSED"): Promise<Result> {
@@ -240,13 +262,40 @@ export async function confirmUpload(token: string, itemId: string, pathname: str
   const blob = await head(pathname, { token: docBlobToken() }).catch(() => null);
   if (!blob || blob.size > MAX_UPLOAD_BYTES) return { ok: false, error: "We couldn't find that upload. Please try again." };
 
-  const previous = await db.docChaseItem.findUnique({ where: { id: itemId }, select: { filePathname: true } });
+  const previous = await db.docChaseItem.findUnique({ where: { id: itemId }, select: { filePathname: true, status: true, label: true } });
+  // Is this the first thing waiting for the accountant's review from this client? Then they get an email.
+  const alreadyWaiting = previous?.status === "RECEIVED" || (await db.docChaseItem.count({ where: { clientId: allowed.clientId, status: "RECEIVED", id: { not: itemId } } })) > 0;
   await db.docChaseItem.update({
     where: { id: itemId },
     data: { status: "RECEIVED", filePathname: pathname, fileName: fileName.slice(0, 160), uploadedAt: new Date(), rejectReason: null, aiVerdict: null, aiNote: null },
   });
   if (previous?.filePathname && previous.filePathname !== pathname) await del(previous.filePathname, { token: docBlobToken() }).catch(() => {});
+  if (!alreadyWaiting) await notifyAccountantOfUpload(allowed.clientId, previous?.label ?? "a document");
   return { ok: true };
+}
+
+/** "Jane uploaded a document": one email to the accountant for the first upload waiting for review, not one per
+    file. Once they've reviewed everything, the next upload emails them again. Never fails the client's upload. */
+async function notifyAccountantOfUpload(clientId: string, label: string): Promise<void> {
+  try {
+    const c = await db.docChaseClient.findUnique({ where: { id: clientId }, select: { name: true, email: true, projectId: true, project: { select: { user: { select: { email: true } } } } } });
+    const to = c?.project.user.email;
+    if (!c || !to) return;
+    await sendAsBusiness({
+      businessName: "Zenith Document Chaser",
+      to,
+      replyTo: null,
+      subject: `${c.name} sent you a document`,
+      text: `${c.name} (${c.email}) just uploaded "${label.replace(/ \(\d+\)$/, "")}".
+
+Review it, accept it or send it back:
+${getSiteUrl()}/services/dashboard/${c.projectId}/agents/chaser?show=review#clients
+
+You get this email for the first upload waiting for review, not one for every file. Once you've reviewed everything, the next upload emails you again.`,
+    });
+  } catch (err) {
+    console.error("[doc-chaser] upload notice failed:", err instanceof Error ? err.message : err);
+  }
 }
 
 /** The client says they don't have this document (this year it doesn't apply, say). It stops being chased; the
@@ -315,6 +364,12 @@ async function chaseClients(where: { id?: { in: string[] } }, now = new Date()):
   for (const c of clients) {
     const businessName = businessNameOf(c.project) || "Your accountant";
     const accountantEmail = c.project.user.email;
+    // Empty extra slots the client opened and never used don't count as missing documents.
+    const abandoned = c.items.filter((i) => isAbandonedExtraSlot(i, now));
+    if (abandoned.length) {
+      await db.docChaseItem.deleteMany({ where: { id: { in: abandoned.map((i) => i.id) } } });
+      c.items = c.items.filter((i) => !abandoned.includes(i));
+    }
     const outstanding = c.items.filter((i) => i.status === "REQUESTED");
 
     // Everything uploaded (some may still need review): tell the accountant once, stop chasing.

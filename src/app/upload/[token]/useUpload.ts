@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { upload } from "@vercel/blob/client";
-import { MAX_UPLOAD_BYTES, uploadPathname } from "@/lib/document-chaser";
+import { acceptedContentType, MAX_UPLOAD_BYTES, uploadPathname } from "@/lib/document-chaser";
 import { confirmUploadAction } from "./actions";
 
 /* Sends one file for one slot straight to private storage, then tells the server it arrived. */
@@ -15,10 +15,14 @@ export function useUpload(token: string, clientId: string, itemId: string) {
   async function send(file: File | undefined) {
     if (!file) return;
     if (file.size > MAX_UPLOAD_BYTES) return setState({ busy: false, progress: 0, error: "That file is over 20 MB. Please send a smaller copy." });
+    // A file we can't take gets a plain answer here, not the generic "try again" (retrying can't help).
+    const contentType = acceptedContentType(file.name, file.type);
+    if (!contentType) return setState({ busy: false, progress: 0, error: "We can't take that kind of file. Please send a PDF, a photo, a spreadsheet or a Word document." });
     setState({ busy: true, progress: 0, error: null });
     try {
       const blob = await upload(uploadPathname(clientId, itemId, file.name), file, {
         access: "private",
+        contentType,
         handleUploadUrl: "/api/doc-chaser/upload",
         clientPayload: JSON.stringify({ token, itemId }),
         multipart: file.size > 5 * 1024 * 1024,
@@ -39,4 +43,4 @@ export function useUpload(token: string, clientId: string, itemId: string) {
   return { input, state, send, pick: () => input.current?.click() };
 }
 
-export const ACCEPT = "image/*,application/pdf,.xlsx,.xls,.csv";
+export const ACCEPT = "image/*,application/pdf,.xlsx,.xls,.csv,.doc,.docx";

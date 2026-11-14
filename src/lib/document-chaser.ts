@@ -350,6 +350,35 @@ ${input.businessName}`;
   return { subject, text };
 }
 
+/** Sent straight away when the accountant sends a document back: what was wrong with each one, and the link to
+    send a new copy. The regular reminder repeats it later if the client doesn't act. */
+export function sentBackEmail(input: { businessName: string; clientName: string; items: { label: string; rejectReason: string }[]; uploadUrl: string }): { subject: string; text: string } {
+  const first = input.clientName.trim().split(/\s+/)[0] || "there";
+  const many = input.items.length > 1;
+  const list = input.items.map((i) => `- ${i.label} (${i.rejectReason})`).join("\n");
+  const text = `Hi ${first},
+
+We couldn't use ${many ? "some of the documents" : "a document"} you sent:
+
+${list}
+
+Please send ${many ? "new copies" : "a new copy"} here, it only takes a minute:
+${input.uploadUrl}
+
+If you have any questions, just reply to this email.
+
+Thanks,
+${input.businessName}`;
+  return { subject: `Please resend ${many ? "some documents" : "a document"} for ${input.businessName}`, text };
+}
+
+/** An extra "(2)" slot the client opened with "Add another file" and never used. After a day it's dropped,
+    so it doesn't hold back "everything is in" or show up in the accountant's list as a missing document. */
+export const EXTRA_SLOT_GRACE_HOURS = 24;
+export function isAbandonedExtraSlot(item: { label: string; status: string; filePathname: string | null; rejectReason: string | null; createdAt: Date }, now: Date): boolean {
+  return / \(\d+\)$/.test(item.label) && item.status === "REQUESTED" && !item.filePathname && !item.rejectReason && now.getTime() - item.createdAt.getTime() > EXTRA_SLOT_GRACE_HOURS * 3600000;
+}
+
 /** Private Blob path for one uploaded file: doc-chaser/<client>/<item>-<random>-<safe name>. */
 export function uploadPathname(clientId: string, itemId: string, filename: string): string {
   const base = filename.split(/[\\/]/).pop() ?? "file";
@@ -375,6 +404,30 @@ export const UPLOAD_CONTENT_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+
+/** Content type by file extension, for files the browser reports without one (HEIC photos from a Windows PC, say). */
+export const CONTENT_TYPE_BY_EXT: Record<string, string> = {
+  pdf: "application/pdf",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  heic: "image/heic",
+  heif: "image/heif",
+  webp: "image/webp",
+  csv: "text/csv",
+  xls: "application/vnd.ms-excel",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  doc: "application/msword",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+};
+
+/** The content type to upload a file as, or null when it isn't a kind we accept. */
+export function acceptedContentType(fileName: string, reported: string): string | null {
+  const type = reported.split(";")[0]!.trim().toLowerCase();
+  if (UPLOAD_CONTENT_TYPES.includes(type)) return type;
+  if (type && type !== "application/octet-stream") return null;
+  return CONTENT_TYPE_BY_EXT[fileName.split(".").pop()?.toLowerCase() ?? ""] ?? null;
+}
 
 /** Where a client is, for the accountant's list: something to review first, then who hasn't started. */
 export type ClientStage = "review" | "waiting" | "started" | "complete" | "paused";

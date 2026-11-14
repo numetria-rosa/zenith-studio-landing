@@ -17,6 +17,7 @@ const ORDER: ClientStage[] = ["review", "waiting", "started", "complete", "pause
    review first. Every button posts to one server action with an `op`. */
 export function DocChaserClients({
   clients,
+  flash,
   base,
   show,
   list,
@@ -25,6 +26,8 @@ export function DocChaserClients({
   review,
 }: {
   clients: Client[];
+  /** What the last action did ("Sent back. Jane has been emailed."), shown here so it's in view after the jump to this list. */
+  flash?: string;
   base: string;
   show?: string;
   list?: string;
@@ -52,6 +55,11 @@ export function DocChaserClients({
         <h2 className={c.cardTitle}>Your clients</h2>
         <span className={c.count}>{clients.length} total</span>
       </div>
+      {flash && (
+        <p role="status" style={{ margin: "0 0 16px", padding: "12px 16px", borderRadius: 12, background: "rgba(61,220,151,.08)", border: "1px solid rgba(61,220,151,.3)", color: "var(--zc-done-text)", fontSize: 14 }}>
+          {flash}
+        </p>
+      )}
 
       <nav className={c.filters} aria-label="Filter by status">
         <Link href={href({ list })} className={!show ? c.filterOn : c.filter}>

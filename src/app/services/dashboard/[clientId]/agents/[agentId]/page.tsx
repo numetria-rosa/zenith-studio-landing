@@ -467,7 +467,16 @@ export default async function AgentDetailPage({
     const result = await reviewDocChaseItem(clientId, session2!.user.id, String(formData.get("id") || ""), decision, String(formData.get("reason") || ""));
     revalidatePath(dashboardBase, "layout");
     if (!result.ok) failTo(agentBase, result.error);
-    redirect(`${agentBase}#clients`);
+    const name = result.clientName;
+    const flashText =
+      decision === "accept"
+        ? "Accepted."
+        : result.emailed === "sent"
+          ? `Sent back. ${name} has been emailed the reason and a link to send a new copy.`
+          : result.emailed === "paused"
+            ? `Sent back. ${name} isn't emailed while chasing is paused, but will see the reason on their upload page.`
+            : `Sent back. The email to ${name} couldn't be sent, so they'll be reminded at the next daily run.`;
+    redirect(`${agentBase}?flash=${encodeURIComponent(flashText)}#clients`);
   }
 
   async function chaseClientAction(op: string, formData: FormData): Promise<void> {
@@ -947,7 +956,7 @@ export default async function AgentDetailPage({
       <div>
         <Breadcrumb clientId={clientId} agentName={agent.name} />
         <Header agent={agent} tone={status.tone} clientId={clientId} />
-        {flash && <FlashBox text={flash} />}
+        {flash && project.docChaseClients.length === 0 && <FlashBox text={flash} />}
         {activateError && <p className={s.errorBox} style={{ maxWidth: 720 }}>{activateError}</p>}
 
         <DocChaserSetup
@@ -968,6 +977,7 @@ export default async function AgentDetailPage({
 
         <DocChaserClients
           clients={project.docChaseClients}
+          flash={flash}
           base={agentBase}
           show={show}
           list={list}

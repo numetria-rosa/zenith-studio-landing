@@ -3,12 +3,38 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { notApplicableAction } from "./actions";
+import { ACCEPT, useUpload } from "./useUpload";
 import { GLASS, Icon, MONO, P } from "./ui";
-import type { Doc } from "./model";
+import type { Doc, Slot } from "./model";
 
-/* Everything finished: sent documents (with their filenames) and ones the client said they don't have,
-   each with "I do have it" to undo. Fills the empty last grid cell, or spans both columns. */
-export function DoneCard({ token, docs, span }: { token: string; docs: Doc[]; span: boolean }) {
+/* One sent file: its name, and Replace until the accountant accepts it. */
+function DoneFile({ token, clientId, slot }: { token: string; clientId: string; slot: Slot }) {
+  const { input, state, send, pick } = useUpload(token, clientId, slot.id);
+  return (
+    <div className="mt-[3px] flex flex-wrap items-center gap-x-3 gap-y-1">
+      <span className={`${MONO} min-w-0 truncate text-[12.5px] text-[#7FF0BD] lg:text-[12px]`}>{state.busy ? `Uploading ${state.progress}%` : slot.fileName}</span>
+      {slot.accepted ? (
+        <span className="text-[12.5px] text-[#7D8392]">Accepted</span>
+      ) : (
+        <>
+          <input ref={input} type="file" className="sr-only" accept={ACCEPT} onChange={(e) => send(e.target.files?.[0])} aria-label={`Replace ${slot.fileName}`} />
+          <button type="button" onClick={pick} disabled={state.busy} className="cursor-pointer border-0 bg-transparent p-0 text-[12.5px] text-[#5CC8FF] underline underline-offset-2 disabled:opacity-60">
+            Replace
+          </button>
+        </>
+      )}
+      {state.error && (
+        <p role="alert" className="m-0 w-full text-[13px] text-[#FF9BB0]">
+          {state.error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* Everything finished: sent documents (with their filenames and Replace) and ones the client said they don't
+   have, each with "I do have it" to undo. Fills the empty last grid cell, or spans both columns. */
+export function DoneCard({ token, clientId, docs, span }: { token: string; clientId: string; docs: Doc[]; span: boolean }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [busy, start] = useTransition();
@@ -45,12 +71,7 @@ export function DoneCard({ token, docs, span }: { token: string; docs: Doc[]; sp
               {d.skip ? (
                 <div className="mt-[3px] text-[13.5px] text-[#7D8392] lg:truncate lg:text-[13px]">Not applicable &middot; {d.reason ? `“${d.reason}”` : "No reason given"}</div>
               ) : (
-                <div className={`${MONO} mt-[3px] truncate text-[12.5px] text-[#7FF0BD] lg:text-[12px]`}>
-                  {d.slots
-                    .map((s) => s.fileName)
-                    .filter(Boolean)
-                    .join(", ")}
-                </div>
+                d.slots.filter((s) => s.fileName).map((s) => <DoneFile key={s.id} token={token} clientId={clientId} slot={s} />)
               )}
             </div>
             {d.skip && (
@@ -65,10 +86,12 @@ export function DoneCard({ token, docs, span }: { token: string; docs: Doc[]; sp
             {error}
           </p>
         )}
-        <div className="hidden items-center gap-[10px] border-t border-[rgba(255,255,255,0.06)] pb-3 pt-[14px] text-[13.5px] text-[#7D8392] lg:flex">
-          <Icon d={P.file} stroke="#7D8392" />
-          Sent something by mistake? Use Replace, or reply to the email.
-        </div>
+        {docs.some((d) => !d.skip && d.slots.some((s) => s.fileName && !s.accepted)) && (
+          <div className="hidden items-center gap-[10px] border-t border-[rgba(255,255,255,0.06)] pb-3 pt-[14px] text-[13.5px] text-[#7D8392] lg:flex">
+            <Icon d={P.file} stroke="#7D8392" />
+            Sent something by mistake? Use Replace, or reply to the email.
+          </div>
+        )}
       </div>
     </section>
   );

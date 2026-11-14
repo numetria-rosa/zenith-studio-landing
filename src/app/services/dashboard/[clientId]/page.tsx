@@ -56,9 +56,9 @@ export default async function ClientConsoleOverview({ params }: { params: Promis
     <div>
       <div className={s.header}>
         <div>
-          <h1 className={s.greeting}>Good morning, {firstName}</h1>
+          <h1 className={s.greeting}>Welcome back, {firstName}</h1>
           <p className={s.subline}>
-            {agentsOnShift} agent{agentsOnShift === 1 ? "" : "s"} on shift &middot; {needsYou} item{needsYou === 1 ? "" : "s"} need
+            {agentsOnShift} agent{agentsOnShift === 1 ? "" : "s"} on shift &middot; {needsYou} item{needsYou === 1 ? " needs" : "s need"}
             you
           </p>
         </div>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHECKLISTS, groupUploadItems, chaseEmail, cleanItems, filesToPurge, MAX_ITEMS, isDueForChase, parseClientCsv, REJECT_REASONS, uploadPathname } from "./document-chaser";
+import { acceptedContentType, CHECKLISTS, groupUploadItems, chaseEmail, cleanItems, filesToPurge, isAbandonedExtraSlot, MAX_ITEMS, isDueForChase, parseClientCsv, REJECT_REASONS, sentBackEmail, uploadPathname } from "./document-chaser";
 
 const DAY = 86400000;
 
@@ -110,5 +110,52 @@ describe("groupUploadItems", () => {
     expect(g.map((x) => x.base)).toEqual(["Receipts", "Bank statements"]);
     expect(g[0].parent.id).toBe("a");
     expect(g[0].slots.map((x) => x.id)).toEqual(["a", "c", "d"]);
+  });
+});
+
+describe("sentBackEmail", () => {
+  const base = { businessName: "Acme Tax", clientName: "Jane Doe", uploadUrl: "https://x.test/upload/abc" };
+  it("says what was wrong with one document and links to the upload page", () => {
+    const m = sentBackEmail({ ...base, items: [{ label: "W-2 from each employer", rejectReason: "Please send it as a PDF" }] });
+    expect(m.subject).toBe("Please resend a document for Acme Tax");
+    expect(m.text).toContain("Hi Jane,");
+    expect(m.text).toContain("- W-2 from each employer (Please send it as a PDF)");
+    expect(m.text).toContain("https://x.test/upload/abc");
+    expect(m.text).toContain("a new copy");
+  });
+  it("lists every sent-back document and uses the plural", () => {
+    const m = sentBackEmail({ ...base, items: [{ label: "A", rejectReason: "Pages are missing" }, { label: "B", rejectReason: "Wrong year or period" }] });
+    expect(m.subject).toBe("Please resend some documents for Acme Tax");
+    expect(m.text).toContain("- A (Pages are missing)\n- B (Wrong year or period)");
+    expect(m.text).toContain("new copies");
+  });
+});
+
+describe("isAbandonedExtraSlot", () => {
+  const now = new Date("2026-11-14T12:00:00Z");
+  const slot = { label: "W-2 from each employer (2)", status: "REQUESTED", filePathname: null, rejectReason: null, createdAt: new Date(now.getTime() - 2 * DAY) };
+  it("drops an empty extra slot after a day", () => expect(isAbandonedExtraSlot(slot, now)).toBe(true));
+  it("keeps a fresh one, one with a file, a sent-back one, and a normal document", () => {
+    expect(isAbandonedExtraSlot({ ...slot, createdAt: new Date(now.getTime() - 3600000) }, now)).toBe(false);
+    expect(isAbandonedExtraSlot({ ...slot, filePathname: "doc-chaser/x" }, now)).toBe(false);
+    expect(isAbandonedExtraSlot({ ...slot, rejectReason: "Pages are missing" }, now)).toBe(false);
+    expect(isAbandonedExtraSlot({ ...slot, label: "W-2 from each employer" }, now)).toBe(false);
+  });
+});
+
+describe("acceptedContentType", () => {
+  it("accepts documents, photos and spreadsheets by type", () => {
+    expect(acceptedContentType("a.pdf", "application/pdf")).toBe("application/pdf");
+    expect(acceptedContentType("a.jpg", "image/jpeg")).toBe("image/jpeg");
+    expect(acceptedContentType("a.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")).toContain("wordprocessingml");
+  });
+  it("falls back to the extension when the browser reports no type (HEIC on a PC)", () => {
+    expect(acceptedContentType("IMG_1.HEIC", "")).toBe("image/heic");
+    expect(acceptedContentType("a.xlsx", "application/octet-stream")).toContain("spreadsheetml");
+  });
+  it("refuses everything else", () => {
+    expect(acceptedContentType("a.exe", "application/x-msdownload")).toBeNull();
+    expect(acceptedContentType("a.exe", "")).toBeNull();
+    expect(acceptedContentType("a.gif", "image/gif")).toBeNull();
   });
 });

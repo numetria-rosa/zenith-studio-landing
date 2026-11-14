@@ -35,7 +35,7 @@ export function PortalView({ token, clientId, firm, first, docs }: { token: stri
           {todo.map((d) => (
             <DocCard key={d.id} token={token} clientId={clientId} firm={firm} doc={d} />
           ))}
-          {fin.length > 0 && <DoneCard token={token} docs={fin} span={todo.length % 2 === 0} />}
+          {fin.length > 0 && <DoneCard token={token} clientId={clientId} docs={fin} span={todo.length % 2 === 0} />}
         </div>
       </main>
       <MobileFooter firm={firm} />

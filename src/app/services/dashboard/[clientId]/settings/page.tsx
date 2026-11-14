@@ -119,7 +119,7 @@ export default async function SettingsPage({
         <section className={`${u.card} ${s.card}`}>
           <Eyebrow>Notifications</Eyebrow>
           <p style={{ marginTop: 12, fontSize: 13, color: "var(--zc-muted)", lineHeight: 1.6 }}>
-            Notification preferences aren&apos;t configurable yet - you&apos;ll always get an email the moment something needs you.
+            Notification preferences aren&apos;t configurable yet - you&apos;ll get an email when something needs you, such as a client&apos;s first upload waiting for review.
           </p>
         </section>
       </div>

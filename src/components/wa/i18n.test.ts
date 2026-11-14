@@ -1,4 +1,4 @@
-import { createElement, type ReactNode } from "react";
+import { createElement, type FC, type ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { UiLangProvider } from "./i18n";
@@ -8,7 +8,7 @@ import { SidebarNav } from "@/app/(dashboard)/whatsapp-umrah/[agencyId]/SidebarN
 vi.mock("next/navigation", () => ({ usePathname: () => "/whatsapp-umrah/a1", useRouter: () => ({ refresh: () => {} }) }));
 vi.mock("@/lib/whatsapp-umrah/ui-lang-action", () => ({ setUiLangAction: async () => {} }));
 
-const render = (lang: "en" | "fr", node: ReactNode) => renderToStaticMarkup(createElement(UiLangProvider, { lang }, node));
+const render = (lang: "en" | "fr", node: ReactNode) => renderToStaticMarkup(createElement(UiLangProvider as FC<{ lang: "en" | "fr"; children?: ReactNode }>, { lang }, node));
 const nav = () => createElement(SidebarNav, { base: "/whatsapp-umrah/a1", waiting: 2 });
 
 describe("dashboard language", () => {
