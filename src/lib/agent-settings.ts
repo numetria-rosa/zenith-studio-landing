@@ -21,7 +21,9 @@ export type SettingKey =
   | "renewalRepeat"
   | "tcReminderDays"
   | "tcClientUpdates"
-  | "dbDormantAfter";
+  | "dbDormantAfter"
+  | "chaserGapDays"
+  | "chaserMaxReminders";
 
 type Option = { value: string; label: string; hint: string };
 type SettingDef = { label: string; question: string; options: Option[] };
@@ -152,6 +154,25 @@ export const SETTINGS: Record<SettingKey, SettingDef> = {
       { value: "365", label: "12 months", hint: "Only truly quiet contacts." },
     ],
   },
+  chaserGapDays: {
+    label: "Days between reminders",
+    question: "How often should a client who has not sent their documents be reminded?",
+    options: [
+      { value: "2", label: "Every 2 days", hint: "Persistent, for tight deadlines." },
+      { value: "3", label: "Every 3 days", hint: "This is the default." },
+      { value: "5", label: "Every 5 days", hint: "Gentler." },
+      { value: "7", label: "Once a week", hint: "The lightest touch." },
+    ],
+  },
+  chaserMaxReminders: {
+    label: "Most reminders per client",
+    question: "How many reminder emails should one client get before we stop?",
+    options: [
+      { value: "3", label: "3 reminders", hint: "Short and polite." },
+      { value: "6", label: "6 reminders", hint: "This is the default." },
+      { value: "10", label: "10 reminders", hint: "For clients who need a lot of nudging." },
+    ],
+  },
   renewalRepeat: {
     label: "Reminder repeats",
     question: "Should clients get more than one reminder?",
@@ -180,6 +201,8 @@ export const DEFAULT_SETTINGS: AgentSettings = {
   tcReminderDays: "3",
   tcClientUpdates: "on",
   dbDormantAfter: "180",
+  chaserGapDays: "3",
+  chaserMaxReminders: "6",
 };
 
 /** Normalizes stored JSON: unknown keys dropped, invalid values fall back to defaults. */
@@ -214,9 +237,19 @@ export function adjustableSettings(agentId: string): SettingKey[] {
       return ["tcReminderDays", "tcClientUpdates", "messageTone"];
     case "db":
       return ["dbDormantAfter", "messageTone"];
+    case "chaser":
+      return ["chaserGapDays", "chaserMaxReminders"];
     default:
       return [];
   }
+}
+
+/** AI Document Chaser reminder timing; the defaults are what it always did. */
+export function chaserGapDays(s: AgentSettings): number {
+  return Number(s.chaserGapDays) || 3;
+}
+export function chaserMaxReminders(s: AgentSettings): number {
+  return Number(s.chaserMaxReminders) || 6;
 }
 
 export function optionLabel(key: SettingKey, value: string): string {

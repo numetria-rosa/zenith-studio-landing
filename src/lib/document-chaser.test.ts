@@ -159,3 +159,13 @@ describe("acceptedContentType", () => {
     expect(acceptedContentType("a.gif", "image/gif")).toBeNull();
   });
 });
+
+describe("reminder schedule settings", () => {
+  const now = new Date("2026-10-20T10:00:00Z");
+  it("uses the accountant's gap and cap instead of the defaults", () => {
+    const client = { status: "ACTIVE", chaseCount: 1, lastChasedAt: new Date(now.getTime() - 4 * DAY) };
+    expect(isDueForChase(client, 3, now, 7, 6)).toBe(false); // weekly: 4 days is too soon
+    expect(isDueForChase(client, 3, now, 2, 6)).toBe(true); // every 2 days: due
+    expect(isDueForChase({ ...client, chaseCount: 3 }, 3, now, 2, 3)).toBe(false); // capped at 3
+  });
+});

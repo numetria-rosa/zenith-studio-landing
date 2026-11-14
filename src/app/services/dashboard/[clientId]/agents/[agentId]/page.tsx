@@ -20,10 +20,12 @@ import { adjustableSettings, readSettings, dbDormantDays } from "@/lib/agent-set
 import { createTransaction, updateDeadline, setDocumentReceived, setTransactionStatus } from "@/lib/transaction-coordinator";
 import { importContacts, startReengagement, markContactReplied, isDormant } from "@/lib/database-manager";
 import { getSiteUrl } from "@/lib/site";
-import { CHASE_GAP_DAYS, CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_CHASES, MAX_ITEMS, parseStartDay, SMS_ADDON_MONTHLY_USD } from "@/lib/document-chaser";
+import { CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_ITEMS, parseStartDay, SMS_ADDON_MONTHLY_USD } from "@/lib/document-chaser";
+import { checkUploadedDocument } from "@/lib/doc-check";
+import { chaserGapDays, chaserMaxReminders } from "@/lib/agent-settings";
 import { db } from "@/lib/db";
 import { sendAsBusiness } from "@/lib/client-mail";
-import { addDocChaseClients, addDocChaseItem, changeDocChaseChecklist, deleteDocChaseClient, deleteDocChecklist, listDocChecklists, reaskDocChaseItem, remindDocChaseClientNow, removeDocChaseItem, reviewDocChaseItem, saveDocChecklist, sendDocChaserTestEmail, setDocChaseClientStatus, type NewChaseClient } from "@/lib/document-chaser-db";
+import { addDocChaseClients, addDocChaseItem, changeDocChaseChecklist, deleteDocChaseClient, deleteDocChecklist, listDocChecklists, reaskDocChaseItem, remindDocChaseClientNow, removeDocChaseItem, resetFailedDocCheck, reviewDocChaseItem, saveDocChecklist, sendDocChaserTestEmail, setDocChaseClientStatus, type NewChaseClient } from "@/lib/document-chaser-db";
 import { readXlsx } from "@/lib/spreadsheet";
 import { DocChaserClients } from "./DocChaserClients";
 import { TextReminders } from "./TextReminders";
@@ -491,7 +493,13 @@ export default async function AgentDetailPage({
     else if (op === "add-doc") result = await addDocChaseItem(clientId, uid, id, String(formData.get("label") || ""));
     else if (op === "remove-doc") result = await removeDocChaseItem(clientId, uid, id);
     else if (op === "reask") result = await reaskDocChaseItem(clientId, uid, id);
-    else if (op === "remind") {
+    else if (op === "recheck") {
+      result = await resetFailedDocCheck(clientId, uid, id);
+      if (result.ok) {
+        await checkUploadedDocument(id);
+        flashText = "Checked again. The result is under the document.";
+      }
+    } else if (op === "remind") {
       result = await remindDocChaseClientNow(clientId, uid, id);
       flashText = "Reminder sent.";
     } else if (op === "change-checklist") {
@@ -952,10 +960,17 @@ export default async function AgentDetailPage({
       ...CHECKLISTS.map((l) => ({ key: `std:${l.id}`, name: l.label, title: l.title, sub: l.sub, group: l.region, items: [...l.items] })),
       ...saved.map((l) => ({ key: `saved:${l.id}`, name: l.name, sub: "Saved", group: "Yours", items: l.items })),
     ];
+    const chaserTiming = readSettings(project.agentSettings);
     return (
       <div>
         <Breadcrumb clientId={clientId} agentName={agent.name} />
         <Header agent={agent} tone={status.tone} clientId={clientId} />
+        <p style={{ margin: "12px 0 0", fontSize: 13.5, color: "var(--zc-muted)" }}>
+          Reminders go out every {chaserGapDays(chaserTiming)} days, up to {chaserMaxReminders(chaserTiming)} times.{" "}
+          <Link href={`/services/dashboard/${clientId}/agents/chaser/adjust`} style={{ color: "var(--zc-link, #5CC8FF)" }}>
+            Change the schedule
+          </Link>
+        </p>
         {flash && project.docChaseClients.length === 0 && <FlashBox text={flash} />}
         {activateError && <p className={s.errorBox} style={{ maxWidth: 720 }}>{activateError}</p>}
 
@@ -964,8 +979,8 @@ export default async function AgentDetailPage({
           extras={EXTRA_ITEMS}
           maxItems={MAX_ITEMS}
           businessName={businessName || "Your firm"}
-          gapDays={CHASE_GAP_DAYS}
-          maxChases={MAX_CHASES}
+          gapDays={chaserGapDays(chaserTiming)}
+          maxChases={chaserMaxReminders(chaserTiming)}
           retentionDays={FILE_RETENTION_DAYS}
           first={project.docChaseClients.length === 0}
           addAction={addChaseClientsAction}
@@ -978,6 +993,7 @@ export default async function AgentDetailPage({
         <DocChaserClients
           clients={project.docChaseClients}
           flash={flash}
+          maxChases={chaserMaxReminders(chaserTiming)}
           base={agentBase}
           show={show}
           list={list}

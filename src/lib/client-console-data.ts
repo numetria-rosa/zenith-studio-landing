@@ -1,4 +1,5 @@
 import type { IconName } from "@/app/services/dashboard/[clientId]/Icon";
+import { chaserGapDays, readSettings } from "@/lib/agent-settings";
 
 /* Shapes real ServiceProject data into what the client console's screens
    need (KPI tiles, team map nodes, workflow steps, activity feed,
@@ -78,6 +79,7 @@ export type ConsoleProject = {
   }[];
   dormantContacts: { id: string; name: string; status: string; lastSentAt: Date | null; sequenceStep: number }[];
   textingRegistration: { status: string; submittedAt: Date; lastError: string | null } | null;
+  agentSettings?: unknown;
   docChaseClients?: { id: string; name: string; status: string; chaseCount: number; lastChasedAt: Date | null; completedAt: Date | null; createdAt: Date; items: { id: string; label: string; status: string; uploadedAt: Date | null }[] }[];
 };
 
@@ -576,18 +578,23 @@ function docChaserWorkflowSteps(project: ConsoleProject): WorkflowStep[] {
   return [
     { title: "Client list", kind: "trigger", detail: "with a checklist each", state: has ? "done" : "pending" },
     { title: "Email request", kind: "email", detail: "private upload link", state: has ? "done" : "pending" },
-    { title: "Reminders", kind: "email", detail: "every 3 days until sent", state: has ? "done" : "pending" },
+    { title: "Reminders", kind: "email", detail: `every ${chaserGapDays(readSettings(project.agentSettings))} days until sent`, state: has ? "done" : "pending" },
     { title: "Your review", kind: "human review", detail: review > 0 ? `${review} waiting` : "none waiting", state: review > 0 ? "human-waiting" : has ? "human-pending" : "pending" },
     { title: "All in", kind: "notify", detail: "you get an email", state: has ? "done" : "pending" },
   ];
 }
 
+/** "14 Nov 2026, 22:04 UTC": date and time, with the zone named because the server doesn't know the reader's. */
+export function whenLabel(d: Date): string {
+  return `${d.toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC" })} UTC`;
+}
+
 function docChaserActivityFeed(project: ConsoleProject): ActivityEvent[] {
   const events: ActivityEvent[] = [];
   for (const c of chaseClients(project)) {
-    for (const i of c.items) if (i.uploadedAt) events.push({ tone: "done", text: `${c.name} sent: ${i.label}`, meta: `AI Document Chaser · ${i.uploadedAt.toISOString().slice(0, 10)}`, at: i.uploadedAt });
-    if (c.lastChasedAt) events.push({ tone: "run", text: `Reminded ${c.name} (${c.chaseCount} so far)`, meta: `AI Document Chaser · ${c.lastChasedAt.toISOString().slice(0, 10)}`, at: c.lastChasedAt });
-    if (c.completedAt) events.push({ tone: "done", text: `${c.name} sent everything`, meta: `AI Document Chaser · ${c.completedAt.toISOString().slice(0, 10)}`, at: c.completedAt });
+    for (const i of c.items) if (i.uploadedAt) events.push({ tone: "done", text: `${c.name} sent: ${i.label}`, meta: `AI Document Chaser · ${whenLabel(i.uploadedAt)}`, at: i.uploadedAt });
+    if (c.lastChasedAt) events.push({ tone: "run", text: `Reminded ${c.name} (${c.chaseCount} so far)`, meta: `AI Document Chaser · ${whenLabel(c.lastChasedAt)}`, at: c.lastChasedAt });
+    if (c.completedAt) events.push({ tone: "done", text: `${c.name} sent everything`, meta: `AI Document Chaser · ${whenLabel(c.completedAt)}`, at: c.completedAt });
   }
   return events.sort((a, b) => b.at.getTime() - a.at.getTime());
 }

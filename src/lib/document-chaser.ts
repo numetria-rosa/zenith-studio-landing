@@ -315,9 +315,10 @@ export function parseClientCsv(text: string): { clients: { name: string; email: 
   return { clients, skipped };
 }
 
-export function isDueForChase(client: { status: string; chaseCount: number; lastChasedAt: Date | null }, outstanding: number, now: Date): boolean {
-  if (client.status !== "ACTIVE" || outstanding === 0 || client.chaseCount >= MAX_CHASES) return false;
-  return !client.lastChasedAt || now.getTime() - client.lastChasedAt.getTime() >= CHASE_GAP_DAYS * DAY;
+/** Is this client due a reminder? The gap and the cap are the accountant's settings (default: every 3 days, up to 6). */
+export function isDueForChase(client: { status: string; chaseCount: number; lastChasedAt: Date | null }, outstanding: number, now: Date, gapDays = CHASE_GAP_DAYS, maxChases = MAX_CHASES): boolean {
+  if (client.status !== "ACTIVE" || outstanding === 0 || client.chaseCount >= maxChases) return false;
+  return !client.lastChasedAt || now.getTime() - client.lastChasedAt.getTime() >= gapDays * DAY;
 }
 
 export function chaseEmail(input: {

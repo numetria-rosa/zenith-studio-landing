@@ -3,9 +3,10 @@ import { runnableProject } from "@/lib/project-pause";
 import { del, head, list } from "@vercel/blob";
 import { db } from "@/lib/db";
 import { sendAsBusiness } from "@/lib/client-mail";
+import { chaserGapDays, chaserMaxReminders, readSettings } from "@/lib/agent-settings";
 import { businessNameOf } from "@/lib/services";
 import { getSiteUrl } from "@/lib/site";
-import { CANCELLED_GRACE_DAYS, chaseEmail, cleanItems, FILE_RETENTION_DAYS, filesToPurge, isAbandonedExtraSlot, isDueForChase, MAX_CHASES, MAX_EMAILS_PER_RUN, MAX_ITEMS, MAX_UPLOAD_BYTES, REJECT_REASONS, sentBackEmail } from "@/lib/document-chaser";
+import { CANCELLED_GRACE_DAYS, chaseEmail, cleanItems, FILE_RETENTION_DAYS, filesToPurge, isAbandonedExtraSlot, isDueForChase, MAX_EMAILS_PER_RUN, MAX_ITEMS, MAX_UPLOAD_BYTES, REJECT_REASONS, sentBackEmail } from "@/lib/document-chaser";
 
 /* AI Document Chaser: database side. Every accountant-facing function checks the project belongs to the
    signed-in user and is this service; the client-facing ones are keyed by the secret upload token only. */
@@ -27,6 +28,10 @@ async function ownedProject(projectId: string, userId: string) {
 }
 
 export const uploadUrlFor = (token: string) => `${getSiteUrl()}/upload/${token}`;
+
+/** The preview page a test email links to: the client's page with the firm's name and these documents, uploads off. */
+export const samplePortalUrl = (firm: string, items: string[]) =>
+  `${getSiteUrl()}/upload/sample?${new URLSearchParams({ firm: firm.slice(0, 60), docs: items.slice(0, 8).join("|").slice(0, 600) }).toString()}`;
 
 /** One client to add: their own document list (from a checklist, maybe edited) and that list's name. */
 export type NewChaseClient = { name: string; email: string; checklist: string; items: string[] };
@@ -124,15 +129,24 @@ export async function changeDocChaseChecklist(projectId: string, userId: string,
 
 /** "Remind now": emails this client their outstanding list straight away (not more than once an hour). */
 export async function remindDocChaseClientNow(projectId: string, userId: string, clientId: string): Promise<Result> {
-  const c = await db.docChaseClient.findFirst({ where: { id: clientId, projectId, project: { userId } }, select: { status: true, chaseCount: true, lastChasedAt: true } });
+  const c = await db.docChaseClient.findFirst({ where: { id: clientId, projectId, project: { userId } }, select: { status: true, chaseCount: true, lastChasedAt: true, project: { select: { agentSettings: true } } } });
   if (!c) return { ok: false, error: "not_found" };
   if (c.status !== "ACTIVE") return { ok: false, error: c.status === "PAUSED" ? "Resume this client first." : "This client has sent everything." };
-  if (c.chaseCount >= MAX_CHASES) return { ok: false, error: `This client has had all ${MAX_CHASES} reminders. Contact them directly.` };
+  const max = chaserMaxReminders(readSettings(c.project.agentSettings));
+  if (c.chaseCount >= max) return { ok: false, error: `This client has had all ${max} reminders. Contact them directly.` };
   if (c.lastChasedAt && Date.now() - c.lastChasedAt.getTime() < 3600000) return { ok: false, error: "They were emailed less than an hour ago." };
   // "Remind now" also starts a client who was scheduled for later.
   await db.docChaseClient.update({ where: { id: clientId }, data: { lastChasedAt: null, startAt: null } });
   const r = await chaseClients({ id: { in: [clientId] } });
   return r.chased ? { ok: true } : { ok: false, error: "The reminder couldn't be sent. Try again in a few minutes." };
+}
+
+/** "Check again" on a document whose AI check didn't run: clears the failed result so the check can run again. */
+export async function resetFailedDocCheck(projectId: string, userId: string, itemId: string): Promise<Result> {
+  const item = await ownedItem(projectId, userId, itemId);
+  if (!item || item.status !== "RECEIVED" || item.aiVerdict !== "failed") return { ok: false, error: "That document doesn't need a new check." };
+  await db.docChaseItem.update({ where: { id: itemId }, data: { aiVerdict: null, aiNote: null } });
+  return { ok: true };
 }
 
 /** The accountant asks again for a document the client said they don't have. */
@@ -354,7 +368,7 @@ async function chaseClients(where: { id?: { in: string[] } }, now = new Date()):
     where: { ...where, status: "ACTIVE", OR: [{ startAt: null }, { startAt: { lte: now } }], project: { sourceServiceId: DOC_CHASER_SERVICE_ID, ...runnableProject() } },
     include: {
       items: { orderBy: [{ order: "asc" }, { createdAt: "asc" }] },
-      project: { select: { title: true, sourceServiceId: true, user: { select: { email: true } } } },
+      project: { select: { title: true, sourceServiceId: true, agentSettings: true, user: { select: { email: true } } } },
     },
   });
   let chased = 0;
@@ -388,7 +402,8 @@ async function chaseClients(where: { id?: { in: string[] } }, now = new Date()):
       continue;
     }
 
-    if (!isDueForChase(c, outstanding.length, now)) continue;
+    const timing = readSettings(c.project.agentSettings);
+    if (!isDueForChase(c, outstanding.length, now, chaserGapDays(timing), chaserMaxReminders(timing))) continue;
     const sentSoFar = sentPerProject.get(c.projectId) ?? 0;
     if (sentSoFar >= MAX_EMAILS_PER_RUN) continue;
     const mail = chaseEmail({ businessName, clientName: c.name, items: outstanding, uploadUrl: uploadUrlFor(c.uploadToken), reminder: c.chaseCount });
@@ -406,7 +421,7 @@ async function chaseClients(where: { id?: { in: string[] } }, now = new Date()):
 export async function sendDocChaserTestEmail(projectId: string, userId: string, rawItems: string[]): Promise<Result> {
   const project = await db.serviceProject.findFirst({
     where: { id: projectId, userId, sourceServiceId: DOC_CHASER_SERVICE_ID },
-    select: { title: true, sourceServiceId: true, user: { select: { email: true } } },
+    select: { title: true, sourceServiceId: true, user: { select: { email: true, name: true } } },
   });
   if (!project?.user.email) return { ok: false, error: "not_found" };
   const items = cleanItems(rawItems);
@@ -414,9 +429,9 @@ export async function sendDocChaserTestEmail(projectId: string, userId: string, 
   const businessName = businessNameOf(project) || "Your accountant";
   const mail = chaseEmail({
     businessName,
-    clientName: "Jane Doe",
+    clientName: project.user.name?.trim() || "Jane Doe",
     items: items.map((label) => ({ label, rejectReason: null })),
-    uploadUrl: "[Your client's private upload link goes here]",
+    uploadUrl: samplePortalUrl(businessName, items),
     reminder: 0,
   });
   const sent = await sendAsBusiness({
@@ -424,7 +439,7 @@ export async function sendDocChaserTestEmail(projectId: string, userId: string, 
     to: project.user.email,
     replyTo: project.user.email,
     subject: `[Test] ${mail.subject}`,
-    text: `This is a test. Your clients get exactly this email, with their own name and a working private upload link.
+    text: `This is a test. Your clients get exactly this email, with their own name. Each client's link is private to them; the link below opens a preview of the page they see (uploads are switched off in the preview).
 
 ---
 

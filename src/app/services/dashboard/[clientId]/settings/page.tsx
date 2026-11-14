@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { getOwnedServiceProject, cancelOwnedMembership } from "@/lib/service-workspace";
 import { getService } from "@/lib/services";
 import { isSupportedPlan } from "@/lib/client-console-data";
@@ -34,6 +35,19 @@ export default async function SettingsPage({
     redirect(`/services/dashboard/${clientId}/settings?flash=${encodeURIComponent("Your plan will cancel at the end of the current billing period.")}`);
   }
 
+  /** The name clients see in emails and on their upload page. */
+  async function renameBusiness(formData: FormData): Promise<void> {
+    "use server";
+    const session2 = await auth();
+    if (!session2?.user?.id) redirect(`/sign-in?callbackUrl=${encodeURIComponent(`/services/dashboard/${clientId}/settings`)}`);
+    const name = String(formData.get("name") ?? "").replace(/[\u0000-\u001f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
+    const back = (msg: string) => redirect(`/services/dashboard/${clientId}/settings?flash=${encodeURIComponent(msg)}`);
+    if (name.length < 2) back("Enter a business name of at least 2 characters.");
+    await db.serviceProject.updateMany({ where: { id: clientId, userId: session2!.user.id }, data: { title: name } });
+    revalidatePath(`/services/dashboard/${clientId}`, "layout");
+    back(`Saved. Your clients now see "${name}" in emails and on their upload page.`);
+  }
+
   const service = project.sourceServiceId ? getService(project.sourceServiceId) : undefined;
   const toolsConnected =
     project.integrations.some((i) => i.status === "CONNECTED") ||
@@ -57,6 +71,24 @@ export default async function SettingsPage({
       )}
 
       <div className={s.grid}>
+        <section className={`${u.card} ${s.card}`}>
+          <Eyebrow>Business name</Eyebrow>
+          <p style={{ marginTop: 8, fontSize: 13, color: "var(--zc-muted)", lineHeight: 1.6 }}>The name your clients see in emails and on their upload page.</p>
+          <form action={renameBusiness} style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <input
+              name="name"
+              defaultValue={project.title}
+              maxLength={80}
+              required
+              aria-label="Business name"
+              style={{ flex: "1 1 220px", minHeight: 40, padding: "0 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,.14)", background: "rgba(255,255,255,.04)", color: "inherit", fontSize: 14 }}
+            />
+            <button type="submit" className={u.btnPrimary}>
+              Save
+            </button>
+          </form>
+        </section>
+
         <section className={`${u.card} ${s.card}`}>
           <Eyebrow>Setup status</Eyebrow>
           <div className={s.timeline}>

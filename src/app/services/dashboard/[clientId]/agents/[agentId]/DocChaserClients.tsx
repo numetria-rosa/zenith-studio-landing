@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { checklistName, clientStage, FILE_RETENTION_DAYS, startsLater, MAX_CHASES, MAX_ITEMS, REJECT_REASONS, STAGE_LABELS, type ClientStage } from "@/lib/document-chaser";
+import { checklistName, clientStage, FILE_RETENTION_DAYS, startsLater, MAX_ITEMS, REJECT_REASONS, STAGE_LABELS, type ClientStage } from "@/lib/document-chaser";
 import { uploadUrlFor } from "@/lib/document-chaser-db";
 import { CopyField } from "./ConnectForm";
 import { ChangeChecklist } from "./ChangeChecklist";
@@ -18,6 +18,7 @@ const ORDER: ClientStage[] = ["review", "waiting", "started", "complete", "pause
 export function DocChaserClients({
   clients,
   flash,
+  maxChases,
   base,
   show,
   list,
@@ -26,6 +27,8 @@ export function DocChaserClients({
   review,
 }: {
   clients: Client[];
+  /** The most reminder emails one client gets (the accountant's setting). */
+  maxChases: number;
   /** What the last action did ("Sent back. Jane has been emailed."), shown here so it's in view after the jump to this list. */
   flash?: string;
   base: string;
@@ -120,7 +123,7 @@ export function DocChaserClients({
                     <form>
                       <input type="hidden" name="id" value={cl.id} />
                       {cl.status === "ACTIVE" && (
-                        <button type="submit" formAction={act.bind(null, "remind")} className={c.smallBtn} disabled={cl.chaseCount >= MAX_CHASES}>
+                        <button type="submit" formAction={act.bind(null, "remind")} className={c.smallBtn} disabled={cl.chaseCount >= maxChases}>
                           <Icon name="mail" size={14} /> Remind now
                         </button>
                       )}
@@ -138,7 +141,7 @@ export function DocChaserClients({
                     <span className={c.meta}>
                       {startsLater(cl.startAt) && cl.startAt
                         ? `First email on ${cl.startAt.toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "UTC" })}`
-                        : `${cl.chaseCount} of ${MAX_CHASES} emails sent`}
+                        : `${cl.chaseCount} of ${maxChases} emails sent`}
                       {cl.items.some((i) => i.filePathname) && (
                         <>
                           {" · "}
@@ -161,7 +164,7 @@ export function DocChaserClients({
                           {i.status === "NOT_APPLICABLE" && <small>Client says they don&apos;t have this{i.clientNote ? `: "${i.clientNote}"` : "."}</small>}
                           {i.fileDeletedAt && !i.filePathname && <small>File deleted after {FILE_RETENTION_DAYS} days</small>}
                           {i.status === "RECEIVED" && i.aiVerdict === "failed" && (
-                            <small title={i.aiNote ?? undefined}>AI check didn&apos;t run for this file. Review it yourself.</small>
+                            <small title={i.aiNote ?? undefined}>AI check didn&apos;t run for this file. Review it yourself, or check it again.</small>
                           )}
                           {i.status === "RECEIVED" && (i.aiVerdict === "ok" || i.aiVerdict === "check") && (
                             <small className={i.aiVerdict === "check" ? c.aiCheck : c.aiOk}>
@@ -175,6 +178,14 @@ export function DocChaserClients({
                             <a href={`/api/doc-chaser/file/${i.id}`} target="_blank" rel="noopener noreferrer" className={c.smallBtn}>
                               View file
                             </a>
+                          )}
+                          {i.status === "RECEIVED" && i.aiVerdict === "failed" && (
+                            <form>
+                              <input type="hidden" name="id" value={i.id} />
+                              <button type="submit" formAction={act.bind(null, "recheck")} className={c.smallBtn}>
+                                Check again
+                              </button>
+                            </form>
                           )}
                           {i.status === "RECEIVED" && (
                             <form className={c.inlineForm}>

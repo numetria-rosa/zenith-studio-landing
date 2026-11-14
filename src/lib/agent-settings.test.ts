@@ -69,3 +69,17 @@ describe("every option produces output and bad input is rejected", () => {
     expect(adjustableSettings("renewals")).toContain("renewalLeadDays");
   });
 });
+
+describe("Document Chaser reminder options", () => {
+  it("defaults to every 3 days, up to 6, as it always did", async () => {
+    const { readSettings, chaserGapDays, chaserMaxReminders, adjustableSettings } = await import("./agent-settings");
+    const s = readSettings(null);
+    expect([chaserGapDays(s), chaserMaxReminders(s)]).toEqual([3, 6]);
+    expect(adjustableSettings("chaser")).toEqual(["chaserGapDays", "chaserMaxReminders"]);
+  });
+  it("reads a saved choice and ignores an invalid one", async () => {
+    const { readSettings, chaserGapDays, chaserMaxReminders } = await import("./agent-settings");
+    const s = readSettings({ chaserGapDays: "7", chaserMaxReminders: "99" });
+    expect([chaserGapDays(s), chaserMaxReminders(s)]).toEqual([7, 6]);
+  });
+});
