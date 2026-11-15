@@ -885,10 +885,10 @@ main{flex:1;min-width:0;padding:26px 34px 70px}
       <div class="legend"><span style="--c:#3ddc97">Complete 22</span><span style="--c:#5cc8ff">In progress 18</span><span style="--c:#a9aeba">Not started 14</span><span style="--c:#f5b83d">Needs review 9</span></div>
       <div style="margin-top:20px"><button class="btn go" type="button" data-view="agent">Open the Document Chaser</button></div></section>
     <div>
-      <section class="card needs"><span class="t">Needs you</span><h3>9 uploads are waiting for review</h3><p>Accept each one, or send it back with a reason. The AI check has flagged 2 to look at closely.</p></section>
+      <section class="card needs"><span class="t">Needs you</span><h3>9 uploads are waiting for review</h3><p>Accept each one, or send it back with a reason.</p></section>
       <section class="card feed"><span class="eyebrow">Live activity</span>
         <div class="fi" style="--c:#3ddc97"><i></i><div>Amira Khan sent everything<span>Document Chaser · 8 min ago</span></div></div>
-        <div class="fi" style="--c:#f5b83d"><i></i><div>AI check flagged a W-2 for Jane Doe<span>Document Chaser · 21 min ago</span></div></div>
+        <div class="fi" style="--c:#f5b83d"><i></i><div>Jane Doe uploaded a W-2<span>Document Chaser · 21 min ago</span></div></div>
         <div class="fi" style="--c:#5cc8ff"><i></i><div>18 reminders sent this morning<span>Document Chaser · 9:00 AM</span></div></div></section>
     </div>
   </div>
@@ -932,8 +932,8 @@ main{flex:1;min-width:0;padding:26px 34px 70px}
 
   <div class="cl" data-stage="rv" id="c-jane"><div class="cs" data-card><span class="av">JD</span><span class="who"><b>Jane Doe</b><span>jane@example.com · Individual tax return</span></span><span class="prg"><span>5 of 12</span><div class="b"><i style="width:42%"></i></div></span><span class="stg rv">Needs review</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a9aeba" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
     <div class="cb"><div class="top"><span class="l"><button class="btn" type="button" data-toast="Reminder sent to Jane.">✉ Remind now</button><button class="btn" type="button" data-toast="Jane is paused. Nothing more is sent until you resume.">❚❚ Pause</button></span><span class="r">2 of 6 emails sent · <u id="zip">Download all files (.zip)</u></span></div>
-      <div class="dc" id="d-w2"><div class="tx">W-2 from each employer<small class="ck">AI check, look closely: This looks like a 2024 W-2, not 2025.</small><small class="bk" id="bk-w2">Sent back: Wrong year or period</small></div><div class="ac"><button class="sm" type="button">View file</button><button class="sm go" type="button" data-accept="d-w2">Accept</button><span class="sel" id="reason">Send back because… ▾</span><button class="sm" type="button" data-back="d-w2" id="sendback">Send back</button><span class="st acc">Accepted</span></div></div>
-      <div class="dc" id="d-1098"><div class="tx">1098 mortgage interest statement<small class="ok">AI check: 1098 for 2025 from Chase, readable.</small></div><div class="ac"><button class="sm" type="button">View file</button><button class="sm go" type="button" data-accept="d-1098" id="acc1098">Accept</button><span class="sel">Send back because… ▾</span><button class="sm" type="button">Send back</button><span class="st acc">Accepted</span></div></div>
+      <div class="dc" id="d-w2"><div class="tx">W-2 from each employer<small class="bk" id="bk-w2">Sent back: Wrong year or period</small></div><div class="ac"><button class="sm" type="button">View file</button><button class="sm go" type="button" data-accept="d-w2">Accept</button><span class="sel" id="reason">Send back because… ▾</span><button class="sm" type="button" data-back="d-w2" id="sendback">Send back</button><span class="st acc">Accepted</span></div></div>
+      <div class="dc" id="d-1098"><div class="tx">1098 mortgage interest statement</div><div class="ac"><button class="sm" type="button">View file</button><button class="sm go" type="button" data-accept="d-1098" id="acc1098">Accept</button><span class="sel">Send back because… ▾</span><button class="sm" type="button">Send back</button><span class="st acc">Accepted</span></div></div>
       <div class="dc done"><div class="tx">✓ Last year's tax return</div><div class="ac"><span class="st">Accepted</span></div></div>
       <div class="dc done"><div class="tx">Charitable donation receipts<small>Client says they don't have this: "No donations this year."</small></div><div class="ac"><button class="sm" type="button">Ask again</button></div></div>
       <div class="dc"><div class="tx">Estimated tax payments made this year</div><div class="ac"><span class="st">Waiting</span></div></div>
@@ -948,7 +948,7 @@ main{flex:1;min-width:0;padding:26px 34px 70px}
 <section class="view" id="v-activity"><div class="ph"><h1>Activity</h1><p>Everything your agent did today, newest first.</p></div>
   <section class="card act">
     <div class="fi" style="--c:#3ddc97"><i></i><div>Amira Khan sent every document<span>You were emailed the moment she finished</span></div></div>
-    <div class="fi" style="--c:#f5b83d"><i></i><div>AI check flagged a W-2 for Jane Doe: "This looks like a 2024 W-2, not 2025."<span>Waiting for your review</span></div></div>
+    <div class="fi" style="--c:#f5b83d"><i></i><div>Jane Doe uploaded a W-2<span>Waiting for your review</span></div></div>
     <div class="fi" style="--c:#5cc8ff"><i></i><div>Reminder emails sent to 18 clients<span>Only for the documents still missing</span></div></div>
     <div class="fi" style="--c:#3ddc97"><i></i><div>Tom Reyes opened his upload link<span>First email sent yesterday</span></div></div>
     <div class="fi" style="--c:#5cc8ff"><i></i><div>4 new clients added and emailed<span>From your spreadsheet</span></div></div></section></section>
@@ -1184,7 +1184,7 @@ window.ZT_CH = [
   ["Overview", "Your firm at a glance", "Who is being chased, what has come in and what needs your review, the moment you sign in."],
   ["Add clients", "Add clients in minutes", "Pick a checklist, give each client the one that fits them, and press start. First emails go out straight away."],
   ["Your clients", "Everyone in one list", "Filter by who needs review, who is in progress and who has not started. Progress for each client at a glance."],
-  ["Review", "Review what needs you", "The AI check flags wrong-year or unreadable files. Accept, or send back with a reason, and download everything as one zip."],
+  ["Review", "Review what needs you", "Open each file, then accept it or send it back with a reason, and download everything as one zip."],
   ["Activity", "Every step is logged", "A plain record of what was sent, what came in and who finished, newest first."],
   ["Settings", "Private by default", "Files are stored privately and deleted after 180 days. One flat monthly price, no per-seat fees."],
   ["Ask", "Ask your team anything", "Everyday questions answered from your live data, with buttons that take you straight to what needs you."]

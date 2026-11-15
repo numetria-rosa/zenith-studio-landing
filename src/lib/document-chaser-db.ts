@@ -141,14 +141,6 @@ export async function remindDocChaseClientNow(projectId: string, userId: string,
   return r.chased ? { ok: true } : { ok: false, error: "The reminder couldn't be sent. Try again in a few minutes." };
 }
 
-/** "Check again" on a document whose AI check didn't run: clears the failed result so the check can run again. */
-export async function resetFailedDocCheck(projectId: string, userId: string, itemId: string): Promise<Result> {
-  const item = await ownedItem(projectId, userId, itemId);
-  if (!item || item.status !== "RECEIVED" || item.aiVerdict !== "failed") return { ok: false, error: "That document doesn't need a new check." };
-  await db.docChaseItem.update({ where: { id: itemId }, data: { aiVerdict: null, aiNote: null } });
-  return { ok: true };
-}
-
 /** The accountant asks again for a document the client said they don't have. */
 export async function reaskDocChaseItem(projectId: string, userId: string, itemId: string): Promise<Result> {
   const item = await ownedItem(projectId, userId, itemId);
@@ -281,7 +273,7 @@ export async function confirmUpload(token: string, itemId: string, pathname: str
   const alreadyWaiting = previous?.status === "RECEIVED" || (await db.docChaseItem.count({ where: { clientId: allowed.clientId, status: "RECEIVED", id: { not: itemId } } })) > 0;
   await db.docChaseItem.update({
     where: { id: itemId },
-    data: { status: "RECEIVED", filePathname: pathname, fileName: fileName.slice(0, 160), uploadedAt: new Date(), rejectReason: null, aiVerdict: null, aiNote: null },
+    data: { status: "RECEIVED", filePathname: pathname, fileName: fileName.slice(0, 160), uploadedAt: new Date(), rejectReason: null },
   });
   if (previous?.filePathname && previous.filePathname !== pathname) await del(previous.filePathname, { token: docBlobToken() }).catch(() => {});
   if (!alreadyWaiting) await notifyAccountantOfUpload(allowed.clientId, previous?.label ?? "a document");

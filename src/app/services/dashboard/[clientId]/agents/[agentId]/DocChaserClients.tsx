@@ -7,7 +7,7 @@ import type { PickerOption } from "./ChecklistPicker";
 import { Icon } from "../../Icon";
 import c from "./chaser.module.css";
 
-type Item = { id: string; label: string; status: string; rejectReason: string | null; clientNote: string | null; filePathname: string | null; fileDeletedAt: Date | null; aiVerdict: string | null; aiNote: string | null };
+type Item = { id: string; label: string; status: string; rejectReason: string | null; clientNote: string | null; filePathname: string | null; fileDeletedAt: Date | null };
 type Client = { id: string; name: string; email: string; checklist: string; status: string; chaseCount: number; uploadToken: string; startAt: Date | null; items: Item[] };
 type Option = PickerOption;
 
@@ -163,29 +163,12 @@ export function DocChaserClients({
                           {i.status === "REQUESTED" && i.rejectReason && <small>Sent back: {i.rejectReason}</small>}
                           {i.status === "NOT_APPLICABLE" && <small>Client says they don&apos;t have this{i.clientNote ? `: "${i.clientNote}"` : "."}</small>}
                           {i.fileDeletedAt && !i.filePathname && <small>File deleted after {FILE_RETENTION_DAYS} days</small>}
-                          {i.status === "RECEIVED" && i.aiVerdict === "failed" && (
-                            <small title={i.aiNote ?? undefined}>AI check didn&apos;t run for this file. Review it yourself, or check it again.</small>
-                          )}
-                          {i.status === "RECEIVED" && (i.aiVerdict === "ok" || i.aiVerdict === "check") && (
-                            <small className={i.aiVerdict === "check" ? c.aiCheck : c.aiOk}>
-                              {i.aiVerdict === "check" ? "AI check, look closely: " : "AI check: "}
-                              {i.aiNote || (i.aiVerdict === "ok" ? "looks right." : "this may not be the right document.")}
-                            </small>
-                          )}
                         </span>
                         <span className={c.docActions}>
                           {i.filePathname && (
                             <a href={`/api/doc-chaser/file/${i.id}`} target="_blank" rel="noopener noreferrer" className={c.smallBtn}>
                               View file
                             </a>
-                          )}
-                          {i.status === "RECEIVED" && i.aiVerdict === "failed" && (
-                            <form>
-                              <input type="hidden" name="id" value={i.id} />
-                              <button type="submit" formAction={act.bind(null, "recheck")} className={c.smallBtn}>
-                                Check again
-                              </button>
-                            </form>
                           )}
                           {i.status === "RECEIVED" && (
                             <form className={c.inlineForm}>

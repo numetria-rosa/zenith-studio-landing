@@ -21,11 +21,10 @@ import { createTransaction, updateDeadline, setDocumentReceived, setTransactionS
 import { importContacts, startReengagement, markContactReplied, isDormant } from "@/lib/database-manager";
 import { getSiteUrl } from "@/lib/site";
 import { CHECKLISTS, EXTRA_ITEMS, FILE_RETENTION_DAYS, MAX_ITEMS, parseStartDay, SMS_ADDON_MONTHLY_USD } from "@/lib/document-chaser";
-import { checkUploadedDocument } from "@/lib/doc-check";
 import { chaserGapDays, chaserMaxReminders } from "@/lib/agent-settings";
 import { db } from "@/lib/db";
 import { sendAsBusiness } from "@/lib/client-mail";
-import { addDocChaseClients, addDocChaseItem, changeDocChaseChecklist, deleteDocChaseClient, deleteDocChecklist, listDocChecklists, reaskDocChaseItem, remindDocChaseClientNow, removeDocChaseItem, resetFailedDocCheck, reviewDocChaseItem, saveDocChecklist, sendDocChaserTestEmail, setDocChaseClientStatus, type NewChaseClient } from "@/lib/document-chaser-db";
+import { addDocChaseClients, addDocChaseItem, changeDocChaseChecklist, deleteDocChaseClient, deleteDocChecklist, listDocChecklists, reaskDocChaseItem, remindDocChaseClientNow, removeDocChaseItem, reviewDocChaseItem, saveDocChecklist, sendDocChaserTestEmail, setDocChaseClientStatus, type NewChaseClient } from "@/lib/document-chaser-db";
 import { readXlsx } from "@/lib/spreadsheet";
 import { DocChaserClients } from "./DocChaserClients";
 import { TextReminders } from "./TextReminders";
@@ -493,13 +492,7 @@ export default async function AgentDetailPage({
     else if (op === "add-doc") result = await addDocChaseItem(clientId, uid, id, String(formData.get("label") || ""));
     else if (op === "remove-doc") result = await removeDocChaseItem(clientId, uid, id);
     else if (op === "reask") result = await reaskDocChaseItem(clientId, uid, id);
-    else if (op === "recheck") {
-      result = await resetFailedDocCheck(clientId, uid, id);
-      if (result.ok) {
-        await checkUploadedDocument(id);
-        flashText = "Checked again. The result is under the document.";
-      }
-    } else if (op === "remind") {
+    else if (op === "remind") {
       result = await remindDocChaseClientNow(clientId, uid, id);
       flashText = "Reminder sent.";
     } else if (op === "change-checklist") {

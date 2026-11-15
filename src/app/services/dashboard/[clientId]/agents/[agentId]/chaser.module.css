@@ -1213,12 +1213,6 @@ details[open] > .clientSummary > svg:last-child {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.docText small.aiCheck {
-  color: var(--zc-need-text);
-}
-.docText small.aiOk {
-  color: var(--zc-done-text);
-}
 
 .when {
   margin: 22px 0 0;
