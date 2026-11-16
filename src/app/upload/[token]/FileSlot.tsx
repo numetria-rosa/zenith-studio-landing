@@ -14,7 +14,7 @@ export function FileSlot({ token, clientId, itemId, fileName, accepted }: { toke
         </span>
         <div className="min-w-0 flex-1">
           <div className={`${MONO} truncate text-[13px] leading-[17px] text-[#F5F6F8] lg:text-[12.5px]`}>{fileName}</div>
-          <div className="mt-[3px] text-[13px] text-[#7FF0BD]">{state.busy ? `Uploading ${state.progress}%` : accepted ? "Accepted" : "Received, being checked"}</div>
+          <div className="mt-[3px] text-[13px] text-[#7FF0BD]">{state.busy ? `Uploading ${state.progress}%` : accepted ? "Accepted" : "Received"}</div>
         </div>
         {!accepted && (
           <>
