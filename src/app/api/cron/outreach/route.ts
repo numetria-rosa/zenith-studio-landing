@@ -1,14 +1,11 @@
 import { NextRequest } from "next/server";
+import { cronAuthorized } from "@/lib/cron-auth";
 import { processFollowUps } from "@/lib/outreach-admin";
 
 export async function GET(request: NextRequest) {
-  const secret = process.env.CRON_SECRET;
-  const auth = request.headers.get("authorization");
-  const vercelCron = request.headers.get("x-vercel-cron");
-  const authorized = (secret && auth === `Bearer ${secret}`) || (!secret && vercelCron === "1") || (!secret && process.env.NODE_ENV !== "production");
-  if (!authorized) {
-    return new Response("unauthorized", { status: 401 });
-  }
+  if (!cronAuthorized(request)) return new Response("unauthorized", { status: 401 });
+  // Switched off until someone has checked what it would send; set ENABLE_OUTREACH_CRON=1 in Vercel to turn it on.
+  if (process.env.ENABLE_OUTREACH_CRON !== "1") return Response.json({ skipped: "disabled" });
   const result = await processFollowUps();
   return Response.json(result);
 }
