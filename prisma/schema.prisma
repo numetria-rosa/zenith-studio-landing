@@ -2307,6 +2307,10 @@ model DemoHit {
   utmMedium   String?
   utmCampaign String?
   referrer    String?
+  /// "view" (page opened), "start" (Get started clicked) or "checkout" (a Whop checkout link clicked).
+  kind        String   @default("view")
+  /// For a checkout click: the Whop checkout id (ch_...).
+  target      String?
   createdAt   DateTime @default(now())
 
   @@index([createdAt])

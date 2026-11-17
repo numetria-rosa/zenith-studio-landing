@@ -9,7 +9,9 @@ import { db } from "@/lib/db";
    (vercel.com/docs/analytics/quickstart, script served at /_vercel/insights/script.js), and keep our own DemoHit row per
    visit, because Vercel's UTM breakdown is a paid add-on. No IP address and no user agent are stored. */
 
-const ANALYTICS_SNIPPET = `<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script><script defer src="/_vercel/insights/script.js"></script>`;
+// Second script: one beacon per click on a Get started button or a link to the Whop checkout (see demo-events.ts).
+const CLICK_TRACKER = String.raw`<script>(function(){document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('a'):null;if(!a)return;var h=a.href||'';var k=/whop\.com\/checkout/.test(h)?'checkout':(a.classList&&a.classList.contains('js-start')?'start':'');if(!k)return;try{navigator.sendBeacon('/api/demo-event',new Blob([JSON.stringify({kind:k,path:location.pathname,search:location.search,href:h})],{type:'application/json'}));}catch(x){}},true);})();</script>`;
+const ANALYTICS_SNIPPET = `<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script><script defer src="/_vercel/insights/script.js"></script>` + CLICK_TRACKER;
 
 /** Puts the analytics snippet at the end of <head> (or the top of the document when there is no head). */
 export function injectAnalytics(html: string): string {
