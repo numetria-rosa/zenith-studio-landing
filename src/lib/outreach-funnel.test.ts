@@ -17,6 +17,7 @@ const hits: FunnelHit[] = [
   hit({ kind: "checkout", target: "ch_1", contact: "aaaaaaa1", utmCampaign: "umrah-au" }),
   hit({ kind: "view", contact: "bbbbbbb1" }), // no campaign tag: the market comes from the agency
   hit({ kind: "view", utmCampaign: "other-campaign" }), // not an outreach market: ignored
+  hit({ kind: "view", contact: "aaaaaaa1", utmCampaign: "umrah-au-followup1" }), // a follow-up campaign still counts for its market
 ];
 
 describe("funnelByMarket", () => {
@@ -28,7 +29,7 @@ describe("funnelByMarket", () => {
     expect(uk).toMatchObject({ agencies: 2, emailed: 1, delivered: 1, replied: 1 });
   });
   it("counts the website side per market, naming agencies where the link had a code", () => {
-    expect(au).toMatchObject({ views: 2, openedAgencies: 1, engagedAgencies: 1, checkoutClicks: 1, startClicks: 0 });
+    expect(au).toMatchObject({ views: 3, openedAgencies: 1, engagedAgencies: 1, checkoutClicks: 1, startClicks: 0 });
     expect(uk).toMatchObject({ views: 1, openedAgencies: 1, engagedAgencies: 0 });
   });
   it("puts markets in a fixed order", () => {

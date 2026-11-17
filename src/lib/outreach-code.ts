@@ -11,5 +11,5 @@ export function contactCode(email: string): string {
 /** Adds ?utm_content=<code> style tagging to the demo link inside an email or WhatsApp text. */
 export function withContactCode(text: string, email: string): string {
   const code = contactCode(email);
-  return text.replace(/(utm_campaign=umrah-[a-z]+)(?![a-z]|&utm_content=)/g, `$1&utm_content=${code}`);
+  return text.replace(/(utm_campaign=umrah-[a-z0-9-]+)(?![a-z0-9-])(?!&utm_content=)/g, `$1&utm_content=${code}`);
 }

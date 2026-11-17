@@ -26,7 +26,7 @@ export type MarketRow = {
 
 /** Which market a hit belongs to: the campaign tag (umrah-uk), else the agency's own market. */
 export function hitMarket(h: FunnelHit, byCode: Map<string, FunnelContact>): string | null {
-  const m = h.utmCampaign?.match(/^umrah-([a-z]{2})$/)?.[1];
+  const m = h.utmCampaign?.match(/^umrah-([a-z]{2})(?:-|$)/)?.[1];
   if (m) return m;
   return h.contact ? (byCode.get(h.contact)?.market ?? null) : null;
 }

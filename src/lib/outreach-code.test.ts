@@ -21,4 +21,10 @@ describe("withContactCode", () => {
     expect(out).toContain(`utm_campaign=umrah-uk&utm_content=${contactCode("info@example.co.uk")} now`);
     expect(withContactCode(out, "info@example.co.uk")).toBe(out);
   });
+  it("keeps the follow-up campaign name whole and never tags twice", () => {
+    const text = "x https://www.zenith-studio.site/demo/uk/whatsapp-umrah-agent?utm_source=email&utm_medium=cold&utm_campaign=umrah-uk-followup1 y";
+    const out = withContactCode(text, "info@example.co.uk");
+    expect(out).toContain(`utm_campaign=umrah-uk-followup1&utm_content=${contactCode("info@example.co.uk")} y`);
+    expect(withContactCode(out, "info@example.co.uk")).toBe(out);
+  });
 });

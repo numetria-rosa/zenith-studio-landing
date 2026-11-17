@@ -80,9 +80,10 @@ describe("click tracker script", () => {
     t.click({ match: "#playBtn" });
     t.click({ match: "#playBtn" });
     t.click({ match: "[data-sim]", data: "2" });
+    t.click({ match: "[data-s]", data: "4" });
     t.click({ match: "[data-view]", data: "leads" });
     t.click({ match: "details.faq" });
-    expect(t.sent.map((e) => e.target)).toEqual(["play", "sim:2", "view:leads", "faq"]);
+    expect(t.sent.map((e) => e.target)).toEqual(["play", "sim:2", "sim:4", "view:leads", "faq"]);
   });
   it("reports scroll depth as it grows, and time on the page", () => {
     const t = setup();
