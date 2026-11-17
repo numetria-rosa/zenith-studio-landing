@@ -32,7 +32,7 @@ describe("demoHitFrom", () => {
       "https://www.zenith-studio.site/demo/uk/whatsapp-umrah-agent?utm_source=email&utm_medium=cold&utm_campaign=umrah-uk",
       h({ "user-agent": BROWSER, "x-vercel-ip-country": "GB", referer: "https://mail.google.com/" }),
     );
-    expect(hit).toEqual({ path: "/demo/uk/whatsapp-umrah-agent", country: "GB", utmSource: "email", utmMedium: "cold", utmCampaign: "umrah-uk", referrer: "mail.google.com" });
+    expect(hit).toEqual({ path: "/demo/uk/whatsapp-umrah-agent", country: "GB", utmSource: "email", utmMedium: "cold", utmCampaign: "umrah-uk", contact: null, referrer: "mail.google.com" });
   });
   it("ignores our own site as a referrer and skips bots", () => {
     expect(demoHitFrom("https://www.zenith-studio.site/services", h({ "user-agent": BROWSER, referer: "https://www.zenith-studio.site/" }))?.referrer).toBeNull();
@@ -41,27 +41,56 @@ describe("demoHitFrom", () => {
 });
 
 describe("click tracker script", () => {
-  const run = (href: string, classes: string[] = []) => {
+  type Ev = Record<string, unknown>;
+  /** Runs the served script against a tiny fake browser and returns the beacons it sent. */
+  const setup = () => {
     const html = injectAnalytics("<html><head></head></html>");
-    const code = html.match(/<script>(\(function\(\)\{document\.addEventListener[\s\S]*?)<\/script>/)![1]!;
-    const sent: { url: string; body: string }[] = [];
-    let handler: (e: unknown) => void = () => {};
-    const a = { href, classList: { contains: (c: string) => classes.includes(c) } };
-    const doc = { addEventListener: (_t: string, f: (e: unknown) => void) => (handler = f) };
-    const nav = { sendBeacon: (url: string, blob: { text: string }) => (sent.push({ url, body: blob.text }), true) };
+    const code = html.match(/<script>(\(function\(\)\{var v=[\s\S]*?)<\/script>/)![1]!;
+    const sent: Ev[] = [];
+    const listeners: Record<string, (e?: unknown) => void> = {};
+    const timers: (() => void)[] = [];
+    const win = { scrollY: 0, innerHeight: 1000, addEventListener: (t: string, f: () => void) => (listeners[t] = f) };
+    const doc = { visibilityState: "visible", documentElement: { scrollHeight: 5000 }, addEventListener: (t: string, f: (e: unknown) => void) => (listeners[t] = f) };
+    const nav = { sendBeacon: (_u: string, blob: { text: string }) => (sent.push(JSON.parse(blob.text)), true) };
     class FakeBlob { constructor(public parts: string[]) {} get text() { return this.parts.join(""); } }
-    new Function("document", "navigator", "Blob", "location", code)(doc, nav, FakeBlob, { pathname: "/demo/uk/whatsapp-umrah-agent", search: "?utm_campaign=umrah-uk" });
-    handler({ target: { closest: () => a } });
-    return sent;
+    new Function("document", "window", "navigator", "Blob", "location", "setInterval", code)(doc, win, nav, FakeBlob, { pathname: "/demo/uk/whatsapp-umrah-agent", search: "?utm_campaign=umrah-uk&utm_content=0uxipfc5" }, (f: () => void) => timers.push(f));
+    const click = (o: { href?: string; classes?: string[]; match?: string; data?: string }) => {
+      const a = o.href ? { href: o.href, classList: { contains: (c: string) => (o.classes ?? []).includes(c) } } : null;
+      const hit = (sel: string) => (o.match && sel.includes(o.match) ? { getAttribute: () => o.data ?? "" } : null);
+      listeners.click!({ target: { closest: (sel: string) => (sel === "a" ? a : hit(sel)) } });
+    };
+    return { sent, win, click, scroll: () => listeners.scroll!(), tick: (n: number) => { for (let i = 0; i < n; i++) timers.forEach((f) => f()); } };
   };
-  it("reports a click on a Whop checkout link", () => {
-    const sent = run("https://whop.com/checkout/ch_M5XKy2oxQQkoO28/");
-    expect(sent).toHaveLength(1);
-    expect(sent[0]!.url).toBe("/api/demo-event");
-    expect(JSON.parse(sent[0]!.body)).toMatchObject({ kind: "checkout", path: "/demo/uk/whatsapp-umrah-agent", href: "https://whop.com/checkout/ch_M5XKy2oxQQkoO28/" });
+
+  it("reports a click on a Whop checkout link, with the page, the link and a visit id", () => {
+    const t = setup();
+    t.click({ href: "https://whop.com/checkout/ch_M5XKy2oxQQkoO28/" });
+    expect(t.sent).toHaveLength(1);
+    expect(t.sent[0]).toMatchObject({ kind: "checkout", path: "/demo/uk/whatsapp-umrah-agent", search: "?utm_campaign=umrah-uk&utm_content=0uxipfc5", href: "https://whop.com/checkout/ch_M5XKy2oxQQkoO28/" });
+    expect(String(t.sent[0]!.visit)).toMatch(/^[a-z0-9]{4,16}$/);
   });
   it("reports a Get started button as a start, and ignores other links", () => {
-    expect(JSON.parse(run("https://x.test/#pricing", ["js-start"])[0]!.body).kind).toBe("start");
-    expect(run("https://x.test/#faq")).toHaveLength(0);
+    const t = setup();
+    t.click({ href: "https://x.test/#pricing", classes: ["js-start"] });
+    t.click({ href: "https://x.test/#faq" });
+    expect(t.sent.map((e) => e.kind)).toEqual(["start"]);
+  });
+  it("reports the chat demo, a simulator scenario, a dashboard tab and the FAQ once each", () => {
+    const t = setup();
+    t.click({ match: "#playBtn" });
+    t.click({ match: "#playBtn" });
+    t.click({ match: "[data-sim]", data: "2" });
+    t.click({ match: "[data-view]", data: "leads" });
+    t.click({ match: "details.faq" });
+    expect(t.sent.map((e) => e.target)).toEqual(["play", "sim:2", "view:leads", "faq"]);
+  });
+  it("reports scroll depth as it grows, and time on the page", () => {
+    const t = setup();
+    t.win.scrollY = 1100; // 1100 of 4000 scrollable = 27 percent
+    t.scroll();
+    t.win.scrollY = 4000;
+    t.scroll();
+    t.tick(30);
+    expect(t.sent.map((e) => e.target)).toEqual(["scroll:25", "scroll:50", "scroll:75", "scroll:90", "time:30"]);
   });
 });

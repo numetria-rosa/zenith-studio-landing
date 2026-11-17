@@ -2311,7 +2311,34 @@ model DemoHit {
   kind        String   @default("view")
   /// For a checkout click: the Whop checkout id (ch_...).
   target      String?
+  /// utm_content of the link: the outreach contact code (src/lib/outreach-code.ts), so a visit can be tied to one agency.
+  contact     String?
+  /// Random id per page load, so the engagement events of one visit can be grouped.
+  visit       String?
   createdAt   DateTime @default(now())
 
   @@index([createdAt])
+  @@index([contact])
+}
+
+/// One agency in the Umrah cold-email campaign. The code goes into that agency's demo links (utm_content) so a visit,
+/// a click or a checkout can be tied to a named agency. Filled and kept current by scripts/umrah-sync.mjs.
+model OutreachContact {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  email       String    @unique
+  name        String
+  market      String
+  hasWhatsapp Boolean   @default(false)
+  emailedAt   DateTime?
+  resendId    String?
+  /// queued | sent | delivered | bounced | complained
+  status      String    @default("queued")
+  followUps   Int       @default(0)
+  repliedAt   DateTime?
+  suppressed  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([market])
 }
