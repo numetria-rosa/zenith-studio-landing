@@ -1,5 +1,4 @@
-import { readFile } from "fs/promises";
-import path from "path";
+import { serveStaticHtml } from "@/lib/static-html";
 
 /* Serves public/demos/insurance-ai-team.html directly at the pretty
    /demo/insurance-ai-team URL, same as /demo/law-firm-ai-team/route.ts and
@@ -8,8 +7,6 @@ import path from "path";
    pricing, quarterly billing) - a complete, self-contained HTML document,
    so serving it verbatim is correct. Read fresh each request, not bundled
    at build time. */
-export async function GET() {
-  const filePath = path.join(process.cwd(), "public", "demos", "insurance-ai-team.html");
-  const html = await readFile(filePath, "utf-8");
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+export async function GET(request: Request) {
+  return serveStaticHtml(request, "demos/insurance-ai-team.html");
 }

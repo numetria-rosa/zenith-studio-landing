@@ -1,5 +1,4 @@
-import { readFile } from "fs/promises";
-import path from "path";
+import { serveStaticHtml } from "@/lib/static-html";
 
 /* /demo/<country>/<serviceName> - dynamic country segment on purpose (see
    CLAUDE.md): the WhatsApp Umrah product launches UK-only, but more
@@ -22,12 +21,10 @@ const PAGES: Record<string, Record<string, string>> = {
   fr: { "whatsapp-umrah-agent": "fr/whatsapp-umrah-agent.html" },
 };
 
-export async function GET(_request: Request, { params }: { params: Promise<{ slug: string; serviceName: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ slug: string; serviceName: string }> }) {
   const { slug: country, serviceName } = await params;
   const relativePath = PAGES[country]?.[serviceName];
   if (!relativePath) return new Response("Not found", { status: 404 });
 
-  const filePath = path.join(process.cwd(), "public", "demos", relativePath);
-  const html = await readFile(filePath, "utf-8");
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  return serveStaticHtml(request, `demos/${relativePath}`);
 }

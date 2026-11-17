@@ -1,5 +1,4 @@
-import { readFile } from "fs/promises";
-import path from "path";
+import { serveStaticHtml } from "@/lib/static-html";
 
 /* Serves public/demos/brokerage-ai-team.html directly at the pretty
    /demo/brokerage-ai-team URL used on the homepage and in outreach emails.
@@ -8,8 +7,6 @@ import path from "path";
    Whop pricing, quarterly billing), served verbatim rather
    than ported into React. Read fresh each request, not bundled at build
    time. */
-export async function GET() {
-  const filePath = path.join(process.cwd(), "public", "demos", "brokerage-ai-team.html");
-  const html = await readFile(filePath, "utf-8");
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+export async function GET(request: Request) {
+  return serveStaticHtml(request, "demos/brokerage-ai-team.html");
 }

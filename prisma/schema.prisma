@@ -2296,3 +2296,18 @@ model WaOccasion {
 
   @@index([agencyId, startDate])
 }
+
+/// One visit to a hand-made public page (the demo pages and the services catalog), recorded by src/lib/static-html.ts.
+/// No IP address and no user agent. Bots and link scanners are not recorded.
+model DemoHit {
+  id          String   @id @default(cuid())
+  path        String
+  country     String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  referrer    String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}

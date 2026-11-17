@@ -1,5 +1,4 @@
-import { readFile } from "fs/promises";
-import path from "path";
+import { serveStaticHtml } from "@/lib/static-html";
 
 /* Serves public/demos/law-firm-ai-team.html directly at the pretty
    /demo/law-firm-ai-team URL used on the homepage and in outreach emails.
@@ -9,8 +8,6 @@ import path from "path";
    so serving it verbatim is correct, not a shortcut. Read fresh each
    request (not imported at build time) so editing the html file doesn't
    require a redeploy. */
-export async function GET() {
-  const filePath = path.join(process.cwd(), "public", "demos", "law-firm-ai-team.html");
-  const html = await readFile(filePath, "utf-8");
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+export async function GET(request: Request) {
+  return serveStaticHtml(request, "demos/law-firm-ai-team.html");
 }

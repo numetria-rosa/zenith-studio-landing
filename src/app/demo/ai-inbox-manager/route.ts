@@ -1,5 +1,4 @@
-import { readFile } from "fs/promises";
-import path from "path";
+import { serveStaticHtml } from "@/lib/static-html";
 
 /* Serves public/demos/ai-inbox-manager.html directly at the pretty
    /demo/ai-inbox-manager URL, same pattern as law-firm-ai-team,
@@ -10,8 +9,6 @@ import path from "path";
    2026-09-24 so this service gets the same single all-in-one page as
    the AI team bundles. Read fresh each request so editing the html
    file doesn't require a redeploy. */
-export async function GET() {
-  const filePath = path.join(process.cwd(), "public", "demos", "ai-inbox-manager.html");
-  const html = await readFile(filePath, "utf-8");
-  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+export async function GET(request: Request) {
+  return serveStaticHtml(request, "demos/ai-inbox-manager.html");
 }
