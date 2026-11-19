@@ -59,7 +59,7 @@ export function analyzeAgencySite(pages: { url: string; html: string }[]): Agenc
   const host = pages[0] ? new URL(pages[0].url).hostname : "";
   const reasons: string[] = [];
 
-  const sellsUmrah = /\b(umrah|umra|hajj|haj)\b/i.test(body);
+  const sellsUmrah = /\b(umrah|umra|omra|hajj|haj|hadj|hadsj|hadsch)\b/i.test(body);
   const waLink = html.match(/(?:wa\.me\/|api\.whatsapp\.com\/send\/?\?(?:[^"'\s>]*&)?phone=|web\.whatsapp\.com\/send\/?\?(?:[^"'\s>]*&)?phone=)\+?(\d{8,15})/i);
   const whatsapp = waLink ? "link" : /whatsapp/i.test(html) ? "mention" : "none";
   const aiSignals = AI_VENDORS.filter(([, re]) => re.test(html)).map(([n]) => n);
