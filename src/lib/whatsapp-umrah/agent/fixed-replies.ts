@@ -64,6 +64,15 @@ export const OFF_TOPIC_REPLIES: Record<Language, string> = {
   fr: "Je peux seulement vous aider pour nos forfaits Omra et Hajj et votre réservation. Y a-t-il quelque chose concernant votre voyage pour lequel je peux vous aider ?",
 };
 
+/** The same refusal for a general travel agency (WaAgency.vertical "travel"). The French wording has not been reviewed by a native speaker. */
+export const TRAVEL_OFF_TOPIC_REPLIES: Record<Language, string> = {
+  en: "I can only help with our travel packages and your booking. Is there anything about your trip I can help with?",
+  ar: "يمكنني المساعدة فقط في باقات السفر الخاصة بنا وحجزك. هل هناك شيء يخص رحلتك يمكنني مساعدتك به؟",
+  tr: "Yalnızca seyahat paketlerimiz ve rezervasyonunuzla ilgili yardımcı olabilirim. Yolculuğunuzla ilgili yardımcı olabileceğim bir şey var mı?",
+  ur: "میں صرف ہمارے سفری پیکجز اور آپ کی بکنگ میں مدد کر سکتا ہوں۔ کیا آپ کے سفر کے بارے میں کوئی ایسی بات ہے جس میں میں مدد کر سکوں؟",
+  fr: "Je peux seulement vous aider pour nos forfaits de voyage et votre réservation. Y a-t-il quelque chose concernant votre voyage pour lequel je peux vous aider ?",
+};
+
 /** "Are you a real person or a bot?" Never claims to be human (CLAUDE.md 3.1), and offers a person. */
 export function identityReply(language: Language, agentName: string, agencyName: string): string {
   const text: Record<Language, string> = {

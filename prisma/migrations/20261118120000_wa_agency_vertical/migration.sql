@@ -1,0 +1,1 @@
+ALTER TABLE "WaAgency" ADD COLUMN "vertical" TEXT NOT NULL DEFAULT 'umrah';

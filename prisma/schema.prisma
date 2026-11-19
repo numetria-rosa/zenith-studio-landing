@@ -1712,6 +1712,9 @@ model WaAgency {
   name    String
   slug    String         @unique
   country String         @default("GB") // ISO 3166-1 alpha-2; more countries later, UK only at launch
+  // What kind of agency: "umrah" (Umrah and Hajj, the original product) or "travel" (a general travel agency). Picks the
+  // agent's system prompt and off-topic wording, see lib/whatsapp-umrah/vertical.ts. Every existing agency is "umrah".
+  vertical String         @default("umrah")
   status  WaAgencyStatus @default(ONBOARDING)
 
   // The owner's recorded acceptance of the DPA, terms, AI disclosure and Meta billing (see lib/whatsapp-umrah/terms.ts).

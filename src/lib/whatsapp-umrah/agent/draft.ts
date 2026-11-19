@@ -53,6 +53,7 @@ export type DraftInput = {
   extraContext?: string; // quotes table, occasions calendar and what we already know about the customer, as prompt text
   conversationHistory: string; // formatted recent turns, may be empty
   persona?: string; // the agency's style note, see persona.ts
+  systemPrompt?: string; // the agency's vertical rules (see vertical.ts); the Umrah prompt when absent
 };
 
 export type DraftResult = { ok: true; draft: AgentDraft; promptTokens?: number; completionTokens?: number; latencyMs: number } | { ok: false; error: string; latencyMs: number };
@@ -63,14 +64,14 @@ function apiKey(): string {
   return key;
 }
 
-async function callGroq(userPrompt: string, model: string): Promise<Response> {
+async function callGroq(userPrompt: string, model: string, systemPrompt: string): Promise<Response> {
   return fetch(`${GROQ_API_BASE}/chat/completions`, {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey()}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       model,
       messages: [
-        { role: "system", content: DRAFT_SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
       temperature: 0.3,
@@ -84,7 +85,8 @@ export async function draftReply(input: DraftInput, model = DRAFT_MODEL): Promis
   const startedAt = Date.now();
 
   try {
-    let res = await callGroq(userPrompt, model);
+    const systemPrompt = input.systemPrompt ?? DRAFT_SYSTEM_PROMPT;
+    let res = await callGroq(userPrompt, model, systemPrompt);
     // A rate limit here is a real, expected condition on a normal (not
     // enterprise) Groq account under real traffic, not just a test
     // artifact - one retry after Groq's own suggested wait, then give up
@@ -93,7 +95,7 @@ export async function draftReply(input: DraftInput, model = DRAFT_MODEL): Promis
       const body = await res.clone().json().catch(() => null);
       const waitMs = Math.min(Number(body?.error?.message?.match(/try again in ([\d.]+)s/)?.[1] ?? 2) * 1000, 8000);
       await new Promise((resolve) => setTimeout(resolve, waitMs));
-      res = await callGroq(userPrompt, model);
+      res = await callGroq(userPrompt, model, systemPrompt);
     }
     if (!res.ok) return { ok: false, error: `${res.status} ${await res.text()}`, latencyMs: Date.now() - startedAt };
     const body = (await res.json()) as { choices?: { message?: { content?: string } }[]; usage?: { prompt_tokens?: number; completion_tokens?: number } };

@@ -68,7 +68,7 @@ export async function escalateDraft(input: DraftInput, previousFailures: GuardFa
         // call, so repeat calls within 5 minutes read it at a tenth of the input price. Minimum cacheable size is 512 tokens on
         // Haiku 5.5 and 4,096 on Haiku 4.5 (ours is about 2,600, so on 4.5 this is silently a no-op), per
         // platform.claude.com/docs/en/build-with-claude/prompt-caching, read 2026-11-09.
-        system: [{ type: "text", text: DRAFT_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
+        system: [{ type: "text", text: input.systemPrompt ?? DRAFT_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
         tools: [AGENT_DRAFT_TOOL],
         tool_choice: { type: "tool", name: "agent_draft" },
         messages: [{ role: "user", content: userPrompt }],

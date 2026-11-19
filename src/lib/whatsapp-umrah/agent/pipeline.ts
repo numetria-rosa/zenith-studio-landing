@@ -1,4 +1,4 @@
-import { DRAFT_SYSTEM_PROMPT_VERSION } from "../../../../prompts/whatsapp-umrah/draft-system-v9";
+import { loadVertical, offTopicRepliesFor, systemPromptFor } from "../vertical";
 import { loadKbChunks, type RetrievedChunk } from "../kb/retrieve";
 import { loadOccasions, occasionsPrompt } from "../occasions";
 import { loadQuotes } from "../kb/quotes";
@@ -7,7 +7,7 @@ import { containsSensitiveData, isIdentityQuestion, isOptOutMessage } from "./pr
 import { plainHandoffReason, TECHNICAL_PROBLEM_REASON } from "./reasons";
 import { guessLanguage } from "./language";
 import { applyPersona, LANGUAGE_NAMES, loadPersona, personaPrompt, replyLanguageAllowed, type Persona } from "./persona";
-import { HOLDING_FOLLOW_UPS, HOLDING_MESSAGES, identityReply, OFF_TOPIC_REPLIES, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
+import { HOLDING_FOLLOW_UPS, HOLDING_MESSAGES, identityReply, SENSITIVE_DATA_REPLIES } from "./fixed-replies";
 import { draftReply, type DraftResult } from "./draft";
 import { escalateDraft } from "./escalate";
 import { runGuards } from "./guards";
@@ -37,13 +37,13 @@ function estimateCostCents(model: string, inputTokens?: number, outputTokens?: n
   return Math.round(usd * 100 * 100) / 100; // cents, 2 decimal places - these calls cost fractions of a cent
 }
 
-function toPromptRunRecord(stage: "DRAFT" | "ESCALATION", model: string, result: DraftResult, guardsTriggered: string[]): PromptRunRecord {
+function toPromptRunRecord(stage: "DRAFT" | "ESCALATION", model: string, result: DraftResult, guardsTriggered: string[], promptVersion: string): PromptRunRecord {
   const inputTokens = result.ok ? result.promptTokens : undefined;
   const outputTokens = result.ok ? result.completionTokens : undefined;
   return {
     stage,
     model,
-    promptVersion: DRAFT_SYSTEM_PROMPT_VERSION,
+    promptVersion,
     inputTokens,
     outputTokens,
     latencyMs: result.latencyMs,
@@ -117,7 +117,9 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   const request = quoteRequest({ message: input.customerMessage, knownPackage: input.knownFields?.packagePreference, knownTravellers: input.knownFields?.travelers }, quotes.packages);
   const quoteLine = request ? `QUOTE FOR THIS CUSTOMER (worked out in code: when you state a total, deposit or balance for them, use exactly these figures): ${request.sentence}` : "";
   const extraContext = [quotes.text, quoteLine, occasionsPrompt(await loadOccasions(input.agencyId)), known].filter(Boolean).join("\n\n");
-  const draftInput = { customerMessage: input.customerMessage, kbContext, extraContext, conversationHistory: input.conversationHistory ?? "", persona: personaPrompt(persona) };
+  const vertical = await loadVertical(input.agencyId);
+  const prompt = systemPromptFor(vertical);
+  const draftInput = { customerMessage: input.customerMessage, kbContext, extraContext, conversationHistory: input.conversationHistory ?? "", persona: personaPrompt(persona), systemPrompt: prompt.text };
   const promptRuns: PromptRunRecord[] = [];
 
   let drafter: "groq" | "claude" = input.firstDrafter ?? "groq";
@@ -127,33 +129,33 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
   // about 40 of our messages). A customer must never get a "technical problem" because of that: Claude drafts instead.
   // Both failing is the only case that hands off. The failed Groq call is still logged, for the owner's stats and ours.
   if (!first.ok && drafter === "groq") {
-    promptRuns.push(toPromptRunRecord("DRAFT", drafterModel, first, ["draft_error"]));
+    promptRuns.push(toPromptRunRecord("DRAFT", drafterModel, first, ["draft_error"], prompt.version));
     console.error("[whatsapp-umrah pipeline] Groq draft failed, drafting with Claude instead:", first.error);
     drafterModel = CLAUDE_MODEL();
     first = await escalateDraft(draftInput, []);
     drafter = "claude";
   }
   if (!first.ok) {
-    promptRuns.push(toPromptRunRecord("DRAFT", drafterModel, first, ["draft_error"]));
+    promptRuns.push(toPromptRunRecord("DRAFT", drafterModel, first, ["draft_error"], prompt.version));
     console.error("[whatsapp-umrah pipeline] draft failed:", first.error); // the detail is for us; the owner gets a plain reason
     return handoffResult(TECHNICAL_PROBLEM_REASON, fallbackLanguage, ["draft_error"], null, promptRuns);
   }
   const firstFailures = runGuards(first.draft, kbContext, input.customerMessage, extraContext, quotes.perPerson, quotes.packages);
-  promptRuns.push(toPromptRunRecord("DRAFT", drafterModel, first, guardNames(firstFailures)));
+  promptRuns.push(toPromptRunRecord("DRAFT", drafterModel, first, guardNames(firstFailures), prompt.version));
   // A language the agency has switched off goes to a person (no retry: a second draft would be in the same language).
   if (!replyLanguageAllowed(first.draft.language, persona)) return languageOffResult(first.draft, persona, promptRuns);
   // Two kinds of message are answered by fixed text, not by what the model wrote: "are you a bot?" (never claim to
   // be human) and anything off-topic (a polite refusal, because Meta bans open-ended chat). Neither hands off.
   const lang = first.draft.language;
   if (first.draft.intent === "identity_question") return fixedReplyResult(identityReply(lang, persona.agentName, persona.agencyName), lang, "identity_question", "identity_question", persona, promptRuns);
-  if (first.draft.intent === "off_topic") return fixedReplyResult(OFF_TOPIC_REPLIES[lang], lang, "off_topic", "off_topic", persona, promptRuns);
+  if (first.draft.intent === "off_topic") return fixedReplyResult(offTopicRepliesFor(vertical)[lang], lang, "off_topic", "off_topic", persona, promptRuns);
   if (firstFailures.length === 0) {
     return replyResult(first.draft, `${drafter}:${drafterModel}`, [], promptRuns, persona, await resolveSources(input.agencyId, first.draft.kbIdsUsed));
   }
 
   const escalated = await escalateDraft(draftInput, firstFailures);
   if (!escalated.ok) {
-    promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(firstFailures)));
+    promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(firstFailures), prompt.version));
     // Groq's draft itself still carries real lead info even though it
     // failed a guard (e.g. a booking request that correctly hands off but
     // still stated the customer's budget/dates) - see leads.ts on why
@@ -162,7 +164,7 @@ export async function runAgentPipeline(input: PipelineInput): Promise<PipelineRe
     return handoffResult(plainHandoffReason(first.draft, firstFailures), first.draft.language, guardNames(firstFailures), withKnown(first.draft, input.knownFields), promptRuns);
   }
   const secondFailures = runGuards(escalated.draft, kbContext, input.customerMessage, extraContext, quotes.perPerson, quotes.packages);
-  promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures)));
+  promptRuns.push(toPromptRunRecord("ESCALATION", CLAUDE_MODEL(), escalated, guardNames(secondFailures), prompt.version));
   if (secondFailures.length === 0) {
     return replyResult(escalated.draft, "claude:" + CLAUDE_MODEL(), guardNames(firstFailures), promptRuns, persona, await resolveSources(input.agencyId, escalated.draft.kbIdsUsed));
   }
