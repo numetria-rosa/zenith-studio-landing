@@ -3,7 +3,7 @@
 // accepts mail. Drops agencies already in queue.json, sent-log.json or suppress.json. Reads public pages only, sends
 // nothing. ATOL is required with --uk (UK agencies) and not for other countries.
 //
-// Usage: node --experimental-strip-types scripts/check-umrah-sites.mjs <urls.txt> <outName> [--uk]
+// Usage: node --experimental-strip-types scripts/check-umrah-sites.mjs <urls.txt> <outName> [--uk] [--general]
 //   The scratchpad folder is read for queue.json, sent-log.json and suppress.json (override with SCRATCH=<dir>).
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { promises as dns } from "node:dns";
@@ -14,6 +14,9 @@ const UA = "Mozilla/5.0 (compatible; ZenithStudioLeadCheck/1.0; +https://zenith-
 const SCRATCH = (process.env.SCRATCH ?? "D:/claude-tmp/claude/d1642bcfe405282b/405c237e-2a3d-4c1c-be20-11af98a9515a/scratchpad").replace(/\\/g, "/").replace(/\/?$/, "/");
 const [urlsFile, outName] = process.argv.slice(2);
 const uk = process.argv.includes("--uk");
+// --general: for general travel agencies, so no Umrah, WhatsApp or ATOL requirement. Only a chatbot, a missing or dead email,
+// an agency already queued or sent, or the do-not-email list drops one. The WhatsApp state is kept on each row for sorting.
+const general = process.argv.includes("--general");
 if (!urlsFile || !outName) {
   console.error("Usage: check-umrah-sites.mjs <urls.txt> <outName> [--uk]");
   process.exit(1);
@@ -58,16 +61,16 @@ for (const site of sites) {
   const email = c.emails[0] ?? "";
   const host = new URL(home.url).hostname.replace(/^www\./, "");
   const why = [];
-  if (!c.sellsUmrah) why.push("no Umrah/Hajj mention");
-  if (c.whatsapp === "none") why.push("no WhatsApp");
+  if (!general && !c.sellsUmrah) why.push("no Umrah/Hajj mention");
+  if (!general && c.whatsapp === "none") why.push("no WhatsApp");
   if (c.aiSignals.length) why.push("has AI/chatbot: " + c.aiSignals.join(", "));
-  if (uk && !c.atol) why.push("no ATOL");
+  if (uk && !general && !c.atol) why.push("no ATOL");
   if (!email) why.push("no email");
   else if (known.has(email.toLowerCase())) why.push("already in the queue or sent");
   else if (suppress.has(email.toLowerCase()) || suppress.has(domain(email).toLowerCase())) why.push("on the do-not-email list");
   else if (!(await acceptsMail(email))) why.push("email domain does not accept mail");
   if (why.length) dropped.push(`${host}: ${why.join("; ")}`);
-  else out.push({ name: c.title || host, email, otherEmails: c.emails.slice(1).join("; "), website: new URL(home.url).origin, whatsappNumber: c.whatsappNumber, whatsapp: c.whatsapp, liveChat: c.liveChat.join("; "), atol: c.atol, score: c.score });
+  else out.push({ name: c.title || host, email, otherEmails: c.emails.slice(1).join("; "), website: new URL(home.url).origin, whatsappNumber: c.whatsappNumber, whatsapp: c.whatsapp, sellsUmrah: c.sellsUmrah, liveChat: c.liveChat.join("; "), atol: c.atol, score: c.score });
 }
 writeFileSync(`leads/${outName}.json`, JSON.stringify({ generatedAt: new Date().toISOString(), checked: sites.length, kept: out, dropped }, null, 2));
 console.log(`checked ${sites.length}, kept ${out.length}`);
